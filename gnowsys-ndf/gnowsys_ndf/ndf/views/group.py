@@ -215,9 +215,9 @@ def create_group(request,group_id):
     colg.group_type = request.POST.get('group_type', "")        
     colg.edit_policy = request.POST.get('edit_policy', "")
     colg.subscription_policy = request.POST.get('subscription', "")
-    colg.visibility_policy = request.POST.get('existance', "")
-    colg.disclosure_policy = request.POST.get('member', "")
-    colg.encryption_policy = request.POST.get('encryption', "")
+    colg.visibility_policy = request.POST.get('existance', 'ANNOUNCED')
+    colg.disclosure_policy = request.POST.get('member', 'DISCLOSED_TO_MEM')
+    colg.encryption_policy = request.POST.get('encryption', 'NOT_ENCRYPTED')
     colg.agency_type=request.POST.get('agency_type',"")
     colg.save()
     
@@ -369,16 +369,12 @@ def group_dashboard(request,group_id=None):
     grpid=groupobj['_id']
     pass
 
-  if groupobj.status == u"DRAFT":
-    groupobj, ver = get_page(request, groupobj)
-
   # Call to get_neighbourhood() is required for setting-up property_order_list
   groupobj.get_neighbourhood(groupobj.member_of)
 
   property_order_list = []
   if groupobj.has_key("group_of"):
     if groupobj['group_of']:
-      # print "\n ", groupobj['group_of'][0], "\n"
       college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
 
       if college:

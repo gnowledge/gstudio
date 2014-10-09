@@ -32,7 +32,7 @@ collection_tr = db[Triple.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
-app=collection.Node.one({'name':u'Browse Topic','_type':'GSystemType'})
+app=collection.Node.one({'name':u'Topics','_type':'GSystemType'})
 #######################################################################################################################################
 list_trans_coll = []
 coll_set_dict={}
@@ -52,7 +52,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     else :
         pass
     if app_id is None:
-        app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'Browse Topic'})
+        app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'Topics'})
         if app_ins:
             app_id = str(app_ins._id)
 
@@ -82,7 +82,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
         shelves = []
     # End of user shelf
 
-    appName = "browse topic"
+    appName = "topics"
     title = appName
     nodes_dict = []
     themes_list_items = ""
@@ -93,7 +93,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     unfold_tree = request.GET.get('unfold','')
     unfold = "false"
 
-    br_topic_GST = collection.Node.find_one({'_type':'GSystemType', 'name': 'Browse Topic'})
+    topics_GST = collection.Node.find_one({'_type':'GSystemType', 'name': 'Topics'})
     
     if unfold_tree:
         unfold = unfold_tree
@@ -112,7 +112,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                 nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
 
     # to display the tree hierarchy of themes items inside particular theme(Here app_id defines the Theme id)
-    elif ObjectId(app_id) != br_topic_GST._id:
+    elif ObjectId(app_id) != topics_GST._id:
         themes_hierarchy = True
         themes_cards = ""
         Theme_obj = collection.Node.one({'_id': ObjectId(app_id)})
@@ -120,7 +120,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
             node = Theme_obj
 
     else:
-        # This will show Themes as a card view on landing page of browse topic
+        # This will show Themes as a card view on landing page of Topics
         themes_cards = True
         if request.user.username:
             nodes_dict = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})

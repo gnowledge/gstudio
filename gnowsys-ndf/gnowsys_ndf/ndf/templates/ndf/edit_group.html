@@ -4,6 +4,11 @@
 
 {% block title %} {{node.name}} - edit {% endblock %}
 
+{% block meta_content %}  
+<h3 class="subheader">{% trans "Group Editor" %}</h3>
+{% endblock %}
+
+
 {% get_user_object node.created_by as user_obj %}
 
 {% block body_content %} 

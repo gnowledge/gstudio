@@ -31,7 +31,7 @@
 
 
 {% block meta_content %}
- <h2>{% trans "Modules" %}</h2>
+ <h2 class="subheader">{% trans "Modules" %}</h2>
 {% endblock %}
 
 
@@ -64,6 +64,7 @@
 
 {% endif %}
 
+{% group_type_info groupid request.user as grouptype %}
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
@@ -72,40 +73,42 @@
   {% for node in module_coll %}
   {% get_version_of_module node.pk as version %}
   <li class="card">
-    <div class="course">
+        {% if grouptype == "Moderated" %}
+          {% if node.status == "DRAFT" %}
+            <div class="draft course">
+          {% elif node.status == "PUBLISHED" %}
+            <div class="published course">
+          {% endif %}
+        {% else %}
+          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} course'>
+        {% endif %}
 
-      <header>
-        <div class="label-list">
-          {% for tag in node.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-          {% endfor %}
+        <a href="{% url 'module_detail' group_name_tag node %}">
+        <div class="row">
+          <div class="small-10 columns">                             
+              <b>
+                {{ node.name }}<font color = "red"><b>Ver.</b>{{version}}</font>
+              </b>
+          </div>
         </div>
 
-        <div class="th"><img src="/static/ndf/scss/themes/metastudio/logo.svg"></div>
+        <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
 
-        <h4>{{ node.name|truncatechars:20 }} <font color = "red"><b>Ver.</b>{{version}}</font></h4>
+        <footer>
+          <div class="age">
+            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            <br/>
+            by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </div>
+          <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
+        </footer>
+        </a>
 
-        <div>
-          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-          <br/>
-          by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-          </small>
+        <div class="label-list small-12 columns">
+        {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
+        {% endfor %}
         </div>
-      </header>
-
-      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-
-      <a class="small button expand" href="{% url 'module_detail' group_name_tag node %}">Detail</a> 
-
-      {% get_user_object node.created_by as user_obj %}
-      {% ifequal user_obj.username user.username %}
-      <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete</a>
-      {% endifequal %}
-      
-      <footer class="row">
-        <div class="small-7 columns"><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</div>
-        <div class="small-5 columns"><div class="right"><strong>{{course.version_dict|length}}</strong> Edit{{course.version_dict|pluralize}}</div></div>
-      </footer>
 
     </div>
   </li>  

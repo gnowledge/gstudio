@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load pagination_tags %}
+{% load ndf_tags %}
 <br/>
 <div>
   <!-- Title only row -->
@@ -36,7 +37,20 @@
           <input type="hidden" class="node_id" value="{{key}}" name="{{value.name}}" />
           <!-- <input type="hidden" class="node_id" value="{{key}}" name="{{value}}" /> -->
           <div class="row">
-            <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' groupid key %}), url(/static/ndf/images/doc.png); ">
+            <div class="small-1 columns resource-type-image" 
+            style="background-image: url({% if 'image' in value.mime_type %}
+                                            {% url 'getFileThumbnail' groupid key %}
+                                         {% elif 'video' in value.mime_type and 'Pandora_video' in value.member_of_names_list %} 
+                                            {% get_source_id key as source_id %}
+                                            'http://wetube.gnowledge.org/{{source_id}}/icon128.jpg'
+                                         {% elif 'video' not in value.mime_type %}
+                                            /static/ndf/images/doc.png
+                                         {% endif %}
+                                        ); ">
+              {% if 'video' in value.mime_type and value.member_of_names_list|join:', ' != "Pandora_video" %}
+                <video width="45px;" src="{% url 'getFileThumbnail' groupid key %}"/>                  
+              {% endif %}
+
             </div>
 
             <div class="small-11 columns">
@@ -216,7 +230,20 @@
       <li class="bullet-item" value="{{value.pk}}" > 
         <input type="hidden" class="node_id {{widget_for}}_values" value="{{value.pk}}" name="{{value.name}}" />
         <div class="row">
-          <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' groupid value.pk %}), url(/static/ndf/images/doc.png); ">
+          <div class="small-1 columns resource-type-image" 
+          style="background-image: url({% if 'image' in value.mime_type %}
+                                            {% url 'getFileThumbnail' groupid value.pk %}
+                                         {% elif 'video' in value.mime_type and 'Pandora_video' in value.member_of_names_list %} 
+                                            {% get_source_id value.pk as source_id %}
+                                            'http://wetube.gnowledge.org/{{source_id}}/icon128.jpg'
+                                         {% elif 'video' not in value.mime_type %}
+                                            /static/ndf/images/doc.png
+                                         {% endif %}
+                                        ); ">
+              {% if 'video' in value.mime_type and value.member_of_names_list|join:', ' != "Pandora_video" %}
+                <video width="40px;" src="{% url 'getFileThumbnail' groupid value.pk %}"/>                  
+              {% endif %}
+
           </div>
 
           <div class="small-11 columns">

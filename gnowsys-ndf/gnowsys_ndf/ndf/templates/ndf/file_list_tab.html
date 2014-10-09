@@ -1,0 +1,109 @@
+{% load i18n %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+
+    {% if searching and resource_type.count > 0 %}
+    <div class="row">
+      <div class="small-12 columns end">
+      	<p>{% trans "Search Results:" %} <span class="label success round">Found {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
+      </div>
+    </div>
+    
+    {% elif searching and resource_type.count == 0 %}
+    <div class="row">
+      <div class="small-12 columns">
+        <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{resource_type.count|pluralize}} matched your search criteria!!!</span></p>
+      </div>  
+    </div>  
+    
+    {% endif %}
+
+
+    <!-- Card -->
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Existing card list-->
+      {% autopaginate resource_type 23 %}
+
+      {% for each_res in resource_type %}      
+      {% get_grid_fs_object each_res as grid_fs_obj %}
+
+      <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if each_res.status == "DRAFT" %}
+            <div class="draft">
+          {% elif each_res.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if each_res.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
+
+        {% if "Pandora_video" in each.member_of_names_list %}
+          <a href="{% url detail_urlname group_name_tag each_res %}?vid_id={{src_id}}">
+        {% else %}
+          <a href="{% url detail_urlname group_name_tag each_res %}">
+        {% endif %}
+
+          <div class="row">
+            <div class="small-8 column">
+              <b>
+                {{ each_res.name }} {% if each_res.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+              </b>
+            </div>
+            <div class="small-4 column">
+              {% if "image" in each_res.mime_type %}
+                <img src="{% url 'getImageThumbnail' group_id each_res.pk %}"/>
+              {% elif "audio" in each_res.mime_type %}
+                <span class="fi-music" style="font-size:40px"></span>
+               {% elif "Pandora_video" in each_res.member_of_names_list and "video" in each_res.mime_type %}
+                {% get_source_id each_res.pk as source_id %}
+                <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
+              {% elif "video" in each_res.mime_type and each_res.member_of_names_list|join:', ' != "Pandora_video" %}
+                <video width="100px;" src="{% url 'getFileThumbnail' group_id each_res.pk %}"/>                  
+              {% else %}
+                <span class="fi-page-filled" style="font-size:40px"></span>
+              {% endif %}
+            </div>
+          </div>
+            
+            <span style="font-size:12px;">{{ each_res.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span></br>
+            
+            <footer>
+              <div class="small-6 columns">{{each_res.mime_type|truncatechars:15}}</div>
+              <div class="small-6 columns"><div class="right"><strong>{{each_res.file_size.size}}</strong> {{each_res.file_size.unit}}</div></div>
+            </footer>
+            </a>
+
+            <div class="label-list small-12 columns">
+              {% for tag in each_res.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>{% endfor %}
+            </div>
+
+    
+        </div>
+      </li>
+        <!-- end new -->      
+
+      {% empty %}
+        {% if not searching %}
+          <div class="row">
+            <div class="small-12 columns">
+        
+              {% if res_type_name == "collection" %}
+                <h5>{% trans "This group doesn't have any collections." %}</h5>
+              {% else %}
+                <h5> {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %} </h5>
+              {% endif %}
+
+            </div>
+          </div>
+        {% endif %}
+          
+      {% endfor %}
+      
+    </ul>
+    <!-- #{#% include 'ndf/pagination.html' with urlname="data_review_page" first_arg=group_name_tag second_arg="" third_arg="" %} -->
+    {% paginate %}

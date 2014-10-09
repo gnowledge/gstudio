@@ -42,6 +42,23 @@ coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
 
+def check_delete(main):
+  try:
+    def check(*args, **kwargs):
+      relns=""
+      node_id=kwargs['node_id']
+      ins_objectid  = ObjectId()
+      if ins_objectid.is_valid(node_id) :
+        node=collection.Node.one({'_id':ObjectId(node_id)})
+        relns=node.get_possible_relations(node.member_of)
+        attrbts=node.get_possible_attributes(node.member_of)
+        return main(*args, **kwargs)
+      else:
+        print "Not a valid id"
+    return check 
+  except Exception as e:
+    print "Error in check_delete "+str(e)
+
 def get_all_resources_for_group(group_id):
   if ins_objectid.is_valid(group_id):
     obj_resources=coln.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'File'}]},{'group_set':{'$all':[ObjectId(group_id)]}},{'member_of':{'$nin':[grp_st._id]}}]})
@@ -55,20 +72,23 @@ def get_all_gapps():
 
 #checks forum notification turn off for an author object
 def forum_notification_status(group_id,user_id):
-  grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
-  auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
-  at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
-  list_at_pref=[]
-  if at_user_pref:
-    poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
-    if poss_attrs:
-      if poss_attrs.has_key('user_preference_off'):
-        list_at_pref=poss_attrs['user_preference_off']['object_value']
-      if grp_obj in list_at_pref:
-        return False
-      else:
-        return True
-
+  try:
+    grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
+    auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
+    at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
+    list_at_pref=[]
+    if at_user_pref:
+      poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
+      if poss_attrs:
+        if poss_attrs.has_key('user_preference_off'):
+          list_at_pref=poss_attrs['user_preference_off']['object_value']
+        if grp_obj in list_at_pref:
+          return False
+        else:
+          return True
+    return True
+  except Exception as e:
+    print "Exception in forum notification status check "+str(e)
 def get_forum_repl_type(forrep_id):
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
@@ -176,7 +196,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
       elif checked == "Pandora Video":
         gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
-        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
+        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).limit(50)
 
       elif checked == "Theme":
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
@@ -344,6 +364,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
+  altnames = request.POST.get('altnames', '')
+  featured = request.POST.get('featured', '')
+  status = request.POST.get('status', '')
 
   if map_geojson_data:
     map_geojson_data = map_geojson_data + ","
@@ -387,6 +410,16 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: name"
       is_changed = True
   
+  if altnames:
+    if node.altnames != altnames:
+      node.altnames = altnames
+      is_changed = True
+
+  if (featured == True) or (featured == False) :
+    if node.featured != featured:
+      node.featured = featured
+      is_changed = True
+
   if sub_theme_name:
     if node.name != sub_theme_name:
       node.name = sub_theme_name
@@ -588,6 +621,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     if usrid not in node.contributors:
       node.contributors.append(usrid)
+
+  if status:
+    if node.status != status:
+      node.status = status
+      is_changed = True
 
   # print "\n Reached here ...\n\n"
   return is_changed
@@ -814,16 +852,26 @@ def get_node_metadata_fields(request, node, node_type):
       print "field_value: ",atname," : ",field_value,"\n"
 """
 
-def get_node_metadata(request,node,node_type):
-  attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
-  if(node.has_key('_id')):
-    for atname in attribute_type_list:
-      field_value=unicode(request.POST.get(atname,""))
 
-      at=collection.Node.one({"_type":"AttributeType","name":atname})	
-      if(at!=None):
-        create_gattribute(node._id,at,field_value)		
-"""			
+def get_node_metadata(request, node, node_type):
+    attribute_type_list = ["age_range", "audience", "timerequired",
+                           "interactivitytype", "basedonurl", "educationaluse",
+                           "textcomplexity", "readinglevel", "educationalsubject",
+                           "educationallevel", "curricular", "educationalalignment",
+                           "adaptation_of", "other_contributors", "creator", "source"
+                          ]
+
+    if(node.has_key('_id')):
+
+        for atname in attribute_type_list:
+
+            field_value = unicode(request.POST.get(atname, ""))
+            at = collection.Node.one({"_type": "AttributeType", "name": atname})	
+
+            if(at is not None):
+                create_gattribute(node._id, at, field_value)
+
+"""
 def create_AttributeType(name, data_type, system_name, user_id):
 
 	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})

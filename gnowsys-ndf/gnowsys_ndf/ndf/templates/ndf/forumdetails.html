@@ -62,7 +62,7 @@
       {% user_access_policy groupid request.user as user_access %}
 
       {% if user_access == "allow" %}
-      <a class="button expand" href="{% url 'create_thread' groupid forum %}">
+      <a class="button expand" href="{% url 'create_thread' groupid forum.pk %}">
        {% blocktrans %} Create &nbsp;Thread {% endblocktrans %}
       </a>
       {% endif %}
@@ -89,10 +89,25 @@
 
     <h2>{% trans "Forum:" %} 
     <a title="{{forum.name}}" href="#">
-     <a href="/{{groupid}}/forum/show/{{forum}}">
+     <a href="/{{groupid}}/forum/{{forum}}">
         {{forum.name}}</a></h2>
     </a>
+    {% get_edit_url forum.pk as edit_url %}
+   
+    {% if user.is_superuser or forum.created_by == user.id %}
+ <a href="{% url edit_url group_name_tag forum.pk %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
+    {% endif %}
   
+<ul id="edit-options" data-dropdown-content class="f-dropdown">
+            <li>
+
+            {% if forum.created_by == request.user.id %}
+      <a class="tiny alert button" href="{% url 'forum_delete' group_name_tag forum %}">{% trans "Delete" %}</a>
+      {% endif %}
+
+            </li>
+
+</ul>
     <div class="row forum-summary">
       <div class="small-2 columns">
         <a class="user"></a>

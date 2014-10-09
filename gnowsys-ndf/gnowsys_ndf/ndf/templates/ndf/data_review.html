@@ -172,11 +172,11 @@
 			<!-- Attribution -->
 			<td class="view">{{ resource.creator }}</td>
 			<td class="view">{{ resource.other_contributors }}</td>
-			<td class="view">{{ resource.licence }}</td>
+			<td class="view">{{ resource.license }}</td>
 			<td class="view">{{ resource.source }}</td>
 			<td class="view">{{ resource.basedonurl }}</td>
 			<td class="view">{{ resource.translation_of }}</td>
-			<td class="view right-border">{{ resource.adaption_of }}</td>
+			<td class="view right-border">{{ resource.adaptation_of }}</td>
 
 			<!-- LRMI -->
 			<td class="view">{{ resource.educationaluse }}</td>
@@ -192,12 +192,12 @@
 			<td class="view">{{ resource.audience }}</td>
 			<td class="view">
 				{% for each_teaches in resource.teaches %}
-					{{ each_teaches.name }}
+					{{ each_teaches.name }}{% if not forloop.last %}, {% endif %}
 				{% endfor %}
 			</td>
 			<td class="view"><!-- prior_node processing -->
 				{% for index_key, each_node in resource.prior_node_dict.items %}
-					{{ each_node.name }}
+					{{ each_node.name }}{% if not forloop.last %}, {% endif %}
 				{% endfor %}
 			</td>
 			<td class="view">{{ resource.featured }}</td>
@@ -220,7 +220,7 @@
 					Edit
 				</div>
 				<div class="row" style="display:none;" data-id="save-cancel-div-{{resource.pk}}">
-					<span class="small-push-1 small-4 columns button success tiny" data-id="save-btn-{{resource.pk}}">
+					<span class="small-push-1 small-4 columns button success tiny" onclick="saveResource('{{resource.pk}}')" data-id="save-btn-{{resource.pk}}">
 						Save
 					</span>
 					<span class="small-pull-1 small-4 columns button alert tiny" data-id="cancel-btn-{{resource.pk}}" onclick="CancelEditResRow('{{resource.pk}}')">
@@ -254,15 +254,17 @@
 			</td>
 
 			<!-- Attribution -->
-			<td class="hide-el" data-field="created_by"><input type="text" value="{{ resource.creator }}" /></td>
-			<td class="hide-el" data-field="contributors"><input type="text" value="{{ resource.other_contributors }}" /></td>
-			<td class="hide-el" data-field="license"><input type="text" value="{{ resource.licence }}" /></td>
+			<td class="hide-el" data-field="creator"><input type="text" value="{{ resource.creator }}" /></td>
+			<td class="hide-el" data-field="other_contributors"><input type="text" value="{{ resource.other_contributors }}" /></td>
+			<td class="hide-el" data-field="license"><input type="text" value="{{ resource.license }}" /></td>
 			<td class="hide-el" data-field="source"><input type="text" value="{{ resource.source }}" /></td>
-			<td class="hide-el" data-field="basenodeurl"><input type="text" value="{{ resource.basedonurl }}" /></td>
+			<td class="hide-el" data-field="basedonurl"><input type="text" value="{{ resource.basedonurl }}" /></td>
 			<td class="hide-el" data-field="translation_of">
-				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+				<!-- <input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/> -->
 			</td>
-			<td class="hide-el right-border" data-field="adaptation_of" ><input type="text" value="{{ resource.adaption_of }}" /></td>
+			<td class="hide-el right-border" data-field="adaptation_of" >
+				<input type="text" value="{{ resource.adaptation_of }}" />
+			</td>
 
 			<!-- LRMI -->
 			<!-- <td class="view">{{ resource.educationaluse }}</td> -->
@@ -328,7 +330,7 @@
 				<input type="button" data-reveal-id="teaches-overlay" class="button tiny expand" value="Edit in drawer"/>
 			</td>
 			<td class="hide-el" data-field="prior_node">
-				<input type="button" data-reveal-id="prior-node-overlay" class="button tiny expand" value="Edit in drawer"/>
+				<input type="button" data-reveal-id="prior_node-overlay" class="button tiny expand" value="Edit in drawer"/>
 			</td>
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
@@ -353,7 +355,7 @@
 			<!-- Advance -->
 			<td class="hide-el" data-field="readinglevel"></td>
 			<td class="hide-el" data-field="timerequired">
-				<input type="text" class="time-required" value=""/>
+				<input type="text" class="time-required" value="{{resource.timerequired}}"/>
 			</td>
 			<td class="hide-el" data-field="textcomplexity" class="right-border">
 				<select name="textcomplexity">
@@ -379,13 +381,13 @@
 <a class="close-reveal-modal">&#215;</a>
 </div>
 
-<div id="teaches-overlay" class="reveal-modal" data-reveal>
+<div id="teaches-overlay" data-right-drawer-list="" class="reveal-modal" data-reveal>
 	teaches
 	<div id="teaches_drawer"></div>
 	<a class="close-reveal-modal">&#215;</a>
 </div>
 
-<div id="prior-node-overlay" class="reveal-modal" data-reveal>
+<div id="prior_node-overlay" data-right-drawer-list="" class="reveal-modal" data-reveal>
 	prior node
 	<div id="prior_node_drawer"></div>
 	<a class="close-reveal-modal">&#215;</a>
@@ -397,7 +399,7 @@
 <!-- Pagination -->
 {% block data_review_pagination %}
 
-	{% include 'ndf/pagination.html' %}
+	{% include 'ndf/pagination.html' with urlname="data_review_page" first_arg=group_name_tag second_arg="" third_arg="" %}
 
 	<!-- Datetimepicker  -->
 	<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
@@ -458,11 +460,14 @@
 		}
 
 		$("tr#view-row-" + oid).removeClass("show-view-border");
+		$("tr#view-row-" + oid).css("opacity", 1);
+
 		$("tr#edit-row-" + oid).removeClass("show-edit-border");
 
 		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
 		setCurrEditRowToNone();
 	}
+
 
 
 	// action on edit click:
@@ -493,6 +498,7 @@
 
 		$resEditRow.addClass("show-edit-border");
 		$("tr#view-row-" + oid).addClass("show-view-border");
+		$("tr#view-row-" + oid).css("opacity", 0.25);
 
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
 
@@ -501,8 +507,8 @@
 
 	}
 
-	// action on cancel button click
-	function CancelEditResRow(oid)
+
+	function getEditSummary(oid, msg, action)
 	{
 
 		// fetching resource object VIEW row
@@ -516,6 +522,8 @@
 		// to show details on confirm popup
 		var tempEditedFields = "";
 
+		nodeObj = new Object()
+
 		// processing each element of row
 		for (var i = 1; i < resEditRowArr.length; i++)
 		{
@@ -524,55 +532,201 @@
 			{
 				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
 				{
-					if((resViewRowArr[4+i].textContent.trim() != 'None') && (resViewRowArr[4+i].textContent.trim() != resEditRowArr[i].firstElementChild.value.trim()))
+					var tempEditFieldVal = resEditRowArr[i].firstElementChild.value.trim(),
+						tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
+
+					if(tempViewFieldVal != tempEditFieldVal)
 					{
 						tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n(" 
-						+ resViewRowArr[4+i].textContent.trim() + ")\nChanged to:\n(" 
-						+ resEditRowArr[i].firstElementChild.value.trim() + ")\n\n";
+						+ tempViewFieldVal + ")\nChanged to:\n(" 
+						+ tempEditFieldVal + ")\n\n";
 					}
+
+					// adding the key value pair in nodeObj
+					nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempEditFieldVal;
 				}
 				else if((resEditRowArr[i].firstElementChild.type == "button"))
 				{
-					// check if it had 'data-content-org' attribute
+					// 'content-org' field
 					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
 					{
-						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value.trim())
+						var tempContentOrg = document.getElementById("orgitdown_data_reveal_editor").value.trim();
+
+						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
 						{
 							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
 						}
+
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempContentOrg;
+					}
+					// 'prior_node' field and 'teaches' relation edit checking
+					else if((resEditRowArr[i].getAttribute("data-field") == "teaches") || (resEditRowArr[i].getAttribute("data-field") == "prior_node"))
+					{
+						// calling following to fill values in hidden _list/s
+						getDrawerVals();
+
+						var tempPrevDrawerFields = $("#"+ resEditRowArr[i].getAttribute("data-field") +"-overlay").attr("data-right-drawer-list");
+						var tempCurrDrawerFields = $("#" + resEditRowArr[i].getAttribute("data-field") + "_list").val();
+
+						if(tempPrevDrawerFields != tempCurrDrawerFields)
+						{
+							// console.log(resEditRowArr[i].getAttribute("data-field") + tempPrevDrawerFields);
+							// console.log(resEditRowArr[i].getAttribute("data-field") + tempCurrDrawerFields);
+							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n Element's in right drawer are changed.\n\n"
+						}
+
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempCurrDrawerFields;
 					}
 				}
-			}
 
+			}
 		};
 
 		isFieldEdited = (tempEditedFields.length > 0) ? true: false;
 
-
 		if(isFieldEdited)
 		{
-			var cancelConfirm = "false"
+			var saveCancelConfirm = "false"
 			
-			cancelConfirm = window.confirm("Please Note that following fields are changed:\n\n" + tempEditedFields + "\n\nAre you sure that you don't want to save these edited fields ?\nIf yes click - 'OK' or else click 'cancel'.");
+			saveCancelConfirm = window.confirm("Please Note that following fields are changed:\n\n" + tempEditedFields + msg);
 			
-			if(cancelConfirm)
+			if(saveCancelConfirm)
 			{
+				if(action == "save")
+				{
+					return [true, nodeObj];
+				}
 				changeSaveCancelToEdit(oid, resEditRowArr);
 			}	
 		}
 		else
 		{
+			if(action == "save")
+			{
+				alert("No field is edited or changed to save !")
+				return [false, nodeObj];
+			}
+
 			changeSaveCancelToEdit(oid, resEditRowArr)
+		}
+
+	}
+
+
+	// function for setting the values in the view of data row.
+	function setViewByEditData(oid)
+	{
+		// fetching resource object VIEW row
+		var $resViewRow = $("tr#view-row-" + oid),
+			resViewRowArr = $resViewRow.children();
+
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid);
+			resEditRowArr = $resEditRow.children();
+
+		// processing each element of row
+		for (var i = 1; i < resEditRowArr.length; i++)
+		{
+			// checking if the values in textboxes are changed
+			if(resEditRowArr[i].firstElementChild)
+			{
+				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
+				{
+					var tempEditFieldVal = resEditRowArr[i].firstElementChild.value.trim(),
+						tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
+
+					if(tempViewFieldVal != tempEditFieldVal)
+					{
+						resViewRowArr[4+i].textContent = resEditRowArr[i].firstElementChild.value.trim();						
+					}
+				}
+				else if((resEditRowArr[i].firstElementChild.type == "button"))
+				{
+					var tempEditField = resEditRowArr[i].getAttribute("data-field");
+
+					// 'content-org' field
+					if(tempEditField == "content_org")
+					{
+						var tempContentOrg = document.getElementById("orgitdown_data_reveal_editor").value.trim();
+
+						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
+						{
+							resViewRowArr[4+i].title = tempContentOrg;
+							resViewRowArr[4+i].textContent = tempContentOrg.substr(0, 60) + "..."
+						}
+
+					}
+					// 'prior_node' field and 'teaches' relation edit checking
+					else if((tempEditField == "teaches") || (tempEditField == "prior_node"))
+					{
+						var tempPrevDrawerFields = $("#"+ tempEditField +"-overlay").attr("data-right-drawer-list");
+						var tempCurrDrawerFields = $("#" + tempEditField + "_list").val();
+
+						if(tempPrevDrawerFields != tempCurrDrawerFields)
+						{
+							var tempArr = [];
+							$("#"+ tempEditField +"_drawer2").find(".node_id").each(function(){tempArr.push(this.getAttribute("name"))});
+
+							resViewRowArr[4+i].textContent = tempArr.toString()	;
+						}
+					}
+				}
+
+			}
 		}
 	}
 
 
-	function populateTeachesPriorNode(oid, field, app="")
+
+	function saveResource(oid)
+	{
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid);
+			resEditRowArr = $resEditRow.children();
+
+		var msg = "To save above changes click on - 'OK'."
+
+		// to show details on confirm popup; getEditSummary returns: [bool, nodeObject]
+		var nodeData = getEditSummary(oid, msg, "save");
+
+		if(nodeData[0])
+		{
+			// console.log(JSON.stringify(nodeData[1]))
+			$.ajax({
+
+				type: "POST",
+				url: "{% url 'data_review_save' groupid %}",
+				data:{
+					node_oid: oid,
+					node_details: JSON.stringify(nodeData[1]),
+					csrfmiddlewaretoken: '{{ csrf_token }}'
+				},
+				success: function(data){
+					alert("Resource is successfully saved." + data);
+					setViewByEditData(oid);
+					changeSaveCancelToEdit(oid, resEditRowArr)
+				}
+			})
+		}
+
+	}
+
+
+	// action on cancel button click
+	function CancelEditResRow(oid)
+	{
+		var msg="\n\nAre you sure that you don't want to save these edited fields ?\nIf yes click - 'OK' or else click 'cancel'."
+
+		// to show details on confirm popup and show edit button
+		getEditSummary(oid, msg, "cancel");
+	}
+
+
+	function populateTeachesPriorNode(oid, field)
 	{
 
-		// $("#save-node").css("display", "none");
-		// $('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
-// editdrawerwidget tag
+		var app = "";
+		
 		$.ajax({
 			type: "POST",
 			url: "{% url 'drawer_widget' groupid %}",
@@ -593,25 +747,59 @@
 				{
 					$("#prior_node_drawer").html(data);	
 				}
-				// $("#save-node").css("display", "block");
+			
+				getDrawerVals();
+				$("#teaches-overlay").attr("data-right-drawer-list", $("#teaches_list").val());
+				$("#prior_node-overlay").attr("data-right-drawer-list", $("#prior_node_list").val());
+
 			}
 		});
-
 	}
     
 
-	// $('.time-required').timepicker();
+	// set inputbox to timepicker
 	$('.time-required').timepicker({
 		timeOnlyTitle: 'Choose Time Required',
 		minDate: new Date(2050, 1, 1)
 	});
 
-	// // opening the orgit down editor and setting the value in textarea
-	// function openOrgEditor(oid)
-	// {
 
-	// 	// $('#content_org_overlay').foundation('reveal', 'open');
-	// }
+	function getDrawerVals()
+	{
+                      
+      	var pn_arr = [],
+			cn_arr = [],
+			md_arr = [], //for adding module
+			tch_arr = [],  // for teaches
+			assess_arr = []; // for assesses		
+
+ 		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+				pn_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
+
+			// if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+			// 	cn_arr.push($(this).val());
+			// }
+
+			// if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
+  	// 			md_arr.push($(this).val());
+  	// 		}
+			// if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				// assess_arr.push($(this).val());
+			// }
+		});
+
+		$("#prior_node_list").val(pn_arr);
+		$("#teaches_list").val(tch_arr);
+		// $("#collection_list").val(cn_arr) ;
+		// $("#module_list").val(md_arr);
+		// $("#assesses_list").val(assess_arr);
+
+	}
 
 // </script>
 {% endblock %}
