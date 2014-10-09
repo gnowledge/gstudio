@@ -226,30 +226,45 @@ def results_search(request, group_id):
 					of public access policy in case insensitive regex match. If no user is specified, then it searches for GSystems created
 					by any user
 				"""
-				for GSType in all_GSystemTypes:					# Search in all GSystem types
-                                        
-					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
-                                        #print "group id",group_id
-					if user_reqd != -1:				# 
-						exact_match = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"created_by":user_reqd},{"group_set":ObjectId(group_id)},{"access_policy":"PUBLIC"},{"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+                                 
+									# Search in all GSystem types
+				all_list=[]
+                                for i in all_GSystemTypes:
+					  print i._id	
+					  all_list.append(i._id)	
+				print "all list",all_list        
+				# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
+                                #print "group id",group_id
+				
+				if user_reqd != -1:				# 
+						exact_match = col.Node.find({'$and':[
+									   {"member_of":{'$in':all_list}},	    	
+									   {"created_by":user_reqd},
+									   {"group_set":ObjectId(group_id)},
+									   {"access_policy":"PUBLIC"},
+									   {"name":{"$regex":search_str_user, "$options":"i"}}]},
+					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 
-					else:
-						exact_match = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"access_policy":"PUBLIC"},{"group_set":ObjectId(group_id)},{"name":{"$regex":search_str_user,"$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+				else:
+						exact_match = col.Node.find({'$and':[
+									    {"member_of":{'$in':all_list}},		
+									    {"access_policy":"PUBLIC"},
+									    {"group_set":ObjectId(group_id)},
+									    {"name":{"$regex":search_str_user,"$options":"i"}}]},
+					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
                                                 
-                                        # SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
-                                        #exact_match.rewind()
-                                        
-					exact_match = list(exact_match)				
-					
-					"""
-					For each matching GSystem, see if the GSystem has already been added to the list of ids and add if not added.
-					result is added only if belongs to the list of public groups
-					"""
-                                	for j in exact_match:
+                                # SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
+                                #exact_match.rewind()
+                                
+				exact_match = list(exact_match)				
+				"""
+				For each matching GSystem, see if the GSystem has already been added to the list of ids and add if not added.
+				result is added only if belongs to the list of public groups
+				"""
+				for j in exact_match:
                                                
-                                                j.name=(j.name).replace('"',"'")
-                                                
-						if j._id not in all_ids:
+                                        j.name=(j.name).replace('"',"'")
+                                        if j._id not in all_ids:
 							grps = j.group_set
 							#for gr in public_groups:
 							#	if gr in grps:
@@ -258,58 +273,78 @@ def results_search(request, group_id):
                                                         all_ids.append(j['_id'])
                                                         
 
-					# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY
-					search_results_ex['name'] = sort_names_by_similarity(search_results_ex['name'], search_str_user)
-					
-					# split stemmed match
-					split_stem_match = []					# will hold all the split stem match results
-					len_stemmed = len(search_str_stemmed)	
-					c = 0									# GEN. COUNTER 
-
-					while c < len_stemmed:	
+				# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY
+				search_results_ex['name'] = sort_names_by_similarity(search_results_ex['name'], search_str_user)
+				# split stemmed match
+				split_stem_match = []					# will hold all the split stem match results
+				len_stemmed = len(search_str_stemmed)	
+				c = 0							# GEN. COUNTER 
+				
+				while c < len_stemmed:	
 						word = search_str_stemmed[c]
-						if user_reqd != -1:					# user_reqd = -1  =>  search all users, else user_reqd = pk of user
-							temp = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"created_by":user_reqd},{"group_set":ObjectId(group_id)},{"access_policy":"PUBLIC"},{"name":{"$regex":word, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-						else:								# search all users in created by 
-							temp = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"access_policy":"PUBLIC"},{"group_set":ObjectId(group_id)},{"name":{"$regex":word, "$options":"i"}}]},
-
-                                                                             {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						if user_reqd != -1:	# user_reqd = -1  =>  search all users, else user_reqd = pk of user
+							temp = col.Node.find({'$and':[
+									   {"member_of":{'$in':all_list}},	    	 										   {"created_by":user_reqd},
+									   {"group_set":ObjectId(group_id)},{"access_policy":"PUBLIC"},	
+									   {"name":{"$regex":word, "$options":"i"}}]},
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						else:					# search all users in created by 
+							print "comming here"
+							temp = col.Node.find({'$and':[
+									    {"member_of":{'$in':all_list}},	    	
+									    {"access_policy":"PUBLIC"},
+									    {"group_set":ObjectId(group_id)},
+									    {"name":{"$regex":word, "$options":"i"}},
+				{"member_of":{'$in':[list(all_GSystemTypes)]}}						   ]},
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
                                                         
 						split_stem_match.append(temp)
 						c += 1
 					
-					"""
-					For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
-					Result is added only if belongs to the list of public groups and has public access policy
-					"""
-					for j in split_stem_match:
+				"""
+				For each matching GSystem, see if the GSystem has already been returned in search results and add if not 					already added.
+				Result is added only if belongs to the list of public groups and has public access policy
+				"""
+				for j in split_stem_match:
 						c = 0
-						for k in j:
-                                                        k.name=(k.name).replace('"',"'")
-							if (k._id not in all_ids):				# check if this GSYstem has already been added to search results
-								#grps = k.group_set					# group_set holds all the groups that the current GSystem is published in
-								#for gr in public_groups:			# for each public group
-								#	if gr in grps:					# check that the GSystem should belong to at least one public group
-                                                                k = addType(k)				# adds the link and datetime to the 
-                                                                search_results_st['name'].append(k)
-                                                                all_ids.append(k['_id'])	# append to the list of all ids of GSYstems in the results
-                                                                c += 1
-                                                               
+                                                for k in j:
 
-					# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY			
-					search_results_st['name'] = sort_names_by_similarity(search_results_st['name'], search_str_user)
+                                                        k.name=(k.name).replace('"',"'")
+							if (k._id not in all_ids):# check if this GSYstem has already been added to search 											    results
+								#grps = k.group_set		
+								# group_set holds all the groups that the current GSystem is published in
+								#for gr in public_groups:			
+								# for each public group
+								#	if gr in grps:			
+								# check that the GSystem should belong to at least one public group
+                                                                k = addType(k) # adds the link and datetime to the 
+                                                                search_results_st['name'].append(k)
+                                                                all_ids.append(k['_id'])#append to the list of all ids of GSYstems in the 												results
+                                                                c += 1
+                                # SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY			
+				search_results_st['name'] = sort_names_by_similarity(search_results_st['name'], search_str_user)
+				
 
 			if (search_by_tags == True):						# IF True, THEN SEARCH BY TAGS
 				all_GSystemTypes.rewind()						# Rewinds the cursor to first result
 				count = 0
-				print "f",search_str_user,user_reqd
-				for GSType in all_GSystemTypes:
-					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
-					if user_reqd != -1:				
-						exact_match = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"created_by":user_reqd},{"group_set":ObjectId(group_id)},{"access_policy":"PUBLIC"},{"tags":search_str_user}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-					else:
-						exact_match = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"access_policy":"PUBLIC"},{"group_set":ObjectId(group_id)},{"tags":search_str_user}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-					for j in exact_match:
+				
+				# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
+				if user_reqd != -1:				
+						exact_match = col.Node.find({'$and':[
+									   {"member_of":{'$in':all_list}},	    		
+									   {"created_by":user_reqd},
+									   {"group_set":ObjectId(group_id)},
+									   {"access_policy":"PUBLIC"},
+									   {"tags":search_str_user}]},
+					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+				else:
+						exact_match = col.Node.find({'$and':[
+										{"member_of":{'$in':all_list}},	    											{"access_policy":"PUBLIC"},
+									   {"group_set":ObjectId(group_id)},
+									   {"tags":search_str_user}]},
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+				for j in exact_match:
 						j.name=(j.name).replace('"',"'")
 						if j._id not in all_ids:
 							
@@ -321,29 +356,38 @@ def results_search(request, group_id):
                                                         all_ids.append(j['_id'])
                                                         
 
-					search_results_ex['tags'] = sort_names_by_similarity(search_results_ex['tags'], search_str_user)
+				search_results_ex['tags'] = sort_names_by_similarity(search_results_ex['tags'], search_str_user)
 
-					# split stemmed match
-					split_stem_match = []
-					c = 0						# GEN. COUNTER 
-					len_stemmed = len(search_str_stemmed)
+				# split stemmed match
+				split_stem_match = []
+				c = 0						# GEN. COUNTER 
+				len_stemmed = len(search_str_stemmed)
 
-					while c < len_stemmed:
+				while c < len_stemmed:
 						word = search_str_stemmed[c]
 						if user_reqd != -1:					
-							temp = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"tags":word},{"created_by":user_reqd},{"group_set":ObjectId(group_id)},{"access_policy":"PUBLIC"}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
+							temp = col.Node.find({'$and':[{"tags":word},
+									     {"member_of":{'$in':all_list}},	    		 	
+									     {"created_by":user_reqd},
+									     {"group_set":ObjectId(group_id)},
+									     {"access_policy":"PUBLIC"}]}, 
+							{"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
 						else:
-							temp = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"tags":word},{"access_policy":"PUBLIC"},{"group_set":ObjectId(group_id)}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+							temp = col.Node.find({'$and':[{"tags":word},
+									    {"member_of":{'$in':all_list}},	    			
+									    {"access_policy":"PUBLIC"},
+									    {"group_set":ObjectId(group_id)}]},
+						        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 						
 						split_stem_match.append(temp)
 						c += 1
-					search_results_st['tags'] = sort_names_by_similarity(search_results_st['tags'], search_str_user)
+				search_results_st['tags'] = sort_names_by_similarity(search_results_st['tags'], search_str_user)
 					
-					"""
-					For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
-					Result is added only if belongs to the list of public groups and has public access policy
-					"""
-					for j in split_stem_match:
+				"""
+				For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
+				Result is added only if belongs to the list of public groups and has public access policy
+				"""
+				for j in split_stem_match:
 						c = 0
 						for k in j:
                                                         k.name=(k.name).replace('"',"'")
@@ -363,7 +407,7 @@ def results_search(request, group_id):
 			"""
 			#print "stemmed query: ", search_str_stemmed			
 			content_docs = []
-			content_match_pairs = []					# STORES A DICTIONARY OF MATCHING DOCUMENTS AND NO_OF_WORDS THAT MATCH SEARCH QUERY
+			content_match_pairs = []	# STORES A DICTIONARY OF MATCHING DOCUMENTS AND NO_OF_WORDS THAT MATCH SEARCH QUERY
 			sorted_content_match_pairs = []				# STORES THE ABOVE DICTIONARY IN A SORTED MANNER
 
 			if (search_by_contents == True):
@@ -372,24 +416,24 @@ def results_search(request, group_id):
 				# ABOVE LINE DOES NOT RETURN ALL GSYSTEMS. IT RETURNS OBJECTS OF "ToReduceDocs" class. 
 
 				for singleDoc in all_Reduced_documents:
-					if singleDoc.orignal_id not in all_ids:			# IF THE GSYSTEM HAS NOT ALREADY BEEN ADDED TO SEARCH RESULTS
+					if singleDoc.orignal_id not in all_ids:	# IF THE GSYSTEM HAS NOT ALREADY BEEN ADDED TO SEARCH RESULTS
 						content = singleDoc.content
-						match_count = 0								# KEEPS A CUMMULATIVE COUNT OF MATCHES OF ALL SEARCH QUERY WORDS IN THE CURRENT GSYSTEM CONTENTS
+						match_count = 0	# KEEPS A CUMMULATIVE COUNT OF MATCHES OF ALL SEARCH QUERY WORDS IN THE 									CURRENT GSYSTEM CONTENTS
 						for word in search_str_stemmed:
-							if word in content.keys():				# IF THE WORD EXISTS IN THE CURRENT DOCUMENT
-								match_count += content[word]		# ADD IT TO THE MATCHES COUNT
+							if word in content.keys():# IF THE WORD EXISTS IN THE CURRENT DOCUMENT
+								match_count += content[word]	# ADD IT TO THE MATCHES COUNT
 
 						if match_count > 0:
 							all_ids.append(singleDoc.orignal_id)
 							content_match_pairs.append({'doc_id':singleDoc.orignal_id, 'matches':match_count})	
 		
-				match_counts = []									# KEEPS A SORTED LIST OF COUNT OF MATCHES IN RESULT DOCUMENTS
+				match_counts = []			# KEEPS A SORTED LIST OF COUNT OF MATCHES IN RESULT DOCUMENTS
 				for pair in content_match_pairs:	
 					c = 0
-					while ((c < len(match_counts)) and (pair['matches'] < match_counts[c])):	# INSERT IN SORTED ORDER BY INCREASING ORDER
+					while ((c < len(match_counts)) and (pair['matches'] < match_counts[c])):# INSERT IN SORTED ORDER BY 															INCREASING ORDER
 						c += 1
 					match_counts.insert(c, pair['matches'])
-					sorted_content_match_pairs.insert(c, pair)		# SORTED INSERT (INCREASING ORDER)
+					sorted_content_match_pairs.insert(c, pair)	# SORTED INSERT (INCREASING ORDER)
 
 				for docId in sorted_content_match_pairs:
 					doc = col.Node.find_one({"_id":docId['doc_id'], "access_policy":"PUBLIC"}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})

@@ -81,10 +81,23 @@
 	</div>
 </div>
 
-  <div class = "row">
-    <h2>{% trans "My Groups:" %}</h2>
+
+<div class= "row">
+	<div class= "small-6 columns">
+        <h2>{% trans "My Groups:" %}</h2>
+	</div>
+</div>  
+<div class= "column">	 
+  	<div class= "small-12 rows" align="right">
+		{% if user_groups %}
+   		<a  href="/{{group_id}}/group">	{% trans "Show more..." %} </a>
+		{% endif %}
+	</div>
+</div>   
+  
+    
     <hr></hr>
-    <div class ="small-11 rows" id="trial">
+  
       
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
@@ -92,8 +105,9 @@
     
   {% get_version_of_module node.pk as version %}
   <li class="card">
-    <div class="groups">
+    <div class="group">
       <header>
+	<a  href="/{{node.pk}}">
         <div class="label-list">
           {% for tag in node.tags|slice:":3" %}
           <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
@@ -114,13 +128,13 @@
 
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-      <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a> 
+     </a> 
 
       
       
     </div>
-  </li>  
-
+  </li>
+   	
   {% empty %}
     {% if not searching %}
     <div class="row">
@@ -134,7 +148,7 @@
 
 </ul>
 
-    </div>
+    
 
 <!--<h2> Notifications:</h2> -->
 <hr></hr>
@@ -149,9 +163,24 @@
       </ul>
     </div>
   </div>
+  {% if user_task %}
   
-  <h2>{% trans "My Tasks:" %}</h2>
-  <hr></hr>
+  
+
+<div class= "row">
+	<div class= "small-6 columns">
+        <h2>{% trans "My Tasks:" %}</h2>
+	</div>
+</div>  
+<div class= "column">	 
+  	<div class= "small-12 rows" align="right">
+		{% if user_task %}
+   		<a  href="/{{group_name_tag}}/task">	{% trans "Show more..." %} </a>
+		{% endif %}
+	</div>
+</div>   
+  
+	<hr></hr>
    <div id="Assigned Tasks" >
       
      	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -161,7 +190,7 @@
     
   {% get_version_of_module node.pk as version %}
   <li class="card">
-    <div class="AssignedTask">
+    <div class="course">
       <header>
         <div class="label-list">
           {% for tag in node.tags|slice:":3" %}
@@ -170,7 +199,7 @@
         </div>
           
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
+	<a  href="{% url 'task_details' group_id node.pk %}">
         <h4>{{ node.name|truncatechars:20 }}</h4>
 
         <div>
@@ -183,7 +212,7 @@
 
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-      <a class="small button expand" href="{% url 'task_details' group_id node.pk %}">{% trans "Detail" %}</a> 
+      </a> 
 
       
 
@@ -205,9 +234,22 @@
 </ul>
       
     </div>
+{% endif %}
+    
 
-    <h2>{% trans "My Activities:" %}</h2>
-    <hr></hr>
+<div class= "row">
+	<div class= "small-6 columns">
+        <h2>{% trans "My Activities:" %}</h2>
+	</div>
+</div>  
+<div class= "column">	 
+  	<div class= "small-12 rows" align="right">
+		{% if user_activity %}
+   		<a  href="/{{group_id}}/useractivity">	{% trans "Show more..." %} </a>
+		{% endif %}
+	</div>
+</div>     
+	  <hr></hr>
     <div id="Activity">
       
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -225,7 +267,11 @@
           <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
           {% endfor %}
         </div>
-          
+       {% if res_type == 'group' %}
+      <a  href="/{{node.pk}}">
+      {% elif res_type %}
+      	<a  href="{% url res_type group_id node.pk  %}"> 
+      {% endif %}   
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
 
         <h4>{{ node.name|truncatechars:20 }}</h4>
@@ -239,13 +285,10 @@
       </header>
 
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-      {% if res_type == 'group' %}
-      <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a>
-      {% elif res_type %}
-      	<a class="small button expand" href="{% url res_type group_id node.pk  %}">{% trans "Detail" %}</a> 
-      {% endif %}
+</a>      
       
     </div>
+   
   </li>  
 
   {% empty %}
