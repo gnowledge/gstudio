@@ -204,7 +204,8 @@ def uDashboard(request, group_id):
     else :
         group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
         pass
-
+    Group_name=collection.Node.find_one({"_id": ObjectId(group_id)})
+    group_name=Group_name.name
     ID = int(usrid)
     userObject = User.objects.get(pk=ID)
     usrname = userObject.username
@@ -255,10 +256,10 @@ def uDashboard(request, group_id):
     user_activity=[]
     group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}, 
                     '$or': [{'group_admin': request.user.id}, {'author_set': request.user.id}],
-                  }).sort('last_update', -1).limit(9)
+                  }).sort('last_update', -1).limit(10)
 
     for i in group_cur:
-        group_list.append(i)
+	group_list.append(i)
         
     # user_task = get_user_task(userObject)
     #user_notification = get_user_notification(userObject)
@@ -332,7 +333,8 @@ def uDashboard(request, group_id):
     return render_to_response("ndf/uDashboard.html",
                               {'username': usrname, 'user_id': ID, 'DOJ': date_of_join,
                                'group_id':group_id, 'usr': current_user,             
-                               'author':auth,
+				'group_name':group_name,                               
+				'author':auth,
                                'already_uploaded': uploaded,
                                'groupid':group_id,'prof_pic_obj': img_obj,
                                'user_groups':group_list,
