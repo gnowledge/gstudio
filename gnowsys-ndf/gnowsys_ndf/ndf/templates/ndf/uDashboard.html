@@ -88,7 +88,7 @@
 
   <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#group" id="p1">Groups </a></dd>
-    <dd ><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd>
+    {% if user_task %}<dd ><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
     <dd ><a href="#Activity" id="p3">My Activities </a></dd>			
  
   </dl>
@@ -143,7 +143,7 @@
 
   {% endfor %}
 
-{% if user_groups|length == 10 %}
+{% if dashboard_count.group > 10 %}
 	<div class="row">
       		<div class="small-12 columns" align="right">
        			<h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
@@ -223,7 +223,7 @@
 
 </ul>
 
-{% if user_task|length == 10 %}
+{% if dashboard_count.Task > 10 %}
 	<div class="row">
       		<div class="small-12 columns" align="right">
        			<h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
@@ -292,7 +292,7 @@
 
 </ul>
 
-		{% if user_activity|length == 10 %}
+		{% if dashboard_count.activity > 10 %}
 	<div class="row">
       		<div class="small-12 columns" align="right">
        			<h6> <a href="{% url 'user_activity' group_id %}"> Show More.. <a></h6>
