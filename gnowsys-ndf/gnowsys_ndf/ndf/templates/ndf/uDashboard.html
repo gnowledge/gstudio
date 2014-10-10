@@ -82,20 +82,19 @@
 	</div>
 </div>
 
-<!-- ################################################################################################################################ -->
 <!-- Task tab view  -->
 
 
   <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#group" id="p1">Groups </a></dd>
-    {% if user_task %}<dd ><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
-    <dd ><a href="#Activity" id="p3">My Activities </a></dd>			
+    {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
+    <dd><a href="#Activity" id="p3">My Activities </a></dd>			
  
   </dl>
 
   
 <div class="tabs-content">
-<div class="content" id="group">      
+<div class="content active" id="group">      
 	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
   {% for node in user_groups %}
