@@ -230,9 +230,7 @@ def results_search(request, group_id):
 									# Search in all GSystem types
 				all_list=[]
                                 for i in all_GSystemTypes:
-					  print i._id	
 					  all_list.append(i._id)	
-				print "all list",all_list        
 				# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
                                 #print "group id",group_id
 				
@@ -289,7 +287,6 @@ def results_search(request, group_id):
 									   {"name":{"$regex":word, "$options":"i"}}]},
 						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 						else:					# search all users in created by 
-							print "comming here"
 							temp = col.Node.find({'$and':[
 									    {"member_of":{'$in':all_list}},	    	
 									    {"access_policy":"PUBLIC"},
@@ -371,13 +368,13 @@ def results_search(request, group_id):
 									     {"created_by":user_reqd},
 									     {"group_set":ObjectId(group_id)},
 									     {"access_policy":"PUBLIC"}]}, 
-							{"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
 						else:
 							temp = col.Node.find({'$and':[{"tags":word},
 									    {"member_of":{'$in':all_list}},	    			
 									    {"access_policy":"PUBLIC"},
 									    {"group_set":ObjectId(group_id)}]},
-						        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 						
 						split_stem_match.append(temp)
 						c += 1
