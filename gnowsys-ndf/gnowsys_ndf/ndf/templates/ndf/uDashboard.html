@@ -67,7 +67,11 @@
 		<div class="small-9 columns" style="padding-top:30px;">
 
 			<h4><a href="#">{% trans "Welcome" %} {{username}} </a></h4>
-			{% trans "Registered on" %} : &nbsp;{{DOJ}}
+			{% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
+      {% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
+      {% trans "Pages created" %}: &nbsp;{{page_count}}<br>
+      <!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
+      {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
 		</div>
 	</div>
 	
