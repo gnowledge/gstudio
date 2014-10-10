@@ -33,8 +33,8 @@ theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_ite
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 br_topic = collection.Node.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
 
-grp = collection.Node.one({'_type': 'Group', '_id': ObjectId('53747277c1704121fe54be46')})
-# grp = collection.Node.one({'_type': 'Group', 'name': 'home'})
+#grp = collection.Node.one({'_type': 'Group', '_id': ObjectId('53747277c1704121fe54be46')})
+grp = collection.Node.one({'_type': 'Group', 'name': 'home'})
 
 if grp:
 	group_id = grp._id

@@ -273,7 +273,7 @@ else  {
 	    	<input type="file" name="UploadTask"  id="docFile" value= "" multiple/></label>
 	    <div id="contentlist" class="content">
 		<div class="">
-		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
 		</div>
 		
 	    </div>
