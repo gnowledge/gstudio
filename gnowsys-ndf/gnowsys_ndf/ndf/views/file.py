@@ -306,7 +306,7 @@ def file(request, group_id, file_id=None, page_no=1):
       # File list view
       title = GST_FILE.name
       datavisual = []
-      no_of_objs_pp = 24
+      no_of_objs_pp = 24  # no. of objects per page to be list
 
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
           files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
@@ -327,33 +327,33 @@ def file(request, group_id, file_id=None, page_no=1):
 
           file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
 
-          files_pc = [ each_file for each_file in file_pages.items ]
+          files_pc = files #[ each_file for each_file in file_pages.items ]
 
       else:
         files_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
-        files_pc = files_dict["result_paginated_cur"]
+        files_pc = files_dict["result_cur"]
         file_pages = files_dict["result_pages"]
 
       # --- for documents ---
       doc = get_query_cursor_filetype('$nin', [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
       docCollection = doc["result_cur"]
-      docs_pc = doc["result_paginated_cur"]
+      docs_pc = doc["result_cur"]
       doc_pages = doc["result_pages"]
 
       # --- for images ---
       image_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
       imageCollection = image_dict["result_cur"]
-      images_pc = image_dict["result_paginated_cur"]
+      images_pc = image_dict["result_cur"]
       image_pages = image_dict["result_pages"]
 
       # --- for videos ---
       video_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
       videoCollection = video_dict["result_cur"]
-      videos_pc = video_dict["result_paginated_cur"]
+      videos_pc = video_dict["result_cur"]
       video_pages = video_dict["result_pages"]
       
       already_uploaded = request.GET.getlist('var', "")     
@@ -424,7 +424,6 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
     Result: It gives result as dictionary. {"result_cur": "", "result_pages":"", "result_paginated_cur": ""}
     -- result_cur : It's mongoDB cursor.
     -- result_pages : It's mongokit.paginator cursor. Containing all the info for pagination.
-    -- result_paginated_cur : It's list of length no_of_objs_pp, containig objects according to asked page.
  
     '''
 
@@ -444,13 +443,10 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
                                 }).sort("last_update", -1)
 
     if result_cur:
-        result_dict["result_cur"] = result_cur
 
         result_pages = paginator.Paginator(result_cur, page_no, no_of_objs_pp)
         result_dict["result_pages"] = result_pages
-
-        result_paginated_cur = [ each_file for each_file in result_pages.items ]
-        result_dict["result_paginated_cur"] = result_paginated_cur
+        result_dict["result_cur"] = result_cur
 
     return result_dict
 
@@ -523,13 +519,11 @@ def paged_file_objs(request, group_id, filetype, page_no):
                                                      ]}).sort("last_update", -1)
                     if files:
                         result_dict = {}
-                        result_dict["result_cur"] = files
 
                         result_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
                         result_dict["result_pages"] = result_pages
-
-                        result_paginated_cur = [ each_file for each_file in result_pages.items ]
-                        result_dict["result_paginated_cur"] = result_paginated_cur
+                        result_dict["result_cur"] = files
+                        result_dict["result_paginated_cur"] = files
                 else:
                     result_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp)
             elif app == "E-Library":
@@ -596,7 +590,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         if app == "File":
             result_cur = result_dict["result_cur"]
-            result_paginated_cur = result_dict["result_paginated_cur"]
+            result_paginated_cur = result_dict["result_cur"]
             result_pages = result_dict["result_pages"]
 
         return render_to_response ("ndf/file_list_tab.html", {
