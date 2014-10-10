@@ -199,7 +199,8 @@ def uDashboard(request, group_id):
     else :
         group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
         pass
-
+    Group_name=collection.Node.find_one({"_id": ObjectId(group_id)})
+    group_name=Group_name.name
     ID = int(usrid)
     userObject = User.objects.get(pk=ID)
     usrname = userObject.username
@@ -246,18 +247,22 @@ def uDashboard(request, group_id):
 
     
     #user_group = get_user_group(userObject)
+    dashboard_count={}	
     group_list=[]
     user_activity=[]
     group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}, 
                     '$or': [{'group_admin': request.user.id}, {'author_set': request.user.id}],
-                  }).sort('last_update', -1).limit(9)
+                  }).sort('last_update', -1).limit(10)
+
+    dashboard_count.update({'group':group_cur.count()})  
+    
     GST_PAGE = collection.Node.one({'_type': "GSystemType", 'name': 'Page'})
     page_cur = collection.GSystem.find({'member_of': {'$all': [GST_PAGE._id]}, 'created_by':int(ID)})
     file_cur = collection.Node.find({'_type':  u"File", 'created_by': int(ID) })
 
-
     for i in group_cur:
         group_list.append(i)
+
     # user_task = get_user_task(userObject)
     #user_notification = get_user_notification(userObject)
     #user_activity = get_user_activity(userObject)
@@ -268,6 +273,7 @@ def uDashboard(request, group_id):
 
                                                  }).sort('last_update', -1).limit(10)
     a_user=[]
+    dashboard_count.update({'activity':activity_user.count()})
     for i in activity_user:
         if i._type != 'Batch' or i._type != 'Course' or i._type !='Module':
             a_user.append(i)
@@ -295,12 +301,15 @@ def uDashboard(request, group_id):
     
     
     user_assigned = []
+    
     attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
     attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username}).sort('last_update',-1).limit(10)
+    dashboard_count.update({'Task':attr_assignee.count()})
     for attr in attr_assignee :
-     task_node = collection.Node.find_one({'_id':attr.subject})
-     user_assigned.append(task_node) 
-    
+     task_node = collection.Node.one({'_id':attr.subject})
+     if task_node:	
+     	user_assigned.append(task_node) 
+   
                                                           
     obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
     collab_drawer = []	
@@ -328,7 +337,8 @@ def uDashboard(request, group_id):
     return render_to_response("ndf/uDashboard.html",
                               {'username': usrname, 'user_id': ID, 'DOJ': date_of_join,
                                'group_id':group_id, 'usr': current_user,             
-                               'author':auth,
+				'group_name':group_name,                               
+				'author':auth,
                                'already_uploaded': uploaded,
                                'groupid':group_id,'prof_pic_obj': img_obj,
                                'group_count':group_cur.count(),
@@ -336,7 +346,8 @@ def uDashboard(request, group_id):
                                'page_count':page_cur.count(),
                                'user_groups':group_list,
                                'user_activity':user_activity, 'user_notification':notification_list,
-                               'user_task': user_assigned
+                               'user_task': user_assigned,
+				'dashboard_count':dashboard_count
                               },
                               context_instance=RequestContext(request)
     )
@@ -383,6 +394,7 @@ def user_preferences(request,group_id,auth_id):
     except Exception as e:
         print "Exception in userpreference view "+str(e)
         return HttpResponse("Failure")
+
 def user_template_view(request,group_id):
     
     auth_group = None
@@ -430,3 +442,30 @@ def user_template_view(request,group_id):
     #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
     variable = RequestContext(request, {'TASK_inst':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
     return render_to_response(template, variable)
+
+@login_required
+def user_activity(request, group_id):
+    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
+                                                 
+                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
+
+                                                 }).sort('last_update', -1)
+    blank_list=[]
+    for each in activity_user:
+      if each.created_by == each.modified_by :
+        if each.last_update == each.created_at:
+          activity =  'created'
+        else :
+          activity =  'modified'
+      else :
+        activity =  'created'
+      if each._type == 'Group':
+        blank_list.append(each)
+      else :
+        member_of = collection.Node.find_one({"_id":each.member_of[0]})
+        blank_list.append(each)
+    template = "ndf/User_Activity.html"
+    #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
+    variable = RequestContext(request, {'user_activity':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
+    return render_to_response(template, variable)
+
