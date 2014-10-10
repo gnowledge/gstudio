@@ -74,7 +74,7 @@
     <dd class="active">
       <a href="#view-all">
         <i class="fi-eye"></i>
-        {% trans "All files" %} {% if files.count %}({{ files.count }}){% endif %}
+        {% trans "All files" %} {% if file_pages.count > 0 %}({{ file_pages.count }}){% endif %}
       </a>
     </dd>
     
@@ -82,7 +82,7 @@
     <dd>
       <a href="#view-doc">
         <i class="fi-page-filled"></i>
-        {% trans "Documents" %} {% if docCollection.count %}({{ docCollection.count }}){% endif %}
+        {% trans "Documents" %} {% if doc_pages.count > 0 %}({{ doc_pages.count }}){% endif %}
       </a>
     </dd>
 
@@ -109,7 +109,7 @@
     <!-- Image -->
     <dd>
       <a href="#view-image"><i class="fi-camera"></i>
-        {% trans "Images" %} {% if imageCollection.count %}({{ imageCollection.count }}){% endif %}
+        {% trans "Images" %} {% if image_pages.count > 0 %}({{ image_pages.count }}){% endif %}
       </a>
     </dd>
 
@@ -117,7 +117,7 @@
     {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
       <dd>
         <a href="#view-video"><i class="fi-video"></i>
-          {% trans "Videos" %}{% if videoCollection.count %}({{ videoCollection.count }}){% endif %}
+          {% trans "Videos" %} {% if video_pages.count > 0 %}({{ video_pages.count }}){% endif %}
         </a>
       </dd>
     {% endif %}
@@ -173,14 +173,14 @@
   <!-- Tab View #1 - All -->
   <div class="content row active" id="view-all">
 
-    {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" res_type_name="" %}
+    {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
 
   </div>
 
   <!-- Tab View 2 - Documents -->
   <div class="content" id="view-doc">
 
-    {% include "ndf/file_list_tab.html" with resource_type=docCollection detail_urlname="file_detail" res_type_name="" %}
+    {% include "ndf/file_list_tab.html" with resource_type=docCollection detail_urlname="file_detail" filetype="doc" res_type_name="" page_info=doc_pages %}
 
   </div>
 
@@ -189,7 +189,7 @@
   {% if interactiveCollection %}
     <div class="content" id="view-interactive">
 
-      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" res_type_name="" %}
+      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" filetype="interactives" res_type_name="" page_info=interactive_pages %}
 
     </div>
   {% endif %}
@@ -199,7 +199,7 @@
   {% if audioCollection %}
     <div class="content" id="view-audio">
 
-      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" res_type_name="" %}
+      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" filetype="audio" res_type_name="" page_info=audio_pages %}
 
     </div>
   {% endif %}
@@ -207,21 +207,21 @@
   <!-- Tab View #3 - Images -->
   <div class="content" id="view-image">
 
-    {% include "ndf/file_list_tab.html" with resource_type=imageCollection detail_urlname="image_detail" res_type_name="" %}
+    {% include "ndf/file_list_tab.html" with resource_type=imageCollection detail_urlname="image_detail" filetype="image" res_type_name="" page_info=image_pages %}
 
   </div>
 
   <!-- Tab View #4 - Videos -->
   <div class="content" id="view-video">
 
-    {% include "ndf/file_list_tab.html" with resource_type=videoCollection detail_urlname="video_detail" res_type_name="" %}
+    {% include "ndf/file_list_tab.html" with resource_type=videoCollection detail_urlname="video_detail" filetype="video" res_type_name="" page_info=video_pages %}
 
   </div>
 
   <!-- Tab View #5 - pandora Videos -->
   <div class="content" id="view-pandora-video">
 
-    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" res_type_name="" %}
+    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" filetype="pandora-video" res_type_name="" page_info="" %}
 
   </div>
   
@@ -229,7 +229,7 @@
 
     {% get_resource_collection groupid title as file_collections %}
 
-    {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" res_type_name="collection" %}
+    {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
 
   </div>
 
@@ -353,5 +353,57 @@ else{
   {% if is_video %}
     alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
   {% endif %}
+
+
+// <script type="text/javascript">
+
+// pagination ajax  
+$('ul.pagination a').click(function(e)
+{
+    e.preventDefault();
+    populateFileList(this);    
+});
+
+function populateFileList(pageAnchor)
+{
+
+    var filetype = pageAnchor.href.split("/")[5],
+        page_no = pageAnchor.text.trim(),
+        no_of_objs_pp = 24,
+        url = pageAnchor.href.substr(pageAnchor.href.search(pageAnchor.host)+pageAnchor.host.length);
+
+    aaa = pageAnchor;
+
+    var tabContainerDiv = $(pageAnchor).closest("div.content");
+    console.log(url); 
+    $.ajax({
+
+      type: 'POST',
+      url: url,
+      datatype: 'html',
+      data: {
+
+        title: "{{title}}",
+        filetype: filetype,
+        page_no: page_no,
+        no_of_objs_pp: no_of_objs_pp,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data){
+        
+        $(tabContainerDiv).html(data);
+
+        // making newly loaded html pagination <a> non clickable and bind with populateFileList()
+        $(tabContainerDiv).find("ul.pagination a").click(function(e){
+          e.preventDefault();
+          populateFileList(this);
+        });
+
+      }
+    })
+
+}
+
+// </script>
 
 {% endblock %}
