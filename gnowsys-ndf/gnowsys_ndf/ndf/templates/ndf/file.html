@@ -189,7 +189,7 @@
   {% if interactiveCollection %}
     <div class="content" id="view-interactive">
 
-      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" filetype="interactives" res_type_name="" page_info="" %}
+      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" filetype="interactives" res_type_name="" page_info=interactive_pages %}
 
     </div>
   {% endif %}
@@ -199,7 +199,7 @@
   {% if audioCollection %}
     <div class="content" id="view-audio">
 
-      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" filetype="audio" res_type_name="" page_info="" %}
+      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" filetype="audio" res_type_name="" page_info=audio_pages %}
 
     </div>
   {% endif %}
@@ -375,7 +375,7 @@ function populateFileList(pageAnchor)
     aaa = pageAnchor;
 
     var tabContainerDiv = $(pageAnchor).closest("div.content");
-    console.log(tabContainerDiv); 
+    console.log(url); 
     $.ajax({
 
       type: 'POST',
@@ -383,6 +383,7 @@ function populateFileList(pageAnchor)
       datatype: 'html',
       data: {
 
+        title: "{{title}}",
         filetype: filetype,
         page_no: page_no,
         no_of_objs_pp: no_of_objs_pp,
