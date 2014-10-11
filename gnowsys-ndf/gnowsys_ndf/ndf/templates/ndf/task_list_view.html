@@ -1,43 +1,4 @@
 
-
-
-
-
-<!--<style type="text/css"> 
-#created {
-    background-color: #ffff7f;
-}
-#New{
-background-color: #7fe8bf;
-}
-
-#Rejected{
-background-color: #ffad99;
-}
-#InProgress{
-background-color: #7fe8bf;
-}
-#Closed{
-background-color: #FFFFFF;
-}
-#Feedback{
-background-color: #b7b7b7;
-}
-#Resolved{
-background-color: #FFFFFF;
-}
-#Pending{
-background-color: #ffad99;
-}
-#Assigned{
-background-color: #a1a57f;
-}
-#completed{
-background-color: #FFFFFF;
-}
-</style>
--->
-
 {% block body_content %}
 
 
@@ -55,7 +16,7 @@ background-color: #FFFFFF;
 		<tr>
                       
 			{%for i in TASK_inst.0 %}
-			{% if i != "id"%}
+			{% if i != "id" and i != "collection"  %}
 			<th class="view" style="width:10000px">{{i}}</th>
                         
 			<input type=hidden id='{{i}}' value='{{i}}'>
@@ -71,10 +32,21 @@ background-color: #FFFFFF;
 		
 		<tr id="view-row-{{i.id}}">
 					
-	        		{% for j,v in i.items %}
-				{% if j != "id"%}
-								         
-			  <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v}} </a></td>
+	     {% for j,v in i.items %}
+	      
+				{% if j != "id" and j != "collection" %}
+					          {% if i.collection %}
+				            	    {% if j == "Status" %}
+					                   <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v}} (Group Task) </a></td>
+					                {% else %}
+					                  <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v}}  </a></td>
+						              {% endif %}
+						             <div id="myModal" class="reveal-modal" data-reveal>
+              
+                         </div>
+						        {% else %}
+				 			            <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v}} </a></td>
+					          {% endif %}
 				{% endif %}	
 			        						 
 			{% endfor %}
@@ -138,6 +110,27 @@ function updatefeild(oid)
       
       success: function(data){
         $("#example").html(data)      
+      }
+    });
+
+
+}
+
+
+
+function collection_overlay(oid)
+{
+  
+
+  $.ajax({
+      url:"{% url 'task_collection' group_name 'oid' %}".replace('oid',oid),
+
+      type: "GET",
+      
+      success: function(data){
+         $('#myModal').empty()
+         $('#myModal').append(data)
+        $('#myModal').foundation('reveal', 'open');
       }
     });
 

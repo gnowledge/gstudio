@@ -10,7 +10,9 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from mongokit import paginator			
+from mongokit import paginator
+from django.utils import simplejson
+from online_status.utils import encode_json			
 import datetime
 import json
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
@@ -220,7 +222,8 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                 		newattribute.attribute_type = attributetype_key
                 		newattribute.object_value = field_value[0]
                 		newattribute.save()
-	    if  int(len(request.POST.getlist("Assignee","")))<1:
+                		
+	    if  int(len(request.POST.getlist("Assignee","")))>1:
               if task is None:
                		Task=collection.Node.find_one({"_id":ObjectId(task_node._id)})
 			
@@ -228,7 +231,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 			Task=collection.Node.find_one({"_id":ObjectId(task)})
 			Task.collection_set.append(task_node._id)
 	      Task.save()
-		
+	      print "length of somethin",int(len(request.POST.getlist("Assignee",""))),count	
 	      if int(count) <int(len(request.POST.getlist("Assignee",""))-1):
 		create_edit_task(request, group_name, task_id,Task._id,count=count+1)
 	    if count == 0:	
@@ -330,10 +333,12 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                                   context_instance=RequestContext(request)
                               )
 
-    
+  
 @login_required    
-def task_collection(request,group_name,_id):
+def task_collection(request,group_name,task_id):
     ins_objectid  = ObjectId()
+    choice=1
+    
     task=[]
     if ins_objectid.is_valid(group_name) is False :
       group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
@@ -347,16 +352,28 @@ def task_collection(request,group_name,_id):
     else :
         pass
     collection_task=[]
-    node = collection.Node.one({'_id':ObjectId(_id)})
-    
-	
+    node = collection.Node.one({'_id':ObjectId(task_id)})
+    attr_value = {}
+    at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]	
     for each in node.collection_set:
+        attr_value = {}
     	new = collection.Node.one({'_id':ObjectId(each)})
-	collection_task.append(new)		
-    template = "ndf/card_view.html"
-    variable = RequestContext(request, {'TASK_inst': collection_task,'group_name':group_name,'groupid':group_id})
-    return render_to_response(template, variable)
-    	
+    	for attrvalue in at_list:
+		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':attrvalue})
+		attr = collection.Node.find_one({"_type":"GAttribute", "subject":new._id, "attribute_type.$id":attributetype_key._id})
+		if attr:
+			attr_value.update({attrvalue:attr.object_value})
+		else:
+			attr_value.update({attrvalue:"--"})
+	attr_value.update({'id':each})
+	attr_value.update({'Name':new.name})
+	 
+	         
+	collection_task.append(dict(attr_value))		
+    template = "ndf/task_list_view.html"
+    variable = RequestContext(request, {'TASK_inst':collection_task,'group_name':group_name, 
+                                        'group_id': group_id, 'groupid': group_id,'choice':choice,'status':'None'})
+    return render_to_response(template, variable)                                     	
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
@@ -444,6 +461,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 			attr_value.update({attrvalue:"--"})
 	 attr_value.update({'id':each._id})
 	 attr_value.update({'Name':each.name})
+	 attr_value.update({'collection':each.collection_set})	
 	 if int(choice) == int(1):
 		 task_list.append(dict(attr_value))
 	 if int(choice) == int(2):
@@ -480,7 +498,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
      
     		 
     
-
+    print "task_list",task_list    
     paged_resources = Paginator(task_list,10)
     files_list = []
     for each_resource in (paged_resources.page(each_page)).object_list:
