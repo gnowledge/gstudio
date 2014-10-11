@@ -309,25 +309,11 @@ def file(request, group_id, file_id=None, page_no=1):
       no_of_objs_pp = 24  # no. of objects per page to be list
 
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
-          files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
-                                                '_type': 'File', 'fs_file_ids':{'$ne': []}, 
-                                                'group_set': {'$all': [ObjectId(group_id)]},
-                                                '$or': [
-                                                    {'access_policy': u"PUBLIC"},
-                                                    {'$and': [
-                                                        {'access_policy': u"PRIVATE"}, 
-                                                        {'created_by': request.user.id}
-                                                    ]
-                                                 }
-                                                ]
-                                                },{'member_of': {'$all': [pandora_video_st._id]}, 
-                                                  'group_set': {'$all': [ObjectId(group_id)]}
-                                                  }
-                                           ]}).sort("last_update", -1)
 
-          file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
+        files_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_files")
 
-          files_pc = files #[ each_file for each_file in file_pages.items ]
+        file_pages = files_dict["result_pages"]
+        files_pc = files_dict["result_cur"]
 
       else:
         files_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp)
@@ -371,7 +357,13 @@ def file(request, group_id, file_id=None, page_no=1):
 
       # pandora_video_id = []
       # source_id_set=[]
-      get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'group_set': ObjectId(group_id)},{'_type':'File'}]})
+      # get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'group_set': ObjectId(group_id)},{'_type':'File'}]})
+      # pandora_pages = paginator.Paginator(get_member_set, page_no, no_of_objs_pp)
+      all_videos = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_videos")
+
+      pandora_pages = all_videos["result_pages"]
+      get_member_set = all_videos["result_cur"]
+
       #for each in get_member_set:
   
        #  pandora_video_id.append(each['_id'])
@@ -398,7 +390,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
                                  'file_pages': file_pages, 'image_pages': image_pages,
-                                 'doc_pages': doc_pages, 'video_pages': video_pages,
+                                 'doc_pages': doc_pages, 'video_pages': video_pages, "pandora_pages": pandora_pages,
                                  'files': files_pc, 'docCollection': docs_pc, 'imageCollection': images_pc,
                                  'videoCollection': videos_pc, 'pandoravideoCollection':pandoravideoCollection, 
                                  'pandoraCollection':get_member_set,'is_video':is_video,'groupid': group_id,
@@ -406,10 +398,10 @@ def file(request, group_id, file_id=None, page_no=1):
                                 }, 
                                 context_instance = RequestContext(request))
     else:
-      return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
+        return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
 
 
-def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_no, no_of_objs_pp):
+def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_no, no_of_objs_pp, tab_type=None):
     '''
     This method used to fire mongoDB query and send its result along with pagination details. This method is specially for "_type": "File" objects only.
 
@@ -427,9 +419,27 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
  
     '''
 
-    result_dict = {"result_cur": "", "result_pages":"", "result_paginated_cur": ""}
+    result_dict = {"result_cur": "", "result_pages":"", "result_paginated_cur": "", "result_count": ""}
 
-    result_cur = collection.Node.find({'member_of': {operator: member_of_list},
+    if tab_type == "all_videos" or tab_type == "all_files":
+        result_cur = collection.Node.find({'$or':[{'member_of': {'$all': member_of_list}, 
+                                                '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+                                                'group_set': {'$all': [ObjectId(group_id)]},
+                                                '$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [
+                                                        {'access_policy': u"PRIVATE"}, 
+                                                        {'created_by': userid}
+                                                    ]
+                                                 }
+                                                ]
+                                                },{'member_of': {'$all': [pandora_video_st._id]}, 
+                                                  'group_set': {'$all': [ObjectId(group_id)]},
+                                                  '_type': "File"
+                                                  }
+                                           ]}).sort("last_update", -1)
+    else:
+        result_cur = collection.Node.find({'member_of': {operator: member_of_list},
                                     '_type': 'File', 'fs_file_ids':{'$ne': []},
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$or': [
@@ -502,28 +512,8 @@ def paged_file_objs(request, group_id, filetype, page_no):
         if filetype == "all":
             if app == "File":
                 if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
-                    files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
-                                                          '_type': 'File', 'fs_file_ids':{'$ne': []}, 
-                                                          'group_set': {'$all': [ObjectId(group_id)]},
-                                                          '$or': [
-                                                              {'access_policy': u"PUBLIC"},
-                                                              {'$and': [
-                                                                  {'access_policy': u"PRIVATE"}, 
-                                                                  {'created_by': request.user.id}
-                                                              ]
-                                                           }
-                                                          ]
-                                                          },{'member_of': {'$all': [pandora_video_st._id]}, 
-                                                            'group_set': {'$all': [ObjectId(group_id)]}
-                                                            }
-                                                     ]}).sort("last_update", -1)
-                    if files:
-                        result_dict = {}
+                    result_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_files")
 
-                        result_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
-                        result_dict["result_pages"] = result_pages
-                        result_dict["result_cur"] = files
-                        result_dict["result_paginated_cur"] = files
                 else:
                     result_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp)
             elif app == "E-Library":
@@ -559,15 +549,17 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         elif filetype == "video":
             if app == "File":
-                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
+                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_videos")
+
             elif app == "E-Library":
                 vid_Collection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Videos"}).sort("last_update", -1)
                 video = []
                 for e in vid_Collection:
                     video.append(e.subject)
 
-                result_paginated_cur = collection.Node.find({'_id': {'$in': video} })    
-                result_pages = paginator.Paginator(videoCollection, page_no, no_of_objs_pp)
+                result_paginated_cur = collection.Node.find({'$or': [{'_id': {'$in': video} },
+                                    {'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'group_set': ObjectId(group_id)},{'_type':'File'}]}]})    
+                result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         elif filetype == "interactives" and app == "E-Library":
             interCollection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": {'$in': coll} ,"object_value": "Interactives"}).sort("last_update", -1)

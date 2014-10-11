@@ -6,6 +6,12 @@
 
 {% block title %} {{title}} {% endblock %}
 
+{% block style %}
+
+  .first-load { display: none; }
+
+{% endblock %}
+
 <!-- left top panel -->
 {% block meta_content %}
   <h2 class="subheader">{% trans "Gallery" %}</h2>
@@ -135,8 +141,8 @@
       <dd>
         <a href="#view-pandora-video"><i class="fi-video"></i>
           {% trans "Videos" %}
-          {% if pandoravideoCollection.count %}
-            ({{ pandoravideoCollection.count }})
+          {% if pandoraCollection.count %}
+            ({{ pandoraCollection.count }})
           {% endif %}
         </a>
       </dd>
@@ -180,17 +186,21 @@
   <!-- Tab View 2 - Documents -->
   <div class="content" id="view-doc">
 
+    <a href='{% url "paged_file_objs" group_name_tag "doc" 1 %}' class="first-load">1</a>
+    {% comment %}
     {% include "ndf/file_list_tab.html" with resource_type=docCollection detail_urlname="file_detail" filetype="doc" res_type_name="" page_info=doc_pages %}
-
+    {% endcomment %}
   </div>
 
 
   <!-- Tab View 3 - Interactives -->
   {% if interactiveCollection %}
     <div class="content" id="view-interactive">
+    <a href='{% url "paged_file_objs" group_name_tag "interactives" 1 %}' class="first-load">1</a>
 
+          {% comment %}
       {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" filetype="interactives" res_type_name="" page_info=interactive_pages %}
-
+    {% endcomment %}
     </div>
   {% endif %}
 
@@ -198,31 +208,38 @@
   <!-- Tab View 4 - Audios -->
   {% if audioCollection %}
     <div class="content" id="view-audio">
+    <a href='{% url "paged_file_objs" group_name_tag "audio" 1 %}' class="first-load">1</a>
 
+    {% comment %}
       {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" filetype="audio" res_type_name="" page_info=audio_pages %}
-
+    {% endcomment %}
     </div>
   {% endif %}
 
   <!-- Tab View #3 - Images -->
   <div class="content" id="view-image">
+    <a href='{% url "paged_file_objs" group_name_tag "image" 1 %}' class="first-load">1</a>
 
+        {% comment %}
     {% include "ndf/file_list_tab.html" with resource_type=imageCollection detail_urlname="image_detail" filetype="image" res_type_name="" page_info=image_pages %}
-
+    {% endcomment %}
   </div>
 
   <!-- Tab View #4 - Videos -->
   <div class="content" id="view-video">
+    <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
 
+    {% comment %}
     {% include "ndf/file_list_tab.html" with resource_type=videoCollection detail_urlname="video_detail" filetype="video" res_type_name="" page_info=video_pages %}
-
+    {% endcomment %}
   </div>
 
   <!-- Tab View #5 - pandora Videos -->
   <div class="content" id="view-pandora-video">
-
-    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" filetype="pandora-video" res_type_name="" page_info="" %}
-
+    <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+    {% comment %}
+    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" filetype="video" res_type_name="" page_info=pandora_pages %}
+    {% endcomment %}
   </div>
   
   <div class="content" id="view-collection">
@@ -364,9 +381,20 @@ $('ul.pagination a').click(function(e)
     populateFileList(this);    
 });
 
+
+$("dl.tabs dd").click(function(){
+  tabDivId = $(this).children("a").attr("href");
+  if((tabDivId != "#view-collection") && (tabDivId != "#view-all") && (tabDivId != "view-pandora-video"))
+     {
+     pageAnchor = $(tabDivId).children("a")[0];
+     populateFileList(pageAnchor);
+}
+      $(this).off("click");
+});
+
+
 function populateFileList(pageAnchor)
 {
-
     var filetype = pageAnchor.href.split("/")[5],
         page_no = pageAnchor.text.trim(),
         no_of_objs_pp = 24,
@@ -375,7 +403,6 @@ function populateFileList(pageAnchor)
     aaa = pageAnchor;
 
     var tabContainerDiv = $(pageAnchor).closest("div.content");
-    console.log(url); 
     $.ajax({
 
       type: 'POST',
