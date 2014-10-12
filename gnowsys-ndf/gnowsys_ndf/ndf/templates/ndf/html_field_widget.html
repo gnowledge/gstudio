@@ -1,7 +1,6 @@
 {% load ndf_tags %}
 {% load i18n %}
 
-<!-- {{field.name}} -- {{field_type}} -->
 <!-- Base fields / AttributeType fields -->
 {% if is_base_field or is_attribute_field %}
   {% if is_special_field %}
@@ -26,7 +25,7 @@
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     {% endif %}
-    <small class="error">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
     {% endif %}
 
   {% elif field.validators.0 == "tel" %}
@@ -41,7 +40,7 @@
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     {% endif %}
-    <small class="error">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
     {% endif %}
 
   {% elif field_type == "unicode" or field_type == "basestring" %}
@@ -56,7 +55,7 @@
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     {% endif %}
-    <small class="error">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
     {% endif %}
 
   {% elif field_type == "int" or field_type == "float" or field_type == "long" %}
@@ -171,7 +170,6 @@
 
 
   {% endif %}
-
 
 <!-- RelationType fields -->
 {% elif is_relation_field %}
