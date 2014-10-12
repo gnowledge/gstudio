@@ -10,6 +10,7 @@ try:
 	from bson import ObjectId
 except ImportError:  # old pymongo
 	from pymongo.objectid import ObjectId
+from mongokit import paginator
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
@@ -26,7 +27,7 @@ app = collection.GSystemType.one({'_type':'GSystemType', 'name': 'E-Library'})
 
 #######################################################################################################################################
 
-def resource_list(request,group_id,app_id=None):
+def resource_list(request, group_id, app_id=None, page_no=1):
 
 	ins_objectid  = ObjectId()
 	is_video = request.GET.get('is_video', "")
@@ -81,7 +82,8 @@ def resource_list(request,group_id,app_id=None):
 
 	file_id = GST_FILE._id
 	datavisual = []
-	 
+	no_of_objs_pp = 24
+
 	files = collection.Node.find({'$or':[{'member_of': ObjectId(file_id), 
 	                                	  '_type': 'File', 'fs_file_ids':{'$ne': []}, 
 	                                	  'group_set': ObjectId(group_id),
@@ -98,11 +100,13 @@ def resource_list(request,group_id,app_id=None):
 
 	                              }).sort("last_update", -1)
 
-
 	# All files list
 	coll = []
 	for each in files:
 		coll.append(each._id)
+
+	files.rewind()
+	file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
 
 	gattr = collection.Node.one({'_type': 'AttributeType', 'name': u'educationaluse'})
 	interCollection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": {'$in': coll} ,"object_value": "Interactives"}).sort("last_update", -1)
@@ -116,7 +120,9 @@ def resource_list(request,group_id,app_id=None):
 	for e in d_Collection:
 		doc.append(e.subject)
 
-	docCollection = collection.Node.find({'_id': {'$in': doc} })    
+	docCollection = collection.Node.find({'_id': {'$in': doc} })
+
+	doc_pages = paginator.Paginator(docCollection, page_no, no_of_objs_pp)
 	# End of fetching the documents
 
 	# For manipulating interactives
@@ -125,6 +131,7 @@ def resource_list(request,group_id,app_id=None):
 		interactive.append(e.subject)
 
 	interactiveCollection = collection.Node.find({'_id': {'$in': interactive} })    
+	interactive_pages = paginator.Paginator(interactiveCollection, page_no, no_of_objs_pp)
 	# End of fetching the interactives
 
 	# For manipulating audios
@@ -133,6 +140,7 @@ def resource_list(request,group_id,app_id=None):
 		audio.append(e.subject)
 
 	audioCollection = collection.Node.find({'_id': {'$in': audio} })    
+	audio_pages = paginator.Paginator(audioCollection, page_no, no_of_objs_pp)
 	# End of fetching the audios
 
 	# For manipulating images
@@ -141,6 +149,7 @@ def resource_list(request,group_id,app_id=None):
 		image.append(e.subject)
 
 	imageCollection = collection.Node.find({'_id': {'$in': image} })    
+	image_pages = paginator.Paginator(imageCollection, page_no, no_of_objs_pp)
 	# End of fetching the images
 
 	# For manipulating videos
@@ -149,9 +158,10 @@ def resource_list(request,group_id,app_id=None):
 		video.append(e.subject)
 
 	videoCollection = collection.Node.find({'_id': {'$in': video} })    
+	video_pages = paginator.Paginator(videoCollection, page_no, no_of_objs_pp)
 	# End of fetching the images
 	
-	files.rewind()
+	# files.rewind()
 	already_uploaded = request.GET.getlist('var', "")
 
 	get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'group_set': ObjectId(group_id)},{'_type':'File'}]})
@@ -170,7 +180,81 @@ def resource_list(request,group_id,app_id=None):
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection, 'pandoravideoCollection':pandoravideoCollection,
                                  'pandoraCollection':get_member_set,'interactiveCollection': interactiveCollection,
-                                 'audioCollection':audioCollection,
+                                 'audioCollection':audioCollection, "detail_urlname": "file_detail",
+                                 'file_pages': file_pages, 'image_pages': image_pages, 'interactive_pages': interactive_pages,
+                                 'doc_pages': doc_pages, 'video_pages': video_pages, 'audio_pages': audio_pages,
                                  'is_video':is_video,'groupid': group_id, 'group_id':group_id,"datavisual":datavisual
                                 }, 
                                 context_instance = RequestContext(request))
+
+
+def elib_paged_file_objs(request, group_id, filetype, page_no):
+
+    if request.is_ajax() and request.method == "POST":
+
+        no_of_objs_pp = 24
+
+        ins_objectid  = ObjectId()
+
+        if ins_objectid.is_valid(group_id) is False :
+            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+            if group_ins:
+                group_id = str(group_ins._id)
+            else :
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                if auth :
+                    group_id = str(auth._id)
+
+        file_ins = collection.Node.find_one({'_type':"GSystemType", "name":"File"})
+        if file_ins:
+            file_id = str(file_ins._id)
+
+        files = collection.Node.find({'$or':[{'member_of': ObjectId(file_id), 
+                                	  '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+                                	  'group_set': ObjectId(group_id),
+                                	  '$or': [{'access_policy': u"PUBLIC"},
+                                  				{'$and': [{'access_policy': u"PRIVATE"}, 
+                                      					  {'created_by': request.user.id}
+                                    					 ]
+                                  				}
+                                			]
+                                	 },
+                                	 {'member_of': ObjectId(pandora_video_st._id),
+                                	  'group_set': ObjectId(group_id)
+                                	 }]
+                                	 }).sort("last_update", -1)
+
+        coll = []
+        for each in files:
+        	coll.append(each._id)
+
+		files.rewind()
+
+        if filetype == "all":
+            if files:
+            	result_paginated_cur = files
+            	result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+
+        elif filetype == "doc":
+			d_Collection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id,"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
+
+			doc = []
+			for e in d_Collection:
+				doc.append(e.subject)
+
+			result_paginated_cur = collection.Node.find({'_id': {'$in': doc} })
+
+			result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+
+        elif filetype == "image":
+        	"lnllmn"
+        elif filetype == "video":
+        	"ljjk"
+
+        return render_to_response ("ndf/file_list_tab.html", {
+                "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
+                "resource_type": result_paginated_cur, "detail_urlname": "file_detail", 
+                "filetype": filetype, "res_type_name": "", "page_info": result_pages,
+                "pagination_url": ""
+            }, 
+            context_instance = RequestContext(request))

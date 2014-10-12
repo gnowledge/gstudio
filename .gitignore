@@ -64,7 +64,7 @@ include/
 rcs-repo/
 bower_components/
 mathjax/
-schema_files/filldb.log
+schema_files/
 *.db
 *~
 wikidata/
