@@ -449,9 +449,17 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     message="" 	
     send="This group doesn't have any files"
     #Task Completed
-    	
+    sub_task_name=[] 
     for each in TASK_inst:
-    	 attr_value={}
+	  if (each.collection_set):
+            sub_task_name.append(each.name)
+    TASK_inst.rewind()
+
+
+	
+    for each in TASK_inst:
+       attr_value={}
+       if ((each.name in sub_task_name and (not each.collection_set) == False) or each.name not in sub_task_name): 	 
 	 for attrvalue in at_list:
 		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':attrvalue})
 		attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
