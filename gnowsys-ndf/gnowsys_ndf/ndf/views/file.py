@@ -607,11 +607,29 @@ def uploadDoc(request, group_id):
                 group_id = str(auth._id)
     else :
         pass
+
+    user_access = False 
+    #If user_access is False, user is not allowed to upload file larger than 100mb
+    if request.user.is_superuser:
+      user_access = True
+
+    else:
+      group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(group_id)})
+
+      if request.user.id == group_node.created_by:#group_creator
+        user_access = True
+
+      elif request.user.id in group_node.group_admin:#group_admin
+        user_access = True
+
+      else:
+        user_access = False
+
     if request.method == "GET":
         page_url = request.GET.get("next", "")
         template = "ndf/UploadDoc.html"
     if  page_url:
-        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id})
+        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id,'user_access':user_access})
     else:
         variable = RequestContext(request, {'groupid':group_id,'group_id':group_id})
     return render_to_response(template, variable)
