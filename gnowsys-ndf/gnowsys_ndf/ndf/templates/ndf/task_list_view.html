@@ -1,10 +1,17 @@
-
-{% block body_content %}
-
+<style>
+.reveal-modal {
+    top:-1;
+    
+    
+}
+</style>
+<div id="myModal" class="reveal-modal" animation="None" data-reveal>
+    <a class="close-reveal-modal">&#215;</a>            
+</div>
 
 <br/>
 
-<div id="example">
+<div id="example" >
 
 {% if TASK_inst %}
 
@@ -41,9 +48,7 @@
 					                {% else %}
 					                  <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v}}  </a></td>
 						              {% endif %}
-						             <div id="myModal" class="reveal-modal" data-reveal>
-              
-                         </div>
+						             
 						        {% else %}
 				 			            <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v}} </a></td>
 					          {% endif %}
@@ -101,10 +106,33 @@
 
 function updatefeild(oid)
 {
-  
-  	 
+  var aurl=""
+ if ('{{choice}}'==0)
+ {
+ alert('{{task}}')
+ var task_id='{{task}}'
+  aurl = "{% url 'task_collection' group_name 'task_id' 'oid' %}".replace('oid',oid).replace('task_id',task_id)
+ 
   $.ajax({
-      url:"{% url 'filter' group_name choice status 'oid' %}".replace('oid',oid),
+      url:aurl,
+
+      type: "GET",
+      
+      success: function(data){
+        $('#myModal').empty()
+         $('#myModal').append(data)
+        $('#myModal').foundation('reveal', 'open');
+      }
+    });
+
+ 
+ 
+ }
+ else
+ {
+  aurl ="{% url 'filter' group_name choice status 'oid' %}".replace('oid',oid)
+ $.ajax({
+      url:aurl,
 
       type: "GET",
       
@@ -113,6 +141,8 @@ function updatefeild(oid)
       }
     });
 
+ }  	 
+ 
 
 }
 
@@ -123,7 +153,7 @@ function collection_overlay(oid)
   
 
   $.ajax({
-      url:"{% url 'task_collection' group_name 'oid' %}".replace('oid',oid),
+      url:"{% url 'task_collection' group_name 'oid' '1' %}".replace('oid',oid),
 
       type: "GET",
       
@@ -151,7 +181,6 @@ function editResRow(oid)
 </script>
 
 
-{% endblock %}
 
 
 

@@ -335,9 +335,9 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 
   
 @login_required    
-def task_collection(request,group_name,task_id):
+def task_collection(request,group_name,task_id=None,each_page=1):
     ins_objectid  = ObjectId()
-    choice=1
+    choice=0
     
     task=[]
     if ins_objectid.is_valid(group_name) is False :
@@ -369,10 +369,16 @@ def task_collection(request,group_name,task_id):
 	attr_value.update({'Name':new.name})
 	 
 	         
-	collection_task.append(dict(attr_value))		
+	collection_task.append(dict(attr_value))
+    paged_resources = Paginator(collection_task,10)
+    files_list = []
+    print "each_page",each_page
+    for each_resource in (paged_resources.page(each_page)).object_list:
+		files_list.append(each_resource)
+    			
     template = "ndf/task_list_view.html"
-    variable = RequestContext(request, {'TASK_inst':collection_task,'group_name':group_name, 
-                                        'group_id': group_id, 'groupid': group_id,'choice':choice,'status':'None'})
+    variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name,"page_info":paged_resources,'page_no':each_page, 
+                                        'group_id': group_id, 'groupid': group_id,'choice':choice,'status':'None','task':task_id})
     return render_to_response(template, variable)                                     	
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
@@ -455,7 +461,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
             sub_task_name.append(each.name)
     TASK_inst.rewind()
 
-
+    
 	
     for each in TASK_inst:
        attr_value={}
@@ -506,7 +512,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
      
     		 
     
-    print "task_list",task_list    
+        
     paged_resources = Paginator(task_list,10)
     files_list = []
     for each_resource in (paged_resources.page(each_page)).object_list:
