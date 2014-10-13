@@ -607,6 +607,7 @@ def uploadDoc(request, group_id):
                 group_id = str(auth._id)
     else :
         pass
+
     if request.method == "GET":
         page_url = request.GET.get("next", "")
         template = "ndf/UploadDoc.html"
@@ -679,7 +680,7 @@ def submitDoc(request, group_id):
        
         if img_type != "": 
             
-            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id , 'usrid': userid}))
+            return HttpResponseRedirect(reverse('uDashboard', kwargs={'group_id': group_id}))
 
         elif topic_file != "": 
             
