@@ -159,7 +159,8 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 	field_value=[]
 	if request.FILES.getlist('UploadTask'):
         	files=request.FILES.getlist('UploadTask')
-        	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag)
+        	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag,oid=True)
+        	
 	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
 		if watchers:
