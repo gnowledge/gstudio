@@ -152,7 +152,7 @@ $('#hidden_watchers').val(selected);
 {% block body_content %}
 
 
-<form data-abide id="form-edit-node" enctype="multipart/form-data"  method="POST" action="">
+<form data-abide id="form-edit-node" enctype="multipart/form-data"  onSubmit="enablePath();" method="POST" action="">
 
 {% csrf_token %}
     <h2 class="medium-12 columns">
@@ -191,6 +191,7 @@ $('#hidden_watchers').val(selected);
 			<option value="Closed" id="Closed">Closed</option>
 			<option value="Rejected" id="Rejected">Rejected</option></select>
 		</select>
+		<input type="hidden" name="myselect" value="myselectedvalue" />
 		<small class="error">Broke.</small>
 	  </div>
 	  <div class="medium-6 columns">
@@ -361,6 +362,14 @@ function select_values(source)
 
 }
 
+if ('{{node.name}}' == "" )
+{
+document.getElementById("customDropdown").disabled = true;
+}
+
+function enablePath() {
+    document.getElementById('customDropdown').disabled= "";
+}
 </script>
 
 {% endblock %}
