@@ -137,8 +137,9 @@
         var max_size =100000
         var fsize=this.files[0].size
         fsize=fsize/1024
+        {% check_is_gstaff groupid request.user as gstaff_access %}
         if(fsize> max_size){
-          {% if user_access%}
+          {% if gstaff_access%}
           	$('#docFile').val(this.value);
           {% else %}
           	alert("Sorry. Max File Size Limit Exceeded");
