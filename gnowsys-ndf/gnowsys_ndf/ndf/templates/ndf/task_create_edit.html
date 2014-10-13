@@ -152,7 +152,7 @@ $('#hidden_watchers').val(selected);
 {% block body_content %}
 
 
-<form data-abide id="form-edit-node" enctype="multipart/form-data"  onSubmit="enablePath();" method="POST" action="">
+<form data-abide id="form-edit-node" enctype="multipart/form-data"  onSubmit="enableselect();" method="POST" action="">
 
 {% csrf_token %}
     <h2 class="medium-12 columns">
@@ -367,7 +367,7 @@ if ('{{node.name}}' == "" )
 document.getElementById("customDropdown").disabled = true;
 }
 
-function enablePath() {
+function enableselect() {
     document.getElementById('customDropdown').disabled= "";
 }
 </script>
