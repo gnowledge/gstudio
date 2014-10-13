@@ -240,6 +240,9 @@
 					{% for each_lang in static_language %}
 						<option {%if each_lang|lower == resource.language|lower %}selected="selected"{%endif%} value="{{ each_lang }}">{{ each_lang }}</option>
 					{% endfor %}
+					<option {%if not resource.language %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 					
 					{% comment %}
 					<!-- <option {%if resource.language|lower == "english" %}selected="selected"{%endif%} value="English">English</option>
@@ -278,6 +281,9 @@
 							{{ each_edu_use }}
 						</option>
 					{% endfor %}
+					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 				</select>
 			</td>
 			<td class="hide-el right-border" data-field="interactivitytype">
@@ -285,6 +291,9 @@
 					{% for each_intertype in static_interactivitytype %}
 						<option {%if each_intertype == resource.interactivitytype %}selected="selected"{%endif%} value="{{ each_intertype }}">{{ each_intertype }}</option>
 					{% endfor %}
+					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 				</select>
 			</td>
 
@@ -294,6 +303,7 @@
 					{% for each_edu_align in static_educationalalignment %}
 						<option {%if each_edu_align == resource.educationalalignment %}selected="selected"{%endif%} value="{{ each_edu_align }}">{{ each_edu_align }}</option>
 					{% endfor %}
+					<option {%if not each_edu_use %}selected="selected"{%endif%} value=""></option>
 				</select>
 			</td>
 			<td class="hide-el" data-field="educationallevel">
@@ -301,13 +311,19 @@
 					{% for each_edulevel in static_educationallevel %}
 						<option {%if each_edulevel == resource.educationallevel %}selected="selected"{%endif%} value="{{ each_edulevel }}">{{ each_edulevel }}</option>
 					{% endfor %}
+					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 				</select>
 			</td>
 			<td class="hide-el right-border" data-field="educationalsubject">
 				<select name="educationalsubject">
-				{% for each_sub in static_educationalsubject %}
-					<option {%if each_sub == resource.educationalsubject %}selected="selected"{%endif%} value="{{each_sub}}">{{ each_sub }}</option>
-				{% endfor %}
+					{% for each_sub in static_educationalsubject %}
+						<option {%if each_sub == resource.educationalsubject %}selected="selected"{%endif%} value="{{each_sub}}">{{ each_sub }}</option>
+					{% endfor %}
+					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 				</select>
 			</td>
 
@@ -317,6 +333,7 @@
 				{% for each_curr in static_curricular %}		
 					<option {%if each_curr == resource.curricular %}selected="selected"{%endif%} value="{{ each_curr }}">{{ each_curr }}</option>
 				{% endfor %}
+					<option selected="selected" value=""></option>
 				</select>
 			</td>
 			<td class="hide-el" data-field="audience">
@@ -324,6 +341,9 @@
 				{% for each_aud in static_audience %}		
 					<option {%if each_aud == resource.audience %}selected="selected"{%endif%} value="{{ each_aud }}">{{ each_aud }}</option>
 				{% endfor %}
+					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 				</select>
 			</td>
 			<td class="hide-el" data-field="teaches">
@@ -334,8 +354,11 @@
 			</td>
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
-					<option value="False">False</option>
-					<option value="True">True</option>
+					<option {%if resource.featured == "False"%}selected="selected"{%endif%} value="False">False</option>
+					<option {%if resource.featured == "True"%}selected="selected"{%endif%} value="True">True</option>
+					<option {%if not resource.featured %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 				</select>
 			</td>
 			<td class="hide-el" data-field="status">
@@ -347,8 +370,11 @@
 			</td>
 			<td class="hide-el right-border" data-field="access_policy">
 				<select name="access_policy">
-					<option value="PUBLIC">PUBLIC</option>
-					<option value="PRIVATE">PRIVATE</option>
+					<option {%if resource.access_policy == "PUBLIC"%}selected="selected"{%endif%} value="PUBLIC">PUBLIC</option>
+					<option {%if resource.access_policy == "PRIVATE"%}selected="selected"{%endif%} value="PRIVATE">PRIVATE</option>
+					<option {%if not resource.access_policy %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 				</select>
 			</td>
 
