@@ -220,7 +220,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                 		newattribute.attribute_type = attributetype_key
                 		newattribute.object_value = field_value[0]
                 		newattribute.save()
-	    if  int(len(request.POST.getlist("Assignee","")))<1:
+	    if  int(len(request.POST.getlist("Assignee","")))>1:
               if task is None:
                		Task=collection.Node.find_one({"_id":ObjectId(task_node._id)})
 			
@@ -299,14 +299,19 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 			update_node.altnames = unicode(str(change_list))
 		else :
 			update_node.altnames = unicode('[]')
+		
 		update_node.prior_node = [task_node._id]		
 		update_node.name = unicode(task_node.name+"-update_history")
 		update_node.save()
 		update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
 		update_node.save()
 		task_node.post_node.append(update_node._id)
-		task_node.save()			
-
+		task_node.save()
+		# patch
+		GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 			
+                get_node_common_fields(request, task_node, group_id, GST_TASK)
+		task_node.save()
+		#End Patch        
         return HttpResponseRedirect(reverse('task_details', kwargs={'group_name': group_name, 'task_id': str(task_node._id) }))
 
     if task_id:
