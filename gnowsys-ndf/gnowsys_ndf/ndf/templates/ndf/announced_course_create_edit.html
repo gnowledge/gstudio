@@ -4,68 +4,30 @@
 {% load pagination_tags %}
 
 {% block style %}
-// <style type="text/css">
-/* CSS for Multiple-selection (or drawer) widget */
-  .divider-line { font-size: xx-large; color:lightgray; }
-  .line-height-2 { line-height:2; }
-  .line-height-2pt5 { line-height:2.5; }
-  .fontsize-x-large { font-size: x-large; }
+  {{block.super}}
 
-  .margin-0 { margin: 0 !important ;}
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
 
-  .resource-drawer { 
-    border-color: #D3D3D3; border-style: solid; 
-    padding: 0 !important; 
-    overflow-y: auto;
-  }
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
 
-  .resource-drawer li.bullet-item:hover{
-    background-color: #ecf0f1; cursor:pointer;
-  }
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
 
-  .posted-by{ color: #808080; font-size: small; }
-
-  .selected-resource { background-color:lightgray !important ; }
-
-  .resource-type-image {
-    height:40px;    
-    background-repeat:no-repeat; background-size: 48px 48px
-  }
-
-/* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
-  dl.tabs>dd a.disable {
-    pointer-events: none;
-    cursor: default;
-  }
-
-  .row .row {
-    margin: 0 0;
-  }
-
-/* Resetting css-properties for fieldset (also legend, input) */
-  /* fieldset (padding-bottom) */ 
-  fieldset {
-    padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
-  }
-
-  /* legend (background-color) */
-  fieldset legend {
-    background-color: transparent !important;
-  }
-
-  /* input (margin) */
-  fieldset input {
-    margin: 0 !important;
-  }
-
-/* Setting css-properties for reveal-modal's label */
-  div.reveal-modal > label {
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-  }
-
-// </style>
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
 {% endblock %}
 
 {% block body_content %} 
@@ -174,29 +136,230 @@
       <input type="hidden" id="name" name="name" value="">
     </div>
   </form>
-
 {% endblock %}
 
 {% block script %}
-// <script type="text/javascript">
-// Function to hide fieldset & submit ----------------------------------------------------------------------------
-  function hideFieldsetSubmit() {
-    if ($("#announce-course").css("display") == "block") {
-      $("#announce-course").toggle();
+  {{block.super}}
+
+  // Function to hide fieldset & submit ----------------------------------------------------------------------------
+    function hideFieldsetSubmit() {
+      if ($("#announce-course").css("display") == "block") {
+        $("#announce-course").toggle();
+      }
+
+      if ($("#unset-ac").css("display") == "block") {
+        $("#unset-ac-options-div").empty();
+        $("#unset-ac").toggle();
+      }
     }
 
-    if ($("#unset-ac").css("display") == "block") {
-      $("#unset-ac-options-div").empty();
-      $("#unset-ac").toggle();
-    }
-  }
+  // Default settings for date-widgets & tabs on page load ---------------------------------------------------------
+    var currentYear = (new Date()).getFullYear()
+    lowerYearLimit = currentYear - 5;
+    upperYearLimit = currentYear + 5;
 
-// Default settings for date-widgets & tabs on page load ---------------------------------------------------------
-  var currentYear = (new Date()).getFullYear()
-  lowerYearLimit = currentYear - 5;
-  upperYearLimit = currentYear + 5;
+  // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
+    $(".content").on('click', '.tab_next', function(event){
+      event.preventDefault();
 
-  $(document).ready(function() {
+      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+      $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+      // Then check no. of data-invalid fields
+      // if count == 0, then only proceed to next tab
+      if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+        // Valid, move to next step
+        $('.active').removeClass('active').next().addClass('active');
+      }
+    });
+
+    $(".content").on('click', '.tab_prev' ,function(event){
+      event.preventDefault();
+      $('.active').removeClass('active').prev().addClass('active');
+    });
+
+  // Only keeping month's & year's drop-down and hiding other datepicker's elements --------------------------------
+    $(document).on('focus click', '.date_month_day_year' ,function(){
+      $(".ui-datepicker-calendar").hide();
+    });
+
+  // If any of the Input field of fieldset (sc) is changed ---------------------------------------------------------
+    $("#sc :input").on('change click', function(){
+      // hide fieldsets & submit button 
+      hideFieldsetSubmit();
+
+      // Enable Find button (find_ac)
+      $("#find_ac").removeAttr('disabled');
+    });
+
+  // Select/Deselect all checbox(es) ['unset-ac-options'] based on state of checkbox ['selectAllOptions'] ----------
+    $("#selectAllOptions").bind("change", function(){
+      selectAllState = this.checked;
+      $("input[name='unset-ac-options']").each(function() {
+        $(this).prop("checked", selectAllState);
+
+      // Enable/Disable Announce (submit) button, if none of the checkbox is selected
+        $("#announce-course").attr("disabled", !selectAllState);
+      });
+    });
+
+  // Select/Deselect selectAllOptions checkbox & Enable/Disable Announce (submit) button ---------------------------
+    $(document).on("change click", ".unsetOption", function(){
+      optionState = $(this).prop("checked");
+      
+    // Select/Deselect selectAllOptions checkbox, if any of the unset-check-options is unchecked
+      if (!optionState) {
+        selectAll = $("#selectAllOptions");
+        if (selectAll.prop("checked")) {
+          selectAll.prop("checked", optionState);
+        }
+      }
+
+    // Enable/Disable Announce (submit) button, if none of the checkbox is selected
+      $("#announce-course").attr("disabled", !optionState);
+    });
+
+  // On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
+    $("#find_ac").click(function(event) {
+      // alert("AC Find clicked...")
+      event.preventDefault();
+
+      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+      $(this).parents("fieldset").parents(".content").find(':input[required]').blur();
+
+      // Then check no. of data-invalid fields
+      // if count == 0, then only proceed to make ajax-call & later on successful returned O/P, displaying Announce(submit) button
+      if($(this).parents("fieldset").parents(".content").find(':input[data-invalid]').length == 0) {
+        var start_time = $("#start_time").val()
+        var end_time = $("#end_time").val()
+        var nussd_course_type = $("#nussd_course_type").val()
+        var success_state = false
+        // alert("\n start_time: " + start_time + "\n end_time: " + end_time + "\n nussd_course_type: " + nussd_course_type)
+
+        // All field(s) have valid I/P, make ajax-call
+        $.ajax({
+          url: "{% url 'get_announced_courses' group_id %}",
+
+          data: {
+            start_time: start_time,
+            end_time: end_time,
+            nussd_course_type: nussd_course_type
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          success: function(data){
+            // alert("Output" + "\n success: " + data);
+
+            // var dataDict = JSON.parse(data.responseText);
+            // alert(" " + data["success"] + " -- " + typeof(data["success"]))          
+            success_state = data["success"];
+            $("#alertModalLabel").text(data["message"]);
+
+            if (data["success"]) {
+              $("#alertModal").removeClass("alert");
+              $("#alertModal").addClass("success");
+              $("#alertModal").foundation('reveal', 'open');
+
+              $("#unset-ac-options-div").empty();
+              // alert("length: " + Object.keys(data["unset_nc"]).length)
+              var dict_len = Object.keys(data["unset_nc"]).length;
+              $.each(data["unset_nc"], function(k, val){
+                // alert(k + " -- " + val);
+                input_chk = ""
+                if (dict_len != 1) {
+                  input_chk += "<div class='small-12 columns'>" 
+                }
+
+                else {
+                  input_chk += "<div class='small-12 columns end'>" 
+                }
+                
+                v = k + ">>" + val;
+
+                input_chk += "<input type='checkbox' name='unset-ac-options' class='unsetOption' checked='' value='"+v+"'/>" + 
+                              "<label>"+val+"</label>" +
+                              "</div>";
+                $("#unset-ac-options-div").append(input_chk);
+                
+                dict_len = dict_len - 1;
+              });
+
+              // If nussd_course_type is Foundation Course disable all checkboxes
+              if (nussd_course_type == "Foundation Course") {
+                // alert("Foundation Course found!")
+                $("#selectAllOptions").attr("disabled", "disabled");
+                $(".unsetOption").attr("disabled", "disabled");
+              }
+
+              else {
+                $("#selectAllOptions").removeAttr("disabled", "disabled");
+                $(".unsetOption").removeAttr("disabled", "disabled");
+              }
+            }
+
+            else {
+              $("#alertModal").removeClass("success");
+              $("#alertModal").addClass("alert");
+              $("#alertModal").foundation('reveal', 'open');
+            }
+          },
+
+          complete: function(){
+            // var respDict = JSON.parse(resp.responseText);
+            if (success_state) {
+              // If unset NUSSD course(s) found, display Announce(submit) button only if it's hidden
+              if ($("#announce-course").css("display") == "none") {
+                $("#announce-course").toggle();
+              }
+
+              // Also toggle unset-ac fieldset
+              if ($("#unset-ac").css("display") == "none") {
+                $("#selectAllOptions").prop("checked", true);
+                $("#unset-ac").toggle();
+              }
+            }
+
+            else {
+              // Otherwise, hide button as well as fieldset
+              if ($("#announce-course").css("display") == "block") {
+                $("#announce-course").toggle();
+              }
+
+              // Also toggle unset-ac fieldset
+              if ($("#unset-ac").css("display") == "block") {
+                $("#unset-ac-options-div").empty();
+                $("#unset-ac").toggle();
+              }
+            }
+          }
+        });
+      }
+    });
+
+  // On close event of reveal-modal (alertModal) -------------------------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      if ($(this).hasClass('success')) {
+        // Disable 'Find' button, which gets enable only when any of the input element
+        // of the fieldset (fsSc) is changed
+        $("#find_ac").attr('disabled', "disabled");
+      }
+    });
+
+  // On click of Register/Update -----------------------------------------------------------------------------------
+    $(document).on("click", "#announce-course", function() {
+    // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+      $("#selectAllOptions").removeAttr("disabled", "disabled");
+      $(".unsetOption").removeAttr("disabled", "disabled");
+    });
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+  // Default settings for date-widgets & tabs on page load ---------------------------------------------------------
     // Change placeholders for start-time & end-time
       // From MM/DD/YYYY HH:MM to MM/YYYY
       $(".date_month_day_year").each(function(i) {
@@ -369,202 +532,4 @@
       if ($("#find_ac").attr("disabled") == "disabled") {
         $("#find_ac").removeAttr("disabled");
       }
-  });
-
-// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
-  $(".content").on('click', '.tab_next', function(event){
-    event.preventDefault();
-
-    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
-    $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
-
-    // Then check no. of data-invalid fields
-    // if count == 0, then only proceed to next tab
-    if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
-      // Valid, move to next step
-      $('.active').removeClass('active').next().addClass('active');
-    }
-  });
-
-  $(".content").on('click', '.tab_prev' ,function(event){
-    event.preventDefault();
-    $('.active').removeClass('active').prev().addClass('active');
-  });
-
-// Only keeping month's & year's drop-down and hiding other datepicker's elements --------------------------------
-  $(document).on('focus click', '.date_month_day_year' ,function(){
-    $(".ui-datepicker-calendar").hide();
-  });
-
-// If any of the Input field of fieldset (sc) is changed -------------------------------------------------
-  $("#sc :input").on('change click', function(){
-    // hide fieldsets & submit button 
-    hideFieldsetSubmit();
-
-    // Enable Find button (find_ac)
-    $("#find_ac").removeAttr('disabled');
-  });
-
-// Select/Deselect all checbox(es) ['unset-ac-options'] based on state of checkbox ['selectAllOptions'] ----------
-  $("#selectAllOptions").bind("change", function(){
-    selectAllState = this.checked;
-    $("input[name='unset-ac-options']").each(function() {
-      $(this).prop("checked", selectAllState);
-
-    // Enable/Disable Announce (submit) button, if none of the checkbox is selected
-      $("#announce-course").attr("disabled", !selectAllState);
-    });
-  });
-
-// Select/Deselect selectAllOptions checkbox & Enable/Disable Announce (submit) button ---------------------------
-  $(document).on("change click", ".unsetOption", function(){
-    optionState = $(this).prop("checked");
-    
-  // Select/Deselect selectAllOptions checkbox, if any of the unset-check-options is unchecked
-    if (!optionState) {
-      selectAll = $("#selectAllOptions");
-      if (selectAll.prop("checked")) {
-        selectAll.prop("checked", optionState);
-      }
-    }
-
-  // Enable/Disable Announce (submit) button, if none of the checkbox is selected
-    $("#announce-course").attr("disabled", !optionState);
-  });
-
-// On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
-  $("#find_ac").click(function(event) {
-    // alert("AC Find clicked...")
-    event.preventDefault();
-
-    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
-    $(this).parents("fieldset").parents(".content").find(':input[required]').blur();
-
-    // Then check no. of data-invalid fields
-    // if count == 0, then only proceed to make ajax-call & later on successful returned O/P, displaying Announce(submit) button
-    if($(this).parents("fieldset").parents(".content").find(':input[data-invalid]').length == 0) {
-      var start_time = $("#start_time").val()
-      var end_time = $("#end_time").val()
-      var nussd_course_type = $("#nussd_course_type").val()
-      var success_state = false
-      // alert("\n start_time: " + start_time + "\n end_time: " + end_time + "\n nussd_course_type: " + nussd_course_type)
-
-      // All field(s) have valid I/P, make ajax-call
-      $.ajax({
-        url: "{% url 'get_announced_courses' group_id %}",
-
-        data: {
-          start_time: start_time,
-          end_time: end_time,
-          nussd_course_type: nussd_course_type
-        },
-
-        type: "GET",
-
-        dataType: "json",
-
-        success: function(data){
-          // alert("Output" + "\n success: " + data);
-
-          // var dataDict = JSON.parse(data.responseText);
-          // alert(" " + data["success"] + " -- " + typeof(data["success"]))          
-          success_state = data["success"];
-          $("#alertModalLabel").text(data["message"]);
-
-          if (data["success"]) {
-            $("#alertModal").removeClass("alert");
-            $("#alertModal").addClass("success");
-            $("#alertModal").foundation('reveal', 'open');
-
-            $("#unset-ac-options-div").empty();
-            // alert("length: " + Object.keys(data["unset_nc"]).length)
-            var dict_len = Object.keys(data["unset_nc"]).length;
-            $.each(data["unset_nc"], function(k, val){
-              // alert(k + " -- " + val);
-              input_chk = ""
-              if (dict_len != 1) {
-                input_chk += "<div class='small-12 columns'>" 
-              }
-
-              else {
-                input_chk += "<div class='small-12 columns end'>" 
-              }
-              
-              v = k + ">>" + val;
-
-              input_chk += "<input type='checkbox' name='unset-ac-options' class='unsetOption' checked='' value='"+v+"'/>" + 
-                            "<label>"+val+"</label>" +
-                            "</div>";
-              $("#unset-ac-options-div").append(input_chk);
-              
-              dict_len = dict_len - 1;
-            });
-
-            // If nussd_course_type is Foundation Course disable all checkboxes
-            if (nussd_course_type == "Foundation Course") {
-              // alert("Foundation Course found!")
-              $("#selectAllOptions").attr("disabled", "disabled");
-              $(".unsetOption").attr("disabled", "disabled");
-            }
-
-            else {
-              $("#selectAllOptions").removeAttr("disabled", "disabled");
-              $(".unsetOption").removeAttr("disabled", "disabled");
-            }
-          }
-
-          else {
-            $("#alertModal").removeClass("success");
-            $("#alertModal").addClass("alert");
-            $("#alertModal").foundation('reveal', 'open');
-          }
-        },
-
-        complete: function(){
-          // var respDict = JSON.parse(resp.responseText);
-          if (success_state) {
-            // If unset NUSSD course(s) found, display Announce(submit) button only if it's hidden
-            if ($("#announce-course").css("display") == "none") {
-              $("#announce-course").toggle();
-            }
-
-            // Also toggle unset-ac fieldset
-            if ($("#unset-ac").css("display") == "none") {
-              $("#selectAllOptions").prop("checked", true);
-              $("#unset-ac").toggle();
-            }
-          }
-
-          else {
-            // Otherwise, hide button as well as fieldset
-            if ($("#announce-course").css("display") == "block") {
-              $("#announce-course").toggle();
-            }
-
-            // Also toggle unset-ac fieldset
-            if ($("#unset-ac").css("display") == "block") {
-              $("#unset-ac-options-div").empty();
-              $("#unset-ac").toggle();
-            }
-          }
-        }
-      });
-    }
-  });
-
-// On close event of reveal-modal (alertModal) -------------------------------------------------------------
-  $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
-    if ($(this).hasClass('success')) {
-      // Disable 'Find' button, which gets enable only when any of the input element
-      // of the fieldset (fsSc) is changed
-      $("#find_ac").attr('disabled', "disabled");
-    }
-  });
-
-// On click of Register/Update -----------------------------------------------------------------------------------
-  $(document).on("click", "#announce-course", function() {
-  // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
-    $("#selectAllOptions").removeAttr("disabled", "disabled");
-    $(".unsetOption").removeAttr("disabled", "disabled");
-  });
 {% endblock %}
