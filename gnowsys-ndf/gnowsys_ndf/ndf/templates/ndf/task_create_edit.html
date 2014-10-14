@@ -17,6 +17,15 @@
 	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
 		<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+	
+	
+	
+		<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
 
 <script type="text/javascript">
 </script>
@@ -167,7 +176,6 @@ $(document).on('click',"#save-node",function(event){
 	  <div class="medium-6 columns">
 	    <label>Start date</label>
         <input id="start_date" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="MM/DD/YYYY" value="" name="start_time">
-
 	  </div>
 	</div>	
 
@@ -356,10 +364,16 @@ function select_values(source)
 if ('{{node.name}}' == "" )
 {
 document.getElementById("customDropdown").disabled = true;
+
+
 }
 
 function enableselect() {
+
+  if ((document.getElementById('start_date').value != "") && (document.getElementById('end_date').value != ""))
+  {
     document.getElementById('customDropdown').disabled= "";
+  }  
 }
 </script>
 
