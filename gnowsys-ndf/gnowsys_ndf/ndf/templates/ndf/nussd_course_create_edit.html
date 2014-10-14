@@ -3,106 +3,70 @@
 {% load ndf_tags %}
 
 {% block style %}
-// <style type="text/css">
-/* CSS for Multiple-selection (or drawer) widget */
-  .divider-line { font-size: xx-large; color:lightgray; }
-  .line-height-2 { line-height:2; }
-  .line-height-2pt5 { line-height:2.5; }
-  .fontsize-x-large { font-size: x-large; }
+  {{block.super}}
 
-  .margin-0 { margin: 0 !important ;}
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
 
-  .resource-drawer { 
-    border-color: #D3D3D3; border-style: solid; 
-    padding: 0 !important; 
-    overflow-y: auto;
-  }
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
 
-  .resource-drawer li.bullet-item:hover{
-    background-color: #ecf0f1; cursor:pointer;
-  }
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
 
-  .posted-by{ color: #808080; font-size: small; }
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
 
-  .selected-resource { background-color:lightgray !important ; }
+  /* .orgitdownContainer properties */
+    /*  .orgitdownContainer {
+        width: 62rem !important;
+      }
+    */
+  
+  /* dropdown class's button properties */
+    /*
+    .dropdown.button:after, button.dropdown:after {
+        right: 0.80625rem !important;
+    }
 
-  .resource-type-image {
-    height:40px;    
-    background-repeat:no-repeat; background-size: 48px 48px
-  }
+    .dropdown.button.tiny, button.dropdown.tiny {
+        padding-right: 1.125rem !important;
+    }
+    */
 
-/* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
-  dl.tabs>dd a.disable {
-    pointer-events: none;
-    cursor: default;
-  }
+  /* classes defined specifically for this template */
+    .row-space {
+      margin-bottom: 13px;
+    }
 
-  .row .row {
-    margin: 0 0;
-  }
+    .checkbox-top-padding {
+      padding-top: 4px !important;
+    }
 
-/* Resetting css-properties for fieldset (also legend, input) */
-  /* fieldset (padding-bottom) */ 
-  fieldset {
-    padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
-  }
+    .option-spacing {
+      padding: 0px 5px; 
+      line-height: 1.8rem;
+    }
 
-  /* legend (background-color) */
-  fieldset legend {
-    background-color: transparent !important;
-  }
-
-  /* input (margin) */
-  fieldset input {
-    margin: 0 !important;
-  }
-
-/* Setting css-properties for reveal-modal's label */
-  div.reveal-modal > label {
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-  }
-
-/* .orgitdownContainer properties */
-/*  .orgitdownContainer {
-    width: 62rem !important;
-  }
-*/
-/* dropdown class's button properties */
-  /*
-  .dropdown.button:after, button.dropdown:after {
-      right: 0.80625rem !important;
-  }
-
-  .dropdown.button.tiny, button.dropdown.tiny {
-      padding-right: 1.125rem !important;
-  }
-  */
-
-/* classes defined specifically for this template */
-  .row-space {
-    margin-bottom: 13px;
-  }
-
-  .checkbox-top-padding {
-    padding-top: 4px !important;
-  }
-
-  .option-spacing {
-    padding: 0px 5px; 
-    line-height: 1.8rem;
-  }
-
-/* textarea properties specifically for this template */
-  textarea.qualification-text {
-    resize: none;
-    min-height: 2.7rem !important;
-    height: 2.7rem !important;
-    float: left;
-    width: 99% !important;
-  }
-// </style>
+  /* textarea properties specifically for this template */
+    textarea.qualification-text {
+      resize: none;
+      min-height: 2.7rem !important;
+      height: 2.7rem !important;
+      float: left;
+      width: 99% !important;
+    }
 {% endblock %}
 
 {% block body_content %} 
@@ -354,109 +318,290 @@
 {% endblock %}
 
 {% block script %}
-// <script type="text/javascript">
-// function to get requirements count
-  function get_requirements_count(widget_for) {
-    return (parseInt($("#"+widget_for+"_requirements_count").val()));
-  }
-
-// function to add requirement row (checkbox, text, action button (delete)) -------------------------------------
-  function add_requirement(add_req_options) {
-    // add_req_options = {
-    //   widget_for: "mt"/"vt", 
-    //   requirements_count: null/int,
-    //   textarea_html: null/html-element,
-    //   requirement_dict: null/dict-object
-    // }
-    var widget_for = add_req_options.widget_for;
-    var requirements_count = add_req_options.requirements_count|null;
-    var textarea_html = add_req_options.textarea_html || null;
-    var from_node = add_req_options.from_node || false;
-    var requirement_dict = add_req_options.requirement_dict || null;
-
-    // if requirements_count is not passed, fetch it
-    if (requirements_count === null) {
-      requirements_count = get_requirements_count(widget_for);
-      requirements_count = requirements_count + 1;
+  {{block.super}}
+  
+  // function to get requirements count
+    function get_requirements_count(widget_for) {
+      return (parseInt($("#"+widget_for+"_requirements_count").val()));
     }
 
-    // if textarea element is not passed, fetch it
-    if (textarea_html === null) {
+  // function to add requirement row (checkbox, text, action button (delete)) -------------------------------------
+    function add_requirement(add_req_options) {
+      // add_req_options = {
+      //   widget_for: "mt"/"vt", 
+      //   requirements_count: null/int,
+      //   textarea_html: null/html-element,
+      //   requirement_dict: null/dict-object
+      // }
+      var widget_for = add_req_options.widget_for;
+      var requirements_count = add_req_options.requirements_count|null;
+      var textarea_html = add_req_options.textarea_html || null;
+      var from_node = add_req_options.from_node || false;
+      var requirement_dict = add_req_options.requirement_dict || null;
+
+      // if requirements_count is not passed, fetch it
+      if (requirements_count === null) {
+        requirements_count = get_requirements_count(widget_for);
+        requirements_count = requirements_count + 1;
+      }
+
+      // if textarea element is not passed, fetch it
+      if (textarea_html === null) {
+        textarea_html = $("#"+widget_for+"_qualification_text");
+      }
+
+      var add_button_class = "."+widget_for+"-add-div";
+
+    // mandatory-div & checkbox -----------------------------------------------------------------------------------
+      mandatory_div = $("#qualification_mandatory_div").clone();
+      
+      name_var = widget_for+"_"+requirements_count+"_mandatory";
+      
+      mandatory_div.attr('id', name_var+"_div");
+      
+      mandatory_checkbox = mandatory_div.children("input[type='checkbox']");
+      mandatory_checkbox.attr('id', name_var);
+      mandatory_checkbox.attr('name', name_var);
+
+      if (requirement_dict !== null) {
+        mandatory_checkbox.prop("checked", requirement_dict["mandatory"]);
+      }
+
+      $(mandatory_div).insertBefore(add_button_class);
+      mandatory_div.css('display', "block");
+
+    // text-div & label -------------------------------------------------------------------------------------------
+      text_div = $("#qualification_text_div").clone();
+      
+      name_var = widget_for+"_"+requirements_count+"_text";
+      
+      text_div.attr('id', name_var+"_div");
+      
+      text_label = text_div.children("label");
+      text_label.attr('id', name_var);
+      text_label.attr('name', name_var);
+
+      if (requirement_dict !== null) {
+        text_label.text(requirement_dict["text"]);
+      }
+
+      else {
+        text_label.text(textarea_html.val());
+      }    
+
+      $(text_div).insertBefore(add_button_class);
+      text_div.css('display', "block");
+
+    // action-div & options ---------------------------------------------------------------------------------------
+      action_div = $("#qualification_action_div").clone();
+      
+      name_var = widget_for+"_"+requirements_count+"_action";
+      
+      action_div.attr('id', name_var+"_div");
+      
+      // action_div.children("div").attr('id', name_var+"_delete");
+      // action_div.children("div").attr('data-dropdown', name_var+"_dropdown");
+
+      // action_div.find(".f-dropdown").attr('id', name_var+"_dropdown");
+      // action_div.find(".option-spacing").attr('id', name_var+"_edit");
+      action_div.children("input[type='button']").attr('id', name_var+"_delete");
+
+      $(action_div).insertBefore(add_button_class);
+      action_div.css('display', "block");
+
+      if (requirement_dict === null) {
+      // clear textarea & update hidden requirements_count (increment by 1) -----------------------------------------
+        $("#"+widget_for+"_requirements_count").val(requirements_count);
+        textarea_html.val("");
+
+      // remove required attr ---------------------------------------------------------------------------------------
+        textarea_html.removeAttr("required");
+      }
+    }
+
+  // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons ------------------
+    $(".content").on('click', '.tab_next' ,function(event){
+      event.preventDefault();
+
+      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+      $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+      // Then check no. of data-invalid fields
+      // if count == 0, then only proceed to next tab
+      if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+        // Valid, move to next step
+        $('.active').removeClass('active').next().addClass('active');
+      }
+    });
+
+    $(".content").on('click', '.tab_prev' ,function(event){
+      event.preventDefault();
+      $('.active').removeClass('active').prev().addClass('active');
+    });
+
+  // Enable/Disable Min. & Max. Marks based on value of Evaluation Type -------------------------------------------
+    $("input[name='evaluation_type']").on("change", function(){
+      if (this.value == "Final") {
+        $("#min_marks").removeAttr("disabled");
+        $("#max_marks").removeAttr("disabled");
+      }
+
+      else {
+        // Clear Marks' fields first
+        $("#min_marks").val("");
+        $("#max_marks").val("");
+
+        // Then disable them!
+        $("#min_marks").attr("disabled", "disabled");
+        $("#max_marks").attr("disabled", "disabled");
+      }
+    });
+
+  // On click of 'Add', add a row with checkbox, label & action buttons (delete & edit) ---------------------------
+    $(document).on("click", ".add_requirement", function(){
+      var widget_for = $(this).attr("id");
+
+      // Forcefully blur textarea, so that mandatory fields become data-invalid if not fill
       textarea_html = $("#"+widget_for+"_qualification_text");
-    }
 
-    var add_button_class = "."+widget_for+"-add-div";
+      if (textarea_html.val() == "") {
+        textarea_html.attr('required', "required");
+      }
 
-  // mandatory-div & checkbox -----------------------------------------------------------------------------------
-    mandatory_div = $("#qualification_mandatory_div").clone();
-    
-    name_var = widget_for+"_"+requirements_count+"_mandatory";
-    
-    mandatory_div.attr('id', name_var+"_div");
-    
-    mandatory_checkbox = mandatory_div.children("input[type='checkbox']");
-    mandatory_checkbox.attr('id', name_var);
-    mandatory_checkbox.attr('name', name_var);
+      textarea_html.attr('required', true).blur();
 
-    if (requirement_dict !== null) {
-      mandatory_checkbox.prop("checked", requirement_dict["mandatory"]);
-    }
+      if (!(textarea_html.attr('data-invalid') !== undefined)) {
+        var add_button_class = "."+widget_for+"-add-div";
 
-    $(mandatory_div).insertBefore(add_button_class);
-    mandatory_div.css('display', "block");
+        var requirements_count = get_requirements_count(widget_for);
+        requirements_count = requirements_count + 1;
 
-  // text-div & label -------------------------------------------------------------------------------------------
-    text_div = $("#qualification_text_div").clone();
-    
-    name_var = widget_for+"_"+requirements_count+"_text";
-    
-    text_div.attr('id', name_var+"_div");
-    
-    text_label = text_div.children("label");
-    text_label.attr('id', name_var);
-    text_label.attr('name', name_var);
+      // mandatory-div & checkbox -----------------------------------------------------------------------------------
+        mandatory_div = $("#qualification_mandatory_div").clone();
+        
+        name_var = widget_for+"_"+requirements_count+"_mandatory";
+        
+        mandatory_div.attr('id', name_var+"_div");
+        
+        mandatory_checkbox = mandatory_div.children("input[type='checkbox']");
+        mandatory_checkbox.attr('id', name_var);
+        mandatory_checkbox.attr('name', name_var);
 
-    if (requirement_dict !== null) {
-      text_label.text(requirement_dict["text"]);
-    }
+        $(mandatory_div).insertBefore(add_button_class);
+        mandatory_div.css('display', "block");
 
-    else {
-      text_label.text(textarea_html.val());
-    }    
+      // text-div & label -------------------------------------------------------------------------------------------
+        text_div = $("#qualification_text_div").clone();
+        
+        name_var = widget_for+"_"+requirements_count+"_text";
+        
+        text_div.attr('id', name_var+"_div");
+        
+        text_label = text_div.children("label");
+        text_label.attr('id', name_var);
+        text_label.attr('name', name_var);
+        text_label.text(textarea_html.val());
 
-    $(text_div).insertBefore(add_button_class);
-    text_div.css('display', "block");
+        $(text_div).insertBefore(add_button_class);
+        text_div.css('display', "block");
 
-  // action-div & options ---------------------------------------------------------------------------------------
-    action_div = $("#qualification_action_div").clone();
-    
-    name_var = widget_for+"_"+requirements_count+"_action";
-    
-    action_div.attr('id', name_var+"_div");
-    
-    // action_div.children("div").attr('id', name_var+"_delete");
-    // action_div.children("div").attr('data-dropdown', name_var+"_dropdown");
+      // action-div & options ---------------------------------------------------------------------------------------
+        action_div = $("#qualification_action_div").clone();
+        
+        name_var = widget_for+"_"+requirements_count+"_action";
+        
+        action_div.attr('id', name_var+"_div");
+        
+        // action_div.children("div").attr('id', name_var+"_delete");
+        // action_div.children("div").attr('data-dropdown', name_var+"_dropdown");
 
-    // action_div.find(".f-dropdown").attr('id', name_var+"_dropdown");
-    // action_div.find(".option-spacing").attr('id', name_var+"_edit");
-    action_div.children("input[type='button']").attr('id', name_var+"_delete");
+        // action_div.find(".f-dropdown").attr('id', name_var+"_dropdown");
+        // action_div.find(".option-spacing").attr('id', name_var+"_edit");
+        action_div.children("input[type='button']").attr('id', name_var+"_delete");
 
-    $(action_div).insertBefore(add_button_class);
-    action_div.css('display', "block");
+        $(action_div).insertBefore(add_button_class);
+        action_div.css('display', "block");
 
-    if (requirement_dict === null) {
-    // clear textarea & update hidden requirements_count (increment by 1) -----------------------------------------
-      $("#"+widget_for+"_requirements_count").val(requirements_count);
-      textarea_html.val("");
+      // clear textarea & update hidden requirements_count (increment by 1) -----------------------------------------
+        $("#"+widget_for+"_requirements_count").val(requirements_count);
+        textarea_html.val("");
 
-    // remove required attr ---------------------------------------------------------------------------------------
-      textarea_html.removeAttr("required");
-    }
-  }
+      // remove required attr ---------------------------------------------------------------------------------------
+        textarea_html.removeAttr("required");
+      }
 
-// Default settings for tabs & evaluation_type on page load -----------------------------------------------------
-  $(document).ready(function() {
-    // Tabs: Adding Next and Previous buttons for navigation ----------------------------------------------------
+      else {
+      // remove required attr ---------------------------------------------------------------------------------------
+        textarea_html.removeAttr("required");
+      }
+    });
+
+  // On click of 'Delete', delete corresponding row with checkbox, label & action buttons (delete & edit) ---------
+    $(document).on("click", ".delete_requirement", function(){
+      var button_id = $(this).attr('id');
+      var first_underscore_index = button_id.indexOf("_", 0);
+      var second_underscore_index = button_id.indexOf("_", 3);
+
+      var widget_for = button_id.slice(0, first_underscore_index);
+      var widget_count_to_delete = button_id.slice((first_underscore_index + 1), second_underscore_index);
+
+    // remove 'mandatory' div along with all it's children
+      $("#"+widget_for+"_"+widget_count_to_delete+"_mandatory_div").remove();
+    // remove 'text' div along with all it's children
+      $("#"+widget_for+"_"+widget_count_to_delete+"_text_div").remove();
+    // remove 'action' div along with all it's children
+      $("#"+widget_for+"_"+widget_count_to_delete+"_action_div").remove();
+
+      // DON'T DECEREMENT requirements count, may create conflicts in ids
+    });
+
+  // On click of Register/Update ----------------------------------------------------------------------------------
+    $(document).on("click", "#save_course", function(event) {
+    // Store requirements in a list for master-trainer & voluntary-teacher respectively
+      var widget_for = ["mt", "vt"];
+
+      for (var i=0; i<widget_for.length; i++) {
+        qualification_list = [];
+        requirements_count = parseInt($("#"+widget_for[i]+"_requirements_count").val());
+
+        if (requirements_count > 0) {
+          cnt = 1;
+          while (cnt <= requirements_count) {
+            qualification_mandatory = $("#"+widget_for[i]+"_"+cnt+"_mandatory").prop('checked');
+            qualification_text = $("#"+widget_for[i]+"_"+cnt+"_text").text();
+
+            if (qualification_mandatory !== undefined && qualification_text != "") {
+              // alert("qualification_mandatory: " + qualification_mandatory + "\nqualification_text: " + qualification_text);
+              // qualification = {}
+              // qualification["qualification_mandatory"] = qualification_mandatory;
+              // qualification["qualification_text"] = qualification_text;
+
+              // qualification_list.push(qualification);
+              qualification_list.push(qualification_mandatory);
+              qualification_list.push(qualification_text);
+
+            }
+
+            cnt += 1;
+          }
+
+          if (widget_for[i] == "mt") {
+            $("#mast_tr_qualifications").val(qualification_list);
+          }
+
+          else if (widget_for[i] == "vt") {
+            $("#voln_tr_qualifications").val(qualification_list);
+          }
+        }
+      }
+    });
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+  
+  // Default settings for tabs & evaluation_type on page load -----------------------------------------------------
+    // Tabs: Adding Next and Previous buttons for navigation ------------------------------------------------------
       $(".content").each(function(i) {
         totalTabs = $(".content").size() - 1
 
@@ -485,7 +630,7 @@
         }
       });
 
-    // If Continuous value found, disable Min. & Max. Marks -----------------------------------------------------
+    // If Continuous value found, disable Min. & Max. Marks -------------------------------------------------------
       if ($('input:radio[name="evaluation_type"]').filter('[value="Continuous"]').attr('checked') == "checked") {
       // Clear Marks' fields first
         $("#min_marks").val("");
@@ -496,7 +641,7 @@
         $("#max_marks").attr("disabled", "disabled");
       }
 
-    // Set requirements count for master-trainer & populate requirements if any exists --------------------------
+    // Set requirements count for master-trainer & populate requirements if any exists ----------------------------
       widget_for = "mt"
       textarea_html = $("#"+widget_for+"_qualification_text");
       requirements_count = "{{property_order_list.1.1.0.value|length}}";
@@ -519,7 +664,7 @@
         $("#mt_requirements_count").val(0);
       }
 
-    // Set requirements count for voluntary-trainer & populate requirements if any exists -----------------------
+    // Set requirements count for voluntary-trainer & populate requirements if any exists -------------------------
       widget_for = "vt"
       textarea_html = $("#"+widget_for+"_qualification_text");
       requirements_count = "{{property_order_list.1.1.1.value|length}}";
@@ -541,182 +686,4 @@
       else {
         $("#vt_requirements_count").val(0);
       }
-  });
-
-// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons ------------------
-  $(".content").on('click', '.tab_next' ,function(event){
-    event.preventDefault();
-
-    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
-    $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
-
-    // Then check no. of data-invalid fields
-    // if count == 0, then only proceed to next tab
-    if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
-      // Valid, move to next step
-      $('.active').removeClass('active').next().addClass('active');
-    }
-  });
-
-  $(".content").on('click', '.tab_prev' ,function(event){
-    event.preventDefault();
-    $('.active').removeClass('active').prev().addClass('active');
-  });
-
-// Enable/Disable Min. & Max. Marks based on value of Evaluation Type -------------------------------------------
-  $("input[name='evaluation_type']").on("change", function(){
-    if (this.value == "Final") {
-      $("#min_marks").removeAttr("disabled");
-      $("#max_marks").removeAttr("disabled");
-    }
-
-    else {
-      // Clear Marks' fields first
-      $("#min_marks").val("");
-      $("#max_marks").val("");
-
-      // Then disable them!
-      $("#min_marks").attr("disabled", "disabled");
-      $("#max_marks").attr("disabled", "disabled");
-    }
-  });
-
-// On click of 'Add', add a row with checkbox, label & action buttons (delete & edit) ---------------------------
-  $(document).on("click", ".add_requirement", function(){
-    var widget_for = $(this).attr("id");
-
-    // Forcefully blur textarea, so that mandatory fields become data-invalid if not fill
-    textarea_html = $("#"+widget_for+"_qualification_text");
-
-    if (textarea_html.val() == "") {
-      textarea_html.attr('required', "required");
-    }
-
-    textarea_html.attr('required', true).blur();
-
-    if (!(textarea_html.attr('data-invalid') !== undefined)) {
-      var add_button_class = "."+widget_for+"-add-div";
-
-      var requirements_count = get_requirements_count(widget_for);
-      requirements_count = requirements_count + 1;
-
-    // mandatory-div & checkbox -----------------------------------------------------------------------------------
-      mandatory_div = $("#qualification_mandatory_div").clone();
-      
-      name_var = widget_for+"_"+requirements_count+"_mandatory";
-      
-      mandatory_div.attr('id', name_var+"_div");
-      
-      mandatory_checkbox = mandatory_div.children("input[type='checkbox']");
-      mandatory_checkbox.attr('id', name_var);
-      mandatory_checkbox.attr('name', name_var);
-
-      $(mandatory_div).insertBefore(add_button_class);
-      mandatory_div.css('display', "block");
-
-    // text-div & label -------------------------------------------------------------------------------------------
-      text_div = $("#qualification_text_div").clone();
-      
-      name_var = widget_for+"_"+requirements_count+"_text";
-      
-      text_div.attr('id', name_var+"_div");
-      
-      text_label = text_div.children("label");
-      text_label.attr('id', name_var);
-      text_label.attr('name', name_var);
-      text_label.text(textarea_html.val());
-
-      $(text_div).insertBefore(add_button_class);
-      text_div.css('display', "block");
-
-    // action-div & options ---------------------------------------------------------------------------------------
-      action_div = $("#qualification_action_div").clone();
-      
-      name_var = widget_for+"_"+requirements_count+"_action";
-      
-      action_div.attr('id', name_var+"_div");
-      
-      // action_div.children("div").attr('id', name_var+"_delete");
-      // action_div.children("div").attr('data-dropdown', name_var+"_dropdown");
-
-      // action_div.find(".f-dropdown").attr('id', name_var+"_dropdown");
-      // action_div.find(".option-spacing").attr('id', name_var+"_edit");
-      action_div.children("input[type='button']").attr('id', name_var+"_delete");
-
-      $(action_div).insertBefore(add_button_class);
-      action_div.css('display', "block");
-
-    // clear textarea & update hidden requirements_count (increment by 1) -----------------------------------------
-      $("#"+widget_for+"_requirements_count").val(requirements_count);
-      textarea_html.val("");
-
-    // remove required attr ---------------------------------------------------------------------------------------
-      textarea_html.removeAttr("required");
-    }
-
-    else {
-    // remove required attr ---------------------------------------------------------------------------------------
-      textarea_html.removeAttr("required");
-    }
-  });
-
-// On click of 'Delete', delete corresponding row with checkbox, label & action buttons (delete & edit) ---------
-  $(document).on("click", ".delete_requirement", function(){
-    var button_id = $(this).attr('id');
-    var first_underscore_index = button_id.indexOf("_", 0);
-    var second_underscore_index = button_id.indexOf("_", 3);
-
-    var widget_for = button_id.slice(0, first_underscore_index);
-    var widget_count_to_delete = button_id.slice((first_underscore_index + 1), second_underscore_index);
-
-  // remove 'mandatory' div along with all it's children
-    $("#"+widget_for+"_"+widget_count_to_delete+"_mandatory_div").remove();
-  // remove 'text' div along with all it's children
-    $("#"+widget_for+"_"+widget_count_to_delete+"_text_div").remove();
-  // remove 'action' div along with all it's children
-    $("#"+widget_for+"_"+widget_count_to_delete+"_action_div").remove();
-
-    // DON'T DECEREMENT requirements count, may create conflicts in ids
-  });
-
-// On click of Register/Update ----------------------------------------------------------------------------------
-  $(document).on("click", "#save_course", function(event) {
-  // Store requirements in a list for master-trainer & voluntary-teacher respectively
-    var widget_for = ["mt", "vt"];
-
-    for (var i=0; i<widget_for.length; i++) {
-      qualification_list = [];
-      requirements_count = parseInt($("#"+widget_for[i]+"_requirements_count").val());
-
-      if (requirements_count > 0) {
-        cnt = 1;
-        while (cnt <= requirements_count) {
-          qualification_mandatory = $("#"+widget_for[i]+"_"+cnt+"_mandatory").prop('checked');
-          qualification_text = $("#"+widget_for[i]+"_"+cnt+"_text").text();
-
-          if (qualification_mandatory !== undefined && qualification_text != "") {
-            // alert("qualification_mandatory: " + qualification_mandatory + "\nqualification_text: " + qualification_text);
-            // qualification = {}
-            // qualification["qualification_mandatory"] = qualification_mandatory;
-            // qualification["qualification_text"] = qualification_text;
-
-            // qualification_list.push(qualification);
-            qualification_list.push(qualification_mandatory);
-            qualification_list.push(qualification_text);
-
-          }
-
-          cnt += 1;
-        }
-
-        if (widget_for[i] == "mt") {
-          $("#mast_tr_qualifications").val(qualification_list);
-        }
-
-        else if (widget_for[i] == "vt") {
-          $("#voln_tr_qualifications").val(qualification_list);
-        }
-      }
-    }
-  });
 {% endblock %}
