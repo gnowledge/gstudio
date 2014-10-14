@@ -15,7 +15,6 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.notification import models as notification
-from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
