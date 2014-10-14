@@ -358,6 +358,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   access_policy = request.POST.get("login-mode", '') 
   prior_node_list = request.POST.get('prior_node_list','')
   collection_list = request.POST.get('collection_list','')
+  teaches_list = request.POST.get('teaches_list','')
+  assesses_list = request.POST.get('assesses_list','')
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
@@ -477,100 +479,117 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       is_changed = True
 
   #  prior_node
-
-   
-  # if prior_node_list != '':
-  #   prior_node_list = prior_node_list.split(",")
-
-  # i = 0
-  # while (i < len(prior_node_list)):
-  #   node_id = ObjectId(prior_node_list[i])
-  #   if gcollection.Node.one({"_id": node_id}):
-  #     node.prior_node.append(node_id)
-    
-  #   i = i+1
-  #node.prior_node = []
   if prior_node_list != '':
     prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
 
-  if set(node.prior_node) != set(prior_node_list):
-    i = 0
-    node.prior_node=[]
-    while (i < len(prior_node_list)):
-      node_id = ObjectId(prior_node_list[i])
-      if gcollection.Node.one({"_id": node_id}):
-        if node_id not in node.prior_node:
-          node.prior_node.append(node_id)
-      
-      i = i+1
-    # print "\n Changed: prior_node"
-    is_changed = True
+    if set(node.prior_node) != set(prior_node_list):
+      i = 0
+      node.prior_node=[]
+      while (i < len(prior_node_list)):
+        node_id = ObjectId(prior_node_list[i])
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.prior_node:
+            node.prior_node.append(node_id)
+        
+        i = i+1
+      # print "\n Changed: prior_node"
+      is_changed = True
   
   #  collection
-
-  # node.collection_set = []
-  # if collection_list != '':
-  #     collection_list = collection_list.split(",")
-
-  # i = 0
-  # while (i < len(collection_list)):
-  #   node_id = ObjectId(collection_list[i])
-    
-  #   if gcollection.Node.one({"_id": node_id}):
-  #     node.collection_set.append(node_id)
-    
-  #   i = i+1
- 
-    
   if collection_list != '':
     collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
-    print "collection_list: ",collection_list,"\n\n"
 
-  if set(node.collection_set) != set(collection_list):
-    i = 0
-    node.collection_set = []
+    if set(node.collection_set) != set(collection_list):
+      i = 0
+      node.collection_set = []
 
-    # checking if each _id in collection_list is valid or not
-    while (i < len(collection_list)):
-      node_id = ObjectId(collection_list[i])
-      
-      if gcollection.Node.one({"_id": node_id}):
-        if node_id not in node.collection_set:
-          node.collection_set.append(node_id)
-      
-      i = i+1
-    # print "\n Changed: collection_list"
-    is_changed = True
+      # checking if each _id in collection_list is valid or not
+      while (i < len(collection_list)):
+        node_id = ObjectId(collection_list[i])
+        
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.collection_set:
+            node.collection_set.append(node_id)
+        
+        i = i+1
+      # print "\n Changed: collection_list"
+      is_changed = True
   
+  # Teaches
+  if teaches_list != '':
+
+    teaches_list = [ObjectId(each.strip()) for each in teaches_list.split(",")]
+
+    nlist = []
+    relationtype = gcollection.Node.one({"_type":"RelationType","name":"teaches"})
+    list_grelations = gcollection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+    for relation in list_grelations:
+      nlist.append(ObjectId(relation.right_subject))
+
+    if set(nlist) != set(teaches_list):
+      list_grelations.rewind()
+      i = 0
+
+      while (i < len(teaches_list)):
+        node_id = ObjectId(teaches_list[i])
+        
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in nlist:
+            rel = gcollection.Node.one({'_type': 'GRelation', 'subject': ObjectId(node._id), 'right_subject': ObjectId(node_id), 'relation_type': relationtype.get_dbref()})
+            if rel:
+              rel.delete()
+        
+        i = i+1      
+
+      # print "\n Changed: teaches_list"
+      is_changed = True
+
+  # Assesses
+  if assesses_list != '':
+    assesses_list = [ObjectId(each.strip()) for each in teaches_list.split(",")]
+
+    nlist = []
+    relationtype = gcollection.Node.one({"_type":"RelationType","name":"assesses"})
+    list_grelations = gcollection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+    for relation in list_grelations:
+      nlist.append(ObjectId(relation.right_subject))
+
+    if set(nlist) != set(assesses_list):
+      list_grelations.rewind()
+      i = 0
+
+      while (i < len(assesses_list)):
+        node_id = ObjectId(assesses_list[i])
+        
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in nlist:
+            rel = gcollection.Node.one({'_type': 'GRelation', 'subject': ObjectId(node._id), 'right_subject': ObjectId(node_id), 'relation_type': relationtype.get_dbref()})
+            if rel:
+              rel.delete()
+        
+        i = i+1      
+
+      # print "\n Changed: teaches_list"
+      is_changed = True
+
+
+
   #  Module
-
-  # node.collection_set = []
-  # if module_list != '':
-  #     collection_list = module_list.split(",")
-
-  # i = 0
-  # while (i < len(collection_list)):
-  #   node_id = ObjectId(collection_list[i])
-    
-  #   if gcollection.Node.one({"_id": node_id}):
-  #     node.collection_set.append(node_id)
-    
-  #   i = i+1
   if module_list != '':
     collection_list = [ObjectId(each.strip()) for each in module_list.split(",")]
 
-  if set(node.collection_set) != set(collection_list):
-    i = 0
-    while (i < len(collection_list)):
-      node_id = ObjectId(collection_list[i])
-      
-      if gcollection.Node.one({"_id": node_id}):
-        if node_id not in node.collection_set:
-          node.collection_set.append(node_id)
-      
-      i = i+1
-    # print "\n Changed: module_list"
-    is_changed = True
+    if set(node.collection_set) != set(collection_list):
+      i = 0
+      while (i < len(collection_list)):
+        node_id = ObjectId(collection_list[i])
+        
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.collection_set:
+            node.collection_set.append(node_id)
+        
+        i = i+1
+      # print "\n Changed: module_list"
+      is_changed = True
     
   #  org-content
   
@@ -862,7 +881,7 @@ def get_node_metadata(request, node, node_type):
             field_value = unicode(request.POST.get(atname, ""))
             at = collection.Node.one({"_type": "AttributeType", "name": atname})	
 
-            if(at is not None):
+            if at and field_value:
                 create_gattribute(node._id, at, field_value)
 
 """

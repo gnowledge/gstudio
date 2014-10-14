@@ -150,6 +150,7 @@ def video_edit(request,group_id,_id):
     else :
         pass
     vid_node = collection.File.one({"_id": ObjectId(_id)})
+    title = GST_VIDEO.name
     video_obj=request.GET.get("vid_id","")
     if request.method == "POST":
 
@@ -172,7 +173,7 @@ def video_edit(request,group_id,_id):
         
     else:
         return render_to_response("ndf/video_edit.html",
-                                  { 'node': vid_node,
+                                  { 'node': vid_node, 'title': title,
                                     'group_id': group_id,
                                     'groupid':group_id,
                                     'video_obj':video_obj
