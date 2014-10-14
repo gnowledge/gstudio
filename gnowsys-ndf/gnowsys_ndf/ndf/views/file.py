@@ -607,6 +607,7 @@ def uploadDoc(request, group_id):
                 group_id = str(auth._id)
     else :
         pass
+
     if request.method == "GET":
         page_url = request.GET.get("next", "")
         template = "ndf/UploadDoc.html"
@@ -679,7 +680,7 @@ def submitDoc(request, group_id):
        
         if img_type != "": 
             
-            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id , 'usrid': userid}))
+            return HttpResponseRedirect(reverse('uDashboard', kwargs={'group_id': group_id}))
 
         elif topic_file != "": 
             
@@ -1153,14 +1154,17 @@ def getFileThumbnail(request, group_id, _id):
 
     if file_node is not None:
         if file_node.fs_file_ids:
-
           # getting latest uploaded pic's _id
           file_fs = file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]
          
           if (file_node.fs.files.exists(file_fs)):
             # f = file_node.fs.files.get(ObjectId(file_fs))
             ## This is to display the thumbnail properly, depending upon the size of file.
-            f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]))
+            #f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]))
+            if len(file_node.fs_file_ids) > 1:
+              f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
+            else:
+              f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
             # if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
             #     f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
             return HttpResponse(f.read(), content_type=f.content_type)
@@ -1221,6 +1225,7 @@ def file_edit(request,group_id,_id):
         pass
 
     file_node = collection.File.one({"_id": ObjectId(_id)})
+    title = GST_FILE.name
 
     if request.method == "POST":
 
@@ -1251,7 +1256,7 @@ def file_edit(request,group_id,_id):
             file_node.get_neighbourhood(file_node.member_of)
 
         return render_to_response("ndf/document_edit.html",
-                                  { 'node': file_node,
+                                  { 'node': file_node,'title':title,
                                     'group_id': group_id,
                                     'groupid':group_id
                                 },

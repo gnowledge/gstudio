@@ -3,7 +3,7 @@
 <div id="rating-bar" class="show-on-hover">
     <form>
         
-    <h6>{% trans "Rating" %} <span class="subheader" id="avg-rating">{{ratings.tot|default:"unrated"}}</span></h6>
+    <b>{% trans "Rating" %} <span class="subheader" id="avg-rating">{{ratings.tot|default:"unrated"}}</span></b><br/>
      
        {% get_node_ratings request node as ratings %}
       

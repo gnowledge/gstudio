@@ -418,6 +418,7 @@ def edit_group(request,group_id):
     pass
 
   page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+  title = gst_group.name
   if request.method == "POST":
     is_node_changed=get_node_common_fields(request, page_node, group_id, gst_group)
     
@@ -437,7 +438,7 @@ def edit_group(request,group_id):
       page_node, ver = get_page(request, page_node)
       page_node.get_neighbourhood(page_node.member_of) 
   return render_to_response("ndf/edit_group.html",
-                                    { 'node': page_node,
+                                    { 'node': page_node,'title':title,
                                       'appId':app._id,
                                       'groupid':group_id,
                                       'group_id':group_id
