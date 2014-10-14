@@ -1482,7 +1482,7 @@ def resource_info(node):
 			grname=re.split(r'[/=]',node)
 			group_gst=col_Group.Group.one({'_id':ObjectId(grname[1])})
 		return group_gst
-																
+
 		
 @register.assignment_tag
 def edit_policy(groupid,node,user):

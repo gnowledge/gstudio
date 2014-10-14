@@ -195,6 +195,7 @@ def image_edit(request,group_id,_id):
     else :
         pass
     img_node = collection.File.one({"_id": ObjectId(_id)})
+    title = GST_IMAGE.name
     if request.method == "POST":
 
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
@@ -218,7 +219,7 @@ def image_edit(request,group_id,_id):
     else:
 	img_node.get_neighbourhood(img_node.member_of)
         return render_to_response("ndf/image_edit.html",
-                                  { 'node': img_node,
+                                  { 'node': img_node,'title': title,
                                     'group_id': group_id,
                                     'groupid':group_id
                                 },
