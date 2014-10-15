@@ -281,7 +281,7 @@
 							{{ each_edu_use }}
 						</option>
 					{% endfor %}
-					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+					<option {%if not resource.educationaluse %}selected="selected"{%endif%} value="None">
 						None
 					</option>
 				</select>
@@ -291,7 +291,7 @@
 					{% for each_intertype in static_interactivitytype %}
 						<option {%if each_intertype == resource.interactivitytype %}selected="selected"{%endif%} value="{{ each_intertype }}">{{ each_intertype }}</option>
 					{% endfor %}
-					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+					<option {%if not resource.interactivitytype %}selected="selected"{%endif%} value="None">
 						None
 					</option>
 				</select>
@@ -303,7 +303,7 @@
 					{% for each_edu_align in static_educationalalignment %}
 						<option {%if each_edu_align == resource.educationalalignment %}selected="selected"{%endif%} value="{{ each_edu_align }}">{{ each_edu_align }}</option>
 					{% endfor %}
-					<option {%if not each_edu_use %}selected="selected"{%endif%} value=""></option>
+					<option {%if not resource.educationalalignment %}selected="selected"{%endif%} value=""></option>
 				</select>
 			</td>
 			<td class="hide-el" data-field="educationallevel">
@@ -311,7 +311,7 @@
 					{% for each_edulevel in static_educationallevel %}
 						<option {%if each_edulevel == resource.educationallevel %}selected="selected"{%endif%} value="{{ each_edulevel }}">{{ each_edulevel }}</option>
 					{% endfor %}
-					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+					<option {%if not resource.educationallevel %}selected="selected"{%endif%} value="None">
 						None
 					</option>
 				</select>
@@ -321,7 +321,7 @@
 					{% for each_sub in static_educationalsubject %}
 						<option {%if each_sub == resource.educationalsubject %}selected="selected"{%endif%} value="{{each_sub}}">{{ each_sub }}</option>
 					{% endfor %}
-					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+					<option {%if not resource.educationalsubject %}selected="selected"{%endif%} value="None">
 						None
 					</option>
 				</select>
@@ -333,7 +333,7 @@
 				{% for each_curr in static_curricular %}		
 					<option {%if each_curr == resource.curricular %}selected="selected"{%endif%} value="{{ each_curr }}">{{ each_curr }}</option>
 				{% endfor %}
-					<option selected="selected" value=""></option>
+					<option {%if not resource.curricular %}selected="selected"{%endif%} value=""></option>
 				</select>
 			</td>
 			<td class="hide-el" data-field="audience">
@@ -341,7 +341,7 @@
 				{% for each_aud in static_audience %}		
 					<option {%if each_aud == resource.audience %}selected="selected"{%endif%} value="{{ each_aud }}">{{ each_aud }}</option>
 				{% endfor %}
-					<option {%if not each_edu_use %}selected="selected"{%endif%} value="None">
+					<option {%if not resource.audience %}selected="selected"{%endif%} value="None">
 						None
 					</option>
 				</select>
@@ -385,10 +385,12 @@
 			</td>
 			<td class="hide-el" data-field="textcomplexity" class="right-border">
 				<select name="textcomplexity">
-					<option value="None">None</option>
 				{% for each_tc in static_textcomplexity %}		
 					<option {%if each_tc == resource.textcomplexity %}selected="selected"{%endif%} value="{{ each_tc }}">{{ each_tc }}</option>
 				{% endfor %}	
+					<option {%if not resource.textcomplexity %}selected="selected"{%endif%} value="None">
+						None
+					</option>
 				</select>				
 			</td>
 		</tr>
@@ -488,8 +490,6 @@
 		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
 		setCurrEditRowToNone();
 	}
-
-
 
 	// action on edit click:
 	function editResRow(oid)
@@ -673,7 +673,8 @@
 						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
 						{
 							resViewRowArr[4+i].title = tempContentOrg;
-							resViewRowArr[4+i].textContent = tempContentOrg.substr(0, 60) + "..."
+							resViewRowArr[4+i].textContent = tempContentOrg.substr(0, 60);
+							resEditRowArr[i].firstElementChild.setAttribute("data-content-org", tempContentOrg);
 						}
 
 					}
