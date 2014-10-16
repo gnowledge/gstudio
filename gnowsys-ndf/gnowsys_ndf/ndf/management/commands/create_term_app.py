@@ -22,7 +22,6 @@ class Command(BaseCommand):
         
         term = collection.Node.one({'_type': 'GSystemType', 'name': 'Term', 'member_of': ObjectId(gapp_GST._id) })
         if not term:
-            term = collection.Node.one()
             term = collection.GSystemType()
             term.name = u"Term"
             term.access_policy = u"PUBLIC"
