@@ -106,6 +106,21 @@ var edit_Assignee  = document.getElementById("customDropdown2")
 edit_Assignee.selectedIndex = edit_Assignee.options.{{Assignee}}.index
 {% endif %}
 
+{% if start_time %}
+var start_date  = document.getElementById("start_date")
+start_date.value='{{start_time}}'
+{% endif %}
+
+{% if end_time %}
+var end_date  = document.getElementById("end_date")
+end_date.value='{{end_time}}'
+{% endif %}
+
+{% if parent %}
+var parent  = document.getElementById("parent")
+parent.value='{{parent}}'
+{% endif %}
+
 var selected = new Array();
 $(document).on('click',"#save-node",function(event){
 	$('form-edit-node input:checkbox:checked').each(function()
@@ -175,7 +190,7 @@ $(document).on('click',"#save-node",function(event){
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Start date</label>
-        <input id="start_date" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="MM/DD/YYYY" value="" name="start_time">
+        <input id="start_date" class="date_month_day_year" type="text" style="float:left; width:10rem"  placeholder="MM/DD/YYYY" value="" name="start_time">
 	  </div>
 	</div>	
 
@@ -192,7 +207,7 @@ $(document).on('click',"#save-node",function(event){
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Due date</label>
-	     <input id="end_date" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="MM/DD/YYYY" value="" name="end_time">
+	     <input id="end_date" class="date_month_day_year" type="text" style="float:left; width:10rem"  placeholder="MM/DD/YYYY" value="" name="end_time">
 
 	  </div>
 	</div>	
@@ -370,10 +385,8 @@ document.getElementById("customDropdown").disabled = true;
 
 function enableselect() {
 
-  if ((document.getElementById('start_date').value != "") && (document.getElementById('end_date').value != ""))
-  {
     document.getElementById('customDropdown').disabled= "";
-  }  
+  
 }
 </script>
 
