@@ -67,6 +67,7 @@
   {% endfor %} -->
   {% endcomment %}
 
+  {% check_user_join request groupid as user_is_joined %}
   
   <div class="panel" style="background-color:#ddd;">
     <b>{% trans "Visit" %}</b>
@@ -79,11 +80,11 @@
     {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-
-        <a class="tiny round button" href="{% url 'page_create_edit' group_name_tag %}">
-          <span class="fi-plus">&nbsp;&nbsp;{% trans "Create" %} {{title}}</span>
-        </a>
-      
+        {% if user_is_joined == "joined" or user_is_joined == "author" %}
+          <a class="tiny round button" href="{% url 'page_create_edit' group_name_tag %}">
+            <span class="fi-plus">&nbsp;&nbsp;{% trans "Create" %} {{title}}</span>
+          </a>
+        {% endif %}
       {% endif %}
     {% endif %}
 
