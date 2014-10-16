@@ -272,7 +272,7 @@
               
               <ul class="button-group medium-2 columns">
                 <li class="left">
-                  <!-- <a id="toggle-shelf" class="button left-off-canvas-toggle">--><i class='button fi-book-bookmark' disabled></i><!--</a>  -->
+                  <!-- <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a>  -->
                 </li>
 
                 <li>
@@ -284,19 +284,22 @@
               {% get_gapps_iconbar request groupid %}
               
               <ul class="tools button-group medium-2 columns right">
+                  {% comment %}
                   <!-- Show app options if user is logged in-->
-                  {% if user.is_authenticated %}
+                  <!-- {% if user.is_authenticated %}
                   <li>
                <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> {% trans "Actions" %}</a><br>
 <ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
   {% block app_action_list %} {% endblock %}
 </ul>
                       </li>
-                  {% endif %}
-                  
+                  {% endif %} -->
+                  {% endcomment %}
+
                   <li class="right">
-                    <!--<a id="toggle-help" class="button right-off-canvas-toggle" >--><i class='button fi-lightbulb' disabled></i>
-                    <!--</a> -->
+                    <!-- help documentation for every app -->
+                    <!-- <a id="toggle-help" class="button right-off-canvas-toggle" ><i class='button fi-lightbulb'></i>
+                    </a> --> 
                   </li>
                   
                   </ul>
