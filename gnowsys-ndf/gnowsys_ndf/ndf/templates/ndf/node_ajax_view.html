@@ -181,6 +181,8 @@
 
 {% get_schema node as schema %} 
 
+{% check_user_join request groupid as user_is_joined %}
+
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
     
     <section class="medium-9 columns" >
@@ -602,6 +604,7 @@
     <div class="panel" style="background-color:#ddd;">
 
       {% user_access_policy groupid request.user as user_access %} 
+      
       {% if user.is_authenticated %}
       <b>{% trans "Actions" %}</b><br/>
       <div class="row">         
@@ -618,7 +621,9 @@
               {% endif %}
 
             {% else %}
-              <a href="{% url edit_url group_name_tag node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              {% if user_is_joined == "joined" or user_is_joined == "author" %}
+                <a href="{% url edit_url group_name_tag node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              {% endif %}
             {% endif %}
           {% endif %}
         </div>
@@ -668,22 +673,26 @@
             
 
           {% else %}
-            {% if node.member_of_names_list.0 == "File" %}
-              <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny round button">
-                <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-              </a>
+            
+            {% if user_is_joined == "joined" or  user_is_joined == "author" %}
 
-            {% else %}
-              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
-                <a href="{% url create_url group_name_tag app_id %}" class="tiny round button">
-                  <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+              {% if node.member_of_names_list.0 == "File" %}
+                <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny round button">
+                  <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                 </a>
+
               {% else %}
-                <a href="{% url create_url group_name_tag %}" class="tiny round button">
-                  <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-                </a>
-              {% endif %}
+                {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+                  <a href="{% url create_url group_name_tag app_id %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                  </a>
+                {% else %}
+                  <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                  </a>
+                {% endif %}
 
+              {% endif %}
             {% endif %}
           {% endif %}
 
@@ -702,7 +711,6 @@
 
             {% get_group_policy node request.user as policy %}
             {% get_prior_post_node group_id as groupname %}
-            {% check_user_join request groupid as user_is_joined %}
 
             <input type="hidden" id="groupname" value="{{node}}">
             {% if user.is_authenticated %}
@@ -819,9 +827,11 @@
           
         <!-- This button translates given resource -->
         {% if user.is_authenticated %}
-        <li>
-          <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
-        </li>
+          {% if user_is_joined == "joined" or user_is_joined == "author" %}
+            <li>
+              <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
+            </li>
+          {% endif %}
         {% endif %}
       </ul>
     </div>
