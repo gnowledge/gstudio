@@ -272,7 +272,7 @@
               
               <ul class="button-group medium-2 columns">
                 <li class="left">
-                  <!-- <a id="toggle-shelf" class="button left-off-canvas-toggle">--><i class='button fi-book-bookmark' disabled></i><!--</a>  -->
+                  <!-- <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a>  -->
                 </li>
 
                 <li>
@@ -284,19 +284,22 @@
               {% get_gapps_iconbar request groupid %}
               
               <ul class="tools button-group medium-2 columns right">
+                  {% comment %}
                   <!-- Show app options if user is logged in-->
-                  {% if user.is_authenticated %}
+                  <!-- {% if user.is_authenticated %}
                   <li>
                <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> {% trans "Actions" %}</a><br>
 <ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
   {% block app_action_list %} {% endblock %}
 </ul>
                       </li>
-                  {% endif %}
-                  
+                  {% endif %} -->
+                  {% endcomment %}
+
                   <li class="right">
-                    <!--<a id="toggle-help" class="button right-off-canvas-toggle" >--><i class='button fi-lightbulb' disabled></i>
-                    <!--</a> -->
+                    <!-- help documentation for every app -->
+                    <!-- <a id="toggle-help" class="button right-off-canvas-toggle" ><i class='button fi-lightbulb'></i>
+                    </a> --> 
                   </li>
                   
                   </ul>
@@ -428,116 +431,103 @@
   <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
   
   <script type="text/javascript">
-    
 		// Initialize Foundation CSS
-		$(document).foundation();
+		  $(document).foundation();
       
     // Register global ajax start and complete events to show ajax loader when request is in process
-    $( document )
-    .ajaxStart(function() {
-      $( "#ajax_load_image" ).show();
-      $("#content").css({"opacity":"0.1",})
-    })
-    .ajaxComplete(function() {
-      $("#ajax_load_image").hide();
-      $("#content").css({"opacity":"",})
-    });
+      $( document )
+        .ajaxStart(function() {
+          $( "#ajax_load_image" ).show();
+          $("#content").css({"opacity":"0.1",})
+        })
+        .ajaxComplete(function() {
+          $("#ajax_load_image").hide();
+          $("#content").css({"opacity":"",})
+        });
     
     // Toggles the display of main sidebar for 12 col article view
-    var toggleMainSidebar = function(){
-      $("main>aside").toggle();
-      $("main>article").toggleClass("large-9 large-12");
-    };
+      var toggleMainSidebar = function(){
+        $("main>aside").toggle();
+        $("main>article").toggleClass("large-9 large-12");
+      };
       
-      //Hide broken image links
-    $('img').error(function(){
+    // Hide broken image links
+      $('img').error(function(){
         $(this).addClass("hide");
         //$(this).attr('src', 'missing.png');
-    });
+      });
       
-      //If on the home group, change group dropdown text to "Groups"
-      if( $(".group a.active").html() == "home")
-      {
-          $(".group a.active").html("Groups").removeClass("active");
-          $("#home-group").addClass("active");
+    // If on the home group, change group dropdown text to "Groups"
+      if($(".group a.active").html() == "home") {
+        $(".group a.active").html("Groups").removeClass("active");
+        $("#home-group").addClass("active");
       }
 
-
     //Functions to automatically add an <i> element icon inside node spans 
-		$(".user").prepend(function(){
-			/* Attaches user icon with gnow level color for every user link */
-			return "<i class='fi-torso'></i>"
-		});
+  		$(".user").prepend(function(){
+  			/* Attaches user icon with gnow level color for every user link */
+  			return "<i class='fi-torso'></i>"
+  		});
 
-		$(".card .course").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-book'></i>"
-		});
+  		$(".card .course").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-book'></i>"
+  		});
 
-		$(".card .quiz").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-graph-bar'></i>"
-		});
+  		$(".card .quiz").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-graph-bar'></i>"
+  		});
 
-		$(".card .forum").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-comments'></i>"
-		});
+  		$(".card .forum").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-comments'></i>"
+  		});
 
-		$(".card .group").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-torsos'></i>"
-		});
+  		$(".card .group").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-torsos'></i>"
+  		});
 
-		$(".card .page").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-page'></i>"
-		});
+  		$(".card .page").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-page'></i>"
+  		});
 
-		$("aside.page").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-page'></i>"
-		});
-
+  		$("aside.page").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-page'></i>"
+  		});
 		
 		/* Expand create card on hover */
-		$(".create.card").find(">div>div").slideUp();
-		$(".create.card").hover(function(){
-			$(this).find(">div>div").slideDown();
-		},
-		function(){
-			$(this).find(">div>div").slideUp();
-		});
-      
-      
 
     //set language prefernce
-    $(document).on('click',"#savepref",function(){
-      var vpref=$("#pref").val();
-      var fb=$("#fallback").val();
-      var vurl='/{{group_id}}/userpreference/';
+      $(document).on('click', "#savepref", function(){
+        var vpref=$("#pref").val();
+        var fb=$("#fallback").val();
+        var vurl='/{{group_id}}/userpreference/';
 
-      $.ajax({
-        url: vurl,
-        type: 'POST',
-        data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        $.ajax({
+          url: vurl,
+          type: 'POST',
+          data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
 
-        success:function(data){
-          alert("Successfully set the preferences");
-	  location.reload()
-        }
-      }); //ajax closes
-    }); //document closes
+          success:function(data){
+            alert("Successfully set the preferences");
+            location.reload();
+          }
+        }); //ajax closes
+      }); //document closes
 
   	{% block script %} {% endblock %}	
 
+    $(document).ready(function(){
+      $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
+      
+      {% block document_ready %} {% endblock %}
+    });
   </script>
-  
-<script type="text/javascript">
-  $(document).ready(function(){
-  $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true)
-})
-  </script>
+
   <script src="/static/ndf/js/app.js"></script> <!-- checked -->
 
 </body>

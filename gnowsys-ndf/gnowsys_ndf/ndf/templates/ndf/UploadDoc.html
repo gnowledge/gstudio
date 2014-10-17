@@ -129,24 +129,44 @@
 		<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
 		{% endif %}
 		{% endblock %}
+
+
 		{% block script %}
 
-		jQuery(document).ready(function($){
+		$("#docFile").change(function() {
+        var max_size =100000
+        var fsize=this.files[0].size
+        fsize=fsize/1024
+        {% check_is_gstaff groupid request.user as gstaff_access %}
+        if(fsize> max_size){
+          {% if gstaff_access%}
+          	$('#docFile').val(this.value);
+          {% else %}
+          	alert("Sorry. Max File Size Limit Exceeded");
+          	$(this).val("")
+          	$('#docFile').val(this.value);
+          {% endif %}
+          }
+        else{
+		$('#docFile').val(this.value);}        
+      	});
+		
 		$(document).on('submit',"form",function(){
 		if($("#docFile").val() != "")
 		{	
+
 		$("#message").show();
 		$("#submitpostid").hide();
 		$("#submitpostid").submit();
 
-	}
-	else
-	{
-	alert("select a file");
-	return false;
-}
+		}
+		else
+		{
+		alert("select a file");
+		return false;
+		}
 
-});
+
 });
 {% endblock %}
 

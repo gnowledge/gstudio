@@ -155,6 +155,7 @@
 
 </style>
 
+
 {% if user.is_authenticated %}
 <!--<a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> -->
 {% endif %}
@@ -180,153 +181,24 @@
 
 {% get_schema node as schema %} 
 
-<div itemscope itemtype="{{schema.1.type}}">
-  <header class="row page">
+{% check_user_join request groupid as user_is_joined %}
 
+<div class="row page" itemscope itemtype="{{schema.1.type}}">
+    
     <section class="medium-9 columns" >
       <ul class="breadcrumbs">
         <li><a href="/{{groupid}}">{{groupid}}</a></li>
         <li><a href="#">{% trans "Collection Name " %}</a></li>
       </ul>
 
-      <div class="label-list"> 
-        {% for tag in node.tags %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-          <span itemprop="{{schema.1.tags}}" content="{{tag}}"></span>
-        {% endfor %}
-
-      </div> 
+       
       
-      <h1>
-        <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span> 
-        <!-- Tabs for content and discussion views-->
-        <div class="node-bar">
+      <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span> </h1>
 
-        <!-- Start of Block: For listing Editing options --> 
-        {% user_access_policy groupid request.user as user_access %}
-        {% edit_policy groupid node request.user as status %}
-        {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
-        {% get_edit_url node.pk as edit_url %}
-
-        {% check_group node as is_group %}
-        {% if is_group %}
-          {% if user.is_superuser or node.created_by == user.id %}
-          <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
-          {% endif %}
-
-        {% else %}
-          <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
-        {% endif %}    
-
-        <ul id="edit-options" data-dropdown-content class="f-dropdown">
-
-          <!-- This button publishes the drafted resource -->
-          {% if node %}
-          {% get_publish_policy request groupid node as group_policy %}
-          {% if group_policy == "allow" %}
-            {% if is_group %}
-            {% if user.is_superuser or node.created_by == user.id %}
-            <li>
-              <a href="{% url 'publish_group' group_name_tag node %}">{% trans "Publish" %}</a>
-            </li>
-            {% endif %}
-            
-            {% else %}
-            <li>
-              <a href="{% url 'publish_page' group_name_tag node %}">Publish</a>
-            </li>
-            
-            {% endif %}
-            
-          {% endif %}
-          
-          {% endif %}
-
-          <!-- This button converts collection into module -->
-          {% if node.collection_set and user.is_authenticated %}
-            {% if user_access == "allow" %}
-            <li>
-             <a href="#" id="module">{% trans "Make Module" %}</a>
-            </li>
-            {% endif %}
-          {% endif %}
-
-            
-            <!-- Delete button if page created by user -->
-            {% if node.created_by == request.user.id %}
-      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
-      {% endif %}
-
-          <!--
-            * This button Adds/Uploads New resource
-            * Displayed 
-              - For Pages and Files
-              - In case of Groups/Author, only to the superuser
-          -->
-          {% get_create_url node.pk as create_url %}
-
-          {% if is_group %}
-            
-<!-- 
-This section has been integrated to groupdashboard and appears in block app_action_list
-            {% if request.user.is_superuser %}
-            <li>
-              <a href="{% url create_url group_name_tag %}">
-                <span class="fi-plus">&nbsp;&nbsp; New Group</span>
-              </a>
-            </li>
-            {% endif %}
--->
-
-          {% else %}
-            {% if node.member_of_names_list.0 == "File" %}
-            <li>
-              <a href="{% url create_url group_name_tag %}?next={{request.path}}">
-                <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-              </a>
-            </li>
-
-            {% else %}
-              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
-              
-                <li>
-                  <a href="{% url create_url group_name_tag app_id %}">
-                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-                  </a>
-                </li>
-              {% else %}
-                <li>
-                  <a href="{% url create_url group_name_tag %}">
-                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-                  </a>
-                </li>
-              {% endif %}
-
-            {% endif %}
-
-          {% endif %}
-
-        </ul>
-
-      {% endif %}
-      <!-- End of Block: For listing Editing options -->
-            
-          
-            </div>
-  </h1>
       <h1 class="subheader">
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
       <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
-      {% comment %}
-      <!--
-      # This code has been commented out because this coding is 
-        effecting performance in displaying node details
-
-      <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes" %}</a></dd>
-      -->
-      {% endcomment %}
-      
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
 
@@ -347,51 +219,9 @@ This section has been integrated to groupdashboard and appears in block app_acti
     </dl>
   </h1>
 
-</section>
+  <!-- new  -->
 
-<div class="medium-3 columns"> 
-
-  <!-- Modal links for associated views like graphs and map-->
-  <ul class="side-nav">
-
-  {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
-    <!-- Below code/widgets will only be shown for all resource instances/documents
-         which are neither Topic nor Concept
-    -->
-    <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></li>
-
-    <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
-    </li>
-
-    <ul id="graph-list" class="f-dropdown" data-dropdown-content>
-      <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph" %}</a></li>
-
-      {% if node.collection_set %}
-      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
-      {% endif %}
-
-      {% if node.prior_node %}
-      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
-      {% endif %}               
-    </ul>
-  {% endif %}
-
-    <!-- 
-    <li>
-      <a id = "toggleContainer"  href="#" onClick="toggle(this);">
-        <i class="fi-comments annotateIcon"></i> {% trans "Annotate" %}
-      </a>
-    </li> 
-    --> 
-  
-  </ul>
-
-  </div>
-</header>
-
-
-
-{% if schema.0 %}
+  {% if schema.0 %}
 <meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">
 <meta itemprop="{{schema.1.DM}}" content="{{node.last_update}}" >
 <meta itemprop="{{schema.1.creator}}" content="{{node.user_details_dict.created_by}}">
@@ -402,42 +232,43 @@ This section has been integrated to groupdashboard and appears in block app_acti
 {% for contributor_name in node.user_details.contributors %}
 <meta itemprop="{{schema.1.contributor}}" content="{{contributor_name}}">
 {% endfor %}                                                             
-{% if node|is_File %}     		
-<meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " > 	
-<meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >     	
-{% endif %}                     					  
-{% endif %} 	
+{% if node|is_File %}         
+<meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " >  
+<meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >      
+{% endif %}                                 
+{% endif %}   
 
-{% for neighbour in node.teaches %} 																
+{% for neighbour in node.teaches %}                                 
 <div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
-	<meta itemprop="{{schema.1.educationalframework}}" content="">
-	<meta itemprop="{{schema.1.alignmenttype}}" content="teaches">	
-	<meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
-	<meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
-	<meta itemprop ="{{Schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
+  <meta itemprop="{{schema.1.educationalframework}}" content="">
+  <meta itemprop="{{schema.1.alignmenttype}}" content="teaches">  
+  <meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+  <meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
+  <meta itemprop ="{{Schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
 </div>
 {% endfor %}
 
-{% for neighbour in node.assesses %} 																
+{% for neighbour in node.assesses %}                                
 <div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
-	<meta itemprop="{{schema.1.educationalframework}}" content="">
-	<meta itemprop="{{schema.1.alignmenttype}}" content="assesses">	
-	<meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
-	<meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
-	<meta itemprop ="{{schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
+  <meta itemprop="{{schema.1.educationalframework}}" content="">
+  <meta itemprop="{{schema.1.alignmenttype}}" content="assesses"> 
+  <meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+  <meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
+  <meta itemprop ="{{schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
 </div>
 {% endfor %}
 
 <div class="row">
-	
-  <section class="medium-9 columns content">
+  
+  <section class="medium-12 columns content">
     <div class="tabs-content">
       <!-- Tab content -->
       <div class="content active commentable-section" id="view-page" data-section-id="1">
-      	<div class="row">
+        <div class="row">
           <div class="small-4 columns">
             {% if node.prior_node|length > 0 %}
             <div class="panel">
+
               <h6>{% trans "You may want to read these first: " %}</h6>
               {% for index_key, each_node in node.prior_node_dict.items %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
@@ -454,7 +285,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
           <div class="small-4 columns">
             {% if node.teaches %}
             <div class="panel">
-  		        <h6>This resource teaches you: </h6>
+              <h6>This resource teaches you: </h6>
               {% for  each_node in node.teaches %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
@@ -464,7 +295,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
               {% if not forloop.last %},&nbsp; {% endif %}
               {% endif %}
               {% endfor %}
-          	</div>
+            </div>
             {% endif %}
           </div>
 
@@ -484,7 +315,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
             {% endif %}
           </div>
         </div>
-	
+  
         <!-- Code for showing media details -->
         {% if node.mime_type %}
 
@@ -516,7 +347,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
           </div>
 
           {% elif 'video' in node.mime_type %}
-    	    <div>
+          <div>
             <video width="640px" controls buffered>
               <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
               <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
@@ -658,7 +489,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
         <div>
           {% with node.html_content|safe as description %}
           {% if description != "None" %}
-        	<span itemprop="{{schema.1.description}}">{{ description }}</span>
+          <span itemprop="{{schema.1.description}}">{{ description }}</span>
           {% endif %}
           {% endwith %}
         </div>
@@ -717,8 +548,8 @@ This section has been integrated to groupdashboard and appears in block app_acti
         <!-- Content for Collection Graph -->
         {% if node.collection_set %}
           <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-          	<a class="close-reveal-modal">&#215;</a>
-          	{% include "ndf/graph_collection.html" %}
+            <a class="close-reveal-modal">&#215;</a>
+            {% include "ndf/graph_collection.html" %}
           </div>
         {% endif %}
 
@@ -738,38 +569,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
           <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
           <!-- #{#%# endif %} -->
         </div>
-
-        <!-- View node change history area -->
-        {% comment %}
-        <!--
-        # This code has been commented out because this coding is 
-          effecting performance in displaying node details
-
-        # This needs to be see in details and change accordingly
-
-        <div id="view-changes" class="content">
-          <p>
-            {{ node.member_of_names_list.0 }} 
-            Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
-          </p>
-          
-          <h4>{% trans "Recent changes" %}:</h4>
-          <ul class="side-nav">
-            {% for seq_no, version_no in node.version_dict.items|slice:"-20:" reversed %}
-              <li title="Version #{{version_no}}">
-                {% if forloop.last and forloop.counter > 5 %}
-                <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">All Changes</a>
-                
-                {% else %}
-                <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
-
-                {% endif %}
-              </li> 
-            {% endfor %}
-          </ul>
-        </div>
-        -->
-        {% endcomment %}
+        
       {% endif %}
       
       <!-- discussion content area -->
@@ -778,30 +578,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
 
     </div><!-- end of tab's content -->
   </section>
-
-  <section class="medium-3 columns">
-    <div>
-    {% include "ndf/rating.html" %} 
-    </div>
-
-    <div>
-      <ul class="side-nav">
-        <li>{% trans "In other languages" %}</li>
-        {% get_possible_translations node as tran %}
-        {% for each in tran %}
-          {% for k,v in each.items %}
-          <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
-          {% endfor %}
-        {% endfor %}
-          
-        <!-- This button translates given resource -->
-        <li>
-          <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
-        </li>
-      </ul>
-    </div>
-  </section>
-
+  
 </div>
 
 <footer>
@@ -811,7 +588,261 @@ This section has been integrated to groupdashboard and appears in block app_acti
   </small></p>
 </footer>
       
-</div> <!-- schema ends here -->
+<!-- schema ends here -->
+
+
+  <!-- end new -->
+
+</section>
+
+
+
+<section class="medium-3 columns"> 
+
+  <!-- Modal links for associated views like graphs and map-->
+  <ul class="side-nav">
+    <div class="panel" style="background-color:#ddd;">
+
+      {% user_access_policy groupid request.user as user_access %} 
+      
+      {% if user.is_authenticated %}
+      <b>{% trans "Actions" %}</b><br/>
+      <div class="row">         
+        <div class="medium-6 columns">
+          
+          {% edit_policy groupid node request.user as status %}
+          {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+            {% get_edit_url node.pk as edit_url %}
+
+            {% check_group node as is_group %}
+            {% if is_group %}
+              {% if user.is_superuser or node.created_by == user.id %}
+              <a href="{% url edit_url group_name_tag %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              {% endif %}
+
+            {% else %}
+              {% if user_is_joined == "joined" or user_is_joined == "author" %}
+                <a href="{% url edit_url group_name_tag node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        </div>
+        <div class="medium-6 columns">
+
+          <!-- This button publishes the drafted resource -->
+          {% if node %}
+            {% get_publish_policy request groupid node as group_policy %}
+            {% if group_policy == "allow" %}
+
+              {% if is_group %}
+                {% if user.is_superuser or node.created_by == user.id %}
+                  <a href="{% url 'publish_group' group_name_tag node %}" class="tiny round button edit">{% trans "Publish" %}</a>
+                {% endif %}
+              {% else %}
+                <a href="{% url 'publish_page' group_name_tag node %}" class="tiny round button edit">{% trans "Publish" %}</a><br/>
+              {% endif %}
+            
+            {% else %}
+              <a class="tiny round button edit" style="background-color:gray;" disabled>{% trans "Published" %}</a>
+            {% endif %}
+          {% endif %}
+
+        </div>
+        
+        <br/><br/>
+        <div class="medium-5 columns">
+        <!-- Delete button if page created by user -->
+          {% if node.created_by == request.user.id %}
+            <a class="tiny alert round button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+          {% endif %}
+        </div>
+        <div class="medium-7 columns">
+          {% get_create_url node.pk as create_url %}
+          {% if is_group %}
+            
+            {% if user_access == "allow" %}
+              {% if request.user.is_superuser %}
+              <li>
+                <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                  <span class="fi-plus">&nbsp;&nbsp; New Group</span>
+                </a>
+              </li>
+
+              {% endif %}
+            {% endif %}
+            
+
+          {% else %}
+            
+            {% if user_is_joined == "joined" or  user_is_joined == "author" %}
+
+              {% if node.member_of_names_list.0 == "File" %}
+                <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny round button">
+                  <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                </a>
+
+              {% else %}
+                {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+                  <a href="{% url create_url group_name_tag app_id %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                  </a>
+                {% else %}
+                  <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                  </a>
+                {% endif %}
+
+              {% endif %}
+            {% endif %}
+          {% endif %}
+
+        </div>
+
+        {% if node %}
+          {% get_publish_policy request groupid node as group_policy %}
+          {% if group_policy == "allow" %}
+            <br/><p style='position:fixed; color: gray;font-size: 30pt; margin-left:40px'>Draft</p><br/>
+          {% endif %}
+        {% endif %}
+
+        {% if node %}
+          {% check_group node as is_group %}
+          {% if is_group %}
+
+            {% get_group_policy node request.user as policy %}
+            {% get_prior_post_node group_id as groupname %}
+
+            <input type="hidden" id="groupname" value="{{node}}">
+            {% if user.is_authenticated %}
+              {% if user_access == "allow" %}
+               {% if user.is_superuser or node.created_by == user.id %}
+                   <li><a href="{% url 'create_sub_group' group_id %}" class="tiny round button">create subgroup</a></li>
+               {% endif %}
+              {% endif %}
+            {% if user_is_joined == "joined" %}
+              {% if is_user_group and node.created_by != request.user %}
+              <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
+
+              {% else %}
+              <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
+              {% endif %} 
+
+            {% elif user_is_joined == "not" or not user.is_authenticated %}
+              {% if is_user_group and node.created_by != request.user %}
+              <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
+
+              {% else %}
+              <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+              {% endif %}
+
+            {% endif %}
+
+            {% endif %}
+
+            <!-- Triggers the modals -->
+            <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
+
+            <!-- Reveal Modals begin -->
+            <div id="firstModal" class="reveal-modal" data-reveal></div>
+
+            {% check_is_gstaff groupid request.user as is_gstaff %}
+            {% if is_gstaff %}
+              {% include "ndf/invite_users.html" %}
+
+              {% include "ndf/invite_admins.html" %}
+            {% endif %} 
+          {% endif %}
+        {% endif %}
+
+      </div>      
+      {% endif %}
+
+      <!-- This button converts collection into module -->
+      {% comment %}
+      {% if node.collection_set and user.is_authenticated %}
+        {% if user_access == "allow" %}
+         <a href="#" id="module" class="tiny round button">{% trans "Make Module" %}</a>
+        {% endif %}
+      {% endif %}
+      {% endcomment %}
+
+
+  {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
+    <!-- Below code/widgets will only be shown for all resource instances/documents
+         which are neither Topic nor Concept
+    -->
+    <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></li>
+
+    <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
+    </li>
+
+    <ul id="graph-list" class="f-dropdown" data-dropdown-content>
+      <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph" %}</a></li>
+
+      {% if node.collection_set %}
+      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
+      {% endif %}
+
+      {% if node.prior_node %}
+      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
+      {% endif %}               
+    </ul>
+  {% endif %}
+
+    <!-- 
+    <li>
+      <a id = "toggleContainer"  href="#" onClick="toggle(this);">
+        <i class="fi-comments annotateIcon"></i> {% trans "Annotate" %}
+      </a>
+    </li> 
+    --> 
+    
+    <br/>
+    <div class="label-list"> 
+      <b>{% trans "Tags" %}</b><br/>
+      {% if node.tags %}
+        {% for tag in node.tags %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          <span itemprop="{{schema.1.tags}}" content="{{tag}}"></span>
+        {% endfor %}
+      {% else %}
+        <span class="label">{% trans "No tags defined" %}</span>
+      {% endif %}
+
+    </div><hr/>
+
+    <div>
+    {% include "ndf/rating.html" %} 
+    </div><br/>
+
+    <div>
+      <ul class="side-nav">
+        <li><b>{% trans "In other languages" %}</b></li>
+        {% get_possible_translations node as tran %}
+        {% for each in tran %}
+          {% for k,v in each.items %}
+          <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
+          {% endfor %}
+        {% endfor %}
+          
+        <!-- This button translates given resource -->
+        {% if user.is_authenticated %}
+          {% if user_is_joined == "joined" or user_is_joined == "author" %}
+            <li>
+              <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
+            </li>
+          {% endif %}
+        {% endif %}
+      </ul>
+    </div>
+
+    </div>
+  </ul>
+
+  </section>
+
+
+
     
     
 <script type="text/javascript">

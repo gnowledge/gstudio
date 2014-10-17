@@ -4,50 +4,96 @@
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block style %}
-	table td {	padding:0.5em;	}
-	table {	margin-left:auto; margin-right:auto; }
+	{{block.super}}
+
+	label, small.all-error { font-size: 15px; }
+
+  /* Setting css-properties for small.error */
+  small.error {
+    padding: 0 0 0 0.5rem !important;
+    margin-top: 0rem !important;
+    position: relative !important;
+  }
 {% endblock %}
 
 {% block body_content %} 
-{% url 'auth_password_reset' as auth_pwd_reset_url %}
-{% url 'registration_register' as register_url%}
+	{% url 'auth_password_reset' as auth_pwd_reset_url %}
+	{% url 'registration_register' as register_url %}
 
-<br/>
-{% if form.errors %}
+	<div class="row">
+		<div class="small-8 large-8 small-centered large-centered columns">
+			<br/>
+			{% if form.errors %}
+				<small class="small-8 large-8 columns error all-error">{% trans "Either your email or password is incorrect !!!" %}</small>
+			{% endif %}
 
-<p>{% trans "Either your email or password is incorrect." %}</p>
-{% endif %}
+			<form method="post" id="loginSubmit" action="{% url 'auth_login' %}" data-abide>
+				{% csrf_token %}
 
-<form method="post" id="loginSubmit" action="{% url 'auth_login' %}">
-{% csrf_token %}
-<table>
-	<tr>
-		<td>{{ form.username.label_tag }}</td>
-		<td>{{ form.username }}</td>
-		<td><i class="fi-torso"></i></td>
-	</tr>
-	<tr>
-		<td>{{ form.password.label_tag }}</td>
-		<td>{{ form.password }}</td>
-		<td><i class="fi-key"></i></td>
-	</tr>
-	<tr>
-		<td colspan="3">
-			<a href="{{ auth_pwd_reset_url }}" title="Recover your password" >{% trans "Forgot your password?" %}</a>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="3"><input type="submit" class="button expand" value="{% trans "Login" %}" /></td>
-	</tr>
-	<tr>
-		<td colspan="3"> 
-			<a title="Click here to register" href="{{ register_url }}">{% trans "Don't have an account? Register yourself now." %}</a> 
-		</td>
-	</tr>
-</table>
-    
-<input type="hidden" name="next" value="{{ next }}" />
-		
-</form>
+				<!-- Email -->
+				<div class="row">
+					<div class="small-8 large-8 columns end">
+						<label class="left">
+							{{ form.username.label_tag }}
+						</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="small-8 large-8 columns end">
+						{{ form.username }}
+					</div>
+				</div>
 
+				<!-- Password -->
+				<div class="row">
+					<div class="small-4 large-4 columns">
+						<label class="left">
+							{{ form.password.label_tag }}
+						</label>
+					</div>
+					<div class="small-4 large-4 columns end">
+						<label class="right">
+							<a href="{{ auth_pwd_reset_url }}" title="Recover your password" >{% trans "Forgot your password?" %}</a>
+						</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="small-8 large-8 columns end">
+						{{ form.password }}
+					</div>
+				</div>
+
+				<!-- Login button -->
+				<div class="row">
+					<div class="small-2 large-2 small-offset-3 large-offset-3 columns end">
+						<input type="submit" class="button small expand" value="{% trans "Login" %}" style="font-size:15px" />
+					</div>
+				</div>
+
+				<!-- Forgot password link & New Registration link -->
+				<div class="row">
+					<div class="small-6 large-6 small-offset-1 large-offset-1 columns end">
+						<center>
+						<label>
+						<a title="Click here to register" href="{{ register_url }}">
+							{% trans "Don't have an account? Register yourself now." %}
+						</a>
+						</label>
+						</center>
+					</div>
+				</div>
+				    
+				<!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+			</form>
+		</div>
+	</div>
+{% endblock %}
+
+{% block document_ready %}
+	{{block.super}}
+
+	$("input[id='id_username'], input[id='id_password']").each(function(){
+		$(this).attr("required", "");
+		$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+	});
 {% endblock %}

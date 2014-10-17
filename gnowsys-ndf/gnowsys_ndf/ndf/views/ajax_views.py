@@ -116,7 +116,7 @@ def select_drawer(request, group_id):
             node = collection.Node.one({'_id': ObjectId(node_id) })            
             if selected_collection_list:
               selected_collection_list = [ObjectId(each.strip()) for each in selected_collection_list.split(",")]
-              # print "selected: ", selected_collection_list,"\n"
+              #print "selected: ", selected_collection_list,"\n"
 
             if field:
               if field == "teaches":
@@ -154,7 +154,9 @@ def select_drawer(request, group_id):
 
           elif field == "teaches" or "assesses":
             if set(nlist) != set(selected_collection_list):
-              create_grelation(node._id,relationtype,selected_collection_list)
+              for each in selected_collection_list:
+                if each not in nlist:
+                  create_grelation(node._id,relationtype,ObjectId(each))
 
           node.reload()
 

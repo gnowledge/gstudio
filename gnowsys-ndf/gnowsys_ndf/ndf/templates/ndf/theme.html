@@ -90,11 +90,17 @@
 			        // The clicked node is 'event.node'
 			        var node = event.node;
 			        
-			        // If its topic node i.e no children of this node then show the detail veiw for topic
+			        // If its topic node i.e no children of this node then show the detail view for topic
 			  		if( node.children[0] == null ){
 
 			  			if (node.node_type == "Topic"){
-		  					location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
+			  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";
+
+			               //	console.log('clicked node:' + node.id );
+			               // 	$('#myModal2').foundation('reveal', 'open', {
+			               //   	url:"/{{group_name_tag}}/topic_details/"+node.id+"",
+			               // 	} );    	      
+                                                
 			  			}
 				        
 			  		}
@@ -173,6 +179,7 @@
 {% if user.is_authenticated %}
 {% user_access_policy groupid request.user as user_access %}
 
+
 <ul class="no-bullet" id="app-set-item"> 
 
     {% get_memberof_objects_count theme_GST_id groupid as count %}
@@ -180,12 +187,12 @@
       <li class="selected-app-set-item"> 
         <div>
   		  {% if user_access == "allow" %}
-          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right" title="Add Theme">
+          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right;color:#0b8a91;" title="Add Theme">
             +&nbsp;Add
           </a>
           {% endif %}
 
-          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" >
+          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" style="color:#0b8a91;">
             Theme ({{count}})
           </a> 
 
@@ -199,7 +206,7 @@
 <ul class="no-bullet">
   	<li>
       	<div>
-        	<a href="{% url 'theme_page' group_name_tag %}"> <input class="medium button split" type="button" value="Themes" > </a>
+        	<a href="{% url 'theme_page' group_name_tag %}"> <input class="small button" type="button" value="Themes" > </a>
       	</div>
     </li>
 
@@ -212,6 +219,8 @@
 
 {% block body_content %}
 {% user_access_policy groupid request.user as user_access %}
+
+      	<!-- <div id="myModal2" class="reveal-modal" style="height:500px;overflow:hidden;width:80%" data-reveal>  <a class="close-reveal-modal" >&#215;</a> </div> -->
 
 	{% if themes_hierarchy %}
 

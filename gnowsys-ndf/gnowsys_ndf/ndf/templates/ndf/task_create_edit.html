@@ -17,7 +17,14 @@
 	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
 		<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
-		<script type="text/javascript" src="/static/ndf/js/CalendarControl.js"></script> <!-- checked -->
+	
+	
+	
+		<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
 
 <script type="text/javascript">
@@ -37,37 +44,6 @@
     overflow-x: hidden;
     overflow-y: auto;
     padding-left: 10px;
-    
-}
-</style>
-<style type="text/css">
-#CalendarControlIFrame {
-  display: none;
-  left: 0px;
-  position: fixed;
-  top: 100px;
-
-  height: 150px;
-  width: 50px;
-
-    left:100px;
-    top:200px;
-  z-index: 99;
-
-}
-
-
-#CalendarControl {
-  position:fixed;
-  background-color:#FFF;
-  margin:0;
-  padding:0;
-
-  display:none;
-  z-index: 100;
-    left:100px;
-    top:200px;
-
 }
 </style>
 {% endblock %}
@@ -78,13 +54,17 @@ $( "#parent" ).autocomplete({
   select: function( event, ui ) {
 	$('#hidden_parent').val(ui.item.id);console.log(ui.item.id);} 
 });
-{% if node %}
-$('.start_date').fdatepicker();
-{% else %}
-$('.start_date').fdatepicker('update','06/14/2014');
-{% endif %}
-$('.due_date').fdatepicker();
-user_list =JSON.parse(update_user_list())
+
+<!-- To prevent error while parsing to JSON, if group has no members -->
+user_list = update_user_list()
+if (JSON.stringify(user_list) != "[]") {
+  user_list =JSON.parse(user_list)
+}
+else  {
+	user_list=[]
+}
+
+
 function update_user_list()
 {
 var ajurl ="{% url 'get_group_member_user' groupid %}";
@@ -126,13 +106,27 @@ var edit_Assignee  = document.getElementById("customDropdown2")
 edit_Assignee.selectedIndex = edit_Assignee.options.{{Assignee}}.index
 {% endif %}
 
+{% if start_time %}
+var start_date  = document.getElementById("start_date")
+start_date.value='{{start_time}}'
+{% endif %}
+
+{% if end_time %}
+var end_date  = document.getElementById("end_date")
+end_date.value='{{end_time}}'
+{% endif %}
+
+{% if parent %}
+var parent  = document.getElementById("parent")
+parent.value='{{parent}}'
+{% endif %}
+
 var selected = new Array();
-$(document).on('click',"#save-node",function(){
-$('form-edit-node input:checkbox:checked').each(function() {     selected.push(this.id);});
-$('#hidden_watchers').val(selected);
+$(document).on('click',"#save-node",function(event){
+	$('form-edit-node input:checkbox:checked').each(function()
+		{selected.push(this.id);});
+	$('#hidden_watchers').val(selected);
 });
-
-
 
 {% endblock %}
 
@@ -152,7 +146,7 @@ $('#hidden_watchers').val(selected);
 {% block body_content %}
 
 
-<form data-abide id="form-edit-node" enctype="multipart/form-data"  method="POST" action="">
+<form data-abide id="form-edit-node" enctype="multipart/form-data"  onSubmit="enableselect();" method="POST" action="">
 
 {% csrf_token %}
     <h2 class="medium-12 columns">
@@ -169,7 +163,7 @@ $('#hidden_watchers').val(selected);
 	  <div class="medium-12 columns">
 	    <label>{{title}} Name <font color="red">*</font></label>
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    <small class="error">Please give your Task a descriptive name. It's helpful for others and for yourself.</small>
+	    <small class="error">Please give your Task a descriptive name.</small>
 	  </div>
 	</div>
 	{% endif %}
@@ -191,11 +185,12 @@ $('#hidden_watchers').val(selected);
 			<option value="Closed" id="Closed">Closed</option>
 			<option value="Rejected" id="Rejected">Rejected</option></select>
 		</select>
+		<input type="hidden" name="myselect" value="myselectedvalue" />
 		<small class="error">Broke.</small>
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Start date</label>
-	    <input name="start_time" type="text" placeholder="select date..." onfocus="showCalendarControl(this);" value="{{start_time}}">
+        <input id="start_date" class="date_month_day_year" type="text" style="float:left; width:10rem"  placeholder="MM/DD/YYYY" value="" name="start_time">
 	  </div>
 	</div>	
 
@@ -212,7 +207,8 @@ $('#hidden_watchers').val(selected);
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Due date</label>
-	    <input name="end_time" type="text" placeholder="select date..." onfocus="showCalendarControl(this);" value="{{end_time}}">
+	     <input id="end_date" class="date_month_day_year" type="text" style="float:left; width:10rem"  placeholder="MM/DD/YYYY" value="" name="end_time">
+
 	  </div>
 	</div>	
 	<div class="row">
@@ -265,7 +261,7 @@ $('#hidden_watchers').val(selected);
 	    	<input type="file" name="UploadTask"  id="docFile" value= "" multiple/></label>
 	    <div id="contentlist" class="content">
 		<div class="">
-		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
 		</div>
 		
 	    </div>
@@ -295,12 +291,31 @@ $('#hidden_watchers').val(selected);
     </div>
 </form>
 <script type="text/javascript">
+var currentYear = (new Date()).getFullYear()
+  lowerYearLimit = currentYear - 30;
 $("#document").ready(function(){
 
 		var select=document.getElementById("selectAllOptions");
 		select.checked=false;
 
+
+	$("#start_date.date_month_day_year").datepicker({
+		defaultDate: "+1w",
+		changeMonth: true,
+        changeYear: true,
+         onClose: function( selectedDate ) {
+			$( "#end_date.date_month_day_year" ).datepicker( "option", "minDate", selectedDate );
+		}
+      });
+	$("#end_date.date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        
+      });
+
 		});
+
+
 function toggle(source) {
 	
        if ((source.value) == 'Single Assignee')
@@ -361,6 +376,18 @@ function select_values(source)
 
 }
 
+if ('{{node.name}}' == "" )
+{
+document.getElementById("customDropdown").disabled = true;
+
+
+}
+
+function enableselect() {
+
+    document.getElementById('customDropdown').disabled= "";
+  
+}
 </script>
 
 {% endblock %}

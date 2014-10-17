@@ -4,12 +4,10 @@
 
 {% block title %} {{ title }} {% endblock %}
 
-{% block head %}
-
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
-  <style type="text/css">
-
+{% block style %}
+  {{block.super}}
+  
+  /* Setting css-properties for app-set in left panel */
     .active-app-set, .active-app-set-edit, .active-app-set-view {
       /*padding:0.5em 0 0.5em 0.5em; */
       /*margin-left: -10px !important;*/
@@ -25,66 +23,56 @@
       border-left: 4px solid #808080;
       font-weight: bold;
     }
-
-  </style>
-
 {% endblock %}
 
 {% block meta_content %}
-{% check_is_gstaff groupid request.user as gstaff_access %}
+  {% check_is_gstaff groupid request.user as gstaff_access %}
 
-<ul class="side-nav"> 
-	<li>
-		<a></a>
-	</li>
+  <ul class="side-nav"> 
+  	<li>
+  		<a></a>
+  	</li>
 
-  {% for each in app_collection_set %}
-  {% get_memberof_objects_count each.pk groupid as count %}
+    {% for each in app_collection_set %}
+    {% get_memberof_objects_count each.pk groupid as count %}
 
-  {% if app_set_id == each|safe %}
-    {% if '/new/' in request.path %}
-    <li class="active-app-set-edit">
-    {% else %}
-    <li class="active-app-set-view">
-    {% endif %}
-  {% else %}
-  <li>
-  {% endif %}
-  
-    <div class="row">
-      {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
-        {% if app_name == "MIS" %}
-        <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-        {% else %}
-        <a class="small-8 columns" href="{% url 'mis-po:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-        {% endif %}
-          {{each.name}} ({{count}})
-        </a>
-
-        {% if gstaff_access %}
-        {% if app_name == "MIS" %}
-        <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-        {% else %}
-        <a class="small-4 columns" href="{% url 'mis-po:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-        {% endif %}
-          +&nbsp;Add
-        </a>
-        {% endif %}
-
+    {% if app_set_id == each|safe %}
+      {% if '/new/' in request.path %}
+      <li class="active-app-set-edit">
       {% else %}
-        {{each.name}}
+      <li class="active-app-set-view">
       {% endif %}
-    </div>
-	</li>
+    {% else %}
+    <li>
+    {% endif %}
+    
+      <div class="row">
+        {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
+          {% if app_name == "MIS" %}
+          <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+          {% else %}
+          <a class="small-8 columns" href="{% url 'mis-po:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+          {% endif %}
+            {{each.name}} ({{count}})
+          </a>
 
-	{% endfor %}
+          {% if gstaff_access %}
+          {% if app_name == "MIS" %}
+          <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+          {% else %}
+          <a class="small-4 columns" href="{% url 'mis-po:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+          {% endif %}
+            +&nbsp; {% trans "Add" %}
+          </a>
+          {% endif %}
 
-</ul>
+        {% else %}
+          {{each.name}}
+        {% endif %}
+      </div>
+  	</li>
+
+  	{% endfor %}
+
+  </ul>
 {% endblock %}
-
-
-{% block body_content %} 
-{% endblock %}
-
-{% block script %}
-{% endblock %}	
