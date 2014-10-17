@@ -17,7 +17,7 @@
     <!-- populating replies -->
     {% for each_reply in all_replies %}
 
-    <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-priornode-id="{{ each_reply.prior_node }}">
+    <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
 
       <div class="row"> 
         <div class="small-3 columns">
@@ -34,8 +34,9 @@
       </div>
 
       <div class="row">
-        <div class="small-9 columns"> <small>{{ each_reply.last_update }}</small> </div>
-        <div class='reply-btn text-right small-3 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
+        <div class="small-8 columns"> <small>{{ each_reply.last_update }}</small> </div>
+        <div class="reply-btn small-2 columns" onclick="deleteReply('{{ each_reply.oid }}')">delete</div>
+        <div class='reply-btn text-right small-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
           reply
         </div>
       </div>
@@ -210,7 +211,7 @@
 
                 // add reply text content after #replies-area
                 $("#replies-area").prepend(
-                  "<div style='margin-top:20px;' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
+                  "<div style='margin-top:20px;' data-reply-id='"+ data[1] +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
                   + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
                   + "<span class='align-center'><i class='fi-torso'></i></span>"
                   + "<label>" + data[6] + "</label></a></div>"
@@ -231,7 +232,7 @@
 
                 // add reply text content as sub-reply
                 $($tempPrior).after(
-                "<div style='margin-left:"+ calcMargLeft +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
+                "<div style='margin-left:"+ calcMargLeft +"' data-reply-id='"+ data[1] +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
                   + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
                   + "<span class='align-center'><i class='fi-torso'></i></span>"
                   + "<label>" + data[6] + "</label></a></div>"
@@ -258,6 +259,34 @@
     } // --- END of IF-ELSE
   
   } // --- END of addReply()
+
+
+  function deleteReply(reply_id)
+  {
+    // aaa = $("[data-priornode-id="+reply_id+"]");
+    var aaa = getChildRelies(reply_id, []);
+    console.log(aaa);
+  }
+
+  // recursive function to get child replies
+  function getChildRelies(oid, replyArr)
+  {
+    var tempReplyArr = $("[data-priornode-id="+oid+"]");
+    // console.log(tempReplyArr)
+    if (tempReplyArr.length > 0)
+    {
+      
+      tempReplyArr.each(function(){
+        var tempId = $(this).attr("data-reply-id")
+        // console.log(replyArr);
+        replyArr.push(tempId);
+        getChildRelies(tempId, replyArr);
+
+      })
+
+    }
+    return replyArr;
+  }
 
   // --- END of discussion code ----
 
