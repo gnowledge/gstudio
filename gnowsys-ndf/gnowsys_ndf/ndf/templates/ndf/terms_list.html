@@ -1,0 +1,22 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} Term {% endblock %}
+
+{% block meta_content %}
+
+<h2 class="subheader">{% trans "Terms" %}</h2>
+
+{% endblock %}
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block body_content %} 
+
+<h3>Terms will appear very soon ! !</h3>
+{% endblock %}

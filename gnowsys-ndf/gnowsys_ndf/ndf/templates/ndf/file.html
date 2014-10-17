@@ -35,6 +35,9 @@
 {% endblock %}
 
 {% block related_content %}
+
+{% check_user_join request groupid as user_is_joined %}
+
 <ul class="side-nav">
 
   <div class="panel"  style="background-color:#ddd;">
@@ -117,20 +120,22 @@
 
     </dl><br/>
 
-    <b>{% trans "Actions" %}</b><br/><br/>
-
     {% if user.is_authenticated %}
+    {% if user_is_joined == "joined" or user_is_joined == "author" %}
+    <b>{% trans "Actions" %}</b><br/><br/>
+    
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-
+        
         <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny round button">
           {% trans "Upload File" %}
         </a><br/><br/>
+        
       {% endif %}
-    {% endif %}
+    
 
     <b>{% trans "Review" %}</b><br/><br/>
-    {% if user.is_authenticated %}
+    
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
 
@@ -138,6 +143,7 @@
           {% trans "Data Review" %}
         </a>
       {% endif %}
+    {% endif %}
     {% endif %}
 
     <a href="#" data-reveal-id="library-statistics" class="tiny round button">
