@@ -36,11 +36,6 @@
   <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> 
   <!-- <script src="/static/ndf/bower_components/jquery-legacy/jquery.min.js"> </script> -->
 
-  <!-- an plugin to load images asynchronously   -->
-  <!-- <script type="text/javascript" src="/static/ndf/js/jail.js"></script> -->
-  <!-- <script type="text/javascript"> $(function(){ $('img.lazy').jail(); }); </script> -->
-
-  <!--  <script src="/static/ndf/js/jquery.js"></script> -->
   <!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
   <script src="/static/ndf/bower_components/jquery-legacy/jquery-migrate.js"> </script>
 
@@ -52,13 +47,12 @@
   {% block head %}{% endblock %}
 
   <style>
-    {% block style %}  {% endblock %}
+    {% block style %}{% endblock %}
   </style>
 
 </head>
 
 <body itemscope itemtype="http://schema.org/Webpage">
-  
     
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
@@ -107,33 +101,32 @@
             </select>
           </div>
           <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
-
               
-<!-- Hiding search options on the top bar, this is available from the results page to refine-->
-                   <!--ul class="show">
-	      	<li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
-                <label for="chk_name">Name</label>
+          <!-- Hiding search options on the top bar, this is available from the results page to refine-->
+          <!-- 
+          <ul class="show">
+            <li>
+              <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
+              <label for="chk_name">Name</label>
             </li>
             <li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
-                <label for="chk_tags">Tags</label>
+              <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
+              <label for="chk_tags">Tags</label>
             </li>
             <li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
-                <label for="chk_content">Contents</label><br>
-			</li>
-			<li >
-				{% if groupid %}
-				<a href="{% url 'search_page' groupid %}">Advanced Search</a>
-				{% endif %}
-			</li>
-	      
-	    </ul-->
+              <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
+              <label for="chk_content">Contents</label><br>
+            </li>
+            <li >
+              {% if groupid %}
+              <a href="{% url 'search_page' groupid %}">Advanced Search</a>
+              {% endif %}
+            </li>
+          </ul>
+           -->
 
-          
-                </form>
-        </li>
+        </form>
+      </li>
         
     <!-- Language selector--> 
         
@@ -248,8 +241,6 @@
 
     </nav>
 
-
-
     <div class="workspace">
       <div class="off-canvas-wrap" data-offcanvas>
         <div class="inner-wrap">
@@ -325,7 +316,6 @@
                 </div>
               </section>
 
-
               <div>
                {% block add_resource_content %}  {% endblock %}
              </div>    
@@ -380,7 +370,6 @@
     <img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif">
   </center>
 
-
   <footer>
     <section class="row">
       <div class="medium-12 columns">
@@ -411,8 +400,6 @@
     </p>
 
   </div>
-
-
 
 <div class="medium-10 columns">
   <strong>{% trans "Powered by" %} <a href="https://github.com/gnowledge/gstudio" target="_blank">{% trans "Gnowsys-Studio" %}</a> {% trans "at the" %} <a href="http://www.hbcse.tifr.res.in/" target="_blank">{% trans "Homi Bhabha Centre for Science Education" %}</a>, <a href="http://www.tifr.res.in/" target="_blank">{% trans "TIFR" %}</a>.</strong>
@@ -517,14 +504,18 @@
 
   	{% block script %} {% endblock %}	
 
+    // start of document.ready()
     $(document).ready(function(){
       $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
             
       {% block document_ready %} {% endblock %}
 
-      // function defined in app.js to check font and load async way.
+      // function defined in app.js to check the font and load it asynchronously.
       checkOpenSansFont();
+
     });
+    // --- END of document.ready()
+
   </script>
 
   <script src="/static/ndf/js/app.js"></script> 
