@@ -78,8 +78,6 @@
 	}
 	/* ---END of drawer CSS */
 
-
-
 {% endblock %}
 
 {% block body_content %}
@@ -87,6 +85,7 @@
 <br/>
 <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
 
+<div id="data-rev-table-container-div" style="width: auto; ">
 <table style="width:auto">
 <!-- <table> -->
 	<thead>
@@ -237,9 +236,13 @@
 			</td>
 			<td class="hide-el" data-field="language">
 				<select name="language">
+				    <option value="{{resource.language}}">-- Select --</option>
 					{% for each_lang in static_language %}
 						<option {%if each_lang|lower == resource.language|lower %}selected="selected"{%endif%} value="{{ each_lang }}">{{ each_lang }}</option>
 					{% endfor %}
+					<!-- <option {%if not resource.language %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 					
 					{% comment %}
 					<!-- <option {%if resource.language|lower == "english" %}selected="selected"{%endif%} value="English">English</option>
@@ -273,57 +276,81 @@
 			<!-- LRMI -->
 			<td class="hide-el" data-field="educationaluse">
 				<select name="educationaluse">
+				    <option value="{{resource.educationaluse}}"> -- Select -- </option>
 					{% for each_edu_use in static_educationaluse %}
 						<option {%if each_edu_use == resource.educationaluse %}selected="selected"{%endif%} value="{{ each_edu_use }}">
 							{{ each_edu_use }}
 						</option>
 					{% endfor %}
+					<!-- <option {%if not resource.educationaluse %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 				</select>
 			</td>
 			<td class="hide-el right-border" data-field="interactivitytype">
 				<select name="interactivitytype">
+					<option value="{{resource.interactivitytype}}"> -- Select -- </option>
 					{% for each_intertype in static_interactivitytype %}
 						<option {%if each_intertype == resource.interactivitytype %}selected="selected"{%endif%} value="{{ each_intertype }}">{{ each_intertype }}</option>
 					{% endfor %}
+					<!-- <option {%if not resource.interactivitytype %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 				</select>
 			</td>
 
 			<!-- Alignment and Level -->
 			<td class="hide-el" data-field="educationalalignment">
 				<select name="educationalalignment">
+					<option value="{{resource.educationalalignment}}"> -- Select -- </option>
 					{% for each_edu_align in static_educationalalignment %}
 						<option {%if each_edu_align == resource.educationalalignment %}selected="selected"{%endif%} value="{{ each_edu_align }}">{{ each_edu_align }}</option>
 					{% endfor %}
+					<!-- <option {%if not resource.educationalalignment %}selected="selected"{%endif%} value=""></option> -->
 				</select>
 			</td>
 			<td class="hide-el" data-field="educationallevel">
 				<select name="educationallevel">
+					<option value="{{resource.educationallevel}}"> -- Select -- </option>
 					{% for each_edulevel in static_educationallevel %}
 						<option {%if each_edulevel == resource.educationallevel %}selected="selected"{%endif%} value="{{ each_edulevel }}">{{ each_edulevel }}</option>
 					{% endfor %}
+					<!-- <option {%if not resource.educationallevel %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 				</select>
 			</td>
 			<td class="hide-el right-border" data-field="educationalsubject">
 				<select name="educationalsubject">
-				{% for each_sub in static_educationalsubject %}
-					<option {%if each_sub == resource.educationalsubject %}selected="selected"{%endif%} value="{{each_sub}}">{{ each_sub }}</option>
-				{% endfor %}
+					<option value="{{resource.educationalsubject}}"> -- Select -- </option>
+					{% for each_sub in static_educationalsubject %}
+						<option {%if each_sub == resource.educationalsubject %}selected="selected"{%endif%} value="{{each_sub}}">{{ each_sub }}</option>
+					{% endfor %}
+					<!-- <option {%if not resource.educationalsubject %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 				</select>
 			</td>
 
 			<!-- Curate -->
 			<td class="hide-el" data-field="curricular">
 				<select name="curricular">
+					<option value="{{resource.curricular}}"> -- Select -- </option>
 				{% for each_curr in static_curricular %}		
 					<option {%if each_curr == resource.curricular %}selected="selected"{%endif%} value="{{ each_curr }}">{{ each_curr }}</option>
 				{% endfor %}
+					<!-- <option {%if not resource.curricular %}selected="selected"{%endif%} value=""></option> -->
 				</select>
 			</td>
 			<td class="hide-el" data-field="audience">
 				<select name="audience">
+					<option value="{{resource.audience}}"> -- Select -- </option>
 				{% for each_aud in static_audience %}		
 					<option {%if each_aud == resource.audience %}selected="selected"{%endif%} value="{{ each_aud }}">{{ each_aud }}</option>
 				{% endfor %}
+				<!-- 	<option {%if not resource.audience %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 				</select>
 			</td>
 			<td class="hide-el" data-field="teaches">
@@ -334,12 +361,17 @@
 			</td>
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
-					<option value="False">False</option>
-					<option value="True">True</option>
+					<option value="{{resource.featured}}"> -- Select -- </option>
+					<option {%if resource.featured == "False"%}selected="selected"{%endif%} value="False">False</option>
+					<option {%if resource.featured == "True"%}selected="selected"{%endif%} value="True">True</option>
+					<!-- <option {%if not resource.featured %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 				</select>
 			</td>
 			<td class="hide-el" data-field="status">
 				<select name="status">
+					<option value="{{resource.status}}"> -- Select -- </option>
 				{% for each_status in static_status %}		
 					<option {%if each_status == resource.status %}selected="selected"{%endif%} value="{{ each_status }}">{{ each_status }}</option>
 				{% endfor %}	
@@ -347,8 +379,12 @@
 			</td>
 			<td class="hide-el right-border" data-field="access_policy">
 				<select name="access_policy">
-					<option value="PUBLIC">PUBLIC</option>
-					<option value="PRIVATE">PRIVATE</option>
+					<option value="{{resource.access_policy}}"> -- Select -- </option>
+					<option {%if resource.access_policy == "PUBLIC"%}selected="selected"{%endif%} value="PUBLIC">PUBLIC</option>
+					<option {%if resource.access_policy == "PRIVATE"%}selected="selected"{%endif%} value="PRIVATE">PRIVATE</option>
+					<!-- <option {%if not resource.access_policy %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 				</select>
 			</td>
 
@@ -359,10 +395,13 @@
 			</td>
 			<td class="hide-el" data-field="textcomplexity" class="right-border">
 				<select name="textcomplexity">
-					<option value="None">None</option>
+					<option value="{{resource.textcomplexity}}"> -- Select -- </option>
 				{% for each_tc in static_textcomplexity %}		
 					<option {%if each_tc == resource.textcomplexity %}selected="selected"{%endif%} value="{{ each_tc }}">{{ each_tc }}</option>
 				{% endfor %}	
+					<!-- <option {%if not resource.textcomplexity %}selected="selected"{%endif%} value="None">
+						None
+					</option> -->
 				</select>				
 			</td>
 		</tr>
@@ -370,6 +409,7 @@
 		{% endfor %}
 	</tbody>
 </table>
+</div>
 
 <div id="content_org_overlay" class="reveal-modal" data-reveal>
   {% include "ndf/add_editor.html" with var_name="data_reveal_editor" var_placeholder="Enter your content here."  %}
@@ -420,6 +460,8 @@
 	$article.removeClass("medium-10").addClass("large-12");
 	$article.css("overflow-x", "scroll");
 
+	// setting the height of data review table
+	$("#data-rev-table-container-div").height(window.innerHeight - ($("nav.top-bar").height()*4) + "px");
 
 	function checkCurrEditRow()
 	{
@@ -462,8 +504,6 @@
 		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
 		setCurrEditRowToNone();
 	}
-
-
 
 	// action on edit click:
 	function editResRow(oid)
@@ -647,7 +687,8 @@
 						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
 						{
 							resViewRowArr[4+i].title = tempContentOrg;
-							resViewRowArr[4+i].textContent = tempContentOrg.substr(0, 60) + "..."
+							resViewRowArr[4+i].textContent = tempContentOrg.substr(0, 60);
+							resEditRowArr[i].firstElementChild.setAttribute("data-content-org", tempContentOrg);
 						}
 
 					}
