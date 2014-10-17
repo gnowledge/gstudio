@@ -10,6 +10,14 @@
 
   .first-load { display: none; }
 
+  .tabs dd.active a, .tabs .tab-title.active a {
+    background-color: #f7f7f7;
+  }
+
+  .tabs dd.active{
+    width: 100%;
+  }
+
 {% endblock %}
 
 <!-- left top panel -->
@@ -42,7 +50,7 @@
 
   <div class="panel"  style="background-color:#ddd;">
     <b>{% trans "Visit" %}</b>
-
+    <br/><br/>
     <dl class="tabs" data-tab >
       <!-- all files -->
       <dd class="active">
@@ -499,8 +507,6 @@ else{
   {% endif %}
 
 
-// <script type="text/javascript">
-
 // pagination ajax  
 $('ul.pagination a').click(function(e)
 {
@@ -555,9 +561,6 @@ function populateFileList(pageAnchor)
 
       }
     })
-
 }
-
-// </script>
 
 {% endblock %}
