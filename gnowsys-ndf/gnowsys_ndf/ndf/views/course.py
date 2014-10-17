@@ -172,7 +172,7 @@ def course_detail(request, group_id, _id):
         pass
     course_node = collection.Node.one({"_id": ObjectId(_id)})
     if course_node._type == "GSystemType":
-	return course(request, group_id, _id)
+      return course(request, group_id, _id)
     return render_to_response("ndf/course_detail.html",
                                   { 'node': course_node,
                                     'groupid': group_id,
@@ -241,14 +241,19 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     title = course_gst.name
     course_gs = collection.GSystem()
     course_gs.member_of.append(course_gst._id)
+    course_sec_gst = collection.Node.one({'_type': "GSystemType", 'name': 'StudentEnrollCourse'})
+    course_sec_gs = collection.GSystem()
+    course_sec_gs.member_of.append(course_sec_gst._id)
 
   if app_set_instance_id:
     course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
   property_order_list = get_property_order_with_value(course_gs)
+  property_order_list_sec = get_property_order_with_value(course_sec_gs)
 
   if request.method == "POST":
     # [A] Save course-node's base-field(s)
+
     start_time = ""
     if request.POST.has_key("start_time"):
       start_time = request.POST.get("start_time", "")
@@ -328,16 +333,45 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                 else:
                   # Other AttributeTypes 
-                  field_value = request.POST[field_instance["name"]]
+                  # field_value = request.POST[field_instance["name"]]
+                  field_value = request.POST.get(field_instance["name"], "")
 
                 if field_instance["name"] in ["start_time", "end_time"]: #, "registration_year"]:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
+
+                elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
+                  # Needs sepcial kind of parsing
+                  field_value = []
+                  tr_qualifications = request.POST.get(field_instance["name"], '')
+                  
+                  if tr_qualifications:
+                    qualifications_dict = {}
+                    tr_qualifications = [each.strip() for each in tr_qualifications.split(",")]
+                    
+                    for i, each in enumerate(tr_qualifications):
+                      if (i % 2) == 0:
+                        if each == "true":
+                          qualifications_dict["mandatory"] = True
+                        elif each == "false":
+                          qualifications_dict["mandatory"] = False
+                      else:
+                        qualifications_dict["text"] = unicode(each)
+                        field_value.append(qualifications_dict)
+                        qualifications_dict = {}
+
+                elif field_instance["name"] in ["max_marks", "min_marks"]:
+                  # Needed because both these fields' values are dependent upon evaluation_type field's value
+                  evaluation_type = request.POST.get("evaluation_type", "")
+                  if evaluation_type == u"Continuous":
+                    field_value = None
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+
                 else:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
 
-                if field_value:
-                  course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
-                  # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
+                # if field_value:
+                course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
+                # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
 
               else:
                 field_value_list = request.POST.getlist(field_instance["name"])
@@ -359,13 +393,17 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 #   print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
     
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
-  
+  univ = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
+  university_cur = collection.Node.find({'member_of': univ._id}, {'name': 1}).sort('name', 1)
+
   default_template = "ndf/course_create_edit.html"
   context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
-                        'property_order_list': property_order_list
+                        'university_cur':university_cur,
+                        'property_order_list': property_order_list,
+                        'property_order_list_sec': property_order_list_sec
                       }
 
   if app_set_instance_id:

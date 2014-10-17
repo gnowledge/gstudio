@@ -2149,6 +2149,101 @@ def get_announced_courses(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
+
+
+
+def get_colleges(request,group_id):
+  """
+  This view returns list of college(s) that are affiliated to 
+  the selected University
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  univ_id - ObjectId of currently selected University
+  nussd_course_type - Type of NUSSD course
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  unset_nc - dictionary consisting of announced-course(s) [if match found] and/or 
+             NUSSD-Courses [if match not found]
+  """
+  response_dict = {'success': False, 'message': ""}
+
+  try:
+    if request.is_ajax() and request.method == "GET":
+      # Fetch field(s) from GET object
+      univ_id = request.GET.get("univ_id", "")
+      all_univs = request.GET.get("all_univs", "")
+      
+      # Check whether any field has missing value or not
+      if univ_id == "":
+        error_message = "Invalid data: No data found in any of the field(s)!!!"
+        raise Exception(error_message)
+
+      # Fetch "Announced Course" GSystemType
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
+      if not mis_admin:
+        # If not found, throw exception
+        error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
+        raise Exception(error_message)
+
+      # Fetch all college groups
+      college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'name': 1})
+      if not college:
+        # If not found, throw exception
+        error_message = "'College' (GSystemType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      
+      # Type-cast fetched field(s) into their appropriate type
+      univ_id = ObjectId(univ_id)
+      
+      # Fetch the node of selected university
+      univGST = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
+      university_node = collection.Node.one({'_id': univ_id}, {'relation_set': 1,'name':1})
+
+      # Fetch the list of colleges that are affiliated by the selected university
+      college_ids = []
+      for each in university_node.relation_set:
+        if each.has_key("affiliated_college"):
+          college_ids = each["affiliated_college"]
+          
+      #If "Select All" checkbox is True, display all colleges from all universities
+      if all_univs == u"true":
+        colg_under_univ_id = collection.Node.find({'member_of': college._id},{'name': 1}).sort('name',1)
+        msg_string = " List of colleges in ALL Universities."
+      else:
+        colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'name': 1}).sort('name',1)
+        msg_string = " List of colleges in " +university_node.name+"."
+      
+      list_colg=[]                           
+      for each in colg_under_univ_id:
+        list_colg.append(each)
+
+      nc_dict = {}
+      if colg_under_univ_id.count():
+        # If found, append them to a dict
+        for each in colg_under_univ_id:
+          nc_dict[str(each._id)] = each.name
+
+      response_dict["unset_nc"] = nc_dict
+      drawer_template_context = edit_drawer_widget("", group_id, None, list(list_colg))
+      drawer_template_context["widget_for"] = "student_enroll"
+      drawer_widget = render_to_string('ndf/drawer_widget.html', 
+                                        drawer_template_context,
+                                        context_instance = RequestContext(request)
+                                      )
+      response_dict["drawer_widget"] = drawer_widget
+      response_dict["success"] = True
+      response_dict["message"] = msg_string
+      return HttpResponse(json.dumps(response_dict))
+  except Exception as e:
+    error_message = "AnnouncedCourseError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
+
+
 def get_anncourses_allstudents(request, group_id):
   """
   This view returns ...

@@ -108,11 +108,38 @@
       <div class="active content row" id="panel_{{property_order_list.0.0}}">
         <!-- fieldset for search criteria //////////////////////////////////////////////////////////////////// -->
         <fieldset id="sc">
-          <legend><label><h5>Search Criteria</h5></label></legend>
+          <legend><label><h5>Course</h5></label></legend>
+
           <div class="row">
             <div class="small-3 columns">
-              <label for="NUSSD Course Duration/Period" class="right inline"> 
-                {% trans "NUSSD Course Duration/Period" %}
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+                {% blocktrans with label_val=property_order_list.0.1.2.altnames %} {{label_val}} {% endblocktrans %}
+              </label>
+            </div>
+            
+          
+            <div class="small-5 columns end" style="width: 51.4%;">
+              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
+            <input type="button" id="find_ac" value="View"/>
+          </div>
+          <div class="row">
+                  <!-- fieldset for listing Unset Announced courses based on serach criteria /////////////////////////// -->
+        <fieldset id="unset-ac" style="display: none">
+          <legend>
+            <label><h5>Select Course : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
+          </legend>
+          <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
+            
+          </div>
+        </fieldset>
+            
+          </div>
+
+          <div class="row">
+            <div class="small-3 columns">
+              <label for="Course Period" class="right inline"> 
+                {% trans "Course Period" %}
               </label>
             </div>
             <div class="small-1 columns">
@@ -133,31 +160,69 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="small-3 columns">
-              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
-                {% blocktrans with label_val=property_order_list.0.1.2.altnames %} {{label_val}} {% endblocktrans %}
-              </label>
-            </div>
-            <div class="small-6 columns end" style="width: 51.4%;">
-              {% html_widget groupid node.pk property_order_list.0.1.2 %}
-            </div>
-          </div>
 
-          <div class="small-2 small-centered columns">
-            <input type="button" id="find_ac" value="Find" class="button small round expand"/>
-          </div>
         </fieldset>
 
-        <!-- fieldset for listing Unset Announced courses based on serach criteria /////////////////////////// -->
-        <fieldset id="unset-ac" style="display: none">
+        <fieldset id="colg_drop">
           <legend>
-            <label><h5>Search Results : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
+            <label><h5>Select College</h5> </label>
           </legend>
-          <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
+          <div class="row" style="padding-bottom: 1rem;">
+            
+            
+              <!-- Drop down for college -->
+            <div class="small-3 columns">
+              <label class="right inline">   Select University </label>
+            </div>
+          <div class="small-3 columns">
+              <select id="univ_cur">
+                {% for each in university_cur %}
+                <option value="{{each.pk}}">{{each.name}}</option>
+                {% endfor %}
+              </select>
+              <input type="button" id="find_colg" value="Get Colleges"/>
+
+            </div>
+
+
+            <div class="small-4 columns">
+            
+             <input type="checkbox" id="all_univ" name="all_univ">Select All
+
+            </div>
             
           </div>
+
+          <fieldset id="colglisting">
+          <div class="row" id="divcolg">
+            </div>
+
+          </fieldset>
+          <br>
+          <div class="row">
+            <div class="small-3 columns">
+              <label class="right inline"> This option will be available to PO </label>
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list_sec.0.1.1.name}}" class="right inline"> 
+                {% trans "From" %}
+              </label>
+            </div>
+            <div class="small-2 columns">
+              {% html_widget groupid node.pk property_order_list_sec.0.1.1 %}
+            </div>
+            <div class="small-1 columns">
+              <label for="{{property_order_list_sec.0.1.2.name}}" class="right inline"> 
+                {% trans "To" %}
+              </label>
+            </div>
+            <div class="small-2 columns end">
+              {% html_widget groupid node.pk property_order_list_sec.0.1.2 %}
+            </div>
+          </div>
         </fieldset>
+
         
         <div class="row tab-nav">
           <div class="small-2 columns for-prev">
@@ -179,6 +244,8 @@
 
 {% block script %}
 // <script type="text/javascript">
+
+
 // Function to hide fieldset & submit ----------------------------------------------------------------------------
   function hideFieldsetSubmit() {
     if ($("#announce-course").css("display") == "block") {
@@ -189,6 +256,7 @@
       $("#unset-ac-options-div").empty();
       $("#unset-ac").toggle();
     }
+
   }
 
 // Default settings for date-widgets & tabs on page load ---------------------------------------------------------
@@ -199,18 +267,40 @@
   $(document).ready(function() {
     // Change placeholders for start-time & end-time
       // From MM/DD/YYYY HH:MM to MM/YYYY
+      $("#colg_drop #start_time").removeClass("date_month_day_year");
+      $("#colg_drop #start_time").addClass("dmy");
+      $("#colg_drop #end_time").removeClass("date_month_day_year");
+      $("#colg_drop #end_time").addClass("dmy");
+        
       $(".date_month_day_year").each(function(i) {
         $(this).attr("placeholder", "MM/YYYY");
 
       // Below code is required because in validators "m/d/Y H:i" is set
       // In order to override that, below code is overwritten
-        if ($(this).attr("id") == "start_time") {
+        if ($(".date_month_day_year").attr("id") == "start_time") {
           var st = "{{node.start_time|date:'m/Y'}}"
           // alert("start_time: " + st)
           $(this).val(st)
         }
 
-        else if ($(this).attr("id") == "end_time") {
+        else if ($(".date_month_day_year").attr("id") == "end_time") {
+          var et = "{{node.end_time|date:'m/Y'}}"
+          // alert("end_time: " + et)
+          $(this).val(et)
+        }
+      });
+
+      $(".dmy").each(function(i) {
+        $(this).attr("placeholder", "DD/MM/YYYY");
+
+
+        if ($(".dmy").attr("id") == "start_time") {
+          var st = "{{node.start_time|date:'m/Y'}}"
+          // alert("start_time: " + st)
+          $(this).val(st)
+        }
+
+        else if ($(".dmy").attr("id") == "end_time") {
           var et = "{{node.end_time|date:'m/Y'}}"
           // alert("end_time: " + et)
           $(this).val(et)
@@ -247,8 +337,9 @@
       });
 
     // Settings for datepicker widget (with month & year) --------------------------------------------------------
-      var startDtInput = $("#start_time");
-      var endDtInput = $("#end_time");
+      var startDtInput = $("#fc #start_time");
+      var endDtInput = $("#fc #end_time");
+
 
       $(".date_month_day_year").datepicker({
         changeMonth: true,
@@ -264,7 +355,7 @@
           var month = 1
           var year = lowerYearLimit
 
-          if ($(this).attr('id') == "start_time") {
+          if ($(".date_month_day_year").attr('id') == "start_time") {
             if (month_year) {
               month_year = month_year.split("/")
               
@@ -293,10 +384,10 @@
               $(this).datepicker('setDate', new Date(year, (month-1), 1));
             }
 
-            $("#end_time").datepicker('option', 'minDate', new Date(year, (month-1), 1));
+            $("#end_time.date_month_day_year").datepicker('option', 'minDate', new Date(year, (month-1), 1));
           }
 
-          else if ($(this).attr('id') == "end_time") {
+          else if ($(".date_month_day_year").attr('id') == "end_time") {
             if (month_year) {
               month_year = month_year.split("/")
 
@@ -325,17 +416,122 @@
               $(this).datepicker('setDate', new Date(year, (month-1), 1));
             }
 
-            $("#start_time").datepicker('option', 'maxDate', new Date(year, (month-1), 1));
+            $("#start_time.date_month_day_year").datepicker('option', 'maxDate', new Date(year, (month-1), 1));
           }
         },
 
         beforeShow: function() {
-          // alert("beforeShow")
-          // month[0]: month-value   =======   month[1]: year-value
-          // NOTE: Experienced an odd behavior which is stated as follows:
-          // > Month-value was automatically getting incremented by 1 except only when it is 1
-          // > Hence, to tackle that I'm explicitly subtracting 1 from it!
-          // > and in case of 1 making it 2 & then subtracting 1 from it!
+          var month_year = $(this).val();
+          month = 1
+          year = lowerYearLimit
+  
+          if (month_year) {
+            month_year = month_year.split("/")
+  
+            month = parseInt(month_year[0])
+            year = parseInt(month_year[1])
+          }
+
+          $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
+          $(this).datepicker('setDate', new Date(year, (month-1), 1));
+        },
+
+        onChangeMonthYear: function(year, month, inst){
+          $(this).val(month+"/"+year)
+
+          hideFieldsetSubmit();
+        }
+      });
+
+
+      var startDtInput1 = $("#colg_drop #start_time");
+      var endDtInput1 = $("#colg_drop #end_time");
+      var currentYear = (new Date()).getFullYear()
+      lowerYearLimit = currentYear - 5;
+      upperYearLimit = currentYear + 5;
+
+
+      $(".dmy").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        
+        dateFormat: 'mm/yy',
+        yearRange: "" + lowerYearLimit + ":" + upperYearLimit,
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText);
+          
+          var month_year = $(this).val();
+
+          var month = 1
+          var year = lowerYearLimit
+
+          if ($(".dmy").attr('id') == "start_time") {
+            if (month_year) {
+              month_year = month_year.split("/")
+              
+              month = parseInt(month_year[0])
+              year = parseInt(month_year[1])
+            }
+
+            if (endDtInput1.val() != '') {
+              var testStartDate = startDtInput1.datepicker('getDate');
+              var testEndDate = endDtInput1.datepicker('getDate');
+
+              if (testStartDate > testEndDate) {
+                endDtInput1.datepicker('setDate', testStartDate);
+              }
+
+              else {
+                $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
+                $(this).datepicker('setDate', new Date(year, (month-1), 1));
+              }
+            }
+
+            else {
+              endDtInput1.val(dateText);
+
+              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
+              $(this).datepicker('setDate', new Date(year, (month-1), 1));
+            }
+
+            $("#colg_drop #end_time").datepicker('option', 'minDate', new Date(year, (month-1), 1));
+          }
+
+          else if ($(".dmy").attr('id') == "end_time") {
+            if (month_year) {
+              month_year = month_year.split("/")
+
+              month = parseInt(month_year[0]);
+              year = parseInt(month_year[1]);
+            }
+
+            if (startDtInput1.val() != '') {
+              var testStartDate = startDtInput1.datepicker('getDate');
+              var testEndDate = endDtInput1.datepicker('getDate');
+
+              if (testStartDate > testEndDate) {
+                startDtInput1.datepicker('setDate', testEndDate);
+              }
+
+              else {
+                $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
+                $(this).datepicker('setDate', new Date(year, (month-1), 1));
+              }
+            }
+
+            else {
+              startDtInput1.val(dateText);
+
+              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
+              $(this).datepicker('setDate', new Date(year, (month-1), 1));
+            }
+
+            $("#colg_drop #start_time").datepicker('option', 'maxDate', new Date(year, (month-1), 1));
+          }
+        },
+
+        beforeShow: function() {
 
           var month_year = $(this).val();
           month = 1
@@ -348,12 +544,6 @@
             year = parseInt(month_year[1])
           }
 
-          // if (month == 1) {
-          //   month = 2;
-          // }
-          // alert("month: " + month + typeof(month))
-          // alert("year: " + year + typeof(year))
-
           $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
           $(this).datepicker('setDate', new Date(year, (month-1), 1));
         },
@@ -364,6 +554,7 @@
           hideFieldsetSubmit();
         }
       });
+
 
     // If Find button is disabled, enable it
       if ($("#find_ac").attr("disabled") == "disabled") {
@@ -432,6 +623,69 @@
     $("#announce-course").attr("disabled", !optionState);
   });
 
+
+// On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
+  $("#find_colg").click(function(event) {
+    //alert("Get colleges clicked...")
+    var univ_id = $("#univ_cur option:selected").val();
+    var success_state = false
+    var all_univs = $("#all_univ").prop("checked");
+    //alert("\n univ_id: " + univ_id)
+
+    $.ajax({
+      url: "{% url 'get_colleges' group_id%}",
+
+      data: {
+        univ_id:univ_id,
+        
+        all_univs: all_univs
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data){
+          // alert("Output" + "\n success: " + data);
+
+          // var dataDict = JSON.parse(data.responseText);
+          // alert(" " + data["success"] + " -- " + typeof(data["success"]))          
+          success_state = data["success"];
+          $("#alertModalLabel").text(data["message"]);
+
+          if (data["success"]) {
+            $("#alertModal").removeClass("alert");
+            $("#alertModal").addClass("success");
+            $("#alertModal").foundation('reveal', 'open');
+
+
+            $("#divcolg").empty();
+            // alert("length: " + Object.keys(data["unset_nc"]).length)
+            var dict_len = Object.keys(data["unset_nc"]).length;
+            $.each(data["unset_nc"], function(k, val){
+              // alert(k + " -- " + val);
+              $("#unset_nc").append(val);
+
+            });
+
+            // Fill divcolg
+            $("#divcolg").empty();
+            drawer_widget = data["drawer_widget"]
+            $("#divcolg").html(drawer_widget); 
+
+          }
+
+          else {
+            $("#alertModal").removeClass("success");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        }
+  });
+});
+
+
+
 // On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
   $("#find_ac").click(function(event) {
     // alert("AC Find clicked...")
@@ -496,7 +750,7 @@
                             "<label>"+val+"</label>" +
                             "</div>";
               $("#unset-ac-options-div").append(input_chk);
-              
+
               dict_len = dict_len - 1;
             });
 
@@ -511,6 +765,12 @@
               $("#selectAllOptions").removeAttr("disabled", "disabled");
               $(".unsetOption").removeAttr("disabled", "disabled");
             }
+
+            // Fill divSt
+            $("#divSt").empty();
+            drawer_widget = data["drawer_widget"]
+            $("#divSt").html(drawer_widget); 
+
           }
 
           else {
