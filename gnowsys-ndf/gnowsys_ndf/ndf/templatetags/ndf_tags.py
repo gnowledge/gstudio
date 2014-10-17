@@ -637,7 +637,7 @@ def thread_reply_count( oid ):
 	'''
 	Method to count total replies for the thread.
 	'''
-	thr_rep = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}]})
+	thr_rep = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}],'status':{'$nin':['HIDDEN']}})
 	global global_thread_rep_counter		# to acces global_thread_rep_counter as global and not as local, 
 	global global_thread_latest_reply
 
@@ -748,10 +748,7 @@ def get_forum_twists(forum):
 		each['thread_reply_count'] = thread_reply_count(each._id)
 		each['latest_reply'] = global_thread_latest_reply
 		ret_replies.append(each)
-
 	return ret_replies
-
-
 lp=[]
 def get_rec_objs(ob_id):
 	lp.append(ob_id)
