@@ -22,6 +22,7 @@ from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 
 ####################################################################################################################
@@ -370,29 +371,29 @@ def parse_data_create_gsystem(json_file_path):
 
                                 perform_eval_type(key, json_document, "GSystem", "GSystem")
 
-                                for right_subject_id in json_document[key]:
-                                    subject_id = node._id
+                                # for right_subject_id in json_document[key]:
+                                subject_id = node._id
 
-                                    # Here we are appending list of ObjectIds of GSystemType's type_of field 
-                                    # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
-                                    # This is because some of the RelationType's are holding Base class's ObjectId
-                                    # and not that of the Derived one's
-                                    # Delibrately keeping GSystemType's ObjectId first in the list
-                                    # And hence, used $in operator in the query!
-                                    rel_subject_type = []
-                                    rel_subject_type.append(gsystem_type_id)
-                                    if gsystem_type_node.type_of:
-                                        rel_subject_type.extend(gsystem_type_node.type_of)
+                                # Here we are appending list of ObjectIds of GSystemType's type_of field 
+                                # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
+                                # This is because some of the RelationType's are holding Base class's ObjectId
+                                # and not that of the Derived one's
+                                # Delibrately keeping GSystemType's ObjectId first in the list
+                                # And hence, used $in operator in the query!
+                                rel_subject_type = []
+                                rel_subject_type.append(gsystem_type_id)
+                                if gsystem_type_node.type_of:
+                                    rel_subject_type.extend(gsystem_type_node.type_of)
 
-                                    relation_type_node = collection.Node.one({'_type': "RelationType", 
-                                                                              '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
-                                                                                      {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
-                                                                              'subject_type': {'$in': rel_subject_type}
-                                                                      })
+                                relation_type_node = collection.Node.one({'_type': "RelationType", 
+                                                                          '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
+                                                                                  {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
+                                                                          'subject_type': {'$in': rel_subject_type}
+                                                                  })
 
-                                    info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(right_subject_id)+") ...\n"
-                                    log_list.append(info_message)
-                                    gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
+                                info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(json_document[key])+") ...\n"
+                                log_list.append(info_message)
+                                gr_node = create_grelation(subject_id, relation_type_node, json_document[key])
 
                                 # To break outer for loop if key found
                                 break
@@ -664,108 +665,3 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
     # Sets python-type converted list
     json_document[eval_field] = type_list
 
-
-def create_gattribute(subject_id, attribute_type_node, object_value):
-    ga_node = None
-
-    ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
-
-    if ga_node is None:
-        # Code for creation
-        try:
-            ga_node = collection.GAttribute()
-
-            ga_node.subject = subject_id
-            ga_node.attribute_type = attribute_type_node
-            ga_node.object_value = object_value
-            
-            ga_node.status = u"PUBLISHED"
-            ga_node.save()
-            info_message = "GAttribute ("+ str(ga_node.name) +") created successfully.\n"
-            print info_message
-            log_list.append(info_message)
-
-        except Exception as e:
-            error_message = "\n GAttributeCreateError: " + str(e) + "\n"
-            print error_message
-            log_list.append(error_message)
-            raise Exception(error_message)
-
-    else:
-        # Code for updation
-        is_ga_node_changed = False
-
-        try:
-            if type(ga_node.object_value) == list:
-                if set(ga_node.object_value) != set(object_value):
-                    ga_node.object_value = object_value
-                    is_ga_node_changed = True
-
-            elif type(ga_node.object_value) == dict:
-                if cmp(ga_node.object_value, object_value) != 0:
-                    ga_node.object_value = object_value
-                    is_ga_node_changed = True
-
-            else:
-                if ga_node.object_value != object_value:
-                    ga_node.object_value = object_value
-                    is_ga_node_changed = True
-
-            if is_ga_node_changed:
-                ga_node.status = u"PUBLISHED"
-                ga_node.save()
-                info_message = " GAttribute ("+ str(ga_node.name) +") updated successfully.\n"
-                print info_message
-                log_list.append(info_message)
-
-            else:
-                info_message = " GAttribute ("+ str(ga_node.name)+ ") already exists (Nothing updated) !\n"
-                print info_message
-                log_list.append(info_message)
-
-        except Exception as e:
-            error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
-            print error_message
-            log_list.append(error_message)
-            raise Exception(error_message)
-
-    return ga_node
-
-
-def create_grelation(subject_id, relation_type_node, right_subject_id):
-    gr_node = None
-
-    gr_node = collection.Triple.one({'_type': "GRelation", 
-                                     'subject': subject_id, 
-                                     'relation_type.$id': relation_type_node._id,
-                                     'right_subject': right_subject_id
-                                 })
-
-    if gr_node is None:
-        # Code for creation
-        try:
-            gr_node = collection.GRelation()
-
-            gr_node.subject = subject_id
-            gr_node.relation_type = relation_type_node
-            gr_node.right_subject = right_subject_id
-
-            gr_node.status = u"PUBLISHED"
-            
-            gr_node.save()
-            info_message = " GRelation ("+ str(gr_node.name)+ ") created successfully.\n"
-            print info_message
-            log_list.append(info_message)
-
-        except Exception as e:
-            error_message = "\n GRelationCreateError: " + str(e) + "\n"
-            print error_message
-            log_list.append(error_message)
-            raise Exception(error_message)
-
-    else:
-        info_message = " GRelation ("+str(gr_node.name)+") already exists !\n"
-        print info_message
-        log_list.append(info_message)
-
-    return gr_node
