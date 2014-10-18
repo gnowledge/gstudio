@@ -70,8 +70,11 @@
   {% edit_policy groupid node request.user as status %}
   var edit_policy = "{{ status }}"; // "allow" or "disallow"
 
-  $("#orgitdownreps").orgitdown(mySettings);
-
+  if( user_access == "allow" && edit_policy == "allow" )
+  { 
+    $("#orgitdownreps").orgitdown(mySettings);
+  }
+  
   function createDiscussion()
   {
 

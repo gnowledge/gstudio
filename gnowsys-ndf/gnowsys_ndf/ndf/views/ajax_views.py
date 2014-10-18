@@ -359,6 +359,35 @@ def search_drawer(request, group_id):
       )    
       
 
+
+def terms_list(request, group_id):
+  
+    if request.is_ajax() and request.method == "POST":
+      # page number which have clicked on pagination
+      page_no = request.POST.get("page_no", '')
+      terms = []
+      gapp_GST = collection.Node.one({'_type':'MetaType', 'name':'GAPP' })
+      term_GST = collection.Node.one({'_type': 'GSystemType', 'name':'Term', 'member_of':ObjectId(gapp_GST._id) })
+
+      # To list all term instances
+      terms_list = collection.Node.find({'_type':'GSystem','member_of': ObjectId(term_GST._id),
+                                         'group_set': ObjectId(group_id) 
+                                        })
+
+      paged_terms = paginator.Paginator(terms_list, page_no, 24) 
+      
+      # Since "paged_terms" returns dict ,we append the dict items in a list to forwarded into template
+      for each in paged_terms.items:
+        terms.append(each)
+
+         
+      return render_to_response('ndf/terms_list.html', 
+                            {'group_id': group_id,'groupid': group_id,"paged_terms": terms, 
+                             'page_info': paged_terms
+                            },context_instance = RequestContext(request)
+      )
+
+
             
 # This ajax view renders the output as "node view" by clicking on collections
 def collection_nav(request, group_id):
