@@ -1932,6 +1932,7 @@ def html_widget(groupid, node_id, field):
     field_altnames = field['altnames']
     field_value = field['value']
     # print "\n IS: ", IS
+
     if type(field_type) == IS:
       field_value_choices = field_type._operands
       # print "\n operands: ", field_value
@@ -1967,6 +1968,7 @@ def html_widget(groupid, node_id, field):
 
     # if field['name'] == "tot_when":
     #   print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type), "\n"
+
     is_list_of = (field_type in LIST_OF)
 
     is_special_field = (field['name'] in SPECIAL_FIELDS.keys())
@@ -1998,7 +2000,13 @@ def html_widget(groupid, node_id, field):
                                       )
                                 )
 
-      field_value = [str(each._id) for each in field_value]
+      if field_value:
+	      if type(field_value[0]) == ObjectId or ObjectId.is_valid(field_value[0]):
+	      	field_value = [str(each) for each in field_value]
+
+	      else:
+	      	field_value = [str(each._id) for each in field_value]
+
       if node_id:
       	node_dict[field['name']] = [ObjectId(each) for each in field_value]
 
@@ -2081,4 +2089,22 @@ def jsonify(value):
   """
   return json.dumps(value)
 
+@register.assignment_tag
+def get_university(college_name):
+	"""
+	Returns university name to which given college is affiliated to.
+	"""
+	try:
+		college = collection.Node.one({'_type': "GSystemType", 'name': u"College"})
+		sel_college = collection.Node.one({'member_of': college._id, 'name': unicode(college_name)})
 
+		university_name = None
+		if sel_college:
+			university = collection.Node.one({'_type': "GSystemType", 'name': u"University"})
+			sel_university = collection.Node.one({'member_of': university._id, 'relation_set.affiliated_college': sel_college._id})
+			university_name = sel_university.name
+
+		return university_name
+	except Exception as e:
+		error_message = "UniversityFindError: " + str(e) + " !!!"
+		# raise e
