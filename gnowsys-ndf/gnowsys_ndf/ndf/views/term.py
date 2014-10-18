@@ -30,7 +30,7 @@ history_manager = HistoryManager()
 gapp_GST = collection.Node.one({'_type':'MetaType', 'name':'GAPP' })
 term_GST = collection.Node.one({'_type': 'GSystemType', 'name':'Term', 'member_of':ObjectId(gapp_GST._id) })
 if term_GST:	
-	title = term_GST.name
+	title = term_GST.altnames
 
 def term(request, group_id, node_id=None):
 
