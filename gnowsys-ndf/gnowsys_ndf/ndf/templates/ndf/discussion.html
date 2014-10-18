@@ -278,48 +278,54 @@
 
   function deleteReply(sourceObj)
   {
-    var reply_id = $(sourceObj).closest("div.disc-replies").attr("data-reply-id");
-
-    var nodesToDeleteArr = getChildReplies(reply_id, []);
-    nodesToDeleteArr.push(reply_id);  // adding current node's _id
-
-    var deleteConfirm;
-
-    if(nodesToDeleteArr.length > 1)
+    if( user_access == "allow" && edit_policy == "allow" )
     {
-      deleteConfirm = confirm("Along with this reply, total of: " + nodesToDeleteArr.length + " replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'");
+      var reply_id = $(sourceObj).closest("div.disc-replies").attr("data-reply-id");
+
+      var nodesToDeleteArr = getChildReplies(reply_id, []);
+      nodesToDeleteArr.push(reply_id);  // adding current node's _id
+
+      var deleteConfirm;
+
+      if(nodesToDeleteArr.length > 1)
+      {
+        deleteConfirm = confirm("Along with this reply, total of: " + nodesToDeleteArr.length + " replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'");
+      }
+      else
+      {
+        deleteConfirm = confirm("Are you sure to delete this reply ?\nClick 'OK' to delete.");
+      }
+
+      if(deleteConfirm)
+      {
+        $.ajax({
+          
+          type: 'POST',
+          url: '{% url "discussion_delete_reply" group_id %}',
+          data: { 
+              "csrfmiddlewaretoken": "{{ csrf_token }}",
+              "nodes_to_delete": JSON.stringify(nodesToDeleteArr)
+            },
+          success: function(data){
+
+            data = typeof(data) == "string" ? JSON.parse(data): data;
+
+            data.forEach(function(reply){
+              $("[data-reply-id="+ reply +"]").detach().fadeOut();
+            })
+
+            // updating tab-text
+            updateDiscussionTabText();
+          }
+
+        })
+        //end of ajax
+      }
     }
     else
     {
-      deleteConfirm = confirm("Are you sure to delete this reply ?\nClick 'OK' to delete.");
+      alert("To delete this reply you need to be login and be the member of this group.");
     }
-
-    if(deleteConfirm)
-    {
-      $.ajax({
-        
-        type: 'POST',
-        url: '{% url "discussion_delete_reply" group_id %}',
-        data: { 
-            "csrfmiddlewaretoken": "{{ csrf_token }}",
-            "nodes_to_delete": JSON.stringify(nodesToDeleteArr)
-          },
-        success: function(data){
-
-          data = typeof(data) == "string" ? JSON.parse(data): data;
-
-          data.forEach(function(reply){
-            $("[data-reply-id="+ reply +"]").detach().fadeOut();
-          })
-
-          // updating tab-text
-          updateDiscussionTabText();
-        }
-
-      })
-      //end of ajax
-    }
-
   }
 
   // recursive function to get child replies
