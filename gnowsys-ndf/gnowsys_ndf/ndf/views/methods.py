@@ -330,7 +330,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
+  topic_GST = gcollection.Node.one({'_type': 'GSystemType', 'name':'Topic'})
   collection = None
+
   if coll_set:
       if "Theme" in coll_set.member_of_names_list:
         node_type = theme_GST
@@ -379,6 +381,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     
     if node_type._id not in node.member_of:
       node.member_of.append(node_type._id)
+      if node_type.name == "Term":
+        node.member_of.append(topic_GST._id)
+
 
     if group_obj._id not in node.group_set:
       node.group_set.append(group_obj._id)
