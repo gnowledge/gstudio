@@ -844,11 +844,13 @@ class AttributeType(Node):
                     # doesn't exists, then only add it!
                     if attr_value is None:
                         inner_attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                                 '_id': attr_id_or_node._id,
                                                                  'data_type': eval(attr_id_or_node.data_type), 
                                                                  'object_value': attr_value
                                                                 }
                     else:
                         inner_attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                                 '_id': attr_id_or_node._id,
                                                                  'data_type': eval(attr_id_or_node.data_type), 
                                                                  'object_value': attr_value[attr_id_or_node.name]
                                                                 }
@@ -864,6 +866,7 @@ class AttributeType(Node):
                     # If attr_dict[attr_id_or_node.name] key doesn't
                     # exists, then only add it!
                     attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                       '_id': attr_id_or_node._id,
                                                        'data_type': eval(attr_id_or_node.data_type), 
                                                        'object_value': attr_value
                                                       }
@@ -900,6 +903,7 @@ class AttributeType(Node):
                         # If attr_dict[attr_id_or_node.name] key
                         # doesn't exists, then only add it!
                         attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                           '_id': attr_id_or_node._id,
                                                            'data_type': eval(dt), 
                                                            'object_value': attr_value
                                                           }
@@ -930,6 +934,7 @@ class AttributeType(Node):
                     # If attr_dict[attr_id_or_node.name] key doesn't
                     # exists, then only add it!
                     attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                       '_id': attr_id_or_node._id,
                                                        'data_type': eval(dt), 
                                                        'object_value': attr_value
                                                       }
@@ -1047,6 +1052,7 @@ class RelationType(Node):
                     subject_or_right_subject_list.append(left_or_right_subject_node)
                     rel_dict[rel_name]["subject_or_right_subject_list"] = subject_or_right_subject_list
 
+        rel_dict[rel_name]["_id"] = rel_type_node._id
         return rel_dict
 
 
