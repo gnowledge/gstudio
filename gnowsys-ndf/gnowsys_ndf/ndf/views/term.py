@@ -29,6 +29,8 @@ collection = db[Node.collection_name]
 history_manager = HistoryManager()
 gapp_GST = collection.Node.one({'_type':'MetaType', 'name':'GAPP' })
 term_GST = collection.Node.one({'_type': 'GSystemType', 'name':'Term', 'member_of':ObjectId(gapp_GST._id) })
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+
 if term_GST:	
 	title = term_GST.altnames
 
@@ -65,12 +67,12 @@ def term(request, group_id, node_id=None):
 	    )
 
 	else:
-
+		topic = "Topic"
 		node_obj = collection.Node.one({'_id': ObjectId(node_id) })
 
-		return render_to_response('ndf/term_details.html',
+		return render_to_response('ndf/topic_details.html',
 									{ 'node': node_obj, 'title':title,
-                                      'group_id': group_id,
+                                      'group_id': group_id,'topic':topic,
                                       'groupid':group_id,
 									},
                                   	context_instance = RequestContext(request)
