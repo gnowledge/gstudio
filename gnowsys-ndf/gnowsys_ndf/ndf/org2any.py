@@ -76,7 +76,12 @@ def org2html(org_content, file_prefix="", file_delete=True):
         org_version_data = cmd_res_list[(len(cmd_res_list)-1)] # Collecting last line from the list, i.e. "7.9.3f"
         org_version = org_version_data[:(org_version_data.rfind("."))] # Stripping content from right decimal point (including the decimal)
 
-        if (float(org_version) >= 8): 
+        if org_version.isdigit():
+          org_version = float(org_version)
+        else:
+          org_version = 7
+
+        if (org_version >= 8): 
             export_to_html="org-html-export-to-html"
         else:
             export_to_html="org-export-as-html"
