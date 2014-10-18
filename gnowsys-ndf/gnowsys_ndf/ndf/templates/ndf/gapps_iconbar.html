@@ -5,11 +5,9 @@
 <!-- GApps Menubar -->
 {% check_gapp_menus groupid as check_menu %}
 
-
 {% if check_menu %}
 {% get_apps_for_groups groupid as gapps %}
 {% endif %}
-
 
 <input type="hidden" value="{{newgroup}}">
 
@@ -26,10 +24,15 @@
   	active
   	
   	{% endif %}">
-        
+
     <a class="
   	{{app_dict.name|title}} app small button rounded" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
-      <i class='fi-play'></i>{% app_translations request app_dict as app_name %}{{app_name}}
+      {% app_translations request app_dict as app_name %}
+      {% if app_name == "Term" %}
+        <i class='fi-play'></i>Topic
+      {% else %}
+        <i class='fi-play'></i>{{app_name}}
+      {% endif %}    
     </a>  
         </li>
     {% endif %}

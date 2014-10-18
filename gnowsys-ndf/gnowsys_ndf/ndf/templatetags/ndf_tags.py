@@ -973,6 +973,8 @@ def get_edit_url(groupid):
 			return 'quiz_edit'    
 		elif type_name == 'Page':
 			return 'page_create_edit' 
+		elif type_name == 'Term':
+			return 'term_create_edit' 
 		elif type_name == 'Theme' or type_name == 'Topic':
 			return 'theme_topic_create'
 		elif type_name == 'QuizItem':
@@ -1038,6 +1040,8 @@ def get_create_url(groupid):
       return 'quiz_create'    
     elif type_name == 'Page':
       return 'page_create_edit' 
+    elif type_name == 'Term':
+      return 'term_create_edit' 
     elif type_name == 'Theme' or type_name == 'Topic':
 		return 'theme_topic_create'
     elif type_name == 'QuizItem':
