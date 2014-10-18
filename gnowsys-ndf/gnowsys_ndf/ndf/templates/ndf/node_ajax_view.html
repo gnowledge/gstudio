@@ -687,6 +687,10 @@
                   <a href="{% url create_url group_name_tag app_id %}" class="tiny round button">
                     <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                   </a>
+                {% elif node.member_of_names_list.0 == "Term" %}
+                  <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} Topic</span>
+                  </a>
                 {% else %}
                   <a href="{% url create_url group_name_tag %}" class="tiny round button">
                     <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
