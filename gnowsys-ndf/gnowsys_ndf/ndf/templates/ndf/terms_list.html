@@ -7,51 +7,13 @@
 
   {% group_type_info groupid request.user as grouptype %}
 
+  <h3><u>Topics list: </u></h3>
   <!-- Existing card list-->
   {% for node in paged_terms %}
+  		<a href="{% url 'term_details' group_name_tag node.pk %}">
+  			<b>{{ node.name }}</b>
+  		</a><br/><br/>
 
-      <li class="card">
-        {% if grouptype == "Moderated" %}
-          {% if node.status == "DRAFT" %}
-            <div class="draft page">
-          {% elif node.status == "PUBLISHED" %}
-            <div class="published page">
-          {% endif %}
-        {% else %}
-          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} page'>
-        {% endif %} 
-
-          <a href="{% url 'term_details' group_name_tag node.pk %}">
-          <div class="row">
-            <div class="small-10 columns">                             
-                <b>
-                  {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </b>
-            </div>
-          </div>
-          
-          <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-
-          <footer>
-            <div class="age">
-              {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-              <br/>
-              by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-            </div>
-            <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
-          </footer>
-          </a>
-
-          <div class="label-list small-12 columns">
-          {% for tag in node.tags|slice:":3" %}
-            <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
-          {% endfor %}
-          </div>
-
-        
-        </div>
-      </li>
-      
   {% empty %}
     {% if not searching %}
       <div class="row">
