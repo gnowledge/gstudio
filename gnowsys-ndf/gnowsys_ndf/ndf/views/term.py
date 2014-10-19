@@ -54,7 +54,7 @@ def term(request, group_id, node_id=None):
 		# To list all term instances
 	  	terms_list = collection.Node.find({'_type':'GSystem','member_of': ObjectId(term_GST._id),
 	  	 								   'group_set': ObjectId(group_id) 
-	  	 								  })
+	  	 								  }).sort('name', 1)
 
 	  	
 	  	terms = terms_list.count()
@@ -104,7 +104,7 @@ def create_edit_term(request, group_id, node_id=None):
     # To list all term instances
     terms_list = collection.Node.find({'_type':'GSystem','member_of': ObjectId(term_GST._id),
                                        'group_set': ObjectId(group_id) 
-                                   })
+                                   }).sort('name', 1)
 
     nodes_list = []
     for each in terms_list:
