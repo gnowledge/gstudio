@@ -15,7 +15,6 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.notification import models as notification
-from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -331,7 +330,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
+  topic_GST = gcollection.Node.one({'_type': 'GSystemType', 'name':'Topic'})
   collection = None
+
   if coll_set:
       if "Theme" in coll_set.member_of_names_list:
         node_type = theme_GST
@@ -380,6 +381,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     
     if node_type._id not in node.member_of:
       node.member_of.append(node_type._id)
+      if node_type.name == "Term":
+        node.member_of.append(topic_GST._id)
+
 
     if group_obj._id not in node.group_set:
       node.group_set.append(group_obj._id)
@@ -944,6 +948,115 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
 	    gr_node.status = u"PUBLISHED"
             gr_node.save()
 		
+def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set=[]):
+  """
+  Returns data in list of dictionary format which is required for building html widget.
+  This data is used by html_widget template-tag.
+  """
+
+  if not isinstance(at_rt_objectid_or_attr_name_list, list):
+    at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
+
+  if not type_of_set:
+    node["property_order"] = []
+    gst_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
+    for gst in gst_nodes:
+      for type_of in gst["type_of"]:
+        if type_of not in type_of_set:
+          type_of_set.append(type_of)
+
+      for po in gst["property_order"]:
+        if po not in node["property_order"]:
+          node["property_order"].append(po)
+
+  BASE_FIELD_METADATA = {
+    'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
+    'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Describe", 'required': False},
+    # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
+    'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
+    'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
+    'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
+  }
+
+  widget_data_list = []
+  for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
+    if type(at_rt_objectid_or_attr_name) == ObjectId: #ObjectId.is_valid(at_rt_objectid_or_attr_name):
+      # For attribute-field(s) and/or relation-field(s)
+      
+      field = collection.Node.one({'_id': ObjectId(at_rt_objectid_or_attr_name)}, {'_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
+
+      altnames = u""
+      value = None
+      data_type = None
+      if field._type == RelationType or field._type == "RelationType":
+        # For RelationTypes
+        if set(node["member_of"]).issubset(field.subject_type):
+          # It means we are dealing with normal relation & 
+          data_type = node.structure[field.name]
+          value = node[field.name]
+          if field.altnames:
+            if ";" in field.altnames:
+              altnames = field.altnames.split(";")[0]
+            else:
+              altnames = field.altnames
+
+        elif set(node["member_of"]).issubset(field.object_type):
+          # It means we are dealing with inverse relation
+          data_type = node.structure[field.inverse_name]
+          value = node[field.inverse_name]
+          if field.altnames:
+            if ";" in field.altnames:
+              altnames = field.altnames.split(";")[1]
+            else:
+              altnames = field.altnames
+
+        elif type_of_set:
+          # If current node's GST is not in subject_type
+          # Search for that GST's type_of field value in subject_type
+          for each in type_of_set:
+            if each in field.subject_type:
+              data_type = node.structure[field.name]
+              value = node[field.name]
+              if field.altnames:
+                if ";" in field.altnames:
+                  altnames = field.altnames.split(";")[0]
+                else:
+                  altnames = field.altnames
+
+            elif each in field.object_type:
+              data_type = node.structure[field.inverse_name]
+              value = node[field.inverse_name]
+              if field.altnames:
+                if ";" in field.altnames:
+                  altnames = field.altnames.split(";")[0]
+                else:
+                  altnames = field.altnames
+
+      else:
+        # For AttributeTypes
+        altnames = field.altnames
+        data_type = node.structure[field.name]
+        value = node[field.name]
+
+      widget_data_list.append({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
+                              '_id': field._id, 
+                              'data_type': data_type,
+                              'name': field.name, 'altnames': altnames,
+                              'value': value
+                            })
+
+    else:
+      # For node's base-field(s)
+
+      # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
+      widget_data_list.append({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+                              'data_type': node.structure[at_rt_objectid_or_attr_name],
+                              'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
+                              'value': node[at_rt_objectid_or_attr_name],
+                              'required': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['required']
+                            })
+
+  return widget_data_list
 
 
 def get_property_order_with_value(node):
@@ -974,104 +1087,8 @@ def get_property_order_with_value(node):
 
     demo.get_neighbourhood(node["member_of"])
 
-    for tab_name, list_field_id in demo['property_order']:
-      list_field_set = []
-      for field_id_or_name in list_field_id:
-        if type(field_id_or_name) == ObjectId: #ObjectId.is_valid(field_id_or_name):
-          # For attribute-field(s) and/or relation-field(s)
-          
-          field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
-          # list_field_set.append([demo['member_of'], field, demo[field.name]])
-          altnames = u""
-          value = None
-          data_type = None
-          if field._type == RelationType or field._type == "RelationType":
-            # For RelationTypes
-            # print "\n field.altnames: ", field.altnames, "\n"
-            # print "\n ", demo["member_of"], " === ", field.subject_type, "\n"
-            if set(demo["member_of"]).issubset(field.subject_type):
-              # It means we are dealing with normal relation & 
-              data_type = demo.structure[field.name]
-              value = demo[field.name]
-              # print "\n field.altnames(inner 1 if): ", field.altnames, "\n"
-              if field.altnames:
-                if ";" in field.altnames:
-                  # print "\n altnames: ", field.altnames
-                  altnames = field.altnames.split(";")[0]
-                else:
-                  altnames = field.altnames
-
-            elif set(demo["member_of"]).issubset(field.object_type):
-              # It means we are dealing with inverse relation
-              data_type = demo.structure[field.inverse_name]
-              # print "\n field.altnames(else`): ", field.altnames, "\n"
-              value = demo[field.inverse_name]
-              if field.altnames:
-                if ";" in field.altnames:
-                  altnames = field.altnames.split(";")[1]
-                else:
-                  altnames = field.altnames
-
-            elif type_of_set:
-              # If current node's GST is not in subject_type
-              # Search for that GST's type_of field value in subject_type
-              for each in type_of_set:
-                if each in field.subject_type:
-                  data_type = demo.structure[field.name]
-                  # print "\n field.altnames(inner 2 if): ", field.altnames, "\n"
-                  value = demo[field.name]
-                  if field.altnames:
-                    if ";" in field.altnames:
-                      altnames = field.altnames.split(";")[0]
-                    else:
-                      altnames = field.altnames
-
-                elif each in field.object_type:
-                  data_type = demo.structure[field.inverse_name]
-                  # print "\n field.altnames(inner 2_2 if): ", field.altnames, "\n"
-                  value = demo[field.inverse_name]
-                  if field.altnames:
-                    if ";" in field.altnames:
-                      altnames = field.altnames.split(";")[0]
-                    else:
-                      altnames = field.altnames
-
-
-          else:
-            # For AttributeTypes
-            altnames = field.altnames
-            data_type = demo.structure[field.name]
-            value = demo[field.name]
-
-
-          # print " field._id: ", field._id, " --  field.altnames: ", altnames
-
-          list_field_set.append({ 'type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
-                                  '_id': field._id, 
-                                  'data_type': data_type,
-                                  'name': field.name, 'altnames': altnames,
-                                  'value': value
-                                })
-
-        else:
-          # For node's base-field(s)
-
-          base_field = {
-            'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
-            'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Description", 'required': False},
-            # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
-            'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
-            # 'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
-            'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
-          }
-          # list_field_set.append([demo['member_of'], base_field[field_id_or_name], demo[field_id_or_name]])
-          list_field_set.append({ '_type': base_field[field_id_or_name]['_type'],
-                                  'data_type': demo.structure[field_id_or_name],
-                                  'name': field_id_or_name, 'altnames': base_field[field_id_or_name]['altnames'],
-                                  'value': demo[field_id_or_name],
-                                  'required': base_field[field_id_or_name]['required']
-                                })
-
+    for tab_name, list_field_id_or_name in demo['property_order']:
+      list_field_set = get_widget_built_up_data(list_field_id_or_name, demo, type_of_set)
       new_property_order.append([tab_name, list_field_set])
 
     demo["property_order"] = new_property_order
@@ -1134,7 +1151,6 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
     if type(field_data_type) == type:
       field_data_type = field_data_type.__name__
-      # print " (if)--> ", field_data_type, (field_data_type == "datetime"), "\n"
 
       if not field_value:
         if field_data_type == "dict":
@@ -1190,8 +1206,6 @@ def parse_template_data(field_data_type, field_value, **kwargs):
         error_message = "Unknown data-type ("+field_data_type+") found"
         raise Exception(error_message)
 
-      # print "\n parsed field_value: ", field_value
-
     elif type(field_data_type) == list:
 
       if kwargs.has_key("field_instance"):
@@ -1200,11 +1214,9 @@ def parse_template_data(field_data_type, field_value, **kwargs):
           if not field_value:
             return None
 
-          # print "\n field_value (going herre): ", field_value
-          field_value = collection.Node.one({'_id': ObjectId(field_value), 'member_of': {'$in': kwargs["field_instance"]["object_type"]}}, {'_id': 1})
           if field_value:
-            field_value = field_value._id
-            # print "\n field_value (innerobjectid): ", field_value, " -- ", type(field_value)
+            field_value = ObjectId(field_value)
+
           else:
             error_message = "This ObjectId("+field_type+") doesn't exists"
             raise Exception(error_message)
@@ -1445,6 +1457,11 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             # Just to remove already existing entries (whose status is PUBLISHED)
             right_subject_id_or_list.remove(n.right_subject)
             gr_node_list.append(n)
+
+            collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                              {'$addToSet': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
+                              upsert=False, multi=False
+                            )
 
         else:
           # Case: When already existing entry doesn't exists in newly come list of right_subject(s)

@@ -27,7 +27,8 @@ SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files")
 collection = get_database()[Node.collection_name]
 gapp_GST = collection.Node.one({'_type':'MetaType', 'name':'GAPP' })
 term_GST = collection.Node.one({'_type': 'GSystemType', 'name':'Term', 'member_of':ObjectId(gapp_GST._id) })
-grp = collection.Node.one({'_type': 'Group', 'name': 'ATLAS'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+grp = collection.Node.one({'_type': 'Group', 'name': 'atlas'})
 
 if grp:
 	group_id = grp._id
@@ -77,7 +78,7 @@ class Command(BaseCommand):
 
 def create_term_obj(val):
 	# print "\ninside create_term_obj\n"
-	term_obj = collection.Node.one({'_type': 'GSystem','member_of': ObjectId(term_GST._id), 'name':unicode(val) })
+	term_obj = collection.Node.one({'_type': 'GSystem','member_of': {'$in': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(val) })
 	if not term_obj:
 		term_obj = collection.GSystem()
 		term_obj.name = unicode(val)
@@ -89,6 +90,7 @@ def create_term_obj(val):
 		term_obj.group_set.append(group_id)
 		term_obj.language = u"en"
 		term_obj.member_of.append(term_GST._id)
+		term_obj.member_of.append(topic_GST._id)
 		term_obj.save()
 		print "Term ",val," created successfully\n"
 
@@ -97,8 +99,8 @@ def create_term_obj(val):
 
 def add_prior_node(val, obj):
 	# print "\nadd_prior_node to this obj: ",val," depends on ",obj,"\n"
-	term_obj1 = collection.Node.one({'_type': 'GSystem','member_of': ObjectId(term_GST._id), 'name':unicode(val) })
-	term_obj2 = collection.Node.one({'_type': 'GSystem','member_of': ObjectId(term_GST._id), 'name':unicode(obj) })
+	term_obj1 = collection.Node.one({'_type': 'GSystem','member_of': {'$in': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(val) })
+	term_obj2 = collection.Node.one({'_type': 'GSystem','member_of': {'$in': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(obj) })
 
 	if term_obj1 and term_obj2:
 		if term_obj2._id not in term_obj1.prior_node:

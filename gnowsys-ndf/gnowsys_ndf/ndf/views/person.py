@@ -15,9 +15,9 @@ from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 
 try:
-    from bson import ObjectId
+  from bson import ObjectId
 except ImportError:  # old pymongo
-    from pymongo.objectid import ObjectId
+  from pymongo.objectid import ObjectId
 
 from mongokit import IS
 
@@ -25,7 +25,7 @@ from mongokit import IS
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
-from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
+from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 collection = get_database()[Node.collection_name]
@@ -34,7 +34,6 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   """
   custom view for custom GAPPS
   """
-  # print "\n Found person_detail n gone inn this...\n\n"
 
   auth = None
   if ObjectId.is_valid(group_id) is False :
@@ -71,6 +70,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   nodes = None
   node = None
   property_order_list = []
+  widget_for = []
   is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
 
   template_prefix = "mis"
@@ -86,18 +86,28 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   if app_set_id:
-    person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+    person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
     title = person_gst.name
+
+    if title == "Student":
+      person_gs = collection.GSystem()
+      person_gs.member_of.append(person_gst._id)
+      person_gs.get_neighbourhood(person_gs.member_of)
+      rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id': 1})
+      rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
+      attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id': 1})
+
+      widget_for = ["name", 
+                    rel_univ._id,
+                    rel_colg._id,
+                    attr_deg_yr._id
+                  ]
+                  #   'status'
+                  # ]
+      widget_for = get_widget_built_up_data(widget_for, person_gs)
   
     template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
     default_template = "ndf/person_list.html"
-
-    if request.method=="POST":
-      search = request.POST.get("search","")
-      classtype = request.POST.get("class","")
-      nodes = collection.Node.find({'member_of': person_gst._id, 'name': {'$regex': search, '$options': 'i'}})
-    else:
-      nodes = collection.Node.find({'member_of': person_gst._id, 'group_set': ObjectId(group_id)})
 
   if app_set_instance_id:
     template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_details.html"
@@ -112,7 +122,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         'app_set_id': app_set_id,
                         'title':title,
                         'nodes': nodes, 'node': node,
-                        'property_order_list': property_order_list,
+                        'property_order_list': property_order_list, 'lstFilters': widget_for,
                         'is_link_needed': is_link_needed
                       }
 
