@@ -379,7 +379,7 @@ def terms_list(request, group_id):
                                          'group_set': ObjectId(group_id) 
                                         }).sort('name', 1)
 
-      paged_terms = paginator.Paginator(terms_list, page_no, 24) 
+      paged_terms = paginator.Paginator(terms_list, page_no, 25) 
       
       # Since "paged_terms" returns dict ,we append the dict items in a list to forwarded into template
       for each in paged_terms.items:
