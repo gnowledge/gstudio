@@ -6,12 +6,11 @@
 }
 </style>
 <div id="container">
-<div id="close">
-<a class="close-reveal-modal">&#215;</a>
-</div>
-<div id="myModal" class="reveal-modal" animation="None" data-reveal>
+
+
+      <div id="myModal" class="reveal-modal" animation="None" data-reveal>
                 
-</div>
+      </div>
 </div>
 <br/>
 
@@ -59,7 +58,10 @@
 				{% endif %}	
 			        						 
 			{% endfor %}
+			{% if i.collection %}
+			{% else %}
 			<td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
+			{% endif %}
 		</tr>	
 		
 		{% endfor %}
@@ -164,6 +166,7 @@ function collection_overlay(oid)
       success: function(data){
          $('#myModal').empty()
          $('#myModal').append(data)
+        $('#myModal').append( '<a class="close-reveal-modal"  data-reveal-id="myModal" >&#215;</a>')
         $('#myModal').foundation('reveal', 'open');
       }
     });

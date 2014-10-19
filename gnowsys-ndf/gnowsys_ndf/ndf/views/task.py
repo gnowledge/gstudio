@@ -231,7 +231,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 			Task=collection.Node.find_one({"_id":ObjectId(task)})
 			Task.collection_set.append(task_node._id)
 	      Task.save()
-	      print "length of somethin",int(len(request.POST.getlist("Assignee",""))),count	
+	      	
 	      if int(count) <int(len(request.POST.getlist("Assignee",""))-1):
 		create_edit_task(request, group_name, task_id,Task._id,count=count+1)
 	    if count == 0:	
@@ -372,7 +372,6 @@ def task_collection(request,group_name,task_id=None,each_page=1):
 	collection_task.append(dict(attr_value))
     paged_resources = Paginator(collection_task,10)
     files_list = []
-    print "each_page",each_page
     for each_resource in (paged_resources.page(each_page)).object_list:
 		files_list.append(each_resource)
     			
@@ -499,7 +498,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 		if attr_value['Status'] not in Completed_Status_List: 
 					if attr_value['Status'] != 'Rejected':
 						if attr_value['end_time'] != "--" :
-							print "getting in"
+							
                                                         if (attr_value['end_time'] > unicode(datetime.date.today())) is False:
 								task_list.append(dict(attr_value))
 						else:
