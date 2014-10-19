@@ -377,7 +377,7 @@ def terms_list(request, group_id):
       # To list all term instances
       terms_list = collection.Node.find({'_type':'GSystem','member_of': ObjectId(term_GST._id),
                                          'group_set': ObjectId(group_id) 
-                                        })
+                                        }).sort('name', 1)
 
       paged_terms = paginator.Paginator(terms_list, page_no, 24) 
       
