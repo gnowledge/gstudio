@@ -45,6 +45,10 @@
     overflow-y: auto;
     padding-left: 10px;
 }
+
+	#selectedFiles {
+	}
+
 </style>
 {% endblock %}
 
@@ -258,7 +262,9 @@ $(document).on('click',"#save-node",function(event){
 		-->
 	  <div class="medium-12 columns">
 	    <label>
-	    	<input type="file" name="UploadTask"  id="docFile" value= "" multiple/></label>
+	    	<input type="file" name="UploadTask" onChange="handleFileSelect(this)" id="docFile" value= "" multiple/></label>
+	    	<div id="selectedFiles"></div>
+
 	    <div id="contentlist" class="content">
 		<div class="">
 		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
@@ -282,6 +288,7 @@ $(document).on('click',"#save-node",function(event){
 
         <input type="hidden" name="node" value="{{node.pk}}">
         <input type="hidden" name="user" value="{{user.id}}">
+        <input type="hidden" name="files" id="trial" >
         <input type="hidden" name="page_url" value="{{request.path}}">
       <div class="row" >
 	<div class="medium-6 columns">
@@ -289,8 +296,116 @@ $(document).on('click',"#save-node",function(event){
 	</div>
       </div>
     </div>
+   {% if  Upload_Task %}
+	{% get_file_node request Upload_Task as new %}
+	{% endif %}
+	
 </form>
 <script type="text/javascript">
+
+	var selDiv = "";
+	var storedFiles = [];
+	var selfiles=[];
+	$(document).ready(function() {
+		$("#files").on("change", handleFileSelect);
+		
+		selDiv = $("#selectedFiles"); 
+		//$("#form-edit-node").on("submit", handleForm);
+		
+		$("body").on("click", ".selFile", removeFile);
+	});
+	
+function handleFileSelect(e) {
+		var files = e.files;
+		
+		var filesArr = Array.prototype.slice.call(files);
+		filesArr.forEach(function(f) {			
+
+			storedFiles.push(f);
+			
+			var reader = new FileReader();
+			reader.onload = function (e) {
+			var html = "<div><span  data-file='"+f.name+"' class='selFile' title='Click to remove'>" + f.name + 
+			" &#215; <span></div> ";
+
+				selDiv.append(html);
+				
+			}
+			reader.readAsDataURL(f); 
+		});
+		
+		
+		
+		var formData = new FormData();
+
+				// Loop through each of the selected files.
+				for (var i = 0; i < files.length; i++) {
+				  var file = files[i];
+
+				  formData.append('doc[]', file, file.name);
+				}
+
+				// appending csrfmiddlewaretoken and user-id
+				formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+				formData.append('user','{{request.user.id}}');
+				
+
+				// Set up the request.
+				xhr = new XMLHttpRequest();
+      xhr.open('POST', "{% url 'save_image' group_name  %}", true);
+        
+				// Set up a handler for when the request finishes sucessfully.
+    xhr.onload = function () {
+    if (xhr.status === 200) 
+				  {
+				  var select=document.getElementById('trial')
+	        select.value=xhr.responseText
+				  selfiles.push(xhr.responseText)
+				  select.value=selfiles
+				  }}
+    xhr.send(formData);
+			}
+		
+function handleForm(e) {
+		e.preventDefault();
+		var data = new FormData();
+		
+		for(var i=0, len=storedFiles.length; i<len; i++) {
+			data.append('files', storedFiles[i]);	
+		}
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', 'handler.cfm', true);
+	
+		
+		xhr.onload = function(e) {
+			if(this.status == 200) {
+				console.log(e.currentTarget.responseText);	
+				alert(e.currentTarget.responseText + ' items uploaded.');
+			}
+		}
+		
+		xhr.send(data);
+	}
+		
+	function removeFile(e) {
+		var file = $(this).data("file");
+		for(var i=0;i<storedFiles.length;i++) {
+			if(storedFiles[i].name === file) {
+				storedFiles.splice(i,1);
+				selfiles.splice(i,1);
+				break;
+			}
+		}
+		$(this).parent().remove();
+		var select=document.getElementById('trial')
+	  select.value=selfiles
+		alert(select.value)		  
+		
+	}
+
+
+
 var currentYear = (new Date()).getFullYear()
   lowerYearLimit = currentYear - 30;
 $("#document").ready(function(){
@@ -375,6 +490,10 @@ function select_values(source)
                 }
 
 }
+
+
+  
+
 
 if ('{{node.name}}' == "" )
 {

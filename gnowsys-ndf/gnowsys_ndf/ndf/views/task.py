@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,StreamingHttpResponse
 from django.http import HttpResponse
 from mongokit import paginator			
 import datetime
@@ -111,6 +111,40 @@ def task_details(request, group_name, task_id):
     template = "ndf/task_details.html"
     return render_to_response(template, variables)
 
+def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None, slug=None):
+    print "gettin in "
+    if request.method == "POST" :
+        
+        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+
+            title = each.name
+            userid = request.POST.get("user", "")
+            content_org = request.POST.get('content_org', '')
+            tags = request.POST.get('tags', "")
+            img_type = request.POST.get("type", "")
+            language = request.POST.get("lan", "")
+            usrname = request.user.username
+            page_url = request.POST.get("page_url", "")
+            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
+
+            # for storing location in the file
+            
+            # location = []
+            # location.append(json.loads(request.POST.get("location", "{}")))
+            # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True, location=location)
+            print "the value of each",each
+            obs_image = save_file(each,title,userid,group_name, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+            # Sample output of (type tuple) obs_image: (ObjectId('5357634675daa23a7a5c2900'), 'True') 
+
+            # if image sucessfully get uploaded then it's valid ObjectId
+            
+            if obs_image[0] and ObjectId.is_valid(obs_image[0]):
+              print "the value",obs_image[0]
+              return StreamingHttpResponse(str(obs_image[0]))
+            
+            else: # file is not uploaded sucessfully or uploaded with error
+            	
+            	return StreamingHttpResponse("UploadError")	
 @login_required
 def create_edit_task(request, group_name, task_id=None,task=None,count=0):
     """Creates/Modifies details about the given Task.
@@ -157,9 +191,13 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 	
         tag=""
 	field_value=[]
-	if request.FILES.getlist('UploadTask'):
-        	files=request.FILES.getlist('UploadTask')
-        	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag,usrname=request.user.username,oid=True)
+	a=(request.POST.get("files"))
+	
+	
+	#if request.FILES.getlist('UploadTask'):
+  #      	files=request.FILES.getlist('UploadTask')
+  #      	print "the upload task values",files
+  #      	field_value = save_file(a[0],a[0], request.user.id, group_id, content_org,tag,usrname=request.user.username,oid=True)
 
         	
 	if not task_id: # create
@@ -220,7 +258,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                			newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
-                		newattribute.object_value = field_value[0]
+                		newattribute.object_value = a
                 		newattribute.save()
 	    if  int(len(request.POST.getlist("Assignee","")))>1:
               if task is None:
@@ -272,14 +310,14 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
         		if attr:
         		  print "the value",field_value
-        		  change_list.append(str(field_value[0])+' changed from '+str(attr.object_value)+' to '+str(field_value[0]))
-        		  attr.object_value=field_value[0]
+        		  change_list.append(str(a)+' changed from '+str(attr.object_value)+' to '+str(a))
+        		  attr.object_value=a
         		  attr.save()
                         else :
 				newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
-                		newattribute.object_value = field_value[0]
+                		newattribute.object_value = a
                 		newattribute.save()
 				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
         		
@@ -322,7 +360,8 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
         	attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
         	if attr:
-        		blank_dict[each] = attr.object_value
+        	  print "all the object values",attr.object_value
+        	  blank_dict[each] = attr.object_value
         	
         		
 	if task_node.prior_node :
