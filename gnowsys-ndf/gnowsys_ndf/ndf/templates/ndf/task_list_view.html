@@ -33,6 +33,7 @@
 			{% endif %}
 			{% endfor %}
 			<th class="view" style="width:10000px"> </th>
+			<th class="view" style="width:10000px"> </th>
 		</tr>
 </thead>
 		<tbody>
@@ -61,6 +62,7 @@
 			{% if i.collection %}
 			{% else %}
 			<td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
+			<td> <a class="tiny button" href="{% url 'delete_task' group_name i.id %}"> Delete </td>						
 			{% endif %}
 		</tr>	
 		
@@ -115,7 +117,6 @@ function updatefeild(oid)
   var aurl=""
  if ('{{choice}}'==0)
  {
- alert('{{task}}')
  var task_id='{{task}}'
   aurl = "{% url 'task_collection' group_name 'task_id' 'oid' %}".replace('oid',oid).replace('task_id',task_id)
  
