@@ -70,7 +70,8 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
 
     url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.methods.create_discussion', name='create_discussion'),    
-    url(r'^(?P<group_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_reply', name='discussion_reply'),    
+    url(r'^(?P<group_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_reply', name='discussion_reply'),
+    url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_delete_reply', name='discussion_delete_reply'),    
 
     #url(r'^(?P<group_id>[^/]+)/visualize', 'gnowsys_ndf.ndf.views.visualize.graphs', name='visualize'),
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
