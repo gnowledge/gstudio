@@ -262,7 +262,7 @@ $(document).on('click',"#save-node",function(event){
 		-->
 	  <div class="medium-12 columns">
 	    <label>
-	    	<input type="file" name="UploadTask" onChange="handleFileSelect(this)" id="docFile" value= "" multiple/></label>
+	    	<input type="file" name="UploadTask" onChange="handleFileSelect(this)" id="docFile" value= "" /></label>
 	    	<div id="selectedFiles"></div>
 
 	    <div id="contentlist" class="content">
@@ -296,16 +296,27 @@ $(document).on('click',"#save-node",function(event){
 	</div>
       </div>
     </div>
-   {% if  Upload_Task %}
+  {% if  Upload_Task %}
 	{% get_file_node request Upload_Task as new %}
-	{% endif %}
+	{% for node in new %}
+	{% get_grid_fs_object node as grid_fs_obj %}
+	<div id="Uploaded">
+	<b><a href="{% url 'read_file' group_id node.pk grid_fs_obj.filename %}">{{grid_fs_obj.filename}}</a></b>
 	
+		
+	</div>
+	{% endfor %}
+	{% else %}
+	--
+	{% endif %}
+
 </form>
 <script type="text/javascript">
 
 	var selDiv = "";
 	var storedFiles = [];
 	var selfiles=[];
+	
 	$(document).ready(function() {
 		$("#files").on("change", handleFileSelect);
 		
@@ -313,28 +324,52 @@ $(document).on('click',"#save-node",function(event){
 		//$("#form-edit-node").on("submit", handleForm);
 		
 		$("body").on("click", ".selFile", removeFile);
+		
 	});
+	$(document).ready(function() {
+	
+	attachedfiles();
+	
+	});
+	
+function attachedfiles(){
+
+    var sData = '{{Upload_Task}}'
+		sData = sData.replace(/&quot;/g, '"');
+		 
+		sData = jQuery.parseJSON(sData);
+    for(i=0;i<sData.length;i++)
+    {
+      storedFiles.push(sData[i]);
+      var html = "<div><span  data-file='"+sData[i]+"' class='selFile' title='Click to remove'>" + sData[i] + 
+			" &#215; <span></div> ";
+      selDiv.append(html);
+		}
+		var select=document.getElementById('trial')
+	  select.value=storedFiles
+		
+  		
+		
+}
 	
 function handleFileSelect(e) {
 		var files = e.files;
-		
 		var filesArr = Array.prototype.slice.call(files);
-		filesArr.forEach(function(f) {			
-
-			storedFiles.push(f);
+		
+		filesArr.forEach(function(f) {	
+		
+			storedFiles.push(f.name);
 			
 			var reader = new FileReader();
 			reader.onload = function (e) {
 			var html = "<div><span  data-file='"+f.name+"' class='selFile' title='Click to remove'>" + f.name + 
 			" &#215; <span></div> ";
-
+      
 				selDiv.append(html);
 				
 			}
 			reader.readAsDataURL(f); 
 		});
-		
-		
 		
 		var formData = new FormData();
 
@@ -358,40 +393,20 @@ function handleFileSelect(e) {
     xhr.onload = function () {
     if (xhr.status === 200) 
 				  {
+				  
+	        selfiles.push(xhr.responseText)
 				  var select=document.getElementById('trial')
-	        select.value=xhr.responseText
-				  selfiles.push(xhr.responseText)
-				  select.value=selfiles
+      	  select.value=storedFiles
+
 				  }}
     xhr.send(formData);
-			}
-		
-function handleForm(e) {
-		e.preventDefault();
-		var data = new FormData();
-		
-		for(var i=0, len=storedFiles.length; i<len; i++) {
-			data.append('files', storedFiles[i]);	
-		}
-		
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST', 'handler.cfm', true);
-	
-		
-		xhr.onload = function(e) {
-			if(this.status == 200) {
-				console.log(e.currentTarget.responseText);	
-				alert(e.currentTarget.responseText + ' items uploaded.');
-			}
-		}
-		
-		xhr.send(data);
-	}
+    
+    	}
 		
 	function removeFile(e) {
 		var file = $(this).data("file");
 		for(var i=0;i<storedFiles.length;i++) {
-			if(storedFiles[i].name === file) {
+		    if(storedFiles[i] === file) {
 				storedFiles.splice(i,1);
 				selfiles.splice(i,1);
 				break;
@@ -399,8 +414,8 @@ function handleForm(e) {
 		}
 		$(this).parent().remove();
 		var select=document.getElementById('trial')
-	  select.value=selfiles
-		alert(select.value)		  
+	  select.value=storedFiles
+		alert(select.value)  
 		
 	}
 

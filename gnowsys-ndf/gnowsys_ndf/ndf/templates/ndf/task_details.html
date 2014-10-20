@@ -108,7 +108,7 @@
 	  <label><b>{% trans "Selected File"  %}</b> </label>
 	  </div >
 	  <div class="medium-3 columns">
-	  {% if  Upload_Task %}
+	{% if  Upload_Task %}
 	{% get_file_node request Upload_Task as new %}
 	{% for node in new %}
 	{% get_grid_fs_object node as grid_fs_obj %}

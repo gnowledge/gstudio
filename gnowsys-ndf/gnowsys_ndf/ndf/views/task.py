@@ -112,9 +112,8 @@ def task_details(request, group_name, task_id):
     return render_to_response(template, variables)
 
 def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None, slug=None):
-    print "gettin in "
     if request.method == "POST" :
-        
+        group_object=collection.Group.one({'name':unicode(group_name)})
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
 
             title = each.name
@@ -132,14 +131,12 @@ def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None,
             # location = []
             # location.append(json.loads(request.POST.get("location", "{}")))
             # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True, location=location)
-            print "the value of each",each
-            obs_image = save_file(each,title,userid,group_name, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+            obs_image = save_file(each,title,userid,group_object._id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
             # Sample output of (type tuple) obs_image: (ObjectId('5357634675daa23a7a5c2900'), 'True') 
 
             # if image sucessfully get uploaded then it's valid ObjectId
             
             if obs_image[0] and ObjectId.is_valid(obs_image[0]):
-              print "the value",obs_image[0]
               return StreamingHttpResponse(str(obs_image[0]))
             
             else: # file is not uploaded sucessfully or uploaded with error
@@ -192,6 +189,8 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
         tag=""
 	field_value=[]
 	a=(request.POST.get("files"))
+	
+	print 
 	
 	
 	#if request.FILES.getlist('UploadTask'):
@@ -304,12 +303,12 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                 		newattribute.save()
 				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
 				
-		elif each == 'Upload_Task' and request.FILES.getlist('UploadTask'):
-			
+		elif each == 'Upload_Task' :
+			print "unexpected blast"
 			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
         		if attr:
-        		  print "the value",field_value
+        		  print "the value",field_value,a
         		  change_list.append(str(a)+' changed from '+str(attr.object_value)+' to '+str(a))
         		  attr.object_value=a
         		  attr.save()
@@ -317,6 +316,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 				newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
+                		print "the value of this",a
                 		newattribute.object_value = a
                 		newattribute.save()
 				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
@@ -360,8 +360,26 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
         	attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
         	if attr:
-        	  print "all the object values",attr.object_value
-        	  blank_dict[each] = attr.object_value
+        	  if each == "Upload_Task":
+        	        file_list=[]
+                        new=[]
+	                a=str(attr.object_value).split(',')
+                        for i in a:
+                                  k=str(i.strip('   [](\'u\'   '))
+                                  new.append(k)
+	                ins_objectid  = ObjectId()
+	                for i in new:
+	                        if  ins_objectid.is_valid(i) is False:
+                                        filedoc=collection.Node.find({'_type':'File','name':unicode(i)})
+	                        else:
+	                                filedoc=collection.Node.find({'_type':'File','_id':ObjectId(i)})			
+                                if filedoc:
+                                        for i in filedoc:
+		                                file_list.append(i.name)
+                        
+		        blank_dict[each] = json.dumps(file_list)                
+		  else:                      	
+                                blank_dict[each] = attr.object_value
         	
         		
 	if task_node.prior_node :
