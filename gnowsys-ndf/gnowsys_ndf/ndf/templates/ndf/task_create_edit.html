@@ -289,6 +289,7 @@ $(document).on('click',"#save-node",function(event){
         <input type="hidden" name="node" value="{{node.pk}}">
         <input type="hidden" name="user" value="{{user.id}}">
         <input type="hidden" name="files" id="trial" >
+        <input type="hidden" name="files_name" id="filename" >
         <input type="hidden" name="page_url" value="{{request.path}}">
       <div class="row" >
 	<div class="medium-6 columns">
@@ -333,7 +334,7 @@ $(document).on('click',"#save-node",function(event){
 	});
 	
 function attachedfiles(){
-
+//popultate the files with their names
     var sData = '{{Upload_Task}}'
 		sData = sData.replace(/&quot;/g, '"');
 		 
@@ -345,9 +346,23 @@ function attachedfiles(){
 			" &#215; <span></div> ";
       selDiv.append(html);
 		}
-		var select=document.getElementById('trial')
-	  select.value=storedFiles
+		var sData = '{{select}}'
+		sData = sData.replace(/&quot;/g, '"');
+		sData = jQuery.parseJSON(sData);
+		//populate the list with their ids
 		
+   for(i=0;i<sData.length;i++)
+    {
+    
+    if(sData[i]){
+		selfiles.push(sData[i])
+		
+		  }
+		}
+		var select=document.getElementById('trial')
+	  select.value=selfiles
+		var files_name=document.getElementById('filename')
+      	files_name.value=storedFiles
   		
 		
 }
@@ -371,6 +386,8 @@ function handleFileSelect(e) {
 			reader.readAsDataURL(f); 
 		});
 		
+		var files_name=document.getElementById('filename')
+      	files_name.value=storedFiles
 		var formData = new FormData();
 
 				// Loop through each of the selected files.
@@ -396,7 +413,7 @@ function handleFileSelect(e) {
 				  
 	        selfiles.push(xhr.responseText)
 				  var select=document.getElementById('trial')
-      	  select.value=storedFiles
+      	  select.value=selfiles
 
 				  }}
     xhr.send(formData);
@@ -414,9 +431,9 @@ function handleFileSelect(e) {
 		}
 		$(this).parent().remove();
 		var select=document.getElementById('trial')
-	  select.value=storedFiles
-		alert(select.value)  
-		
+	  select.value=selfiles
+		var files_name=document.getElementById('filename')
+      	files_name.value=storedFiles
 	}
 
 
