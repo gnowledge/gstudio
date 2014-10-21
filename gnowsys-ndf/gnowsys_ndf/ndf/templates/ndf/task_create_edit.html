@@ -47,7 +47,7 @@
 }
 
 	.selFile { border-radius: 1px;
-  box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.1);}
+  box-shadow: 3px 3px 3px 1px rgba(1,1,1,0.1);}
 
 </style>
 {% endblock %}
@@ -342,8 +342,8 @@ function attachedfiles(){
     for(i=0;i<sData.length;i++)
     {
       storedFiles.push(sData[i]);
-      var html = "<div><div  data-file='"+sData[i]+"' class='selFile' title='Click to remove'>" + sData[i] + 
-			" &#215; </div></div> ";
+      var html = "<div><div  data-file='"+sData[i]+"'  title='Click to remove'> <span class='selFile'>"  + sData[i] + 
+			" &#215; </div></span></div> ";
       selDiv.append(html);
 		}
 		var sData = '{{select}}'
@@ -434,6 +434,8 @@ function handleFileSelect(e) {
 	  select.value=selfiles
 		var files_name=document.getElementById('filename')
       	files_name.value=storedFiles
+    var select_docfile=document.getElementById('docFile')
+	    	select_docfile.value=""
 	}
 
 

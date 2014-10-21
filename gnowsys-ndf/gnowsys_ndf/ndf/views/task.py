@@ -188,8 +188,8 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 	
         tag=""
 	field_value=[]
-	a=(request.POST.get("files"))
-	b=(request.POST.get("files_name"))
+	file_id=(request.POST.get("files"))
+	file_name=(request.POST.get("files_name"))
 	
 	print 
 	
@@ -258,7 +258,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                			newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
-                		newattribute.object_value = a
+                		newattribute.object_value = file_id
                 		newattribute.save()
 	    if  int(len(request.POST.getlist("Assignee","")))>1:
               if task is None:
@@ -309,16 +309,16 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
         		if attr:
-        		  change_list.append(' changed from '+str(attr.object_value)+' to '+str(b))      
-        		  attr.object_value=a
+        		  change_list.append(' changed from '+str(attr.object_value)+' to '+str(file_name))      
+        		  attr.object_value=file_id
         		  attr.save()
                         else :
 				newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
-                		newattribute.object_value = a
+                		newattribute.object_value = file_id
                 		newattribute.save()
-				change_list.append(each.encode('utf8')+' set to '+b.encode('utf8')) # updated details
+				change_list.append(each.encode('utf8')+' set to '+file_name.encode('utf8')) # updated details
         		        
 			
 	    userobj = User.objects.get(id=task_node.created_by)
@@ -362,13 +362,13 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
         	if attr:
         	  if each == "Upload_Task":
         	        file_list=[]
-                        new=[]
-	                a=str(attr.object_value).split(',')
-                        for i in a:
-                                  k=str(i.strip('   [](\'u\'   '))
-                                  new.append(k)
+                        new_list=[]
+	                files=str(attr.object_value).split(',')
+                        for i in files:
+                                  files_name=str(i.strip('   [](\'u\'   '))
+                                  new_list.append(files_name)
 	                ins_objectid  = ObjectId()
-	                for i in new:
+	                for i in new_list:
 	                        if  ins_objectid.is_valid(i) is False:
                                         filedoc=collection.Node.find({'_type':'File','name':unicode(i)})
 	                        else:
@@ -377,7 +377,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                                         for i in filedoc:
 		                                file_list.append(i.name)
                         blank_dict[each] = json.dumps(file_list)
-		        blank_dict['select'] = json.dumps(new)                
+		        blank_dict['select'] = json.dumps(new_list)                
 		  else:          
 		                blank_dict[each] = attr.object_value
         	
