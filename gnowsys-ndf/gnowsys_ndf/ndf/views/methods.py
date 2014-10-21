@@ -1780,6 +1780,24 @@ def discussion_reply(request, group_id):
     return HttpResponse(json.dumps(["Server Error"]))
 
 
+def discussion_delete_reply(request, group_id):
+
+    nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
+    
+    reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+
+    deleted_replies = []
+    
+    for each_reply in nodes_to_delete:
+        temp_reply = collection.Node.one({"_id": ObjectId(each_reply)})
+        
+        if temp_reply:
+            deleted_replies.append(temp_reply._id.__str__())
+            temp_reply.delete()
+        
+    return HttpResponse(json.dumps(deleted_replies))
+
+
 def get_user_group(userObject):
   '''
   methods for getting user's belongs to group.

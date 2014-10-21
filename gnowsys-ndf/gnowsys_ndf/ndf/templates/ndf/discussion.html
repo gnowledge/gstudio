@@ -17,7 +17,7 @@
     <!-- populating replies -->
     {% for each_reply in all_replies %}
 
-    <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-priornode-id="{{ each_reply.prior_node }}">
+    <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
 
       <div class="row"> 
         <div class="small-3 columns">
@@ -34,8 +34,9 @@
       </div>
 
       <div class="row">
-        <div class="small-9 columns"> <small>{{ each_reply.last_update }}</small> </div>
-        <div class='reply-btn text-right small-3 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
+        <div class="small-8 columns"> <small>{{ each_reply.last_update }}</small> </div>
+        <div class="reply-btn small-2 columns" onclick="deleteReply($(this))">delete</div>
+        <div class='reply-btn text-right small-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
           reply
         </div>
       </div>
@@ -168,6 +169,39 @@
   }
 
 
+  function updateDiscussionTabText()
+  {
+    var totalReplies = $("#replies-area div.disc-replies:visible").length;
+    if(totalReplies == 0)
+    {
+      $("a[href='#view-discussion'] span").fadeOut().fadeIn().text("Begin Discussion");
+      $("#create-discussion").text("Initiate discussion on " + $("h1 span.node[itemprop]").text().trim());
+    }
+    else
+    {
+      $("a[href='#view-discussion'] span").fadeOut().fadeIn().text("Join Discussion ("+totalReplies+")");
+    }
+  }
+
+
+  function createReplyHTML(replyStyle, data)
+  {
+    var htmlReply = "<div style='"+ replyStyle +"' data-reply-id='"+ data[1] +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
+    + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
+    + "<span class='align-center'><i class='fi-torso'></i></span>"
+    + "<label>" + data[6] + "</label></a></div>"
+    + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
+
+    + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
+    + "<div class='reply-btn small-2 columns' onclick='deleteReply($(this))'>delete</div>"
+    + "<div data-org-content='"
+    + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
+    + data[1] + "' class='reply-btn text-right small-2 columns'> reply </div></div></div>"
+
+    return htmlReply;
+  }
+
+
   function addReply(sourceObj)
   {
     $('#org').foundation('reveal', 'close');
@@ -195,7 +229,6 @@
         success: function(data){
             
             data = JSON.parse(data);
-            aaa = data;
 
             if( data[0] == "reply_saved" )
             {
@@ -209,22 +242,10 @@
                 $("#create-discussion").html("Initiate New Discussion Thread");                
                 // $("#create-discussion").fadeIn();
 
-                // [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
+                //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
 
                 // add reply text content after #replies-area
-                $("#replies-area").prepend(
-                  "<div style='margin-top:20px;' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
-                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
-                  + "<span class='align-center'><i class='fi-torso'></i></span>"
-                  + "<label>" + data[6] + "</label></a></div>"
-                  + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
-
-                  + "<div class='row'><div class='small-9 columns'><small>"
-                  + data[7] + "</small></div> <div data-org-content='"
-                  + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-                  + data[1] + "' class='reply-btn text-right small-3 columns'> reply </div></div></div>"
-                  ).fadeIn(8000);
-
+                $("#replies-area").prepend(createReplyHTML('margin-top:20px;', data)).fadeIn(8000);
               }
               else  // sub-reply
               {
@@ -233,19 +254,11 @@
                 calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
 
                 // add reply text content as sub-reply
-                $($tempPrior).after(
-                "<div style='margin-left:"+ calcMargLeft +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
-                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
-                  + "<span class='align-center'><i class='fi-torso'></i></span>"
-                  + "<label>" + data[6] + "</label></a></div>"
-                  + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
-
-                  + "<div class='row'><div class='small-9 columns'><small>"
-                  + data[7] + "</small></div> <div data-org-content='"
-                  + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-                  + data[1] + "' class='reply-btn text-right small-3 columns'> reply </div></div></div>"
-                  ).fadeIn(8000);
+                $($tempPrior).after(createReplyHTML('margin-left:'+calcMargLeft, data)).fadeIn(8000);
               }
+
+              // updating tab-text
+              updateDiscussionTabText();
             }
             else if( data[0] == "no_content" ){
               
@@ -261,6 +274,77 @@
     } // --- END of IF-ELSE
   
   } // --- END of addReply()
+
+
+  function deleteReply(sourceObj)
+  {
+    if( user_access == "allow" && edit_policy == "allow" )
+    {
+      var reply_id = $(sourceObj).closest("div.disc-replies").attr("data-reply-id");
+
+      var nodesToDeleteArr = getChildReplies(reply_id, []);
+      nodesToDeleteArr.push(reply_id);  // adding current node's _id
+
+      var deleteConfirm;
+
+      if(nodesToDeleteArr.length > 1)
+      {
+        deleteConfirm = confirm("Along with this reply, total of: " + nodesToDeleteArr.length + " replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'");
+      }
+      else
+      {
+        deleteConfirm = confirm("Are you sure to delete this reply ?\nClick 'OK' to delete.");
+      }
+
+      if(deleteConfirm)
+      {
+        $.ajax({
+          
+          type: 'POST',
+          url: '{% url "discussion_delete_reply" group_id %}',
+          data: { 
+              "csrfmiddlewaretoken": "{{ csrf_token }}",
+              "nodes_to_delete": JSON.stringify(nodesToDeleteArr)
+            },
+          success: function(data){
+
+            data = typeof(data) == "string" ? JSON.parse(data): data;
+
+            data.forEach(function(reply){
+              $("[data-reply-id="+ reply +"]").detach().fadeOut();
+            })
+
+            // updating tab-text
+            updateDiscussionTabText();
+          }
+
+        })
+        //end of ajax
+      }
+    }
+    else
+    {
+      alert("To delete this reply you need to be login and be the member of this group.");
+    }
+  }
+
+  // recursive function to get child replies
+  function getChildReplies(oid, replyArr)
+  {
+    var tempReplyArr = $("[data-priornode-id="+oid+"]");
+    // console.log(tempReplyArr)
+    if (tempReplyArr.length > 0)
+    {
+      tempReplyArr.each(function(){
+        var tempId = $(this).attr("data-reply-id")
+        // console.log(replyArr);
+        replyArr.push(tempId);
+        getChildReplies(tempId, replyArr);
+
+      })
+    }
+    return replyArr;
+  }
 
   // --- END of discussion code ----
 

@@ -412,7 +412,8 @@
 
   <!-- JS -->
   <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> 
-  
+  <script src="/static/ndf/js/app.js"></script> 
+    
   <script type="text/javascript">
 		// Initialize Foundation CSS
 		  $(document).foundation();
@@ -502,8 +503,6 @@
         }); //ajax closes
       }); //document closes
 
-  	{% block script %} {% endblock %}	
-
     // start of document.ready()
     $(document).ready(function(){
       $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
@@ -516,9 +515,10 @@
     });
     // --- END of document.ready()
 
+  	{% block script %} {% endblock %}	
+    
   </script>
 
-  <script src="/static/ndf/js/app.js"></script> 
 
 </body>
 
