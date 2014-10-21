@@ -46,8 +46,8 @@
     padding-left: 10px;
 }
 
-	#selectedFiles {
-	}
+	.selFile { border-radius: 1px;
+  box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.1);}
 
 </style>
 {% endblock %}
@@ -342,8 +342,8 @@ function attachedfiles(){
     for(i=0;i<sData.length;i++)
     {
       storedFiles.push(sData[i]);
-      var html = "<div><span  data-file='"+sData[i]+"' class='selFile' title='Click to remove'>" + sData[i] + 
-			" &#215; <span></div> ";
+      var html = "<div><div  data-file='"+sData[i]+"' class='selFile' title='Click to remove'>" + sData[i] + 
+			" &#215; </div></div> ";
       selDiv.append(html);
 		}
 		var sData = '{{select}}'
@@ -377,7 +377,7 @@ function handleFileSelect(e) {
 			
 			var reader = new FileReader();
 			reader.onload = function (e) {
-			var html = "<div><span  data-file='"+f.name+"' class='selFile' title='Click to remove'>" + f.name + 
+			var html = " <div><span  data-file='"+f.name+"' class='selFile' title='Click to remove'>" + f.name + 
 			" &#215; <span></div> ";
       
 				selDiv.append(html);
