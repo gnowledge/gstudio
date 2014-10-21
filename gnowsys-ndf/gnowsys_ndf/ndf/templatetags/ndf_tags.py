@@ -381,21 +381,16 @@ def get_attribute_value(node_id, attr):
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_id, node, checked=None):
-
-	drawer = None
+def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kwargs):
 	drawers = None
 	drawer1 = None
 	drawer2 = None
-	dict_drawer = {}
-	dict1 = {}
-	dict2 = []
-	nlist=[]
-	page_no = 1
-	node = None
+
+	# Special case used while dealing with RelationType widget
+	left_drawer_content = None
+	paged_resources = ""
 
 	if node:
-		node_id = node._id
 		if field == "collection":
 			if checked == "Quiz":
 				checked = "QuizItem"
@@ -403,23 +398,28 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 				checked = "Theme"
 			else:
 				checked = None
+			drawers, paged_resources = get_drawers(group_id, node._id, node.collection_set, checked)
 
-			nlist = node.collection_set
-			drawers = get_drawers(group_id, node._id, nlist, checked)
 		elif field == "prior_node":
 			checked = None
-			nlist = node.prior_node
-			drawers = get_drawers(group_id, node._id, nlist, checked)
+			drawers, paged_resources = get_drawers(group_id, node._id, node.prior_node, checked)
+
 		elif field == "module":
 			checked = "Module"
-			nlist = node.collection_set
-			drawers = get_drawers(group_id, node._id, nlist, checked)
-		elif type(checked) == list:
+			drawers, paged_resources = get_drawers(group_id, node._id, node.collection_set, checked)
+
+		elif field == "RelationType":
 			# Special case used while dealing with RelationType widget
-			drawers = get_drawers(group_id, node['_id'], node[field], checked)
+			if kwargs.has_key("left_drawer_content"):
+				widget_for = checked
+				checked = field
+				field = widget_for
+				left_drawer_content = kwargs["left_drawer_content"]
+
+				drawers = get_drawers(group_id, nid=node["_id"], nlist=node[field], checked=checked, left_drawer_content=left_drawer_content)
 		
-		# drawer1 = drawers['1']
-		# drawer2 = drawers['2']
+		drawer1 = drawers['1']
+		drawer2 = drawers['2']
 
 	else:
 		if field == "collection" and checked == "Quiz":
@@ -431,50 +431,28 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 		elif field == "module":
 			checked = "Module"
 
-		elif type(checked) == list:
+		elif field == "RelationType":
 			# Special case used while dealing with RelationType widget
-			checked = checked
+			if kwargs.has_key("left_drawer_content"):
+				widget_for = checked
+				checked = field
+				field = widget_for
+				left_drawer_content = kwargs["left_drawer_content"]
 
 		else:
 			# To make the collection work as Heterogenous one, by default
 			checked = None
 
-		drawer1 = get_drawers(group_id, None, [], checked)
+		if checked == "RelationType":
+			drawer1 = get_drawers(group_id, checked=checked, left_drawer_content=left_drawer_content)
 
+		else:
+			drawer1, paged_resources = get_drawers(group_id, page_no=page_no, checked=checked)
 
-	paged_resources = paginator.Paginator(drawer, page_no, 10)
-
-	drawer.rewind()
-
-	if node_id:
-
-		for each in paged_resources.items:
-			if each._id != node._id:
-				if each._id not in nlist:  
-					dict1[each._id] = each
-
-		for oid in nlist: 
-			obj = collection.Node.one({'_id': oid})
-			dict2.append(obj)
-
-		dict_drawer['1'] = dict1
-		dict_drawer['2'] = dict2
-
-	else:
-		if (node is None) and (not nlist):
-			for each in paged_resources.items:               
-				dict_drawer[each._id] = each
-
-
-	drawers = dict_drawer
-	if not node_id:
-		drawer1 = drawers
-	else:
-		drawer1 = drawers['1']
-		drawer2 = drawers['2']
-
-
-	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, "page_info": paged_resources,'node_id': node_id,'group_id': group_id,'groupid': group_id}
+	return {'template': 'ndf/drawer_widget.html', 
+					'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'page_info': paged_resources, 
+					'is_RT': checked, 'group_id': group_id, 'groupid': group_id
+				}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):

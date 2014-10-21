@@ -6,7 +6,9 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.decorators import login_required
+from mongokit import paginator
 import mongokit 
+
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
@@ -128,7 +130,7 @@ def check_existing_group(group_name):
   else:
     return False
 
-def get_drawers(group_id, nid=None, nlist=[], checked=None):
+def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs):
     """Get both drawers-list.
     """
     dict_drawer = {}
@@ -146,19 +148,17 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     
     drawer = None    
 
-    if checked:     
+    if checked:
       if checked == "Page":
- 
         gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
       elif checked == "File":         
         drawer = collection.Node.find({'_type': u"File", 'group_set': {'$all': [ObjectId(group_id)]}})
         
-      elif checked == "Image":         
+      elif checked == "Image":
         gst_image_id = collection.Node.one({'_type': "GSystemType", 'name': "Image"})._id
         drawer = collection.Node.find({'_type': u"File", 'member_of': {'$in':[gst_image_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-        
 
       elif checked == "Video":         
         gst_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Video"})._id
@@ -206,14 +206,15 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Topic":
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif type(checked) == list:
-        # Special case: used while dealing with RelationType widget
-        drawer = checked
+      elif checked == "RelationType":
+        # Special case used while dealing with RelationType widget
+        if kwargs.has_key("left_drawer_content"):
+          drawer = kwargs["left_drawer_content"]
 
     else:
       # For heterogeneous collection
-      if type(checked) == list:
-        # Special case: used while dealing with RelationType widget
+      if checked == "RelationType":
+        # Special case used while dealing with RelationType widget
         drawer = checked
 
       elif theme_GST_id or topic_GST_id or theme_item_GST or forum_GST_id or reply_GST_id:
@@ -221,42 +222,45 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       
       else:
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]} })
+
+    if checked != "RelationType":
+      paged_resources = paginator.Paginator(drawer, page_no, 10)
+      drawer.rewind()
     
+    if (nid is None) and (not nlist):
+      for each in drawer:
+        dict_drawer[each._id] = each
 
-    #kept this bellow commented part for future reference,(Don't delete this)
+    elif (nid is None) and (nlist):
+      for each in drawer:
+        if each._id not in nlist:
+          dict1[each._id] = each
+
+      for oid in nlist:
+        obj = collection.Node.one({'_id': oid})
+        dict2.append(obj)
+
+      dict_drawer['1'] = dict1
+      dict_drawer['2'] = dict2
     
-    # if (nid is None) and (not nlist):
-    #   for each in drawer:               
-    #     dict_drawer[each._id] = each.name
-
-
-    # elif (nid is None) and (nlist):
-    #   for each in drawer:
-    #     if each._id not in nlist:
-    #       dict1[each._id] = each.name
-
-    #   for oid in nlist: 
-    #     obj = collection.Node.one({'_id': oid})
-    #     dict2.append(obj)        
-
-    #   dict_drawer['1'] = dict1
-    #   dict_drawer['2'] = dict2
-
-    
-    # else:
-    #   for each in drawer:
-    #     if each._id != nid:
-    #       if each._id not in nlist:  
-    #         dict1[each._id] = each.name
+    else:
+      for each in drawer:
+        if each._id != nid:
+          if each._id not in nlist:
+            dict1[each._id] = each
           
-    #   for oid in nlist: 
-    #     obj = collection.Node.one({'_id': oid})
-    #     dict2.append(obj)
+      for oid in nlist: 
+        obj = collection.Node.one({'_id': oid})
+        dict2.append(obj)
       
-    #   dict_drawer['1'] = dict1
-    #   dict_drawer['2'] = dict2
+      dict_drawer['1'] = dict1
+      dict_drawer['2'] = dict2
 
-    return drawer
+    if checked == "RelationType":
+      return dict_drawer
+
+    else:
+      return dict_drawer, paged_resources
 
 # get type of resource
 def get_resource_type(request,node_id):
