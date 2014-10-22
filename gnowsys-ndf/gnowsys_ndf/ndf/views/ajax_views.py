@@ -2160,7 +2160,6 @@ def get_announced_courses(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
-
 def get_colleges(request,group_id):
   """
   This view returns list of college(s) that are affiliated to 
@@ -2251,7 +2250,6 @@ def get_colleges(request,group_id):
     error_message = "AnnouncedCourseError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
-
 
 
 def get_anncourses_allstudents(request, group_id):

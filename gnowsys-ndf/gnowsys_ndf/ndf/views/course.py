@@ -414,11 +414,8 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                 if field_instance["name"] in ["start_time", "end_time"]: #, "registration_year"]:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
-
                 elif field_instance["name"] in ["start_enroll", "end_enroll"]: #, "registration_year"]:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
-
-
                 elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
                   # Needs sepcial kind of parsing
                   field_value = []

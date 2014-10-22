@@ -110,6 +110,35 @@
         <fieldset id="sc">
           <legend><label><h5>Course</h5></label></legend>
 
+
+          <div class="row">
+            <div class="small-3 columns">
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+                {% blocktrans with label_val=property_order_list.0.1.2.altnames %} {{label_val}} {% endblocktrans %}
+              </label>
+            </div>
+            
+          
+            <div class="small-5 columns end" style="width: 51.4%;">
+              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
+            <input type="button" id="find_ac" value="View"/>
+          </div>
+          <div class="row">
+                  <!-- fieldset for listing Unset Announced courses based on serach criteria /////////////////////////// -->
+        <fieldset id="unset-ac" style="display: none">
+          <legend>
+            <label><h5>Select Course : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
+          </legend>
+          <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
+            
+          </div>
+        </fieldset>
+            
+          </div>
+
+          <div class="row">
+            <div class="small-3 columns">
           <div class="row">
             <div class="small-3 columns">
               <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
@@ -212,6 +241,67 @@
             <div class="small-2 columns end">
               {% html_widget groupid node.pk property_order_list_sec.0.1.3 %}
             </div>
+        </fieldset>
+
+        <fieldset id="colg_drop">
+          <legend>
+            <label><h5>Select College</h5> </label>
+          </legend>
+          <div class="row" style="padding-bottom: 1rem;">
+            
+            
+              <!-- Drop down for college -->
+            <div class="small-3 columns">
+              <label class="right inline">   Select University </label>
+            </div>
+          <div class="small-3 columns">
+              <select id="univ_cur">
+                {% for each in university_cur %}
+                <option value="{{each.pk}}">{{each.name}}</option>
+                {% endfor %}
+              </select>
+              <input type="button" id="find_colg" value="Get Colleges"/>
+
+            </div>
+
+
+            <div class="small-4 columns">
+            
+             <input type="checkbox" id="all_univ" name="all_univ">Select All
+
+            </div>
+            
+          </div>
+
+          <fieldset id="colglisting">
+          <div class="row" id="divcolg">
+            </div>
+
+
+
+          </fieldset>
+          <br>
+          <div class="row">
+            <div class="small-3 columns">
+              <label class="right inline"> This option will be available to PO </label>
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list_sec.0.1.1.name}}" class="right inline"> 
+                {% trans "From" %}
+              </label>
+            </div>
+            <div class="small-2 columns">
+              {% html_widget groupid node.pk property_order_list_sec.0.1.1 %}
+            </div>
+            <div class="small-1 columns">
+              <label for="{{property_order_list_sec.0.1.2.name}}" class="right inline"> 
+                {% trans "To" %}
+              </label>
+            </div>
+            <div class="small-2 columns end">
+              {% html_widget groupid node.pk property_order_list_sec.0.1.2 %}
+            </div>
           </div>
         </fieldset>
 
@@ -266,9 +356,8 @@
 
       // Change placeholders for start-time & end-time
       // From MM/DD/YYYY HH:MM to MM/YYYY
-      $(".date_month_day_year").each(function(i) {
         
-
+      $(".date_month_day_year").each(function(i) {
       // Below code is required because in validators "m/d/Y H:i" is set
       // In order to override that, below code is overwritten
         if ($(this).attr("id") == "start_time") {
@@ -280,18 +369,6 @@
         else if ($(this).attr("id") == "end_time") {
           $(this).attr("placeholder", "MM/YYYY");
           var et = "{{node.end_time|date:'m/Y'}}"
-          $(this).val(et)
-        }
-
-        else if ($(this).attr("id") == "start_enroll") {
-          $(this).attr("placeholder", "MM/DD/YYYY");
-          var et = "{{node.start_enroll|date:'m/d/Y'}}"
-          $(this).val(et)
-        }
-
-        else if ($(this).attr("id") == "end_enroll") {
-          $(this).attr("placeholder", "MM/DD/YYYY");
-          var et = "{{node.end_enroll|date:'m/d/Y'}}"
           $(this).val(et)
         }
       });
@@ -348,10 +425,6 @@
       lowerYearLimitE = currentYear - 0;
       upperYearLimitE = currentYear + 0;
 
-      
-      
-
-      
       $( ".dmy" ).datepicker({
         defaultDate: "+1w",
         changeMonth: true,
@@ -461,6 +534,8 @@
       var currentYear = (new Date()).getFullYear()
       lowerYearLimit = currentYear - 5;
       upperYearLimit = currentYear + 5;
+      var startDtInput = $("#fc #start_time");
+      var endDtInput = $("#fc #end_time");
 
       $(".date_month_day_year").datepicker({
         changeMonth: true,
@@ -476,7 +551,7 @@
           var month = 1
           var year = lowerYearLimit
 
-          if ($(this).attr('id') == "start_time") {
+          if ($(".date_month_day_year").attr('id') == "start_time") {
             if (month_year) {
               month_year = month_year.split("/")
               month = parseInt(month_year[0])
@@ -504,10 +579,10 @@
               $(this).datepicker('setDate', new Date(year, (month-1), 1));
             }
 
-            $("#end_time").datepicker('option', 'minDate', new Date(year, (month-1), 1));
+            $("#end_time.date_month_day_year").datepicker('option', 'minDate', new Date(year, (month-1), 1));
           }
 
-          else if ($(this).attr('id') == "end_time") {
+          else if ($(".date_month_day_year").attr('id') == "end_time") {
             if (month_year) {
               month_year = month_year.split("/")
 
@@ -536,12 +611,11 @@
               $(this).datepicker('setDate', new Date(year, (month-1), 1));
             }
 
-            $("#start_time").datepicker('option', 'maxDate', new Date(year, (month-1), 1));
+            $("#start_time.date_month_day_year").datepicker('option', 'maxDate', new Date(year, (month-1), 1));
           }
         },
 
         beforeShow: function() {
-
           var month_year = $(this).val();
           month = 1
           year = lowerYearLimit
@@ -553,12 +627,6 @@
             year = parseInt(month_year[1])
           }
 
-          // if (month == 1) {
-          //   month = 2;
-          // }
-          // alert("month: " + month + typeof(month))
-          // alert("year: " + year + typeof(year))
-
           $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
           $(this).datepicker('setDate', new Date(year, (month-1), 1));
         },
@@ -569,7 +637,6 @@
           hideFieldsetSubmit();
         }
       });
-
 
     // If Find button is disabled, enable it
       if ($("#find_ac").attr("disabled") == "disabled") {
