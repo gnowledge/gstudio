@@ -22,6 +22,7 @@ from django_mongokit import get_database
 
 ''' -- imports from gstudio -- '''
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
 from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
@@ -386,11 +387,16 @@ def display_forum(request,group_id,forum_id):
     forum_object = collection.Node.one({'_id': ObjectId(forum_id)})
     if forum_object._type == "GSystemType":
        return forum(request, group_id, forum_id)
-
+    th_all=get_forum_twists(forum)
+    if th_all:
+        th_count=len(list(th_all))
+    else:
+        th_count=0
     variables = RequestContext(request,{
                                         'forum':forum,
                                         'groupid':group_id,'group_id':group_id,
-                                        'forum_created_by':usrname
+                                        'forum_created_by':usrname,
+                                        'thread_count':th_count,
                                         })
 
     return render_to_response("ndf/forumdetails.html",variables)
@@ -416,6 +422,13 @@ def display_thread(request,group_id, thread_id, forum_id=None):
 
     try:
         thread = collection.Node.one({'_id': ObjectId(thread_id)})
+        rep_lst=get_all_replies(thread)
+        lst_rep=list(rep_lst)
+        if lst_rep:
+            reply_count=len(lst_rep)
+        else:
+            reply_count=0
+        print "reply count=",reply_count
         forum = ""
         
         for each in thread.prior_node:
@@ -429,6 +442,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                                                 'group_id':group_id,
                                                 'eachrep':thread,
                                                 'user':request.user,
+                                                'reply_count':reply_count,
                                                 'forum_created_by':usrname
                                             })
                 return render_to_response("ndf/thread_details.html",variables)
@@ -440,6 +454,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                                                 'group_id':group_id,
                                                 'eachrep':thread,
                                                 'user':request.user,
+                                                'reply_count':reply_count,
                                                 'forum_created_by':usrname
                                             })
         return render_to_response("ndf/thread_details.html",variables)    
@@ -532,6 +547,7 @@ def create_thread(request, group_id, forum_id):
                                         'groupid':group_id,
                                         'group_id':group_id,
                                         'user':request.user,
+                                        'reply_count':0,
                                         'forum_threads': json.dumps(forum_threads),
                                         'forum_created_by':User.objects.get(id=forum.created_by).username
                                     })
@@ -752,16 +768,15 @@ def delete_thread(request,group_id,forum_id,node_id):
     exstng_reply.sort('created_at')
     for each in exstng_reply:
         forum_threads.append(each.name)
-    
-    return render_to_response("ndf/create_thread.html",
-                                    {   'group_id':group_id,
-                                        'groupid':group_id,
-                                        'forum': forum,
-                                        'forum_threads': json.dumps(forum_threads),
+    variables = RequestContext(request,{
+                                        'forum':forum,
+                                        'groupid':group_id,'group_id':group_id,
                                         'forum_created_by':User.objects.get(id=forum.created_by).username
-                                    },
-                              RequestContext(request))
+                                        })
 
+    return render_to_response("ndf/forumdetails.html",variables)
+
+   
 def edit_thread(request,group_id,forum_id,thread_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :

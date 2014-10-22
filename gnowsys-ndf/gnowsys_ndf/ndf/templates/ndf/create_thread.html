@@ -1,3 +1,4 @@
+
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
@@ -62,7 +63,7 @@
       <!-- <small>{#{#forum.created_by}}</small> -->
     </div>
     <div class="small-10 columns">
-      <font size ="5">Forum: <a href="/{{groupid}}/forum/show/{{forum}}">
+      <font size ="5">Forum: <a href="/{{groupid}}/forum/{{forum}}">
         {{forum.name}}</a></font>
       <!-- <hr style="margin:0.5rem 0;" /> -->
       <br/><br/>      
