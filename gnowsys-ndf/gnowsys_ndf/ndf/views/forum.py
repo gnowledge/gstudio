@@ -14,6 +14,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.contrib.auth.decorators import login_required
+
 
 
 ''' -- imports from django_mongokit -- '''
@@ -26,7 +28,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_repli
 from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
-from gnowsys_ndf.ndf.views.notify import set_notif_val
+from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
 from gnowsys_ndf.ndf.org2any import org2html
 
 try:
@@ -126,7 +128,7 @@ def forum(request, group_id, node_id=None):
       variables = RequestContext(request,{'existing_forums': forum_detail_list,'groupid': group_id, 'group_id': group_id})
       return render_to_response("ndf/forum.html",variables)
 
-
+@login_required
 def create_forum(request,group_id):    
     '''
     Method to create forum and Retrieve all the forums
@@ -252,7 +254,7 @@ def create_forum(request,group_id):
 
     return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
-
+@login_required
 def edit_forum(request,group_id,forum_id):    
     '''
     Method to create forum and Retrieve all the forums
@@ -463,7 +465,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
         pass
 
 
-
+@login_required
 def create_thread(request, group_id, forum_id):
     ''' 
     Method to create thread
@@ -503,14 +505,13 @@ def create_thread(request, group_id, forum_id):
         
         colrep.prior_node.append(forum._id)
         colrep.name = name
-
         if content_org:
             colrep.content_org = unicode(content_org)
             # Required to link temporary files with the current user who is modifying this document
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             colrep.content = org2html(content_org, file_prefix=filename)
-
+        print "content=",colrep.content
         usrid=int(request.user.id)
         colrep.created_by=usrid
         colrep.modified_by = usrid
@@ -566,7 +567,7 @@ def create_thread(request, group_id, forum_id):
 
 
 
-
+@login_required
 def add_node(request,group_id):
 
     ins_objectid  = ObjectId()
@@ -721,6 +722,7 @@ def get_profile_pic(username):
 
     return img_obj
 
+@login_required
 @check_delete
 def delete_forum(request,group_id,node_id,relns=None):
     """ Changing status of forum to HIDDEN
@@ -737,11 +739,29 @@ def delete_forum(request,group_id,node_id,relns=None):
                 group_id = str(auth._id)
     else :
         pass
-    
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    node=collection.Node.one({'_id':ObjectId(node_id)})
+    #send notifications to all group members
+    colg=collection.Node.one({'_id':ObjectId(group_id)})
+    for each in colg.author_set:
+        if each != colg.created_by:
+            bx=get_userobject(each)
+            if bx:
+                activity=request.user.username+" -deleted forum "
+                msg=activity+"-"+node.name+"- in the group '"+ colg.name
+#                no_check=forum_notification_status(group_id,auth._id)
+#                if no_check:
+                ret = set_notif_val(request,group_id,msg,activity,bx)
+    activity=request.user.username+" -deleted forum "    
+    bx=get_userobject(colg.created_by)
+    if bx:
+        msg=activity+"-"+node.name+"- in the group '"+colg.name+"' created by you"  
+#        no_check=forum_notification_status(group_id,auth._id)
+#        if no_check:
+        ret = set_notif_val(request,group_id,msg,activity,bx)
     return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id}))
 
-
+@login_required
 def delete_thread(request,group_id,forum_id,node_id):
     """ Changing status of thread to HIDDEN
     """
@@ -763,11 +783,36 @@ def delete_thread(request,group_id,forum_id,node_id):
     else :
         pass
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    node=collection.Node.one({'_id':ObjectId(node_id)})
     forum_threads = []
     exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
     exstng_reply.sort('created_at')
+    forum_node=collection.Node.one({'_id':ObjectId(forum_id)})
     for each in exstng_reply:
         forum_threads.append(each.name)
+    #send notifications to all group members
+    colg=collection.Node.one({'_id':ObjectId(group_id)})
+    for each in colg.author_set:
+        if each != colg.created_by:
+            bx=get_userobject(each)
+            if bx:
+                activity=request.user.username+" -deleted thread "
+                prefix=" in the forum "+forum_node.name
+                link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(forum_node._id)
+                msg=activity+"-"+node.name+prefix+"- in the group '"+colg.name+"' created by you."+"'\n"+"Please visit "+link+" to see the forum."  
+#                no_check=forum_notification_status(group_id,auth._id)
+#                if no_check:
+                ret = set_notif_val(request,group_id,msg,activity,bx)
+    activity=request.user.username+" -deleted thread "    
+    prefix=" in the forum "+forum_node.name
+    bx=get_userobject(colg.created_by)
+    if bx:
+        link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(forum_node._id)
+        msg=activity+"-"+node.name+prefix+"- in the group '"+colg.name+"' created by you."+"'\n"+"Please visit "+link+" to see the forum."  
+#        no_check=forum_notification_status(group_id,auth._id)
+#        if no_check:
+        ret = set_notif_val(request,group_id,msg,activity,bx)
+    #send notification code ends here
     variables = RequestContext(request,{
                                         'forum':forum,
                                         'groupid':group_id,'group_id':group_id,
@@ -776,7 +821,7 @@ def delete_thread(request,group_id,forum_id,node_id):
 
     return render_to_response("ndf/forumdetails.html",variables)
 
-   
+@login_required   
 def edit_thread(request,group_id,forum_id,thread_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -798,19 +843,44 @@ def edit_thread(request,group_id,forum_id,thread_id):
     for each in exstng_reply:
         nodes.append(each.name)
     request.session['nodes']=json.dumps(nodes)
-#   
+    colg=collection.Node.one({'_id':ObjectId(group_id)})   
     if request.method == 'POST':
         name = unicode(request.POST.get('thread_name',"")) # thread name
         thread.name = name
         
         content_org = request.POST.get('content_org',"") # thread content
+        print "content=",content_org
         if content_org:
             thread.content_org = unicode(content_org)
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             thread.content = org2html(content_org, file_prefix=filename)
         thread.save() 
-        variables=variables = RequestContext(request,{'group_id':group_id,'thread_id': thread._id,'nodes':json.dumps(nodes)})
+        link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(thread._id)
+        for each in colg.author_set:
+            if each != colg.created_by:
+                bx=get_userobject(each)
+                if bx:
+                    msg=request.user.username+" has edited thread- "+thread.name+"- in the forum " + forum.name + " in the group -'" + colg.name+"'\n"+"Please visit "+link+" to see the thread."
+                    activity="Edited thread"
+                    #auth = collection.Node.one({'_type': 'Author', 'name': unicode(bx.username) })
+                    #if colg._id and auth:
+                        #no_check=forum_notification_status(colg._id,auth._id)
+#                    else:
+#                        no_check=True
+#                    if no_check:
+                    ret = set_notif_val(request,colg._id,msg,activity,bx)
+        activity=request.user.username+" edited thread -"
+        bx=get_userobject(colg.created_by)
+        prefix="-in the forum -"+forum.name
+        if bx:
+            msg=activity+"-"+thread.name+prefix+" in the group '"+colg.name+"' created by you"+"\n"+"Please visit "+link+" to see the thread"   
+#            no_check=forum_notification_status(group_id,auth._id)
+#            if no_check:
+            ret = set_notif_val(request,group_id,msg,activity,bx)
+
+
+        variables = RequestContext(request,{'group_id':group_id,'thread_id': thread._id,'nodes':json.dumps(nodes)})
         return HttpResponseRedirect(reverse('thread', kwargs={'group_id':group_id,'thread_id': thread._id }))    
     else:
         return render_to_response("ndf/edit_thread.html",
@@ -822,7 +892,7 @@ def edit_thread(request,group_id,forum_id,thread_id):
                                     },
                               RequestContext(request))
 
-
+@login_required
 def delete_reply(request,group_id,forum_id,thread_id,node_id):
     ins_objectid  = ObjectId()    
     if ins_objectid.is_valid(group_id) is False :
@@ -837,8 +907,34 @@ def delete_reply(request,group_id,forum_id,thread_id,node_id):
     else :
         pass
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    replyobj=collection.Node.one({'_id':ObjectId(node_id)})
     forumobj=collection.Node.one({"_id": ObjectId(forum_id)})
     threadobj=collection.Node.one({"_id": ObjectId(thread_id)})
+    # notifications to all group members
+    colg=collection.Node.one({'_id':ObjectId(group_id)})
+    link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(threadobj._id)
+    for each in colg.author_set:
+        if each != colg.created_by:
+            bx=get_userobject(each)
+            if bx:
+                msg=request.user.username+" has deleted reply- "+replyobj.content_org+"- in the thread " + threadobj.name + " in the group -'" + colg.name+"'\n"+"Please visit "+link+" to see the thread."
+                activity="Deleted reply"
+                #auth = collection.Node.one({'_type': 'Author', 'name': unicode(bx.username) })
+                #if colg._id and auth:
+                     #no_check=forum_notification_status(colg._id,auth._id)
+#               else:
+#                    no_check=True
+#                    if no_check:
+                ret = set_notif_val(request,colg._id,msg,activity,bx)
+        prefix="-in the forum -"+forumobj.name
+        msg=request.user.username+" has deleted reply- "+replyobj.content_org+"- in the thread " + threadobj.name +prefix+ " in the group -'" + colg.name+"' created by you"+"\n Please visit "+link+" to see the thread."
+        bx=get_userobject(colg.created_by)
+        if bx:
+#            no_check=forum_notification_status(group_id,auth._id)
+#            if no_check:
+            ret = set_notif_val(request,group_id,msg,activity,bx)
+
+    
     variables=RequestContext(request,{'thread':threadobj,'user':request.user,'forum':forumobj,'groupid':group_id,'group_id':group_id})
     return HttpResponseRedirect(reverse('thread', kwargs={'group_id':group_id,'thread_id': threadobj._id }))
 #    return render_to_response("ndf/replytwistrep.html",variables)    
