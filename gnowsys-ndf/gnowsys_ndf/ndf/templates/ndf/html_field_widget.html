@@ -206,7 +206,7 @@
   <div id="{{field.name}}_modal" class="reveal-modal xlarge" style="height: 90% !important" data-reveal>
     <div id="{{field.name}}_drawer">
       <h3>{% trans "Select" %} {{field.altnames}} </h3>
-      {% edit_drawer_widget field.name groupid node_dict field_value_choices %}
+      {% edit_drawer_widget "RelationType" groupid node_dict checked=field.name left_drawer_content=field_value_choices %}
     </div>
     <a class="close-reveal-modal">&#215;</a>
   </div>

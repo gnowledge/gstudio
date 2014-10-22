@@ -52,7 +52,7 @@ def term(request, group_id, node_id=None):
 
 	if not node_id:
 		# To list all term instances
-	  	terms_list = collection.Node.find({'_type':'GSystem','member_of': ObjectId(term_GST._id),
+	  	terms_list = collection.Node.find({'_type':'GSystem','member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]},
 	  	 								   'group_set': ObjectId(group_id) 
 	  	 								  }).sort('name', 1)
 
@@ -102,7 +102,7 @@ def create_edit_term(request, group_id, node_id=None):
                       }
     
     # To list all term instances
-    terms_list = collection.Node.find({'_type':'GSystem','member_of': ObjectId(term_GST._id),
+    terms_list = collection.Node.find({'_type':'GSystem','member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]},
                                        'group_set': ObjectId(group_id) 
                                    }).sort('name', 1)
 
