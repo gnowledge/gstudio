@@ -108,11 +108,38 @@
       <div class="active content row" id="panel_{{property_order_list.0.0}}">
         <!-- fieldset for search criteria //////////////////////////////////////////////////////////////////// -->
         <fieldset id="sc">
-          <legend><label><h5>Search Criteria</h5></label></legend>
+          <legend><label><h5>Course</h5></label></legend>
+
           <div class="row">
             <div class="small-3 columns">
-              <label for="NUSSD Course Duration/Period" class="right inline"> 
-                {% trans "NUSSD Course Duration/Period" %}
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+                {% blocktrans with label_val=property_order_list.0.1.2.altnames %} {{label_val}} {% endblocktrans %}
+              </label>
+            </div>
+            
+          
+            <div class="small-5 columns end" style="width: 51.4%;">
+              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
+            <input type="button" id="find_ac" value="View"/>
+          </div>
+          <div class="row">
+                  <!-- fieldset for listing Unset Announced courses based on serach criteria /////////////////////////// -->
+        <fieldset id="unset-ac" style="display: none">
+          <legend>
+            <label><h5>Select Course : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
+          </legend>
+          <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
+            
+          </div>
+        </fieldset>
+            
+          </div>
+
+          <div class="row">
+            <div class="small-3 columns">
+              <label for="Course Period" class="right inline"> 
+                {% trans "Course Period" %}
               </label>
             </div>
             <div class="small-1 columns">
@@ -133,31 +160,61 @@
             </div>
           </div>
 
+
+        </fieldset>
+
+        <fieldset id="colg_drop">
+          <legend>
+            <label><h5>Select College</h5> </label>
+          </legend>
+          <div class="row" style="padding-bottom: 1rem;">
+              <!-- Drop down for college -->
+            <div class="small-3 columns">
+              <label class="right inline">   Select University </label>
+            </div>
+            <div class="small-4 columns">
+              <select id="univ_cur">
+                {% for each in university_cur %}
+                <option value="{{each.pk}}">{{each.name}}</option>
+                {% endfor %}
+              </select>
+              <input type="button" id="find_colg" value="Get Colleges"/>
+            </div>
+            <div class="left inline">
+              <input type="checkbox" id="all_univ" name="all_univ">Select All
+            </div>
+          </div>
+
+          <fieldset id="colglisting">
+          <div class="row" id="divcolg">
+            </div>
+
+          </fieldset>
+          <br>
           <div class="row">
             <div class="small-3 columns">
-              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
-                {% blocktrans with label_val=property_order_list.0.1.2.altnames %} {{label_val}} {% endblocktrans %}
+              <label class="right inline"> This option will be available to PO </label>
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list_sec.0.1.2.name}}" class="right inline"> 
+                {% trans "From" %}
               </label>
             </div>
-            <div class="small-6 columns end" style="width: 51.4%;">
-              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            <div class="small-2 columns">
+              {% html_widget groupid node.pk property_order_list_sec.0.1.2 %}
+            </div>
+            <div class="small-1 columns">
+              <label for="{{property_order_list_sec.0.1.3.name}}" class="right inline"> 
+                {% trans "To" %}
+              </label>
+            </div>
+            <div class="small-2 columns end">
+              {% html_widget groupid node.pk property_order_list_sec.0.1.3 %}
             </div>
           </div>
-
-          <div class="small-2 small-centered columns">
-            <input type="button" id="find_ac" value="Find" class="button small round expand"/>
-          </div>
         </fieldset>
 
-        <!-- fieldset for listing Unset Announced courses based on serach criteria /////////////////////////// -->
-        <fieldset id="unset-ac" style="display: none">
-          <legend>
-            <label><h5>Search Results : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
-          </legend>
-          <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
-            
-          </div>
-        </fieldset>
         
         <div class="row tab-nav">
           <div class="small-2 columns for-prev">
@@ -172,6 +229,7 @@
       </div>
 
       <input type="hidden" id="name" name="name" value="">
+      <input type="hidden" id="announce_to_colg_list" name="announce_to_colg_list" value="">
     </div>
   </form>
 
@@ -179,6 +237,8 @@
 
 {% block script %}
 // <script type="text/javascript">
+
+
 // Function to hide fieldset & submit ----------------------------------------------------------------------------
   function hideFieldsetSubmit() {
     if ($("#announce-course").css("display") == "block") {
@@ -189,33 +249,66 @@
       $("#unset-ac-options-div").empty();
       $("#unset-ac").toggle();
     }
+
   }
 
 // Default settings for date-widgets & tabs on page load ---------------------------------------------------------
-  var currentYear = (new Date()).getFullYear()
-  lowerYearLimit = currentYear - 5;
-  upperYearLimit = currentYear + 5;
-
+  
   $(document).ready(function() {
-    // Change placeholders for start-time & end-time
+
+/*    $("#colg_drop #start_time").removeClass("date_month_day_year").addClass("dmy");
+    $("#colg_drop #end_time").removeClass("date_month_day_year").addClass("dmy");
+*/
+    $('#colg_drop #start_time').removeClass("date_month_day_year").addClass("dmy")
+    $('#colg_drop #end_time').removeClass("date_month_day_year").addClass("dmy")
+    $('#colg_drop #start_time').attr({id: 'start_enroll',name: 'start_enroll'});
+    $('#colg_drop #end_time').attr({id: 'end_enroll',name:'end_enroll'});
+
+      // Change placeholders for start-time & end-time
       // From MM/DD/YYYY HH:MM to MM/YYYY
       $(".date_month_day_year").each(function(i) {
-        $(this).attr("placeholder", "MM/YYYY");
+        
 
       // Below code is required because in validators "m/d/Y H:i" is set
       // In order to override that, below code is overwritten
         if ($(this).attr("id") == "start_time") {
+          $(this).attr("placeholder", "MM/YYYY");
           var st = "{{node.start_time|date:'m/Y'}}"
-          // alert("start_time: " + st)
           $(this).val(st)
         }
 
         else if ($(this).attr("id") == "end_time") {
+          $(this).attr("placeholder", "MM/YYYY");
           var et = "{{node.end_time|date:'m/Y'}}"
-          // alert("end_time: " + et)
+          $(this).val(et)
+        }
+
+        else if ($(this).attr("id") == "start_enroll") {
+          $(this).attr("placeholder", "MM/DD/YYYY");
+          var et = "{{node.start_enroll|date:'m/d/Y'}}"
+          $(this).val(et)
+        }
+
+        else if ($(this).attr("id") == "end_enroll") {
+          $(this).attr("placeholder", "MM/DD/YYYY");
+          var et = "{{node.end_enroll|date:'m/d/Y'}}"
           $(this).val(et)
         }
       });
+
+      $(".dmy").each(function(i) {
+        $(this).attr("placeholder", "MM/DD/YYYY");
+        if ($(this).attr("id") == "start_enroll") {
+          var st = "{{node.start_enroll|date:'m/d/Y'}}"
+          $(this).val(st)
+        }
+
+        else if ($(this).attr("id") == "end_enroll") {
+          var et = "{{node.end_enroll|date:'m/d/Y'}}"
+          $(this).val(et)
+        }
+      });
+
 
     // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
       $(".content").each(function(i) {
@@ -249,6 +342,125 @@
     // Settings for datepicker widget (with month & year) --------------------------------------------------------
       var startDtInput = $("#start_time");
       var endDtInput = $("#end_time");
+      var startEnrollDt = $("#start_enroll")
+      var endEnrollDt = $("#end_enroll")
+      var currentYear = (new Date()).getFullYear()
+      lowerYearLimitE = currentYear - 0;
+      upperYearLimitE = currentYear + 0;
+
+      
+      
+
+      
+      $( ".dmy" ).datepicker({
+        defaultDate: "+1w",
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "" + lowerYearLimitE + ":" + upperYearLimitE,
+
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText);
+          
+          var month_year = $(this).val();
+          var month = 1
+          var day = 1
+          
+          if ($(this).attr('id') == "start_enroll") {
+            if (month_year) {
+              month_year = month_year.split("/")
+              month = parseInt(month_year[0])
+              day = parseInt(month_year[1])
+              year = parseInt(month_year[2])
+            }
+
+            if (endEnrollDt.val() != '') {
+              var testStartDate = startEnrollDt.datepicker('getDate');
+              var testEndDate = endEnrollDt.datepicker('getDate');
+
+              if (testStartDate > testEndDate) {
+                endEnrollDt.datepicker('setDate', testStartDate);
+              }
+
+              else {
+                $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+                $(this).datepicker('setDate', new Date(year, (month-1), day));
+              }
+            }
+
+            else {
+              endEnrollDt.val(dateText);
+              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+
+            $("#end_enroll").datepicker('option', 'minDate', new Date(year, (month-1), day));
+          }
+
+          else if ($(this).attr('id') == "end_enroll") {
+            if (month_year) {
+              month_year = month_year.split("/")
+
+              month = parseInt(month_year[0]);
+              day = parseInt(month_year[1]);
+              year = parseInt(month_year[2]);
+            }
+
+            if (startEnrollDt.val() != '') {
+              var testStartDate = startEnrollDt.datepicker('getDate');
+              var testEndDate = endEnrollDt.datepicker('getDate');
+
+              if (testStartDate > testEndDate) {
+                startEnrollDt.datepicker('setDate', testEndDate);
+              }
+
+              else {
+                $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+                $(this).datepicker('setDate', new Date(year, (month-1), day));
+              }
+            }
+
+            else {
+              startEnrollDt.val(dateText);
+
+              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+
+            $("#start_enroll").datepicker('option', 'maxDate', new Date(year, (month-1), day));
+          }
+        },
+
+        beforeShow: function() {
+
+          var month_year = $(this).val();
+          month = 1
+          year = lowerYearLimitE
+          day =1
+  
+          if (month_year) {
+            month_year = month_year.split("/")
+            month = parseInt(month_year[0])
+            day = parseInt(month_year[1])
+            year = parseInt(month_year[2])
+          }
+
+          $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        },
+
+
+      });
+
+
+
+    // If Find button is disabled, enable it
+      if ($("#find_ac").attr("disabled") == "disabled") {
+        $("#find_ac").removeAttr("disabled");
+      }
+      var currentYear = (new Date()).getFullYear()
+      lowerYearLimit = currentYear - 5;
+      upperYearLimit = currentYear + 5;
 
       $(".date_month_day_year").datepicker({
         changeMonth: true,
@@ -267,7 +479,6 @@
           if ($(this).attr('id') == "start_time") {
             if (month_year) {
               month_year = month_year.split("/")
-              
               month = parseInt(month_year[0])
               year = parseInt(month_year[1])
             }
@@ -330,12 +541,6 @@
         },
 
         beforeShow: function() {
-          // alert("beforeShow")
-          // month[0]: month-value   =======   month[1]: year-value
-          // NOTE: Experienced an odd behavior which is stated as follows:
-          // > Month-value was automatically getting incremented by 1 except only when it is 1
-          // > Hence, to tackle that I'm explicitly subtracting 1 from it!
-          // > and in case of 1 making it 2 & then subtracting 1 from it!
 
           var month_year = $(this).val();
           month = 1
@@ -364,6 +569,7 @@
           hideFieldsetSubmit();
         }
       });
+
 
     // If Find button is disabled, enable it
       if ($("#find_ac").attr("disabled") == "disabled") {
@@ -432,6 +638,69 @@
     $("#announce-course").attr("disabled", !optionState);
   });
 
+
+// On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
+  $("#find_colg").click(function(event) {
+    //alert("Get colleges clicked...")
+    var univ_id = $("#univ_cur option:selected").val();
+    var success_state = false
+    var all_univs = $("#all_univ").prop("checked");
+    //alert("\n univ_id: " + univ_id)
+
+    $.ajax({
+      url: "{% url 'get_colleges' group_id%}",
+
+      data: {
+        univ_id:univ_id,
+        
+        all_univs: all_univs
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data){
+          // alert("Output" + "\n success: " + data);
+
+          // var dataDict = JSON.parse(data.responseText);
+          // alert(" " + data["success"] + " -- " + typeof(data["success"]))          
+          success_state = data["success"];
+          $("#alertModalLabel").text(data["message"]);
+
+          if (data["success"]) {
+            $("#alertModal").removeClass("alert");
+            $("#alertModal").addClass("success");
+            $("#alertModal").foundation('reveal', 'open');
+
+
+            $("#divcolg").empty();
+            // alert("length: " + Object.keys(data["unset_nc"]).length)
+            var dict_len = Object.keys(data["unset_nc"]).length;
+            $.each(data["unset_nc"], function(k, val){
+              // alert(k + " -- " + val);
+              $("#unset_nc").append(val);
+
+            });
+
+            // Fill divcolg
+            $("#divcolg").empty();
+            drawer_widget = data["drawer_widget"]
+            $("#divcolg").html(drawer_widget); 
+
+          }
+
+          else {
+            $("#alertModal").removeClass("success");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        }
+  });
+});
+
+
+
 // On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
   $("#find_ac").click(function(event) {
     // alert("AC Find clicked...")
@@ -445,9 +714,11 @@
     if($(this).parents("fieldset").parents(".content").find(':input[data-invalid]').length == 0) {
       var start_time = $("#start_time").val()
       var end_time = $("#end_time").val()
+      var start_enroll = $("#start_enroll").val()
+      var end_enroll = $("#end_enroll").val()
       var nussd_course_type = $("#nussd_course_type").val()
       var success_state = false
-      // alert("\n start_time: " + start_time + "\n end_time: " + end_time + "\n nussd_course_type: " + nussd_course_type)
+      alert("\n start_time: " + start_time +  "end_time: " + end_time+"start_enroll: " + start_enroll + "\n end_enroll: " + end_enroll + "\n nussd_course_type: " + nussd_course_type)
 
       // All field(s) have valid I/P, make ajax-call
       $.ajax({
@@ -456,6 +727,8 @@
         data: {
           start_time: start_time,
           end_time: end_time,
+          start_enroll: start_enroll,
+          end_enroll: end_enroll,
           nussd_course_type: nussd_course_type
         },
 
@@ -496,7 +769,7 @@
                             "<label>"+val+"</label>" +
                             "</div>";
               $("#unset-ac-options-div").append(input_chk);
-              
+
               dict_len = dict_len - 1;
             });
 
@@ -511,6 +784,12 @@
               $("#selectAllOptions").removeAttr("disabled", "disabled");
               $(".unsetOption").removeAttr("disabled", "disabled");
             }
+
+            // Fill divSt
+            $("#divSt").empty();
+            drawer_widget = data["drawer_widget"]
+            $("#divSt").html(drawer_widget); 
+
           }
 
           else {
@@ -566,5 +845,22 @@
   // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
     $("#selectAllOptions").removeAttr("disabled", "disabled");
     $(".unsetOption").removeAttr("disabled", "disabled");
-  });
+    widget_for = "announced_course_create_edit"
+    class_value = ".node_id." + widget_for + "_values"
+    right_drawer_len = $(class_value).size();
+
+    var announce_to_colg_list = [];
+
+    if (right_drawer_len > 0) {
+      $(class_value).each(function (){
+        // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
+        resource_name = $(this).attr('name');
+        /*resource_id = $(this).val()*/;
+        announce_to_colg_list.push(resource_name);
+      });
+    }  
+    $("#announce_to_colg_list").val(announce_to_colg_list);
+});
+
+
 {% endblock %}
