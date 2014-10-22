@@ -134,37 +134,7 @@
             
           </div>
         </fieldset>
-            
           </div>
-
-          <div class="row">
-            <div class="small-3 columns">
-          <div class="row">
-            <div class="small-3 columns">
-              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
-                {% blocktrans with label_val=property_order_list.0.1.2.altnames %} {{label_val}} {% endblocktrans %}
-              </label>
-            </div>
-            
-          
-            <div class="small-5 columns end" style="width: 51.4%;">
-              {% html_widget groupid node.pk property_order_list.0.1.2 %}
-            </div>
-            <input type="button" id="find_ac" value="View"/>
-          </div>
-          <div class="row">
-                  <!-- fieldset for listing Unset Announced courses based on serach criteria /////////////////////////// -->
-        <fieldset id="unset-ac" style="display: none">
-          <legend>
-            <label><h5>Select Course : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
-          </legend>
-          <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
-            
-          </div>
-        </fieldset>
-            
-          </div>
-
           <div class="row">
             <div class="small-3 columns">
               <label for="Course Period" class="right inline"> 
@@ -345,10 +315,6 @@
 // Default settings for date-widgets & tabs on page load ---------------------------------------------------------
   
   $(document).ready(function() {
-
-/*    $("#colg_drop #start_time").removeClass("date_month_day_year").addClass("dmy");
-    $("#colg_drop #end_time").removeClass("date_month_day_year").addClass("dmy");
-*/
     $('#colg_drop #start_time').removeClass("date_month_day_year").addClass("dmy")
     $('#colg_drop #end_time').removeClass("date_month_day_year").addClass("dmy")
     $('#colg_drop #start_time').attr({id: 'start_enroll',name: 'start_enroll'});
