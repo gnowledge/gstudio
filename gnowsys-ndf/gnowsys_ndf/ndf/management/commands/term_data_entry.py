@@ -43,25 +43,29 @@ class Command(BaseCommand):
             reader = csv.reader(f)
             try:
               i = 1
-              k = None
               for ind, row in enumerate(reader):
                 # print "\n row: ", row
                 
                 for index, obj in enumerate(row):
-					# print index," ",obj,"\n"
+                	# Index = 0 means first column
 					if index == 1:
-						val = obj
+						# index = 1 means its second column
+						second_col = obj
 					elif index == 2:
-						if val:
-							if obj in ["instanceof","subtypeof"]:
-								create_term_obj(val)
-							else:
-								k = obj
+						# index = 2 means its third column
+						if second_col:
+							third_col = obj
 
 					elif index == 3:
+						# index = 3 means its fourth column
 						if obj:
-							if k == "dependson":
-								add_prior_node(val, obj)
+							fourth_col = obj
+							if fourth_col != "dependson" and fourth_col in ["concept","activity"]:
+								if third_col in ["instanceof","subtypeof"]:
+									create_term_obj(second_col)
+
+							if third_col == "dependson":
+								add_prior_node(second_col, fourth_col)
 
 
                 i = i + 1
@@ -70,18 +74,18 @@ class Command(BaseCommand):
                 print " ======================================================="
                 
                 # if (i == 6):
-                #   break
+                  # break
                   
             except csv.Error as e:
               sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e)) 
 
 
-def create_term_obj(val):
+def create_term_obj(second_col):
 	# print "\ninside create_term_obj\n"
-	term_obj = collection.Node.one({'_type': 'GSystem','member_of': {'$in': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(val) })
+	term_obj = collection.Node.one({'_type': 'GSystem','member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(second_col) })
 	if not term_obj:
 		term_obj = collection.GSystem()
-		term_obj.name = unicode(val)
+		term_obj.name = unicode(second_col)
 		term_obj.access_policy = u"PUBLIC"
 		term_obj.status = u"PUBLISHED"
 		term_obj.contributors.append(1)
@@ -92,26 +96,24 @@ def create_term_obj(val):
 		term_obj.member_of.append(term_GST._id)
 		term_obj.member_of.append(topic_GST._id)
 		term_obj.save()
-		print "Term ",val," created successfully\n"
+		print "Term ",second_col," created successfully\n"
 
 	else:
-		print "Term ",val," already created\n"
+		print "Term ",second_col," already created\n"
 
-def add_prior_node(val, obj):
+def add_prior_node(second_col, fourth_col):
 	# print "\nadd_prior_node to this obj: ",val," depends on ",obj,"\n"
-	term_obj1 = collection.Node.one({'_type': 'GSystem','member_of': {'$in': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(val) })
-	term_obj2 = collection.Node.one({'_type': 'GSystem','member_of': {'$in': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(obj) })
+	term_obj1 = collection.Node.one({'_type': 'GSystem','member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(second_col) })
+	term_obj2 = collection.Node.one({'_type': 'GSystem','member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]}, 'name':unicode(fourth_col) })
 
 	if term_obj1 and term_obj2:
 		if term_obj2._id not in term_obj1.prior_node:
 
 			collection.update({'_id': term_obj1._id}, {'$set': {'prior_node': [term_obj2._id] }}, upsert=False, multi=False)
-			# term_obj1.prior_node.append(term_obj2._id)
-			# term_obj1.save()
-			print "Term ",obj," added to prior node of term ",val," successfully !!!\n"
+			print "Term ",fourth_col," added to prior node of term ",second_col," successfully !!!\n"
 
 		else:
-			print "Term ",obj," already added to prior node of term ",val,"\n"
+			print "Term ",fourth_col," already added to prior node of term ",second_col,"\n"
 
 	else:
 		print "Terms doesnot exists\n"
