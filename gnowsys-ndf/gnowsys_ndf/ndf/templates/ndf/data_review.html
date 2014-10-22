@@ -466,11 +466,43 @@
 	// setting the height of data review table
 	$("#data-rev-table-container-div").height(window.innerHeight - ($("nav.top-bar").height()*4) + "px");
 
-	if(window.location.hash && $("tr#edit-row-" + window.location.hash.substr(1)).length)
+
+	function updateContent()
 	{
-		document.getElementById("view-row-"+window.location.hash.substr(1)).scrollIntoView(true);
-		editResRow(window.location.hash.substr(1));
+		// console.log(":::before  " + history.state)
+		if(window.location.hash && $("tr#edit-row-" + window.location.hash.substr(1)).length)
+		{
+			document.getElementById("view-row-"+window.location.hash.substr(1)).scrollIntoView(true);
+
+			if(document.getElementById("currently-edited-row").getAttribute("data-edited-row-id") != window.location.hash.substr(1))
+			{
+				editResRow(window.location.hash.substr(1));
+			}
+		}
+		else if(!history.state)
+		{
+			// console.log("----------" + history.state)
+			var oid = document.getElementById("currently-edited-row").getAttribute("data-edited-row-id");
+
+			// fetching resource object edit row
+			var $resEditRow = $("tr#edit-row-" + oid),
+			resEditRowArr = $resEditRow.children();
+
+			if( oid && (resEditRowArr.length > 0) )
+			{
+				// console.log("========== calling changeSaveCancelToEdit() history.state")
+				changeSaveCancelToEdit(oid, resEditRowArr);
+			}
+		}
+		// console.log("In updateContent() : ");
 	}
+
+	// call the specific row to edit depending on availability of #oid in the url
+	if( window.location.hash.length >= 24 ){ updateContent() };
+
+	// Revert to a previously saved state
+	window.addEventListener('popstate', updateContent );
+
 
 	function checkCurrEditRow()
 	{
@@ -497,15 +529,19 @@
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", oid);
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", $resEditRow.attr("data-row-name"));
 		window.location.hash = oid;
+		history.pushState({'oid': oid}, document.title, window.location.href);
 	}
 
 
 	function setCurrEditRowToNone()
 	{
+		// var oid = document.getElementById("currently-edited-row").getAttribute("data-edited-row-id");
+
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", "");
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", "");
-		// window.location.hash = "";
-		window.location = window.location.pathname;
+
+		window.location.hash = "";
+		// window.location = window.location.pathname;
 		// location.reload();
 	}
 
@@ -530,7 +566,7 @@
 	// action on edit click:
 	function editResRow(oid)
 	{
-
+		// console.log("In editResRow() ")
 		// exit from the function if any other row is being edited now.
 		if(checkCurrEditRow()){ return false; }
 
