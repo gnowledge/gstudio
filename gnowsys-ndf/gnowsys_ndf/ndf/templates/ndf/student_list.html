@@ -63,14 +63,6 @@
   }
 {% endblock %}
 
-{% block app_action_list %}
-  <li>
-    <a href="{% url 'mis:mis_enroll' groupid app_id app_set_id %}">
-      {% trans "Enroll in Courses" %}
-    </a>
-  </li>
-{% endblock %}
-
 {% block body_content %}
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <label id="alertModalLabel"></label>
@@ -78,9 +70,16 @@
   </div>
 
   <header class="row" style="margin: 1rem 0 0 0;">
-    <h2 class="small-12 columns">
-      {% trans "Student List View" %}
-    </h2>
+    <div class="small-7 columns">
+      <h2>
+        {% trans "Student List View" %}
+      </h2>
+    </div>
+    <div class="small-5 columns end">
+      <a href="{% url 'mis:mis_enroll' groupid app_id app_set_id %}" class="button small right align">
+        {% trans "Enroll in Courses" %}
+      </a>
+    </div>
   </header>
 
   {% if group_name_tag == "MIS_admin" %}
