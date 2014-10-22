@@ -213,67 +213,7 @@
             </div>
         </fieldset>
 
-        <fieldset id="colg_drop">
-          <legend>
-            <label><h5>Select College</h5> </label>
-          </legend>
-          <div class="row" style="padding-bottom: 1rem;">
-            
-            
-              <!-- Drop down for college -->
-            <div class="small-3 columns">
-              <label class="right inline">   Select University </label>
-            </div>
-          <div class="small-3 columns">
-              <select id="univ_cur">
-                {% for each in university_cur %}
-                <option value="{{each.pk}}">{{each.name}}</option>
-                {% endfor %}
-              </select>
-              <input type="button" id="find_colg" value="Get Colleges"/>
 
-            </div>
-
-
-            <div class="small-4 columns">
-            
-             <input type="checkbox" id="all_univ" name="all_univ">Select All
-
-            </div>
-            
-          </div>
-
-          <fieldset id="colglisting">
-          <div class="row" id="divcolg">
-            </div>
-
-
-
-          </fieldset>
-          <br>
-          <div class="row">
-            <div class="small-3 columns">
-              <label class="right inline"> This option will be available to PO </label>
-            </div>
-
-            <div class="small-1 columns">
-              <label for="{{property_order_list_sec.0.1.1.name}}" class="right inline"> 
-                {% trans "From" %}
-              </label>
-            </div>
-            <div class="small-2 columns">
-              {% html_widget groupid node.pk property_order_list_sec.0.1.1 %}
-            </div>
-            <div class="small-1 columns">
-              <label for="{{property_order_list_sec.0.1.2.name}}" class="right inline"> 
-                {% trans "To" %}
-              </label>
-            </div>
-            <div class="small-2 columns end">
-              {% html_widget groupid node.pk property_order_list_sec.0.1.2 %}
-            </div>
-          </div>
-        </fieldset>
 
         
         <div class="row tab-nav">
