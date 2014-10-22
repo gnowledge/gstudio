@@ -1392,10 +1392,16 @@ def data_review_save(request, group_id):
     license = request.POST.get('license', '')
     
     file_node = collection.File.one({"_id": ObjectId(node_oid)})
+
     if request.method == "POST":
-        get_node_common_fields(request, file_node, group_id, GST_FILE)
-        file_node.license = license if license else file_node.license
-        file_node.save()
+        is_changed = get_node_common_fields(request, file_node, group_id, GST_FILE)
+
+        if license and license != file_node.license:
+            file_node.license = file_node.license
+            is_changed = True
+
+        if is_changed:
+            file_node.save()
 
     # to fill/update attributes of the node
     get_node_metadata(request, file_node, GST_FILE)

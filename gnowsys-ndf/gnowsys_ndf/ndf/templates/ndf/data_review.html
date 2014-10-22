@@ -373,7 +373,7 @@
 				</select>
 			</td>
 			<td class="hide-el" data-field="status">
-				<select name="status" {% if not user_is_joined == "joined" or not user_is_joined == "author" %}{% if not user_access == "allow" %}disabled{%endif%}{%endif%}>
+				<select name="status" {% if not user_is_joined == "author" or not user.is_superuser %}disabled{%endif%}>
 					<option value="{{resource.status}}"> -- Select -- </option>
 				{% for each_status in static_status %}		
 					<option {%if each_status == resource.status %}selected="selected"{%endif%} value="{{ each_status }}">{{ each_status }}</option>
