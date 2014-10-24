@@ -483,7 +483,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 		else:
 			attr_value.update({attrvalue:"--"})
 	 attr_value.update({'id':each._id})
-	 if each.created_by == request.user:
+	 if each.created_by == request.user.id:
 	        attr_value.update({'owner':'owner'})
 	 else:       
 	        attr_value.update({'owner':'assignee'})

@@ -60,15 +60,16 @@
 			        						 
 			{% endfor %}
 			{% if i.collection %}
-			<td>	</td>
+			    <td>	</td>
+			    <td>	</td>
 			{% else %}
-			<td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
+			      <td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
+		        	
+			      {% if i.owner == "owner" %}
+			      <td> <a class="tiny button" href="{% url 'delete_task' group_name i.id %}"> Delete </td>
+			      {% else %}	
+			      <td>	</td>				
 			{% endif %}
-			{% if i.owner == 'owner' %}
-			<td> <a class="tiny button" href="{% url 'delete_task' group_name i.id %}"> Delete </td>
-			{% else %}	
-			<td>	</td>				
-			
 			{% endif %}
 		</tr>	
 		
