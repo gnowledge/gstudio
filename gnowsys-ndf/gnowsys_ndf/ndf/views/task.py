@@ -483,6 +483,10 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 		else:
 			attr_value.update({attrvalue:"--"})
 	 attr_value.update({'id':each._id})
+	 if each.created_by == request.user:
+	        attr_value.update({'owner':'owner'})
+	 else:       
+	        attr_value.update({'owner':'assignee'})
 	 attr_value.update({'Name':each.name})
 	 attr_value.update({'collection':each.collection_set})
 	 if attr1 or each.created_by == request.user.id or group.created_by == request.user.id :

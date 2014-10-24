@@ -26,7 +26,7 @@
 		<tr>
                       
 			{%for i in TASK_inst.0 %}
-			{% if i != "id" and i != "collection"  %}
+			{% if i != "id" and i != "collection" and i != "owner"   %}
 			<th class="view" style="width:10000px">{{i}}</th>
                         
 			<input type=hidden id='{{i}}' value='{{i}}'>
@@ -45,7 +45,7 @@
 					
 	     {% for j,v in i.items %}
 	      
-				{% if j != "id" and j != "collection" %}
+				{% if j != "id" and j != "collection" and j != "owner" %}
 					          {% if i.collection %}
 				            	    {% if j == "Status" %}
 					                   <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v}} (Group Task) </a></td>
@@ -60,9 +60,15 @@
 			        						 
 			{% endfor %}
 			{% if i.collection %}
+			<td>	</td>
 			{% else %}
 			<td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
-			<td> <a class="tiny button" href="{% url 'delete_task' group_name i.id %}"> Delete </td>						
+			{% endif %}
+			{% if i.owner == 'owner' %}
+			<td> <a class="tiny button" href="{% url 'delete_task' group_name i.id %}"> Delete </td>
+			{% else %}	
+			<td>	</td>				
+			
 			{% endif %}
 		</tr>	
 		
