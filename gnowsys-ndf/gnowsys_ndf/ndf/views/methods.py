@@ -1859,4 +1859,22 @@ def get_user_activity(userObject):
       blank_list.append({'id':str(each._id), 'name':each.name, 'date':each.last_update, 'activity': activity, 'type': each._type, 'group_id':str(each.group_set[0]), 'member_of':member_of.name.lower()})
   return blank_list
 
+def get_file_node(file_name=""):
+  file_list=[]
+  new=[]
+  a=str(file_name).split(',')
+  for i in a:
+        k=str(i.strip('   [](\'u\'   '))
+        new.append(k)
+	col_Group = db[Node.collection_name]
+	ins_objectid  = ObjectId()
+  for i in new:
+          if  ins_objectid.is_valid(i) is False:
+		  filedoc=collection.Node.find({'_type':'File','name':unicode(i)})
+	  else:
+		  filedoc=collection.Node.find({'_type':'File','_id':ObjectId(i)})			
+          if filedoc:
+             for i in filedoc:
+		            file_list.append(i.name)	
+  return file_list	
 

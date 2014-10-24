@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.models import GSystemType, Node 
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,get_file_node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 collection = get_database()[Node.collection_name]
 sitename=Site.objects.all()
@@ -308,14 +308,16 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 			
 			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+        		value=get_file_node(attr.object_value)
         		if attr:
-        		  change_list.append(' changed from '+str(attr.object_value)+' to '+str(file_name))      
+        		  change_list.append(' changed from '+str(value).strip('[]')+' to '+str(file_name))      
         		  attr.object_value=file_id
         		  attr.save()
                         else :
 				newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
+                		print "the eight tab",file_id
                 		newattribute.object_value = file_id
                 		newattribute.save()
 				change_list.append(each.encode('utf8')+' set to '+file_name.encode('utf8')) # updated details
@@ -364,7 +366,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
         	        file_list=[]
                         new_list=[]
 	                files=str(attr.object_value).split(',')
-                        for i in files:
+	                for i in files:
                                   files_name=str(i.strip('   [](\'u\'   '))
                                   new_list.append(files_name)
 	                ins_objectid  = ObjectId()
