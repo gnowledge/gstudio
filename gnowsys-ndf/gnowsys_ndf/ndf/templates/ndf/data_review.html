@@ -454,6 +454,9 @@
 // <script type="text/javascript">
 	
 	var isFieldEdited = false;
+	
+	{% check_user_join request groupid as user_is_joined %}
+	var user_is_joined = "{{user_is_joined}}";
 
 	// removing left panel:
 	$("main.row > aside.columns").detach();
@@ -782,6 +785,13 @@
 		// to show details on confirm popup; getEditSummary returns: [bool, nodeObject]
 		var nodeData = getEditSummary(oid, msg, "save");
 
+		nodeObject = nodeData[1];
+
+		// if user is not superuser or admin of the group then remove value of status
+		{% if not user.is_superuser %}
+			if(user_is_joined != "author"){ nodeObject.status = ""; }
+		{% endif %}
+
 		if(nodeData[0])
 		{
 			// console.log(JSON.stringify(nodeData[1]))
@@ -791,7 +801,7 @@
 				url: "{% url 'data_review_save' groupid %}",
 				data:{
 					node_oid: oid,
-					node_details: JSON.stringify(nodeData[1]),
+					node_details: JSON.stringify(nodeObject),
 					csrfmiddlewaretoken: '{{ csrf_token }}'
 				},
 				success: function(data){
