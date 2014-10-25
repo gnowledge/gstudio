@@ -417,7 +417,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: name"
       is_changed = True
   
-  if altnames:
+  if altnames or request.POST.has_key("altnames"):
     if node.altnames != altnames:
       node.altnames = altnames
       is_changed = True
@@ -645,7 +645,12 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   if status:
     if node.status != status:
-      node.status = status
+      node.status = unicode(status)
+      node.modified_by = usrid
+
+      if usrid not in node.contributors:
+        node.contributors.append(usrid)
+
       is_changed = True
 
   # print "\n Reached here ...\n\n"
