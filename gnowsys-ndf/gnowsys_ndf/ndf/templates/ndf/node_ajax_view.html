@@ -190,17 +190,26 @@
 
        
       
-      <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span> </h1>
+      <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
+
+      {% if node %}
+        {% get_publish_policy request groupid node as group_policy %}
+        {% if group_policy == "allow" %}
+          &nbsp;&nbsp;&nbsp;<span style='position:fixed; color: gray;'>Draft</span>
+        {% endif %}
+      {% endif %}
+
+      </h1>
 
       <h1 class="subheader">
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
-      <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
 
-      <dd>
-        <a href="#view-discussion"><i class="fi-comment"></i> 
+      <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
+        
           {% if all_replies %}
             <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
               {% trans "Join Discussion" %} ({{ all_replies | length }})
@@ -210,6 +219,7 @@
               {% trans "Begin Discussion" %}
             </span>
           {% endif %}
+
         </a>
       </dd>
 
@@ -569,9 +579,12 @@
         
       {% endif %}
       
+
+      <div id="view-discussion" style="display:none;">
       <!-- discussion content area -->
         {% include 'ndf/discussion.html' %}
       <!-- END of discussion content area -->     
+      </div>
 
     </div><!-- end of tab's content -->
   </section>
@@ -703,12 +716,7 @@
 
         </div>
 
-        {% if node %}
-          {% get_publish_policy request groupid node as group_policy %}
-          {% if group_policy == "allow" %}
-            <br/><p style='position:fixed; color: gray;font-size: 30pt; margin-left:40px'>Draft</p><br/>
-          {% endif %}
-        {% endif %}
+        
 
         {% if node %}
           {% check_group node as is_group %}
@@ -846,8 +854,6 @@
 
   </section>
 
-
-
     
     
 <script type="text/javascript">
@@ -868,6 +874,21 @@
   $(document).on('click','#clickConceptGraph',function(){
     $('#view-concept-graph #chart-concept').append(svgdata); 
     $('#view-concept-graph').foundation('reveal', 'open'); 
+  });
+
+  $(document).on('click','.view-discussion',function(){
+    $("#view-page").css("display", "none");
+    $(".page-view").removeClass("active");
+    $(".discussion-view").addClass("active");    
+    $("#view-discussion").css("display", "block");
+
+  });
+
+  $(document).on('click','.view-page',function(){
+    $("#view-discussion").css("display", "none");
+    $(".discussion-view").removeClass("active");
+    $(".page-view").addClass("active");    
+    $("#view-page").css("display", "block");
   });
 
   $(document).on('dblclick','.imgLightbox',function(){
@@ -914,6 +935,8 @@
 });
 
   });
+
+
   $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
       
     map.invalidateSize();  
