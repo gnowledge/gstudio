@@ -2149,6 +2149,212 @@ def get_announced_courses(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
+<<<<<<< Updated upstream
+=======
+def get_announced_courses_with_ctype(request, group_id):
+  """
+  This view returns list of announced-course(s) that match given criteria
+  along with NUSSD-Course(s) for which match doesn't exists.
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  nussd_course_type - Type of NUSSD course
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  acourse_ctype_list - dictionary consisting of announced-course(s) [if match found] and/or 
+             NUSSD-Courses [if match not found]
+  """
+
+  try:
+    if request.is_ajax() and request.method == "GET":
+      # Fetch field(s) from GET object
+      nussd_course_type = request.GET.get("nussd_course_type", "")
+      acourse_ctype_list = []
+
+      # Fetch "Announced Course" GSystemType
+      nussd_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "NUSSD Course"})
+      if not nussd_course_gt:
+        # If not found, throw exception
+        error_message = "'NUSSD Course' (GSystemType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+
+      # Fetch "Announced Course" GSystemType
+      announced_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
+      if not announced_course_gt:
+        # If not found, throw exception
+        error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      
+      # Type-cast fetched field(s) into their appropriate type
+      nussd_course_type = unicode(nussd_course_type)
+
+      groups_to_search_from = [ObjectId(group_id)]
+                                    
+      ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
+                                      'group_set': {'$in': groups_to_search_from},
+                                      'attribute_set.nussd_course_type': nussd_course_type
+                                    },{'name':1})
+
+      if ac_cur.count():
+        for d in ac_cur:
+          acourse_ctype_list.append(d.name)
+
+      else:
+        error_message = "No Announced Course found"
+        raise Exception(error_message)
+      
+      return HttpResponse(json.dumps(acourse_ctype_list))
+
+    else:
+      error_message = " AnnouncedCourseFetchError: Either not an ajax call or not a GET request!!!"
+      return HttpResponse(json.dumps({'message': " AnnouncedCourseFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+  except Exception as e:
+    error_message = "\n AnnouncedCourseFetchError: " + str(e) + "!!!"
+    return HttpResponse(json.dumps({'message': error_message}))
+
+
+def get_studentenrollcourse_of_ac_id(request, group_id):
+  """
+  This view returns list of announced-course(s) that match given criteria
+  along with NUSSD-Course(s) for which match doesn't exists.
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  announced_course_id - ObjectId of currently selected Announced Course
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  acourse_ctype_list - dictionary consisting of announced-course(s) [if match found] and/or 
+             NUSSD-Courses [if match not found]
+  """
+  try:
+    if request.is_ajax() and request.method == "GET":
+      # Fetch field(s) from GET object
+      acourse_name = request.GET.get("acourse_name", "")
+      acourse_name_id = ""
+      start_end_of_enroll = []
+      # Fetch "Announced Course" GSystemType
+      print "acourse_name",acourse_name
+      announced_course_gst = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
+      try:
+        acourse_node = collection.Node.one({'member_of':announced_course_gst._id,u'name':unicode(acourse_name)},{'_id':1})
+        print acourse_node,"is id**"
+      except:
+        acourse_node = collection.Node.find({'member_of':announced_course_gst._id,u'name':unicode(acourse_name)},{'_id':1})
+        print acourse_node,"\n\nMultiple Announced Course with same name exists"
+        acourse_node = acourse_node[0]
+        
+      sec_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentEnrollCourse"})
+      print "acourse_id",acourse_node._id
+      sec_node = collection.Node.one({'member_of':sec_gst._id,'attribute_set.announced_course_id':ObjectId('544b7b04f084a332efb0fccb')})
+      print "sec_node",sec_node
+      start_end_of_enroll.append(sec_node)
+      
+      print "\n\nstart_end_of_enroll",start_end_of_enroll
+      return HttpResponse(json.dumps(start_end_of_enroll))
+    else:
+      error_message = " SECFetchError: Either not an ajax call or not a GET request!!!"
+      return HttpResponse(json.dumps({'message': " SECFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+  except Exception as e:
+    error_message = "\n SECFetchError: " + str(e) + "!!!"
+    return HttpResponse(json.dumps({'message': error_message}))
+
+def get_colleges(request,group_id):
+  """
+  This view returns list of college(s) that are affiliated to 
+  the selected University
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  univ_id - ObjectId of currently selected University
+  nussd_course_type - Type of NUSSD course
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  unset_nc - dictionary consisting of announced-course(s) [if match found] and/or 
+             NUSSD-Courses [if match not found]
+  """
+  response_dict = {'success': False, 'message': ""}
+
+  try:
+    if request.is_ajax() and request.method == "GET":
+      # Fetch field(s) from GET object
+      univ_id = request.GET.get("univ_id", "")
+      all_univs = request.GET.get("all_univs", "")
+      
+      # Check whether any field has missing value or not
+      if univ_id == "":
+        error_message = "Invalid data: No data found in any of the field(s)!!!"
+        raise Exception(error_message)
+
+      # Fetch "Announced Course" GSystemType
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
+      if not mis_admin:
+        # If not found, throw exception
+        error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
+        raise Exception(error_message)
+
+      # Fetch all college groups
+      college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'name': 1})
+      if not college:
+        # If not found, throw exception
+        error_message = "'College' (GSystemType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      
+      # Type-cast fetched field(s) into their appropriate type
+      univ_id = ObjectId(univ_id)
+      
+      # Fetch the node of selected university
+      univGST = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
+      university_node = collection.Node.one({'_id': univ_id}, {'relation_set': 1,'name':1})
+
+      # Fetch the list of colleges that are affiliated by the selected university
+      college_ids = []
+      for each in university_node.relation_set:
+        if each.has_key("affiliated_college"):
+          college_ids = each["affiliated_college"]
+          
+      #If "Select All" checkbox is True, display all colleges from all universities
+      if all_univs == u"true":
+        colg_under_univ_id = collection.Node.find({'member_of': college._id},{'name': 1}).sort('name',1)
+        msg_string = " List of colleges in ALL Universities."
+      else:
+        colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'name': 1}).sort('name',1)
+        msg_string = " List of colleges in " +university_node.name+"."
+      
+      list_colg=[]                           
+      for each in colg_under_univ_id:
+        list_colg.append(each)
+
+      nc_dict = {}
+      if colg_under_univ_id.count():
+        # If found, append them to a dict
+        for each in colg_under_univ_id:
+          nc_dict[str(each._id)] = each.name
+
+      response_dict["unset_nc"] = nc_dict
+      drawer_template_context = edit_drawer_widget("", group_id, None, list(list_colg))
+      drawer_template_context["widget_for"] = "announced_course_create_edit"
+      drawer_widget = render_to_string('ndf/drawer_widget.html', 
+                                        drawer_template_context,
+                                        context_instance = RequestContext(request)
+                                      )
+      response_dict["drawer_widget"] = drawer_widget
+      response_dict["success"] = True
+      response_dict["message"] = msg_string
+      return HttpResponse(json.dumps(response_dict))
+  except Exception as e:
+    error_message = "AnnouncedCourseError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
+
+
+
 def get_anncourses_allstudents(request, group_id):
   """
   This view returns ...
@@ -2164,18 +2370,15 @@ def get_anncourses_allstudents(request, group_id):
   response_dict = {'success': False, 'message': ""}
   all_students_text = ""
 
+
   try:
     if request.is_ajax() and request.method == "GET":
-      # Fetch field(s) from GET object
-      nussd_course_type = request.GET.get("nussd_course_type", "")
       registration_year = request.GET.get("registration_year", "")
-      degree_year = request.GET.get("degree_year", "")
-      # college = request.GET.get("college", "")
       all_students = request.GET.get("all_students", "")
       college_groups = []   # List of ObjectIds
 
       # Check whether any field has missing value or not
-      if nussd_course_type == "" or registration_year == "" or degree_year == "" or all_students == "":
+      if registration_year == "" or all_students == "":
         error_message = "Invalid data: No data found in any of the field(s)!!!"
         raise Exception(error_message)
 
@@ -2207,58 +2410,13 @@ def get_anncourses_allstudents(request, group_id):
         error_message = "'has_group' (RelationType) doesn't exists... Please create it first"
         raise Exception(error_message)
 
-      # Fetch all college groups
-      college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'name': 1})
-      if not college:
-        # If not found, throw exception
-        error_message = "'College' (GSystemType) doesn't exists... Please create it first"
-        raise Exception(error_message)
-      else:
-        college_gs = collection.Node.find({'member_of': college._id, 'group_set': mis_admin._id}, {'_id': 1})
-        for each in college_gs:
-          cg = collection.Triple.one({'_type': "GRelation", 'subject': each._id, 'relation_type.$id': has_group_RT._id}, {'right_subject': 1})
-          if cg:
-            college_groups.append(cg.right_subject)
-
       # Type-cast fetched field(s) into their appropriate type
-      nussd_course_type = unicode(nussd_course_type)
-      # registration_year = datetime.datetime.strptime(registration_year, "%Y")
-      # As there is no proper mechanism to search on datetime object in mongodb
-      # Preparing greater than equal to and less than equal to values
+      
       date_lte = datetime.datetime.strptime("31/12/"+registration_year, "%d/%m/%Y")
       date_gte = datetime.datetime.strptime("1/1/"+registration_year, "%d/%m/%Y")
-      degree_year = unicode(degree_year)
-      # college_group = college_group.right_subject
 
       groups_to_search_from = []
-      if ObjectId(group_id) == mis_admin._id or ObjectId(group_id) in college_groups:
-        groups_to_search_from = college_groups
-        groups_to_search_from.append(mis_admin._id)
-
-      else:
-        groups_to_search_from = [ObjectId(group_id)]
-
-      # Based on registration_year, fetch corresponding Announced Course(s)
-      ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
-                                      'group_set': {'$in': groups_to_search_from},
-                                      'attribute_set.start_time': {'$lte': date_lte}, 
-                                      'attribute_set.end_time': {'$gte': date_gte},
-                                      'attribute_set.nussd_course_type': nussd_course_type
-                                    })
-      if not ac_cur.count():
-        # If no documents found, throw exception
-        error_message = "'Announced Course' of given type ("+nussd_course_type+") doesn't exists for given year ("+registration_year+")... Please announce it first"
-        raise Exception(error_message)
-
-      ac_list = []
-      for each in ac_cur:
-        val = [str(each._id), each.name]
-        if val not in ac_list:
-          ac_list.append(val)
-
-      # Sort list based on Announced Course's name field
-      # which is 2nd element in each entry
-      ac_list.sort(key=itemgetter(1))
+      groups_to_search_from = [ObjectId(group_id)]
 
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
 
@@ -2267,7 +2425,6 @@ def get_anncourses_allstudents(request, group_id):
         res = collection.Node.find({'member_of': student._id, 
                                       'group_set': {'$in': groups_to_search_from},
                                       'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
-                                      'attribute_set.degree_year': degree_year
                                     },
                                     {'_id': 1,'name': 1}
                                   )
@@ -2280,7 +2437,6 @@ def get_anncourses_allstudents(request, group_id):
                                       'group_set': {'$in': groups_to_search_from},
                                       'relation_set.selected_course': {'$exists': False},
                                       'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
-                                      'attribute_set.degree_year': degree_year
                                     },
                                     {'_id': 1,'name': 1}
                                   )
@@ -2293,7 +2449,7 @@ def get_anncourses_allstudents(request, group_id):
                                         context_instance = RequestContext(request)
                                       )
 
-      response_dict["announced_courses"] = ac_list
+      response_dict["announced_courses"] = []
       response_dict["drawer_widget"] = drawer_widget
 
       response_dict["success"] = True
@@ -2310,3 +2466,7 @@ def get_anncourses_allstudents(request, group_id):
     error_message = "EnrollInCourseError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
+
+
+
+

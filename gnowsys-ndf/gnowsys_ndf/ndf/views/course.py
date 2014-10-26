@@ -274,10 +274,70 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     for each in unset_ac_options:
       if course_gst.name == u"Announced Course":
         # Code to be executed only for 'Announced Course' GSystem(s)
+        announce_to_colg_list = request.POST.get("announce_to_colg_list", "")
+        colg_names = []
+        colg_names = announce_to_colg_list.split(',')
+        print "each in unset_ac_options",each
         sid, nm = each.split(">>")
+        print "\n\nsid",sid,nm
+
+        colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
+        colg_list_cur = collection.Node.find({'name': {'$in': colg_names},'member_of':colg_gst._id},{'_id':1, 'name':1})
+
+
+        #list of groups of the colleges selected
 
         course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
 
+        colg_grp_list_cur = collection.Node.find({'_type':u"Group",'name': {'$in': colg_names}},{'_id':1, 'name':1})
+
+        course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
+        
+        colg_PO = {}
+
+
+        PO = {
+          "Agra College": {"Mr. Rajaram Yadav": "yadav.rajaram2009@gmail.com"},
+          "Arts College Shamlaji": {"Mr. Ashish Varia": "ashishvaria13@gmail.com"},
+          "Baba Bhairabananda Mahavidyalaya": {"Mr. Mithilesh Kumar" : "mithu.ranchi@gmail.com"},
+          "Balugaon College": {"Mr. Pradeep Pradhan" : "pradeep.bulu7@gmail.com"},
+          "City Women's College": {"Ms. Itishri Panda", "itipanda85@gmail.com"},
+          "Comrade Godavari Shamrao Parulekar College of Arts, Commerce & Science": {"Mr. Rahul Sable" : "rahulsab1991@gmail.com"},
+          "Faculty of Arts": {"Mr. Jokhim" : "jokhim.lepcha@gmail.com", "Ms. Tusharika Kumbhar" : "tusharika_sai@yahoo.co.in"},
+          "Gaya College":  {"Ms. Rishvana Sheik" : "sheik.rishvana@gmail.com"},
+          "Govt. M. H. College of Home Science & Science for Women, Autonomous": {"Ms. Rajni Sharma" : "rajni009sharma@gmail.com"}, 
+          "Govt. Mahakoshal Arts and Commerce College": {"Ms. Davis Yadav" : "davis.yadav23@gmail.com"},
+          "Govt. Mahaprabhu Vallabhacharya Post Graduate College": {"Mr. Gaurav Sharma" : "sonu.12488@gmail.com"},
+          "Govt. Rani Durgavati Post Graduate College": {"Mr. Asad Ullah" : "asad13ullah@gmail.com"},
+          "Jamshedpur Women's College": {"Mr. Arun Agrawal" : "tissarun@gmail.com"},
+          "Kalyan Post Graduate College": {"Mr. Praveen Kumar" : "nayak1307@gmail.com"},
+          "Kamla Nehru College for Women": {"Ms. Tusharika Kumbhar" : "tusharika_sai@yahoo.co.in" , "Ms. Thaku Pujari" : "creativethaku@gmail.com"},
+          "L. B. S. M. College": {"Mr. Charles Kindo" : "kindocmf@gmail.com"},
+          "Mahila College": {"Mr. Sonu Kumar" : "sonu90kumar@gmail.com"},
+          "Marwari College": {"Mr. Avinash Anand" : "avinashanand7@gmail.com"},
+          "Matsyodari Shikshan Sanstha's Arts, Commerce & Science College": {"Ms. Jyoti Kapale" : "advocatejyotikapale@gmail.com"},
+          "Ranchi Women's College": {"Mr. Avinash Anand" : "avinashanand7@gmail.com"},
+          "Shiv Chhatrapati College": {"Mr. Swapnil Sardar" : "swapnil85sardar@gmail.com"},
+          "Shri & Smt. PK Kotawala Arts College": {"Mr. Sawan Kumar" : "guptsawan1989@gmail.com"},
+          "Shri VR Patel College of Commerce": {"Mr. Sushil Mishra" : "sushilmishra.prayag@gmail.com"},
+          "Sree Narayana Guru College of Commerce": {"Ms. Bharti Bhalerao" : "bhaleraobharti3@gmail.com"},
+          "Sri Mahanth Shatanand Giri College": {"Mr. Narendra Singh" : "narendrasingh.dheeraj@gmail.com"},
+          "St. John's College": {"Mr. Himanshu Guru" : "guruhimanshu1987@gmail.com"},
+          "The Graduate School College For Women": {"Mr. Pradeep Gupta" : "pkg.gupta141@gmail.com"},
+          "Vasant Rao Naik Mahavidyalaya": {"Mr. Dayanand Waghmare": "tiss.dayawagh@gmail.com"},
+          "Vivekanand Arts, Sardar Dalip Singh Commerce & Science College": {"Mr. Anis Ambade" : "anisambade@gmail.com"}
+          }
+
+        userObj = {}
+        for each in colg_grp_list_cur:
+          for key,val in PO.items():
+            if (key == each.name):
+              try:
+                for key1,val1 in val.items():
+                  userObj[(User.objects.get(email = val1))]=key1
+              except:
+                print "No PO exists"  
+        
         if not course_gs:
           course_gs = collection.GSystem()
 
@@ -293,8 +353,28 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       if is_changed:
         # Remove this when publish button is setup on interface
         course_gs.status = u"PUBLISHED"
-
       course_gs.save(is_changed=is_changed)
+      print "course_gs.name",course_gs.name
+      if course_gst.name == u"Announced Course":
+        if not course_sec_gs:
+          course_sec_gs = collection.GSystem()
+        c_sec_name = unicode(c_name+"--"+start_enroll+"--"+end_enroll)
+        request.POST["name"] = c_sec_name
+
+        is_changed = get_node_common_fields(request, course_sec_gs, group_id, course_sec_gst)
+        if is_changed:
+          course_sec_gs.status = u"PUBLISHED"
+        course_sec_gs.save(is_changed=is_changed)
+        print "course_sec_gs",course_sec_gs._id
+        print is_changed
+        if userObj:
+          for key,val in userObj.items():
+            activ="Course Announced"
+            msg="An NUSSD course of "+nussd_course_type+" type is announced for the period from "+start_time+" to "+end_time+ \
+                "\nStudent Enrollment can be done from "+start_enroll+ " to "+ end_enroll
+            set_notif_val(request,group_id,msg,activ,key)
+        else:
+          print "No email/PO"
     
       # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
       for tab_details in property_order_list:
@@ -332,6 +412,33 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                 if field_instance["name"] in ["start_time", "end_time"]: #, "registration_year"]:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
+                elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
+                  # Needs sepcial kind of parsing
+                  field_value = []
+                  tr_qualifications = request.POST.get(field_instance["name"], '')
+                  
+                  if tr_qualifications:
+                    qualifications_dict = {}
+                    tr_qualifications = [each.strip() for each in tr_qualifications.split(",")]
+                    
+                    for i, each in enumerate(tr_qualifications):
+                      if (i % 2) == 0:
+                        if each == "true":
+                          qualifications_dict["mandatory"] = True
+                        elif each == "false":
+                          qualifications_dict["mandatory"] = False
+                      else:
+                        qualifications_dict["text"] = unicode(each)
+                        field_value.append(qualifications_dict)
+                        qualifications_dict = {}
+
+                elif field_instance["name"] in ["max_marks", "min_marks"]:
+                  # Needed because both these fields' values are dependent upon evaluation_type field's value
+                  evaluation_type = request.POST.get("evaluation_type", "")
+                  if evaluation_type == u"Continuous":
+                    field_value = None
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+
                 else:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
 
@@ -349,15 +456,31 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                 course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value_list)
                 
-                # if isinstance(course_gs_triple_instance, list):
-                #   print "\n"
-                #   for each in course_gs_triple_instance:
-                #     print " course_gs_triple_instance: ", each._id, " -- ", each.name
-                #   print "\n"
 
-                # else:
-                #   print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
-    
+            # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
+      for tab_details in property_order_list_sec:
+        for field_set in tab_details[1]:
+          if field_set.has_key('_id'):
+            field_instance = collection.Node.one({'_id': field_set['_id']})
+            field_instance_type = type(field_instance)
+            if field_instance_type in [AttributeType, RelationType]:
+              field_data_type = field_set['data_type']
+              if field_instance_type == AttributeType:
+                if field_instance["name"] in ["announced_course_id"]:
+                  field_value = parse_template_data(field_data_type, course_gs._id)
+                elif field_instance["name"] in ["start_time"]:
+                  field_value = parse_template_data(field_data_type, start_enroll, date_format_string="%m/%d/%y")
+                elif field_instance["name"] in ["end_time"]:
+                  field_value = parse_template_data(field_data_type, end_enroll,date_format_string="%m/%d/%y")
+                course_sec_gs_triple_instance = create_gattribute(course_sec_gs._id, collection.AttributeType(field_instance), field_value)
+                print "\n\ncreate_gattribute\n\n",course_sec_gs._id,collection.AttributeType(field_instance),field_value
+                print "course_sec_gs",course_sec_gs
+              else:
+                rt_acourse_for = collection.Node.one({'_type': "RelationType", 'name': u"acourse_for_college"})
+                for each in colg_list_cur:
+                  course_sec_gs_triple_instance = create_grelation(course_gs._id, rt_acourse_for, each._id)
+      
+
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   default_template = "ndf/course_create_edit.html"

@@ -432,6 +432,68 @@
     $("#announce-course").attr("disabled", !optionState);
   });
 
+
+// On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
+  $("#find_colg").click(function(event) {
+    //alert("Get colleges clicked...")
+    var univ_id = $("#univ_cur option:selected").val();
+    var success_state = false
+    var all_univs = $("#all_univ").prop("checked");
+    //alert("\n univ_id: " + univ_id)
+
+    $.ajax({
+      url: "{% url 'get_colleges' group_id%}",
+
+      data: {
+        univ_id:univ_id,
+        
+        all_univs: all_univs
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data){
+          // alert("Output" + "\n success: " + data);
+
+          // var dataDict = JSON.parse(data.responseText);
+          // alert(" " + data["success"] + " -- " + typeof(data["success"]))          
+          success_state = data["success"];
+          $("#alertModalLabel").text(data["message"]);
+
+          if (data["success"]) {
+            $("#alertModal").removeClass("alert");
+            $("#alertModal").addClass("success");
+            $("#alertModal").foundation('reveal', 'open');
+
+
+            $("#divcolg").empty();
+            // alert("length: " + Object.keys(data["unset_nc"]).length)
+            var dict_len = Object.keys(data["unset_nc"]).length;
+            $.each(data["unset_nc"], function(k, val){
+              // alert(k + " -- " + val);
+              $("#unset_nc").append(val);
+
+            });
+
+            // Fill divcolg
+            $("#divcolg").empty();
+            drawer_widget = data["drawer_widget"]
+            $("#divcolg").html(drawer_widget); 
+
+          }
+
+          else {
+            $("#alertModal").removeClass("success");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        }
+  });
+});
+
+
 // On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
   $("#find_ac").click(function(event) {
     // alert("AC Find clicked...")

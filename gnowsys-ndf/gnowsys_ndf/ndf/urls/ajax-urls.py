@@ -46,6 +46,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
 
                        url(r'^get_announced_courses/', 'get_announced_courses', name='get_announced_courses'),
+                       url(r'^get_studentenrollcourse_of_ac_id/', 'get_studentenrollcourse_of_ac_id', name='get_studentenrollcourse_of_ac_id'),
+                       url(r'^get_announced_courses_with_ctype/', 'get_announced_courses_with_ctype', name='get_announced_courses_with_ctype'),
                        url(r'^get_anncourses_allstudents/', 'get_anncourses_allstudents', name='get_anncourses_allstudents'),
                        
 )

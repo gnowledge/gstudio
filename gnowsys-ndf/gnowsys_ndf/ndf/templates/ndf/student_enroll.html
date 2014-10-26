@@ -79,47 +79,75 @@
     </header>
 
     {% csrf_token %}
-    <!-- fieldset for search criteria //////////////////////////////////////////////////////////////////// -->
-    <fieldset id="fsSc">
-      <legend>
-        {% html_widget groupid "" ATs.0 %}
-      </legend>
 
+    <!-- fieldset for selecting announced course/////////////////////////////////////////////// -->
+    <fieldset id="fsSc">
+    <legend>
+      <label> <b>{% trans "Select Course"%}</b> </label>
+    </legend>
       <div class="row">
         <!-- Registration Year -->
-        <div class="small-2 columns">
-          <label for="registration_year" class="right inline">
-            {% trans "Registration Year" %}
-          </label>
-        </div>
-        <div class="small-3 columns">
-          <input type="text" id="registration_year" name="registration_year" value="" placeholder="YYYY"
-                readonly required class="date_year" style="float:left; width:10rem" 
-          />
-          <i style="color:red; float:left display:inline">*</i>
-          <small class="error">{% trans "Please set Registration Year" %}</small>
-        </div>
+        <div class="left inline">
+          <label> {% trans "Course type"%} </label></div>
+        <div class="small-4 columns">
+          {% html_widget groupid "" ATs.0 %}
+          </div>
 
-        <!-- Year of Study -->
-        <div class="small-2 columns">
-          <label for="{{ATs.1.name}}" class="right inline">
-            {{ATs.1.altnames}}
-          </label>
+        <!-- Drop down for announced courses -->
+        <div class="left inline">
+          <label> {% trans "Announced Course"%} </label>
         </div>
-        <div class="small-3 columns end">
-          {% html_widget groupid "" ATs.1 %}
+        <div class="small-4 columns">
+          <select id="acourse_list" name="acourse_list" disabled="disabled">
+          </select>
         </div>
       </div>
-
-      <!-- Checkbox: Students Enrolled and/or Non-enrolled -->
+      
       <div class="row">
-        <div class="small-11 small-centered columns">
-          <input type="checkbox" id="all_students" name="all_students">
-          <label for="all_students">
-            <b>{% trans "NOTE: If selected all students (including enrolled ones) will be listed; otherwise only non-enrolled students will be shown." %}</b>
-          </label>
+       <div class="small-6 columns">
+       <div class="right inline">
+        <label>{% trans "Enrollment Duration"%}</label>
+       </div></div>
+       <div class="small-5 columns">
+       <div class="row">
+        <label>From</label>
+        <label id="lblenroll_from">--/--/-- </label>
         </div>
+        <div class="row">
+        <label>To</label>
+        <label id="lblenroll_to">--/--/-- </label></div>
+       </div>
       </div>
+    </fieldset>
+    
+
+    <fieldset>
+    <legend>
+      <label> <b>{% trans "Select Students"%}</b> </label>
+    </legend>
+        <div class="row">
+          <div class="left inline">
+            <label for="registration_year" class="right inline">
+              {% trans "Registration Year" %}
+            </label>
+          </div>
+          <div class="small-3 columns">
+            <input type="text" id="registration_year" name="registration_year" value="" placeholder="YYYY"
+                readonly required class="date_year" style="float:left; width:10rem"/>
+            <i style="color:red; float:left display:inline">*</i>
+            <small class="error">{% trans "Please set Registration Year" %}</small>
+          </div>
+        </div>
+
+        <!-- Checkbox: Students Enrolled and/or Non-enrolled -->
+        <div class="row">
+          <div class="small-11 small-centered columns">
+            <input type="checkbox" id="all_students" name="all_students">
+            <label for="all_students">
+              <b>{% trans "NOTE: If selected all students (including enrolled ones) will be listed; otherwise only non-enrolled students will be shown." %}</b>
+            </label>
+          </div>
+        </div>
 
       <!-- Find button -->
       <div class="row">
@@ -128,19 +156,13 @@
           <input type="button" id="btnFindES" value="Find" class="button small round expand"/>
         </div>
       </div>
-    </fieldset>
 
-    <!-- fieldset for listing Announced courses & Students for enrolling into them /////////////////////// -->
-    <fieldset id="fsAc" style="display: none">
-      <legend>
-        <label><h5>Announced Courses : <input type="checkbox" id="cbxSelectAllOptions" checked="" /> Select/Deselect All</h5></label>
-      </legend>
-      <div class="row" id="divAc">
-      </div>
+
+</fieldset>
+
       <input type="hidden" id="announced_courses_list" name="announced_courses_list" value="">
-    </fieldset>
 
-    <!-- fieldset for listing Announced courses & Students for enrolling into them /////////////////////// -->
+    <!-- fieldset for listing  Students for enrolling into them /////////////////////// -->
     <fieldset id="fsSt" style="display: none">
       <legend>
         <label><h5>Students : </h5></label>
@@ -167,11 +189,6 @@
   function hideFieldsetSubmit() {
     if ($("#sbtnEnroll").css("display") != "none") {
       $("#sbtnEnroll").toggle();
-    }
-
-    if ($("#fsAc").css("display") != "none") {
-      $("#divAc").empty();
-      $("#fsAc").toggle();
     }
 
     if ($("#fsSt").css("display") != "none") {
@@ -280,41 +297,81 @@
     }
   });
 
-// Select/Deselect all checbox(es) ['acOptions'] based on state of checkbox (cbxSelectAllOptions) ----------
-  $("#cbxSelectAllOptions").bind("change", function(){
-    selectAllState = this.checked;
-    $("input[name='acOptions']").each(function() {
-      $(this).prop("checked", selectAllState);
+  $("select#acourse_list").change(function() {
+    var acourse_name = $("#acourse_list").val();
+    alert(acourse_name)
+    $.ajax({
+      url: "{% url 'get_studentenrollcourse_of_ac_id' group_id %}",
 
-    // Enable/Disable submit button (btnEnroll), if none of the checkbox is selected
-      $("#sbtnEnroll").attr("disabled", !selectAllState);
-    });
+      data: {
+        acourse_name: acourse_name
+      },
+
+      type: "GET",
+
+      dataType: "json",
+
+      complete: function () {
+        // Enable District field
+        $("select#acourse_list").removeAttr('disabled')
+        
+      },
+
+      success: function(data){
+        alert("success")
+        $.each(data, function(i, value) {
+          alert(value)
+/*          $("lblenroll_from").text(value)
+
+*/    
+       });
+
+      },
+
+
   });
 
-// Select/Deselect checkbox (cbxSelectAllOptions) & Enable/Disable submit button (btnEnroll) ---------------
-  $(document).on("change click", ".acOptions", function(){
-    optionState = $(this).prop("checked");
-    
-  // Select/Deselect checkbox (cbxSelectAllOptions), 
-  // if any of the checkbox (class='acOptions') is unchecked
-    if (!optionState) {
-      selectAll = $("#cbxSelectAllOptions");
-      if (selectAll.prop("checked")) {
-        selectAll.prop("checked", optionState);
-      }
-    }
 
-  // Enable/Disable submit button (btnEnroll), 
-  // if none of the checkbox (class='acOptions') is checked
-    $(".acOptions").each(function(){
-      optionState = $(this).prop('checked');
-
-      if (optionState == true) {
-        return false;
-      }
-    });
-    $("#sbtnEnroll").attr("disabled", !optionState);
   });
+
+
+  $("select#nussd_course_type").change(function() {
+
+    var nussd_course_type = $("#nussd_course_type").val();
+    alert(nussd_course_type)
+    $.ajax({
+      url: "{% url 'get_announced_courses_with_ctype' group_id %}",
+
+      data: {
+        nussd_course_type: nussd_course_type
+      },
+
+      type: "GET",
+
+      dataType: "json",
+
+      complete: function () {
+        // Enable District field
+        $("select#acourse_list").removeAttr('disabled')
+        
+      },
+
+      success: function(data){
+        $("select#acourse_list").empty();
+        $.each(data, function(i, value) {
+          $("select#acourse_list").append(
+            $("<option></option>")
+              .attr("value", value)
+              .text(value)
+          );
+        });
+        $("select#acourse_list").prop("selectedIndex", 0);
+      },
+
+
+  });
+});
+  
 
 // On click of Find (Setup Ajax call) ----------------------------------------------------------------------
   $("#btnFindES").click(function(event) {
@@ -328,9 +385,7 @@
     // if count == 0, then only proceed to make ajax-call & 
     // later on, on successful returned O/P, displaying Announce(submit) button
     if($(this).parents("fieldset").find(':input[data-invalid]').length == 0) {
-      var nussd_course_type = $("#nussd_course_type").val();
       var registration_year = $("#registration_year").val();
-      var degree_year = $("#degree_year").val();
       var college = $("#college option:selected").val();
       var all_students = $("#all_students").prop("checked");
       var success_state = false
@@ -340,9 +395,7 @@
         url: "{% url 'get_anncourses_allstudents' group_id %}",
 
         data: {
-          nussd_course_type: nussd_course_type,
           registration_year: registration_year,
-          degree_year: degree_year,
           college: college,
           all_students: all_students
         },
@@ -360,36 +413,8 @@
             $("#alertModal").addClass("success");
             $("#alertModal").foundation('reveal', 'open');
 
-            // Fill fsAc
-            $("#divAc").empty();
-            announced_courses_list = data["announced_courses"]
-            var announced_courses_len = announced_courses_list.length;
-            $.each(announced_courses_list, function(index, val){
-              input_chk = ""
-              if ((index + 1) != announced_courses_len) {
-                input_chk += "<div class='small-12 columns'>" 
-              }
-
-              else {
-                input_chk += "<div class='small-12 columns end'>" 
-              }
-              
-              // Don't change below line of code
-              // This format is referred in views file (course.py)
-              v = val[0] + ">>" + val[1];
-
-              input_chk += "<input type='checkbox' name='acOptions' class='acOptions' checked='' value='"+v+"'/>" + 
-                            "<label>"+val[1]+"</label>" +
-                            "</div>";
-              $("#divAc").append(input_chk);
-            });
 
             // If nussd_course_type is Foundation Course disable all checkboxes
-            if (nussd_course_type == "Foundation Course") {
-              // alert("Foundation Course found!")
-              $("#cbxSelectAllOptions").attr("disabled", "disabled");
-              $(".acOptions").attr("disabled", "disabled");
-            }
 
             // Fill divSt
             $("#divSt").empty();
