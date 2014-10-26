@@ -242,15 +242,11 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     title = course_gst.name
     course_gs = collection.GSystem()
     course_gs.member_of.append(course_gst._id)
-    course_sec_gst = collection.Node.one({'_type': "GSystemType", 'name': 'StudentEnrollCourse'})
-    course_sec_gs = collection.GSystem()
-    course_sec_gs.member_of.append(course_sec_gst._id)
 
   if app_set_instance_id:
     course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
   property_order_list = get_property_order_with_value(course_gs)
-  property_order_list_sec = get_property_order_with_value(course_sec_gs)
 
   if request.method == "POST":
     # [A] Save course-node's base-field(s)
@@ -281,7 +277,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       end_enroll = request.POST.get("end_enroll", "")
       end_enroll = datetime.datetime.strptime(end_enroll,"%m/%d/%Y")
       end_enroll = end_enroll.strftime("%D")
-    print "start_enroll",start_enroll,"end_enroll",end_enroll
       
     nussd_course_type = ""
     if request.POST.has_key("nussd_course_type"):
@@ -312,14 +307,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
         colg_list_cur = collection.Node.find({'name': {'$in': colg_names},'member_of':colg_gst._id},{'_id':1, 'name':1})
 
-
-        #list of groups of the colleges selected
-
         #list of colleges selected
         colg_grp_list_cur = collection.Node.find({'_type':u"Group",'name': {'$in': colg_names}},{'_id':1, 'name':1})
-
         course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
-        
         colg_PO = {}
 
 
@@ -430,19 +420,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         course_gs.status = u"PUBLISHED"
       course_gs.save(is_changed=is_changed)
 
-      print "course_gs.name",course_gs.name
       if course_gst.name == u"Announced Course":
-        if not course_sec_gs:
-          course_sec_gs = collection.GSystem()
-        c_sec_name = unicode(c_name+"--"+start_enroll+"--"+end_enroll)
-        request.POST["name"] = c_sec_name
-
-        is_changed = get_node_common_fields(request, course_sec_gs, group_id, course_sec_gst)
-        if is_changed:
-          course_sec_gs.status = u"PUBLISHED"
-        course_sec_gs.save(is_changed=is_changed)
-        print "course_sec_gs",course_sec_gs._id
-        print is_changed
         if userObj:
           for key,val in userObj.items():
             activ="Course Announced"
@@ -452,14 +430,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         else:
           print "No email/PO"
 
-      if userObj:
-        for key,val in userObj.items():
-          activ="Course Announced"
-          msg="An NUSSD course of "+nussd_course_type+" type is announced for the period from "+start_time+" to "+end_time+ \
-              "\nStudent Enrollment can be done from "+start_enroll+ " to "+ end_enroll
-          set_notif_val(request,group_id,msg,activ,key)
-      else:
-        print "No email/PO"
     
       # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
       for tab_details in property_order_list:
@@ -496,10 +466,13 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                   # field_value = request.POST[field_instance["name"]]
                   field_value = request.POST.get(field_instance["name"], "")
 
-                if field_instance["name"] in ["start_time", "end_time"]: #, "registration_year"]:
+                if field_instance["name"] in ["start_time"]: #, "registration_year"]:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
-
-                elif field_instance["name"] in ["start_enroll", "end_enroll"]: #, "registration_year"]:
+                elif field_instance["name"] in ["end_time"]: #, "registration_year"]:
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
+                elif field_instance["name"] in ["start_enroll"]: #, "registration_year"]:
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
+                elif field_instance["name"] in ["end_enroll"]: #, "registration_year"]:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
                 elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
                   # Needs sepcial kind of parsing
@@ -533,8 +506,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                 # if field_value:
                 course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
-                # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
-
+              # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
               else:
                 field_value_list = request.POST.getlist(field_instance["name"])
 
@@ -544,31 +516,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                   field_value_list[i] = field_value
 
                 course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value_list)
-                
-
-            # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
-      for tab_details in property_order_list_sec:
-        for field_set in tab_details[1]:
-          if field_set.has_key('_id'):
-            field_instance = collection.Node.one({'_id': field_set['_id']})
-            field_instance_type = type(field_instance)
-            if field_instance_type in [AttributeType, RelationType]:
-              field_data_type = field_set['data_type']
-              if field_instance_type == AttributeType:
-                if field_instance["name"] in ["announced_course_id"]:
-                  field_value = parse_template_data(field_data_type, course_gs._id)
-                elif field_instance["name"] in ["start_time"]:
-                  field_value = parse_template_data(field_data_type, start_enroll, date_format_string="%m/%d/%y")
-                elif field_instance["name"] in ["end_time"]:
-                  field_value = parse_template_data(field_data_type, end_enroll,date_format_string="%m/%d/%y")
-                course_sec_gs_triple_instance = create_gattribute(course_sec_gs._id, collection.AttributeType(field_instance), field_value)
-                print "\n\ncreate_gattribute\n\n",course_sec_gs._id,collection.AttributeType(field_instance),field_value
-                print "course_sec_gs",course_sec_gs
-              else:
-                rt_acourse_for = collection.Node.one({'_type': "RelationType", 'name': u"acourse_for_college"})
-                for each in colg_list_cur:
-                  course_sec_gs_triple_instance = create_grelation(course_gs._id, rt_acourse_for, each._id)
-      
 
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   univ = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
@@ -581,7 +528,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                         'title':title,
                         'university_cur':university_cur,
                         'property_order_list': property_order_list,
-                        'property_order_list_sec': property_order_list_sec
                       }
 
   if app_set_instance_id:
