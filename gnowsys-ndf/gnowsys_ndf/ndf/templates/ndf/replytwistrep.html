@@ -10,7 +10,23 @@
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
 <script type="text/javascript">
-
+function reply_del{{eachrep}}() {
+   var repl_count=$("#replycount{{eachrep}}").val();
+   if (repl_count <= 0)
+   {
+      if (!window.confirm("Are you sure you want to delete this ?"))
+      {
+         $("edit-options").class="f-dropdown";		
+         return false;
+      }
+   }
+   else
+   {
+      alert("This reply has "+repl_count +" existing replies.Please delete them and then try again.");
+      $("edit-options").hide();
+      return false;
+   }
+}
   $(document).ready(function(){
 
     $("#orgitdownreps{{eachrep}}").orgitdown(mySettings);
@@ -135,7 +151,8 @@
 <!-- end of head block -->
 
 <!-- <input type="button" id="reply_forum{{eachrep}}" value="Reply" class="button"/> -->
-
+{% get_all_replies eachrep as rep_cnt %}
+<input type="hidden" id="replycount{{eachrep}}" style="visibility:hidden" value="{{rep_cnt.count}}">
 <div class="row">
   <div class="small-2 columns">
     <button id="reply_forum{{eachrep}}" class="button large postfix" style="height: 2.5em;">
@@ -146,7 +163,8 @@
 
    {% if eachrep.created_by == user_obj.id %}
      {% if eachrep != thread %}
-       <a class="tiny alert button" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}">{% trans "Delete" %}</a>
+       <a class="tiny alert button" id="myname" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
+     
      {% endif %}
    {% endif %}
 

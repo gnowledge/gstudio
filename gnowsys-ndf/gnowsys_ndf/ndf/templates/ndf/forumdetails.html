@@ -102,7 +102,7 @@
             <li>
 
             {% if forum.created_by == request.user.id %}
-      <a class="tiny alert button" href="{% url 'forum_delete' group_name_tag forum %}">{% trans "Delete" %}</a>
+      <a id="delthread" class="tiny alert button" href="{% url 'forum_delete' group_name_tag forum %}" onClick="return forum_del();">{% trans "Delete" %}</a>
       {% endif %}
 
             </li>
@@ -243,6 +243,24 @@
 
 // <script type="text/javascript">
 
+function forum_del() {
+var th_count={{thread_count}};
+if (th_count <= 0)
+{
+if (!window.confirm("Are you sure you want to delete this ?"))
+{
+  $("edit-options").class="f-dropdown";		
+  return false;
+}
+}
+else
+{
+
+alert("This forum has "+th_count +" existing threads.Please remove them and try again.");
+$("edit-options").hide();
+return false;
+}
+}
 $("#node_search_form").parent().hide();
 
   // removing left-off-canvas behaviour

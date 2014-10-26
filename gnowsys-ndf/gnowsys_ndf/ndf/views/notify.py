@@ -21,6 +21,14 @@ except ImportError:  # old pymongo
 db = get_database()
 col_Group = db[Node.collection_name]
 sitename=Site.objects.all()[0]
+def get_userobject(user_id):
+    bx=User.objects.filter(id=user_id)
+    if bx:
+        bx=User.objects.get(id=user_id)
+        return bx
+    else:
+        return 0
+
 def get_user(username):
     bx=User.objects.filter(username=username)
     if bx:
