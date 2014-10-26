@@ -27,6 +27,7 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
@@ -172,7 +173,7 @@ def course_detail(request, group_id, _id):
         pass
     course_node = collection.Node.one({"_id": ObjectId(_id)})
     if course_node._type == "GSystemType":
-	return course(request, group_id, _id)
+      return course(request, group_id, _id)
     return render_to_response("ndf/course_detail.html",
                                   { 'node': course_node,
                                     'groupid': group_id,
@@ -241,24 +242,47 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     title = course_gst.name
     course_gs = collection.GSystem()
     course_gs.member_of.append(course_gst._id)
+    course_sec_gst = collection.Node.one({'_type': "GSystemType", 'name': 'StudentEnrollCourse'})
+    course_sec_gs = collection.GSystem()
+    course_sec_gs.member_of.append(course_sec_gst._id)
 
   if app_set_instance_id:
     course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
   property_order_list = get_property_order_with_value(course_gs)
+  property_order_list_sec = get_property_order_with_value(course_sec_gs)
 
   if request.method == "POST":
     # [A] Save course-node's base-field(s)
+
     start_time = ""
     if request.POST.has_key("start_time"):
+      #convert string into datetime object
       start_time = request.POST.get("start_time", "")
-      start_time = datetime.datetime.strptime(start_time, "%m/%Y")
+      start_time = datetime.datetime.strptime(start_time,"%m/%Y")
+      #get month name (%b for abbreviation and %B for full name) and year and convert to str
+      start_time = start_time.strftime("%b %Y")
 
     end_time = ""
     if request.POST.has_key("end_time"):
       end_time = request.POST.get("end_time", "")
-      end_time = datetime.datetime.strptime(end_time, "%m/%Y")
+      end_time = datetime.datetime.strptime(end_time,"%m/%Y")
+      end_time = end_time.strftime("%b %Y")
 
+
+    start_enroll = ""
+    if request.POST.has_key("start_enroll"):
+      start_enroll = request.POST.get("start_enroll", "")
+      start_enroll = datetime.datetime.strptime(start_enroll,"%m/%d/%Y")
+      start_enroll = start_enroll.strftime("%D")
+
+    end_enroll = ""
+    if request.POST.has_key("end_enroll"):
+      end_enroll = request.POST.get("end_enroll", "")
+      end_enroll = datetime.datetime.strptime(end_enroll,"%m/%d/%Y")
+      end_enroll = end_enroll.strftime("%D")
+    print "start_enroll",start_enroll,"end_enroll",end_enroll
+      
     nussd_course_type = ""
     if request.POST.has_key("nussd_course_type"):
       nussd_course_type = request.POST.get("nussd_course_type", "")
@@ -273,11 +297,15 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
     for each in unset_ac_options:
       if course_gst.name == u"Announced Course":
+
         # Code to be executed only for 'Announced Course' GSystem(s)
         announce_to_colg_list = request.POST.get("announce_to_colg_list", "")
         colg_names = []
         colg_names = announce_to_colg_list.split(',')
         print "each in unset_ac_options",each
+        announce_to_colg_list = request.POST.get("announce_to_colg_list", "")
+        colg_names = []
+        colg_names = announce_to_colg_list.split(',')
         sid, nm = each.split(">>")
         print "\n\nsid",sid,nm
 
@@ -287,7 +315,56 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
         #list of groups of the colleges selected
 
+        #list of colleges selected
+        colg_grp_list_cur = collection.Node.find({'_type':u"Group",'name': {'$in': colg_names}},{'_id':1, 'name':1})
+
         course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
+        
+        colg_PO = {}
+
+
+        PO = {
+          "Agra College": {"Mr. Rajaram Yadav": "yadav.rajaram2009@gmail.com"},
+          "Arts College Shamlaji": {"Mr. Ashish Varia": "ashishvaria13@gmail.com"},
+          "Baba Bhairabananda Mahavidyalaya": {"Mr. Mithilesh Kumar" : "mithu.ranchi@gmail.com"},
+          "Balugaon College": {"Mr. Pradeep Pradhan" : "pradeep.bulu7@gmail.com"},
+          "City Women's College": {"Ms. Itishri Panda", "itipanda85@gmail.com"},
+          "Comrade Godavari Shamrao Parulekar College of Arts, Commerce & Science": {"Mr. Rahul Sable" : "rahulsab1991@gmail.com"},
+          "Faculty of Arts": {"Mr. Jokhim" : "jokhim.lepcha@gmail.com", "Ms. Tusharika Kumbhar" : "tusharika_sai@yahoo.co.in"},
+          "Gaya College":  {"Ms. Rishvana Sheik" : "sheik.rishvana@gmail.com"},
+          "Govt. M. H. College of Home Science & Science for Women, Autonomous": {"Ms. Rajni Sharma" : "rajni009sharma@gmail.com"}, 
+          "Govt. Mahakoshal Arts and Commerce College": {"Ms. Davis Yadav" : "davis.yadav23@gmail.com"},
+          "Govt. Mahaprabhu Vallabhacharya Post Graduate College": {"Mr. Gaurav Sharma" : "sonu.12488@gmail.com"},
+          "Govt. Rani Durgavati Post Graduate College": {"Mr. Asad Ullah" : "asad13ullah@gmail.com"},
+          "Jamshedpur Women's College": {"Mr. Arun Agrawal" : "tissarun@gmail.com"},
+          "Kalyan Post Graduate College": {"Mr. Praveen Kumar" : "nayak1307@gmail.com"},
+          "Kamla Nehru College for Women": {"Ms. Tusharika Kumbhar" : "tusharika_sai@yahoo.co.in" , "Ms. Thaku Pujari" : "creativethaku@gmail.com"},
+          "L. B. S. M. College": {"Mr. Charles Kindo" : "kindocmf@gmail.com"},
+          "Mahila College": {"Mr. Sonu Kumar" : "sonu90kumar@gmail.com"},
+          "Marwari College": {"Mr. Avinash Anand" : "avinashanand7@gmail.com"},
+          "Matsyodari Shikshan Sanstha's Arts, Commerce & Science College": {"Ms. Jyoti Kapale" : "advocatejyotikapale@gmail.com"},
+          "Ranchi Women's College": {"Mr. Avinash Anand" : "avinashanand7@gmail.com"},
+          "Shiv Chhatrapati College": {"Mr. Swapnil Sardar" : "swapnil85sardar@gmail.com"},
+          "Shri & Smt. PK Kotawala Arts College": {"Mr. Sawan Kumar" : "guptsawan1989@gmail.com"},
+          "Shri VR Patel College of Commerce": {"Mr. Sushil Mishra" : "sushilmishra.prayag@gmail.com"},
+          "Sree Narayana Guru College of Commerce": {"Ms. Bharti Bhalerao" : "bhaleraobharti3@gmail.com"},
+          "Sri Mahanth Shatanand Giri College": {"Mr. Narendra Singh" : "narendrasingh.dheeraj@gmail.com"},
+          "St. John's College": {"Mr. Himanshu Guru" : "guruhimanshu1987@gmail.com"},
+          "The Graduate School College For Women": {"Mr. Pradeep Gupta" : "pkg.gupta141@gmail.com"},
+          "Vasant Rao Naik Mahavidyalaya": {"Mr. Dayanand Waghmare": "tiss.dayawagh@gmail.com"},
+          "Vivekanand Arts, Sardar Dalip Singh Commerce & Science College": {"Mr. Anis Ambade" : "anisambade@gmail.com"}
+          }
+
+        userObj = {}
+        for each in colg_grp_list_cur:
+          for key,val in PO.items():
+            if (key == each.name):
+              try:
+                for key1,val1 in val.items():
+                  userObj[(User.objects.get(email = val1))]=key1
+              except:
+                print "No PO exists"  
+        print "userObj", userObj
 
         colg_grp_list_cur = collection.Node.find({'_type':u"Group",'name': {'$in': colg_names}},{'_id':1, 'name':1})
 
@@ -345,15 +422,14 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
           if " -- " in nm:
             nm = nm.split(" -- ")[0].lstrip().rstrip()
 
-        c_name = unicode(nm + " -- " + nussd_course_type + " -- " + str(start_time) + " -- " + str(end_time))
+        c_name = unicode(nm + " -- " + nussd_course_type + " -- " + start_time + " -- " + end_time)
         request.POST["name"] = c_name
-
       is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
-
       if is_changed:
         # Remove this when publish button is setup on interface
         course_gs.status = u"PUBLISHED"
       course_gs.save(is_changed=is_changed)
+
       print "course_gs.name",course_gs.name
       if course_gst.name == u"Announced Course":
         if not course_sec_gs:
@@ -375,6 +451,15 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             set_notif_val(request,group_id,msg,activ,key)
         else:
           print "No email/PO"
+
+      if userObj:
+        for key,val in userObj.items():
+          activ="Course Announced"
+          msg="An NUSSD course of "+nussd_course_type+" type is announced for the period from "+start_time+" to "+end_time+ \
+              "\nStudent Enrollment can be done from "+start_enroll+ " to "+ end_enroll
+          set_notif_val(request,group_id,msg,activ,key)
+      else:
+        print "No email/PO"
     
       # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
       for tab_details in property_order_list:
@@ -408,10 +493,14 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                 else:
                   # Other AttributeTypes 
-                  field_value = request.POST[field_instance["name"]]
+                  # field_value = request.POST[field_instance["name"]]
+                  field_value = request.POST.get(field_instance["name"], "")
 
                 if field_instance["name"] in ["start_time", "end_time"]: #, "registration_year"]:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
+
+                elif field_instance["name"] in ["start_enroll", "end_enroll"]: #, "registration_year"]:
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
                 elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
                   # Needs sepcial kind of parsing
                   field_value = []
@@ -442,9 +531,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 else:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
 
-                if field_value:
-                  course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
-                  # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
+                # if field_value:
+                course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
+                # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
 
               else:
                 field_value_list = request.POST.getlist(field_instance["name"])
@@ -482,13 +571,17 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       
 
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
-  
+  univ = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
+  university_cur = collection.Node.find({'member_of': univ._id}, {'name': 1}).sort('name', 1)
+
   default_template = "ndf/course_create_edit.html"
   context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
-                        'property_order_list': property_order_list
+                        'university_cur':university_cur,
+                        'property_order_list': property_order_list,
+                        'property_order_list_sec': property_order_list_sec
                       }
 
   if app_set_instance_id:
@@ -508,6 +601,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   except Exception as e:
     error_message = "\n CourseCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
+
+def announce_to_colleges(request, group_id):
+  print "\n From set_enrollment_code... \n"
 
 
 def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):

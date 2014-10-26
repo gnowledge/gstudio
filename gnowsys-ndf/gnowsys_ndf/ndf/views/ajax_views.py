@@ -1986,6 +1986,17 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
+def announce_to_colleges(request, group_id):
+  if request.is_ajax() and request.method == "POST":
+    announce_to_colg_list = request.POST.get("announce_to_colg_list", '')
+    right_drawer_len = request.POST.get("right_drawer_len",'')
+    print "\n\n******** inside ajax_views*******\n\n"
+    print type(announce_to_colg_list)
+    print "announce_to_colg_list",announce_to_colg_list," is Empty",right_drawer_len
+    # for each in announce_to_colg_list:
+    #   print each
+    return HttpResponse("failure")
+
 # =============================================================================
 
 def get_announced_courses(request, group_id):
@@ -2149,8 +2160,6 @@ def get_announced_courses(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
-<<<<<<< Updated upstream
-=======
 def get_announced_courses_with_ctype(request, group_id):
   """
   This view returns list of announced-course(s) that match given criteria
@@ -2352,8 +2361,6 @@ def get_colleges(request,group_id):
     error_message = "AnnouncedCourseError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
-
-
 
 def get_anncourses_allstudents(request, group_id):
   """
