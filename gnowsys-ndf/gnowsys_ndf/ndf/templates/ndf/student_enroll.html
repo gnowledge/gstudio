@@ -299,7 +299,6 @@
 
   $("select#acourse_list").change(function() {
     var acourse_name = $("#acourse_list").val();
-    alert(acourse_name)
     $.ajax({
       url: "{% url 'get_studentenrollcourse_of_ac_id' group_id %}",
 
@@ -312,20 +311,24 @@
       dataType: "json",
 
       complete: function () {
-        // Enable District field
+        // Enable AnnouncedCourse field
         $("select#acourse_list").removeAttr('disabled')
         
       },
 
+
       success: function(data){
-        alert("success")
-        $.each(data, function(i, value) {
-          alert(value)
-/*          $("lblenroll_from").text(value)
+        if(data){
+          if(data["start_enroll"])
+          {
+            $("#lblenroll_from").text(data["start_enroll"])
+          }
+          if(data["end_enroll"])
+          {
+            $("#lblenroll_to").text(data["end_enroll"])
+          }
 
-*/    
-       });
-
+        }
       },
 
 
@@ -338,7 +341,6 @@
   $("select#nussd_course_type").change(function() {
 
     var nussd_course_type = $("#nussd_course_type").val();
-    alert(nussd_course_type)
     $.ajax({
       url: "{% url 'get_announced_courses_with_ctype' group_id %}",
 

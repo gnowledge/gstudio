@@ -2238,31 +2238,29 @@ def get_studentenrollcourse_of_ac_id(request, group_id):
   acourse_ctype_list - dictionary consisting of announced-course(s) [if match found] and/or 
              NUSSD-Courses [if match not found]
   """
+  response_dict = {'success': False, 'message': ""}
   try:
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
       acourse_name = request.GET.get("acourse_name", "")
       acourse_name_id = ""
-      start_end_of_enroll = []
       # Fetch "Announced Course" GSystemType
-      print "acourse_name",acourse_name
       announced_course_gst = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
       try:
-        acourse_node = collection.Node.one({'member_of':announced_course_gst._id,u'name':unicode(acourse_name)},{'_id':1})
-        print acourse_node,"is id**"
-      except:
-        acourse_node = collection.Node.find({'member_of':announced_course_gst._id,u'name':unicode(acourse_name)},{'_id':1})
-        print acourse_node,"\n\nMultiple Announced Course with same name exists"
-        acourse_node = acourse_node[0]
+        acourse_node = collection.Node.one({'member_of':announced_course_gst._id,u'name':unicode(acourse_name)})
         
-      sec_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentEnrollCourse"})
-      print "acourse_id",acourse_node._id
-      sec_node = collection.Node.one({'member_of':sec_gst._id,'attribute_set.announced_course_id':ObjectId('544b7b04f084a332efb0fccb')})
-      print "sec_node",sec_node
-      start_end_of_enroll.append(sec_node)
-      
-      print "\n\nstart_end_of_enroll",start_end_of_enroll
-      return HttpResponse(json.dumps(start_end_of_enroll))
+      except:
+        acourse_node = collection.Node.find({'member_of':announced_course_gst._id,u'name':unicode(acourse_name)})
+        print acourse_node,"\n\nMultiple Announced Course with same name exists"
+
+      se= acourse_node.attribute_set[3]
+      se = se[u'start_enroll'].strftime("%d-%m-%Y")
+      response_dict["start_enroll"]=se
+
+      ee= acourse_node.attribute_set[4]
+      ee = ee[u'end_enroll'].strftime("%d-%m-%Y")
+      response_dict["end_enroll"]=ee
+      return HttpResponse(json.dumps(response_dict))
     else:
       error_message = " SECFetchError: Either not an ajax call or not a GET request!!!"
       return HttpResponse(json.dumps({'message': " SECFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
