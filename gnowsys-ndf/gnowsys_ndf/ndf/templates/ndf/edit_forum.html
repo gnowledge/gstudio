@@ -96,8 +96,9 @@
       <div class="large-8 large-pull-4 large-offset-4 columns" 
            style="padding:0 1.65em 0 1.4em;">
 
-        <textarea id="orgitdown" name="content_org" 
-        placeholder="Some description about forum ..." value=""></textarea>
+{% include "ndf/add_editor.html" with var_name="content_org" var_value=forum.content_org|default_if_none:"" node_id=forum.pk %}
+
+
         <div id="message" style="display:none; color:red"></div>
         <input type="hidden" id="nodes_list" value="{{nodes_list}}">                  
         <!-- <input type="button" id="save_edit_cont" class="button" value="Save"> -->
@@ -196,29 +197,11 @@
   $("#node_search_form").parent().hide();
 
   // method to provide autocomplete/intellisence of forum names
-  $(document).ready(function(){
-    var content_var = "{{forum.content_org}}";
-    $("#orgitdown").val(content_var);
-    $("#forum_name").change(function(){
 
-      var name = $("#forum_name").val();
-      var nodes = $("#nodes_list").val();
+ 
+ {% block document_ready %}
 
-      if (nodes.indexOf(name) > 0)  
-      {
-        $("#message").css("display", "block");
-        $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
-        $("#forum_name").val("");
-      }
-      else
-      {
-        $("#message").css("display", "none");
-      }
-
-    });
-  });
-
-  function saveforum(){
+ function saveforum(){
     var name=$("#forum_name").val();
     if (name=="" )
     {
@@ -230,7 +213,28 @@
     }
   }
 
+  var forumn=$("#forum_name").val()
+    $("#forum_name").change(function(){
 
+      var name = $("#forum_name").val();
+      var nodes = $("#nodes_list").val();
+      if (name != forumn)
+      {
+      if (nodes.indexOf(name) > 0)  
+      {
+        $("#message").css("display", "block");
+        $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+        $("#forum_name").val("");
+      }
+      else
+      {
+        $("#message").css("display", "none");
+      }
+      }
+    });
+ {% endblock %}
+
+ 
   // ==================================
 
 
