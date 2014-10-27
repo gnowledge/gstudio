@@ -320,10 +320,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
         if content_org:
             usrname = request.user.username
             filename = slugify(newgsystem.name) + "-" + usrname
-            if GSTUDIO_SITE_EDITOR == "aloha":
-                newgsystem.content = content_org
-            else:
-                newgsystem.content = org2html(content_org, file_prefix=filename)
+            newgsystem.content = org2html(content_org, file_prefix=filename)
             newgsystem.content_org = content_org
 
         # check if map markers data exist in proper format then add it into newgsystem

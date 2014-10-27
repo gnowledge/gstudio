@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 import mongokit 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_EDITOR
+from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
@@ -321,10 +321,7 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
     # Required to link temporary files with the current user who is modifying this document
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
-    if GSTUDIO_SITE_EDITOR == "aloha":
-      node.content = unicode(content_org)
-    else:
-      node.content = org2html(content_org, file_prefix=filename)
+    node.content = org2html(content_org, file_prefix=filename)
 
 
 
@@ -584,10 +581,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # Required to link temporary files with the current user who is modifying this document
       usrname = request.user.username
       filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
-      if GSTUDIO_SITE_EDITOR == "aloha":
-        node.content = content_org
-      else:
-        node.content = org2html(content_org, file_prefix=filename)
+      node.content = org2html(content_org, file_prefix=filename)
       # print "\n Changed: content_org"
       is_changed = True
 
@@ -1725,10 +1719,7 @@ def discussion_reply(request, group_id):
   
       reply_obj.content_org = unicode(content_org)
       filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-      if GSTUDIO_SITE_EDITOR == "aloha":
-        reply_obj.content = unicode(content_org)
-      else:
-        reply_obj.content = org2html(content_org, file_prefix=filename)
+      reply_obj.content = org2html(content_org, file_prefix=filename)
   
       # saving the reply obj
       reply_obj.save()

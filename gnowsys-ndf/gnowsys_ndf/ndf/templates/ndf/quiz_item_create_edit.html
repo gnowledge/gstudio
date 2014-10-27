@@ -111,13 +111,8 @@ background-repeat:no-repeat; background-size: 48px 48px
       <legend>{% trans "Question" %}</legend>
       <div class="row">
 	<div class="small-12 large-11 columns end">
-	  {% gstudio_site_editor as editor %}
-	  {% if editor == "aloha" %}
-               {% include "ndf/add_aloha_editor.html" with var_name="question" var_placeholder="Enter question" var_value=node.content_org %}
-	  {% else %}
 	       {% include "ndf/add_editor.html" with var_name="question" var_placeholder="Enter question" var_value=node.content_org %}
-	  {% endif %}
-	</div>
+	 </div>
       </div>
     </fieldset>
 

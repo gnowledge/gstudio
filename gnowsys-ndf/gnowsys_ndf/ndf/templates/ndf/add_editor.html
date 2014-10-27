@@ -2,6 +2,8 @@
 {% load i18n %}
 <!-- orgitdown! -->
 <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+<script type="text/javascript" src="/home/supriya/Downloads/jquery.caret.1.02.min.js"></script>
+
 <!-- orgitdown! toolbar settings -->
 <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
 <!-- orgitdown! skin -->
@@ -86,6 +88,23 @@
   $("#orgitdown_{{var_name}}").orgitdown(mySettings);
 {% endif %}
 
+
+function insertImg(){
+  if($("#image_name").val() == "" || $("#image_width").val() == "" || $("#image_url").val() == ""){
+          alert("Please fill the input provided");
+    }
+  else {
+  insert_img=("\n#+CAPTION: "+$("#image_name").val()+"\n#+ATTR_HTML: "+$("#image_width").val()+"\n[["+$("#image_url").val()+"]]\n");
+  var startPos = $("#{{node_id}}").prop("selectionStart");
+  var endPos = $("#{{node_id}}").prop("selectionEnd");
+  var content = $("#{{node_id}}").val().substring(0, startPos) + insert_img + $("#{{node_id}}").val().substring(endPos, $("#{{node_id}}").val().length);
+  $("#{{node_id}}").val(content);
+  $(".close-reveal-modal").trigger("click");
+  endPos.focus();
+
+}
+}
+
 function myFunction(str){ 
 				cite = document.getElementById(str.id).name;
 				var txtAreaContainer = $(".orgitdownContainer textarea");
@@ -97,13 +116,24 @@ function myFunction(str){
 				txtAreaContainer.val(string4);
 				$('#bib-text').foundation('reveal', 'close');
 			}
+
+$(".orgitdownButton.orgitdownButton6 a").click(function(){
+         $.ajax({
+                 url: "{% url 'insert_picture' group_id %}",
+                 type:"GET",
+                 success: function(data) {
+                          $('#insert-pic').foundation('reveal', 'open');
+              }
+          })
+        })
+
 $(".orgitdownButton.orgitdownButton10 a").click(function(){
 		  $.ajax({
           url: "{% url 'view_articles' group_id %}",
           type:"GET",
           success: function(data) {
-			data = JSON.parse(data);
-			temp = '';
+                        data = JSON.parse(data);
+                        temp = '';
 			for(i=0; i<data.length; i++)
 			{
 				console.log(data.length)
@@ -137,6 +167,23 @@ $(".orgitdownButton.orgitdownButton10 a").click(function(){
 		});
 
 </script>
+
+<div id="insert-pic" class="small reveal-modal" data-reveal>
+<a class="close-reveal-modal">&#215;</a>
+<h3>Add Internal/External Images:</h3> 
+<div>
+    <label for="name">Image Name</label> 
+    <input type="text" name="name" id="image_name" placeholder="Enter name ..." required>
+    <label for="width">Width</label>
+    <input type="text" name="width" id="image_width" placeholder="Enter width in pixel eg.600..." required>
+    <label for="url">URL</label>
+    <input type="url" name="url" id="image_url" placeholder="Enter url eg. http:filename.jpg..." required>
+  <button type="submit" id="insertimage" onclick="insertImg()"> Add Image</button>
+</div>
+<dl class="accordion" data-accordion id="pic">
+</dl>
+</div>
+
 
 <div id="bib-text" class="reveal-modal" data-reveal>
 <dl class="accordion" data-accordion id="bib1">

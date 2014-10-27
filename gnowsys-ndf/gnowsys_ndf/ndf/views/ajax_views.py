@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from mongokit import paginator
+from gnowsys_ndf.ndf.views.imageDashboard import getImageThumbnail
 
 import ast
 
@@ -1736,6 +1737,15 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
 
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+
+def insert_picture(request, group_id):
+    if request.is_ajax():
+        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'_id': 0, 'name': 1})
+        resources=list(resource_list)
+    
+    return StreamingHttpResponse(json.dumps(resources))
+
+
 def view_articles(request, group_id):
   if request.is_ajax():
     # extracting all the bibtex entries from database
@@ -2235,10 +2245,7 @@ def edit_task_content(request, group_id):
   	# Required to link temporary files with the current user who is modifying this document
     	usrname = request.user.username
     	filename = slugify(task.name) + "-" + usrname + "-"
-        if GSTUDIO_SITE_EDITOR == "aloha":
-            task.content=content_org
-        else:
-            task.content = org2html(content_org, file_prefix=filename)
+        task.content = org2html(content_org, file_prefix=filename)
 	task.save()
         return HttpResponse(task.content)
     else:

@@ -372,13 +372,8 @@
 </table>
 
 <div id="content_org_overlay" class="reveal-modal" data-reveal>
-  {% gstudio_site_editor as editor %}
-  {% if editor == "aloha" %}
-       {% include "ndf/add_aloha_editor.html" with var_name="data_reveal_editor" var_placeholder="Enter your content here."  %}
-  {% else %}  
        {% include "ndf/add_editor.html" with var_name="data_reveal_editor" var_placeholder="Enter your content here."  %}
-  {% endif %}
-<a class="close-reveal-modal">&#215;</a>
+  <a class="close-reveal-modal">&#215;</a>
 </div>
 
 <div id="teaches-overlay" data-right-drawer-list="" class="reveal-modal" data-reveal>

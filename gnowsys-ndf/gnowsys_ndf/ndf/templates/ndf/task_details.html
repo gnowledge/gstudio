@@ -215,14 +215,7 @@
 	    <label><b>{% trans "Description" %}</b></label>
 	    <div id="contentlist" class="content">
 		<div class="">
-		  {% gstudio_site_editor as editor %}
-		  {% if editor == "aloha" %}
-
- 		     {% include "ndf/add_aloha_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
-		  {% else %}
-
 		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
-		  {% endif %}
 		</div>
 	    </div>
 	  </div>

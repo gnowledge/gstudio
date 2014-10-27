@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django_mongokit import get_database
-from gnowsys_ndf.settings import LANGUAGES, GSTUDIO_SITE_EDITOR
+from gnowsys_ndf.settings import LANGUAGES
 from django.utils.translation import ugettext as _  
 
 try:

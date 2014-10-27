@@ -46,12 +46,8 @@ print "entered template"
   </br>
   {% endfor %}
   <div class="" style="width:500px;height:100px;">
-    {% gstudio_site_editor as editor %}
-    {% if editor == "aloha" %}
-          {% include "ndf/add_aloha_editor.html"  with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
-    {% else %}
           {% include "ndf/add_editor.html"  with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
-    {% endif %}
+   
 </div>
 </br>
 </br>
