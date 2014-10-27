@@ -42,6 +42,18 @@ coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
 
+def check_if_moderated_group(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  ins_objectid  = ObjectId()
+  if ins_objectid.is_valid(node_id) :
+    if grp.edit_policy == "EDITABLE_MODERATED":
+      return True
+    else:
+      return False
+  else:
+    return False
+
+
 def check_delete(main):
   try:
     def check(*args, **kwargs):

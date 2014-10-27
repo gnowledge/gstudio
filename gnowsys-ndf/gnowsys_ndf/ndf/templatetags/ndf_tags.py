@@ -82,20 +82,23 @@ def get_node_type(node):
 
 @register.assignment_tag
 def get_schema(node):
-   obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
-   nam=node.member_of_names_list[0]
-   if(nam=='Page'):
-	#print s_dict[nam]
-        return [1,schema_dict[nam]]
-   elif(nam=='File'):
-	if( 'image' in node.mime_type):
-		return [1,schema_dict['Image']]
-        elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
-        	return [1,schema_dict['Video']]
-	else:
-		return [1,schema_dict['Document']]	
-   else:
-	return [0,""]
+   try:
+      obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
+      nam=node.member_of_names_list[0]
+      if(nam=='Page'):
+         #print s_dict[nam]
+         return [1,schema_dict[nam]]
+      elif(nam=='File'):
+         if( 'image' in node.mime_type):
+            return [1,schema_dict['Image']]
+         elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+            return [1,schema_dict['Video']]
+	 else:
+            return [1,schema_dict['Document']]	
+      else:
+         return [0,""]
+   except Exception as e:
+      print "Error in get_schema "+str(e)
 """
 @register.assignment_tag
 def g2(node):
