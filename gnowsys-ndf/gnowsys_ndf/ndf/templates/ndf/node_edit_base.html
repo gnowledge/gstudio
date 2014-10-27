@@ -40,32 +40,27 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">    
-    <header>
-
+    
+    <header> 
     <div class="row">
- 	<div class="large-8 columns">     
+ 	<div class="large-8 columns">    
+ 		
 		<h3><span class="subheader">		
 		{% if node %}
-			{% trans "Editing:" %} 
+			{% trans "Editing " %} {{title}} : 
 		{% else %}
-			{% trans "Create:" %}
+			{% trans "Create New " %} {{title}} :
 		{% endif %} 
 		</span></h3>
+		
 
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
 	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 	  
+    </div>     
     </div> 
-    
-                
-    <div class="large-4 columns">
-	   	<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><h3><span class="subheader"> {% trans "Tag" %} {{node.tags|pluralize|default_if_none:"'s"}} </span></h3>
-	    </span>
-	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-	</div>
-    </div> 
-
-  	</header>
+    </header>
+  	
 
     <div class="edit-card">
         
@@ -195,9 +190,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			{% if not is_group %}
 				<div class="row">
-				<div class="small-12 columns">
+				<div class="small-8 columns">
 					<dl class="accordion" data-accordion>
-					  	<dd style="width:70%;">
+					  	<dd>
 					    <a id="switch_group" href="#switchgrp">{{node.name}} {% trans "Publish this resource in other group/s" %}</a>
 
 					       <div id="switchgrp" class="content">
@@ -212,7 +207,16 @@ background-repeat:no-repeat; background-size: 48px 48px
 					</dl>
 				</div>
 				</div>
-			{% endif %}        
+			{% endif %} 
+			<div class="row">
+				<div class="small-8 columns">
+					<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','">
+						<h3><span class="subheader"> {% trans "Tag'" %} {{node.tags|pluralize|default_if_none:""}} 
+						</span></h3>
+			    	</span>
+			    	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas..."> 
+		    	</div>
+	    	</div>      
     	</div>
     
     {% block prior_node %}
@@ -503,12 +507,12 @@ $(document).ready(function(){
 		$(".teaches_tab").show();
 		$(".prior_node_tab").show();
 	}
-	else if (nt == "Topic")
+	else if (nt == "Topic" || nt == "Term")
 	{
 		$(".teaches_tab").show();
 		$(".prior_node_tab").show(); 
 		$(".assesses_tab").show();
-	} 
+	}
 	else if(nt == "Quiz" || nt == "QuizItem")
 	{
 		$(".assesses_tab").show();

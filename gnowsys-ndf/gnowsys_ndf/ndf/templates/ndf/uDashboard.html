@@ -3,6 +3,7 @@
 {% load i18n %}
 {% block title %} {{username}}'s - Dashboard  {% endblock %}
 
+
 {% block meta_content %}
 
     <h3>{% trans "About" %}</h3>
@@ -17,7 +18,7 @@
 
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
-<div class="row">
+<div class="row" id="new">
 
 	<!-- Users General Information -->
 	<div class="row">
@@ -66,8 +67,12 @@
 
 		<div class="small-9 columns" style="padding-top:30px;">
 
-			<h4><a href="#">{% trans "Welcome" %} {{username}} </a></h4>
-			{% trans "Registered on" %} : &nbsp;{{DOJ}}
+			<h3>{{username}}</h3>
+			{% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
+      {% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
+      {% trans "Pages created" %}: &nbsp;{{page_count}}<br>
+      <!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
+      {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
 		</div>
 	</div>
 	
@@ -81,19 +86,28 @@
 	</div>
 </div>
 
-  <div class = "row">
-    <h2>{% trans "My Groups:" %}</h2>
-    <hr></hr>
-    <div class ="small-11 rows" id="trial">
-      
-      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+<!-- Task tab view  -->
+
+
+  <dl class="tabs" data-tab data-options="deep_linking:true">
+    <dd class="active"><a href="#group" id="p1">Groups </a></dd>
+    {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
+    <dd><a href="#Activity" id="p3">My Activities </a></dd>			
+ 
+  </dl>
+
+  
+<div class="tabs-content">
+<div class="content active" id="group">      
+	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
   {% for node in user_groups %}
     
   {% get_version_of_module node.pk as version %}
   <li class="card">
-    <div class="groups">
+    <div  id="group">
       <header>
+	<a  href="/{{node.pk}}">
         <div class="label-list">
           {% for tag in node.tags|slice:":3" %}
           <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
@@ -114,13 +128,13 @@
 
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-      <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a> 
+     </a> 
 
       
       
     </div>
-  </li>  
-
+  </li>
+   	
   {% empty %}
     {% if not searching %}
     <div class="row">
@@ -132,12 +146,19 @@
 
   {% endfor %}
 
-</ul>
-
+{% if dashboard_count.group > 10 %}
+	<div class="row">
+      		<div class="small-12 columns" align="right">
+       			<h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
+      		</div>
     </div>
+{% endif %}
+</ul>
+</div>
+    
 
 <!--<h2> Notifications:</h2> -->
-<hr></hr>
+
     <div id="Notification">
       
       <div>
@@ -149,10 +170,11 @@
       </ul>
     </div>
   </div>
+ 
+
   
-  <h2>{% trans "My Tasks:" %}</h2>
-  <hr></hr>
-   <div id="Assigned Tasks" >
+
+ <div class="content" id="AssignedTasks" >
       
      	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
@@ -161,7 +183,7 @@
     
   {% get_version_of_module node.pk as version %}
   <li class="card">
-    <div class="AssignedTask">
+    <div class="course">
       <header>
         <div class="label-list">
           {% for tag in node.tags|slice:":3" %}
@@ -170,7 +192,7 @@
         </div>
           
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
+	<a  href="{% url 'task_details' group_id node.pk %}">
         <h4>{{ node.name|truncatechars:20 }}</h4>
 
         <div>
@@ -183,7 +205,7 @@
 
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-      <a class="small button expand" href="{% url 'task_details' group_id node.pk %}">{% trans "Detail" %}</a> 
+      </a> 
 
       
 
@@ -203,12 +225,23 @@
   {% endfor %}
 
 </ul>
+
+{% if dashboard_count.Task > 10 %}
+	<div class="row">
+      		<div class="small-12 columns" align="right">
+       			<h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
+      		</div>
+    </div>
+{% endif %}
+
       
     </div>
 
-    <h2>{% trans "My Activities:" %}</h2>
-    <hr></hr>
-    <div id="Activity">
+    
+
+
+	  
+<div class="content" id="Activity">
       
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
@@ -225,7 +258,11 @@
           <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
           {% endfor %}
         </div>
-          
+       {% if res_type == 'group' %}
+      <a  href="/{{node.pk}}">
+      {% elif res_type %}
+      	<a  href="{% url res_type group_id node.pk  %}"> 
+      {% endif %}   
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
 
         <h4>{{ node.name|truncatechars:20 }}</h4>
@@ -239,13 +276,10 @@
       </header>
 
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-      {% if res_type == 'group' %}
-      <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a>
-      {% elif res_type %}
-      	<a class="small button expand" href="{% url res_type group_id node.pk  %}">{% trans "Detail" %}</a> 
-      {% endif %}
+</a>      
       
     </div>
+   
   </li>  
 
   {% empty %}
@@ -261,10 +295,20 @@
 
 </ul>
 
+		{% if dashboard_count.activity > 10 %}
+	<div class="row">
+      		<div class="small-12 columns" align="right">
+       			<h6> <a href="{% url 'user_activity' group_id %}"> Show More.. <a></h6>
+      		</div>
+    	</div>
+		{% endif %}
+
+
     </div>
   </div>
 </div>
 
+</div>
 <script type="text/javascript">
 	$("input").each(function() {
 		$(this).bind('keydown keypress keyup change', function() {

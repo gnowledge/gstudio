@@ -1,31 +1,26 @@
-{% extends "ndf/base.html" %}
-{% load ndf_tags %}
-{% load i18n %}
-{% load pagination_tags %}
-
-{% block title %} {{ title }} {% endblock %}
+{% extends "ndf/mis_base.html" %}
 
 {% block head %}  
-
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
+  {{block.super}}
+  
   <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
 
   <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
   <link rel="stylesheet" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+{% endblock%}
 
-  <style type="text/css">
+{% block style %}
+  {{block.super}}
 
+  /* Setting css-properties for ui-datepicker */
     #ui-datepicker-div {
-
       box-shadow: 0 5px 5px #808080;
       width: 230px;
     }
 
     .ui-widget {
-
       font-family: inherit;
       font-size: inherit;
     }
@@ -57,86 +52,54 @@
       padding: 0;
     }
 
-    .active-app-set, .active-app-set-edit, .active-app-set-view {
-      /*padding:0.5em 0 0.5em 0.5em; */
-      /*margin-left: -10px !important;*/
-      background-color:#efefef;
+  /* CSS for Multiple-selection (or drawer) widget */
+    .divider-line { font-size: xx-large; color:lightgray; }
+    .line-height-2 { line-height:2; }
+    .line-height-2pt5 { line-height:2.5; }
+    .fontsize-x-large { font-size: x-large; }
+
+    .margin-0 { margin: 0 !important ;}
+
+    .resource-drawer { 
+      border-color: #D3D3D3; border-style: solid; 
+      padding: 0 !important; 
+      overflow-y: auto;
     }
 
-    .active-app-set-edit {
-      border-right: 4px solid #808080;
-      font-weight: bold;
+    .resource-drawer li.bullet-item:hover{
+      background-color: #ecf0f1; cursor:pointer;
     }
 
-    .active-app-set-view {
-      border-left: 4px solid #808080;
-      font-weight: bold;
+    .posted-by{ color: #808080; font-size: small; }
+
+    .selected-resource { background-color:lightgray !important ; }
+
+    .resource-type-image {
+      height:40px;    
+      background-repeat:no-repeat; background-size: 48px 48px
     }
 
+  /* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+    dl.tabs>dd a.disable {
+      pointer-events: none;
+      cursor: default;
+    }
+
+    .row .row {
+      margin: 0 0;
+    }
+
+  /* Setting css-properties for small.error */
     small.error {
-      display: block;
-      line-height: 0;
-      padding: 0;
-      margin-bottom: 1rem;
-      margin-top: 0.9rem;
+      padding: 0 0 0 0.5rem !important;
+      margin-top: 1rem !important;
+      position: relative !important;
     }
-  </style>
-{% endblock%}
 
-{% block meta_content %}
-  {% check_is_gstaff groupid request.user as gstaff_access %}
-
-  <ul class="side-nav"> 
-  	<li>
-  		<a></a>
-  	</li>
-
-    {% for each in app_collection_set %}
-    {% get_memberof_objects_count each.pk groupid as count %}
-
-    {% if app_set_id == each|safe %}
-      {% if '/new/' in request.path %}
-      <li class="active-app-set-edit">
-      {% else %}
-      <li class="active-app-set-view">
-      {% endif %}
-    {% else %}
-    <li>
-    {% endif %}
-    
-      <div class="row">
-        {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
-        {% if app_name == "MIS" %}
-        <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-        {% else %}
-        <a class="small-8 columns" href="{% url 'mis-po:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-        {% endif %}
-          {{each.name}} ({{count}})
-        </a>
-
-        {% if gstaff_access %}
-        {% if app_name == "MIS" %}
-        <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-        {% else %}
-        <a class="small-4 columns" href="{% url 'mis-po:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-        {% endif %}
-            +&nbsp; {% trans "Add" %}
-          </a>
-          {% endif %}
-
-        {% else %}
-          {{each.name}}
-        {% endif %}
-      </div>
-  	</li>
-
-  	{% endfor %}
-
-  </ul>
+  /* Setting css-properties for small.non-required*/
+    small.non-required {
+      padding: 0 0 0 0.5rem !important;
+      margin-top: 2.5rem !important;
+      position: relative !important;
+    }
 {% endblock %}
-
-{% block body_content %} 
-{% endblock %}
-
-{% block script %}
-{% endblock %}	

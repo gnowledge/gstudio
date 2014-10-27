@@ -6,6 +6,20 @@
 
 {% block title %} {{title}} {% endblock %}
 
+{% block style %}
+
+  .first-load { display: none; }
+
+  .tabs dd.active a, .tabs .tab-title.active a {
+    background-color: #f7f7f7;
+  }
+
+  .tabs dd.active{
+    width: 100%;
+  }
+
+{% endblock %}
+
 <!-- left top panel -->
 {% block meta_content %}
   <h2 class="subheader">{% trans "Gallery" %}</h2>
@@ -28,9 +42,133 @@
   {% endif %}  
 {% endblock %}
 
+{% block related_content %}
+
+{% check_user_join request groupid as user_is_joined %}
+
+<ul class="side-nav">
+
+  <div class="panel"  style="background-color:#ddd;">
+    <b>{% trans "Visit" %}</b>
+    <br/><br/>
+    <dl class="tabs" data-tab >
+      <!-- all files -->
+      <dd class="active">
+        <a href="#view-all">
+          <i class="fi-eye"></i>
+          {% trans "All files" %} {% if file_pages.count > 0 %}({{ file_pages.count }}){% endif %}
+        </a>
+      </dd><br/>
+      <!-- Documents -->
+      <dd>
+        <a href="#view-doc">
+          <i class="fi-page-filled"></i>
+          {% trans "Documents" %} {% if doc_pages.count > 0 %}({{ doc_pages.count }}){% endif %}
+        </a>
+      </dd><br/>
+      <!-- Interactives -->
+      {% if interactiveCollection.count %}
+        <dd>
+          <a href="#view-interactive">
+            <i class="fi-arrows-compress"></i>
+            {% trans "Interactives" %} ({{ interactiveCollection.count }})
+          </a>
+        </dd><br/>
+      {% endif %}
+      <!-- Audio -->
+      {% if audioCollection.count %}
+        <dd>
+          <a href="#view-audio">
+            <i class="fi-music"></i>
+            {% trans "Audios" %} ({{ audioCollection.count }})
+          </a>
+        </dd><br/>
+      {% endif %}
+      <!-- Image -->
+      <dd>
+        <a href="#view-image"><i class="fi-camera"></i>
+          {% trans "Images" %} {% if image_pages.count > 0 %}({{ image_pages.count }}){% endif %}
+        </a>
+      </dd><br/>
+      <!-- Video -->
+      {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
+        <dd>
+          <a href="#view-video"><i class="fi-video"></i>
+            {% trans "Videos" %} {% if video_pages.count > 0 %}({{ video_pages.count }}){% endif %}
+          </a>
+        </dd><br/>
+      {% endif %}
+      <!-- Pandora -->
+      {% if site.SITE_VIDEO == 'pandora_and_local' %}
+        <dd>
+          <a href="#view-pandora-video"><i class="fi-video"></i>
+            {% trans "Pandora Videos" %}
+          </a>
+        </dd><br/>
+      {% endif %}
+
+      {% if site.SITE_VIDEO == 'pandora' %}
+        <dd>
+          <a href="#view-pandora-video"><i class="fi-video"></i>
+            {% trans "Videos" %}
+            {% if pandoraCollection.count %}
+              ({{ pandoraCollection.count }})
+            {% endif %}
+          </a>
+        </dd><br/>
+      {% endif %}
+
+      {% if title != "E-Library" %}
+        <dd>
+          <a href="#view-collection">
+            <i class="fi-page-multiple"></i>{% trans "Collections" %}
+          </a>
+        </dd><br/>
+      {% endif %}
+
+    </dl><br/>
+
+    {% if user.is_authenticated %}
+    {% if user_is_joined == "joined" or user_is_joined == "author" %}
+    <b>{% trans "Actions" %}</b><br/><br/>
+    
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+        
+        <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny round button">
+          {% trans "Upload File" %}
+        </a><br/><br/>
+        
+      {% endif %}
+    
+
+    <b>{% trans "Review" %}</b><br/><br/>
+    
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+
+        <a href="{% url 'data_review' group_name_tag %}" class="tiny round button">
+          {% trans "Data Review" %}
+        </a>
+      {% endif %}
+    {% endif %}
+    {% endif %}
+
+    <a href="#" data-reveal-id="library-statistics" class="tiny round button">
+      {% trans "File Statistics" %}
+    </a>
+    <div class="medium reveal-modal" id="library-statistics" data-reveal>
+      {% include "ndf/file_statistics.html" %}
+      <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+  </div>
+</ul>
+{% endblock %}
 
 <!-- actions -->
-{% block app_action_list %}
+{% comment %}
+<!-- {% block app_action_list %}
 
   {% if user.is_authenticated %}
     {% user_access_policy groupid request.user as user_access %}
@@ -62,11 +200,13 @@
     <a class="close-reveal-modal">&#215;</a>
   </div>
 
-{% endblock %}
+{% endblock %} -->
+{% endcomment %}
 
 {% block body_content %}
   {% get_group_name groupid as group_name_tag %}
 
+{% comment %}
 <header class="row">
   <dl class="tabs" data-tab >
     
@@ -74,7 +214,7 @@
     <dd class="active">
       <a href="#view-all">
         <i class="fi-eye"></i>
-        {% trans "All files" %} \ {% if files.count %}({{ files.count }}){% endif %}
+        {% trans "All files" %} {% if file_pages.count > 0 %}({{ file_pages.count }}){% endif %}
       </a>
     </dd>
     
@@ -82,7 +222,7 @@
     <dd>
       <a href="#view-doc">
         <i class="fi-page-filled"></i>
-        {% trans "Documents" %} {% if docCollection.count %}({{ docCollection.count }}){% endif %}
+        {% trans "Documents" %} {% if doc_pages.count > 0 %}({{ doc_pages.count }}){% endif %}
       </a>
     </dd>
 
@@ -109,7 +249,7 @@
     <!-- Image -->
     <dd>
       <a href="#view-image"><i class="fi-camera"></i>
-        {% trans "Images" %} {% if imageCollection.count %}({{ imageCollection.count }}){% endif %}
+        {% trans "Images" %} {% if image_pages.count > 0 %}({{ image_pages.count }}){% endif %}
       </a>
     </dd>
 
@@ -117,7 +257,7 @@
     {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
       <dd>
         <a href="#view-video"><i class="fi-video"></i>
-          {% trans "Videos" %}{% if videoCollection.count %}({{ videoCollection.count }}){% endif %}
+          {% trans "Videos" %} {% if video_pages.count > 0 %}({{ video_pages.count }}){% endif %}
         </a>
       </dd>
     {% endif %}
@@ -135,8 +275,8 @@
       <dd>
         <a href="#view-pandora-video"><i class="fi-video"></i>
           {% trans "Videos" %}
-          {% if pandoravideoCollection.count %}
-            ({{ pandoravideoCollection.count }})
+          {% if pandoraCollection.count %}
+            ({{ pandoraCollection.count }})
           {% endif %}
         </a>
       </dd>
@@ -152,6 +292,7 @@
 
    </dl>
 </header>
+{% endcomment %}
 
 <div class="tabs-content gallery">
 
@@ -173,24 +314,28 @@
   <!-- Tab View #1 - All -->
   <div class="content row active" id="view-all">
 
-    {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" res_type_name="" %}
+    {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
 
   </div>
 
   <!-- Tab View 2 - Documents -->
   <div class="content" id="view-doc">
 
-    {% include "ndf/file_list_tab.html" with resource_type=docCollection detail_urlname="file_detail" res_type_name="" %}
-
+    <a href='{% url "paged_file_objs" group_name_tag "doc" 1 %}' class="first-load">1</a>
+    {% comment %}
+    {% include "ndf/file_list_tab.html" with resource_type=docCollection detail_urlname="file_detail" filetype="doc" res_type_name="" page_info=doc_pages %}
+    {% endcomment %}
   </div>
 
 
   <!-- Tab View 3 - Interactives -->
   {% if interactiveCollection %}
     <div class="content" id="view-interactive">
+    <a href='{% url "paged_file_objs" group_name_tag "interactives" 1 %}' class="first-load">1</a>
 
-      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" res_type_name="" %}
-
+          {% comment %}
+      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" filetype="interactives" res_type_name="" page_info=interactive_pages %}
+    {% endcomment %}
     </div>
   {% endif %}
 
@@ -198,38 +343,45 @@
   <!-- Tab View 4 - Audios -->
   {% if audioCollection %}
     <div class="content" id="view-audio">
+    <a href='{% url "paged_file_objs" group_name_tag "audio" 1 %}' class="first-load">1</a>
 
-      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" res_type_name="" %}
-
+    {% comment %}
+      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" filetype="audio" res_type_name="" page_info=audio_pages %}
+    {% endcomment %}
     </div>
   {% endif %}
 
   <!-- Tab View #3 - Images -->
   <div class="content" id="view-image">
+    <a href='{% url "paged_file_objs" group_name_tag "image" 1 %}' class="first-load">1</a>
 
-    {% include "ndf/file_list_tab.html" with resource_type=imageCollection detail_urlname="image_detail" res_type_name="" %}
-
+        {% comment %}
+    {% include "ndf/file_list_tab.html" with resource_type=imageCollection detail_urlname="image_detail" filetype="image" res_type_name="" page_info=image_pages %}
+    {% endcomment %}
   </div>
 
   <!-- Tab View #4 - Videos -->
   <div class="content" id="view-video">
+    <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
 
-    {% include "ndf/file_list_tab.html" with resource_type=videoCollection detail_urlname="video_detail" res_type_name="" %}
-
+    {% comment %}
+    {% include "ndf/file_list_tab.html" with resource_type=videoCollection detail_urlname="video_detail" filetype="video" res_type_name="" page_info=video_pages %}
+    {% endcomment %}
   </div>
 
   <!-- Tab View #5 - pandora Videos -->
   <div class="content" id="view-pandora-video">
-
-    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" res_type_name="" %}
-
+    <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+    {% comment %}
+    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" filetype="video" res_type_name="" page_info=pandora_pages %}
+    {% endcomment %}
   </div>
   
   <div class="content" id="view-collection">
 
     {% get_resource_collection groupid title as file_collections %}
 
-    {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" res_type_name="collection" %}
+    {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
 
   </div>
 
@@ -353,5 +505,62 @@ else{
   {% if is_video %}
     alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
   {% endif %}
+
+
+// pagination ajax  
+$('ul.pagination a').click(function(e)
+{
+    e.preventDefault();
+    populateFileList(this);    
+});
+
+
+$("dl.tabs dd").click(function(){
+  tabDivId = $(this).children("a").attr("href");
+  if((tabDivId != "#view-collection") && (tabDivId != "#view-all") && (tabDivId != "view-pandora-video"))
+     {
+     pageAnchor = $(tabDivId).children("a")[0];
+     populateFileList(pageAnchor);
+}
+      $(this).off("click");
+});
+
+
+function populateFileList(pageAnchor)
+{
+    var filetype = pageAnchor.href.split("/")[5],
+        page_no = pageAnchor.text.trim(),
+        no_of_objs_pp = 24,
+        url = pageAnchor.href.substr(pageAnchor.href.search(pageAnchor.host)+pageAnchor.host.length);
+
+    aaa = pageAnchor;
+
+    var tabContainerDiv = $(pageAnchor).closest("div.content");
+    $.ajax({
+
+      type: 'POST',
+      url: url,
+      datatype: 'html',
+      data: {
+
+        title: "{{title}}",
+        filetype: filetype,
+        page_no: page_no,
+        no_of_objs_pp: no_of_objs_pp,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data){
+        
+        $(tabContainerDiv).html(data);
+
+        // making newly loaded html pagination <a> non clickable and bind with populateFileList()
+        $(tabContainerDiv).find("ul.pagination a").click(function(e){
+          e.preventDefault();
+          populateFileList(this);
+        });
+
+      }
+    })
+}
 
 {% endblock %}

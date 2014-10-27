@@ -322,14 +322,14 @@ def create_edit_page(request, group_id, node_id=None):
 
 	get_node_metadata(request,page_node,gst_page)
         
-	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
-        teaches_edited = request.POST.get('teaches_edited','') # check teaches modified or not
-	if teaches_list !='':
-			teaches_list=teaches_list.split(",")
-                        create_grelation_list(page_node._id,"teaches",teaches_list)
-        else:
-          relationtype = collection.Node.one({"_type":"RelationType","name":unicode("teaches")})
-          collection.remove({"_type":"GRelation","subject":page_node._id,"relation_type":relationtype.get_dbref()})
+	# teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+ #        teaches_edited = request.POST.get('teaches_edited','') # check teaches modified or not
+	# if teaches_list !='':
+	# 		teaches_list=teaches_list.split(",")
+ #                        create_grelation_list(page_node._id,"teaches",teaches_list)
+ #        # else:
+        #   relationtype = collection.Node.one({"_type":"RelationType","name":unicode("teaches")})
+        #   collection.remove({"_type":"GRelation","subject":page_node._id,"relation_type":relationtype.get_dbref()})
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:

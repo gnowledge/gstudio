@@ -3,6 +3,9 @@
 import json  
 import datetime
 from operator import itemgetter
+import csv
+import time
+
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -34,11 +37,13 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import STATIC_ROOT, STATIC_URL
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation
+from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
 
@@ -75,288 +80,33 @@ def checkgroup(request,group_name):
         return HttpResponse("failure")    
 
 
-def select_drawer(request, group_id):
-    
-    if request.is_ajax() and request.method == "POST":
-
-        drawer = None
-        drawers = None
-        drawer1 = None
-        drawer2 = None
-        node = None
-        dict_drawer = {}
-        dict1 = {}
-        dict2 = []
-        nlist=[]
-        check = ""
-        checked = ""
-        relationtype = "" 
-
-        selected_collection_list = request.POST.get("collection_list", '')
-        node_id = request.POST.get("node_id", '')
-        page_no = request.POST.get("page_no", '')
-        selection_save = request.POST.get("selection_save", '')
-        field = request.POST.get("field", '')
-        checked = request.POST.get("homo_collection", '')
-
-        if checked:
-          if checked == "QuizObj" :
-            quiz = collection.Node.one({'_type': 'GSystemType', 'name': "Quiz" })
-            quizitem = collection.Node.one({'_type': 'GSystemType', 'name': "QuizItem" })
-
-          elif checked == "Pandora Video":
-            check = collection.Node.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
-
-          else:
-            check = collection.Node.one({'_type': 'GSystemType', 'name': unicode(checked) })
-
-        
-
-        if node_id:
-            node_id = ObjectId(node_id)
-            node = collection.Node.one({'_id': ObjectId(node_id) })            
-            if selected_collection_list:
-              selected_collection_list = [ObjectId(each.strip()) for each in selected_collection_list.split(",")]
-              # print "selected: ", selected_collection_list,"\n"
-
-            if field:
-              if field == "teaches":
-                relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
-                list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
-                for relation in list_grelations:
-                  nlist.append(ObjectId(relation.right_subject))
-              elif field == "assesses":
-                relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
-                list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
-                for relation in list_grelations:
-                  nlist.append(ObjectId(relation.right_subject))
-              elif field == "prior_node":
-                nlist = node.prior_node
-              elif field == "collection":
-                nlist = node.collection_set
-
-
-        else:
-            node_id = None
-
-
-        if selection_save:
-          if field == "collection":
-            if set(nlist) != set(selected_collection_list):              
-              for each in selected_collection_list:
-                if each not in nlist:
-                  collection.update({'_id': node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
-            
-          elif field == "prior_node":    
-            if set(nlist) != set(selected_collection_list):            
-              for each in selected_collection_list:
-                if each not in nlist:
-                  collection.update({'_id': node._id}, {'$push': {'prior_node': ObjectId(each) }}, upsert=False, multi=False)
-
-          elif field == "teaches" or "assesses":
-            if set(nlist) != set(selected_collection_list):
-              create_grelation(node._id,relationtype,selected_collection_list)
-
-          node.reload()
-
-
-        if node_id:
-          if selected_collection_list:
-            if field == "collection":
-              if set(nlist) != set(selected_collection_list):  
-                return HttpResponse("Warning");
-            elif field == "prior_node":
-              if set(nlist) != set(selected_collection_list):            
-                return HttpResponse("Warning");
-            elif field == "teaches" or "assesses":
-              if set(nlist) != set(selected_collection_list):
-                return HttpResponse("Warning");
-
-        
-          if node.collection_set:
-            if checked:              
-              for k in node.collection_set:
-                obj = collection.Node.one({'_id': ObjectId(k) })
-                if check:
-                  if check._id in obj.member_of:
-                    nlist.append(k)
-                else:
-                  if quiz._id in obj.member_of or quizitem._id in obj.member_of:
-                    nlist.append(k)
-
-            else:
-              nlist = node.collection_set
-              if field == "assesses":
-                checked = field
-              checked = None
-
-
-        drawer = get_drawers(group_id, node_id, nlist, checked)
-
-        paged_resources = paginator.Paginator(drawer, page_no, 10)
-
-        drawer.rewind()
-
-        # print "\nnlist: ",nlist,"\n"
-
-        if node_id:
-          
-          for each in paged_resources.items:
-            if each._id != node._id:
-              if each._id not in nlist:  
-                dict1[each._id] = each
-              
-          for oid in nlist: 
-            obj = collection.Node.one({'_id': oid })           
-            dict2.append(obj)            
-          
-          dict_drawer['1'] = dict1
-          dict_drawer['2'] = dict2
-        else:
-          if (node is None) and (not nlist):
-            for each in paged_resources.items:               
-              dict_drawer[each._id] = each          
-
-
-        drawers = dict_drawer
-        if not node_id:
-          drawer1 = drawers
-        else:
-          drawer1 = drawers['1']
-          drawer2 = drawers['2']
-
-
-        if not field:
-          field = "collection"
-        return render_to_response("ndf/drawer_widget.html", 
-                                  {"widget_for": field,"page_info": paged_resources,
-                                   "drawer1": drawer1, 'selection': True, 'node_id':node_id,
-                                   "drawer2": drawer2, 
-                                   "groupid": group_id
-                                  },
-                                  context_instance=RequestContext(request)
-        )
-         
+def terms_list(request, group_id):
   
-
-def search_drawer(request, group_id):
-    
     if request.is_ajax() and request.method == "POST":
-      # print "\ninside search_drawer in ajax_views.py\n"
+      # page number which have clicked on pagination
+      page_no = request.POST.get("page_no", '')
+      terms = []
+      gapp_GST = collection.Node.one({'_type':'MetaType', 'name':'GAPP' })
+      term_GST = collection.Node.one({'_type': 'GSystemType', 'name':'Term', 'member_of':ObjectId(gapp_GST._id) })
 
-      search_name = request.POST.get("search_name", '')
-      node_id = request.POST.get("node_id", '')
-      selection = request.POST.get("selection", '')
-      field = request.POST.get("field", '')
-      # print "search_name: ",search_name,"\n"
-      # print "node_id: ",node_id,"\n"
+      # To list all term instances
+      terms_list = collection.Node.find({'_type':'GSystem','member_of': ObjectId(term_GST._id),
+                                         'group_set': ObjectId(group_id) 
+                                        }).sort('name', 1)
 
-      search_drawer = None
-      drawers = None
-      drawer1 = None
-      drawer2 = None
-      dict_drawer = {}
-      dict1 = {}
-      dict2 = []
-      nlist=[]
-      node = None
-      page_no = 1
-
-      theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-      topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
-      theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
-      forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
-      reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
-
-      if node_id:
-        node = collection.Node.one({'_id': ObjectId(node_id) })
-        node_type = collection.Node.one({'_id': ObjectId(node.member_of[0]) })
-        diff_types = [theme_GST_id ,topic_GST_id, theme_item_GST, forum_GST_id, reply_GST_id]
-
-        if field: 
-          if field == "teaches":
-            relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
-            list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
-            for relation in list_grelations:
-              nlist.append(ObjectId(relation.right_subject))
-
-          elif field == "assesses":
-            relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
-            list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
-            for relation in list_grelations:
-              nlist.append(ObjectId(relation.right_subject))
-
-          elif field == "prior_node":
-            nlist = node.prior_node
-
-          elif field == "collection":
-            nlist = node.collection_set
-
-          node.reload()
-
-        if node_type._id in diff_types:
-          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]},
-                                          'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 
-                                          '$and': [
-                                            {'name': {'$regex': str(search_name), '$options': "i"}},
-                                            {'group_set': {'$all': [ObjectId(group_id)]} }
-                                          ]
-                                        })   
-        
-        else:
-          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
-                                          '$and': [
-                                            {'name': {'$regex': str(search_name), '$options': "i"}},
-                                            {'group_set': {'$all': [ObjectId(group_id)]} }
-                                          ]                                          
-                                        })
-
-      else:
-          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
-                                          '$and': [
-                                            {'name': {'$regex': str(search_name), '$options': "i"}},
-                                            {'group_set': {'$all': [ObjectId(group_id)]} }
-                                          ]                                          
-                                        })      
-
-
-      if node_id:
-        
-        for each in search_drawer:
-          if each._id != node._id:
-            if each._id not in nlist:  
-              dict1[each._id] = each
-            
-        for oid in nlist: 
-          obj = collection.Node.one({'_id': oid })           
-          dict2.append(obj)            
-        
-        dict_drawer['1'] = dict1
-        dict_drawer['2'] = dict2
-
-      else:
-        if (node is None) and (not nlist):
-          for each in search_drawer:               
-            dict_drawer[each._id] = each
-
-
-      drawers = dict_drawer
-      if not node_id:
-        drawer1 = drawers
-      else:
-
-        drawer1 = drawers['1']
-        drawer2 = drawers['2']
+      paged_terms = paginator.Paginator(terms_list, page_no, 25) 
       
-      return render_to_response("ndf/drawer_widget.html", 
-                                {"widget_for": field, 
-                                 "drawer1": drawer1, 'selection': selection,
-                                 "drawer2": drawer2, 'search_name': search_name,
-                                 "groupid": group_id, 'node_id': node_id
-                                },
-                                context_instance=RequestContext(request)
-      )    
-      
+      # Since "paged_terms" returns dict ,we append the dict items in a list to forwarded into template
+      for each in paged_terms.items:
+        terms.append(each)
+
+         
+      return render_to_response('ndf/terms_list.html', 
+                            {'group_id': group_id,'groupid': group_id,"paged_terms": terms, 
+                             'page_info': paged_terms
+                            },context_instance = RequestContext(request)
+      )
+
 
             
 # This ajax view renders the output as "node view" by clicking on collections
@@ -408,7 +158,6 @@ def collection_view(request, group_id):
 
     collection = db[Node.collection_name]
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-    print "\n\n------", node_obj, "\n\n"
 
     breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
     breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
@@ -549,7 +298,7 @@ def drawer_widget(request, group_id):
       if field == "prior_node":
         app = None
         nlist = node.prior_node	       
-        drawer = get_drawers(group_id, node._id, nlist, app)
+        drawer, paged_resources = get_drawers(group_id, node._id, nlist, page_no, app)
 
       elif field == "teaches":
         app = None
@@ -558,7 +307,7 @@ def drawer_widget(request, group_id):
         for relation in list_grelations:
           nlist.append(ObjectId(relation.right_subject))
 
-        drawer = get_drawers(group_id, node._id, nlist, app)
+        drawer, paged_resources = get_drawers(group_id, node._id, nlist, page_no, app)
 
       elif field == "assesses":
         app = field
@@ -567,7 +316,7 @@ def drawer_widget(request, group_id):
         for relation in list_grelations:
           nlist.append(ObjectId(relation.right_subject))
 
-        drawer = get_drawers(group_id, node._id, nlist, app)
+        drawer, paged_resources = get_drawers(group_id, node._id, nlist, page_no, app)
 
       elif field == "collection":
         if app == "Quiz":
@@ -584,7 +333,7 @@ def drawer_widget(request, group_id):
           app = None
 
         nlist = node.collection_set
-        drawer = get_drawers(group_id, node._id, nlist, app)
+        drawer, paged_resources = get_drawers(group_id, node._id, nlist, page_no, app)
         
 
     else:
@@ -600,33 +349,34 @@ def drawer_widget(request, group_id):
         app = None
 
       nlist = []
-      drawer = get_drawers(group_id, None, nlist, app)
+      drawer, paged_resources = get_drawers(group_id, None, nlist, page_no, app)
 
-    paged_resources = paginator.Paginator(drawer, page_no, 10)
+    # paged_resources = paginator.Paginator(drawer, page_no, 10)
+    # drawer.rewind()
 
-    drawer.rewind()
+    # if node_id:
 
-    if node_id:
-
-      for each in paged_resources.items:
-        if each._id != node._id:
-          if each._id not in nlist:  
-            dict1[each._id] = each
+    #   for each in paged_resources.items:
+    #     if each._id != node._id:
+    #       if each._id not in nlist:  
+    #         dict1[each._id] = each
           
-      for oid in nlist: 
-        obj = collection.Node.one({'_id': oid})
-        dict2.append(obj)
+    #   for oid in nlist: 
+    #     obj = collection.Node.one({'_id': oid})
+    #     dict2.append(obj)
       
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
+    #   dict_drawer['1'] = dict1
+    #   dict_drawer['2'] = dict2
 
-    else:
-      if (node is None) and (not nlist):
-        for each in paged_resources.items:               
-          dict_drawer[each._id] = each
+    # else:
+    #   if (node is None) and (not nlist):
+    #     for each in paged_resources.items:               
+    #       dict_drawer[each._id] = each
 
 
-    drawers = dict_drawer
+    # drawers = dict_drawer
+    # print "\n drawer: ", drawer, "\n"
+    drawers = drawer
     if not node_id:
       drawer1 = drawers
     else:
@@ -640,6 +390,287 @@ def drawer_widget(request, group_id):
                               context_instance = RequestContext(request)
     )
 
+
+
+def select_drawer(request, group_id):
+    
+    if request.is_ajax() and request.method == "POST":
+
+        drawer = None
+        drawers = None
+        drawer1 = None
+        drawer2 = None
+        node = None
+        dict_drawer = {}
+        dict1 = {}
+        dict2 = []
+        nlist=[]
+        check = ""
+        checked = ""
+        relationtype = "" 
+
+        selected_collection_list = request.POST.get("collection_list", '')
+        node_id = request.POST.get("node_id", '')
+        page_no = request.POST.get("page_no", '')
+        selection_save = request.POST.get("selection_save", '')
+        field = request.POST.get("field", '')
+        checked = request.POST.get("homo_collection", '')
+
+        if checked:
+          if checked == "QuizObj" :
+            quiz = collection.Node.one({'_type': 'GSystemType', 'name': "Quiz" })
+            quizitem = collection.Node.one({'_type': 'GSystemType', 'name': "QuizItem" })
+
+          elif checked == "Pandora Video":
+            check = collection.Node.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
+
+          else:
+            check = collection.Node.one({'_type': 'GSystemType', 'name': unicode(checked) })
+
+        
+
+        if node_id:
+            node_id = ObjectId(node_id)
+            node = collection.Node.one({'_id': ObjectId(node_id) })            
+            if selected_collection_list:
+              selected_collection_list = [ObjectId(each.strip()) for each in selected_collection_list.split(",")]
+              # print "selected: ", selected_collection_list,"\n"
+
+            if field:
+              if field == "teaches":
+                relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
+                list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+                for relation in list_grelations:
+                  nlist.append(ObjectId(relation.right_subject))
+              elif field == "assesses":
+                relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
+                list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+                for relation in list_grelations:
+                  nlist.append(ObjectId(relation.right_subject))
+              elif field == "prior_node":
+                nlist = node.prior_node
+              elif field == "collection":
+                nlist = node.collection_set
+
+
+        else:
+            node_id = None
+
+
+        if selection_save:
+          if field == "collection":
+            if set(nlist) != set(selected_collection_list):              
+              for each in selected_collection_list:
+                if each not in nlist:
+                  collection.update({'_id': node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
+            
+          elif field == "prior_node":    
+            if set(nlist) != set(selected_collection_list):            
+              for each in selected_collection_list:
+                if each not in nlist:
+                  collection.update({'_id': node._id}, {'$push': {'prior_node': ObjectId(each) }}, upsert=False, multi=False)
+
+          elif field == "teaches" or "assesses":
+            if set(nlist) != set(selected_collection_list):
+              create_grelation(node._id,relationtype,selected_collection_list)
+
+          node.reload()
+
+
+        if node_id:
+          if selected_collection_list:
+            if field == "collection":
+              if set(nlist) != set(selected_collection_list):  
+                return HttpResponse("Warning");
+            elif field == "prior_node":
+              if set(nlist) != set(selected_collection_list):            
+                return HttpResponse("Warning");
+            elif field == "teaches" or "assesses":
+              if set(nlist) != set(selected_collection_list):
+                return HttpResponse("Warning");
+
+        
+          if node.collection_set:
+            if checked:              
+              for k in node.collection_set:
+                obj = collection.Node.one({'_id': ObjectId(k) })
+                if check:
+                  if check._id in obj.member_of:
+                    nlist.append(k)
+                else:
+                  if quiz._id in obj.member_of or quizitem._id in obj.member_of:
+                    nlist.append(k)
+
+            else:
+              nlist = node.collection_set
+              if field == "assesses":
+                checked = field
+              checked = None
+
+
+        drawer, paged_resources = get_drawers(group_id, node_id, nlist, page_no, checked)#get_drawers(group_id, node_id, nlist, checked)
+
+        # paged_resources = paginator.Paginator(drawer, page_no, 10)
+        # drawer.rewind()
+
+        # # print "\nnlist: ",nlist,"\n"
+
+        # if node_id:
+          
+        #   for each in paged_resources.items:
+        #     if each._id != node._id:
+        #       if each._id not in nlist:  
+        #         dict1[each._id] = each
+              
+        #   for oid in nlist: 
+        #     obj = collection.Node.one({'_id': oid })           
+        #     dict2.append(obj)            
+          
+        #   dict_drawer['1'] = dict1
+        #   dict_drawer['2'] = dict2
+        # else:
+        #   if (node is None) and (not nlist):
+        #     for each in paged_resources.items:               
+        #       dict_drawer[each._id] = each          
+
+
+        # drawers = dict_drawer
+        drawers = drawer
+        if not node_id:
+          drawer1 = drawers
+        else:
+          drawer1 = drawers['1']
+          drawer2 = drawers['2']
+
+
+        if not field:
+          field = "collection"
+        return render_to_response("ndf/drawer_widget.html", 
+                                  {"widget_for": field,"page_info": paged_resources,
+                                   "drawer1": drawer1, 'selection': True, 'node_id':node_id,
+                                   "drawer2": drawer2, 
+                                   "groupid": group_id
+                                  },
+                                  context_instance=RequestContext(request)
+        )
+         
+  
+
+def search_drawer(request, group_id):
+    
+    if request.is_ajax() and request.method == "POST":
+
+      search_name = request.POST.get("search_name", '')
+      node_id = request.POST.get("node_id", '')
+      selection = request.POST.get("selection", '')
+      field = request.POST.get("field", '')
+
+      search_drawer = None
+      drawers = None
+      drawer1 = None
+      drawer2 = None
+      dict_drawer = {}
+      dict1 = {}
+      dict2 = []
+      nlist=[]
+      node = None
+      page_no = 1
+
+      theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+      topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
+      theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+      forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
+      reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
+
+      if node_id:
+        node = collection.Node.one({'_id': ObjectId(node_id) })
+        node_type = collection.Node.one({'_id': ObjectId(node.member_of[0]) })
+        diff_types = [theme_GST_id ,topic_GST_id, theme_item_GST, forum_GST_id, reply_GST_id]
+
+        if field: 
+          if field == "teaches":
+            relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
+            list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+            for relation in list_grelations:
+              nlist.append(ObjectId(relation.right_subject))
+
+          elif field == "assesses":
+            relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
+            list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+            for relation in list_grelations:
+              nlist.append(ObjectId(relation.right_subject))
+
+          elif field == "prior_node":
+            nlist = node.prior_node
+
+          elif field == "collection":
+            nlist = node.collection_set
+
+          node.reload()
+
+        if node_type._id in diff_types:
+          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]},
+                                          'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 
+                                          '$and': [
+                                            {'name': {'$regex': str(search_name), '$options': "i"}},
+                                            {'group_set': {'$all': [ObjectId(group_id)]} }
+                                          ]
+                                        })   
+        
+        else:
+          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
+                                          '$and': [
+                                            {'name': {'$regex': str(search_name), '$options': "i"}},
+                                            {'group_set': {'$all': [ObjectId(group_id)]} }
+                                          ]                                          
+                                        })
+
+      else:
+          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
+                                          '$and': [
+                                            {'name': {'$regex': str(search_name), '$options': "i"}},
+                                            {'group_set': {'$all': [ObjectId(group_id)]} }
+                                          ]                                          
+                                        })      
+
+
+      if node_id:
+        
+        for each in search_drawer:
+          if each._id != node._id:
+            if each._id not in nlist:  
+              dict1[each._id] = each
+            
+        for oid in nlist: 
+          obj = collection.Node.one({'_id': oid })           
+          dict2.append(obj)            
+        
+        dict_drawer['1'] = dict1
+        dict_drawer['2'] = dict2
+
+      else:
+        if (node is None) and (not nlist):
+          for each in search_drawer:               
+            dict_drawer[each._id] = each
+
+
+      drawers = dict_drawer
+      if not node_id:
+        drawer1 = drawers
+      else:
+
+        drawer1 = drawers['1']
+        drawer2 = drawers['2']
+      
+      return render_to_response("ndf/drawer_widget.html", 
+                                {"widget_for": field, 
+                                 "drawer1": drawer1, 'selection': selection,
+                                 "drawer2": drawer2, 'search_name': search_name,
+                                 "groupid": group_id, 'node_id': node_id
+                                },
+                                context_instance=RequestContext(request)
+      )    
+      
 
 
 def get_collection_list(collection_list, node):
@@ -1157,7 +1188,7 @@ def create_version_of_module(subject_id,node_id):
                 attr = collection.Triple.one({'_type':'GAttribute','attribute_type.$id':at_version._id,'subject':ObjectId(module_id.right_subject)})
             if attr:
                 attr_versions.append(attr.object_value)
-    print attr_versions,"Test version"
+
     if attr_versions:
         attr_versions.sort()
         attr_ver = float(attr_versions[-1])
@@ -1171,7 +1202,6 @@ def create_version_of_module(subject_id,node_id):
         attr.attribute_type = at_version
         attr.subject = ObjectId(subject_id)
         attr.object_value = 1
-        print "berfore save",attr
         attr.save()
             
 
@@ -1527,7 +1557,7 @@ def get_data_for_batch_drawer(request, group_id):
     for each in batch_coll:
         drawer1.append(each)
     drawer_set1 = set(drawer1) - set(drawer2)
-    print len(drawer_set1),"drawer1-count"
+
     drawer_set2 = drawer2
     for each in drawer_set1:
         dic = {}
@@ -1816,7 +1846,7 @@ def remove_user_from_author_set(request, group_id):
             node.author_set.remove(user_id)
             can_remove = True
             node.save()
-            print node.author_set,"TEst author"
+
             if node.author_set:
                 for each in node.author_set:
                     user_list.append(User.objects.get(id = each))
@@ -1841,7 +1871,7 @@ def get_filterd_user_list(request, group_id):
         if node._type == 'Group':
             for each in node.author_set:
                 user_list.append(User.objects.get(id = each).username)
-        print all_users_list,set(user_list)
+
         filtered_users = list(set(all_users_list) - set(user_list))
         return HttpResponse(json.dumps(filtered_users))
 
@@ -1935,10 +1965,418 @@ def delComment(request, group_id):
   '''
   Delete comment from thread
   '''
-  print "Inside del comments"
   return HttpResponse("comment deleted")
 
-# Views related to STUDIO.TISS =======================================================================================
+# Views related to MIS -------------------------------------------------------------
+
+def get_students(request, group_id):
+  """
+  This view returns list of students along with required data based on selection criteria.
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  """
+  response_dict = {'success': False, 'message': ""}
+  all_students_text = ""
+
+  try:
+    if request.is_ajax() and request.method == "POST":
+      groupid = request.POST.get("groupid", None)
+      app_id = request.POST.get("app_id", None)
+      app_set_id = request.POST.get("app_set_id", None)
+
+      person_gst = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'name': 1, 'type_of': 1})
+
+      widget_for = []
+      person_gs = collection.GSystem()
+      person_gs.member_of.append(person_gst._id)
+      person_gs.get_neighbourhood(person_gs.member_of)
+      rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id'})
+      rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id'})
+      attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id'})
+
+      widget_for = ["name", 
+                    rel_univ._id, 
+                    rel_colg._id, 
+                    attr_deg_yr._id
+                  ]
+                  #   'status'
+                  # ]
+      widget_for = get_widget_built_up_data(widget_for, person_gs)
+
+      # Fetch field(s) from POST object
+      query = {}
+      university_id = None
+      for each in widget_for:
+        field_name = each["name"]
+  
+        if each["_type"] == "BaseField":
+          if request.POST.has_key(field_name):
+            query_data = request.POST.get(field_name, "")
+            query_data = parse_template_data(each["data_type"], query_data)
+            if field_name == "name":
+              query.update({field_name: {'$regex': query_data, '$options': "i"}})
+            else:
+              query.update({field_name: query_data})
+
+        elif each["_type"] == "AttributeType":
+          if request.POST.has_key(field_name):
+            query_data = request.POST.get(field_name, "")
+            query_data = parse_template_data(each["data_type"], query_data)
+            query.update({"attribute_set."+field_name: query_data})
+
+        elif each["_type"] == "RelationType":
+          if request.POST.has_key(field_name):
+            query_data = request.POST.get(field_name, "")
+            query_data = parse_template_data(each["data_type"], query_data, field_instance=each)
+            if field_name == "student_belongs_to_university":
+              university_id = query_data
+            else:
+              query.update({"relation_set."+field_name: query_data})
+
+      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
+      query["member_of"] = student._id
+
+      date_lte = datetime.datetime.strptime("31/12/2014", "%d/%m/%Y")
+      date_gte = datetime.datetime.strptime("1/1/2014", "%d/%m/%Y")
+      query["attribute_set.registration_date"] = {'$gte': date_gte, '$lte': date_lte}
+
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
+
+      # Get selected college's groupid, where given college should belongs to MIS_admin group
+      college_groupid = collection.Node.one({'_id': query["relation_set.student_belongs_to_college"], 'group_set': mis_admin._id, 'relation_set.has_group': {'$exists': True}}, 
+                                            {'relation_set.has_group': 1}
+                                          )
+
+      if college_groupid:
+        for each in college_groupid.relation_set:
+          if "has_group" in each.keys():
+            college_groupid = each["has_group"][0]
+            break
+      else:
+        college_groupid = None
+
+      groupid = ObjectId(groupid)
+      group_set_to_check = []
+      if groupid == college_groupid or groupid == mis_admin._id:
+        # It means group is either a college group or MIS_admin group
+        # In either case append MIS_admin group's ObjectId
+        # and if college_groupid exists, append it's ObjectId too!
+        if college_groupid:
+          group_set_to_check.append(college_groupid)
+        group_set_to_check.append(mis_admin._id)
+
+      else:
+        # Otherwise, append given group's ObjectId
+        group_set_to_check.append(groupid)
+
+      query.update({'group_set': {'$in': group_set_to_check}})
+
+      rec = collection.aggregate([{'$match': query},
+                                  {'$project': {'_id': 0,
+                                                'stud_id': '$_id', 
+                                                'Name': '$name',
+                                                # 'First Name': '$attribute_set.first_name',
+                                                # 'Middle Name': '$attribute_set.middle_name',
+                                                # 'Last Name': '$attribute_set.last_name',
+                                                'Reg# Date': '$attribute_set.registration_date',
+                                                'Gender': '$attribute_set.gender',
+                                                'Birth Date': '$attribute_set.dob',
+                                                'Religion': '$attribute_set.religion',
+                                                'Email ID': '$attribute_set.email_id',
+                                                'Languages Known': '$attribute_set.languages_known',
+                                                'Caste': '$relation_set.student_of_caste_category',
+                                                'Contact Number (Mobile)': '$attribute_set.mobile_number',
+                                                'Alternate Number / Landline': '$attribute_set.alternate_number',
+                                                'House / Street': '$attribute_set.house_street',
+                                                'Village': '$attribute_set.village',
+                                                'Taluka': '$attribute_set.taluka',
+                                                'Town / City': '$attribute_set.town_city',
+                                                'District': '$relation_set.person_belongs_to_district',
+                                                'State': '$relation_set.person_belongs_to_state',
+                                                'Pin Code': '$attribute_set.pin_code',
+                                                'Year of Passing 12th Standard': '$attribute_set.12_passing_year',
+                                                'Degree Name / Highest Degree': '$attribute_set.degree_name',
+                                                'Year of Study': '$attribute_set.degree_year',
+                                                'Stream / Degree Specialization': '$attribute_set.degree_specialization',
+                                                'College Enrolment Number / Roll No': '$attribute_set.college_enroll_num',
+                                                'College ( Graduation )': '$relation_set.student_belongs_to_college',
+                                                'Are you registered for NSS?': '$attribute_set.is_nss_registered'
+                                  }},
+                                  {'$sort': {'Name': 1}}
+            ])
+
+      json_data = []
+      filename = ""
+      column_header = []
+      if len(rec["result"]):
+        for each_dict in rec["result"]:
+          new_dict = {}
+          
+          for each_key in each_dict:
+            if each_dict[each_key]:
+              if type(each_dict[each_key]) == list:
+                data = each_dict[each_key][0]
+              else:
+                data = each_dict[each_key]
+
+              if type(data) == list:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                
+                  elif type(data[0]) in [ObjectId]:
+                    # new_dict[each_key] = str(data)
+                    d_list = []
+                    for oid in data:
+                      d = collection.Node.one({'_id': oid}, {'name': 1})
+                      d_list.append(str(d.name))
+                    new_dict[each_key] = ', '.join(str(n) for n in d_list)
+                
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+                
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+                
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+                
+                else:
+                  new_dict[each_key] = str(data)
+
+              else:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                  elif type(data[0]) in [ObjectId]:
+                    new_dict[each_key] = str(data)
+
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+
+                else:
+                  new_dict[each_key] = str(data)
+
+            else:
+              new_dict[each_key] = ""
+          
+          json_data.append(new_dict)
+
+        # Start: CSV file processing -------------------------------------------
+        column_header = [u'Name', u'Reg# Date', u'Gender', u'Birth Date', u'Religion', u'Email ID', u'Languages Known', u'Caste', u'Contact Number (Mobile)', u'Alternate Number / Landline', u'House / Street', u'Village', u'Taluka', u'Town / City', u'District', u'State', u'Pin Code', u'Year of Passing 12th Standard', u'Degree Name / Highest Degree', u'Year of Study', u'Stream / Degree Specialization', u'College Enrolment Number / Roll No', u'College ( Graduation )', u'Are you registered for NSS?']
+
+        t = time.strftime("%c").replace(":", "_").replace(" ", "_")
+        filename = "csv/" + "student_registration_data_" + t + ".csv"
+        filepath = os.path.join(STATIC_ROOT, filename)
+        filedir = os.path.dirname(filepath)
+
+        if not os.path.exists(filedir):
+          os.makedirs(filedir)
+          
+        with open(filepath, 'wb') as csv_file:
+          fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
+          fw.writerow(dict((col,col) for col in column_header))
+          for row in json_data:
+            v = {}
+            v["stud_id"] = row.pop("stud_id")
+            fw.writerow(row)
+            row.update(v)
+        # End: CSV file processing ----------------------------------------------
+        
+        column_header = ['Name', "Reg# Date", "Gender", "Birth Date", "Email ID", 'stud_id']
+
+        for i, each in enumerate(json_data):
+          data = []
+          for ch in column_header:
+            data.append(each[ch])
+
+          json_data[i] = data
+
+      university = collection.Node.one({'_id': ObjectId(university_id)}, {'name': 1})
+      college = collection.Node.one({'_id': ObjectId(query["relation_set.student_belongs_to_college"])})
+      students_count = len(json_data)
+
+      student_list = render_to_string('ndf/student_data_review.html', 
+                                        {'groupid': groupid, 'app_id': app_id, 'app_set_id': app_set_id, 
+                                         'university': university, 'college': college, 'students_count': students_count, 'half_count': students_count/2,
+                                         'column_header': column_header, 'students_list': json_data, 'filename': filename
+                                        },
+                                        context_instance = RequestContext(request)
+                                    )
+
+      response_dict["success"] = True
+      response_dict["students_data_review"] = student_list
+
+      return HttpResponse(json.dumps(response_dict))
+
+    else:
+      error_message = "StudentFindError: Either not an ajax call or not a POST request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict))
+
+  except OSError as oe:
+    error_message = "StudentFindError: " + str(oe) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
+
+  except Exception as e:
+    error_message = "StudentFindError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
+
+def get_college_wise_students_data(request, group_id):
+  """
+  This view returns a download link of CSV created consisting of students statistical data based on degree_year for each college.
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  download_link - file path of CSV created
+  """
+  response_dict = {'success': False, 'message': ""}
+  all_students_text = ""
+
+  try:
+    if request.is_ajax() and request.method == "GET":
+      groupid = request.GET.get("groupid", None)
+
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
+      college_gst = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+
+      date_lte = datetime.datetime.strptime("31/12/2014", "%d/%m/%Y")
+      date_gte = datetime.datetime.strptime("1/1/2014", "%d/%m/%Y")
+
+      college_cur = collection.Node.find({'member_of': college_gst._id, 'group_set': mis_admin._id}, 
+                                         {'_id': 1, 'name': 1, 'relation_set': 1}).sort('name', 1)
+
+      json_data = []
+      for i, each in enumerate(college_cur):
+        data = {}
+        college_group_id = None
+        for each_dict in each.relation_set:
+          if u"has_group" in each_dict.keys():
+            college_group_id = each_dict["has_group"]
+            break
+
+        rec = collection.aggregate([{'$match': {'member_of': student._id,
+                                                'group_set': {'$in': [college_group_id, mis_admin._id]},
+                                                'relation_set.student_belongs_to_college': each._id,
+                                                'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte}
+                                    }},
+                                    {'$group': {
+                                      '_id': {'College': '$each.name', 'Degree Year': '$attribute_set.degree_year'},
+                                      'No of students': {'$sum': 1}
+                                    }}
+                                  ])
+
+        data["College"] = each.name
+        for res in rec["result"]:
+          data[res["_id"]["Degree Year"][0]] = res["No of students"]
+        if not data.has_key("I"):
+          data["I"] = 0
+        if not data.has_key("II"):
+          data["II"] = 0
+        if not data.has_key("III"):
+          data["III"] = 0
+
+        data["Total"] = data["I"] + data["II"] + data["III"]
+
+        json_data.append(data)
+
+      t = time.strftime("%c").replace(":", "_").replace(" ", "_")
+      filename = "csv/" + "college_wise_student_data_" + t + ".csv"
+      filepath = os.path.join(STATIC_ROOT, filename)
+      filedir = os.path.dirname(filepath)
+
+      if not os.path.exists(filedir):
+        os.makedirs(filedir)
+
+      column_header = [u"College", u"Program Officer", u"I", u"II", u"III", u"Total"]
+
+      PO = {
+        "Agra College": ["Mr. Rajaram Yadav"],
+        "Arts College Shamlaji": ["Mr. Ashish Varia"],
+        "Baba Bhairabananda Mahavidyalaya": ["Mr. Mithilesh Kumar"],
+        "Balugaon College": ["Mr. Pradeep Pradhan"],
+        "City Women's College": ["Ms. Rajni Sharma"],
+        "Comrade Godavari Shamrao Parulekar College of Arts, Commerce & Science": ["Mr. Rahul Sable"],
+        "Faculty of Arts": ["Mr. Jokhim", "Ms. Tusharika Kumbhar"],
+        "Gaya College":  ["Ms. Rishvana Sheik"],
+        "Govt. M. H. College of Home Science & Science for Women, Autonomous": [], 
+        "Govt. Mahakoshal Arts and Commerce College": ["Ms. Davis Yadav"],
+        "Govt. Mahaprabhu Vallabhacharya Post Graduate College": ["Mr. Gaurav Sharma"],
+        "Govt. Rani Durgavati Post Graduate College": ["Mr. Asad Ullah"],
+        "Jamshedpur Women's College": ["Mr. Arun Agrawal"],
+        "Kalyan Post Graduate College": ["Mr. Praveen Kumar"],
+        "Kamla Nehru College for Women": ["Ms. Tusharika Kumbhar", "Ms. Thaku Pujari"],
+        "L. B. S. M. College": ["Mr. Charles Kindo"],
+        "Mahila College": ["Mr. Sonu Kumar"],
+        "Marwari College": ["Mr. Avinash Anand"],
+        "Matsyodari Shikshan Sanstha's Arts, Commerce & Science College": ["Ms. Jyoti Kapale"],
+        "Ranchi Women's College": ["Mr. Avinash Anand"],
+        "Shiv Chhatrapati College": ["Mr. Swapnil Sardar"],
+        "Shri & Smt. PK Kotawala Arts College": ["Mr. Sawan Kumar"],
+        "Shri VR Patel College of Commerce": ["Mr. Sushil Mishra"],
+        "Sree Narayana Guru College of Commerce": ["Ms. Bharti Bhalerao"],
+        "Sri Mahanth Shatanand Giri College": ["Mr. Narendra Singh"],
+        "St. John's College": ["Mr. Himanshu Guru"],
+        "The Graduate School College For Women": ["Mr. Pradeep Gupta"],
+        "Vasant Rao Naik Mahavidyalaya": ["Mr. Dayanand Waghmare"],
+        "Vivekanand Arts, Sardar Dalip Singh Commerce & Science College": ["Mr. Anis Ambade"]
+      }
+
+      with open(filepath, 'wb') as csv_file:
+        fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
+        fw.writerow(dict((col,col) for col in column_header))
+        for row in json_data:
+          row[u"Program Officer"] = ", ".join(PO[row[u"College"]])
+          fw.writerow(row)
+
+      response_dict["success"] = True
+      response_dict["download_link"] = (STATIC_URL + filename)
+      return HttpResponse(json.dumps(response_dict))
+
+    else:
+      error_message = "CollegeSummaryDataError: Either not an ajax call or not a POST request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict))
+
+  except OSError as oe:
+    error_message = "CollegeSummaryDataError: " + str(oe) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
+
+  except Exception as e:
+    error_message = "CollegeSummaryDataError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
 
 def set_user_link(request, group_id):
   """
@@ -2021,7 +2459,7 @@ def set_enrollment_code(request, group_id):
   """
   """
   if request.is_ajax() and request.method == "POST":
-    print "\n From set_enrollment_code... \n"
+
     return HttpResponse("Five digit code")
 
   else:
@@ -2048,16 +2486,11 @@ def get_students_assignments(request, group_id):
       # Fetching college group
       college_group = collection.Node.one({'_id': ObjectId(group_id)}, {'name': 1, 'tags': 1, 'author_set': 1, 'created_by': 1})
       page_res = collection.Node.one({'_type': "GSystemType", 'name': "Page"}, {'_id': 1})
-      # print "\n page_res: ", page_res._id
       file_res = collection.Node.one({'_type': "GSystemType", 'name': "File"}, {'_id': 1})
-      # print " file_res: ", file_res._id
       image_res = collection.Node.one({'_type': "GSystemType", 'name': "Image"}, {'_id': 1})
-      # print " image_res: ", image_res._id
       video_res = collection.Node.one({'_type': "GSystemType", 'name': "Video"}, {'_id': 1})
-      # print " video_res: ", video_res._id
 
       student_list = []
-      # print " college_group (author_set): ", college_group.author_set, "\n"
 
       if user_id:
         # Fetch assignment details of a given student
@@ -2088,13 +2521,9 @@ def get_students_assignments(request, group_id):
             num_files.append(res)
 
         student_dict["Pages"] = num_pages
-        # print "\n student_dict['Pages']: ", student_dict["Pages"], "\n"
         student_dict["Images"] = num_images
-        # print "\n student_dict['Images']: ", student_dict["Images"], "\n"
         student_dict["Videos"] = num_videos
-        # print "\n student_dict['Videos']: ", student_dict["Videos"], "\n"
         student_dict["Files"] = num_files
-        # print "\n student_dict['Files']: ", student_dict["Files"], "\n"
 
         return HttpResponse(json.dumps(student_dict, cls=NodeJSONEncoder))
 
@@ -2116,7 +2545,6 @@ def get_students_assignments(request, group_id):
           # Fetch student's node from his/her has_login relationship
           student_has_login_rel = collection.Node.one({'_type': "GRelation", 'right_subject': user_group._id})
           student_node = collection.Node.one({'_id': student_has_login_rel.subject}, {'name': 1})
-          # print " student_node: ", student_node.name
           student_dict["Name"] = student_node.name
           student_dict["user_id"] = user_id
 
@@ -2142,7 +2570,6 @@ def get_students_assignments(request, group_id):
           student_dict["Files"] = num_files
           student_dict["Total"] = num_pages + num_images + num_videos + num_files
 
-          # print "\n student_dict: ", student_dict
           student_list.append(student_dict)
 
         # Outside of above for loop
@@ -2216,21 +2643,64 @@ def get_districts(request, group_id):
     error_message = "\n DistrictFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
-# ====================================================================================================
+def get_affiliated_colleges(request, group_id):
+  """
+  This view returns list of colleges affiliated to given university.
 
-def edit_task_title(request, group_id):
-    '''
-    This function will edit task's title 
-    '''
-    if request.is_ajax() and request.method =="POST":
-        taskid = request.POST.get('taskid',"")
-        title = request.POST.get('title',"")
-	task = collection.Node.find_one({'_id':ObjectId(taskid)})
-        task.name = title
-	task.save()
-        return HttpResponse(task.name)
-    else:
-	raise Http404
+  Each element of the list is again a list where,
+  0th index-element: ObjectId of college
+  1st index-element: Name of college
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  affiliated_colleges - List consisting of affiliated colleges (ObjectIds & names)
+  """
+  response_dict = {'success': False, 'message': ""}
+  all_students_text = ""
+
+  try:
+    if request.is_ajax() and request.method == "GET":
+      # Fetch field(s) from GET object
+      university_id = request.GET.get("university_id", "")
+      req_university = None
+      req_affiliated_colleges = None
+
+      # Check whether any field has missing value or not
+      if university_id == "":
+        error_message = "AffiliatedCollegeFindError: Invalid data (No university selected)!!!"
+        raise Exception(error_message)
+
+      # Type-cast fetched field(s) into their appropriate type
+      university_id = ObjectId(university_id)
+
+      # Fetch required university
+      req_university = collection.Node.one({'_id': university_id})
+
+      if not req_university:
+        error_message = "AffiliatedCollegeFindError: No university exists with given ObjectId("+university_id+")!!!"
+        raise Exception(error_message)
+
+      for each in req_university["relation_set"]:
+        if u"affiliated_college" in each.keys():
+          req_affiliated_colleges = collection.Node.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
+      
+      req_affiliated_colleges_list = []
+      for each in req_affiliated_colleges:
+        req_affiliated_colleges_list.append([str(each._id), each.name])
+
+      response_dict["affiliated_colleges"] = req_affiliated_colleges_list
+
+      response_dict["success"] = True
+      response_dict["message"] = "This university ("+req_university.name+") has following list of affiliated colleges:"
+      for i, each in enumerate(req_affiliated_colleges_list):
+        response_dict["message"] += "\n\n " + str(i+1) + ". " + each[1]
+
+      return HttpResponse(json.dumps(response_dict))
 
 def edit_task_content(request, group_id):
     '''
@@ -2249,9 +2719,7 @@ def edit_task_content(request, group_id):
 	task.save()
         return HttpResponse(task.content)
     else:
-	raise Http404
-
-# =============================================================================
+        raise Http404
 
 def get_announced_courses(request, group_id):
   """
@@ -2444,7 +2912,7 @@ def get_anncourses_allstudents(request, group_id):
         error_message = "Invalid data: No data found in any of the field(s)!!!"
         raise Exception(error_message)
 
-      # Fetch "Announced Course" GSystemType
+      # Fetch "MIS_admin" Group
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
       if not mis_admin:
         # If not found, throw exception
@@ -2529,28 +2997,37 @@ def get_anncourses_allstudents(request, group_id):
 
       if all_students == u"true":
         all_students_text = "All students (including enrolled ones)"
+
         res = collection.Node.find({'member_of': student._id, 
                                       'group_set': {'$in': groups_to_search_from},
                                       'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
                                       'attribute_set.degree_year': degree_year
                                     },
-                                    {'_id': 1,'name': 1}
-                                  )
+                                    {'_id': 1,'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+                                  ).sort("name", 1)
         all_students_text += " [Count("+str(res.count())+")]"
-        drawer_template_context = edit_drawer_widget("", group_id, None, list(res))
+        # drawer_template_context = edit_drawer_widget("", group_id, None, list(res))
+        # page_no = 1
+        checked = "student_enroll"
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, None, page_no, checked, left_drawer_content=res)
 
       elif all_students == u"false":
         all_students_text = "Only non-enrolled students"
+
         res = collection.Node.find({'member_of': student._id, 
                                       'group_set': {'$in': groups_to_search_from},
                                       'relation_set.selected_course': {'$exists': False},
                                       'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
                                       'attribute_set.degree_year': degree_year
                                     },
-                                    {'_id': 1,'name': 1}
-                                  )
+                                    {'_id': 1,'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+                                  ).sort("name", 1)
         all_students_text += " [Count("+str(res.count())+")]"
-        drawer_template_context = edit_drawer_widget("", group_id, None, list(res))
+        checked = "student_enroll"
+        # drawer_template_context = edit_drawer_widget("RelationType", group_id, None, page_no, checked, left_drawer_content=res)
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, checked=checked, left_drawer_content=res)
+
+      print "\n drawer_template_context: ", drawer_template_context, "\n"
 
       drawer_template_context["widget_for"] = "student_enroll"
       drawer_widget = render_to_string('ndf/drawer_widget.html', 
@@ -2575,3 +3052,40 @@ def get_anncourses_allstudents(request, group_id):
     error_message = "EnrollInCourseError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
+
+# ====================================================================================================
+
+def edit_task_title(request, group_id):
+    '''
+    This function will edit task's title 
+    '''
+    if request.is_ajax() and request.method =="POST":
+        taskid = request.POST.get('taskid',"")
+        title = request.POST.get('title',"")
+	task = collection.Node.find_one({'_id':ObjectId(taskid)})
+        task.name = title
+	task.save()
+        return HttpResponse(task.name)
+    else:
+	raise Http404
+
+def edit_task_content(request, group_id):
+    '''
+    This function will edit task's title 
+    '''
+    if request.is_ajax() and request.method =="POST":
+        taskid = request.POST.get('taskid',"")
+        content_org = request.POST.get('content_org',"")
+	task = collection.Node.find_one({'_id':ObjectId(taskid)})
+        task.content_org = unicode(content_org)
+    
+  	# Required to link temporary files with the current user who is modifying this document
+    	usrname = request.user.username
+    	filename = slugify(task.name) + "-" + usrname + "-"
+    	task.content = org2html(content_org, file_prefix=filename)
+	task.save()
+        return HttpResponse(task.content)
+    else:
+	raise Http404
+
+# =============================================================================

@@ -9,25 +9,23 @@
                     <li>It searches all the public resources for the keywords provided.</li>
                     <li>Search by name, tags, contents and on specific users. </li>
               </ul><br>
-          <li> <strong>Advanced Search </strong><br> 
-              <ul>
-                    <li>It allows you to apply a lot more filters on the data than simple keyword search.</li>
-                    <li>You can search over any attributes.</li>
-              </ul><br>
-          <li> <strong>Graph Search</strong>
-                <ul>
-                    <li> Built for natural language queries like <br><i>"Students of teacher X"</i></li>
-                    <li> As you enter search query you are provided <i>auto-suggestions.</i></li>
-                    <li> Click the suggestion for auto-fill </li> 
                 </ul>
-          </li>
-      </ul>
 
     </div>
 {% endblock %}
 
 {% block body_content %} 
 
+<hr>
+			<h3>Results</h3>
+			<div id="results" width="100%" style="position:relative">
+			
+			</div>
+
+<div id="pages">
+  
+</div>
+<hr>
 <dl class="accordion" data-accordion>
     <dd class="accordion-navigation" data-options="deep_linking:true">
           <a href="#panel1">Search</a>
@@ -54,102 +52,11 @@
                         <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" />
                       </form>
 		
-			<hr>
-			<h3>Results</h3>
-			<div id="results" width="100%" style="position:relative">
-			
-			</div>
-			
+						
           </div>
 		
     </dd>
-    <dd class="accordion-navigation"  >
-        <a href="#panel2">Advanced Search</a>
-        <div id="panel2" class="content" >
-                        <!-- <h3>Advanced Search</h3> -->
-
-                        <form name="search_form" method="GET" action="{% url 'advanced_search_results' groupid %}">
-                        {% csrf_token %}
-                        Enter the value to be searched:
-                        <input type="text" name="search_text" id="search_text" required>
-                        <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
-                                <li>
-                                      <h5> Select groups: </h5>
-                                      <select multiple id="Groups" name="Groups" style="height:100px" >
-                                        <option value='all' selected='true'>All Groups</option>
-                                        {% for gr in allGroups %}
-                                        <option value='{{ gr }}'> {{ gr }} </option>
-                                        {% endfor %}
-                                      </select>
-                                </li>
-
-                                <li>
-                                      <h5> Select authors: </h5>
-                                      <select multiple id="Users" name="Users" style="height:100px" >
-                                        <option value='all' selected='true'>All Authors</option>
-                                        {% for us in allUsers %}
-                                        <option value='{{ us }}'> {{ us }} </option>
-                                        {% endfor %}
-                                      </select>
-                                </li>
-
-                                <li>
-                                      <h5> Select categories: </h5>
-                                      <select multiple id="GSystems" name="GSystems" style="height:100px" required>
-                                        {% for gs in allGSystems %}
-                                        <option value='{{ gs }}'> {{ gs }} </option>
-                                        {% endfor %}
-                                      </select>
-                                </li>
-                                <li>
-                                      <h5> Select attributes: <img src="/static/ndf/images/refresh.png" style="cursor:pointer" height="20px" width="20px" id="refreshAttr" alt="refresh"></img></h5>
-                                      <select multiple id="attribs" name="attribs" style="height:100px" required>
-
-                                      </select>
-                                </li>
-                        </ul>
-                        <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" />
-                      </form>
-			
-			<hr>
-			<h3>Results</h3>
-			<div id="resultsadv"   width="100%" style="position:relative">
-			
-			</div>
-	</div>		
-	
-    </dd>
-    <dd class="accordion-navigation"  >
-      <a href="#panel3">Graph Search</a>
-      <div id="panel3" class="content">
-
-            <form name="search_form" action="{% url 'ra_search_results' groupid %}" method="GET" >
-              {% csrf_token %}
-              Enter the value to be searched:
-              <input type="text" name="search_text" id="search_text_rel" list="datalist1" required>
-              <input type="submit" class="button" value="Submit"></input>  
-              <div id="suggestions" >
-              </div>
-            </form>
-
-    </dd>
-    <dd class="accordion-navigation" hidden >
-      <a href="#panel4">Semantic Search</a>
-      <div id="panel4" class="content">
-        <h6><i>(Under Construction)</i></h6>
-
-          <form name="search_form" method="GET" action="{% url 'get_nearby_words' groupid %}">
-            {% csrf_token %}
-            Enter the value to be searched:
-            <input type="text" name="search_text" id="search_text" required ></input>
-            <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" ></input>
-          </form>
-        
-    </dd>
 </dl>
-<div id="pages">
-  
-</div>
 <script>
   /********************************************************************************
   THIS SCRIPT EXTRACTS THE GET VARIABLES FROM THE URL AND CONVERTS IT INTO A DICTIONARY - "VARS"  
@@ -380,7 +287,7 @@
                 card_html += '<div class="label-list">';
                 
                 card_html += '</div>';
-          
+          	card_html += '<a href=' + GSystem_link + ' target="_blank"> ';
                 card_html += '<h4>'+name;
                   card_html += '<div>';
                     card_html += '<small class="subheader">';
@@ -392,9 +299,10 @@
                 card_html += '</h4>';
             card_html += '</header>';
 
-            card_html += '<a href=' + GSystem_link + ' class="button expand" target="_blank">View details</a>';
+            
       
           card_html += '</div>';
+		card_html += '</a>';
         card_html += '</li>';
 
       return card_html;  

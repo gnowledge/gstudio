@@ -19,7 +19,6 @@
       <input class="button cancelDeleteObjects" type="button" value="Cancel">
       <div id="deletion_results"></div>
       <a class="close-reveal-modal"> &#215;</a>
-
     </div>
 
     <div id="linkModal" class="reveal-modal small" data-reveal>
@@ -74,11 +73,15 @@
           {% if gstaff_access %}
           <th>Edit</th>
 
-          <!-- <th>Confirmation status</th> -->
+          {% comment %}
+          <!--
+          <th>Confirmation status</th>
 
           {% if is_link_needed %}
           <th>Link to User A/C</th>
           {% endif %}
+          -->
+          {% endcomment %}
 
           {% endif %}
       </tr>
@@ -112,12 +115,14 @@
           </td>
           {% endif %}
 
-<!--           <td>
+          {% comment %}
+          <!--
+          <td>
             <div id="enrollement_code_{{each.pk}}">
             <a href="#" class="button small enrollment_code" onclick="get_enrollment_code('{{each.pk}}')">Confirm</a>
             </div>
           </td>
- -->
+
           {% if is_link_needed %}
           {% check_node_linked each.pk as is_linked %}
           <td style="font-size:11px;">
@@ -128,6 +133,8 @@
             />
           </td>
           {% endif %}
+          -->
+          {% endcomment %}
 
           <!-- endif of GStaff members -->
           {% endif %}
@@ -148,245 +155,268 @@
   {% endif %}
 
   {% paginate %}
-
 {% endblock %}
 
 {% block script %}
-// <script type="text/javascript">
+  {{block.super}}
 
-$(document).on('click',".checkedAll",function(){
-  if($(this).is(":checked")==true){
-    $('.objectsCheckbox input').prop( "checked", true );
-  }
-  else{
-    $('.objectsCheckbox input').prop( "checked", false );
-  }
-});
-
-$(document).on('click',".button.confirmDeleteObjects",function(){
-  var selectedobject = $(".objectsCheckbox input:checked")
-  $('#myModal').foundation('reveal', 'open');
-       // $('#myModal').foundation('reveal', 'close');
-       if(selectedobject.length > 0){
-         var i = 0;
-         var str = "";  
-         $.map(selectedobject,function(each){
-          if(i == 0){str = str.concat(each.parentElement.id)}
-            else {str = str.concat(","+each.parentElement.id)}
-              i= i+1
-          })
-
-         $.ajax({
-           url: "{% url 'deletion_instances' groupid %}",
-           type: 'POST',
-           data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"},
-           beforeSend: function() {     },
-           success: function(result){
-           },
-           complete: function(){ 
-            $('#myModal').foundation('reveal', 'close');
-          }
-        });
-         
-         $.map(selectedobject,function(each){
-          each.parentElement.parentElement.remove()
-        })
-         $('#myModal').foundation('reveal', 'close');
-
-         
-       }
-       else{
-        alert("select object to delete")
-      }
-
-    });
-
-$(document).on('click',".button.deleteObjects",function(){
-  var selectedobject = $(".objectsCheckbox input:checked")
-       // $('#myModal').foundation('reveal', 'close');
-       if(selectedobject.length > 0){
-         $('#myModal').foundation('reveal', 'open');
-
-//             var confirmed = confirm("Deleting "+selectedobject.length+" objects");
-//             if(confirmed == true){
- var i = 0;
- var str = "";  
- $.map(selectedobject,function(each){
-  if(i == 0){str = str.concat(each.parentElement.id)}
-    else {str = str.concat(","+each.parentElement.id)}
-      i= i+1
-  })
-
- $.ajax({
-   url: "{% url 'deletion_instances' groupid %}",
-   type: 'POST',
-   data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
-   beforeSend: function() {     },
-   success: function(result){
-    $("#deletion_results").html("");
-    for(var obj in result){
-      var ulist = $("<ul>"+"</ul>")
-      .attr("id","conceptlist")
-      .appendTo($("#deletion_results"));
-      var li = $("<li><b>"+result[obj].title+"</b></li>")
-      .appendTo(ulist);
-      var ulist1 = $("<ul>"+"</ul>")
-      .attr("id","conceptlist")
-      .appendTo(li);
-      for(var obj2 in result[obj].content){
-        object = result[obj].content[obj2]
-        for(var obj3 in  object){
-          for(var each in object[obj3]){
-            var li1 = $("<li>"+object[obj3][each]+"</li>")
-            .appendTo(ulist1);
-          }}
-        }
-      }
-
-    },
-    complete: function(){   }
-  });
-  //           }
-}
-else{
-  alert("select object to delete")
-}
-
-});
-
-$(document).on('click',".button.cancelDeleteObjects",function(){
- $('#myModal').foundation('reveal', 'close');
-});
-
-// ========================================================================================
-
-/*
- *  Code regarding "Link" button & its reveal-modal (id: linkModal)
-
-    + linkModal consists of 
-      - text-box: link_to (id)
-      - button: link_to_ac (class)
- */
-var link_username = ""
-var parent_link_button = ""
-var is_linked = false
-
-$(".link").click(function() {
-  /*
-   * Stores the current clicked button object from given list of "Link" buttons
-   */
-  parent_link_button = $(this);
-});
-
-$("#link_to").bind("keyup keypress onmouseup blur change", function() {
-  /*
-   * Changes state (disabled/enabled) of "Link to User A/C" button (class: link_to_ac) 
-   * depending on whether text-box (id: link_to) having some input or not
-   */
-  link_username = $("#link_to").val().trim()
-
-  if (link_username != "") {
-    if ($(".link_to_ac").attr("disabled")) {
-      $(".link_to_ac").removeAttr('disabled');
+  $(document).on('click', ".checkedAll", function() {
+    if($(this).is(":checked")==true){
+      $('.objectsCheckbox input').prop( "checked", true );
     }
-  }
+    else{
+      $('.objectsCheckbox input').prop( "checked", false );
+    }
+  });
 
-  else {
-    if (!$(".link_to_ac").attr("disabled")) {
+  $(document).on('click', ".button.confirmDeleteObjects", function() {
+    var selectedobject = $(".objectsCheckbox input:checked")
+    $('#myModal').foundation('reveal', 'open');
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      var i = 0;
+      var str = "";
+      
+      $.map(selectedobject, function(each) {
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+        
+        i = i+1
+      })
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"},
+        
+        beforeSend: function() {},
+        
+        success: function(result) {
+        },
+      
+        complete: function() { 
+          $('#myModal').foundation('reveal', 'close');
+        }
+      });
+       
+      $.map(selectedobject,function(each) {
+        each.parentElement.parentElement.remove()
+      });
+      
+      $('#myModal').foundation('reveal', 'close');
+    }
+
+    else {
+      alert("select object to delete");
+    }
+  });
+
+  $(document).on('click',".button.deleteObjects",function(){
+    var selectedobject = $(".objectsCheckbox input:checked");
+    // $('#myModal').foundation('reveal', 'close');
+    
+    if(selectedobject.length > 0) {
+      $('#myModal').foundation('reveal', 'open');
+
+      // var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+      // if(confirmed == true){
+   
+      var i = 0;
+      var str = "";  
+   
+      $.map(selectedobject,function(each) {
+        if(i == 0) {
+          str = str.concat(each.parentElement.id)
+        }
+        else {
+          str = str.concat(","+each.parentElement.id)
+        }
+        
+        i= i+1;
+      });
+
+      $.ajax({
+        url: "{% url 'deletion_instances' groupid %}",
+        type: 'POST',
+        data: {deleteobjects:str, csrfmiddlewaretoken: '{{ csrf_token }}'},
+        
+        beforeSend: function() {},
+        
+        success: function(result) {
+          $("#deletion_results").html("");
+          
+          for(var obj in result){
+            var ulist = $("<ul>"+"</ul>")
+            .attr("id","conceptlist")
+            .appendTo($("#deletion_results"));
+            
+            var li = $("<li><b>"+result[obj].title+"</b></li>")
+            .appendTo(ulist);
+            
+            var ulist1 = $("<ul>"+"</ul>")
+            .attr("id","conceptlist")
+            .appendTo(li);
+            
+            for(var obj2 in result[obj].content) {
+              object = result[obj].content[obj2]
+              for(var obj3 in  object) {
+                for(var each in object[obj3]) {
+                  var li1 = $("<li>"+object[obj3][each]+"</li>")
+                  .appendTo(ulist1);
+                }
+              }
+            }
+          }
+        },
+
+        complete: function() {}
+      });
+      
+      // }
+    }
+    
+    else {
+      alert("select object to delete");
+    }
+  });
+
+  $(document).on('click',".button.cancelDeleteObjects",function(){
+    $('#myModal').foundation('reveal', 'close');
+  });
+
+  // ========================================================================================
+
+  /*
+   *  Code regarding "Link" button & its reveal-modal (id: linkModal)
+
+      + linkModal consists of 
+        - text-box: link_to (id)
+        - button: link_to_ac (class)
+   */
+  var link_username = ""
+  var parent_link_button = ""
+  var is_linked = false
+
+  $(".link").click(function() {
+    /*
+     * Stores the current clicked button object from given list of "Link" buttons
+     */
+    parent_link_button = $(this);
+  });
+
+  $("#link_to").bind("keyup keypress onmouseup blur change", function() {
+    /*
+     * Changes state (disabled/enabled) of "Link to User A/C" button (class: link_to_ac) 
+     * depending on whether text-box (id: link_to) having some input or not
+     */
+    link_username = $("#link_to").val().trim()
+
+    if (link_username != "") {
+      if ($(".link_to_ac").attr("disabled")) {
+        $(".link_to_ac").removeAttr('disabled');
+      }
+    }
+
+    else {
+      if (!$(".link_to_ac").attr("disabled")) {
+        $(".link_to_ac").attr("disabled", "disabled")
+      }
+    }
+  });
+
+  $(".link_to_ac").click(function() {
+    /*
+     *  On click of "Link to User A/C" button
+        + Retrieves 
+          - ObjectId of node from parent ("Link") button's id attribute 
+          - Username from text-box
+
+        + Ajax call made to "set_user_link" url
+          + Parameters passed
+            - ObjectId of group (groupid) via url
+            - ObjectId of node (node_id) via POST request
+            - Username entered (username) via POST request
+
+        + Depending on the result of the ajax call, label of parent button is modified:
+          - If successful, Linked.
+          - Else, it remains as Link only!
+     */
+
+    link_node_id = parent_link_button.attr('id').slice(5)  // remove "link_" from given id
+    link_username = $("#link_to").val()
+
+    $.ajax({
+      url:"{% url 'set_user_link' groupid %}",
+
+      data: {
+        node_id: link_node_id,
+        username: link_username,
+        csrfmiddlewaretoken: "{{csrf_token}}"
+      },
+
+      type: "POST",
+
+      dataType: "json",
+
+      complete: function () {
+        $('#linkModal').foundation('reveal', 'close');
+      },
+
+      success: function (data) {
+        is_linked = data["result"]
+        alert(data["message"])
+
+        if (is_linked) {
+          parent_link_button.attr("disabled", "disabled")
+          parent_link_button.val("Linked");
+        }
+
+      }
+    });
+  });
+
+  $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+    /*
+     *  On closing of reveal-modal
+        - Clear text-box (id: link_to)
+        - Disable "Link to User A/C" button
+     */
+    $("#link_to").val("")
+
+    if (is_linked) {
       $(".link_to_ac").attr("disabled", "disabled")
     }
-  }
-});
+  });
 
-$(".link_to_ac").click(function() {
-  /*
-   *  On click of "Link to User A/C" button
-      + Retrieves 
-        - ObjectId of node from parent ("Link") button's id attribute 
-        - Username from text-box
+  // ========================================================================================
 
-      + Ajax call made to "set_user_link" url
-        + Parameters passed
-          - ObjectId of group (groupid) via url
-          - ObjectId of node (node_id) via POST request
-          - Username entered (username) via POST request
+  function get_enrollment_code(node_id) {
+    alert("node_id: " + node_id)
 
-      + Depending on the result of the ajax call, label of parent button is modified:
-        - If successful, Linked.
-        - Else, it remains as Link only!
-   */
+    $.ajax({
+      url:"{% url 'set_enrollment_code' groupid %}",
 
-  link_node_id = parent_link_button.attr('id').slice(5)  // remove "link_" from given id
-  link_username = $("#link_to").val()
+      data: {
+        node_id: node_id,
+        csrfmiddlewaretoken: "{{csrf_token}}"
+      },
 
-  $.ajax({
-    url:"{% url 'set_user_link' groupid %}",
+      type: "POST",
 
-    data: {
-      node_id: link_node_id,
-      username: link_username,
-      csrfmiddlewaretoken: "{{csrf_token}}"
-    },
+      dataType: "html",
 
-    type: "POST",
+      success: function(data) {
+        $("#enrollement_code_"+node_id).html("Enrollment Code: <br><b>"+data+"</b>")
+      },
 
-    dataType: "json",
-
-    complete: function () {
-      $('#linkModal').foundation('reveal', 'close');
-    },
-
-    success: function (data) {
-      is_linked = data["result"]
-      alert(data["message"])
-
-      if (is_linked) {
-        parent_link_button.attr("disabled", "disabled")
-        parent_link_button.val("Linked");
+      error: function(data) {
+        alert("EnrollementCodeError: Either not an ajax call or not a POST request!!!")
       }
-
-    }
-  });
-});
-
-$(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
-  /*
-   *  On closing of reveal-modal
-      - Clear text-box (id: link_to)
-      - Disable "Link to User A/C" button
-   */
-  $("#link_to").val("")
-
-  if (is_linked) {
-    $(".link_to_ac").attr("disabled", "disabled")
+    });
   }
-});
-
-// ========================================================================================
-
-function get_enrollment_code(node_id) {
-  alert("node_id: " + node_id)
-
-  $.ajax({
-    url:"{% url 'set_enrollment_code' groupid %}",
-
-    data: {
-      node_id: node_id,
-      csrfmiddlewaretoken: "{{csrf_token}}"
-    },
-
-    type: "POST",
-
-    dataType: "html",
-
-    success: function(data) {
-      $("#enrollement_code_"+node_id).html("Enrollment Code: <br><b>"+data+"</b>")
-    },
-
-    error: function(data) {
-      alert("EnrollementCodeError: Either not an ajax call or not a POST request!!!")
-    }
-  });
-}
-// </script>
 {% endblock %}  

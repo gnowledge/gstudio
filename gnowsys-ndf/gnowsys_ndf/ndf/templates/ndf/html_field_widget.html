@@ -1,7 +1,6 @@
 {% load ndf_tags %}
 {% load i18n %}
 
-<!-- {{field.name}} -- {{field_type}} -->
 <!-- Base fields / AttributeType fields -->
 {% if is_base_field or is_attribute_field %}
   {% if is_special_field %}
@@ -26,7 +25,7 @@
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     {% endif %}
-    <small class="error">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
     {% endif %}
 
   {% elif field.validators.0 == "tel" %}
@@ -41,7 +40,7 @@
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     {% endif %}
-    <small class="error">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
     {% endif %}
 
   {% elif field_type == "unicode" or field_type == "basestring" %}
@@ -56,7 +55,7 @@
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     {% endif %}
-    <small class="error">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
+    <small class="error{% if not is_required_field %} non-required{% endif %}">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
     {% endif %}
 
   {% elif field_type == "int" or field_type == "float" or field_type == "long" %}
@@ -172,7 +171,6 @@
 
   {% endif %}
 
-
 <!-- RelationType fields -->
 {% elif is_relation_field %}
   {% if field.object_cardinality == 1 %}
@@ -208,7 +206,7 @@
   <div id="{{field.name}}_modal" class="reveal-modal xlarge" style="height: 90% !important" data-reveal>
     <div id="{{field.name}}_drawer">
       <h3>{% trans "Select" %} {{field.altnames}} </h3>
-      {% edit_drawer_widget field.name groupid node_dict field_value_choices %}
+      {% edit_drawer_widget "RelationType" groupid node_dict checked=field.name left_drawer_content=field_value_choices %}
     </div>
     <a class="close-reveal-modal">&#215;</a>
   </div>

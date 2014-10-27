@@ -15,127 +15,118 @@
 
   <title>metaStudio - {% block title %} {% endblock %} </title>	
 
-  <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> <!-- checked -->
+  <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> 
 
   <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
-  <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> <!-- checked -->
-  <link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
+  <link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> 
 
-    
   <!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
-  <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> 
     
   <!-- Open Source webfonts for better typography -->
-  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
-<!--    <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>-->
+  <!-- <link rel="stylesheet" href="/static/ndf/css/open-sans-normal-font.css"> -->
+  <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'> -->
+  <!-- <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>-->
 
   <!-- Modernizr - Browser detection JS http://modernizr.com/ -->
-  <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script> 
 
   <!-- jQuery -->
-  <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> 
   <script src="/static/ndf/bower_components/jquery-legacy/jquery.min.js"> </script>
-  
-  <!--  <script src="/static/ndf/js/jquery.js"></script> -->
+
   <!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
-  <!--  <script src="/static/ndf/js/jquery-migrate-1.0.0.js"></script> -->
   <script src="/static/ndf/bower_components/jquery-legacy/jquery-migrate.js"> </script>
 
   <!-- External library stylesheets-->
-  <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> <!-- checked -->
 
   <!-- Enable HTML5 on old browsers -->
   <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
-
-  {% block head %}  
-  {% endblock %}
+  {% block head %}{% endblock %}
 
   <style>
-    {% block style %}  {% endblock %}
+    {% block style %}{% endblock %}
   </style>
+
 </head>
 
 <body itemscope itemtype="http://schema.org/Webpage">
-  <center>
-    <img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif">
-  </center>
-
     
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
-{% get_group_object groupid as group_object %}
-       {% get_site_variables as site %}
-      
+    {% get_group_object groupid as group_object %}
+    {% get_site_variables as site %}
+
     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
-        <ul class="title-area ">
+      <ul class="title-area ">
       	<li class="name">
-     {% get_site_variables as site %}
-      	  <h1><a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a></h1>
-      	</li>
-      	<li class="toggle-topbar menu-icon">
-      	  <a href="#">{% trans "Menu" %}</a>
-      	</li>
-      </ul>
-        
-      <section class="top-bar-section">
-	
-	<!-- Right Nav Section -->
-	<ul class="right">
-        
+         {% get_site_variables as site %}
+         <h1><a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a></h1>
+       </li>
+       <li class="toggle-topbar menu-icon">
+         <a href="#">{% trans "Menu" %}</a>
+       </li>
+     </ul>
+
+     <section class="top-bar-section">
+
+       <!-- Right Nav Section -->
+       <ul class="right">
+
         <!-- Search bar -->
         
-<!-- Old Contextual Search-->
-         <li class="has-form search hide">
-  {% include "ndf/node_search_base.html" %}
-             </li>
-
-            <li class="has-form search">
-            
-            <form 
-                      {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-                      name="search_form" method="GET" >
-              <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
-                <div class="hide">
-                <input type="checkbox" name="search_fields" id="chk_name" value="name" checked />Name
-	<input type="checkbox" name="search_fields" id="chk_tags" value="tags" checked />Tags 
-	<input type="checkbox" name="search_fields" id="chk_content" value="contents" checked />Content <br>
-                    <select name="users">
-		<option value="all">All users</option>
-		{% for mem in authors %}		
-			<option value="hello">{{ mem }} </option>
-  		{% endfor %}
-	</select>
-                </div>
-                <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
-        
-              
-<!-- Hiding search options on the top bar, this is available from the results page to refine-->
-                   <!--ul class="show">
-	      	<li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
-                <label for="chk_name">Name</label>
-            </li>
-            <li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
-                <label for="chk_tags">Tags</label>
-            </li>
-            <li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
-                <label for="chk_content">Contents</label><br>
-			</li>
-			<li >
-				{% if groupid %}
-				<a href="{% url 'search_page' groupid %}">Advanced Search</a>
-				{% endif %}
-			</li>
-	      
-	    </ul-->
-
-          
-                </form>
+        <!-- Old Contextual Search-->
+        <li class="has-form search hide">
+          {% include "ndf/node_search_base.html" %}
         </li>
+
+        <li class="has-form search">
+
+          <form 
+          {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+          name="search_form" method="GET" >
+          <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+          <div class="hide">
+            <input type="checkbox" name="search_fields" id="chk_name" value="name" checked />Name
+            <input type="checkbox" name="search_fields" id="chk_tags" value="tags" checked />Tags 
+            <input type="checkbox" name="search_fields" id="chk_content" value="contents" checked />Content <br>
+            <select name="users">
+              <option value="all">All users</option>
+              {% for mem in authors %}		
+              <option value="hello">{{ mem }} </option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
+              
+          <!-- Hiding search options on the top bar, this is available from the results page to refine-->
+          <!-- 
+          <ul class="show">
+            <li>
+              <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
+              <label for="chk_name">Name</label>
+            </li>
+            <li>
+              <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
+              <label for="chk_tags">Tags</label>
+            </li>
+            <li>
+              <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
+              <label for="chk_content">Contents</label><br>
+            </li>
+            <li >
+              {% if groupid %}
+              <a href="{% url 'search_page' groupid %}">Advanced Search</a>
+              {% endif %}
+            </li>
+          </ul>
+           -->
+
+        </form>
+      </li>
         
     <!-- Language selector--> 
         
@@ -176,7 +167,7 @@
 
       	    {% if prof_pic %}
       	    <a href="{% url 'dashboard' request.user.pk %}">
-      	      <img  src="{% url 'getImageThumbnail' group_object prof_pic %}" height="30" width="30">
+      	      <img src="{% url 'getImageThumbnail' group_object prof_pic %}" height="30" width="30">
       	      {{ user.username }}
       	    </a>
       	    
@@ -250,295 +241,284 @@
 
     </nav>
 
+    <div class="workspace">
+      <div class="off-canvas-wrap" data-offcanvas>
+        <div class="inner-wrap">
 
+         <!-- Off Canvas Meta Map -->
+         <aside id="help" class="left-off-canvas-menu">
+           <!-- whatever you want goes here -->
+           <!-- <h4><i class='fi-info'></i> Help</h4> -->
+           <ul class="off-canvas-list">
+            <!-- Shelf content code and logic -->
+            {% block shelf_content %} {% endblock %}
+          </ul>
+        </aside>
 
-  <div class="workspace">
-    <div class="off-canvas-wrap" data-offcanvas>
-      <div class="inner-wrap">
-	
-	<!-- Off Canvas Meta Map -->
-	<aside id="help" class="left-off-canvas-menu">
-	  <!-- whatever you want goes here -->
-	  <!-- <h4><i class='fi-info'></i> Help</h4> -->
-	  <ul class="off-canvas-list">
-	     <!-- Shelf content code and logic -->
-    	  {% block shelf_content %} {% endblock %}
-	  </ul>
-	</aside>
-
-	<main class="row">  
-	  <nav class="drop-shadow">
+        <main class="row">  
+         <nav class="drop-shadow">
           <div class="button-bar">
-              
-              <ul class="button-group medium-2 columns">
-                <li class="left">
-                  <!-- <a id="toggle-shelf" class="button left-off-canvas-toggle">--><i class='button fi-book-bookmark' disabled></i><!--</a>  -->
-                </li>
 
-                <li>
-                  <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> {% trans "Dashboard" %}</a>
+            <ul class="button-group medium-2 columns">
+              <li class="left">
+                <!-- <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a>  -->
+              </li>
 
-                </li>
-              </ul>
-              
-              {% get_gapps_iconbar request groupid %}
-              
-              <ul class="tools button-group medium-2 columns right">
-                  <!-- Show app options if user is logged in-->
-                  {% if user.is_authenticated %}
+              <li>
+                <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> {% trans "Dashboard" %}</a>
+
+              </li>
+            </ul>
+
+            {% get_gapps_iconbar request groupid %}
+
+            <ul class="tools button-group medium-2 columns right">
+              {% comment %}
+              <!-- Show app options if user is logged in-->
+                  <!-- {% if user.is_authenticated %}
                   <li>
                <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> {% trans "Actions" %}</a><br>
 <ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
   {% block app_action_list %} {% endblock %}
 </ul>
                       </li>
-                  {% endif %}
-                  
-                  <li class="right">
-                    <!--<a id="toggle-help" class="button right-off-canvas-toggle" >--><i class='button fi-lightbulb' disabled></i>
-                    <!--</a> -->
-                  </li>
-                  
-                  </ul>
+                      {% endif %} -->
+                      {% endcomment %}
+
+                      <li class="right">
+                        <!-- help documentation for every app -->
+                    <!-- <a id="toggle-help" class="button right-off-canvas-toggle" ><i class='button fi-lightbulb'></i>
+                  </a> --> 
+                </li>
+
+              </ul>
               
-              </div>
-        </nav>
-	  <!-- Start of sidebar section (main aside) -->
+            </div>
+          </nav>
+          <!-- Start of sidebar section (main aside) -->
 
-        <aside class="medium-2 columns">
-          <div>
-            
-            <header>
-              {% block meta_content %}  {% endblock %} 
-              {% block concern_information %} {% endblock %}
-            </header>
-
-            <!-- Meta content in the (main aside header)-->
-            <section>
-              <div>
-          		{% block collection_content %}  {% endblock %}
-              </div>
-                    
-              <div>
-              {% block related_content %}  {% endblock %}
-              </div>
-            </section>
-                
-
+          <aside class="medium-2 columns">
             <div>
-            	{% block add_resource_content %}  {% endblock %}
-            </div>    
-          </div>
-        </aside>
-        <!-- End of related content -->	
 
-        <!-- Start of content section -->
-        <article class="medium-10 columns">
+              <header>
+                {% block meta_content %}  {% endblock %} 
+                {% block concern_information %} {% endblock %}
+              </header>
+
+              <!-- Meta content in the (main aside header)-->
+              <section>
+                <div>
+                  {% block collection_content %}  {% endblock %}
+                </div>
+
+                <div>
+                  {% block related_content %}  {% endblock %}
+                </div>
+              </section>
+
+              <div>
+               {% block add_resource_content %}  {% endblock %}
+             </div>    
+           </div>
+         </aside>
+         <!-- End of related content -->	
+
+         <!-- Start of content section -->
+         <article class="medium-10 columns">
           <!-- The actual body content -->
           <!-- Url redirection -->
-      	    
+
           {% get_group_type request.path request.user as group_type %}
           
           <!-- "pass" is used for the url which does not contains Group_name and "allowed" is used for those urls which Consist of Group names which user or public is allowed to acccess"-->
           {% if group_type == "pass" or group_type == "allowed"%}
-            {% block body_content %} {% endblock %}	
-            {% block extra_content %}  {% endblock %}  
+          {% block body_content %} {% endblock %}	
+          {% block extra_content %}  {% endblock %}  
           {% endif %}
 
           <input type="hidden" value="{{newgroup}}"> 
           <input type="hidden" value="{{groupid}}"> 
-      	    
+
         </article>
         {% block data_review_pagination %}  {% endblock %}
         <!-- End of content section -->	
-    	</main>
+      </main>
 
-    	<!-- Off Canvas User Shelf -->
-    	<aside id="help"  class="right-off-canvas-menu">
-            <ul class="off-canvas-list">
-                
-                <li><label><h4>{% trans "User Guide" %}</h4></label></li>
-                {% block detailed_help_content %}  {% endblock %}
-                <li><label>{% trans "About this Application" %}</label></li>
-                {% block help_content %}  {% endblock %}
-                <li><label>{% trans "About this Group" %}</label></li>
-                {% block about_group %}  {% endblock %}
-                <li><label>Meta Studio {% trans "Version" %} 0.8.23</label></li>
-                    <li><a href="#">{% trans "About metaStudio" %}</a></li>
-                </ul>
-    	</aside>
+      <!-- Off Canvas User Shelf -->
+      <aside id="help"  class="right-off-canvas-menu">
+        <ul class="off-canvas-list">
 
-    	<!-- close the off-canvas menu -->
-    	<a class="exit-off-canvas"></a>
-	
-      </div>
+          <li><label><h4>{% trans "User Guide" %}</h4></label></li>
+          {% block detailed_help_content %}  {% endblock %}
+          <li><label>{% trans "About this Application" %}</label></li>
+          {% block help_content %}  {% endblock %}
+          <li><label>{% trans "About this Group" %}</label></li>
+          {% block about_group %}  {% endblock %}
+          <li><label>Meta Studio {% trans "Version" %} 0.8.23</label></li>
+          <li><a href="#">{% trans "About metaStudio" %}</a></li>
+        </ul>
+      </aside>
+
+      <!-- close the off-canvas menu -->
+      <a class="exit-off-canvas"></a>
+
     </div>
   </div>
+</div>
 
+  <center>
+    <img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif">
+  </center>
 
   <footer>
-<section class="row">
-       <div class="medium-12 columns">
-          <ul class="inline-list">
-  <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
-  {% if user.is_authenticated %}
-    <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
-    <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
-    <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
-    <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
-    <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
-  {% endif %}
-  <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
-  
-  
-</ul>   
+    <section class="row">
+      <div class="medium-12 columns">
+        <ul class="inline-list">
+          <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
+          {% if user.is_authenticated %}
+          <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
+          <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
+          <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
+          <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
+          <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
+          {% endif %}
+          <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
+        </ul>   
       </div>
-    
     </section>
-      
-      <div class="medium-2 columns">    	
-             <p>
-        <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a>
-		
 
-        <br>
-        
-          <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="/static/ndf/images/cc-by-sa.png"/>
-<small>
-        <span>{% trans "All material is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License unless mentioned otherwise." %}</span>
-   
-    	</small>
-               </a>
-          </p>
-          
-      </div>
+    <div class="medium-2 columns">    	
+     <p>
+      <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a>
+      <br>
 
+      <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img src="/static/ndf/images/cc-by-sa.png" alt="Creative Commons License" style="border-width:0" src="/static/ndf/images/cc-by-sa.png"/>
+        <small>
+          <span>{% trans "All material is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License unless mentioned otherwise." %}</span>
+        </small>
+      </a>
+    </p>
 
-     
-      <div class="medium-10 columns">
-          <strong>{% trans "Powered by" %} <a href="https://github.com/gnowledge/gstudio" target="_blank">{% trans "Gnowsys-Studio" %}</a> {% trans "at the" %} <a href="http://www.hbcse.tifr.res.in/" target="_blank">{% trans "Homi Bhabha Centre for Science Education" %}</a>, <a href="http://www.tifr.res.in/" target="_blank">{% trans "TIFR" %}</a>.</strong>
+  </div>
 
-<!--{{site.ORG_NAME |safe }}-->
-          
-      </div>
-          
-  </footer>
+<div class="medium-10 columns">
+  <strong>{% trans "Powered by" %} <a href="https://github.com/gnowledge/gstudio" target="_blank">{% trans "Gnowsys-Studio" %}</a> {% trans "at the" %} <a href="http://www.hbcse.tifr.res.in/" target="_blank">{% trans "Homi Bhabha Centre for Science Education" %}</a>, <a href="http://www.tifr.res.in/" target="_blank">{% trans "TIFR" %}</a>.</strong>
+
+  <!--{{site.ORG_NAME |safe }}-->
+
+</div>
+
+</footer>
 
   <!-- JS -->
-  <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
-  
-  <script type="text/javascript">
+  <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> 
+  <script src="/static/ndf/js/app.js"></script> 
     
+  <script type="text/javascript">
 		// Initialize Foundation CSS
-		$(document).foundation();
+		  $(document).foundation();
       
     // Register global ajax start and complete events to show ajax loader when request is in process
-    $( document )
-    .ajaxStart(function() {
-      $( "#ajax_load_image" ).show();
-      $("#content").css({"opacity":"0.1",})
-    })
-    .ajaxComplete(function() {
-      $("#ajax_load_image").hide();
-      $("#content").css({"opacity":"",})
-    });
+      $( document )
+        .ajaxStart(function() {
+          $( "#ajax_load_image" ).show();
+          $("#content").css({"opacity":"0.1",})
+        })
+        .ajaxComplete(function() {
+          $("#ajax_load_image").hide();
+          $("#content").css({"opacity":"",})
+        });
     
     // Toggles the display of main sidebar for 12 col article view
-    var toggleMainSidebar = function(){
-      $("main>aside").toggle();
-      $("main>article").toggleClass("large-9 large-12");
-    };
+      var toggleMainSidebar = function(){
+        $("main>aside").toggle();
+        $("main>article").toggleClass("large-9 large-12");
+      };
       
-      //Hide broken image links
-    $('img').error(function(){
+    // Hide broken image links
+      $('img').error(function(){
         $(this).addClass("hide");
         //$(this).attr('src', 'missing.png');
-    });
+      });
       
-      //If on the home group, change group dropdown text to "Groups"
-      if( $(".group a.active").html() == "home")
-      {
-          $(".group a.active").html("Groups").removeClass("active");
-          $("#home-group").addClass("active");
+    // If on the home group, change group dropdown text to "Groups"
+      if($(".group a.active").html() == "home") {
+        $(".group a.active").html("Groups").removeClass("active");
+        $("#home-group").addClass("active");
       }
 
-
     //Functions to automatically add an <i> element icon inside node spans 
-		$(".user").prepend(function(){
-			/* Attaches user icon with gnow level color for every user link */
-			return "<i class='fi-torso'></i>"
-		});
+  		$(".user").prepend(function(){
+  			/* Attaches user icon with gnow level color for every user link */
+  			return "<i class='fi-torso'></i>"
+  		});
 
-		$(".card .course").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-book'></i>"
-		});
+  		$(".card .course").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-book'></i>"
+  		});
 
-		$(".card .quiz").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-graph-bar'></i>"
-		});
+  		$(".card .quiz").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-graph-bar'></i>"
+  		});
 
-		$(".card .forum").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-comments'></i>"
-		});
+  		$(".card .forum").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-comments'></i>"
+  		});
 
-		$(".card .group").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-torsos'></i>"
-		});
+  		$(".card .group").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-torsos'></i>"
+  		});
 
-		$(".card .page").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-page'></i>"
-		});
+  		$(".card .page").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-page'></i>"
+  		});
 
-		$("aside.page").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-page'></i>"
-		});
-
+  		$("aside.page").prepend(function(){
+  			/* Attaches icon for node type */
+  			return "<i class='fi-page'></i>"
+  		});
 		
 		/* Expand create card on hover */
-		$(".create.card").find(">div>div").slideUp();
-		$(".create.card").hover(function(){
-			$(this).find(">div>div").slideDown();
-		},
-		function(){
-			$(this).find(">div>div").slideUp();
-		});
-      
-      
 
     //set language prefernce
-    $(document).on('click',"#savepref",function(){
-      var vpref=$("#pref").val();
-      var fb=$("#fallback").val();
-      var vurl='/{{group_id}}/userpreference/';
+      $(document).on('click', "#savepref", function(){
+        var vpref=$("#pref").val();
+        var fb=$("#fallback").val();
+        var vurl='/{{group_id}}/userpreference/';
 
-      $.ajax({
-        url: vurl,
-        type: 'POST',
-        data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        $.ajax({
+          url: vurl,
+          type: 'POST',
+          data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
 
-        success:function(data){
-          alert("Successfully set the preferences");
-	  location.reload()
-        }
-      }); //ajax closes
-    }); //document closes
+          success:function(data){
+            alert("Successfully set the preferences");
+            location.reload();
+          }
+        }); //ajax closes
+      }); //document closes
+
+    // start of document.ready()
+    $(document).ready(function(){
+      $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
+            
+      {% block document_ready %} {% endblock %}
+
+      // function defined in app.js to check the font and load it asynchronously.
+      checkOpenSansFont();
+
+    });
+    // --- END of document.ready()
 
   	{% block script %} {% endblock %}	
+    
+  </script>
 
-  </script>
-  
-<script type="text/javascript">
-  $(document).ready(function(){
-  $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true)
-})
-  </script>
-  <script src="/static/ndf/js/app.js"></script> <!-- checked -->
 
 </body>
 

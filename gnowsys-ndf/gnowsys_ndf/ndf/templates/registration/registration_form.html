@@ -1,51 +1,152 @@
 {% extends "registration/registration_base.html" %}
-
 {% load i18n %}
 {% load ndf_tags %}
+
 {% block title %}{% trans "Register for an account" %}{% endblock %}
 
 {% block style %}
+  {{block.super}}
 	th {	text-align:left;	}
 	table td {	padding:0.5em;	}
 	table ul   {	color:#ff3232;	}
+
+  label { font-size: 15px; }
+
+  .text-center { text-align: center; }
+
+  small.all-error { font-size: 16px; }
+
+  /* Setting css-properties for small.error */
+    small.error {
+      padding: 0 0 0 0.5rem !important;
+      margin-top: 1rem !important;
+      position: relative !important;
+      width: 95%;
+    }
 {% endblock %}
 
 {% block body_content %}
+  <!-- Heading -->
+  <div class="row" style="margin: 1.2rem 0;">
+    <div class="small-10 large-10 small-centered large-centered columns">
+      <!-- Heading text -->
+      <div class="row">
+        <div class="small-10 large-10 columns end text-center">
+          <h2 style="padding-left: 30px;">{% trans "Register a New User Account" %}</h2>
+        </div>
+      </div>
+    </div>
 
-{% get_author_agency_types as agency_types %}
+    <!-- Error message -->
+    {% if form.errors %}
+    <div class="row">
+      <div class="small-7 large-7 small-offset-2 large-offset-2 columns end">
+        <small class="error all-error text-center">
+          {% trans "Either both passwords doesn't match or doesn't satisfy the criteria!!!" %}
+        </small>
+      </div>
+    </div>
+    {% endif %}
+  </div>
 
-<table class="medium-6 columns">
-  <form method='post' action=''>
-     <h2>{% trans "Register a new account" %}</h2>
-     {% csrf_token %}
-    {{ form }}
-    <tr>
-      <td></td>
-      <td><small>{% trans "Password must contain atleast 8 characters, one uppercase letter and one numeral" %}</small></td>
-    </tr>
-    
-    <tr><th><label for="">{% trans "Occupation" %}</label></th>
-      <td>
-      <select name="agency_type">
-        {% for each in agency_types %}
-        <option id="{{each}}" name="group_agency_type">{{each}}</option>
-        {% endfor %}
-      </select>
-      </td>
-    </tr>
-     
-    <tr><th><label for="affiliation">{% trans "Affiliation" %}</label></th> 
-      <td>
-        <input type="text" id="affiliation" name="group_affiliation">
-      </td>
-    </tr>
-    
-    <tr>
-      <td></td>
-      <td><input type="submit" class="button expand" value="{% trans 'Send activation email' %}"></td>
-    </tr>
-  </form>
-</table>
+  <!-- Form -->
+  <div class="row">
+    <div class="small-10 large-10 small-centered large-centered columns">
+      <form method='post' action='' data-abide>
+        {% csrf_token %}
 
+        <!-- Email -->
+        <div class="row">
+          <div class="small-3 large-3 columns">
+            <label class="right inline">
+              {{form.email.label_tag}}
+            </label>
+          </div>
+          <div class="small-6 large-6 columns end">
+            {{form.email}}
+          </div>
+        </div>
+
+        <!-- Password1 -->
+        <div class="row">
+          <div class="small-3 large-3 columns">
+            <label class="right inline">
+              {{form.password1.label_tag}}
+            </label>
+          </div>
+          <div class="small-6 large-6 columns end">
+            {{form.password1}}
+            <p style="color: green; font-weight: bold;">{% trans "NOTE: Password must contain atleast 8 characters, one uppercase letter and one numeral" %}</p>
+          </div>
+        </div>
+
+        <!-- Password2 -->
+        <div class="row">
+          <div class="small-3 large-3 columns">
+            <label class="right inline">
+              {{form.password2.label_tag}}
+            </label>
+          </div>
+          <div class="small-6 large-6 columns end">
+            {{form.password2}}
+          </div>
+        </div>
+
+        <!-- Occupation -->
+        <div class="row">
+          <div class="small-3 large-3 columns">
+            <label for="id_agency_type" class="right inline">
+              {% trans "Occupation" %}
+            </label>
+          </div>
+          <div class="small-6 large-6 columns end">
+            {% get_author_agency_types as agency_types %}
+
+            <select id="id_agency_type" name="agency_type">
+              <option value="">{% trans "- - - Select Group Agency Type - - -" %}</option>
+              {% for each in agency_types %}
+              <option id="{{each}}" name="group_agency_type">{{each}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Affiliation -->
+        <div class="row">
+          <div class="small-3 large-3 columns">
+            <label for="id_affiliation" class="right inline">
+              {% trans "Affiliation" %}
+            </label>
+          </div>
+          <div class="small-6 large-6 columns end">
+            <input type="text" id="id_affiliation" name="group_affiliation">
+          </div>
+        </div>
+
+        <!-- Send Activation button -->
+        <div class="row">
+          <div class="small-3 large-3 small-offset-4 large-offset-4 columns end">
+            <input type="submit" class="button small expand" value="{% trans 'Send activation email' %}" style="font-size:15px" >
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>  
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+  $("input[id='id_email'], input[id='id_password1'], input[id='id_password2'], select[id='id_agency_type'], input[id='id_affiliation']").each(function(){
+    if (this.id == "id_email") {
+      $(this).prop("type", "email");
+    }
+
+    $(this).css("width", "95%");
+    $(this).attr("required", "");
+    $(this).css("float", "left");
+    $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
+    $(this).after("<i style='color:red; float:left display:inline'>*</i>");
+  });
 {% endblock %}
 
