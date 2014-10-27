@@ -90,7 +90,7 @@ color: #7a7a7a;
             <li>
 
             {% if thread.created_by == request.user.id %}
-      <a class="tiny alert button" href="{% url 'thread_delete' group_name_tag forum thread %}">{% trans "Delete" %}</a>
+      <a class="tiny alert button" href="{% url 'thread_delete' group_name_tag forum thread %}"onClick="return thread_del();" >{% trans "Delete" %}</a>
 
       {% endif %}
 
@@ -174,7 +174,28 @@ color: #7a7a7a;
 
 {% block script %}
 
+
 	// <script type="text/javascript">
+function thread_del()
+{
+var reply_count={{reply_count}};
+if (reply_count <= 0)
+{
+if (!window.confirm("Are you sure you want to delete this ?"))
+{
+  $("edit-options").class="f-dropdown";		
+  return false;
+}
+}
+else
+{
+
+alert("This forum has "+reply_count +" existing threads.Please remove them and try again.");
+$("edit-options").hide();
+return false;
+}
+
+}
 
 	$("#node_search_form").parent().hide();
 
