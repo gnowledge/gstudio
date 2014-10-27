@@ -6,22 +6,19 @@
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   
-  <!-- Scripts required for D3 graph -->
-  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
-  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
-  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
-  
   <!-- Scripts and stylesheets for SideComments -->
-  <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script>
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css">
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css">
+  <!-- <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script> -->
+  <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css"> -->
 
-  <!-- orgitdown! -->
-  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
-  <!-- orgitdown! toolbar settings -->
-  <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
-  <!-- orgitdown! skin -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+  {% if user.is_authenticated %}
+    <!-- orgitdown! -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+    <!-- orgitdown! toolbar settings -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+    <!-- orgitdown! skin -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+  {% endif %}
 
 {% endblock %}
 
@@ -138,7 +135,7 @@
     
     padding:10px;
     background-color:#d8f1f3;
-    width:25em;
+    width:27em;
     max-width: 40em;
     margin-left: 48px; 
     margin-top: 10px;
@@ -653,7 +650,11 @@
         <div class="medium-5 columns">
         <!-- Delete button if page created by user -->
           {% if node.created_by == request.user.id %}
-            <a class="tiny alert round button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+            {% if node.member_of_names_list.0 == "Page" %}
+              <a class="tiny alert round button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+            {% elif node.member_of_names_list.0 == "Term" %}
+              <a class="tiny alert round button" href="{% url 'term_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+            {% endif %}
           {% endif %}
         </div>
         <div class="medium-7 columns">
@@ -685,6 +686,10 @@
                 {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
                   <a href="{% url create_url group_name_tag app_id %}" class="tiny round button">
                     <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                  </a>
+                {% elif node.member_of_names_list.0 == "Term" %}
+                  <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} Topic</span>
                   </a>
                 {% else %}
                   <a href="{% url create_url group_name_tag %}" class="tiny round button">

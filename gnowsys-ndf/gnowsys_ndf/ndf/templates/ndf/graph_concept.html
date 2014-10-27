@@ -1,4 +1,14 @@
 {% load i18n %}
+
+{% block head %}
+
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js" async></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js" async></script> <!-- checked -->
+  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" async></script> <!-- checked -->
+  
+{% endblock %}
+
 <style type="text/css">
 		#chart-concept .link
 		{

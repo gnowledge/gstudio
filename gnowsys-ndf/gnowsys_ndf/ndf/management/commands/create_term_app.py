@@ -24,6 +24,7 @@ class Command(BaseCommand):
         if not term:
             term = collection.GSystemType()
             term.name = u"Term"
+            term.altnames = u"Topic"
             term.access_policy = u"PUBLIC"
             term.contributors.append(1)
             term.created_by = int(1)
