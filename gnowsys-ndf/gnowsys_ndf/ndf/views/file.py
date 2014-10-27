@@ -532,7 +532,19 @@ def paged_file_objs(request, group_id, filetype, page_no):
                 for e in d_Collection:
                     doc.append(e.subject)
 
-                result_paginated_cur = collection.Node.find({'_id': {'$in': doc} })
+                result_paginated_cur = collection.Node.find({ '$or':[{'_id': {'$in': doc}},
+
+                            {'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
+                                                '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
+                                                '$or': [
+                                                      {'access_policy': u"PUBLIC"},
+                                                        {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                       ]
+                                                }]
+
+                    }).sort("last_update", -1)
+
+
                 result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         elif filetype == "image":
@@ -544,7 +556,19 @@ def paged_file_objs(request, group_id, filetype, page_no):
                 for e in img_Collection:
                     image.append(e.subject)
 
-                result_paginated_cur = collection.Node.find({'_id': {'$in': image} })    
+                # result_paginated_cur = collection.Node.find({'_id': {'$in': image} })    
+                result_paginated_cur = collection.Node.find({'$or': [{'_id': {'$in': image} }, 
+
+                            {'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+                                                 '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
+                                                 '$or': [
+                                                      {'access_policy': u"PUBLIC"},
+                                                        {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                       ]
+                                                }]
+
+                    }).sort("last_update", -1)
+
                 result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)                
 
         elif filetype == "video":
@@ -557,8 +581,19 @@ def paged_file_objs(request, group_id, filetype, page_no):
                 for e in vid_Collection:
                     video.append(e.subject)
 
-                result_paginated_cur = collection.Node.find({'$or': [{'_id': {'$in': video} },
-                                    {'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'group_set': ObjectId(group_id)},{'_type':'File'}]}]})    
+                result_paginated_cur = collection.Node.find({'$or': [{'_id': {'$in': video} }, 
+
+                          {'member_of': {'$in': [ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]}, 
+                                                 '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
+                                                 '$or': [
+                                                      {'access_policy': u"PUBLIC"},
+                                                        {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                       ]
+                                                }]
+
+                    }).sort("last_update", -1)
+
+
                 result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         elif filetype == "interactives" and app == "E-Library":
@@ -577,7 +612,22 @@ def paged_file_objs(request, group_id, filetype, page_no):
             for e in aud_Collection:
                 audio.append(e.subject)
 
-            result_paginated_cur = collection.Node.find({'_id': {'$in': audio} })    
+            # result_paginated_cur = collection.Node.find({'_id': {'$in': audio} })  
+
+            result_paginated_cur = collection.Node.find({ '$or':[{'_id': {'$in': audio}},
+
+                      {'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
+                                                '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
+                                                'mime_type': 'audio',
+                                                '$or': [
+                                                      {'access_policy': u"PUBLIC"},
+                                                        {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                       ]
+                                                }]
+
+                    }).sort("last_update", -1)
+
+
             result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
         if app == "File":
