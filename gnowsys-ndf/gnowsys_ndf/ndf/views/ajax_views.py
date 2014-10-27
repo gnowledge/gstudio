@@ -2701,26 +2701,15 @@ def get_affiliated_colleges(request, group_id):
         response_dict["message"] += "\n\n " + str(i+1) + ". " + each[1]
 
       return HttpResponse(json.dumps(response_dict))
-
-def edit_task_content(request, group_id):
-    '''
-    This function will edit task's title 
-    '''
-    if request.is_ajax() and request.method =="POST":
-        taskid = request.POST.get('taskid',"")
-        content_org = request.POST.get('content_org',"")
-	task = collection.Node.find_one({'_id':ObjectId(taskid)})
-        task.content_org = unicode(content_org)
-    
-  	# Required to link temporary files with the current user who is modifying this document
-    	usrname = request.user.username
-    	filename = slugify(task.name) + "-" + usrname + "-"
-        task.content = org2html(content_org, file_prefix=filename)
-	task.save()
-        return HttpResponse(task.content)
+      
     else:
-        raise Http404
-
+        error_message = "AffiliatedCollegeFindError: Either not an ajax call or not a GET request!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
+  except Exception as e:
+      error_message = "AffiliatedCollegeFindError: " + str(e) + "!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict))  
 def get_announced_courses(request, group_id):
   """
   This view returns list of announced-course(s) that match given criteria

@@ -100,8 +100,6 @@ function insertImg(){
   var content = $("#{{node_id}}").val().substring(0, startPos) + insert_img + $("#{{node_id}}").val().substring(endPos, $("#{{node_id}}").val().length);
   $("#{{node_id}}").val(content);
   $(".close-reveal-modal").trigger("click");
-  endPos.focus();
-
 }
 }
 
