@@ -196,7 +196,9 @@
   $("#node_search_form").parent().hide();
 
   // method to provide autocomplete/intellisence of forum names
-  $(document).ready(function(){
+
+ {% block document_ready %}
+
     $("#forum_name").change(function(){
 
       var name = $("#forum_name").val();
@@ -308,4 +310,7 @@
     // }
 
     // </script>
+
+{% endblock %}
+
 {% endblock %}

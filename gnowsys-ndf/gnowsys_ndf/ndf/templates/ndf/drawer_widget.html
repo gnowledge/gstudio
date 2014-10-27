@@ -82,6 +82,7 @@
         <li class="bullet-item" > <i> {% trans "No content of selected type !" %} </i> </li>
         {% endif %}
 
+        {% if is_RT != "RelationType" %}
         <!-- pagination -->
         {% if page_info %}
           {% if page_info.num_pages > 1 %}
@@ -174,10 +175,9 @@
               </ul>
             </div>
           {% endif %}
-        
         {% endif %}
-
         <!-- end of pagination -->
+        {% endif %}
 
         <!-- <div class="text-center" > <a class="prev"><< prev</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="next">next >></a> </div> -->
       </ul>
@@ -282,272 +282,278 @@
 <input id="{{widget_for}}_list" type="hidden" name="{{widget_for}}_list" value="" />
 
 <script type="text/javascript">
-    $(document).ready(function(){
+  var is_RT = "{{is_RT}}";
 
-      if ("{{search_name}}"){
-        $(".search_items").val("{{search_name}}");
-      }
-    });
+  $(document).ready(function(){
+    if ("{{search_name}}"){
+      $(".search_items").val("{{search_name}}");
+    }
+  });
 
-    //To allocate space of 10 resources listing for drawers.
-    liHeight = $("#{{widget_for}}_drawer1 > li").outerHeight();
-    // alert("liHeight" + liHeight + " -- " + (liHeight * 6))
-    $(".resource-drawer").height(430);
+  //To allocate space of 10 resources listing for drawers.
+  liHeight = $("#{{widget_for}}_drawer1 > li").outerHeight();
+  $(".resource-drawer").height(430);
 
-    // To select the single as well as multiple items from list 
-    $(document).on('click','#{{widget_for}}_drawer1 li.bullet-item',function(e){
-      // $("#{{widget_for}}_drawer1 li.bullet-item").on("click", function(e) {
-      if (e.ctrlKey)
-      {        
-        $(this).toggleClass('selected-resource');
-      } 
-      else
-      {
-        $('.bullet-item').removeClass('selected-resource');           
-        $(this).addClass('selected-resource');        
-      }                   
-        
-    }); 
+  // To select the single as well as multiple items from list
+  $(document).on('click','#{{widget_for}}_drawer1 li.bullet-item',function(e){
+    // $("#{{widget_for}}_drawer1 li.bullet-item").on("click", function(e) {
+    if (e.ctrlKey) {
+      $(this).toggleClass('selected-resource');
+    }
+    else {
+      $('.bullet-item').removeClass('selected-resource');
+      $(this).addClass('selected-resource');
+    }
+  });
 
-    $(document).on('click','#{{widget_for}}_drawer2 li.bullet-item',function(e){
-      // $("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
-      
-      if (e.ctrlKey)
-      {        
-        $(this).toggleClass('selected-resource');
-      } 
-      else
-      {
-        $('.bullet-item').removeClass('selected-resource');           
-        $(this).addClass('selected-resource');        
-      }     
-      
-    });
+  $(document).on('click','#{{widget_for}}_drawer2 li.bullet-item',function(e){
+    // $("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
     
-    
-      //For left drawer selected resources and right button click
-      $("#{{widget_for}}_btnRight").click(function() {
-        $("#{{widget_for}}_drawer1 li.selected-resource input.node_id").addClass("{{widget_for}}_values");
+    if (e.ctrlKey) {
+      $(this).toggleClass('selected-resource');
+    }
+    else
+    {
+      $('.bullet-item').removeClass('selected-resource');
+      $(this).addClass('selected-resource');
+    }
+  });
 
-        var selectedOpts = $("#{{widget_for}}_drawer1 li.selected-resource");
-        $("#{{widget_for}}_drawer1 li.selected-resource").removeClass("selected-resource");        
+  //For left drawer selected resources and right button click
+  $("#{{widget_for}}_btnRight").click(function() {
+    $("#{{widget_for}}_drawer1 li.selected-resource input.node_id").addClass("{{widget_for}}_values");
 
-        if (selectedOpts.length == 0){
-          alert("Nothing to move.");
+    var selectedOpts = $("#{{widget_for}}_drawer1 li.selected-resource");
+    $("#{{widget_for}}_drawer1 li.selected-resource").removeClass("selected-resource");
+
+    if (selectedOpts.length == 0) {
+      alert("Nothing to move.");
+    }
+
+    $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
+
+    $(selectedOpts).remove();
+    // var innerhtml = $("#{{widget_for}}_drawer1").html()
+    // $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);
+
+    if (is_RT != "RelationType") {
+      // write comment
+      var cn_arr = []
+      $(".node_id").each(function (){
+        if ($(this).parent(".bullet-item").parent("#{{widget_for}}_drawer2").attr("id") == "{{widget_for}}_drawer2") {
+          cn_arr.push($(this).val());
         }
+      });
 
-        $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
+      var cn_list = cn_arr.join(',');
+      var field = "{{widget_for}}";
 
-        $(selectedOpts).remove();
-        var innerhtml = $("#{{widget_for}}_drawer1").html()
-        $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);  
+      $.ajax({
+        type: "POST",
+        url: "{% url 'select_drawer' groupid %}",
+        datatype: "html",
+        data:{
+          collection_list: cn_list,
+          // homo_collection: "{{checked}}",
+          node_id: '{{node_id}}',
+          field: field,
+          page_no: 1,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
 
-        // write comment
-        var cn_arr = []
-        $(".node_id").each(function (){
-          if ($(this).parent(".bullet-item").parent("#{{widget_for}}_drawer2").attr("id") == "{{widget_for}}_drawer2") {
-            cn_arr.push($(this).val());
-            
-          }
+          if ($.trim(data) === "Warning") {
 
-        });
-        
-        var cn_list = cn_arr.join(',');
-        var field = "{{widget_for}}";
+            var r = confirm("Do you want to save this selection for "+ field +" ?");
 
-        $.ajax({
-          type: "POST",
-          url: "{% url 'select_drawer' groupid %}",
-          datatype: "html",
-          data:{
-            collection_list: cn_list,
-            // homo_collection: "{{checked}}",
-            node_id: '{{node_id}}',
-            field: field,
-            page_no: 1,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
-          success: function(data) {
+            if (r == true){
 
-            if ($.trim(data) === "Warning") {
+              $.ajax({
+                type: "POST",
+                url: "{% url 'select_drawer' groupid %}",
+                datatype: "html",
+                data: {   
+                  collection_list: cn_list,
+                  node_id: '{{node_id}}',
+                  field: field,
+                  selection_save: "True",
+                  page_no: 1,
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(data) {
+                  // cnt(data)
+                  alert("Saved selection as "+ field +" Successfully");
 
-              var r = confirm("Do you want to save this selection for "+ field +" ?");
-
-              if (r == true){
-
-                $.ajax({
-                  type: "POST",
-                  url: "{% url 'select_drawer' groupid %}",
-                  datatype: "html",
-                  data:{              
-                    collection_list: cn_list,
-                    node_id: '{{node_id}}',
-                    field: field,
-                    selection_save: "True",
-                    page_no: 1,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                  success: function(data) {                         
-                    // cnt(data)
-                    alert("Saved selection as "+ field +" Successfully");
-
-                    if (field == "collection"){
-                      $("input:radio").prop('checked', false);
-                      $(".collection_tab").trigger('click');
-                    }
-                    if (field == "prior_node"){
-                      $(".prior_node_tab").trigger('click');
-                    }
-                    if (field == "teaches"){
-                      $(".teaches_tab").trigger('click');
-                    }
-                    if (field == "assesses"){
-                      $(".assesses_tab").trigger('click');
-                    }
-
+                  if (field == "collection"){
+                    $("input:radio").prop('checked', false);
+                    $(".collection_tab").trigger('click');
+                  }
+                  if (field == "prior_node"){
+                    $(".prior_node_tab").trigger('click');
+                  }
+                  if (field == "teaches"){
+                    $(".teaches_tab").trigger('click');
+                  }
+                  if (field == "assesses"){
+                    $(".assesses_tab").trigger('click');
                   }
 
-                });
+                }
+
+              });
+            }
+            else{
+
+              if (field == "collection"){
+                $("input:radio").prop('checked', false);
+                $(".collection_tab").trigger('click');
               }
-              else{
-
-                if (field == "collection"){
-                  $("input:radio").prop('checked', false);
-                  $(".collection_tab").trigger('click');
-                }
-                if (field == "prior_node"){
-                  $(".prior_node_tab").trigger('click');
-                }
-                if (field == "teaches"){
-                  $(".teaches_tab").trigger('click');
-                }
-                if (field == "assesses"){
-                  $(".assesses_tab").trigger('click');
-                }
-
+              if (field == "prior_node"){
+                $(".prior_node_tab").trigger('click');
               }
-
+              if (field == "teaches"){
+                $(".teaches_tab").trigger('click');
+              }
+              if (field == "assesses"){
+                $(".assesses_tab").trigger('click');
+              }
 
             }
 
-            
-          }          
-        });
 
-        // end of comment
-
-
-      });  
-
-
-      //For right drawer selected resources and left button click
-      $("#{{widget_for}}_btnLeft").click(function() {
-        $("#{{widget_for}}_drawer2 li.selected-resource input.node_id.{{widget_for}}_values").removeClass("{{widget_for}}_values");
-        var selectedOpts = $("#{{widget_for}}_drawer2 li.selected-resource");
-        $("#{{widget_for}}_drawer2 li.selected-resource").removeClass("selected-resource");
-
-        if (selectedOpts.length == 0) {
-          alert("Nothing to move.");
-        }
-
-        $("#{{widget_for}}_drawer1").append($(selectedOpts).clone(true));
-        $(selectedOpts).remove();
-        var innerhtml = $("#{{widget_for}}_drawer1").html()
-        $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);
-      });  
-
-
-      function checkUpDownButton()
-      {
-        for(var i=0; i<collSelected.length-1; i++)
-        {
-          var flag;
-          if( (collSelected[i].nextElementSibling) == (collSelected[i+1]) ){
-            flag = true;
           }
-          else{
-            flag = false;
-          }
+
+
         }
-        return flag;
+      });
+
+      // end of comment
+    }
+  });
+
+  //For right drawer selected resources and left button click
+  $("#{{widget_for}}_btnLeft").click(function() {
+    $("#{{widget_for}}_drawer2 li.selected-resource input.node_id.{{widget_for}}_values").removeClass("{{widget_for}}_values");
+    var selectedOpts = $("#{{widget_for}}_drawer2 li.selected-resource");
+    $("#{{widget_for}}_drawer2 li.selected-resource").removeClass("selected-resource");
+
+    if (selectedOpts.length == 0) {
+      alert("Nothing to move.");
+    }
+
+    $("#{{widget_for}}_drawer1").append($(selectedOpts).clone(true));
+    $(selectedOpts).remove();
+    // var innerhtml = $("#{{widget_for}}_drawer1").html()
+    // $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);
+  });
+
+  function checkUpDownButton() {
+    for(var i=0; i<collSelected.length-1; i++)
+    {
+      var flag;
+      if( (collSelected[i].nextElementSibling) == (collSelected[i+1]) ){
+        flag = true;
+      }
+      else{
+        flag = false;
+      }
+    }
+    return flag;
+  }
+
+  //For UP Button pressed :
+  $("#{{widget_for}}_btnUp").click(function() {
+
+    collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
+
+    if( collSelected ){
+
+      //If multiple element's are selected :
+      if( collSelected.length > 1 ){
+
+        if( checkUpDownButton ){
+          prevFirstSel = collSelected[0].previousElementSibling;
+          lastSel = collSelected[collSelected.length-1];
+
+          $(prevFirstSel).insertAfter(lastSel);
+        }
       }
 
-      //For UP Button pressed :
-      $("#{{widget_for}}_btnUp").click(function() {
+      //If only one element is selected :
+      else{
+        currSel =  collSelected[0];
+        $(currSel).insertBefore(currSel.previousElementSibling);
+      }
+    }
+  });
 
-        collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
+  //For DOWN Button pressed :
+  $("#{{widget_for}}_btnDown").click(function() {
 
-        if( collSelected ){
+    collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
 
-          //If multiple element's are selected :
-          if( collSelected.length > 1 ){
+    if( collSelected ){
 
-            if( checkUpDownButton ){
-              prevFirstSel = collSelected[0].previousElementSibling;
-              lastSel = collSelected[collSelected.length-1];
+      //If multiple element's are selected :
+      if( collSelected.length > 1 ){
 
-              $(prevFirstSel).insertAfter(lastSel);  
-            }
-          } 
-          
-          //If only one element is selected :
-          else{
-            currSel =  collSelected[0];
-            $(currSel).insertBefore(currSel.previousElementSibling);
-          }
+        if( checkUpDownButton ){
+          FirstSel = collSelected[0];
+          nexttoLastSel = collSelected[collSelected.length-1].nextElementSibling;
+
+          $(nexttoLastSel).insertBefore(FirstSel);  
         }
-      });
+      }
 
-      //For DOWN Button pressed :
-      $("#{{widget_for}}_btnDown").click(function() {
-
-        collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
-
-        if( collSelected ){
-
-          //If multiple element's are selected :
-          if( collSelected.length > 1 ){
-
-            if( checkUpDownButton ){
-              FirstSel = collSelected[0];
-              nexttoLastSel = collSelected[collSelected.length-1].nextElementSibling;
-
-              $(nexttoLastSel).insertBefore(FirstSel);  
-            }
-          } 
-          
-          //If only one element is selected :
-          else{
-            currSel =  collSelected[0];
-            $(currSel).insertAfter(currSel.nextElementSibling);
-          }
-        }
-      });
-
+      //If only one element is selected :
+      else{
+        currSel =  collSelected[0];
+        $(currSel).insertAfter(currSel.nextElementSibling);
+      }
+    }
+  });
 
   // Search-Box for LHS drawer of resources
-    // $(document).on('keydown keypress keyup change', '#{{widget_for}}_search' ,function(){
-    //   //$('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
-    //   var search = (this.value).toLowerCase();
-    //   //var $li = $("#{{widget_for}}_drawer1 li.bullet-item").hide()
-    //   var $li = $(".{{widget_for}}.pricing-table.drawer1 li.bullet-item").hide()
-    //   $li.filter(function() {
-    //     return $(this).text().toLowerCase().indexOf(search) >=0;
-        
-    //   }).show();
-    
-   // });
+  // $('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
+  $('#{{widget_for}}_search').bind('keydown change', function() {
+    if (is_RT == "RelationType") {
+      var search_text = (this.value).toLowerCase();
+      var search_text_len = search_text.length
 
+      var $li = $( ".{{widget_for}}.pricing-table.drawer1 li.bullet-item" );
 
-    // $(document).on('keydown keypress keyup change', '#{{widget_for}}_search' ,function(){
+      if (search_text_len > 2) {
+        $(".searching").css("display", "block");
+        $li.each(function() {
+          if ($(this).text().toLowerCase().indexOf(search_text) >= 0) {
+            $(this).css("display", "block");
+          }
 
-    // write comment 
-    $('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
+          else{
+            $(this).css("display", "none");
+          }
+        });
+        $(".searching").css("display", "none");
+      }
 
+      else if (search_text_len == 2) {
+        $li.filter(function() {
+          if ($(this).css("display") == "none") {
+            return true;
+          }
+
+          else {
+            return false;
+          }
+        }).show();
+      }
+    }
+
+    else {
       var len = (this.value.length);
       var field = "{{widget_for}}";
-      if (len > 2){
 
+      if (len >= 2){
         $(".searching").css("display", "block");
 
         $.ajax({
@@ -562,8 +568,7 @@
             csrfmiddlewaretoken: '{{ csrf_token }}'
           },
           success: function(data) {
-             //alert(data);
-            $(".searching").css("display", "none");             
+            $(".searching").css("display", "none");
             if (field == "collection"){
               $("#collection_drawer").html(data);  
             }
@@ -579,11 +584,9 @@
             
           }          
         });
-
       }
-    });
-    // end of comment
-
+    }
+  });
 </script>
 
 
