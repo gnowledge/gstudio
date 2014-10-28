@@ -1,49 +1,20 @@
-
-
-
-
-
-<!--<style type="text/css"> 
-#created {
-    background-color: #ffff7f;
-}
-#New{
-background-color: #7fe8bf;
-}
-
-#Rejected{
-background-color: #ffad99;
-}
-#InProgress{
-background-color: #7fe8bf;
-}
-#Closed{
-background-color: #FFFFFF;
-}
-#Feedback{
-background-color: #b7b7b7;
-}
-#Resolved{
-background-color: #FFFFFF;
-}
-#Pending{
-background-color: #ffad99;
-}
-#Assigned{
-background-color: #a1a57f;
-}
-#completed{
-background-color: #FFFFFF;
+<style>
+.reveal-modal {
+    top:-1;
+    
+    
 }
 </style>
--->
-
-{% block body_content %}
+<div id="container">
 
 
+      <div id="myModal" class="reveal-modal" animation="None" data-reveal>
+                
+      </div>
+</div>
 <br/>
 
-<div id="example">
+<div id="example" >
 
 {% if TASK_inst %}
 
@@ -55,12 +26,13 @@ background-color: #FFFFFF;
 		<tr>
                       
 			{%for i in TASK_inst.0 %}
-			{% if i != "id"%}
+			{% if i != "id" and i != "collection" and i != "owner"   %}
 			<th class="view" style="width:10000px">{{i}}</th>
                         
 			<input type=hidden id='{{i}}' value='{{i}}'>
 			{% endif %}
 			{% endfor %}
+			<th class="view" style="width:10000px"> </th>
 			<th class="view" style="width:10000px"> </th>
 		</tr>
 </thead>
@@ -71,14 +43,34 @@ background-color: #FFFFFF;
 		
 		<tr id="view-row-{{i.id}}">
 					
-	        		{% for j,v in i.items %}
-				{% if j != "id"%}
-								         
-			  <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v}} </a></td>
+	     {% for j,v in i.items %}
+	      
+				{% if j != "id" and j != "collection" and j != "owner" %}
+					          {% if i.collection %}
+				            	    {% if j == "Status" %}
+					                   <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v}} (Group Task) </a></td>
+					                {% else %}
+					                  <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v}}  </a></td>
+						              {% endif %}
+						             
+						        {% else %}
+				 			            <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v}} </a></td>
+					          {% endif %}
 				{% endif %}	
 			        						 
 			{% endfor %}
-			<td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
+			{% if i.collection %}
+			    <td>	</td>
+			    <td>	</td>
+			{% else %}
+			      <td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
+		        	
+			      {% if i.owner == "owner" %}
+			      <td> <a class="tiny button" href="{% url 'delete_task' group_name i.id %}"> Delete </td>
+			      {% else %}	
+			      <td>	</td>				
+			{% endif %}
+			{% endif %}
 		</tr>	
 		
 		{% endfor %}
@@ -129,15 +121,61 @@ background-color: #FFFFFF;
 
 function updatefeild(oid)
 {
-  
-  	 
+  var aurl=""
+ if ('{{choice}}'==0)
+ {
+ var task_id='{{task}}'
+  aurl = "{% url 'task_collection' group_name 'task_id' 'oid' %}".replace('oid',oid).replace('task_id',task_id)
+ 
   $.ajax({
-      url:"{% url 'filter' group_name choice status 'oid' %}".replace('oid',oid),
+      url:aurl,
+
+      type: "GET",
+      
+      success: function(data){
+        $('#myModal').empty()
+         $('#myModal').append(data)
+        $('#myModal').foundation('reveal', 'open');
+      }
+    });
+
+ 
+ 
+ }
+ else
+ {
+  aurl ="{% url 'filter' group_name choice status 'oid' %}".replace('oid',oid)
+ $.ajax({
+      url:aurl,
 
       type: "GET",
       
       success: function(data){
         $("#example").html(data)      
+      }
+    });
+
+ }  	 
+ 
+
+}
+
+
+
+function collection_overlay(oid)
+{
+  
+
+  $.ajax({
+      url:"{% url 'task_collection' group_name 'oid' '1' %}".replace('oid',oid),
+
+      type: "GET",
+      
+      success: function(data){
+         $('#myModal').empty()
+         $('#myModal').append(data)
+        $('#myModal').append( '<a class="close-reveal-modal"  data-reveal-id="myModal" >&#215;</a>')
+        $('#myModal').foundation('reveal', 'open');
       }
     });
 
@@ -158,7 +196,6 @@ function editResRow(oid)
 </script>
 
 
-{% endblock %}
 
 
 

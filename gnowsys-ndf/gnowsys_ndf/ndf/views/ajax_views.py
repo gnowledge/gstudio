@@ -114,35 +114,38 @@ def collection_nav(request, group_id):
     if request.is_ajax() and request.method == "POST":    
       node_id = request.POST.get("node_id", '')
       
-      collection = db[Node.collection_name]
-      imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
-                                              '_type': 'File', 
-                                              '$or': [
-                                                  {'$or': [
-                                                    {'access_policy': u"PUBLIC"},
-                                                      {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                                    ]
-                                                  }
-                                                ,
-                                                {'$and': [
-                                                  {'$or': [
-                                                    {'access_policy': u"PUBLIC"},
-                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                                    ]
-                                                  }
-                                                  ]
-                                                }
-                                              ],
-                                              'group_set': {'$all': [ObjectId(group_id)]}
-                                            }).sort("last_update", -1)
+      # collection = db[Node.collection_name]
+      # imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+      #                                         '_type': 'File', 
+      #                                         '$or': [
+      #                                             {'$or': [
+      #                                               {'access_policy': u"PUBLIC"},
+      #                                                 {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+      #                                               ]
+      #                                             }
+      #                                           ,
+      #                                           {'$and': [
+      #                                             {'$or': [
+      #                                               {'access_policy': u"PUBLIC"},
+      #                                               {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+      #                                               ]
+      #                                             }
+      #                                             ]
+      #                                           }
+      #                                         ],
+      #                                         'group_set': {'$all': [ObjectId(group_id)]}
+      #                                       }).sort("last_update", -1)
 
 
       node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+
+      node_obj.get_neighbourhood(node_obj.member_of)
+
       return render_to_response('ndf/node_ajax_view.html', 
                                   { 'node': node_obj,
                                     'group_id': group_id,
-                                    'groupid':group_id,
-                                    'imageCollection':imageCollection
+                                    'groupid':group_id
+                                    # 'imageCollection':imageCollection
                                   },
                                   context_instance = RequestContext(request)
       )
@@ -653,6 +656,7 @@ def search_drawer(request, group_id):
             dict_drawer[each._id] = each
 
 
+
       drawers = dict_drawer
       if not node_id:
         drawer1 = drawers
@@ -671,7 +675,7 @@ def search_drawer(request, group_id):
       )    
       
 
-
+####Bellow part is for manipulating theme topic hierarchy####
 def get_collection_list(collection_list, node):
   inner_list = []
   error_list = []
@@ -734,6 +738,61 @@ def get_tree_hierarchy(request, group_id, node_id):
 
     return HttpResponse(json.dumps(data))
 
+####End of manipulating theme topic hierarchy####
+
+##### bellow part is for manipulating nodes collections#####
+def get_inner_collection(collection_list, node):
+  inner_list = []
+  error_list = []
+
+  if node.collection_set:
+    for each in node.collection_set:
+      col_obj = collection.Node.one({'_id': ObjectId(each)})
+      if col_obj:
+        for cl in collection_list:
+          if cl['id'] == node.pk:
+            node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
+            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
+            inner_sub_list = [inner_sub_dict]
+            inner_sub_list = get_inner_collection(inner_sub_list, col_obj)
+
+            if inner_sub_list:
+              inner_list.append(inner_sub_list[0])
+            else:
+              inner_list.append(inner_sub_dict)
+
+            cl.update({'children': inner_list })
+      else:
+        error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
+        print "\n " + error_message
+
+    return collection_list
+
+  else:
+    return collection_list
+
+
+def get_collection(request, group_id, node_id):
+
+  node = collection.Node.one({'_id':ObjectId(node_id)})
+  # print "\nnode: ",node.name,"\n"
+
+  collection_list = []
+
+  if node:
+    if node.collection_set:
+      for each in node.collection_set:
+        obj = collection.Node.one({'_id': ObjectId(each) })
+        if obj:
+          node_type = collection.Node.one({'_id': ObjectId(obj.member_of[0])}).name
+          collection_list.append({'name': obj.name, 'id': obj.pk,'node_type': node_type})
+          collection_list = get_inner_collection(collection_list, obj)
+
+
+  data = collection_list
+  return HttpResponse(json.dumps(data))
+
+####End of manipulating nodes collection####
 
 def add_sub_themes(request, group_id):
 
