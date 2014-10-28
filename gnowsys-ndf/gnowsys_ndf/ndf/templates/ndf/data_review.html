@@ -713,14 +713,14 @@
 
 
 	// function for setting the values in the view of data row.
-	function setViewByEditData(oid)
+	function setViewByEditData(oid, status)
 	{
 		// fetching resource object VIEW row
 		var $resViewRow = $("tr#view-row-" + oid),
 			resViewRowArr = $resViewRow.children();
 
 		// fetching resource object EDIT row
-		var $resEditRow = $("tr#edit-row-" + oid);
+		var $resEditRow = $("tr#edit-row-" + oid),
 			resEditRowArr = $resEditRow.children();
 
 		// processing each element of row
@@ -736,7 +736,13 @@
 
 					if(tempViewFieldVal != tempEditFieldVal)
 					{
-						resViewRowArr[4+i].textContent = resEditRowArr[i].firstElementChild.value.trim();						
+						resViewRowArr[4+i].textContent = resEditRowArr[i].firstElementChild.value.trim();
+					}
+
+					if(resEditRowArr[i].firstElementChild.name.trim() == "status")
+					{
+						resViewRowArr[4+i].textContent = status;
+						resEditRowArr[i].firstElementChild.value = status;								
 					}
 				}
 				else if((resEditRowArr[i].firstElementChild.type == "button"))
@@ -774,6 +780,7 @@
 
 			}
 		}
+		// --- END of for()
 	}
 
 
@@ -809,8 +816,8 @@
 					csrfmiddlewaretoken: '{{ csrf_token }}'
 				},
 				success: function(data){
-					alert("Resource is successfully saved." + data);
-					setViewByEditData(oid);
+					alert("Resource is successfully saved.");
+					setViewByEditData(oid, data);
 					changeSaveCancelToEdit(oid, resEditRowArr)
 				}
 			})
