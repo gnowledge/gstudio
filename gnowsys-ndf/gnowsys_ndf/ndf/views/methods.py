@@ -485,7 +485,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   # for license field
   if license and license != node.license:
-      file_node.license = file_node.license
+      node.license = node.license
       is_changed = True
 
   #  prior_node

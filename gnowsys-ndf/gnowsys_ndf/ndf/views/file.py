@@ -45,7 +45,6 @@ import threading
 from django.http import Http404
 #from string import maketrans 
 
-
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 
@@ -53,9 +52,8 @@ from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.models import STATUS_CHOICES
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,set_all_urls
-
-
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list ,set_all_urls
+from gnowsys_ndf.ndf.views.methods import create_grelation
 
 db = get_database()
 collection = db[Node.collection_name]
@@ -1350,6 +1348,8 @@ def data_review_save(request, group_id):
     Method to save each and every data-row edit of data review app
     '''
 
+    userid = request.user.pk
+
     # getting group obj from name
     group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
 
@@ -1373,6 +1373,7 @@ def data_review_save(request, group_id):
     node_details["lan"] = node_details.pop("language")
     node_details["prior_node_list"] = node_details.pop("prior_node")
     node_details["login-mode"] = node_details.pop("access_policy")
+    status = node_details.pop("status")
     # node_details["collection_list"] = node_details.pop("collection") for future use
 
     # Making copy of POST QueryDict instance.
@@ -1394,29 +1395,64 @@ def data_review_save(request, group_id):
     file_node = collection.File.one({"_id": ObjectId(node_oid)})
 
     if request.method == "POST":
-        is_changed = get_node_common_fields(request, file_node, group_id, GST_FILE)
 
-        if license and license != file_node.license:
-            file_node.license = file_node.license
+        is_changed = get_node_common_fields(request, file_node, group_id, GST_FILE)
+        
+        # to fill/update attributes of the node and get updated attrs as return 
+        ga_nodes = get_node_metadata(request, file_node, GST_FILE, is_changed=True)
+        
+        if len(ga_nodes):
             is_changed = True
+
+        teaches_list = request.POST.get('teaches','') # get the teaches list
+        if teaches_list != '':
+            teaches_list = teaches_list.split(",")
+            teaches_list = [ObjectId(each_oid) for each_oid in teaches_list]
+            # print "\n-------------", teaches_list
+
+            relation_type_node = collection.Node.one({'_type': "RelationType", 'name':'teaches'})
+
+            gr_nodes = create_grelation(file_node._id, relation_type_node, teaches_list)
+            gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes]
+
+            if len(gr_nodes_oid_list) == len(teaches_list) and set(gr_nodes_oid_list) == set(teaches_list):
+                pass
+            else:
+                is_changed = True
+
+        assesses_list = request.POST.get('assesses_list','')
+        if assesses_list != '':
+            assesses_list = assesses_list.split(",")
+            assesses_list = [ObjectId(each_oid) for each_oid in assesses_list]
+
+            relation_type_node = collection.Node.one({'_type': "RelationType", 'name':'assesses'})
+
+            gr_nodes = create_grelation(file_node._id, relation_type_node, teaches_list)
+            gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes]
+
+            if len(gr_nodes_oid_list) == len(teaches_list) and set(gr_nodes_oid_list) == set(teaches_list):
+                pass
+            else:
+                is_changed = True
+
+        # checking if user is authenticated to change the status of node
+        if status and (group_obj.created_by == userid or (userid in group_obj.group_admin) or (userid in group_obj.author_set) or request.user.is_superuser):
+            if file_node.status != status:
+                file_node.status = unicode(status)
+                file_node.modified_by = userid
+
+                if userid not in file_node.contributors:
+                    file_node.contributors.append(userid)
+
+                is_changed = True
+
+        # if request.user.is_superuser:
+        #     print "superuser"
+        # else:
+        #     print "NOt superuser"
 
         if is_changed:
             file_node.save()
-
-    # to fill/update attributes of the node
-    get_node_metadata(request, file_node, GST_FILE)
-
-    teaches_list = request.POST.get('teaches','') # get the teaches list 
-
-    if teaches_list !='':
-        teaches_list=teaches_list.split(",")
-        create_grelation_list(file_node._id,"teaches",teaches_list)
-
-    assesses_list = request.POST.get('assesses_list','')
-    
-    if assesses_list !='':
-        assesses_list=assesses_list.split(",")
-        create_grelation_list(file_node._id,"assesses",assesses_list)
 
     return HttpResponse("")
 
