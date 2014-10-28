@@ -300,7 +300,7 @@
   $("select#acourse_list").change(function() {
     var acourse_name = $("#acourse_list").val();
     $.ajax({
-      url: "{% url 'get_studentenrollcourse_of_ac_id' group_id %}",
+      url: "{% url 'get_enroll_duration_of_ac' group_id %}",
 
       data: {
         acourse_name: acourse_name
@@ -323,19 +323,21 @@
           {
             $("#lblenroll_from").text(data["start_enroll"])
           }
+          else{
+            $("#lblenroll_from").text("--/--/----")
+          }
           if(data["end_enroll"])
           {
             $("#lblenroll_to").text(data["end_enroll"])
           }
-
+          else{
+            $("#lblenroll_to").text("--/--/----")
+          }
         }
-      },
+      },//end of success
 
-
-  });
-
-
-  });
+    });//end of ajax call
+   });//end of .change function
 
 
   $("select#nussd_course_type").change(function() {
@@ -355,6 +357,9 @@
       complete: function () {
         // Enable District field
         $("select#acourse_list").removeAttr('disabled')
+        $("#lblenroll_from").text("--/--/----")
+        $("#lblenroll_to").text("--/--/----")
+
         
       },
 
@@ -388,7 +393,6 @@
     // later on, on successful returned O/P, displaying Announce(submit) button
     if($(this).parents("fieldset").find(':input[data-invalid]').length == 0) {
       var registration_year = $("#registration_year").val();
-      var college = $("#college option:selected").val();
       var all_students = $("#all_students").prop("checked");
       var success_state = false
 
@@ -398,7 +402,6 @@
 
         data: {
           registration_year: registration_year,
-          college: college,
           all_students: all_students
         },
 
@@ -414,9 +417,6 @@
             $("#alertModal").removeClass("alert");
             $("#alertModal").addClass("success");
             $("#alertModal").foundation('reveal', 'open');
-
-
-            // If nussd_course_type is Foundation Course disable all checkboxes
 
             // Fill divSt
             $("#divSt").empty();
@@ -439,13 +439,6 @@
             if ($("#sbtnEnroll").css("display") == "none") {
               $("#sbtnEnroll").toggle();
             }
-
-            // Also toggle fieldset (fsAc)
-            if ($("#fsAc").css("display") == "none") {
-              $("#cbxSelectAllOptions").prop("checked", true);
-              $("#fsAc").toggle();
-            }
-
             // Also toggle fieldset (fsSt)
             if ($("#fsSt").css("display") == "none") {
               $("#fsSt legend label h5").text(all_students_txt);
@@ -459,11 +452,6 @@
               $("#sbtnEnroll").toggle();
             }
 
-            // Also toggle fieldset (fsAc)
-            if ($("#fsAc").css("display") != "none") {
-              $("#divAc").empty();
-              $("#fsAc").toggle();
-            }
 
             // Also toggle fieldset (fsSt)
             if ($("#fsSt").css("display") != "none") {
@@ -507,7 +495,7 @@
     $("#student_enroll_list").val(student_enroll_list);
 
   // Fetching Announced courses (checked) & setting their value into hidden list
-    var announced_courses_list = [];
+/*    var announced_courses_list = [];
     $("input[name='acOptions']:checked").each(function(){
       ac_val = this.value
       if (ac_val.contains(">>")) {
@@ -516,9 +504,10 @@
 
       announced_courses_list.push(ac_val)
     });
-
+*/
+    var acourse_name = $("#acourse_list").val();
     // Setting hidden field's value as the list of checked announced_courses
-    $("#announced_courses_list").val(announced_courses_list);
+    $("#announced_courses_list").val(acourse_name);
   });
 // </script>
 {% endblock %}

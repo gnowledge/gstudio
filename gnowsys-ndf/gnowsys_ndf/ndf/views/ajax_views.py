@@ -1986,20 +1986,10 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
-def announce_to_colleges(request, group_id):
-  if request.is_ajax() and request.method == "POST":
-    announce_to_colg_list = request.POST.get("announce_to_colg_list", '')
-    right_drawer_len = request.POST.get("right_drawer_len",'')
-    print "\n\n******** inside ajax_views*******\n\n"
-    print type(announce_to_colg_list)
-    print "announce_to_colg_list",announce_to_colg_list," is Empty",right_drawer_len
-    # for each in announce_to_colg_list:
-    #   print each
-    return HttpResponse("failure")
 
 # =============================================================================
 
-def get_announced_courses(request, group_id):
+def get_courses(request, group_id):
   """
   This view returns list of announced-course(s) that match given criteria
   along with NUSSD-Course(s) for which match doesn't exists.
@@ -2117,36 +2107,36 @@ def get_announced_courses(request, group_id):
         raise Exception(error_message)
 
       # Search for already created announced-courses with given criteria
-      ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
-                                      'group_set': {'$in': groups_to_search_from},
-                                      'attribute_set.start_time': start_time, 
-                                      'attribute_set.end_time': end_time,
-                                      'attribute_set.nussd_course_type': nussd_course_type
-                                    })
+      # ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
+      #                                 'group_set': {'$in': groups_to_search_from},
+      #                                 'attribute_set.start_time': start_time, 
+      #                                 'attribute_set.end_time': end_time,
+      #                                 'attribute_set.nussd_course_type': nussd_course_type
+      #                               })
 
-      if ac_cur.count():
-        # Iterate already existing announced-course(s)' instances
-        # > Iterate registered NUSSD-courses 
-        #   >> If match found between both of them
-        #   >> Then
-        #      >>> delete registered NUSSD-course entry from dict
-        #      >>> Add already existing Announced-course entry in it
-        #      >>> break inner for-loop, continue with next announced-course value
-        for each in ac_cur:
-          for k, v in nc_dict.iteritems():
-            if v in each.name:
-              del nc_dict[k]
-              nc_dict[str(each._id)] = each.name
-              break
+      # if ac_cur.count():
+      #   # Iterate already existing announced-course(s)' instances
+      #   # > Iterate registered NUSSD-courses 
+      #   #   >> If match found between both of them
+      #   #   >> Then
+      #   #      >>> delete registered NUSSD-course entry from dict
+      #   #      >>> Add already existing Announced-course entry in it
+      #   #      >>> break inner for-loop, continue with next announced-course value
+      #   for each in ac_cur:
+      #     for k, v in nc_dict.iteritems():
+      #       if v in each.name:
+      #         del nc_dict[k]
+      #         nc_dict[str(each._id)] = each.name
+      #         break
 
-        response_dict["success"] = True
-        response_dict["message"] = "NOTE: Some announced-course(s) found which match given criteria."
-        response_dict["unset_nc"] = nc_dict
+      #   response_dict["success"] = True
+      #   response_dict["message"] = "NOTE: Some announced-course(s) found which match given criteria."
+      #   response_dict["unset_nc"] = nc_dict
 
-      else:
-        response_dict["success"] = True
-        response_dict["message"] = "NOTE: No match found of announced-course instance(s) with given criteria."
-        response_dict["unset_nc"] = nc_dict
+      # else:
+      response_dict["success"] = True
+      response_dict["message"] = "NOTE: No match found of announced-course instance(s) with given criteria."
+      response_dict["unset_nc"] = nc_dict
 
       return HttpResponse(json.dumps(response_dict))
 
@@ -2224,7 +2214,7 @@ def get_announced_courses_with_ctype(request, group_id):
     return HttpResponse(json.dumps({'message': error_message}))
 
 
-def get_studentenrollcourse_of_ac_id(request, group_id):
+def get_enroll_duration_of_ac(request, group_id):
   """
   This view returns list of announced-course(s) that match given criteria
   along with NUSSD-Course(s) for which match doesn't exists.
@@ -2254,19 +2244,19 @@ def get_studentenrollcourse_of_ac_id(request, group_id):
         print acourse_node,"\n\nMultiple Announced Course with same name exists"
 
       se= acourse_node.attribute_set[3]
-      se = se[u'start_enroll'].strftime("%d-%m-%Y")
+      se = se[u'start_enroll'].strftime("%m-%d-%Y")
       response_dict["start_enroll"]=se
 
       ee= acourse_node.attribute_set[4]
-      ee = ee[u'end_enroll'].strftime("%d-%m-%Y")
+      ee = ee[u'end_enroll'].strftime("%m-%d-%Y")
       response_dict["end_enroll"]=ee
       return HttpResponse(json.dumps(response_dict))
     else:
-      error_message = " SECFetchError: Either not an ajax call or not a GET request!!!"
-      return HttpResponse(json.dumps({'message': " SECFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+      error_message = " EnrollDurationFetchError: Either not an ajax call or not a GET request!!!"
+      return HttpResponse(json.dumps({'message': " EnrollDurationFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
 
   except Exception as e:
-    error_message = "\n SECFetchError: " + str(e) + "!!!"
+    error_message = "\n EnrollDurationFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
 def get_colleges(request,group_id):
@@ -2292,7 +2282,7 @@ def get_colleges(request,group_id):
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
       univ_id = request.GET.get("univ_id", "")
-      all_univs = request.GET.get("all_univs", "")
+      # all_univs = request.GET.get("all_univs", "")
       
       # Check whether any field has missing value or not
       if univ_id == "":
@@ -2327,12 +2317,12 @@ def get_colleges(request,group_id):
           college_ids = each["affiliated_college"]
           
       #If "Select All" checkbox is True, display all colleges from all universities
-      if all_univs == u"true":
-        colg_under_univ_id = collection.Node.find({'member_of': college._id},{'name': 1}).sort('name',1)
-        msg_string = " List of colleges in ALL Universities."
-      else:
-        colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'name': 1}).sort('name',1)
-        msg_string = " List of colleges in " +university_node.name+"."
+      # if all_univs == u"true":
+      #   colg_under_univ_id = collection.Node.find({'member_of': college._id},{'name': 1}).sort('name',1)
+      #   msg_string = " List of colleges in ALL Universities."
+      # else:
+      colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'name': 1}).sort('name',1)
+      msg_string = " List of colleges in " +university_node.name+"."
       
       list_colg=[]                           
       for each in colg_under_univ_id:
@@ -2458,7 +2448,7 @@ def get_anncourses_allstudents(request, group_id):
       response_dict["drawer_widget"] = drawer_widget
 
       response_dict["success"] = True
-      response_dict["message"] = "NOTE: " + all_students_text + " are listed along with announced courses ("+nussd_course_type+")"
+      response_dict["message"] = "NOTE: " + all_students_text + " are listed along with announced courses"
 
       return HttpResponse(json.dumps(response_dict))
 
