@@ -12,6 +12,7 @@ from django.template import TemplateDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 
 from django_mongokit import get_database
 
@@ -27,8 +28,10 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+
 
 
 collection = get_database()[Node.collection_name]
@@ -172,7 +175,7 @@ def course_detail(request, group_id, _id):
         pass
     course_node = collection.Node.one({"_id": ObjectId(_id)})
     if course_node._type == "GSystemType":
-	return course(request, group_id, _id)
+      return course(request, group_id, _id)
     return render_to_response("ndf/course_detail.html",
                                   { 'node': course_node,
                                     'groupid': group_id,
@@ -252,14 +255,31 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
     start_time = ""
     if request.POST.has_key("start_time"):
+      #convert string into datetime object
       start_time = request.POST.get("start_time", "")
-      start_time = datetime.datetime.strptime(start_time, "%m/%Y")
+      start_time = datetime.datetime.strptime(start_time,"%m/%Y")
+      #get month name (%b for abbreviation and %B for full name) and year and convert to str
+      start_time = start_time.strftime("%b %Y")
 
     end_time = ""
     if request.POST.has_key("end_time"):
       end_time = request.POST.get("end_time", "")
-      end_time = datetime.datetime.strptime(end_time, "%m/%Y")
+      end_time = datetime.datetime.strptime(end_time,"%m/%Y")
+      end_time = end_time.strftime("%b %Y")
 
+
+    start_enroll = ""
+    if request.POST.has_key("start_enroll"):
+      start_enroll = request.POST.get("start_enroll", "")
+      start_enroll = datetime.datetime.strptime(start_enroll,"%m/%d/%Y")
+      start_enroll = start_enroll.strftime("%D")
+
+    end_enroll = ""
+    if request.POST.has_key("end_enroll"):
+      end_enroll = request.POST.get("end_enroll", "")
+      end_enroll = datetime.datetime.strptime(end_enroll,"%m/%d/%Y")
+      end_enroll = end_enroll.strftime("%D")
+      
     nussd_course_type = ""
     if request.POST.has_key("nussd_course_type"):
       nussd_course_type = request.POST.get("nussd_course_type", "")
@@ -271,132 +291,189 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
     else:
       unset_ac_options = ["dummy"] # Just to execute loop at least once for Course Sub-Types other than 'Announced Course'
-
-    for each in unset_ac_options:
-      if course_gst.name == u"Announced Course":
-        # Code to be executed only for 'Announced Course' GSystem(s)
-        sid, nm = each.split(">>")
-
-        course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
-
-        if not course_gs:
-          course_gs = collection.GSystem()
-
-        else:
-          if " -- " in nm:
-            nm = nm.split(" -- ")[0].lstrip().rstrip()
-
-        c_name = unicode(nm + " -- " + nussd_course_type + " -- " + str(start_time) + " -- " + str(end_time))
-        request.POST["name"] = c_name
-
-      is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
-
-      if is_changed:
-        # Remove this when publish button is setup on interface
-        course_gs.status = u"PUBLISHED"
-
-      course_gs.save(is_changed=is_changed)
     
+    announce_to_colg_list = request.POST.get("announce_to_colg_list", "")
+    colg_names = []
+    colg_names = announce_to_colg_list.split(',')
+    announce_to_colg_list = request.POST.get("announce_to_colg_list", "")
+    colg_names = []
+    colg_names = announce_to_colg_list.split(',')
+    colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
+    colg_list_cur = collection.Node.find({'name': {'$in': colg_names},'member_of':colg_gst._id},{'_id':1, 'name':1})
+
+    #list of colleges selected
+    colg_grp_list_cur = collection.Node.find({'_type':u"Group",'name': {'$in': colg_names}},{'_id':1, 'name':1})
+    
+    colg_PO = {}
+
+    PO = {
+      "Agra College": ["Mr. Rajaram Yadav"],
+      "Arts College Shamlaji": ["Mr. Ashish Varia"],
+      "Baba Bhairabananda Mahavidyalaya": ["Mr. Mithilesh Kumar"],
+      "Balugaon College": ["Mr. Pradeep Pradhan"],
+      "City Women's College": ["Ms. Rajni Sharma"],
+      "Comrade Godavari Shamrao Parulekar College of Arts, Commerce & Science": ["Mr. Rahul Sable"],
+      "Faculty of Arts": ["Mr. Jokhim", "Ms. Tusharika Kumbhar"],
+      "Gaya College":  ["Ms. Rishvana Sheik"],
+      "Govt. M. H. College of Home Science & Science for Women, Autonomous": [], 
+      "Govt. Mahakoshal Arts and Commerce College": ["Ms. Davis Yadav"],
+      "Govt. Mahaprabhu Vallabhacharya Post Graduate College": ["Mr. Gaurav Sharma"],
+      "Govt. Rani Durgavati Post Graduate College": ["Mr. Asad Ullah"],
+      "Jamshedpur Women's College": ["Mr. Arun Agrawal"],
+      "Kalyan Post Graduate College": ["Mr. Praveen Kumar"],
+      "Kamla Nehru College for Women": ["Ms. Tusharika Kumbhar", "Ms. Thaku Pujari"],
+      "L. B. S. M. College": ["Mr. Charles Kindo"],
+      "Mahila College": ["Mr. Sonu Kumar"],
+      "Marwari College": ["Mr. Avinash Anand"],
+      "Matsyodari Shikshan Sanstha's Arts, Commerce & Science College": ["Ms. Jyoti Kapale"],
+      "Ranchi Women's College": ["Mr. Avinash Anand"],
+      "Shiv Chhatrapati College": ["Mr. Swapnil Sardar"],
+      "Shri & Smt. PK Kotawala Arts College": ["Mr. Sawan Kumar"],
+      "Shri VR Patel College of Commerce": ["Mr. Sushil Mishra"],
+      "Sree Narayana Guru College of Commerce": ["Ms. Bharti Bhalerao"],
+      "Sri Mahanth Shatanand Giri College": ["Mr. Narendra Singh"],
+      "St. John's College": ["Mr. Himanshu Guru"],
+      "The Graduate School College For Women": ["Mr. Pradeep Gupta"],
+      "Vasant Rao Naik Mahavidyalaya": ["Mr. Dayanand Waghmare"],
+      "Vivekanand Arts, Sardar Dalip Singh Commerce & Science College": ["Mr. Anis Ambade"]
+    }
+
+    userObj = {}
+    for each in colg_grp_list_cur:
+      for key,val in PO.items():
+        if (key == each.name):
+          if val:
+            try:
+              for key1,val1 in val.items():
+                userObj[(User.objects.get(email = val1))]=key1
+            except:
+              print "No PO exists"  
+          else:
+            print "No PO exists for ",each.name
+
+    for colg_ids in colg_list_cur: 
+      #for each selected college
+      for each in unset_ac_options:
+        #for each selected course to Announce
+        if course_gst.name == u"Announced Course":
+          # Code to be executed only for 'Announced Course' GSystem(s)
+          sid, nm = each.split(">>")
+          course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
+          if not course_gs:
+            course_gs = collection.GSystem()
+          else:
+            if " -- " in nm:
+              nm = nm.split(" -- ")[0].lstrip().rstrip()
+          c_name = unicode(nm + " -- " + nussd_course_type + " -- " + colg_ids.name+" -- " + start_time + " -- " + end_time)
+          request.POST["name"] = c_name
+        is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
+        if is_changed:
+          # Remove this when publish button is setup on interface
+          course_gs.status = u"PUBLISHED"
+        course_gs.save(is_changed=is_changed)
+
+        #Send e-mail notification to POs of respective Colleges
+        if course_gst.name == u"Announced Course":
+          sitename=Site.objects.all()[0]
+          if userObj:
+            for key,val in userObj.items():
+              activ="Course Announced"
+              msg="\n\nGreetings "+val+","+"\nCourse Announced : " +nm+"("+nussd_course_type+")" +" for period "+start_time+" to "+end_time+"."+"\nStudent Enrollment can be done from "+\
+                start_enroll+ " to "+ end_enroll+"."+"\n\nBest Regards,\n"+sitename.name.__str__()+" Management."
+              set_notif_val(request,group_id,msg,activ,key)
+          else:
+            print "No email/PO"
+
       # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
-      for tab_details in property_order_list:
-        for field_set in tab_details[1]:
-          # Fetch only Attribute field(s) / Relation field(s)
-          if field_set.has_key('_id'):
-            field_instance = collection.Node.one({'_id': field_set['_id']})
-            field_instance_type = type(field_instance)
-            if field_instance_type in [AttributeType, RelationType]:
-              
-              field_data_type = field_set['data_type']
+        for tab_details in property_order_list:
+          for field_set in tab_details[1]:
+            # Fetch only Attribute field(s) / Relation field(s)
+            if field_set.has_key('_id'):
+              field_instance = collection.Node.one({'_id': field_set['_id']})
+              field_instance_type = type(field_instance)
+              if field_instance_type in [AttributeType, RelationType]:
+                
+                field_data_type = field_set['data_type']
 
-              # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
-              if field_instance_type == AttributeType:
+                # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
+                if field_instance_type == AttributeType:
 
-                if "File" in field_instance["validators"]:
-                  # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
-                  
-                  if field_instance["name"] in request.FILES:
-                    field_value = request.FILES[field_instance["name"]]
+                  if "File" in field_instance["validators"]:
+                    # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
+                    
+                    if field_instance["name"] in request.FILES:
+                      field_value = request.FILES[field_instance["name"]]
+
+                    else:
+                      field_value = ""
+                    
+                    # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
+                    if field_value != '' and field_value != u'':
+                      file_name = course_gs.name + " -- " + field_instance["altnames"]
+                      content_org = ""
+                      tags = ""
+                      field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
 
                   else:
-                    field_value = ""
-                  
-                  # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
-                  if field_value != '' and field_value != u'':
-                    file_name = course_gs.name + " -- " + field_instance["altnames"]
-                    content_org = ""
-                    tags = ""
-                    field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
+                    # Other AttributeTypes 
+                    field_value = request.POST.get(field_instance["name"], "")
 
-                else:
-                  # Other AttributeTypes 
-                  # field_value = request.POST[field_instance["name"]]
-                  field_value = request.POST.get(field_instance["name"], "")
-
-                if field_instance["name"] in ["start_time", "end_time"]: #, "registration_year"]:
-                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
-
-                elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
-                  # Needs sepcial kind of parsing
-                  field_value = []
-                  tr_qualifications = request.POST.get(field_instance["name"], '')
-                  
-                  if tr_qualifications:
-                    qualifications_dict = {}
-                    tr_qualifications = [each.strip() for each in tr_qualifications.split(",")]
+                  if field_instance["name"] in ["start_time","end_time"]: #Course Duration 
+                    field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
+                  elif field_instance["name"] in ["start_enroll", "end_enroll"]: #Student Enrollment DUration
+                    field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
+                  elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
+                    # Needs sepcial kind of parsing
+                    field_value = []
+                    tr_qualifications = request.POST.get(field_instance["name"], '')
                     
-                    for i, each in enumerate(tr_qualifications):
-                      if (i % 2) == 0:
-                        if each == "true":
-                          qualifications_dict["mandatory"] = True
-                        elif each == "false":
-                          qualifications_dict["mandatory"] = False
-
-                      else:
-                        qualifications_dict["text"] = unicode(each)
-                        field_value.append(qualifications_dict)
-                        qualifications_dict = {}
-
-                elif field_instance["name"] in ["max_marks", "min_marks"]:
-                  # Needed because both these fields' values are dependent upon evaluation_type field's value
-                  evaluation_type = request.POST.get("evaluation_type", "")
-                  if evaluation_type == u"Continuous":
-                    field_value = None
-                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
-
+                    if tr_qualifications:
+                      qualifications_dict = {}
+                      tr_qualifications = [each.strip() for each in tr_qualifications.split(",")]
+                      
+                      for i, each in enumerate(tr_qualifications):
+                        if (i % 2) == 0:
+                          if each == "true":
+                            qualifications_dict["mandatory"] = True
+                          elif each == "false":
+                            qualifications_dict["mandatory"] = False
+                        else:
+                          qualifications_dict["text"] = unicode(each)
+                          field_value.append(qualifications_dict)
+                          qualifications_dict = {}
+                  elif field_instance["name"] in ["max_marks", "min_marks"]:
+                    # Needed because both these fields' values are dependent upon evaluation_type field's value
+                    evaluation_type = request.POST.get("evaluation_type", "")
+                    if evaluation_type == u"Continuous":
+                      field_value = None
+                    field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                  else:
+                    field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                  course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
                 else:
-                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                  #i.e if field_instance_type == RelationType
+                  if field_instance["name"] == "announced_for":
+                    field_value = ObjectId(sid)
+                    #Pass ObjectId of selected Course
 
-                # if field_value:
-                course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
-                # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
+                  elif field_instance["name"] == "acourse_for_college":
+                    field_value = colg_ids._id
+                    #Pass ObjectId of selected College
+                  
+                  course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value)
 
-              else:
-                field_value_list = request.POST.getlist(field_instance["name"])
-
-                # field_instance_type = "GRelation"
-                for i, field_value in enumerate(field_value_list):
-                  field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
-                  field_value_list[i] = field_value
-
-                course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value_list)
-                
-                # if isinstance(course_gs_triple_instance, list):
-                #   print "\n"
-                #   for each in course_gs_triple_instance:
-                #     print " course_gs_triple_instance: ", each._id, " -- ", each.name
-                #   print "\n"
-
-                # else:
-                #   print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
-    
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
+  univ = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
+  university_cur = collection.Node.find({'member_of': univ._id}, {'name': 1}).sort('name', 1)
+
   default_template = "ndf/course_create_edit.html"
   context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
-                        'property_order_list': property_order_list
+                        'university_cur':university_cur,
+                        'property_order_list': property_order_list,
                       }
 
   if app_set_instance_id:
@@ -473,8 +550,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       for eachset in agency_type_node.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
-  # for eachset in app.collection_set:
-  #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   if app_set_id:
     course_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
@@ -495,13 +570,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
-    # print "\n property_order_list: ", property_order_list, "\n"
     node.get_neighbourhood(node.member_of)
-  #   print "\n node.keys(): ", node.keys(), "\n"
-
-  # print "\n course_gst._id: ", course_gst._id
-
-  # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
