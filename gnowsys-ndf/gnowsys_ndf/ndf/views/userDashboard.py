@@ -186,24 +186,34 @@ def userpref(request,group_id):
 @login_required
 def uDashboard(request, group_id):
     usrid = group_id
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
-        pass
-    Group_name=collection.Node.find_one({"_id": ObjectId(group_id)})
-    group_name=Group_name.name
+
     ID = int(usrid)
-    userObject = User.objects.get(pk=ID)
-    usrname = userObject.username
+    # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
+    user_group = collection.Node.one({'_type': "Author", 'created_by': ID}, {'name': 1})
+    group_id = user_group._id
+
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+    #     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+    #     pass
+    
+    # Group_name=collection.Node.find_one({"_id": ObjectId(group_id)})
+    # group_name=Group_name.name
+    # userObject = User.objects.get(pk=ID)
+    # usrname = userObject.username
+    
+    group_name = user_group.name
+    usrname = user_group.name
+
     date_of_join = request.user.date_joined
     current_user = request.user.pk
 
@@ -333,7 +343,7 @@ def uDashboard(request, group_id):
         img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
       else:
         img_obj = "" 
-    print group_id
+
     return render_to_response("ndf/uDashboard.html",
                               {'username': usrname, 'user_id': ID, 'DOJ': date_of_join,
                                'group_id':group_id, 'usr': current_user,             

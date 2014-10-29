@@ -6,22 +6,19 @@
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   
-  <!-- Scripts required for D3 graph -->
-  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
-  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
-  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
-  
   <!-- Scripts and stylesheets for SideComments -->
-  <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script>
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css">
-  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css">
+  <!-- <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script> -->
+  <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css"> -->
 
-  <!-- orgitdown! -->
-  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
-  <!-- orgitdown! toolbar settings -->
-  <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
-  <!-- orgitdown! skin -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+  {% if user.is_authenticated %}
+    <!-- orgitdown! -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+    <!-- orgitdown! toolbar settings -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+    <!-- orgitdown! skin -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+  {% endif %}
 
 {% endblock %}
 
@@ -138,7 +135,7 @@
     
     padding:10px;
     background-color:#d8f1f3;
-    width:25em;
+    width:27em;
     max-width: 40em;
     margin-left: 48px; 
     margin-top: 10px;
@@ -181,6 +178,8 @@
 
 {% get_schema node as schema %} 
 
+{% check_user_join request groupid as user_is_joined %}
+
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
     
     <section class="medium-9 columns" >
@@ -191,17 +190,26 @@
 
        
       
-      <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span> </h1>
+      <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
+
+      {% if node %}
+        {% get_publish_policy request groupid node as group_policy %}
+        {% if group_policy == "allow" %}
+          &nbsp;&nbsp;&nbsp;<span style='position:fixed; color: gray;'>Draft</span>
+        {% endif %}
+      {% endif %}
+
+      </h1>
 
       <h1 class="subheader">
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
-      <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
 
-      <dd>
-        <a href="#view-discussion"><i class="fi-comment"></i> 
+      <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
+        
           {% if all_replies %}
             <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
               {% trans "Join Discussion" %} ({{ all_replies | length }})
@@ -211,6 +219,7 @@
               {% trans "Begin Discussion" %}
             </span>
           {% endif %}
+
         </a>
       </dd>
 
@@ -570,9 +579,12 @@
         
       {% endif %}
       
+
+      <div id="view-discussion" style="display:none;">
       <!-- discussion content area -->
         {% include 'ndf/discussion.html' %}
       <!-- END of discussion content area -->     
+      </div>
 
     </div><!-- end of tab's content -->
   </section>
@@ -601,12 +613,12 @@
   <ul class="side-nav">
     <div class="panel" style="background-color:#ddd;">
 
-      <b>{% trans "Actions" %}</b><br/>
-
       {% user_access_policy groupid request.user as user_access %} 
+      
+      {% if user.is_authenticated %}
+      <b>{% trans "Actions" %}</b><br/>
       <div class="row">         
         <div class="medium-6 columns">
-
           
           {% edit_policy groupid node request.user as status %}
           {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
@@ -619,7 +631,9 @@
               {% endif %}
 
             {% else %}
-              <a href="{% url edit_url group_name_tag node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              {% if user_is_joined == "joined" or user_is_joined == "author" %}
+                <a href="{% url edit_url group_name_tag node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              {% endif %}
             {% endif %}
           {% endif %}
         </div>
@@ -649,58 +663,121 @@
         <div class="medium-5 columns">
         <!-- Delete button if page created by user -->
           {% if node.created_by == request.user.id %}
-            <a class="tiny alert round button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+            {% if node.member_of_names_list.0 == "Page" %}
+              <a class="tiny alert round button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+            {% elif node.member_of_names_list.0 == "Term" %}
+              <a class="tiny alert round button" href="{% url 'term_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+            {% endif %}
           {% endif %}
         </div>
         <div class="medium-7 columns">
           {% get_create_url node.pk as create_url %}
-
           {% if is_group %}
-            {% if request.user.is_superuser %}
-            <li>
-              <a href="{% url create_url group_name_tag %}" class="tiny round button">
-                <span class="fi-plus">&nbsp;&nbsp; New Group</span>
-              </a>
-            </li>
+            
+            {% if user_access == "allow" %}
+              {% if request.user.is_superuser %}
+              <li>
+                <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                  <span class="fi-plus">&nbsp;&nbsp; New Group</span>
+                </a>
+              </li>
+
+              {% endif %}
             {% endif %}
+            
 
           {% else %}
-            {% if node.member_of_names_list.0 == "File" %}
-              <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny round button">
-                <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-              </a>
+            
+            {% if user_is_joined == "joined" or  user_is_joined == "author" %}
 
-            {% else %}
-              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
-                <a href="{% url create_url group_name_tag app_id %}" class="tiny round button">
-                  <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+              {% if node.member_of_names_list.0 == "File" %}
+                <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny round button">
+                  <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                 </a>
+
               {% else %}
-                <a href="{% url create_url group_name_tag %}" class="tiny round button">
-                  <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
-                </a>
-              {% endif %}
+                {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+                  <a href="{% url create_url group_name_tag app_id %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                  </a>
+                {% elif node.member_of_names_list.0 == "Term" %}
+                  <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} Topic</span>
+                  </a>
+                {% else %}
+                  <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
+                  </a>
+                {% endif %}
 
+              {% endif %}
             {% endif %}
           {% endif %}
 
         </div>
 
+        
+
         {% if node %}
-          {% get_publish_policy request groupid node as group_policy %}
-          {% if group_policy == "allow" %}
-            <br/><p style='position:fixed; color: gray;font-size: 30pt; margin-left:40px'>Drafted</p><br/>
+          {% check_group node as is_group %}
+          {% if is_group %}
+
+            {% get_group_policy node request.user as policy %}
+            {% get_prior_post_node group_id as groupname %}
+
+            <input type="hidden" id="groupname" value="{{node}}">
+            {% if user.is_authenticated %}
+              {% if user_access == "allow" %}
+               {% if user.is_superuser or node.created_by == user.id %}
+                   <li><a href="{% url 'create_sub_group' group_id %}" class="tiny round button">create subgroup</a></li>
+               {% endif %}
+              {% endif %}
+            {% if user_is_joined == "joined" %}
+              {% if is_user_group and node.created_by != request.user %}
+              <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
+
+              {% else %}
+              <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
+              {% endif %} 
+
+            {% elif user_is_joined == "not" or not user.is_authenticated %}
+              {% if is_user_group and node.created_by != request.user %}
+              <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
+
+              {% else %}
+              <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+              {% endif %}
+
+            {% endif %}
+
+            {% endif %}
+
+            <!-- Triggers the modals -->
+            <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
+
+            <!-- Reveal Modals begin -->
+            <div id="firstModal" class="reveal-modal" data-reveal></div>
+
+            {% check_is_gstaff groupid request.user as is_gstaff %}
+            {% if is_gstaff %}
+              {% include "ndf/invite_users.html" %}
+
+              {% include "ndf/invite_admins.html" %}
+            {% endif %} 
           {% endif %}
         {% endif %}
 
       </div>      
+      {% endif %}
 
       <!-- This button converts collection into module -->
+      {% comment %}
       {% if node.collection_set and user.is_authenticated %}
         {% if user_access == "allow" %}
          <a href="#" id="module" class="tiny round button">{% trans "Make Module" %}</a>
         {% endif %}
       {% endif %}
+      {% endcomment %}
 
 
   {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
@@ -762,9 +839,13 @@
         {% endfor %}
           
         <!-- This button translates given resource -->
-        <li>
-          <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
-        </li>
+        {% if user.is_authenticated %}
+          {% if user_is_joined == "joined" or user_is_joined == "author" %}
+            <li>
+              <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
+            </li>
+          {% endif %}
+        {% endif %}
       </ul>
     </div>
 
@@ -772,8 +853,6 @@
   </ul>
 
   </section>
-
-
 
     
     
@@ -795,6 +874,21 @@
   $(document).on('click','#clickConceptGraph',function(){
     $('#view-concept-graph #chart-concept').append(svgdata); 
     $('#view-concept-graph').foundation('reveal', 'open'); 
+  });
+
+  $(document).on('click','.view-discussion',function(){
+    $("#view-page").css("display", "none");
+    $(".page-view").removeClass("active");
+    $(".discussion-view").addClass("active");    
+    $("#view-discussion").css("display", "block");
+
+  });
+
+  $(document).on('click','.view-page',function(){
+    $("#view-discussion").css("display", "none");
+    $(".discussion-view").removeClass("active");
+    $(".page-view").addClass("active");    
+    $("#view-page").css("display", "block");
   });
 
   $(document).on('dblclick','.imgLightbox',function(){
@@ -841,6 +935,8 @@
 });
 
   });
+
+
   $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
       
     map.invalidateSize();  
