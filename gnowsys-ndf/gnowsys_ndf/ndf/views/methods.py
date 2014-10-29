@@ -43,6 +43,17 @@ coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
 
+def get_all_subscribed_users(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  ins_objectid  = ObjectId()
+  all_users=[]
+  if ins_objectid.is_valid(group_id) :
+    if grp.author_set:
+      all_users=grp.author_set
+    if grp.created_by in all_users:
+      all_users.remove(grp.created_by)
+  return all_users
+  
 def check_if_moderated_group(group_id):
   grp=collection.Node.one({'_id':ObjectId(group_id)})
   ins_objectid  = ObjectId()

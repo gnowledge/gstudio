@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
+from gnowsys_ndf.ndf.views.methods import get_all_subscribed_users
 
 import json
 
@@ -183,6 +184,7 @@ def invite_users(request,group_id):
         return HttpResponse("Failure")
 
 def invite_admins(request,group_id):
+    #inorder to be a group admin, the user must be member of that group
     try:
         sending_user=request.user
         node=col_Group.Node.one({'_id':ObjectId(group_id)})
@@ -238,11 +240,13 @@ def invite_admins(request,group_id):
             st=[]
             user_grps=get_all_user_groups()
             usergrps=[]
+            subscribed=get_all_subscribed_users(group_id)
             for each in user_grps:
                 usergrps.append(each.created_by)
             for each in users:
                 if each.id != owner and each.id not in node.group_admin and each.id in usergrps:
-                   st.append(each)
+                    if each.id in subscribed:
+                        st.append(each)
                 else:
                     if each.id !=owner and each.id in usergrps:
                         coll_obj_list.append(each)
