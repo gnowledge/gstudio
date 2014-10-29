@@ -91,13 +91,21 @@
 
   <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#group" id="p1">Groups </a></dd>
+    
     {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
     <dd><a href="#Activity" id="p3">My Activities </a></dd>			
- 
+    <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
   </dl>
 
   
 <div class="tabs-content">
+<div class="content" id="view-scheduler-calendar">
+
+          {% include "ndf/scheduler_calender.html" with app_set_instance_atlist='hello' event=events event_count=event_count %}
+
+</div>
+
+
 <div class="content active" id="group">      
 	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   

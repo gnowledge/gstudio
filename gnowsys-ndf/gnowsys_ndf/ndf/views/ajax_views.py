@@ -20,6 +20,8 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
+from django.utils import simplejson
+from django.core.serializers.json import DjangoJSONEncoder
 from mongokit import paginator
 
 import ast
@@ -1615,8 +1617,109 @@ def set_drawer_widget(st,coll_obj_list):
     data_list.append(draw2)
     return data_list 
 
+def data_for_event_task(request,group_id):
+    groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
+    attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
+    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.username}).sort('last_update',-1).limit(10)
+    user_assigned=[]
+    for attr in attr_assignee :
+     task_node = collection.Node.one({'_id':attr.subject})
+     if task_node:
+                  attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id})	
+     	          attr_value={}
+             	  a="/" + groupname.name +"/" + "task"+"/" + str(task_node._id)  
+                  attr_value.update({'id':task_node._id})
+                  attr_value.update({'title':task_node.name})
+                  if attr1:
+                        attr_value.update({'start':attr1.object_value})
+                  else: 
+                        attr_value.update({'start':'01/02/2014'})     
+                  attr_value.update({'url':a})
+                  user_assigned.append(attr_value) 
+    return HttpResponse(json.dumps(user_assigned,cls=NodeJSONEncoder))
+def get_data_for_event_task(request,group_id):
+    listing=[]
+    obj = collection.Node.find({'name': {'$in' : ["Course Developers Meeting","Session"]}})
+    event_count={}
+    for i in obj:
+        nodes = collection.Node.find({'member_of': i._id})
+        for i in nodes:
+          attr_value={}
+          attr_value.update({'url':'events'})
+          attr_value.update({'id':i._id})
+          attr_value.update({'title':i.name})
+          date=i.attribute_set[0]['start_time']
+          formated_date=date.strftime("%m/%d/%Y")
+          attr_value.update({'start':formated_date})
+          listing.append(dict(attr_value))
+    count=0
+    dummylist=[]
+    date=""
+    listing1=[]
+    changed="false"
+    recount=0
+    user_assigned=[]
+    groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
+    attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
+    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.username}).sort('last_update',-1).limit(10)
+    for attr in attr_assignee :
+     task_node = collection.Node.one({'_id':attr.subject})
+     if task_node:
+                  attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id})	
+     	          attr_value={}
+             	  a="/" + groupname.name +"/" + "task"+"/" + str(task_node._id)  
+                  attr_value.update({'id':task_node._id})
+                  attr_value.update({'title':task_node.name})
+                  if attr1:
+                        attr_value.update({'start':attr1.object_value})
+                  else: 
+                        attr_value.update({'start':'01/02/2014'})     
+                  attr_value.update({'url':a})
+                  user_assigned.append(attr_value) 
+    listings=[]
+    date=""
+    listdate=[]
+    for i in user_assigned:
+        listing.append(dict(i))
+    listing.sort(key=lambda item:item['start'])
+    for i in listing:
+        if date == i['start'] or date == "":
+           dummylist.append(i)
+           count=count +  1
+           changed="false"
+        else:
+            changed="true"
+            recount=count
+            count=0
+            count=count +  1
+            if recount > 2:
+             attr_value={}
+             dummylist=[]
+             attr_value.update({'id':i['id']})
+             attr_value.update({'title':'More Events'})
+             attr_value.update({'start':date})
+             dummylist.append(dict(attr_value)) 
+        date=i['start']    
+        if changed == "true" :
+              for i in dummylist:
+                   listing1.append(i)
+              dummylist=[]
+              changed="false"        
+    if recount > 2:
+             attr_value={}
+             dummylist=[]
+             attr_value.update({'id':i['id']})
+             attr_value.update({'title':'More Events'})
+             attr_value.update({'start':date})
+             dummylist.append(dict(attr_value)) 
+    for i in dummylist:
+                   listing1.append(i)
+                            
+    return HttpResponse(json.dumps(listing1,cls=NodeJSONEncoder))
 def get_data_for_drawer_of_attributetype_set(request, group_id):
-    '''
+    '''1
     this method will fetch data for designer module's drawer widget
     '''
     data_list = []
