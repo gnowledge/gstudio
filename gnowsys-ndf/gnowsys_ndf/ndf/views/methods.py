@@ -1125,24 +1125,24 @@ def get_property_order_with_value(node):
 
 
 def parse_template_data(field_data_type, field_value, **kwargs):
-  """
-  Parses the value fetched from request (GET/POST) object based on the data-type of the given field.
+    """
+    Parses the value fetched from request (GET/POST) object based on the data-type of the given field.
 
-  Arguments:
-  field_data_type -- data-type of the field
-  field_value -- value of the field retrieved from GET/POST object
+    Arguments:
+    field_data_type -- data-type of the field
+    field_value -- value of the field retrieved from GET/POST object
 
-  Returns:
-  Parsed value based on the data-type of the field
-  """
+    Returns:
+    Parsed value based on the data-type of the field
+    """
   
-  '''
-  kwargs_keys_list = [
+    '''
+    kwargs_keys_list = [
                       "date_format_string",     # date-format in string representation
                       "field_instance"          # dict-object reperesenting AT/RT node
                     ]
-  '''
-  DATA_TYPE_STR_CHOICES = [
+    '''
+    DATA_TYPE_STR_CHOICES = [
                             "unicode", "basestring",
                             "int", "float", "long",
                             "list", "dict",
@@ -1151,7 +1151,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
                             "ObjectId"
                           ]
 
-  try:
+  
 
     if type(field_data_type) == type:
       field_data_type = field_data_type.__name__
@@ -1217,7 +1217,6 @@ def parse_template_data(field_data_type, field_value, **kwargs):
           # Write RT related code 
           if not field_value:
             return None
-
           if field_value:
             field_value = ObjectId(field_value)
 
@@ -1272,10 +1271,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
     return field_value
 
-  except Exception as e:
-    error_message = "\n TemplateDataParsingError: "+str(e)+" !!!\n"
-    raise Exception(error_message)
-
+  
 def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
   info_message = ""
