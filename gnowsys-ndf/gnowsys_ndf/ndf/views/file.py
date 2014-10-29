@@ -1397,7 +1397,7 @@ def data_review_save(request, group_id):
     if request.method == "POST":
 
         is_changed = get_node_common_fields(request, file_node, group_id, GST_FILE)
-        
+
         # to fill/update attributes of the node and get updated attrs as return 
         ga_nodes = get_node_metadata(request, file_node, GST_FILE, is_changed=True)
         
@@ -1435,8 +1435,17 @@ def data_review_save(request, group_id):
             else:
                 is_changed = True
 
+        # changing status to draft even if attributes/relations are changed
+        if is_changed:
+
+            file_node.status = unicode("DRAFT")
+            file_node.modified_by = userid
+
+            if userid not in file_node.contributors:
+                file_node.contributors.append(userid)
+
         # checking if user is authenticated to change the status of node
-        if status and (group_obj.created_by == userid or (userid in group_obj.group_admin) or (userid in group_obj.author_set) or request.user.is_superuser):
+        if status and ((group_obj.is_gstaff(request.user)) or (userid in group_obj.author_set)):
             if file_node.status != status:
                 file_node.status = unicode(status)
                 file_node.modified_by = userid
@@ -1446,14 +1455,9 @@ def data_review_save(request, group_id):
 
                 is_changed = True
 
-        # if request.user.is_superuser:
-        #     print "superuser"
-        # else:
-        #     print "NOt superuser"
-
         if is_changed:
             file_node.save()
 
-    return HttpResponse("")
+    return HttpResponse(file_node.status)
 
 # ---END of data review saving.
