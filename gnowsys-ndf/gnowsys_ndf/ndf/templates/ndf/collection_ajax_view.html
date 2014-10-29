@@ -2,71 +2,72 @@
 {% load i18n %}
 
 {% block head %}
+
+  <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> <!-- checked -->
   <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
+  <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+    
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(function() {
+
+        var $tree = $('.collection');
+
+        $tree.tree();
+
+        $tree.bind(
+          'tree.click',
+          function(event) {
+              // The clicked node is 'event.node'
+              var node = event.node;
+              var node_type = node.node_type;
+
+              $.ajax({
+                  type: "POST",
+                  url: "{% url 'collection_nav' group_id %}",
+                  datatype: "html",
+                  data:{
+                    node_id: node.id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+                  success: function(data) {
+
+                    if (node_type == "Page"){
+                      window.history.pushState("", "", "/{{group_name_tag}}/page/"+node.id+"");
+                    }
+                    else if(node_type == "File"){
+                      window.history.pushState("", "", "/{{group_name_tag}}/file/"+node.id+"");  
+                    }
+                    else if (node_type == "Term"){
+                      window.history.pushState("", "", "/{{group_name_tag}}/term/"+node.id+"");
+                    }
+                    else if (node_type == "Topic"){
+                      window.history.pushState("", "", "/{{group_name_tag}}/topic_details/"+node.id+"");
+                    }
+                    
+                    $("#view_page").html(data);
+
+                  }
+              });
+            
+          }
+        );
+
+
+      });
+    });
+  </script>
+
 {% endblock %}
-
-<style type="text/css">
-
-  .current-resource{
-    background-color:#47b079; 
-    padding:0.5em;
-    cursor: pointer;
-  }
-
-  .current-resource div {
-    color: #f9f9f9;
-  }
-
-</style>
-
+  
+  <h3><a class="current" style="color:black;">{{node.name}}</a></h3>
+  <div style="background-color:#ddd; overflow:auto;">
+    <b><div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div></b>
+  </div>
 
 {% comment %}
-<!-- 
-<ul class="side-nav">
-    <nav class="breadcrumbs">
-    {% for key,value in breadcrumbs_list %}
-       <a name="{{key}}">{{ value }}</a>
-    {% endfor %}
-  </nav>
+<!-- <ul class="side-nav collection">
 
-  {% if node.collection_dict|length > 0 %}
-
-  {% for index_key, each_node in node.collection_dict.items %}
-  {% get_grid_fs_object each_node as grid_fs_obj %}
-  
-  {% if each_node.collection_set %}
-  <li>
-   
-      <h5>
-      <a class="select" class="collection" name="{{each_node.pk}}"><i class="fi-page-multiple"></i>
-          {% if 'image' in each_node.mime_type %}<i class="fi-camera"></i>  {% endif %}
-    
-     {% if 'video' in each_node.mime_type %}<i class="fi-video"></i>  {% endif %}
-   
-     {% if 'Pandora_video' in each_node.member_of_names_list %}<i class="fi-video"></i>  {% endif %}
-          {{ each_node.name }}</a>
-      </h5>
-  </li>
-
-{% else %}
-  
-  <li>
-      <h6 class="{{ each_node.type }}">
-        <a class="select" name="{{each_node.pk}}">{{ each_node.name }}</a>
-      </h6>
-  </li>
-
-</ul>
-
-  {% endif %}
-  {% endfor %}
-{% endif %}
- -->
- {% endcomment %}
-
-<ul class="side-nav collection">
-
-  <!-- current page title -->
   {% for key,value in breadcrumbs_list %}
   {% get_memberof_name key as member_of_name %}
   
@@ -74,9 +75,7 @@
       <h5>
         <a>
         <div class="row" title="{{ member_of_name }} - {{ value }}">
-          <!-- <div class="small-2 columns">
-            <i class="fi-play"></i>
-          </div> -->
+         
           <div class="small-12 columns" name="{{key}}">{{ value | truncatechars:20 }}
           </div>
         </div>
@@ -101,15 +100,11 @@
               {% if "/zip" in each_node.mime_type %}
                 <i class="fi-archive"></i>
               {% elif "image" in each_node.mime_type %}
-                <!-- <i class="fi-camera"></i> -->
                 <img src="{% url 'getImageThumbnail' group_id each_node.pk %}">
               {% elif "/pdf" in each_node.mime_type %}
-                <!-- <i class="fi-page-pdf"></i> -->
                 <img src="{% url 'getFileThumbnail' group_id each_node.pk %}">
               {% elif "ogg" in each_node.mime_type or "video" in each_node.mime_type %}
                 <i class="fi-video"></i>
-                <!-- <img src="#{#% url 'getvideoThumbnail' group_id each_node.pk %}"> -->
-                <!-- <div style="background:url#(#url 'getvideoThumbnail' group_id each_node.pk)"></div> -->
               {% else %}
                 <i class="fi-folder"></i>
               {% endif %}
@@ -134,50 +129,71 @@
   {% endif%}
   
 </ul>
-
+ -->
+{% endcomment %}
 
 <script>
 
-$(document).on('click', '.side-nav.collection li', function (e) {
-    
-    // to access in success block
-    var currObj = this;
+  $(document).on('click', '.current', function (e) {
 
     $.ajax({
+        type: "POST",
+        url: "{% url 'collection_nav' group_id %}",
+        datatype: "html",
+        data:{
+          node_id: "{{node.pk}}",
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
+          $("#view_page").html(data);
 
-      type: "POST",
-      url: "{% url 'collection_nav' group_id %}",
-      datatype: "html",
-      data:{
-        node_id: this.id,
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      
-      success: function(data) {
-        
-        // removing active class from other li
-        $(".side-nav > li").removeClass("active");
-
-        // adding active to this li
-        $(currObj).addClass("active");
-        
-        // console.trace()
-        // var prevHTML = $(document).children();
-        $("#view_page").html(data);
-        // $("#view_page").foundation({bindings:'events'});
-        $("#view-map-widget, a[data-reveal-id='view-map-widget'], a[href='#view-graph']").foundation();
-        $("#view-discussion, a[href='#view-discussion']").foundation();
-        $("dl.row.tabs").foundation();
-        $("div.tabs-content").foundation();
-        // $("dd > a[href='#view-discussion']").foundation();
-        // $("#graph-hover").foundation({dropdown:{is_hover:false,active_class:'open'});        
-        // window.history.pushState(“object or string”, “Title”, “/new-url”);
-        // window.history.pushState({"html":prevHTML, "pageTitle":"try"},"", "#try");
-        // window.location.hash = this.id;
-      }
-
+        }
     });
+
   });
+
+// // #################################################
+
+// $(document).on('click', '.side-nav.collection li', function (e) {
+    
+//     // to access in success block
+//     var currObj = this;
+
+//     $.ajax({
+
+//       type: "POST",
+//       url: "{% url 'collection_nav' group_id %}",
+//       datatype: "html",
+//       data:{
+//         node_id: this.id,
+//         csrfmiddlewaretoken: '{{ csrf_token }}'
+//       },
+      
+//       success: function(data) {
+        
+//         // removing active class from other li
+//         $(".side-nav > li").removeClass("active");
+
+//         // adding active to this li
+//         $(currObj).addClass("active");
+        
+//         // console.trace()
+//         // var prevHTML = $(document).children();
+//         $("#view_page").html(data);
+//         // $("#view_page").foundation({bindings:'events'});
+//         $("#view-map-widget, a[data-reveal-id='view-map-widget'], a[href='#view-graph']").foundation();
+//         $("#view-discussion, a[href='#view-discussion']").foundation();
+//         $("dl.row.tabs").foundation();
+//         $("div.tabs-content").foundation();
+//         // $("dd > a[href='#view-discussion']").foundation();
+//         // $("#graph-hover").foundation({dropdown:{is_hover:false,active_class:'open'});        
+//         // window.history.pushState(“object or string”, “Title”, “/new-url”);
+//         // window.history.pushState({"html":prevHTML, "pageTitle":"try"},"", "#try");
+//         // window.location.hash = this.id;
+//       }
+
+//     });
+//   });
 
   // {% comment %}
   // $(".select").click(function() {

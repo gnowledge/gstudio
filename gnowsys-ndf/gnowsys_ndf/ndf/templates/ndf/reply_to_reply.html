@@ -1,12 +1,14 @@
 {% load ndf_tags %}
 {% load i18n %}
 <script type="text/javascript">
-$(document).ready(function(){
+
+{% block document_ready %}
+
  $('#orgitdown{{each}}').orgitdown(mySettings);
 
 $("#savereply{{each}}").click(function(){
 var content=$('#orgitdown{{each}}').val()
-alert(content);
+
 
 var repl=$("#rep{{each}}").val();
 var ajurl="/"+groupid+"/forum/add_node/"
@@ -26,7 +28,6 @@ $.ajax({
                     }
                 else
                     {
-                    alert(data);
                     $(".close").trigger('click');
                     }
            },
@@ -38,6 +39,7 @@ $.ajax({
 
 });
 });
+{% endblock %}
 </script>
 
 
