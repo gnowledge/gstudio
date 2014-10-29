@@ -97,7 +97,7 @@ if(txt_input <= 0)
       {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-      <a id ="btn_create" class="button expand" data-reveal-id="firstModal" href="">
+      <a id ="btn_create" class="button expand"  href="{% url 'create_new' groupid %}">
         Create {{title}}
       </a>
       {% endif %}
@@ -149,38 +149,6 @@ if(txt_input <= 0)
 </li>  
 {% endfor %}
 </ul>
-
-
-
-<!-- Reveal Modals begin -->
-
-<div id="firstModal" class="reveal-modal" data-reveal>
-<form data-abide id="form-create-batch" method="POST" action="{% url 'create_new' groupid %}">{% csrf_token %}
-<div class="row">
-  <div class="small-2 large-4 columns">
-    <b> {% trans "Students present in this group: " %} {{student_count}}</b>
-  </div>
-</div>
-<br>
-<div class="row">
-  <div class="large-4 columns">
-    <label>{% trans "Number of batches to create" %}
-      <input type="text" pattern="\d*" id="txt_batch_count" name="batch_count" placeholder="Enter Number Only" required>
-    </label>
-    <small class="error">{% trans "Entered value should be numbers" %}</small>
-  </div>
-</div>
-
-<div class="row">
-  <div class="large-4 columns">
-    <input type="submit" class="button"  value="Next" />
-  </div>
-</div>
-<a class="close-reveal-modal">&#215;</a>
-</form>
-</div>
-<!-- Reveal Model end -->
-
 
 {% paginate %}
 {% endblock %}
