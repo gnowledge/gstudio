@@ -312,6 +312,9 @@ $(document).on('click',"#save-node",function(event){
 	{% endif %}
 
 </form>
+<div id="myModal" class="reveal-modal" animation="None" data-reveal>
+<h2> Please wait till file is Uploading... </h2>                
+</div>
 <script type="text/javascript">
 
 	var selDiv = "";
@@ -408,10 +411,11 @@ function handleFileSelect(e) {
       xhr.open('POST', "{% url 'save_image' group_name  %}", true);
         
 				// Set up a handler for when the request finishes sucessfully.
+    $('#myModal').foundation('reveal', 'open');
     xhr.onload = function () {
     if (xhr.status === 200) 
 				  {
-				  
+		      $('#myModal').foundation('reveal', 'close');		  
 	        selfiles.push(xhr.responseText)
 				  var select=document.getElementById('trial')
       	  select.value=selfiles
