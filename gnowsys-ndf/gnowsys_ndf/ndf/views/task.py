@@ -308,8 +308,8 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 			
 			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
-        		value=get_file_node(attr.object_value)
         		if attr:
+        		  value=get_file_node(attr.object_value)
         		  change_list.append(' changed from '+str(value).strip('[]')+' to '+str(file_name))      
         		  attr.object_value=file_id
         		  attr.save()
@@ -317,7 +317,6 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 				newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
-                		print "the eight tab",file_id
                 		newattribute.object_value = file_id
                 		newattribute.save()
 				change_list.append(each.encode('utf8')+' set to '+file_name.encode('utf8')) # updated details
