@@ -1742,7 +1742,9 @@ def get_data_for_event_task(request,group_id):
                         formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
                         attr_value.update({'start':formated_date})
                   else: 
-                        attr_value.update({'start':'01/04/2014'})     
+                        date=task_node.created_at
+                        formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+                        attr_value.update({'start':formated_date})     
                   attr_value.update({'url':task_url})
                   user_assigned.append(attr_value) 
     listings=[]
@@ -1755,9 +1757,11 @@ def get_data_for_event_task(request,group_id):
     for i in user_assigned:
         listing.append(dict(i))
     listing.sort(key=lambda item:item['start'])
+    
     countlist=[]
     if request.GET.get('view','') == 'month':
      for i in listing:
+        
         if date == i['start'] or date == "":
            if countlist:
              dummylist=countlist
@@ -1770,8 +1774,10 @@ def get_data_for_event_task(request,group_id):
             recount=count
             count=0
             count=count +  1
+            countlist=[]
             countlist.append(i)
             if len(dummylist) > 3:
+             print countlist
              attr_value={}
              dummylist=[]
              attr_value.update({'id':i['id']})
