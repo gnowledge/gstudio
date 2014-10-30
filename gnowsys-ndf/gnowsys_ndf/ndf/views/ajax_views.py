@@ -353,31 +353,7 @@ def drawer_widget(request, group_id):
       nlist = []
       drawer, paged_resources = get_drawers(group_id, None, nlist, page_no, app)
 
-    # paged_resources = paginator.Paginator(drawer, page_no, 10)
-    # drawer.rewind()
-
-    # if node_id:
-
-    #   for each in paged_resources.items:
-    #     if each._id != node._id:
-    #       if each._id not in nlist:  
-    #         dict1[each._id] = each
-          
-    #   for oid in nlist: 
-    #     obj = collection.Node.one({'_id': oid})
-    #     dict2.append(obj)
-      
-    #   dict_drawer['1'] = dict1
-    #   dict_drawer['2'] = dict2
-
-    # else:
-    #   if (node is None) and (not nlist):
-    #     for each in paged_resources.items:               
-    #       dict_drawer[each._id] = each
-
-
-    # drawers = dict_drawer
-    # print "\n drawer: ", drawer, "\n"
+    
     drawers = drawer
     if not node_id:
       drawer1 = drawers
@@ -411,10 +387,8 @@ def select_drawer(request, group_id):
         checked = ""
         relationtype = "" 
 
-        selected_collection_list = request.POST.get("collection_list", '')
         node_id = request.POST.get("node_id", '')
         page_no = request.POST.get("page_no", '')
-        selection_save = request.POST.get("selection_save", '')
         field = request.POST.get("field", '')
         checked = request.POST.get("homo_collection", '')
 
@@ -434,9 +408,6 @@ def select_drawer(request, group_id):
         if node_id:
             node_id = ObjectId(node_id)
             node = collection.Node.one({'_id': ObjectId(node_id) })            
-            if selected_collection_list:
-              selected_collection_list = [ObjectId(each.strip()) for each in selected_collection_list.split(",")]
-              # print "selected: ", selected_collection_list,"\n"
 
             if field:
               if field == "teaches":
@@ -459,38 +430,7 @@ def select_drawer(request, group_id):
             node_id = None
 
 
-        if selection_save:
-          if field == "collection":
-            if set(nlist) != set(selected_collection_list):              
-              for each in selected_collection_list:
-                if each not in nlist:
-                  collection.update({'_id': node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
-            
-          elif field == "prior_node":    
-            if set(nlist) != set(selected_collection_list):            
-              for each in selected_collection_list:
-                if each not in nlist:
-                  collection.update({'_id': node._id}, {'$push': {'prior_node': ObjectId(each) }}, upsert=False, multi=False)
-
-          elif field == "teaches" or "assesses":
-            if set(nlist) != set(selected_collection_list):
-              create_grelation(node._id,relationtype,selected_collection_list)
-
-          node.reload()
-
-
         if node_id:
-          if selected_collection_list:
-            if field == "collection":
-              if set(nlist) != set(selected_collection_list):  
-                return HttpResponse("Warning");
-            elif field == "prior_node":
-              if set(nlist) != set(selected_collection_list):            
-                return HttpResponse("Warning");
-            elif field == "teaches" or "assesses":
-              if set(nlist) != set(selected_collection_list):
-                return HttpResponse("Warning");
-
         
           if node.collection_set:
             if checked:              
@@ -511,32 +451,7 @@ def select_drawer(request, group_id):
 
 
         drawer, paged_resources = get_drawers(group_id, node_id, nlist, page_no, checked)#get_drawers(group_id, node_id, nlist, checked)
-
-        # paged_resources = paginator.Paginator(drawer, page_no, 10)
-        # drawer.rewind()
-
-        # # print "\nnlist: ",nlist,"\n"
-
-        # if node_id:
-          
-        #   for each in paged_resources.items:
-        #     if each._id != node._id:
-        #       if each._id not in nlist:  
-        #         dict1[each._id] = each
-              
-        #   for oid in nlist: 
-        #     obj = collection.Node.one({'_id': oid })           
-        #     dict2.append(obj)            
-          
-        #   dict_drawer['1'] = dict1
-        #   dict_drawer['2'] = dict2
-        # else:
-        #   if (node is None) and (not nlist):
-        #     for each in paged_resources.items:               
-        #       dict_drawer[each._id] = each          
-
-
-        # drawers = dict_drawer
+        
         drawers = drawer
         if not node_id:
           drawer1 = drawers
