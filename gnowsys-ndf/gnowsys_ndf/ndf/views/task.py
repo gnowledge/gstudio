@@ -10,7 +10,9 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from mongokit import paginator			
+from mongokit import paginator
+from django.utils import simplejson
+from online_status.utils import encode_json			
 import datetime
 import json
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
@@ -222,6 +224,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                 		newattribute.attribute_type = attributetype_key
                 		newattribute.object_value = field_value[0]
                 		newattribute.save()
+
 	    if  int(len(request.POST.getlist("Assignee","")))>1:
               if task is None:
                		Task=collection.Node.find_one({"_id":ObjectId(task_node._id)})
@@ -230,7 +233,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 			Task=collection.Node.find_one({"_id":ObjectId(task)})
 			Task.collection_set.append(task_node._id)
 	      Task.save()
-		
+	      	
 	      if int(count) <int(len(request.POST.getlist("Assignee",""))-1):
 		create_edit_task(request, group_name, task_id,Task._id,count=count+1)
 	    if count == 0:	
@@ -338,10 +341,12 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                                   context_instance=RequestContext(request)
                               )
 
-    
+  
 @login_required    
-def task_collection(request,group_name,_id):
+def task_collection(request,group_name,task_id=None,each_page=1):
     ins_objectid  = ObjectId()
+    choice=0
+    
     task=[]
     if ins_objectid.is_valid(group_name) is False :
       group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
@@ -355,16 +360,33 @@ def task_collection(request,group_name,_id):
     else :
         pass
     collection_task=[]
-    node = collection.Node.one({'_id':ObjectId(_id)})
-    
-	
+    node = collection.Node.one({'_id':ObjectId(task_id)})
+    attr_value = {}
+    at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]	
     for each in node.collection_set:
+        attr_value = {}
     	new = collection.Node.one({'_id':ObjectId(each)})
-	collection_task.append(new)		
-    template = "ndf/card_view.html"
-    variable = RequestContext(request, {'TASK_inst': collection_task,'group_name':group_name,'groupid':group_id})
-    return render_to_response(template, variable)
-    	
+    	for attrvalue in at_list:
+		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':attrvalue})
+		attr = collection.Node.find_one({"_type":"GAttribute", "subject":new._id, "attribute_type.$id":attributetype_key._id})
+		if attr:
+			attr_value.update({attrvalue:attr.object_value})
+		else:
+			attr_value.update({attrvalue:"--"})
+	attr_value.update({'id':each})
+	attr_value.update({'Name':new.name})
+	 
+	         
+	collection_task.append(dict(attr_value))
+    paged_resources = Paginator(collection_task,10)
+    files_list = []
+    for each_resource in (paged_resources.page(each_page)).object_list:
+		files_list.append(each_resource)
+    			
+    template = "ndf/task_list_view.html"
+    variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name,"page_info":paged_resources,'page_no':each_page, 
+                                        'group_id': group_id, 'groupid': group_id,'choice':choice,'status':'None','task':task_id})
+    return render_to_response(template, variable)                                     	
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
@@ -430,6 +452,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     else :
         pass
     #section to get the Tasks 
+    group=collection.Node.find_one({'_id':ObjectId(group_id)})
     GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
     attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
     
@@ -440,55 +463,71 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     message="" 	
     send="This group doesn't have any files"
     #Task Completed
-    	
+    sub_task_name=[] 
     for each in TASK_inst:
-    	 attr_value={}
-	 for attrvalue in at_list:
+	  if (each.collection_set):
+            sub_task_name.append(each.name)
+    TASK_inst.rewind()
+
+    
+    #every one see only task created by them and assigned to them 
+    #only group owner can see all the task	
+    for each in TASK_inst:
+         attr_value={}
+         for attrvalue in at_list:
 		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':attrvalue})
 		attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
+		attr1 = collection.Node.find_one({"_type":"GAttribute","subject":each._id, "attribute_type.$id":attributetype_key1._id,"object_value":request.user.username})
 		if attr:
 			attr_value.update({attrvalue:attr.object_value})
 		else:
 			attr_value.update({attrvalue:"--"})
 	 attr_value.update({'id':each._id})
+	 if each.created_by == request.user.id:
+	        attr_value.update({'owner':'owner'})
+	 else:       
+	        attr_value.update({'owner':'assignee'})
 	 attr_value.update({'Name':each.name})
-	 if int(choice) == int(1):
-		 task_list.append(dict(attr_value))
-	 if int(choice) == int(2):
-                message="No Completed Task"
-		if attr_value['Status'] in Completed_Status_List:
-				task_list.append(dict(attr_value))
-	 if int(choice) == int(3):
-                message="No Task Created"
-		auth1 = collection.Node.one({'_type': 'Author', 'created_by': each.created_by })   
-		if auth:    		
-			if auth.name == auth1.name:
-				task_list.append(dict(attr_value))
-	 if int(choice) == int(4):
-		message="Nothing Assigned"
-		attr1 = collection.Node.find_one({"_type":"GAttribute","subject":each._id, "attribute_type.$id":attributetype_key1._id,"object_value":request.user.username})
-		if attr1:
-			task_list.append(dict(attr_value))
-	 if int(choice) == int(5):
-                message="No Pending Task"  
+	 attr_value.update({'collection':each.collection_set})
+	 if attr1 or each.created_by == request.user.id or group.created_by == request.user.id :
+	    if ((each.name in sub_task_name and (not each.collection_set) == False) or each.name not in sub_task_name or attr1):    	
+	        if int(choice) == int(1):
+		         task_list.append(dict(attr_value))
+	        if int(choice) == int(2):
+                        message="No Completed Task"
+	        	if attr_value['Status'] in Completed_Status_List:
+		        		task_list.append(dict(attr_value))
+	        if int(choice) == int(3):
+                        message="No Task Created"
+		        auth1 = collection.Node.one({'_type': 'Author', 'created_by': each.created_by })   
+		        if auth:    		
+		        	if auth.name == auth1.name:
+		        		task_list.append(dict(attr_value))
+	        if int(choice) == int(4):
+		        message="Nothing Assigned"
+		        attr1 = collection.Node.find_one({"_type":"GAttribute","subject":each._id, "attribute_type.$id":attributetype_key1._id,"object_value":request.user.username})
+		        if attr1:
+		        	task_list.append(dict(attr_value))
+	        if int(choice) == int(5):
+                        message="No Pending Task"  
 		
-		if attr_value['Status'] not in Completed_Status_List: 
-					if attr_value['Status'] != 'Rejected':
-						if attr_value['end_time'] != "--" :
-							print "getting in"
-                                                        if (attr_value['end_time'] > unicode(datetime.date.today())) is False:
-								task_list.append(dict(attr_value))
-						else:
-                                                        task_list.append(dict(attr_value)) 
-	 if int(choice) == int(6):
-                message="No"+" "+status+" "+"Task"
-		if attr_value['Status'] == status:
-					task_list.append(dict(attr_value))
+		        if attr_value['Status'] not in Completed_Status_List: 
+		        			if attr_value['Status'] != 'Rejected':
+		        				if attr_value['end_time'] != "--" :
+							
+                                                                if (attr_value['end_time'] > unicode(datetime.date.today())) is False:
+		        						task_list.append(dict(attr_value))
+		        				else:
+                                                                task_list.append(dict(attr_value)) 
+	        if int(choice) == int(6):
+                        message="No"+" "+status+" "+"Task"
+		        if attr_value['Status'] == status:
+		        			task_list.append(dict(attr_value))
     		
      
     		 
     
-
+        
     paged_resources = Paginator(task_list,10)
     files_list = []
     for each_resource in (paged_resources.page(each_page)).object_list:
@@ -500,6 +539,6 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     count=len(task_list)	
     	
     template = "ndf/task_list_view.html"
-    variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':message,'count':count_list,'TASK_obj':TASK_inst,"page_info":paged_resources,'page_no':each_page,'choice':choice,'status':status})
+    variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':message,'count':count,'TASK_obj':TASK_inst,"page_info":paged_resources,'page_no':each_page,'choice':choice,'status':status})
     return render_to_response(template, variable)
     #return HttpResponse(json.dumps(self_task,cls=NodeJSONEncoder))

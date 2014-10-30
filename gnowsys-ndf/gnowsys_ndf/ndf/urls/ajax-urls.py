@@ -17,6 +17,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^deleteThemes/', 'delete_themes', name='delete_themes'),
                        url(r'^add_Topics/', 'add_topics', name='add_topics'),
                        url(r'^get_tree_hierarchy/(?P<node_id>[\w-]+)$', 'get_tree_hierarchy', name='get_tree_hierarchy'),
+                       url(r'^get_collection/(?P<node_id>[\w-]+)$', 'get_collection', name='get_collection'),
                        url(r'^drawer/', 'drawer_widget', name='drawer_widget'),
                        url(r'^search/', 'search_drawer', name='search_drawer'),
                        url(r'^terms/', 'terms_list', name='terms_list'),
@@ -40,22 +41,22 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
 
                        # Ajax-urls required for MIS --------------------------------
-                       url(r'^get_announced_courses/', 'get_announced_courses', name='get_announced_courses'),
+                       
                        url(r'^get_anncourses_allstudents/', 'get_anncourses_allstudents', name='get_anncourses_allstudents'),
-
+                       url(r'^get_courses/', 'get_courses', name='get_courses'),
+                       
+                       url(r'^get_enroll_duration_of_ac/', 'get_enroll_duration_of_ac', name='get_enroll_duration_of_ac'),
+                       url(r'^get_announced_courses_with_ctype/', 'get_announced_courses_with_ctype', name='get_announced_courses_with_ctype'),
+                       url(r'^get_colleges/', 'get_colleges', name='get_colleges'),
                        url(r'^get_districts/', 'get_districts', name='get_districts'),
                        url(r'^get_affiliated_colleges/', 'get_affiliated_colleges', name='get_affiliated_colleges'),
-
                        url(r'^get_students/', 'get_students', name='get_students'),
                        url(r'^get_college_wise_students_data/', 'get_college_wise_students_data', name='get_college_wise_students_data'),
                        url(r'^set_user_link/', 'set_user_link', name='set_user_link'),
                        url(r'^set_enrollment_code/', 'set_enrollment_code', name='set_enrollment_code'),
                        url(r'^get_students_assignments/', 'get_students_assignments', name='get_students_assignments'),
                        # ===========================================================
-
                        url(r'^edit_task_title/', 'edit_task_title', name='edit_task_title'),
                        url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
-
-                       
                        url(r'^insert_picture/', 'insert_picture', name="insert_picture"),
 )
