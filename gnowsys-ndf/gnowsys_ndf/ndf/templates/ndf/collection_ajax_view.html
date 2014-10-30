@@ -45,6 +45,8 @@
                       window.history.pushState("", "", "/{{group_name_tag}}/topic_details/"+node.id+"");
                     }
                     
+                    $("#ajax_load_image").hide();
+                    $("#content").css({"opacity":""})
                     $("#view_page").html(data);
 
                   }
