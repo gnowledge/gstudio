@@ -61,41 +61,12 @@
 {% block script %}
 	<script>
 	
-/*	  var fcSources = {
-    monthview: {
-                url: "{% url 'get_data_for_event_task' group_id %}",
-                type: 'GET',
-                cache: true,
-                error: function() { alert('something broke with courses...'); },
-                color: 'purple',
-                textColor: 'white',
-                className: 'monthview'
-            },
-    dayview: {
-                url: "{% url 'data_for_event_task' group_id %}",
-                type: 'GET',
-                cache: true,
-                error: function() { alert('something broke with requests...'); },
-                textColor: 'white',
-                className: 'dayview'
-            }
-    */
-//};
 
 
 		$('#view-scheduler-calendar').on('toggled', function (event, tab) {
      
-      var monthview = 
-      {
-        url: "{% url 'get_data_for_event_task' group_id %}",
-        type: 'POST',
-        data: {
-              start: $('.fullcalendar').fullCalendar('getView').start,
-              end: $('.fullcalendar').fullCalendar('getView').end       
-          }
-      }    
-			$('#calendar').fullCalendar({
-
+    $('#calendar').fullCalendar({
+        default: true,
 				header: {
 					left: 'prev,next today',
 					center: 'title',
@@ -111,7 +82,7 @@
     
         eventClick: function(calevent){
 
-		    if (calevent.title == "More Events"){
+		    if (calevent.title == "+3"){
              $('#calendar')
                 .fullCalendar('changeView', 'agendaDay'/* or 'basicDay' */)
                 var moment = $('#calendar').fullCalendar('getDate');
@@ -123,16 +94,25 @@
 				 			},
 				 			
 				viewRender: function(view) {
-        
+         var date=$('#calendar').fullCalendar('getDate')
+         var groupid='{{groupid}}'   
             if (view.name == 'month'){
+
              $.ajax({
-             url:"{% url 'get_data_for_event_task' group_id %}",
+             data: {
+              view:'month',
+              start:date.format()
+              
+              },
+
+             url:"{% url 'get_data_for_event_task' 'groupid' %}".replace('groupid',groupid),
              type:"GET",
              success:function(data){
              sData = jQuery.parseJSON(data);
              $('#calendar').fullCalendar( 'removeEvents');
              for(i=0;i<sData.length;i++)
              {
+             //alert(moment(sData[i].start).format())
              var source = { events: [
                             {   id:sData[i].id,
                                 title: sData[i].title,
@@ -150,7 +130,13 @@
             }
             else{
             $.ajax({
-             url:"{% url 'data_for_event_task' group_id %}",
+             
+             url:"{% url 'get_data_for_event_task' 'groupid' %}".replace('groupid',groupid),
+             data: {
+              view:'day',
+              start:date.format()
+              
+              },
              type:"GET",
              success:function(data){
              sData = jQuery.parseJSON(data);

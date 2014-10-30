@@ -1675,43 +1675,45 @@ def set_drawer_widget(st,coll_obj_list):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list 
-
 def data_for_event_task(request,group_id):
-    groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
-    attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
-    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.username}).sort('last_update',-1).limit(10)
-    user_assigned=[]
-    for attr in attr_assignee :
-     task_node = collection.Node.one({'_id':attr.subject})
-     if task_node:
-                  attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id})	
-     	          attr_value={}
-             	  a="/" + groupname.name +"/" + "task"+"/" + str(task_node._id)  
-                  attr_value.update({'id':task_node._id})
-                  attr_value.update({'title':task_node.name})
-                  if attr1:
-                        attr_value.update({'start':attr1.object_value})
-                  else: 
-                        attr_value.update({'start':'01/02/2014'})     
-                  attr_value.update({'url':a})
-                  user_assigned.append(attr_value) 
-    return HttpResponse(json.dumps(user_assigned,cls=NodeJSONEncoder))
+ print "the pass in view"
+ return HttpResponse(json.dumps("broken url",cls=NodeJSONEncoder))
 def get_data_for_event_task(request,group_id):
+    #date creation for task type is date month and year
     listing=[]
-    obj = collection.Node.find({'name': {'$in' : ["Course Developers Meeting","Session"]}})
+    obj = collection.Node.find({'name': {'$in' : ["Course Developers Meeting","Inauguration","Field Visit","Meeting","Orientation","Master Trainer Program","Training of Teachers","Course Developers Meeting","Session","Lab Session"]}})
     event_count={}
-    for i in obj:
-        nodes = collection.Node.find({'member_of': i._id})
+    list31=[1,3,5,7,8,10,12]
+    list30=[4,6,9,11]
+    
+    month=request.GET.get('start','')[5:7]
+    year=request.GET.get('start','')[0:4]
+    start = datetime.datetime(2014, int(month), 1)
+    task_start=str(int(month))+"/"+"01"+"/"+str(int(year))
+    
+    if int(month) in list31:
+     end=datetime.datetime(2014,int(month), 31)
+     task_end=str(int(month))+"/"+"31"+"/"+str(int(year))
+    elif int(month) in list30:
+     end=datetime.datetime(2014,int(month), 30)
+     task_end=str(int(month))+"/"+"30"+"/"+str(int(year))
+    else:
+     end=datetime.datetime(2014,int(month), 28)
+     task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
+    #listing of events  
+    for j in obj:
+        nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end}})
         for i in nodes:
           attr_value={}
-          attr_value.update({'url':'events'})
+          event_url="/"+str(group_id)+"/mis/54451151697ee12b7e222076/"+str(j._id) +"/"+str(i._id)
+          attr_value.update({'url':event_url})
           attr_value.update({'id':i._id})
           attr_value.update({'title':i.name})
           date=i.attribute_set[0]['start_time']
-          formated_date=date.strftime("%m/%d/%Y")
+          formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           attr_value.update({'start':formated_date})
           listing.append(dict(attr_value))
+
     count=0
     dummylist=[]
     date=""
@@ -1719,32 +1721,47 @@ def get_data_for_event_task(request,group_id):
     changed="false"
     recount=0
     user_assigned=[]
+    #listing of task
     groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
     attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
     attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
-    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.username}).sort('last_update',-1).limit(10)
+    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.username}).sort('last_update',-1)
     for attr in attr_assignee :
      task_node = collection.Node.one({'_id':attr.subject})
      if task_node:
-                  attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id})	
-     	          attr_value={}
-             	  a="/" + groupname.name +"/" + "task"+"/" + str(task_node._id)  
+                  attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id
+                  ,'object_value':{'$gte':task_start,'$lte':task_end}
+                   })	
+                  attr_value={}
+                  task_url="/" + groupname.name +"/" + "task"+"/" + str(task_node._id)
+                  
                   attr_value.update({'id':task_node._id})
                   attr_value.update({'title':task_node.name})
                   if attr1:
-                        attr_value.update({'start':attr1.object_value})
+                        date=datetime.datetime(int(attr1.object_value[6:10]),int(attr1.object_value[0:2]),int(attr1.object_value[3:5]))
+                        formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+                        attr_value.update({'start':formated_date})
                   else: 
-                        attr_value.update({'start':'01/02/2014'})     
-                  attr_value.update({'url':a})
+                        attr_value.update({'start':'01/04/2014'})     
+                  attr_value.update({'url':task_url})
                   user_assigned.append(attr_value) 
     listings=[]
     date=""
     listdate=[]
+    #Sorting of events and task's
+    #below code is used to replace more than 3 event or task on the particular date 
+    #value +3 so instead of all the task and events on the single day it would show 
+    #+3 
     for i in user_assigned:
         listing.append(dict(i))
     listing.sort(key=lambda item:item['start'])
-    for i in listing:
+    countlist=[]
+    if request.GET.get('view','') == 'month':
+     for i in listing:
         if date == i['start'] or date == "":
+           if countlist:
+             dummylist=countlist
+             countlist=[]  
            dummylist.append(i)
            count=count +  1
            changed="false"
@@ -1753,30 +1770,42 @@ def get_data_for_event_task(request,group_id):
             recount=count
             count=0
             count=count +  1
-            if recount > 2:
+            countlist.append(i)
+            if len(dummylist) > 3:
              attr_value={}
              dummylist=[]
              attr_value.update({'id':i['id']})
-             attr_value.update({'title':'More Events'})
+             attr_value.update({'title':'+3'})
              attr_value.update({'start':date})
              dummylist.append(dict(attr_value)) 
         date=i['start']    
         if changed == "true" :
               for i in dummylist:
                    listing1.append(i)
+              changed="false"
               dummylist=[]
-              changed="false"        
-    if recount > 2:
+                   
+     roundlist=[]
+     if countlist:
+       roundlist=countlist
+     else:
+       roundlist=dummylist
+       
+     dummylist=[]
+     countlist=[]
+     if len(roundlist)>3 :
              attr_value={}
-             dummylist=[]
-             attr_value.update({'id':i['id']})
-             attr_value.update({'title':'More Events'})
-             attr_value.update({'start':date})
-             dummylist.append(dict(attr_value)) 
-    for i in dummylist:
-                   listing1.append(i)
-                            
-    return HttpResponse(json.dumps(listing1,cls=NodeJSONEncoder))
+             attr_value.update({'id':roundlist[0]['id']})
+             attr_value.update({'title':'+3'})
+             attr_value.update({'start':roundlist[0]['start']})
+             dummylist.append(dict(attr_value))
+             roundlist=[]
+             roundlist=dummylist 
+     for i in roundlist:
+           listing1.append(i)  
+     return HttpResponse(json.dumps(listing1,cls=NodeJSONEncoder))
+    else:
+     return HttpResponse(json.dumps(listing,cls=NodeJSONEncoder)) 
 def get_data_for_drawer_of_attributetype_set(request, group_id):
     '''1
     this method will fetch data for designer module's drawer widget
