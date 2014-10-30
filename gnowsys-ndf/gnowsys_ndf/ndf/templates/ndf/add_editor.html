@@ -2,8 +2,6 @@
 {% load i18n %}
 <!-- orgitdown! -->
 <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
-<script type="text/javascript" src="/home/supriya/Downloads/jquery.caret.1.02.min.js"></script>
-
 <!-- orgitdown! toolbar settings -->
 <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
 <!-- orgitdown! skin -->
@@ -90,11 +88,11 @@
 
 
 function insertImg(){
-  if($("#image_name").val() == "" || $("#image_width").val() == "" || $("#image_url").val() == ""){
-          alert("Please fill the input provided");
+  if($("#image_url").val() == ""){
+          alert("Please insert an image url");
     }
   else {
-  insert_img=("\n#+CAPTION: "+$("#image_name").val()+"\n#+ATTR_HTML: "+$("#image_width").val()+"\n[["+$("#image_url").val()+"]]\n");
+  insert_img=("\n#+CAPTION: "+$("#image_name").val()+"\n#+ATTR_HTML: width='"+$("#image_width").val()+"'"+"\n[["+$("#image_url").val()+"]]\n");
   var startPos = $("#{{node_id}}").prop("selectionStart");
   var endPos = $("#{{node_id}}").prop("selectionEnd");
   var content = $("#{{node_id}}").val().substring(0, startPos) + insert_img + $("#{{node_id}}").val().substring(endPos, $("#{{node_id}}").val().length);
@@ -170,12 +168,12 @@ $(".orgitdownButton.orgitdownButton10 a").click(function(){
 <a class="close-reveal-modal">&#215;</a>
 <h3>Add Internal/External Images:</h3> 
 <div>
-    <label for="name">Image Name</label> 
-    <input type="text" name="name" id="image_name" placeholder="Enter name ..." required>
-    <label for="width">Width</label>
-    <input type="text" name="width" id="image_width" placeholder="Enter width in pixel eg.600..." required>
-    <label for="url">URL</label>
-    <input type="url" name="url" id="image_url" placeholder="Enter url eg. http:filename.jpg..." required>
+    <label>Image Name</label> 
+    <input type="text" id="image_name" placeholder="Some description ...">
+    <label>Width</label>
+    <input type="text" id="image_width" placeholder="Enter width in pixel eg.600...">
+    <label>URL</label>
+    <input type="text" id="image_url" placeholder="Enter url eg. http:filename.jpg...">
   <button type="submit" id="insertimage" onclick="insertImg()"> Add Image</button>
 </div>
 <dl class="accordion" data-accordion id="pic">
