@@ -210,10 +210,16 @@
 
       {% else %}
 
-        <br/><br/><br/><br/><br/><br/><br/><br/>
+        <br/><br/><br/><br/><br/><br/>
         <span id="{{widget_for}}_btnRight" class="fontsize-x-large">
           <i class="button fi-arrow-right coll-arrows"></i>
+        </span><br/>
+
+        <span id="{{widget_for}}_btnLeft" class="fontsize-x-large">
+          <i class="button fi-arrow-left coll-arrows"></i>
         </span>
+
+        
 
       {% endif %}
      	     
@@ -280,6 +286,7 @@
 </div>
 
 <input id="{{widget_for}}_list" type="hidden" name="{{widget_for}}_list" value="" />
+<input type="hidden" name="check_collection" value="{{widget_for}}" />
 
 <script type="text/javascript">
   var is_RT = "{{is_RT}}";
@@ -344,90 +351,7 @@
           cn_arr.push($(this).val());
         }
       });
-
-      var cn_list = cn_arr.join(',');
-      var field = "{{widget_for}}";
-
-      $.ajax({
-        type: "POST",
-        url: "{% url 'select_drawer' groupid %}",
-        datatype: "html",
-        data:{
-          collection_list: cn_list,
-          // homo_collection: "{{checked}}",
-          node_id: '{{node_id}}',
-          field: field,
-          page_no: 1,
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function(data) {
-
-          if ($.trim(data) === "Warning") {
-
-            var r = confirm("Do you want to save this selection for "+ field +" ?");
-
-            if (r == true){
-
-              $.ajax({
-                type: "POST",
-                url: "{% url 'select_drawer' groupid %}",
-                datatype: "html",
-                data: {   
-                  collection_list: cn_list,
-                  node_id: '{{node_id}}',
-                  field: field,
-                  selection_save: "True",
-                  page_no: 1,
-                  csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function(data) {
-                  // cnt(data)
-                  alert("Saved selection as "+ field +" Successfully");
-
-                  if (field == "collection"){
-                    $("input:radio").prop('checked', false);
-                    $(".collection_tab").trigger('click');
-                  }
-                  if (field == "prior_node"){
-                    $(".prior_node_tab").trigger('click');
-                  }
-                  if (field == "teaches"){
-                    $(".teaches_tab").trigger('click');
-                  }
-                  if (field == "assesses"){
-                    $(".assesses_tab").trigger('click');
-                  }
-
-                }
-
-              });
-            }
-            else{
-
-              if (field == "collection"){
-                $("input:radio").prop('checked', false);
-                $(".collection_tab").trigger('click');
-              }
-              if (field == "prior_node"){
-                $(".prior_node_tab").trigger('click');
-              }
-              if (field == "teaches"){
-                $(".teaches_tab").trigger('click');
-              }
-              if (field == "assesses"){
-                $(".assesses_tab").trigger('click');
-              }
-
-            }
-
-
-          }
-
-
-        }
-      });
-
-      // end of comment
+      
     }
   });
 
