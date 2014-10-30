@@ -330,7 +330,7 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
 
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   """Updates the retrieved values of common fields from request into the given node."""
-  # print "\n Coming here...\n\n"
+  #print "\n Coming here...\n\n"
 
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
