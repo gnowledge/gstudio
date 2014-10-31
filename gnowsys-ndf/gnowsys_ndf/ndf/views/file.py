@@ -1447,6 +1447,7 @@ def data_review_save(request, group_id):
     if request.method == "POST":
 
         is_changed = get_node_common_fields(request, file_node, group_id, GST_FILE)
+        edit_summary = []
 
         # to fill/update attributes of the node and get updated attrs as return 
         ga_nodes = get_node_metadata(request, file_node, GST_FILE, is_changed=True)
@@ -1454,13 +1455,24 @@ def data_review_save(request, group_id):
         if len(ga_nodes):
             is_changed = True
 
+            # adding the edit attribute name in summary
+            for each_ga in ga_nodes:
+                temp_edit_summ = {}
+                temp_edit_summ["name"] = "Attribute: " + each_ga["node"]["attribute_type"]["name"]
+                temp_edit_summ["before"] = each_ga["before_obj_value"]
+                temp_edit_summ["after"] = each_ga["node"]["object_value"]
+
+                edit_summary.append(temp_edit_summ)
+
+
         teaches_list = request.POST.get('teaches','') # get the teaches list
         if teaches_list != '':
             teaches_list = teaches_list.split(",")
             teaches_list = [ObjectId(each_oid) for each_oid in teaches_list]
-            # print "\n-------------", teaches_list
 
             relation_type_node = collection.Node.one({'_type': "RelationType", 'name':'teaches'})
+
+            temp_teaches_list = [t for t in teaches_list]
 
             gr_nodes = create_grelation(file_node._id, relation_type_node, teaches_list)
             gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes]
@@ -1468,8 +1480,25 @@ def data_review_save(request, group_id):
             if len(gr_nodes_oid_list) == len(teaches_list) and set(gr_nodes_oid_list) == set(teaches_list):
                 pass
             else:
-                is_changed = True
+                rel_nodes = collection.Triple.find({'_type': "GRelation", 
+                                      'subject': file_node._id, 
+                                      'relation_type.$id': relation_type_node._id
+                                    })
+                
+                rel_oid_name = {}
 
+                for each in rel_nodes:
+                    temp = {}
+                    temp[each.right_subject] = each.name
+                    rel_oid_name.update(temp)
+
+                is_changed = True
+                temp_edit_summ = {}
+                temp_edit_summ["name"] = "Relation: Teaches"
+                temp_edit_summ["before"] = [rel_oid_name[each_oid].split(" -- ")[2] for each_oid in temp_teaches_list]
+                temp_edit_summ["after"] = [rel_oid_name[each_oid].split(" -- ")[2] for each_oid in  gr_nodes_oid_list]
+                edit_summary.append(temp_edit_summ)
+                
         assesses_list = request.POST.get('assesses_list','')
         if assesses_list != '':
             assesses_list = assesses_list.split(",")
@@ -1507,6 +1536,8 @@ def data_review_save(request, group_id):
 
         if is_changed:
             file_node.save()
+
+        print edit_summary
 
     return HttpResponse(file_node.status)
 

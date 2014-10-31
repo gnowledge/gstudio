@@ -1424,10 +1424,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
     ga_dict = {}
     ga_dict["is_changed"] = is_ga_node_changed
     ga_dict["node"] = ga_node
+    ga_dict["before_obj_value"] = old_object_value
     return ga_dict
   else:
     return ga_node
-
 
 
 def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):
