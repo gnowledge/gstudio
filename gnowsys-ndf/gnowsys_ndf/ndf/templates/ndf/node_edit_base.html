@@ -335,6 +335,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 			</div>
 		  	
 		</div>
+		<div id="metadata_info"></div>
 	</div>	
     
     <!-- Kept this bellow commented part for future reference(Don't delete this) -->
@@ -501,6 +502,7 @@ $(document).ready(function(){
 	$(".assesses_tab").hide();
 	$(".teaches_tab").hide();
 	$(".prior_node_tab").hide();
+	$("#metadata_info").empty();
 
 	if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
 	{
@@ -552,9 +554,9 @@ $(document).ready(function(){
 		var cn_list = cn_arr.join(',');
 		var homo_coll = this.value;
 		var node_id = "{{node.pk}}";
-		if (node_id){
-			$("#save-node").hide();
-		}
+		// if (node_id){
+		// 	$("#save-node").hide();
+		// }
 
 		$.ajax({
 			type: "POST",
@@ -632,6 +634,8 @@ $(document).ready(function(){
 		$("#coll_tab").removeClass("active");
 		$("#node_tab").removeClass("active");
 		$("#meta_tab").addClass("active");
+
+		$("#metadata_info").html("<input type='hidden' name='metadata_info' value='metadata'>");
 
 	});			
 

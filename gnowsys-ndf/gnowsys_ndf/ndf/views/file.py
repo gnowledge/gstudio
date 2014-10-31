@@ -1282,23 +1282,6 @@ def file_edit(request,group_id,_id):
 
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
-	get_node_metadata(request,file_node,GST_FILE)
-	
-	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
-
-	if teaches_list !='':
-			teaches_list=teaches_list.split(",")
-	
-	create_grelation_list(file_node._id,"teaches",teaches_list)
-
-	
-	assesses_list = request.POST.get('assesses_list','')
-	
-	if assesses_list !='':
-		assesses_list=assesses_list.split(",")
-					
-	create_grelation_list(file_node._id,"assesses",assesses_list)
-	
 
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
@@ -1449,19 +1432,19 @@ def data_review_save(request, group_id):
         file_node.save()
 
     # to fill/update attributes of the node
-    get_node_metadata(request, file_node, GST_FILE)
+    # get_node_metadata(request, file_node, GST_FILE)
 
-    teaches_list = request.POST.get('teaches','') # get the teaches list 
+    # teaches_list = request.POST.get('teaches','') # get the teaches list 
 
-    if teaches_list !='':
-        teaches_list=teaches_list.split(",")
-        create_grelation_list(file_node._id,"teaches",teaches_list)
+    # if teaches_list !='':
+    #     teaches_list=teaches_list.split(",")
+    #     create_grelation_list(file_node._id,"teaches",teaches_list)
 
-    assesses_list = request.POST.get('assesses_list','')
+    # assesses_list = request.POST.get('assesses_list','')
     
-    if assesses_list !='':
-        assesses_list=assesses_list.split(",")
-        create_grelation_list(file_node._id,"assesses",assesses_list)
+    # if assesses_list !='':
+    #     assesses_list=assesses_list.split(",")
+    #     create_grelation_list(file_node._id,"assesses",assesses_list)
 
     return HttpResponse("")
 
