@@ -115,7 +115,7 @@ def task_details(request, group_name, task_id):
 
 def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None, slug=None):
     if request.method == "POST" :
-        group_object=collection.Group.one({'name':unicode(group_name)})
+        group_object=collection.Group.one({'name':unicode(group_name), "_type": "Group"})
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
 
             title = each.name
