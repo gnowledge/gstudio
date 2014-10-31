@@ -38,7 +38,7 @@ import subprocess
 import mimetypes
 from PIL import Image, ImageDraw, ImageFile #install PIL example:pip install PIL
 from StringIO import StringIO
-import os
+import os, re
 import subprocess
 import ox
 import threading
@@ -534,8 +534,9 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
                 result_paginated_cur = collection.Node.find({ '$or':[{'_id': {'$in': doc}},
 
-                            {'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
+                            {'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]},
                                                 '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
+                                                'mime_type': {'$not': re.compile("^audio.*")},
                                                 '$or': [
                                                       {'access_policy': u"PUBLIC"},
                                                         {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -618,7 +619,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
                       {'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
                                                 '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
-                                                'mime_type': 'audio',
+                                                'mime_type': {'$regex': 'audio','$options': "i"},
                                                 '$or': [
                                                       {'access_policy': u"PUBLIC"},
                                                         {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
