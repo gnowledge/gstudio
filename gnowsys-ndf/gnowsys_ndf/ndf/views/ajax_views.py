@@ -1604,7 +1604,7 @@ def get_data_for_batch_drawer(request, group_id):
     data_list = []
     st = collection.Node.one({'_type':'GSystemType','name':'Student'})
     node_id = request.GET.get('_id','')
-    batch_coll = collection.GSystem.find({'member_of': {'$all': [st._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    batch_coll = collection.GSystem.find({'member_of':st._id, 'group_set': {'$all': [ObjectId(group_id)]}})
     if node_id:
         rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
         relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'right_subject':ObjectId(node_id)})
@@ -2762,8 +2762,6 @@ def get_affiliated_colleges(request, group_id):
     return HttpResponse(json.dumps(response_dict))
 
 # =============================================================================
-
-
 def get_courses(request, group_id):
   """
   This view returns list of announced-course(s) that match given criteria
@@ -2988,7 +2986,6 @@ def get_announced_courses_with_ctype(request, group_id):
     error_message = "\n AnnouncedCourseFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
-
 def get_enroll_duration_of_ac(request, group_id):
   """
   This view returns list of announced-course(s) that match given criteria
@@ -3145,6 +3142,7 @@ def get_anncourses_allstudents(request, group_id):
     if request.is_ajax() and request.method == "GET":
       registration_year = request.GET.get("registration_year", "")
       all_students = request.GET.get("all_students", "")
+      print "registration_year all_students",registration_year,all_students
       college_groups = []   # List of ObjectIds
 
       # Check whether any field has missing value or not
@@ -3242,11 +3240,81 @@ def get_anncourses_allstudents(request, group_id):
 
   except Exception as e:
     error_message = "EnrollInCourseError: " + str(e) + "!!!"
+    esponse_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
+
+
+def get_enrolled_students_count(request,group_id):
+  try:
+    if request.is_ajax() and request.method == "GET":
+      acourse_name = request.GET.get("acourse_name", "")
+      announced_course_GST = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
+      acourse_node = collection.Node.one({'member_of':announced_course_GST._id,u'name':unicode(acourse_name)},{'_id':1})
+      acourse_name = ObjectId(acourse_node._id)
+      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id),'relation_set.selected_course': acourse_name})
+    return HttpResponse(json.dumps(res.count()))
+  except Exception as e:
+    no_stud="No students have been enrolled to this Course.\n"
+    return HttpResponse(json.dumps(no_stud))
+
+def get_students_for_batches(request, group_id):
+  """
+  This view returns ...
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  """
+  response_dict = {'success': False, 'message': ""}
+  try:
+    if request.is_ajax() and request.method == "GET":
+      btn_id = request.GET.get('btn_id',"")
+      print btn_id
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
+      if not mis_admin:
+        error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      has_group_RT = collection.Node.one({'_type': "RelationType", 'name': "has_group"}, {'_id': 1})
+      if not has_group_RT:
+        error_message = "'has_group' (RelationType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      # try:
+      #   mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'author_set':1})
+      # except:
+      #   mis_admin = collection.Node.find({'_type': "Group", 'name': "MIS_admin"}, {'author_set':1})
+
+      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      res = collection.Node.find({'member_of': student._id, 
+                                    'group_set': ObjectId(group_id),'relation_set.has_batch_member': {'$exists': False}
+                                  },
+                                  {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+                                ).sort("name", 1) 
+      drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
+      drawer_template_context["widget_for"] = "new_create_batch_"+btn_id
+      print "drawer_widget",drawer_template_context["widget_for"]
+      drawer_widget = render_to_string('ndf/drawer_widget.html', 
+                                        drawer_template_context,
+                                        context_instance = RequestContext(request)
+                                      )
+      response_dict["drawer_widget"] = drawer_widget
+      response_dict["success"] = True
+      response_dict["message"] = "NOTE"
+      return HttpResponse(json.dumps(response_dict))
+    else:
+      error_message = "EnrollInCourseError: Either not an ajax call or not a GET request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict))
+
+  except Exception as e:
+    error_message = "EnrollInCourseError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
 # ====================================================================================================
-
 def edit_task_title(request, group_id):
     '''
     This function will edit task's title 
