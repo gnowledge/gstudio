@@ -80,7 +80,7 @@
         <dd>
           <a href="#view-audio">
             <i class="fi-music"></i>
-            {% trans "Audios" %} ({{ audioCollection.count }})
+            {% trans "Audios" %} {% if audio_pages.count > 0 %}({{ audio_pages.count }}){% endif %}
           </a>
         </dd><br/>
       {% endif %}
