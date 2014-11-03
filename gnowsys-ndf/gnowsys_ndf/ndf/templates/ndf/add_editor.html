@@ -88,16 +88,23 @@
 
 
 function insertImg(){
-  if($("#image_url").val() == ""){
-          alert("Please insert an image url");
-    }
-  else {
-  insert_img=("\n#+CAPTION: "+$("#image_name").val()+"\n#+ATTR_HTML: width='"+$("#image_width").val()+"'"+"\n[["+$("#image_url").val()+"]]\n");
-  var startPos = $("#{{node_id}}").prop("selectionStart");
-  var endPos = $("#{{node_id}}").prop("selectionEnd");
-  var content = $("#{{node_id}}").val().substring(0, startPos) + insert_img + $("#{{node_id}}").val().substring(endPos, $("#{{node_id}}").val().length);
-  $("#{{node_id}}").val(content);
-  $(".close-reveal-modal").trigger("click");
+   insert_img=("\n#+CAPTION: "+$("#image_name").val()+"\n#+ATTR_HTML: width='"+$("#image_width").val()+"'"+"\n[["+$("#image_url").val()+"]]\n");
+   if($("#image_url").val() == ""){
+             alert("Please insert an image url");}
+   else {
+        if ("{{node_id}}"){
+           var startPos = $("#{{node_id}}").prop("selectionStart");
+           var endPos = $("#{{node_id}}").prop("selectionEnd");
+           var content = $("#{{node_id}}").val().substring(0, startPos) + insert_img + $("#{{node_id}}").val().substring(endPos, $("#{{node_id}}").val().length);
+          $("#{{node_id}}").val(content);
+        }
+       else{
+           var startPos = $("#orgitdown_content_org").prop("selectionStart");
+           var endPos = $("#orgitdown_content_org").prop("selectionEnd");
+           var content = $("#orgitdown_content_org").val().substring(0, startPos) + insert_img + $("#orgitdown_content_org").val().substring(endPos, $("#orgitdown_content_org").val().length);
+           $("#orgitdown_content_org").val(content); 
+           }
+       $(".close-reveal-modal").trigger("click");
 }
 }
 

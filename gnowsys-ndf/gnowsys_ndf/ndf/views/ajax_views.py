@@ -21,7 +21,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from mongokit import paginator
-from gnowsys_ndf.ndf.views.imageDashboard import getImageThumbnail
 
 import ast
 
@@ -1826,15 +1825,6 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
 
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
-
-def insert_picture(request, group_id):
-    if request.is_ajax():
-        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'_id': 0, 'name': 1})
-        resources=list(resource_list)
-    
-    return StreamingHttpResponse(json.dumps(resources))
-
-
 def view_articles(request, group_id):
   if request.is_ajax():
     # extracting all the bibtex entries from database
@@ -2760,17 +2750,21 @@ def get_affiliated_colleges(request, group_id):
         response_dict["message"] += "\n\n " + str(i+1) + ". " + each[1]
 
       return HttpResponse(json.dumps(response_dict))
-      
-    else:
-        error_message = "AffiliatedCollegeFindError: Either not an ajax call or not a GET request!!!"
-        response_dict["message"] = error_message
-        return HttpResponse(json.dumps(response_dict))
-  except Exception as e:
-      error_message = "AffiliatedCollegeFindError: " + str(e) + "!!!"
-      response_dict["message"] = error_message
-      return HttpResponse(json.dumps(response_dict))  
-def get_announced_courses(request, group_id):
 
+    else:
+      error_message = "AffiliatedCollegeFindError: Either not an ajax call or not a GET request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict))
+
+  except Exception as e:
+    error_message = "AffiliatedCollegeFindError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
+
+# =============================================================================
+
+
+def get_courses(request, group_id):
   """
   This view returns list of announced-course(s) that match given criteria
   along with NUSSD-Course(s) for which match doesn't exists.
@@ -3285,5 +3279,13 @@ def edit_task_content(request, group_id):
         return HttpResponse(task.content)
     else:
 	raise Http404
+
+def insert_picture(request, group_id):
+    if request.is_ajax():
+        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'_id': 0, 'name': 1})
+        resources=list(resource_list)
+    return StreamingHttpResponse(json.dumps(resources))
+
+
 
 # =============================================================================
