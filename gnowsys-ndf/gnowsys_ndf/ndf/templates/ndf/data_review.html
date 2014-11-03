@@ -639,6 +639,12 @@
 
 					// adding the key value pair in nodeObj
 					nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempEditFieldVal;
+
+					// checking if status value is changed explicitely
+					if((resEditRowArr[i].getAttribute("data-field") == "status") && (tempViewFieldVal == tempEditFieldVal))
+					{
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = ""; 
+					}
 				}
 				else if((resEditRowArr[i].firstElementChild.type == "button"))
 				{
@@ -665,12 +671,11 @@
 
 						if(tempPrevDrawerFields != tempCurrDrawerFields)
 						{
-							// console.log(resEditRowArr[i].getAttribute("data-field") + tempPrevDrawerFields);
-							// console.log(resEditRowArr[i].getAttribute("data-field") + tempCurrDrawerFields);
-							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n Element's in right drawer are changed.\n\n"
+							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n Element's in right drawer are changed.\n\n";
 						}
 
 						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempCurrDrawerFields;
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value + "_prev"] = tempPrevDrawerFields;
 					}
 				}
 
@@ -895,13 +900,6 @@
 				tch_arr.push($(this).val());
 			}
 
-			// if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
-			// 	cn_arr.push($(this).val());
-			// }
-
-			// if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
-  	// 			md_arr.push($(this).val());
-  	// 		}
 			// if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
 				// assess_arr.push($(this).val());
 			// }
@@ -909,8 +907,6 @@
 
 		$("#prior_node_list").val(pn_arr);
 		$("#teaches_list").val(tch_arr);
-		// $("#collection_list").val(cn_arr) ;
-		// $("#module_list").val(md_arr);
 		// $("#assesses_list").val(assess_arr);
 
 	}

@@ -26,7 +26,6 @@ from gnowsys_ndf.settings import GSTUDIO_RESOURCES_AUDIENCE
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_TEXT_COMPLEXITY
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_LANGUAGES
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
 try:
     from bson import ObjectId
@@ -54,6 +53,7 @@ from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.models import STATUS_CHOICES
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list ,set_all_urls
 from gnowsys_ndf.ndf.views.methods import create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 db = get_database()
 collection = db[Node.collection_name]
@@ -1464,21 +1464,25 @@ def data_review_save(request, group_id):
                 temp_edit_summ["after"] = each_ga["node"]["object_value"]
 
                 edit_summary.append(temp_edit_summ)
-
-
-        teaches_list = request.POST.get('teaches','') # get the teaches list
+        
+        teaches_list = request.POST.get('teaches','[]') # get the teaches list
         if teaches_list != '':
+
             teaches_list = teaches_list.split(",")
             teaches_list = [ObjectId(each_oid) for each_oid in teaches_list]
 
+
             relation_type_node = collection.Node.one({'_type': "RelationType", 'name':'teaches'})
 
-            temp_teaches_list = [t for t in teaches_list]
-
             gr_nodes = create_grelation(file_node._id, relation_type_node, teaches_list)
-            gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes]
 
-            if len(gr_nodes_oid_list) == len(teaches_list) and set(gr_nodes_oid_list) == set(teaches_list):
+            gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes]
+            
+            prev_teaches_list = request.POST.get("teaches_prev", "[]")
+            prev_teaches_list = prev_teaches_list.split(",")
+            prev_teaches_list = [ObjectId(each_oid) for each_oid in prev_teaches_list]
+
+            if len(gr_nodes_oid_list) == len(prev_teaches_list) and set(gr_nodes_oid_list) == set(prev_teaches_list):
                 pass
             else:
                 rel_nodes = collection.Triple.find({'_type': "GRelation", 
@@ -1496,7 +1500,7 @@ def data_review_save(request, group_id):
                 is_changed = True
                 temp_edit_summ = {}
                 temp_edit_summ["name"] = "Relation: Teaches"
-                temp_edit_summ["before"] = [rel_oid_name[each_oid].split(" -- ")[2] for each_oid in temp_teaches_list]
+                temp_edit_summ["before"] = [rel_oid_name[each_oid].split(" -- ")[2] for each_oid in prev_teaches_list]
                 temp_edit_summ["after"] = [rel_oid_name[each_oid].split(" -- ")[2] for each_oid in  gr_nodes_oid_list]
                 edit_summary.append(temp_edit_summ)
                 
