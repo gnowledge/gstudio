@@ -1675,16 +1675,18 @@ def set_drawer_widget(st,coll_obj_list):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list 
-def data_for_event_task(request,group_id):
- print "the pass in view"
- return HttpResponse(json.dumps("broken url",cls=NodeJSONEncoder))
 def get_data_for_event_task(request,group_id):
     #date creation for task type is date month and year
-    listing=[]
-    obj = collection.Node.find({'name': {'$in' : ["Course Developers Meeting","Inauguration","Field Visit","Meeting","Orientation","Master Trainer Program","Training of Teachers","Course Developers Meeting","Session","Lab Session"]}})
+    day_list=[]
+    event = collection.Node.one({'_type': "GSystemType", 'name': "Event"})
+    obj = collection.Node.find({'type_of': event._id})
     event_count={}
     list31=[1,3,5,7,8,10,12]
     list30=[4,6,9,11]
+    #create the date format in unix format for querying it from data 
+    #Task attribute_type start time's object value takes the only date 
+    #in month/date/year format 
+    #As events are quried from the nodes which store the date time in unix format
     
     month=request.GET.get('start','')[5:7]
     year=request.GET.get('start','')[0:4]
@@ -1700,7 +1702,8 @@ def get_data_for_event_task(request,group_id):
     else:
      end=datetime.datetime(2014,int(month), 28)
      task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
-    #listing of events  
+    #day_list of events  
+    
     for j in obj:
         nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end}})
         for i in nodes:
@@ -1712,16 +1715,16 @@ def get_data_for_event_task(request,group_id):
           date=i.attribute_set[0]['start_time']
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           attr_value.update({'start':formated_date})
-          listing.append(dict(attr_value))
+          day_list.append(dict(attr_value))
 
     count=0
     dummylist=[]
     date=""
-    listing1=[]
+    sorted_month_list=[]
     changed="false"
     recount=0
     user_assigned=[]
-    #listing of task
+    #day_list of task
     groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
     attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
     attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
@@ -1747,7 +1750,7 @@ def get_data_for_event_task(request,group_id):
                         attr_value.update({'start':formated_date})     
                   attr_value.update({'url':task_url})
                   user_assigned.append(attr_value) 
-    listings=[]
+    day_lists=[]
     date=""
     listdate=[]
     #Sorting of events and task's
@@ -1755,17 +1758,17 @@ def get_data_for_event_task(request,group_id):
     #value +3 so instead of all the task and events on the single day it would show 
     #+3 
     for i in user_assigned:
-        listing.append(dict(i))
-    listing.sort(key=lambda item:item['start'])
+        day_list.append(dict(i))
+    day_list.sort(key=lambda item:item['start'])
     
-    countlist=[]
+    date_changed=[]
     if request.GET.get('view','') == 'month':
-     for i in listing:
+     for i in day_list:
         
         if date == i['start'] or date == "":
-           if countlist:
-             dummylist=countlist
-             countlist=[]  
+           if date_changed:
+             dummylist=date_changed
+             date_changed=[]  
            dummylist.append(i)
            count=count +  1
            changed="false"
@@ -1774,10 +1777,9 @@ def get_data_for_event_task(request,group_id):
             recount=count
             count=0
             count=count +  1
-            countlist=[]
-            countlist.append(i)
+            date_changed=[]
+            date_changed.append(i)
             if len(dummylist) > 3:
-             print countlist
              attr_value={}
              dummylist=[]
              attr_value.update({'id':i['id']})
@@ -1787,31 +1789,31 @@ def get_data_for_event_task(request,group_id):
         date=i['start']    
         if changed == "true" :
               for i in dummylist:
-                   listing1.append(i)
+                   sorted_month_list.append(i)
               changed="false"
               dummylist=[]
                    
-     roundlist=[]
-     if countlist:
-       roundlist=countlist
+     final_changed_dates=[]
+     if date_changed:
+       final_changed_dates=date_changed
      else:
-       roundlist=dummylist
+       final_changed_dates=dummylist
        
      dummylist=[]
-     countlist=[]
-     if len(roundlist)>3 :
+     date_changed=[]
+     if len(final_changed_dates)>3 :
              attr_value={}
-             attr_value.update({'id':roundlist[0]['id']})
+             attr_value.update({'id':final_changed_dates[0]['id']})
              attr_value.update({'title':'+3'})
-             attr_value.update({'start':roundlist[0]['start']})
+             attr_value.update({'start':final_changed_dates[0]['start']})
              dummylist.append(dict(attr_value))
-             roundlist=[]
-             roundlist=dummylist 
-     for i in roundlist:
-           listing1.append(i)  
-     return HttpResponse(json.dumps(listing1,cls=NodeJSONEncoder))
+             final_changed_dates=[]
+             final_changed_dates=dummylist 
+     for i in final_changed_dates:
+           sorted_month_list.append(i)  
+     return HttpResponse(json.dumps(sorted_month_list,cls=NodeJSONEncoder))
     else:
-     return HttpResponse(json.dumps(listing,cls=NodeJSONEncoder)) 
+     return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder)) 
 def get_data_for_drawer_of_attributetype_set(request, group_id):
     '''1
     this method will fetch data for designer module's drawer widget
