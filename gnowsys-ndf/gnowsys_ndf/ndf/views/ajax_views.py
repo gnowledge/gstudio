@@ -1825,6 +1825,7 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
 
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+    
 def view_articles(request, group_id):
   if request.is_ajax():
     # extracting all the bibtex entries from database
@@ -3240,11 +3241,12 @@ def get_anncourses_allstudents(request, group_id):
 
   except Exception as e:
     error_message = "EnrollInCourseError: " + str(e) + "!!!"
-    esponse_dict["message"] = error_message
+    response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
 
 def get_enrolled_students_count(request,group_id):
+  response_dict = {'success': False, 'message': ""}
   try:
     if request.is_ajax() and request.method == "GET":
       acourse_name = request.GET.get("acourse_name", "")
@@ -3253,10 +3255,15 @@ def get_enrolled_students_count(request,group_id):
       acourse_name = ObjectId(acourse_node._id)
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
       res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id),'relation_set.selected_course': acourse_name})
-    return HttpResponse(json.dumps(res.count()))
+      response_dict["success"] = True
+      response_dict["message"] = "Students enrolled to Course"
+      response_dict["stud_count"] = res.count()
+      response_dict["acourse_name"] = str(acourse_name)
+      print response_dict
+    return HttpResponse(json.dumps(response_dict))
   except Exception as e:
-    no_stud="No students have been enrolled to this Course.\n"
-    return HttpResponse(json.dumps(no_stud))
+    response_dict["stud_count"]="No students have been enrolled to this Course.\n"
+    return HttpResponse(json.dumps(response_dict))
 
 def get_students_for_batches(request, group_id):
   """
@@ -3273,7 +3280,9 @@ def get_students_for_batches(request, group_id):
   try:
     if request.is_ajax() and request.method == "GET":
       btn_id = request.GET.get('btn_id',"")
-      print btn_id
+      batch_id = request.GET.get('node_id',"")
+      ac_id = request.GET.get('ac_id',"")
+
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
       if not mis_admin:
         error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
@@ -3286,13 +3295,44 @@ def get_students_for_batches(request, group_id):
       #   mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'author_set':1})
       # except:
       #   mis_admin = collection.Node.find({'_type': "Group", 'name': "MIS_admin"}, {'author_set':1})
-
+      all_batches_in_grp = []
+      course_of_batch_dict = {}
+      batch_member_list=[]
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
-      res = collection.Node.find({'member_of': student._id, 
-                                    'group_set': ObjectId(group_id),'relation_set.has_batch_member': {'$exists': False}
-                                  },
-                                  {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
-                                ).sort("name", 1) 
+      if batch_id:
+        res = collection.Node.find({'member_of': student._id, 
+                                      'group_set': ObjectId(group_id)
+                                    },
+                                    {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+                                  ).sort("name", 1) 
+
+      else:
+        rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
+        rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
+        rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
+
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
+        for each in relation_coll:
+          batch_in_grp = collection.Node.one({'_id':ObjectId(each.right_subject)})
+          #if (batch_in_grp._id==ObjectId(batch_id)):
+          all_batches_in_grp.append(batch_in_grp)
+
+        for each_batch in all_batches_in_grp:
+          relation_coll_b = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_course._id,'subject':ObjectId(each_batch._id)})
+          for each_course in relation_coll_b:
+            course_of_batch = collection.Node.one({'_id':ObjectId(each_course.right_subject)})
+            if (course_of_batch._id==ObjectId(ac_id)):
+              batch_mem_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':ObjectId(each_batch._id)},{'right_subject':1})
+
+        for each in batch_mem_coll:
+          batch_member_list.append(each.right_subject)
+        print "batch_mem_coll",batch_member_list
+        res = collection.Node.find({'member_of': student._id, 
+                                      'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list}
+                                    },
+                                    {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+                                  ).sort("name", 1) 
+        print res
       drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
       drawer_template_context["widget_for"] = "new_create_batch_"+btn_id
       print "drawer_widget",drawer_template_context["widget_for"]
@@ -3300,6 +3340,7 @@ def get_students_for_batches(request, group_id):
                                         drawer_template_context,
                                         context_instance = RequestContext(request)
                                       )
+
       response_dict["drawer_widget"] = drawer_widget
       response_dict["success"] = True
       response_dict["message"] = "NOTE"

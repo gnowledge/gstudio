@@ -131,39 +131,44 @@ def save_students_for_batches(request, group_id):
     '''
     This save method creates new  and update existing the batches
     '''
+    print "in views"
     if request.method == 'POST':
         user_list = request.POST.get('user_list', '')
-        node_id = request.POST.get('node_id', '')
+        ac_id = request.POST.get('ac_id', '')
         batch_name = request.POST.get('batch_name', '')
-        print "user_list",json.loads(user_list)
-        save_batch(batch_name, json.loads(user_list), group_id, request, node_id)
-        return HttpResponse("")
+        batch_created = save_batch(batch_name, json.loads(user_list), group_id, request, ac_id, None)
+        batch_created = str(batch_created)
+        return HttpResponse(json.dumps(batch_created))
 
 
-def save_batch(batch_name, user_list, group_id, request, node_id):
+def save_batch(batch_name, user_list, group_id, request, ac_id, node_id):
 
-    if node_id:
-        new_batch = collection.Node.one({'_id':ObjectId(node_id)})
-        rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
-        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'right_subject':ObjectId(node_id)})
-        for each in relation_coll:
-            rel = collection.Triple.one({'_id':each._id})
-            rel.delete()
-    else:
-        new_batch = collection.GSystem()
-        new_batch.created_by = int(request.user.id)
-        new_batch.member_of.append(GST_BATCH._id)
-        new_batch.group_set.append(ObjectId(group_id))
+    new_batch = collection.GSystem()
+    new_batch.member_of.append(GST_BATCH._id)
+
+    new_batch.created_by = int(request.user.id)
+    new_batch.group_set.append(ObjectId(group_id))
     new_batch.name = batch_name
     new_batch.contributors.append(int(request.user.id))
     new_batch.modified_by = int(request.user.id)
     new_batch.save()
-    print user_list,"user_list"
+    all_batches_in_grp=[]
     rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
-    rt_batch_of_group = collection.Node.one({'_type':'RelationType', 'name':'batch_of_group'})
+    rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
+    rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
+    relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
+    
+    for each in relation_coll:
+        all_batches_in_grp.append(each.right_subject)
+
     for each in user_list:
         create_grelation(new_batch._id,rt_has_batch_member,ObjectId(each))
-    create_grelation(new_batch._id,rt_batch_of_group,ObjectId(group_id))
+    all_batches_in_grp.append(new_batch._id)
+    
+    create_grelation(new_batch._id,rt_has_course,ObjectId(ac_id))
+
+    create_grelation(ObjectId(group_id),rt_group_has_batch,all_batches_in_grp)
+    return new_batch._id
     
    
 
@@ -171,11 +176,11 @@ def detail(request, group_id, _id):
     student_coll = []
     node = collection.Node.one({'_id':ObjectId(_id)})
     rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
-    relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'relation_type.subject':node._id})
+    relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':node._id})
+    
     for each in relation_coll:
-        n = collection.Node.one({'_id':ObjectId(each.subject)})
+        n = collection.Node.one({'_id':ObjectId(each.right_subject)})
         student_coll.append(n)
-    print "student_coll",student_coll
     template = "ndf/batch_detail.html"
     variable = RequestContext(request, {'node':node, 'appId':app._id, 'groupid':group_id, 'group_id': group_id,'title':GST_BATCH.name, 'student_coll':student_coll})
     return render_to_response(template, variable)

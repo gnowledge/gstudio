@@ -3,6 +3,12 @@
 {% load i18n %}
 {% block title %} {{title}} {% endblock %}
 {% block url %}{% url 'create_edit' groupid node %}{% endblock %}
+<script type="text/javascript">
+  function stud(){
+    alert("hello")
+  }
+
+</script>
 
 
 
@@ -25,7 +31,7 @@
     </h2>
     <h3 class="subheader"></h3>
       <small>
-  	{% with node.last_update|timesince as timesince %}
+    {% with node.last_update|timesince as timesince %}
         {{timesince}} {% trans "ago edited by  " %}<a class="user">{% trans "User" %}</a> <a href="#view-changes"><i class="fi-clock"></i> {% trans "View history " %}</a>
       </small>{% endwith%}
 
@@ -36,11 +42,12 @@
 <h3> Members of {{node.name}}: </h3>
 {% for each in student_coll %}
 <div>
-<a href ="">{{each.name}}</a><br><br>
+{{each.name}}<br><br>
 </div>
 {% endfor %}
 </div>
 {% endblock %}
+
 
 
 {% block meta_content %}

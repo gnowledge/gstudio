@@ -74,9 +74,7 @@
   </div>
 
   <div id="batch-drawer" name="batch-drawer-reveal" class="reveal-modal" data-reveal>
-    <div id="batch-name">
-      <label>Enter Batch Name : </label>
-      <input type="text" id="batch_inp_name">
+    <label>Enter Batch Name : </label><div id="batch-name">
     </div>
     <div id="drawer-div">
     </div>
@@ -87,79 +85,11 @@
 
 {% block script%}
   // <script type="text/javascript">
+  //global variables 
+  var batch_id=""
+  var ac_id=""
 
-  function create_batch(btn_id){
-    $("#batch-drawer").foundation('reveal','close')
-    widget_for = "new_create_batch_"+btn_id
-    class_value = ".node_id." + widget_for + "_values"
-    right_drawer_len = $(class_value).size();
-
-    var user_list = [];
-    batch_name=$("#batch_inp_name").val()
-    batch_btn = document.getElementById(btn_id)
-    batch_btn.value=batch_name
-    if (right_drawer_len > 0) {
-      $(class_value).each(function (){
-        resource_id = $(this).val()
-        user_list.push(resource_id);
-      });
-    }
-    $.ajax({
-      url: "{% url 'save_students_for_batches' group_id %}",
-      type: "POST",
-      dataType: "json",
-      data: {
-        user_list:JSON.stringify(user_list),
-        batch_name:batch_name,
-        csrfmiddlewaretoken:"{{csrf_token}}"
-        },
-      success: function(data){
-        alert(data)
-        },
-    });
-  }
-
-  function batch_reveal(btn_id) {
-    batch_btn = document.getElementById(btn_id)
-    var success_state = false
-    
-    $.ajax({
-      url: "{% url 'get_students_for_batches' group_id %}",
-      data: {
-        btn_id: btn_id
-      },
-      type: "GET",
-      dataType: "json",
-      success: function(data){
-        success_state = data["success"];
-        if (data["success"]) {
-          drawer_widget = data["drawer_widget"]
-          $("#drawer-div").html(drawer_widget)
-          $('#save-batch').attr("onclick", "create_batch('"+btn_id+"')");
-        }
-        else {
-         alert("fail")
-        }
-      },
-    });
-    batch_btn.setAttribute("data-reveal-id","batch-drawer")
-    //element.data-reveal-id="firstModal"
-  };
-
-  function add_batch_button(btn_id){
-    var element = document.createElement("input");
-    element.type="button"
-    element.name = btn_id+"name";
-    element.classList.add("button");
-    element.classList.add("small");
-    element.value = "Batch "+btn_id;
-    element.id = "batch-"+btn_id;
-    
-    element.setAttribute("onclick","batch_reveal('batch-"+btn_id+"')");
-    var divParent = document.getElementById("divSt");
-    divParent.appendChild(element);
-  }
-  
+//For selecting Course type
   $("select#nussd_course_type").change(function() {
 
     var nussd_course_type = $("#nussd_course_type").val();
@@ -175,7 +105,7 @@
       dataType: "json",
 
       complete: function () {
-        // Enable District field
+        // Enable AC field
         $("select#acourse_list").removeAttr('disabled')
       },
 
@@ -191,8 +121,9 @@
         $("select#acourse_list").prop("selectedIndex", 0);
       },
     });
-  });
+  });//end of nussd_course_type.change function
 
+//For selecting Announced Course type
   $("select#acourse_list").change(function() {
       var acourse_name = $("#acourse_list").val();
       $.ajax({
@@ -201,37 +132,180 @@
         data: {
           acourse_name: acourse_name
         },
-
         type: "GET",
-
         dataType: "json",
-
+        complete: function () {
+        },
         success: function(data){
-          if(data){
-            $("#input-fd").removeClass("hide")
-            $("#lblstud_count").text(data)
+          $("#input-fd").removeClass("hide")
+          if(data["success"]){
+            $("#lblstud_count").text(data["stud_count"])
+            ac_id = data["acourse_name"]
           }
           else{
-            $("#lblstud_count").text(data)
+            $("#lblstud_count").text(data["stud_count"])
           }
         },//end of success
       });//end of ajax call
-  });//end of .change function
+  });//end of acourse_list.change function
 
+//"Next" after inputting #of batches
   $("#nextbtn").click(function(event) {
-    $(this).off("click")
+
     b_count = $("#txt_batch_count").val()
     if (b_count && $.isNumeric(b_count)){
+      $("#nextbtn").off("click")
       $("#input-fd").fadeOut();
       $("#stud-count").fadeOut();
       for (i = 1;i<= b_count;i++){
-        add_batch_button(i)
+        divstr="<div id='div"+i+"'</div>"
+        $("#divSt").append(divstr)
+        div_btn="div"+i
+        add_batch_button(i,div_btn)
       }
     }
     else{
       alert("Please enter number");
       event.preventDefault();
     }
-  });  //end of nextbtn.click()
+  });//end of nextbtn.click()
+
+//Create Buttons to create batches
+  function add_batch_button(btn_id,div_of_btn){
+    var element = document.createElement("input");
+    element.type="button"
+    element.name = btn_id+"name";
+    element.classList.add("button");
+    element.classList.add("small");
+    element.classList.add("round");
+    element.value = "Batch "+btn_id;
+    element.id = "batch-"+btn_id;
+    element.setAttribute("onclick","reveal_on_create_batch('batch-"+btn_id+"')");
+    var divParent = document.getElementById(div_of_btn);
+    divParent.appendChild(element);
+  }  // end of add_batch_button()
+  
+//On click of batch button display overlay to create batch
+  function reveal_on_create_batch(btn_id) {
+    batch_btn = document.getElementById(btn_id)
+    var success_state = false
+    $("#save-batch").removeAttr("onclick")    
+    $.ajax({
+      url: "{% url 'get_students_for_batches' group_id %}",
+      data: {
+        btn_id: btn_id,
+        ac_id:ac_id
+      },
+      type: "GET",
+      dataType: "json",
+      success: function(data){
+        success_state = data["success"];
+        if (data["success"]) {
+          $("#batch-name").empty()
+          b_name="<input type='text' id='batch_inp_name"+btn_id+"'>"
+          drawer_widget = data["drawer_widget"]
+          $("#batch-name").append(b_name)
+          $("#drawer-div").html(drawer_widget)
+          $('#save-batch').attr("onclick", "save_after_create_batch('"+btn_id+"')");
+        }
+        else {
+         alert("fail")
+        }
+      },
+    });
+    batch_btn.setAttribute("data-reveal-id","batch-drawer")
+  }; // end of reveal_on_create_batch
+  
+//Saving students to batch as batch members
+  function save_after_create_batch(btn_id){
+    $("#batch-drawer").foundation('reveal','close')
+    widget_for = "new_create_batch_"+btn_id
+    class_value = ".node_id." + widget_for + "_values"
+    right_drawer_len = $(class_value).size();
+    batch_name=$("#batch_inp_name"+btn_id).val()
+    alert(ac_id)
+    var user_list = [];
+    
+    if (right_drawer_len > 0) {
+      $(class_value).each(function (){
+        resource_id = $(this).val()
+        user_list.push(resource_id);
+      });
+      $.ajax({
+        url: "{% url 'save_students_for_batches' group_id %}",
+        type: "POST",
+        dataType: "json",
+        data: {
+          user_list:JSON.stringify(user_list),
+          batch_name:batch_name,
+          ac_id:ac_id,
+          csrfmiddlewaretoken:"{{csrf_token}}"
+        },
+        success: function(data){
+            batch_id = data
+            arglist = "'"+batch_id+"','"+btn_id+"'"
+            batch_btn.setAttribute("onclick","reveal_on_edit_batch("+arglist+")")
+        },
+        complete: function(){
+            batch_btn = document.getElementById(btn_id)
+            batch_btn.value=batch_name
+            $("#"+btn_id).removeAttr("onclick")
+            $("#"+btn_id).removeAttr("data-reveal-id")
+        }
+      });
+    }
+    else{
+      alert("Please select Students")
+      event.preventDefault();
+    }
+  }; // end of save_after_create_batch
+
+//On click of batch button display overlay to edit batch
+  function reveal_on_edit_batch(batch_id,btn_id){
+    
+    batch_btn = document.getElementById(btn_id)
+    batch_ip = document.getElementById("batch_inp_name"+btn_id)
+    bname = batch_ip.value
+    var success_state = false
+    $("#save-batch").removeAttr("onclick")
+
+    $.ajax({
+      url: "{% url 'get_students_for_batches' group_id %}",
+      data: {
+        btn_id: btn_id,
+        ac_id:ac_id,
+        node_id:batch_id
+      },
+      type: "GET",
+      dataType: "json",
+      success: function(data){
+        success_state = data["success"];
+        if (data["success"]) {
+          $("#batch-name").empty()
+          b_name="<input type='text' id='batch_inp_name"+btn_id+"'>"
+          $("#batch-name").append(b_name)
+          drawer_widget = data["drawer_widget"]
+          $("#drawer-div").html(drawer_widget)
+          $("#save-batch").attr('value',"Update")
+          $('#save-batch').attr("onclick", "save_after_edit_batch('"+btn_id+"')");
+          /*          $("#batch_inp_name"+btn_id).attr("value",bname)
+                    $("#batch_inp_name"+btn_id).attr("disabled","disabled")
+          */
+        }
+        else {
+         alert("fail")
+        }
+      },
+    });
+    batch_btn.setAttribute("data-reveal-id","batch-drawer")
+  }; // end of reveal_on_edit_batch
+
+//Saving batch after edit
+  function save_after_edit_batch(btn_id){
+      alert("edited");
+  }
+
+
+
   //</script>
 {% endblock %}
