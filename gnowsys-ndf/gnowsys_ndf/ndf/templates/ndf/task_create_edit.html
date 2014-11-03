@@ -45,6 +45,10 @@
     overflow-y: auto;
     padding-left: 10px;
 }
+
+	.selFile { border-radius: 1px;
+  box-shadow: 3px 3px 3px 1px rgba(9,9,9,0.2);}
+
 </style>
 {% endblock %}
 
@@ -258,7 +262,9 @@ $(document).on('click',"#save-node",function(event){
 		-->
 	  <div class="medium-12 columns">
 	    <label>
-	    	<input type="file" name="UploadTask"  id="docFile" value= "" multiple/></label>
+	    	<input type="file" name="UploadTask" onChange="handleFileSelect(this)" id="docFile" value= "" /></label>
+	    	<div id="selectedFiles"></div>
+
 	    <div id="contentlist" class="content">
 		<div class="">
 		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
@@ -282,6 +288,8 @@ $(document).on('click',"#save-node",function(event){
 
         <input type="hidden" name="node" value="{{node.pk}}">
         <input type="hidden" name="user" value="{{user.id}}">
+        <input type="hidden" name="files" id="trial" >
+        <input type="hidden" name="files_name" id="filename" >
         <input type="hidden" name="page_url" value="{{request.path}}">
       <div class="row" >
 	<div class="medium-6 columns">
@@ -289,8 +297,154 @@ $(document).on('click',"#save-node",function(event){
 	</div>
       </div>
     </div>
+  {% if  Upload_Task %}
+	{% get_file_node request Upload_Task as new %}
+	{% for node in new %}
+	{% get_grid_fs_object node as grid_fs_obj %}
+	<div id="Uploaded">
+	<b><a href="{% url 'read_file' group_id node.pk grid_fs_obj.filename %}">{{grid_fs_obj.filename}}</a></b>
+	
+		
+	</div>
+	{% endfor %}
+	{% else %}
+	--
+	{% endif %}
+
 </form>
+<div id="myModal" class="reveal-modal" animation="None" data-reveal>
+<h2> Please wait till file is Uploading... </h2>                
+</div>
 <script type="text/javascript">
+
+	var selDiv = "";
+	var storedFiles = [];
+	var selfiles=[];
+	
+	$(document).ready(function() {
+		$("#files").on("change", handleFileSelect);
+		
+		selDiv = $("#selectedFiles"); 
+		//$("#form-edit-node").on("submit", handleForm);
+		
+		$("body").on("click", ".selFile", removeFile);
+		
+	});
+	$(document).ready(function() {
+	
+	attachedfiles();
+	
+	});
+	
+function attachedfiles(){
+//popultate the files with their names
+    var sData = '{{Upload_Task}}'
+		sData = sData.replace(/&quot;/g, '"');
+		 
+		sData = jQuery.parseJSON(sData);
+    for(i=0;i<sData.length;i++)
+    {
+      storedFiles.push(sData[i]);
+      var html = " <div><span  data-file='"+sData[i]+"' class='selFile' title='Click to remove'>" +sData[i]+  
+			" &#215; <span></div> ";
+      
+      selDiv.append(html);
+		}
+		var sData = '{{select}}'
+		sData = sData.replace(/&quot;/g, '"');
+		sData = jQuery.parseJSON(sData);
+		//populate the list with their ids
+		
+   for(i=0;i<sData.length;i++)
+    {
+    
+    if(sData[i]){
+		selfiles.push(sData[i])
+		
+		  }
+		}
+		var select=document.getElementById('trial')
+	  select.value=selfiles
+		var files_name=document.getElementById('filename')
+      	files_name.value=storedFiles
+  		
+		
+}
+	
+function handleFileSelect(e) {
+		var files = e.files;
+		var filesArr = Array.prototype.slice.call(files);
+		
+		filesArr.forEach(function(f) {	
+		
+			storedFiles.push(f.name);
+			
+			var reader = new FileReader();
+			reader.onload = function (e) {
+			var html = " <div><span  data-file='"+f.name+"' class='selFile' title='Click to remove'>" + f.name + 
+			" &#215; <span></div> ";
+      
+				selDiv.append(html);
+				
+			}
+			reader.readAsDataURL(f); 
+		});
+		
+		var files_name=document.getElementById('filename')
+      	files_name.value=storedFiles
+		var formData = new FormData();
+
+				// Loop through each of the selected files.
+				for (var i = 0; i < files.length; i++) {
+				  var file = files[i];
+
+				  formData.append('doc[]', file, file.name);
+				}
+
+				// appending csrfmiddlewaretoken and user-id
+				formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+				formData.append('user','{{request.user.id}}');
+				
+
+				// Set up the request.
+				xhr = new XMLHttpRequest();
+      xhr.open('POST', "{% url 'save_image' group_name  %}", true);
+        
+				// Set up a handler for when the request finishes sucessfully.
+    $('#myModal').foundation('reveal', 'open');
+    xhr.onload = function () {
+    if (xhr.status === 200) 
+				  {
+		      $('#myModal').foundation('reveal', 'close');		  
+	        selfiles.push(xhr.responseText)
+				  var select=document.getElementById('trial')
+      	  select.value=selfiles
+
+				  }}
+    xhr.send(formData);
+    
+    	}
+		
+	function removeFile(e) {
+		var file = $(this).data("file");
+   for(var i=0;i<storedFiles.length;i++) {
+		    if(storedFiles[i] === file) {
+				storedFiles.splice(i,1);
+				selfiles.splice(i,1);
+				break;
+			}
+		}
+		$(this).parent().remove();
+		var select=document.getElementById('trial')
+	  select.value=selfiles
+		var files_name=document.getElementById('filename')
+      	files_name.value=storedFiles
+    var select_docfile=document.getElementById('docFile')
+	    	select_docfile.value=""
+	}
+
+
+
 var currentYear = (new Date()).getFullYear()
   lowerYearLimit = currentYear - 30;
 $("#document").ready(function(){
@@ -375,6 +529,10 @@ function select_values(source)
                 }
 
 }
+
+
+  
+
 
 if ('{{node.name}}' == "" )
 {

@@ -82,6 +82,9 @@
 
 {% block body_content %}
 
+	{% check_user_join request groupid as user_is_joined %}
+    {% user_access_policy groupid request.user as user_access %}
+
 <br/>
 <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
 
@@ -362,15 +365,15 @@
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
 					<option value="{{resource.featured}}"> -- Select -- </option>
-					<option {%if resource.featured == "False"%}selected="selected"{%endif%} value="False">False</option>
-					<option {%if resource.featured == "True"%}selected="selected"{%endif%} value="True">True</option>
+					<option {% if resource.featured == False %}selected="selected"{%endif%} value="False">False</option>
+					<option {% if resource.featured == True %}selected="selected"{%endif%} value="True">True</option>
 					<!-- <option {%if not resource.featured %}selected="selected"{%endif%} value="None">
 						None
 					</option> -->
 				</select>
 			</td>
 			<td class="hide-el" data-field="status">
-				<select name="status">
+				<select name="status" {% if not user_is_joined == "joined" or not user_is_joined == "author" %}{% if not user_access == "allow" %}disabled{%endif%}{%endif%}>
 					<option value="{{resource.status}}"> -- Select -- </option>
 				{% for each_status in static_status %}		
 					<option {%if each_status == resource.status %}selected="selected"{%endif%} value="{{ each_status }}">{{ each_status }}</option>
@@ -463,6 +466,12 @@
 	// setting the height of data review table
 	$("#data-rev-table-container-div").height(window.innerHeight - ($("nav.top-bar").height()*4) + "px");
 
+	if(window.location.hash && $("tr#edit-row-" + window.location.hash.substr(1)).length)
+	{
+		document.getElementById("view-row-"+window.location.hash.substr(1)).scrollIntoView(true);
+		editResRow(window.location.hash.substr(1));
+	}
+
 	function checkCurrEditRow()
 	{
 		var editedRowName = document.getElementById("currently-edited-row").getAttribute("data-edited-row-name").trim(),
@@ -481,10 +490,23 @@
 	}
 
 
+	function setCurrNoneToEditRow(oid)
+	{
+		var $resEditRow = $("tr#edit-row-" + oid);
+
+		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", oid);
+		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", $resEditRow.attr("data-row-name"));
+		window.location.hash = oid;
+	}
+
+
 	function setCurrEditRowToNone()
 	{
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", "");
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", "");
+		// window.location.hash = "";
+		window.location = window.location.pathname;
+		// location.reload();
 	}
 
 	// hiding save/cancel buttons and showing edit button again
@@ -516,8 +538,7 @@
 		var $resEditRow = $("tr#edit-row-" + oid),
 			resEditRowArr = $resEditRow.children();
 
-		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", oid);
-		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", $resEditRow.attr("data-row-name"));
+		setCurrNoneToEditRow(oid);
 
 		$("div[data-id='edit-btn-" + oid +"']").fadeOut(0);
 

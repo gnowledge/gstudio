@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 from django_mongokit import get_database
 from gnowsys_ndf.ndf.org2any import org2html
 
+import re
+
 try:
 	from bson import ObjectId
 except ImportError:  # old pymongo
@@ -125,9 +127,9 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
 	docCollection = collection.Node.find({ '$or':[{'_id': {'$in': doc}},
 
-												   {'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
+												   {'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]},
 		                                            '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
-		                                            'mime_type': {'$ne': 'audio'},
+		                                             'mime_type': {'$not': re.compile("^audio.*")},
 		                                            '$or': [
 		                                                 	{'access_policy': u"PUBLIC"},
 		                                                  	{'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -158,8 +160,8 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	audioCollection = collection.Node.find({ '$or':[{'_id': {'$in': audio}},
 
 											{'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
-		                                            '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
-		                                            'mime_type': 'audio',
+		                                            '_type': 'File','group_set': {'$all': [ObjectId(group_id)]},
+		                                            'mime_type': {'$regex': 'audio','$options': "i"},
 		                                            '$or': [
 		                                                 	{'access_policy': u"PUBLIC"},
 		                                                  	{'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
