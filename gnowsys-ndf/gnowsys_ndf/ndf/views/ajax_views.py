@@ -3282,6 +3282,7 @@ def get_students_for_batches(request, group_id):
       btn_id = request.GET.get('btn_id',"")
       batch_id = request.GET.get('node_id',"")
       ac_id = request.GET.get('ac_id',"")
+      print "coming here"
 
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
       if not mis_admin:
@@ -3300,11 +3301,13 @@ def get_students_for_batches(request, group_id):
       batch_member_list=[]
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
       if batch_id:
-        res = collection.Node.find({'member_of': student._id, 
-                                      'group_set': ObjectId(group_id)
-                                    },
-                                    {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
-                                  ).sort("name", 1) 
+        batch_node = collection.Node.one({'_id':ObjectId(batch_id)})
+        print batch_id, batch_node._id
+        batch_node.get_neighbourhood(batch_node.member_of)
+        print batch_node.keys()
+        res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id)},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort("name", 1) 
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, batch_node, None,"has_batch_member", left_drawer_content=res)
+
 
       else:
         rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
@@ -3332,10 +3335,8 @@ def get_students_for_batches(request, group_id):
                                     },
                                     {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
                                   ).sort("name", 1) 
-        print res
-      drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
-      drawer_template_context["widget_for"] = "new_create_batch_"+btn_id
-      print "drawer_widget",drawer_template_context["widget_for"]
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
+      drawer_template_context["widget_for"] = "new_create_batch"
       drawer_widget = render_to_string('ndf/drawer_widget.html', 
                                         drawer_template_context,
                                         context_instance = RequestContext(request)
@@ -3346,12 +3347,12 @@ def get_students_for_batches(request, group_id):
       response_dict["message"] = "NOTE"
       return HttpResponse(json.dumps(response_dict))
     else:
-      error_message = "EnrollInCourseError: Either not an ajax call or not a GET request!!!"
+      error_message = "Batch Drawer: Either not an ajax call or not a GET request!!!"
       response_dict["message"] = error_message
       return HttpResponse(json.dumps(response_dict))
 
   except Exception as e:
-    error_message = "EnrollInCourseError: " + str(e) + "!!!"
+    error_message = "Batch Drawer: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
