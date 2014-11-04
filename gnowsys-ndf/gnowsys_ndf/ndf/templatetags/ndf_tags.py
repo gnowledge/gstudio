@@ -1971,7 +1971,16 @@ def html_widget(groupid, node_id, field):
       is_relation_field = True
       is_required_field = True
 
-      field_value_choices.extend(list(collection.Node.find({'_type': "GSystem", 
+      group=collection.Node.find({"_id":ObjectId(groupid)},{"group_admin":1})
+      person=collection.Node.find({"_id":{'$in': field["object_type"]}},{"name":1})
+      if person[0].name == "Author":
+          field_value_choices.extend(list(collection.Node.find({'member_of': {'$in':field["object_type"]},
+                                                            'created_by':{'$in':group[0]["group_admin"]},                                																														}).sort('name', 1)
+                                      )
+                                )
+
+      else:
+        field_value_choices.extend(list(collection.Node.find({'_type': "GSystem", 
 																														'member_of': {'$in': field["object_type"]}, 
 																														'status': u"PUBLISHED",
 																														'group_set': ObjectId(groupid)
