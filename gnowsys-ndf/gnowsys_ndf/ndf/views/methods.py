@@ -17,6 +17,7 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.notification import models as notification
+from django.contrib.sites.models import Site
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -27,6 +28,8 @@ import ast
 import string
 import json
 from datetime import datetime
+#set_notif_val
+#from gnowsys_ndf.ndf.views.file import save_file
 
 
 db = get_database()
@@ -35,6 +38,13 @@ collection = db[Node.collection_name]
 history_manager = HistoryManager()
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+sitename=Site.objects.all()
+if sitename :
+	sitename = sitename[0]
+else : 
+	sitename = ""
+
+
 
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
@@ -42,6 +52,137 @@ topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
+
+def create_task_for_activity(request,group_id,activity_dict,assignee_list,set_notif_val):
+    """Creates a task for an activity and notify assignee.
+    """
+    try:
+        grp=collection.Node.one({'_id':ObjectId(group_id)})
+        group_name=grp.name
+        get_assignee_list=assignee_list
+        print "all assignees",get_assignee_list
+        count=0
+        print "inside create_tas_for_act"
+        ins_objectid  = ObjectId()
+        if ins_objectid.is_valid(group_id) is False :
+            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+            if group_ins:
+                group_id = str(group_ins._id)
+            else:
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                if auth:
+                    group_id=str(auth._id)
+        elif ins_objectid.is_valid(group_id) is True :
+            group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+            if group_ins:
+                group_id = str(group_ins._id)
+        at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"]
+        task_node = collection.GSystem()
+        userlist=[]
+        GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 	
+        if request.method == "POST": # create or edit
+            print "reached this point",activity_dict
+            task_node.name = unicode(activity_dict['name'])
+            task_node.content_org = unicode(activity_dict['content_org'])
+            task_node.created_by=request.user.id
+            print task_node.member_of,"membeof",GST_TASK
+            if GST_TASK._id not in task_node.member_of:
+                task_node.member_of.append(GST_TASK._id)
+                print "set memberof"
+            if request.user.id not in task_node.contributors:
+                task_node.contributors.append(request.user.id)
+            if group_id not in task_node.group_set:
+                task_node.group_set.append(grp._id)
+            parent = activity_dict['parent']
+            Status = activity_dict['Status']
+            Start_date = activity_dict['Start_date']
+            Priority = activity_dict['Priority']
+            Due_date = activity_dict['Due_date']
+            Assignee = activity_dict['Assignee']
+            Estimated_time = activity_dict['Estimated_time']
+            watchers = activity_dict['watchers']
+            
+           
+	
+            tag=""
+            field_value=[]
+            task_node.save()
+            print task_node,"taskinnode"
+            if request.FILES.getlist('UploadTask'):
+        	files=request.FILES.getlist('UploadTask')
+        	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag,usrname=request.user.username,oid=True)
+
+            get_node_common_fields(request, task_node, group_id, GST_TASK)
+            if watchers:
+                for each_watchers in watchers.split(','):
+                    bx=User.objects.get(username=each_watchers)
+                    task_node.author_set.append(bx.id)
+                    userlist.append(each_watchers)
+                task_node.save()
+		
+	    if parent: # prior node saving
+		task_node.prior_node = [ObjectId(parent)]
+                parent_object = collection.Node.find_one({'_id':ObjectId(parent)})
+                parent_object.post_node = [task_node._id]
+                parent_object.save()
+            print "attrib list",at_list    
+            for each in at_list:
+                #if request.POST.get(each,"")  :
+                    print "true"
+                    attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+                    newattribute = collection.GAttribute()
+                    newattribute.subject = task_node._id
+                    newattribute.attribute_type = attributetype_key
+                    if each == 'Assignee' and len(get_assignee_list)>1:
+                        print "for assignee",count
+                        if count == 0:
+                            newattribute.object_value = request.user.username
+                        else:
+                            assignee_list=[]
+                            assignee_list=(request.POST.getlist(each,""))
+                            newattribute.object_value = assignee_list[count]
+                    else:
+                        print "else of assignee"
+                        newattribute.object_value = request.POST.get(each,"")
+                    newattribute.save()
+                    print "attribute saved"
+	    if request.FILES.getlist('UploadTask'):
+                                attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
+               			newattribute = collection.GAttribute()
+                		newattribute.subject = task_node._id
+                		newattribute.attribute_type = attributetype_key
+                		newattribute.object_value = field_value[0]
+                		newattribute.save()
+            print task_node,"some task"
+	    if  int(len(get_assignee_list))>1:
+                if task is None:
+                    Task=collection.Node.find_one({"_id":ObjectId(task_node._id)})
+			
+                else:
+                    Task=collection.Node.find_one({"_id":ObjectId(task)})
+                    Task.collection_set.append(task_node._id)
+	        Task.save()
+	      	
+	        if int(count) <int(len(get_assignee_list)-1):
+                    create_edit_task(request, group_name, task_id,Task._id,count=count+1)
+	    if count == 0:	
+                get_assignee_list.append(request.user.id)	
+                print "some errr",get_assignee_list
+                for eachuser in (get_assignee_list):
+                    if eachuser != "":	
+			activ="task reported"
+                        print eachuser
+                        print "vals",task_node
+			msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+activity_dict['Status']+"\n     - Assignee: "+ "user"+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
+			bx=User.objects.get(id=eachuser)
+                        print "box of user",bx
+	       		set_notif_val(request,group_id,msg,activ,bx)
+			
+        print "last way",task_node	 
+        return
+    except Exception as e:
+        print "Exception in create_task_for_activity "+str(e)
+
 
 def get_all_subscribed_users(group_id):
   grp=collection.Node.one({'_id':ObjectId(group_id)})
@@ -54,10 +195,16 @@ def get_all_subscribed_users(group_id):
       all_users.remove(grp.created_by)
   return all_users
   
+def get_all_admins(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  return grp.group_admin
+
+
 def check_if_moderated_group(group_id):
   grp=collection.Node.one({'_id':ObjectId(group_id)})
   ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(node_id) :
+  print "edtpol",grp.edit_policy
+  if ins_objectid.is_valid(group_id) :
     if grp.edit_policy == "EDITABLE_MODERATED":
       return True
     else:

@@ -117,6 +117,7 @@ def task_details(request, group_name, task_id):
 def create_edit_task(request, group_name, task_id=None,task=None,count=0):
     """Creates/Modifies details about the given Task.
     """
+    print "in create_edit_task"
     edit_task_node = ""
     change_list = []
     parent_task_check = ""
@@ -165,6 +166,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 
         	
 	if not task_id: # create
+                print "gng to get_common_fields bef",task_node
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
 		if watchers:
 	     	    for each_watchers in watchers.split(','):
@@ -172,7 +174,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 	                 task_node.author_set.append(bx.id)
 			 userlist.append(each_watchers)
 		task_node.save()
-		
+		print "task node saved",task_node
 	if parent: # prior node saving
 		if not task_id:		
 			task_node.prior_node = [ObjectId(parent)]
@@ -213,6 +215,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                                 else:
 					assignee_list=[]
                                         assignee_list=(request.POST.getlist(each,""))
+                                        print "assgnlist",assignee_list
                                         newattribute.object_value = assignee_list[count]
 			else:
 				newattribute.object_value = request.POST.get(each,"")
@@ -245,6 +248,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 			bx=User.objects.get(username =eachuser)
 	       		set_notif_val(request,group_id,msg,activ,bx)
 	else: #update
+            print "reacjh else"
 	    for each in at_list:
 	        
 		if request.POST.get(each,""):
@@ -284,6 +288,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                 		newattribute.attribute_type = attributetype_key
                 		newattribute.object_value = field_value[0]
                 		newattribute.save()
+                                print "atrtrbt save avunnundo?",newattribute
 				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
         		
 			
@@ -291,6 +296,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 	    userlist.append(userobj.username)
 	    for each_author in task_node.author_set:
 		userlist.append(User.objects.get(id=each_author).username)
+            print "enta userlistil?",userlist,"++++++++++++++++++++"
        	    for eachuser in list(set(userlist)):
 		activ="task updated"
 		msg="Task '"+task_node.name+"' has been updated by "+request.user.username+"\n     - Changes: "+ str(change_list).strip('[]')+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
@@ -313,10 +319,12 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 		update_node.save()
 		task_node.post_node.append(update_node._id)
 		task_node.save()
+                print "task node save save?",tasknode
 		# patch
 		GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 			
                 get_node_common_fields(request, task_node, group_id, GST_TASK)
 		task_node.save()
+                print "pinneyum save?",tasknode
 		#End Patch        
         return HttpResponseRedirect(reverse('task_details', kwargs={'group_name': group_name, 'task_id': str(task_node._id) }))
 
