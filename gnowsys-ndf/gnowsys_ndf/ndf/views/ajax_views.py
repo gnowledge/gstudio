@@ -3280,4 +3280,12 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
+def insert_picture(request, group_id):
+    if request.is_ajax():
+        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'_id': 0, 'name': 1})
+        resources=list(resource_list)
+    return StreamingHttpResponse(json.dumps(resources))
+
+
+
 # =============================================================================

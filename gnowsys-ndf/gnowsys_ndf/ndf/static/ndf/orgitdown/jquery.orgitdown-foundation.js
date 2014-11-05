@@ -240,6 +240,7 @@
                         $(".orgitdownContainer").hide();
 		        location.reload();}
 
+		   
 			// build block to insert
 			function build(string) {
 				var openWith 			= prepare(clicked.openWith);
