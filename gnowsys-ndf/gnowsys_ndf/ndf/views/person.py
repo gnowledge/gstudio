@@ -1,6 +1,7 @@
 ''' -- imports from python libraries -- '''
 # from datetime import datetime
 import datetime
+import json
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
@@ -58,7 +59,6 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
   app_name = app.name 
 
-  # print "\n coming in person detail... \n"
   # app_name = "mis"
   app_set = ""
   app_collection_set = []
@@ -106,6 +106,97 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                   # ]
       widget_for = get_widget_built_up_data(widget_for, person_gs)
   
+    else:
+      query = {}
+      if request.method == "POST":
+        search = request.POST.get("search","")
+        query = {'member_of': person_gst._id, 'group_set': ObjectId(group_id), 'name': {'$regex': search, '$options': 'i'}}
+      
+      else:
+        query = {'member_of': person_gst._id, 'group_set': ObjectId(group_id)}
+
+      rec = collection.aggregate([{'$match': query},
+                            {'$project': {'_id': 0,
+                                          'p_id': '$_id',
+                                          'name': '$name',
+                                          'gender': '$attribute_set.gender',
+                                          'dob': '$attribute_set.dob',
+                                          'email_id': '$attribute_set.email_id',
+                            }},
+                            {'$sort': {'name': 1}}
+      ])
+
+      nodes = []
+      if len(rec["result"]):
+        for each_dict in rec["result"]:
+          new_dict = {}
+          
+          for each_key in each_dict:
+            if each_dict[each_key]:
+              if type(each_dict[each_key]) == list:
+                data = each_dict[each_key][0]
+              else:
+                data = each_dict[each_key]
+
+              if type(data) == list:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                
+                  elif type(data[0]) in [ObjectId]:
+                    # new_dict[each_key] = str(data)
+                    d_list = []
+                    for oid in data:
+                      d = collection.Node.one({'_id': oid}, {'name': 1})
+                      d_list.append(str(d.name))
+                    new_dict[each_key] = ', '.join(str(n) for n in d_list)
+                
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+                
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+                
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+                
+                else:
+                  new_dict[each_key] = str(data)
+
+              else:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                  elif type(data[0]) in [ObjectId]:
+                    new_dict[each_key] = str(data)
+
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+
+                else:
+                  new_dict[each_key] = str(data)
+
+            else:
+              new_dict[each_key] = ""
+          
+          nodes.append(new_dict)
+
     template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
     default_template = "ndf/person_list.html"
 
@@ -146,8 +237,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   """
   Creates/Modifies document of given person-type.
   """
-  # print "\n Found person_create_edit n gone inn this...\n\n"
-
   auth = None
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
@@ -207,16 +296,9 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     person_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
   property_order_list = get_property_order_with_value(person_gs)#.property_order
-  # print "\n property_order_list: ", property_order_list, "\n"
 
   if request.method == "POST":
     # [A] Save person-node's base-field(s)
-    # print "\n Going before....", type(person_gs), "\n person_gs.keys(): ", person_gs.keys()
-    # get_node_common_fields(request, person_gs, group_id, person_gst)
-    # print "\n Going after....", type(person_gs), "\n person_gs.keys(): ", person_gs.keys()
-    # print "\n person_gs: \n", person_gs.keys()
-    # for k, v in person_gs.items():
-    #   print "\n ", k, " -- ", v
     is_changed = get_node_common_fields(request, person_gs, group_id, person_gst)
 
     if is_changed:
@@ -228,17 +310,12 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     # [B] Store AT and/or RT field(s) of given person-node (i.e., person_gs)
     for tab_details in property_order_list:
       for field_set in tab_details[1]:
-        # field_set pattern -- {[field_set[0]:node_structure, field_set[1]:field_base/AT/RT_instance{'_id':, 'name':, 'altnames':}, field_set[2]:node_value]}
-        # field_set pattern -- {'_id', 'data_type', 'name', 'altnames', 'value'}
-        # print " ", field_set["name"]
-
         # Fetch only Attribute field(s) / Relation field(s)
         if field_set.has_key('_id'):
           field_instance = collection.Node.one({'_id': field_set['_id']})
           field_instance_type = type(field_instance)
 
           if field_instance_type in [AttributeType, RelationType]:
-            
             if field_instance["name"] == "attendees":
               continue
 
@@ -246,7 +323,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
             # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
             if field_instance_type == AttributeType:
-
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
                 
@@ -268,7 +344,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 field_value = request.POST[field_instance["name"]]
 
               # field_instance_type = "GAttribute"
-              # print "\n Parsing data for: ", field_instance["name"]
               if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
               elif field_instance["name"] in ["dob", "registration_date"]:
@@ -278,10 +353,13 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
               if field_value:
                 person_gs_triple_instance = create_gattribute(person_gs._id, collection.AttributeType(field_instance), field_value)
-                # print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
 
             else:
-              field_value_list = request.POST.getlist(field_instance["name"])
+              if field_instance["object_cardinality"] > 1:
+                field_value_list = request.POST.get(field_instance["name"], "")
+                field_value_list = json.loads(field_value_list)
+              else:
+                field_value_list = request.POST.getlist(field_instance["name"])
 
               # field_instance_type = "GRelation"
               for i, field_value in enumerate(field_value_list):
@@ -289,42 +367,46 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 field_value_list[i] = field_value
 
               person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value_list)
-              # if isinstance(person_gs_triple_instance, list):
-              #   print "\n"
-              #   for each in person_gs_triple_instance:
-              #     print " person_gs_triple_instance: ", each._id, " -- ", each.name
-              #   print "\n"
 
-              # else:
-              #   print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
-    
-    # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   default_template = "ndf/person_create_edit.html"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
-  context_variables = { 'groupid': group_id, 
+  context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'property_order_list': property_order_list
                       }
 
+  if person_gst and person_gst.name in ["Voluntary Teacher", "Master Trainer"]:
+    nussd_course_type = collection.Node.one({'_type': "AttributeType", 'name': "nussd_course_type"}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
+
+    if nussd_course_type["data_type"] == "IS()":
+      # Below code does little formatting, for example:
+      # data_type: "IS()" complex_value: [u"ab", u"cd"] dt:
+      # "IS(u'ab', u'cd')"
+      dt = "IS("
+      for v in nussd_course_type.complex_data_type:
+          dt = dt + "u'" + v + "'" + ", " 
+      dt = dt[:(dt.rfind(", "))] + ")"
+      nussd_course_type["data_type"] = dt
+
+    nussd_course_type["data_type"] = eval(nussd_course_type["data_type"])
+    nussd_course_type["value"] = None
+    context_variables['nussd_course_type'] = nussd_course_type
+
   if app_set_instance_id:
+    person_gs.get_neighbourhood(person_gs.member_of)
     context_variables['node'] = person_gs
 
   try:
-    # print "\n template-list: ", [template, default_template]
-    # template = "ndf/fgh.html"
-    # default_template = "ndf/dsfjhk.html"
-    # return render_to_response([template, default_template], 
     return render_to_response([template, default_template], 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
   
   except TemplateDoesNotExist as tde:
-    # print "\n ", tde
     error_message = "\n PersonCreateEditViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
   
@@ -382,7 +464,6 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
     if request.method == "POST":
       student_enroll_list = request.POST.get("student_enroll_list", "")
       announced_courses_name = request.POST.get("announced_courses_list", "")
-      print "announced_courses_name",announced_courses_name
 
       if student_enroll_list != '':
         student_enroll_list = [ObjectId(each.strip()) for each in student_enroll_list.split(",")]
