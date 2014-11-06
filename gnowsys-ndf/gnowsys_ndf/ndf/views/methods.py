@@ -1060,24 +1060,22 @@ def parse_template_data(field_data_type, field_value, **kwargs):
   Returns:
   Parsed value based on the data-type of the field
   """
-  
+
   '''
   kwargs_keys_list = [
-                      "date_format_string",     # date-format in string representation
-                      "field_instance"          # dict-object reperesenting AT/RT node
-                    ]
+                    "date_format_string",     # date-format in string representation
+                    "field_instance"          # dict-object reperesenting AT/RT node
+                  ]
   '''
   DATA_TYPE_STR_CHOICES = [
-                            "unicode", "basestring",
-                            "int", "float", "long",
-                            "list", "dict",
-                            "datetime",
-                            "bool",
-                            "ObjectId"
-                          ]
-
+                          "unicode", "basestring",
+                          "int", "float", "long",
+                          "list", "dict",
+                          "datetime",
+                          "bool",
+                          "ObjectId"
+                        ]
   try:
-
     if type(field_data_type) == type:
       field_data_type = field_data_type.__name__
 
@@ -1142,7 +1140,6 @@ def parse_template_data(field_data_type, field_value, **kwargs):
           # Write RT related code 
           if not field_value:
             return None
-
           if field_value:
             field_value = ObjectId(field_value)
 
@@ -1163,7 +1160,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
           field_value = rr.split(",")
 
         return field_value
-        
+
     elif type(field_data_type) == dict:
       # Write code...
       if not field_value:
@@ -1199,10 +1196,11 @@ def parse_template_data(field_data_type, field_value, **kwargs):
       raise Exception(error_message)
 
     return field_value
-
+  
   except Exception as e:
     error_message = "\n TemplateDataParsingError: "+str(e)+" !!!\n"
     raise Exception(error_message)
+
 
 def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
