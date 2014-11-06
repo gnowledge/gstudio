@@ -632,11 +632,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if usrid not in node.contributors:
       node.contributors.append(usrid)
 
-  if status:
-    if node.status != status:
-      node.status = status
-      is_changed = True
-
   return is_changed
 # ============= END of def get_node_common_fields() ==============
   
@@ -1231,7 +1226,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
 
   ga_node = None
   info_message = ""
-  
+  old_object_value = None
+
   ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
     # Code for creation
@@ -1272,7 +1268,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
   else:
     # Code for updation
     is_ga_node_changed = False
-    old_object_value = None
+    
     try:
       if (not object_value) and type(object_value) != bool:
         old_object_value = ga_node.object_value
@@ -1359,25 +1355,25 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
 
 
 def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):
-    """
-    Creates single or multiple GRelation documents (instances) based on given RelationType's cardinality (one-to-one / one-to-many).
+  """
+  Creates single or multiple GRelation documents (instances) based on given RelationType's cardinality (one-to-one / one-to-many).
 
-    Arguments:
-    subject_id -- ObjectId of the subject-node
-    relation_type_node -- Document of the RelationType node (Embedded document)
-    right_subject_id_or_list -- 
-      - When one to one relationship: Single ObjectId of the right_subject node
-      - When one to many relationship: List of ObjectId(s) of the right_subject node(s)
+  Arguments:
+  subject_id -- ObjectId of the subject-node
+  relation_type_node -- Document of the RelationType node (Embedded document)
+  right_subject_id_or_list -- 
+    - When one to one relationship: Single ObjectId of the right_subject node
+    - When one to many relationship: List of ObjectId(s) of the right_subject node(s)
 
-    Returns:
-    - When one to one relationship: Created/Updated/Existed document.
-    - When one to many relationship: Created/Updated/Existed list of documents.
-    
-    """
-    gr_node = None
-    multi_relations = False
+  Returns:
+  - When one to one relationship: Created/Updated/Existed document.
+  - When one to many relationship: Created/Updated/Existed list of documents.
+  
+  """
+  gr_node = None
+  multi_relations = False
 
-    # try:
+  try:
     subject_id = ObjectId(subject_id)
 
     if relation_type_node["object_cardinality"]:
@@ -1584,9 +1580,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
       return gr_node
 
-  # except Exception as e:
-  #     error_message = "\n GRelationError: " + str(e) + "\n"
-  #     raise Exception(error_message)
+  except Exception as e:
+      error_message = "\n GRelationError: " + str(e) + "\n"
+      raise Exception(error_message)
 
       
 

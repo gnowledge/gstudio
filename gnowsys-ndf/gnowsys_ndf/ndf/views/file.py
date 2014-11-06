@@ -1445,10 +1445,22 @@ def data_review_save(request, group_id):
     
     file_node = collection.File.one({"_id": ObjectId(node_oid)})
 
+
     if request.method == "POST":
 
-        is_changed = get_node_common_fields(request, file_node, group_id, GST_FILE)
         edit_summary = []
+        
+        file_node_before = file_node.copy()  # copying before it is getting modified
+        is_changed = get_node_common_fields(request, file_node, group_id, GST_FILE)
+
+        for key, val in file_node_before.iteritems():
+            if file_node_before[key] != file_node[key]:
+                temp_edit_summ = {}
+                temp_edit_summ["name"] = "Field: " + key
+                temp_edit_summ["before"] = file_node_before[key]
+                temp_edit_summ["after"] = file_node[key]
+
+                edit_summary.append(temp_edit_summ)
 
         # to fill/update attributes of the node and get updated attrs as return 
         ga_nodes = get_node_metadata(request, file_node, GST_FILE, is_changed=True)
