@@ -129,7 +129,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-12 columns">
-		    			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+					       {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+					 
 		  			</div>
 				</div>
 
@@ -251,8 +252,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-12 columns">
-		    			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
-		  			</div>
+					  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+					  </div>
 				</div>
 
 				<div class="row">

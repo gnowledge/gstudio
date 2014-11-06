@@ -85,7 +85,6 @@ def get_schema(node):
    obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
    nam=node.member_of_names_list[0]
    if(nam=='Page'):
-	#print s_dict[nam]
         return [1,schema_dict[nam]]
    elif(nam=='File'):
 	if( 'image' in node.mime_type):
@@ -96,18 +95,7 @@ def get_schema(node):
 		return [1,schema_dict['Document']]	
    else:
 	return [0,""]
-"""
-@register.assignment_tag
-def g2(node):
-     	node.get_neighbourhood(node.member_of)
-  #if(node.has_key('basedonurl')):
-	#schema_lrmi["basedonurl"] = node.basedonurl
-	#schema_lrmi["timerequired"] = node.timerequired
-	#schema_lrmi["agerange"]=node.age_range
-	#schema_lrmi["audience"]=node.audience
-	#schema_lrmi["interactivitytype"]=node.interactivitytype
-        return schema_lrmi 
-"""
+
 @register.filter
 def is_Page(node):
 	Page = collection.Node.one({"_type":"GSystemType","name":"Page"})
@@ -115,6 +103,7 @@ def is_Page(node):
 		return 1
 	else:
 		return 0
+
 @register.filter
 def is_Quiz(node):
 	Quiz = collection.Node.one({"_type":"GSystemType","name":"Quiz"})
@@ -1406,15 +1395,6 @@ def user_access_policy(node, user):
   Returns:
   string value (allow/disallow), i.e. whether user is allowed or not!
   """
-	# try:
-	# 	col_Group=db[Group.collection_name]
-	# 	group_gst = col_Group.Group.one({'_id':ObjectId(node)})
-	# 	# if user.id in group_gst.group_set or group_gst.created_by == user.id:
-	# 	if user.id in group_gst.author_set or group_gst.created_by == user.id :
-	# 		return 'allow'
-	# except Exception as e:
-	# 	print "Exception in user_access_policy- "+str(e)
-
   user_access = False
 
   try:
@@ -1496,7 +1476,6 @@ def edit_policy(groupid,node,user):
 
 @register.assignment_tag
 def get_prior_post_node(group_id):
-	
 	col_Group = db[Group.collection_name]
 	prior_post_node=col_Group.Group.one({'_type': 'Group',"_id":ObjectId(group_id)})
 	#check wheather we got the Group name       
@@ -1910,24 +1889,15 @@ def html_widget(groupid, node_id, field):
     field_type = field['data_type']
     field_altnames = field['altnames']
     field_value = field['value']
-    # print "\n IS: ", IS
 
     if type(field_type) == IS:
       field_value_choices = field_type._operands
-      # print "\n operands: ", field_value
 
       if len(field_value_choices) == 2:
         is_mongokit_is_radio = True
 
     elif field_type == bool:
-      # print "\n ", field['name'], " -- ", field_type, " -- ", field_value
-      # field_value_choices = ["True", "False"]
-      # field_value = str(field_value)
       field_value_choices = [True, False]
-      # print " ", type(field_value), " -- ", type(field_value_choices[0])
-
-    # print "\n ", field['name'], " -- ", field['value'], " -- ", type(field_value)
-    # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
 
     if field.has_key('_id'):
       field = collection.Node.one({'_id': field['_id']})
@@ -1944,9 +1914,6 @@ def html_widget(groupid, node_id, field):
       field_type = field_type.__name__
     else:
       field_type = field_type.__str__()
-
-    # if field['name'] == "tot_when":
-    #   print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type), "\n"
 
     is_list_of = (field_type in LIST_OF)
 
@@ -1971,13 +1938,21 @@ def html_widget(groupid, node_id, field):
       is_relation_field = True
       is_required_field = True
 
-      field_value_choices.extend(list(collection.Node.find({'_type': "GSystem", 
-																														'member_of': {'$in': field["object_type"]}, 
-																														'status': u"PUBLISHED",
-																														'group_set': ObjectId(groupid)
-																													}).sort('name', 1)
-                                      )
-                                )
+      group = collection.Node.find({"_id": ObjectId(groupid)}, {"group_admin": 1})
+      person = collection.Node.find({"_id": {'$in': field["object_type"]}}, {"name": 1})
+      if person[0].name == "Author":
+				field_value_choices.extend(list(collection.Node.find({'member_of': {'$in': field["object_type"]},
+																					'created_by':{'$in': group[0]["group_admin"]}
+																				}).sort('name', 1)
+																	))
+
+      else:
+        field_value_choices.extend(list(collection.Node.find({'_type': "GSystem", 
+																					'member_of': {'$in': field["object_type"]}, 
+																					'status': u"PUBLISHED",
+																					'group_set': ObjectId(groupid)
+																				}).sort('name', 1)
+                                  ))
 
       if field_value:
 	      if type(field_value[0]) == ObjectId or ObjectId.is_valid(field_value[0]):
@@ -2039,8 +2014,7 @@ def check_node_linked(node_id):
 
 
 @register.assignment_tag
-
-def get_file_node(request,file_name=""):
+def get_file_node(request, file_name=""):
 	file_list=[]
         new=[]
 	a=str(file_name).split(',')
@@ -2048,19 +2022,19 @@ def get_file_node(request,file_name=""):
            k=str(i.strip('   [](\'u\'   '))
            new.append(k)
 	col_Group = db[Node.collection_name]
+
 	ins_objectid  = ObjectId()
-	for i in new:
-          if  ins_objectid.is_valid(i) is False:
-		  filedoc=collection.Node.find({'_type':'File','name':unicode(i)})
-	  else:
-		  filedoc=collection.Node.find({'_type':'File','_id':ObjectId(i)})			
-            
-          
-                 
-          if filedoc:
-             for i in filedoc:
-		    file_list.append(i)	
-        return file_list	
+	if  ins_objectid.is_valid(new) is False:
+		filedoc=collection.Node.find({'_type':'File','name':unicode(new)})
+
+	else:
+		filedoc=collection.Node.find({'_type':'File','_id':ObjectId(new)})			
+	
+	if filedoc:
+		for i in filedoc:
+			file_list.append(i)	
+
+	return file_list	
 
 @register.filter(name='jsonify')
 def jsonify(value):

@@ -330,7 +330,6 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
 
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   """Updates the retrieved values of common fields from request into the given node."""
-  # print "\n Coming here...\n\n"
 
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
@@ -411,7 +410,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   if name:
     if node.name != name:
       node.name = name
-      # print "\n Changed: name"
       is_changed = True
   
   if altnames or request.POST.has_key("altnames"):
@@ -427,13 +425,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   if sub_theme_name:
     if node.name != sub_theme_name:
       node.name = sub_theme_name
-      # print "\n Changed: sub-theme"
       is_changed = True
   
   if add_topic_name:
     if node.name != add_topic_name:
       node.name = add_topic_name
-      # print "\n Changed: topic"
       is_changed = True
 
   #  language
@@ -480,7 +476,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     if set(node.tags) != set(tags_list):
       node.tags = tags_list
-      # print "\n Changed: tags"
       is_changed = True
 
   # for license field
@@ -502,7 +497,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             node.prior_node.append(node_id)
         
         i = i+1
-      # print "\n Changed: prior_node"
       is_changed = True
   
   #  collection
@@ -522,7 +516,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             node.collection_set.append(node_id)
         
         i = i+1
-      # print "\n Changed: collection_list"
       is_changed = True
   
   # Teaches
@@ -551,7 +544,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         
         i = i+1      
 
-      # print "\n Changed: teaches_list"
       is_changed = True
 
   # Assesses
@@ -579,7 +571,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         
         i = i+1      
 
-      # print "\n Changed: teaches_list"
       is_changed = True
 
 
@@ -598,7 +589,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             node.collection_set.append(node_id)
         
         i = i+1
-      # print "\n Changed: module_list"
       is_changed = True
     
   #  org-content
@@ -611,13 +601,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       usrname = request.user.username
       filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
       node.content = org2html(content_org, file_prefix=filename)
-      # print "\n Changed: content_org"
       is_changed = True
 
   # visited_location in author class
   if node.location != map_geojson_data:
     node.location = map_geojson_data # Storing location data
-    # print "\n Changed: map"
     is_changed = True
   
   if user_last_visited_location:
@@ -630,7 +618,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       if node._type == "Author" and user_group_location._id == node._id:
         if node['visited_location'] != user_last_visited_location:
           node['visited_location'] = user_last_visited_location
-          # print "\n Changed: user location"
           is_changed = True
 
       else:
@@ -645,7 +632,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if usrid not in node.contributors:
       node.contributors.append(usrid)
 
-  # print "\n Reached here ...\n\n"
+  if status:
+    if node.status != status:
+      node.status = status
+      is_changed = True
+
   return is_changed
 # ============= END of def get_node_common_fields() ==============
   
@@ -721,7 +712,6 @@ def get_page(request,node):
   
   if  ver2 != '1.1':                           
 	    if node2 is not None:
-		# print "direct"
                 if node2.status == 'PUBLISHED':
                   
 			if float(ver2) > float(ver1):			
@@ -782,7 +772,6 @@ def tag_info(request, group_id, tagname):
   Function to get all the resources related to tag
   '''
 
-  # print group_id
 
   return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
 
@@ -858,19 +847,6 @@ def update_mobwrite_content_org(node_system):
   return textobj
 
 
-                      
-"""
-def get_node_metadata_fields(request, node, node_type):
-	if(node.has_key('_id')):
-  		for at in node_type.attribute_type_set:
-			field_value=(request.POST.get(at.name,""))
-	
-			create_gattribute(node._id,at,field_value)
-
-      print "field_value: ",atname," : ",field_value,"\n"
-"""
-
-
 def get_node_metadata(request, node, node_type, **kwargs):
     '''
     Getting list of updated GSystems with kwargs arguments.
@@ -910,48 +886,6 @@ def get_node_metadata(request, node, node_type, **kwargs):
         return updated_ga_nodes
 
 
-"""
-def create_AttributeType(name, data_type, system_name, user_id):
-
-	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
-	if (cursor != None):
-		print "The AttributeType already exists."
-	else:
-		attribute_type = collection.AttributeType()
-		attribute_type.name = unicode(name)
-		attribute_type.data_type = data_type
-		system_type = collection.Node.one({"name":system_name})
-		attribute_type.subject_type.append(system_type._id)
-		attribute_type.created_by = user_id
-		attribute_type.modified_by = user_id
-	        attribute_type.status=u"PUBLISHED"
-		#factory_id = collection.Node.one({"name":u"factory_types"})._id
-		#attribute_type.member_of.append(factory_id)
-		attribute_type.save()
-		system_type.attribute_type_set.append(attribute_type)
-		system_type.save()
-
-def create_RelationType(name,inverse_name,subject_type_name,object_type_name,user_id):
-
-	cursor = collection.Node.one({"name":unicode(name)})
-        if cursor!=None:
-		print "The RelationType already exists."
-	else:
-		relation_type = collection.RelationType()
-                relation_type.name = unicode(name)
-                system_type = collection.Node.one({"name":unicode(subject_type_name)})
-                relation_type.subject_type.append(system_type._id)
-                relation_type.inverse_name = unicode(inverse_name)
-		relation_type.created_by = user_id
-                relation_type.modified_by = user_id
-		relation_type.status=u"PUBLISHED"
-		object_type = collection.Node.one({"name":unicode(object_type_name)})
-		relation_type.object_type.append(ObjectId(object_type._id))
-                relation_type.save()
-		system_type.relation_type_set.append(relation_type)
-		system_type.save()
-"""
-
 def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
 # function to create grelations for new ones and delete old ones.
 	relationtype = collection.Node.one({"_type":"RelationType","name":unicode(relation_type_name)})
@@ -975,7 +909,6 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   Returns data in list of dictionary format which is required for building html widget.
   This data is used by html_widget template-tag.
   """
-
   if not isinstance(at_rt_objectid_or_attr_name_list, list):
     at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
 
@@ -1153,24 +1086,22 @@ def parse_template_data(field_data_type, field_value, **kwargs):
   Returns:
   Parsed value based on the data-type of the field
   """
-  
+
   '''
   kwargs_keys_list = [
-                      "date_format_string",     # date-format in string representation
-                      "field_instance"          # dict-object reperesenting AT/RT node
-                    ]
+                    "date_format_string",     # date-format in string representation
+                    "field_instance"          # dict-object reperesenting AT/RT node
+                  ]
   '''
   DATA_TYPE_STR_CHOICES = [
-                            "unicode", "basestring",
-                            "int", "float", "long",
-                            "list", "dict",
-                            "datetime",
-                            "bool",
-                            "ObjectId"
-                          ]
-
+                          "unicode", "basestring",
+                          "int", "float", "long",
+                          "list", "dict",
+                          "datetime",
+                          "bool",
+                          "ObjectId"
+                        ]
   try:
-
     if type(field_data_type) == type:
       field_data_type = field_data_type.__name__
 
@@ -1235,7 +1166,6 @@ def parse_template_data(field_data_type, field_value, **kwargs):
           # Write RT related code 
           if not field_value:
             return None
-
           if field_value:
             field_value = ObjectId(field_value)
 
@@ -1244,16 +1174,19 @@ def parse_template_data(field_data_type, field_value, **kwargs):
             raise Exception(error_message)
 
       else:
-        # Write code...
         if not field_value:
           return []
 
-        lr = field_value.replace(" ,", ",")
-        rr = lr.replace(", ", ",")
-        field_value = rr.split(",")
+        if ("[" in field_value) and ("]" in field_value):
+          field_value = json.loads(field_value)
+
+        else:
+          lr = field_value.replace(" ,", ",")
+          rr = lr.replace(", ", ",")
+          field_value = rr.split(",")
 
         return field_value
-        
+
     elif type(field_data_type) == dict:
       # Write code...
       if not field_value:
@@ -1289,12 +1222,13 @@ def parse_template_data(field_data_type, field_value, **kwargs):
       raise Exception(error_message)
 
     return field_value
-
+  
   except Exception as e:
     error_message = "\n TemplateDataParsingError: "+str(e)+" !!!\n"
     raise Exception(error_message)
 
 def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
+
   ga_node = None
   info_message = ""
   
@@ -1319,11 +1253,9 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
 
       if object_value == u"None":
         info_message = " GAttribute ("+ga_node.name+") created successfully with status as 'DELETED'!\n"
-        print "\n ", info_message
 
       else:
         info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
-        print "\n ", info_message
 
         # Fetch corresponding document & append into it's attribute_set
         collection.update({'_id': subject_id}, 
@@ -1348,7 +1280,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
         ga_node.status = u"DELETED"
         ga_node.save()
         info_message = " GAttribute ("+ga_node.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
-        print "\n ", info_message
 
         # Fetch corresponding document & update it's attribute_set with proper value
         collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
@@ -1393,7 +1324,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
             ga_node.save()
 
             info_message = " GAttribute ("+ga_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
-            print "\n", info_message
 
             # Fetch corresponding document & append into it's attribute_set
             collection.update({'_id': subject_id}, 
@@ -1405,7 +1335,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
             ga_node.save()
 
             info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
-            print "\n ", info_message
 
             # Fetch corresponding document & update it's attribute_set with proper value
             collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
@@ -1413,7 +1342,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
                               upsert=False, multi=False)
         else:
           info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
-          print "\n ", info_message
 
     except Exception as e:
       error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
@@ -1500,7 +1428,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
           n.status = u"DELETED"
           n.save()
           info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
-          print "\n", info_message
 
           collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
                             {'$pull': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
@@ -1529,7 +1456,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.status = u"PUBLISHED"
             gr_node.save()
             info_message = " MultipleGRelation: GRelation ("+gr_node.name+") created successfully.\n"
-            print "\n", info_message
 
             left_subject = collection.Node.one({'_id': subject_id}, {'relation_set': 1})
 
@@ -1560,7 +1486,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
               gr_node.save()
 
               info_message = " MultipleGRelation: GRelation ("+gr_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
-              print "\n", info_message
 
               collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
                                 {'$addToSet': {'relation_set.$.'+relation_type_node.name: gr_node.right_subject}}, 
@@ -1602,7 +1527,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             node.status = u"PUBLISHED"
             node.save()
             info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
-            print "\n", info_message
 
             collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
                               {'$addToSet': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
@@ -1611,7 +1535,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
           elif node.status == u"PUBLISHED":
             info_message = " SingleGRelation: GRelation ("+node.name+") already exists !\n"
-            print "\n", info_message
 
         else:
           # If match not found and if it's PUBLISHED one, modify it to DELETED
@@ -1625,7 +1548,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                             )
 
             info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
-            print "\n", info_message 
 
       if gr_node is None:
         # Code for creation
@@ -1639,7 +1561,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         
         gr_node.save()
         info_message = " GRelation ("+gr_node.name+") created successfully.\n"
-        print "\n", info_message
 
         left_subject = collection.Node.one({'_id': subject_id}, {'relation_set': 1})
 
@@ -1672,7 +1593,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
       
 ###############################################      ###############################################
 def set_all_urls(member_of):
-	print "INSIDE SET ALL URLS"
 	Gapp_obj = collection.Node.one({"_type":"MetaType", "name":"GAPP"})
 	factory_obj = collection.Node.one({"_type":"MetaType", "name":"factory_types"})
 
@@ -1795,7 +1715,6 @@ def discussion_reply(request, group_id):
       
       # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
       reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
-      # print "\n\n====", reply
 
       return HttpResponse( reply )
 
