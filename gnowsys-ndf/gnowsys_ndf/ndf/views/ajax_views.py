@@ -2778,8 +2778,7 @@ def get_courses(request, group_id):
   A dictionary consisting of following key-value pairs:-
   success - Boolean giving the state of ajax call
   message - Basestring giving the error/information message
-  unset_nc - dictionary consisting of announced-course(s) [if match found] and/or 
-             NUSSD-Courses [if match not found]
+  unset_nc - dictionary consisting of NUSSD-Courses 
   """
   response_dict = {'success': False, 'message': ""}
 
@@ -2935,7 +2934,7 @@ def get_announced_courses_with_ctype(request, group_id):
 
   Returns:
   A dictionary consisting of following key-value pairs:-
-  acourse_ctype_list - dictionary consisting of announced-course(s) [if match found] and/or 
+  acourse_ctype_list - list consisting of announced-course(s) [if match found] and/or 
              NUSSD-Courses [if match not found]
   """
 
@@ -2944,13 +2943,7 @@ def get_announced_courses_with_ctype(request, group_id):
       # Fetch field(s) from GET object
       nussd_course_type = request.GET.get("nussd_course_type", "")
       acourse_ctype_list = []
-
-      # Fetch "Announced Course" GSystemType
-      nussd_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "NUSSD Course"})
-      if not nussd_course_gt:
-        # If not found, throw exception
-        error_message = "'NUSSD Course' (GSystemType) doesn't exists... Please create it first"
-        raise Exception(error_message)
+      ac_of_colg = []
 
       # Fetch "Announced Course" GSystemType
       announced_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
@@ -2958,17 +2951,24 @@ def get_announced_courses_with_ctype(request, group_id):
         # If not found, throw exception
         error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first"
         raise Exception(error_message)
+
+  
+      nussd_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "NUSSD Course"})
+      if not nussd_course_gt:
+        # If not found, throw exception
+        error_message = "'NUSSD Course' (GSystemType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+
       
       # Type-cast fetched field(s) into their appropriate type
       nussd_course_type = unicode(nussd_course_type)
 
       groups_to_search_from = [ObjectId(group_id)]
                                     
-      ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
-                                      'group_set': {'$in': groups_to_search_from},
+      curr_date = datetime.datetime.now()
+      ac_cur = collection.Node.find({'member_of': announced_course_gt._id,
                                       'attribute_set.nussd_course_type': nussd_course_type
-                                    },{'name':1})
-
+                                      },{'name':1})
       if ac_cur.count():
         for d in ac_cur:
           acourse_ctype_list.append(d.name)
@@ -3330,6 +3330,7 @@ def get_students_for_batches(request, group_id):
         for each in batch_mem_coll:
           batch_member_list.append(each.right_subject)
         print "batch_mem_coll",batch_member_list
+        res=[{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}]
         res = collection.Node.find({'member_of': student._id, 
                                       'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list}
                                     },

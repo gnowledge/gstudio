@@ -97,7 +97,7 @@ if(txt_input <= 0)
       {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-      <a id ="btn_create" class="button expand" href="{% url 'new_create_and_edit' groupid %}">
+      <a id ="btn_create" class="button expand" href="{% url 'new_batch' groupid %}">
         Create {{title}}
       </a>
       {% endif %}

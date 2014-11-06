@@ -248,7 +248,6 @@
     $("select#nussd_course_type").change(function() {
 
       var nussd_course_type = $("#nussd_course_type").val();
-      alert(nussd_course_type)
       $.ajax({
         url: "{% url 'get_announced_courses_with_ctype' group_id %}",
 
