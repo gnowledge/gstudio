@@ -25,7 +25,7 @@
       {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user.is_superuser or node.created_by == user.id %}
-      <span><a class="button" href="{% url 'edit' groupid node.pk %}">{% trans "Edit" %}</a></span>
+      <!-- <span><a class="button" href="{% url 'edit' groupid node.pk %}">{% trans "Edit" %}</a></span> -->
       {% endif %}
       {% endif %}
     </h2>

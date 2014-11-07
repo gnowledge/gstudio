@@ -214,7 +214,7 @@
         });
         for (i = 1;i<= b_count;i++){
           b = add_batch_button(i,"batch-btn-div")
-          b_str = "<div id='new_batch"+i+"_id' class='small-6 columns end new-batch'>Batch Name : <input id='new_batch_name"+i+"_id' type='text'><div id='new_batch_list"+i+"_id' class='batch-user-list-div'></div></div><hr>"
+          b_str = "<div id='new_batch"+i+"_id' class='small-6 columns end new-batch'>Batch Name : <input id='new_batch_name"+i+"_id' type='text' required><div id='new_batch_list"+i+"_id' class='batch-user-list-div'></div></div><hr>"
           $("#batch-container").append(b_str)
           b.setAttribute("onclick","add_to_batch_list('new_batch_list"+i+"_id','new_batch_name"+i+"_id')")
         }
