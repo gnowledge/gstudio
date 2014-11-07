@@ -90,11 +90,16 @@ def save_students_for_batches(request, group_id):
     print "in views"
     if request.method == 'POST':
         batch_user_list_v = request.POST.get('batch_user_list_dict', '')
+        print "\nbefore",batch_user_list_v
         batch_user_list_v = json.loads(batch_user_list_v)
+        print "\nafter",batch_user_list_v
         ac_id = request.POST.get('ac_id', '')
-        for k,v in batch_user_list_v.items():
-            save_batch(k,v, group_id, request, ac_id, None)
-    return HttpResponseRedirect('/'+group_id+'/'+'batch')
+        print "batch_user_list_v",batch_user_list_v
+        # for k,v in batch_user_list_v.items():
+        #     save_batch(k,v, group_id, request, ac_id, None)
+        a = "/"+group_id+"/batch"
+
+        return HttpResponseRedirect(reverse('batch',kwargs={'group_id':group_id}))
 
 
 def save_batch(batch_name, user_list, group_id, request, ac_id, node_id):

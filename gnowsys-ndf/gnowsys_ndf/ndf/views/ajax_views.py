@@ -2945,30 +2945,48 @@ def get_announced_courses_with_ctype(request, group_id):
       acourse_ctype_list = []
       ac_of_colg = []
 
-      # Fetch "Announced Course" GSystemType
-      announced_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
-      if not announced_course_gt:
-        # If not found, throw exception
-        error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first"
-        raise Exception(error_message)
-
-  
       nussd_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "NUSSD Course"})
       if not nussd_course_gt:
         # If not found, throw exception
         error_message = "'NUSSD Course' (GSystemType) doesn't exists... Please create it first"
         raise Exception(error_message)
 
-      
-      # Type-cast fetched field(s) into their appropriate type
-      nussd_course_type = unicode(nussd_course_type)
-
-      groups_to_search_from = [ObjectId(group_id)]
-                                    
+      # Fetch "Announced Course" GSystemType
+      announced_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
+      if not announced_course_gt:
+        # If not found, throw exception
+        error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first"
+        raise Exception(error_message)
       curr_date = datetime.datetime.now()
-      ac_cur = collection.Node.find({'member_of': announced_course_gt._id,
-                                      'attribute_set.nussd_course_type': nussd_course_type
-                                      },{'name':1})
+
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
+      if(ObjectId(group_id)==mis_admin._id):
+        ac_cur = collection.Node.find({'member_of': announced_course_gt._id,
+                                         'group_set':ObjectId(group_id),
+                                        'attribute_set.nussd_course_type': nussd_course_type
+                                        },{'name':1})
+      else:
+        colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
+        req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
+        #Get college id of corresponding college_group_id
+        
+        acourse_for_college_RT = collection.Node.one({'_type': "RelationType", 'name': "acourse_for_college"})
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':acourse_for_college_RT._id,'right_subject':req_colg_id._id})
+
+        for each in relation_coll:
+          ac_of_colg.append(ObjectId(each.subject))
+          # Courses announced for this college id
+
+        
+        # Type-cast fetched field(s) into their appropriate type
+        nussd_course_type = unicode(nussd_course_type)
+
+        groups_to_search_from = [ObjectId(group_id)]
+                                      
+        ac_cur = collection.Node.find({'member_of': announced_course_gt._id,'_id':{'$in':ac_of_colg},
+                                      'attribute_set.nussd_course_type': nussd_course_type,
+                                      'attribute_set.start_enroll':{'$lte': curr_date},
+                                      'attribute_set.end_enroll':{'$gte': curr_date}},{'name':1})
       if ac_cur.count():
         for d in ac_cur:
           acourse_ctype_list.append(d.name)
@@ -3255,10 +3273,13 @@ def get_enrolled_students_count(request,group_id):
       acourse_name = ObjectId(acourse_node._id)
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
       res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id),'relation_set.selected_course': acourse_name})
+      if (res.count()>0):
+        response_dict["stud_count"] = res.count()
+      else:
+        raise e
+      response_dict["acourse_name"] = str(acourse_name)
       response_dict["success"] = True
       response_dict["message"] = "Students enrolled to Course"
-      response_dict["stud_count"] = res.count()
-      response_dict["acourse_name"] = str(acourse_name)
       print response_dict
     return HttpResponse(json.dumps(response_dict))
   except Exception as e:

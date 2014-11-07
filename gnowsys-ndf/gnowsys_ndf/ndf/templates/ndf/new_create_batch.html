@@ -31,43 +31,48 @@
   .resource-type-image {
   height:40px;    
   background-repeat:no-repeat; background-size: 48px 48px
-  }
+
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
 {% endblock %}
 
 {% block body_content %}
+ <form data-abide enctype="multipart/form-data" id="form-batch" method="POST" action="{% url 'save_batch' groupid %}">{% csrf_token %}
 
   <fieldset id="stud-count">
-    <div class="small-4 columns">
+  <div class="row">
+    <div class="small-4 columns end">
       <label>{% trans "Course Type" %}</label>
+    </div>
+    <div class="small-4 columns end ">
       {% html_widget groupid "" ATs.0 %}
     </div>
+  </div>
 
-    <div class="small-4 columns">
+  <div class="row">
+    <div class="small-4 columns end">
       <label>{% trans "Name of Course" %}</label>
+    </div>
+    <div class="small-4 columns end">
       <select id="acourse_list" name="acourse_list" disabled="disabled">
       </select>
     </div>
+  </div>
   </fieldset>
-
-  
-  <div class="row dummy-2-div hide">
-    <div class="small-6 columns new-batch">
-      {% trans "Batch Name : " %}<input type="text"><hr>
-      <div class="batch-user-list-div"></div>
-    </div>
-    <div class="small-6 columns new-batch">
-      {% trans "Batch Name : " %}<input type="text"><hr>
-      <div class="batch-user-list-div"></div>
-    </div>
-  </div>
-
-  <div class="row dummy-1-div hide">
-    <div class="small-6 columns end new-batch">
-      {% trans "Batch Name : " %}<input type="text"><hr>
-      <div class="batch-user-list-div"></div>
-    </div>
-  </div>
-
 
   <fieldset id="input-fd" class="hide">
     <div class="row">
@@ -83,28 +88,24 @@
       <div class="left inline"> 
         <input type="text" pattern="\d*" id="txt_batch_count" name="batch_count" placeholder="Enter Number Only" required/><i style="color:red; float:left display:inline">*</i>
           <small class="error">{% trans "Entered value should be numbers" %}</small>
-      </div>
-    </div>
-    <div class="row">
-      <div class="large-4 columns">
-        <input type="button" class="small button" id="nextbtn" value="Next" />
-      </div>
+      </div>&nbsp;&nbsp;
+        <input type="button" class="small button" id="nextbtn" value="Proceed" disabled="disabled" />
     </div>
   </fieldset>
 
-  <div id="drawer-div">
-  </div>
-  <input type="hidden" id="batch_user_list" name="batch_user_list">
-  <ul class="hide" id="removed_user_ids_ul"></ul>
-  <div id="batch-btn-div"> </div>
-
-  <div id="batch-container"></div>
-
+  <fieldset id="make_batch_fs" class="hide">
+    <ul class="hide" id="removed_user_ids_ul"></ul>
+    <div id="drawer-div"></div>
+    <br>
+    <div id="batch-btn-div"> </div>
+    <div id="batch-container"></div>
+  </fieldset>
   <div>
-    <input type="submit" class="small button hide" name="save-batch" value="Save" onclick="save_after_create_batch()">
-    <input type="button" class="small button hide" name="remove-user" value="Remove" onclick="remove_user_from_batch()">
+    <input type="submit" class="button" id="save_batch" name="save-batch" value="Save" onclick="save_after_create_batch()" disabled="disabled" style='display: none'>&nbsp;&nbsp;
+    <input type="button" class="button" id="remove_user" name="remove-user" value="Remove" onclick="remove_user_from_batch()" disabled="disabled" style='display: none'>
+    <input type="hidden" id="batch_user_list_dict" name="batch_user_list_dict">
   </div>
-
+ </form>
 {% endblock %}
 
 {% block script%}
@@ -112,200 +113,186 @@
   //global variables 
   var batch_id=""
   var ac_id=""
+  var b_count=0;
 
-//For selecting Course type
-  $("select#nussd_course_type").change(function() {
+  //For selecting Course type
+    $("select#nussd_course_type").change(function() {
 
-    var nussd_course_type = $("#nussd_course_type").val();
-    $.ajax({
-      url: "{% url 'get_announced_courses_with_ctype' group_id %}",
-
-      data: {
-        nussd_course_type: nussd_course_type
-      },
-
-      type: "GET",
-
-      dataType: "json",
-
-      complete: function () {
-        // Enable AC field
-        $("select#acourse_list").removeAttr('disabled')
-      },
-
-      success: function(data){
-        $("select#acourse_list").empty();
-        $.each(data, function(i, value) {
-          $("select#acourse_list").append(
-            $("<option></option>")
-              .attr("value", value)
-              .text(value)
-          );
-        });
-        $("select#acourse_list").prop("selectedIndex", 0);
-      },
-    });
-  });//end of nussd_course_type.change function
-
-//For selecting Announced Course type
-  $("select#acourse_list").change(function() {
-      var acourse_name = $("#acourse_list").val();
+      var nussd_course_type = $("#nussd_course_type").val();
       $.ajax({
-        url: "{% url 'get_enrolled_students_count' group_id %}",
+        url: "{% url 'get_announced_courses_with_ctype' group_id %}",
 
         data: {
-          acourse_name: acourse_name
+          nussd_course_type: nussd_course_type
         },
+
         type: "GET",
+
         dataType: "json",
+
         complete: function () {
+          // Enable AC field
+          $("select#acourse_list").removeAttr('disabled')
         },
-        success: function(data){
-          $("#input-fd").removeClass("hide")
-          if(data["success"]){
-            $("#lblstud_count").text(data["stud_count"])
-            ac_id = data["acourse_name"]
-          }
-          else{
-            $("#lblstud_count").text(data["stud_count"])
-          }
-        },//end of success
-      });//end of ajax call
-  });//end of acourse_list.change function
 
-//"Next" after inputting #of batches
-  $("#nextbtn").click(function(event) {
-
-    b_count = $("#txt_batch_count").val()
-    if (b_count && $.isNumeric(b_count)){
-      $("#nextbtn").off("click")
-      $("#input-fd").fadeOut();
-      $("#stud-count").fadeOut();
-      $.ajax({
-        url: "{% url 'get_students_for_batches' group_id %}",
-        data: {
-          ac_id:ac_id
-        },
-        type: "GET",
-        dataType: "json",
         success: function(data){
-          success_state = data["success"];
-          if (data["success"]) {
-            drawer_widget = data["drawer_widget"];
-            $("#drawer-div").html(drawer_widget);
-          }
-          else {
-           alert("fail")
-          }
+          $("select#acourse_list").empty();
+          $.each(data, function(i, value) {
+            $("select#acourse_list").append(
+              $("<option></option>")
+                .attr("value", value)
+                .text(value)
+            );
+          });
+          $("select#acourse_list").prop("selectedIndex", 0);
         },
       });
-      for (i = 1;i<= b_count;i++){
-        b = add_batch_button(i,"batch-btn-div")
-        b_list_name = "batch_user_val_list"+i
-        b_list_name = []
-        b_str = "<div id='new_batch"+i+"_id' class='small-12 columns end new-batch'>Batch Name : <input id='new_batch_name"+i+"_id' type='text'><hr><div id='new_batch_list"+i+"_id' class='batch-user-list-div'></div></div>"
-        $("#batch-container").append(b_str)
-        b.setAttribute("onclick","add_to_batch_list('new_batch_list"+i+"_id','new_batch_name"+i+"_id')")
-      }
-    }
-    else{
-      alert("Please enter number");
-      event.preventDefault();
-    }
-  });//end of nextbtn.click()
+    });//end of nussd_course_type.change function
 
- batch_user_list_dict = {}
+  //For selecting Announced Course type
+    $("select#acourse_list").change(function() {
+        var acourse_name = $("#acourse_list").val();
+        $.ajax({
+          url: "{% url 'get_enrolled_students_count' group_id %}",
 
-  function add_to_batch_list(batch_div_users,batch_name_param){
-    var names=[]
-    var ids=[]
-    b = []
-    var res = get_from_right_drawer()
-    names = res[0]
-    alert(names)
-    ids = res[1]
-    batch_name_set = $("#"+batch_name_param).val();
-
-    if (batch_user_list_dict.hasOwnProperty(batch_name_set)){
-      //if key exists
-      for (i = 0;i<names.length;i++){
-        $("#"+batch_div_users).append("<input type='checkbox' value='"+ ids[i]+"'><label>"+names[i]+"</label><br>");
-        batch_user_list_dict[batch_name_set].push(ids[i])
-      }
-    }
-    else{
-      batch_user_list_dict[batch_name_set]=[]
-      for (i = 0;i<names.length;i++){
-        $("#"+batch_div_users).append("<input type='checkbox' value='"+ ids[i]+"'><label>"+names[i]+"</label><br>");
-        batch_user_list_dict[batch_name_set].push(ids[i])
-      }
-    }
-  }
-
-  function remove_user_from_batch(){
-    user_ids = []
-    $("#batch-container input:checked").each(function(d, i){user_ids.push(i.value);
-      $(i).next("label").remove();
-      i.remove();
-    });
-    $("#removed_user_ids_ul").children().each(function(i,v){
-      var oid = v.getAttribute("value");
-      if(user_ids.indexOf(oid) >= 0)
-      {
-        // add this li to new_create_batch_drawer1
-        $("#new_create_batch_drawer1").append($(v).clone());
-        console.log(oid)
-        v.remove()
-        // remove that li from removed_user_ids_ul
-      }
-    });
-    $("#new_create_batch_drawer1")
-  }
-
-  function get_from_right_drawer(){
-    var user_names_list = [];
-    var user_id_list = [];
-    $("#new_create_batch_drawer2").children("li").each(function(c,v){user_id_list.push(v.getAttribute("value")); user_names_list.push($(v).children("input")[0].name);})
-    $("#removed_user_ids_ul").append($("#new_create_batch_drawer2").children("li"));
-    $("#new_create_batch_drawer2").html("")
-    return [user_names_list,user_id_list]
-  }
-//Create Buttons to create batches
-  function add_batch_button(btn_id,div_of_btn){
-    var element = document.createElement("input");
-    element.type="button"
-    element.name = btn_id+"name";
-    element.classList.add("button");
-    element.classList.add("small");
-    element.classList.add("round");
-    element.value = "Add to Batch "+btn_id;
-    element.id = "batch-"+btn_id;
-    var divParent = document.getElementById(div_of_btn);
-    divParent.appendChild(element);
-    return element;
-  }  // end of add_batch_button()
+          data: {
+            acourse_name: acourse_name
+          },
+          type: "GET",
+          dataType: "json",
+          complete: function () {
+          },
+          success: function(data){
+            $("#input-fd").removeClass("hide")
+            if(data["success"]){
+              $("#lblstud_count").text(data["stud_count"])
+              ac_id = data["acourse_name"]
+              $("#nextbtn").removeAttr("disabled")
+            }
+            else{
+              $("#lblstud_count").text(data["stud_count"])
+              $("#nextbtn").attr("disabled","disabled")
+            }
+          },//end of success
+        });//end of ajax call
+    });//end of acourse_list.change function
   
-//Saving students to batch as batch members
-  function save_after_create_batch(){
-    console.log(batch_user_list_dict)
-    // $("#batch_user_list").val(batch_user_list);
-    console.log(batch_user_list_dict)
-    $.ajax({
-      url: "{% url 'save_students_for_batches' group_id %}",
-      type: "POST",
-      dataType: "json",
+  //"Next" after inputting #of batches
+    $("#nextbtn").click(function(event) {
 
-      data: {
-        ac_id:ac_id,
-        batch_user_list_dict: JSON.stringify(batch_user_list_dict),
-        csrfmiddlewaretoken:"{{csrf_token}}"
-      },
-      success: function(data){
-          batch_id = data
-      },
-      complete: function(){
+      b_count = $("#txt_batch_count").val()
+      if (b_count && $.isNumeric(b_count)){
+        $("#nextbtn").off("click")
+        $("#input-fd").fadeOut();
+        $("#stud-count").fadeOut();
+        $.ajax({
+          url: "{% url 'get_students_for_batches' group_id %}",
+          data: {
+            ac_id:ac_id
+          },
+          type: "GET",
+          dataType: "json",
+          success: function(data){
+            success_state = data["success"];
+            if (data["success"]) {
+              $("#make_batch_fs").removeClass("hide")
+              drawer_widget = data["drawer_widget"];
+              $("#drawer-div").html(drawer_widget);
+              if ($("#save_batch").css("display") == "none") {
+                $("#save_batch").toggle();
+              }
+              if ($("#remove_user").css("display") == "none") {
+                $("#remove_user").toggle();
+              }
+
+            }
+            else {
+             alert("fail")
+            }
+          },
+        });
+        for (i = 1;i<= b_count;i++){
+          b = add_batch_button(i,"batch-btn-div")
+          b_str = "<div id='new_batch"+i+"_id' class='small-6 columns end new-batch'>Batch Name : <input id='new_batch_name"+i+"_id' type='text'><div id='new_batch_list"+i+"_id' class='batch-user-list-div'></div></div><hr>"
+          $("#batch-container").append(b_str)
+          b.setAttribute("onclick","add_to_batch_list('new_batch_list"+i+"_id','new_batch_name"+i+"_id')")
+        }
       }
-    });
-  }; // end of save_after_create_batch
-  //</script>
+      else{
+        alert("Please enter number");
+        event.preventDefault();
+      }
+    });//end of nextbtn.click()
+
+
+    function add_to_batch_list(batch_div_users,batch_name_param){
+      var res = get_from_right_drawer()
+      var names = res[0]
+      var ids = res[1]
+      for (i = 0;i<names.length;i++){
+        $("#"+batch_div_users).append("<input type='checkbox' value='"+ ids[i]+"'><label>"+names[i]+"</label><br>");
+      }
+      $("#save_batch").removeAttr("disabled")
+      $("#remove_user").removeAttr("disabled")
+    }
+
+    function remove_user_from_batch(){
+      user_ids = []
+      $("#batch-container input:checked").each(function(d, i){user_ids.push(i.value);
+        $(i).next("label").remove();
+        i.remove();
+      });
+      $("#removed_user_ids_ul").children().each(function(i,v){
+        var oid = v.getAttribute("value");
+        if(user_ids.indexOf(oid) >= 0)
+        {
+          // add this li to new_create_batch_drawer1
+          $("#new_create_batch_drawer1").append($(v).clone());
+          console.log(oid)
+          v.remove()
+          // remove that li from removed_user_ids_ul
+        }
+      });
+      $("#new_create_batch_drawer1")
+    }
+
+    function get_from_right_drawer(){
+      var user_names_list = [];
+      var user_id_list = [];
+      $("#new_create_batch_drawer2").children("li").each(function(c,v){user_id_list.push(v.getAttribute("value"));user_names_list.push($(v).children("input")[0].name);})
+      $("#removed_user_ids_ul").append($("#new_create_batch_drawer2").children("li"));
+      $("#new_create_batch_drawer2").html("")
+      return [user_names_list,user_id_list]
+    }
+
+  //Create Buttons to create batches
+    function add_batch_button(btn_id,div_of_btn){
+      var element = document.createElement("input");
+      element.type="button"
+      element.name = btn_id+"name";
+      element.classList.add("button");
+      element.classList.add("small");
+      element.classList.add("round");
+      element.value = "Add to Batch "+btn_id;
+      element.id = "batch-"+btn_id;
+      var divParent = document.getElementById(div_of_btn);
+      divParent.appendChild(element);
+      return element;
+    }  // end of add_batch_button()
+    
+   batch_user_list_dict = {}
+
+  //Saving students to batch as batch members
+    function save_after_create_batch(){
+      console.log(batch_user_list_dict+"before")
+      for(i=1;i<=b_count;i++){
+        arr = []
+        get_batch_name = $("#new_batch_name"+i+"_id").val();
+        $("#new_batch_list"+i+"_id").children("input").each(function(c,v){arr.push(v.getAttribute("value"))});
+        batch_user_list_dict[get_batch_name]=arr;
+      }
+      console.log(JSON.stringify(batch_user_list_dict))
+      $("#batch_user_list_dict").val(JSON.stringify(batch_user_list_dict))
+    }; // end of save_after_create_batch
+    //</script>
 {% endblock %}
