@@ -86,6 +86,28 @@
   $("#orgitdown_{{var_name}}").orgitdown(mySettings);
 {% endif %}
 
+
+function insertImg(){
+   insert_img=("\n#+CAPTION: "+$("#image_name").val()+"\n#+ATTR_HTML: width='"+$("#image_width").val()+"'"+"\n[["+$("#image_url").val()+"]]\n");
+   if($("#image_url").val() == ""){
+             alert("Please insert an image url");}
+   else {
+        if ("{{node_id}}"){
+           var startPos = $("#{{node_id}}").prop("selectionStart");
+           var endPos = $("#{{node_id}}").prop("selectionEnd");
+           var content = $("#{{node_id}}").val().substring(0, startPos) + insert_img + $("#{{node_id}}").val().substring(endPos, $("#{{node_id}}").val().length);
+          $("#{{node_id}}").val(content);
+        }
+       else{
+           var startPos = $("#orgitdown_content_org").prop("selectionStart");
+           var endPos = $("#orgitdown_content_org").prop("selectionEnd");
+           var content = $("#orgitdown_content_org").val().substring(0, startPos) + insert_img + $("#orgitdown_content_org").val().substring(endPos, $("#orgitdown_content_org").val().length);
+           $("#orgitdown_content_org").val(content); 
+           }
+       $(".close-reveal-modal").trigger("click");
+}
+}
+
 function myFunction(str){ 
 				cite = document.getElementById(str.id).name;
 				var txtAreaContainer = $(".orgitdownContainer textarea");
@@ -97,13 +119,24 @@ function myFunction(str){
 				txtAreaContainer.val(string4);
 				$('#bib-text').foundation('reveal', 'close');
 			}
+
+$(".orgitdownButton.orgitdownButton6 a").click(function(){
+         $.ajax({
+                 url: "{% url 'insert_picture' group_id %}",
+                 type:"GET",
+                 success: function(data) {
+                          $('#insert-pic').foundation('reveal', 'open');
+              }
+          })
+        })
+
 $(".orgitdownButton.orgitdownButton10 a").click(function(){
 		  $.ajax({
           url: "{% url 'view_articles' group_id %}",
           type:"GET",
           success: function(data) {
-			data = JSON.parse(data);
-			temp = '';
+                        data = JSON.parse(data);
+                        temp = '';
 			for(i=0; i<data.length; i++)
 			{
 				console.log(data.length)
@@ -137,6 +170,23 @@ $(".orgitdownButton.orgitdownButton10 a").click(function(){
 		});
 
 </script>
+
+<div id="insert-pic" class="small reveal-modal" data-reveal>
+<a class="close-reveal-modal">&#215;</a>
+<h3>Add Internal/External Images:</h3> 
+<div>
+    <label>Image Name</label> 
+    <input type="text" id="image_name" placeholder="Some description ...">
+    <label>Width</label>
+    <input type="text" id="image_width" placeholder="Enter width in pixel eg.600...">
+    <label>URL</label>
+    <input type="text" id="image_url" placeholder="Enter url eg. http:filename.jpg...">
+  <button type="submit" id="insertimage" onclick="insertImg()"> Add Image</button>
+</div>
+<dl class="accordion" data-accordion id="pic">
+</dl>
+</div>
+
 
 <div id="bib-text" class="reveal-modal" data-reveal>
 <dl class="accordion" data-accordion id="bib1">
