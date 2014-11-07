@@ -104,6 +104,7 @@
     <input type="submit" class="button" id="save_batch" name="save-batch" value="Save" onclick="save_after_create_batch()" disabled="disabled" style='display: none'>&nbsp;&nbsp;
     <input type="button" class="button" id="remove_user" name="remove-user" value="Remove" onclick="remove_user_from_batch()" disabled="disabled" style='display: none'>
     <input type="hidden" id="batch_user_list_dict" name="batch_user_list_dict">
+    <input type="hidden" id="ac_id" name="ac_id">
   </div>
  </form>
 {% endblock %}
@@ -284,15 +285,14 @@
 
   //Saving students to batch as batch members
     function save_after_create_batch(){
-      console.log(batch_user_list_dict+"before")
       for(i=1;i<=b_count;i++){
         arr = []
         get_batch_name = $("#new_batch_name"+i+"_id").val();
         $("#new_batch_list"+i+"_id").children("input").each(function(c,v){arr.push(v.getAttribute("value"))});
         batch_user_list_dict[get_batch_name]=arr;
       }
-      console.log(JSON.stringify(batch_user_list_dict))
       $("#batch_user_list_dict").val(JSON.stringify(batch_user_list_dict))
+      $("#ac_id").val(ac_id)
     }; // end of save_after_create_batch
     //</script>
 {% endblock %}

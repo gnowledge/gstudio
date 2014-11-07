@@ -95,10 +95,8 @@ def save_students_for_batches(request, group_id):
         print "\nafter",batch_user_list_v
         ac_id = request.POST.get('ac_id', '')
         print "batch_user_list_v",batch_user_list_v
-        # for k,v in batch_user_list_v.items():
-        #     save_batch(k,v, group_id, request, ac_id, None)
-        a = "/"+group_id+"/batch"
-
+        for k,v in batch_user_list_v.items():
+            save_batch(k,v, group_id, request, ac_id, None)
         return HttpResponseRedirect(reverse('batch',kwargs={'group_id':group_id}))
 
 
