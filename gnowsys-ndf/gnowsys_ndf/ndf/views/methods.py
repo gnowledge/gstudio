@@ -369,7 +369,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   user_last_visited_location = request.POST.get('last_visited_location')
   altnames = request.POST.get('altnames', '')
   featured = request.POST.get('featured', '')
-  license = request.POST.get('license', '')
 
   if map_geojson_data:
     map_geojson_data = map_geojson_data + ","
@@ -476,11 +475,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     if set(node.tags) != set(tags_list):
       node.tags = tags_list
-      is_changed = True
-
-  # for license field
-  if license and license != node.license:
-      node.license = node.license
       is_changed = True
 
   #  prior_node
@@ -1492,7 +1486,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             else:
               error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
-              # raise Exception(error_message)
+              raise Exception(error_message)
 
       return gr_node_list
 

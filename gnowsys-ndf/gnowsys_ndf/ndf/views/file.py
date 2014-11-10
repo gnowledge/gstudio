@@ -1554,7 +1554,7 @@ def data_review_save(request, group_id):
         if is_changed:
             file_node.save()
 
-        print edit_summary
+        # print edit_summary
 
     return HttpResponse(file_node.status)
 
