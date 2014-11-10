@@ -26,7 +26,7 @@ from gnowsys_ndf.settings import GSTUDIO_RESOURCES_AUDIENCE
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_TEXT_COMPLEXITY
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_LANGUAGES
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -1353,7 +1353,7 @@ def data_review(request, group_id, page_no=1):
                                         }
                                     ]},
                                         {'member_of': {'$all': [pandora_video_st._id]}}
-                                        ]}).sort("last_update", -1)
+                                        ]}).sort("created_at", -1)
                                  
     # implementing pagination: paginator.Paginator(cursor_obj, <int: page no>, <int: no of obj in each page>)
     # (ref: https://github.com/namlook/mongokit/blob/master/mongokit/paginator.py)
@@ -1363,6 +1363,7 @@ def data_review(request, group_id, page_no=1):
     files_list = []
 
     for each_resource in paged_resources.items:
+        each_resource, ver = get_page(request, each_resource) 
         each_resource.get_neighbourhood(each_resource.member_of)
         files_list.append(collection.GSystem(each_resource))
         # print "\n\n\n========", each_resource.keys()
