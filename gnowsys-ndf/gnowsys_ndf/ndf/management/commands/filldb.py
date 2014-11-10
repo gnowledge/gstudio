@@ -449,6 +449,17 @@ def clean_structure():
   # ------------------------------------------------------------------------------------
   # Keeping timeout=False, as cursor may exceeds it's default time i.e. 10 mins for which it remains alive
   # Needs to be expicitly close
+
+  # to fix broken documents which are having partial/outdated attributes/relations in their attribute_set/relation_set. 
+  # first make their attribute_set and relation_set empty and them fill them with latest key-values. 
+  collection.update({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
+                      'attribute_set': {'$exists': True}, 
+                      'relation_set': {'$exists': True}
+                    },
+                    {'$set': {'attribute_set': [], 'relation_set': []}}, 
+                    upsert=False, multi=True
+                    )
+
   gs = collection.Node.find({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
                               '$or': [{'attribute_set': []}, {'relation_set': []}] 
                             }, timeout=False)
