@@ -63,9 +63,12 @@
 {% endblock %}
   
   <h3><a class="current" style="color:black;">{{node.name}}</a></h3>
-  <div style="background-color:#ddd; overflow:auto;">
-    <b><div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div></b>
+  
+  <div style="background-color:#ddd;overflow: auto;">
+    <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
   </div>
+
+  
 
 {% comment %}
 <!-- <ul class="side-nav collection">

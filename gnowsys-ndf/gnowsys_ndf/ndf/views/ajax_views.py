@@ -500,7 +500,7 @@ def select_drawer(request, group_id):
         return render_to_response("ndf/drawer_widget.html", 
                                   {"widget_for": field, "page_info": paged_resources,
                                    "drawer1": drawer1, 'selection': True, 'node_id':node_id,
-                                   "drawer2": drawer2, 
+                                   "drawer2": drawer2, "checked": checked,
                                    "groupid": group_id
                                   },
                                   context_instance=RequestContext(request)

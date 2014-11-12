@@ -130,6 +130,74 @@ def check_existing_group(group_name):
   else:
     return False
 
+
+def filter_drawer_nodes(nid, group_id=None):
+  page_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
+  file_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
+  Pandora_video_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Pandora_video'})
+  quiz_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Quiz'})
+  quizItem_gst = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})
+  query = None
+
+  if group_id:
+    query = {'_type': {'$in': ['GSystem', 'File']}, 'group_set': ObjectId(group_id), 
+                'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in':[ObjectId(nid)]},
+                'member_of': {'$in': [page_gst._id,file_gst._id,Pandora_video_gst._id,quiz_gst._id,quizItem_gst._id] }
+            }
+
+  else:
+    query = {'_type': {'$in': ['GSystem', 'File']},'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in':[ObjectId(nid)]},
+            'member_of': {'$in': [page_gst._id,file_gst._id,Pandora_video_gst._id,quiz_gst._id,quizItem_gst._id] }
+            }                   
+
+  nodes = collection.Node.find(query)
+
+  # Remove parent nodes in which current node exists
+  def filter_nodes(parents, group_id=None):  
+    length = []
+    if parents:
+      length.extend(parents)
+
+      inner_parents = []
+      for each in parents:
+        if group_id:
+          query = {'_type': {'$in': ['GSystem', 'File']}, 'group_set': ObjectId(group_id), 
+                    'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in':[ObjectId(each)]},
+                    'member_of': {'$in': [page_gst._id,file_gst._id,Pandora_video_gst._id,quiz_gst._id,quizItem_gst._id] }
+                  }
+        else:
+          query = {'_type': {'$in': ['GSystem', 'File']},
+                    'collection_set': {'$exists': True, '$not': {'$size': 0}, '$in':[ObjectId(each)]},
+                    'member_of': {'$in': [page_gst._id,file_gst._id,Pandora_video_gst._id,quiz_gst._id,quizItem_gst._id] }
+                  }
+
+        nodes = collection.Node.find(query)
+        if nodes.count() > 0:
+          for k in nodes:
+            inner_parents.append(k._id) 
+   
+      for each in inner_parents:
+        if each not in parents:
+          parents.append(each)
+
+      if set(length) != set(parents):
+        parents = filter_nodes(parents, group_id)
+        return parents        
+      else:
+        return parents
+
+  parents_list = []
+  if nodes.count() > 0: 
+    for each in nodes:
+      parents_list.append(each._id)
+
+    parents = filter_nodes(parents_list, group_id)    
+    return parents 
+  else:
+    return parents_list
+
+
+
 def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs):
     """Get both drawers-list.
     """
@@ -149,62 +217,64 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
     drawer = None    
 
     if checked:
+      filtering = filter_drawer_nodes(nid, group_id)
+
       if checked == "Page":
         gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
       elif checked == "File":         
-        drawer = collection.Node.find({'_type': u"File", 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"File", '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]}})
         
       elif checked == "Image":
         gst_image_id = collection.Node.one({'_type': "GSystemType", 'name': "Image"})._id
-        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$in':[gst_image_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$in':[gst_image_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Video":         
         gst_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Video"})._id
-        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$in':[gst_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$in':[gst_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Quiz":
         # For prior-node-list
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "QuizObj" or checked == "assesses":
         # For collection-list
         gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
         gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "OnlyQuiz":
         gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_quiz_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "QuizItem":
         gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Group":
-        drawer = collection.Node.find({'_type': u"Group"})
+        drawer = collection.Node.find({'_type': u"Group", '_id': {'$nin': filtering} })
 
       elif checked == "Forum":
         gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Pandora Video":
         gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
-        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).limit(50)
+        drawer = collection.Node.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).limit(50)
 
       elif checked == "Theme":
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "theme_item":
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_item_GST._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_item_GST._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "Topic":
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "RelationType":
         # Special case used while dealing with RelationType widget
@@ -218,15 +288,19 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         drawer = checked
 
       elif theme_GST_id or topic_GST_id or theme_item_GST or forum_GST_id or reply_GST_id:
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+        # filtering = filter_drawer_nodes(nid, group_id)
+        filtering = []
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
       
       else:
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]} })
+        filtering = filter_drawer_nodes(nid, group_id)
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]} })
 
     if checked != "RelationType":
       paged_resources = paginator.Paginator(drawer, page_no, 10)
       drawer.rewind()
     
+
     if (nid is None) and (not nlist):
       for each in drawer:
         dict_drawer[each._id] = each
@@ -245,6 +319,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
     
     else:
       for each in drawer:
+
         if each._id != nid:
           if each._id not in nlist:
             dict1[each._id] = each
@@ -260,7 +335,11 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
       return dict_drawer
 
     else:
+
       return dict_drawer, paged_resources
+
+
+
 
 # get type of resource
 def get_resource_type(request,node_id):
@@ -360,11 +439,27 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
-  prior_node_list = request.POST.get('prior_node_list','')
-  collection_list = request.POST.get('collection_list','')
-  teaches_list = request.POST.get('teaches_list','')
-  assesses_list = request.POST.get('assesses_list','')
-  module_list = request.POST.get('module_list','')
+  right_drawer_list = []
+  checked = request.POST.get("checked", '') 
+  check_collection = request.POST.get("check_collection", '') 
+  if check_collection:
+    if check_collection == "collection":
+      right_drawer_list = request.POST.get('collection_list','')
+    elif check_collection == "prior_node":    
+      right_drawer_list = request.POST.get('prior_node_list','')
+    elif check_collection == "teaches":    
+      right_drawer_list = request.POST.get('teaches_list','')
+    elif check_collection == "assesses":    
+      right_drawer_list = request.POST.get('assesses_list','')
+    elif check_collection == "module":    
+      right_drawer_list = request.POST.get('module_list','')
+
+  metadata = request.POST.get("metadata_info", '') 
+  if metadata:
+    if metadata == "metadata":
+      node_gst = gcollection.Node.one({'_id':ObjectId(node.member_of[0]) })
+      get_node_metadata(request,node,node_gst)
+
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
   altnames = request.POST.get('altnames', '')
@@ -404,12 +499,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     specific_url = set_all_urls(node.member_of)
     node.url = specific_url
 
-  #  For create/edit
-  
-
-
-  #   name
- 
   if name:
     if node.name != name:
       node.name = name
@@ -479,116 +568,13 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       node.tags = tags_list
       is_changed = True
 
-  #  prior_node
-  if prior_node_list != '':
-    prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
-
-    if set(node.prior_node) != set(prior_node_list):
-      i = 0
-      node.prior_node=[]
-      while (i < len(prior_node_list)):
-        node_id = ObjectId(prior_node_list[i])
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.prior_node:
-            node.prior_node.append(node_id)
-        
-        i = i+1
-      is_changed = True
-  
-  #  collection
-  if collection_list != '':
-    collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
-
-    if set(node.collection_set) != set(collection_list):
-      i = 0
-      node.collection_set = []
-
-      # checking if each _id in collection_list is valid or not
-      while (i < len(collection_list)):
-        node_id = ObjectId(collection_list[i])
-        
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.collection_set:
-            node.collection_set.append(node_id)
-        
-        i = i+1
-      is_changed = True
-  
-  # Teaches
-  if teaches_list != '':
-
-    teaches_list = [ObjectId(each.strip()) for each in teaches_list.split(",")]
-
-    nlist = []
-    relationtype = gcollection.Node.one({"_type":"RelationType","name":"teaches"})
-    list_grelations = gcollection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
-    for relation in list_grelations:
-      nlist.append(ObjectId(relation.right_subject))
-
-    if set(nlist) != set(teaches_list):
-      list_grelations.rewind()
-      i = 0
-
-      while (i < len(teaches_list)):
-        node_id = ObjectId(teaches_list[i])
-        
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in nlist:
-            rel = gcollection.Node.one({'_type': 'GRelation', 'subject': ObjectId(node._id), 'right_subject': ObjectId(node_id), 'relation_type': relationtype.get_dbref()})
-            if rel:
-              rel.delete()
-        
-        i = i+1      
-
-      is_changed = True
-
-  # Assesses
-  if assesses_list != '':
-    assesses_list = [ObjectId(each.strip()) for each in teaches_list.split(",")]
-
-    nlist = []
-    relationtype = gcollection.Node.one({"_type":"RelationType","name":"assesses"})
-    list_grelations = gcollection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
-    for relation in list_grelations:
-      nlist.append(ObjectId(relation.right_subject))
-
-    if set(nlist) != set(assesses_list):
-      list_grelations.rewind()
-      i = 0
-
-      while (i < len(assesses_list)):
-        node_id = ObjectId(assesses_list[i])
-        
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in nlist:
-            rel = gcollection.Node.one({'_type': 'GRelation', 'subject': ObjectId(node._id), 'right_subject': ObjectId(node_id), 'relation_type': relationtype.get_dbref()})
-            if rel:
-              rel.delete()
-        
-        i = i+1      
-
-      is_changed = True
-
-
-
-  #  Module
-  if module_list != '':
-    collection_list = [ObjectId(each.strip()) for each in module_list.split(",")]
-
-    if set(node.collection_set) != set(collection_list):
-      i = 0
-      while (i < len(collection_list)):
-        node_id = ObjectId(collection_list[i])
-        
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.collection_set:
-            node.collection_set.append(node_id)
-        
-        i = i+1
+  #  Build collection, prior node, teaches and assesses lists
+  if check_collection:
+    changed = build_collection(node, check_collection, right_drawer_list, checked)  
+    if changed == True:
       is_changed = True
     
   #  org-content
-  
   if content_org:
     if node.content_org != content_org:
       node.content_org = content_org
@@ -636,7 +622,218 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   return is_changed
 # ============= END of def get_node_common_fields() ==============
   
+def build_collection(node, check_collection, right_drawer_list, checked):  
   
+  is_changed = False
+  gcollection = db[Node.collection_name]
+
+  if check_collection == "prior_node":
+    if right_drawer_list != '':
+      # prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
+      right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+
+      if set(node.prior_node) != set(right_drawer_list):
+        i = 0
+        node.prior_node=[]
+        while (i < len(right_drawer_list)):
+          node_id = ObjectId(right_drawer_list[i])
+          node_obj = gcollection.Node.one({"_id": node_id})
+          if node_obj:
+            node.prior_node.append(node_id)
+          
+          i = i+1
+        # print "\n Changed: prior_node"
+        is_changed = True
+    else:
+      node.prior_node = []
+      is_changed = True
+
+  elif check_collection == "collection":
+    #  collection
+    if right_drawer_list != '':
+      right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+
+      nlist = node.collection_set
+
+      if set(node.collection_set) != set(right_drawer_list):
+        i = 0          
+        node.collection_set = []
+        # checking if each _id in collection_list is valid or not
+        while (i < len(right_drawer_list)):
+          node_id = ObjectId(right_drawer_list[i])
+          node_obj = gcollection.Node.one({"_id": node_id})
+          if node_obj:
+            if node_id not in nlist:
+              nlist.append(node_id)  
+            else:
+              node.collection_set.append(node_id)            
+          
+          i = i+1
+
+        for each in nlist:
+          if each not in node.collection_set:
+            node.collection_set.append(each)
+
+        # For removing collection elements from heterogeneous collection drawer only
+        if not checked: 
+          if nlist:
+            for each in nlist:
+              if each not in right_drawer_list:
+                node.collection_set.remove(each)
+
+        else:
+          if nlist and checked:
+            if checked == "QuizObj":
+              quiz = gcollection.Node.one({'_type': 'GSystemType', 'name': "Quiz" })
+              quizitem = gcollection.Node.one({'_type': 'GSystemType', 'name': "QuizItem" })
+              for each in nlist:
+                obj = gcollection.Node.one({'_id': ObjectId(each) })
+                if quiz._id in obj.member_of or quizitem._id in obj.member_of:
+                  if obj._id not in right_drawer_list:
+                    node.collection_set.remove(obj._id)
+            elif checked == "Pandora Video":
+              check = gcollection.Node.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
+              for each in nlist:
+                obj = gcollection.Node.one({'_id': ObjectId(each) })
+                if check._id == obj.member_of[0]:
+                  if obj._id not in right_drawer_list:
+                    node.collection_set.remove(obj._id)
+            else:
+              check = gcollection.Node.one({'_type': 'GSystemType', 'name': unicode(checked) })
+              for each in nlist:
+                obj = gcollection.Node.one({'_id': ObjectId(each) })
+                if len(obj.member_of) < 2:
+                  if check._id == obj.member_of[0]:
+                    if obj._id not in right_drawer_list:
+                      node.collection_set.remove(obj._id)
+                else:
+                  if check._id == obj.member_of[1]: 
+                    if obj._id not in right_drawer_list:
+                      node.collection_set.remove(obj._id)
+
+
+        is_changed = True
+      
+    else:
+      if node.collection_set and checked:
+        if checked == "QuizObj":
+          quiz = gcollection.Node.one({'_type': 'GSystemType', 'name': "Quiz" })
+          quizitem = gcollection.Node.one({'_type': 'GSystemType', 'name': "QuizItem" })
+          for each in node.collection_set:
+            obj = gcollection.Node.one({'_id': ObjectId(each) })
+            if quiz._id in obj.member_of or quizitem._id in obj.member_of:
+              node.collection_set.remove(obj._id)
+        elif checked == "Pandora Video":
+          check = gcollection.Node.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
+          for each in node.collection_set:
+            obj = gcollection.Node.one({'_id': ObjectId(each) })
+            if check._id == obj.member_of[0]:
+              node.collection_set.remove(obj._id)
+        else:
+          check = gcollection.Node.one({'_type': 'GSystemType', 'name': unicode(checked) })
+          for each in node.collection_set:
+            obj = gcollection.Node.one({'_id': ObjectId(each) })
+            if len(obj.member_of) < 2:
+              if check._id == obj.member_of[0]:
+                node.collection_set.remove(obj._id)
+            else:
+              if check._id == obj.member_of[1]: 
+                node.collection_set.remove(obj._id)
+
+      else:
+        node.collection_set = []
+      
+      is_changed = True
+
+  elif check_collection == "teaches":
+    # Teaches
+    if right_drawer_list != '':
+
+      right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+
+      relationtype = gcollection.Node.one({"_type":"RelationType","name":"teaches"})
+      list_grelations = gcollection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+      for relation in list_grelations:
+        # nlist.append(ObjectId(relation.right_subject))
+        relation.delete()
+
+      if right_drawer_list:
+        list_grelations.rewind()
+        i = 0
+
+        while (i < len(right_drawer_list)):
+          node_id = ObjectId(right_drawer_list[i])
+          node_obj = gcollection.Node.one({"_id": node_id})
+          if node_obj:
+            create_grelation(node._id,relationtype,node_id)
+          i = i+1      
+        
+        # print "\n Changed: teaches_list"
+        is_changed = True
+    else:
+      relationtype = gcollection.Node.one({"_type":"RelationType","name":"teaches"})
+      list_grelations = gcollection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+      for relation in list_grelations:
+        relation.delete()
+
+      is_changed = True
+
+  elif check_collection == "assesses":
+    # Assesses
+    if right_drawer_list != '':
+      right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+
+      relationtype = gcollection.Node.one({"_type":"RelationType","name":"assesses"})
+      list_grelations = gcollection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+      for relation in list_grelations:
+        relation.delete()
+
+      if right_drawer_list:
+        list_grelations.rewind()
+        i = 0
+
+        while (i < len(right_drawer_list)):
+          node_id = ObjectId(right_drawer_list[i])
+          node_obj = gcollection.Node.one({"_id": node_id})
+          if node_obj:
+            create_grelation(node._id,relationtype,node_id)            
+          i = i+1      
+
+        # print "\n Changed: teaches_list"
+        is_changed = True
+    else:
+      relationtype = gcollection.Node.one({"_type":"RelationType","name":"assesses"})
+      list_grelations = gcollection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+      for relation in list_grelations:
+        relation.delete()
+      
+      is_changed = True
+
+  # elif check_collection == "module":
+    #  Module
+    # if right_drawer_list != '':
+    #   right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+
+    #   if set(node.collection_set) != set(right_drawer_list):
+    #     i = 0
+    #     while (i < len(right_drawer_list)):
+    #       node_id = ObjectId(right_drawer_list[i])
+    #       node_obj = gcollection.Node.one({"_id": node_id})
+    #       if node_obj:
+    #         if node_id not in node.collection_set:
+    #           node.collection_set.append(node_id)
+          
+    #       i = i+1
+        # print "\n Changed: module_list"
+        # is_changed = True
+    # else:
+      # node.module_set = []
+      # is_changed = True
+  if is_changed == True:
+    return True
+  else:
+    return False
+
 def get_versioned_page(node):
             
     rcs = RCS()

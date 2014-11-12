@@ -315,7 +315,6 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
 
@@ -334,6 +333,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     else:
         if node_id:
+
             page_node,ver=get_page(request,page_node)
             page_node.get_neighbourhood(page_node.member_of)
             context_variables['node'] = page_node
@@ -568,7 +568,6 @@ def translate_node(request,group_id,node_id=None):
                              
                               context_instance = RequestContext(request)
     )        
-
 
 
 #######################################################################################################################################
