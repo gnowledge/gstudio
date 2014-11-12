@@ -26,19 +26,25 @@
     }
 
   /* css-properties for table */
-    .width-5p {
+    .width_s_no {
       width: 5%;
     }
 
-    .width-8p {
+    .width_gender, .width_edit {
       width: 8%;
     }
 
-    .width-9p {
+    .width_delete {
+      width: 8%;
+      line-height: 0.5em;
+      text-align: center !important;
+    }
+
+    .width_dob {
       width: 9%;
     }
 
-    .width-31p {
+    .width_name, .width_email_id {
       width: 31%;
     }
 
@@ -49,6 +55,10 @@
     .counter {
       font-weight: bold;
       text-align: right;
+    }
+
+    .tiny.button {
+      font-size: 1em !important;
     }
 {% endblock%}
 
@@ -75,12 +85,12 @@
     
       <div class="row">
         {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
-          <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+          <a class="large-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
             {{each.name}} ({{count}})
           </a>
 
           {% if gstaff_access %}
-          <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+          <a class="large-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
             +&nbsp;Add
           </a>
           {% endif %}
@@ -112,12 +122,12 @@
     <div class="row" style="margin-top: 1rem;">
       <form method="POST">
         {% csrf_token %}
-        <div class="small-5 small-push-7 columns">
+        <div class="large-5 large-push-7 columns">
           <div class="row collapse">
-            <div class="small-10 columns">
+            <div class="large-10 columns">
               <input type="text" name="search" value="" placeholder="By name...">
             </div>
-            <div class="small-2 columns end">
+            <div class="large-2 columns end">
               <input type="submit" class="button postfix" value="Search">
               <input type="hidden" name="class" value="{{class_name}}">
             </div>
@@ -130,14 +140,13 @@
   <table>
     <thead>
       {% if nodes %}
-        <th class="width-5p counter">{% trans "S. #" %}</th>
-        <th class="width-31p">{% trans "Name" %}</th>
-        <th class="width-8p">{% trans "Gender" %}</th>
-        <th class="width-9p">{% trans "Birth Date" %}</th>
-        <th class="width-31p">{% trans "Email ID" %}</th>
+        <th class="width_s_no counter">{% trans "S. #" %}</th>
+        {% for each_key in nodes_keys %}
+        <th class="width_{{each_key.0}}">{{each_key.1}}</th>
+        {% endfor %}
         {% if gstaff_access %}
-        <th class="width-8p">{% trans "Edit" %}</th>
-        <th class="width-8p text-center"><input class="margin-0r checkedAll" type="checkbox"><input class="button tiny margin-0r deleteObjects" type="button" value="Delete"></th>
+        <th class="width_edit">{% trans "Edit" %}</th>
+        <th class="width_delete"><input class="margin-0r checkedAll" type="checkbox"><br><input class="button tiny margin-0r deleteObjects" type="button" value="Delete"></th>
         {% endif %}
       {% endif %}
     </thead>
@@ -146,13 +155,18 @@
       {% for each in nodes %}
         <tr>
           <td class="counter">{{forloop.counter}}.</td>
-          <td>{{each.name|title}}</a></td>
-          <td>{{each.gender}}</td>
-          <td>{{each.dob|default:"--"}}</td>
-          <td>{{each.email_id}}</td>
+          {% for each_key in nodes_keys %}
+          {% if forloop.counter == 1 %}
+          <td>{{each|get_dict_item:each_key.0|title}}</a></td>
+          {% elif forloop.counter > 2 %}
+          <td>{{each|get_dict_item:each_key.0|default:"--"}}</a></td>
+          {% else %}
+          <td>{{each|get_dict_item:each_key.0}}</a></td>
+          {% endif %}
+          {% endfor %}
           {% if gstaff_access %}
-          <td class="name"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.p_id %}" target="_blank" class="button small expand margin-0r">Edit</a></td>
-          <td id="{{each.pk}}" class="text-center objectsCheckbox"> <input type="checkbox"> </td>
+          <td class="name"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each|get_dict_item:'_id' %}" target="_blank" class="button tiny expand margin-0r width_edit">Edit</a></td>
+          <td id="{{each|get_dict_item:'_id'}}" class="width_delete objectsCheckbox"> <input type="checkbox"> </td>
           {% endif %}
         </tr>
         
@@ -231,15 +245,10 @@
     // $('#myModal').foundation('reveal', 'close');
     
     if(selectedobject.length > 0) {
-      $('#myModal').foundation('reveal', 'open');
-
-      // var confirmed = confirm("Deleting "+selectedobject.length+" objects");
-      // if(confirmed == true){
-   
       var i = 0;
       var str = "";  
    
-      $.map(selectedobject,function(each) {
+      $.map(selectedobject, function(each) {
         if(i == 0) {
           str = str.concat(each.parentElement.id)
         }
@@ -247,7 +256,7 @@
           str = str.concat(","+each.parentElement.id)
         }
         i = i+1;
-      })
+      });
 
       $.ajax({
         url: "{% url 'deletion_instances' groupid %}",
@@ -258,31 +267,35 @@
 
         success: function(result) {
           $("#deletion_results").html("");
-            for(var obj in result){
-              var ulist = $("<ul>"+"</ul>")
+
+          for(var obj in result){
+            var ulist = $("<ul>"+"</ul>")
               .attr("id","conceptlist")
               .appendTo($("#deletion_results"));
-        
-              var li = $("<li><b>"+result[obj].title+"</b></li>")
+      
+            var li = $("<li><b>"+result[obj].title+"</b></li>")
               .appendTo(ulist);
-        
-              var ulist1 = $("<ul>"+"</ul>")
+      
+            var ulist1 = $("<ul>"+"</ul>")
               .attr("id","conceptlist")
               .appendTo(li);
         
-              for(var obj2 in result[obj].content) {
-                object = result[obj].content[obj2]
-                for(var obj3 in  object) {
-                  for(var each in object[obj3]) {
-                    var li1 = $("<li>"+object[obj3][each]+"</li>")
+            for(var obj2 in result[obj].content) {
+              object = result[obj].content[obj2]
+              for(var obj3 in  object) {
+                for(var each in object[obj3]) {
+                  var li1 = $("<li>"+object[obj3][each]+"</li>")
                     .appendTo(ulist1);
-                  }
+                }
               }
             }
           }
+
+          $('#myModal').foundation('reveal', 'open');
         },
 
-        complete: function() {}
+        complete: function() {
+        }
       });
 
       // }
