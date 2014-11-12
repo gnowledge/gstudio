@@ -1105,7 +1105,13 @@ def parse_template_data(field_data_type, field_value, **kwargs):
         field_value = long(field_value)
 
       elif field_data_type == "list":
-        field_value = "???"
+        if ("[" in field_value) and ("]" in field_value):
+          field_value = json.loads(field_value)
+
+        else:
+          lr = field_value.replace(" ,", ",")
+          rr = lr.replace(", ", ",")
+          field_value = rr.split(",")
 
       elif field_data_type == "dict":
         field_value = "???"
