@@ -105,7 +105,7 @@
               
               },
 
-             url:"{% url 'get_data_for_event_task' 'groupid' %}".replace('groupid',groupid),
+             url: "{% url 'get_data_for_event_task' groupid %}",
              type:"GET",
              success:function(data){
              sData = jQuery.parseJSON(data);
@@ -131,7 +131,7 @@
             else{
             $.ajax({
              
-             url:"{% url 'get_data_for_event_task' 'groupid' %}".replace('groupid',groupid),
+             url:"{% url 'get_data_for_event_task' groupid %}",
              data: {
               view:'day',
               start:date.format()

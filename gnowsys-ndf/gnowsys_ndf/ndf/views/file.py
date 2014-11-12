@@ -731,7 +731,7 @@ def submitDoc(request, group_id):
        
         if img_type != "": 
             
-            return HttpResponseRedirect(reverse('uDashboard', kwargs={'group_id': group_id}))
+            return HttpResponseRedirect(reverse('uDashboard', kwargs={'group_id': int(userid)}))
 
         elif topic_file != "": 
             
