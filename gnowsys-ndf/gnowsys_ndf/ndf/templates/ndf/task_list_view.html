@@ -53,6 +53,8 @@
 					                  <td class="view" ><a onClick="collection_overlay('{{i.id }}')" >{{v}}  </a></td>
 						              {% endif %}
 						             
+                    {% elif j == "start_time" or j = "end_time" %}
+                          <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v|date:"d/m/Y"}} </a></td>
 						        {% else %}
 				 			            <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v}} </a></td>
 					          {% endif %}

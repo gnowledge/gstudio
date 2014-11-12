@@ -514,7 +514,6 @@
     });
 
   // State-wise District selection ---------------------------------------------------------------------------------
-
     // Disable District field, later on will be enabled after a state is selected
     $("select#person_belongs_to_district").attr('disabled', 'disabled')
 
@@ -687,14 +686,20 @@
       $("#dob.date_month_day_year").datepicker({
         changeMonth: true,
         changeYear: true,
-        yearRange: "" + lowerYearLimit + ":" + (currentYear-14),
+        dateFormat: "dd/mm/yy",
+        yearRange: lowerYearLimit + ":" + (currentYear-14),
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: new Date((currentYear-14), 1 - 1, 1),
+        defaultDate: new Date(lowerYearLimit, 1 - 1, 1)
       });
 
       $("#registration_date.date_month_day_year").datepicker({
         changeMonth: true,
         changeYear: true,
         yearRange: "" + lowerYearLimit + ":" + currentYear,
-        maxDate: '0'
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: '0',
+        defaultDate: '0'
       });
 
     // Signature Upload File Size Limit
@@ -731,7 +736,10 @@
       $(".date_year").datepicker({
         changeYear: true,
         dateFormat: 'yy',
-        yearRange: "" + lowerYearLimit + ":" + currentYear,
+        yearRange: lowerYearLimit + ":" + currentYear,
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: '0',
+        defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
 
         onClose: function(dateText, inst) {
           $(this).val(dateText)

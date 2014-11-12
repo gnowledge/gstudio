@@ -4,7 +4,6 @@
 {% load pagination_tags %}
 
 {% block style %}
-
   {{block.super}}
 
   /* Resetting css-properties for fieldset (also legend, input) */
@@ -33,7 +32,6 @@
     #announce-course.hide{
       display: none;
     }
-
 {% endblock %}
 
 {% block body_content %} 
@@ -143,13 +141,14 @@
                 <i style="color:red; float:left display:inline">*</i>
                 <small class="error">{% trans "Please select University" %} </small>
             </div>
-<!-- 
+            <!-- 
             <div class="left inline">
               <input type="checkbox" id="all_univ" name="all_univ">Select All
             </div>
- -->
+            -->
+
             <div class="small-3 columns">
-            <input type="button" id="find_colg" class="small button round" value="Get Colleges"/>
+              <input type="button" id="find_colg" class="small button round" value="Get Colleges"/>
             </div>
           </div>
 
@@ -525,7 +524,7 @@
   // Change placeholders for start-time & end-time
     // From MM/DD/YYYY HH:MM to MM/YYYY
     $(".date_month_day_year").each(function(i) {
-      // Below code is required because in validators "m/d/Y H:i" is set
+      // Below code is required because in validators "d/m/Y H:i" is set
       // In order to override that, below code is overwritten
       if ($(this).attr("id") == "start_time") {
         $(this).attr("placeholder", "MM/YYYY");
@@ -543,12 +542,12 @@
     $(".dmy").each(function(i) {
       $(this).attr("placeholder", "MM/DD/YYYY");
       if ($(this).attr("id") == "start_enroll") {
-        var st = "{{node.start_enroll|date:'m/d/Y'}}"
+        var st = "{{node.start_enroll|date:'d/m/Y'}}"
         $(this).val(st)
       }
 
       else if ($(this).attr("id") == "end_enroll") {
-        var et = "{{node.end_enroll|date:'m/d/Y'}}"
+        var et = "{{node.end_enroll|date:'d/m/Y'}}"
         $(this).val(et)
       }
     });
@@ -583,32 +582,34 @@
     });
 
   // Enroll: start & end date-widgets --------------------------------------------------------------------------
-    var startEnrollDt = $("#start_enroll")
-    var endEnrollDt = $("#end_enroll")
-    var currentYear = (new Date()).getFullYear()
-    lowerYearLimitE = currentYear - 0;
-    upperYearLimitE = currentYear + 0;
+    var startEnrollDt = $("#start_enroll");
+    var endEnrollDt = $("#end_enroll");
+    currentDate = new Date();
+    var currentDay = currentDate.getDate();
+    var currentMonth = currentDate.getMonth();
+    var currentYear = currentDate.getFullYear();
 
-    $( ".dmy" ).datepicker({
-      defaultDate: "+1w",
+    $(".dmy").datepicker({
       changeMonth: true,
-      changeYear: true,
-      yearRange: "" + lowerYearLimitE + ":" + upperYearLimitE,
-
+      dateFormat: 'dd/mm/yy',
+      minDate: '0',
+      maxDate: '+2m',
+      defaultDate: '0',
 
       onClose: function(dateText, inst) {
         $(this).val(dateText);
         
         var month_year = $(this).val();
-        var month = 1
-        var day = 1
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
         
         if ($(this).attr('id') == "start_enroll") {
           if (month_year) {
-            month_year = month_year.split("/")
-            month = parseInt(month_year[0])
-            day = parseInt(month_year[1])
-            year = parseInt(month_year[2])
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
           }
 
           if (endEnrollDt.val() != '') {
@@ -620,14 +621,13 @@
             }
 
             else {
-              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+              $(this).val(day+"/"+month+"/"+year);
               $(this).datepicker('setDate', new Date(year, (month-1), day));
             }
           }
 
           else {
-            endEnrollDt.val(dateText);
-            $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+            endEnrollDt.val(day+"/"+month+"/"+year);
             $(this).datepicker('setDate', new Date(year, (month-1), day));
           }
 
@@ -636,10 +636,9 @@
 
         else if ($(this).attr('id') == "end_enroll") {
           if (month_year) {
-            month_year = month_year.split("/")
-
-            month = parseInt(month_year[0]);
-            day = parseInt(month_year[1]);
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
             year = parseInt(month_year[2]);
           }
 
@@ -652,34 +651,30 @@
             }
 
             else {
-              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+              $(this).val(day+"/"+month+"/"+year);
               $(this).datepicker('setDate', new Date(year, (month-1), day));
             }
           }
 
           else {
-            startEnrollDt.val(dateText);
+            startEnrollDt.val(day+"/"+month+"/"+year);
 
-            $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
             $(this).datepicker('setDate', new Date(year, (month-1), day));
           }
-
-          $("#start_enroll").datepicker('option', 'maxDate', new Date(year, (month-1), day));
         }
       },
 
       beforeShow: function() {
-
         var month_year = $(this).val();
-        month = 1
-        year = lowerYearLimitE
-        day =1
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
 
         if (month_year) {
-          month_year = month_year.split("/")
-          month = parseInt(month_year[0])
-          day = parseInt(month_year[1])
-          year = parseInt(month_year[2])
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
         }
 
         $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
@@ -688,17 +683,21 @@
     });
 
   // Course: start & end date-widgets --------------------------------------------------------------------------
-    var currentYear = (new Date()).getFullYear()
-    lowerYearLimit = currentYear - 5;
+    var currentYear = (new Date()).getFullYear();
+    var currentMonth = (new Date()).getMonth();
+    lowerYearLimit = currentYear;
     upperYearLimit = currentYear + 5;
-    var startDtInput = $("#fc #start_time");
-    var endDtInput = $("#fc #end_time");
+    var startDtInput = $("#sc #start_time");
+    var endDtInput = $("#sc #end_time");
 
     $(".date_month_day_year").datepicker({
       changeMonth: true,
       changeYear: true,
       dateFormat: 'mm/yy',
-      yearRange: "" + lowerYearLimit + ":" + upperYearLimit,
+      yearRange: lowerYearLimit + ":" + upperYearLimit,
+      minDate: new Date(lowerYearLimit, currentMonth, 1),
+      maxDate: new Date(upperYearLimit, currentMonth, 1),
+      defaultDate: new Date(lowerYearLimit, currentMonth, 1),
 
       onClose: function(dateText, inst) {
         $(this).val(dateText);
@@ -708,7 +707,7 @@
         var month = 1
         var year = lowerYearLimit
 
-        if ($(".date_month_day_year").attr('id') == "start_time") {
+        if ($(this).attr('id') == "start_time") {
           if (month_year) {
             month_year = month_year.split("/")
             month = parseInt(month_year[0])
@@ -724,22 +723,21 @@
             }
 
             else {
-              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
+              $(this).val(month+"/"+year);
               $(this).datepicker('setDate', new Date(year, (month-1), 1));
             }
           }
 
           else {
-            endDtInput.val(dateText);
+            endDtInput.val(month+"/"+year);
 
-            $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
             $(this).datepicker('setDate', new Date(year, (month-1), 1));
           }
 
           $("#end_time.date_month_day_year").datepicker('option', 'minDate', new Date(year, (month-1), 1));
         }
 
-        else if ($(".date_month_day_year").attr('id') == "end_time") {
+        else if ($(this).attr('id') == "end_time") {
           if (month_year) {
             month_year = month_year.split("/")
 
@@ -756,25 +754,22 @@
             }
 
             else {
-              $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
+              $(this).val(month+"/"+year);
               $(this).datepicker('setDate', new Date(year, (month-1), 1));
             }
           }
 
           else {
-            startDtInput.val(dateText);
+            startDtInput.val(month+"/"+year);
 
-            $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
             $(this).datepicker('setDate', new Date(year, (month-1), 1));
           }
-
-          $("#start_time.date_month_day_year").datepicker('option', 'maxDate', new Date(year, (month-1), 1));
         }
       },
 
       beforeShow: function() {
         var month_year = $(this).val();
-        month = 1
+        month = currentMonth;
         year = lowerYearLimit
 
         if (month_year) {
@@ -789,8 +784,12 @@
       },
 
       onChangeMonthYear: function(year, month, inst){
-        $(this).val(month+"/"+year)
+        $(this).val(month+"/"+year);
 
+        if ($(this).attr("id") == "start_date") {
+          $("#end_date").val(month+"/"+year);
+        }
+        
         hideFieldsetSubmit();
       }
     });
