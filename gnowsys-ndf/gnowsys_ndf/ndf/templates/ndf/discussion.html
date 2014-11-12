@@ -301,7 +301,7 @@
         $.ajax({
           
           type: 'POST',
-          url: '{% url "discussion_delete_reply" group_id %}',
+          url: "{% url 'discussion_delete_reply' group_id %}",
           data: { 
               "csrfmiddlewaretoken": "{{ csrf_token }}",
               "nodes_to_delete": JSON.stringify(nodesToDeleteArr)
