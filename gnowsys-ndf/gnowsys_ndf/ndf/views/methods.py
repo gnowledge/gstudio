@@ -288,8 +288,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         drawer = checked
 
       elif theme_GST_id or topic_GST_id or theme_item_GST or forum_GST_id or reply_GST_id:
-        # filtering = filter_drawer_nodes(nid, group_id)
-        filtering = []
+        filtering = filter_drawer_nodes(nid, group_id)
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
       
       else:
