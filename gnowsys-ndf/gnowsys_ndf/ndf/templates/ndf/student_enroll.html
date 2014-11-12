@@ -407,7 +407,7 @@
     $(".date_year").datepicker({
       changeYear: true,
       dateFormat: 'yy',
-      yearRange: "" + lowerYearLimit + ":" + upperYearLimit,
+      yearRange: lowerYearLimit + ":" + upperYearLimit,
 
       onClose: function(dateText, inst) {
         $(this).val(dateText);
@@ -442,7 +442,7 @@
       },
 
       onChangeMonthYear: function(year, month, inst){
-        $(this).val(year)
+        $(this).val(year);
       }
     });
 

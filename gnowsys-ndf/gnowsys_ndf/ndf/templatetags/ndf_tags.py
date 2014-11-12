@@ -1336,7 +1336,7 @@ def get_memberof_name(node_id):
 	
 @register.filter
 def get_dict_item(dictionary, key):
-		return dictionary.get(key)
+	return dictionary.get(key)
 
 
 @register.assignment_tag
