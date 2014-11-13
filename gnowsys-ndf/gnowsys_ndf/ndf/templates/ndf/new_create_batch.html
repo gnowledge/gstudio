@@ -177,6 +177,7 @@
         });//end of ajax call
     });//end of acourse_list.change function
   
+  var batch_name_index;
   //"Next" after inputting #of batches
     $("#nextbtn").click(function(event) {
 
@@ -184,7 +185,6 @@
       $("#input-fd").addClass("hide")
       $("#nussd_course_type").attr("disabled","disabled")
       $("#acourse_list").attr("disabled","disabled")
-      batch_name_index = 1;
       $.ajax({
         url: "{% url 'get_students_for_batches' group_id %}",
         data: {
@@ -197,10 +197,9 @@
           if (data["success"]) {
             drawer_widget = data["drawer_widget"];
             $("#drawer-div").html(drawer_widget);
-            if (batch_name_index==1) {
-              $("#drawer_head").attr("value","Batch "+batch_name_index);
-              batch_name_index += 1;
-            }
+            batch_name_index = data["batch_name_index"]
+            $("#drawer_head").attr("value","Batch "+batch_name_index);
+            batch_name_index += 1;
           }
           else {
            alert("Failed to get drawer")

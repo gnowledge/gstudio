@@ -3557,6 +3557,7 @@ def get_students_for_batches(request, group_id):
       batch_id = request.GET.get('node_id',"")
       ac_id = request.GET.get('ac_id',"")
       print "coming here",ac_id
+      batch_name_index = 1
 
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
       if not mis_admin:
@@ -3587,28 +3588,27 @@ def get_students_for_batches(request, group_id):
         rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
         rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
         rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
-        print "\n\n1"
         relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
-        # print relation_coll.count()
-        if relation_coll:
-          for each in relation_coll:
-            batch_in_grp = collection.Node.one({'_id':ObjectId(each.right_subject)})
-            #if (batch_in_grp._id==ObjectId(batch_id)):
-            all_batches_in_grp.append(batch_in_grp)
-          if all_batches_in_grp:
-            for each_batch in all_batches_in_grp:
-              relation_coll_b = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_course._id,'subject':ObjectId(each_batch._id)})
-              if relation_coll_b:
-                for each_course in relation_coll_b:
-                  course_of_batch = collection.Node.one({'_id':ObjectId(each_course.right_subject)})
-                  if (course_of_batch._id==ObjectId(ac_id)):
-                    batch_mem_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':ObjectId(each_batch._id)},{'right_subject':1})
-                  else:
-                    print "\n\n not matched"
-                  if batch_mem_coll:
-                    for each in batch_mem_coll:
-                      batch_member_list.append(each.right_subject)
-
+        try:
+          if relation_coll:
+            for each in relation_coll:
+              batch_in_grp = collection.Node.one({'_id':ObjectId(each.right_subject)})
+              all_batches_in_grp.append(batch_in_grp)
+            if all_batches_in_grp:
+              for each_batch in all_batches_in_grp:
+                relation_coll_b = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_course._id,'subject':ObjectId(each_batch._id)})
+                if relation_coll_b:
+                  for each_course in relation_coll_b:
+                    course_of_batch = collection.Node.one({'_id':ObjectId(each_course.right_subject)})
+                    if (course_of_batch._id==ObjectId(ac_id)):
+                      batch_mem_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':ObjectId(each_batch._id)},{'right_subject':1})
+                      batch_name_index += 1
+                      print batch_name_index, "batch_name_index"
+                    if batch_mem_coll:
+                      for each in batch_mem_coll:
+                        batch_member_list.append(each.right_subject)
+        except:
+          batch_mem_coll=[]
         # else:
           # batch_member_list=[]
         res = collection.Node.find({'member_of': student._id, 
@@ -3626,6 +3626,7 @@ def get_students_for_batches(request, group_id):
       response_dict["drawer_widget"] = drawer_widget
       response_dict["success"] = True
       response_dict["message"] = "NOTE"
+      response_dict["batch_name_index"] = batch_name_index
       return HttpResponse(json.dumps(response_dict))
     else:
       error_message = "Batch Drawer: Either not an ajax call or not a GET request!!!"
