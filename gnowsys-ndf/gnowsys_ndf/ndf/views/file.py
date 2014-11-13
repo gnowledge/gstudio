@@ -1446,7 +1446,6 @@ def data_review_save(request, group_id):
     
     file_node = collection.File.one({"_id": ObjectId(node_oid)})
 
-
     if request.method == "POST":
 
         edit_summary = []
@@ -1478,21 +1477,22 @@ def data_review_save(request, group_id):
 
                 edit_summary.append(temp_edit_summ)
         
-        teaches_list = request.POST.get('teaches','[]') # get the teaches list
-        if teaches_list != '':
+        teaches_list = request.POST.get('teaches','')  # get the teaches list
+        prev_teaches_list = request.POST.get("teaches_prev", "")  # get the before-edit teaches list
 
-            teaches_list = teaches_list.split(",")
+        # check if teaches list exist means nodes added/removed for teaches relation_type
+        # also check for if previous teaches list made empty with prev_teaches_list 
+        if (teaches_list != '') or prev_teaches_list:
+
+            teaches_list = teaches_list.split(",") if teaches_list else []
             teaches_list = [ObjectId(each_oid) for each_oid in teaches_list]
-
 
             relation_type_node = collection.Node.one({'_type': "RelationType", 'name':'teaches'})
 
             gr_nodes = create_grelation(file_node._id, relation_type_node, teaches_list)
+            gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes] if gr_nodes else []
 
-            gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes]
-            
-            prev_teaches_list = request.POST.get("teaches_prev", "[]")
-            prev_teaches_list = prev_teaches_list.split(",")
+            prev_teaches_list = prev_teaches_list.split(",") if prev_teaches_list else []
             prev_teaches_list = [ObjectId(each_oid) for each_oid in prev_teaches_list]
 
             if len(gr_nodes_oid_list) == len(prev_teaches_list) and set(gr_nodes_oid_list) == set(prev_teaches_list):
@@ -1555,7 +1555,7 @@ def data_review_save(request, group_id):
         if is_changed:
             file_node.save()
 
-        # print edit_summary
+        print edit_summary
 
     return HttpResponse(file_node.status)
 
