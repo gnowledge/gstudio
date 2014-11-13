@@ -2015,26 +2015,27 @@ def check_node_linked(node_id):
 
 @register.assignment_tag
 def get_file_node(request, file_name=""):
-	file_list=[]
-        new=[]
-	a=str(file_name).split(',')
-        for i in a:
-           k=str(i.strip('   [](\'u\'   '))
-           new.append(k)
-	col_Group = db[Node.collection_name]
+	file_list = []
+	new_file_list = []
 
-	ins_objectid  = ObjectId()
-	if  ins_objectid.is_valid(new) is False:
-		filedoc=collection.Node.find({'_type':'File','name':unicode(new)})
+	a = str(file_name).split(',')
 
-	else:
-		filedoc=collection.Node.find({'_type':'File','_id':ObjectId(new)})			
-	
-	if filedoc:
-		for i in filedoc:
-			file_list.append(i)	
+	for i in a:
+		k = str(i.strip('   [](\'u\'   '))
+		file_list.append(k)
 
-	return file_list	
+	for each in file_list:
+		if ObjectId.is_valid(each) is False:
+			filedoc = collection.Node.find({'_type':'File','name':unicode(each)})
+
+		else:
+			filedoc = collection.Node.find({'_type':'File','_id':ObjectId(each)})			
+
+		if filedoc:
+			for i in filedoc:
+				new_file_list.append(i)	
+
+	return new_file_list	
 
 @register.filter(name='jsonify')
 def jsonify(value):
