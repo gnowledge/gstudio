@@ -76,6 +76,52 @@
 		height:40px; 		
 		background-repeat:no-repeat; background-size: 48px 48px
 	}
+
+	#kbd-tips {
+	    bottom: 20px;
+	    position: absolute;
+	    right: 50px;
+	    color: #999999;
+	    transition: color 1s ease-out;
+	}
+
+	#kbd-tips:hover {
+		color: inherit;
+	    cursor: pointer;
+	}
+
+	#kbd-tips > i{
+		font-size: 1.5em;
+	    position: absolute;
+	    left: -25px;
+	    top: 0.1em;
+	}
+
+	#kbd-tips-alert {
+	    bottom: 50px;
+	    right: 50px;
+	    z-index: 100;
+	    padding: 1em;
+	    background-color: #e5e5e5;
+	    border: thin solid #b7b7b7;
+	    border-radius: 5px 5px 0 0;
+	    box-shadow: 0 -2px 8px gray;
+	    position: absolute;
+	    display: none;
+	}
+
+	#kbd-tips-alert > div.close{
+		position: absolute;
+	    right: 3px;
+	    top: 0;
+		color: gray;
+	}
+
+	#kbd-tips-alert > div.close > i {
+		font-size: 1.25em;
+		cursor: pointer;
+	}
+
 	/* ---END of drawer CSS */
 
 {% endblock %}
@@ -183,8 +229,24 @@
 
 <!-- Pagination -->
 {% block data_review_pagination %}
-
+	
 	{% include 'ndf/pagination.html' with urlname="data_review_page" first_arg=group_name_tag second_arg="" third_arg="" %}
+	<div id="kbd-tips" onclick="$('#kbd-tips-alert').fadeIn()"><i class="fi-layout"></i>Keyboard Shortcuts</div>
+	
+	<div id="kbd-tips-alert">
+
+		<div class="close" onclick="$('#kbd-tips-alert').fadeOut()">
+			<i class="fi-x-circle"></i>
+		</div>
+
+		<h4 class="text-center"><small>Data Review: Keyboard shortcuts</small></h4>
+		When row is open to edit:
+		<ul>
+			<li>"<b>save</b>" : Press "<b>s</b>" of keyboard</li>
+			<li>"<b>cancel</b>" : Press "<b>c</b>" of keyboard</li>
+		</ul>
+	 	 
+	</div>
 
 	<!-- Datetimepicker  -->
 	<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
@@ -192,6 +254,7 @@
 	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
 	<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/mousetrap/mousetrap.js"></script>
 
 {% endblock %}
 <!-- -END of Pagination -->
@@ -364,7 +427,7 @@
 		// to show details on confirm popup
 		var tempEditedFields = "";
 
-		nodeObj = new Object()
+		var nodeObj = new Object()
 
 		// processing each element of row
 		for (var i = 1; i < resEditRowArr.length; i++)
@@ -656,6 +719,29 @@
 		// $("#assesses_list").val(assess_arr);
 
 	}
+
+	// defining keyboard shortcuts to elements
+
+	function clickAction(button) {
+		if (button.closest(".disabled").length) {
+			return;
+		}
+		if (button.is(":visible")) {
+			button[0].click();
+		}
+	}
+
+	Mousetrap.bind('s', function () { clickAction($('[data-action="save"]:visible')); });
+	Mousetrap.bind('c', function () { clickAction($('[data-action="cancel"]:visible')); });
+
+	Mousetrap.bind('right', function () {
+		$('article').animate({scrollLeft: '+=150'}, 200, 'easeOutQuad');
+	});
+
+	Mousetrap.bind('left', function () {
+		$('article').animate({scrollLeft: '-=150'}, 200, 'easeOutQuad');
+	});
+	// --- END of defining keyboard shortcuts to elements
 
 // </script>
 {% endblock %}

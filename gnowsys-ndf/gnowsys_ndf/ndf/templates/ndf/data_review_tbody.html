@@ -74,10 +74,10 @@
 			Edit
 		</div>
 		<div class="row" style="display:none;" data-id="save-cancel-div-{{resource.pk}}">
-			<span class="small-push-1 small-4 columns button success tiny" onclick="saveResource('{{resource.pk}}')" data-id="save-btn-{{resource.pk}}">
+			<span class="small-push-1 small-4 columns button success tiny" onclick="saveResource('{{resource.pk}}')" data-id="save-btn-{{resource.pk}}" data-action="save">
 				Save
 			</span>
-			<span class="small-pull-1 small-4 columns button alert tiny" data-id="cancel-btn-{{resource.pk}}" onclick="CancelEditResRow('{{resource.pk}}')">
+			<span class="small-pull-1 small-4 columns button alert tiny" data-id="cancel-btn-{{resource.pk}}" onclick="CancelEditResRow('{{resource.pk}}')" data-action="cancel">
 				Cancel
 			</span>
 		</div>
