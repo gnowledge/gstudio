@@ -11,7 +11,18 @@
 	<script src='/static/ndf/bower_components/fullcalendar/dist/fullcalendar.min.js'></script> <!-- checked -->
 
 	<style>
-		
+	
+		  .MaxHght
+        {
+        height:16px;
+        }
+        .viewMore
+        {
+        float:right;
+        color: rgb(219, 104, 28);
+        cursor:pointer;
+        }
+        
 			#view-scheduler-calendar table {
 				border: none;
 				margin-bottom: 0px;
@@ -49,11 +60,13 @@
 
 {% block script %}
 	<script>
+	
+
 
 		$('#view-scheduler-calendar').on('toggled', function (event, tab) {
-
-			$('#calendar').fullCalendar({
-
+     
+    $('#calendar').fullCalendar({
+        default: true,
 				header: {
 					left: 'prev,next today',
 					center: 'title',
@@ -62,29 +75,98 @@
 
 				// first day of week e.g: Monday
 				firstDay:1,
-
-				editable: false,
-
-				eventBackgroundColor:'#2980b9',
-
-				events: [
+        
+        editable: false,
+			  eventBackgroundColor:'#23000',
 				
-				{% for each in events_arr %}
+    
+        eventClick: function(calevent){
 
-					{
-						id: '{{each.id}}',
-						title: '{{each.title}}',
-						start: '{{each.start|date:"c"}}',
-						end: '{{each.end|date:"c"}}'
-						{% if 'week' in each.start|timesince:each.end or 'weeks' in each.start|timesince:each.end or 'days' in each.start|timesince:each.end %}
-							,allDay: true
-						{% endif %}
+		    if (calevent.title == "+3"){
+             $('#calendar')
+                .fullCalendar('changeView', 'agendaDay'/* or 'basicDay' */)
+                var moment = $('#calendar').fullCalendar('getDate');
+               
+                $('#calendar').fullCalendar('gotoDate',
+                   (calevent.start).format());
+        
+             }	  
+				 			},
+				 			
+				viewRender: function(view) {
+         var date=$('#calendar').fullCalendar('getDate')
+         var groupid='{{groupid}}'   
+            if (view.name == 'month'){
 
-					}{% if not forloop.last %},{% endif %}
+             $.ajax({
+             data: {
+              view:'month',
+              start:date.format()
+              
+              },
 
-				{% endfor %}
-				
-				]
+             url:"{% url 'get_data_for_event_task' 'groupid' %}".replace('groupid',groupid),
+             type:"GET",
+             success:function(data){
+             sData = jQuery.parseJSON(data);
+             $('#calendar').fullCalendar( 'removeEvents');
+             for(i=0;i<sData.length;i++)
+             {
+             //alert(moment(sData[i].start).format())
+             var source = { events: [
+                            {   id:sData[i].id,
+                                title: sData[i].title,
+                                start: sData[i].start,
+                                url: sData[i].url
+                            }
+                ]};   
+                
+             $('#calendar').fullCalendar( 'addEventSource', source );
+            }
+            }
+          
+        
+        });
+            }
+            else{
+            $.ajax({
+             
+             url:"{% url 'get_data_for_event_task' 'groupid' %}".replace('groupid',groupid),
+             data: {
+              view:'day',
+              start:date.format()
+              
+              },
+             type:"GET",
+             success:function(data){
+             sData = jQuery.parseJSON(data);
+
+             $('#calendar').fullCalendar('removeEvents');
+             for(i=0;i<sData.length;i++)
+             {
+             var source = { events: [
+                            {   id:sData[i].id,
+                                title: sData[i].title,
+                                start: sData[i].start,
+                                url: sData[i].url
+                            }
+                ]};   
+                
+             $('#calendar').fullCalendar( 'addEventSource', source );
+            }
+            }
+          
+        
+        });
+            
+            }
+       
+    }
+	 			
+				 			
+				 			
+				 			
+				 			
 			});
 		});
 		

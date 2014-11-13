@@ -2,7 +2,7 @@
 {% load pagination_tags %}
 {% load ndf_tags %}
 {% load i18n %}
-{% block title %}  {{title}}  
+{% block title %} {% blocktrans %} {{title}}  {% endblocktrans %}
 {% endblock %}
 
 {% block style %}
@@ -97,7 +97,7 @@ if(txt_input <= 0)
       {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-      <a id ="btn_create" class="button expand"  href="{% url 'create_new' groupid %}">
+      <a id ="btn_create" class="button expand" href="{% url 'new_batch' groupid %}">
         Create {{title}}
       </a>
       {% endif %}
@@ -111,7 +111,7 @@ if(txt_input <= 0)
 {% get_group_name groupid as group_name_tag %}
 
 <header class="row">
-  <dl class="tabs" data-tab data-options="deep_linking:true">
+  <dl class="tabs" data-tab>
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Batches {% if batch_coll.count %}({{ batch_coll.count }}){% endif %}</a></dd>
   </dl>
 </header>
@@ -149,6 +149,10 @@ if(txt_input <= 0)
 </li>  
 {% endfor %}
 </ul>
+
+
+
+
 
 {% paginate %}
 {% endblock %}

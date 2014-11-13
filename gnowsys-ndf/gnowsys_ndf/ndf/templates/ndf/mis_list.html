@@ -24,6 +24,32 @@
       border-left: 4px solid #808080;
       font-weight: bold;
     }
+
+  /* css-properties for table */
+    .width-5p {
+      width: 5%;
+    }
+
+    .width-8p {
+      width: 8%;
+    }
+
+    .width-9p {
+      width: 9%;
+    }
+
+    .width-31p {
+      width: 31%;
+    }
+
+    .margin-0r {
+      margin: 0 !important;
+    }
+
+    .counter {
+      font-weight: bold;
+      text-align: right;
+    }
 {% endblock%}
 
 {% block meta_content %}
@@ -49,20 +75,12 @@
     
       <div class="row">
         {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
-          {% if app_name == "MIS" %}
           <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-          {% else %}
-          <a class="small-8 columns" href="{% url 'mis-po:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-          {% endif %}
             {{each.name}} ({{count}})
           </a>
 
           {% if gstaff_access %}
-          {% if app_name == "MIS" %}
           <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-          {% else %}
-          <a class="small-4 columns" href="{% url 'mis-po:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-          {% endif %}
             +&nbsp;Add
           </a>
           {% endif %}
@@ -79,93 +97,73 @@
 
 {% block body_content %} 
   {% check_is_gstaff groupid request.user as gstaff_access %}  
-  {# template for showing apt_set_instance list #}
 
-  {% if app_set_template %}
-    
-    {% if nodes %}
-      {% autopaginate nodes 25 %}
-    
-      <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
-        
-       {% blocktrans %} <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> {% endblocktrans %} 
-        
-        <input class="button confirmDeleteObjects" type="button" value="Confirm">
-        <input class="button cancelDeleteObjects" type="button" value="Cancel">
-        <div id="deletion_results"></div>
-        <a class="close-reveal-modal">&#215;</a>
+  {% if nodes %}
+    {% autopaginate nodes 25 %}
+  
+    <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+     {% blocktrans %} <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> {% endblocktrans %} 
+      <input class="button confirmDeleteObjects" type="button" value="Confirm">
+      <input class="button cancelDeleteObjects" type="button" value="Cancel">
+      <div id="deletion_results"></div>
+      <a class="close-reveal-modal">&#215;</a>
+    </div>
 
-      </div>
-
-      {% if gstaff_access %}
-        <input class="button deleteObjects" type="button" value="Delete">
-      {% endif %}
-      
-      <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
-
+    <div class="row" style="margin-top: 1rem;">
+      <form method="POST">
         {% csrf_token %}
-        <input name="search" type="textbox" value="" style="width:300px;">
-        <input type="hidden" name="class" value="{{class_name}}">
-        <input type="submit" value="search" style="width:100px;">
-
+        <div class="small-5 small-push-7 columns">
+          <div class="row collapse">
+            <div class="small-10 columns">
+              <input type="text" name="search" value="" placeholder="By name...">
+            </div>
+            <div class="small-2 columns end">
+              <input type="submit" class="button postfix" value="Search">
+              <input type="hidden" name="class" value="{{class_name}}">
+            </div>
+          </div>
+        </div>
       </form>
-    {% endif %}
-
-    <table >
-      <thead>
-        <tr>
-    
-          {% if nodes %}
-    
-            <th width="20"> <input class="checkedAll" type="checkbox"></th>
-            <th width="150">{% trans "Title" %}</th>
-            <th width="150">{% trans "Created by" %}</th>
-            <th width="150">{% trans "Creation date" %}</th>
-
-            {% if gstaff_access %}
-            <th width="150">{% trans "Edit" %}</th>
-            {% endif %}
-      
-          {% endif %}
-    
-        </tr>
-      </thead>
-      
-      <tbody>
-        {% for each in nodes %}
-          <tr>
-        
-            <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-            {% if app_name == "MIS" %}
-            <td  class="name" style="font-size:11px;"><a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each.id %}">{{each.name}}</a></td>
-            {% else %}
-            <td  class="name" style="font-size:11px;"><a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.id %}">{{each.name}}</a></td>
-            {% endif %}
-
-            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
-            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
-
-            {% if gstaff_access %}
-            {% if app_name == "MIS" %}
-            <td  class="name" style="font-size:11px;"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each.id %}" class="button medium">Edit</a></td>
-            {% else %}
-            <td  class="name" style="font-size:11px;"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.id %}" class="button medium">Edit</a></td>
-            {% endif %}
-            {% endif %}
-        
-          </tr>
-          
-          {% empty %}
-
-          {% blocktrans %}<h3>No data to display</h3> {% endblocktrans %}
-
-        {% endfor %}
-
-      </tbody>
-    </table>
-
-    {% paginate %}
+    </div>
   {% endif %}
+
+  <table>
+    <thead>
+      {% if nodes %}
+        <th class="width-5p counter">{% trans "S. #" %}</th>
+        <th class="width-31p">{% trans "Name" %}</th>
+        <th class="width-8p">{% trans "Gender" %}</th>
+        <th class="width-9p">{% trans "Birth Date" %}</th>
+        <th class="width-31p">{% trans "Email ID" %}</th>
+        {% if gstaff_access %}
+        <th class="width-8p">{% trans "Edit" %}</th>
+        <th class="width-8p text-center"><input class="margin-0r checkedAll" type="checkbox"><input class="button tiny margin-0r deleteObjects" type="button" value="Delete"></th>
+        {% endif %}
+      {% endif %}
+    </thead>
+    
+    <tbody>
+      {% for each in nodes %}
+        <tr>
+          <td class="counter">{{forloop.counter}}.</td>
+          <td>{{each.name|title}}</a></td>
+          <td>{{each.gender}}</td>
+          <td>{{each.dob|default:"--"}}</td>
+          <td>{{each.email_id}}</td>
+          {% if gstaff_access %}
+          <td class="name"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.p_id %}" target="_blank" class="button small expand margin-0r">Edit</a></td>
+          <td id="{{each.pk}}" class="text-center objectsCheckbox"> <input type="checkbox"> </td>
+          {% endif %}
+        </tr>
+        
+      {% empty %}
+        {% blocktrans %}<h3>No data to display</h3> {% endblocktrans %}
+
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% paginate %}
 {% endblock %}
 
 {% block script %}
