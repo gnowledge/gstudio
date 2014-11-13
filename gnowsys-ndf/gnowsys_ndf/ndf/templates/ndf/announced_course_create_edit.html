@@ -522,7 +522,7 @@
   $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
 
   // Change placeholders for start-time & end-time
-    // From MM/DD/YYYY HH:MM to MM/YYYY
+    // From DD/MM/YYYY HH:MM to MM/YYYY
     $(".date_month_day_year").each(function(i) {
       // Below code is required because in validators "d/m/Y H:i" is set
       // In order to override that, below code is overwritten
@@ -540,7 +540,7 @@
     });
 
     $(".dmy").each(function(i) {
-      $(this).attr("placeholder", "MM/DD/YYYY");
+      $(this).attr("placeholder", "DD/MM/YYYY");
       if ($(this).attr("id") == "start_enroll") {
         var st = "{{node.start_enroll|date:'d/m/Y'}}"
         $(this).val(st)
