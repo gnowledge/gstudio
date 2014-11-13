@@ -21,6 +21,17 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Updates the value of object_cardinality to 100. So that teaches will behave as 1:M (one-to-many) relation.
+    teaches = collection.Node.one({'_type': "RelationType", 'name': "teaches"})
+    res = collection.update({'_id': teaches._id, 'object_cardinality': {'$ne': 100}}, 
+            {'$set': {'object_cardinality': 100}}, 
+            upsert=False, multi=False
+        )
+    if res["updatedExisting"]:
+        print "\n 'teaches' RelationType updated with object_cardinality: 100. Changed document: ", res['n']
+    else:
+        print "\n 'teaches' RelationType: no need to update."
+
     # Adds "relation_set" field (with default value as []) to all documents belonging to GSystems.
     res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'relation_set': {'$exists': False}}, 
                             {'$set': {'relation_set': []}}, 
