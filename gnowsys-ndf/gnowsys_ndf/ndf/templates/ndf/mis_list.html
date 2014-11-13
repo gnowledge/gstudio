@@ -112,9 +112,9 @@
     {% autopaginate nodes 25 %}
   
     <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
-     {% blocktrans %} <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> {% endblocktrans %} 
-      <input class="button confirmDeleteObjects" type="button" value="Confirm">
-      <input class="button cancelDeleteObjects" type="button" value="Cancel">
+     {% blocktrans %} <h3>Are you sure you want to delete? All of the following related data also will be deleted:</h3> {% endblocktrans %} 
+      <input class="button tiny confirmDeleteObjects" type="button" value="Confirm">
+      <input class="button tiny cancelDeleteObjects" type="button" value="Cancel">
       <div id="deletion_results"></div>
       <a class="close-reveal-modal">&#215;</a>
     </div>
