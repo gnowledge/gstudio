@@ -1554,7 +1554,7 @@ def get_data_for_batch_drawer(request, group_id):
     data_list = []
     st = collection.Node.one({'_type':'GSystemType','name':'Student'})
     node_id = request.GET.get('_id','')
-    batch_coll = collection.GSystem.find({'member_of': {'$all': [st._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    batch_coll = collection.GSystem.find({'member_of':st._id, 'group_set': {'$all': [ObjectId(group_id)]}})
     if node_id:
         rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
         relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'right_subject':ObjectId(node_id)})
@@ -1953,6 +1953,7 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
 
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+    
 def view_articles(request, group_id):
   if request.is_ajax():
     # extracting all the bibtex entries from database
@@ -2903,8 +2904,7 @@ def get_courses(request, group_id):
   A dictionary consisting of following key-value pairs:-
   success - Boolean giving the state of ajax call
   message - Basestring giving the error/information message
-  unset_nc - dictionary consisting of announced-course(s) [if match found] and/or 
-             NUSSD-Courses [if match not found]
+  unset_nc - dictionary consisting of NUSSD-Courses 
   """
   response_dict = {'success': False, 'message': ""}
 
@@ -3060,7 +3060,7 @@ def get_announced_courses_with_ctype(request, group_id):
 
   Returns:
   A dictionary consisting of following key-value pairs:-
-  acourse_ctype_list - dictionary consisting of announced-course(s) [if match found] and/or 
+  acourse_ctype_list - list consisting of announced-course(s) [if match found] and/or 
              NUSSD-Courses [if match not found]
   """
 
@@ -3069,8 +3069,8 @@ def get_announced_courses_with_ctype(request, group_id):
       # Fetch field(s) from GET object
       nussd_course_type = request.GET.get("nussd_course_type", "")
       acourse_ctype_list = []
+      ac_of_colg = []
 
-      # Fetch "Announced Course" GSystemType
       nussd_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "NUSSD Course"})
       if not nussd_course_gt:
         # If not found, throw exception
@@ -3083,17 +3083,36 @@ def get_announced_courses_with_ctype(request, group_id):
         # If not found, throw exception
         error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first"
         raise Exception(error_message)
-      
-      # Type-cast fetched field(s) into their appropriate type
-      nussd_course_type = unicode(nussd_course_type)
+      curr_date = datetime.datetime.now()
 
-      groups_to_search_from = [ObjectId(group_id)]
-                                    
-      ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
-                                      'group_set': {'$in': groups_to_search_from},
-                                      'attribute_set.nussd_course_type': nussd_course_type
-                                    },{'name':1})
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
+      if(ObjectId(group_id)==mis_admin._id):
+        ac_cur = collection.Node.find({'member_of': announced_course_gt._id,
+                                         'group_set':ObjectId(group_id),
+                                        'attribute_set.nussd_course_type': nussd_course_type
+                                        },{'name':1})
+      else:
+        colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
+        req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
+        #Get college id of corresponding college_group_id
+        
+        acourse_for_college_RT = collection.Node.one({'_type': "RelationType", 'name': "acourse_for_college"})
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':acourse_for_college_RT._id,'right_subject':req_colg_id._id})
 
+        for each in relation_coll:
+          ac_of_colg.append(ObjectId(each.subject))
+          # Courses announced for this college id
+
+        
+        # Type-cast fetched field(s) into their appropriate type
+        nussd_course_type = unicode(nussd_course_type)
+
+        groups_to_search_from = [ObjectId(group_id)]
+                                      
+        ac_cur = collection.Node.find({'member_of': announced_course_gt._id,'_id':{'$in':ac_of_colg},
+                                      'attribute_set.nussd_course_type': nussd_course_type,
+                                      'attribute_set.start_enroll':{'$lte': curr_date},
+                                      'attribute_set.end_enroll':{'$gte': curr_date}},{'name':1})
       if ac_cur.count():
         for d in ac_cur:
           acourse_ctype_list.append(d.name)
@@ -3266,6 +3285,7 @@ def get_anncourses_allstudents(request, group_id):
     if request.is_ajax() and request.method == "GET":
       registration_year = request.GET.get("registration_year", "")
       all_students = request.GET.get("all_students", "")
+      print "registration_year all_students",registration_year,all_students
       college_groups = []   # List of ObjectIds
 
       # Check whether any field has missing value or not
@@ -3498,6 +3518,122 @@ def get_course_details_for_trainer(request, group_id):
 
 # ====================================================================================================
 
+def get_enrolled_students_count(request,group_id):
+  response_dict = {'success': False, 'message': ""}
+  try:
+    if request.is_ajax() and request.method == "GET":
+      acourse_name = request.GET.get("acourse_name", "")
+      announced_course_GST = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
+      acourse_node = collection.Node.one({'member_of':announced_course_GST._id,u'name':unicode(acourse_name)},{'_id':1})
+      acourse_name = ObjectId(acourse_node._id)
+      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id),'relation_set.selected_course': acourse_name})
+      if (res.count()>0):
+        response_dict["stud_count"] = res.count()
+      else:
+        raise e
+      response_dict["acourse_name"] = str(acourse_name)
+      response_dict["success"] = True
+      response_dict["message"] = "Students enrolled to Course"
+      print response_dict
+    return HttpResponse(json.dumps(response_dict))
+  except Exception as e:
+    response_dict["stud_count"]="No students have been enrolled to this Course.\n"
+    return HttpResponse(json.dumps(response_dict))
+
+def get_students_for_batches(request, group_id):
+  """
+  This view returns ...
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  """
+  response_dict = {'success': False, 'message': ""}
+  try:
+    if request.is_ajax() and request.method == "GET":
+      btn_id = request.GET.get('btn_id',"")
+      batch_id = request.GET.get('node_id',"")
+      ac_id = request.GET.get('ac_id',"")
+      print "coming here"
+
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
+      if not mis_admin:
+        error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      has_group_RT = collection.Node.one({'_type': "RelationType", 'name': "has_group"}, {'_id': 1})
+      if not has_group_RT:
+        error_message = "'has_group' (RelationType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      # try:
+      #   mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'author_set':1})
+      # except:
+      #   mis_admin = collection.Node.find({'_type': "Group", 'name': "MIS_admin"}, {'author_set':1})
+      all_batches_in_grp = []
+      course_of_batch_dict = {}
+      batch_member_list=[]
+      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      if batch_id:
+        batch_node = collection.Node.one({'_id':ObjectId(batch_id)})
+        print batch_id, batch_node._id
+        batch_node.get_neighbourhood(batch_node.member_of)
+        print batch_node.keys()
+        res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id)},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort("name", 1) 
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, batch_node, None,"has_batch_member", left_drawer_content=res)
+
+
+      else:
+        rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
+        rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
+        rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
+
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
+        for each in relation_coll:
+          batch_in_grp = collection.Node.one({'_id':ObjectId(each.right_subject)})
+          #if (batch_in_grp._id==ObjectId(batch_id)):
+          all_batches_in_grp.append(batch_in_grp)
+
+        for each_batch in all_batches_in_grp:
+          relation_coll_b = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_course._id,'subject':ObjectId(each_batch._id)})
+          for each_course in relation_coll_b:
+            course_of_batch = collection.Node.one({'_id':ObjectId(each_course.right_subject)})
+            if (course_of_batch._id==ObjectId(ac_id)):
+              batch_mem_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':ObjectId(each_batch._id)},{'right_subject':1})
+
+        for each in batch_mem_coll:
+          batch_member_list.append(each.right_subject)
+        print "batch_mem_coll",batch_member_list
+        res=[{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}]
+        res = collection.Node.find({'member_of': student._id, 
+                                      'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list}
+                                    },
+                                    {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+                                  ).sort("name", 1) 
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
+      drawer_template_context["widget_for"] = "new_create_batch"
+      drawer_widget = render_to_string('ndf/drawer_widget.html', 
+                                        drawer_template_context,
+                                        context_instance = RequestContext(request)
+                                      )
+
+      response_dict["drawer_widget"] = drawer_widget
+      response_dict["success"] = True
+      response_dict["message"] = "NOTE"
+      return HttpResponse(json.dumps(response_dict))
+    else:
+      error_message = "Batch Drawer: Either not an ajax call or not a GET request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict))
+
+  except Exception as e:
+    error_message = "Batch Drawer: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
+
+# ====================================================================================================
 def edit_task_title(request, group_id):
     '''
     This function will edit task's title 
