@@ -122,8 +122,7 @@ def save_batch(batch_name, user_list, group_id, request, ac_id, node_id):
         all_batches_in_grp.append(each.right_subject)
         #to get all batches of the group
     
-    for each in user_list:
-        create_grelation(new_batch._id,rt_has_batch_member,ObjectId(each))
+    create_grelation(new_batch._id,rt_has_batch_member,user_list)
 
     create_grelation(new_batch._id,rt_has_course,ObjectId(ac_id))
     all_batches_in_grp.append(new_batch._id)
