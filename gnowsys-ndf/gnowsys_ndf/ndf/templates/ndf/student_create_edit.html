@@ -696,6 +696,7 @@
       $("#registration_date.date_month_day_year").datepicker({
         changeMonth: true,
         changeYear: true,
+        dateFormat: "dd/mm/yy",
         yearRange: "" + lowerYearLimit + ":" + currentYear,
         minDate: new Date(lowerYearLimit, 1 - 1, 1),
         maxDate: '0',
