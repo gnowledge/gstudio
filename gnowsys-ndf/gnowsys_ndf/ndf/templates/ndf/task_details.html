@@ -8,6 +8,14 @@
 {% block head %}
 {% endblock %}
 
+{% block style %}
+  {{block.super}}
+
+  .margin-top-1 {
+    margin-top: 1em !important;
+  }
+{% endblock %}
+
 {% block help_content %}
 {% endblock %}
 
@@ -35,192 +43,232 @@
 {% endblock %}
   
 {% block body_content %}
-<div class="row">
-
+<div class="row margin-top-1">
   <section class="medium-9 columns">
-<h2>
-<span class='node'><font id="nodeTitleId">{{node.name}}</font> 
-{% get_user_object node.created_by as user_obj %}
-{% if user_obj.username = request.user.username or request.user.is_superuser %}
-<a href="#" class="button tiny" style="float:right" data-reveal-id="titleModal">Edit</a>
-{% endif %}
-</span> 
+    <h2>
+      <span class='node'><font id="nodeTitleId">{{node.name}}</font> 
+        {% get_user_object node.created_by as user_obj %}
+      
+        {% if user_obj.username == request.user.username or request.user.is_superuser %}
+        <a href="#" class="button tiny" style="float:right" data-reveal-id="titleModal">Edit</a>
+        {% endif %}
+      </span> 
+    </h2>
 
-</h2>
-    <div style="display:table; border:1px; border-spacing:6px; " class="medium-12 columns">
-	<div class="row">
-	  <div class="medium-3 columns">
-	    <label><b>{% trans "Parent task:" %}</b></label>
-	  </div>
-	  <div class="medium-3 columns">
-	    <label>{% if parent %}{{parent}}{% else %} -- {% endif %}</label>
-
-	  </div>
-	<!</div>
-	<!<div class="row">
-	  <div class="medium-3 columns">
-	    <label><b>Status:</b></label>
-	  </div>
-	  <div class="medium-3 columns">
-	    <label>{% if Status %}{{Status}}{% else %} -- {% endif %} </label>
-	  </div>
-	</div>
-	<div class="row">
-	  <div class="medium-3 columns">
-	    <label><b>{% trans "Start date:" %}</b></label>
-	  </div>
-	  <div class="medium-3 columns">
-	    <label>{% if start_time %}{{start_time}}{% else %} -- {% endif %}</label>
-	  </div>
-	<!</div>	
-	<!<div class="row">
-	  <div class="medium-3 columns">
-	    <label><b>{% trans "Priority:" %}</b></label>
-	  </div>
-	  <div class="medium-3 columns">
-	    <label>{% if Priority %}{{Priority}}{% else %} -- {% endif %}</label>
-	  </div>
-	</div>
-	<div class="row">
-	  <div class="medium-3 columns">
-	    <label><b>{% trans "Due date:" %}</b></label>
-	  </div>
-	  <div class="medium-3 columns">
-	    <label>{% if end_time %}{{end_time}}{% else %} -- {% endif %}</label>
-	  </div>
-	<!</div>	
-	<!<div class="row">
-	  <div class="medium-3 columns">
-	    <label><b>{% trans "Assignee:" %}</b></label>
-	  </div>
-	  <div class="medium-3 columns">
-	    <label>{% if Assignee %}{{Assignee}}{% else %} -- {% endif %}</label>
-	  </div>
-	</div>
-	<div class="row">
-	  <div class="medium-3 columns">
-	    <label><b>{% trans "Estimated time:" %}</b></label>
-	  </div>
-	  <div class="medium-3 columns">
-	    <label>{% if Estimated_time %}{{Estimated_time}}{% else %} -- {% endif %}</label>
-	  </div>
-	  <div class="medium-3 columns">
-	  <label><b>{% trans "Selected File"  %}</b> </label>
-	  </div >
-	  <div class="medium-3 columns">
-	{% if  Upload_Task %}
-	{% get_file_node request Upload_Task as new %}
-	{% for node in new %}
-	{% get_grid_fs_object node as grid_fs_obj %}
-	
-	<b><a href="{% url 'read_file' group_id node.pk grid_fs_obj.filename %}">{{grid_fs_obj.filename}}</a></b>
-	
-	{% endfor %}
-	{% else %}
-	--
-	{% endif %}
-	  
-	  </div>		
-	</div>
-	{% if subtask %}
-	<div class="row">
-	  <div class="medium-3 columns">
-	      <label><b>{% trans "Sub Task:" %}</b></label>
-	  </div>
-	  <div class="medium-3 columns">
-		{% for each_subtask in subtask %}
-	    <a class="" href="{% url 'task_details' group_name each_subtask.id %}">{{each_subtask.name}}</a>
-		{% if not forloop.last %},{% endif %}
-		{% endfor %}
-	  </div>
-	  <div class="medium-6 columns">
-	  </div>
-	</div>
-	{% endif %}
-	<hr>
-	<div class="row">
-	  <div class="medium-12 columns">
-	    <label><b>{% trans "Description:" %}</b>
-		{% if user_obj.username = request.user.username or request.user.is_superuser %}
-		<a href="#" class="button tiny" style="float:right" data-reveal-id="contentModal">Edit</a>
-		{% endif %}
-		</label>
-	    <div id="contentlist" class="content" style="padding-left:20px;">
-		<font id="nodeContentId">
-      	{% with node.html_content|safe as description %}
-      	{% if description != "None" %}
-      	{{ description }}
-	{% else %} -- {% endif %}
-      	{% endwith %}
-		</font>
-	    </div>
-	  </div>
-	</div>	
-       <hr>
-	<div class="row">
-	  <div class="medium-12 columns">
-	    <label><b>{% trans "History:" %}</b></label>
-	  </div>
-	</div>
-	<div class="history_task" style="padding-left:20px;">
-{% for each_history in history %}
-	<div class="panel">
-		{% if each_history.content %}
-			      	{% with each_history.content|safe as history_description %}
- 			      	{{ history_description }}
-  				{% endwith %}
-		{% endif %}
-		{% for each_altnames in each_history.altnames %}		
-			<p style="color:#999999">{{each_altnames}}</p>
-		{% endfor %}
-		<div align="right">
-			<label>- Updated by <em>{{ each_history.created_by }}  {{ each_history.created_at|timesince }}</em> ago</label>
-		</div>
-	</div>
-{% empty %}
---
-{% endfor %}	
+    <!-- Parent Task & Status -->
+    <div class="row margin-top-1">
+      <div class="medium-6 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Parent task:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if parent %}{{parent}}{% else %} -- {% endif %}</label>
+          </div>
         </div>
+      </div>
+
+      <div class="medium-6 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Status:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if Status %}{{Status}}{% else %} -- {% endif %} </label>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Start Date & Priority -->
+    <div class="row margin-top-1">
+      <div class="medium-6 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Start Date:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if start_time %}{{start_time|date:'d/m/Y'}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="medium-6 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Priority:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if Priority %}{{Priority}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Due Date & Assignee -->
+    <div class="row margin-top-1">
+      <div class="medium-6 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Due Date:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if end_time %}{{end_time|date:'d/m/Y'}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="medium-6 columns">
+        <div class="row">
+          <div class="medium-4 columns">
+            <label class="align right"><b>{% trans "Assignee:" %}</b></label>
+          </div>
+          <div class="medium-8 columns">
+            <label>{% if Assignee %}{{Assignee|join:","}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  	{% if subtask %}
+      <hr>
+
+    	<div class="row">
+    	  <div class="medium-3 columns">
+          <label><b>{% trans "Sub Task:" %}</b></label>
+    	  </div>
+
+    	  <div class="medium-3 columns">
+      		{% for each_subtask in subtask %}
+    	    <a class="" href="{% url 'task_details' group_name each_subtask.id %}">{{each_subtask.name}}</a>
+      		{% if not forloop.last %},{% endif %}
+      		{% endfor %}
+    	  </div>
+    	
+        <div class="medium-6 columns">
+    	  </div>
+    	</div>
+  	{% endif %}
+
+  	<hr>
+
+    <!-- Description -->
+    <div class="row">
+      <div class="medium-12 columns">
+        <label>
+          <b>{% trans "Description:" %}</b>
+          
+          {% if user_obj.username == request.user.username or request.user.is_superuser %}
+          <a href="#" class="button tiny" style="float:right" data-reveal-id="contentModal">Edit</a>
+          {% endif %}
+        </label>
+      
+        <div id="contentlist" class="content" style="padding-left:20px;">
+          <font id="nodeContentId">
+          {% with node.html_content|safe as description %}
+          {% if description != "None" %}
+            {{ description }}
+          {% else %}
+            -- 
+          {% endif %}
+          {% endwith %}
+          </font>
+        </div>
+      </div>
+    </div>
+    
+    <hr>
+
+    <!-- Attachments -->
+    <div class="row">
+      <div class="medium-12 columns">
+        <label style=""><b>{% trans "Attachment(s):" %}</b></label>
+        {% if Upload_Task %}
+          {% get_file_node request Upload_Task as new %}
+          {% for node in new %}
+            {% get_grid_fs_object node as grid_fs_obj %}
+            <b><a href="{% url 'read_file' group_id node.pk grid_fs_obj.filename %}">{{grid_fs_obj.filename}}</a></b>
+            {% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          --
+        {% endif %}
+      </div>
+    </div>
+
+    <hr>
+	
+    <div class="row">
+      <div class="medium-12 columns">
+        <label><b>{% trans "History:" %}</b></label>
+
+        <div class="history_task" style="padding-left:20px;">
+          {% for each_history in history %}
+            <div class="panel">
+              {% if each_history.content %}
+              {% with each_history.content|safe as history_description %}
+                {{ history_description }}
+              {% endwith %}
+              {% endif %}
+              {% for each_altnames in each_history.altnames %}		
+                <p style="color:#999999">{{each_altnames}}</p>
+              {% endfor %}
+              <div align="right">
+                <label>- Updated by <em>{{ each_history.created_by }}  {{ each_history.created_at|timesince }}</em> ago</label>
+              </div>
+            </div>
+          {% empty %}
+            --
+          {% endfor %}	
+        </div>
+      </div>
+    </div>
+
   </section>
+
   <section class="medium-3 columns">
     <div class="panel">
-     <h3 class="subheader"></h3>
-       Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
-       <small>
-         <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
-          {% for seq_no, version_no in node.version_dict.items reversed %}
-          <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
-          {% endfor %}
+      <h3 class="subheader"></h3>
+  
+      Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
+      <small>
+        <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+        {% for seq_no, version_no in node.version_dict.items reversed %}
+        <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+        {% endfor %}
         </div>
       </small>
-	{% if collection != 'True' %}
-     <a href="{% url 'task_edit' group_name node %}" class="small button split edit"><i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span></a> 
-	{% endif %}
+    
+      {% if collection != 'True' %}
+      <a href="{% url 'task_edit' group_name node %}" class="small button split edit">
+        <i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span>
+      </a> 
+      {% endif %}
     </div>
-
   </section>
 
-
-<div id="titleModal" class="reveal-modal" data-reveal>
-  <label><b>{% trans "Editing Name" %}</b></label><br/>
-  <div class="medium-6 columns">
-     <input id="name_id" name="name" type="text" value="{{node.name}}"  class="medium-3 columns" placeholder="Enter name..." required>
-     <a href="#" class="button tiny" id="title_save">{% trans "Save" %}</a>
+  <div id="titleModal" class="reveal-modal" data-reveal>
+    <label><b>{% trans "Editing Name" %}</b></label><br/>
+    <div class="medium-6 columns">
+       <input id="name_id" name="name" type="text" value="{{node.name}}"  class="medium-3 columns" placeholder="Enter name..." required>
+       <a href="#" class="button tiny" id="title_save">{% trans "Save" %}</a>
+    </div>
+    <a class="close-reveal-modal">{% trans "&#215;" %}</a>
   </div>
-  <a class="close-reveal-modal">{% trans "&#215;" %}</a>
-</div>
-<div id="contentModal" class="reveal-modal" data-reveal>
-	<div class="medium-12 columns">
-	    <label><b>{% trans "Description" %}</b></label>
-	    <div id="contentlist" class="content">
-		<div class="">
-		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
-		</div>
-	    </div>
-	  </div>
-     <a href="#" class="button tiny" id="content_save">{% trans "Save" %}</a>
-  <a class="close-reveal-modal">{% trans "&#215;" %}</a>
+
+  <div id="contentModal" class="reveal-modal" data-reveal>
+    <div class="medium-12 columns">
+      <label><b>{% trans "Description" %}</b></label>
+
+      <div id="contentlist" class="content">
+        {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
+      </div>
+
+      <a href="#" class="button tiny" id="content_save">{% trans "Save" %}</a>
+    </div>
+
+    <a class="close-reveal-modal">{% trans "&#215;" %}</a>
+  </div>
 </div>
 {% endblock %}
 
