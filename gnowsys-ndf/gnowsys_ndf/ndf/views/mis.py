@@ -64,7 +64,8 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     
     app_set = ""
     nodes = ""
-    nodes_dict = ""
+    # nodes_dict = ""
+    nodes_keys = []
     app_menu = ""
     app_set_template = ""
     app_set_instance_template = ""
@@ -136,13 +137,14 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}))
+        nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}, {'name': 1}).sort('name', 1))
       else :
-        nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+        nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}, {'name': 1}).sort('name', 1))
 
-      nodes_dict = []
-      for each in nodes:
-        nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
+      nodes_keys = [('name', "Name")]
+      # nodes_dict = []
+      # for each in nodes:
+      #   nodes_dict.append({"p_id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
                          
     else :
       app_menu = "yes"
@@ -277,7 +279,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     variable = RequestContext(request, {
                                         'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id,
                                         "app_collection_set":app_collection_set, "app_set_id":app_set_id, 
-                                        "nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template,
+                                        "nodes":nodes, "nodes_keys": nodes_keys, "app_menu":app_menu, "app_set_template":app_set_template,
                                         "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name,
                                         "app_set_instance_name":app_set_instance_name, "title":title,
                                         "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 

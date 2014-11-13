@@ -1871,7 +1871,10 @@ def deletion_instances(request, group_id):
         if left_relations :
           list_rel = []
           for each in left_relations:
-            rname = collection.Node.find_one({"_id":each.right_subject}).name
+            rname = collection.Node.find_one({"_id":each.right_subject})
+            if not rname:
+              continue
+            rname = rname.name
             alt_names = each.relation_type.name
             if each.relation_type.altnames:
               if ";" in each.relation_type.altnames:
@@ -1883,7 +1886,10 @@ def deletion_instances(request, group_id):
         if right_relations :
           list_rel = []
           for each in right_relations:
-            lname = collection.Node.find_one({"_id":each.subject}).name
+            lname = collection.Node.find_one({"_id":each.subject})
+            if not lname:
+              continue
+            lname = lname.name
             alt_names = each.relation_type.name
             if each.relation_type.altnames:
               if ";" in each.relation_type.altnames:
