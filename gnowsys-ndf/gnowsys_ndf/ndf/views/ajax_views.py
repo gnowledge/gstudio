@@ -3282,10 +3282,20 @@ def edit_task_content(request, group_id):
 
 def insert_picture(request, group_id):
     if request.is_ajax():
-        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'_id': 0, 'name': 1})
+        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'name': 1})
         resources=list(resource_list)
-    return StreamingHttpResponse(json.dumps(resources))
-
+        n=[]
+        for each in resources:
+            each['_id'] =str(each['_id'])
+            file_collection = db[File.collection_name]
+            file_obj = file_collection.File.one({'_id':ObjectId(str(each['_id']))})
+            if file_obj.fs_file_ids:
+                grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
+                each['fname']=grid_fs_obj.filename
+                each['name'] = each['name']
+            n.append(each)
+        return StreamingHttpResponse(json.dumps(n))
+    
 
 
 # =============================================================================
