@@ -68,6 +68,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   person_gs = None
 
   nodes = None
+  nodes_keys = []
   node = None
   property_order_list = []
   widget_for = []
@@ -116,8 +117,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
         query = {'member_of': person_gst._id, 'group_set': ObjectId(group_id)}
 
       rec = collection.aggregate([{'$match': query},
-                            {'$project': {'_id': 0,
-                                          'p_id': '$_id',
+                            {'$project': {'_id': 1,
                                           'name': '$name',
                                           'gender': '$attribute_set.gender',
                                           'dob': '$attribute_set.dob',
@@ -197,6 +197,12 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
           
           nodes.append(new_dict)
 
+      nodes_keys = [('name', "Name"),
+        ('gender', "Gender"),
+        ('dob', 'Birth Date'),
+        ('email_id', 'Email ID')
+      ]
+
     template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
     default_template = "ndf/person_list.html"
 
@@ -212,7 +218,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
-                        'nodes': nodes, 'node': node,
+                        'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
                         'property_order_list': property_order_list, 'lstFilters': widget_for,
                         'is_link_needed': is_link_needed
                       }
@@ -347,9 +353,9 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
               elif field_instance["name"] in ["dob", "registration_date"]:
-                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y")
               else:
-                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
 
               if field_value:
                 person_gs_triple_instance = create_gattribute(person_gs._id, collection.AttributeType(field_instance), field_value)
