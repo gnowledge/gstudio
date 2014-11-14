@@ -1127,6 +1127,33 @@ def get_contents(node_id):
 
 
 @register.assignment_tag
+def get_teaches_list(node):
+	
+	teaches_list = []
+	if node:
+		relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
+        list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+        for relation in list_grelations:
+        	obj = collection.Node.one({'_id': ObjectId(relation.right_subject) })
+          	teaches_list.append(obj)
+
+	return teaches_list
+
+@register.assignment_tag
+def get_assesses_list(node):
+	
+	assesses_list = []
+	if node:
+		relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
+        list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+        for relation in list_grelations:
+        	obj = collection.Node.one({'_id': ObjectId(relation.right_subject) })
+          	assesses_list.append(obj)
+
+	return assesses_list
+
+
+@register.assignment_tag
 def get_group_type(group_id, user):
 	try:
 		col_Group = db[Node.collection_name]

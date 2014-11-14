@@ -290,10 +290,11 @@
           </div>
 
           <div class="small-4 columns">
-            {% if node.teaches %}
+            {% get_teaches_list node as teaches_list %}
+            {% if teaches_list %}
             <div class="panel">
               <h6>This resource teaches you: </h6>
-              {% for  each_node in node.teaches %}
+              {% for  each_node in teaches_list %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
@@ -307,10 +308,12 @@
           </div>
 
           <div class="small-4 columns">
-            {% if node.assesses %}
+            <!-- {#% if node.assesses %#} -->
+            {% get_assesses_list node as assesses_list %}
+            {% if assesses_list %}
             <div class="panel">
               <h6>This resource assesses these</h6>
-              {% for  each_node in node.assesses %}
+              {% for  each_node in assesses_list %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
