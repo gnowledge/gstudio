@@ -369,7 +369,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   user_last_visited_location = request.POST.get('last_visited_location')
   altnames = request.POST.get('altnames', '')
   featured = request.POST.get('featured', '')
-  status = request.POST.get('status', '')
 
   if map_geojson_data:
     map_geojson_data = map_geojson_data + ","
@@ -406,16 +405,13 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   #  For create/edit
   
-
-
   #   name
- 
   if name:
     if node.name != name:
       node.name = name
       is_changed = True
   
-  if altnames:
+  if altnames or request.POST.has_key("altnames"):
     if node.altnames != altnames:
       node.altnames = altnames
       is_changed = True
@@ -436,11 +432,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       is_changed = True
 
   #  language
-
   if language:
-    node.language = unicode(language) 
+      node.language = unicode(language) 
   else:
-    node.language = u"en"
+      node.language = u"en"
 
   #  access_policy
 
@@ -448,23 +443,26 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # Policy will be changed only by the creator of the resource
     # via access_policy(public/private) option on the template which is visible only to the creator
     if access_policy == "PUBLIC" and node.access_policy != access_policy:
-      node.access_policy = u"PUBLIC"
-      is_changed = True
+        node.access_policy = u"PUBLIC"
+        # print "\n Changed: access_policy (pu 2 pr)"
+        is_changed = True
     elif access_policy == "PRIVATE" and node.access_policy != access_policy:
-      node.access_policy = u"PRIVATE"
-      is_changed = True
+        node.access_policy = u"PRIVATE"
+        # print "\n Changed: access_policy (pr 2 pu)"
+        is_changed = True
   else:
-    node.access_policy = u"PUBLIC"
+      node.access_policy = u"PUBLIC"
 
   # For displaying nodes in home group as well as in creator group.
   user_group_obj=gcollection.Node.one({'$and':[{'_type':ObjectId(group_id)},{'name':usrname}]})
 
   if group_obj._id not in node.group_set:
-    node.group_set.append(group_obj._id)
+      node.group_set.append(group_obj._id)
   else:
-    if user_group_obj:
-      if user_group_obj._id not in node.group_set:
-        node.group_set.append(user_group_obj._id)
+      if user_group_obj:
+          if user_group_obj._id not in node.group_set:
+              node.group_set.append(user_group_obj._id)
+
   #  tags
   if tags:
     tags_list = []
@@ -627,11 +625,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     if usrid not in node.contributors:
       node.contributors.append(usrid)
-
-  if status:
-    if node.status != status:
-      node.status = status
-      is_changed = True
 
   return is_changed
 # ============= END of def get_node_common_fields() ==============
@@ -842,13 +835,24 @@ def update_mobwrite_content_org(node_system):
     textobj.save()
   return textobj
 
-def get_node_metadata(request, node, node_type):
+
+def get_node_metadata(request, node, node_type, **kwargs):
+    '''
+    Getting list of updated GSystems with kwargs arguments.
+    Pass is_changed=True as last/fourth argument while calling this/get_node_metadata method.
+    Example: 
+      updated_ga_nodes = get_node_metadata(request, node_obj, GST_FILE_OBJ, is_changed=True)
+
+    '''
     attribute_type_list = ["age_range", "audience", "timerequired",
                            "interactivitytype", "basedonurl", "educationaluse",
                            "textcomplexity", "readinglevel", "educationalsubject",
                            "educationallevel", "curricular", "educationalalignment",
                            "adaptation_of", "other_contributors", "creator", "source"
                           ]
+
+    if kwargs.has_key("is_changed"):
+        updated_ga_nodes = []
 
     if(node.has_key('_id')):
 
@@ -858,7 +862,18 @@ def get_node_metadata(request, node, node_type):
             at = collection.Node.one({"_type": "AttributeType", "name": atname})	
 
             if at and field_value:
-                create_gattribute(node._id, at, field_value)
+
+                if kwargs.has_key("is_changed"):
+                    temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
+                    if temp_res["is_changed"]:  # if value is true
+                        updated_ga_nodes.append(temp_res)
+              
+                else:
+                    create_gattribute(node._id, at, field_value)
+    
+    if kwargs.has_key("is_changed"):
+        return updated_ga_nodes
+
 
 def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
 # function to create grelations for new ones and delete old ones.
@@ -1207,11 +1222,12 @@ def parse_template_data(field_data_type, field_value, **kwargs):
     error_message = "\n TemplateDataParsingError: "+str(e)+" !!!\n"
     raise Exception(error_message)
 
+def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
 
-def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
   info_message = ""
-  
+  old_object_value = None
+
   ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
     # Code for creation
@@ -1243,6 +1259,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
                           upsert=False, multi=False
                         )
 
+      is_ga_node_changed = True
 
     except Exception as e:
       error_message = "\n GAttributeCreateError: " + str(e) + "\n"
@@ -1251,7 +1268,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
   else:
     # Code for updation
     is_ga_node_changed = False
-    old_object_value = None
+    
     try:
       if (not object_value) and type(object_value) != bool:
         old_object_value = ga_node.object_value
@@ -1326,7 +1343,15 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
       error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
       raise Exception(error_message)
 
-  return ga_node
+  # print "\n\t is_ga_node_changed: ", is_ga_node_changed
+  if kwargs.has_key("is_changed"):
+    ga_dict = {}
+    ga_dict["is_changed"] = is_ga_node_changed
+    ga_dict["node"] = ga_node
+    ga_dict["before_obj_value"] = old_object_value
+    return ga_dict
+  else:
+    return ga_node
 
 
 def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):

@@ -21,6 +21,17 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Updates the value of object_cardinality to 100. So that teaches will behave as 1:M (one-to-many) relation.
+    teaches = collection.Node.one({'_type': "RelationType", 'name': "teaches"})
+    res = collection.update({'_id': teaches._id, 'object_cardinality': {'$ne': 100}}, 
+            {'$set': {'object_cardinality': 100}}, 
+            upsert=False, multi=False
+        )
+    if res["updatedExisting"]:
+        print "\n 'teaches' RelationType updated with object_cardinality: 100. Changed document: ", res['n']
+    else:
+        print "\n 'teaches' RelationType: no need to update."
+
     # Replacing object_type of "has_course" relationship from "NUSSD Course" to "Announced Course"
     ann_course = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
     res = collection.update({'_type': "RelationType", 'name': "has_course"}, 

@@ -23,14 +23,18 @@
   {% user_access_policy groupid request.user as user_access %}
   {% if user_access == "allow" %}
   <br/>
-  <div class="create card">
-    <div class="file">
-      <br/>
-      <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-      	<span class="fi-upload">&nbsp;&nbsp;{% trans "New File" %}</span>
-      </a>
-    </div>
-  </div>
+
+	<!-- following button code is not needed. Do we ? -->
+		<div class="create card hide">
+			<div class="file">
+			  <br/>
+			  <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+			  	<span class="fi-upload">&nbsp;&nbsp;{% trans "New File" %}</span>
+			  </a>
+			</div>
+		</div>
+	<!-- above button code is not needed. Do we ? for time being "hide" class is added. -->
+
   {% endif %}
   {% endif %}
 {% endblock %}
