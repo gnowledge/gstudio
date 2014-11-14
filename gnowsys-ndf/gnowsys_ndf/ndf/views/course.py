@@ -270,13 +270,13 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     start_enroll = ""
     if request.POST.has_key("start_enroll"):
       start_enroll = request.POST.get("start_enroll", "")
-      start_enroll = datetime.datetime.strptime(start_enroll,"%m/%d/%Y")
+      start_enroll = datetime.datetime.strptime(start_enroll,"%d/%m/%Y")
       start_enroll = start_enroll.strftime("%D")
 
     end_enroll = ""
     if request.POST.has_key("end_enroll"):
       end_enroll = request.POST.get("end_enroll", "")
-      end_enroll = datetime.datetime.strptime(end_enroll,"%m/%d/%Y")
+      end_enroll = datetime.datetime.strptime(end_enroll,"%d/%m/%Y")
       end_enroll = end_enroll.strftime("%D")
       
     nussd_course_type = ""
@@ -421,7 +421,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                       field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
 
                     elif field_instance["name"] in ["start_enroll", "end_enroll"]: #Student Enrollment DUration
-                      field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
+                      field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y")
 
                     elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
                       # Needs sepcial kind of parsing
@@ -448,10 +448,10 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                       evaluation_type = request.POST.get("evaluation_type", "")
                       if evaluation_type == u"Continuous":
                         field_value = None
-                      field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                      field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
 
                     else:
-                      field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                      field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
                     course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
 
                   else:
@@ -511,7 +511,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
 
                 elif field_instance["name"] in ["start_enroll", "end_enroll"]: #Student Enrollment DUration
-                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y")
 
                 elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
                   # Needs sepcial kind of parsing
@@ -538,10 +538,10 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                   evaluation_type = request.POST.get("evaluation_type", "")
                   if evaluation_type == u"Continuous":
                     field_value = None
-                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
 
                 else:
-                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
                 course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
 
               else:
