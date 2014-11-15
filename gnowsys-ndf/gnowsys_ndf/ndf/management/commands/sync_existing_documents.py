@@ -34,11 +34,12 @@ class Command(BaseCommand):
 
     # Replacing object_type of "has_course" relationship from "NUSSD Course" to "Announced Course"
     ann_course = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
-    res = collection.update({'_type': "RelationType", 'name': "has_course"}, 
-            {'$set': {'object_type': [ann_course._id]}}, 
-            upsert=False, multi=False
-          )
-    print "\n Replaced object_type of 'has_course' relationship from 'NUSSD Course' to 'Announced Course'."
+    if ann_course:
+        res = collection.update({'_type': "RelationType", 'name': "has_course"}, 
+                {'$set': {'object_type': [ann_course._id]}}, 
+                upsert=False, multi=False
+              )
+        print "\n Replaced object_type of 'has_course' relationship from 'NUSSD Course' to 'Announced Course'."
 
     # Adds "relation_set" field (with default value as []) to all documents belonging to GSystems.
     res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'relation_set': {'$exists': False}}, 
