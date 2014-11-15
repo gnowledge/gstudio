@@ -183,31 +183,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 	            </div> 
 			</div>  
 
-			{% switch_group_conditions request.user group_id as switch_conditions %}
-				{% if node %}
-			    	{% check_group node as is_group %}
-			    {% endif %}
-
-			{% if not is_group %}
-				<div class="row">
-				<div class="small-8 columns">
-					<dl class="accordion" data-accordion>
-					  	<dd>
-					    <a id="switch_group" href="#switchgrp">{{node.name}} {% trans "Publish this resource in other group/s" %}</a>
-
-					       <div id="switchgrp" class="content">
-						        <h4>{% trans "Select Groups" %}</h4>
-							 	<div id="group_drawer">
-						        	{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-						     	</div><br/>
-						        <input type="button" id="save_switch_group" class="round button push-4" value="Save selected group">
-					      	</div>
-
-					  	</dd>
-					</dl>
-				</div>
-				</div>
-			{% endif %} 
 			<div class="row">
 				<div class="small-8 columns">
 					<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','">
