@@ -852,6 +852,7 @@
       </ul>
     </div>
 
+    {% if user.is_authenticated %}
     {% switch_group_conditions request.user group_id as switch_conditions %}
         {% if node %}
             {% check_group node as is_group %}
@@ -881,7 +882,7 @@
         </div>
         </div>
       {% endif %} 
-
+    {% endif %}
 
     </div>
   </ul>
