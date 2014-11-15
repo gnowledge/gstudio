@@ -1,6 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}    
-<div id="rating-bar" class="show-on-hover">
+<!-- <div id="rating-bar" class="show-on-hover"> -->
+<div id="rating-bar">
     <form>
         
     <b>{% trans "Rating" %} <span class="subheader" id="avg-rating">{{ratings.tot|default:"unrated"}}</span></b><br/>
@@ -23,6 +24,7 @@
         </span>   
         {% endif %}
 
+        <div>Numberof persons rated: {% if node.rating %} {{ node.rating|length }} {% endif %} </div>
               
     </div>
          
