@@ -852,6 +852,37 @@
       </ul>
     </div>
 
+    {% switch_group_conditions request.user group_id as switch_conditions %}
+        {% if node %}
+            {% check_group node as is_group %}
+          {% endif %}
+
+    {% if not is_group %}
+        <div class="row">
+        <div class="small-12 columns">
+
+          <a class="tiny button" data-reveal-id="publish_resource"> 
+              <span>{% trans "Publish this resource in other group/s" %} </span> 
+            </a>
+            <div id="publish_resource" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+
+              <div id="switchgrp" class="content">
+                    <h4>{% trans "Select Groups" %}</h4>
+                <div id="group_drawer">
+                      {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+                  </div><br/>
+                    <input type="button" id="save_switch_group" class="round button push-4" value="Save selected group">
+                  </div>
+
+              <a class="close-reveal-modal">&#215;</a>
+
+            </div>          
+          
+        </div>
+        </div>
+      {% endif %} 
+
+
     </div>
   </ul>
 
