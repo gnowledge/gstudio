@@ -1,5 +1,6 @@
 ''' -- imports from python libraries -- '''
 import re, magic
+from time import time
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
@@ -868,27 +869,24 @@ def get_user_group(user, selected_group_name):
 
 
 @register.assignment_tag
-def get_profile_pic(user):
-	ID = User.objects.get(username=user).pk
-	auth = collection.Node.one({'_type': u'Author', 'name': unicode(user)})
-	collection_tr = db[Triple.collection_name]
+def get_profile_pic(user_pk):
+    """
+    This returns file document if exists, otherwise None value.
+    """
+    profile_pic_image = None
+    ID = int(user_pk)
+    auth = collection.Node.one({'_type': "Author", 'created_by': ID}, {'_id': 1, 'relation_set': 1})
 
-	if auth:
-		profile_pic_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_profile_pic' })
-		dbref_profile_pic = profile_pic_RT.get_dbref()
-		prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
+    if auth:
+        for each in auth.relation_set:
+            if "has_profile_pic" in each:
+                profile_pic_image = collection.Node.one(
+                    {'_type': "File", '_id': each["has_profile_pic"][0]}
+                )
 
-		if prof_pic_rel.count() :
-			index = prof_pic_rel.count() - 1
-			Index = prof_pic_rel[index].right_subject
-			# prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject'])})      
-			prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
-		else:
-			prof_pic = "" 
-	else:
-		prof_pic = ""
-		
-	return prof_pic
+                break
+
+    return profile_pic_image
 
 
 @register.assignment_tag
