@@ -82,7 +82,7 @@
       			<div id="pic_div" class="hide" class="row">
       				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
       					{% csrf_token %}
-      					<input type="file" name="doc[]" id="docFile" accept="image/*" class="hide" />
+      					<input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
 
                 <input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
       					<input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
@@ -375,8 +375,8 @@
 {% endblock %}
 
 {% block document_ready %}
-  {% if already_uploaded != "None" %}
-    var message = "{{already_uploaded}} {% trans 'image is already selected, choose different image !!!' %}"
+  {% if already_set %}
+    var message = "{{already_set}} {% trans 'image is already selected, choose different image !!!' %}"
 
     $("#alertModalLabel").text(message);
     $("#alertModal").addClass("alert");
