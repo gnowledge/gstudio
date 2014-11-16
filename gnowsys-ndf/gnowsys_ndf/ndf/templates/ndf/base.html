@@ -162,7 +162,7 @@
           <!-- If logged in show user options -->
       	  {% if user.is_authenticated %}
       	  <li class="has-dropdown">
-      	    {% get_profile_pic  request.user as prof_pic %}
+      	    {% get_profile_pic request.user.pk as prof_pic %}
 
       	    {% if prof_pic %}
       	    <a href="{% url 'dashboard' request.user.pk %}">
