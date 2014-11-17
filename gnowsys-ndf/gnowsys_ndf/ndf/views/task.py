@@ -204,6 +204,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"] # fields
 	if not task_id: # create
 	    for each in at_list:
+                 print "printing each",each
 	         if request.POST.get(each,"")  :
 	         	attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
                		newattribute = collection.GAttribute()
@@ -218,7 +219,9 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                                         print "assgnlist",assignee_list
                                         newattribute.object_value = assignee_list[count]
 			else:
+                                   
 				newattribute.object_value = request.POST.get(each,"")
+                                print "newattribute obj value",newattribute.object_value,type(newattribute.object_value)
                 	newattribute.save()
 	    if request.FILES.getlist('UploadTask'):
                                 attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})

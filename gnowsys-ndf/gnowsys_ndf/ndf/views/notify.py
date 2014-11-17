@@ -48,6 +48,7 @@ def set_notif_val(request,group_id,msg,activ,bx):
         render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':group_obj,'site':site,'link':objurl})
         notification.create_notice_type(render, msg, "notification")
         notification.send([bx], render, {"from_user": request.user})
+        
         return True
     except Exception as e:
         print "Error in sending notification- "+str(e)
