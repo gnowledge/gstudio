@@ -5,7 +5,6 @@
     <form>
         
     <b>{% trans "Rating" %} <span class="subheader" id="avg-rating">{{ratings.tot|default:"unrated"}}</span></b><br/>
-     
        {% get_node_ratings request node as ratings %}
       
     <!-- Sets the rating values as data attributes -->
@@ -13,7 +12,6 @@
 
        <div class="rating-bar show" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
 
-        {% if user.is_authenticated %}
           <span>
             <input type="radio" id="rating-5" name="rating" value="5" /><label for="rating-5">5</label>
             <input type="radio" id="rating-4" name="rating" value="4" /><label for="rating-4">4</label>
@@ -22,9 +20,10 @@
             <input type="radio" id="rating-1" name="rating" value="1" /><label for="rating-1">1</label>
             <input type="radio" id="rating-0" name="rating" value="0" class="last" /><label for="rating-0">0</label>
         </span>   
-        {% endif %}
 
-        <div>Numberof persons rated: {% if node.rating %} {{ node.rating|length }} {% endif %} </div>
+        <div>
+            {% if node.rating %} Numberof persons rated: {{ node.rating|length }} {% endif %} 
+        </div>
               
     </div>
          
@@ -36,25 +35,25 @@
     
     //Ajax to post the user rating and fetch the new average
     function updateRating() {
-surl="/{{node}}/ratings/add_ratings/";
-userRating = $('input[name=rating]:checked').val();
-nodeId=$(".rating-bar").attr("data-node");
+        surl="/{{node}}/ratings/add_ratings/";
+        userRating = $('input[name=rating]:checked').val();
+        nodeId=$(".rating-bar").attr("data-node");
+            
+        $.ajax({
+                url: surl,
+                type: 'POST',
+                data: {
+                    rating: userRating, node: nodeId, csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+            
+               success: function(data){
+                   //Replace rating bar with new values
+                               $("#rating-bar").html(data);   
+                   setRating();
+                                     }
+        }); 
     
-    $.ajax({
-            url: surl,
-            type: 'POST',
-            data: {
-                rating: userRating, node: nodeId, csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-        
-           success: function(data){
-               //Replace rating bar with new values
-                           $("#rating-bar").html(data);   
-               setRating();
-                                 }
-    }); 
-    
-}
+    }
     //Sets the stars in the rating bar based on loaded values
     function setRating(){
         userRating = parseInt($(".rating-bar").attr("data-user-rating"));
@@ -80,11 +79,17 @@ nodeId=$(".rating-bar").attr("data-node");
 </script>
 
   <!-- Rating script only if user is logged in -->
-{% if user.is_authenticated %}
 <script type="text/javascript">
 
 // Send the user's rating to the server on submit
-$("input[name=rating]").on('click',updateRating);
-
+$("input[name=rating]").click(function() {
+    var user = "{{user.is_authenticated}}";
+    if (user == "True"){
+        updateRating();
+    }
+    else{
+        alert("Please login to rate this resource");    
+    }
+    
+});
 </script>
-{% endif %}
