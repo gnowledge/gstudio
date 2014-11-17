@@ -454,13 +454,11 @@ def clean_structure():
 
   # to fix broken documents which are having partial/outdated attributes/relations in their attribute_set/relation_set. 
   # first make their attribute_set and relation_set empty and them fill them with latest key-values. 
-  collection.update({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
-                      'attribute_set': {'$exists': True}, 
-                      'relation_set': {'$exists': True}
-                    },
-                    {'$set': {'attribute_set': [], 'relation_set': []}}, 
-                    upsert=False, multi=True
-                    )
+  collection.update(
+    {'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 'attribute_set': {'$exists': True}, 'relation_set': {'$exists': True}},
+    {'$set': {'attribute_set': [], 'relation_set': []}}, 
+    upsert=False, multi=True
+  )
 
   gs = collection.Node.find({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
                               '$or': [{'attribute_set': []}, {'relation_set': []}] 
@@ -480,7 +478,7 @@ def clean_structure():
     # Fetch all attributes, if created in GAttribute Triple
     # Key-value pair will be appended only for those whose entry would be found in GAttribute Triple
     # ------------------------------------------------------------------------------------
-    ga = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GAttribute"}}, 
+    ga = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GAttribute", 'status': u"PUBLISHED"}}, 
                               {'$project': {'_id': 0, 'key_val': '$attribute_type', 'value_val': '$object_value'}}
                             ])
 
@@ -488,7 +486,7 @@ def clean_structure():
     # Fetch all relations, if created in GRelation Triple
     # Key-value pair will be appended only for those whose entry would be found in GRelation Triple
     # ------------------------------------------------------------------------------------
-    gr = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GRelation"}},
+    gr = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
                               {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$right_subject'}}
                             ])
     if ga:
@@ -580,7 +578,11 @@ def clean_structure():
     new_value = ""
     attribute_type_node = each.attribute_type
     
-    if "-" in each.object_value:
+    if "-" in each.object_value and ":" in each.object_value:
+      date_format_string = "%m-%d-%Y %H:%M"
+    elif "/" in each.object_value and ":" in each.object_value:
+      date_format_string = "%m/%d/%Y %H:%M"
+    elif "-" in each.object_value:
       date_format_string = "%m-%d-%Y"
     elif "/" in each.object_value:
       date_format_string = "%m/%d/%Y"

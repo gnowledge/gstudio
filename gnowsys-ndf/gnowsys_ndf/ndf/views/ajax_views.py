@@ -2146,9 +2146,9 @@ def get_students(request, group_id):
       person_gs = collection.GSystem()
       person_gs.member_of.append(person_gst._id)
       person_gs.get_neighbourhood(person_gs.member_of)
-      rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id'})
-      rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id'})
-      attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id'})
+      rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id': 1})
+      rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
+      attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id': 1})
 
       widget_for = ["name", 
                     rel_univ._id, 
@@ -2226,6 +2226,7 @@ def get_students(request, group_id):
         group_set_to_check.append(groupid)
 
       query.update({'group_set': {'$in': group_set_to_check}})
+      query.update({'status': u"PUBLISHED"})
 
       rec = collection.aggregate([{'$match': query},
                                   {'$project': {'_id': 0,
@@ -2438,7 +2439,8 @@ def get_college_wise_students_data(request, group_id):
         rec = collection.aggregate([{'$match': {'member_of': student._id,
                                                 'group_set': {'$in': [college_group_id, mis_admin._id]},
                                                 'relation_set.student_belongs_to_college': each._id,
-                                                'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte}
+                                                'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
+                                                'status': u"PUBLISHED"
                                     }},
                                     {'$group': {
                                       '_id': {'College': '$each.name', 'Degree Year': '$attribute_set.degree_year'},
