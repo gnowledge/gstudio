@@ -59,7 +59,7 @@ def userpref(request,group_id):
     return HttpResponse("Success")
     
 
-# def dashboard(request, group_id, usrid):	
+# def dashboard(request, group_id, usrid):  
 #     ins_objectid  = ObjectId()
 #     if ins_objectid.is_valid(group_id) is False :
 #         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -87,22 +87,22 @@ def userpref(request,group_id):
 #       """
 #       This will take the image uploaded by user and it searches if its already available in gridfs 
 #       using its md5 
-#       """ 	
-#       for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-#       	fcol = db[File.collection_name]
-#     	fileobj = fcol.File()
-#     	filemd5 = hashlib.md5(each.read()).hexdigest()
-#     	if fileobj.fs.files.exists({"md5":filemd5}):
-#     	  coll = get_database()['fs.files']
-#     	  a = coll.find_one({"md5":filemd5})
-#     	  # prof_image takes the already available document of uploaded image from its md5 
-#     	  prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+#       """     
+#       for index, each in enumerate(request.FILES.getlist("has_profile_pic", "")):
+#           fcol = db[File.collection_name]
+#       fileobj = fcol.File()
+#       filemd5 = hashlib.md5(each.read()).hexdigest()
+#       if fileobj.fs.files.exists({"md5":filemd5}):
+#         coll = get_database()['fs.files']
+#         a = coll.find_one({"md5":filemd5})
+#         # prof_image takes the already available document of uploaded image from its md5 
+#         prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
 
-#     	else:
-#     	  # If uploaded image is not found in gridfs stores this new image 
-#       	  submitDoc(request, group_id)
-#       	  # prof_image takes the already available document of uploaded image from its name
-#       	  prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+#       else:
+#         # If uploaded image is not found in gridfs stores this new image 
+#             submitDoc(request, group_id)
+#             # prof_image takes the already available document of uploaded image from its name
+#             prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
 
 #       # prof_img takes already available relation of user with its profile image
 #       prof_img = collection.GRelation.one({'subject': ObjectId(auth._id), 'right_subject': ObjectId(prof_image._id) })
@@ -127,7 +127,7 @@ def userpref(request,group_id):
     
 #     obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
     
-#     collab_drawer = []	
+#     collab_drawer = []    
 #     for each in obj.sort('last_update', -1):    # To populate collaborators according to their latest modification of particular resource:
 #       for val in each.contributors:
 #         name = User.objects.get(pk=val).username    
@@ -189,83 +189,78 @@ def uDashboard(request, group_id):
 
     ID = int(usrid)
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
-    user_group = collection.Node.one({'_type': "Author", 'created_by': ID}, {'name': 1})
-    group_id = user_group._id
+    auth = collection.Node.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1})
+    group_id = auth._id
 
-    # ins_objectid  = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False :
-    #     group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-    #     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else :
-    #         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth :
-    #             group_id = str(auth._id)
-    # else :
-    #     group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
-    #     pass
-    
-    # Group_name=collection.Node.find_one({"_id": ObjectId(group_id)})
-    # group_name=Group_name.name
-    # userObject = User.objects.get(pk=ID)
-    # usrname = userObject.username
-    
-    group_name = user_group.name
-    usrname = user_group.name
+    group_name = auth.name
+    usrname = auth.name
 
     date_of_join = request.user.date_joined
     current_user = request.user.pk
 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(usrname) })
-    prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
-    uploaded = "None"
+    has_profile_pic = None
+    profile_pic_image = None
+    is_already_selected = None
 
     if request.method == "POST" :
-      """
-      This will take the image uploaded by user and it searches if its already available in gridfs 
-      using its md5 
-      """ 	
-      for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-      	fcol = db[File.collection_name]
-    	fileobj = fcol.File()
-    	filemd5 = hashlib.md5(each.read()).hexdigest()
-    	if fileobj.fs.files.exists({"md5":filemd5}):
-    	  coll = get_database()['fs.files']
-    	  a = coll.find_one({"md5":filemd5})
-    	  # prof_image takes the already available document of uploaded image from its md5 
-    	  prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
-
-    	else:
-    	  # If uploaded image is not found in gridfs stores this new image 
-      	  submitDoc(request, group_id)
-      	  # prof_image takes the already available document of uploaded image from its name
-      	  prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
-
-      # prof_img takes already available relation of user with its profile image
-      prof_img = collection.GRelation.one({'subject': ObjectId(auth._id), 'right_subject': ObjectId(prof_image._id) })
-      # If prof_img not found then it creates the relation of new uploaded image with its user
-      if not prof_img:
-        prof_img = collection.GRelation()
-        prof_img.subject = ObjectId(auth._id) 
-        prof_img.relation_type = prof_pic
-        prof_img.right_subject = ObjectId(prof_image._id)
-        prof_img.save()
-      else:
-        obj_img = collection.Node.one({'_id': ObjectId(prof_img.right_subject) })
-        uploaded = obj_img.name
-
+        """
+        This will take the image uploaded by user and it searches if its already availale in gridfs 
+        using its md5 
+        """
+        has_profile_pic_str = "has_profile_pic"
+        gridfs = get_database()['fs.files']
+        pp = None
+        
+        if has_profile_pic_str in request.FILES:
+            pp = request.FILES[has_profile_pic_str]
+            has_profile_pic = collection.Node.one({'_type': "RelationType", 'name': has_profile_pic_str})
     
-    #user_group = get_user_group(userObject)
-    dashboard_count={}	
+            # Find md5
+            pp_md5 = hashlib.md5(pp.read()).hexdigest()
+
+            # Check whether this md5 exists in file collection
+            gridfs_node = gridfs.one({'md5': pp_md5})
+            if gridfs_node:
+                # md5 exists
+                right_subject = gridfs_node["docid"]
+                
+                # Check whether already selected
+                is_already_selected = collection.Triple.one(
+                    {'subject': auth._id, 'right_subject': right_subject, 'status': u"PUBLISHED"}
+                )
+
+                if is_already_selected:
+                    # Already selected found
+                    # Signify already selected
+                    is_already_selected = gridfs_node["filename"]
+                
+                else:
+                    # Already uploaded found
+                    # Reset already uploaded as to be selected
+                    profile_pic_image = create_grelation(auth._id, has_profile_pic, right_subject)
+
+                profile_pic_image = collection.Node.one({'_type': "File", '_id': right_subject})
+            
+            else:
+                # Otherwise (md5 doesn't exists)
+                # Upload image
+                # submitDoc(request, group_id)
+                field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
+                profile_pic_image = collection.Node.one({'_type': "File", 'name': unicode(pp)})
+
+                # Create new grelation and append it to that along with given user
+                gr_node = create_grelation(auth._id, has_profile_pic, profile_pic_image._id)
+
+    dashboard_count={}  
     group_list=[]
     user_activity=[]
-    group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}, 
-                    '$or': [{'group_admin': request.user.id}, {'author_set': request.user.id}],
-                  }).sort('last_update', -1).limit(10)
+    group_cur = collection.Node.find(
+        {'_type': "Group", 'name': {'$nin': ["home", request.user.username]}, 
+        '$or': [{'group_admin': request.user.id}, {'author_set': request.user.id}],
+    }).sort('last_update', -1).limit(10)
 
     dashboard_count.update({'group':group_cur.count()})  
-    
+
     GST_PAGE = collection.Node.one({'_type': "GSystemType", 'name': 'Page'})
     page_cur = collection.GSystem.find({'member_of': {'$all': [GST_PAGE._id]}, 'created_by':int(ID)})
     file_cur = collection.Node.find({'_type':  u"File", 'created_by': int(ID) })
@@ -277,89 +272,86 @@ def uDashboard(request, group_id):
     #user_notification = get_user_notification(userObject)
     #user_activity = get_user_activity(userObject)
     activity = ""
-    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
-                                                 
-                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
+    activity_user = collection.Node.find(
+        {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
+        {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
+    }).sort('last_update', -1).limit(10)
 
-                                                 }).sort('last_update', -1).limit(10)
-    a_user=[]
+    a_user = []
     dashboard_count.update({'activity':activity_user.count()})
+    
     for i in activity_user:
         if i._type != 'Batch' or i._type != 'Course' or i._type !='Module':
             a_user.append(i)
+    
     for each in a_user:
-      if each.created_by == each.modified_by :
-        if each.last_update == each.created_at:
-          activity =  'created'
-        else :
-          activity =  'modified'
-      else :
-        activity =  'created'
-      if each._type == 'Group':
-
-        user_activity.append(each)
-      else :
-        member_of = collection.Node.find_one({"_id":each.member_of[0]})
-        user_activity.append(each)
+        if each.created_by == each.modified_by :
+            if each.last_update == each.created_at:
+                activity =  'created'
+            else:
+                activity =  'modified'
+        else:
+            activity =  'created'
+        
+        if each._type == 'Group':
+            user_activity.append(each)
+        else:
+            member_of = collection.Node.find_one({"_id":each.member_of[0]})
+            user_activity.append(each)
+    
     notification_list=[]    
     notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)
     for each in notification_object:
-      ntid = each.notice_type_id
-      ntype = notification.NoticeType.objects.get(id=ntid)
-      label = ntype.label.split("-")[0]
-      notification_list.append(label)
-    
-    
+        ntid = each.notice_type_id
+        ntype = notification.NoticeType.objects.get(id=ntid)
+        label = ntype.label.split("-")[0]
+        notification_list.append(label)
+
     user_assigned = []
-    
     attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username}).sort('last_update',-1).limit(10)
+    attr_assignee = collection.Node.find(
+        {"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username}
+    ).sort('last_update',-1).limit(10)
     dashboard_count.update({'Task':attr_assignee.count()})
     for attr in attr_assignee :
-     task_node = collection.Node.one({'_id':attr.subject})
-     if task_node:	
-     	user_assigned.append(task_node) 
-   
-                                                          
-    obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
-    collab_drawer = []	
-    for each in obj.sort('last_update', -1):    # To populate collaborators according to their latest modification of particular resource:
-      for val in each.contributors:
-        name = User.objects.get(pk=val).username    
-        collab_drawer.append({'usrname':name, 'Id': val,'resource': each.name})   
+        task_node = collection.Node.one({'_id':attr.subject})
+        if task_node:   
+            user_assigned.append(task_node) 
 
-    
+    obj = collection.Node.find(
+        {'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}}
+    )
+    collab_drawer = []  
+    for each in obj.sort('last_update', -1):    # To populate collaborators according to their latest modification of particular resource:
+        for val in each.contributors:
+            name = User.objects.get(pk=val).username    
+            collab_drawer.append({'usrname':name, 'Id': val,'resource': each.name})   
+
     shelves = []
     shelf_list = {}
-    if auth:
-      dbref_profile_pic = prof_pic.get_dbref()
-      prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
 
-      # prof_pic_rel will get the cursor object of relation of user with its profile picture 
-      if prof_pic_rel.count() :
-        index = prof_pic_rel.count() - 1
-        Index = prof_pic_rel[index].right_subject
-        # img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      
-        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
-      else:
-        img_obj = "" 
+    if not profile_pic_image:
+        if auth:
+            for each in auth.relation_set:
+                if "has_profile_pic" in each:
+                    profile_pic_image = collection.Node.one(
+                        {'_type': "File", '_id': each["has_profile_pic"][0]}
+                    )
 
-    return render_to_response("ndf/uDashboard.html",
-                              {'username': usrname, 'user_id': ID, 'DOJ': date_of_join,
-                               'group_id':group_id, 'usr': current_user,             
-				'group_name':group_name,                               
-				'author':auth,
-                               'already_uploaded': uploaded,
-                               'groupid':group_id,'prof_pic_obj': img_obj,
-                               'group_count':group_cur.count(),
-                               'file_count':file_cur.count(),
-                               'page_count':page_cur.count(),
-                               'user_groups':group_list,
-                               'user_activity':user_activity, 'user_notification':notification_list,
-                               'user_task': user_assigned,
-				'dashboard_count':dashboard_count
-                              },
-                              context_instance=RequestContext(request)
+                    break
+
+    return render_to_response(
+        "ndf/uDashboard.html",
+        {
+            'usr': current_user, 'username': usrname, 'user_id': ID, 'DOJ': date_of_join, 'author':auth,
+            'group_id':group_id, 'groupid':group_id, 'group_name':group_name,
+            'already_set': is_already_selected, 'prof_pic_obj': profile_pic_image,
+            'group_count':group_cur.count(), 'page_count':page_cur.count(), 'file_count':file_cur.count(),
+            'user_groups':group_list, 'user_task': user_assigned, 'user_activity':user_activity,
+            'user_notification':notification_list,
+            'dashboard_count':dashboard_count
+        },
+        context_instance=RequestContext(request)
     )
 
 

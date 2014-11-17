@@ -230,12 +230,12 @@
 				}
 				return magicMarkups(action);
 			}
-		    function cite() {
-                        alert("jquery test");}
-
-		    function close() {
-                        $(".orgitdownContainer").hide();
-		        location.reload();}
+		        function cite() {
+                           alert("jquery test");}
+		    
+		        function close() {
+                           $(".orgitdownContainer").hide();
+		           location.reload();}
 
 			// build block to insert
 			function build(string) {

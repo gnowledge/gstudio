@@ -23,7 +23,6 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
-
 from gnowsys_ndf.ndf.models import Node, GSystemType, GSystem
 from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import HistoryManager

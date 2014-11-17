@@ -290,10 +290,11 @@
           </div>
 
           <div class="small-4 columns">
-            {% if node.teaches %}
+            {% get_teaches_list node as teaches_list %}
+            {% if teaches_list %}
             <div class="panel">
               <h6>This resource teaches you: </h6>
-              {% for  each_node in node.teaches %}
+              {% for  each_node in teaches_list %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
@@ -307,10 +308,12 @@
           </div>
 
           <div class="small-4 columns">
-            {% if node.assesses %}
+            <!-- {#% if node.assesses %#} -->
+            {% get_assesses_list node as assesses_list %}
+            {% if assesses_list %}
             <div class="panel">
               <h6>This resource assesses these</h6>
-              {% for  each_node in node.assesses %}
+              {% for  each_node in assesses_list %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
@@ -849,6 +852,38 @@
       </ul>
     </div>
 
+    {% if user.is_authenticated %}
+    {% switch_group_conditions request.user group_id as switch_conditions %}
+        {% if node %}
+            {% check_group node as is_group %}
+          {% endif %}
+
+    {% if not is_group %}
+        <div class="row">
+        <div class="small-12 columns">
+
+          <a id="switch_group" class="tiny button" data-reveal-id="publish_resource"> 
+              <span>{% trans "Publish this resource in other group/s" %} </span> 
+            </a>
+            <div id="publish_resource" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+
+              <div id="switchgrp" class="content">
+                <h4>{% trans "Select Groups" %}</h4>
+                <div id="group_drawer">
+                  {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+                </div><br/>
+                <input type="button" id="save_switch_group" class="round button push-4" value="Save selected group">
+              </div>
+
+              <a class="close-reveal-modal">&#215;</a>
+
+            </div>          
+          
+        </div>
+        </div>
+      {% endif %} 
+    {% endif %}
+
     </div>
   </ul>
 
@@ -858,6 +893,57 @@
     
 <script type="text/javascript">
 
+  // publishing resource in other groups
+  var data_list = ""
+  var saveflag = 0
+  function get_new_groups(){
+    $.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
+           data_list=data_list+String(item.id)+",";
+    });
+  }
+
+  $(document).on('click',"#switch_group",function(){
+    $('#switchgrp #collection_set_drawer1').html("");
+     $('#switchgrp #collection_set_drawer2').html("");
+     $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+      var url='/{{groupid}}/group/switch_group/'+'{{node}}';
+      $.getJSON( url, function( data ) {
+        $.each(data ,function(index , drawer_elements){
+        
+         if(index == 0)
+          {
+           $.each(drawer_elements.drawer1, function(index, element) {
+              $('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+            });
+          }
+          if(index == 1)
+          {
+            $.each(drawer_elements.drawer2, function(index, element) {
+              $('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+            });
+          }
+
+        });
+      });
+
+  });
+
+  $(document).on('click',"#save_switch_group",function(){
+    var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
+    saveflag = 1;
+    get_new_groups();
+    new_groups=data_list;
+    $.ajax({
+           url: turl,
+           type: 'POST',
+           data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function(data){
+                           alert("Successfully switched groups");
+                
+               },
+    }); //end of ajax
+
+  }); //end of document click
 
   // Taken value of svg data of that node globally
   var svgdata;

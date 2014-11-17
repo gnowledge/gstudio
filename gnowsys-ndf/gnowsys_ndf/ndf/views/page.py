@@ -57,7 +57,6 @@ def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     ins_objectid  = ObjectId()
-    print group_id
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -315,27 +314,14 @@ def create_edit_page(request, group_id, node_id=None):
         
 
     if request.method == "POST":
-        
         # get_node_common_fields(request, page_node, group_id, gst_page)
-
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
-
-
-	get_node_metadata(request,page_node,gst_page)
-        
-	# teaches_list = request.POST.get('teaches_list','') # get the teaches list 
- #        teaches_edited = request.POST.get('teaches_edited','') # check teaches modified or not
-	# if teaches_list !='':
-	# 		teaches_list=teaches_list.split(",")
- #                        create_grelation_list(page_node._id,"teaches",teaches_list)
- #        # else:
-        #   relationtype = collection.Node.one({"_type":"RelationType","name":unicode("teaches")})
-        #   collection.remove({"_type":"GRelation","subject":page_node._id,"relation_type":relationtype.get_dbref()})
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:
         if node_id:
+
             page_node,ver=get_page(request,page_node)
             page_node.get_neighbourhood(page_node.member_of)
             context_variables['node'] = page_node
@@ -570,7 +556,6 @@ def translate_node(request,group_id,node_id=None):
                              
                               context_instance = RequestContext(request)
     )        
-
 
 
 #######################################################################################################################################
