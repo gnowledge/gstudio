@@ -66,7 +66,11 @@
       <label>{% trans "Course Type" %}</label>
     </div>
     <div class="small-4 columns end ">
+    {% if node %}
+      <input type="text" value="{{nussd_course_name}}" disabled="disabled">
+    {% else %}
       {% html_widget groupid "" ATs.0 %}
+    {% endif %}
     </div>
   </div>
 
@@ -76,10 +80,14 @@
     </div>
     <div class="small-4 columns end">
       <select id="acourse_list" name="acourse_list_name" disabled="disabled">
+      {% if node %}
+        <option value="{{ac_node.pk}}">{{ac_node.name}}</option>
+      {% endif %}
       </select>
     </div>
   </div>
   </fieldset>
+  
 
   <div class="small-2 columns" align="center">
     <br>  
@@ -96,7 +104,7 @@
       <input type="text" contenteditable="true" id="drawer_head" name="drawer_head" disabled="disabled">
     </div><br>
     <div id="drawer-div"> </div><br>
-    <div id="batch-details"> </div>
+    <div id="batch-details" style='display: block'> </div>
     <input type='button' name='add_btn' id='add_btn' value='Add Batch' class='button round small' onclick = 'add_new_batch()' style='display: none'>
   <div>
     <input type="submit" class="button right inline" id="save_batch" name="save_batch" value="Save" onclick="save_after_create_batch()" disabled="disabled" style='display: none'>&nbsp;&nbsp;
@@ -104,6 +112,7 @@
     <input type="hidden" id="ac_id" name="ac_id">
   </div>
   </fieldset>
+  
  </form>
 {% endblock %}
 
@@ -153,7 +162,7 @@
   
   //For selecting Announced Course type
     $("select#acourse_list").change(function() {
-        ac_id = $("#acourse_list").val();
+        //ac_id = $("#acourse_list").val();
         $("#stud_count").text("")
         // sct = $(this).data("scount")
         $("#nextbtn").removeAttr("disabled")
@@ -173,7 +182,10 @@
 
   //Proceed to create batches for selected AC
     $("#nextbtn").click(function(event) {
-      $("#nextbtn").off("click")
+      //$("#nextbtn").off("click");
+      ac_id = $("#acourse_list").val();
+      console.log("ac_id: "+ac_id);
+
       if ($("#nextbtn").css("display") != "none") {
         $("#nextbtn").css("display", "none");
       }
@@ -227,6 +239,9 @@
           if ($("#add_btn").css("display") == "none") {
             $("#add_btn").toggle();
           }
+          {% if node %}
+            $("#"+"{{node.name}}".replace(/ /g,'_')).trigger('click')
+          {% endif %}
         }
       });
     });//end of nextbtn.click()
@@ -234,7 +249,6 @@
   // On click of Batch link 
     $(document).on("click","a.edit_batch", function(event){
       edit_batch_name = $(this).attr('id');
-
       edit_batch_name=edit_batch_name.replace(/_/g,' ')
       $("#drawer_head").attr("value",edit_batch_name);
       $("#new_create_batch_drawer2").html("")
@@ -250,12 +264,16 @@
       if ($("#add_btn").css("display") == "none") {
         $("#add_btn").toggle()
       }
+      if (!($("#batch-details").css("display") == "none")) {
+        $("#batch-details").toggle()
+      }
+
       event.preventDefault();
       return false;
     });
 
   //Add new batch
-    function add_new_batch(){
+    function add_new_batch(event){
       $("#save_batch").removeAttr("disabled")
       //Fetch the value of "#drawer_head" which will be key for above dict
       batch_name= $("#drawer_head").val()
@@ -279,18 +297,11 @@
         else{
           batch_user_list_dict[batch_name] = arr
           //Display the Batch details
-          batch_det_str="<a href='' class='edit_batch' id='"+batch_name.replace(' ','_')+"'>" + batch_name + "  --  " + arr.length + " members.</a><br>"
+          batch_det_str="<a href='' class='edit_batch' id='"+batch_name.replace(/ /g,'_')+"'>" + batch_name + "  --  " + arr.length + " members.</a><br>"
           $("#batch-details").append(batch_det_str)
           batch_name_index += 1;
         }
-        for(i in batch_user_list_dict){
-          for (j in batch_user_list_dict[i]){
-            // console.log(batch_user_list_dict[i][j])
-            // arr1.push(batch_user_list_dict[i][j].getAttribute("value"))
-          }
-        }
         batch_user_list_list[batch_name] = arr1
-        console.log(batch_user_list_list[batch_name])
 
         //Remove these resources from right drawer.
         $("#new_create_batch_drawer2").html("")
@@ -303,6 +314,10 @@
           $("#drawer_head").attr("value",ac_name_as_prefix + " Batch "+ batch_name_index);
         }
       }
+      if ($("#batch-details").css("display") == "none") {
+        $("#batch-details").toggle()
+      }
+
 
     };
 
@@ -320,4 +335,10 @@
       $("#ac_id").val(ac_id)
     }; // end of save_after_create_batch
     //</script>
+{% endblock %}
+
+{% block document_ready %}
+{% if node %}
+  $("#nextbtn").trigger("click");
+{% endif %}
 {% endblock %}

@@ -25,7 +25,9 @@
       {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user.is_superuser or node.created_by == user.id %}
-      <!-- <span><a class="button" href="{% url 'edit' groupid node.pk %}">{% trans "Edit" %}</a></span> -->
+      <span><a class="button tiny" href="{% url 'edit' groupid node.pk %}">{% trans "Edit" %}</a>
+      <a class="button alert tiny" href="{% url 'delete_batch' group_name_tag node %}?next={{request.path}}">{% trans "Delete" %} </a>
+      </span>
       {% endif %}
       {% endif %}
     </h2>
@@ -39,7 +41,7 @@
   </section>
 </header>
 <div class="row">
-<h3> Members of {{node.name}}: </h3>
+<h3> Members: </h3>
 {% for each in student_coll %}
 <div>
 {{each.name}}<br><br>
