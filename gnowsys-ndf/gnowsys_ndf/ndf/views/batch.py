@@ -87,48 +87,59 @@ def save_students_for_batches(request, group_id):
     '''
     This save method creates new  and update existing the batches
     '''
-    print "in views"
+    edit_batch = []
     if request.method == 'POST':
-        batch_user_list_v = request.POST.get('batch_user_list_dict', '')
-        print "\nbefore",batch_user_list_v
-        batch_user_list_v = json.loads(batch_user_list_v)
-        print "\nafter",batch_user_list_v
+        batch_user_list = request.POST.get('batch_user_list_dict', '')
+        batch_user_list = json.loads(batch_user_list)
         ac_id = request.POST.get('ac_id', '')
-        print "batch_user_list_v",batch_user_list_v
-        for k,v in batch_user_list_v.items():
-            save_batch(k,v, group_id, request, ac_id, None)
+        print "batch_user_list_v",batch_user_list
+
+
+        # for k,v in batch_user_list.items():
+        #     for each in batch_user_list:
+        #         if ObjectId.is_valid(each):
+        #             b_node_id = each
+        #         else:
+        #             b_node_id = None
+        #         save_batch(k,v, group_id, request, ac_id, b_node_id)
         return HttpResponseRedirect(reverse('batch',kwargs={'group_id':group_id}))
 
 
 def save_batch(batch_name, user_list, group_id, request, ac_id, node_id):
-    print "batch_name",batch_name,"\n\nuser list",user_list
-    new_batch = collection.GSystem()
-    new_batch.member_of.append(GST_BATCH._id)
-
-    new_batch.created_by = int(request.user.id)
-    new_batch.group_set.append(ObjectId(group_id))
-    new_batch.name = batch_name
-    new_batch.contributors.append(int(request.user.id))
-    new_batch.modified_by = int(request.user.id)
-    new_batch.save()
-    all_batches_in_grp=[]
+    # print "batch_name",batch_name,"\n\nuser list",user_list
 
     rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
-    rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
-    rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
-    relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
-    
-    for each in relation_coll:
-        all_batches_in_grp.append(each.right_subject)
-        #to get all batches of the group
-    
-    create_grelation(new_batch._id,rt_has_batch_member,user_list)
+    if node_id:
+        b_node = collection.Node.one({'_type':u"Batch", "_id":ObjectId(node_id)})
+        
+    else:
+        new_batch = collection.GSystem()
+        new_batch.member_of.append(GST_BATCH._id)
+        new_batch.created_by = int(request.user.id)
+        new_batch.group_set.append(ObjectId(group_id))
+        new_batch.name = batch_name
+        new_batch.contributors.append(int(request.user.id))
+        new_batch.modified_by = int(request.user.id)
+        new_batch.save()
+        all_batches_in_grp=[]
 
-    create_grelation(new_batch._id,rt_has_course,ObjectId(ac_id))
-    all_batches_in_grp.append(new_batch._id)
+        rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
+        rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
+        
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
+        
+        for each in relation_coll:
+            all_batches_in_grp.append(each.right_subject)
+            #to get all batches of the group
+        
+        create_grelation(new_batch._id,rt_has_batch_member,user_list)
 
-    create_grelation(ObjectId(group_id),rt_group_has_batch,all_batches_in_grp)
-    return new_batch._id
+        create_grelation(new_batch._id,rt_has_course,ObjectId(ac_id))
+       
+        all_batches_in_grp.append(new_batch._id)
+
+        create_grelation(ObjectId(group_id),rt_group_has_batch,all_batches_in_grp)
+        return new_batch._id
 
 
 def detail(request, group_id, _id):

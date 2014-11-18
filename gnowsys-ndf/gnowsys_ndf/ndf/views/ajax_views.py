@@ -3063,7 +3063,7 @@ def get_announced_courses_with_ctype(request, group_id):
   acourse_ctype_list - list consisting of announced-course(s) [if match found] and/or 
              NUSSD-Courses [if match not found]
   """
-
+  response_dict = {}
   try:
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
@@ -3086,7 +3086,9 @@ def get_announced_courses_with_ctype(request, group_id):
       curr_date = datetime.datetime.now()
 
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
-      if(ObjectId(group_id)==mis_admin._id):
+      selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
+
+      if(ObjectId(group_id) == mis_admin._id):
         ac_cur = collection.Node.find({'member_of': announced_course_gt._id,
                                          'group_set':ObjectId(group_id),
                                         'attribute_set.nussd_course_type': nussd_course_type
@@ -3112,14 +3114,17 @@ def get_announced_courses_with_ctype(request, group_id):
                                       'attribute_set.start_enroll':{'$lte': curr_date},
                                       'attribute_set.end_enroll':{'$gte': curr_date}})
       if ac_cur.count():
-        for each in ac_cur:
-          acourse_ctype_list.append(each)
+        for each_ac in ac_cur:
+          relation_coll_ac = collection.Triple.find({'_type':'GRelation','relation_type.$id':selected_course_RT._id,'right_subject':each_ac._id})
+          each_ac["enrolled_stud_count"] = relation_coll_ac.count()
+          acourse_ctype_list.append(each_ac)
       
       else:
         error_message = "No Announced Course found"
         raise Exception(error_message)
-      # print "acourse_ctype_list",acourse_ctype_list
-      return HttpResponse(json.dumps(acourse_ctype_list,cls=NodeJSONEncoder))
+      
+      response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list,cls=NodeJSONEncoder)
+      return HttpResponse(json.dumps(response_dict))
 
     else:
       error_message = " AnnouncedCourseFetchError: Either not an ajax call or not a GET request!!!"
@@ -3551,12 +3556,13 @@ def get_students_for_batches(request, group_id):
   message - Basestring giving the error/information message
   """
   response_dict = {'success': False, 'message': ""}
+  b_arr=[]
   try:
     if request.is_ajax() and request.method == "GET":
       btn_id = request.GET.get('btn_id',"")
       batch_id = request.GET.get('node_id',"")
       ac_id = request.GET.get('ac_id',"")
-      print "coming here",ac_id
+      batches_for_same_course = []
       batch_name_index = 1
 
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
@@ -3572,14 +3578,14 @@ def get_students_for_batches(request, group_id):
       # except:
       #   mis_admin = collection.Node.find({'_type': "Group", 'name': "MIS_admin"}, {'author_set':1})
       all_batches_in_grp = []
-      course_of_batch_dict = {}
+      batch_mem_dict = {}
       batch_member_list=[]
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
       if batch_id:
         batch_node = collection.Node.one({'_id':ObjectId(batch_id)})
-        print batch_id, batch_node._id
+        # print batch_id, batch_node._id
         batch_node.get_neighbourhood(batch_node.member_of)
-        print batch_node.keys()
+        # print batch_node.keys()
         res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id)},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort("name", 1) 
         drawer_template_context = edit_drawer_widget("RelationType", group_id, batch_node, None,"has_batch_member", left_drawer_content=res)
 
@@ -3589,30 +3595,27 @@ def get_students_for_batches(request, group_id):
         rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
         rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
         relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
-        try:
-          if relation_coll:
-            for each in relation_coll:
-              batch_in_grp = collection.Node.one({'_id':ObjectId(each.right_subject)})
-              all_batches_in_grp.append(batch_in_grp)
-            if all_batches_in_grp:
-              for each_batch in all_batches_in_grp:
-                relation_coll_b = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_course._id,'subject':ObjectId(each_batch._id)})
-                if relation_coll_b:
-                  for each_course in relation_coll_b:
-                    course_of_batch = collection.Node.one({'_id':ObjectId(each_course.right_subject)})
-                    if (course_of_batch._id==ObjectId(ac_id)):
-                      batch_mem_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':ObjectId(each_batch._id)},{'right_subject':1})
-                      batch_name_index += 1
-                      print batch_name_index, "batch_name_index"
-                    if batch_mem_coll:
-                      for each in batch_mem_coll:
-                        batch_member_list.append(each.right_subject)
-        except:
-          batch_mem_coll=[]
-        # else:
-          # batch_member_list=[]
+        batch_gst = collection.Node.one({'_type':"GSystemType",'name':"Batch"})
+        batch1 = collection.Node.find({'member_of':batch_gst._id,'relation_set.has_course':ObjectId(ac_id)})
+        for each1 in batch1:
+          existing_batch = collection.Node.one({'_id':ObjectId(each1._id)})
+          batch_name_index += 1
+          # for each2 in each1.relation_set:
+          #   if each2.has_key("has_batch_member"):
+          #     batch_member_list.extend(each2['has_batch_member'])
+          #     for each3 in each2['has_batch_member'] :
+          #       aa = collection.Node.one({'_id':ObjectId(each3)},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}) 
+          #       b_arr.append(aa)
+          #     each1["batch_mem_node"] = b_arr
+          each1.get_neighbourhood(each1.member_of)
+          each1.keys()
+          batch_mem_dict[each1.name] = each1
+          # batches_for_same_course.append(existing_batch)
+
+        # print batch_mem_dict
         res = collection.Node.find({'member_of': student._id, 
-                                      'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list}
+                                      'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list},
+                                      'relation_set.selected_course':ObjectId(ac_id)
                                     },
                                     {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
                                   ).sort("name", 1) 
@@ -3622,11 +3625,14 @@ def get_students_for_batches(request, group_id):
                                         drawer_template_context,
                                         context_instance = RequestContext(request)
                                       )
+      # print "\n\nbatches_for_same_course",batches_for_same_course
 
       response_dict["drawer_widget"] = drawer_widget
+      response_dict["student_count"] = res.count()
       response_dict["success"] = True
       response_dict["message"] = "NOTE"
       response_dict["batch_name_index"] = batch_name_index
+      response_dict["batches_for_same_course"] = json.dumps(batch_mem_dict,cls=NodeJSONEncoder)
       return HttpResponse(json.dumps(response_dict))
     else:
       error_message = "Batch Drawer: Either not an ajax call or not a GET request!!!"
