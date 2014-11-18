@@ -48,6 +48,11 @@
 
   <style>
     {% block style %}{% endblock %}
+
+  .app.button-bar {
+    height: 45px;
+  }
+  
   </style>
 </head>
 
@@ -82,49 +87,6 @@
           {% include "ndf/node_search_base.html" %}
         </li>
 
-        <li class="has-form search">
-
-          <form 
-          {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-          name="search_form" method="GET" >
-          <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
-          <div class="hide">
-            <input type="checkbox" name="search_fields" id="chk_name" value="name" checked />Name
-            <input type="checkbox" name="search_fields" id="chk_tags" value="tags" checked />Tags 
-            <input type="checkbox" name="search_fields" id="chk_content" value="contents" checked />Content <br>
-            <select name="users">
-              <option value="all">All users</option>
-              {% for mem in authors %}		
-              <option value="hello">{{ mem }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
-              
-          <!-- Hiding search options on the top bar, this is available from the results page to refine-->
-          <!-- 
-          <ul class="show">
-            <li>
-              <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
-              <label for="chk_name">Name</label>
-            </li>
-            <li>
-              <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
-              <label for="chk_tags">Tags</label>
-            </li>
-            <li>
-              <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
-              <label for="chk_content">Contents</label><br>
-            </li>
-            <li >
-              {% if groupid %}
-              <a href="{% url 'search_page' groupid %}">Advanced Search</a>
-              {% endif %}
-            </li>
-          </ul>
-           -->
-
-        </form>
       </li>
         
     <!-- Language selector--> 
@@ -256,7 +218,7 @@
 
         <main class="row">  
          <nav class="drop-shadow">
-          <div class="button-bar">
+          <div class="button-bar app">
 
             <ul class="button-group medium-2 columns">
               <li class="left">
@@ -272,25 +234,30 @@
             {% get_gapps_iconbar request groupid %}
 
             <ul class="tools button-group medium-2 columns right">
-              {% comment %}
-              <!-- Show app options if user is logged in-->
-                  <!-- {% if user.is_authenticated %}
-                  <li>
-               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> {% trans "Actions" %}</a><br>
-<ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
-  {% block app_action_list %} {% endblock %}
-</ul>
-                      </li>
-                      {% endif %} -->
-                      {% endcomment %}
+              
+              <!-- search in the app bar -->
+              <li class="has-form">
+              <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                name="search_form" method="GET" >
+                <div class="row collapse">
+                  <div class="large-10 columns">
+                    <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                  </div>
+                  <div class="large-2 columns">
+                    <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
+                  </div>
+                </div>
+                </form>
+              </li>
 
-                      <li class="right">
-                        <!-- help documentation for every app -->
+
+              <li class="right">
+                <!-- help documentation for every app -->
                     <!-- <a id="toggle-help" class="button right-off-canvas-toggle" ><i class='button fi-lightbulb'></i>
                   </a> --> 
-                </li>
+              </li>
 
-              </ul>
+            </ul>
               
             </div>
           </nav>
