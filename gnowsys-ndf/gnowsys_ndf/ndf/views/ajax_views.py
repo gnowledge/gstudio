@@ -21,9 +21,11 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
-
 from django_mongokit import get_database
-
+from django.utils import simplejson
+from django.core.serializers.json import DjangoJSONEncoder
+from mongokit import paginator
+import ast
 from mongokit import paginator
 
 from stemming.porter2 import stem
@@ -3660,4 +3662,33 @@ def insert_picture(request, group_id):
 
 
 # =============================================================================
+<<<<<<< HEAD
 
+=======
+def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
+ assigneelist=request.POST.getlist("Assignee[]","")
+ oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
+ create_grelation(ObjectId(app_set_instance_id), oid,assigneelist)
+ return HttpResponse("attendance taken")
+
+def save_csv(request,group_id,app_set_instance_id=None):
+        column_header = [u'Name', 'Presence']
+        json_data=request.POST.getlist("attendance[]","")
+        t = time.strftime("%c").replace(":", "_").replace(" ", "_")
+        filename = "csv/" + "Attendance_data_" + t + ".csv"
+        filepath = os.path.join(STATIC_ROOT, filename)
+        filedir = os.path.dirname(filepath)
+        if not os.path.exists(filedir):
+          os.makedirs(filedir)
+        data={}
+        for i in list(json_data):
+          print "\n",ast.literal_eval(i)['Name']
+        with open(filepath, 'wb') as csv_file:
+          fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
+          fw.writerow(dict((col,col) for col in column_header))
+          for row in list(json_data):
+            v = {}
+            v["Name"] = ast.literal_eval(row)['Name']
+            fw.writerow(ast.literal_eval(row))
+        return HttpResponse((STATIC_URL + filename))
+>>>>>>> attendees
