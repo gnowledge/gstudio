@@ -3662,9 +3662,7 @@ def insert_picture(request, group_id):
 
 
 # =============================================================================
-<<<<<<< HEAD
 
-=======
 def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
  assigneelist=request.POST.getlist("Assignee[]","")
  oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
@@ -3691,4 +3689,4 @@ def save_csv(request,group_id,app_set_instance_id=None):
             v["Name"] = ast.literal_eval(row)['Name']
             fw.writerow(ast.literal_eval(row))
         return HttpResponse((STATIC_URL + filename))
->>>>>>> attendees
+
