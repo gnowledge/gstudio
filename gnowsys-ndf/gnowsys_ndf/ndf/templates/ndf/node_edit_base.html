@@ -183,31 +183,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 	            </div> 
 			</div>  
 
-			{% switch_group_conditions request.user group_id as switch_conditions %}
-				{% if node %}
-			    	{% check_group node as is_group %}
-			    {% endif %}
-
-			{% if not is_group %}
-				<div class="row">
-				<div class="small-8 columns">
-					<dl class="accordion" data-accordion>
-					  	<dd>
-					    <a id="switch_group" href="#switchgrp">{{node.name}} {% trans "Publish this resource in other group/s" %}</a>
-
-					       <div id="switchgrp" class="content">
-						        <h4>{% trans "Select Groups" %}</h4>
-							 	<div id="group_drawer">
-						        	{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-						     	</div><br/>
-						        <input type="button" id="save_switch_group" class="round button push-4" value="Save selected group">
-					      	</div>
-
-					  	</dd>
-					</dl>
-				</div>
-				</div>
-			{% endif %} 
 			<div class="row">
 				<div class="small-8 columns">
 					<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','">
@@ -335,6 +310,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 			</div>
 		  	
 		</div>
+		<div id="metadata_info"></div>
 	</div>	
     
     <!-- Kept this bellow commented part for future reference(Don't delete this) -->
@@ -501,6 +477,7 @@ $(document).ready(function(){
 	$(".assesses_tab").hide();
 	$(".teaches_tab").hide();
 	$(".prior_node_tab").hide();
+	$("#metadata_info").empty();
 
 	if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
 	{
@@ -552,9 +529,9 @@ $(document).ready(function(){
 		var cn_list = cn_arr.join(',');
 		var homo_coll = this.value;
 		var node_id = "{{node.pk}}";
-		if (node_id){
-			$("#save-node").hide();
-		}
+		// if (node_id){
+			// $("#save-node").hide();
+		// }
 
 		$.ajax({
 			type: "POST",
@@ -633,6 +610,7 @@ $(document).ready(function(){
 		$("#node_tab").removeClass("active");
 		$("#meta_tab").addClass("active");
 
+		$("#metadata_info").html("<input type='hidden' name='metadata_info' value='metadata'>");
 	});			
 
 	$(".prior_node_tab").click(function() {

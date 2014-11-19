@@ -21,6 +21,68 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Updates already created has_profile_pic grelations' status - Except latest one (PUBLISHED) others' are set to DELETED
+    has_profile_pic = collection.Node.one({'_type': "RelationType", 'name': u"has_profile_pic"})
+    op = collection.aggregate([
+        {'$match': {
+        '_type': "GRelation",
+        'relation_type.$id': has_profile_pic._id
+        }},
+        {'$group': {
+        '_id': {'auth_id': "$subject"},
+        'pp_data': {'$addToSet': {'gr_id': "$_id", 'status': "$status"}}
+        }}
+    ])
+
+    res = 0
+
+    for each in op["result"]:
+        auth_id = each["_id"]["auth_id"]
+        pub_id = None
+        pub_res = 0
+        del_id = []
+        del_res = 0
+
+        for l in each["pp_data"]:
+            if l["status"] == u"PUBLISHED":
+                pub_id = l["gr_id"]
+
+            else:
+                del_id.append(l["gr_id"])
+
+        if not pub_id:
+            pub_id = each["pp_data"][len(each["pp_data"])-1]["gr_id"]
+            pub_res = collection.update({'_id': pub_id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+            pub_res = pub_res['n']            
+            del_id.pop()
+
+        del_res = collection.update({'_id': {'$in': del_id}}, {'$set': {'status': u"DELETED"}}, upsert=False, multi=True)
+
+        if pub_res or del_res['n']:
+            res += 1
+
+    print "\n Updated following no. of has_profile_pic GRelation document(s): ", res
+
+    # Updates the value of object_cardinality to 100. So that teaches will behave as 1:M (one-to-many) relation.
+    teaches = collection.Node.one({'_type': "RelationType", 'name': "teaches"})
+    res = collection.update({'_id': teaches._id, 'object_cardinality': {'$ne': 100}}, 
+            {'$set': {'object_cardinality': 100}}, 
+            upsert=False, multi=False
+        )
+    if res["updatedExisting"]:
+        print "\n 'teaches' RelationType updated with object_cardinality: 100. Changed document: ", res['n']
+    else:
+        print "\n 'teaches' RelationType: no need to update."
+
+    # Replacing object_type of "has_course" relationship from "NUSSD Course" to "Announced Course"
+    ann_course = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
+    if ann_course:
+        res = collection.update({'_type': "RelationType", 'name': "has_course"}, 
+                {'$set': {'object_type': [ann_course._id]}}, 
+                upsert=False, multi=False
+              )
+        print "\n Replaced object_type of 'has_course' relationship from 'NUSSD Course' to 'Announced Course'."
+
     # Adds "relation_set" field (with default value as []) to all documents belonging to GSystems.
     res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'relation_set': {'$exists': False}}, 
                             {'$set': {'relation_set': []}}, 

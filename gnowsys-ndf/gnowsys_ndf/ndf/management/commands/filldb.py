@@ -3,6 +3,7 @@ import os
 import time
 import sys
 import json
+from datetime import datetime
 
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
@@ -191,7 +192,7 @@ class Command(BaseCommand):
         pass
       finally:
         if log_list:
-          log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+          log_list.append("\n ============================ End of Iteration ============================\n")
 
           log_file_name = os.path.splitext(os.path.basename(__file__))[0] + ".log"
           log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
@@ -218,7 +219,7 @@ class Command(BaseCommand):
         pass
       finally:
         if log_list:
-          log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+          log_list.append("\n ============================ End of Iteration ============================\n")
 
           log_file_name = os.path.splitext(os.path.basename(__file__))[0] + ".log"
           log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
@@ -440,8 +441,9 @@ def clean_structure():
   '''
   This function perform cleaning activities.
   '''
-  # ================== Setting attribute_set & relation_set ==================
-  info_message = "\n Setting attribute_set & relation_set for following document(s)...\n"
+
+  # Setting attribute_set & relation_set ==================
+  info_message = "\n\nSetting attribute_set & relation_set for following document(s)...\n"
   print info_message
   log_list.append(info_message)
   # ------------------------------------------------------------------------------------
@@ -449,6 +451,15 @@ def clean_structure():
   # ------------------------------------------------------------------------------------
   # Keeping timeout=False, as cursor may exceeds it's default time i.e. 10 mins for which it remains alive
   # Needs to be expicitly close
+
+  # to fix broken documents which are having partial/outdated attributes/relations in their attribute_set/relation_set. 
+  # first make their attribute_set and relation_set empty and them fill them with latest key-values. 
+  collection.update(
+    {'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 'attribute_set': {'$exists': True}, 'relation_set': {'$exists': True}},
+    {'$set': {'attribute_set': [], 'relation_set': []}}, 
+    upsert=False, multi=True
+  )
+
   gs = collection.Node.find({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
                               '$or': [{'attribute_set': []}, {'relation_set': []}] 
                             }, timeout=False)
@@ -457,17 +468,17 @@ def clean_structure():
     attr_list = []  # attribute-list
     rel_list = []   # relation-list
 
-    print " ", each_gs.name,
+    print " .",
     if each_gs.member_of_names_list:
-      info_message = "\n\n>>> " + str(each_gs.name) + " ("+str(each_gs.member_of_names_list[0])+")"
+      info_message = "\n\n >>> " + str(each_gs.name) + " ("+str(each_gs.member_of_names_list[0])+")"
     else:
-      info_message = "\n\n>>> " + str(each_gs.name) + " (ERROR: member_of field is not set properly for this document -- "+str(each_gs._id)+")"
+      info_message = "\n\n >>> " + str(each_gs.name) + " (ERROR: member_of field is not set properly for this document -- "+str(each_gs._id)+")"
     log_list.append(info_message)
     # ------------------------------------------------------------------------------------
     # Fetch all attributes, if created in GAttribute Triple
     # Key-value pair will be appended only for those whose entry would be found in GAttribute Triple
     # ------------------------------------------------------------------------------------
-    ga = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GAttribute"}}, 
+    ga = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GAttribute", 'status': u"PUBLISHED"}}, 
                               {'$project': {'_id': 0, 'key_val': '$attribute_type', 'value_val': '$object_value'}}
                             ])
 
@@ -475,7 +486,7 @@ def clean_structure():
     # Fetch all relations, if created in GRelation Triple
     # Key-value pair will be appended only for those whose entry would be found in GRelation Triple
     # ------------------------------------------------------------------------------------
-    gr = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GRelation"}},
+    gr = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
                               {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$right_subject'}}
                             ])
     if ga:
@@ -536,9 +547,9 @@ def clean_structure():
     # ------------------------------------------------------------------------------------
     res = collection.update({'_id': each_gs._id}, {'$set': {'attribute_set': attr_list, 'relation_set': rel_list}}, upsert=False, multi=False)
     if res['n']:
-      info_message = "\n\n " + str(each_gs.name) + " updated succesfully !"
+      info_message = "\n\n\t" + str(each_gs.name) + " updated succesfully !"
       log_list.append(info_message)
-      print " -- attribute_set & relation_set updated succesfully !"
+      # print " -- attribute_set & relation_set updated succesfully !"
 
   # ------------------------------------------------------------------------------------
   # Close cursor object if still alive
@@ -550,6 +561,57 @@ def clean_structure():
     info_message = "\n\n GSystem-Cursor state (after): " + str(gs.alive)
     log_list.append(info_message)
     print "\n Setting attribute_set & relation_set completed succesfully !"
+
+
+  # Rectify start_time & end_time of task ==================
+  start_time = collection.Node.one({'_type': "AttributeType", 'name': "start_time"})
+  end_time = collection.Node.one({'_type': "AttributeType", 'name': "end_time"})
+
+  info_message = "\n\nRectifing start_time & end_time of following task(s)...\n"
+  print info_message
+  log_list.append(info_message)
+  
+  invalid_dates_cur = collection.Triple.find({'attribute_type.$id': {'$in': [start_time._id, end_time._id]}, 'object_value': {'$not': {'$type': 9}}})
+  for each in invalid_dates_cur:
+    date_format_string = ""
+    old_value = ""
+    new_value = ""
+    attribute_type_node = each.attribute_type
+    
+    if "-" in each.object_value and ":" in each.object_value:
+      date_format_string = "%m-%d-%Y %H:%M"
+    elif "/" in each.object_value and ":" in each.object_value:
+      date_format_string = "%m/%d/%Y %H:%M"
+    elif "-" in each.object_value:
+      date_format_string = "%m-%d-%Y"
+    elif "/" in each.object_value:
+      date_format_string = "%m/%d/%Y"
+    
+    if date_format_string:
+      old_value = each.object_value
+      info_message = "\n\n\t" + str(each._id) + " -- " + str(old_value)
+
+      res = collection.update({'_id': each._id}, 
+              {'$set': {'object_value': datetime.strptime(each.object_value, date_format_string)}}, 
+              upsert=False, multi=False
+            )
+  
+      if res['n']:
+        print " .",
+        each.reload()
+        new_value = each.object_value
+
+        info_message += " >> " + str(new_value)
+        log_list.append(info_message)
+
+        res = collection.update({'_id': each.subject, 'attribute_set.'+attribute_type_node.name: old_value}, 
+                {'$set': {'attribute_set.$.'+attribute_type_node.name: new_value}}, 
+                upsert=False, multi=False
+              )
+
+        if res["n"]:
+          info_message = "\n\n\tNode's (" + str(each.subject) + ") attribute_set (" + attribute_type_node.name + ") updated succesfully."
+          log_list.append(info_message)
 
 
   # Update type_of field to list
@@ -596,7 +658,7 @@ def clean_structure():
   profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_pic'})
   if profile_pic_obj:
     profile_pic_obj.delete()
-    print "Deleted GST document of profile_pic"
+    print "\n Deleted GST document of profile_pic.\n"
 
   # For adding visited_location field (default value set as []) in User Groups.
   try:

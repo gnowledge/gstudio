@@ -235,7 +235,8 @@
       startDtInput.datetimepicker({ 
         changeMonth: true,
         changeYear: true,
-        yearRange: "" + lowerYearLimit + ":" + upperYearLimit,
+        dateFormat: 'dd/mm/yy',
+        yearRange: lowerYearLimit + ":" + upperYearLimit,
         hourGrid: 6,
         minuteGrid: 15,
 
@@ -255,7 +256,7 @@
         },
 
         onSelect: function (selectedDateTime){
-          endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate') );
+          endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate'));
         }
       });
     }
@@ -266,7 +267,8 @@
       endDtInput.datetimepicker({ 
         changeMonth: true,
         changeYear: true,
-        yearRange: "" + lowerYearLimit + ":" + upperYearLimit,
+        dateFormat: 'dd/mm/yy',
+        yearRange: lowerYearLimit + ":" + upperYearLimit,
         hourGrid: 6,
         minuteGrid: 15,
         numberOfMonths: 2,

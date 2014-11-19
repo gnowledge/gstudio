@@ -387,10 +387,8 @@ def select_drawer(request, group_id):
         checked = ""
         relationtype = "" 
 
-        selected_collection_list = request.POST.get("collection_list", '')
         node_id = request.POST.get("node_id", '')
         page_no = request.POST.get("page_no", '')
-        selection_save = request.POST.get("selection_save", '')
         field = request.POST.get("field", '')
         checked = request.POST.get("homo_collection", '')
 
@@ -410,9 +408,7 @@ def select_drawer(request, group_id):
         if node_id:
             node_id = ObjectId(node_id)
             node = collection.Node.one({'_id': ObjectId(node_id) })            
-            if selected_collection_list:
-              selected_collection_list = [ObjectId(each.strip()) for each in selected_collection_list.split(",")]
-
+            
             if field:
               if field == "teaches":
                 relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
@@ -434,39 +430,8 @@ def select_drawer(request, group_id):
             node_id = None
 
 
-        if selection_save:
-          if field == "collection":
-            if set(nlist) != set(selected_collection_list):              
-              for each in selected_collection_list:
-                if each not in nlist:
-                  collection.update({'_id': node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
-            
-          elif field == "prior_node":    
-            if set(nlist) != set(selected_collection_list):            
-              for each in selected_collection_list:
-                if each not in nlist:
-                  collection.update({'_id': node._id}, {'$push': {'prior_node': ObjectId(each) }}, upsert=False, multi=False)
-
-          elif field == "teaches" or "assesses":
-            if set(nlist) != set(selected_collection_list):
-              create_grelation(node._id,relationtype,selected_collection_list)
-
-          node.reload()
-
-
         if node_id:
-          if selected_collection_list:
-            if field == "collection":
-              if set(nlist) != set(selected_collection_list):  
-                return HttpResponse("Warning");
-            elif field == "prior_node":
-              if set(nlist) != set(selected_collection_list):            
-                return HttpResponse("Warning");
-            elif field == "teaches" or "assesses":
-              if set(nlist) != set(selected_collection_list):
-                return HttpResponse("Warning");
 
-        
           if node.collection_set:
             if checked:              
               for k in node.collection_set:
@@ -486,6 +451,7 @@ def select_drawer(request, group_id):
 
         drawer, paged_resources = get_drawers(group_id, node_id, nlist, page_no, checked)#get_drawers(group_id, node_id, nlist, checked)
 
+
         drawers = drawer
         if not node_id:
           drawer1 = drawers
@@ -500,7 +466,7 @@ def select_drawer(request, group_id):
         return render_to_response("ndf/drawer_widget.html", 
                                   {"widget_for": field, "page_info": paged_resources,
                                    "drawer1": drawer1, 'selection': True, 'node_id':node_id,
-                                   "drawer2": drawer2, 
+                                   "drawer2": drawer2, "checked": checked,
                                    "groupid": group_id
                                   },
                                   context_instance=RequestContext(request)
@@ -1871,7 +1837,10 @@ def deletion_instances(request, group_id):
         if left_relations :
           list_rel = []
           for each in left_relations:
-            rname = collection.Node.find_one({"_id":each.right_subject}).name
+            rname = collection.Node.find_one({"_id":each.right_subject})
+            if not rname:
+              continue
+            rname = rname.name
             alt_names = each.relation_type.name
             if each.relation_type.altnames:
               if ";" in each.relation_type.altnames:
@@ -1883,7 +1852,10 @@ def deletion_instances(request, group_id):
         if right_relations :
           list_rel = []
           for each in right_relations:
-            lname = collection.Node.find_one({"_id":each.subject}).name
+            lname = collection.Node.find_one({"_id":each.subject})
+            if not lname:
+              continue
+            lname = lname.name
             alt_names = each.relation_type.name
             if each.relation_type.altnames:
               if ";" in each.relation_type.altnames:
@@ -2174,9 +2146,9 @@ def get_students(request, group_id):
       person_gs = collection.GSystem()
       person_gs.member_of.append(person_gst._id)
       person_gs.get_neighbourhood(person_gs.member_of)
-      rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id'})
-      rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id'})
-      attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id'})
+      rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id': 1})
+      rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
+      attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id': 1})
 
       widget_for = ["name", 
                     rel_univ._id, 
@@ -2254,6 +2226,7 @@ def get_students(request, group_id):
         group_set_to_check.append(groupid)
 
       query.update({'group_set': {'$in': group_set_to_check}})
+      query.update({'status': u"PUBLISHED"})
 
       rec = collection.aggregate([{'$match': query},
                                   {'$project': {'_id': 0,
@@ -2466,7 +2439,8 @@ def get_college_wise_students_data(request, group_id):
         rec = collection.aggregate([{'$match': {'member_of': student._id,
                                                 'group_set': {'$in': [college_group_id, mis_admin._id]},
                                                 'relation_set.student_belongs_to_college': each._id,
-                                                'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte}
+                                                'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
+                                                'status': u"PUBLISHED"
                                     }},
                                     {'$group': {
                                       '_id': {'College': '$each.name', 'Degree Year': '$attribute_set.degree_year'},
@@ -3587,7 +3561,21 @@ def edit_task_content(request, group_id):
 
 def insert_picture(request, group_id):
     if request.is_ajax():
-        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'_id': 0, 'name': 1})
+        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'name': 1})
         resources=list(resource_list)
-    return StreamingHttpResponse(json.dumps(resources))
+        n=[]
+        for each in resources:
+            each['_id'] =str(each['_id'])
+            file_collection = db[File.collection_name]
+            file_obj = file_collection.File.one({'_id':ObjectId(str(each['_id']))})
+            if file_obj.fs_file_ids:
+                grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
+                each['fname']=grid_fs_obj.filename
+                each['name'] = each['name']
+            n.append(each)
+        return StreamingHttpResponse(json.dumps(n))
+    
+
+
+# =============================================================================
 

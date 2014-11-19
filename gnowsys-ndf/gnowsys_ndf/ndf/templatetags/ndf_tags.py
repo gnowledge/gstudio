@@ -1,5 +1,6 @@
 ''' -- imports from python libraries -- '''
 import re, magic
+from time import time
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
@@ -868,27 +869,24 @@ def get_user_group(user, selected_group_name):
 
 
 @register.assignment_tag
-def get_profile_pic(user):
-	ID = User.objects.get(username=user).pk
-	auth = collection.Node.one({'_type': u'Author', 'name': unicode(user)})
-	collection_tr = db[Triple.collection_name]
+def get_profile_pic(user_pk):
+    """
+    This returns file document if exists, otherwise None value.
+    """
+    profile_pic_image = None
+    ID = int(user_pk)
+    auth = collection.Node.one({'_type': "Author", 'created_by': ID}, {'_id': 1, 'relation_set': 1})
 
-	if auth:
-		profile_pic_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_profile_pic' })
-		dbref_profile_pic = profile_pic_RT.get_dbref()
-		prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
+    if auth:
+        for each in auth.relation_set:
+            if "has_profile_pic" in each:
+                profile_pic_image = collection.Node.one(
+                    {'_type': "File", '_id': each["has_profile_pic"][0]}
+                )
 
-		if prof_pic_rel.count() :
-			index = prof_pic_rel.count() - 1
-			Index = prof_pic_rel[index].right_subject
-			# prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject'])})      
-			prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
-		else:
-			prof_pic = "" 
-	else:
-		prof_pic = ""
-		
-	return prof_pic
+                break
+
+    return profile_pic_image
 
 
 @register.assignment_tag
@@ -1127,6 +1125,33 @@ def get_contents(node_id):
 
 
 @register.assignment_tag
+def get_teaches_list(node):
+	
+	teaches_list = []
+	if node:
+		relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
+        list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+        for relation in list_grelations:
+        	obj = collection.Node.one({'_id': ObjectId(relation.right_subject) })
+          	teaches_list.append(obj)
+
+	return teaches_list
+
+@register.assignment_tag
+def get_assesses_list(node):
+	
+	assesses_list = []
+	if node:
+		relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
+        list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+        for relation in list_grelations:
+        	obj = collection.Node.one({'_id': ObjectId(relation.right_subject) })
+          	assesses_list.append(obj)
+
+	return assesses_list
+
+
+@register.assignment_tag
 def get_group_type(group_id, user):
 	try:
 		col_Group = db[Node.collection_name]
@@ -1336,7 +1361,7 @@ def get_memberof_name(node_id):
 	
 @register.filter
 def get_dict_item(dictionary, key):
-		return dictionary.get(key)
+	return dictionary.get(key)
 
 
 @register.assignment_tag
@@ -2015,26 +2040,27 @@ def check_node_linked(node_id):
 
 @register.assignment_tag
 def get_file_node(request, file_name=""):
-	file_list=[]
-        new=[]
-	a=str(file_name).split(',')
-        for i in a:
-           k=str(i.strip('   [](\'u\'   '))
-           new.append(k)
-	col_Group = db[Node.collection_name]
+	file_list = []
+	new_file_list = []
 
-	ins_objectid  = ObjectId()
-	if  ins_objectid.is_valid(new) is False:
-		filedoc=collection.Node.find({'_type':'File','name':unicode(new)})
+	a = str(file_name).split(',')
 
-	else:
-		filedoc=collection.Node.find({'_type':'File','_id':ObjectId(new)})			
-	
-	if filedoc:
-		for i in filedoc:
-			file_list.append(i)	
+	for i in a:
+		k = str(i.strip('   [](\'u\'   '))
+		file_list.append(k)
 
-	return file_list	
+	for each in file_list:
+		if ObjectId.is_valid(each) is False:
+			filedoc = collection.Node.find({'_type':'File','name':unicode(each)})
+
+		else:
+			filedoc = collection.Node.find({'_type':'File','_id':ObjectId(each)})			
+
+		if filedoc:
+			for i in filedoc:
+				new_file_list.append(i)	
+
+	return new_file_list	
 
 @register.filter(name='jsonify')
 def jsonify(value):
