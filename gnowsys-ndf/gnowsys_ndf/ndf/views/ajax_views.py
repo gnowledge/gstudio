@@ -3134,50 +3134,6 @@ def get_announced_courses_with_ctype(request, group_id):
     error_message = "\n AnnouncedCourseFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
-def get_enroll_duration_of_ac(request, group_id):
-  """
-  This view returns list of announced-course(s) that match given criteria
-  along with NUSSD-Course(s) for which match doesn't exists.
-
-  Arguments:
-  group_id - ObjectId of the currently selected group
-  announced_course_id - ObjectId of currently selected Announced Course
-
-  Returns:
-  A dictionary consisting of following key-value pairs:-
-  acourse_ctype_list - dictionary consisting of announced-course(s) [if match found] and/or 
-             NUSSD-Courses [if match not found]
-  """
-  response_dict = {'success': False, 'message': ""}
-  try:
-    if request.is_ajax() and request.method == "GET":
-      # Fetch field(s) from GET object
-      acourse_name = request.GET.get("acourse_name", "")
-      acourse_name_id = ""
-      # Fetch "Announced Course" GSystemType
-      announced_course_gst = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
-      try:
-        acourse_node = collection.Node.one({'member_of':announced_course_gst._id,u'name':unicode(acourse_name)})
-        
-      except:
-        acourse_node = collection.Node.find({'member_of':announced_course_gst._id,u'name':unicode(acourse_name)})
-        print acourse_node,"\n\nMultiple Announced Course with same name exists"
-
-      se= acourse_node.attribute_set[3]
-      se = se[u'start_enroll'].strftime("%m-%d-%Y")
-      response_dict["start_enroll"]=se
-
-      ee= acourse_node.attribute_set[4]
-      ee = ee[u'end_enroll'].strftime("%m-%d-%Y")
-      response_dict["end_enroll"]=ee
-      return HttpResponse(json.dumps(response_dict))
-    else:
-      error_message = " EnrollDurationFetchError: Either not an ajax call or not a GET request!!!"
-      return HttpResponse(json.dumps({'message': " EnrollDurationFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
-
-  except Exception as e:
-    error_message = "\n EnrollDurationFetchError: " + str(e) + "!!!"
-    return HttpResponse(json.dumps({'message': error_message}))
 
 def get_colleges(request,group_id):
   """
@@ -3521,28 +3477,6 @@ def get_course_details_for_trainer(request, group_id):
 
 # ====================================================================================================
 
-def get_enrolled_students_count(request,group_id):
-  response_dict = {'success': False, 'message': ""}
-  try:
-    if request.is_ajax() and request.method == "GET":
-      acourse_name = request.GET.get("acourse_name", "")
-      announced_course_GST = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
-      acourse_node = collection.Node.one({'member_of':announced_course_GST._id,u'name':unicode(acourse_name)},{'_id':1})
-      acourse_name = ObjectId(acourse_node._id)
-      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
-      res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id),'relation_set.selected_course': acourse_name})
-      if (res.count()>0):
-        response_dict["stud_count"] = res.count()
-      else:
-        raise e
-      response_dict["acourse_name"] = str(acourse_name)
-      response_dict["success"] = True
-      response_dict["message"] = "Students enrolled to Course"
-      print response_dict
-    return HttpResponse(json.dumps(response_dict))
-  except Exception as e:
-    response_dict["stud_count"]="No students have been enrolled to this Course.\n"
-    return HttpResponse(json.dumps(response_dict))
 
 def get_students_for_batches(request, group_id):
   """
@@ -3577,20 +3511,6 @@ def get_students_for_batches(request, group_id):
       batch_mem_dict = {}
       batch_member_list=[]
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
-      # if batch_id:
-      #   batch_node = collection.Node.one({'_id':ObjectId(batch_id)})
-      #   # print batch_id, batch_node._id
-      #   batch_node.get_neighbourhood(batch_node.member_of)
-      #   # print batch_node.keys()
-      #   res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id)},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort("name", 1) 
-      #   drawer_template_context = edit_drawer_widget("RelationType", group_id, batch_node, None,"has_batch_member", left_drawer_content=res)
-
-
-      # else:
-      # rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
-      # rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
-      # rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
-      # relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
       batch_gst = collection.Node.one({'_type':"GSystemType",'name':"Batch"})
       batch1 = collection.Node.find({'member_of':batch_gst._id,'relation_set.has_course':ObjectId(ac_id)})
       for each1 in batch1:

@@ -102,17 +102,13 @@ def save_students_for_batches(request, group_id):
         batch_user_list = request.POST.get('batch_user_list_dict', '')
         batch_user_list = json.loads(batch_user_list)
         ac_id = request.POST.get('ac_id', '')
-        print "batch_user_list_v",batch_user_list
-
 
         for k,v in batch_user_list.items():
-            print len(v)
             save_batch(k,v, group_id, request, ac_id)
         return HttpResponseRedirect(reverse('batch',kwargs={'group_id':group_id}))
 
 
 def save_batch(batch_name, user_list, group_id, request, ac_id):
-    # print "batch_name",batch_name,"\n\nuser list",user_list
 
     rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
     all_batches_in_grp=[]
@@ -141,8 +137,6 @@ def save_batch(batch_name, user_list, group_id, request, ac_id):
 
     create_grelation(b_node._id,rt_has_course,ObjectId(ac_id))
    
-    print "group_id",group_id
-    print "all_batches_in_grp",all_batches_in_grp
     create_grelation(ObjectId(group_id),rt_group_has_batch,all_batches_in_grp)
 
 
@@ -150,7 +144,7 @@ def detail(request, group_id, _id):
     student_coll = []
     node = collection.Node.one({'_id':ObjectId(_id)})
     rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
-    relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':node._id})
+    relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':node._id,'status':u'PUBLISHED'})
     
     for each in relation_coll:
         n = collection.Node.one({'_id':ObjectId(each.right_subject)})

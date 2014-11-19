@@ -92,7 +92,7 @@
   <div class="small-2 columns" align="center">
     <br>  
     <label id="stud_count" style='display: none'></label>
-    <label id="lblstud" style='display: none'> {% trans "Students" %}</label>
+    <label id="lblstud" style='display: none'> {% trans "Student(s)" %}</label>
   </div>
 
 <div class="small-12 columns" align="center">
@@ -117,13 +117,14 @@
 {% endblock %}
 
 {% block script%}
-  // <script type="text/javascript">
+
   //global variables 
   var ac_id=""
   var batch_name_index;
   var ac_name_as_prefix;
   var batch_user_list_dict = {}
   var batch_user_list_list = {}
+  var scount_lbl = 0
   //For selecting Course type
     $("select#nussd_course_type").change(function() {
 
@@ -147,12 +148,12 @@
           $.each(ac_data,function(i,v){
             se = v["_id"];
             ac_name=v["name"];
-            sc = v["enrolled_stud_count"]
+            scount_lbl = v["enrolled_stud_count"]
             $("select#acourse_list").append(
               $("<option></option>")
                 .attr("value",se)
                 .text(ac_name)
-                .attr("scount",sc)
+                .attr("scount",scount_lbl)
               )
           });
           $("select#acourse_list").prop("selectedIndex", 0);
@@ -165,7 +166,7 @@
         //ac_id = $("#acourse_list").val();
         $("#stud_count").text("")
         // sct = $(this).data("scount")
-        $("#nextbtn").removeAttr("disabled")
+        
         if ($("#nextbtn").css("display") == "none") {
           $("#nextbtn").toggle()
         }
@@ -175,16 +176,22 @@
         if ($("#lblstud").css("display") == "none") {
           $("#lblstud").toggle()
         }
-        sct = $("#acourse_list option:selected").attr("scount")
+        scount_lbl = $("#acourse_list option:selected").attr("scount")
         $("#stud_count").css("font-size", "53px");
-        $("#stud_count").text(sct)
+        $("#stud_count").text(scount_lbl)
+
+        if(scount_lbl>0){
+          $("#nextbtn").removeAttr("disabled")
+        }
+        else{
+          $("#nextbtn").attr("disabled","disabled")
+        }
     });//end of acourse_list.change function
 
   //Proceed to create batches for selected AC
     $("#nextbtn").click(function(event) {
       //$("#nextbtn").off("click");
       ac_id = $("#acourse_list").val();
-      console.log("ac_id: "+ac_id);
 
       if ($("#nextbtn").css("display") != "none") {
         $("#nextbtn").css("display", "none");
@@ -204,6 +211,11 @@
             drawer_widget = data["drawer_widget"];
             ac_name_as_prefix = $("#acourse_list option:selected").text()
             $("#drawer-div").html(drawer_widget);
+            scount_lbl = data["student_count"]
+            $("#stud_count").css("font-size", "53px");
+            $("#stud_count").text(scount_lbl)
+
+
             batch_name_index = data["batch_name_index"]
             $("#drawer_head").attr("size",ac_name_as_prefix.length)
             $("#drawer_head").attr("value",ac_name_as_prefix +" Batch "+batch_name_index);
@@ -217,14 +229,13 @@
                 li_ele = "<li class='bullet-item text-left' value='"+batch_mem_list["_id"]+"'><input type='hidden' value='"+batch_mem_list["_id"]+"' name='"+batch_mem_list["name"]+"' class='node_id new_create_batch_values'><div class='row'><div class='small-1 columns resource-type-image' style='background-image: url();'></div><div class='small-11 columns'><div class='row'><div class='small-12 columns'><b>"+batch_mem_list["name"]+" </b></div><div class='small-12 columns text-left' style='padding-top:3px'><i class='posted-by'>Student by <a class='user' href='/1/dashboard' data-gnow=''></a> on 19 October 2014 </i></div></div><div class='row'><div class='small-12 columns text-left' style='padding-top:5px;'>None</div></div></div></div></li>" 
                 arr_batch_mem_nodes.push(li_ele)
                 batch_user_list_list_arr.push(batch_mem_list["_id"])
-
               });
               batch_user_list_dict[batch_node["name"]] = arr_batch_mem_nodes
               batch_user_list_list[batch_node["name"]] = batch_user_list_list_arr
-              // console.log(batch_user_list_list[batch_node["name"]])
               batch_det_str="<a href='' class='edit_batch' id='"+batch_node["name"].replace(/ /g,'_')+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a><br>"
               $("#batch-details").append(batch_det_str)
             });
+
           }
           else {
            alert("Failed to get drawer")
@@ -242,6 +253,7 @@
           {% if node %}
             $("#"+"{{node.name}}".replace(/ /g,'_')).trigger('click')
           {% endif %}
+
         }
       });
     });//end of nextbtn.click()
@@ -278,13 +290,16 @@
       //Fetch the value of "#drawer_head" which will be key for above dict
       batch_name= $("#drawer_head").val()
       batch_user_list_list[batch_name] = []
-      
+      scount_lbl = $("#new_create_batch_drawer1").children("li").length-1
+      $("#stud_count").css("font-size", "53px");
+      $("#stud_count").text(scount_lbl)
+
       arr = [] //Value for above key
       arr1 = []
       //Add the right drawer resources to this list.
       $("#new_create_batch_drawer2").children("li").each(function(c,v){arr.push(v);arr1.push(v.getAttribute("value"))});
 
-      if(arr.length<=0){
+      if(arr.length<20){
         alert("Batch must have more than 20 members");
         event.preventDefault();
       }
@@ -323,22 +338,22 @@
 
   //Saving students to batch as batch members
     function save_after_create_batch(){
-        for(i in batch_user_list_list){
-          console.log(batch_user_list_list[i])
-          for (j in batch_user_list_list[i]){
-            console.log(batch_user_list_list[i][j])
-            // arr1.push(batch_user_list_dict[i][j].getAttribute("value"))
-          }
-        }
-
       $("#batch_user_list_dict").val(JSON.stringify(batch_user_list_list))
       $("#ac_id").val(ac_id)
     }; // end of save_after_create_batch
-    //</script>
+    
 {% endblock %}
 
 {% block document_ready %}
 {% if node %}
+  if ($("#stud_count").css("display") == "none") {
+    $("#stud_count").toggle()
+  }
+
+  if ($("#lblstud").css("display") == "none") {
+    $("#lblstud").toggle()
+  }
+
   $("#nextbtn").trigger("click");
 {% endif %}
 {% endblock %}
