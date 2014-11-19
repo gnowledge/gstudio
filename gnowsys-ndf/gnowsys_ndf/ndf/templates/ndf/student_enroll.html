@@ -1,3 +1,5 @@
+<!ATTLIST acourse_list_name start_enroll_of_ac CDATA #IMPLIED>
+<!ATTLIST acourse_list_name end_enroll_of_ac CDATA #IMPLIED>
 {% extends "ndf/mis_base_create_edit.html" %}
 {% load i18n %}
 {% load ndf_tags %}
@@ -50,7 +52,7 @@
     {% csrf_token %}
 
     <!-- fieldset for selecting announced course/////////////////////////////////////////////// -->
-    <fieldset id="fsSc">
+    <fieldset id="fsCc">
       <legend>
         <label> <b>{% trans "Select Course"%}</b> </label>
       </legend>
@@ -67,7 +69,7 @@
           <label> {% trans "Announced Course"%} </label>
         </div>
         <div class="small-4 columns">
-          <select id="acourse_list" name="acourse_list" disabled="disabled">
+          <select id="acourse_list" name="acourse_list_name" disabled="disabled">
           </select>
         </div>
       </div>
@@ -89,7 +91,7 @@
       </div>
     </fieldset>
 
-    <fieldset>
+    <fieldset id="fsSc" style="display: none">
       <legend>
         <label> <b>{% trans "Select Students"%}</b> </label>
       </legend>
@@ -142,6 +144,7 @@
     <div class="row">
       <div class="small-2 small-centered columns">
         <input type="submit" id="sbtnEnroll" value="Enroll" class="button small radio expand" style="display: none">
+        <!-- <input type="button" id="sbtnEnroll" value="Complete" class="button small radio expand" > -->
       </div>
     </div>
   </form>
@@ -191,6 +194,11 @@
       // Enable Find button (btnFindES)
       $("#btnFindES").removeAttr('disabled');
     });
+  // If any of the Input field of fieldset (fsCc) is changed -------------------------------------------------
+    $("#fsCc :input").on('change click', function(){
+      hideFieldsetSubmit();
+      $("#btnFindES").removeAttr('disabled');
+    });
 
   // Set text (all_students_txt) based on state of checkbox (all_students) -----------------------------------
     $("#all_students").on("change cick", function() {
@@ -205,43 +213,11 @@
 
     $("select#acourse_list").change(function() {
       var acourse_name = $("#acourse_list").val();
-      $.ajax({
-        url: "{% url 'get_enroll_duration_of_ac' group_id %}",
+      start_en_dt = $("#acourse_list option:selected").attr("start_enroll_of_ac")
+      end_en_dt = $("#acourse_list option:selected").attr("end_enroll_of_ac")
 
-        data: {
-          acourse_name: acourse_name
-        },
-
-        type: "GET",
-
-        dataType: "json",
-
-        complete: function () {
-          // Enable AnnouncedCourse field
-          $("select#acourse_list").removeAttr('disabled')
-          
-        },
-
-
-        success: function(data){
-          if(data){
-            if(data["start_enroll"])
-            {
-              $("#lblenroll_from").text(data["start_enroll"])
-            }
-            else{
-              $("#lblenroll_from").text("--/--/----")
-            }
-            if(data["end_enroll"])
-            {
-              $("#lblenroll_to").text(data["end_enroll"])
-            }
-            else{
-              $("#lblenroll_to").text("--/--/----")
-            }
-          }
-        },//end of success
-      });//end of ajax call
+      $("#lblenroll_from").text(start_en_dt)
+      $("#lblenroll_to").text(end_en_dt)
     });//end of .change function
 
     $("select#nussd_course_type").change(function() {
@@ -257,25 +233,40 @@
 
         dataType: "json",
 
+        success: function(data){
+          ac_data = data["acourse_ctype_list"]
+          ac_data = JSON.parse(ac_data)
+
+          $("select#acourse_list").empty();
+          $.each(ac_data,function(i,v){
+            ac_val = v["_id"];
+            ac_name=v["name"];
+            start_en = v["attribute_set"][3]["start_enroll"]
+            end_en = v["attribute_set"][4]["end_enroll"]
+            start_en = start_en.split(' ')
+            end_en = end_en.split(' ')
+            $("select#acourse_list").append(
+              $("<option></option>")
+                .attr("value",ac_val)
+                .text(ac_name)
+                .attr("start_enroll_of_ac",start_en[0])
+                .attr("end_enroll_of_ac",end_en[0])
+              )
+          });
+
+
+          $("select#acourse_list").prop("selectedIndex", 0);
+        },
+
         complete: function () {
           // Enable District field
           $("select#acourse_list").removeAttr('disabled')
           $("#lblenroll_from").text("--/--/----")
           $("#lblenroll_to").text("--/--/----")
+          if ($("#fsSc").css("display") == "none") {
 
-          
-        },
-
-        success: function(data){
-          $("select#acourse_list").empty();
-          $.each(data, function(i, value) {
-            $("select#acourse_list").append(
-              $("<option></option>")
-                .attr("value", value)
-                .text(value)
-            );
-          });
-          $("select#acourse_list").prop("selectedIndex", 0);
+            $("#fsSc").toggle()
+          }
         },
       });
     });

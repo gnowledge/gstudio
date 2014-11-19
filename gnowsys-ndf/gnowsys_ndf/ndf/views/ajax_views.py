@@ -3091,6 +3091,7 @@ def get_announced_courses_with_ctype(request, group_id):
         for each_ac in ac_cur:
           relation_coll_ac = collection.Triple.find({'_type':'GRelation','relation_type.$id':selected_course_RT._id,'right_subject':each_ac._id})
           each_ac["enrolled_stud_count"] = relation_coll_ac.count()
+          
           acourse_ctype_list.append(each_ac)
       
       else:
@@ -3275,7 +3276,7 @@ def get_anncourses_allstudents(request, group_id):
                                   ).sort("name", 1) 
         all_students_text += " [Count("+str(res.count())+")]"
         # drawer_template_context = edit_drawer_widget("", group_id, None, list(res))
-        # page_no = 1
+        page_no = 1
         checked = "student_enroll"
         drawer_template_context = edit_drawer_widget("RelationType", group_id, None, page_no, checked, left_drawer_content=res)
 
