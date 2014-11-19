@@ -304,25 +304,31 @@ var encryption_policy  = document.getElementById("encryption_policy")
 var agency_type = document.getElementById("agency_type")
 
 {% if node.edit_policy %}
-edit_policy.selectedIndex = edit_policy.options.{{node.edit_policy}}.index
+$("select#edit_policy option[value='{{node.edit_policy}}']").prop("selected", true);
 {% endif %}
+
 {% if node.group_type %}
-group_type.selectedIndex = group_type.options.{{node.group_type}}.index
+$("select#group_type option[value='{{node.group_type}}']").prop("selected", true);
 {% endif %}
+
 {% if node.subscription_policy %}
-subscription_policy.selectedIndex = subscription_policy.options.{{node.subscription_policy}}.index
+$("select#subscription_policy option[value='{{node.subscription_policy}}']").prop("selected", true);
 {% endif %}
+
 {% if node.visibility_policy %}
-visibility_policy.selectedIndex = visibility_policy.options.{{node.visibility_policy}}.index
+$("select#visibility_policy option[value='{{node.visibility_policy}}']").prop("selected", true);
 {% endif %}
+
 {% if node.disclosure_policy %}
-disclosure_policy.selectedIndex = disclosure_policy.options.{{node.disclosure_policy}}.index
+$("select#disclosure_policy option[value='{{node.disclosure_policy}}']").prop("selected", true);
 {% endif %}
+
 {% if node.encryption_policy %}
-encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_policy}}.index
+$("select#encryption_policy option[value='{{node.encryption_policy}}']").prop("selected", true);
 {% endif %}
+
 {% if node.agency_type %}
-agency_type.selectedIndex = agency_type.options.{{node.agency_type}}.index
+$("select#agency_type option[value='{{node.agency_type}}']").prop("selected", true);
 {% endif %}
 
 $(document).on('click',"#changeButton",function(){
