@@ -7,6 +7,7 @@ from datetime import datetime
 
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth.models import User
 from optparse import make_option
 
 from mongokit import IS
@@ -441,6 +442,28 @@ def clean_structure():
   '''
   This function perform cleaning activities.
   '''
+  # Setting email_id field of Author class =========================================
+  info_message = "\n\nSetting email_id field of following document(s) of Author class...\n"
+  print info_message
+  log_list.append(info_message)
+
+  users = User.objects.all()
+  for each in users:
+    auth_node = collection.Node.one({'_type': "Author", 'created_by': each.id})
+    res = collection.update(
+      {'_id': auth_node._id},
+      {'$set': {'email': each.email}},
+      upsert=False, multi=False
+    )
+
+    if res['n']:
+      auth_node.reload()
+      info_message = "\n Author node's (" + str(auth_node._id) + " -- " + auth_node.name + ") email field updated with following value: " + auth_node.email
+
+    else:
+      info_message = "\n Author node's (" + str(auth_node._id) + " -- " + auth_node.name + ") email field update failed !!!"
+  
+    log_list.append(info_message)
 
   # Setting attribute_set & relation_set ==================
   info_message = "\n\nSetting attribute_set & relation_set for following document(s)...\n"
@@ -561,7 +584,6 @@ def clean_structure():
     info_message = "\n\n GSystem-Cursor state (after): " + str(gs.alive)
     log_list.append(info_message)
     print "\n Setting attribute_set & relation_set completed succesfully !"
-
 
   # Rectify start_time & end_time of task ==================
   start_time = collection.Node.one({'_type': "AttributeType", 'name': "start_time"})
