@@ -583,7 +583,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
                 result_paginated_cur = collection.Node.find({'$or': [{'_id': {'$in': video} }, 
 
                           {'member_of': {'$in': [ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]}, 
-                                                 '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
+                                                 '_type': 'File', 'access_policy': {'$ne':u"PRIVATE"}, 'group_set': {'$all': [ObjectId(group_id)]},
                                                  '$or': [
                                                       {'access_policy': u"PUBLIC"},
                                                         {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
