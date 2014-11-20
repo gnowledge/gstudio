@@ -299,7 +299,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
         request.POST.getlist("Assignee","").append(request.user.username)		
         for eachuser in (request.POST.getlist("Assignee","")):
           if eachuser != "":	
-            activ="task reported"
+            activ="Task reported"
             msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
             bx=User.objects.get(username =eachuser)
             set_notif_val(request,group_id,msg,activ,bx)
@@ -471,7 +471,7 @@ def task_collection(request,group_name,task_id=None,each_page=1):
 		if attr:
 			attr_value.update({attrvalue:attr.object_value})
 		else:
-			attr_value.update({attrvalue:"--"})
+			attr_value.update({attrvalue:None})
 	attr_value.update({'id':each})
 	attr_value.update({'Name':new.name})
 	 
@@ -579,7 +579,7 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 		if attr:
 			attr_value.update({attrvalue:attr.object_value})
 		else:
-			attr_value.update({attrvalue:"--"})
+			attr_value.update({attrvalue:None})
 	 attr_value.update({'id':each._id})
 	 if each.created_by == request.user.id:
 	        attr_value.update({'owner':'owner'})
@@ -613,7 +613,8 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
 		        			if attr_value['Status'] != 'Rejected':
 		        				if attr_value['end_time'] != "--" :
 							
-                                                                if (attr_value['end_time'] > unicode(datetime.date.today())) is False:
+                                                                # if (attr_value['end_time'] > unicode(datetime.date.today())) is False:
+                                                                if (attr_value['end_time'] > datetime.datetime.today()) is False:
 		        						task_list.append(dict(attr_value))
 		        				else:
                                                                 task_list.append(dict(attr_value)) 
