@@ -308,10 +308,6 @@
             dataType: "json",
 
             success: function(data){
-              // alert("Output" + "\n success: " + data);
-
-              // var dataDict = JSON.parse(data.responseText);
-              // alert(" " + data["success"] + " -- " + typeof(data["success"]))          
               success_state = data["success"];
               $("#alertModalLabel").text(data["message"]);
 
@@ -322,12 +318,9 @@
 
 
                 $("#divcolg").empty();
-                // alert("length: " + Object.keys(data["unset_nc"]).length)
                 var dict_len = Object.keys(data["unset_nc"]).length;
                 $.each(data["unset_nc"], function(k, val){
-                  // alert(k + " -- " + val);
                   $("#unset_nc").append(val);
-
                 });
 
                 // Fill divcolg
@@ -498,6 +491,7 @@
           // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
           resource_name = $(this).attr('name');
           /*resource_id = $(this).val()*/;
+          
           announce_to_colg_list.push(resource_name);
         });
       }

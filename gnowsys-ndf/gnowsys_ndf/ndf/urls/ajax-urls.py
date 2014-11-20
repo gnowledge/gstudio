@@ -46,13 +46,11 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^get_anncourses_allstudents/', 'get_anncourses_allstudents', name='get_anncourses_allstudents'),
                        url(r'^get_courses/', 'get_courses', name='get_courses'),
                        
-                       url(r'^get_enroll_duration_of_ac/', 'get_enroll_duration_of_ac', name='get_enroll_duration_of_ac'),
                        url(r'^get_announced_courses_with_ctype/', 'get_announced_courses_with_ctype', name='get_announced_courses_with_ctype'),
                        url(r'^get_colleges/', 'get_colleges', name='get_colleges'),
                        url(r'^get_districts/', 'get_districts', name='get_districts'),
                        url(r'^get_affiliated_colleges/', 'get_affiliated_colleges', name='get_affiliated_colleges'),
                        url(r'^get_students/', 'get_students', name='get_students'),
-                       url(r'^get_enrolled_students_count/', 'get_enrolled_students_count', name='get_enrolled_students_count'),
                        
                        url(r'^get_college_wise_students_data/', 'get_college_wise_students_data', name='get_college_wise_students_data'),
                        url(r'^set_user_link/', 'set_user_link', name='set_user_link'),
