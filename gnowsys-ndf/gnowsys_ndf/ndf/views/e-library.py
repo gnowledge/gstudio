@@ -99,7 +99,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	                                  				}
 	                                			]
 	                                	 },
-	                                	 {'member_of': ObjectId(pandora_video_st._id),
+	                                         {'member_of': ObjectId(pandora_video_st._id), 'accesss_policy': u"PUBLIC",
 	                                	  'group_set': ObjectId(group_id)
 	                                	 }]
 
@@ -204,9 +204,9 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 	# videoCollection = collection.Node.find({'_id': {'$in': video} }) 
 
 	videoCollection = collection.Node.find({'$or': [{'_id': {'$in': video} }, 
-
-													{'member_of': {'$in': [ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]}, 
-		                                             '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
+                                                        
+                                                        {'member_of': {'$in': [ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]}, 
+		                                             '_type': 'File', 'access_policy': {'$ne': u"PRIVATE"}, 'group_set': {'$all': [ObjectId(group_id)]},
 		                                             '$or': [
 		                                                 	{'access_policy': u"PUBLIC"},
 		                                                  	{'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
