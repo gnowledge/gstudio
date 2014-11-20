@@ -3165,6 +3165,8 @@ def get_colleges(request,group_id):
       for each in university_node.relation_set:
         if each.has_key("affiliated_college"):
           college_ids = each["affiliated_college"]
+
+      print "college_ids",college_ids
           
       #If "Select All" checkbox is True, display all colleges from all universities
       # if all_univs == u"true":
@@ -3172,7 +3174,7 @@ def get_colleges(request,group_id):
       #   msg_string = " List of colleges in ALL Universities."
       # else:
       colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort('name',1)
-      msg_string = " List of colleges in " +university_node.name+"."
+      msg_string = " List of colleges in " + university_node.name + "."
       
       list_colg=[]                           
       for each in colg_under_univ_id:
@@ -3500,6 +3502,36 @@ def get_students_for_batches(request, group_id):
       res = collection.Node.find({'member_of': student._id, 
                                       'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list},
                                       'relation_set.selected_course':ObjectId(ac_id)
+      if batch_id:
+        batch_node = collection.Node.one({'_id':ObjectId(batch_id)})
+        batch_node.get_neighbourhood(batch_node.member_of)
+        batch_node.keys()
+        res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id)},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort("name", 1) 
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, batch_node, None,"has_batch_member", left_drawer_content=res)
+
+
+      else:
+        rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
+        rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
+        rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
+
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
+        for each in relation_coll:
+          batch_in_grp = collection.Node.one({'_id':ObjectId(each.right_subject)})
+          all_batches_in_grp.append(batch_in_grp)
+
+        for each_batch in all_batches_in_grp:
+          relation_coll_b = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_course._id,'subject':ObjectId(each_batch._id)})
+          for each_course in relation_coll_b:
+            course_of_batch = collection.Node.one({'_id':ObjectId(each_course.right_subject)})
+            if (course_of_batch._id==ObjectId(ac_id)):
+              batch_mem_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':ObjectId(each_batch._id)},{'right_subject':1})
+
+        for each in batch_mem_coll:
+          batch_member_list.append(each.right_subject)
+        res=[{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}]
+        res = collection.Node.find({'member_of': student._id, 
+                                      'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list}
                                     },
                                     {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
                                   ).sort("name", 1) 
