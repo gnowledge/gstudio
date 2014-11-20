@@ -354,6 +354,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       for colg_ids in colg_list_cur: 
         # For each selected college
         for each in unset_ac_options:
+          # each is ObjecId of the course.
           # For each selected course to Announce
           nm = ""
           if course_gst.name == u"Announced Course":
@@ -362,11 +363,12 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
             if not course_gs:
               course_gs = collection.GSystem()
-
             else:
               if " -- " in nm:
                 nm = nm.split(" -- ")[0].lstrip().rstrip()
-            c_name = unicode(nm + " -- " + nussd_course_type + " -- " + colg_ids.name+" -- " + start_time.strftime("%d/%m/%Y") + " -- " + end_time.strftime("%d/%m/%Y"))
+
+            course_node = collection.Node.one({'_id':ObjectId(sid)})
+            c_name = unicode(course_node.attribute_set[1][u'course_code'] + "_" + colg_ids.attribute_set[0][u"enrollment_code"]+"_" + start_time.strftime("%d/%m/%Y") + "_" + end_time.strftime("%d/%m/%Y"))
             request.POST["name"] = c_name
           
           is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)

@@ -2,8 +2,8 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load pagination_tags %}
-
-
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
 {% block head %}  
 
   <!-- Scripts required for D3 graph -->
@@ -15,8 +15,14 @@
 
 
 {% block body_content %} 
+<style>
+table, th, td {
+   border: 1px solid #F5F5DC;
+} 
+</style>
 
 <div id="view_event">
+
   {% if user.is_authenticated %}
   <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
   {% endif %}
@@ -35,6 +41,7 @@
       <dl class="row tabs" data-tab data-options="deep_linking:true">
         <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "Read" %}</a></dd>
         <dd ><a href="#view-scheduler-calendar"><i class="fi-calendar"></i>{% trans "Events" %} </a></dd>
+        <dd ><a href="#view-Attendance"><i class="fi-Attendance"></i>{% trans "Attendance" %} </a></dd>
         <dd>
           <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
@@ -178,7 +185,7 @@
               {% endfor %}
             </div>
           </div>
-
+          <!--
           <br>
           <div class="row">
             <div class="small-3 columns">
@@ -195,7 +202,25 @@
               {% endfor %}
             </div>
           </div>
+          --> 
+          <br> 
+          
+          <div class="row">
+            <div class="small-3 columns">
+              <label>Event Co-ordinator:</label>
+            </div>
+            <div class="small-5 end columns">
+              {% for details in node.event_coordinator %}
+                <label>
+                {% if forloop.counter != 1 %}
+                {% endif %}
+                {{details.name}}
+                </label>
+              {% endfor %}
+            </div>
+          </div>
 
+        
           <br>
           <br>
           {% with node.html_content|safe as description %}
@@ -228,7 +253,57 @@
         <div class="content" id="view-scheduler-calendar" >    
         {% include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
         </div>
+        <div class="content" id="view-Attendance" >    
+          {% get_event_relation node.pk as attendeesrel %}
+          {% if attendeesrel == "False" %}
+          
+          {% get_attendees groupid node as attendees %}
+          <H1> Take your attendance here </H1>
+          <div id="attendance">
+              <table id="table">
+                  <Thead>
+                  <th> Name </th>
+                  <th> attended </th>
+                  </Thead>
+                 {% for i in attendees %}
+                 <tr>
+                 <td> {{i.name}}</td>
+                 
+                 <td> <input type="checkbox"  class="chkbx" value="{{i.pk}}"></td>
+                 </tr>
+                 
+                 {% endfor %} 
+                  
+               </table>
+             
+          </div>
+          <div id="save">
+          <input class="tiny button" onclick="saveattendees()" value="Save" >
+          <input class="tiny button" onclick="TakePrint()" value="Print">
+          </div>
+         {% else %}
+         <H1> Event Attended by </H1>
+         <!-- these are those who were supposed to attend the event  -->
+           {% get_attendance groupid node as attendees %}
+     <!-- these are those who attended the meet  -->   
+           <table id="attended">
+            <Thead>
+            <th> Name</th>
+            <th> Presence </th>
+            </Thead>
+           {% for i in attendees %}    
+           <tr>
+           <td> <h6>{{i.name}}</h6> </td>
+           <td> <h6>{{i.presence}} </h6></td>
+           </tr>
+           {% endfor %}
+            </table>
+            
+        <input class="tiny button" id='d' onclick="Download()" value="Download">
+        {% endif %}
         
+        
+        </div>
         <!-- Tab View Map Widget -->
         <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
           <a class="close-reveal-modal" >&#215;</a>
@@ -460,6 +535,75 @@
 
 
 // script for showing map on appearance of overlay.
+
+function Download()
+{
+
+var Event_attended_by = [];
+    var table = document.getElementById("attended");
+    $("#attended").find('tr').each(function(){
+    var Names_attended = $(this).find('td:eq(0)').text()
+    var Status_attended = $(this).find('td:eq(1)').text()
+    var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'"}'
+    
+    Event_attended_by.push(values)
+    });
+
+ val_data = ""
+ $.ajax({
+      url: "{% url 'save_csv' groupid node.pk %}",
+      type: "POST",
+      data:{attendance:Event_attended_by,
+      
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data){
+        val_data = data
+      },
+        complete: function(){
+     document.location.href=val_data
+       
+      }
+    
+      
+    });
+
+}
+function TakePrint()
+{
+     var printContents = document.getElementById("attendance").innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+     window.print();
+     document.body.innerHTML = originalContents;
+}
+function saveattendees()
+{var attendees_list = [];
+    var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
+    $(':checkbox:checked.chkbx').each(function () {
+     attendees_list.push(this.value);
+     });
+     if(attendees_list !="")
+     {
+              $.ajax({
+                      url: url,
+                      type: "POST",
+                      data:{
+                      Assignee:attendees_list,
+                      csrfmiddlewaretoken: '{{ csrf_token }}'},
+                      success: function(data){
+                      alert(data);
+                      location.reload();
+                      }
+                    });
+     }
+     else
+     {
+     alert("Nothing to move foward")
+     }
+    
+    }
 $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
   
   map.invalidateSize();  

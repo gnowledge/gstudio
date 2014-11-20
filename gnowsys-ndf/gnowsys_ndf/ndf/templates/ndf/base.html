@@ -13,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
 
-  <title>metaStudio - {% block title %} {% endblock %} </title>	
+  <title>metaStudio - {% block title %} {% endblock %} </title> 
 
   <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> 
 
@@ -48,6 +48,11 @@
 
   <style>
     {% block style %}{% endblock %}
+
+  .app.button-bar {
+    height: 45px;
+  }
+  
   </style>
 </head>
 
@@ -61,7 +66,7 @@
     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
       <ul class="title-area ">
-      	<li class="name">
+        <li class="name">
          {% get_site_variables as site %}
          <h1><a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a></h1>
        </li>
@@ -82,49 +87,6 @@
           {% include "ndf/node_search_base.html" %}
         </li>
 
-        <li class="has-form search">
-
-          <form 
-          {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-          name="search_form" method="GET" >
-          <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
-          <div class="hide">
-            <input type="checkbox" name="search_fields" id="chk_name" value="name" checked />Name
-            <input type="checkbox" name="search_fields" id="chk_tags" value="tags" checked />Tags 
-            <input type="checkbox" name="search_fields" id="chk_content" value="contents" checked />Content <br>
-            <select name="users">
-              <option value="all">All users</option>
-              {% for mem in authors %}		
-              <option value="hello">{{ mem }} </option>
-              {% endfor %}
-            </select>
-          </div>
-          <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
-              
-          <!-- Hiding search options on the top bar, this is available from the results page to refine-->
-          <!-- 
-          <ul class="show">
-            <li>
-              <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
-              <label for="chk_name">Name</label>
-            </li>
-            <li>
-              <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
-              <label for="chk_tags">Tags</label>
-            </li>
-            <li>
-              <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
-              <label for="chk_content">Contents</label><br>
-            </li>
-            <li >
-              {% if groupid %}
-              <a href="{% url 'search_page' groupid %}">Advanced Search</a>
-              {% endif %}
-            </li>
-          </ul>
-           -->
-
-        </form>
       </li>
         
     <!-- Language selector--> 
@@ -160,32 +122,32 @@
                </li>
   
           <!-- If logged in show user options -->
-      	  {% if user.is_authenticated %}
-      	  <li class="has-dropdown">
-      	    {% get_profile_pic request.user.pk as prof_pic %}
+          {% if user.is_authenticated %}
+          <li class="has-dropdown">
+            {% get_profile_pic request.user.pk as prof_pic %}
 
-      	    {% if prof_pic %}
-      	    <a href="{% url 'dashboard' request.user.pk %}">
-      	      <img src="{% url 'getImageThumbnail' group_object prof_pic %}" height="30" width="30">
-      	      {{ user.username }}
-      	    </a>
-      	    
-      	    {% else %}
-      	    <a class="user" data-gnow="#aabb44" href="{% url 'dashboard' request.user.pk %}">
-      	      {{ user.username }}
-      	    </a>
-      	    {% endif %}
+            {% if prof_pic %}
+            <a href="{% url 'dashboard' request.user.pk %}">
+              <img src="{% url 'getImageThumbnail' group_object prof_pic %}" height="30" width="30">
+              {{ user.username }}
+            </a>
             
-      	    <ul class="dropdown">
+            {% else %}
+            <a class="user" data-gnow="#aabb44" href="{% url 'dashboard' request.user.pk %}">
+              {{ user.username }}
+            </a>
+            {% endif %}
+            
+            <ul class="dropdown">
                   
-      	      <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "User Settings" %}</a></li>
+              <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "User Settings" %}</a></li>
                   
-      	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
-      	    </ul>
+              <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
+            </ul>
           </li>
 
-      	  <!-- Else show login link -->
-      	  {% else %}
+          <!-- Else show login link -->
+          {% else %}
           {% check_accounts_url request.path as is_ac_url %}
           <!-- 
           check_accounts_url:
@@ -196,15 +158,15 @@
             Otherwise it will get into unending loop i.e. as soon as logs-in it gets logged-out
             as redirection-url was of logout; similar case with password-reset!
           -->
-      	  <li class="has-form"><a class="button" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l"><i class="fi-key"></i> {% trans "Login" %}</a></li>
-      	  {% endif %}
-      	</ul>  
+          <li class="has-form"><a class="button" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l"><i class="fi-key"></i> {% trans "Login" %}</a></li>
+          {% endif %}
+        </ul>  
         <!-- Closes Right Nav section -->
 
-      	<!-- Left Nav Section -->
-      	<ul class="left">
+        <!-- Left Nav Section -->
+        <ul class="left">
 
-<!-- Current group selector -->
+          <!-- Current group selector -->
       	  <li class="has-dropdown group">
       	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:30}}</a>
       	    
@@ -243,8 +205,7 @@
               </li>
       	    </ul>
       	  </li>
-            
-      	</ul>
+        </ul>
         <!-- Closes Left Nav section -->
       </section>
 
@@ -266,7 +227,7 @@
 
         <main class="row">  
          <nav class="drop-shadow">
-          <div class="button-bar">
+          <div class="button-bar app">
 
             <ul class="button-group medium-2 columns">
               <li class="left">
@@ -283,25 +244,30 @@
             {% get_gapps_iconbar request groupid %}
 
             <ul class="tools button-group medium-2 columns right">
-              {% comment %}
-              <!-- Show app options if user is logged in-->
-                  <!-- {% if user.is_authenticated %}
-                  <li>
-               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> {% trans "Actions" %}</a><br>
-<ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
-  {% block app_action_list %} {% endblock %}
-</ul>
-                      </li>
-                      {% endif %} -->
-                      {% endcomment %}
+              
+              <!-- search in the app bar -->
+              <li class="has-form">
+              <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                name="search_form" method="GET" >
+                <div class="row collapse">
+                  <div class="large-10 columns">
+                    <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                  </div>
+                  <div class="large-2 columns">
+                    <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
+                  </div>
+                </div>
+                </form>
+              </li>
 
-                      <li class="right">
-                        <!-- help documentation for every app -->
+
+              <li class="right">
+                <!-- help documentation for every app -->
                     <!-- <a id="toggle-help" class="button right-off-canvas-toggle" ><i class='button fi-lightbulb'></i>
                   </a> --> 
-                </li>
+              </li>
 
-              </ul>
+            </ul>
               
             </div>
           </nav>
@@ -331,7 +297,7 @@
              </div>    
            </div>
          </aside>
-         <!-- End of related content -->	
+         <!-- End of related content -->  
 
          <!-- Start of content section -->
          <article class="medium-10 columns">
@@ -342,7 +308,7 @@
           
           <!-- "pass" is used for the url which does not contains Group_name and "allowed" is used for those urls which Consist of Group names which user or public is allowed to acccess"-->
           {% if group_type == "pass" or group_type == "allowed"%}
-          {% block body_content %} {% endblock %}	
+          {% block body_content %} {% endblock %} 
           {% block extra_content %}  {% endblock %}  
           {% endif %}
 
@@ -351,7 +317,7 @@
 
         </article>
         {% block data_review_pagination %}  {% endblock %}
-        <!-- End of content section -->	
+        <!-- End of content section --> 
       </main>
 
       <!-- Off Canvas User Shelf -->
@@ -422,8 +388,8 @@
   <script src="/static/ndf/js/app.js"></script> 
     
   <script type="text/javascript">
-		// Initialize Foundation CSS
-		  $(document).foundation();
+    // Initialize Foundation CSS
+      $(document).foundation();
       
     // Register global ajax start and complete events to show ajax loader when request is in process
       $( document )
@@ -455,41 +421,41 @@
       }
 
     //Functions to automatically add an <i> element icon inside node spans 
-  		$(".user").prepend(function(){
-  			/* Attaches user icon with gnow level color for every user link */
-  			return "<i class='fi-torso'></i>"
-  		});
+      $(".user").prepend(function(){
+        /* Attaches user icon with gnow level color for every user link */
+        return "<i class='fi-torso'></i>"
+      });
 
-  		$(".card .course").prepend(function(){
-  			/* Attaches icon for node type */
-  			return "<i class='fi-book'></i>"
-  		});
+      $(".card .course").prepend(function(){
+        /* Attaches icon for node type */
+        return "<i class='fi-book'></i>"
+      });
 
-  		$(".card .quiz").prepend(function(){
-  			/* Attaches icon for node type */
-  			return "<i class='fi-graph-bar'></i>"
-  		});
+      $(".card .quiz").prepend(function(){
+        /* Attaches icon for node type */
+        return "<i class='fi-graph-bar'></i>"
+      });
 
-  		$(".card .forum").prepend(function(){
-  			/* Attaches icon for node type */
-  			return "<i class='fi-comments'></i>"
-  		});
+      $(".card .forum").prepend(function(){
+        /* Attaches icon for node type */
+        return "<i class='fi-comments'></i>"
+      });
 
-  		$(".card .group").prepend(function(){
-  			/* Attaches icon for node type */
-  			return "<i class='fi-torsos'></i>"
-  		});
+      $(".card .group").prepend(function(){
+        /* Attaches icon for node type */
+        return "<i class='fi-torsos'></i>"
+      });
 
-  		$(".card .page").prepend(function(){
-  			/* Attaches icon for node type */
-  			return "<i class='fi-page'></i>"
-  		});
+      $(".card .page").prepend(function(){
+        /* Attaches icon for node type */
+        return "<i class='fi-page'></i>"
+      });
 
-  		$("aside.page").prepend(function(){
-  			/* Attaches icon for node type */
-  			return "<i class='fi-page'></i>"
-  		});
-		
+      $("aside.page").prepend(function(){
+        /* Attaches icon for node type */
+        return "<i class='fi-page'></i>"
+      });
+    
     //set language prefernce
       $(document).on('click', "#savepref", function(){
         var vpref=$("#pref").val();
@@ -518,7 +484,7 @@
         checkOpenSansFont();
       });
 
-  	{% block script %} {% endblock %}	
+    {% block script %} {% endblock %} 
   </script>
 </body>
 
