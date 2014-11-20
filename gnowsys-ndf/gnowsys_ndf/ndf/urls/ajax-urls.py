@@ -59,8 +59,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^set_enrollment_code/', 'set_enrollment_code', name='set_enrollment_code'),
                        url(r'^get_students_assignments/', 'get_students_assignments', name='get_students_assignments'),
                        url(r'^get_course_details_for_trainer/', 'get_course_details_for_trainer', name='get_course_details_for_trainer'),
-                       # ===========================================================
-                       
+                       url(r'^/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)$', 'event_assginee', name='event_assginee'), 
+                       url(r'^save_csv/(?P<app_set_instance_id>[\w-]+)$', 'save_csv', name='save_csv'),
                        url(r'^edit_task_title/', 'edit_task_title', name='edit_task_title'),
                        url(r'^events/', 'get_data_for_event_task', name='get_data_for_event_task'),
                        url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
