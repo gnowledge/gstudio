@@ -85,7 +85,7 @@
                       {% elif app_name|lower == "file" %}
                         <a href="{% url 'uploadDoc' group_name_tag %}">
                       {% elif app_name|lower == "task" %}
-                        <a href="{% url 'task_create_edit' group_name %}">
+                        <a href="{% url 'task_create_edit' group_name_tag %}">
                       {% else %}
                         <a href="">
                       {% endif %}
