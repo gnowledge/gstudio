@@ -3221,6 +3221,7 @@ def get_anncourses_allstudents(request, group_id):
     if request.is_ajax() and request.method == "GET":
       registration_year = request.GET.get("registration_year", "")
       all_students = request.GET.get("all_students", "")
+      acourse_val = request.GET.get("acourse_val","")
       print "registration_year all_students",registration_year,all_students
       college_groups = []   # List of ObjectIds
 
@@ -3264,40 +3265,39 @@ def get_anncourses_allstudents(request, group_id):
 
       groups_to_search_from = []
       groups_to_search_from = [ObjectId(group_id)]
-
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      rt_acourse_for_college = collection.Node.one({'_type':'RelationType', 'name':'acourse_for_college'})
+
+      acourse_node = collection.Node.one({'_id':ObjectId(acourse_val)})
+      colg_of_acourse = acourse_node.relation_set[1][u'acourse_for_college'][0]
 
       if all_students == u"true":
         all_students_text = "All students (including enrolled ones)"
-
         res = collection.Node.find({'member_of': student._id, 
                                       'group_set': {'$in': groups_to_search_from},
                                       'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
+                                      'relation_set.student_belongs_to_college': ObjectId(colg_of_acourse),
                                     },
                                     {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
-                                  ).sort("name", 1) 
+                                  ).sort("name", 1)
         all_students_text += " [Count("+str(res.count())+")]"
-        # drawer_template_context = edit_drawer_widget("", group_id, None, list(res))
-        page_no = 1
-        checked = "student_enroll"
-        drawer_template_context = edit_drawer_widget("RelationType", group_id, None, page_no, checked, left_drawer_content=res)
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
 
       elif all_students == u"false":
         all_students_text = "Only non-enrolled students"
-
         res = collection.Node.find({'member_of': student._id, 
                                       'group_set': {'$in': groups_to_search_from},
                                       'relation_set.selected_course': {'$exists': False},
                                       'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
+                                      'relation_set.student_belongs_to_college': ObjectId(colg_of_acourse),
                                     },
-                                    {'_id': 1,'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+                                    {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
                                   ).sort("name", 1)
-        all_students_text += " [Count("+str(res.count())+")]"
-        checked = "student_enroll"
-        # drawer_template_context = edit_drawer_widget("RelationType", group_id, None, page_no, checked, left_drawer_content=res)
-        drawer_template_context = edit_drawer_widget("RelationType", group_id, checked=checked, left_drawer_content=res)
 
-      
+
+        all_students_text += " [Count("+str(res.count())+")]"
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
+
       drawer_template_context["widget_for"] = "student_enroll"
       drawer_widget = render_to_string('ndf/drawer_widget.html', 
                                         drawer_template_context,
@@ -3501,39 +3501,8 @@ def get_students_for_batches(request, group_id):
         batch_mem_dict[each1.name] = each1
       res = collection.Node.find({'member_of': student._id, 
                                       'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list},
-                                      'relation_set.selected_course':ObjectId(ac_id)
-      if batch_id:
-        batch_node = collection.Node.one({'_id':ObjectId(batch_id)})
-        batch_node.get_neighbourhood(batch_node.member_of)
-        batch_node.keys()
-        res = collection.Node.find({'member_of': student._id,'group_set': ObjectId(group_id)},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort("name", 1) 
-        drawer_template_context = edit_drawer_widget("RelationType", group_id, batch_node, None,"has_batch_member", left_drawer_content=res)
-
-
-      else:
-        rt_group_has_batch = collection.Node.one({'_type':'RelationType', 'name':'group_has_batch'})
-        rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
-        rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
-
-        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
-        for each in relation_coll:
-          batch_in_grp = collection.Node.one({'_id':ObjectId(each.right_subject)})
-          all_batches_in_grp.append(batch_in_grp)
-
-        for each_batch in all_batches_in_grp:
-          relation_coll_b = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_course._id,'subject':ObjectId(each_batch._id)})
-          for each_course in relation_coll_b:
-            course_of_batch = collection.Node.one({'_id':ObjectId(each_course.right_subject)})
-            if (course_of_batch._id==ObjectId(ac_id)):
-              batch_mem_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':ObjectId(each_batch._id)},{'right_subject':1})
-
-        for each in batch_mem_coll:
-          batch_member_list.append(each.right_subject)
-        res=[{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}]
-        res = collection.Node.find({'member_of': student._id, 
-                                      'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list}
-                                    },
-                                    {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+                                      'relation_set.selected_course':ObjectId(ac_id)},
+                                      {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
                                   ).sort("name", 1) 
       drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
       drawer_template_context["widget_for"] = "new_create_batch"

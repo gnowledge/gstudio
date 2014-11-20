@@ -476,6 +476,7 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
 
       if announced_courses_id != '':
         announced_courses_id = ObjectId(announced_courses_id)
+      print "announced_courses_id", announced_courses_id
 
       # Fetch selected_course RelationType
       selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})

@@ -286,6 +286,7 @@
         var registration_year = $("#registration_year").val();
         var all_students = $("#all_students").prop("checked");
         var success_state = false
+        var acourse_val = $("#acourse_list").val();
 
         // All field(s) have valid I/P, make ajax-call
         $.ajax({
@@ -293,7 +294,8 @@
 
           data: {
             registration_year: registration_year,
-            all_students: all_students
+            all_students: all_students,
+            acourse_val: acourse_val
           },
 
           type: "GET",

@@ -217,8 +217,8 @@
 
 
             batch_name_index = data["batch_name_index"]
-            $("#drawer_head").attr("size",ac_name_as_prefix.length)
-            $("#drawer_head").attr("value",ac_name_as_prefix +" Batch "+batch_name_index);
+            $("#drawer_head").attr("size",ac_name_as_prefix.length+10)
+            $("#drawer_head").attr("value",ac_name_as_prefix +"_Batch_"+batch_name_index);
             a = data["batches_for_same_course"]
             a = JSON.parse(a)
 
@@ -232,7 +232,8 @@
               });
               batch_user_list_dict[batch_node["name"]] = arr_batch_mem_nodes
               batch_user_list_list[batch_node["name"]] = batch_user_list_list_arr
-              batch_det_str="<a href='' class='edit_batch' id='"+batch_node["name"].replace(/ /g,'_')+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a><br>"
+              batch_det_str="<a href='' class='edit_batch' id='"+batch_node["name"]+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a><br>"
+              <!-- batch_det_str="<a href='' class='edit_batch' id='"+batch_node["name"].replace(/ /g,'_')+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a><br>" -->
               $("#batch-details").append(batch_det_str)
             });
 
@@ -251,7 +252,8 @@
             $("#add_btn").toggle();
           }
           {% if node %}
-            $("#"+"{{node.name}}".replace(/ /g,'_')).trigger('click')
+            $("#"+"{{node.name}}").trigger('click')
+            <!-- $("#"+"{{node.name}}".replace(/ /g,'_')).trigger('click') -->
           {% endif %}
 
         }
@@ -261,7 +263,8 @@
   // On click of Batch link 
     $(document).on("click","a.edit_batch", function(event){
       edit_batch_name = $(this).attr('id');
-      edit_batch_name=edit_batch_name.replace(/_/g,' ')
+      edit_batch_name=edit_batch_name
+      <!-- edit_batch_name=edit_batch_name.replace(/_/g,' ') -->
       $("#drawer_head").attr("value",edit_batch_name);
       $("#new_create_batch_drawer2").html("")
 
@@ -299,20 +302,22 @@
       //Add the right drawer resources to this list.
       $("#new_create_batch_drawer2").children("li").each(function(c,v){arr.push(v);arr1.push(v.getAttribute("value"))});
 
-      if(arr.length<20){
+      if(arr.length<2){
         alert("Batch must have more than 20 members");
         event.preventDefault();
       }
       else{
         if(batch_user_list_dict.hasOwnProperty(batch_name)){
           batch_user_list_dict[batch_name] = arr
-          $("#"+batch_name.replace(/ /g,'_')).text(batch_name + " -- " + arr.length+" members");
+          $("#"+batch_name).text(batch_name + " -- " + arr.length+" members");
+          <!-- $("#"+batch_name.replace(/ /g,'_')).text(batch_name + " -- " + arr.length+" members"); -->
           
         }
         else{
           batch_user_list_dict[batch_name] = arr
           //Display the Batch details
-          batch_det_str="<a href='' class='edit_batch' id='"+batch_name.replace(/ /g,'_')+"'>" + batch_name + "  --  " + arr.length + " members.</a><br>"
+          batch_det_str="<a href='' class='edit_batch' id='"+batch_name+"'>" + batch_name + "  --  " + arr.length + " members.</a><br>"
+          <!-- batch_det_str="<a href='' class='edit_batch' id='"+batch_name.replace(/ /g,'_')+"'>" + batch_name + "  --  " + arr.length + " members.</a><br>" -->
           $("#batch-details").append(batch_det_str)
           batch_name_index += 1;
         }
@@ -326,7 +331,7 @@
           $("#add_btn").css("display","none")
         }
         else{
-          $("#drawer_head").attr("value",ac_name_as_prefix + " Batch "+ batch_name_index);
+          $("#drawer_head").attr("value",ac_name_as_prefix + "_Batch_"+ batch_name_index);
         }
       }
       if ($("#batch-details").css("display") == "none") {
