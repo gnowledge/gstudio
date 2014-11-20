@@ -221,16 +221,26 @@
       	      <!-- Create dropdown item for each group -->
       	      
       	      {% if groups == "None" %}
-      	      <li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' 'None' %}">{{gp_id}}</a></li>
+      	      <li id="{{gp_id}}">
+              <a class="group" href="{% url 'groupchange' 'None' %}">{{gp_id}}</a>
+              </li>
 
       	      {% else %}
       	      {% for group_node in groups|slice:":10" %}
-      	        <li id="{{group_node}}"><a class="group" href="{% url 'groupchange' group_node %}">{{group_node.name|truncatechars:30}}</a></li>
+      	        <li id="{{group_node}}">
+                {% if "Author" in group_node.member_of_names_list %}
+                <a class="group" href="{% url 'dashboard' request.user.pk %}">{{group_node.name|truncatechars:30}} (User group)</a>
+                {% else %}
+                <a class="group" href="{% url 'group_dashboard' group_node.pk %}">{{group_node.name|truncatechars:30}}</a>
+                {% endif %}
+                </li>
       	      {% endfor %}	
       	      
       	      {% endif %}	
 
-              <li id="more_groups"><a class="group" href="{% url 'group' 'home' %}">{% trans "See more groups..." %}</a></li>
+              <li id="more_groups">
+              <a class="group" href="{% url 'group' 'home' %}">{% trans "See more groups..." %}</a>
+              </li>
       	    </ul>
       	  </li>
             
@@ -264,8 +274,9 @@
               </li>
 
               <li>
-                <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> {% trans "Dashboard" %}</a>
-
+                {% if group_name_tag %}
+                <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> {{group_name_tag|default:" -- "}}</a>
+                {% endif %}
               </li>
             </ul>
 
