@@ -433,7 +433,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
                                                 ]
                                                 },{'member_of': {'$all': [pandora_video_st._id]}, 
                                                   'group_set': {'$all': [ObjectId(group_id)]},
-                                                  '_type': "File"
+                                                  '_type': "File", 'accesss_policy': u"PUBLIC"
                                                   }
                                            ]}).sort("last_update", -1)
     else:
@@ -583,7 +583,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
                 result_paginated_cur = collection.Node.find({'$or': [{'_id': {'$in': video} }, 
 
                           {'member_of': {'$in': [ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)]}, 
-                                                 '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]},
+                                                 '_type': 'File', 'access_policy': {'$ne':u"PRIVATE"}, 'group_set': {'$all': [ObjectId(group_id)]},
                                                  '$or': [
                                                       {'access_policy': u"PUBLIC"},
                                                         {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
