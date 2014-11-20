@@ -296,10 +296,10 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       colg_names = []
       colg_names = announce_to_colg_list.split(',')
       colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
-      colg_list_cur = collection.Node.find({'name': {'$in': colg_names},'member_of':colg_gst._id}, {'_id':1, 'name':1})
+      colg_list_cur = collection.Node.find({'name': {'$in': colg_names},'member_of':colg_gst._id})
 
       #list of colleges selected
-      colg_grp_list_cur = collection.Node.find({'_type':u"Group",'name': {'$in': colg_names}}, {'_id':1, 'name':1})
+      colg_grp_list_cur = collection.Node.find({'_type':u"Group",'name': {'$in': colg_names}}, {'_id':1, 'name':1,'attribute_set.enrollment_code':1})
       
       colg_PO = {}
 
@@ -351,6 +351,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       for colg_ids in colg_list_cur: 
         #for each selected college
         for each in unset_ac_options:
+          #each is ObjecId of the course.
           #for each selected course to Announce
           if course_gst.name == u"Announced Course":
             # Code to be executed only for 'Announced Course' GSystem(s)
@@ -358,11 +359,11 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
             if not course_gs:
               course_gs = collection.GSystem()
-
             else:
               if " -- " in nm:
                 nm = nm.split(" -- ")[0].lstrip().rstrip()
-            c_name = unicode(nm + " -- " + nussd_course_type + " -- " + colg_ids.name+" -- " + start_time + " -- " + end_time)
+            course_node = collection.Node.one({'_id':ObjectId(sid)})
+            c_name = unicode(course_node.attribute_set[1][u'course_code'] + "_" + colg_ids.attribute_set[0][u"enrollment_code"]+"_" + str(start_time).replace(' ','') + "_" + str(end_time).replace(' ',''))
             request.POST["name"] = c_name
           
           is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
