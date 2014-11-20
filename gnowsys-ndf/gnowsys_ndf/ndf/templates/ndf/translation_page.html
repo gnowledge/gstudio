@@ -22,6 +22,7 @@ $("#lan option[value='{{node.language}}']").remove();
 {% get_possible_translations node as translations %}
 {% for each in translations %}
 {% for k,v in each.items %}
+
 $("#lan option[value='{{v}}']").remove();
 
 {% endfor %}
@@ -36,10 +37,10 @@ $("#lan option[value='{{v}}']").remove();
 <div class="row">
 <div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
 <div class="large-6 columns">
-<select name="lan">
+<select name="lan" id="lan">
 {% get_language_info_list for LANGUAGES as languages %}
 {% for language in languages %}
-<option value="{{ language.name_local }} ({{ language.code }})">{{ language.name_local }} ({{ language.code }})</option>
+<option value={{ language.code }}>{{ language.code }}</option>
 {% endfor %}
 </select>
 
@@ -95,14 +96,15 @@ $("#lan option[value='{{v}}']").remove();
 <div class="large-6 columns">
 <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}{{node.tags|pluralize|default_if_none:"s"}}</label>
 </span>
-<input id="tags_id" name="tags" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+<input type = "hidden" name="access_policy" value="{{node.access_policy}}">
+<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
 </div>
 </div>
 
 
 <div class="row" >
 <div class="large-6 columns">
-<input type="submit" id="save-node" value="Save" class="button medium-6 columns"/>
+<input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
 </div></div></div>
 </form>
       
@@ -170,9 +172,9 @@ Topic Name:  {{each.name}}</br></br>
 <div class="row">
 <div class="large-6 columns">
 {% if not list1 %}
-<input type="hidden" id="save-node" value="Save" class="button medium-6 columns"/>
+<input type="hidden" id="save-node" value="Save as Draft And Preview" class="round button"/>
 {% else%}
-<input type="submit" id="save-node" value="Save"  class="button medium-6 columns"/>
+<input type="submit" id="save-node" value="Save as Draft And Preview"  class="round button"/>
 {% endif %}
 </div></div></div>
 </form>
