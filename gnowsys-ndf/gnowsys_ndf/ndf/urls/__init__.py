@@ -16,17 +16,20 @@ from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_ne
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^online/', include('online_status.urls')),   #for online_users 
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
     (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
     (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
-    (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
-    (r'^r/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
-    (r'^m/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.html'),
-    (r'^t/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.text'),
-    (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
-    (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
+
+    # --mobwrite-- commented for time being
+    # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
+    # (r'^r/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
+    # (r'^m/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.html'),
+    # (r'^t/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.text'),
+    # (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
+    # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
+    # --end of mobwrite
+
     (r'^admin/', include(admin.site.urls)),
     (r'^$', HomeRedirectView.as_view()),        
 
@@ -58,20 +61,22 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis', namespace='mis-po'), {'app_name': "MIS-PO"}),
 
     # meeting app
-    url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
-    url(r'^(?P<group_id>[^/]+)/meeting/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.output', name='newmeeting'),
-    url(r'^(?P<group_id>[^/]+)/meeting','gnowsys_ndf.ndf.views.meeting.dashb', name='Meeting'),                  
-    url(r'^(?P<group_id>[^/]+)/online','gnowsys_ndf.ndf.views.meeting.get_online_users', name='get_online_users'),
+    # (r'^online/', include('online_status.urls')),   #for online_users.
+    # url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
+    # url(r'^(?P<group_id>[^/]+)/meeting/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.output', name='newmeeting'),
+    # url(r'^(?P<group_id>[^/]+)/meeting','gnowsys_ndf.ndf.views.meeting.dashb', name='Meeting'),                  
+    # url(r'^(?P<group_id>[^/]+)/online','gnowsys_ndf.ndf.views.meeting.get_online_users', name='get_online_users'),
     # --end meeting app
-    
     
     (r'^(?P<group_id>[^/]+)/data-review', include('gnowsys_ndf.ndf.urls.data_review')),
     (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
     (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
 
+    # --discussion--
     url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.methods.create_discussion', name='create_discussion'),    
     url(r'^(?P<group_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_reply', name='discussion_reply'),
     url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_delete_reply', name='discussion_delete_reply'),    
+    # --end of discussion
 
     #url(r'^(?P<group_id>[^/]+)/visualize', 'gnowsys_ndf.ndf.views.visualize.graphs', name='visualize'),
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
