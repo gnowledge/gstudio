@@ -325,7 +325,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
-    'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
+    # 'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
      
@@ -333,7 +333,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
+# AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
 
 ROOT_URLCONF = 'gnowsys_ndf.ndf.urls'
 
@@ -369,12 +369,12 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
-    'gnowsys_ndf.mobwrite',	#textb
+    # 'gnowsys_ndf.mobwrite',	#textb
 #    'south',			#textb
-    'django_extensions',	#textb
-    'reversion',		#textb
-    'django.contrib.flatpages',	#textb
-    'online_status',                       #for online_users     
+    # 'django_extensions',	#textb
+    # 'reversion',		#textb
+    # 'django.contrib.flatpages',	#textb
+    # 'online_status',                       #for online_users     
 #    'endless_pagination',
     'registration_email',
 )
@@ -541,8 +541,8 @@ warnings.filterwarnings(
 
 #USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
 
-USERS_ONLINE__TIME_IDLE = 300
-USERS_ONLINE__TIME_OFFLINE = 10
+# USERS_ONLINE__TIME_IDLE = 300
+# USERS_ONLINE__TIME_OFFLINE = 10
 #USERS_ONLINE__CACHE_PREFIX_USER
 #USERS_ONLINE__CACHE_USERS
 
