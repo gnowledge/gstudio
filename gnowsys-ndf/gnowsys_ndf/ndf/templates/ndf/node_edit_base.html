@@ -51,8 +51,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% else %}
 			{% trans "Create New " %} {{title}} :
 		{% endif %} 
-		</span></h3>
-		
+		</span></h3>		
 
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
 	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
@@ -61,34 +60,34 @@ background-repeat:no-repeat; background-size: 48px 48px
     </div> 
     </header>
   	
+    {% check_group node as is_group %}
 
     <div class="edit-card">
         
 	    <div class="row">
-	      	<dl class="tabs pill large-12 columns">
-				<dd class="active" id="node_tab" title="Click here to add Name, Description, Privacy and Tags">
+	      	<dl class="tabs pill large-12 columns select">
+				<dd class="active node_tab" title="Click here to add Name, Description, Privacy and Tags">
 		  		<!-- change name of collection tab overide block in your code -->
-		  			<a class="node_tab">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
+		  			<a>{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 				</dd>
-				<dd id="pr_node_tab" title="Click here to add/edit Prior Node">
-				  	<a class="prior_node_tab">{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
+				<dd class="prior_node_tab" title="Click here to add/edit Prior Node">
+				  	<a>{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
 				</dd>
 				<!-- change name of collection tab overide block in your code -->
-				<dd id="coll_tab" title="Click here to add/edit collection">
-				  	<a class="collection_tab">{% block collection_tab %} {% trans "Collection" %} {% endblock %}</a>
-				</dd>  
-
+				<dd class="collection_tab" data-reveal-id="{% if node %}{% if is_group == False %}publish_resource{% endif %}{% endif %}" title="Click here to add/edit collection">
+				  	<a>{% block collection_tab %} {% trans "Collection" %} {% endblock %}</a>
+				</dd>
 				<!-- change name of metadata tab overide block in your code -->
-				<dd id="meta_tab" title="Click here to add/edit metadata">
-				  	<a class="metadata_tab">{% trans "Metadata" %} </a> 
+				<dd class="meta_tab" title="Click here to add/edit metadata">
+				  	<a>{% trans "Metadata" %} </a> 
 				</dd>  
 		
-				<dd id="teach_tab" title="Click here to add/edit teaches">
-				 	<a class="teaches_tab" >{% trans "Teaches" %} </a> 
+				<dd class="teaches_tab" title="Click here to add/edit teaches">
+				 	<a>{% trans "Teaches" %} </a> 
 				</dd>
 		
-				<dd id="asses_tab" title="Click here to add/edit teaches">
-				 	<a class="assesses_tab" >{% trans "Assesses" %} </a> 
+				<dd class="assesses_tab" title="Click here to add/edit teaches">
+				 	<a>{% trans "Assesses" %} </a> 
 				</dd>	
 	     	</dl>     
 	            
@@ -96,15 +95,21 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
         
   	{% csrf_token %}
+
+  	<div id="publish_resource" class="reveal-modal" data-reveal style="width:500px;">
+  		Do you want to create:<br/><br/>
+  		<input class="collection" type="radio" name="coll" value="homogeneous"> &nbsp;Homogeneous Collection<br/>
+  		<input class="collection" type="radio" name="coll" value="heterogeneous"> &nbsp;Heterogeneous Collection
+  		<a class="close-reveal-modal">&#215;</a>
+  	</div>
   
   	<div id="node-details-edit-div" class="tabs-content" > 
   		<div id="message" style="display:none; color:red"></div>
 
-    	<div class="active content row" id="panel-name-description">
+    	<div class="active content row contents" id="panel-name-description">
       		<div class="medium-8 columns">
-		  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
-		  
-	</div>
+		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
+			</div>
 		
 			<!--  -->
 			<div class="large-4 columns">
@@ -196,7 +201,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     
     {% block prior_node %}
 
-    <div class="content" style="display:none;" id="panel-prior-node">
+    <div class="content contents" style="display:none;" id="panel-prior-node">
       <div class="row">
 		<div class="small-12 columns">
 		  	<div id="prior_node_drawer">
@@ -210,44 +215,46 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     {% block collection %}
 
-    <div class="content" style="display:none;" id="panel-collection">
+    <div class="content contents" style="display:none;" id="panel-collection">
 	    <div class="row">
 			<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}></div>
 		</div>
 		
-	  	{% trans "Classify by:" %}<br/><br/>		
-		<div class="row">
-		    <div class="small-2 columns">
-		      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
-		      {% trans "Page" %} <i class="step fi-page-filled"></i></span>
-		    </div>
-		    <div class="small-2 columns">
-		      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="File" />
-		      {% trans "File" %} <i class="step fi-book"></i></span>
-		    </div>
-		    <div class="small-2 columns">
-		      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Image" />
-		      {% trans "Image" %} <i class="step fi-photo"></i>
-		      </span>
-		    </div>
-		    <div class="small-2 columns">
-		      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Video" />
-		      {% trans "Video" %} <i class="step fi-video"></i>
-		      </span>
-		    </div>
-		    <div class="small-2 columns">
-		      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
-		      {% trans "Pandora" %} <i class="step fi-video"></i>
-		      </span>
-		    </div>	    
-		    <div class="small-2 columns">
-		      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
-		      {% trans "Quiz" %} <i class="step fi-pencil"></i>
-		      </span>
-		    </div>
+		<div class="choose" style="display:none;">
+		  	
+			<div class="row">
+			    <div class="small-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
+			      {% trans "Page" %} <i class="step fi-page-filled"></i></span>
+			    </div>
+			    <div class="small-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="File" />
+			      {% trans "File" %} <i class="step fi-book"></i></span>
+			    </div>
+			    <div class="small-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Image" />
+			      {% trans "Image" %} <i class="step fi-photo"></i>
+			      </span>
+			    </div>
+			    <div class="small-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Video" />
+			      {% trans "Video" %} <i class="step fi-video"></i>
+			      </span>
+			    </div>
+			    <div class="small-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
+			      {% trans "Pandora" %} <i class="step fi-video"></i>
+			      </span>
+			    </div>	    
+			    <div class="small-2 columns">
+			      <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
+			      {% trans "Quiz" %} <i class="step fi-pencil"></i>
+			      </span>
+			    </div>
+			</div>
 		</div>
 
-		<div class="row">
+		<div class="row drawers" style="display:none;">
 			<div class="small-12 columns">
 			  <div id="collection_drawer" >
 			    <!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
@@ -259,9 +266,9 @@ background-repeat:no-repeat; background-size: 48px 48px
       
     {% endblock %}
     
-    <div class="content" id="panel-metadata" style="width:95%; display:none;" >      
+    <div class="content contents" id="panel-metadata" style="width:95%; display:none;" >      
       	<div class="row">
-		  	<h3>{% trans "Please add or edit Metadata." %} </h3>
+		  	<h4>{% trans "Please add or edit Metadata" %} </h4>
 
 		  	{% get_metadata_values as metadata %}
 	  		{% for k,v in metadata.items %}
@@ -355,13 +362,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
         
    
-    <div class="content" id="panel-teaches"  style="width:95%; display:none;">
+    <div class="content contents" id="panel-teaches"  style="width:95%; display:none;">
   		<div class="row">
-			<div class="small-12 columns">
-  				<h5>{% trans "Add or edit Teaches: " %}</h5>
-			</div>
-			<br/>
-	
 			<div class="small-12 columns">
 	  			<div id="teaches_drawer">
 	    			<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
@@ -370,13 +372,8 @@ background-repeat:no-repeat; background-size: 48px 48px
       	</div>
     </div>
 	
-    <div class="content" id="panel-assesses"  style="width:95%; dsplay:none;">
+    <div class="content contents" id="panel-assesses"  style="width:95%; dsplay:none;">
   		<div class="row">
-			<div class="small-12 columns">
-  				<h5>{% trans "Add or edit Assesses:" %} </h5>
-			</div>
-			<br/>
-	
 			<div class="small-12 columns">
 	  			<div id="assesses_drawer">
 	    			<!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
@@ -516,7 +513,7 @@ $(document).ready(function(){
 });
 
 
-	$("input:radio").click(function() {
+	$("input[type='radio'][name='col']").click(function() {
 
 		cn_arr = []
 
@@ -529,9 +526,6 @@ $(document).ready(function(){
 		var cn_list = cn_arr.join(',');
 		var homo_coll = this.value;
 		var node_id = "{{node.pk}}";
-		// if (node_id){
-			// $("#save-node").hide();
-		// }
 
 		$.ajax({
 			type: "POST",
@@ -544,8 +538,9 @@ $(document).ready(function(){
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function cnt(data) {
-
+				$(".drawers").css("display", "block");
 				$("#collection_drawer").html(data);
+				$("#save-node").css("display", "block");
 
 				// write comment
 				$(".next_prev").click(function() {
@@ -578,45 +573,29 @@ $(document).ready(function(){
 
 	$(".node_tab").click(function() {
 		// for activating "panel-name-description" div and deactivate other div's
-		$("#panel-prior-node").css("display", "none");
-		$("#panel-teaches").css("display", "none");
-		$("#panel-assesses").css("display", "none");
-		$("#panel-collection").css("display", "none");
-		$("#panel-metadata").css("display", "none");
+		$("div.contents").css("display", "none");
 		$("#panel-name-description").css("display", "block");
+		$("#save-node").css("display", "block");
 		// For highlighting current clicked element
-		$("#pr_node_tab").removeClass("active");
-		$("#teach_tab").removeClass("active");
-		$("#asses_tab").removeClass("active");
-		$("#coll_tab").removeClass("active");
-		$("#meta_tab").removeClass("active");
-		$("#node_tab").addClass("active");		
-
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
+		
 	});	
 
-	$(".metadata_tab").click(function() {
+	$(".meta_tab").click(function() {
 		// for activating "panel-metadata" div and deactivate other div's
-		$("#panel-prior-node").css("display", "none");
-		$("#panel-teaches").css("display", "none");
-		$("#panel-assesses").css("display", "none");
-		$("#panel-collection").css("display", "none");
-		$("#panel-name-description").css("display", "none");
+		$("div.contents").css("display", "none");
 		$("#panel-metadata").css("display", "block");
+		$("#save-node").css("display", "block");
 		// For highlighting current clicked element
-		$("#pr_node_tab").removeClass("active");
-		$("#teach_tab").removeClass("active");
-		$("#asses_tab").removeClass("active");
-		$("#coll_tab").removeClass("active");
-		$("#node_tab").removeClass("active");
-		$("#meta_tab").addClass("active");
+
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
 
 		$("#metadata_info").html("<input type='hidden' name='metadata_info' value='metadata'>");
 	});			
 
 	$(".prior_node_tab").click(function() {
-
-		$("#save-node").css("display", "none");
-		$('#prior_node_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
 
 		$.ajax({
 			type: "POST",
@@ -631,19 +610,12 @@ $(document).ready(function(){
 			},
 			success: function cnt(data) {
 				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
-				$("#panel-teaches").css("display", "none");
-				$("#panel-assesses").css("display", "none");
-				$("#panel-collection").css("display", "none");
-				$("#panel-metadata").css("display", "none");
-				$("#panel-name-description").css("display", "none");
+				$("div.contents").css("display", "none");
 				$("#panel-prior-node").css("display", "block");
 				// For highlighting current clicked element
-				$("#teach_tab").removeClass("active");
-				$("#asses_tab").removeClass("active");
-				$("#coll_tab").removeClass("active");
-				$("#meta_tab").removeClass("active");
-				$("#node_tab").removeClass("active");
-				$("#pr_node_tab").addClass("active");
+				$("dl.select > dd").removeClass("active")
+				$(".prior_node_tab").addClass("active")
+
 				// To fill the drawer with returned data from ajax
 				$("#prior_node_drawer").html(data);
 				$("#save-node").css("display", "block");
@@ -674,79 +646,126 @@ $(document).ready(function(){
 
 	});
 
-	$(".collection_tab").click(function() {
-		// var count = 0;
-		// var counter;
-		$("#SelectApp").css("display", "none");
-		$("#save-node").css("display", "none");
-		$('#collection_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
-		$("#module_drawer").html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+	{% if is_group or not node %}
+		$(".collection_tab").click(function() {
+			var collection = "heterogeneous";
+	{% else %}
+		$(".collection").click(function() {
+			var collection = this.value;
+	{% endif %}
 
-		$.ajax({
-			type: "POST",
-			url: "{% url 'drawer_widget' groupid %}",
-			datatype: "html",
-			data:{
-				node_id: '{{node.pk}}',
-				field: "collection",
-				app:"{{title}}",
-				page_no: 1,
-				csrfmiddlewaretoken: '{{ csrf_token }}'
-			},
-			success: function cnt(data) {
-				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
-				$("#panel-prior-node").css("display", "none");
-				$("#panel-name-description").css("display", "none");
-				$("#panel-teaches").css("display", "none");
-				$("#panel-metadata").css("display", "none");
-				$("#panel-assesses").css("display", "none");
-				$("#panel-collection").css("display", "block");
-				// For highlighting current clicked element
-				$("#node_tab").removeClass("active");
-				$("#pr_node_tab").removeClass("active");
-				$("#meta_tab").removeClass("active");
-				$("#teach_tab").removeClass("active");
-				$("#asses_tab").removeClass("active");
-				$("#coll_tab").addClass("active");
-				// To fill the drawer with returned data from ajax
-				$("#collection_drawer").html(data);
-				$("#module_drawer").html(data);
-				$("#SelectApp").css("display", "block");				
-				$("#save-node").css("display", "block");
+		$("#publish_resource").foundation('reveal', 'close');
+		$("input[type='radio'][name='col']").attr("checked", false);
+		
+		if (collection == "homogeneous"){
 
-				$(".next_prev").click(function() {
-					
-					// alert(this.name);
-				 	$.ajax({
-						type: "POST",
-						url: "{% url 'drawer_widget' group_id %}",
-						datatype: "html",
-						data:{							
-							field: "collection",
-							node_id: '{{node.pk}}',
-							app:"{{title}}",
-							page_no: this.name,
-							csrfmiddlewaretoken: '{{ csrf_token }}'
-						},
-						success: function(data) {													
-							cnt(data)
-						}
+			$("div.contents").css("display", "none");
+			$("#panel-collection").css("display", "block");
+			// For highlighting current clicked element
+			$("dl.select > dd").removeClass("active")
+			$(".collection_tab").addClass("active")
+
+			var node_id = "{{node.pk}}";
+
+			$.ajax({
+				type: "POST",
+				url: "{% url 'select_drawer' groupid %}",
+				datatype: "html",
+				data:{
+					node_id: node_id,
+					node_type: "{{node.member_of}}",
+					page_no: 1,
+					csrfmiddlewaretoken: '{{ csrf_token }}'
+				},
+				success: function cnt(data) {
+					$(".choose").css("display", "none");
+					$(".drawers").css("display", "block");
+					$("#collection_drawer").html(data);
+
+					// write comment
+					$(".next_prev").click(function() {
+							
+						// alert(this.name);
+					 	$.ajax({
+							type: "POST",
+							url: "{% url 'select_drawer' groupid %}",
+							datatype: "html",
+							data:{							
+								node_id: node_id,
+								page_no: this.name,
+								csrfmiddlewaretoken: '{{ csrf_token }}'
+							},
+							success: function(data) {													
+								cnt(data)
+							}
+
+						});
+					});
+					// End of coment
+
+				}	
+
+			});
+
+
+		}
+		else{
+
+			$.ajax({
+				type: "POST",
+				url: "{% url 'drawer_widget' groupid %}",
+				datatype: "html",
+				data:{
+					node_id: '{{node.pk}}',
+					field: "collection",
+					app:"{{title}}",
+					page_no: 1,
+					csrfmiddlewaretoken: '{{ csrf_token }}'
+				},
+				success: function cnt(data) {
+					// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+					$("div.contents").css("display", "none");
+					$("#panel-collection").css("display", "block");
+					// For highlighting current clicked element
+					$("dl.select > dd").removeClass("active")
+					$(".collection_tab").addClass("active")
+
+					// To fill the drawer with returned data from ajax
+					$(".choose").css("display", "block");
+					$(".drawers").css("display", "block");
+					$("#collection_drawer").html(data);
+					$("#module_drawer").html(data);
+					// $("#save-node").css("display", "block");
+
+					$(".next_prev").click(function() {
+						
+					 	$.ajax({
+							type: "POST",
+							url: "{% url 'drawer_widget' group_id %}",
+							datatype: "html",
+							data:{							
+								field: "collection",
+								node_id: '{{node.pk}}',
+								app:"{{title}}",
+								page_no: this.name,
+								csrfmiddlewaretoken: '{{ csrf_token }}'
+							},
+							success: function(data) {													
+								cnt(data)
+							}
+
+						});
 
 					});
-
-				});
-				
-			}
-		});
+					
+				}
+			});
+		}
 
 	});
 	
 
 	$(".teaches_tab").click(function() {
-
-		
-		$("#save-node").css("display", "none");
-		$('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
 
 		$.ajax({
 			type: "POST",
@@ -761,19 +780,11 @@ $(document).ready(function(){
 			},
 			success: function cnt(data) {
 				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
-				$("#panel-assesses").css("display", "none");
-				$("#panel-collection").css("display", "none");
-				$("#panel-name-description").css("display", "none");
-				$("#panel-prior-node").css("display", "none");
-				$("#panel-metadata").css("display", "none");
+				$("div.contents").css("display", "none");
 				$("#panel-teaches").css("display", "block");
 				// For highlighting current clicked element
-				$("#asses_tab").removeClass("active");
-				$("#coll_tab").removeClass("active");
-				$("#node_tab").removeClass("active");
-				$("#meta_tab").removeClass("active");
-				$("#pr_node_tab").removeClass("active");
-				$("#teach_tab").addClass("active");
+				$("dl.select > dd").removeClass("active")
+				$(".teaches_tab").addClass("active")
 				// To fill the drawer with returned data from ajax
 				$("#teaches_drawer").html(data);
 				$("#save-node").css("display", "block");
@@ -807,10 +818,6 @@ $(document).ready(function(){
     
   	$(".assesses_tab").click(function() {
 
-		
-		$("#save-node").css("display", "none");
-		$('#assesses_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
-
 		$.ajax({
 			type: "POST",
 			url: "{% url 'drawer_widget' groupid %}",
@@ -824,19 +831,11 @@ $(document).ready(function(){
 			},
 			success: function cnt(data) {
 				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
-				$("#panel-collection").css("display", "none");
-				$("#panel-name-description").css("display", "none");
-				$("#panel-prior-node").css("display", "none");
-				$("#panel-metadata").css("display", "none");
-				$("#panel-teaches").css("display", "none");
+				$("div.contents").css("display", "none");
 				$("#panel-assesses").css("display", "block");
 				// For highlighting current clicked element
-				$("#coll_tab").removeClass("active");
-				$("#node_tab").removeClass("active");
-				$("#meta_tab").removeClass("active");
-				$("#pr_node_tab").removeClass("active");
-				$("#teach_tab").removeClass("active");
-				$("#asses_tab").addClass("active");
+				$("dl.select > dd").removeClass("active")
+				$(".assesses_tab").addClass("active")
 				// To fill the drawer with returned data from ajax
 				$("#assesses_drawer").html(data);
 				$("#save-node").css("display", "block");
@@ -896,8 +895,7 @@ $(document).ready(function(){
 				assess_arr.push($(this).val());
 			}
 		});
-		//alert(pn_arr + 'prior')
-		//alert(assess_arr + 'assess')
+
 		$("#prior_node_list").val(pn_arr);
 		$("#collection_list").val(cn_arr) ;
 		$("#module_list").val(md_arr);
