@@ -433,7 +433,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
                                                 ]
                                                 },{'member_of': {'$all': [pandora_video_st._id]}, 
                                                   'group_set': {'$all': [ObjectId(group_id)]},
-                                                  '_type': "File"
+                                                  '_type': "File", 'accesss_policy': u"PUBLIC"
                                                   }
                                            ]}).sort("last_update", -1)
     else:

@@ -469,22 +469,21 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
 
     if request.method == "POST":
       student_enroll_list = request.POST.get("student_enroll_list", "")
-      announced_courses_name = request.POST.get("announced_courses_list", "")
+      announced_courses_id = request.POST.get("announced_courses_list", "")
 
       if student_enroll_list != '':
         student_enroll_list = [ObjectId(each.strip()) for each in student_enroll_list.split(",")]
 
-      if announced_courses_name != '':
-        announced_course_GST = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
-        acourse_node = collection.Node.one({'member_of':announced_course_GST._id,u'name':unicode(announced_courses_name)},{'_id':1})
-        announced_courses_name = ObjectId(acourse_node._id)
+      if announced_courses_id != '':
+        announced_courses_id = ObjectId(announced_courses_id)
+      print "announced_courses_id", announced_courses_id
 
       # Fetch selected_course RelationType
       selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
 
       for student_id in student_enroll_list:
-        if announced_courses_name:
-          gr = create_grelation(student_id, selected_course_RT, announced_courses_name)
+        if announced_courses_id:
+          gr = create_grelation(student_id, selected_course_RT, announced_courses_id)
 
       return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
 

@@ -257,9 +257,9 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
               if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
               elif field_instance["name"] in ["dob", "registration_date"]:
-                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y")
               else:
-                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
 
               if field_value:
                 event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
@@ -270,7 +270,7 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
 
               # field_instance_type = "GRelation"
               for i, field_value in enumerate(field_value_list):
-                field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
+                field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
 
               event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value_list)
