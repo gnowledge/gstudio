@@ -931,26 +931,17 @@ def convert_pdf_thumbnail(files,_id):
     
 
 def convert_mid_size_image(files):
-    '''
-    convert image into 1000 pixel size userd for image gallery
-    '''
+    """
+    convert image into mid size image image 500*300
+    """
+    files.seek(0)
     mid_size_img = StringIO()
+    size = (500, 300)
     img = Image.open(StringIO(files.read()))
-    width, height = img.size
-
-    widthRatio = 1000 / float(width)
-    heightRatio = 1000 / float(height)
-
-    width = int(float(width) * float(widthRatio))
-    height = int(float(height) * float(heightRatio))
-
-    size = width, height
-
-    img.resize(size, Image.ANTIALIAS)
+    img = img.resize(size, Image.ANTIALIAS)
     img.save(mid_size_img, "JPEG")
     mid_size_img.seek(0)
     return mid_size_img
-    
     
     
 def convertVideo(files, userid, fileobj, filename):
