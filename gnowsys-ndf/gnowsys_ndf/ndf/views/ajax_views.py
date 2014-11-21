@@ -393,6 +393,17 @@ def select_drawer(request, group_id):
         page_no = request.POST.get("page_no", '')
         field = request.POST.get("field", '')
         checked = request.POST.get("homo_collection", '')
+        node_type = request.POST.get("node_type", '')
+          
+        if node_id:
+          node_id = ObjectId(node_id)
+          node = collection.Node.one({'_id': ObjectId(node_id) })  
+          if node_type:
+            if len(node.member_of) > 1:
+              n_type = collection.Node.one({'_id': ObjectId(node.member_of[1]) })
+            else:
+              n_type = collection.Node.one({'_id': ObjectId(node.member_of[0]) })
+            checked = n_type.name
 
         if checked:
           if checked == "QuizObj" :
@@ -405,12 +416,8 @@ def select_drawer(request, group_id):
           else:
             check = collection.Node.one({'_type': 'GSystemType', 'name': unicode(checked) })
 
-        
-
         if node_id:
-            node_id = ObjectId(node_id)
-            node = collection.Node.one({'_id': ObjectId(node_id) })            
-            
+
             if field:
               if field == "teaches":
                 relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
@@ -426,7 +433,6 @@ def select_drawer(request, group_id):
                 nlist = node.prior_node
               elif field == "collection":
                 nlist = node.collection_set
-
 
         else:
             node_id = None
