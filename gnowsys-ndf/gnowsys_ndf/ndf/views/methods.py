@@ -206,14 +206,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
     collection = db[Node.collection_name]
-    
-    theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
-    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
-    forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
-    reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
-    
     drawer = None    
 
     if checked:
@@ -268,9 +261,13 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         drawer = collection.Node.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).limit(50)
 
       elif checked == "Theme":
+        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
         drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "theme_item":
+        theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
         drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_item_GST._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "Topic":
@@ -287,13 +284,15 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         # Special case used while dealing with RelationType widget
         drawer = checked
 
-      elif theme_GST_id or topic_GST_id or theme_item_GST or forum_GST_id or reply_GST_id:
-        filtering = filter_drawer_nodes(nid, group_id)
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
-      
       else:
         filtering = filter_drawer_nodes(nid, group_id)
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]} })
+        Page = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
+        File = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
+        Quiz = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
+                                       '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]}, 
+                                       'member_of':{'$in':[Page._id,File._id,Quiz._id]}
+                                      })
 
     if checked != "RelationType":
       paged_resources = paginator.Paginator(drawer, page_no, 10)
