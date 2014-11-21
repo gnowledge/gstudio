@@ -2,6 +2,11 @@
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 
+<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
+<script type="text/javascript">
+  $(document).foundation();
+</script>
+
 {% block head %}
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -149,6 +154,12 @@
   #html-res-iframe{
     border: none;
   }
+
+  .orbit-container .orbit-prev,
+  .orbit-container .orbit-next {
+    background-color: tomato;    
+  }
+  
 
 </style>
 
@@ -331,133 +342,130 @@
 
           {% get_grid_fs_object node as grid_fs_obj %}
 
-          {% if 'Pandora_video' in node.member_of_names_list %}
-          <div>
-            {% get_source_id node.pk as source_id %}
-            <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-              <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
-              {% trans "Your browser does not support the video tag." %}
-            </video><br/><br/>
+          <!-- New Implementation -->
+          Resource Type: {{node.mime_type}}<br/><br/>          
+          
+          {% if node.collection_set %} 
+            {% if 'image' in node.mime_type or 'video' in node.mime_type %}                    
+            <!-- Orbit image slider only for image and video collections--> 
+              
+              <ul data-orbit data-options="variable_height: true;timer:false;">              
+                <li class="active">
+                  <center>                    
+                  {% if 'image' in node.mime_type %}
+                    <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                  {% elif 'Pandora_video' in node.member_of_names_list %}
+                    {% get_source_id node.pk as source_id %}
+                    <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+                      <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                      {% trans "Your browser does not support the video tag." %}
+                    </video>  
+                  {% elif 'video' in node.mime_type %}
+                    <video width="500" controls buffered>
+                      <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
+                      <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
+                      {% trans "Your browser does not support the video tag." %}
+                    </video>
+                  {% endif %}
+                  <div class="orbit-caption"> {{node.name}} </div>             
+                </li>                
 
-            {% get_pandoravideo_metadata video_obj as metadata %}
-            {% for k,v in metadata.items %} 
-              {% if k != "cuts" %}
-                <h3>{{k}} : {{v}}<h3>
-                <br/>
-              {% endif %}
-            {% endfor %}
+                {% for k in node.collection_set %}
+                  {% get_node k as obj %}
+                  {% get_grid_fs_object obj as grid_fs_obj %}
+                  {% if 'image' in obj.mime_type or 'video' in obj.mime_type %}
+                  <li>
+                    <center>
+                      {% if 'image' in obj.mime_type %}
+                        <img src="{% url 'get_mid_size_img' group_name_tag k %}" /> 
+                      {% elif 'Pandora_video' in obj.member_of_names_list %}
+                        {% get_source_id k as source_id %}
+                        <!-- <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls> -->
+                        <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+                          <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                          {% trans "Your browser does not support the video tag." %}
+                        </video>  
+                      {% elif 'video' in obj.mime_type %}
+                        <!-- <video width="640px" controls buffered> -->
+                        <video width="500" controls buffered>
+                          <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/webm">
+                          <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/ogg">    
+                          {% trans "Your browser does not support the video tag." %}
+                        </video>                    
+                      {% endif %}    
+                      <div class="orbit-caption"> {{obj.name}} </div> 
+                    </center>
+                  </li>
+                  {% endif %} 
 
-            {% if user.is_authenticated %}
-              <br/>
-              <br/>
-              <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
-                <span class="fi-download large"> {% trans "Download " %} </span>
-              </a>
+                {% endfor %}
+              </ul>           
+
+              <!-- End of slider --> 
+            {% else %}
+                {% if 'audio' in node.mime_type %}
+                  <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
+                    <p>Your browser does not support the audio element </p>
+                  </audio>
+                {% elif 'html' in node.mime_type %}
+                  <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    <p>Your browser does not support the audio element </p>
+                  </iframe>
+                {% else %}
+                  <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    {{ grid_fs_obj.filename }}
+                  </a>
+                {% endif %}       
             {% endif %}
-          </div>
 
-          {% elif 'video' in node.mime_type %}
-          <div>
-            <video width="640px" controls buffered>
-              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-              {% trans "Your browser does not support the video tag." %}
-            </video>
-
-            {% if user.is_authenticated %}
-              <br/>
-              <br/>
-              <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-                <span class="fi-download large"> {% trans "Download " %} </span>
-              </a>
-            {% endif %}
-          </div>
-
-          {% else %}    
-            <div>
+          {% else %}
               {% if 'image' in node.mime_type %}
-                Resource Type: {{node.mime_type}}
-
-                <!-- lightbox for displaying image gallary -->
-                <ul class="clearing-thumbs clearing-feature small-block-grid-2" data-clearing> 
-                  {% for image in imageCollection %}
-                    {% get_grid_fs_object image as grid_fs_obj %}
-                    {% if node.pk == image.pk %}
-                    <li class="clearing-featured-img">
-                    {% else %}
-                    <li>
-                    {% endif %}
-                      <a href="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}">
-                        <img class="imgLightbox" src="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}" data-caption="{{image.name}}" name="{{image.pk}}">
-                      </a>
-                    </li> 
-                  {% endfor %}
-                </ul>
-                <!--  -->
-              
+                <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+              {% elif 'Pandora_video' in node.member_of_names_list %}
+                {% get_source_id node.pk as source_id %}
+                <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+                  <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                  {% trans "Your browser does not support the video tag." %}
+                </video>  
+              {% elif 'video' in node.mime_type %}
+                <video width="500" controls buffered>
+                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
+                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
+                  {% trans "Your browser does not support the video tag." %}
+                </video>
               {% elif 'audio' in node.mime_type %}
-                <div class="row">
-                  <div class="small-12 columns">
-                    <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
-                      <p>Your browser does not support the audio element </p>
-                    </audio>
-                  </div>
-                </div>
-                Resource Type: {{node.mime_type}}
-                <br/>
-                <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-                  {{ grid_fs_obj.filename }}
-                </a>
-              
+                <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
+                  <p>Your browser does not support the audio element </p>
+                </audio>
               {% elif 'html' in node.mime_type %}
-                <!-- <div class="row"> -->
-                  <!-- <div class="small-12 columns"> -->
-                    <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      <p>Your browser does not support the audio element </p>
-                    </iframe>
-                  <!-- </div> -->
-                <!-- </div> -->
-                Resource Type: {{node.mime_type}}
-                <br/>
-                <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-                  {{ grid_fs_obj.filename }}
-                </a>
-
-              {% comment %}
-                {% elif 'pdf' in node.mime_type %}
-                <div class="row">
-                  <div class="small-12 columns">
-                    <!-- <object type="application/pdf" width="400" height="500" data="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      alt: <p>Your browser does not support the audio element </p>
-                    </object> -->
-                    <!-- <embed src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" width="600" height="500" alt="pdf" pluginspage="http://www.adobe.com/products/acrobat/readstep2.html"> -->
-                    <!-- <iframe src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" width="500" height="500"></iframe> -->
-                  </div>
-                </div>
-                Resource Type: {{node.mime_type}}
-                <br/>
-                  <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-                  {{ grid_fs_obj.filename }}
-                </a>
-              {% endcomment %}
-              
+                <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                  <p>Your browser does not support the audio element </p>
+                </iframe>
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
                 </a>
-
               {% endif %}
 
-              {% if user.is_authenticated %}
-                <br/>
-                <br/>
-                <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-                  <span class="fi-download large"> {% trans "Download " %} </span>
-                </a>
-              {% endif %}
-            </div>
-    
           {% endif %}
+          
+
+          {% if user.is_authenticated %}
+            <br/>
+            <br/>
+            {% if 'Pandora_video' in node.member_of_names_list %}
+              <a class="button small secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
+            {% elif 'video' in node.mime_type %}
+              <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+            {% else %}
+              <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+            {% endif %}
+                <span class="fi-download large"> {% trans "Download " %} </span>
+              </a>
+            
+          {% endif %}
+
+          <!-- End New -->          
     
         {% endif %}
         
