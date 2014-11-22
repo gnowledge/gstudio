@@ -354,6 +354,7 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
   tags = request.POST.get('tags')
   name = request.POST.get('name')
   tags = request.POST.get('tags')
+  access_policy = request.POST.get('access_policy')
   usrid = int(request.user.id)
   language= request.POST.get('lan')
   if get_type == "File":
@@ -380,9 +381,11 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
  
   node.name = unicode(name)
   node.language=unicode(language)
-
+ 
   node.modified_by = usrid
-
+  if access_policy:
+    node.access_policy = access_policy
+ 
   if usrid not in node.contributors:
     node.contributors.append(usrid)
 
@@ -436,7 +439,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   add_topic_name = unicode(request.POST.get("add_topic_name", ''))
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
-  access_policy = request.POST.get("login-mode", '') 
+  access_policy = request.POST.get("login-mode", '')
   right_drawer_list = []
   checked = request.POST.get("checked", '') 
   check_collection = request.POST.get("check_collection", '') 
