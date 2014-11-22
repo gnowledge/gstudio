@@ -242,6 +242,7 @@ def create_meta_type(user_id,meta_type):
   meta.modified_by = user_id
   if user_id not in meta.contributors:
     meta.contributors.append(user_id)
+  meta.status = u"PUBLISHED"
   meta.save()
   print "succesfully created META_TYPE:",meta_type
 
@@ -260,6 +261,7 @@ def create_gsystem_type(st_name, user_id, meta_type_id = None):
         gs_node.member_of.append(meta_type_id)
       if user_id not in gs_node.contributors:
         gs_node.contributors.append(user_id)
+      gs_node.status = u"PUBLISHED"
       gs_node.save()
       print 'created', st_name, 'as', 'GSystemType'
     except Exception as e:
@@ -291,6 +293,7 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
       at.data_type = data_type              
       for each in system_type_id_list:
         at.subject_type.append(each)
+      at.status = u"PUBLISHED"
       at.save()
       print 'created', at_name, 'as', 'AttributeType'
     except Exception as e:
@@ -312,6 +315,7 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
       edited=True
       print "Edited data_type of",node.name,"Earlier it was",node.data_type,"now it is ",data_type
     if edited:
+      node.status = u"PUBLISHED"
       node.save()
     else:
       print 'AttributeType',at_name,'already created'
@@ -337,6 +341,7 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
 
       if user_id not in rt_node.contributors:
         rt_node.contributors.append(user_id)
+      rt_node.status = u"PUBLISHED"
       rt_node.save()
       print 'created', rt_name, 'as', 'RelationType'
     except Exception as e:
@@ -358,6 +363,7 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
       edited=True
       print "Edited object_type of",rt_node.name,"Earlier it was",rt_node.object_type,"now it is",object_type_id_list
     if edited :
+      rt_node.status = u"PUBLISHED"
       rt_node.save()
     else:
       print 'RelationType',rt_node.name,'already created'
@@ -436,6 +442,7 @@ def create_sts(factory_gsystem_types,user_id):
     topics.collection_set.append(topic_GST._id)
     topics.created_by = 1
     topics.modified_by = 1
+    topics.status = u"PUBLISHED"
     topics.save()
 
 def clean_structure():

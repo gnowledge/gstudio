@@ -27,7 +27,9 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'proceedings','meta_type':'factory_types'},
                          {'name':'techreport','meta_type':'factory_types'},
                          {'name':'unpublished_entry','meta_type':'factory_types'},
-                         {'name':'booklet','meta_type':'factory_types'}]
+                         {'name':'booklet','meta_type':'factory_types'},
+                         {'name':'GList','meta_type':'factory_types'}
+                        ]
 
 
 #fill attribute name,data_type,gsystem_type name in bellow dict to create factory Attribute Type

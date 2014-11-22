@@ -21,6 +21,14 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Update's "status" field from DRAFT to PUBLISHED for all TYPE's node(s)
+    res = collection.update(
+        {'_type': {'$in': ["MetaType", "GSystemType", "RelationType", "AttributeType"]}, 'status': u"DRAFT"}, 
+        {'$set': {'status': u"PUBLISHED"}}, 
+        upsert=False, multi=True
+    )
+    print "\n 'status' field updated for all TYPE's node(s) in following no. of documents: ", res['n']
+
     # Update object_value of GAttribute(s) of "Assignee" AttributeType
     # Find those whose data-type is not list/Array
     # Replace those as list of value(s)
