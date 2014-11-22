@@ -48,7 +48,8 @@ class HomeRedirectView(RedirectView):
             if auth is None:
                 auth = collection.Author()
                 
-                auth.name = unicode(self.request.user)      
+                auth.name = unicode(self.request.user)
+                auth.email = unicode(self.request.user.email)
                 auth.password = u""
                 auth.member_of.append(auth_type)
                 auth.group_type = u"PUBLIC"

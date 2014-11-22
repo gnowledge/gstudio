@@ -1,0 +1,51 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{username}}'s - Dashboard  {% endblock %}
+
+{% block meta_content %}
+  <h3>{% trans "About" %}</h3>
+
+  {% blocktrans %}<b>Group Dashboard</b> Shows task(s) and activitie(s) in the site.{% endblocktrans %}
+{% endblock %}
+
+{% block style %}
+	.resource-drawer { 
+    max-height: 202px;
+    overflow-y: auto;
+  }
+
+  .style2 {
+    color: #10c1cb; 
+    font-size: 10em;
+    text-shadow: 0 1px 0 #0092b3, 0 2px 0 #0087a6, 0 3px 0 #008099, 0 4px 0 #00758c, 0 5px 0 #555, 0 6px 0 #006a80, 0 0 0 #006073, 0 8px 7px #005566;
+  }
+
+  .style-text {
+    margin: 10px 0;
+  }
+
+  .img-height {
+    height: 100%;
+  }
+
+  .div-height {
+    margin-bottom: 0.5em; 
+    height: 9em;
+  }
+
+  .margin-p5 {
+    margin-bottom: 0.5em !important;
+  }
+
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+{% endblock %}
+
+{% block body_content %}
+<h1>Group Dashboard</h1>
+{% endblock %}
