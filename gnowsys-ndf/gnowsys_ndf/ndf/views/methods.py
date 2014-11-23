@@ -1,11 +1,13 @@
 ''' -- imports from installed packages -- '''
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
-from django.template import RequestContext
 from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.auth.decorators import login_required
 from mongokit import paginator
 import mongokit 
 
@@ -20,7 +22,6 @@ from gnowsys_ndf.notification import models as notification
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-
 import subprocess
 import re
 import ast
@@ -2060,3 +2061,119 @@ def get_file_node(file_name=""):
 		            file_list.append(i.name)	
   return file_list	
 
+def create_task(task_dict, task_type_creation="single"):
+    """Creates task with required attribute(s) and relation(s).
+
+    task_dict
+    - Required keys: name, group_set, created_by, modified_by, contributors,
+        content_org, created_by_name, Status, Priority, start_time, end_time, Assignee
+
+    task_type_creation
+    - Valid input values: "single", "multiple", "group"
+    """
+    # Fetch Task GSystemType document
+    task_gst = collection.Node.one(
+        {'_type': "GSystemType", 'name': "Task"}
+    )
+
+    # List of keys of "task_dict" dictionary
+    task_dict_keys = task_dict.keys()
+    task_node = collection.GSystem()
+    task_node["member_of"] = [task_gst._id]
+
+    # Store built in variables of task node
+    # Iterate task_node using it's keys
+    for key in task_node:
+        if key in ["Status", "Priority", "start_time", "end_time", "Assignee"]:
+            # Required because these values are coming as key in node's document
+            continue
+
+        if key in task_dict_keys:
+            if key == "content_org":
+                #  org-content
+                task_node[key] = task_dict[key]
+
+                # Required to link temporary files with the current user who is modifying this document
+                filename = slugify(task_dict["name"]) + "-" + task_dict["created_by_name"] + "-" + ObjectId().__str__()
+                task_dict_keys.remove("created_by_name")
+                task_node.content = org2html(task_dict[key], file_prefix=filename)
+
+            else:
+                task_node[key] = task_dict[key]
+
+            task_dict_keys.remove(key)
+
+    # Save task_node with built-in variables as required for creating GAttribute(s)/GRelation(s)
+    task_node.save()
+
+    # Create GAttribute(s)/GRelation(s)
+    for attr_or_rel_name in task_dict_keys:
+        attr_or_rel_node = collection.Node.one(
+            {'_type': {'$in': ["AttributeType", "RelationType"]}, 'name': unicode(attr_or_rel_name)}
+        )
+
+        if attr_or_rel_node:
+            if attr_or_rel_node._type == "AttributeType":
+                ga_node = create_gattribute(task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
+            
+            elif attr_or_rel_node._type == "RelationType":
+                gr_node = create_grelation(task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
+
+        else:
+            raise Exception("\n No AttributeType/RelationType exists with given name("+attr_or_rel_name+") !!!")
+
+    # If given task is a group task (create a task for each Assignee from the list)
+    # Iterate Assignee list & create separate tasks for each Assignee 
+    # with same set of attribute(s)/relation(s)
+    if task_type_creation == "group":
+        mutiple_assignee = task_dict["Assignee"]
+        collection_set = []
+        for each in mutiple_assignee:
+            task_dict["Assignee"] = [each]
+            task_sub_node = create_task(task_dict)
+            collection_set.append(task_sub_node._id)
+
+        collection.update({'_id': task_node._id}, {'$set': {'collection_set': collection_set}}, upsert=False, multi=False)
+
+    else:
+        # Send notification for each each Assignee of the task
+        # Only be done in case when task_type_creation is not group, 
+        # i.e. either single or multiple
+        site = Site.objects.get(pk=1)
+        site = site.name.__str__()
+
+        from_user = task_node.user_details_dict["created_by"]  # creator of task
+
+        group_name = collection.Node.one(
+            {'_type': {'$in': ["Group", "Author"]}, '_id': task_node.group_set[0]},
+            {'name': 1}
+        ).name
+
+        url_link = "http://" + site + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
+
+        msg = "Task '" + task_node.name + "' has been reported by " + from_user + \
+            "\n     - Status: " + task_dict["Status"] + \
+            "\n     - Priority: " + task_dict["Priority"] + \
+            "\n     - Assignee: " + ", ".join(task_dict["Assignee"]) +  \
+            "\n     - For more details, please click here: " + url_link
+
+        to_user_list = []
+        for user_name in task_dict["Assignee"]:
+            user_obj = User.objects.get(username=user_name)
+            if user_obj not in to_user_list:
+                to_user_list.append(user_obj)
+
+        activity = "reported task"
+        render_label = render_to_string(
+            "notification/label.html",
+            {
+                "sender": from_user,
+                "activity": activity,
+                "conjunction": "-",
+                "link": url_link
+            }
+        )
+        notification.create_notice_type(render_label, msg, "notification")
+        notification.send(to_user_list, render_label, {"from_user": from_user})
+
+    return task_node

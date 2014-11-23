@@ -5,6 +5,7 @@ import datetime
 
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth.models import User
 from optparse import make_option
 
 from django_mongokit import get_database
@@ -17,7 +18,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.models import Node, Group
-from gnowsys_ndf.ndf.views.methods import create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 ####################################################################################################################
 
@@ -39,6 +40,7 @@ class Command(BaseCommand):
     make_option('-d', '--setup-data', action='store_true', dest='setup_mis_data', default=False, help='This sets up group(s) with MIS-data.'),
     make_option('-g', '--setup-gapps', action='store_true', dest='setup_gapps', default=False, help='This sets up default GAPPS for group(s).'),
     make_option('-r', '--ren-regYear', action='store_true', dest='ren_regYear', default=False, help='This renames registration_year to registration_date and updates existing value(s), if exists.'),
+    make_option('-l', '--link-login-ac', action='store_true', dest='link_login_ac', default=False, help='This renames registration_year to registration_date and updates existing value(s), if exists.'),
   )
 
   option_list = option_list + user_defined_option_list
@@ -46,6 +48,29 @@ class Command(BaseCommand):
   help = "This script handles works related to MIS GAPP."
 
   def handle(self, *args, **options):
+    # Links Author GSystem and Respecive Person's Sub-type GSystem. ------------------------------------
+    if options['link_login_ac']:
+      try:
+        info_message = "\n Links Author GSystem and Respecive Person's Sub-type GSystem.\n"
+        log_list.append(info_message)
+        info_message = ""
+        link_login_ac()
+      
+      except Exception as e:
+        error_message = "\n LoginLinkError: " + str(e) + " !!!\n"
+        log_list.append(error_message)
+        pass
+
+      finally:
+        if log_list:
+          log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+
+          log_file_name = os.path.splitext(os.path.basename(__file__))[0] + ".log"
+          log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+
+          with open(log_file_path, 'a') as log_file:
+            log_file.writelines(log_list)
+    
     # Renames registration_year to registration_date & updates existing value(s) ------------------------------------
     if options['ren_regYear']:
       try:
@@ -255,6 +280,25 @@ class Command(BaseCommand):
             log_file.writelines(log_list)
 
 	# ------------------------ End of handle() --------------------------------    
+
+def link_login_ac():
+  """This function links Author GSystem and Respecive Person's Sub-type GSystem.
+  """
+  users = User.objects.all()
+  has_login_rt = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
+
+  for each in users:
+    person_node = collection.Node.find({'attribute_set.email_id': each.email})
+    auth_node = collection.Node.one({'_type': "Author", 'email': each.email})
+    if person_node.count() <= 0 or auth_node is None:
+      error_message = "\n Either person_node or auth_node doesn't exists for given email (" + each.email + ") !!!"
+      log_list.append(error_message)
+      continue
+
+    for pn in person_node:
+      gr_node = create_grelation(pn._id, has_login_rt, auth_node._id)
+      info_message = "\n This GRelation created for " + str(gr_node.name) + "."
+      log_list.append(info_message)
 
 def update_registration_year():
   '''
