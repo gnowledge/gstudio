@@ -456,21 +456,33 @@ def clean_structure():
 
   users = User.objects.all()
   for each in users:
-    auth_node = collection.Node.one({'_type': "Author", 'created_by': each.id})
-    res = collection.update(
-      {'_id': auth_node._id},
-      {'$set': {'email': each.email}},
-      upsert=False, multi=False
-    )
+    try:
+      auth_node = collection.Node.one({'_type': "Author", 'created_by': each.id})
 
-    if res['n']:
-      auth_node.reload()
-      info_message = "\n Author node's (" + str(auth_node._id) + " -- " + auth_node.name + ") email field updated with following value: " + auth_node.email
+      if auth_node:
+        res = collection.update(
+          {'_id': auth_node._id},
+          {'$set': {'email': each.email}},
+          upsert=False, multi=False
+        )
 
-    else:
-      info_message = "\n Author node's (" + str(auth_node._id) + " -- " + auth_node.name + ") email field update failed !!!"
-  
-    log_list.append(info_message)
+        if res['n']:
+          auth_node.reload()
+          info_message = "\n Author node's (" + str(auth_node._id) + " -- " + auth_node.name + ") email field updated with following value: " + auth_node.email
+
+        else:
+          info_message = "\n Author node's (" + str(auth_node._id) + " -- " + auth_node.name + ") email field update failed !!!"
+      
+        log_list.append(info_message)
+
+      else:
+        info_message = "\n No author node exists with this name (" + auth_node.name + ") !!!"
+        log_list.append(info_message)
+    
+    except Exception as e:
+      error_message = "\n Author node has multiple records... " + str(e) + "!!!"
+      log_list.append(error_message)
+      continue
 
   # Setting attribute_set & relation_set ==================
   info_message = "\n\nSetting attribute_set & relation_set for following document(s)...\n"
