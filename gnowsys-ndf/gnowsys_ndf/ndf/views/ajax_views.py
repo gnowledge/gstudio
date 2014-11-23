@@ -2048,18 +2048,22 @@ def search_tasks(request, group_id):
 	raise Http404
 
 def get_group_member_user(request, group_id):
-    '''
-    This function will return (all task's) 
-    '''
-    user_list = []
-    group = collection.Node.find_one({'_id':ObjectId(group_id)})
-    if request.is_ajax():
-        if group.author_set:
-            for each in group.author_set:
-                user_list.append(User.objects.get(id = each).username)
-        return HttpResponse(json.dumps(user_list))
-    else:
-	raise Http404
+  """Returns member(s) of the group excluding (group-admin(s)) in form of
+  dictionary that consists of key-value pair:
+
+  key: Primary key from Django's User table
+  value: User-name of that User record
+  """
+  user_list = {}
+  group = collection.Node.find_one({'_id':ObjectId(group_id)})
+  if request.is_ajax():
+    if group.author_set:
+      for each in group.author_set:
+        user_list[each] = User.objects.get(id=each).username
+    return HttpResponse(json.dumps(user_list))
+
+  else:
+    raise Http404
 
 
 def annotationlibInSelText(request, group_id):
