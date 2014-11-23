@@ -75,7 +75,6 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                            {'Upload_Task':{'gsystem_names_list':['Task'], 
                                         'data_type':'list',
                                         'meta_type':'factory_types'}}, 
-                                        
                            {'Estimated_time':{'gsystem_names_list':['Task'], 
                                               'data_type':'float',
                                               'meta_type':'factory_types'}},
@@ -159,38 +158,78 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
 # 'data_type':'basestring','meta_type':'factory_types'}},
 
 
-
-
 #fill relation_type_name,inverse_name,subject_type,object_type in bellow dict to create factory Relation Type
-factory_relation_types = [{'has_shelf':{'subject_type':['Author'],
-                                        'object_type':['Shelf'], 
-                                        'inverse_name':'shelf_of',
-                                        'meta_type':'factory_types'}}, 
-                          {'translation_of':{'subject_type':['Page','Topic','Theme','theme_item','File','GAPP'],
-                                             'object_type':['Page','Topic','Theme','theme_item','File','GAPP'], 
-                                             'inverse_name':'translation_of', 
-                                             'meta_type':'factory_types'}}, 
-                          {'has_module':{'subject_type':['Page'],
-                                         'object_type':['Module'], 
-                                         'inverse_name':'generated_from', 
-                                         'meta_type':'factory_types'}}, 
-                          {'has_profile_pic':{'subject_type':['Author'],
-                                              'object_type':['Image'], 
-                                              'inverse_name':'profile_pic_of', 
-                                              'meta_type':'factory_types'}}, 
-                          {'has_thread':{'subject_type':['Page', 'File'],
-                                         'object_type':['Twist'], 
-                                         'inverse_name':'thread_of', 
-                                         'meta_type':'factory_types'}}, 
-                          {'teaches':{'subject_type':['Page','File', 'Topic','Pandora_video'],
-                                      'object_type':['Page','Concept','Topic', 'File', 'Pandora_video'], 
-                                      'inverse_name':'taught_by', 
-                                      'meta_type':'factory_types'}},
-                          {'assesses':{'subject_type':['Quiz','QuizItem'],
-                                       'object_type':['Topic','Concept','Page','Quiz','QuizItem'], 
-                                       'inverse_name':'assessed_by', 
-                                       'meta_type':'factory_types'}},
-                          {'has_bib_types':{'subject_type':['Bib_App'],
-                                            'object_type':['conference','inbook','inproceedings','incollection','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','article','booklet','book'],
-                                            'inverse_name':'bib_type_of',
-                                            'meta_type':'factory_types'}}]
+factory_relation_types = [
+    {'has_shelf': {
+            'subject_type':['Author'],
+            'object_type':['Shelf'], 
+            'inverse_name':'shelf_of',
+            'meta_type':'factory_types'
+        }
+    }, 
+
+    {'translation_of': {
+            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP'],
+            'object_type':['Page','Topic','Theme','theme_item','File','GAPP'], 
+            'inverse_name':'translation_of', 
+            'meta_type':'factory_types'
+        }
+    }, 
+
+    {'has_module': {
+            'subject_type':['Page'],
+            'object_type':['Module'], 
+            'inverse_name':'generated_from', 
+            'meta_type':'factory_types'
+        }
+    }, 
+
+    {'has_profile_pic': {
+            'subject_type':['Author'],
+            'object_type':['Image'], 
+            'inverse_name':'profile_pic_of', 
+            'meta_type':'factory_types'
+        }
+    }, 
+
+    {'has_thread': {
+            'subject_type':['Page', 'File'],
+            'object_type':['Twist'], 
+            'inverse_name':'thread_of', 
+            'meta_type':'factory_types'
+        }
+    }, 
+
+    {'teaches': {
+            'subject_type':['Page','File', 'Topic','Pandora_video'],
+            'object_type':['Page','Concept','Topic', 'File', 'Pandora_video'], 
+            'inverse_name':'taught_by', 
+            'meta_type':'factory_types'
+        }
+    },
+
+    {'assesses': {
+            'subject_type':['Quiz','QuizItem'],
+            'object_type':['Topic','Concept','Page','Quiz','QuizItem'], 
+            'inverse_name':'assessed_by', 
+            'meta_type':'factory_types'
+        }
+    },
+
+    {'has_bib_types': {
+            'subject_type':['Bib_App'],
+            'object_type':['conference','inbook','inproceedings','incollection','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','article','booklet','book'],
+            'inverse_name':'bib_type_of',
+            'meta_type':'factory_types'
+        }
+    }, 
+
+    {'has_type': {
+            'subject_type': ['Task'],
+            'object_type': ['GList'], 
+            'inverse_name': 'is_type_of', 
+            'meta_type': 'factory_types',
+            'object_cardinality': 1
+        }
+    }
+]
