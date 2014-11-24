@@ -341,34 +341,34 @@
   
   function attachedfiles() {
     //popultate the files with their names
-      var sData = '{{Upload_Task}}';
-      sData = sData.replace(/&quot;/g, '"');
-      sData = jQuery.parseJSON(sData);
+      {% if Upload_Task %}
+      var sData = {{Upload_Task|safe}};
       if (sData) {
-        for(i = 0; i < sData.length; i++) {
-          storedFiles.push(sData[i]);
+        $.each(sData, function(index, val) {
+          storedFiles.push(val);
           
           var html_content = "<div>" +
-                                "<span data-file='"+sData[i]+"' class='selFile' title='Click to remove'>" + 
-                                  sData[i] + " &#215;" +
+                                "<span data-file='"+val+"' class='selFile' title='Click to remove'>" + 
+                                  val + " &#215;" +
                                 "</span>" +
                               "</div>";
           
           selDiv.append(html_content);
-        }
+        });
       }
+      {% endif %}
 
     //populate the list with their ids
-      var sData = '{{select}}';
-      sData = sData.replace(/&quot;/g, '"');
-      sData = jQuery.parseJSON(sData);
+      {% if select %}
+      var sData = {{select|safe}};
       if (sData) {
-        for(i = 0; i < sData.length; i++) {
-          if(sData[i]) {
-            selfiles.push(sData[i])
+        $.each(sData, function(index, val) {
+          if(val) {
+            selfiles.push(val)
           }
-        }
+        });
       }
+      {% endif %}
 
     var select = document.getElementById('trial');
     select.value = selfiles;
@@ -535,7 +535,6 @@
 {% block document_ready %}
   $("#files").on("change", handleFileSelect);
   selDiv = $("#selectedFiles"); 
-  //$("#form-edit-node").on("submit", handleForm);
   $("body").on("click", ".selFile", removeFile);
 
   attachedfiles();
@@ -571,13 +570,13 @@
     },
 
     complete: function() {
-      $.each(users, function(key,value) {
+      $.each(users, function(key,val) {
         // Populates Assignee widget
         $('#customDropdown2').append(
           $("<option></option>")
             .attr("id", "assignee_"+key)
             .attr("value", key)
-            .text(value)
+            .text(val)
         );
 
         {% if Assignee %}
@@ -598,10 +597,12 @@
           .attr("class", "row")
           .appendTo($(".watchers"));
         
-        var input = $("<input>" + value).attr("type", "checkbox")
+        var input = $("<input>").attr("type", "checkbox")
           .attr("id", "watcher_"+key)
           .attr("value", key)
           .appendTo(div);
+
+        $("<label>"+val+"</label>").insertAfter(input);
 
         {% if Watchers %}
         {% for each in Watchers %}
