@@ -386,7 +386,6 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
       
       if count == 0:	
         # request.POST.getlist("Assignee","").append(request.user.username)   
-        request.POST.getlist("Assignee", "").append(request.user.id)
         assignee_list = []
         assignee_list_id = request.POST.getlist("Assignee", "")
         
