@@ -111,7 +111,7 @@
 				live.html('<p id="plistOnlineUser"></p><ul style="color: green; max-height: 100px; overflow: auto;" id="listOnlineUser"></ul>');
 
 				// add the resize handle after textarea
-				if (options.resizeHandle === true && $.browser.safari !== true) {
+				if (options.resizeHandle === true && (navigator.userAgent.match(/Opera|OPR\//) ? true : false)) {
 					resizeHandle = $('<div class="orgitdownResizeHandle"></div>')
 						.insertAfter($$)
 						.bind("mousedown.orgitdown", function(e) {
