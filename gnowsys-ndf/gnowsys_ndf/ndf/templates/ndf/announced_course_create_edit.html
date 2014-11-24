@@ -6,6 +6,12 @@
 {% block style %}
   {{block.super}}
 
+
+    #ui-datepicker-div {
+    pisition: absolute,
+    top:500px
+    }
+
   /* Resetting css-properties for fieldset (also legend, input) */
     /* fieldset (padding-bottom) */ 
     fieldset {
@@ -81,13 +87,28 @@
                 {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
               </label>
             </div>
-            <div class="small-5 columns end" style="width: 51.4%;">
+            <div class="small-5 columns end disabled" style="width: 51.4%;">
               {% html_widget groupid node.pk property_order_list.0.1.0 %}
+
             </div>
-            <input type="button" id="find_ac" class="small button round" value="View"/>
           </div>
-          
-          <div class="row">
+          <fieldset id="unset-ac" class="hide">
+            <legend>
+            {% if node %}
+            <label> Announced for </label>
+            {% else %}
+              <label><h5>Select Course : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
+            {% endif %}
+            </legend>
+            <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
+            {% if node %}
+             <input type="text" value="{{ announced_for }}" disabled="disabled">
+            {% endif %}
+
+            </div>
+          </fieldset>
+
+          <div class="row" id="course_dur" style='display: none'>
             <div class="small-3 columns">
               <label for="Course Period" class="right inline"> 
                 {% trans "Course Period" %}
@@ -99,7 +120,7 @@
               </label>
             </div>
             <div class="small-2 columns">
-              {% html_widget groupid node.pk property_order_list.0.1.1 %}
+                {% html_widget groupid node.pk property_order_list.0.1.1 %}
             </div>
             <div class="small-1 columns">
               <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
@@ -107,60 +128,45 @@
               </label>
             </div>
             <div class="small-2 columns end">
-              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+                {% html_widget groupid node.pk property_order_list.0.1.2 %}
             </div>
-          </div>
-         
-          <fieldset id="unset-ac" class="hide">
-            <legend>
-              <label><h5>Select Course : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
-            </legend>
-            <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
-              
-            </div>
-          </fieldset>
-
-        </fieldset>
-          
-        <fieldset id="colg_drop" class="hide">
-          <legend>
-            <label><h5>Select College</h5> </label>
-          </legend>
-          <div class="row" style="padding-bottom: 1rem;">
-              <!-- Drop down for college -->
+            <br>
+          <div class="small-9 columns">
             <div class="small-3 columns">
-              <label class="right inline">   Select University </label>
+              <label class="right inline"> 
+            {% if node %}
+              {% trans "Announced in College(s)" %}
+            {% else %}
+                {% trans "Select University" %}
+            {% endif %}
+              </label>
+            
             </div>
-            <div class="small-6 columns">
-              <select id="univ_cur" required style="float:left; width:95%">
-                 <option value="">{% trans "- - - Select University - - -" %}</option>
-                {% for each in university_cur %}
-                <option value="{{each.pk}}">{{each.name}}</option>
-                {% endfor %}
-              </select>
-                <i style="color:red; float:left display:inline">*</i>
-                <small class="error">{% trans "Please select University" %} </small>
-            </div>
-            <!-- 
-            <div class="left inline">
-              <input type="checkbox" id="all_univ" name="all_univ">Select All
-            </div>
-            -->
-
-            <div class="small-3 columns">
-              <input type="button" id="find_colg" class="small button round" value="Get Colleges"/>
+            <div class="small-6 columns ">
+            {% if node %}
+              <input type="text" value="{{acourse_for_college}}" disabled="disabled">
+            {% else %}
+                <select id="univ_cur" required style="float:left; width:95%">
+                   <option value="">{% trans "- - - Select University - - -" %}</option>
+                  {% for each in university_cur %}
+                  <option value="{{each.pk}}">{{each.name}}</option>
+                  {% endfor %}
+                </select>
+                  <i style="color:red; float:left display:inline">*</i>
+                  <small class="error">{% trans "Please select University" %} </small>
+            {% endif %}
             </div>
           </div>
 
           <div class="row" id="divcolg">
+            </div>
           </div>
-          <br>
-        </fieldset>
+          </fieldset>
 
         <fieldset id="enroll_duration" class="hide">
            <div class="row">
             <div class="small-3 columns">
-              <label class="right inline"> This option will be available to PO </label>
+              <label class="right inline"> Student Enrollment Duration : </label>
             </div>
 
             <div class="small-1 columns">
@@ -170,6 +176,7 @@
             </div>
             <div class="small-2 columns">
               {% html_widget groupid node.pk property_order_list.0.1.3 %}
+            
             </div>
             <div class="small-1 columns">
               <label for="{{property_order_list.0.1.4.name}}" class="right inline"> 
@@ -193,27 +200,170 @@
     </div>
     </div>
   </form>
+  
 {% endblock %}
 
 {% block script %}
   {{block.super}}
-  
-  // Function to hide fieldset & submit ----------------------------------------------------------------------------
-    function hideFieldsetSubmit() {
-      if (!$("#announce-course").hasClass("hide")) {
-        $("#announce-course").addClass("hide")
-      }
-      if (!$("#enroll_duration").hasClass("hide")) {
-        $("#enroll_duration").addClass("hide")
-      }
-      if (!$("#colg_drop").hasClass("hide")) {
-        $("#colg_drop").addClass("hide")
-      }
-      if (!$("#unset-ac").hasClass("hide")) {
-        $("#unset-ac-options-div").empty();
-        $("#unset-ac").addClass("hide")
-      }
-    }
+
+  //Selct univ
+    $("select#univ_cur").change(function() {
+      univ_id = $("select#univ_cur").val()
+      $.ajax({
+        url: "{% url 'get_colleges' group_id%}",
+
+        data: {
+          univ_id:univ_id
+          },
+
+          type: "GET",
+
+          dataType: "json",
+
+          complete: function(data){
+            if ($("#enroll_duration").hasClass("hide")) {
+              $("#enroll_duration").removeClass("hide")
+            }
+            if ($("#announce-course").hasClass("hide")) {
+              $("#announce-course").removeClass("hide")
+            }
+
+          },
+          success: function(data){
+            success_state = data["success"];
+            $("#alertModalLabel").text(data["message"]);
+
+            if (data["success"]) {
+
+              $("#divcolg").empty();
+              var dict_len = Object.keys(data["unset_nc"]).length;
+              $.each(data["unset_nc"], function(k, val){
+                $("#unset_nc").append(val);
+              });
+
+              // Fill divcolg
+              $("#divcolg").empty();
+              drawer_widget = data["drawer_widget"]
+              $("#divcolg").html(drawer_widget); 
+
+            }
+
+            else {
+              $("#alertModal").removeClass("success");
+              $("#alertModal").addClass("alert");
+              $("#alertModal").foundation('reveal', 'open');
+            }
+          }//end of success block
+      });//end of ajax call
+    });
+
+
+  $("#datepicker_end").datepicker()
+
+  //For selecting Course type
+    $("select#nussd_course_type").change(function() {
+
+      var nussd_course_type = $("#nussd_course_type").val();
+
+      // All field(s) have valid I/P, make ajax-call
+      $.ajax({
+        url: "{% url 'get_courses' group_id %}",
+
+        data: {
+          nussd_course_type: nussd_course_type
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data){
+          success_state = data["success"];
+          if (data["success"]) {
+
+            $("#unset-ac-options-div").empty();
+            var dict_len = Object.keys(data["unset_nc"]).length;
+            $.each(data["unset_nc"], function(k, val){
+              input_chk = ""
+              if (dict_len != 1) {
+                input_chk += "<div class='small-12 columns'>" 
+              }
+
+              else {
+                input_chk += "<div class='small-12 columns end'>" 
+              }
+              
+              v = k + ">>" + val;
+
+              input_chk += "<input type='checkbox' name='unset-ac-options' class='unsetOption' checked='' value='"+v+"'/>" + 
+                            "<label>"+val+"</label>" +
+                            "</div>";
+              $("#unset-ac-options-div").append(input_chk);
+
+              dict_len = dict_len - 1;
+            });
+
+            // If nussd_course_type is Foundation Course disable all checkboxes
+            if (nussd_course_type == "Foundation Course") {
+              $("#selectAllOptions").attr("disabled", "disabled");
+              $(".unsetOption").attr("disabled", "disabled");
+            }
+
+            else {
+              $("#selectAllOptions").removeAttr("disabled", "disabled");
+              $(".unsetOption").removeAttr("disabled", "disabled");
+            }
+
+            // Fill divSt
+            $("#divSt").empty();
+            drawer_widget = data["drawer_widget"]
+            $("#divSt").html(drawer_widget); 
+
+          }
+
+          else {
+            $("#alertModal").removeClass("success");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        },
+
+        complete: function(){
+          if ($("#colg_drop").hasClass("hide")) {
+            $("#colg_drop").removeClass("hide")
+          }
+
+
+          if ($("#course_dur").css("display") == "none") {
+            $("#course_dur").toggle()
+          }
+
+          // var respDict = JSON.parse(resp.responseText);
+          if (success_state) {
+
+            // Also toggle unset-ac fieldset
+            if ($("#unset-ac").hasClass("hide")) {
+              $("#selectAllOptions").prop("checked", true);
+              $("#unset-ac").removeClass("hide")
+            }
+          }
+
+          else {
+            // Otherwise, hide button as well as fieldset
+            if (!$("#announce-course").hasClass("hide")) {
+              $("#announce-course").addClass("hide")
+            }
+
+            // Also toggle unset-ac fieldset
+            if (!$("#unset-ac").hasClass("hide")) {
+              $("#unset-ac-options-div").empty();
+              $("#unset-ac").addClass("hide")
+            }
+          }
+        }
+      });
+
+    });
 
   // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
     $(".content").on('click', '.tab_next', function(event){
@@ -241,14 +391,7 @@
     });
 
   // If any of the Input field of fieldset (sc) is changed -------------------------------------------------
-    $("#sc :input").on('change click', function(){
-      // hide fieldsets & submit button 
-      hideFieldsetSubmit();
-
-      // Enable Find button (find_ac)
-      $("#find_ac").removeAttr('disabled');
-    });
-
+    
   // Select/Deselect all checbox(es) ['unset-ac-options'] based on state of checkbox ['selectAllOptions'] ----------
     $("#selectAllOptions").bind("change", function(){
       selectAllState = this.checked;
@@ -277,207 +420,14 @@
     });
 
   // On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
-    $("#find_colg").click(function(event) {
-      //alert("Get colleges clicked...")
-
-      $(this).parents("#colg_drop").find(':input[required]').blur();
-
-      if($(this).parents("#colg_drop").find(':input[data-invalid]').length == 0) {
-      
-        if ($("#enroll_duration").hasClass("hide")) {
-          $("#enroll_duration").removeClass("hide")
-        }
-        if ($("#announce-course").hasClass("hide")) {
-          $("#announce-course").removeClass("hide")
-        }
-        
-        var univ_id = $("#univ_cur option:selected").val();
-        var success_state = false
-        /*var all_univs = $("#all_univ").prop("checked");*/
-        //alert("\n univ_id: " + univ_id)
-        $.ajax({
-          url: "{% url 'get_colleges' group_id%}",
-
-          data: {
-            univ_id:univ_id
-            //all_univs: all_univs
-            },
-
-            type: "GET",
-
-            dataType: "json",
-
-            success: function(data){
-              success_state = data["success"];
-              $("#alertModalLabel").text(data["message"]);
-
-              if (data["success"]) {
-                $("#alertModal").removeClass("alert");
-                $("#alertModal").addClass("success");
-                $("#alertModal").foundation('reveal', 'open');
-
-
-                $("#divcolg").empty();
-                var dict_len = Object.keys(data["unset_nc"]).length;
-                $.each(data["unset_nc"], function(k, val){
-                  $("#unset_nc").append(val);
-                });
-
-                // Fill divcolg
-                $("#divcolg").empty();
-                drawer_widget = data["drawer_widget"]
-                $("#divcolg").html(drawer_widget); 
-
-              }
-
-              else {
-                $("#alertModal").removeClass("success");
-                $("#alertModal").addClass("alert");
-                $("#alertModal").foundation('reveal', 'open');
-              }
-            }//end of success block
-        });//end of ajax call
-      }
-    });//end of #find_colg click function
-    
-  // On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
-    $("#find_ac").click(function(event) {
-      if ($("#colg_drop").hasClass("hide")) {
-        $("#colg_drop").removeClass("hide")
-
-      }
-      event.preventDefault();
-
-      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
-      //$(this).parents("fieldset").parents(".content").find(':input[required]').blur();
-      $(this).parents("fieldset").find(':input[required]').blur();
-
-      // Then check no. of data-invalid fields
-      // if count == 0, then only proceed to make ajax-call & later on successful returned O/P, displaying Announce(submit) button
-      if($(this).parents("fieldset").find(':input[data-invalid]').length == 0) {
-        var start_time = $("#start_time").val()
-        var end_time = $("#end_time").val()
-        var nussd_course_type = $("#nussd_course_type").val()
-        var success_state = false
-
-        // All field(s) have valid I/P, make ajax-call
-        $.ajax({
-          url: "{% url 'get_courses' group_id %}",
-
-          data: {
-            start_time: start_time,
-            end_time: end_time,
-            nussd_course_type: nussd_course_type
-          },
-
-          type: "GET",
-
-          dataType: "json",
-
-          success: function(data){
-            // alert("Output" + "\n success: " + data);
-
-            // var dataDict = JSON.parse(data.responseText);
-            // alert(" " + data["success"] + " -- " + typeof(data["success"]))          
-            success_state = data["success"];
-            $("#alertModalLabel").text(data["message"]);
-
-            if (data["success"]) {
-              $("#alertModal").removeClass("alert");
-              $("#alertModal").addClass("success");
-              $("#alertModal").foundation('reveal', 'open');
-
-              $("#unset-ac-options-div").empty();
-              // alert("length: " + Object.keys(data["unset_nc"]).length)
-              var dict_len = Object.keys(data["unset_nc"]).length;
-              $.each(data["unset_nc"], function(k, val){
-                // alert(k + " -- " + val);
-                input_chk = ""
-                if (dict_len != 1) {
-                  input_chk += "<div class='small-12 columns'>" 
-                }
-
-                else {
-                  input_chk += "<div class='small-12 columns end'>" 
-                }
-                
-                v = k + ">>" + val;
-
-                input_chk += "<input type='checkbox' name='unset-ac-options' class='unsetOption' checked='' value='"+v+"'/>" + 
-                              "<label>"+val+"</label>" +
-                              "</div>";
-                $("#unset-ac-options-div").append(input_chk);
-
-                dict_len = dict_len - 1;
-              });
-
-              // If nussd_course_type is Foundation Course disable all checkboxes
-              if (nussd_course_type == "Foundation Course") {
-                // alert("Foundation Course found!")
-                $("#selectAllOptions").attr("disabled", "disabled");
-                $(".unsetOption").attr("disabled", "disabled");
-              }
-
-              else {
-                $("#selectAllOptions").removeAttr("disabled", "disabled");
-                $(".unsetOption").removeAttr("disabled", "disabled");
-              }
-
-              // Fill divSt
-              $("#divSt").empty();
-              drawer_widget = data["drawer_widget"]
-              $("#divSt").html(drawer_widget); 
-
-            }
-
-            else {
-              $("#alertModal").removeClass("success");
-              $("#alertModal").addClass("alert");
-              $("#alertModal").foundation('reveal', 'open');
-            }
-          },
-
-          complete: function(){
-            // var respDict = JSON.parse(resp.responseText);
-            if (success_state) {
-              // If unset NUSSD course(s) found, display Announce(submit) button only if it's hidden
-
-              // Also toggle unset-ac fieldset
-              if ($("#unset-ac").hasClass("hide")) {
-                $("#selectAllOptions").prop("checked", true);
-                $("#unset-ac").removeClass("hide")
-              }
-            }
-
-            else {
-              // Otherwise, hide button as well as fieldset
-              if (!$("#announce-course").hasClass("hide")) {
-                $("#announce-course").addClass("hide")
-              }
-
-              // Also toggle unset-ac fieldset
-              if (!$("#unset-ac").hasClass("hide")) {
-                $("#unset-ac-options-div").empty();
-                $("#unset-ac").addClass("hide")
-              }
-            }
-          }
-        });
-      }
-    });
-
-  // On close event of reveal-modal (alertModal) -------------------------------------------------------------
-    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
-      if ($(this).hasClass('success')) {
-        // Disable 'Find' button, which gets enable only when any of the input element
-        // of the fieldset (fsSc) is changed
-        $("#find_ac").attr('disabled', "disabled");
-      }
-    });
 
   // On click of Register/Update -----------------------------------------------------------------------------------
     $(document).on("click", "#announce-course", function() {
     // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+
+    {% if node %}
+
+    {% else %}
       $("#selectAllOptions").removeAttr("disabled", "disabled");
       $(".unsetOption").removeAttr("disabled", "disabled");
       widget_for = "announced_course_create_edit"
@@ -506,11 +456,37 @@
       nussd_course_type_list.push(nussd_course_type);
 
       $("#announce_to_colg_list").val(announce_to_colg_list);
+      {% endif %}
     });
+
 {% endblock %}
 
 {% block document_ready %}
   {{block.super}}
+{% if node %}
+
+  if ($("#course_dur").css("display") == "none") {
+    $("#course_dur").toggle()
+  }
+
+  if ($("#enroll_duration").hasClass("hide")) {
+    $("#enroll_duration").removeClass("hide")
+  }
+
+  if($("#unset-ac").hasClass("hide")){
+    $("#unset-ac").removeClass("hide")
+  }
+
+  $(".tab-nav").children(".for-next").append("<input type='button' id='announce-course' class='small button ' value='Submit' style='float:right;'>")
+
+  if($("#announce-course").hasClass("hide")){
+    $("#announce-course").removeClass("hide")
+  }
+  if ($("#announce-course").css("display") == "none") {
+    $("#announce-course").toggle()
+  }
+
+{% else %}
 
   $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
   $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
@@ -784,7 +760,6 @@
           $("#end_date").val(month+"/"+year);
         }
         
-        hideFieldsetSubmit();
       }
     });
 
@@ -792,4 +767,6 @@
     if ($("#find_ac").attr("disabled") == "disabled") {
       $("#find_ac").removeAttr("disabled");
     }
+{% endif %}
+
 {% endblock %}
