@@ -304,6 +304,8 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   property_order_list = get_property_order_with_value(person_gs)#.property_order
 
   if request.method == "POST":
+    has_login_rt = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
+
     # [A] Save person-node's base-field(s)
     is_changed = get_node_common_fields(request, person_gs, group_id, person_gst)
 
@@ -363,7 +365,11 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             else:
               if field_instance["object_cardinality"] > 1:
                 field_value_list = request.POST.get(field_instance["name"], "")
-                field_value_list = json.loads(field_value_list)
+                if "[" in field_value_list and "]" in field_value_list:
+                  field_value_list = json.loads(field_value_list)
+                else:
+                  field_value_list = request.POST.getlist(field_instance["name"])
+
               else:
                 field_value_list = request.POST.getlist(field_instance["name"])
 
@@ -373,6 +379,14 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 field_value_list[i] = field_value
 
               person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value_list)
+
+    # [C] Code to link GSystem Node and Author node via "has_login" relationship
+    person_gs.reload()
+    for each in person_gs.attribute_set:
+      if "email_id" in each:
+        auth_node = collection.Node.one({'_type': "Author", 'email': each["email_id"]})
+        if auth_node:
+          gr_node = create_grelation(person_gs._id, has_login_rt, auth_node._id)
 
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
@@ -469,22 +483,21 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
 
     if request.method == "POST":
       student_enroll_list = request.POST.get("student_enroll_list", "")
-      announced_courses_name = request.POST.get("announced_courses_list", "")
+      announced_courses_id = request.POST.get("announced_courses_list", "")
 
       if student_enroll_list != '':
         student_enroll_list = [ObjectId(each.strip()) for each in student_enroll_list.split(",")]
 
-      if announced_courses_name != '':
-        announced_course_GST = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
-        acourse_node = collection.Node.one({'member_of':announced_course_GST._id,u'name':unicode(announced_courses_name)},{'_id':1})
-        announced_courses_name = ObjectId(acourse_node._id)
+      if announced_courses_id != '':
+        announced_courses_id = ObjectId(announced_courses_id)
+      print "announced_courses_id", announced_courses_id
 
       # Fetch selected_course RelationType
       selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
 
       for student_id in student_enroll_list:
-        if announced_courses_name:
-          gr = create_grelation(student_id, selected_course_RT, announced_courses_name)
+        if announced_courses_id:
+          gr = create_grelation(student_id, selected_course_RT, announced_courses_id)
 
       return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
 

@@ -167,23 +167,14 @@ function internalImg(){
                  success: function(data) {
                            data1 = JSON.parse(data);
                            temp1=''
-                           temp1 +='<div><label>Image Description</label><input type="text" id="image_des_int" placeholder="Some description ..."><label>Width</label><input type="text" id="image_width_int" placeholder="Enter width in pixel eg.600..."></div>';
+                           temp1 +='<h3>Add External Image:</h3><div><label>Image Description</label><input type="text" id="image_des_int" placeholder="Some description ..."><label>Width</label><input type="text" id="image_width_int" placeholder="Enter width in pixel eg.600..."></div>';
                            temp1 +='<label>URL</label><select id="img-select">'
                            for(i=0; i<data1.length; i++)
-						    
-    {temp1 += '<option value="'+data1[i].fname+'" id="'+data1[i]._id+'" name="checkedpic">'+data1[i].name+'</option>'
-     
-    }
-                           temp1 +='</select>'
-                           temp1 +='<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">'
-						    
-                           for(i=0; i<data1.length; i++)
-						    {temp1 += '<li><input type="radio" id="'+data1[i]._id+'" name="galleryimg" onclick="getfullImg()"><img data-caption ="'+data1[i].name+'" src ="/{{group_id}}/image/thumbnail/'+data1[i]._id+'"></li>'
-}
-                           temp1 +='</ul>'     
+                           {temp1 += '<option value="'+data1[i].fname+'" id="'+data1[i]._id+'" name="checkedpic">'+data1[i].name+'</option>'
+ }
+                           temp1 +='</select>'                     
                            temp1 +='<input type="button" onclick="getfullImg()" class="button" value="Add Image">'
 						    
-			   
                           $('#ext-img').foundation('reveal', 'open');
                           document.getElementById("extimg").innerHTML=temp1;
 
@@ -255,7 +246,7 @@ $(".orgitdownButton.orgitdownButton10 a").click(function(){
 
 <div id="int-img" class="small reveal-modal" data-reveal>
 <a class="close-reveal-modal">&#215;</a>
-<h3>Add Internal/External Images:</h3> 
+<h3>Add External Image:</h3> 
 <div>
     <label>Image Description</label> 
     <input type="text" id="image_des" placeholder="Some description ...">

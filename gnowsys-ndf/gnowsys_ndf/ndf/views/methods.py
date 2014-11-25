@@ -1,11 +1,13 @@
 ''' -- imports from installed packages -- '''
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
-from django.template import RequestContext
 from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.auth.decorators import login_required
 from mongokit import paginator
 import mongokit 
 
@@ -20,7 +22,6 @@ from gnowsys_ndf.notification import models as notification
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-
 import subprocess
 import re
 import ast
@@ -206,14 +207,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
     collection = db[Node.collection_name]
-    
-    theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
-    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
-    forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
-    reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
-    
     drawer = None    
 
     if checked:
@@ -268,9 +262,13 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         drawer = collection.Node.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).limit(50)
 
       elif checked == "Theme":
+        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
         drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "theme_item":
+        theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
         drawer = collection.Node.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_item_GST._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "Topic":
@@ -287,13 +285,15 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         # Special case used while dealing with RelationType widget
         drawer = checked
 
-      elif theme_GST_id or topic_GST_id or theme_item_GST or forum_GST_id or reply_GST_id:
-        filtering = filter_drawer_nodes(nid, group_id)
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
-      
       else:
         filtering = filter_drawer_nodes(nid, group_id)
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]} })
+        Page = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
+        File = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
+        Quiz = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
+                                       '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]}, 
+                                       'member_of':{'$in':[Page._id,File._id,Quiz._id]}
+                                      })
 
     if checked != "RelationType":
       paged_resources = paginator.Paginator(drawer, page_no, 10)
@@ -355,6 +355,7 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
   tags = request.POST.get('tags')
   name = request.POST.get('name')
   tags = request.POST.get('tags')
+  access_policy = request.POST.get('access_policy')
   usrid = int(request.user.id)
   language= request.POST.get('lan')
   if get_type == "File":
@@ -381,9 +382,11 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
  
   node.name = unicode(name)
   node.language=unicode(language)
-
+ 
   node.modified_by = usrid
-
+  if access_policy:
+    node.access_policy = access_policy
+ 
   if usrid not in node.contributors:
     node.contributors.append(usrid)
 
@@ -437,7 +440,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   add_topic_name = unicode(request.POST.get("add_topic_name", ''))
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
-  access_policy = request.POST.get("login-mode", '') 
+  access_policy = request.POST.get("login-mode", '')
   right_drawer_list = []
   checked = request.POST.get("checked", '') 
   check_collection = request.POST.get("check_collection", '') 
@@ -1554,8 +1557,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
 
 
 def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):
-  """
-  Creates single or multiple GRelation documents (instances) based on given RelationType's cardinality (one-to-one / one-to-many).
+  """Creates single or multiple GRelation documents (instances) based on given 
+  RelationType's cardinality (one-to-one / one-to-many).
 
   Arguments:
   subject_id -- ObjectId of the subject-node
@@ -1714,22 +1717,29 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         if node.right_subject == right_subject_id_or_list:
           # If match found, it means it could be either DELETED one or PUBLISHED one
 
-          # Set gr_node value as matched value, so that no need to create new one 
-          gr_node = node
-
           if node.status == u"DELETED":
             # If deleted, change it's status back to Published from Deleted
             node.status = u"PUBLISHED"
             node.save()
             info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
 
-            collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                              {'$addToSet': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
-                              upsert=False, multi=False
-                            )
+            collection.update(
+              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+              {'$addToSet': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
+              upsert=False, multi=False
+            )
 
           elif node.status == u"PUBLISHED":
+            collection.update(
+              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+              {'$addToSet': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
+              upsert=False, multi=False
+            )
             info_message = " SingleGRelation: GRelation ("+node.name+") already exists !\n"
+
+          # Set gr_node value as matched value, so that no need to create new one
+          node.reload()
+          gr_node = node
 
         else:
           # If match not found and if it's PUBLISHED one, modify it to DELETED
@@ -1741,7 +1751,13 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                               {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
                               upsert=False, multi=False
                             )
-
+            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+          
+          elif node.status == u'DELETED':
+            collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                              {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
+                              upsert=False, multi=False
+                            )
             info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
 
       if gr_node is None:
@@ -1771,6 +1787,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                             {'$addToSet': {'relation_set': {relation_type_node.name: [right_subject_id_or_list]}}}, 
                             upsert=False, multi=False
                           )
+
         else:
           collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
                             {'$addToSet': {'relation_set.$.'+relation_type_node.name: right_subject_id_or_list}}, 
@@ -2058,3 +2075,119 @@ def get_file_node(file_name=""):
 		            file_list.append(i.name)	
   return file_list	
 
+def create_task(task_dict, task_type_creation="single"):
+    """Creates task with required attribute(s) and relation(s).
+
+    task_dict
+    - Required keys: name, group_set, created_by, modified_by, contributors,
+        content_org, created_by_name, Status, Priority, start_time, end_time, Assignee
+
+    task_type_creation
+    - Valid input values: "single", "multiple", "group"
+    """
+    # Fetch Task GSystemType document
+    task_gst = collection.Node.one(
+        {'_type': "GSystemType", 'name': "Task"}
+    )
+
+    # List of keys of "task_dict" dictionary
+    task_dict_keys = task_dict.keys()
+    task_node = collection.GSystem()
+    task_node["member_of"] = [task_gst._id]
+
+    # Store built in variables of task node
+    # Iterate task_node using it's keys
+    for key in task_node:
+        if key in ["Status", "Priority", "start_time", "end_time", "Assignee"]:
+            # Required because these values are coming as key in node's document
+            continue
+
+        if key in task_dict_keys:
+            if key == "content_org":
+                #  org-content
+                task_node[key] = task_dict[key]
+
+                # Required to link temporary files with the current user who is modifying this document
+                filename = slugify(task_dict["name"]) + "-" + task_dict["created_by_name"] + "-" + ObjectId().__str__()
+                task_dict_keys.remove("created_by_name")
+                task_node.content = org2html(task_dict[key], file_prefix=filename)
+
+            else:
+                task_node[key] = task_dict[key]
+
+            task_dict_keys.remove(key)
+
+    # Save task_node with built-in variables as required for creating GAttribute(s)/GRelation(s)
+    task_node.save()
+
+    # Create GAttribute(s)/GRelation(s)
+    for attr_or_rel_name in task_dict_keys:
+        attr_or_rel_node = collection.Node.one(
+            {'_type': {'$in': ["AttributeType", "RelationType"]}, 'name': unicode(attr_or_rel_name)}
+        )
+
+        if attr_or_rel_node:
+            if attr_or_rel_node._type == "AttributeType":
+                ga_node = create_gattribute(task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
+            
+            elif attr_or_rel_node._type == "RelationType":
+                gr_node = create_grelation(task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
+
+        else:
+            raise Exception("\n No AttributeType/RelationType exists with given name("+attr_or_rel_name+") !!!")
+
+    # If given task is a group task (create a task for each Assignee from the list)
+    # Iterate Assignee list & create separate tasks for each Assignee 
+    # with same set of attribute(s)/relation(s)
+    if task_type_creation == "group":
+        mutiple_assignee = task_dict["Assignee"]
+        collection_set = []
+        for each in mutiple_assignee:
+            task_dict["Assignee"] = [each]
+            task_sub_node = create_task(task_dict)
+            collection_set.append(task_sub_node._id)
+
+        collection.update({'_id': task_node._id}, {'$set': {'collection_set': collection_set}}, upsert=False, multi=False)
+
+    else:
+        # Send notification for each each Assignee of the task
+        # Only be done in case when task_type_creation is not group, 
+        # i.e. either single or multiple
+        site = Site.objects.get(pk=1)
+        site = site.name.__str__()
+
+        from_user = task_node.user_details_dict["created_by"]  # creator of task
+
+        group_name = collection.Node.one(
+            {'_type': {'$in': ["Group", "Author"]}, '_id': task_node.group_set[0]},
+            {'name': 1}
+        ).name
+
+        url_link = "http://" + site + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
+
+        msg = "Task '" + task_node.name + "' has been reported by " + from_user + \
+            "\n     - Status: " + task_dict["Status"] + \
+            "\n     - Priority: " + task_dict["Priority"] + \
+            "\n     - Assignee: " + ", ".join(task_dict["Assignee"]) +  \
+            "\n     - For more details, please click here: " + url_link
+
+        to_user_list = []
+        for user_name in task_dict["Assignee"]:
+            user_obj = User.objects.get(username=user_name)
+            if user_obj not in to_user_list:
+                to_user_list.append(user_obj)
+
+        activity = "reported task"
+        render_label = render_to_string(
+            "notification/label.html",
+            {
+                "sender": from_user,
+                "activity": activity,
+                "conjunction": "-",
+                "link": url_link
+            }
+        )
+        notification.create_notice_type(render_label, msg, "notification")
+        notification.send(to_user_list, render_label, {"from_user": from_user})
+
+    return task_node

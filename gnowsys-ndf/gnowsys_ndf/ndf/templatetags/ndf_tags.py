@@ -81,6 +81,17 @@ def get_node_type(node):
    else:
       return ""
 
+
+@register.assignment_tag
+def get_node(node):
+	if node:
+		obj=collection.Node.one({"_id":ObjectId(node)})
+		if obj:
+			return obj
+		else:
+			return ""
+
+
 @register.assignment_tag
 def get_schema(node):
    obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
@@ -768,8 +779,11 @@ def check_user_join(request,group_id):
 	
 @register.assignment_tag
 def check_group(group_id):
-	fl = check_existing_group(group_id)
-	return fl
+	if group_id:
+		fl = check_existing_group(group_id)
+		return fl
+	else:
+		return ""
 
 
 @register.assignment_tag
@@ -1703,12 +1717,18 @@ def get_preferred_lang(request, group_id, nodes, node_type):
    node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
    if uname:
       if uname.has_key("preferred_languages"):
-         pref_lan=uname.preferred_languages
+		pref_lan=uname.preferred_languages
+		if not pref_lan.keys():
+			pref_lan={}
+			pref_lan['primary']=request.LANGUAGE_CODE
+			pref_lan['default']=u"en"
+			uname.preferred_languages=pref_lan
+			uname.save()   
       else:
          pref_lan={}
          pref_lan['primary']=request.LANGUAGE_CODE
          pref_lan['default']=u"en"
-         uname.pref_lang=pref_lan
+         uname.preferred_languages=pref_lan
          uname.save()
    else:
       pref_lan={}
@@ -2076,7 +2096,7 @@ def jsonify(value):
   """
   Parses python value into json-type (useful in converting python list/dict into javascript/json object).
   """
-  return json.dumps(value)
+  return json.dumps(value, cls=NodeJSONEncoder)
 
 @register.assignment_tag
 def get_university(college_name):

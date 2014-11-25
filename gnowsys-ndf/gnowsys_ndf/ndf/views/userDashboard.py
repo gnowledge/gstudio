@@ -354,12 +354,11 @@ def uDashboard(request, group_id):
         context_instance=RequestContext(request)
     )
 
-
 def user_preferences(request,group_id,auth_id):
     try:
         grp=collection.Node.one({'_id':ObjectId(auth_id)})
         if request.method == "POST":
-            lst=[]
+            lst = []
             pref_to_set = request.POST['pref_to_set']
             pref_list=pref_to_set.split(",")
             if pref_list:
@@ -471,3 +470,28 @@ def user_activity(request, group_id):
     variable = RequestContext(request, {'user_activity':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
     return render_to_response(template, variable)
 
+def group_dashboard(request, group_id):
+    """
+    This view returns data required for group's dashboard.
+    """
+    if ObjectId.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+        if group_ins:
+            group_id = group_ins._id
+
+    return render_to_response (
+        "ndf/group_dashboard.html",
+        {
+            'group_id': group_id, 'groupid': group_id
+        },
+        context_instance=RequestContext(request)
+    )

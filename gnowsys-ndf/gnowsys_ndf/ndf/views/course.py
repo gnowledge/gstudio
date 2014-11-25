@@ -23,16 +23,12 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
-# from gnowsys_ndf.ndf.models import GSystemType, Node 
-# from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
-
-
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
 
 collection = get_database()[Node.collection_name]
 GST_COURSE = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
@@ -259,25 +255,25 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       start_time = request.POST.get("start_time", "")
       start_time = datetime.datetime.strptime(start_time,"%m/%Y")
       #get month name (%b for abbreviation and %B for full name) and year and convert to str
-      start_time = start_time.strftime("%b %Y")
+      # start_time = start_time.strftime("%b %Y")
 
     end_time = ""
     if request.POST.has_key("end_time"):
       end_time = request.POST.get("end_time", "")
       end_time = datetime.datetime.strptime(end_time,"%m/%Y")
-      end_time = end_time.strftime("%b %Y")
+      # end_time = end_time.strftime("%b %Y")
 
     start_enroll = ""
     if request.POST.has_key("start_enroll"):
       start_enroll = request.POST.get("start_enroll", "")
       start_enroll = datetime.datetime.strptime(start_enroll,"%d/%m/%Y")
-      start_enroll = start_enroll.strftime("%D")
+      # start_enroll = start_enroll.strftime("%D")
 
     end_enroll = ""
     if request.POST.has_key("end_enroll"):
       end_enroll = request.POST.get("end_enroll", "")
       end_enroll = datetime.datetime.strptime(end_enroll,"%d/%m/%Y")
-      end_enroll = end_enroll.strftime("%D")
+      # end_enroll = end_enroll.strftime("%D")
       
     nussd_course_type = ""
     if request.POST.has_key("nussd_course_type"):
@@ -296,73 +292,83 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       colg_names = []
       colg_names = announce_to_colg_list.split(',')
       colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
-      colg_list_cur = collection.Node.find({'name': {'$in': colg_names},'member_of':colg_gst._id}, {'_id':1, 'name':1})
+      colg_list_cur = collection.Node.find(
+        {'name': {'$in': colg_names}, 'member_of': colg_gst._id}, 
+        {'_id':1, 'name':1, 'attribute_set': 1, 'relation_set': 1}
+      )
 
       #list of colleges selected
-      colg_grp_list_cur = collection.Node.find({'_type':u"Group",'name': {'$in': colg_names}}, {'_id':1, 'name':1})
+      # colg_grp_list_cur = collection.Node.find(
+      #   {'_type':u"Group", 'name': {'$in': colg_names}}, 
+      #   {'_id':1, 'name':1}
+      # )
       
-      colg_PO = {}
+      # colg_PO = {}
 
-      PO = {
-        "Agra College": ["Mr. Rajaram Yadav"],
-        "Arts College Shamlaji": ["Mr. Ashish Varia"],
-        "Baba Bhairabananda Mahavidyalaya": ["Mr. Mithilesh Kumar"],
-        "Balugaon College": ["Mr. Pradeep Pradhan"],
-        "City Women's College": ["Ms. Rajni Sharma"],
-        "Comrade Godavari Shamrao Parulekar College of Arts, Commerce & Science": ["Mr. Rahul Sable"],
-        "Faculty of Arts": ["Mr. Jokhim", "Ms. Tusharika Kumbhar"],
-        "Gaya College":  ["Ms. Rishvana Sheik"],
-        "Govt. M. H. College of Home Science & Science for Women, Autonomous": [], 
-        "Govt. Mahakoshal Arts and Commerce College": ["Ms. Davis Yadav"],
-        "Govt. Mahaprabhu Vallabhacharya Post Graduate College": ["Mr. Gaurav Sharma"],
-        "Govt. Rani Durgavati Post Graduate College": ["Mr. Asad Ullah"],
-        "Jamshedpur Women's College": ["Mr. Arun Agrawal"],
-        "Kalyan Post Graduate College": ["Mr. Praveen Kumar"],
-        "Kamla Nehru College for Women": ["Ms. Tusharika Kumbhar", "Ms. Thaku Pujari"],
-        "L. B. S. M. College": ["Mr. Charles Kindo"],
-        "Mahila College": ["Mr. Sonu Kumar"],
-        "Marwari College": ["Mr. Avinash Anand"],
-        "Matsyodari Shikshan Sanstha's Arts, Commerce & Science College": ["Ms. Jyoti Kapale"],
-        "Ranchi Women's College": ["Mr. Avinash Anand"],
-        "Shiv Chhatrapati College": ["Mr. Swapnil Sardar"],
-        "Shri & Smt. PK Kotawala Arts College": ["Mr. Sawan Kumar"],
-        "Shri VR Patel College of Commerce": ["Mr. Sushil Mishra"],
-        "Sree Narayana Guru College of Commerce": ["Ms. Bharti Bhalerao"],
-        "Sri Mahanth Shatanand Giri College": ["Mr. Narendra Singh"],
-        "St. John's College": ["Mr. Himanshu Guru"],
-        "The Graduate School College For Women": ["Mr. Pradeep Gupta"],
-        "Vasant Rao Naik Mahavidyalaya": ["Mr. Dayanand Waghmare"],
-        "Vivekanand Arts, Sardar Dalip Singh Commerce & Science College": ["Mr. Anis Ambade"]
-      }
+      # PO = {
+      #   "Agra College": ["Mr. Rajaram Yadav"],
+      #   "Arts College Shamlaji": ["Mr. Ashish Varia"],
+      #   "Baba Bhairabananda Mahavidyalaya": ["Mr. Mithilesh Kumar"],
+      #   "Balugaon College": ["Mr. Pradeep Pradhan"],
+      #   "City Women's College": ["Ms. Rajni Sharma"],
+      #   "Comrade Godavari Shamrao Parulekar College of Arts, Commerce & Science": ["Mr. Rahul Sable"],
+      #   "Faculty of Arts": ["Mr. Jokhim", "Ms. Tusharika Kumbhar"],
+      #   "Gaya College":  ["Ms. Rishvana Sheik"],
+      #   "Govt. M. H. College of Home Science & Science for Women, Autonomous": [], 
+      #   "Govt. Mahakoshal Arts and Commerce College": ["Ms. Davis Yadav"],
+      #   "Govt. Mahaprabhu Vallabhacharya Post Graduate College": ["Mr. Gaurav Sharma"],
+      #   "Govt. Rani Durgavati Post Graduate College": ["Mr. Asad Ullah"],
+      #   "Jamshedpur Women's College": ["Mr. Arun Agrawal"],
+      #   "Kalyan Post Graduate College": ["Mr. Praveen Kumar"],
+      #   "Kamla Nehru College for Women": ["Ms. Tusharika Kumbhar", "Ms. Thaku Pujari"],
+      #   "L. B. S. M. College": ["Mr. Charles Kindo"],
+      #   "Mahila College": ["Mr. Sonu Kumar"],
+      #   "Marwari College": ["Mr. Avinash Anand"],
+      #   "Matsyodari Shikshan Sanstha's Arts, Commerce & Science College": ["Ms. Jyoti Kapale"],
+      #   "Ranchi Women's College": ["Mr. Avinash Anand"],
+      #   "Shiv Chhatrapati College": ["Mr. Swapnil Sardar"],
+      #   "Shri & Smt. PK Kotawala Arts College": ["Mr. Sawan Kumar"],
+      #   "Shri VR Patel College of Commerce": ["Mr. Sushil Mishra"],
+      #   "Sree Narayana Guru College of Commerce": ["Ms. Bharti Bhalerao"],
+      #   "Sri Mahanth Shatanand Giri College": ["Mr. Narendra Singh"],
+      #   "St. John's College": ["Mr. Himanshu Guru"],
+      #   "The Graduate School College For Women": ["Mr. Pradeep Gupta"],
+      #   "Vasant Rao Naik Mahavidyalaya": ["Mr. Dayanand Waghmare"],
+      #   "Vivekanand Arts, Sardar Dalip Singh Commerce & Science College": ["Mr. Anis Ambade"]
+      # }
 
-      userObj = {}
-      for each in colg_grp_list_cur:
-        for key,val in PO.items():
-          if (key == each.name):
-            if val:
-              try:
-                for key1,val1 in val.items():
-                  userObj[(User.objects.get(email = val1))]=key1
-              except:
-                print "No PO exists"  
-            else:
-              print "No PO exists for ",each.name
+      # userObj = {}
+      # for each in colg_grp_list_cur:
+      #   for key,val in PO.items():
+      #     if (key == each.name):
+      #       if val:
+      #         try:
+      #           for key1,val1 in val.items():
+      #             userObj[(User.objects.get(email = val1))]=key1
+      #         except:
+      #           print "No PO exists"  
+      #       else:
+      #         print "No PO exists for ",each.name
 
+      officer_incharge_of_rt = collection.Node.one({'_type': "RelationType", 'name': "officer_incharge_of"})
       for colg_ids in colg_list_cur: 
-        #for each selected college
+        # For each selected college
         for each in unset_ac_options:
-          #for each selected course to Announce
+          # each is ObjecId of the course.
+          # For each selected course to Announce
+          nm = ""
           if course_gst.name == u"Announced Course":
             # Code to be executed only for 'Announced Course' GSystem(s)
             sid, nm = each.split(">>")
             course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
             if not course_gs:
               course_gs = collection.GSystem()
-
             else:
               if " -- " in nm:
                 nm = nm.split(" -- ")[0].lstrip().rstrip()
-            c_name = unicode(nm + " -- " + nussd_course_type + " -- " + colg_ids.name+" -- " + start_time + " -- " + end_time)
+
+            course_node = collection.Node.one({'_id':ObjectId(sid)})
+            c_name = unicode(course_node.attribute_set[1][u'course_code'] + "_" + colg_ids.attribute_set[0][u"enrollment_code"]+"_" + start_time.strftime("%d/%m/%Y") + "_" + end_time.strftime("%d/%m/%Y"))
             request.POST["name"] = c_name
           
           is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
@@ -374,16 +380,16 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
           course_gs.save(is_changed=is_changed)
 
           #Send e-mail notification to POs of respective Colleges
-          if course_gst.name == u"Announced Course":
-            sitename=Site.objects.all()[0]
-            if userObj:
-              for key,val in userObj.items():
-                activ="Course Announced"
-                msg="\n\nGreetings "+val+","+"\nCourse Announced : " +nm+"("+nussd_course_type+")" +" for period "+start_time+" to "+end_time+"."+"\nStudent Enrollment can be done from "+\
-                  start_enroll+ " to "+ end_enroll+"."+"\n\nBest Regards,\n"+sitename.name.__str__()+" Management."
-                set_notif_val(request,group_id,msg,activ,key)
-            else:
-              print "No email/PO"
+          # if course_gst.name == u"Announced Course":
+          #   sitename=Site.objects.all()[0]
+          #   if userObj:
+          #     for key,val in userObj.items():
+          #       activ="Course Announced"
+          #       msg="\n\nGreetings "+val+","+"\nCourse Announced : " +nm+"("+nussd_course_type+")" +" for period "+start_time+" to "+end_time+"."+"\nStudent Enrollment can be done from "+\
+          #         start_enroll+ " to "+ end_enroll+"."+"\n\nBest Regards,\n"+sitename.name.__str__()+" Management."
+          #       set_notif_val(request,group_id,msg,activ,key)
+          #   else:
+          #     print "No email/PO"
 
           # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
           for tab_details in property_order_list:
@@ -465,6 +471,57 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                       #Pass ObjectId of selected College
                     
                     course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value)
+
+          # Create task for PO of respective college 
+          # for Student-Course Enrollment
+          task_dict = {}
+          task_dict["name"] = unicode(colg_ids.attribute_set[0]["enrollment_code"] + " -- " + nm + " -- " + "Student-Course_Enrollment" + " -- " + start_enroll.strftime("%d/%m/%Y") + " -- " + end_enroll.strftime("%d/%m/%Y"))
+          task_dict["created_by"] = request.user.id
+          task_dict["created_by_name"] = request.user.username
+          task_dict["modified_by"] = request.user.id
+          task_dict["contributors"] = [request.user.id]
+          
+          MIS_GAPP = collection.Node.one({'_type': "GSystemType", 'name': "MIS"}, {'_id': 1})
+          Student = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
+          college_enrollment_url_link = ""
+          if MIS_GAPP and Student:
+            site = Site.objects.get(pk=1)
+            site = site.name.__str__()
+            college_enrollment_url_link = "http://" + site + "/" + colg_ids.name.replace(" ","%20").encode('utf8') + "/mis/" + str(MIS_GAPP._id) + "/" + str(Student._id) + "/enroll/" 
+          task_dict["content_org"] = "\n- Please click [[" + college_enrollment_url_link + "][here]] to enroll students in " + nm + " course.\n\n- This enrollment procedure is open for duration between " + start_time.strftime("%m/%Y") + " and " + end_time.strftime("%m/%Y") + "."
+
+          # Reload required so that updated attribute_set & relation_set appears
+          course_gs.reload()
+          task_dict["start_time"] = course_gs.attribute_set[3]["start_enroll"]
+          task_dict["end_time"] = course_gs.attribute_set[4]["end_enroll"]
+          task_dict["Status"] = u"New"
+          task_dict["Priority"] = u"High"
+
+          task_dict["Assignee"] = []
+          # Fetch Program Officers' ObjectIds from
+          # College's inverse GRelation "officer_incharge_of"
+          PO_list = collection.Triple.find(
+            {'_type': "GRelation", 'relation_type.$id': officer_incharge_of_rt._id, 'right_subject': colg_ids._id},
+            {'subject': 1}
+          )
+
+          # From 'subject' fetch corresponding Program Officer node
+          # From that node's 'has_login' relation fetch corresponding Author node
+          for each in PO_list:
+            PO = collection.Node.one(
+              {'_id': each.subject, 'attribute_set.email_id': {'$exists': True}, 'relation_set.has_login': {'$exists': True}},
+              {'name': 1, 'attribute_set.email_id': 1, 'relation_set.has_login': 1}
+            )
+
+            PO_auth = None
+            for rel in PO.relation_set:
+              if rel:
+                PO_auth = collection.Node.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
+                if PO_auth:
+                  task_dict["Assignee"].append(PO_auth.name)
+                  task_dict["group_set"] = [PO_auth._id]
+
+          task_node = create_task(task_dict)
 
     else:
       is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
