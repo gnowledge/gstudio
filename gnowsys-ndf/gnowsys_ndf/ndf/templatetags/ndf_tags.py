@@ -2096,7 +2096,7 @@ def jsonify(value):
   """
   Parses python value into json-type (useful in converting python list/dict into javascript/json object).
   """
-  return json.dumps(value)
+  return json.dumps(value, cls=NodeJSONEncoder)
 
 @register.assignment_tag
 def get_university(college_name):

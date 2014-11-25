@@ -55,9 +55,9 @@
       </span> 
     </h2>
 
-    <!-- Parent Task & Status -->
+    <!-- Only Parent Task -->
     <div class="row margin-top-1">
-      <div class="medium-6 columns">
+      <div class="medium-5 columns end">
         <div class="row">
           <div class="medium-4 columns">
             <label class="align right"><b>{% trans "Parent task:" %}</b></label>
@@ -67,13 +67,27 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="medium-6 columns">
+    <!-- Task Type & Status -->
+    <div class="row margin-top-1">
+      <div class="medium-5 columns">
         <div class="row">
           <div class="medium-4 columns">
-            <label class="align right"><b>{% trans "Status:" %}</b></label>
+            <label class="align right"><b>{% trans "Task type:" %}</b></label>
           </div>
           <div class="medium-8 columns">
+            <label>{% if has_type %}{{has_type}}{% else %} -- {% endif %}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="medium-4 columns end">
+        <div class="row">
+          <div class="medium-5 columns">
+            <label class="align right"><b>{% trans "Status:" %}</b></label>
+          </div>
+          <div class="medium-7 columns">
             <label>{% if Status %}{{Status}}{% else %} -- {% endif %} </label>
           </div>
         </div>
@@ -82,7 +96,7 @@
 
     <!-- Start Date & Priority -->
     <div class="row margin-top-1">
-      <div class="medium-6 columns">
+      <div class="medium-5 columns">
         <div class="row">
           <div class="medium-4 columns">
             <label class="align right"><b>{% trans "Start Date:" %}</b></label>
@@ -93,12 +107,12 @@
         </div>
       </div>
 
-      <div class="medium-6 columns">
+      <div class="medium-4 columns end">
         <div class="row">
-          <div class="medium-4 columns">
+          <div class="medium-5 columns">
             <label class="align right"><b>{% trans "Priority:" %}</b></label>
           </div>
-          <div class="medium-8 columns">
+          <div class="medium-7 columns">
             <label>{% if Priority %}{{Priority}}{% else %} -- {% endif %}</label>
           </div>
         </div>
@@ -107,7 +121,7 @@
 
     <!-- Due Date & Assignee -->
     <div class="row margin-top-1">
-      <div class="medium-6 columns">
+      <div class="medium-5 columns">
         <div class="row">
           <div class="medium-4 columns">
             <label class="align right"><b>{% trans "Due Date:" %}</b></label>
@@ -118,13 +132,13 @@
         </div>
       </div>
 
-      <div class="medium-6 columns">
+      <div class="medium-4 columns end">
         <div class="row">
-          <div class="medium-4 columns">
+          <div class="medium-5 columns">
             <label class="align right"><b>{% trans "Assignee:" %}</b></label>
           </div>
-          <div class="medium-8 columns">
-            <label>{% if Assignee %}{{Assignee|join:","}}{% else %} -- {% endif %}</label>
+          <div class="medium-7 columns">
+            <label>{% if Assignee %}{{Assignee|join:", "}}{% else %} -- {% endif %}</label>
           </div>
         </div>
       </div>
@@ -290,7 +304,6 @@ else {
              beforeSend: function() {     },
              success: function(result){
 		  $('#nodeTitleId').html(result);
-		  console.log(result);
 
              },
              complete: function(){ 
@@ -310,7 +323,6 @@ var editedContent = $('#orgitdown_content_org').val();
              beforeSend: function() {     },
              success: function(result){
 		  $('#nodeContentId').html(result);
-		  console.log(result);
 
              },
              complete: function(){ 

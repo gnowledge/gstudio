@@ -1,5 +1,6 @@
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth.models import User
 
 from django_mongokit import get_database
 
@@ -21,6 +22,14 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Update's "status" field from DRAFT to PUBLISHED for all TYPE's node(s)
+    res = collection.update(
+        {'_type': {'$in': ["MetaType", "GSystemType", "RelationType", "AttributeType"]}, 'status': u"DRAFT"}, 
+        {'$set': {'status': u"PUBLISHED"}}, 
+        upsert=False, multi=True
+    )
+    print "\n 'status' field updated for all TYPE's node(s) in following no. of documents: ", res['n']
+
     # Update object_value of GAttribute(s) of "Assignee" AttributeType
     # Find those whose data-type is not list/Array
     # Replace those as list of value(s)
@@ -31,17 +40,59 @@ class Command(BaseCommand):
     if assignee_at:
         res = 0
         assignee_cur = collection.Triple.find(
-            {'_type': "GAttribute", 'attribute_type.$id': assignee_at._id, '$where': "Array.isArray(this.object_value) != true"}
+            {'_type': "GAttribute", 'attribute_type.$id': assignee_at._id}
         )
 
         for each in assignee_cur:
-            upres = collection.update(
-                        {'_id': each._id}, 
-                        {'$set': {'object_value': [each.object_value]}}, 
-                        upsert=False, multi=False
-                    )
+            # If string
+            if type(each.object_value) in [str, unicode]:
+                if "," in each.object_value and "[" in each.object_value and "]" in each.object_value:
+                    ul_sv = each.object_value.strip("[]").replace(", ", ",").replace(" ,", ",").split(",")
+                elif "," in each.object_value:
+                    ul_sv = each.object_value.replace(", ", ",").replace(" ,", ",").split(",")
+                elif "[" in each.object_value or "]" in each.object_value:
+                    ul_sv = each.object_value.strip("[]").split(",")
 
-            res += upres['n']
+                ul_id = []
+                for u in ul_sv:
+                    if not u.isdigit():
+                        user = User.objects.get(username=u)
+                    else:
+                        user = User.objects.get(id=int(u))
+                    if user:
+                        if user.id not in ul_id:
+                            ul_id.append(user.id)
+
+                upres = collection.update(
+                            {'_id': each._id}, 
+                            {'$set': {'object_value': ul_id}}, 
+                            upsert=False, multi=False
+                        )
+                res += upres['n']
+
+            # If list
+            elif type(each.object_value) == list:
+                ul_id = []
+                for u in each.object_value:
+                    if type(u) in [str, unicode] and not u.isdigit():
+                        if u.strip("[]"):
+                            user = User.objects.get(username=u)
+                    elif type(u) in [str, unicode] and u.isdigit():
+                        if u.strip("[]"):
+                            user = User.objects.get(id=int(u))
+                    else:
+                        user = User.objects.get(id=int(u))
+
+                    if user:
+                        if user.id not in ul_id:
+                            ul_id.append(user.id)
+
+                upres = collection.update(
+                            {'_id': each._id}, 
+                            {'$set': {'object_value': ul_id}}, 
+                            upsert=False, multi=False
+                        )
+                res += upres['n']
 
         print "\n Updated following no. of Assignee GAttribute document(s): ", res
 

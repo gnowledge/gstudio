@@ -573,3 +573,5 @@ GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above"
 
 GSTUDIO_RESOURCES_READING_LEVEL = [  ] 
 
+GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
+
