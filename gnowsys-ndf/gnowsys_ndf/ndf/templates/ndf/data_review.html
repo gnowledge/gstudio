@@ -77,6 +77,11 @@
 		background-repeat:no-repeat; background-size: 48px 48px
 	}
 
+	#data-rev-table-container-div{
+		overflow: auto;
+		height: 80vh;
+	}
+
 	#kbd-tips {
 	    bottom: 20px;
 	    position: absolute;
@@ -131,8 +136,24 @@
 	{% check_user_join request groupid as user_is_joined %}
     {% user_access_policy groupid request.user as user_access %}
 
-<br/>
+<div class="row">
+	<div class="small-4 columns">
+		<div class="row collapse">
+			<div class="small-10 columns">
+				<input type="text" id="dr-search" placeholder="Search in the Data Review">
+			</div>
+			<div class="small-2 columns">
+				<div class="button postfix">Search</div>
+			</div>
+		</div>
+	</div>
+	<div class="small-8 columns">
+		
+	</div>
+</div>
+
 <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
+<input type="hidden" id="last-edited-row" data-edited-row-id="" data-edited-row-name="">
 
 <div id="data-rev-table-container-div" style="width: auto; ">
 <table style="width:auto">
@@ -240,10 +261,15 @@
 		</div>
 
 		<h4 class="text-center"><small>Data Review: Keyboard shortcuts</small></h4>
-		When row is open to edit:
+		When the row is open to edit:
 		<ul>
-			<li>"<b>save</b>" : Press "<b>s</b>" of keyboard</li>
-			<li>"<b>cancel</b>" : Press "<b>c</b>" of keyboard</li>
+			<li>"<b>save</b>" : Press <span class="radius secondary label"> s </span> of keyboard</li>
+			<li>"<b>cancel</b>" : Press <span class="radius secondary label"> c </span> of keyboard</li>
+		</ul>
+		<hr/>
+		<ul>
+			<li>"Scroll right till end" : <span class="radius secondary label"> Ctrl </span> + <span class="radius secondary label"><i class="fi-arrow-right"></i></span></li>
+			<li>"Scroll left till end" : <span class="radius secondary label"> Ctrl </span> + <span class="radius secondary label"><i class="fi-arrow-left"></i></span></li>
 		</ul>
 	 	 
 	</div>
@@ -274,10 +300,10 @@
 	// making body_content block to take 12-large columns
 	$article = $("main.row > article.columns");
 	$article.removeClass("medium-10").addClass("large-12");
-	$article.css("overflow-x", "scroll");
+	// $article.css("overflow-x", "scroll");
 
 	// setting the height of data review table
-	$("#data-rev-table-container-div").height(window.innerHeight - ($("nav.top-bar").height()*4) + "px");
+	// $("#data-rev-table-container-div").height(window.innerHeight - ($("nav.top-bar").height()*4) + "px");
 
 
 	function updateContent()
@@ -341,17 +367,20 @@
 
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", oid);
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", $resEditRow.attr("data-row-name"));
+
 		window.location.hash = oid;
 		history.pushState({'oid': oid}, document.title, window.location.href);
 	}
 
 
-	function setCurrEditRowToNone()
+	function setCurrEditRowToNone(oid)
 	{
 		// var oid = document.getElementById("currently-edited-row").getAttribute("data-edited-row-id");
 
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", "");
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", "");
+
+		document.getElementById("last-edited-row").setAttribute("data-edited-row-id", oid);
 
 		window.location.hash = "";
 		// window.location = window.location.pathname;
@@ -373,7 +402,7 @@
 		$("tr#edit-row-" + oid).removeClass("show-edit-border");
 
 		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
-		setCurrEditRowToNone();
+		setCurrEditRowToNone(oid);
 	}
 
 	// action on edit click:
@@ -731,17 +760,37 @@
 		}
 	}
 
+	var $drContainer = $('#data-rev-table-container-div');
+
 	Mousetrap.bind('s', function () { clickAction($('[data-action="save"]:visible')); });
 	Mousetrap.bind('c', function () { clickAction($('[data-action="cancel"]:visible')); });
 
 	Mousetrap.bind('right', function () {
-		$('article').animate({scrollLeft: '+=150'}, 200, 'easeOutQuad');
+		$drContainer.animate({ scrollLeft: '+=' + $drContainer.width()/2 }, 400, 'easeOutQuad');
+	});
+
+	Mousetrap.bind('ctrl+right', function () {
+		$drContainer.animate({ scrollLeft: '+=' + $drContainer.width()*3 }, 1000, 'easeOutQuad');
 	});
 
 	Mousetrap.bind('left', function () {
-		$('article').animate({scrollLeft: '-=150'}, 200, 'easeOutQuad');
+		$drContainer.animate({ scrollLeft: '-=' + $drContainer.width()/2 }, 400, 'easeOutQuad');
 	});
+
+	Mousetrap.bind('ctrl+left', function () {
+		$drContainer.animate({ scrollLeft: '-=' + $drContainer.width()*3 }, 1000, 'easeOutQuad');
+	});
+
 	// --- END of defining keyboard shortcuts to elements
+
+
+	// search in the data-review search input box
+	$("#dr-search").focus(function(){
+		$drContainer.css("opacity", "0.25");
+	})
+
+	$("#dr-search").blur(function(){ $drContainer.css("opacity", "1"); })
+	// ---END of search in the data-review
 
 // </script>
 {% endblock %}
