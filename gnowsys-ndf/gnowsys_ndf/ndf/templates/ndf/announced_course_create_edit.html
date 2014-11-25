@@ -6,12 +6,6 @@
 {% block style %}
   {{block.super}}
 
-
-    #ui-datepicker-div {
-    pisition: absolute,
-    top:500px
-    }
-
   /* Resetting css-properties for fieldset (also legend, input) */
     /* fieldset (padding-bottom) */ 
     fieldset {
@@ -95,16 +89,16 @@
           <fieldset id="unset-ac" class="hide">
             <legend>
             {% if node %}
-            <label> Announced for </label>
+              <label> Announced for </label>
             {% else %}
               <label><h5>Select Course : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
             {% endif %}
             </legend>
+            
             <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
             {% if node %}
-             <input type="text" value="{{ announced_for }}" disabled="disabled">
+               <input type="text" value="{{ announced_for }}" disabled="disabled">
             {% endif %}
-
             </div>
           </fieldset>
 
@@ -134,27 +128,27 @@
           <div class="small-9 columns">
             <div class="small-3 columns">
               <label class="right inline"> 
-            {% if node %}
-              {% trans "Announced in College(s)" %}
-            {% else %}
-                {% trans "Select University" %}
-            {% endif %}
+                {% if node %}
+                  {% trans "Announced in College(s)" %}
+                {% else %}
+                    {% trans "Select University" %}
+                {% endif %}
               </label>
             
             </div>
             <div class="small-6 columns ">
-            {% if node %}
-              <input type="text" value="{{acourse_for_college}}" disabled="disabled">
-            {% else %}
-                <select id="univ_cur" required style="float:left; width:95%">
-                   <option value="">{% trans "- - - Select University - - -" %}</option>
-                  {% for each in university_cur %}
-                  <option value="{{each.pk}}">{{each.name}}</option>
-                  {% endfor %}
-                </select>
-                  <i style="color:red; float:left display:inline">*</i>
-                  <small class="error">{% trans "Please select University" %} </small>
-            {% endif %}
+              {% if node %}
+                <input type="text" value="{{acourse_for_college}}" disabled="disabled">
+              {% else %}
+                  <select id="univ_cur" required style="float:left; width:95%">
+                     <option value="">{% trans "- - - Select University - - -" %}</option>
+                      {% for each in university_cur %}
+                        <option value="{{each.pk}}">{{each.name}}</option>
+                      {% endfor %}
+                  </select>
+                    <i style="color:red; float:left display:inline">*</i>
+                    <small class="error">{% trans "Please select University" %} </small>
+              {% endif %}
             </div>
           </div>
 
@@ -188,7 +182,6 @@
             </div>
         </fieldset>
 
-        
         <div class="row tab-nav">
           <div class="small-2 columns for-prev">
           </div>
@@ -197,7 +190,6 @@
         </div>    
       <input type="hidden" id="name" name="name" value="">
       <input type="hidden" id="announce_to_colg_list" name="announce_to_colg_list" value="">
-      <input type="hidden" id="node_det" name="node_det" value="">
     </div>
     </div>
   </form>
@@ -207,14 +199,14 @@
 {% block script %}
   {{block.super}}
 
-  //Selct univ------------------------------------------------------------------------------------------------------
+  //Selct university------------------------------------------------------------------------------------------------------
     $("select#univ_cur").change(function() {
       univ_id = $("select#univ_cur").val()
       $.ajax({
         url: "{% url 'get_colleges' group_id%}",
 
         data: {
-          univ_id:univ_id
+            univ_id:univ_id
           },
 
           type: "GET",
@@ -228,15 +220,14 @@
             if ($("#announce-course").hasClass("hide")) {
               $("#announce-course").removeClass("hide")
             }
-
           },
+
           success: function(data){
             success_state = data["success"];
             $("#alertModalLabel").text(data["message"]);
 
             if (data["success"]) {
-
-              $("#divcolg").empty();
+                $("#divcolg").empty();
               var dict_len = Object.keys(data["unset_nc"]).length;
               $.each(data["unset_nc"], function(k, val){
                 $("#unset_nc").append(val);
@@ -246,7 +237,6 @@
               $("#divcolg").empty();
               drawer_widget = data["drawer_widget"]
               $("#divcolg").html(drawer_widget); 
-
             }
 
             else {
@@ -260,10 +250,8 @@
 
   //For selecting Course type---------------------------------------------------------------------------------------
     $("select#nussd_course_type").change(function() {
-
       var nussd_course_type = $("#nussd_course_type").val();
 
-      // All field(s) have valid I/P, make ajax-call
       $.ajax({
         url: "{% url 'get_courses' group_id %}",
 
@@ -316,7 +304,6 @@
             $("#divSt").empty();
             drawer_widget = data["drawer_widget"]
             $("#divSt").html(drawer_widget); 
-
           }
 
           else {
@@ -331,12 +318,10 @@
             $("#colg_drop").removeClass("hide")
           }
 
-
           if ($("#course_dur").css("display") == "none") {
             $("#course_dur").toggle()
           }
 
-          // var respDict = JSON.parse(resp.responseText);
           if (success_state) {
 
             // Also toggle unset-ac fieldset
@@ -360,7 +345,6 @@
           }
         }
       });
-
     });
 
   // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
@@ -388,8 +372,6 @@
       $(".ui-datepicker-calendar").hide();
     });
 
-  // If any of the Input field of fieldset (sc) is changed ---------------------------------------------------------
-    
   // Select/Deselect all checbox(es) ['unset-ac-options'] based on state of checkbox ['selectAllOptions'] ----------
     $("#selectAllOptions").bind("change", function(){
       selectAllState = this.checked;
@@ -417,85 +399,80 @@
       $("#announce-course").attr("disabled", !optionState);
     });
 
-  // On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
-
   // On click of Register/Update -----------------------------------------------------------------------------------
     $(document).on("click", "#announce-course", function() {
     // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
 
-    {% if node %}
+      {% if not node %}
 
-    {% else %}
-      $("#selectAllOptions").removeAttr("disabled", "disabled");
-      $(".unsetOption").removeAttr("disabled", "disabled");
-      widget_for = "announced_course_create_edit"
-      class_value = ".node_id." + widget_for + "_values"
-      right_drawer_len = $(class_value).size();
+        $("#selectAllOptions").removeAttr("disabled", "disabled");
+        $(".unsetOption").removeAttr("disabled", "disabled");
+        widget_for = "announced_course_create_edit"
+        class_value = ".node_id." + widget_for + "_values"
+        right_drawer_len = $(class_value).size();
 
-      var announce_to_colg_list = [];
+        var announce_to_colg_list = [];
 
-      if (right_drawer_len > 0) {
-        $(class_value).each(function (){
-          // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
-          resource_name = $(this).attr('name');
-          /*resource_id = $(this).val()*/;
-          
-          announce_to_colg_list.push(resource_name);
-        });
-      }
-      else{
-        $("#alertModalLabel").text("Please select College");
-        $("#alertModal").addClass("alert");
-        $("#alertModal").foundation('reveal', 'open');
-        event.preventDefault();
-      }  
+        if (right_drawer_len > 0) {
+          $(class_value).each(function (){
+            // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
+            resource_name = $(this).attr('name');
+            /*resource_id = $(this).val()*/;
+            
+            announce_to_colg_list.push(resource_name);
+          });
+        }
+        else{
+          $("#alertModalLabel").text("Please select College");
+          $("#alertModal").addClass("alert");
+          $("#alertModal").foundation('reveal', 'open');
+          event.preventDefault();
+        }  
 
-      var nussd_course_type = $("#nussd_course_type").val()
-      var nussd_course_type_list =[]
-      nussd_course_type_list.push(nussd_course_type);
+        var nussd_course_type = $("#nussd_course_type").val()
+        var nussd_course_type_list =[]
+        nussd_course_type_list.push(nussd_course_type);
 
-      $("#announce_to_colg_list").val(announce_to_colg_list);
+        $("#announce_to_colg_list").val(announce_to_colg_list);
       {% endif %}
     });
 
-  $("#date_enroll").datepicker()
 {% endblock %}
 
 {% block document_ready %}
   {{block.super}}
-  {% if node %}
+    {% if node %}
 
-    $('#start_enroll').attr("disabled",true);
-    $('#nussd_course_type').attr("disabled",true);
-    $("#start_time").attr("disabled",true);
-    $("#end_time").attr("disabled",true);
+      $('#start_enroll').attr("disabled",true);
+      $('#nussd_course_type').attr("disabled",true);
+      $("#start_time").attr("disabled",true);
+      $("#end_time").attr("disabled",true);
 
-    if ($("#course_dur").css("display") == "none") {
-      $("#course_dur").toggle()
-    }
+      if ($("#course_dur").css("display") == "none") {
+        $("#course_dur").toggle()
+      }
 
-    if ($("#enroll_duration").hasClass("hide")) {
-      $("#enroll_duration").removeClass("hide")
-    }
+      if ($("#enroll_duration").hasClass("hide")) {
+        $("#enroll_duration").removeClass("hide")
+      }
 
-    if($("#unset-ac").hasClass("hide")){
-      $("#unset-ac").removeClass("hide")
-    }
+      if($("#unset-ac").hasClass("hide")){
+        $("#unset-ac").removeClass("hide")
+      }
 
-    $(".tab-nav").children(".for-next").append("<input type='submit' id='announce-course' class='small button ' value='Update' style='float:right;'>")
+      $(".tab-nav").children(".for-next").append("<input type='submit' id='announce-course' class='small button ' value='Update' style='float:right;'>")
 
-    if($("#announce-course").hasClass("hide")){
-      $("#announce-course").removeClass("hide")
-    }
+      if($("#announce-course").hasClass("hide")){
+        $("#announce-course").removeClass("hide")
+      }
 
-    if ($("#announce-course").css("display") == "none") {
-      $("#announce-course").toggle()
-    }
-  
-  {% endif %}
+      if ($("#announce-course").css("display") == "none") {
+        $("#announce-course").toggle()
+      }
+    {% endif %}
 
-  $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
-  $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
+    $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
+    $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
 
   // Change placeholders for date widgets
 
@@ -617,7 +594,6 @@
         else if ($(this).attr('id') == "end_time") {
           if (month_year) {
             month_year = month_year.split("/")
-
             month = parseInt(month_year[0]);
             year = parseInt(month_year[1]);
           }
@@ -638,7 +614,6 @@
 
           else {
             startDtInput.val(month+"/"+year);
-
             $(this).datepicker('setDate', new Date(year, (month-1), 1));
           }
         }
@@ -651,7 +626,6 @@
 
         if (month_year) {
           month_year = month_year.split("/")
-
           month = parseInt(month_year[0])
           year = parseInt(month_year[1])
         }
@@ -764,9 +738,6 @@
         }
         $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
         $(this).datepicker('setDate', new Date(year, (month-1), day));
-        
       },
     });
-
-
 {% endblock %}

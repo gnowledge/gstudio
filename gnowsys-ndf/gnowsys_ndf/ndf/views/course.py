@@ -222,8 +222,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   property_order_list = []
 
-
-
   template = ""
   template_prefix = "mis"
 
@@ -324,7 +322,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                   nm = nm.split(" -- ")[0].lstrip().rstrip()
 
               course_node = collection.Node.one({'_id':ObjectId(sid)})
-              print course_node,"existing\n\n"
               c_name = unicode(course_node.attribute_set[1][u'course_code'] + "_" + colg_ids.attribute_set[0][u"enrollment_code"]+"_" + str(start_time).replace(' ','_') + "_" + str(end_time).replace(' ','_'))
               request.POST["name"] = c_name
             
@@ -334,7 +331,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               course_gs.status = u"PUBLISHED"
             
             course_gs.save(is_changed=is_changed)
-
 
             # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
             for tab_details in property_order_list:
@@ -462,7 +458,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               for rel in PO.relation_set:
                 if rel:
                   PO_auth = collection.Node.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
-                  print PO_auth._id,"po id"
                   if PO_auth:
                     task_dict["Assignee"].append(PO_auth.name)
                     task_dict["group_set"] = [PO_auth._id]
@@ -576,12 +571,10 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   if app_set_instance_id:
     course_gs.get_neighbourhood(course_gs.member_of)
     course_gs.keys()
-    print course_gs.attribute_set
     context_variables['node'] = course_gs
     for each_in in course_gs.attribute_set:
       for eachk,eachv in each_in.items():
         context_variables[eachk] = eachv
-        print "\n\n", eachk,eachv 
     for each_in in course_gs.relation_set:
       for eachk,eachv in each_in.items():
         get_node_name = collection.Node.one({'_id':eachv[0]})
@@ -630,12 +623,8 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   else:
     app = collection.Node.one({'_id': ObjectId(app_id)})
 
-  ac_app_id = collection.Node.one({'_type': "GSystemType", 'name': u"Announced Course"},{'_id':1})
-
-
   app_name = app.name 
 
-  # print "\n coming in course detail... \n"
   # app_name = "mis"
   app_set = ""
   app_collection_set = []
@@ -661,7 +650,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       for eachset in agency_type_node.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
-
   if app_set_id:
     course_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = course_gst.name
@@ -685,7 +673,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
-                        'ac_app_id':str(ac_app_id._id),
                         'title':title,
                         'nodes': nodes, 'node': node,
                         'property_order_list': property_order_list,
