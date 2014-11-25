@@ -3,6 +3,7 @@
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
+from django.http import HttpResponse
 from django.http import Http404
 from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
@@ -25,12 +26,27 @@ from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 collection = get_database()[Node.collection_name]
+def event(request, group_id):
+
+ #view written just to show the landing page of the events
+ Glisttype=collection.Node.find({"name":"GList"})
+ agency_type_node = collection.Node.one({"type_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventlist"},{'collection_set': 1})
+ app_collection_set=[]
+ if agency_type_node:
+    for eachset in agency_type_node.collection_set:
+          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+
+ return render_to_response('ndf/event.html',{'app_collection_set':app_collection_set,
+                                             'groupid':group_id           
+                                            },
+                              context_instance = RequestContext(request)
+                          )
+
 
 def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   View for handling Event and it's sub-types detail-view
   """
-
   auth = None
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
@@ -43,7 +59,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
         group_id = str(auth._id)
   else :
     pass
-
+  
   app = None
   if app_id is None:
     app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
@@ -52,7 +68,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   else:
     app = collection.Node.one({'_id': ObjectId(app_id)})
 
-  app_name = app.name 
+  #app_name = app.name 
 
   app_set = ""
   app_collection_set = []
@@ -63,19 +79,25 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
   property_order_list = []
 
-  template_prefix = "mis"
+  #template_prefix = "mis"
 
   if request.user:
     if auth is None:
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
-    agency_type = auth.agency_type
+  '''  agency_type = auth.agency_type
     agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
-
+  '''
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  Glisttype=collection.Node.find({"name":"GList"})
+  agency_type_node = collection.Node.one({"type_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventlist"},{'collection_set': 1})
+  app_collection_set=[]
+  if agency_type_node:
+    for eachset in agency_type_node.collection_set:
+          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   nodes = None
   if app_set_id:
@@ -91,7 +113,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       nodes = collection.Node.find({'member_of': event_gst._id, 'name': {'$regex': search, '$options': 'i'}})
     else:
       nodes = collection.Node.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)})
-
+      
   node = None
   if app_set_instance_id :
     template = "ndf/event_details.html"
@@ -131,11 +153,10 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
       
 @login_required
-def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
+def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=None):
   """
   View for handling Event and it's sub-types create-edit-view
   """
-
   auth = None
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
@@ -148,7 +169,7 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
         group_id = str(auth._id)
   else :
     pass
-
+  ''' 
   app = None
   if app_id is None:
     app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
@@ -158,7 +179,7 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
     app = collection.Node.one({'_id': ObjectId(app_id)})
 
   app_name = app.name 
-
+  '''
   app_set = ""
   app_collection_set = []
   title = ""
@@ -170,7 +191,7 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
 
   template_prefix = "mis"
 
-  if request.user:
+  '''if request.user:
     if auth is None:
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
     agency_type = auth.agency_type
@@ -178,6 +199,13 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+  '''
+  Glisttype=collection.Node.find({"name":"GList"})
+  agency_type_node = collection.Node.one({"type_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventlist"},{'collection_set': 1})
+  app_collection_set=[]
+  if agency_type_node:
+    for eachset in agency_type_node.collection_set:
+          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
@@ -282,14 +310,14 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
 
               # else:
               #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
-    
+              print "event",event_gs
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
-    return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
-  
+    '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
+    return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
   template = "ndf/event_create_edit.html"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'group_id': group_id, 'groupid': group_id, 
-                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
+                        'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'property_order_list': property_order_list

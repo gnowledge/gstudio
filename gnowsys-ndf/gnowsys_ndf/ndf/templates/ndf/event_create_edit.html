@@ -1,10 +1,22 @@
-{% extends "ndf/mis_base_create_edit.html" %}
+{% extends "ndf/event.html" %}
 {% load ndf_tags %}
 {% load i18n %}
 {% load pagination_tags %}
+{% block head %}
+	<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+{% endblock %}
 
 {% block style %}
-// <style type="text/css">
+ 
 /* CSS for Multiple-selection (or drawer) widget */
   .divider-line { font-size: xx-large; color:lightgray; }
   .line-height-2 { line-height:2; }
@@ -37,7 +49,7 @@
     pointer-events: none;
     cursor: default;
   }
-// </style>
+
 {% endblock %}
 
 {% block body_content %} 

@@ -55,6 +55,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/term', include('gnowsys_ndf.ndf.urls.term')),
     
     (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis', namespace='mis'), {'app_name': "MIS"}),
+    (r'^(?P<group_id>[^/]+)/event', include('gnowsys_ndf.ndf.urls.event')),
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis', namespace='mis-po'), {'app_name': "MIS-PO"}),
     url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
 	url(r'^(?P<group_id>[^/]+)/meeting/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.output', name='newmeeting'), 

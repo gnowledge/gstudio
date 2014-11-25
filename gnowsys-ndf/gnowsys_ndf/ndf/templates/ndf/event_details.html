@@ -1,4 +1,4 @@
-{% extends "ndf/mis_base.html" %}
+{% extends "ndf/event.html" %}
 {% load ndf_tags %}
 {% load i18n %}
 {% load pagination_tags %}
@@ -345,15 +345,19 @@ table, th, td {
 
       {% edit_policy groupid node request.user as status %}
       {% if user.is_authenticated and status == "allow" and gstaff_access %}
-
+        {% comment %}
+        <!-- commented while making event as separate app 
         {% if app_name == "MIS" %}
         <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
         {% else %}
         <a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
         {% endif %}
           <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
+        </a> -->
+        {% endcomment %}
+        <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
+         <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
         </a>
-
         <ul id="edit-options" class="f-dropdown">
 
           <!-- This button publishes the drafted resource -->
@@ -383,12 +387,18 @@ table, th, td {
               - In case of Groups/Author, only to the superuser
           -->
           <li>
+            {% comment %}
+            <!--
             {% if app_name == "MIS" %}
             <a class="button small expand" href="{% url 'mis:mis_app_instance_create' groupid app_id app_set_id %}">
             {% else %}
             <a class="button small expand" href="{% url 'mis-po:mis_app_instance_create' groupid app_id app_set_id %}">
             {% endif %}
               <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+            </a>-->
+            {% endcomment %}
+            <a class="button small expand" href="{% url 'event_app_instance_create' groupid app_set_id %}">
+            <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
             </a>
           </li>
 
