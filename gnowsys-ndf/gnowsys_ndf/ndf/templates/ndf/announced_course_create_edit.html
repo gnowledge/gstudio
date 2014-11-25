@@ -197,6 +197,7 @@
         </div>    
       <input type="hidden" id="name" name="name" value="">
       <input type="hidden" id="announce_to_colg_list" name="announce_to_colg_list" value="">
+      <input type="hidden" id="node_det" name="node_det" value="">
     </div>
     </div>
   </form>
@@ -206,7 +207,7 @@
 {% block script %}
   {{block.super}}
 
-  //Selct univ
+  //Selct univ------------------------------------------------------------------------------------------------------
     $("select#univ_cur").change(function() {
       univ_id = $("select#univ_cur").val()
       $.ajax({
@@ -257,10 +258,7 @@
       });//end of ajax call
     });
 
-
-  $("#datepicker_end").datepicker()
-
-  //For selecting Course type
+  //For selecting Course type---------------------------------------------------------------------------------------
     $("select#nussd_course_type").change(function() {
 
       var nussd_course_type = $("#nussd_course_type").val();
@@ -390,7 +388,7 @@
       $(".ui-datepicker-calendar").hide();
     });
 
-  // If any of the Input field of fieldset (sc) is changed -------------------------------------------------
+  // If any of the Input field of fieldset (sc) is changed ---------------------------------------------------------
     
   // Select/Deselect all checbox(es) ['unset-ac-options'] based on state of checkbox ['selectAllOptions'] ----------
     $("#selectAllOptions").bind("change", function(){
@@ -451,6 +449,7 @@
         $("#alertModal").foundation('reveal', 'open');
         event.preventDefault();
       }  
+
       var nussd_course_type = $("#nussd_course_type").val()
       var nussd_course_type_list =[]
       nussd_course_type_list.push(nussd_course_type);
@@ -459,40 +458,62 @@
       {% endif %}
     });
 
+  $("#date_enroll").datepicker()
 {% endblock %}
 
 {% block document_ready %}
   {{block.super}}
-{% if node %}
+  {% if node %}
 
-  if ($("#course_dur").css("display") == "none") {
-    $("#course_dur").toggle()
-  }
+    $('#start_enroll').attr("disabled",true);
+    $('#nussd_course_type').attr("disabled",true);
+    $("#start_time").attr("disabled",true);
+    $("#end_time").attr("disabled",true);
 
-  if ($("#enroll_duration").hasClass("hide")) {
-    $("#enroll_duration").removeClass("hide")
-  }
+    if ($("#course_dur").css("display") == "none") {
+      $("#course_dur").toggle()
+    }
 
-  if($("#unset-ac").hasClass("hide")){
-    $("#unset-ac").removeClass("hide")
-  }
+    if ($("#enroll_duration").hasClass("hide")) {
+      $("#enroll_duration").removeClass("hide")
+    }
 
-  $(".tab-nav").children(".for-next").append("<input type='button' id='announce-course' class='small button ' value='Submit' style='float:right;'>")
+    if($("#unset-ac").hasClass("hide")){
+      $("#unset-ac").removeClass("hide")
+    }
 
-  if($("#announce-course").hasClass("hide")){
-    $("#announce-course").removeClass("hide")
-  }
-  if ($("#announce-course").css("display") == "none") {
-    $("#announce-course").toggle()
-  }
+    $(".tab-nav").children(".for-next").append("<input type='submit' id='announce-course' class='small button ' value='Update' style='float:right;'>")
 
-{% else %}
+    if($("#announce-course").hasClass("hide")){
+      $("#announce-course").removeClass("hide")
+    }
+
+    if ($("#announce-course").css("display") == "none") {
+      $("#announce-course").toggle()
+    }
+  
+  {% endif %}
 
   $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
   $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
 
-  // Change placeholders for start-time & end-time
+  // Change placeholders for date widgets
+
     // From DD/MM/YYYY HH:MM to MM/YYYY
+    $(".dmy").each(function(i) {
+      $(this).attr("placeholder", "MM/DD/YYYY");
+      if ($(this).attr("id") == "start_enroll") {
+        var st = "{{node.start_enroll|date:'d/m/Y'}}"
+        $(this).val(st)
+      }
+
+      else if ($(this).attr("id") == "end_enroll") {
+        var et = "{{node.end_enroll|date:'d/m/Y'}}"
+        $(this).val(et)
+      }
+    });
+
+    // From DD/MM/YYYY HH:MM to DD/MM/YYYY
     $(".date_month_day_year").each(function(i) {
       // Below code is required because in validators "d/m/Y H:i" is set
       // In order to override that, below code is overwritten
@@ -505,19 +526,6 @@
       else if ($(this).attr("id") == "end_time") {
         $(this).attr("placeholder", "MM/YYYY");
         var et = "{{node.end_time|date:'m/Y'}}"
-        $(this).val(et)
-      }
-    });
-
-    $(".dmy").each(function(i) {
-      $(this).attr("placeholder", "DD/MM/YYYY");
-      if ($(this).attr("id") == "start_enroll") {
-        var st = "{{node.start_enroll|date:'d/m/Y'}}"
-        $(this).val(st)
-      }
-
-      else if ($(this).attr("id") == "end_enroll") {
-        var et = "{{node.end_enroll|date:'d/m/Y'}}"
         $(this).val(et)
       }
     });
@@ -549,107 +557,6 @@
         $(this).children(".tab-nav").children(".for-prev")
           .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
       }
-    });
-
-  // Enroll: start & end date-widgets --------------------------------------------------------------------------
-    var startEnrollDt = $("#start_enroll");
-    var endEnrollDt = $("#end_enroll");
-    currentDate = new Date();
-    var currentDay = currentDate.getDate();
-    var currentMonth = currentDate.getMonth();
-    var currentYear = currentDate.getFullYear();
-
-    $(".dmy").datepicker({
-      changeMonth: true,
-      dateFormat: 'dd/mm/yy',
-      minDate: '0',
-      maxDate: '+2m',
-      defaultDate: '0',
-
-      onClose: function(dateText, inst) {
-        $(this).val(dateText);
-        
-        var month_year = $(this).val();
-        day = currentDay;
-        month = currentMonth;
-        year = currentYear;
-        
-        if ($(this).attr('id') == "start_enroll") {
-          if (month_year) {
-            month_year = month_year.split("/");
-            day = parseInt(month_year[0]);
-            month = parseInt(month_year[1]);
-            year = parseInt(month_year[2]);
-          }
-
-          if (endEnrollDt.val() != '') {
-            var testStartDate = startEnrollDt.datepicker('getDate');
-            var testEndDate = endEnrollDt.datepicker('getDate');
-
-            if (testStartDate > testEndDate) {
-              endEnrollDt.datepicker('setDate', testStartDate);
-            }
-
-            else {
-              $(this).val(day+"/"+month+"/"+year);
-              $(this).datepicker('setDate', new Date(year, (month-1), day));
-            }
-          }
-
-          else {
-            endEnrollDt.val(day+"/"+month+"/"+year);
-            $(this).datepicker('setDate', new Date(year, (month-1), day));
-          }
-
-          $("#end_enroll").datepicker('option', 'minDate', new Date(year, (month-1), day));
-        }
-
-        else if ($(this).attr('id') == "end_enroll") {
-          if (month_year) {
-            month_year = month_year.split("/");
-            day = parseInt(month_year[0]);
-            month = parseInt(month_year[1]);
-            year = parseInt(month_year[2]);
-          }
-
-          if (startEnrollDt.val() != '') {
-            var testStartDate = startEnrollDt.datepicker('getDate');
-            var testEndDate = endEnrollDt.datepicker('getDate');
-
-            if (testStartDate > testEndDate) {
-              startEnrollDt.datepicker('setDate', testEndDate);
-            }
-
-            else {
-              $(this).val(day+"/"+month+"/"+year);
-              $(this).datepicker('setDate', new Date(year, (month-1), day));
-            }
-          }
-
-          else {
-            startEnrollDt.val(day+"/"+month+"/"+year);
-
-            $(this).datepicker('setDate', new Date(year, (month-1), day));
-          }
-        }
-      },
-
-      beforeShow: function() {
-        var month_year = $(this).val();
-        day = currentDay;
-        month = currentMonth;
-        year = currentYear;
-
-        if (month_year) {
-          month_year = month_year.split("/");
-          day = parseInt(month_year[0]);
-          month = parseInt(month_year[1]);
-          year = parseInt(month_year[2]);
-        }
-
-        $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
-        $(this).datepicker('setDate', new Date(year, (month-1), day));
-      },
     });
 
   // Course: start & end date-widgets --------------------------------------------------------------------------
@@ -763,10 +670,103 @@
       }
     });
 
-  // If Find button is disabled, enable it ---------------------------------------------------------------------
-    if ($("#find_ac").attr("disabled") == "disabled") {
-      $("#find_ac").removeAttr("disabled");
-    }
-{% endif %}
+  // Enroll: start & end date-widgets --------------------------------------------------------------------------
+    var startEnrollDt = $("#start_enroll");
+    var endEnrollDt = $("#end_enroll");
+    currentDate = new Date();
+    var currentDay = currentDate.getDate();
+    var currentMonth = currentDate.getMonth();
+    var currentYear = currentDate.getFullYear();
+
+    $(".dmy").datepicker({
+      changeMonth: true,
+      dateFormat: 'dd/mm/yy',
+      minDate: '0',
+      maxDate: '+2m',
+      defaultDate: '0',
+
+      onClose: function(dateText, inst) {
+        $(this).val(dateText);
+        
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+        
+        if ($(this).attr('id') == "start_enroll") {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (endEnrollDt.val() != '') {
+            var testStartDate = startEnrollDt.datepicker('getDate');
+            var testEndDate = endEnrollDt.datepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              endEnrollDt.datepicker('setDate', testStartDate);
+            }
+
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            endEnrollDt.val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+          $("#end_enroll").datepicker('option', 'minDate', new Date(year, (month-1), day));
+        }
+
+        else if ($(this).attr('id') == "end_enroll") {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (startEnrollDt.val() != '') {
+            var testStartDate = startEnrollDt.datepicker('getDate');
+            var testEndDate = endEnrollDt.datepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              startEnrollDt.datepicker('setDate', testEndDate);
+            }
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            startEnrollDt.val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+      },
+
+      beforeShow: function() {
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+        $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+        $(this).datepicker('setDate', new Date(year, (month-1), day));
+        
+      },
+    });
+
 
 {% endblock %}

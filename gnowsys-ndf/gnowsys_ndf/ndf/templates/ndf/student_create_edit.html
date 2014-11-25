@@ -513,15 +513,6 @@
       }); 
     });
 
-    $(document).on('focus click blur', '.date_month_day_year' ,function(){
-      $("#ui-datepicker-div").position({
-        at: "bottom",
-        my: "bottom",
-        of: $(this)
-      }); 
-    });
-
-
   // State-wise District selection ---------------------------------------------------------------------------------
     // Disable District field, later on will be enabled after a state is selected
     $("select#person_belongs_to_district").attr('disabled', 'disabled')
