@@ -185,6 +185,33 @@ class Command(BaseCommand):
           quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'}))
           quiz_type.save()
 
+        #Creation Gsystem Eventtype as a container to hold the Event types
+        glist = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+        GlistItem=collection.Node.one({'_type': "GSystemType","name":"GListItem"})
+        #create super container list Eventlist
+        #First check if EventList Exist or not
+        Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
+        if Eventtype is None:
+          glist_container = collection.GSystem()
+          glist_container.name=u"Eventtype"
+          glist_container.status = u"PUBLISHED"
+          glist_container.created_by=1
+          glist_container.member_of.append(glist._id)
+          glist_container.save()
+        Event=collection.Node.find_one({'_type':"GSystemType","name":"Event"})  
+        All_Event_Types=collection.Node.find({"type_of": ObjectId(Event._id)})
+        Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
+        Event_type_list=[]
+        for i in All_Event_Types:
+          Event_Type_node=collection.Node.one({"_id":ObjectId(i._id)})
+          if (GlistItem._id not in Event_Type_node.member_of): 
+            Event_Type_node.member_of.append(GlistItem._id)
+            Event_Type_node.save()
+          Event_type_list.append(i._id)
+        collection.update({'_id': ObjectId(Eventtype._id)}, {'$set': {'collection_set': Event_type_list}}, upsert=False, multi=False)
+        
+        #End of adding Event Types
+        
         # Creating GSystem(s) of GList for GSTUDIO_TASK_TYPES
         # Divided in two parts:
         # 1) Creating Types as GList nodes from GSTUDIO_TASK_TYPES
@@ -242,6 +269,7 @@ class Command(BaseCommand):
         else:
           print " GList ("+glc_node_name+") container already created !"
           info_message += "\n GList ("+glc_node_name+") container already created !"
+        
         print "\n"
         info_message += "\n\n"
         log_list.append(info_message)

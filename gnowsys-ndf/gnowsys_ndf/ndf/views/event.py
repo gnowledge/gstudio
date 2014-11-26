@@ -30,10 +30,12 @@ def event(request, group_id):
 
  #view written just to show the landing page of the events
  Glisttype=collection.Node.find({"name":"GList"})
- agency_type_node = collection.Node.one({"type_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventlist"},{'collection_set': 1})
+ Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
  app_collection_set=[]
- if agency_type_node:
-    for eachset in agency_type_node.collection_set:
+ print Event_Types
+ if Event_Types:
+    for eachset in Event_Types.collection_set:
+          print "eachset",eachset
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
  return render_to_response('ndf/event.html',{'app_collection_set':app_collection_set,
@@ -43,7 +45,7 @@ def event(request, group_id):
                           )
 
 
-def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
+def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None):
   """
   View for handling Event and it's sub-types detail-view
   """
@@ -61,12 +63,12 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     pass
   
   app = None
-  if app_id is None:
+  '''if app_id is None:
     app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
     if app:
       app_id = str(app._id)
-  else:
-    app = collection.Node.one({'_id': ObjectId(app_id)})
+  else:'''
+  app = collection.Node.one({'_id': ObjectId(app_id)})
 
   #app_name = app.name 
 
@@ -85,18 +87,18 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     if auth is None:
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
   '''  agency_type = auth.agency_type
-    agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
-    if agency_type_node:
-      for eachset in agency_type_node.collection_set:
+    Event_Types = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    if Event_Types:
+      for eachset in Event_Types.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   Glisttype=collection.Node.find({"name":"GList"})
-  agency_type_node = collection.Node.one({"type_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventlist"},{'collection_set': 1})
+  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"EventType"},{'collection_set': 1})
   app_collection_set=[]
-  if agency_type_node:
-    for eachset in agency_type_node.collection_set:
+  if Event_Types:
+    for eachset in Event_Types.collection_set:
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   nodes = None
@@ -126,7 +128,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
-                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
+                        'app_id': app_id,'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'nodes': nodes, 'node': node
@@ -195,16 +197,16 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
     if auth is None:
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
     agency_type = auth.agency_type
-    agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
-    if agency_type_node:
-      for eachset in agency_type_node.collection_set:
+    Event_Types = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    if Event_Types:
+      for eachset in Event_Types.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
   Glisttype=collection.Node.find({"name":"GList"})
-  agency_type_node = collection.Node.one({"type_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventlist"},{'collection_set': 1})
+  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"EventType"},{'collection_set': 1})
   app_collection_set=[]
-  if agency_type_node:
-    for eachset in agency_type_node.collection_set:
+  if Event_Types:
+    for eachset in Event_Types.collection_set:
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   # for eachset in app.collection_set:
