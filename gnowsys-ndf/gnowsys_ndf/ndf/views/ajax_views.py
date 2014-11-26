@@ -561,34 +561,27 @@ def search_drawer(request, group_id):
 
 
       if node_id:
-        
-        for each in search_drawer:
-          if each._id != node._id:
-            if each._id not in nlist:  
-              dict1[each._id] = each
-            
-        for oid in nlist: 
-          obj = collection.Node.one({'_id': oid })           
-          dict2.append(obj)            
-        
-        dict_drawer['1'] = dict1
-        dict_drawer['2'] = dict2
 
-      else:
-        if (node is None) and (not nlist):
-          for each in search_drawer:               
-            dict_drawer[each._id] = each
+          if node.collection_set:
+              nlist = node.collection_set
+              if field:
+                checked = field
+              checked = None
+          else:
+            nlist = []
+            checked = None
 
 
-
-      drawers = dict_drawer
+      drawer, paged_resources = get_drawers(group_id, node_id, nlist, 1, checked)
+      drawers = drawer
       if not node_id:
         drawer1 = drawers
-      else:
 
+      else:
         drawer1 = drawers['1']
         drawer2 = drawers['2']
-      
+
+
       return render_to_response("ndf/drawer_widget.html", 
                                 {"widget_for": field, 
                                  "drawer1": drawer1, 'selection': selection,
