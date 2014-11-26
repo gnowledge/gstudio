@@ -459,8 +459,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   metadata = request.POST.get("metadata_info", '') 
   if metadata:
     if metadata == "metadata":
-      node_gst = gcollection.Node.one({'_id':ObjectId(node.member_of[0]) })
-      get_node_metadata(request,node,node_gst)
+      if node:
+        node_gst = gcollection.Node.one({'_id':ObjectId(node.member_of[0]) })
+        get_node_metadata(request,node,node_gst)
 
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
