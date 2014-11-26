@@ -22,12 +22,12 @@ urlpatterns = patterns('',
     (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
 
     # --mobwrite-- commented for time being
-    # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
-    # (r'^r/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
-    # (r'^m/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.html'),
-    # (r'^t/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.text'),
-    # (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
-    # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
+    (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
+    (r'^r/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
+    (r'^m/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.html'),
+    (r'^t/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.text'),
+    (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
+    (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     # --end of mobwrite
 
     (r'^admin/', include(admin.site.urls)),
