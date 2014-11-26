@@ -61,7 +61,7 @@
     			{% if user.is_authenticated %}
     				{% if prof_pic_obj %}
               <div class="div-height">
-    					<img src="{% url 'getImageThumbnail' group_id prof_pic_obj %}" class="img-height">
+    					<img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height">
               </div>
 
     				{% else %}
