@@ -456,12 +456,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     elif check_collection == "module":    
       right_drawer_list = request.POST.get('module_list','')
 
-  metadata = request.POST.get("metadata_info", '') 
-  if metadata:
-    if metadata == "metadata":
-      if node:
-        node_gst = gcollection.Node.one({'_id':ObjectId(node.member_of[0]) })
-        get_node_metadata(request,node,node_gst)
 
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
@@ -1039,7 +1033,7 @@ def update_mobwrite_content_org(node_system):
   return textobj
 
 
-def get_node_metadata(request, node, node_type, **kwargs):
+def get_node_metadata(request, node, **kwargs):
     '''
     Getting list of updated GSystems with kwargs arguments.
     Pass is_changed=True as last/fourth argument while calling this/get_node_metadata method.
