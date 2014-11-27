@@ -502,16 +502,13 @@ def search_drawer(request, group_id):
       node = None
       page_no = 1
 
-      theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-      topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
-      theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
-      forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
-      reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
+      Page = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
+      File = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
+      Quiz = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})
 
       if node_id:
         node = collection.Node.one({'_id': ObjectId(node_id) })
         node_type = collection.Node.one({'_id': ObjectId(node.member_of[0]) })
-        diff_types = [theme_GST_id ,topic_GST_id, theme_item_GST, forum_GST_id, reply_GST_id]
 
         if field: 
           if field == "teaches":
@@ -534,25 +531,18 @@ def search_drawer(request, group_id):
 
           node.reload()
 
-        if node_type._id in diff_types:
-          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]},
-                                          'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 
-                                          '$and': [
-                                            {'name': {'$regex': str(search_name), '$options': "i"}},
-                                            {'group_set': {'$all': [ObjectId(group_id)]} }
-                                          ]
-                                        })   
+        search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]},
+                                        'member_of':{'$in':[Page._id,File._id,Quiz._id]}, 
+                                        '$and': [
+                                          {'name': {'$regex': str(search_name), '$options': "i"}},
+                                          {'group_set': {'$all': [ObjectId(group_id)]} }
+                                        ]
+                                      })   
         
-        else:
-          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
-                                          '$and': [
-                                            {'name': {'$regex': str(search_name), '$options': "i"}},
-                                            {'group_set': {'$all': [ObjectId(group_id)]} }
-                                          ]                                          
-                                        })
 
       else:
           search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
+                                          'member_of':{'$in':[Page._id,File._id,Quiz._id]}, 
                                           '$and': [
                                             {'name': {'$regex': str(search_name), '$options': "i"}},
                                             {'group_set': {'$all': [ObjectId(group_id)]} }
@@ -561,26 +551,30 @@ def search_drawer(request, group_id):
 
 
       if node_id:
+        for each in search_drawer:
+          if each._id != node._id:
+            if each._id not in nlist:
+              dict1[each._id] = each
 
-          if node.collection_set:
-              nlist = node.collection_set
-              if field:
-                checked = field
-              checked = None
-          else:
-            nlist = []
-            checked = None
+        for oid in nlist:
+          obj = collection.Node.one({'_id': oid })
+          dict2.append(obj)
+
+        dict_drawer['1'] = dict1
+        dict_drawer['2'] = dict2
+
+      else:
+        if (node is None) and (not nlist):
+          for each in search_drawer:
+            dict_drawer[each._id] = each
 
 
-      drawer, paged_resources = get_drawers(group_id, node_id, nlist, 1, checked)
-      drawers = drawer
+      drawers = dict_drawer
       if not node_id:
         drawer1 = drawers
-
       else:
         drawer1 = drawers['1']
         drawer2 = drawers['2']
-
 
       return render_to_response("ndf/drawer_widget.html", 
                                 {"widget_for": field, 
