@@ -27,19 +27,30 @@ from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 collection = get_database()[Node.collection_name]
 def event(request, group_id):
-
+ 
+ if ObjectId.is_valid(group_id) is False :
+    group_ins = collection.Node.one({'_type': "Group","name": group_id})
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    if group_ins:
+      group_id = str(group_ins._id)
+    else :
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if auth :
+        group_id = str(auth._id)
+ else :
+    pass
  #view written just to show the landing page of the events
  Glisttype=collection.Node.find({"name":"GList"})
  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
  app_collection_set=[]
- print Event_Types
  if Event_Types:
     for eachset in Event_Types.collection_set:
-          print "eachset",eachset
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
-
  return render_to_response('ndf/event.html',{'app_collection_set':app_collection_set,
-                                             'groupid':group_id           
+                                             'groupid':group_id,
+                                             'group_id':group_id,
+                                             'group_name':group_id
+                                                        
                                             },
                               context_instance = RequestContext(request)
                           )
@@ -95,12 +106,13 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   Glisttype=collection.Node.find({"name":"GList"})
-  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"EventType"},{'collection_set': 1})
+  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
   app_collection_set=[]
   if Event_Types:
     for eachset in Event_Types.collection_set:
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
+  
   nodes = None
   if app_set_id:
     event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
@@ -125,7 +137,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     # print "\n property_order_list: ", property_order_list, "\n"
     node.get_neighbourhood(node.member_of)
   #   print "\n node.keys(): ", node.keys(), "\n"
-
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id,'app_collection_set': app_collection_set, 
@@ -203,7 +214,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
   Glisttype=collection.Node.find({"name":"GList"})
-  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"EventType"},{'collection_set': 1})
+  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
   app_collection_set=[]
   if Event_Types:
     for eachset in Event_Types.collection_set:

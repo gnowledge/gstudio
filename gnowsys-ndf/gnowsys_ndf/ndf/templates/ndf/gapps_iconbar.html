@@ -87,7 +87,7 @@
                       {% elif app_name|lower == "task" %}
                         <a href="{% url 'task_create_edit' group_name_tag %}">
                       {% else %}
-                        <a href="{% url 'event' groupid %}">
+                        <a href="{% url 'event' group_name_tag %}">
                       {% endif %}
                         {% if app_name|lower == "file"%}Upload{% else %}Create{% endif %} {{app_name}}
                       </a>
