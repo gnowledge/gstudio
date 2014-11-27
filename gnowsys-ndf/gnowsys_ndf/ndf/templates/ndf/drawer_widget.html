@@ -475,6 +475,7 @@
     else {
       var len = (this.value.length);
       var field = "{{widget_for}}";
+      var value = this.value;
 
       if (e.which == 13) {
 
@@ -508,6 +509,8 @@
               if (field == "assesses"){
                 $("#assesses_drawer").html(data);
               }
+
+              $(".search_items").focus().val('').val(value);
               
             }          
           });
