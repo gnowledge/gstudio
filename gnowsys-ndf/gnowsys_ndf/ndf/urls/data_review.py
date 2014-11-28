@@ -3,8 +3,14 @@ from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.data_review',
-                       url(r'^/$', 'data_review', name='data_review'),
-                       url(r'^/page-no=(?P<page_no>\d+)/$', 'data_review', name='data_review_page'),
-                       url(r'^/save/$', 'data_review_save', name='data_review_save'),
-                       url(r'^/search/', 'data_review', name="data_review_search"),
+						# simple data-review with/withou page no.
+						url(r'^/$', 'data_review', name='data_review'),
+						url(r'^/page-no=(?P<page_no>\d+)/$', 'data_review', name='data_review_page'),
+
+						# to save edited data-review row
+						url(r'^/save/$', 'data_review_save', name='data_review_save'),
+
+						# to render search result with and withou page no.
+						url(r'^/search/(?P<search_text>[^/]+)/$', 'get_dr_search_result_dict', name="data_review_search"),
+						url(r'^/search/(?P<search_text>[^/]+)/page-no=(?P<page_no>\d+)/$', 'get_dr_search_result_dict', name="data_review_search_page"),
 )
