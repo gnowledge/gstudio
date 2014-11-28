@@ -121,7 +121,11 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+                                              {% get_language_info_list for LANGUAGES as languages %}
+					      {% for language in languages %}
+					      
+                                              <option value="{{language.code}}">{{language.name}}</option></select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
@@ -182,7 +186,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+                                        {% get_language_info_list for LANGUAGES as languages %}
+					{% for language in languages %}
+					<option value="{{language.code}}">{{language.name}}</option></select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">

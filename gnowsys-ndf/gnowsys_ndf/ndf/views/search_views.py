@@ -138,75 +138,68 @@ def search_query(request, group_id):
 
 
 
-def results_search(request, group_id):
+def results_search(request, group_id, return_only_dict = None):
 	"""
 	This view returns the results for global search on all GSystems by name, tags and contents.
 	Only publicly accessible GSystems are returned in results.
 	"""
+	
+	userid = request.user.id
+	# print "\n------\n", request.GET
+
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
 		if group_ins:
 			group_id = str(group_ins._id)
-		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
+		else: 
+			auth = collection.Node.one({'_type': 'Author', 'created_by': unicode(userid) })
+    		if auth :
 				group_id = str(auth._id)
-	else:
-		pass
 
 	# INTIALISE THE FLAGS FOR SEARCHING BY NAME / TAGS / CONTENTS
-	search_by_name = False
-	search_by_tags = False
-	search_by_contents = False
-	user = ""								# stores username
-	user_reqd = -1 							# user_reqd = -1 => search all users else user_reqd = pk of the user in user table
+	user = ""		# stores username
+	user_reqd = -1 	# user_reqd = -1 => search all users else user_reqd = pk of the user in user table
+
+	# GET THE LIST OF CHECKBOXES TICKED AND SET CORR. FLAGS
+	checked_fields = request.GET.getlist('search_fields')
+	if checked_fields:
+		search_by_name = True if ("name" in checked_fields) else False
+		search_by_tags = True if ("tags" in checked_fields) else False
+		search_by_contents = True if ("contents" in checked_fields) else False
+	else:
+		search_by_name = search_by_tags = search_by_contents = True
 
 	# FORMAT OF THE RESULTS TO BE RETURNED
-	search_results_ex = {'name':[], 'tags':[], 'content':[]}
-	search_results_st = {'name':[], 'tags':[], 'content':[]}
-	#search_results_li = {'name':[], 'tags':[], 'content':[], 'user':[]}
+	search_results_ex = search_results_st = {'name': [], 'tags': [], 'content': []}
+	# search_results_li = {'name':[], 'tags':[], 'content':[], 'user':[]}
 
 	# ALL SORTED SEARCH RESULTS
-	search_results = {'exact':search_results_ex, 'stemmed':search_results_st}
+	search_results = {'exact': search_results_ex, 'stemmed': search_results_st}
 
 	# STORES OBJECTID OF EVERY SEARCH RESULT TO CHECK FOR DUPLICATES
 	all_ids = []
-
 	
         if request.method == "GET":
 			try:
 				user_reqd_name = str(request.GET['users'])
 			except Exception:
-				user_reqd_name = "all"						
 				# IF USERNAME IS NOT RECEIVED OR ANY INCORRECT USERNAME IS RECEIVED SEARCH ALL USERS
+				user_reqd_name = "all" 
 
 			# CONVERT USERNAME TO INTEGER
-			if user_reqd_name != "all":
-                                #Query writtent o avoid the error due to User.Object
-                                auth = collection.Node.one({'_type': 'Author', 'name': user_reqd_name })
-                                if auth:
-                                        user_reqd = int(auth.created_by)
+			if user_reqd_name != "all": 
+				#Query writtent o avoid the error due to User.Object 
+				auth = collection.Node.one({'_type': 'Author', 'name': user_reqd_name }) 
+				if auth: 
+					user_reqd = int(auth.created_by)
 	 		
-			search_str_user = str(request.GET['search_text']).strip()							# REMOVE LEADING / TRAILING SPACES
-			search_str_user = search_str_user.lower()											# CONVERT TO LOWERCASE
-			search_str_noArticles = list(removeArticles(str(search_str_user)))					# REMOVES ARTICLES
-			search_str_stemmed = list(stemWords(search_str_noArticles, search_str_user))		# STEMS THE WORDS
+			search_str_user = str(request.GET['search_text']).strip()  # REMOVE LEADING / TRAILING SPACES
+			search_str_user = search_str_user.lower()  # CONVERT TO LOWERCASE
+			search_str_noArticles = list(removeArticles(str(search_str_user)))  # REMOVES ARTICLES
+			search_str_stemmed = list(stemWords(search_str_noArticles, search_str_user))  # STEMS THE WORDS
 
-			# GET THE LIST OF CHECKBOXES TICKED AND SET CORR. FLAGS
-			checked_fields = request.GET.getlist('search_fields')
-			nam = "name"
-			if (nam in checked_fields):
-				search_by_name = True
-			nam = "tags"
-			if (nam in checked_fields):
-				search_by_tags = True
-			nam = "contents"
-			if (nam in checked_fields):
-				search_by_contents = True
-
-			col = get_database()[Node.collection_name]			# COLLECTION NAME
+			col = get_database()[Node.collection_name]
 
 			# GET A CURSOR ON ALL THE GSYSTEM TYPES 
 			all_GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"_id":1})
@@ -222,29 +215,27 @@ def results_search(request, group_id):
 				all_GSystemTypes.rewind()							# amn Corrected
 
 				"""
-					Following lines search for all GSystemTypes and then all GSystems in those GSystem types created by the selected user
-					of public access policy in case insensitive regex match. If no user is specified, then it searches for GSystems created
-					by any user
+				Following lines search for all GSystemTypes and then all GSystems in those GSystem types created by the selected user
+				of public access policy in case insensitive regex match. If no user is specified, then it searches for GSystems created
+				by any user
 				"""
                                  
-									# Search in all GSystem types
-				all_list=[]
-                                for i in all_GSystemTypes:
-					  all_list.append(i._id)	
+				# Search in all GSystem types
+				all_list = [ each_gst._id for each_gst in all_GSystemTypes ]
+
 				# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
-                                #print "group id",group_id
+                # print "group id", group_id
 				
-				if user_reqd != -1:				# 
-						exact_match = col.Node.find({'$and':[
+				if user_reqd != -1:
+					exact_match = col.Node.find({'$and':[
 									   {"member_of":{'$in':all_list}},	    	
 									   {"created_by":user_reqd},
 									   {"group_set":ObjectId(group_id)},
 									   {"access_policy":"PUBLIC"},
 									   {"name":{"$regex":search_str_user, "$options":"i"}}]},
 					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-
 				else:
-						exact_match = col.Node.find({'$and':[
+					exact_match = col.Node.find({'$and':[
 									    {"member_of":{'$in':all_list}},		
 									    {"access_policy":"PUBLIC"},
 									    {"group_set":ObjectId(group_id)},
@@ -255,22 +246,22 @@ def results_search(request, group_id):
                                 #exact_match.rewind()
                                 
 				exact_match = list(exact_match)				
+
 				"""
 				For each matching GSystem, see if the GSystem has already been added to the list of ids and add if not added.
 				result is added only if belongs to the list of public groups
 				"""
-				for j in exact_match:
-                                               
-                                        j.name=(j.name).replace('"',"'")
-                                        if j._id not in all_ids:
-							grps = j.group_set
-							#for gr in public_groups:
-							#	if gr in grps:
-                                                        j = addType(j)
-                                                        search_results_ex['name'].append(j)
-                                                        all_ids.append(j['_id'])
-                                                        
 
+				for j in exact_match: 
+					j.name=(j.name).replace('"',"'") 
+					if j._id not in all_ids:
+                                        	grps = j.group_set 
+                                        	#for gr in public_groups: 
+                                        	#	if gr in grps: 
+                                        	j = addType(j) 
+                                        	search_results_ex['name'].append(j) 
+                                        	all_ids.append(j['_id'])
+                                                        
 				# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY
 				search_results_ex['name'] = sort_names_by_similarity(search_results_ex['name'], search_str_user)
 				# split stemmed match
@@ -456,16 +447,21 @@ def results_search(request, group_id):
 			#search_results = json.dumps(search_results, cls=Encoder)
                         memList = populate_list_of_members()
 	
-	
-
 	search_results = json.dumps(search_results, cls=Encoder)
-	#print "search_results:", search_results
-	context_to_return = getRenderableContext(group_id)			# RETURNS BASIC CONTEXT
-	context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
-	context_to_return['processed'] = "1" 							
-	context_to_return['search_type'] = KEYWORD_SEARCH			# TYPE OF SEARCH IS KEYWORD SEARCH
 
-	return render(request, 'ndf/search_page.html', context_to_return)
+
+
+	# print "search_results:", search_results
+
+	if return_only_dict:
+		return search_results
+	else:
+		context_to_return = getRenderableContext(group_id)			# RETURNS BASIC CONTEXT
+		context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
+		context_to_return['processed'] = "1" 							
+		context_to_return['search_type'] = KEYWORD_SEARCH			# TYPE OF SEARCH IS KEYWORD SEARCH
+
+		return render(request, 'ndf/search_page.html', context_to_return)
 
 
 # KEYWORD SEARCH FOR A SPECIFIC GROUP
