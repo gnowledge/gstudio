@@ -23,11 +23,6 @@
 
   <!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> 
-    
-  <!-- Open Source webfonts for better typography -->
-  <!-- <link rel="stylesheet" href="/static/ndf/css/open-sans-normal-font.css"> -->
-  <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'> -->
-  <!-- <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>-->
 
   <!-- Modernizr - Browser detection JS http://modernizr.com/ -->
   <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script> 
@@ -49,16 +44,15 @@
   <style>
     {% block style %}{% endblock %}
 
-  .app.button-bar {
-    height: 45px;
-  }
+    .app.button-bar {
+      height: 45px;
+    }
   
   </style>
+
 </head>
 
 <body itemscope itemtype="http://schema.org/Webpage">
-    
-    <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
     {% get_group_object groupid as group_object %}
     {% get_site_variables as site %}
@@ -66,13 +60,18 @@
     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
       <ul class="title-area ">
+        
         <li class="name">
-         {% get_site_variables as site %}
-         <h1><a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a></h1>
-       </li>
-       <li class="toggle-topbar menu-icon">
-         <a href="#">{% trans "Menu" %}</a>
-       </li>
+          {% get_site_variables as site %}
+            <h1>
+              <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
+            </h1>
+        </li>
+
+        <li class="toggle-topbar menu-icon">
+          <a href="#">{% trans "Menu" %}</a>
+        </li>
+
      </ul>
 
      <section class="top-bar-section">
@@ -80,8 +79,6 @@
        <!-- Right Nav Section -->
        <ul class="right">
 
-        <!-- Search bar -->
-        
         <!-- Old Contextual Search-->
         <li class="has-form search hide">
           {% include "ndf/node_search_base.html" %}
@@ -91,36 +88,38 @@
         
     <!-- Language selector--> 
         
-             <li class="has-form"> 
-                 <a href="#" class="rounded language button"  data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
+      <li class="has-form"> 
+        <a href="#" class="rounded language button"  data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
 
-                 <div id="languageModal" class="small reveal-modal" data-reveal> 
-<!--                   <h2>Language preference</h2> -->
-                      
-                   <h3>Preferred language</h3> 
-                      <form action="/i18n/setlang/" method="POST">
-                      {% csrf_token %}
-                      <input name="next" type="hidden" value="/pref_lang/?url={{request.path}}&group_id={{group_id}}&appid={{appId}}"/>
-                      <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+          <div id="languageModal" class="small reveal-modal" data-reveal> 
+              
+            <h3>Preferred language</h3> 
+            <form action="/i18n/setlang/" method="POST">
+              {% csrf_token %}
+              <input name="next" type="hidden" value="/pref_lang/?url={{request.path}}&group_id={{group_id}}&appid={{appId}}"/>
+              <input name="url" type="hidden" value="{{request.get_full_path}}"/>
 
-                      <select name="language" id="lan">
-                        {% for lang in LANGUAGES %}
-                        <option value="{{ lang.0 }}">{{ lang.1 }}</option>
-                        {% endfor %}
-                      </select>
-                      <input type="submit" class="button" value='{% trans "Set Language" %}' />
-                          <a class="close-reveal-modal">&#215;</a>
-                    </form>
-                     
-<!--                       {% get_languages as lan %} -->
-<!--                   <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>     -->
-<!--                   <h3>Secondary language</h3> -->
-<!--                   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>       -->
-<!--                   <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/> -->
-<!--                   <a class="close-reveal-modal">&#215;</a> -->
-                 </div> 
-               </li>
-  
+              <select name="language" id="lan">
+                {% for lang in LANGUAGES %}
+                <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+                {% endfor %}
+              </select>
+              <input type="submit" class="button" value='{% trans "Set Language" %}' />
+                  <a class="close-reveal-modal">&#215;</a>
+            </form>
+
+            {% comment %}       
+            <!--                       {% get_languages as lan %} -->
+            <!--                   <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>     -->
+            <!--                   <h3>Secondary language</h3> -->
+            <!--                   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>       -->
+            <!--                   <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/> -->
+            <!--                   <a class="close-reveal-modal">&#215;</a> -->
+            {% endcomment %}
+
+          </div> 
+        </li>
+
           <!-- If logged in show user options -->
           {% if user.is_authenticated %}
           <li class="has-dropdown">
@@ -221,7 +220,7 @@
            <!-- <h4><i class='fi-info'></i> Help</h4> -->
            <ul class="off-canvas-list">
             <!-- Shelf content code and logic -->
-            <!-- {% block shelf_content %} {% endblock %} -->
+            {% block shelf_content %} {% endblock %}
           </ul>
         </aside>
 
@@ -259,7 +258,6 @@
                 </div>
                 </form>
               </li>
-
 
               <li class="right">
                 <!-- help documentation for every app -->
@@ -321,6 +319,7 @@
       </main>
 
       <!-- Off Canvas User Shelf -->
+      {% comment %}
       <!-- 
       <aside id="help"  class="right-off-canvas-menu">
         <ul class="off-canvas-list">
@@ -336,7 +335,9 @@
         </ul>
       </aside>
       -->
+      {% endcomment %}
       <!-- close the off-canvas menu -->
+      
       <a class="exit-off-canvas"></a>
 
     </div>
