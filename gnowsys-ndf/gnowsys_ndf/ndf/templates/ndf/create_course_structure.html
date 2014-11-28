@@ -1,0 +1,123 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block style %}
+  {{block.super}}
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
+
+  /* Setting css-properties for reveal-modal's label */
+    div.reveal-modal > label {
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+{% endblock %}
+
+{% block body_content %} 
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+        <dd>
+          <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
+        </dd>
+
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}" class="disable">
+            {{tab_details.0}}
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
+
+
+	{% csrf_token %}
+	<ul class="mtree course-section">
+	<li>
+	<div id="course-structure-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
+      <div class="active content row" id="panel_{{property_order_list.0.0}}">
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
+              {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
+            </label>
+          </div>
+      	  <div class="small-6 columns">
+        	{% html_widget groupid node.pk property_order_list.0.1.0 %}
+    	  </div>
+        </div>
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
+              {% blocktrans with label_val=property_order_list.0.1.1.altnames %} {{label_val}} {% endblocktrans %}
+            </label>
+          </div>
+      	  <div class="small-6 columns">
+        	{% html_widget groupid node.pk property_order_list.0.1.1 %}
+    	  </div>
+        </div>
+
+      </div>
+    </div>
+    </li>
+    </ul>
+
+	<ul class="mtree course-subsection">
+	<li>
+	<div id="course-structure-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
+      <div class="active content row" id="panel_{{property_order_list_css.0.0}}">
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="{{property_order_list_css.0.1.0.name}}" class="right inline"> 
+              {% blocktrans with label_val=property_order_list_css.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
+            </label>
+          </div>
+      	  <div class="small-6 columns">
+        	{% html_widget groupid node.pk property_order_list_css.0.1.0 %}
+    	  </div>
+        </div>
+        <div class="row">
+          <div class="small-4 columns">
+            <label for="{{property_order_list_css.0.1.0.name}}" class="right inline"> 
+              {% blocktrans with label_val=property_order_list_css.0.1.1.altnames %} {{label_val}} {% endblocktrans %}
+            </label>
+          </div>
+      	  <div class="small-6 columns">
+        	{% html_widget groupid node.pk property_order_list_css.0.1.1 %}
+    	  </div>
+        </div>
+
+      </div>
+    </div>
+    </li>
+    </ul>
+  </form>
+  
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+{% endblock %}

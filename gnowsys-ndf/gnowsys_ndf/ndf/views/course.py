@@ -183,7 +183,6 @@ def course_detail(request, group_id, _id):
 
 # ===================================================================================
 
-      
 @login_required
 def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
@@ -245,6 +244,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
   property_order_list = get_property_order_with_value(course_gs)
+  print "\n\ncourse prop start", property_order_list,"\n\n this is course prop"
 
   if request.method == "POST":
     # [A] Save course-node's base-field(s)
@@ -665,7 +665,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       nodes = collection.Node.find({'member_of': course_gst._id, 'group_set': ObjectId(group_id)})
 
   if app_set_instance_id :
-    template = "ndf/course_details.html"
+    template = "ndf/course_detail.html"
 
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
@@ -697,3 +697,48 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   except Exception as e:
     error_message = "\n CourseDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
+
+
+def create_course_structure(request, group_id,node_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
+    course_node = collection.Node.one({"_id": ObjectId(node_id)})
+    property_order_list_cs = []
+    course_sect_struct_gst = collection.Node.one({'_type': "GSystemType", 'name':"Course Section"})
+    course_sect_struct_gs = collection.GSystem()
+    course_sect_struct_gs.member_of.append(course_sect_struct_gst._id)
+    property_order_list_cs = get_property_order_with_value(course_sect_struct_gs)
+
+    property_order_list_css = []
+    course_sect_struct_cs_gst = collection.Node.one({'_type': "GSystemType", 'name':"Course Subsection"})
+    course_sect_struct_cs_gs = collection.GSystem()
+    course_sect_struct_cs_gs.member_of.append(course_sect_struct_cs_gst._id)
+    property_order_list_css = get_property_order_with_value(course_sect_struct_cs_gs)
+    print property_order_list_css
+
+
+
+    return render_to_response("ndf/create_course_structure.html",
+                                  { 'cnode': course_node,
+                                    'groupid': group_id,
+                                    'group_id':group_id,
+                                    'appId':app._id,
+                                    'node':None,
+                                    'property_order_list':property_order_list_cs,
+                                    'property_order_list_css':property_order_list_css
+                                  },
+                                  context_instance = RequestContext(request)
+        )
+
+  

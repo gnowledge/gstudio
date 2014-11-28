@@ -40,11 +40,10 @@ def batch(request, group_id):
     else :
         pass
     batch_coll = collection.GSystem.find({'member_of': {'$all': [GST_BATCH._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-    st_student = collection.Node.one({'_type':'GSystemType','name':'Student'})
-    student_coll = collection.GSystem.find({'member_of': {'$all': [st_student._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    
     #users_in_group = collection.Node.one({'_id':ObjectId(group_id)}).author_set
     template = "ndf/batch.html"
-    variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id, 'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id,'student_count':student_coll.count()})
+    variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id, 'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id})
     return render_to_response(template, variable)
 
 
@@ -91,7 +90,6 @@ def new_create_and_edit(request, group_id, _id = None):
     
     template = "ndf/new_create_batch.html"
     return render_to_response(template, variable)
-
         
 def save_students_for_batches(request, group_id):
     '''
@@ -106,7 +104,6 @@ def save_students_for_batches(request, group_id):
         for k,v in batch_user_list.items():
             save_batch(k,v, group_id, request, ac_id)
         return HttpResponseRedirect(reverse('batch',kwargs={'group_id':group_id}))
-
 
 def save_batch(batch_name, user_list, group_id, request, ac_id):
 
@@ -139,7 +136,6 @@ def save_batch(batch_name, user_list, group_id, request, ac_id):
    
     create_grelation(ObjectId(group_id),rt_group_has_batch,all_batches_in_grp)
 
-
 def detail(request, group_id, _id):
     student_coll = []
     node = collection.Node.one({'_id':ObjectId(_id)})
@@ -150,7 +146,7 @@ def detail(request, group_id, _id):
         n = collection.Node.one({'_id':ObjectId(each.right_subject)})
         student_coll.append(n)
     template = "ndf/batch_detail.html"
-    variable = RequestContext(request, {'node':node, 'appId':app._id, 'groupid':group_id, 'group_id': group_id,'title':GST_BATCH.name, 'student_coll':student_coll})
+    variable = RequestContext(request, {'node':node,'node_name_human_readble':(node.name).replace('_',' '), 'appId':app._id, 'groupid':group_id, 'group_id': group_id,'title':GST_BATCH.name, 'student_coll':student_coll})
     return render_to_response(template, variable)
 
 
