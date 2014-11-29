@@ -30,10 +30,10 @@
       font-size: 1rem;
     }
 
-    li{
-        
-        font-size: 0
 
+    form .row .row .columns {
+        padding:0 !important;
+        padding-left:0 !important;
     }
 
 {% endblock %}
@@ -49,7 +49,7 @@
 	<li class="hide" id="course-section">
 	<div id="course-structure-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
       <div class="active content row" id="panel_{{property_order_list.0.0}}">
-        <div class="row">
+        <div class="row input-cs-row">
           <div class="small-2 columns">
             <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
               {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
@@ -63,9 +63,10 @@
 		        <input type="button" value="Cancel" class="button small round cancel-cs">
 	        </div>
 	     </div>
+
         <div class="row">
-        	<div class="small-10 small-centered columns">
-        		<input type="button" value="Add Sub section" class="button round expand sub-section-btn" id="add-sub-section-btn" onclick="add_course_sub_section(this.id)">
+        	<div class="small-10 small-centered columns sub-section-btn-div">
+        		<input type="button" value="Add Sub section" class="button round expand sub-section-btn" disabled="disabled">
         	</div>
         </div>
       </div>
@@ -75,7 +76,7 @@
 	<li class="hide" id="course-subsection">
     	<div id="course-structure-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
           <div class="active content row" id="panel_{{property_order_list_css.0.0}}">
-            <div class="row">
+            <div class="row input-cs-row">
               <div class="small-1 columns">
                 <label for="{{property_order_list_css.0.1.0.name}}" class="right inline"> 
                   {% blocktrans with label_val=property_order_list_css.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
@@ -84,17 +85,9 @@
           	  <div class="small-4 columns end">
             	{% html_widget groupid node.pk property_order_list_css.0.1.0 %}
         	  </div>
-              <div class="small-1 columns end">
-                <label for="{{property_order_list_css.0.1.0.name}}" class="right inline"> 
-                  {% blocktrans with label_val=property_order_list_css.0.1.1.altnames %} {{label_val}} {% endblocktrans %}
-                </label>
-              </div>
-          	  <div class="small-2 columns end">
-            	{% html_widget groupid node.pk property_order_list_css.0.1.1 %}
-        	  </div>
               <div class="small-4 columns">
-                    <input type="button" value="Save" class="button small round" id="save-css" onclick="save(this.id)">
-                    <input type="button" value="Cancel" class="button small round" id="cancel-css" onclick="cancel(this.id)">
+                    <input type="button" value="Save" class="button small round save-cs save-css" >
+                    <input type="button" value="Cancel" class="button small round cancel-cs cancel-css" >
               </div>
             </div>
           </div>
@@ -105,8 +98,35 @@
 		<input type="button" class="button expand round" value="Add Course Section" onclick="add_course_section()">
     </ul>
 
+    <!-- Reveal Modals begin -->
+
+    <div id="course_prop" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+    <div class="row">
+        <label><h3>Properties</h3></label>
+    </div>
+
+    <div class="row">
+     <div class="small-3 columns end">
+         <label><h5>Enter Minutes</h5></label>
+     </div>        
+
+     <div class="small-3 columns end">
+         <input type="text">
+     </div>        
+     </div>
+     <div class="row">
+     <div class="small-3 columns end">
+         <input type="checkbox" name="assignment" value="assignment"> &nbsp;&nbsp; Assignment
+     </div>        
+
+     <div class="small-3 columns end">
+         <input type="checkbox" name="assessment" value="assessment"> &nbsp;&nbsp;Assessment</h5>
+     </div>        
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+    </div>
+    <!-- Reveal Model end -->  
   </form>
-  
 {% endblock %}
 
 {% block script %}
@@ -131,14 +151,18 @@
   }  
 
 //Adding Course Subsection
-  function add_course_sub_section(ele_id){
-    $("#"+ele_id).before($("#course-subsection").clone().attr('id',function(i,id){
-     cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
-     return cloned_ss_ele_id}).removeClass("hide"));
-    css_cloned_id+=1
-  }
 
-//Save Course Section
+    $(document).on('click','.sub-section-btn',function(){
+        parent_id = $(this).parents("li").attr("id")
+        $("#"+parent_id).find("input.sub-section-btn").attr("disabled",true)
+        $(this).before($("#course-subsection").clone().attr('id',function(i,id){
+        cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
+        return cloned_ss_ele_id}).removeClass("hide"));
+        css_cloned_id+=1
+
+    });
+
+//Save Course Section and Course Subsection
   $(document).on('click','.save-cs',function(){
     parent_id = $(this).parents("li").attr("id")
     lbl_val = $("#"+parent_id).find("input[id='name']").val()
@@ -147,17 +171,34 @@
         event.preventDefault();
     }
     else{
-        $("#"+parent_id).children().hide();
-        $("#"+parent_id).append("<label id='lbl_for_"+parent_id +"'><h4>"+lbl_val+"</h4><label>")
+        var str_btn="<div class='row'><div class='small-2 columns'><input class='button' type='button' value='Drop'></div>"
+        var str_lbl="<div class='small-8 columns'><label id='lbl_for_"+parent_id +"'><h4>"+lbl_val+"</h4></label></div>"
+        var str_prop="<div class='small-2 columns end'><i class='fi-widget large' onclick='reveal_prop_form()'></i></div></div>"
+        $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
+
+        if($(this).hasClass("save-css")){
+            $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled")   
+        }
+        else{
+            $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled")
+        }
     }
   })
 
-
-
-// Cancel Course Section
+// Cancel Course Section and Course Subsection
   $(document).on('click','.cancel-cs',function(){
     parent_id = $(this).parents("li").attr("id")
+    if($(this).hasClass("cancel-css")){
+        $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled")   
+    }
+    else{
+        $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled")
+    }
     $("#"+parent_id).remove()
   });
+
+  function reveal_prop_form(){
+    $('#course_prop').foundation('reveal', 'open');
+  }
   </script>
 {% endblock %}
