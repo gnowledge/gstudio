@@ -100,29 +100,25 @@
 
     <!-- Reveal Modals begin -->
 
-    <div id="course_prop" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+    <div id="course_prop" class="reveal-modal medium" data-reveal style="height:500px;overflow:scroll;"> 
     <div class="row">
         <label><h3>Properties</h3></label>
     </div>
 
     <div class="row">
-     <div class="small-3 columns end">
+     <div class="small-4 columns end">
          <label><h5>Enter Minutes</h5></label>
      </div>        
 
-     <div class="small-3 columns end">
+     <div class="small-3 columns end ">
          <input type="text">
      </div>        
      </div>
-     <div class="row">
-     <div class="small-3 columns end">
-         <input type="checkbox" name="assignment" value="assignment"> &nbsp;&nbsp; Assignment
-     </div>        
 
-     <div class="small-3 columns end">
-         <input type="checkbox" name="assessment" value="assessment"> &nbsp;&nbsp;Assessment</h5>
-     </div>        
+    <div class="small-4 small-centered columns">
+        <input type="button" class="button round expand" name="set_prop" value="Done">        
     </div>
+
     <a class="close-reveal-modal">&#215;</a>
     </div>
     <!-- Reveal Model end -->  
@@ -171,7 +167,7 @@
         event.preventDefault();
     }
     else{
-        var str_btn="<div class='row'><div class='small-2 columns'><input class='button' type='button' value='Drop'></div>"
+        var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
         var str_lbl="<div class='small-8 columns'><label id='lbl_for_"+parent_id +"'><h4>"+lbl_val+"</h4></label></div>"
         var str_prop="<div class='small-2 columns end'><i class='fi-widget large' onclick='reveal_prop_form()'></i></div></div>"
         $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
@@ -200,5 +196,21 @@
   function reveal_prop_form(){
     $('#course_prop').foundation('reveal', 'open');
   }
+
+  $(document).on('click','.fold-btn',function(){
+    parent_id = $(this).parents("li").attr("id");
+    if($("#"+parent_id).hasClass("hidden_children")){
+        $(this).removeClass("fi-plus").addClass("fi-minus");
+        $("#"+parent_id).find("li").removeClass("hide");
+        $("#"+parent_id).removeClass("hidden_children");
+    }
+    else{
+        $(this).removeClass("fi-minus").addClass("fi-plus")
+        $("#"+parent_id).find("li").addClass("hide");
+        $("#"+parent_id).addClass("hidden_children");
+    }
+    
+  });
+
   </script>
 {% endblock %}
