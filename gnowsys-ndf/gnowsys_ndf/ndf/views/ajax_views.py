@@ -3598,6 +3598,46 @@ def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_
  oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
  create_grelation(ObjectId(app_set_instance_id), oid,assigneelist)
  return HttpResponse("attendance taken")
+def fetch_course_name(request, group_id,Course_type):
+  courses=collection.Node.find({"attribute_set.nussd_course_type":unicode(Course_type)})
+  dict1={}
+  list1=[]
+  for i in courses:
+    dict1.update({"name":i.name})
+    dict1.update({"id":str(i._id)})
+    list1.append(dict1)
+    dict1={}
+    
+  return HttpResponse(json.dumps(list1))
+ 
+def fetch_course_Module(request, group_id,Course_name):
+  courses=collection.Node.find({"name":unicode(Course_name)})
+  dict1={}
+  list1=[]
+  course_modules=collection.Node.find({"_id":courses[0].collection_set})
+  
+  for i in course_modules:
+    dict1.update({"name":i.name})
+    dict1.update({"id":str(i._id)})
+    list1.append(dict1)
+    dict1={}
+    
+  return HttpResponse(json.dumps(list1))
+
+def fetch_course_session(request, group_id,Course_name):
+  courses=collection.Node.find({"name":unicode(Course_name)})
+  dict1={}
+  list1=[]
+  course_modules=collection.Node.find({"_id":courses[0].collection_set})
+  
+  for i in course_modules:
+    dict1.update({"name":i.name})
+    dict1.update({"id":str(i._id)})
+    list1.append(dict1)
+    dict1={}
+    
+  return HttpResponse(json.dumps(list1))
+
 
 def save_csv(request,group_id,app_set_instance_id=None):
         column_header = [u'Name', 'Presence']

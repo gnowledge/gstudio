@@ -110,8 +110,26 @@
           </div>
         </div>    
       </div>
+      
       {% endfor %}
-
+     <div  id="coursename">
+         <div class="row">
+          <div class="small-2 columns">
+         Course Name: <select id="cname">
+        </select>
+        </div>
+         <div class="small-2 columns">
+              <input type="button" value="view">
+         </div>
+        </div>
+        <div class="row">
+           <div class= "small-12 columns">
+           <fieldset>
+           </fieldset>
+           </div>
+        <div>
+       
+     </div>
 
       <!-- Additional panels if required
       <div class="" id="panel_?">
@@ -135,6 +153,28 @@
 
 {% block script %}
   // <script type="text/javascript">
+  //Ajax call to take all the courses
+
+  $.ajax({
+      url: "{% url 'fetch_course_name' 'Foundation Course' groupid  %}",
+      type: "GET",
+      success: function(data){
+      courses=JSON.parse(data)
+      },
+     complete:function(){
+       $.each(courses, function(key,val) {
+        $('#cname').append(
+          $("<option></option>")
+            .attr("id", "coursename_"+key.id)
+            .attr("value", key)
+            .text(val.name)
+           );
+            });
+          } 
+      });
+
+  
+
 
 // Default settings for tabs on page load ---------------------------------------------------------
   $(function() {

@@ -11,6 +11,7 @@ from django.template import TemplateDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.template.defaultfilters import slugify
 
 from django_mongokit import get_database
 
@@ -231,9 +232,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
   if app_set_instance_id:
     event_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
-
   property_order_list = get_property_order_with_value(event_gs)#.property_order
-
+  
   if request.method == "POST":
     # [A] Save event-node's base-field(s)
     # print "\n Going before....", type(event_gs), "\n event_gs.keys(): ", event_gs.keys()
@@ -243,11 +243,13 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
     # for k, v in event_gs.items():
     #   print "\n ", k, " -- ", v
     is_changed = get_node_common_fields(request, event_gs, group_id, event_gst)
-
     if is_changed:
       # Remove this when publish button is setup on interface
       event_gs.status = u"PUBLISHED"
-
+    if (request.POST.get("name","")) == "":
+        name=slugify(request.POST.get("nussd_course_type",""))+ "--"+ slugify(request.POST.get("nussd_course_name",""))+ "--"+slugify           (request.POST.get("course_Module",""))+ "--"+slugify(request.POST.get("session_of",""))
+        event_gs.name=name 
+    
     event_gs.save(is_changed=is_changed)
     # print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
   
@@ -272,13 +274,12 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
             # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
             if field_instance_type == AttributeType:
-
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
                 
                 if field_instance["name"] in request.FILES:
                   field_value = request.FILES[field_instance["name"]]
-
+                  
                 else:
                   field_value = ""
                 
@@ -292,7 +293,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               else:
                 # Other AttributeTypes 
                 field_value = request.POST[field_instance["name"]]
-
               # field_instance_type = "GAttribute"
               # print "\n Parsing data for: ", field_instance["name"]
               if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
@@ -301,8 +301,9 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y")
               else:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
-
+              
               if field_value:
+                print "creation of the gattribute",field_instance
                 event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
                 # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
@@ -310,6 +311,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               field_value_list = request.POST.getlist(field_instance["name"])
 
               # field_instance_type = "GRelation"
+              #code for creation of relation Session of 
               for i, field_value in enumerate(field_value_list):
                 field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
@@ -323,11 +325,13 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
               # else:
               #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
-              print "event",event_gs
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
     return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
-  template = "ndf/event_create_edit.html"
+  if event_gst.name == u'Classroom Session':
+     template="ndf/Nussd_event_Schedule.html"
+  else:
+      template = "ndf/event_create_edit.html"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'group_id': group_id, 'groupid': group_id, 
                         'app_collection_set': app_collection_set, 
