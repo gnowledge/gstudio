@@ -128,7 +128,7 @@
 
             {% if prof_pic %}
             <a href="{% url 'dashboard' request.user.pk %}">
-              <img src="{% url 'getImageThumbnail' group_object prof_pic %}" height="30" width="30">
+              <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" height="30" width="30">
               {{ user.username }}
             </a>
             

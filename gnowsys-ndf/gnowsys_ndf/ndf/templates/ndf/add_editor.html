@@ -77,7 +77,7 @@
 
 {% if node_id %}
 
-<input type="hidden" value="{% check_existence_textObj_mobwrite node_id %}">
+<!-- <input type="hidden" value="{#% check_existence_textObj_mobwrite node_id %#}"> -->
 <textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}" value="{{var_value}}">{{var_value}}</textarea>
 
 {% else %}

@@ -77,7 +77,7 @@
 
         </li>
         {% endfor %}
-        
+
         {% else %}  
         <li class="bullet-item" > <i> {% trans "No content of selected type !" %} </i> </li>
         {% endif %}
@@ -438,7 +438,7 @@
 
   // Search-Box for LHS drawer of resources
   // $('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
-  $('#{{widget_for}}_search').bind('keydown change', function() {
+  $('#{{widget_for}}_search').bind('keydown change', function(e) {
     if (is_RT == "RelationType") {
       var search_text = (this.value).toLowerCase();
       var search_text_len = search_text.length
@@ -475,38 +475,46 @@
     else {
       var len = (this.value.length);
       var field = "{{widget_for}}";
+      var value = this.value;
 
-      if (len >= 2){
-        $(".searching").css("display", "block");
+      if (e.which == 13) {
 
-        $.ajax({
-          type: "POST",
-          url: "{% url 'search_drawer' groupid %}",
-          datatype: "html",
-          data:{
-            search_name: this.value,
-            node_id: '{{node_id}}',
-            field: field,
-            selection: "{{selection}}",
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
-          success: function(data) {
-            $(".searching").css("display", "none");
-            if (field == "collection"){
-              $("#collection_drawer").html(data);  
-            }
-            if (field == "prior_node"){
-              $("#prior_node_drawer").html(data);
-            }
-            if (field == "teaches"){
-              $("#teaches_drawer").html(data);
-            }
-            if (field == "assesses"){
-              $("#assesses_drawer").html(data);
-            }
-            
-          }          
-        });
+        e.preventDefault();
+
+        if (len > 2){
+          $(".searching").css("display", "block");
+
+          $.ajax({
+            type: "POST",
+            url: "{% url 'search_drawer' groupid %}",
+            datatype: "html",
+            data:{
+              search_name: this.value,
+              node_id: '{{node_id}}',
+              field: field,
+              selection: "{{selection}}",
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+              $(".searching").css("display", "none");
+              if (field == "collection"){
+                $("#collection_drawer").html(data);  
+              }
+              if (field == "prior_node"){
+                $("#prior_node_drawer").html(data);
+              }
+              if (field == "teaches"){
+                $("#teaches_drawer").html(data);
+              }
+              if (field == "assesses"){
+                $("#assesses_drawer").html(data);
+              }
+
+              $(".search_items").focus().val('').val(value);
+              
+            }          
+          });
+        }
       }
     }
   });
