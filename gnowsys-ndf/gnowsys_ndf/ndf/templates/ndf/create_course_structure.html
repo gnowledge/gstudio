@@ -1,3 +1,4 @@
+<!ATTLIST lbl_name course_mins CDATA #IMPLIED>
 {% extends "ndf/mis_base_create_edit.html" %}
 {% load i18n %}
 {% load ndf_tags %}
@@ -36,19 +37,33 @@
         padding-left:0 !important;
     }
 
-{% endblock %}
 
+    .hoverstyle{
+        background-color:white !important;
+        border-color:#0b8a91;
+        border-width:2px;
+        color:#0b8a91 !important;
+    }
+
+    .hoverstyle:hover{
+        background-color:#0b8a91 !important;
+        color:white !important;
+    }
+
+    <!-- ul,li{
+        list-style-type: none;
+    }
+ -->
+{% endblock %}
 {% block body_content %} 
-  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert action=>
     <label id="alertModalLabel"></label>
     <a class="close-reveal-modal">&#215;</a>
   </div>
 
-  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
-	{% csrf_token %}
-	<li class="hide" id="course-section">
-	<div id="course-structure-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
-      <div class="active content row" id="panel_{{property_order_list.0.0}}">
+  <form  data-abide id="form-edit-node" method="POST" action="">
+    {% csrf_token %}
+	<li class="hide course-section-class" id="course-section">
         <div class="row input-cs-row">
           <div class="small-2 columns">
             <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
@@ -66,75 +81,77 @@
 
         <div class="row">
         	<div class="small-10 small-centered columns sub-section-btn-div">
-        		<input type="button" value="Add Sub section" class="button round expand sub-section-btn" disabled="disabled">
+        		<input type="button" value="Add Sub Section" class="button round expand hoverstyle sub-section-btn" disabled="disabled">
         	</div>
-        </div>
-      </div>
-    </div>
+        </div> 
     </li>
 
 	<li class="hide" id="course-subsection">
-    	<div id="course-structure-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
-          <div class="active content row" id="panel_{{property_order_list_css.0.0}}">
-            <div class="row input-cs-row">
-              <div class="small-1 columns">
-                <label for="{{property_order_list_css.0.1.0.name}}" class="right inline"> 
-                  {% blocktrans with label_val=property_order_list_css.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
-                </label>
-              </div>
-          	  <div class="small-4 columns end">
-            	{% html_widget groupid node.pk property_order_list_css.0.1.0 %}
-        	  </div>
-              <div class="small-4 columns">
-                    <input type="button" value="Save" class="button small round save-cs save-css" >
-                    <input type="button" value="Cancel" class="button small round cancel-cs cancel-css" >
-              </div>
-            </div>
+        <div class="row input-cs-row">
+          <div class="small-1 columns">
+            <label for="{{property_order_list_css.0.1.0.name}}" class="right inline"> 
+              {% blocktrans with label_val=property_order_list_css.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
+            </label>
+          </div>
+      	  <div class="small-4 columns end">
+        	{% html_widget groupid node.pk property_order_list_css.0.1.0 %}
+    	  </div>
+          <div class="small-4 columns">
+                <input type="button" value="Save" class="button small round save-cs save-css" >
+                <input type="button" value="Cancel" class="button small round cancel-cs cancel-css" >
           </div>
         </div>
     </li>
 
-    <ul class="ul-course-section">
-		<input type="button" class="button expand round" value="Add Course Section" onclick="add_course_section()">
+    <ul class="ul-course-section no-bullet">
+		<input type="button" class="button expand round hoverstyle course-sec-btn" value="Add Course Section" onclick="add_course_section()">
     </ul>
 
-    <!-- Reveal Modals begin -->
-
-    <div id="course_prop" class="reveal-modal medium" data-reveal style="height:500px;overflow:scroll;"> 
-    <div class="row">
-        <label><h3>Properties</h3></label>
+    <!-- Reveal Modal  -->
+    <div id="course_prop" class="reveal-modal small" data-reveal style="height:500px;overflow:scroll;"> 
+        <div class="row">
+            <h3><label id="css_name"></label></h3>
+        </div>
+        <br><br><br>
+        <div class="row">
+         <div class="small-6 columns end">
+             <label><h5>Enter Minutes</h5></label>
+         </div>        
+         <div class="small-3 columns end ">
+             <input type="text" class="css_mins_class">
+         </div>        
+         </div>
+        <div class="small-4 small-centered columns">
+            <input type="button" class="button round expand set_prop_class" id="set_prop" value="Done">        
+        </div>
+        <a class="close-reveal-modal">&#215;</a>
     </div>
 
-    <div class="row">
-     <div class="small-4 columns end">
-         <label><h5>Enter Minutes</h5></label>
-     </div>        
+    <!-- <input type="submit" value="submit" id="submit_course_struct" class="button right inline"> -->
 
-     <div class="small-3 columns end ">
-         <input type="text">
-     </div>        
-     </div>
+    <input type="hidden" id="hidden_css_name_id" name="hidden_css_name_id">
 
-    <div class="small-4 small-centered columns">
-        <input type="button" class="button round expand" name="set_prop" value="Done">        
-    </div>
+    <input type="hidden" id="course_sec_dict_ele" name="course_sec_dict_ele">
 
-    <a class="close-reveal-modal">&#215;</a>
-    </div>
-    <!-- Reveal Model end -->  
+    
+    <input type="submit" value="submit" id="submit_course_struct" class="button right inline">  
+
   </form>
 {% endblock %}
 
 {% block script %}
   {{block.super}}
-//<script>
 //Global var declarations
   var cs_cloned_id = 1
   var css_cloned_id = 1
+  var main_list = [];
+  var course_min_value;
+  var course_sec_dict = {};
+  var course_sub_sec_dict = {};
 
 //Adding Course Section
   function add_course_section(){
-    $(".ul-course-section").before($("#course-section").clone().attr('id',function(i,id){
+    $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
      cloned_ele_id = id+"_cloned"+cs_cloned_id;
      return cloned_ele_id
      }).removeClass("hide"));
@@ -155,7 +172,6 @@
         cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
         return cloned_ss_ele_id}).removeClass("hide"));
         css_cloned_id+=1
-
     });
 
 //Save Course Section and Course Subsection
@@ -168,16 +184,29 @@
     }
     else{
         var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
-        var str_lbl="<div class='small-8 columns'><label id='lbl_for_"+parent_id +"'><h4>"+lbl_val+"</h4></label></div>"
-        var str_prop="<div class='small-2 columns end'><i class='fi-widget large' onclick='reveal_prop_form()'></i></div></div>"
-        $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
-
+        
+        
+        lbl_id = "lbl_for_"+parent_id   
         if($(this).hasClass("save-css")){
-            $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled")   
+            course_sub_sec_dict = {};
+            course_sub_sec_dict[lbl_val]=""
+            parent_lbl = $("#"+parent_id).parents("li.course-section-class").find("label.lbl_of_cs").text()
+
+            if(course_sec_dict.hasOwnProperty(parent_lbl)){
+                course_sec_dict[parent_lbl][lbl_val]={}
+            }
+            var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label></div>"    
+            $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
+            var str_prop="<div class='small-2 columns end'><i class='fi-widget large reveal_prop_form' id='widget_id'></i></div></div>"
         }
+
         else{
-            $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled")
+            course_sec_dict[lbl_val]={}
+            $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled");
+            var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label></div>"    
+            var str_prop="</div>"
         }
+        $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
     }
   })
 
@@ -193,10 +222,19 @@
     $("#"+parent_id).remove()
   });
 
-  function reveal_prop_form(){
+// Set label name in reveal modal with respective course name
+  $(document).on('click','.reveal_prop_form',function(){
+    $(".css_mins_class").val('');
+    lb = $(this).closest("li").find("label").text()
+    lb_id = $(this).closest("li").find("label").attr("id")
+    $("#css_name").text("")
+    $("#hidden_css_name_id").val(lb_id)
+    $("#css_name").text("Duration for '"+ lb+"'")
+    $("#css_name").css("font-size", "30px");
     $('#course_prop').foundation('reveal', 'open');
-  }
+  });
 
+//Fold unfold Actions
   $(document).on('click','.fold-btn',function(){
     parent_id = $(this).parents("li").attr("id");
     if($("#"+parent_id).hasClass("hidden_children")){
@@ -212,5 +250,27 @@
     
   });
 
-  </script>
+//Done button in reveal modal
+  $(document).on('click','.set_prop_class',function(){
+    course_min_value = $(".css_mins_class").val()
+    $('#course_prop').foundation('reveal', 'close');
+    a = $("#hidden_css_name_id").val()
+    c_name = $("#"+a).text();
+    x = $("#"+a).parents("li.course-section-class").find("label.lbl_of_cs").text()
+    $("#"+a).attr("course_mins",course_min_value)
+
+    if(course_sec_dict.hasOwnProperty(x)){
+        if(course_sec_dict[x].hasOwnProperty(c_name)){
+            course_sec_dict[x][c_name]["course_structure_mins"] = course_min_value 
+        }
+    }
+  });
+
+//Submit course structure
+  $("#submit_course_struct").click(function() {
+    $("#form-edit-node").find(":input[required]").removeAttr("required")
+    $("#course_sec_dict_ele").val(JSON.stringify(course_sec_dict))
+  });
+
+
 {% endblock %}

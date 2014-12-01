@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 
 from django_mongokit import get_database
-
+import json  
 try:
   from bson import ObjectId
 except ImportError:  # old pymongo
@@ -255,25 +255,22 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       start_time = request.POST.get("start_time", "")
       start_time = datetime.datetime.strptime(start_time,"%m/%Y")
       #get month name (%b for abbreviation and %B for full name) and year and convert to str
-      start_time = start_time.strftime("%b %Y")
+
 
     end_time = ""
     if request.POST.has_key("end_time"):
       end_time = request.POST.get("end_time", "")
       end_time = datetime.datetime.strptime(end_time,"%m/%Y")
-      end_time = end_time.strftime("%b %Y")
 
     start_enroll = ""
     if request.POST.has_key("start_enroll"):
       start_enroll = request.POST.get("start_enroll", "")
       start_enroll = datetime.datetime.strptime(start_enroll,"%d/%m/%Y")
-      # start_enroll = start_enroll.strftime("%D")
 
     end_enroll = ""
     if request.POST.has_key("end_enroll"):
       end_enroll = request.POST.get("end_enroll", "")
       end_enroll = datetime.datetime.strptime(end_enroll,"%d/%m/%Y")
-      # end_enroll = end_enroll.strftime("%D")
       
     nussd_course_type = ""
     if request.POST.has_key("nussd_course_type"):
@@ -290,9 +287,13 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     if course_gst.name == u"Announced Course":
 
       if app_set_instance_id: 
+        course_gs.get_neighbourhood(course_gs.member_of)
+        course_gs.keys()
+        print "\n course_gs first**",course_gs
         collection.update({'_id':course_gs._id,'attribute_set.end_enroll': course_gs.attribute_set[4]["end_enroll"]},
                           {'$set':{'attribute_set.$.end_enroll': end_enroll}},upsert= False, multi = False)
         course_gs.reload()
+        print "\n course_gs second**",course_gs.attribute_set[4]["end_enroll"]
 
       else:
         announce_to_colg_list = request.POST.get("announce_to_colg_list", "")
@@ -322,7 +323,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                   nm = nm.split(" -- ")[0].lstrip().rstrip()
 
               course_node = collection.Node.one({'_id':ObjectId(sid)})
-              c_name = unicode(course_node.attribute_set[1][u'course_code'] + "_" + colg_ids.attribute_set[0][u"enrollment_code"]+"_" + str(start_time).replace(' ','_') + "_" + str(end_time).replace(' ','_'))
+              c_name = unicode(course_node.attribute_set[1][u'course_code'] + "_" + colg_ids.attribute_set[0][u"enrollment_code"]+"_" +start_time.strftime("%b_%Y") + "_" + end_time.strftime("%b_%Y"))
               request.POST["name"] = c_name
             
             is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
@@ -429,7 +430,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               site = Site.objects.get(pk=1)
               site = site.name.__str__()
               college_enrollment_url_link = "http://" + site + "/" + colg_ids.name.replace(" ","%20").encode('utf8') + "/mis/" + str(MIS_GAPP._id) + "/" + str(Student._id) + "/enroll/" 
-            task_dict["content_org"] = "\n- Please click [[" + college_enrollment_url_link + "][here]] to enroll students in " + nm + " course.\n\n- This enrollment procedure is open for duration between " + start_time + " and " + end_time + "."
+            task_dict["content_org"] = "\n- Please click [[" + college_enrollment_url_link + "][here]] to enroll students in " + nm + " course.\n\n- This enrollment procedure is open for duration between " + start_time.strftime("%b %Y") + " and " + end_time.strftime("%b %Y") + "."
 
             # Reload required so that updated attribute_set & relation_set appears
             course_gs.reload()
@@ -670,6 +671,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
     node.get_neighbourhood(node.member_of)
+
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
@@ -699,7 +701,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     raise Exception(error_message)
 
 
-def create_course_structure(request, group_id,node_id):
+def create_course_struct(request, group_id,node_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -713,30 +715,81 @@ def create_course_structure(request, group_id,node_id):
     else :
         pass
 
-    course_node = collection.Node.one({"_id": ObjectId(node_id)})
     property_order_list_cs = []
-    course_sect_struct_gst = collection.Node.one({'_type': "GSystemType", 'name':"Course Section"})
-    course_sect_struct_gs = collection.GSystem()
-    course_sect_struct_gs.member_of.append(course_sect_struct_gst._id)
-    property_order_list_cs = get_property_order_with_value(course_sect_struct_gs)
-
     property_order_list_css = []
-    course_sect_struct_cs_gst = collection.Node.one({'_type': "GSystemType", 'name':"Course Subsection"})
-    course_sect_struct_cs_gs = collection.GSystem()
-    course_sect_struct_cs_gs.member_of.append(course_sect_struct_cs_gst._id)
-    property_order_list_css = get_property_order_with_value(course_sect_struct_cs_gs)
-    print property_order_list_css
 
+    title = "Course Structure"
+
+    course_node = collection.Node.one({"_id": ObjectId(node_id)})
+
+    cs_gst = collection.Node.one({'_type': "GSystemType", 'name':"CourseSection"})
+    cs_gs = collection.GSystem()
+    cs_gs.member_of.append(cs_gst._id)
+    property_order_list_cs = get_property_order_with_value(cs_gs)
+
+    css_gst = collection.Node.one({'_type': "GSystemType", 'name':"CourseSubSection"})
+    css_gs = collection.GSystem()
+    css_gs.member_of.append(css_gst._id)
+    property_order_list_css = get_property_order_with_value(css_gs)
+
+    eval_type = course_node.attribute_set[5][u"evaluation_type"]
+    #If evaluation_type flag is True, it is Final. If False, it is Continous
+    if(eval_type==u"Final"):
+        eval_type_flag = True
+    else:
+        eval_type_flag = False
+    at_cs_hours = collection.Node.one({'_type':'AttributeType', 'name':'course_structure_minutes'})
+    if request.method=="POST":
+        course_sec_dict = request.POST.get("course_sec_dict_ele","")
+        course_sec_dict = json.loads(course_sec_dict)
+        cs_ids = []
+        for cs,v in course_sec_dict.items():
+          cs_new = collection.GSystem()
+          cs_new.member_of.append(cs_gst._id)
+          #set name
+          cs_new.name = cs
+          cs_new.modified_by=int(request.user.id)
+          cs_new.created_by=int(request.user.id)
+          cs_new.contributors.append(int(request.user.id))
+          #save the cs gs
+          cs_new.save()
+          cs_ids.append(cs_new._id)
+          css_ids = []
+          for css,val in v.items():
+            css_new = collection.GSystem()
+            css_new.member_of.append(css_gst._id)
+            #set name
+            css_new.name = css
+            css_new.modified_by=int(request.user.id)
+            css_new.created_by=int(request.user.id)
+            css_new.contributors.append(int(request.user.id))
+            #save the css gs
+            css_new.save()
+            #add to cs collection_set
+            css_ids.append(css_new._id)
+            for propk, propv in val.items():
+              # add attributes to css gs
+              create_gattribute(css_new._id,at_cs_hours,int(propv))
+          #append CSS to CS
+          collection.update({'_id':cs_new._id},{'$set':{'collection_set':css_ids}},upsert=False,multi=False)
+          # cs_new.save()
+        course_node_coll_set = course_node.collection_set
+        for each in cs_ids:
+          if each not in course_node_coll_set:
+            course_node_coll_set.append(each)
+        collection.update({'_id':course_node._id},{'$set':{'collection_set':course_node_coll_set}},upsert=False,multi=False)
 
 
     return render_to_response("ndf/create_course_structure.html",
                                   { 'cnode': course_node,
                                     'groupid': group_id,
                                     'group_id':group_id,
+                                    'title':title,
                                     'appId':app._id,
                                     'node':None,
                                     'property_order_list':property_order_list_cs,
-                                    'property_order_list_css':property_order_list_css
+                                    'property_order_list_css':property_order_list_css,
+                                    'eval_type_flag': eval_type_flag
                                   },
                                   context_instance = RequestContext(request)
         )
