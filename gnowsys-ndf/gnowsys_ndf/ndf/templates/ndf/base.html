@@ -47,6 +47,15 @@
     .app.button-bar {
       height: 45px;
     }
+
+    .logout{
+      background-color: #f04124 !important;
+    }
+
+    .logout:hover {
+      background-color: #cf2a0e !important;
+      transition: background-color 400ms ease-out;
+    }
   
   </style>
 
@@ -141,7 +150,7 @@
                   
               <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "User Settings" %}</a></li>
                   
-              <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
+              <li><a class="logout" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
             </ul>
           </li>
 
