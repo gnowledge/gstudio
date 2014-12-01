@@ -625,7 +625,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
       # prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
       right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
 
-      if set(node.prior_node) != set(right_drawer_list):
+      if node.prior_node != right_drawer_list:
         i = 0
         node.prior_node=[]
         while (i < len(right_drawer_list)):
@@ -648,7 +648,8 @@ def build_collection(node, check_collection, right_drawer_list, checked):
 
       nlist = node.collection_set
 
-      if set(node.collection_set) != set(right_drawer_list):
+      # if set(node.collection_set) != set(right_drawer_list):
+      if node.collection_set != right_drawer_list:
         i = 0          
         node.collection_set = []
         # checking if each _id in collection_list is valid or not
