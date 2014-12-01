@@ -298,10 +298,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         root_themes.append(each.name)
                                 
                     if name:
-                        if not name.upper() in (theme_name.upper() for theme_name in root_themes):
-                            # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))
-                                                        
+                        if name.upper() != theme_topic_node.name.upper():
+                            if not name.upper() in (theme_name.upper() for theme_name in root_themes):
+                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))
+                        else:
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))      
+
 
                     if translate != "true":
                         # For storing and maintaning collection order
@@ -388,19 +391,29 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
                                 
                     if name:
-                        if theme_topic_node._id in root_themes_id:  
-                            if not name.upper() in (theme_name.upper() for theme_name in root_themes):
-                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST))
-                                
-                        else:                       
-                            if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
-                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST)) 
-                                
+                        if name.upper() != theme_topic_node.name.upper():
+                            # If "Name" has changed 
 
-                    if translate != "true":
-                        # For storing and maintaning collection order                        
+                            if theme_topic_node._id in root_themes_id:  
+                                # If editing node in root theme items
+                                if not name.upper() in (theme_name.upper() for theme_name in root_themes):
+                                    # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST))
+                                    
+                            else:
+                                # If editing theme item in prior_theme_collection hierarchy 
+                                if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
+                                    # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST)) 
+                           
+                        else:
+                            # If name not changed but other fields has changed
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST))  
+
+
+
+                    if translate != "true" and collection_list:
+                        # For storing and maintaning collection order         
                         if collection_list != '':
                             theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
@@ -639,10 +652,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
         )
-
-
-
-
+        
     return render_to_response("ndf/theme.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
                             'shelf_list': shelf_list,'shelves': shelves,
