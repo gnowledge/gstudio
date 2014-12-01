@@ -472,9 +472,15 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             theme_topic_node.save()
                             
                         title = topic_GST.name 
-
-                        #ash #currently working #prior,teaching
-                        get_node_metadata(request,theme_topic_node,topic_GST)
+                        
+                        # To fill the metadata info while creating and editing topic node
+                        metadata = request.POST.get("metadata_info", '') 
+                        if metadata:
+                          # Only while metadata editing
+                          if metadata == "metadata":
+                            if theme_topic_node:
+                              get_node_metadata(request,theme_topic_node)
+                        # End of filling metadata
                         
                         
                         if prior_node_list != '':
