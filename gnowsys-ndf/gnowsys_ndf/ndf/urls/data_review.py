@@ -10,7 +10,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.data_review',
 						# to save edited data-review row
 						url(r'^/save/$', 'data_review_save', name='data_review_save'),
 
-						# to render search result with and withou page no.
-						url(r'^/search/(?P<search_text>[^/]+)/$', 'get_dr_search_result_dict', name="data_review_search"),
-						url(r'^/search/(?P<search_text>[^/]+)/page-no=(?P<page_no>\d+)/$', 'get_dr_search_result_dict', name="data_review_search_page"),
-)
+						# to render search result with and without page no.
+						url(r'^/search$', 'get_dr_search_result_dict', name="data_review_search"),
+						url(r'^/search/search_text=(?P<search_text>[^/]+)/page-no=(?P<page_no>\d+)/$', 'get_dr_search_result_dict', name="data_review_search_page"),
+ )
