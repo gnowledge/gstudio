@@ -56,6 +56,12 @@
       background-color: #cf2a0e !important;
       transition: background-color 400ms ease-out;
     }
+
+    #profile-img {
+      height: 40px;
+      margin-right: 5px;
+      width: 40px;
+    }
   
   </style>
 
@@ -136,7 +142,7 @@
 
             {% if prof_pic %}
             <a href="{% url 'dashboard' request.user.pk %}">
-              <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" height="30" width="30">
+              <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
               {{ user.username }}
             </a>
             
