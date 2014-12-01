@@ -266,7 +266,7 @@ def data_review_save(request, group_id):
                 edit_summary.append(temp_edit_summ)
 
         # to fill/update attributes of the node and get updated attrs as return 
-        ga_nodes = get_node_metadata(request, file_node, GST_FILE, is_changed=True)
+        ga_nodes = get_node_metadata(request, file_node, is_changed=True)
         
         if len(ga_nodes):
             is_changed = True
