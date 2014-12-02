@@ -72,6 +72,12 @@
     fieldset input {
       margin: 0 !important;
     }
+  
+  /* Setting css-properties for small.error */
+    small.error {
+      padding: 0 0.5em !important;
+      position: relative !important;
+    }
 
   .watchers{
     max-height: 210px;
@@ -117,6 +123,20 @@
     <br/><br/><br/><br/>
 
     <div class="medium-6 columns end">
+      <!-- TaskType -->
+      <div class="row">
+        <div class="medium-6 columns end">
+          <label>{% trans "Task Type " %}<font color="red">*</font></label>
+          <select id="has_type" name="has_type" required>
+            <option value="">{% trans "- - - Select Task Type - - -" %}</option>
+            {% for choice in task_type_choices %}
+            <option value="{{choice.pk}}" {% if choice.pk in has_type|jsonify %} selected {% endif %} >{% blocktrans with alt=choice.name %}{{alt}}{% endblocktrans %}</option>
+            {% endfor %}
+          </select>
+          <small class="error">{% trans "Please select Task Type." %}</small>
+        </div>
+      </div>
+
       <!-- Name -->
       {% if not task_id %}
     	<div class="row">
@@ -183,7 +203,7 @@
     	  <div class="medium-6 columns">
     	    <label>Assignee</label>
     	   	<select name="Assignee" class="medium" id="customDropdown2" data-invalid="">
-            <option value="" selected="selected"></option>
+            <option value="" selected="selected">{% trans "- - - Select Assignee - - -" %}</option>
     		  </select>
     	  </div>
 
@@ -195,6 +215,7 @@
     	</div>
   	
       <!-- Group members listing -->
+      <!--
       {% get_existing_groups as groups %}
     	<div class="row" id="AssigneeType">	
     	  <div class="medium-12 columns">
@@ -204,11 +225,11 @@
             </legend>
       
         		<div id="list">
-        		  <!-- <input type="checkbox" value="" name= "author_Set" selected="selected"> --> 
         		</div>
           </fieldset>
       	</div>
       </div>
+      -->
 
     	<!--
     	<div class="row">
@@ -235,13 +256,12 @@
   	    <div id="contentlist" class="medium-12 columns content">
           <div class="">
             <label style="margin-left: -5px;margin-bottom: -15px;">{% trans "Describe" %}</label>
-            {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+            {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
     		  </div>
         </div>
   	  </div>
 
       <!-- Watchers list -->
-    	{% if not task_id %}
     	<div class="row">
         <div class="medium-12 columns">
           <label>Watchers</label>
@@ -251,7 +271,6 @@
     	  </div>
       	<input type="hidden" name="watchers" id="hidden_watchers" value="">
       </div>
-    	{% endif %}
 
       {% if Upload_Task %}
       	{% get_file_node request Upload_Task as new %}
@@ -297,54 +316,20 @@
     } 
   });
 
-  <!-- To prevent error while parsing to JSON, if group has no members -->
-  user_list = update_user_list();
-  if (JSON.stringify(user_list) != "[]") {
-    user_list = JSON.parse(user_list);
-  }
-
-  else {
-    user_list = [];
-  }
-
-  function update_user_list() {
-    var ajurl = "{% url 'get_group_member_user' groupid %}";
-    var users = [];
-    
-    $.ajax({
-      url: ajurl,
-      async: false,   
-      success: function(data) {
-        users = data;
-      }
-    });
-
-    return users;
-  }
-
-  $.each(user_list, function(key,value) {
-    $('#customDropdown2').append($("<option></option>")
-                                  .attr("value", value)
-                                  .text(value)
-                                  .attr("id", value)
-                                );
-
-    var div = $("<div>" + "</div>").attr("class", "row").appendTo($(".watchers"));
-    var input = $("<input>" + value).attr("type", "checkbox").attr("id", value).appendTo(div);
-  });
-
   {% if parent %}
   var parent = document.getElementById("parent");
   parent.value = "{{parent}}";
   {% endif %}
 
-  var selected = new Array();
-  $(document).on("click", "#save-node", function(event) {
-    $('form-edit-node input:checkbox:checked').each(function(){
-      selected.push(this.id);
+  var watchers_arr = new Array();
+  $(document).on("click", "#save-node", function() {
+    $("div.watchers input[type='checkbox']:checked").each(function() {
+      if ($.inArray(this.value, watchers_arr) == -1) {
+        watchers_arr.push(this.value);
+      }
     });
     
-    $('#hidden_watchers').val(selected);
+    $('#hidden_watchers').val(watchers_arr);
   });
 
   var selDiv = "";
@@ -356,34 +341,34 @@
   
   function attachedfiles() {
     //popultate the files with their names
-      var sData = '{{Upload_Task}}';
-      sData = sData.replace(/&quot;/g, '"');
-      sData = jQuery.parseJSON(sData);
+      {% if Upload_Task %}
+      var sData = {{Upload_Task|safe}};
       if (sData) {
-        for(i = 0; i < sData.length; i++) {
-          storedFiles.push(sData[i]);
+        $.each(sData, function(index, val) {
+          storedFiles.push(val);
           
           var html_content = "<div>" +
-                                "<span data-file='"+sData[i]+"' class='selFile' title='Click to remove'>" + 
-                                  sData[i] + " &#215;" +
+                                "<span data-file='"+val+"' class='selFile' title='Click to remove'>" + 
+                                  val + " &#215;" +
                                 "</span>" +
                               "</div>";
           
           selDiv.append(html_content);
-        }
+        });
       }
+      {% endif %}
 
     //populate the list with their ids
-      var sData = '{{select}}';
-      sData = sData.replace(/&quot;/g, '"');
-      sData = jQuery.parseJSON(sData);
+      {% if select %}
+      var sData = {{select|safe}};
       if (sData) {
-        for(i = 0; i < sData.length; i++) {
-          if(sData[i]) {
-            selfiles.push(sData[i])
+        $.each(sData, function(index, val) {
+          if(val) {
+            selfiles.push(val)
           }
-        }
+        });
       }
+      {% endif %}
 
     var select = document.getElementById('trial');
     select.value = selfiles;
@@ -470,33 +455,36 @@
   }
 
   function toggle(source) {
-    if ((source.value) == 'Single Assignee') {
-      document.getElementById("AssigneeType").style.visibility = "hidden";
-      document.getElementById("group").style.visibility = "hidden";
-    }
+    /*
+      if ((source.value) == 'Single Assignee') {
+        document.getElementById("AssigneeType").style.visibility = "hidden";
+        document.getElementById("group").style.visibility = "hidden";
+      }
 
-    else if ((source.value) == 'Group Assignee') {
-      document.getElementById("AssigneeType").style.visibility = "visible";
-      document.getElementById("group").style.visibility = "visible";
+      else if ((source.value) == 'Group Assignee') {
+        document.getElementById("AssigneeType").style.visibility = "visible";
+        document.getElementById("group").style.visibility = "visible";
 
-      var check = document.getElementById("AssignTaskGroup");
-      check.checked = false;
-    }
+        var check = document.getElementById("AssignTaskGroup");
+        check.checked = false;
+      }
+      */
 
     /* Selects All the Assignes from the DropDown List */
       var x = document.getElementById("selectAllOptions").checked;
       var y = document.getElementById("customDropdown2");
       select_values("customDropdown2");
-      checkboxes = document.getElementsByName('Assignee');
-      for(var i = 0; i <= checkboxes.length; i++) {
-        if (x == true) {
-          checkboxes[i].checked = true;
-        }
-    
-        else {
-          checkboxes[i].checked = false;
-          document.getElementById("list").innerHTML = "";
-        }
+      // checkboxes = document.getElementsByName('Assignee');
+
+      $("input[type='checkbox'][name='Assignee']").attr("checked", x);
+
+      if (x != true) {
+        document.getElementById("list").innerHTML = "";
+        $("#customDropdown2").attr("disabled", false);
+      }
+
+      else {
+        $("#customDropdown2").attr("disabled", true);
       }
   }
 
@@ -516,11 +504,11 @@
       checkbox.name = "Assignee";
 
       var a = y[i].value;
-      checkbox.value = a  ;
-      checkbox.id = "id";
+      checkbox.value = a;
+      checkbox.id = "group_assignee_" + a;
 
       var label = document.createElement('label');
-      label.appendChild(document.createTextNode(String(y[i].value)));
+      label.appendChild(document.createTextNode(String(y[i].text)));
 
       //fieldset.appendChild(checkbox);
       //fieldset.appendChild(label);
@@ -547,20 +535,21 @@
 {% block document_ready %}
   $("#files").on("change", handleFileSelect);
   selDiv = $("#selectedFiles"); 
-  //$("#form-edit-node").on("submit", handleForm);
   $("body").on("click", ".selFile", removeFile);
 
   attachedfiles();
 
+  /*
   var select = document.getElementById("selectAllOptions");
   select.checked = false;
+  */
 
   {% if Status %}
   $("select[name='Status'] option[value='{{Status}}']").prop("selected", true);
   {% endif %}
 
   {% if Priority %}
-  $("select[name='Status'] option[value='{{Priority}}']").prop("selected", true);
+  $("select[name='Priority'] option[value='{{Priority}}']").prop("selected", true);
   {% endif %}
 
   {% if start_time %}
@@ -573,20 +562,56 @@
     end_date.value = "{{end_time|date:'d/m/Y'}}";
   {% endif %}
 
-  {% if Assignee %}
-    var edit_Assignee = document.getElementById("customDropdown2");
-    if ($("select[name='Assignee'] option[value='{{Assignee.0}}']").length) {
-      {% for each in Assignee %}
-        console.log("{{each}}");
-        $("select[name='Assignee'] option[value='{{each}}']").prop("selected", true);
-      {% endfor %}
-    }
+  // Populates group's user(s) into Assignee & Watcher widgets respectively
+  $.ajax({
+    url: "{% url 'get_group_member_user' groupid %}",
+    success: function(data) {
+      users = JSON.parse(data);
+    },
 
-    else {
-      console.log("else...{{Assignee}}");
-      $("select[name='Assignee'] option[value='{{Assignee}}']").prop("selected", true);
+    complete: function() {
+      $.each(users, function(key,val) {
+        // Populates Assignee widget
+        $('#customDropdown2').append(
+          $("<option></option>")
+            .attr("id", "assignee_"+key)
+            .attr("value", key)
+            .text(val)
+        );
+
+        {% if Assignee %}
+          var edit_Assignee = document.getElementById("customDropdown2");
+          if ($("select[name='Assignee'] option[value='{{Assignee.0}}']").length) {
+            {% for each in Assignee %}
+            $("select[name='Assignee'] option[value='{{each}}']").prop("selected", true);
+            {% endfor %}
+          }
+
+          else {
+            $("select[name='Assignee'] option[value='{{Assignee}}']").prop("selected", true);
+          }
+        {% endif %}
+
+        // Populates Watcher widget
+        var div = $("<div>" + "</div>")
+          .attr("class", "row")
+          .appendTo($(".watchers"));
+        
+        var input = $("<input>").attr("type", "checkbox")
+          .attr("id", "watcher_"+key)
+          .attr("value", key)
+          .appendTo(div);
+
+        $("<label>"+val+"</label>").insertAfter(input);
+
+        {% if Watchers %}
+        {% for each in Watchers %}
+          $("div.watchers input[type='checkbox'][value='{{each}}']").prop("checked", true);
+        {% endfor %}
+        {% endif %}
+      });
     }
-  {% endif %}
+  });
 
   // Start-date & End-date settings -------------------------------------------
     var start_date = $("#start_date");

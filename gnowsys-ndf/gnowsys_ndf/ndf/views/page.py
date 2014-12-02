@@ -317,6 +317,15 @@ def create_edit_page(request, group_id, node_id=None):
         # get_node_common_fields(request, page_node, group_id, gst_page)
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
+        # To fill the metadata info while creating and editing page node
+        metadata = request.POST.get("metadata_info", '') 
+        if metadata:
+          # Only while metadata editing
+          if metadata == "metadata":
+            if page_node:
+              get_node_metadata(request,page_node)
+        # End of filling metadata
+
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:

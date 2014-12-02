@@ -28,6 +28,7 @@ from gnowsys_ndf.ndf.views.methods import create_grelation
 from gnowsys_ndf.ndf.views.methods import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page
 # from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.views.search_views import results_search
 
 # from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO
 # from gnowsys_ndf.settings import EXTRA_LANG_INFO
@@ -74,7 +75,6 @@ def data_review(request, group_id, page_no=1):
 
     file_id = collection.Node.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
 
-    # print group_obj
     files_obj = collection.Node.find({'$or': [
                                     {'member_of': {'$all': [ObjectId(file_id._id)]},
                                     '_type': 'File', 'fs_file_ids': {'$ne': []},
@@ -89,7 +89,7 @@ def data_review(request, group_id, page_no=1):
                                     ]},
                                         {'member_of': {'$all': [pandora_video_st._id]}}
                                         ]}).sort("created_at", -1)
-                                 
+
     # implementing pagination: paginator.Paginator(cursor_obj, <int: page no>, <int: no of obj in each page>)
     # (ref: https://github.com/namlook/mongokit/blob/master/mongokit/paginator.py)
     paged_resources = paginator.Paginator(files_obj, page_no, 10)
@@ -111,6 +111,7 @@ def data_review(request, group_id, page_no=1):
         {
             "group_id": group_id, "groupid": group_id,
             "files": files_list, "page_info": paged_resources,
+            "urlname": "data_review_page", "second_arg": "",
             "static_educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
             # "static_language": EXTRA_LANG_INFO,
             "static_language": GSTUDIO_RESOURCES_LANGUAGES,
@@ -126,6 +127,73 @@ def data_review(request, group_id, page_no=1):
         context_instance=RequestContext(request)
     )
 # ---END of data review in File app
+
+
+def get_dr_search_result_dict(request, group_id, search_text, page_no=1):
+
+    group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
+
+    # checking if passed group_id is group name or group Id
+    if group_obj and (group_id == group_obj.name):
+        # group_name = group_id
+        group_id = group_obj._id
+      
+    else:  # passes group_id is _id and not name
+        ins_objectid = ObjectId()
+        if ins_objectid.is_valid(group_id):
+            # retrieve Obj by _id
+            group_obj = collection.Node.one({"_id": ObjectId(group_id)})
+            if group_obj:
+                # group_name = group_obj.name
+                group_id = group_id       # for clarity
+
+    file_id = collection.Node.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
+    
+    search_text = search_text.replace("+", " ")
+
+    get_req = request.GET.copy()
+    
+    # adding values to GET req
+    get_req.update({"search_text": search_text})
+
+    # overwriting request.GET with newly created QueryDict instance get_req
+    request.GET = get_req
+
+    search_reply = json.loads(results_search(request, group_id, return_only_dict = True))
+    stemmed_search_res = search_reply["stemmed"]["name"]
+    result_ids_list = [ ObjectId(each_dict["_id"]) for each_dict in stemmed_search_res ]
+    files_obj = collection.Node.find({ "_id": {"$in": result_ids_list}, "_type": "File" })
+
+    paged_resources = paginator.Paginator(files_obj, page_no, 10)
+
+    # list to hold resources instances with it's attributes and relations
+    files_list = []
+
+    for each_resource in paged_resources.items:
+        each_resource, ver = get_page(request, each_resource) 
+        each_resource.get_neighbourhood(each_resource.member_of)
+        files_list.append(collection.GSystem(each_resource))
+
+    return render_to_response("ndf/data_review.html",
+    {
+        "group_id": group_id, "groupid": group_id,
+        "files": files_list, "page_info": paged_resources,
+        "urlname": "data_review_search_page", 
+        "second_arg": search_text, "search_text": search_text, 
+        "static_educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+        # "static_language": EXTRA_LANG_INFO,
+        "static_language": GSTUDIO_RESOURCES_LANGUAGES,
+        "static_educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
+        "static_interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
+        "static_educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
+        "static_educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
+        "static_curricular": GSTUDIO_RESOURCES_CURRICULAR,
+        "static_audience": GSTUDIO_RESOURCES_AUDIENCE,
+        "static_status": list(STATUS_CHOICES),
+        "static_textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
+    },
+    context_instance=RequestContext(request)
+    )
 
 
 # saving resource object of data review
@@ -198,7 +266,7 @@ def data_review_save(request, group_id):
                 edit_summary.append(temp_edit_summ)
 
         # to fill/update attributes of the node and get updated attrs as return 
-        ga_nodes = get_node_metadata(request, file_node, GST_FILE, is_changed=True)
+        ga_nodes = get_node_metadata(request, file_node, is_changed=True)
         
         if len(ga_nodes):
             is_changed = True

@@ -25,6 +25,7 @@ from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.settings import GSTUDIO_TASK_TYPES
 from gnowsys_ndf.factory_type import factory_gsystem_types, factory_attribute_types, factory_relation_types
 
 ###############################################################################
@@ -83,24 +84,24 @@ class Command(BaseCommand):
           meta_type = create_meta_type(user_id) #creating MetaType
         
         for each in GAPPS:
-
           # Temporarily made this change for renaming "Browse Topic & Browse Resource" untill all servers will be updated
           if each == "Topics":
             br_topic = collection.Node.one({'_type':'GSystemType', 'name': 'Browse Topic'})
             if br_topic:
               br_topic.name = unicode(each)
+              br_topic.status = u"PUBLISHED"
               br_topic.save()
 
           if each == "E-Library":
             br_resource = collection.Node.one({'_type':'GSystemType', 'name': 'Browse Resource'})
             if br_resource:
               br_resource.name = unicode(each)
+              br_resource.status = u"PUBLISHED"
               br_resource.save()
           # Keep above part untill all servers updated
           
           node_doc = collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':each}]})
           if (node_doc == None or each != node_doc['name']):
-
             gst_node=collection.GSystemType()
             gst_node.name = unicode(each)
             gst_node.created_by = user_id
@@ -110,10 +111,12 @@ class Command(BaseCommand):
               gst_node.contributors.append(user_id)
 
             gst_node.member_of.append(meta_type._id) # appending metatype to the GSystemType
+            gst_node.status = u"PUBLISHED"
             gst_node.save()
 
           elif(meta_type._id not in node_doc.member_of):
             node_doc.member_of.append(meta_type._id)
+            node_doc.status = u"PUBLISHED"
             node_doc.save()
                    
         # Create default group 'home'
@@ -182,15 +185,78 @@ class Command(BaseCommand):
           quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'}))
           quiz_type.save()
 
+        # Creating GSystem(s) of GList for GSTUDIO_TASK_TYPES
+        # Divided in two parts:
+        # 1) Creating Types as GList nodes from GSTUDIO_TASK_TYPES
+        # 2) Create "TaskType" which again is going to be GList node;
+        #    that will act as container i.e. hold above Types in its collection_set
+        glist = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+        task_type_ids = []
+        # First: Creating Types as GList nodes from GSTUDIO_TASK_TYPES
+        print "\n"
+        info_message = "\n"
+        for gl_node_name in GSTUDIO_TASK_TYPES:
+          gl_node = collection.Node.one({'_type': "GSystem", 'member_of':glist._id, 'name': gl_node_name})
+
+          if gl_node is None:
+            gl_node = collection.GSystem()
+            gl_node.name = unicode(gl_node_name)
+            gl_node.created_by = user_id
+            gl_node.modified_by = user_id
+
+            if user_id not in gl_node.contributors:
+              gl_node.contributors.append(user_id)
+
+            gl_node.member_of.append(glist._id)
+            gl_node.status = u"PUBLISHED"
+            gl_node.save()
+            print " Created ("+gl_node_name+") as GList required for TaskType."
+            info_message += "\n Created ("+gl_node_name+") as GList required for TaskType."
+
+            if gl_node._id not in task_type_ids:
+              task_type_ids.append(gl_node._id)
+
+          else:
+            print " GList ("+gl_node_name+") already created !"
+            info_message += "\n GList ("+gl_node_name+") already created !"
+
+        # Second: Create "TaskType" (GList container)
+        glc_node_name = u"TaskType"
+        glc_node = collection.Node.one({'_type': "GSystem", 'member_of': glist._id, 'name': glc_node_name})
+        if glc_node is None:
+          glc_node = collection.GSystem()
+          glc_node.name = unicode(glc_node_name)
+          glc_node.created_by = user_id
+          glc_node.modified_by = user_id
+
+          if user_id not in glc_node.contributors:
+            glc_node.contributors.append(user_id)
+
+          glc_node.member_of.append(glist._id)
+          glc_node.collection_set = task_type_ids
+          glc_node.status = u"PUBLISHED"
+          glc_node.save()
+          print " Created ("+glc_node_name+") as GList (container)."
+          info_message += "\n Created ("+glc_node_name+") as GList (container)."
+
+        else:
+          print " GList ("+glc_node_name+") container already created !"
+          info_message += "\n GList ("+glc_node_name+") container already created !"
+        print "\n"
+        info_message += "\n\n"
+        log_list.append(info_message)
+
         info_message = " Structure updated succesfully.\n"
         print info_message
         log_list.append(info_message)
+
       except Exception as e:
         error_message = "SetupStructureError: " + str(e)
         print "\n " + error_message
         log_list.append(error_message)
         # raise Exception(error_message)
         pass
+
       finally:
         if log_list:
           log_list.append("\n ============================ End of Iteration ============================\n")
@@ -242,6 +308,7 @@ def create_meta_type(user_id,meta_type):
   meta.modified_by = user_id
   if user_id not in meta.contributors:
     meta.contributors.append(user_id)
+  meta.status = u"PUBLISHED"
   meta.save()
   print "succesfully created META_TYPE:",meta_type
 
@@ -260,6 +327,7 @@ def create_gsystem_type(st_name, user_id, meta_type_id = None):
         gs_node.member_of.append(meta_type_id)
       if user_id not in gs_node.contributors:
         gs_node.contributors.append(user_id)
+      gs_node.status = u"PUBLISHED"
       gs_node.save()
       print 'created', st_name, 'as', 'GSystemType'
     except Exception as e:
@@ -291,6 +359,7 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
       at.data_type = data_type              
       for each in system_type_id_list:
         at.subject_type.append(each)
+      at.status = u"PUBLISHED"
       at.save()
       print 'created', at_name, 'as', 'AttributeType'
     except Exception as e:
@@ -312,11 +381,12 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
       edited=True
       print "Edited data_type of",node.name,"Earlier it was",node.data_type,"now it is ",data_type
     if edited:
+      node.status = u"PUBLISHED"
       node.save()
     else:
       print 'AttributeType',at_name,'already created'
 
-def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id = None):
+def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id=None, object_cardinality=None):
   '''
   creating factory RelationType's
   '''
@@ -326,10 +396,14 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
       rt_node = collection.RelationType()
       rt_node.name = unicode(rt_name)
       rt_node.inverse_name = unicode(inverse_name)
+      rt_node.object_cardinality = object_cardinality
+      
       for st_id in subject_type_id_list:
         rt_node.subject_type.append(st_id)
+      
       for ot_id in object_type_id_list:
         rt_node.object_type.append(ot_id)
+      
       rt_node.created_by = user_id
       rt_node.modified_by = user_id
       if meta_type_id:
@@ -337,28 +411,40 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
 
       if user_id not in rt_node.contributors:
         rt_node.contributors.append(user_id)
+      rt_node.status = u"PUBLISHED"
       rt_node.save()
       print 'created', rt_name, 'as', 'RelationType'
     except Exception as e:
       print 'RelationType',rt_name,'fails to create because:',e
+  
   else:
     # Edit already existing document
     edited=False
     if not rt_node.member_of:
       if meta_type_id:
+        print "Edited member_of",rt_node.name
         rt_node.member_of.append(meta_type_id)
         edited=True
-        print "Edited member_of",rt_node.name
+    
+    if rt_node.object_cardinality != object_cardinality:
+      print "Edited object_cardinality of ", rt_node.name, " Earlier it was ", rt_node.object_cardinality, " now it is ", object_cardinality
+      rt_node.object_cardinality = object_cardinality
+      edited = True
+
     if not rt_node.subject_type == subject_type_id_list:
+      print "Edited subject_type of",rt_node.name,"Earlier it was ",rt_node.subject_type,"now it is",subject_type_id_list
       rt_node.subject_type=subject_type_id_list
       edited=True
-      print "Edited subject_type of",rt_node.name,"Earlier it was ",rt_node.subject_type,"now it is",subject_type_id_list
+    
     if not rt_node.object_type == object_type_id_list:
+      print "Edited object_type of",rt_node.name,"Earlier it was",rt_node.object_type,"now it is",object_type_id_list
       rt_node.object_type=object_type_id_list
       edited=True
-      print "Edited object_type of",rt_node.name,"Earlier it was",rt_node.object_type,"now it is",object_type_id_list
+    
     if edited :
+      rt_node.status = u"PUBLISHED"
       rt_node.save()
+    
     else:
       print 'RelationType',rt_node.name,'already created'
 
@@ -389,8 +475,9 @@ def create_rts(factory_relation_types,user_id):
   for each in factory_relation_types:
     subject_type_id_list = []
     object_type_id_list = []
+    object_cardinality = None
+
     for key,value in each.items():
-      print key,value
       at_name = key
       inverse_name = value['inverse_name']
 
@@ -401,7 +488,6 @@ def create_rts(factory_relation_types,user_id):
           meta_type_id = meta_type._id
 
       for s in value['subject_type']:
-        
         node_s = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
         if node_s is None:
           node_s = collection.Node.one({'$and':[{'_type': u'MetaType'},{'name': s}]})
@@ -414,8 +500,11 @@ def create_rts(factory_relation_types,user_id):
           node_rs =collection.Node.one({'$and':[{'_type': u'MetaType'},{'name': rs}]})
   
         object_type_id_list.append(node_rs._id)
-        
-    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id)
+      
+      if value.has_key("object_cardinality"):
+        object_cardinality = value["object_cardinality"]
+
+    create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality)
 
 def create_sts(factory_gsystem_types,user_id):
   meta_type_id = ""
@@ -436,6 +525,7 @@ def create_sts(factory_gsystem_types,user_id):
     topics.collection_set.append(topic_GST._id)
     topics.created_by = 1
     topics.modified_by = 1
+    topics.status = u"PUBLISHED"
     topics.save()
 
 def clean_structure():
