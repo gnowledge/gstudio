@@ -703,15 +703,14 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
-
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
             if not obj_id_instance.is_valid(f):
               alreadyUploadedFiles.append(f)
               title = mtitle
@@ -719,7 +718,6 @@ def submitDoc(request, group_id):
         str1 = str(alreadyUploadedFiles)
        
         if img_type != "": 
-            
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))
 
         elif topic_file != "": 
@@ -728,13 +726,19 @@ def submitDoc(request, group_id):
 
         else:
             if str1:
-                return HttpResponseRedirect(page_url+'?var='+str1)
-            else:
-              if is_video == "True":
-                return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
-              else:
-                return HttpResponseRedirect(page_url)
-                
+                # return HttpResponseRedirect(page_url+'?var='+str1)
+                if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
+                    return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                else:
+                    if alreadyUploadedFiles[0][1]:
+                        return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                    else:
+                        return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
+
+                # if is_video == "True":
+                #     return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
+                # else:
+                #     return HttpResponseRedirect(page_url)
 
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
