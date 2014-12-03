@@ -1800,28 +1800,26 @@ def get_source_id(obj_id):
 
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
    get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
-   
    if obj_id not in r_list:
-      print obj_id,"iiiiiiiiiiiiii"
       r_list.append(obj_id)
-      print r_list
       node_sub_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
       node_rightsub_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
-
-      if node_sub_rt: 
+      
+      if list(node_sub_rt):
+         node_sub_rt.rewind()
          for each in list(node_sub_rt):
             right_subject=collection.Node.one({'_id':each.right_subject})
             if right_subject._id not in r_list:
                r_list.append(right_subject._id)
-      if node_rightsub_rt:
-         for each in list(node_sub_rt):
+      if list(node_rightsub_rt):
+         node_rightsub_rt.rewind()
+         for each in list(node_rightsub_rt):
             right_subject=collection.Node.one({'_id':each.subject})
             if right_subject._id not in r_list:
                r_list.append(right_subject._id)
-      print r_list,"tttt"
       if r_list:
+         r_list.remove(obj_id)
          for each in r_list:
-         
             dic={}
             node=collection.Node.one({'_id':each})
             dic[node._id]=node.language

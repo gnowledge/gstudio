@@ -32,6 +32,7 @@ $("#lan option[value='{{v}}']").remove();
 
 </script>
 
+
 <div class="large-12 columns">
 <table class="large-6 columns">
 <div class="row">
@@ -118,13 +119,16 @@ $("#lan option[value='{{v}}']").remove();
        <div class="large-6 columns">
 {% if list1 %}
 {% for each in list1 %}
-
 <div class="row">
 <div class="medium-8 columns">
 {% if "Theme" in each.member_of_names_list %}
  Theme Name:  {{each.name}}</br></br>
 {% else %}
+{% if "theme_item" in each.member_of_names_list %}
+ Theme Item Name:  {{each.name}}</br></br>
+{% else %}
 Topic Name:  {{each.name}}</br></br>
+{% endif %}
 {% endif %}     
          </div>
    </div>
@@ -154,7 +158,7 @@ Topic Name:  {{each.name}}</br></br>
            </div>
 
 	<div class="row">
-{% if "Theme" not in each.member_of_names_list %}
+{% if "Theme" not in each.member_of_names_list and "theme_item" not in each.member_of_names_list %}
 <div class="large-12 columns">
 <label>{% trans "Description" %}</label>
 {% with each as nodeobj %}

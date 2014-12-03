@@ -34,6 +34,7 @@ topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 app=collection.Node.one({'name':u'Topics','_type':'GSystemType'})
 #######################################################################################################################################
+global list_trans_coll
 list_trans_coll = []
 coll_set_dict={}
 
@@ -258,24 +259,32 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             
                                 if "Theme" in each.member_of_names_list:
                                     app_obj = theme_GST
-                                else:
+                                if "theme_item" in each.member_of_names_list:
+                                    app_obj = theme_item_GST
+                                if "topic" in each.member_of_names_list:
                                     app_obj = topic_GST
-                                   
-                                get_node_common_fields(request, theme_topic_node, group_id, app_obj, each)
-                                theme_topic_node.save()
+                                print app_obj,each.name,each.member_of_names_list,"before save"   
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_obj, each))
                                 coll_set_dict[each._id]=theme_topic_node._id
+                                relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
+                                grelation=collection.GRelation()
+                                grelation.relation_type=relation_type
+                                grelation.subject=each._id
+                                grelation.right_subject=theme_topic_node._id
+                                grelation.name=u""
+                                grelation.save()
                                 
                             
                             for each in coll_set1:
-                                if "Theme" in each.member_of_names_list:
-                                    if each.collection_set:
-                                        for collset in each.collection_set:
-                                            p=coll_set_dict[each._id]
-                                            parent_node=collection.Node.one({'_id':ObjectId(str(p))})
-                                            n= coll_set_dict[collset]
-                                            sub_node=collection.Node.one({'_id':ObjectId(str(n))})
-                                            parent_node.collection_set.append(sub_node._id)
-                                            parent_node.save()
+                                #if "Theme" in each.member_of_names_list:
+                                if each.collection_set:
+                                    for collset in each.collection_set:
+                                        p=coll_set_dict[each._id]
+                                        parent_node=collection.Node.one({'_id':ObjectId(str(p))})
+                                        n= coll_set_dict[collset]
+                                        sub_node=collection.Node.one({'_id':ObjectId(str(n))})
+                                        parent_node.collection_set.append(sub_node._id)
+                                        parent_node.save()
                         
                 
                 # To return themes card view for listing theme nodes after creating new Themes
@@ -541,6 +550,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
         if app_GST:
             # For adding new Theme & Topic
             if app_GST.name == "Theme" or app_GST.name == "Topic" or translate == True:
+                print "22222"
                 title = app_GST.name
                 node = ""
                 root_themes = []
@@ -632,9 +642,11 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     # End of finding unique theme names for editing name
 
 	    if translate:
+                print "33333"
                 global list_trans_coll
                 list_trans_coll = []
                 trans_coll_list = get_coll_set(str(app_GST._id))
+                print trans_coll_list,"333333"
                 return render_to_response("ndf/translation_page.html",
 	                                  {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LANGUAGES, 'list1':trans_coll_list
 	                           },context_instance = RequestContext(request)
@@ -666,21 +678,23 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
     )
 
 def get_coll_set(node):
+  #print "inloop"
   obj=collection.Node.one({'_id':ObjectId(node)})
-  if "Theme" in obj.member_of_names_list:  
-      if  obj.collection_set:
-          if obj not in list_trans_coll:
-              list_trans_coll.append(obj)
+  #print obj.member_of_names_list
+  #if "Theme" in obj.member_of_names_list:  
+  if  obj.collection_set:
+      if obj not in list_trans_coll:
+          list_trans_coll.append(obj)
       for each in obj.collection_set:
           n=collection.Node.one({'_id':each})
-          if "Theme" in n.member_of_names_list:  
+          #if "Theme" in n.member_of_names_list:  
   
-              if n not in list_trans_coll:
-                  list_trans_coll.append(n)
-                  if n.collection_set:
-                      if "Theme" in n.member_of_names_list:  
+          if n not in list_trans_coll:
+              list_trans_coll.append(n)
+              if n.collection_set:
+                  #if "Theme" in n.member_of_names_list:  
   
-                          get_coll_set(n._id)
+                  get_coll_set(n._id)
                   
   #new_list=list_trans_coll
   #list_trans_coll = []
