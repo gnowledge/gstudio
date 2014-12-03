@@ -1263,6 +1263,15 @@ def file_edit(request,group_id,_id):
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
 
+        # To fill the metadata info while creating and editing file node
+        metadata = request.POST.get("metadata_info", '') 
+        if metadata:
+          # Only while metadata editing
+          if metadata == "metadata":
+            if file_node:
+              get_node_metadata(request,file_node)
+        # End of filling metadata
+
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:

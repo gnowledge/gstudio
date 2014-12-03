@@ -381,7 +381,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	$("#save-node").click(function() {
 		cn_arr = []
-
 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#collection_drawer").attr("id") == "collection_drawer") {
 				cn_arr.push($(this).val());
@@ -390,7 +389,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 		});
 
 		$("#collection_list").val(cn_arr); 
-		location.reload(true);
 
 	});
 
