@@ -43,11 +43,17 @@
         border-color:#0b8a91;
         border-width:2px;
         color:#0b8a91 !important;
+        height:42px;
     }
 
     .hoverstyle:hover{
         background-color:#0b8a91 !important;
         color:white !important;
+    }
+
+    li.course-section-class{
+    border-color:#0b8a91 !important; 
+    border: 3px solid
     }
 
     <!-- ul,li{
@@ -71,7 +77,7 @@
             </label>
           </div>
       	  <div class="small-4 columns end">
-        	{% html_widget groupid node.pk property_order_list.0.1.0 %}
+        	{% html_widget groupid coll_node_cs.pk property_order_list.0.1.0 %}
     	  </div>
           <div class="small-6 columns">
 		        <input type="button" value="Save" class="button small round save-cs">
@@ -81,7 +87,7 @@
 
         <div class="row">
         	<div class="small-10 small-centered columns sub-section-btn-div">
-        		<input type="button" value="Add Sub Section" class="button round expand hoverstyle sub-section-btn" disabled="disabled">
+        		<input type="button" value="Add Course Sub Section" class="button round expand hoverstyle sub-section-btn" disabled="disabled">
         	</div>
         </div> 
     </li>
@@ -94,7 +100,7 @@
             </label>
           </div>
       	  <div class="small-4 columns end">
-        	{% html_widget groupid node.pk property_order_list_css.0.1.0 %}
+        	{% html_widget groupid coll_node_css.pk property_order_list_css.0.1.0 %}
     	  </div>
           <div class="small-4 columns">
                 <input type="button" value="Save" class="button small round save-cs save-css" >
@@ -104,6 +110,7 @@
     </li>
 
     <ul class="ul-course-section no-bullet">
+
 		<input type="button" class="button expand round hoverstyle course-sec-btn" value="Add Course Section" onclick="add_course_section()">
     </ul>
 
@@ -114,12 +121,15 @@
         </div>
         <br><br><br>
         <div class="row">
-         <div class="small-6 columns end">
-             <label><h5>Enter Minutes</h5></label>
-         </div>        
-         <div class="small-3 columns end ">
-             <input type="text" class="css_mins_class">
-         </div>        
+           <div class="small-3 columns">
+            <label for="{{property_order_list_css.0.1.1.name}}" class="right inline"> 
+              {% blocktrans with label_val=property_order_list_css.0.1.1.altnames %} {{label_val}} {% endblocktrans %}
+            </label>
+          </div>
+          <div class="small-3 columns end mins_inp_div">
+            {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.1 %}
+          </div>
+
          </div>
         <div class="small-4 small-centered columns">
             <input type="button" class="button round expand set_prop_class" id="set_prop" value="Done">        
@@ -127,18 +137,15 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
 
-    <!-- <input type="submit" value="submit" id="submit_course_struct" class="button right inline"> -->
-
     <input type="hidden" id="hidden_css_name_id" name="hidden_css_name_id">
-
     <input type="hidden" id="course_sec_dict_ele" name="course_sec_dict_ele">
 
-    
     <input type="submit" value="submit" id="submit_course_struct" class="button right inline">  
 
   </form>
 {% endblock %}
 
+<script>
 {% block script %}
   {{block.super}}
 //Global var declarations
@@ -169,8 +176,10 @@
         parent_id = $(this).parents("li").attr("id")
         $("#"+parent_id).find("input.sub-section-btn").attr("disabled",true)
         $(this).before($("#course-subsection").clone().attr('id',function(i,id){
-        cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
-        return cloned_ss_ele_id}).removeClass("hide"));
+            cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
+            return cloned_ss_ele_id}).removeClass("hide"));
+        
+        // $("#course_prop").removeClass().addClass(cloned_ss_ele_id +' reveal-modal small')
         css_cloned_id+=1
     });
 
@@ -185,8 +194,8 @@
     else{
         var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
         
-        
         lbl_id = "lbl_for_"+parent_id   
+
         if($(this).hasClass("save-css")){
             course_sub_sec_dict = {};
             course_sub_sec_dict[lbl_val]=""
@@ -221,13 +230,28 @@
     }
     $("#"+parent_id).remove()
   });
-
-// Set label name in reveal modal with respective course name
+  $("#course_structure_minutes").addClass("css_mins_class")
+// Set label name and mins in reveal modal with respective course name
   $(document).on('click','.reveal_prop_form',function(){
+
     $(".css_mins_class").val('');
     lb = $(this).closest("li").find("label").text()
     lb_id = $(this).closest("li").find("label").attr("id")
-    $("#css_name").text("")
+    
+    xy = $("#"+lb_id).parents("li.course-section-class").find("label.lbl_of_cs").text()
+    if(course_sec_dict.hasOwnProperty(xy)){
+        if(course_sec_dict[xy].hasOwnProperty(lb)){
+            if (course_sec_dict[xy][lb]["course_structure_minutes"])
+            {   
+                v = course_sec_dict[xy][lb]["course_structure_minutes"]
+                $("#course_structure_minutes").val(v)
+            }
+            else
+            {
+                $("#course_structure_minutes").val("")
+            }
+        }
+    }
     $("#hidden_css_name_id").val(lb_id)
     $("#css_name").text("Duration for '"+ lb+"'")
     $("#css_name").css("font-size", "30px");
@@ -257,11 +281,11 @@
     a = $("#hidden_css_name_id").val()
     c_name = $("#"+a).text();
     x = $("#"+a).parents("li.course-section-class").find("label.lbl_of_cs").text()
-    $("#"+a).attr("course_mins",course_min_value)
+    // $("#"+a).attr("course_mins",course_min_value)
 
     if(course_sec_dict.hasOwnProperty(x)){
         if(course_sec_dict[x].hasOwnProperty(c_name)){
-            course_sec_dict[x][c_name]["course_structure_mins"] = course_min_value 
+            course_sec_dict[x][c_name]["course_structure_minutes"] = course_min_value 
         }
     }
   });
@@ -274,3 +298,62 @@
 
 
 {% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+
+    {% if course_collection_dict %}
+        {% for eachk,eachv in course_collection_dict.items %}
+                $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
+                    cloned_ele_id = id+"_cloned"+cs_cloned_id;
+                    return cloned_ele_id}).removeClass("hide"))
+
+            lbl_id = "lbl_for_"+cloned_ele_id   
+            
+            var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
+            var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+"{{eachk}}"+"</h4></label></div>"    
+            var str_prop="<div class='small-2 columns end'><i class='fi-pencil large'></i></i></div></div>"
+        
+            $("#"+cloned_ele_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
+            cs_cloned_id+=1
+            course_sec_dict["{{eachk}}"]={}
+            {% for eachkk,eachvv in eachv.items %}
+                //course section id
+                $("#"+cloned_ele_id).find(".sub-section-btn").before($("#course-subsection").clone().attr('id',function(i,id){
+                    cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
+                    return cloned_ss_ele_id}).removeClass("hide"));
+
+                $("#"+cloned_ele_id).find("input.sub-section-btn").attr("disabled",true)
+                css_cloned_id+=1
+                lbl_id = "lbl_for_"+cloned_ss_ele_id   
+
+                var str_btn1="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
+                var str_lbl1="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"'><h4>"+"{{eachkk}}"+"</h4></label></div>"    
+                var str_prop1="<div class='small-2 columns end'><i class='fi-widget large reveal_prop_form' id='widget_id'></i></div></div>"
+        
+                $("#"+cloned_ele_id).find("input.sub-section-btn").removeAttr("disabled");
+                $("#"+cloned_ss_ele_id).find("div.input-cs-row").replaceWith(str_btn1+str_lbl1+str_prop1)
+                course_sub_sec_dict = {};
+                course_sub_sec_dict["{{eachkk}}"]=""
+
+                if(course_sec_dict.hasOwnProperty("{{eachk}}")){
+                    course_sec_dict["{{eachk}}"]["{{eachkk}}"]={}
+                }
+
+                {% for eachk1,eachv1 in eachvv.items %}
+                    if(course_sec_dict.hasOwnProperty("{{eachk}}")){
+                        if(course_sec_dict["{{eachk}}"].hasOwnProperty("{{eachkk}}")){
+                            course_sec_dict["{{eachk}}"]["{{eachkk}}"]["course_structure_minutes"] = {{eachv1}}           
+                        }
+
+                    }
+
+                {% endfor %}
+
+            {% endfor %}
+
+        {% endfor %}
+
+    {% endif %}
+{% endblock %}
+</script>

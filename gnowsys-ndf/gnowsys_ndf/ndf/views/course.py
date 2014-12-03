@@ -244,7 +244,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
   property_order_list = get_property_order_with_value(course_gs)
-  print "\n\ncourse prop start", property_order_list,"\n\n this is course prop"
 
   if request.method == "POST":
     # [A] Save course-node's base-field(s)
@@ -289,11 +288,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       if app_set_instance_id: 
         course_gs.get_neighbourhood(course_gs.member_of)
         course_gs.keys()
-        print "\n course_gs first**",course_gs
         collection.update({'_id':course_gs._id,'attribute_set.end_enroll': course_gs.attribute_set[4]["end_enroll"]},
                           {'$set':{'attribute_set.$.end_enroll': end_enroll}},upsert= False, multi = False)
         course_gs.reload()
-        print "\n course_gs second**",course_gs.attribute_set[4]["end_enroll"]
 
       else:
         announce_to_colg_list = request.POST.get("announce_to_colg_list", "")
@@ -642,6 +639,10 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   template_prefix = "mis"
   context_variables = {}
 
+  #Course structure collection _dict
+  course_collection_dict = {}
+  course_collection_dict_exists = False
+
   if request.user:
     if auth is None:
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
@@ -656,7 +657,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     title = course_gst.name
   
     template = "ndf/course_list.html"
-
     if request.method=="POST":
       search = request.POST.get("search","")
       classtype = request.POST.get("class","")
@@ -665,17 +665,36 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     else:
       nodes = collection.Node.find({'member_of': course_gst._id, 'group_set': ObjectId(group_id)})
 
+
+  cs_gst = collection.Node.one({'_type': "GSystemType", 'name':"CourseSection"})
+  css_gst = collection.Node.one({'_type': "GSystemType", 'name':"CourseSubSection"})
+
   if app_set_instance_id :
-    template = "ndf/course_detail.html"
+    template = "ndf/course_details.html"
 
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
     node.get_neighbourhood(node.member_of)
 
+    #get the course structure
+    for eachcs in node.collection_set:
+      coll_node_cs = collection.Node.one({'_id':eachcs,'member_of':cs_gst._id},{'name':1,'collection_set':1})
+      css_dict = {}
+      for eachcss in coll_node_cs.collection_set:
+        coll_node_css = collection.Node.one({'_id':eachcss, 'member_of':css_gst._id},{'name':1,'collection_set':1,'attribute_set':1})
+        css_dict[coll_node_css.name] = {}
+        css_dict[coll_node_css.name]["course_structure_minutes"] = coll_node_css.attribute_set[0]["course_structure_minutes"]
+        course_collection_dict[coll_node_cs.name] = css_dict
+
+    if course_collection_dict:
+      course_collection_dict_exists = True
+
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
+                        'course_collection_dict':course_collection_dict,
+                        'course_collection_dict_exists':course_collection_dict_exists,
                         'nodes': nodes, 'node': node,
                         'property_order_list': property_order_list,
                         'is_link_needed': is_link_needed
@@ -702,6 +721,21 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
 
 def create_course_struct(request, group_id,node_id):
+    """
+    This view is to create the structure of the Course.
+    A Course holds CourseSection, which further holds CourseSubSection
+    in their respective collection_set.
+
+    A tree depiction to this is as follows:
+      Course Name:
+        1. CourseSection1
+          1.1. CourseSubSection1
+          1.2. CourseSubSection2
+        2. CourseSection2
+          2.1. CourseSubSection3
+
+    """
+
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -717,6 +751,10 @@ def create_course_struct(request, group_id,node_id):
 
     property_order_list_cs = []
     property_order_list_css = []
+    course_collection_dict = {}
+    course_collection_dict_exists = False
+    coll_node_cs = None
+    coll_node_css = None
 
     title = "Course Structure"
 
@@ -732,6 +770,19 @@ def create_course_struct(request, group_id,node_id):
     css_gs.member_of.append(css_gst._id)
     property_order_list_css = get_property_order_with_value(css_gs)
 
+    #get the course structure
+    for eachcs in course_node.collection_set:
+      coll_node_cs = collection.Node.one({'_id':eachcs,'member_of':cs_gst._id},{'name':1,'collection_set':1})
+      css_dict = {}
+      for eachcss in coll_node_cs.collection_set:
+        coll_node_css = collection.Node.one({'_id':eachcss, 'member_of':css_gst._id},{'name':1,'collection_set':1,'attribute_set':1})
+        css_dict[coll_node_css.name] = {}
+        css_dict[coll_node_css.name]["course_structure_minutes"] = coll_node_css.attribute_set[0]["course_structure_minutes"]
+        course_collection_dict[coll_node_cs.name] = css_dict
+
+    if course_collection_dict:
+      course_collection_dict_exists = True
+
     eval_type = course_node.attribute_set[5][u"evaluation_type"]
     #If evaluation_type flag is True, it is Final. If False, it is Continous
     if(eval_type==u"Final"):
@@ -743,36 +794,85 @@ def create_course_struct(request, group_id,node_id):
         course_sec_dict = request.POST.get("course_sec_dict_ele","")
         course_sec_dict = json.loads(course_sec_dict)
         cs_ids = []
-        for cs,v in course_sec_dict.items():
-          cs_new = collection.GSystem()
-          cs_new.member_of.append(cs_gst._id)
-          #set name
-          cs_new.name = cs
-          cs_new.modified_by=int(request.user.id)
-          cs_new.created_by=int(request.user.id)
-          cs_new.contributors.append(int(request.user.id))
-          #save the cs gs
-          cs_new.save()
-          cs_ids.append(cs_new._id)
-          css_ids = []
-          for css,val in v.items():
-            css_new = collection.GSystem()
-            css_new.member_of.append(css_gst._id)
+
+        #creating course structure GSystems
+        if not course_collection_dict_exists:
+          for cs,v in course_sec_dict.items():
+            cs_new = collection.GSystem()
+            cs_new.member_of.append(cs_gst._id)
             #set name
-            css_new.name = css
-            css_new.modified_by=int(request.user.id)
-            css_new.created_by=int(request.user.id)
-            css_new.contributors.append(int(request.user.id))
-            #save the css gs
-            css_new.save()
-            #add to cs collection_set
-            css_ids.append(css_new._id)
-            for propk, propv in val.items():
-              # add attributes to css gs
-              create_gattribute(css_new._id,at_cs_hours,int(propv))
-          #append CSS to CS
-          collection.update({'_id':cs_new._id},{'$set':{'collection_set':css_ids}},upsert=False,multi=False)
-          # cs_new.save()
+            cs_new.name = cs
+            cs_new.modified_by=int(request.user.id)
+            cs_new.created_by=int(request.user.id)
+            cs_new.contributors.append(int(request.user.id))
+            #save the cs gs
+            cs_new.save()
+            cs_ids.append(cs_new._id)
+            css_ids = []
+            for css,val in v.items():
+              css_new = collection.GSystem()
+              css_new.member_of.append(css_gst._id)
+              #set name
+              css_new.name = css
+              css_new.modified_by=int(request.user.id)
+              css_new.created_by=int(request.user.id)
+              css_new.contributors.append(int(request.user.id))
+              #save the css gs
+              css_new.save()
+              #add to cs collection_set
+              css_ids.append(css_new._id)
+              for propk, propv in val.items():
+                # add attributes to css gs
+                create_gattribute(css_new._id,at_cs_hours,int(propv))
+            #append CSS to CS
+            collection.update({'_id':cs_new._id},{'$set':{'collection_set':css_ids}},upsert=False,multi=False)
+            # cs_new.save()
+        else:
+          if (course_collection_dict==course_sec_dict):
+            pass
+          else:
+            for k in course_sec_dict:
+              if course_collection_dict.has_key(k):
+                if(course_sec_dict[k]==course_collection_dict[k]):
+                  pass
+                else:
+                  for k1 in course_sec_dict[k]:
+                    if course_collection_dict[k].has_key(k1):
+                      if(course_sec_dict[k][k1]==course_collection_dict[k][k1]):
+                        pass
+                      else:
+                        for k2 in course_sec_dict[k][k1]:
+                          css_node = collection.Node.one({"name":k1,"member_of":css_gst._id},{'collection_set':1})
+                          create_gattribute(css_node._id,at_cs_hours,int(course_sec_dict[k][k1][k2]))
+                    else:
+                      css_new = collection.GSystem()
+                      css_new.member_of.append(css_gst._id)
+                      #set name
+                      css_new.name = k1
+                      css_new.modified_by=int(request.user.id)
+                      css_new.created_by=int(request.user.id)
+                      css_new.contributors.append(int(request.user.id))
+                      #save the css gs
+                      css_new.save()
+                      for k2 in course_sec_dict[k][k1]:
+                        if(k2=="course_structure_minutes"):
+                          create_gattribute(css_new._id,at_cs_hours,int(course_sec_dict[k][k1][k2]))
+                      #add to cs collection_set
+                      cs_node = collection.Node.one({"name":k,"member_of":cs_gst._id},{'collection_set':1})
+                      collection.update({'_id':cs_node._id},{'$push':{'collection_set':css_new._id}},upsert=False,multi=False)
+              else:
+
+                cs_new = collection.GSystem()
+                cs_new.member_of.append(cs_gst._id)
+                #set name
+                cs_new.name = k
+                cs_new.modified_by=int(request.user.id)
+                cs_new.created_by=int(request.user.id)
+                cs_new.contributors.append(int(request.user.id))
+                #save the cs gs
+                cs_new.save()
+                cs_ids.append(cs_new._id)
+
         course_node_coll_set = course_node.collection_set
         for each in cs_ids:
           if each not in course_node_coll_set:
@@ -787,6 +887,9 @@ def create_course_struct(request, group_id,node_id):
                                     'title':title,
                                     'appId':app._id,
                                     'node':None,
+                                    'coll_node_cs':coll_node_cs,
+                                    'coll_node_css':coll_node_css,
+                                    'course_collection_dict':course_collection_dict,
                                     'property_order_list':property_order_list_cs,
                                     'property_order_list_css':property_order_list_css,
                                     'eval_type_flag': eval_type_flag
