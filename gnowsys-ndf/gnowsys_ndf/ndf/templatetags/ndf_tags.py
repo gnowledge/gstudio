@@ -1931,6 +1931,7 @@ def html_widget(groupid, node_id, field):
     #   gs.get_neighbourhood(node_member_of)
 
     # field_type = gs.structure[field['name']]
+    print "see",field
     field_type = field['data_type']
     field_altnames = field['altnames']
     field_value = field['value']
@@ -2128,16 +2129,17 @@ def get_attendees(groupid,node):
         for j in  i['has_attendees']:
                 attendieslist.append(j)
                 
-                
+ print "hello",attendieslist               
  attendee_name=[]
  #below code is meant for if a batch or member of group id  is found, fetch the attendees list-
  #from the members of the batches if members are selected from the interface their names would be returned
- attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}},{"group_admin":1})
+ #attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}},{"group_admin":1})
+ attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}})
  for i in attendees_id:
-    if i["group_admin"]:
-      User_info=(collection.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
-    else:
-      User_info=(collection.Node.find({'_id':ObjectId(i._id)}))
+    #if i["group_admin"]:
+    #  User_info=(collection.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
+    #else:
+    User_info=(collection.Node.find({'_id':ObjectId(i._id)}))
     for i in User_info:
        attendee_name.append(i)
  attendee_name_list=[]

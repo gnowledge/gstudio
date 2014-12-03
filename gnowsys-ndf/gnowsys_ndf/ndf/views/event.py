@@ -147,24 +147,17 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         # 'property_order_list': property_order_list
                       }
 
-  try:
+ 
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
     # return render_to_response([template, default_template], 
-    return render_to_response(template, 
+  return render_to_response(template, 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
   
-  except TemplateDoesNotExist as tde:
-    error_message = "\n EventDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
-    raise Http404(error_message)
   
-  except Exception as e:
-    error_message = "\n EventDetailListViewError: " + str(e) + " !!!\n"
-    raise Exception(error_message)
-
       
 @login_required
 def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=None):
@@ -223,18 +216,21 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  iteration=request.POST.get("iteration","")
+  print iteration
+  for i in range(1):
+   print "appli ranges",i,"///////////////////////" 
+   if app_set_id:
+     event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+     title = event_gst.name
+     event_gs = collection.GSystem()
+     event_gs.member_of.append(event_gst._id)
 
-  if app_set_id:
-    event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
-    title = event_gst.name
-    event_gs = collection.GSystem()
-    event_gs.member_of.append(event_gst._id)
-
-  if app_set_instance_id:
-    event_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
-  property_order_list = get_property_order_with_value(event_gs)#.property_order
+   if app_set_instance_id:
+     event_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
+   property_order_list = get_property_order_with_value(event_gs)#.property_order
   
-  if request.method == "POST":
+   if request.method == "POST":
     # [A] Save event-node's base-field(s)
     # print "\n Going before....", type(event_gs), "\n event_gs.keys(): ", event_gs.keys()
     # get_node_common_fields(request, event_gs, group_id, event_gst)
@@ -290,6 +286,14 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                   tags = ""
                   field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
 
+              if "date_month_day_year" in field_instance["validators"]:
+                     if i>0:
+                       print "bhetli re entry",request.POST.get(field_instance["name"]+"_"+"1")
+                       field_value=request.POST.get(field_instance["name"]+"_"+"1")  
+                     else:
+                        field_value = request.POST[field_instance["name"]]
+                        print "mare",field_value
+
               else:
                 # Other AttributeTypes 
                 field_value = request.POST[field_instance["name"]]
@@ -327,7 +331,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
-    return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
+    if i==2:
+     return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
   if event_gst.name == u'Classroom Session':
      template="ndf/Nussd_event_Schedule.html"
   else:

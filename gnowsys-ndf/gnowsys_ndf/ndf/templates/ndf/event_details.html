@@ -231,7 +231,7 @@ table, th, td {
           {% endwith %}
         </div> <!-- End of class="content active" -->
 
-        <!-- Content for Concept Graph -->
+        <!-- Content for Concept Graph -->{% comment %}
         <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
           <a class="close-reveal-modal">&#215;</a>
           {% include "ndf/graph_concept.html" %}
@@ -248,7 +248,7 @@ table, th, td {
           <a class="close-reveal-modal">&#215;</a>
           {% include "ndf/graph_dependency.html" %}
         </div>
-
+         {% endcomment %}
         <!-- Tab View Scheduler-Calender -->
         <div class="content" id="view-scheduler-calendar" >    
         {% include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
@@ -590,9 +590,15 @@ function TakePrint()
 }
 function saveattendees()
 {var attendees_list = [];
+var  absentees_list=[];
+var eventid=[]
+eventid='{{node.pk}}'
     var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
     $(':checkbox:checked.chkbx').each(function () {
      attendees_list.push(this.value);
+     });
+      $(':checkbox:not(:checked.chkbx)').each(function () {
+     absentees_list.push(this.value);
      });
      if(attendees_list !="")
      {
@@ -601,6 +607,8 @@ function saveattendees()
                       type: "POST",
                       data:{
                       Assignee:attendees_list,
+                      Absents:absentees_list,
+                      Event:eventid,
                       csrfmiddlewaretoken: '{{ csrf_token }}'},
                       success: function(data){
                       alert(data);

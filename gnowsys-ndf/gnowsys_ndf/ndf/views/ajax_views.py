@@ -3050,6 +3050,7 @@ def get_announced_courses_with_ctype(request, group_id):
              NUSSD-Courses [if match not found]
   """
   response_dict = {}
+  print"enter the dugon"
   try:
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
@@ -3093,7 +3094,7 @@ def get_announced_courses_with_ctype(request, group_id):
 
         # Type-cast fetched field(s) into their appropriate type
         nussd_course_type = unicode(nussd_course_type)
-
+         
         groups_to_search_from = [ObjectId(group_id)]
         ac_cur = collection.Node.find({'member_of': announced_course_gt._id,'_id':{'$in':ac_of_colg},
                                       'attribute_set.nussd_course_type': nussd_course_type,
@@ -3109,8 +3110,8 @@ def get_announced_courses_with_ctype(request, group_id):
       else:
         error_message = "No Announced Course found"
         raise Exception(error_message)
-      
       response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list,cls=NodeJSONEncoder)
+      print response_dict
       return HttpResponse(json.dumps(response_dict))
 
     else:
@@ -3595,8 +3596,24 @@ def insert_picture(request, group_id):
 
 def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
  assigneelist=request.POST.getlist("Assignee[]","")
+ absentlist=request.POST.getlist("Absents[]","")
+ Event=   request.POST.getlist("Event","")
+ print "Event",Event
  oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
  create_grelation(ObjectId(app_set_instance_id), oid,assigneelist)
+ #create relation for student record
+ student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
+ 
+ for i in (assigneelist):
+    student=collection.Node.one({"_id":ObjectId(i)})
+    dict1={}
+    dict1.update({"atandance":"Present"})
+    create_gattribute(ObjectId(i),student_details[0], dict1)
+ for i in (absentlist):
+    student=collection.Node.one({"_id":ObjectId(i)})
+    dict1={}
+    dict1.update({"atandance":"Absent",'Event':ObjectId(Event[0])})
+    create_gattribute(ObjectId(i),student_details[0], dict1)
  return HttpResponse("attendance taken")
 def fetch_course_name(request, group_id,Course_type):
   courses=collection.Node.find({"attribute_set.nussd_course_type":unicode(Course_type)})
@@ -3611,7 +3628,8 @@ def fetch_course_name(request, group_id,Course_type):
   return HttpResponse(json.dumps(list1))
  
 def fetch_course_Module(request, group_id,Course_name):
-  courses=collection.Node.find({"name":unicode(Course_name)})
+  courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
+  courses=collection.Node.find({"_id":ObjectId(courses[0]['relation_set'][0]['announced_for'][0])})
   dict1={}
   list1=[]
   course_modules=collection.Node.find({"_id":courses[0].collection_set})
@@ -3619,6 +3637,18 @@ def fetch_course_Module(request, group_id,Course_name):
   for i in course_modules:
     dict1.update({"name":i.name})
     dict1.update({"id":str(i._id)})
+    list1.append(dict1)
+    dict1={}
+    
+  return HttpResponse(json.dumps(list1))
+
+def fetch_batch_student(request, group_id,Course_name):
+  courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
+  dict1={}
+  list1=[]
+  a = courses[0].relation_set[0]
+  for i in a['has_batch_member']:
+    dict1.update({"id":str(i)})
     list1.append(dict1)
     dict1={}
     
@@ -3633,8 +3663,24 @@ def fetch_course_session(request, group_id,Course_name):
   for i in course_modules:
     dict1.update({"name":i.name})
     dict1.update({"id":str(i._id)})
+    dict1.update({"minutes":'60'})
     list1.append(dict1)
     dict1={}
+    
+  return HttpResponse(json.dumps(list1))
+
+def fetch_course_batches(request, group_id,Course_name):
+  print Course_name
+  courses=collection.Node.one({"_id":ObjectId(Course_name)})
+  #courses=collection.Node.find({"relation_set.announced_for":ObjectId(Course_name)})
+  dict1={}
+  list1=[]
+  batches=collection.Node.find({"relation_set.has_course":ObjectId(Course_name)})
+  for i in batches:
+      dict1.update({"name":i.name})
+      dict1.update({"id":str(i._id)})
+      list1.append(dict1)
+      dict1={}
     
   return HttpResponse(json.dumps(list1))
 
