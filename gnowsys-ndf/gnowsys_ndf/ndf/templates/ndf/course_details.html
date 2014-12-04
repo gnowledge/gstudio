@@ -92,7 +92,8 @@
 		{% for eachkk,eachvv in eachv.items %}
 			<br>&nbsp;&nbsp;{{eachkk}}
 			{% for eachk1,eachv1 in eachvv.items %}
-				&nbsp;&nbsp;{% trans " ----  Minutes" %}&nbsp;&nbsp;{{eachv1}}
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;{{eachk1}}{% trans " ---- " %}&nbsp;&nbsp;{{eachv1}}
 			{% endfor %}
 		{% endfor %}
 		<br>
