@@ -414,13 +414,16 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
+  theme_item_GST = gcollection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
   topic_GST = gcollection.Node.one({'_type': 'GSystemType', 'name':'Topic'})
   collection = None
 
   if coll_set:
       if "Theme" in coll_set.member_of_names_list:
         node_type = theme_GST
-      else:
+      if "theme_item" in coll_set.member_of_names_list:
+        node_type = theme_item_GST
+      if "Topic" in coll_set.member_of_names_list:
         node_type = topic_GST
                                 
       name = request.POST.get('name_'+ str(coll_set._id),"")
@@ -477,8 +480,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       node.member_of.append(node_type._id)
       if node_type.name == "Term":
         node.member_of.append(topic_GST._id)
-
-
+        
+     
     if group_obj._id not in node.group_set:
       node.group_set.append(group_obj._id)
 
@@ -611,7 +614,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     if usrid not in node.contributors:
       node.contributors.append(usrid)
-
   return is_changed
 # ============= END of def get_node_common_fields() ==============
   

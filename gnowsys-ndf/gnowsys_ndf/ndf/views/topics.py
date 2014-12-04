@@ -263,7 +263,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                     app_obj = theme_item_GST
                                 if "topic" in each.member_of_names_list:
                                     app_obj = topic_GST
-                                print app_obj,each.name,each.member_of_names_list,"before save"   
                                 theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_obj, each))
                                 coll_set_dict[each._id]=theme_topic_node._id
                                 relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
@@ -642,11 +641,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     # End of finding unique theme names for editing name
 
 	    if translate:
-                print "33333"
                 global list_trans_coll
                 list_trans_coll = []
                 trans_coll_list = get_coll_set(str(app_GST._id))
-                print trans_coll_list,"333333"
                 return render_to_response("ndf/translation_page.html",
 	                                  {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LANGUAGES, 'list1':trans_coll_list
 	                           },context_instance = RequestContext(request)
@@ -678,7 +675,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
     )
 
 def get_coll_set(node):
-  #print "inloop"
   obj=collection.Node.one({'_id':ObjectId(node)})
   #print obj.member_of_names_list
   #if "Theme" in obj.member_of_names_list:  
