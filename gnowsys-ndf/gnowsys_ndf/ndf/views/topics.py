@@ -677,23 +677,20 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 def get_coll_set(node):
   obj=collection.Node.one({'_id':ObjectId(node)})
   #print obj.member_of_names_list
-  #if "Theme" in obj.member_of_names_list:  
-  if  obj.collection_set:
-      if obj not in list_trans_coll:
-          list_trans_coll.append(obj)
-      for each in obj.collection_set:
-          n=collection.Node.one({'_id':each})
-          #if "Theme" in n.member_of_names_list:  
+  if "Topic" not in obj.member_of_names_list:  
+      if  obj.collection_set:
+          if obj not in list_trans_coll:
+              list_trans_coll.append(obj)
+          for each in obj.collection_set:
+              n=collection.Node.one({'_id':each})
+              if "Topic" not in n.member_of_names_list:  
   
-          if n not in list_trans_coll:
-              list_trans_coll.append(n)
-              if n.collection_set:
-                  #if "Theme" in n.member_of_names_list:  
+                  if n not in list_trans_coll:
+                      list_trans_coll.append(n)
+                      if n.collection_set:
+                          if "Topic" not in n.member_of_names_list:  
   
-                  get_coll_set(n._id)
-                  
-  #new_list=list_trans_coll
-  #list_trans_coll = []
+                              get_coll_set(n._id)
   return list_trans_coll
 
 def topic_detail_view(request, group_id, app_Id=None):
