@@ -2079,8 +2079,8 @@ def create_task(task_dict, task_type_creation="single"):
     """Creates task with required attribute(s) and relation(s).
 
     task_dict
-    - Required keys: name, group_set, created_by, modified_by, contributors,
-        content_org, created_by_name, Status, Priority, start_time, end_time, Assignee
+    - Required keys: _id[optional], name, group_set, created_by, modified_by, contributors, content_org,
+        created_by_name, Status, Priority, start_time, end_time, Assignee, has_type
 
     task_type_creation
     - Valid input values: "single", "multiple", "group"
@@ -2092,14 +2092,18 @@ def create_task(task_dict, task_type_creation="single"):
 
     # List of keys of "task_dict" dictionary
     task_dict_keys = task_dict.keys()
-    task_node = collection.GSystem()
-    task_node["member_of"] = [task_gst._id]
+
+    if task_dict.has_key("_id"):
+      task_node = collection.Node.one({'_id': task_dict["_id"]})
+    else:
+      task_node = collection.GSystem()
+      task_node["member_of"] = [task_gst._id]
 
     # Store built in variables of task node
     # Iterate task_node using it's keys
     for key in task_node:
         if key in ["Status", "Priority", "start_time", "end_time", "Assignee"]:
-            # Required because these values are coming as key in node's document
+            # Required because these values might come as key in node's document
             continue
 
         if key in task_dict_keys:
@@ -2118,6 +2122,7 @@ def create_task(task_dict, task_type_creation="single"):
             task_dict_keys.remove(key)
 
     # Save task_node with built-in variables as required for creating GAttribute(s)/GRelation(s)
+    task_node.status = u"PUBLISHED"
     task_node.save()
 
     # Create GAttribute(s)/GRelation(s)
@@ -2132,6 +2137,8 @@ def create_task(task_dict, task_type_creation="single"):
             
             elif attr_or_rel_node._type == "RelationType":
                 gr_node = create_grelation(task_node._id, attr_or_rel_node, task_dict[attr_or_rel_name])
+
+            task_node.reload()
 
         else:
             raise Exception("\n No AttributeType/RelationType exists with given name("+attr_or_rel_name+") !!!")
@@ -2153,41 +2160,43 @@ def create_task(task_dict, task_type_creation="single"):
         # Send notification for each each Assignee of the task
         # Only be done in case when task_type_creation is not group, 
         # i.e. either single or multiple
-        site = Site.objects.get(pk=1)
-        site = site.name.__str__()
+        if not task_dict.has_key("_id"):
+          site = Site.objects.get(pk=1)
+          site = site.name.__str__()
 
-        from_user = task_node.user_details_dict["created_by"]  # creator of task
+          from_user = task_node.user_details_dict["created_by"]  # creator of task
 
-        group_name = collection.Node.one(
-            {'_type': {'$in': ["Group", "Author"]}, '_id': task_node.group_set[0]},
-            {'name': 1}
-        ).name
+          group_name = collection.Node.one(
+              {'_type': {'$in': ["Group", "Author"]}, '_id': task_node.group_set[0]},
+              {'name': 1}
+          ).name
 
-        url_link = "http://" + site + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
+          url_link = "http://" + site + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
 
-        msg = "Task '" + task_node.name + "' has been reported by " + from_user + \
-            "\n     - Status: " + task_dict["Status"] + \
-            "\n     - Priority: " + task_dict["Priority"] + \
-            "\n     - Assignee: " + ", ".join(task_dict["Assignee"]) +  \
-            "\n     - For more details, please click here: " + url_link
+          to_user_list = []
+          for index, user_id in enumerate(task_dict["Assignee"]):
+              user_obj = User.objects.get(id=user_id)
+              task_dict["Assignee"][index] = user_obj.username
+              if user_obj not in to_user_list:
+                  to_user_list.append(user_obj)
 
-        to_user_list = []
-        for user_name in task_dict["Assignee"]:
-            user_obj = User.objects.get(username=user_name)
-            if user_obj not in to_user_list:
-                to_user_list.append(user_obj)
+          msg = "Task '" + task_node.name + "' has been reported by " + from_user + \
+              "\n     - Status: " + task_dict["Status"] + \
+              "\n     - Priority: " + task_dict["Priority"] + \
+              "\n     - Assignee: " + ", ".join(task_dict["Assignee"]) +  \
+              "\n     - For more details, please click here: " + url_link
 
-        activity = "reported task"
-        render_label = render_to_string(
-            "notification/label.html",
-            {
-                "sender": from_user,
-                "activity": activity,
-                "conjunction": "-",
-                "link": url_link
-            }
-        )
-        notification.create_notice_type(render_label, msg, "notification")
-        notification.send(to_user_list, render_label, {"from_user": from_user})
+          activity = "reported task"
+          render_label = render_to_string(
+              "notification/label.html",
+              {
+                  "sender": from_user,
+                  "activity": activity,
+                  "conjunction": "-",
+                  "link": url_link
+              }
+          )
+          notification.create_notice_type(render_label, msg, "notification")
+          notification.send(to_user_list, render_label, {"from_user": from_user})
 
     return task_node
