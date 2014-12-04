@@ -1781,23 +1781,6 @@ def get_source_id(obj_id):
   except Exception as e:
     return 'null'
 
- 
-# def get_translation_relation(obj_id, translation_list = [], r_list = []):
-#         r_list.append(obj_id._id)
-#     	relation_set=obj_id.get_possible_relations(obj_id.member_of)
-# 	if relation_set.has_key('translation_of'):  
-# 		for k,v in relation_set['translation_of'].items():                      
-# 			if k == 'subject_or_right_subject_list':
-# 				for each in v:
-# 					dic={}
-# 					if (each['_id'] not in r_list):
-# 						r_list.append(each['_id'])
-# 						dic[each['_id']]=each['language']
-# 						translation_list.append(dic)
-# 						get_translation_relation(each,translation_list, r_list)
-# 	return translation_list
-
-
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
    get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
    if obj_id not in r_list:
