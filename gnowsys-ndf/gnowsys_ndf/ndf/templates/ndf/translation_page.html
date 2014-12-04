@@ -32,6 +32,7 @@ $("#lan option[value='{{v}}']").remove();
 
 </script>
 
+
 <div class="large-12 columns">
 <table class="large-6 columns">
 <div class="row">
@@ -56,13 +57,18 @@ $("#lan option[value='{{v}}']").remove();
 
 <div class="row">
 <div class="medium-8 columns">
+{% if "Theme" in node.member_of_names_list %}
+{% trans "Theme" %} : {{node.name}}</br></br>
+{% else %}
 {% trans "Page Name" %} : {{node.name}}</br></br>
-
+{% endif %}
               </div>
    </div>
 </br>
 <div class="row">
 <div class="medium-8 columns">
+{% if "Theme" not in node.member_of_names_list %}
+
  Description: </br></br>
 <textarea name="content" class="field left">{{node.content_org|default_if_none:""}}</textarea>
           </div></div>
@@ -70,7 +76,11 @@ $("#lan option[value='{{v}}']").remove();
 <div class="medium-8 columns">
 {% trans "Tags: " %} </br></br>
 {{node.tags|join:', '|default_if_none:""}}
-              </div></div>
+{% endif %}
+
+              </div>
+
+</div>
   
   
           </div>
@@ -78,26 +88,39 @@ $("#lan option[value='{{v}}']").remove();
 <div class="large-6 columns">
 <div class="row">
 <div class="medium-8 columns">
+{% if "Theme" in node.member_of_names_list %}
+<label>{% trans "Theme" %}</label>
+<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+{% else %}
 <label>{% trans "Page Name" %}</label>
 <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+{% endif %}
 </div>
            </div>
 
 <div class="row">
 <div class="large-12 columns">
+{% if "Theme" not in node.member_of_names_list %}
+
 <label>{% trans "Description" %}</label>
  
 {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
+{% endif %}
 </div>
 </div>
 
 <div class="row">
 <div class="large-6 columns">
+{% if "Theme" not in node.member_of_names_list %}
+
 <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}{{node.tags|pluralize|default_if_none:"s"}}</label>
 </span>
 <input type = "hidden" name="access_policy" value="{{node.access_policy}}">
 <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+{% endif %}
+
 </div>
 </div>
 
@@ -118,19 +141,22 @@ $("#lan option[value='{{v}}']").remove();
        <div class="large-6 columns">
 {% if list1 %}
 {% for each in list1 %}
-
 <div class="row">
 <div class="medium-8 columns">
 {% if "Theme" in each.member_of_names_list %}
- Theme Name:  {{each.name}}</br></br>
+{% trans "Theme" %} :  {{each.name}}</br></br>
 {% else %}
-Topic Name:  {{each.name}}</br></br>
+{% if "theme_item" in each.member_of_names_list %}
+{% trans "Theme Item" %} :  {{each.name}}</br></br>
+{% else %}
+{% trans "Topic" %}:  {{each.name}}</br></br>
+{% endif %}
 {% endif %}     
          </div>
    </div>
 </br>
 <div class="row">
-{% if "Theme" not in each.member_of_names_list %}
+{% if "Theme" not in each.member_of_names_list and "theme_item" not in each.member_of_names_list and "Topic" not in each.member_of_names_list %}
 
 <div class="medium-8 columns">
  Description: </br></br>
@@ -146,7 +172,6 @@ Topic Name:  {{each.name}}</br></br>
 {% for each in list1 %}
 <div class="row">
 <div class="medium-8 columns">
-<label>{% trans "Theme Name" %} </label>
 <input type="hidden" id="name_id" name="name" value="{{node.name}}">
 <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
 <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
@@ -154,7 +179,7 @@ Topic Name:  {{each.name}}</br></br>
            </div>
 
 	<div class="row">
-{% if "Theme" not in each.member_of_names_list %}
+{% if "Theme" not in each.member_of_names_list and "theme_item" not in each.member_of_names_list and "Topic" not in each.member_of_names_list %}
 <div class="large-12 columns">
 <label>{% trans "Description" %}</label>
 {% with each as nodeobj %}

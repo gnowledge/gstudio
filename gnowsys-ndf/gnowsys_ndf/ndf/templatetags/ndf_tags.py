@@ -1781,27 +1781,42 @@ def get_source_id(obj_id):
   except Exception as e:
     return 'null'
 
- 
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
-        r_list.append(obj_id._id)
-    	relation_set=obj_id.get_possible_relations(obj_id.member_of)
-	if relation_set.has_key('translation_of'):  
-		for k,v in relation_set['translation_of'].items():                      
-			if k == 'subject_or_right_subject_list':
-				for each in v:
-					dic={}
-					if (each['_id'] not in r_list):
-						r_list.append(each['_id'])
-						dic[each['_id']]=each['language']
-						translation_list.append(dic)
-						get_translation_relation(each,translation_list, r_list)
-	return translation_list
+   get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   if obj_id not in r_list:
+      r_list.append(obj_id)
+      node_sub_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
+      node_rightsub_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
+      
+      if list(node_sub_rt):
+         node_sub_rt.rewind()
+         for each in list(node_sub_rt):
+            right_subject=collection.Node.one({'_id':each.right_subject})
+            if right_subject._id not in r_list:
+               r_list.append(right_subject._id)
+      if list(node_rightsub_rt):
+         node_rightsub_rt.rewind()
+         for each in list(node_rightsub_rt):
+            right_subject=collection.Node.one({'_id':each.subject})
+            if right_subject._id not in r_list:
+               r_list.append(right_subject._id)
+      if r_list:
+         r_list.remove(obj_id)
+         for each in r_list:
+            dic={}
+            node=collection.Node.one({'_id':each})
+            dic[node._id]=node.language
+            translation_list.append(dic)
+            get_translation_relation(each,translation_list, r_list)
+   return translation_list
+
+
 
 @register.assignment_tag
 def get_possible_translations(obj_id):
         translation_list = []
 	r_list1 = []
-	return get_translation_relation(obj_id,r_list1,translation_list)
+        return get_translation_relation(obj_id._id,r_list1,translation_list)
 
 
 
