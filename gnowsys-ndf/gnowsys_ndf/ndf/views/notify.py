@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
+from gnowsys_ndf.ndf.views.methods import get_all_subscribed_users
 
 import json
 
@@ -47,6 +48,7 @@ def set_notif_val(request,group_id,msg,activ,bx):
         render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':group_obj,'site':site,'link':objurl})
         notification.create_notice_type(render, msg, "notification")
         notification.send([bx], render, {"from_user": request.user})
+        
         return True
     except Exception as e:
         print "Error in sending notification- "+str(e)
@@ -183,6 +185,7 @@ def invite_users(request,group_id):
         return HttpResponse("Failure")
 
 def invite_admins(request,group_id):
+    #inorder to be a group admin, the user must be member of that group
     try:
         sending_user=request.user
         node=col_Group.Node.one({'_id':ObjectId(group_id)})
@@ -238,11 +241,13 @@ def invite_admins(request,group_id):
             st=[]
             user_grps=get_all_user_groups()
             usergrps=[]
+            subscribed=get_all_subscribed_users(group_id)
             for each in user_grps:
                 usergrps.append(each.created_by)
             for each in users:
                 if each.id != owner and each.id not in node.group_admin and each.id in usergrps:
-                   st.append(each)
+                    if each.id in subscribed:
+                        st.append(each)
                 else:
                     if each.id !=owner and each.id in usergrps:
                         coll_obj_list.append(each)

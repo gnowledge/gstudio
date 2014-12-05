@@ -3,7 +3,7 @@ from django.template.defaultfilters import slugify
 import hashlib # for calculating md5
 # import os -- Keep such imports here
 import json
-
+import datetime
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -17,7 +17,12 @@ from mongokit import paginator
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO
 from gnowsys_ndf.settings import EXTRA_LANG_INFO
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page
+
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata,check_if_moderated_group,get_all_admins,create_task_for_activity,get_page
+from django.contrib.auth.models import User
+from gnowsys_ndf.ndf.views.notify import set_notif_val
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -698,9 +703,10 @@ def submitDoc(request, group_id):
         tags = request.POST.get('tags', "")
 
         i = 1
-
+        filename="" 
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
+                filename=filename+mtitle+" "
                 if index == 0:
 
                     f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
@@ -710,6 +716,7 @@ def submitDoc(request, group_id):
                     i = i + 1
             else:
                 title = each.name
+                filename=filename+title+" "
                 f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
 
             if not obj_id_instance.is_valid(f):
@@ -717,7 +724,27 @@ def submitDoc(request, group_id):
               title = mtitle
         
         str1 = str(alreadyUploadedFiles)
-       
+        #If moderated group, notify moderators and create tasks
+#        moderated=check_if_moderated_group(group_id)       
+#        print "moderated true or false",moderated
+#        if moderated:
+        all_admins=get_all_admins(group_id)
+        try:
+            activity_dict={}
+            activity_dict['name']=filename+"- File uploaded by "+request.user.username
+            activity_dict['content_org']="File is uploaded by "+ request.user.username
+            activity_dict['parent'] = ""
+            activity_dict['Status'] = "New"
+            activity_dict['start_time'] = datetime.datetime.today()
+            activity_dict['Priority'] = "Normal"
+            activity_dict['end_time'] = datetime.datetime.today()
+            activity_dict['Estimated_time'] = ""
+            activity_dict['watchers'] = ""
+            assignee_list=all_admins
+            activity_dict['Assignee'] = ""
+            create_task_for_activity(request,group_id,activity_dict,assignee_list,set_notif_val)
+        except Exception as e:
+            print "Exception at create_task_for_activity -"+str(e)
         if img_type != "": 
             
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))

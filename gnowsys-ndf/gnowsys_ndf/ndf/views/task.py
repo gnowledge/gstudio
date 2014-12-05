@@ -563,6 +563,153 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
         update_node.save()
         task_node.post_node.append(update_node._id)
         task_node.save()
+<<<<<<< HEAD
+	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"] # fields
+	if not task_id: # create
+	    for each in at_list:
+                 print "printing each",each
+	         if request.POST.get(each,"")  :
+	         	attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+               		newattribute = collection.GAttribute()
+                	newattribute.subject = task_node._id
+                	newattribute.attribute_type = attributetype_key
+			if each == 'Assignee' and len(request.POST.getlist("Assignee",""))>1:
+				if count == 0:
+					newattribute.object_value = request.user.username
+                                else:
+					assignee_list=[]
+                                        assignee_list=(request.POST.getlist(each,""))
+                                        print "assgnlist",assignee_list
+                                        newattribute.object_value = assignee_list[count]
+			else:
+                                   
+				newattribute.object_value = request.POST.get(each,"")
+                                print "newattribute obj value",newattribute.object_value,type(newattribute.object_value)
+                	newattribute.save()
+	    if request.FILES.getlist('UploadTask'):
+                                attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
+               			newattribute = collection.GAttribute()
+                		newattribute.subject = task_node._id
+                		newattribute.attribute_type = attributetype_key
+                		newattribute.object_value = field_value[0]
+                		newattribute.save()
+
+	    if  int(len(request.POST.getlist("Assignee","")))>1:
+              if task is None:
+               		Task=collection.Node.find_one({"_id":ObjectId(task_node._id)})
+			
+	      else:
+			Task=collection.Node.find_one({"_id":ObjectId(task)})
+			Task.collection_set.append(task_node._id)
+	      Task.save()
+	      	
+	      if int(count) <int(len(request.POST.getlist("Assignee",""))-1):
+		create_edit_task(request, group_name, task_id,Task._id,count=count+1)
+	    if count == 0:	
+	      request.POST.getlist("Assignee","").append(request.user.username)		
+	      for eachuser in (request.POST.getlist("Assignee","")):
+		if eachuser != "":	
+			activ="task reported"
+			msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
+			bx=User.objects.get(username =eachuser)
+	       		set_notif_val(request,group_id,msg,activ,bx)
+	else: #update
+            print "reacjh else"
+	    for each in at_list:
+	        
+		if request.POST.get(each,""):
+			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+        		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+			if each == "Assignee" :
+				for i in request.POST.getlist(each,""):
+				     if i != "":
+					userlist.append(i)
+				userlist.append(request.user.username)		
+			if attr : # already attribute exist 
+				if not attr.object_value == request.POST.get(each,"") :	
+					change_list.append(each.encode('utf8')+' changed from '+attr.object_value.encode('utf8')+' to '+request.POST.get(each,"").encode('utf8')) # updated 	details					
+					attr.object_value = request.POST.get(each,"")
+					attr.save()
+			else :
+				attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+               			newattribute = collection.GAttribute()
+                		newattribute.subject = task_node._id
+                		newattribute.attribute_type = attributetype_key
+                		newattribute.object_value = request.POST.get(each,"")
+                		newattribute.save()
+				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
+				
+		elif each == 'Upload_Task' and request.FILES.getlist('UploadTask'):
+			
+			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
+        		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+        		if attr:
+        		  print "the value",field_value
+        		  change_list.append(str(field_value[0])+' changed from '+str(attr.object_value)+' to '+str(field_value[0]))
+        		  attr.object_value=field_value[0]
+        		  attr.save()
+                        else :
+				newattribute = collection.GAttribute()
+                		newattribute.subject = task_node._id
+                		newattribute.attribute_type = attributetype_key
+                		newattribute.object_value = field_value[0]
+                		newattribute.save()
+                                print "atrtrbt save avunnundo?",newattribute
+				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
+        		
+			
+	    userobj = User.objects.get(id=task_node.created_by)
+	    userlist.append(userobj.username)
+	    for each_author in task_node.author_set:
+		userlist.append(User.objects.get(id=each_author).username)
+            print "enta userlistil?",userlist,"++++++++++++++++++++"
+       	    for eachuser in list(set(userlist)):
+		activ="task updated"
+		msg="Task '"+task_node.name+"' has been updated by "+request.user.username+"\n     - Changes: "+ str(change_list).strip('[]')+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
+		bx=User.objects.get(username =eachuser)
+	        set_notif_val(request,group_id,msg,activ,bx)
+
+	    if change_list or content_org :
+		GST_task_update_history = collection.Node.one({'_type': "GSystemType", 'name': 'task_update_history'})
+	        update_node = collection.GSystem()
+		get_node_common_fields(request, update_node, group_id, GST_task_update_history)
+		if change_list :
+			update_node.altnames = unicode(str(change_list))
+		else :
+			update_node.altnames = unicode('[]')
+		
+		update_node.prior_node = [task_node._id]		
+		update_node.name = unicode(task_node.name+"-update_history")
+		update_node.save()
+		update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
+		update_node.save()
+		task_node.post_node.append(update_node._id)
+		task_node.save()
+                print "task node save save?",tasknode
+		# patch
+		GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 			
+                get_node_common_fields(request, task_node, group_id, GST_TASK)
+		task_node.save()
+                print "pinneyum save?",tasknode
+		#End Patch        
+        return HttpResponseRedirect(reverse('task_details', kwargs={'group_name': group_name, 'task_id': str(task_node._id) }))
+
+    if task_id:
+    	for each in at_list:
+		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+        	attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+        	if attr:
+        		blank_dict[each] = attr.object_value
+        	
+        		
+	if task_node.prior_node :
+		pri_node = collection.Node.one({'_id':task_node.prior_node[0]})
+		blank_dict['parent'] = pri_node.name 
+		blank_dict['parent_id'] = str(pri_node._id)
+    var = { 'title': 'Task','group_id': group_id, 'groupid': group_id,'appId':app._id, 'group_name': group_name, 'node':edit_task_node, 'task_id':task_id }
+    var.update(blank_dict)
+    context_variables = var
+=======
         
         # patch
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 			
@@ -608,6 +755,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
       pri_node = collection.Node.one({'_id':task_node.prior_node[0]})
       blank_dict['parent'] = pri_node.name 
       blank_dict['parent_id'] = str(pri_node._id)
+>>>>>>> 84f7464c8b4561a920b35be08769eeb1e53413a3
 
     # Appending TaskType to blank_dict, i.e. "has_type" relationship
     if task_node.relation_set:
