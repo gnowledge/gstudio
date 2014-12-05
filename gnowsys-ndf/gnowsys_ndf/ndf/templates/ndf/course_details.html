@@ -1,11 +1,107 @@
 {% extends "ndf/mis_base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
-{% load pagination_tags %}
+{% block title %} {{title}} {% endblock %}
+{% block url %}{% url 'create_edit' groupid node %}{% endblock %}
+
+<!-- overide head block from base.html -->
 
 
-{% block body_content %} 
+{% block style %}
+.row .row {
+  margin-left: 0
 
-<h2>Page Under construction...</h2>
 
-{% endblock %}	
+#top_right_btn{
+  position: absolute,
+  right:0
+}
+
+}
+{% endblock %}
+
+{% block head %}
+  <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block meta_content %}
+
+{% endblock %}
+
+
+<!-- overiding block_related content -->
+{% block related_content %}
+<section class="medium-6 large-12 columns">
+  <h3>{% trans "Modules" %}</h3>
+  <div class ="row">
+    {% for each in node.collection_set %}
+    <!-- below div for making tree from json data -->
+    <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{each}}"></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block collection_content %}
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+  <header class="row">
+	<div class="row">
+		<h2 class="small-6 columns end"> {{node.name}}</h2>
+
+
+	</div>
+	<div class="row">
+		<small class="small-4 columns end">{{ node.last_update|timesince }}{% trans "ago edited by" %} <a class="user">{% trans "User" %}</a> <a href="#view-changes"><i class="fi-clock"></i> {% trans "View history" %}</a>
+		</small>
+	</div>
+  </header>
+
+  <fieldset>
+    <legend>
+  		{% trans "Course Registration Details "%}
+    </legend>
+	{% for tab_name, tab_fields_list in property_order_list %}
+		<div class=" {% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+			{% for field in tab_fields_list %}
+				<div class="small-6 columns"> 
+					{{field.altnames}}
+				</div>
+				<div class="small-3 columns">
+					{{field.value|title}}
+				</div>
+				<br>
+			{% endfor %}
+		</div>
+	{% endfor %}
+  </fieldset>
+
+  <fieldset>
+    <legend>
+  		{% trans "Course Structure Details "%}
+
+    </legend>
+	  
+	{% for eachk,eachv in course_collection_dict.items %}
+		<b>{{eachk}}</b>
+		{% for eachkk,eachvv in eachv.items %}
+			<br>&nbsp;&nbsp;{{eachkk}}
+			{% for eachk1,eachv1 in eachvv.items %}
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;{{eachk1}}{% trans " ---- " %}&nbsp;&nbsp;{{eachv1}}
+			{% endfor %}
+		{% endfor %}
+		<br>
+	{% endfor %}
+
+	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+
+  </fieldset>
+</div>
+
+{% endblock %}

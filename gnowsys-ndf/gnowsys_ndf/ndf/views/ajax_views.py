@@ -2884,13 +2884,11 @@ def get_courses(request, group_id):
   try:
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
-      start_time = request.GET.get("start_time", "")
-      end_time = request.GET.get("end_time", "")
       nussd_course_type = request.GET.get("nussd_course_type", "")
       college_groups = []
 
       # Check whether any field has missing value or not
-      if start_time == "" or end_time == "" or nussd_course_type == "":
+      if nussd_course_type == "":
         error_message = "Invalid data: No data found in any of the field(s)!!!"
         raise Exception(error_message)
 
@@ -2936,8 +2934,6 @@ def get_courses(request, group_id):
             college_groups.append(cg.right_subject)
 
       # Type-cast fetched field(s) into their appropriate type
-      start_time = datetime.datetime.strptime(start_time, "%m/%Y")
-      end_time = datetime.datetime.strptime(end_time, "%m/%Y")
       nussd_course_type = unicode(nussd_course_type)
 
       groups_to_search_from = []
@@ -3165,8 +3161,6 @@ def get_colleges(request,group_id):
         if each.has_key("affiliated_college"):
           college_ids = each["affiliated_college"]
 
-      print "college_ids",college_ids
-          
       #If "Select All" checkbox is True, display all colleges from all universities
       # if all_univs == u"true":
       #   colg_under_univ_id = collection.Node.find({'member_of': college._id},{'name': 1}).sort('name',1)
