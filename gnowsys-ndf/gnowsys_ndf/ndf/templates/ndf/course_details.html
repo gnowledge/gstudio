@@ -92,14 +92,13 @@
 		{% for eachkk,eachvv in eachv.items %}
 			<br>&nbsp;&nbsp;{{eachkk}}
 			{% for eachk1,eachv1 in eachvv.items %}
-				<br>
-				&nbsp;&nbsp;&nbsp;&nbsp;{{eachk1}}{% trans " ---- " %}&nbsp;&nbsp;{{eachv1}}
+				&nbsp;&nbsp;&nbsp;&nbsp;{{eachk1}}{% trans " = " %}&nbsp;&nbsp;{{eachv1}},
 			{% endfor %}
 		{% endfor %}
 		<br>
 	{% endfor %}
 
-	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
 
   </fieldset>
 </div>

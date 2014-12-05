@@ -752,7 +752,8 @@ def create_course_struct(request, group_id,node_id):
                 group_id = str(auth._id)
     else :
         pass
-
+    app_id = None
+    app_set_id = None
     property_order_list_cs = []
     property_order_list_css = []
     course_collection_dict = {}
@@ -785,7 +786,7 @@ def create_course_struct(request, group_id,node_id):
         css_dict[coll_node_css.name]["course_structure_assessment"] = coll_node_css.attribute_set[2]["course_structure_assessment"]
         css_dict[coll_node_css.name]["course_structure_assignment"] = coll_node_css.attribute_set[0]["course_structure_assignment"]
         course_collection_dict[coll_node_cs.name] = css_dict
-    # print "\n\n\nSent from Viewsccourse_collection_dict",course_collection_dict
+    print "\n\n\nSent from Views course_collection_dict",course_collection_dict
     if course_collection_dict:
       course_collection_dict_exists = True
 
@@ -798,11 +799,15 @@ def create_course_struct(request, group_id,node_id):
     at_cs_hours = collection.Node.one({'_type':'AttributeType', 'name':'course_structure_minutes'})
     at_cs_assessment = collection.Node.one({'_type':'AttributeType', 'name':'course_structure_assessment'})
     at_cs_assignment = collection.Node.one({'_type':'AttributeType', 'name':'course_structure_assignment'})
+
     if request.method=="POST":
         course_sec_dict = request.POST.get("course_sec_dict_ele","")
+        changed_names = request.POST.get("changed_names","")
         course_sec_dict = json.loads(course_sec_dict)
+        changed_names = json.loads(changed_names)
+        print "\n\n List of names changed",changed_names
         cs_ids = []
-        # print "\n\n Sent from template\n\n",course_sec_dict
+        print "\n\n Sent from template\n\n",course_sec_dict
 
         #creating course structure GSystems
         if not course_collection_dict_exists:
@@ -848,6 +853,23 @@ def create_course_struct(request, group_id,node_id):
             pass
           else:
             for k in course_sec_dict:#loops over course sections
+              for old_name,new_name in changed_names.items():
+                if (new_name==k):
+                  print "\n\n***Changed from ",old_name,"--to--",new_name
+                  name_edited_node = collection.Node.one({'name':old_name,'prior_node':course_node._id,'member_of':cs_gst._id})
+                  collection.update({'_id':name_edited_node._id,'name':old_name,'prior_node':course_node._id,'member_of':cs_gst._id},{'$set':{'name':new_name}})
+                  name_edited_node.reload()
+                  print k,old_name,new_name,"before"
+
+                  k = old_name
+                  course_sec_dict[old_name]=course_sec_dict[new_name]
+                  del course_sec_dict[new_name]
+
+                  
+                  print k,old_name,new_name,"after"
+                else:
+                  pass
+
               if course_collection_dict.has_key(k):
                 if(course_sec_dict[k]==course_collection_dict[k]):
                   pass
@@ -926,15 +948,21 @@ def create_course_struct(request, group_id,node_id):
           if each not in course_node_coll_set:
             course_node_coll_set.append(each)
         collection.update({'_id':course_node._id},{'$set':{'collection_set':course_node_coll_set}},upsert=False,multi=False)
+        app_id = request.POST.get("app_id","")
+        app_set_id = request.POST.get("app_set_id","")
 
+        return HttpResponseRedirect(reverse('mis:mis_app_instance_detail',kwargs={'group_id':group_id,'app_id':app_id,'app_set_id':app_set_id,'app_set_instance_id':course_node._id}))
+    elif request.method=="GET":
+      app_id = request.GET.get("app_id","")
+      app_set_id = request.GET.get("app_set_id","")
 
     return render_to_response("ndf/create_course_structure.html",
                                   { 'cnode': course_node,
                                     'groupid': group_id,
                                     'group_id':group_id,
                                     'title':title,
-                                    'appId':app._id,
                                     'node':None,
+                                    'app_id':app_id, 'app_set_id':app_set_id,
                                     'coll_node_cs':coll_node_cs,
                                     'coll_node_css':coll_node_css,
                                     'course_collection_dict':json.dumps(course_collection_dict),

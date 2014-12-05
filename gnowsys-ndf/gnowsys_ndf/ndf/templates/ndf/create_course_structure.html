@@ -187,6 +187,9 @@
 
     <input type="hidden" id="hidden_css_name_id" name="hidden_css_name_id">
     <input type="hidden" id="course_sec_dict_ele" name="course_sec_dict_ele">
+    <input type="hidden" id="changed_names" name="changed_names">
+    <input type="hidden" id="app_set_id" name="app_set_id" value="{{app_set_id}}">
+    <input type="hidden" id="app_id" name="app_id" value="{{app_id}}">
 
     <input type="submit" value="submit" id="submit_course_struct" class="button right inline">  
 
@@ -262,7 +265,7 @@ $("#course_structure_minutes").addClass("css_mins_class")
         else{
             course_sec_dict[lbl_val]={}
             $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled");
-            var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='small-4 columns lbl_of_cs' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label><i class='small-4 columns fi-pencil large edit_course_structure_name'></i></div>"    
+            var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='small-4 columns lbl_of_cs' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label><i class='small-4 columns fi-pencil large edit_course_structure_name'></i>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div>"    
             var str_prop="</div>"
         }
         $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
@@ -409,6 +412,7 @@ var lbl_text;
   $("#submit_course_struct").click(function() {
     $("#form-edit-node").find(":input[required]").removeAttr("required")
     $("#course_sec_dict_ele").val(JSON.stringify(course_sec_dict))
+    $("#changed_names").val(JSON.stringify(changed_names))
   });
 
 
@@ -428,7 +432,7 @@ var lbl_text;
     lbl_id = "lbl_for_"+cloned_ele_id   
     
     var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
-    var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+cs+"</h4></label><i class='fi-pencil large edit_course_structure_name '></i></div>"    
+    var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+cs+"</h4></label><i class='fi-pencil large edit_course_structure_name '></i>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div>"    
     var str_prop="</div>"
 
     $("#"+cloned_ele_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
