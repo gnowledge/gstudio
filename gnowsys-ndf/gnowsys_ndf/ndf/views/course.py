@@ -688,7 +688,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
         css_dict[coll_node_css.name]["Assignment"] = coll_node_css.attribute_set[0]["course_structure_assignment"]
 
         course_collection_dict[coll_node_cs.name] = css_dict
-    print course_collection_dict,"course_collection_dict"
+    # print course_collection_dict,"course_collection_dict"
     if course_collection_dict:
       course_collection_dict_exists = True
 
@@ -785,15 +785,9 @@ def create_course_struct(request, group_id,node_id):
         css_dict[coll_node_css.name]["course_structure_assessment"] = coll_node_css.attribute_set[2]["course_structure_assessment"]
         css_dict[coll_node_css.name]["course_structure_assignment"] = coll_node_css.attribute_set[0]["course_structure_assignment"]
         course_collection_dict[coll_node_cs.name] = css_dict
-    print "\n\n\nSent from Viewsccourse_collection_dict",course_collection_dict
+    # print "\n\n\nSent from Viewsccourse_collection_dict",course_collection_dict
     if course_collection_dict:
       course_collection_dict_exists = True
-    #collection set of course node only
-    available_nodes = collection.Node.find({'_type': u'GSystem', 'member_of': cs_gst._id,'prior_node':course_node._id})
-    nodes_list = []
-    for each in available_nodes:
-      nodes_list.append(each.name)
-    print nodes_list
 
     eval_type = course_node.attribute_set[5][u"evaluation_type"]
     #If evaluation_type flag is True, it is Final. If False, it is Continous
@@ -808,7 +802,7 @@ def create_course_struct(request, group_id,node_id):
         course_sec_dict = request.POST.get("course_sec_dict_ele","")
         course_sec_dict = json.loads(course_sec_dict)
         cs_ids = []
-        print "\n\n Sent from template\n\n",course_sec_dict
+        # print "\n\n Sent from template\n\n",course_sec_dict
 
         #creating course structure GSystems
         if not course_collection_dict_exists:
@@ -944,7 +938,6 @@ def create_course_struct(request, group_id,node_id):
                                     'coll_node_cs':coll_node_cs,
                                     'coll_node_css':coll_node_css,
                                     'course_collection_dict':json.dumps(course_collection_dict),
-                                    'nodes_list':json.dumps(nodes_list),
                                     'property_order_list':property_order_list_cs,
                                     'property_order_list_css':property_order_list_css,
                                     'eval_type_flag': eval_type_flag
