@@ -82,8 +82,8 @@ class Command(BaseCommand):
                         print "\n", i ," rows successfully compiled"
                         print " ======================================================="
 
-                        # if (i == 6):
-                        #     break
+                        # if (i == 294):
+                            # break
                 except csv.Error as e:
                     sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e)) 
         
@@ -102,7 +102,7 @@ def create_theme(obj):
 		name = obj
 
 		theme_node = collection.GSystem()
-		theme_node.name = unicode(name)
+		theme_node.name = unicode(name).strip()
 		theme_node.access_policy = u"PUBLIC"
 		theme_node.contributors.append(1)
 		theme_node.created_by = 1
@@ -156,7 +156,7 @@ def create_theme_item(obj, prev, row):
 	if obj not in theme_items_list:
 		# Save the theme item 
 		theme_item_node = collection.GSystem()
-		theme_item_node.name = unicode(obj)
+		theme_item_node.name = unicode(obj).strip()
 		theme_item_node.access_policy = u"PUBLIC"
 		theme_item_node.contributors.append(1)
 		theme_item_node.created_by = 1
@@ -208,10 +208,11 @@ def create_topic(obj, prev, row):
 				theme_item = collection.Node.one({'_id': ObjectId(item) })
 				theme_items_list.append(theme_item.name)
 
+
 	if obj not in theme_items_list:
 		# Save the topic 
 		topic_node = collection.GSystem()
-		topic_node.name = unicode(obj)
+		topic_node.name = unicode(obj).strip()
 		topic_node.access_policy = u"PUBLIC"
 		topic_node.contributors.append(1)
 		topic_node.created_by = 1
