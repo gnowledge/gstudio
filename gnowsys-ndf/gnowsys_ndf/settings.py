@@ -431,7 +431,7 @@ AUTHOR_AGENCY_TYPES=["Student","Teacher","TeacherTrainer","Faculty","Researcher"
 # Built-in GAPPS list 
 # DON'T EDIT THIS LIST - for listing purpose on gapps-menubar/gapps-iconbar, instead make use of below one in local_setting file
 # ONLY TO BE EDITED - in case of adding new built-in GAPPS
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics", u"E-Library", u"Meeting",u"Bib_App"]
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics", u"E-Library", u"Meeting",u"Bib_App", u"Observation"]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # DON'T EDIT this variable here.
