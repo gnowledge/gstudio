@@ -41,8 +41,21 @@ def event(request, group_id):
  else :
     pass
  #view written just to show the landing page of the events
+ Group_type=collection.Node.one({'_id':ObjectId(group_id)})
+ Group_name=collection.Node.one({'_type':'GSystem','name':unicode(Group_type.name)})
+ Eventtype='Eventtype'
+ if Group_name:
+      if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
+           Eventtype='CollegeEvents'     
+      else:
+           Eventtype='Eventtype'
+      
  Glisttype=collection.Node.find({"name":"GList"})
- Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
+ #bug
+ #Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
+ #buggy
+ Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":unicode(Eventtype)},{'collection_set': 1})
+ 
  app_collection_set=[]
  if Event_Types:
     for eachset in Event_Types.collection_set:
@@ -106,8 +119,17 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   '''
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  Group_type=collection.Node.one({'_id':ObjectId(group_id)})
+  Group_name=collection.Node.one({'_type':'GSystem','name':unicode(Group_type.name)})
+  Eventtype='Eventtype'
+  if Group_name:
+      if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
+           Eventtype='CollegeEvents'     
+      else:
+           Eventtype='Eventtype'
+
   Glisttype=collection.Node.find({"name":"GList"})
-  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
+  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
   app_collection_set=[]
   if Event_Types:
     for eachset in Event_Types.collection_set:
@@ -130,24 +152,48 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       nodes = collection.Node.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)})
       
   node = None
+  marks_list=[]
+  Assesslist=[]
+  batch=[]
   if app_set_instance_id :
     template = "ndf/event_details.html"
 
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     # property_order_list = get_property_order_with_value(node)
     # print "\n property_order_list: ", property_order_list, "\n"
+    
     node.get_neighbourhood(node.member_of)
-  #   print "\n node.keys(): ", node.keys(), "\n"
+    course=[]
+    val=False
+    for i in node.relation_set:
+       if unicode('event_has_batch') in i.keys():
+            batch=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
+            batch_relation=collection.Node.one({'_type':"GSystem",'_id':ObjectId(batch._id)},{'relation_set':1})
+            for i in batch_relation['relation_set']:
+               if  unicode('has_course') in i.keys(): 
+                   announced_course =collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['has_course'][0])})
+                   for i in  announced_course.relation_set:
+                      if unicode('announced_for') in i.keys():
+                            course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
+                             
+            batch=batch.name
+            
+       #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id,'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
-                        'nodes': nodes, 'node': node
+                        'nodes': nodes, 'node': node,
                         # 'property_order_list': property_order_list
                       }
 
- 
+  if batch :
+      context_variables.update({'batch':batch}) 
+      if course:
+          context_variables.update({'course':course})
+  else  :    
+      context_variables.update({'Assesslist':Assesslist}) 
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
@@ -207,8 +253,18 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
       for eachset in Event_Types.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
+  Group_type=collection.Node.one({'_id':ObjectId(group_id)})
+  Group_name=collection.Node.one({'_type':'GSystem','name':unicode(Group_type.name)})
+  Eventtype='Eventtype'
+  if Group_name:
+
+      if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
+           Eventtype='CollegeEvents'     
+      else:
+           Eventtype='Eventtype'
+
   Glisttype=collection.Node.find({"name":"GList"})
-  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
+  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
   app_collection_set=[]
   if Event_Types:
     for eachset in Event_Types.collection_set:
@@ -243,7 +299,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
       # Remove this when publish button is setup on interface
       event_gs.status = u"PUBLISHED"
     if (request.POST.get("name","")) == "":
-        name=slugify(request.POST.get("nussd_course_type",""))+ "--"+ slugify(request.POST.get("nussd_course_name",""))+ "--"+slugify           (request.POST.get("course_Module",""))+ "--"+slugify(request.POST.get("session_of",""))
+        name=slugify(request.POST.get("course_type",""))+ "--"+ slugify(request.POST.get("course_name",""))+ "--"+slugify           (request.POST.get("Module_name",""))+ "--"+slugify(request.POST.get("Session",""))
         event_gs.name=name 
     
     event_gs.save(is_changed=is_changed)
@@ -307,7 +363,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
               
               if field_value:
-                print "creation of the gattribute",field_instance
+                print "creation of the gattribute",event_gs._id,collection.AttributeType(field_instance), field_value
                 event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
                 # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
@@ -331,9 +387,9 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
-    if i==2:
+    if i==1:
      return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
-  if event_gst.name == u'Classroom Session':
+  if event_gst.name == u'Classroom Session' or event_gst.name == u'Exam':
      template="ndf/Nussd_event_Schedule.html"
   else:
       template = "ndf/event_create_edit.html"
@@ -348,22 +404,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   if app_set_instance_id:
     context_variables['node'] = event_gs
 
-  try:
+  
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
     # return render_to_response([template, default_template], 
 
-    return render_to_response(template, 
+  return render_to_response(template, 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
   
-  except TemplateDoesNotExist as tde:
-    error_message = "\n EventCreateEditViewError: This html template (" + str(tde) + ") does not exists !!!\n"
-    raise Http404(error_message)
   
-  except Exception as e:
-    error_message = "\n EventCreateEditViewError: " + str(e) + " !!!\n"
-    raise Exception(error_message)
-

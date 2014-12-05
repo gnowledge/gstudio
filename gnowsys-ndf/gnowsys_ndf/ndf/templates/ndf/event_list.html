@@ -69,7 +69,7 @@
   <table >
     <thead>
       <tr>
-          <th width="20"> <input class="checkedAll" type="checkbox"></th>
+          <th width="20"> <input class="checkedAll" type="checkbox" ></th>
           <th>Title</th>
 
           <th>Edit</th>
@@ -81,7 +81,7 @@
       {% for each in nodes %}
         <tr>
       
-          <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+          <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox" class="chkbx"> </td>
           <td style="font-size:14px;">
             <a href="{% url 'event_app_instance_detail' groupid  app_set_id each.pk %}">{{each.name|title}}</a>
           </td>
@@ -127,8 +127,11 @@
   });
 
   $(document).on('click', ".button.confirmDeleteObjects", function() {
-    var selectedobject = $(".objectsCheckbox input:checked")
-    $('#myModal').foundation('reveal', 'open');
+    
+   
+    var selectedobject = $(".objectsCheckbox input:checked");
+   alert(selectedobject) 
+    // $('#myModal').foundation('reveal', 'open');
     // $('#myModal').foundation('reveal', 'close');
     
     if(selectedobject.length > 0) {
@@ -176,7 +179,7 @@
   $(document).on('click',".button.deleteObjects",function(){
     var selectedobject = $(".objectsCheckbox input:checked");
     // $('#myModal').foundation('reveal', 'close');
-    
+
     if(selectedobject.length > 0) {
       $('#myModal').foundation('reveal', 'open');
 
