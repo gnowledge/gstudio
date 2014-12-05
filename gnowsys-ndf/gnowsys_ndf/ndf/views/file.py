@@ -113,7 +113,7 @@ def file(request, group_id, file_id=None, page_no=1):
       # File search view
       title = GST_FILE.name
       
-      search_field = request.POST['search_field']
+      search_field = request.POST.get('search_field', '')
 
       datavisual = []
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
@@ -715,7 +715,7 @@ def submitDoc(request, group_id):
               alreadyUploadedFiles.append(f)
               title = mtitle
         
-        str1 = str(alreadyUploadedFiles)
+        # str1 = alreadyUploadedFiles
        
         if img_type != "": 
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))
@@ -725,7 +725,7 @@ def submitDoc(request, group_id):
             return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
         else:
-            if str1:
+            if alreadyUploadedFiles:
                 # return HttpResponseRedirect(page_url+'?var='+str1)
                 if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
                     return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
