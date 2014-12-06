@@ -44,7 +44,6 @@ ins_objectid  = ObjectId()
 
 
 def userpref(request,group_id):
-    print request.user.username
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     lan_dict={}
     pref=request.POST["pref"]
@@ -307,16 +306,29 @@ def uDashboard(request, group_id):
         label = ntype.label.split("-")[0]
         notification_list.append(label)
 
+    # Retrieving Tasks Assigned for User (Only "New" and "In Progress")
     user_assigned = []
-    attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    attr_assignee = collection.Node.find(
-        {"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username}
-    ).sort('last_update',-1).limit(10)
-    dashboard_count.update({'Task':attr_assignee.count()})
-    for attr in attr_assignee :
-        task_node = collection.Node.one({'_id':attr.subject})
-        if task_node:   
-            user_assigned.append(task_node) 
+    # attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    # attr_assignee = collection.Node.find(
+    #     {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": request.user.id}
+    # ).sort('last_update', -1).limit(10)
+    
+    # dashboard_count.update({'Task':attr_assignee.count()})
+    # for attr in attr_assignee :
+    #     task_node = collection.Node.one({'_id':attr.subject})
+    #     if task_node:   
+    #         user_assigned.append(task_node) 
+    task_gst = collection.Node.one(
+        {'_type': "GSystemType", 'name': "Task"}
+    )
+    task_cur = collection.Node.find(
+        {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee': request.user.id}
+    ).sort('last_update', -1).limit(10)
+
+    dashboard_count.update({'Task': task_cur.count()})
+
+    for task_node in task_cur:
+        user_assigned.append(task_node)
 
     obj = collection.Node.find(
         {'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}}
@@ -488,10 +500,69 @@ def group_dashboard(request, group_id):
         if group_ins:
             group_id = group_ins._id
 
+    # Approve StudentCourseEnrollment view
+    approval = False
+    enrollment_details = []
+    enrollment_columns = []
+
+    sce_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
+    if sce_gst:
+        sce_cur = collection.Node.find(
+            {'member_of': sce_gst._id, 'group_set': ObjectId(group_id), 'status': u"PUBLISHED"},
+            {'member_of': 1}
+        )
+
+        if sce_cur.count():
+            approval = True
+            enrollment_columns = ["College", "Course", "Completed On", "Status", "Enrolled", "Remaining", "Approved", "Rejected"]
+            for sce_gs in sce_cur:
+                sce_gs.get_neighbourhood(sce_gs.member_of)
+                data = {}
+
+                approve_task = sce_gs.has_corresponding_task[0]
+                approve_task.get_neighbourhood(approve_task.member_of)
+                data["Status"] = approve_task.Status
+                # Check for corresponding task's status
+                # Continue with next if status is found as "Closed"
+                # As we listing only 'In Progress'/'New' task(s)
+                if data["Status"] == "Closed":
+                    continue
+
+                data["_id"] = str(sce_gs._id)
+                data["College"] = sce_gs.for_college[0].name
+                data["Course"] = sce_gs.for_acourse[0].name
+                data["Completed On"] =  sce_gs.completed_on.strftime("%d/%m/%Y")
+                
+                remaining_count = None
+                enrolled_list = []
+                approved_list = []
+                rejected_list = []
+                if sce_gs.has_key("has_enrolled"):
+                    if sce_gs["has_enrolled"]:
+                        enrolled_list = sce_gs["has_enrolled"]
+
+                if sce_gs.has_key("has_approved"):
+                    if sce_gs["has_approved"]:
+                        approved_list = sce_gs["has_approved"]
+
+                if sce_gs.has_key("has_rejected"):
+                    if sce_gs["has_rejected"]:
+                        rejected_list = sce_gs["has_rejected"]
+
+                data["Enrolled"] = len(enrolled_list)
+                data["Approved"] = len(approved_list)
+                data["Rejected"] = len(rejected_list)
+                remaining_count = len(enrolled_list) - (len(approved_list) + len(rejected_list))
+                data["Remaining"] = remaining_count
+
+                enrollment_details.append(data)
+
     return render_to_response (
         "ndf/group_dashboard.html",
         {
-            'group_id': group_id, 'groupid': group_id
+            'group_id': group_id, 'groupid': group_id,
+            'approval': approval, 'enrollment_columns': enrollment_columns, 'enrollment_details': enrollment_details
         },
         context_instance=RequestContext(request)
     )
+

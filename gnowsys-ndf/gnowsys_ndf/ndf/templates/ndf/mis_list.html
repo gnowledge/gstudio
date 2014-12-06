@@ -157,11 +157,11 @@
           <td class="counter">{{forloop.counter}}.</td>
           {% for each_key in nodes_keys %}
           {% if forloop.counter == 1 %}
-          <td>{{each|get_dict_item:each_key.0|title}}</a></td>
+          <td>{{each|get_dict_item:each_key.0|title}}</td>
           {% elif forloop.counter > 2 %}
-          <td>{{each|get_dict_item:each_key.0|default:"--"}}</a></td>
+          <td>{{each|get_dict_item:each_key.0|default:"--"}}</td>
           {% else %}
-          <td>{{each|get_dict_item:each_key.0}}</a></td>
+          <td>{{each|get_dict_item:each_key.0}}</td>
           {% endif %}
           {% endfor %}
           {% if gstaff_access %}
