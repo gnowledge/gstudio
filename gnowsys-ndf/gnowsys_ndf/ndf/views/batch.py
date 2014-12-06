@@ -50,43 +50,65 @@ def batch(request, group_id):
 def new_create_and_edit(request, group_id, _id = None):
     node = ""
     count = ""
-    batch_count = 1
     batch = ""
-    if request.method == 'POST':
-        batch_count = int(request.POST.get('batch_count',''))
-    st_student = collection.Node.one({'_type':'GSystemType','name':'Student'})
-    st_ac = collection.Node.one({'_type':'GSystemType','name':'Announced Course'})
-    rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
-    rt_selected_course = collection.Node.one({'_type':'RelationType', 'name':'selected_course'})
+    batch_count = 1
+    ac = None
+    nussd_course_name = ""
 
-    student_coll = collection.GSystem.find({'member_of': {'$all': [st_student._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    if request.method == 'POST':
+        batch_count = int(request.POST.get('batch_count', ''))
+    
+    st_student = collection.Node.one({'_type':'GSystemType','name':'Student'})
+    student_coll = collection.GSystem.find(
+        {'member_of': st_student._id, 'group_set': ObjectId(group_id)}
+    )
+
     if _id:
-        batch = collection.Node.one({'_id':ObjectId(_id)},{'relation_set.has_course':1,'name':1})
+        batch = collection.Node.one(
+            {'_id':ObjectId(_id)}, 
+            {'relation_set.has_course': 1, 'name': 1}
+        )
 
         for each in batch.relation_set:
             if "has_course" in each.keys():
                 ac_id_of_batch = each["has_course"][0]
 
-        ac = collection.Node.one({'member_of':st_ac._id,'_id':ObjectId(ac_id_of_batch)})
+        ac = collection.Node.one(
+            {'_id': ObjectId(ac_id_of_batch), 'attribute_set.nussd_course_type': {'$exists': True}},
+            {'attribute_set.nussd_course_type': 1}
+        )
 
-        variable = RequestContext(request, {'group_id':group_id, 'appId':app._id,'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id,'student_count':student_coll.count(),'ac_node':ac,'nussd_course_name':ac.attribute_set[0][u"nussd_course_type"], 'node':batch})
-    else:
-        fetch_ATs = ["nussd_course_type"]
-        req_ATs = []
-        for each in fetch_ATs:
-            each = collection.Node.one({'_type': "AttributeType", 'name': each}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
+        if ac:
+            for attr in ac.attribute_set:
+                if attr and attr.has_key("nussd_course_type"):
+                    nussd_course_name = attr["nussd_course_type"]
+                    break
 
-            if each["data_type"] == "IS()":
-                dt = "IS("
-                for v in each.complex_data_type:
-                    dt = dt + "u'" + v + "'" + ", " 
-                dt = dt[:(dt.rfind(", "))] + ")"
-                each["data_type"] = dt
+    fetch_ATs = ["nussd_course_type"]
+    req_ATs = []
+    for each in fetch_ATs:
+        each = collection.Node.one({'_type': "AttributeType", 'name': each}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
 
-            each["data_type"] = eval(each["data_type"])
-            each["value"] = None
-            req_ATs.append(each)
-        variable = RequestContext(request, {'group_id':group_id, 'appId':app._id,'ATs': req_ATs, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':xrange(batch_count),'st_batch_id':GST_BATCH._id,'student_count':student_coll.count(),'count':batch_count, 'node':batch})
+        if each["data_type"] == "IS()":
+            dt = "IS("
+            for v in each.complex_data_type:
+                dt = dt + "u'" + v + "'" + ", " 
+            dt = dt[:(dt.rfind(", "))] + ")"
+            each["data_type"] = dt
+
+        each["data_type"] = eval(each["data_type"])
+        each["value"] = None
+        req_ATs.append(each)
+    
+    variable = RequestContext(request, {
+        'group_id': group_id, 'groupid': group_id, 
+        'appId': app._id, 'title': GST_BATCH.name, 'ATs': req_ATs,
+        'count':batch_count, 'batch_count': xrange(batch_count), 'st_batch_id': GST_BATCH._id, 
+        'ac_node': ac, 
+        'student_count': student_coll.count(), 
+        'nussd_course_name': nussd_course_name, 
+        'node': batch
+    })
     
     template = "ndf/new_create_batch.html"
     return render_to_response(template, variable)
