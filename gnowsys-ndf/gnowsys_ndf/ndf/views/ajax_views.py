@@ -3690,52 +3690,67 @@ def get_students_for_batches(request, group_id):
   b_arr=[]
   try:
     if request.is_ajax() and request.method == "GET":
-      btn_id = request.GET.get('btn_id',"")
-      batch_id = request.GET.get('node_id',"")
-      ac_id = request.GET.get('ac_id',"")
-      batches_for_same_course = []
-      batch_name_index = 1
+      btn_id = request.GET.get('btn_id', "")
+      batch_id = request.GET.get('node_id', "")
+      ac_id = request.GET.get('ac_id', "")
 
-      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
-      if not mis_admin:
-        error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
-        raise Exception(error_message)
-      has_group_RT = collection.Node.one({'_type': "RelationType", 'name': "has_group"}, {'_id': 1})
-      if not has_group_RT:
-        error_message = "'has_group' (RelationType) doesn't exists... Please create it first"
-        raise Exception(error_message)
+      batch_name_index = 1
+      batches_for_same_course = []
       all_batches_in_grp = []
       batch_mem_dict = {}
-      batch_member_list=[]
-      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
-      batch_gst = collection.Node.one({'_type':"GSystemType",'name':"Batch"})
-      batch1 = collection.Node.find({'member_of':batch_gst._id,'relation_set.has_course':ObjectId(ac_id)})
-      for each1 in batch1:
-        existing_batch = collection.Node.one({'_id':ObjectId(each1._id)})
+      batch_member_list = []
+      
+      batch_gst = collection.Node.one({'_type':"GSystemType", 'name':"Batch"})
+      batch_for_group = collection.Node.find({'member_of': batch_gst._id, 'relation_set.has_course': ObjectId(ac_id)})
+      for each1 in batch_for_group:
+        existing_batch = collection.Node.one({'_id': ObjectId(each1._id)})
         batch_name_index += 1
         for each2 in each1.relation_set:
           if each2.has_key("has_batch_member"):
             batch_member_list.extend(each2['has_batch_member'])
+            break
         each1.get_neighbourhood(each1.member_of)
-        each1.keys()
         batch_mem_dict[each1.name] = each1
-      res = collection.Node.find({'member_of': student._id, 
-                                      'group_set': ObjectId(group_id),'_id':{'$nin':batch_member_list},
-                                      'relation_set.selected_course':ObjectId(ac_id)},
-                                      {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
-                                  ).sort("name", 1) 
+      
+      # College's ObjectId is required, if student record can't be found 
+      # using group's ObjectId
+      # A use-case where records created via csv file apends MIS_admin group's 
+      # ObjectId in group_set field & not college-group's ObjectId
+      ann_course = collection.Node.one({'_id': ObjectId(ac_id)}, {'relation_set.acourse_for_college': 1})
+      college_id = None
+      for rel in ann_course.relation_set:
+        if rel and rel.has_key("acourse_for_college"):
+          college_id = rel["acourse_for_college"][0]
+          break
+
+      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      res = collection.Node.find(
+        {
+          '_id': {'$nin': batch_member_list},
+          'member_of': student._id,
+          '$or': [
+            {'group_set': ObjectId(group_id)},
+            {'relation_set.student_belongs_to_college': college_id}
+          ],
+          'relation_set.selected_course': ObjectId(ac_id)
+        },
+        {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
+      ).sort("name", 1) 
+
       drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
       drawer_template_context["widget_for"] = "new_create_batch"
-      drawer_widget = render_to_string('ndf/drawer_widget.html', 
-                                        drawer_template_context,
-                                        context_instance = RequestContext(request)
-                                      )
+      drawer_widget = render_to_string(
+        'ndf/drawer_widget.html', 
+        drawer_template_context,
+        context_instance = RequestContext(request)
+      )
+
+      response_dict["success"] = True
       response_dict["drawer_widget"] = drawer_widget
       response_dict["student_count"] = res.count()
-      response_dict["success"] = True
-      response_dict["message"] = "NOTE"
       response_dict["batch_name_index"] = batch_name_index
       response_dict["batches_for_same_course"] = json.dumps(batch_mem_dict,cls=NodeJSONEncoder)
+
       return HttpResponse(json.dumps(response_dict))
     else:
       error_message = "Batch Drawer: Either not an ajax call or not a GET request!!!"
