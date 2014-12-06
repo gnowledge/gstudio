@@ -612,7 +612,8 @@
 
             {% check_group node as is_group %}
             {% if is_group %}
-              {% if user.is_superuser or node.created_by == user.id %}
+              {% check_is_gstaff groupid request.user as is_gstaff %}
+              {% if is_gstaff %}
               <a href="{% url edit_url group_name_tag %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
 
