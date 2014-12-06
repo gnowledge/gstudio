@@ -66,11 +66,7 @@
       <label>{% trans "Course Type" %}</label>
     </div>
     <div class="small-4 columns end ">
-    {% if node %}
-      <input type="text" value="{{nussd_course_name}}" disabled="disabled">
-    {% else %}
       {% html_widget groupid "" ATs.0 %}
-    {% endif %}
     </div>
   </div>
 
@@ -80,9 +76,6 @@
     </div>
     <div class="small-4 columns end">
       <select id="acourse_list" name="acourse_list_name" disabled="disabled">
-      {% if node %}
-        <option value="{{ac_node.pk}}">{{ac_node.name}}</option>
-      {% endif %}
       </select>
     </div>
   </div>
@@ -127,34 +120,49 @@
   var scount_lbl = 0
   //For selecting Course type
     $("select#nussd_course_type").change(function() {
-
       var nussd_course_type = $("#nussd_course_type").val();
+
       $.ajax({
         url: "{% url 'get_announced_courses_with_ctype' group_id %}",
+
         data: {
           nussd_course_type: nussd_course_type
         },
+
         type: "GET",
+
         dataType: "json",
+
         complete: function () {
           // Enable AC field
           $("select#acourse_list").removeAttr('disabled')
+
+          {% if ac_node %}
+          $("select#acourse_list").val("{{ac_node.pk}}");
+          $("select#acourse_list").trigger("change");
+          {% endif %}
         },
+
         success: function(data){
           ac_data = data["acourse_ctype_list"]
           ac_data = JSON.parse(ac_data)
 
           $("select#acourse_list").empty();
-          $.each(ac_data,function(i,v){
+            $("select#acourse_list").append(
+              $("<option></option>")
+                .attr("value", "")
+                .text("{% trans ' - - - Select course - - - ' %}")
+            );
+          $.each(ac_data, function(i,v){
             se = v["_id"];
-            ac_name=v["name"];
+            ac_name = v["name"];
             scount_lbl = v["enrolled_stud_count"]
             $("select#acourse_list").append(
               $("<option></option>")
-                .attr("value",se)
+                .attr("value", se)
                 .text(ac_name)
-                .attr("scount",scount_lbl)
-              )
+                .attr("scount", scount_lbl)
+            );
           });
           $("select#acourse_list").prop("selectedIndex", 0);
         },
@@ -186,21 +194,35 @@
         else{
           $("#nextbtn").attr("disabled","disabled")
         }
+  
+        {% if node %}
+          if ($("#stud_count").css("display") == "none") {
+            $("#stud_count").toggle()
+          }
+
+          if ($("#lblstud").css("display") == "none") {
+            $("#lblstud").toggle()
+          }
+
+          $("#nextbtn").trigger("click");
+        {% endif %}
     });//end of acourse_list.change function
 
   //Proceed to create batches for selected AC
     $("#nextbtn").click(function(event) {
       ac_id = $("#acourse_list").val();
+      console.log("ac_id: " + ac_id)
 
       if ($("#nextbtn").css("display") != "none") {
         $("#nextbtn").css("display", "none");
       }
       $("#nussd_course_type").attr("disabled","disabled")
       $("#acourse_list").attr("disabled","disabled")
+      
       $.ajax({
         url: "{% url 'get_students_for_batches' group_id %}",
         data: {
-          ac_id:ac_id
+          ac_id: ac_id
         },
         type: "GET",
         dataType: "json",
@@ -341,15 +363,11 @@
 {% endblock %}
 
 {% block document_ready %}
-{% if node %}
-  if ($("#stud_count").css("display") == "none") {
-    $("#stud_count").toggle()
-  }
+  {% if nussd_course_name %}
+  $("select#nussd_course_type").val("{{nussd_course_name}}");
+  {% endif %}
 
-  if ($("#lblstud").css("display") == "none") {
-    $("#lblstud").toggle()
-  }
-
-  $("#nextbtn").trigger("click");
-{% endif %}
+  if ($("select#nussd_course_type :selected").index() > 0) {
+    $("select#nussd_course_type").trigger("change");
+  } 
 {% endblock %}
