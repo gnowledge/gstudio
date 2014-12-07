@@ -273,9 +273,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   iteration=request.POST.get("iteration","")
-  print iteration
   for i in range(1):
-   print "appli ranges",i,"///////////////////////" 
    if app_set_id:
      event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
      title = event_gst.name
@@ -344,12 +342,10 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
               if "date_month_day_year" in field_instance["validators"]:
                      if i>0:
-                       print "bhetli re entry",request.POST.get(field_instance["name"]+"_"+"1")
                        field_value=request.POST.get(field_instance["name"]+"_"+"1")  
                      else:
                         field_value = request.POST[field_instance["name"]]
-                        print "mare",field_value
-
+                        
               else:
                 # Other AttributeTypes 
                 field_value = request.POST[field_instance["name"]]
@@ -363,13 +359,11 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
               
               if field_value:
-                print "creation of the gattribute",event_gs._id,collection.AttributeType(field_instance), field_value
                 event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
                 # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
             else:
               field_value_list = request.POST.getlist(field_instance["name"])
-
               # field_instance_type = "GRelation"
               #code for creation of relation Session of 
               for i, field_value in enumerate(field_value_list):
@@ -387,8 +381,26 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
-    if i==1:
+    if i==0:
      return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
+  event_gs.get_neighbourhood(event_gs.member_of)
+  course=[]
+  val=False
+  for i in event_gs.relation_set:
+       if unicode('event_has_batch') in i.keys():
+            batch=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
+            batch_relation=collection.Node.one({'_type':"GSystem",'_id':ObjectId(batch._id)},{'relation_set':1})
+            for i in batch_relation['relation_set']:
+               if  unicode('has_course') in i.keys(): 
+                   announced_course =collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['has_course'][0])})
+                   for i in  announced_course.relation_set:
+                      if unicode('announced_for') in i.keys():
+                            course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
+       if unicode('session_of') in i.keys(): 
+                session_of=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})                     
+                module=collection.Node.one({'_type':"GSystem",'_id':{'$in':session_of.prior_node}})
+  event_gs.event_coordinator
+    
   if event_gst.name == u'Classroom Session' or event_gst.name == u'Exam':
      template="ndf/Nussd_event_Schedule.html"
   else:
@@ -399,12 +411,34 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                         'app_set_id': app_set_id,
                         'title':title,
                         'property_order_list': property_order_list
+                        
                       }
 
   if app_set_instance_id:
-    context_variables['node'] = event_gs
+    event_detail={}
+    events={}
+    event_detail["cordinatorname"]=str(event_gs.event_coordinator[0].name) 
+    event_detail["cordinatorid"]=str(event_gs.event_coordinator[0]._id)
+    events["cordinator"]=event_detail
+    event_detail["course"]=str(announced_course.name) 
+    event_detail["course_id"]=str(announced_course._id)
+    events["course"]=event_detail
+    event_detail={}
+    event_detail["batchname"]=str(batch.name)
+    event_detail["batchid"]=str(batch._id)
+    events["batch"]=event_detail
+    event_detail={}
+    event_detail["sessionname"]=str(session_of.name)
+    event_detail["sessionid"]=str(session_of._id)
+    events["session"]=event_detail
+    event_detail={}
+    event_detail["Modulename"]=str(module.name)
+    event_detail["Moduleid"]=str(module._id)
+    events["Module"]=event_detail
 
-  
+    context_variables['node'] = event_gs
+    context_variables['edit_details']=events
+    
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"

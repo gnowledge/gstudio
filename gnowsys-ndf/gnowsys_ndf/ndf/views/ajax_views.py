@@ -3036,7 +3036,6 @@ def get_announced_courses_with_ctype(request, group_id):
              NUSSD-Courses [if match not found]
   """
   response_dict = {}
-  print"enter the dugon"
   try:
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
@@ -3097,7 +3096,6 @@ def get_announced_courses_with_ctype(request, group_id):
         error_message = "No Announced Course found"
         raise Exception(error_message)
       response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list,cls=NodeJSONEncoder)
-      print response_dict
       return HttpResponse(json.dumps(response_dict))
 
     else:
@@ -3591,13 +3589,12 @@ def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_
  #code for assesment 
  if student_marks:
      for i in (student_id):
-        print i
         student=collection.Node.one({"_id":ObjectId(i)})
-        dict1={}
-        dict1.update({"marks":student_marks[j],'Event':ObjectId(Event[0])})
-        create_gattribute(ObjectId(i),student_details[0], dict1)
-        print dict1
-        j=j+1    
+        student_dict={}
+        student_dict.update({"marks":student_marks[j],'Event':ObjectId(Event[0])})
+        create_gattribute(ObjectId(i),student_details[0], student_dict)
+        j=j+1
+     return HttpResponse("Assesment Marks Saved")    
  else:       
         #code for assesment    
         create_grelation(ObjectId(app_set_instance_id), oid,assigneelist)
@@ -3611,57 +3608,67 @@ def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_
             create_gattribute(ObjectId(i),student_details[0], dict1)
         for i in (absentlist):
             student=collection.Node.one({"_id":ObjectId(i)})
-            dict1={}
-            dict1.update({"atandance":"Absent",'Event':ObjectId(Event[0])})
-            create_gattribute(ObjectId(i),student_details[0], dict1)
- return HttpResponse("attendance taken")
+            student_dict={}
+            student_dict.update({"atandance":"Absent",'Event':ObjectId(Event[0])})
+            create_gattribute(ObjectId(i),student_details[0], student_dict)
+        return HttpResponse("attendance taken")
 def fetch_course_name(request, group_id,Course_type):
   courses=collection.Node.find({"attribute_set.nussd_course_type":unicode(Course_type)})
   
-  dict1={}
-  list1=[]
+  course_detail={}
+  course_list=[]
   for i in courses:
-    print i
-    dict1.update({"name":i.name})
-    dict1.update({"id":str(i._id)})
-    list1.append(dict1)
-    dict1={}
+    course_detail.update({"name":i.name})
+    course_detail.update({"id":str(i._id)})
+    course_list.append(course_detail)
+    course_detail={}
     
-  return HttpResponse(json.dumps(list1))
- 
+  return HttpResponse(json.dumps(course_list))
+  
 def fetch_course_Module(request, group_id,Course_name):
   courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
   courses=collection.Node.find({"_id":ObjectId(courses[0]['relation_set'][0]['announced_for'][0])})
-  dict1={}
-  list1=[]
-  course_modules=collection.Node.find({"_id":courses[0].collection_set})
-  
+  trainers=collection.Node.find({"relation_set.master_trainer_of_course":ObjectId(Course_name)})
+  superdict={}
+  module_Detail={}
+  module_list=[]
+  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})
   for i in course_modules:
-    dict1.update({"name":i.name})
-    dict1.update({"id":str(i._id)})
-    list1.append(dict1)
-    dict1={}
-    
-  return HttpResponse(json.dumps(list1))
+    module_Detail.update({"name":i.name})
+    module_Detail.update({"id":str(i._id)})
+    module_list.append(module_Detail)
+    module_Detail={}
+  
+  trainerlist=[]
+  trainer_detail={}
+  for i in trainers:
+    trainer_detail.update({"name":i.name})
+    trainer_detail.update({"id":str(i._id)})
+    trainerlist.append(trainer_detail)
+    trainer_detail={}
+  superdict['Module']=json.dumps(module_list,cls=NodeJSONEncoder)    
+  superdict['trainer'] = json.dumps(trainerlist,cls=NodeJSONEncoder) 
+  return HttpResponse(json.dumps(superdict))
 
 def fetch_batch_student(request, group_id,Course_name):
-  courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
-  dict1={}
-  list1=[]
-  a = courses[0].relation_set[0]
-  for i in a['has_batch_member']:
-    dict1.update({"id":str(i)})
-    list1.append(dict1)
+  try:
+    courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
     dict1={}
+    list1=[]
+    a = courses[0].relation_set[0]
+    for i in a['has_batch_member']:
+     dict1.update({"id":str(i)})
+     list1.append(dict1)
+     dict1={}
     
-  return HttpResponse(json.dumps(list1))
-
+    return HttpResponse(json.dumps(list1))
+  except:
+    return HttpResponse(json.dumps(list1)) 
 def fetch_course_session(request, group_id,Course_name):
   courses=collection.Node.find({"_id":ObjectId(Course_name)})
   dict1={}
   list1=[]
-  course_modules=collection.Node.find({"_id":courses[0].collection_set})
-  
+  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})
   for i in course_modules:
     dict1.update({"name":i.name})
     dict1.update({"id":str(i._id)})
@@ -3672,21 +3679,22 @@ def fetch_course_session(request, group_id,Course_name):
   return HttpResponse(json.dumps(list1))
 
 def fetch_course_batches(request, group_id,Course_name):
-  print Course_name
   #courses=collection.Node.one({"_id":ObjectId(Course_name)})
   #courses=collection.Node.find({"relation_set.announced_for":ObjectId(Course_name)})
-  dict1={}
-  list1=[]
-  batch=collection.Node.find({"_type":"GSystemType","name":"Batch"})
-  batches=collection.Node.find({"member_of":batch[0]._id,"relation_set.has_course":ObjectId(Course_name)})
-  for i in batches:
-      dict1.update({"name":i.name})
-      dict1.update({"id":str(i._id)})
-      list1.append(dict1)
-      dict1={}
+  try:
+    dict1={}
+    list1=[]
+    batch=collection.Node.find({"_type":"GSystemType","name":"Batch"})
+    batches=collection.Node.find({"member_of":batch[0]._id,"relation_set.has_course":ObjectId(Course_name)})
+    for i in batches:
+        dict1.update({"name":i.name})
+        dict1.update({"id":str(i._id)})
+        list1.append(dict1)
+        dict1={}
     
-  return HttpResponse(json.dumps(list1))
-
+    return HttpResponse(json.dumps(list1))
+  except:
+    return HttpResponse(json.dumps(list1))
 
 def save_csv(request,group_id,app_set_instance_id=None):
         column_header = [u'Name', 'Presence']
@@ -3722,17 +3730,18 @@ def get_assessment(request,group_id,app_set_instance_id):
             if  j.keys()[0] == 'performance_record':
                if (str(j['performance_record']['Event']) == str(app_set_instance_id)) is True:
                   val=True
+                  print "hello",j['performance_record']['marks']
                   dict1.update({'marks':j['performance_record']['marks']})
                else:
                   dict1.update({'marks':""})
-                
-               dict1.update({'id':str(i._id)})
+                   
+       dict1.update({'id':str(i._id)})
        if val is True:
              marks_list.append(dict1)
        else:
+             dict1.update({'marks':"0"})
              marks_list.append(dict1)      
    
-    print marks_list
     return HttpResponse(json.dumps(marks_list))
 def get_attendees(request,group_id,node):
  #get all the ObjectId of the people who would attend the event
@@ -3824,7 +3833,6 @@ def get_attendance(request,group_id,node):
       temp_attendance.update({'presence':'Absent'})
       attendance.append(temp_attendance) 
     temp_attendance={}
- print "coming here"  
  return HttpResponse(json.dumps(attendance))
  
 def attendees_relations(request,group_id,node):

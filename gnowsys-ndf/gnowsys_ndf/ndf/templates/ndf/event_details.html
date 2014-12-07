@@ -686,7 +686,7 @@ var s=s.id
                                            {      
                                                       $("#listAssesment").append("<tr> <td>"
                                                            + val.name + 
-                                                           "</td> <td>  <input type='text' class='marks' id="
+                                                           "</td> <td>  <input type='number' min='0' max='200' class='marks' id="
                                                             + val.id + " placeholder='25' value="
                                                             +val.marks +"></td></tr>" )
                                        
@@ -812,11 +812,13 @@ title='{{app_set_id}}'
 
     var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
      
-     $(':text.marks').each(function(){
+     $('.marks').each(function(){
        student_marks.push(this.value)
        student_id.push(this.id)
      });
      
+     
+     alert(student_marks)
      
     if(student_marks !="")
      {
