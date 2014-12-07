@@ -165,7 +165,7 @@ def invite_users(request,group_id):
             coll_obj_list = []
             lstusers=[]
             owner=node.created_by
-            users=User.objects.all()
+            users=User.objects.all().order_by("email")
             user_names=[]
             st=[]
             for each in users:
@@ -233,7 +233,7 @@ def invite_admins(request,group_id):
             coll_obj_list = []
             lstusers=[]
             owner=node.created_by
-            users=User.objects.all()
+            users=User.objects.all().order_by("email")
             user_names=[]
             st=[]
             user_grps=get_all_user_groups()

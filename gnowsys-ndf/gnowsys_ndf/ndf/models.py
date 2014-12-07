@@ -134,8 +134,13 @@ def user_registered_handler(sender, user, request, **kwargs):
     dict_to_hold={}
     dict_to_hold['node_type']='Author'
     dict_to_hold['userid']=user.id
-    dict_to_hold['agency_type']=request.POST.get("agency_type","")
-    dict_to_hold['group_affiliation']=request.POST.get("group_affiliation","")
+    agency_type = request.POST.get("agency_type", "")
+    if agency_type:
+        dict_to_hold['agency_type']=agency_type
+    else:
+        # Set default value for agency_type as "Other"
+        dict_to_hold['agency_type']="Other"
+    dict_to_hold['group_affiliation']=request.POST.get("group_affiliation", "")
     tmp_hold.details_to_hold=dict_to_hold 
     tmp_hold.save()
     return

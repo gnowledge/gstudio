@@ -34,6 +34,10 @@
       font-weight: bold;
       font-size: 1rem;
     }
+
+  .text-size-15 {
+    font-size: 15px;
+  }
 {% endblock %}
 
 {% block body_content %} 
@@ -43,7 +47,7 @@
   </div>
 
   <form data-abide id="form-edit-node" method="POST" action="">
-    <header class="row" style="margin: 1rem 0 0 0 ;">
+    <header class="row" style="margin: 0.8rem 0 ;">
       <h2 class="small-12 columns">
         {% trans "Enroll Students in Courses" %}
       </h2>
@@ -51,100 +55,106 @@
 
     {% csrf_token %}
 
-    <!-- fieldset for selecting announced course/////////////////////////////////////////////// -->
-    <fieldset id="fsCc">
-      <legend>
-        <label> <b>{% trans "Select Course"%}</b> </label>
-      </legend>
+    <div id="enrollment-content-div">
+      <!-- fieldset for selecting announced course/////////////////////////////////////////////// -->
       <div class="row">
         <!-- Registration Year -->
-        <div class="left inline">
-          <label> {% trans "Course type"%} </label></div>
-        <div class="small-4 columns">
+        <div class="small-2 columns">
+          <label for="acourse_list" class="right inline"> {% trans "Course type"%} </label>
+        </div>
+        <div class="small-4 columns end">
           {% html_widget groupid "" ATs.0 %}
+        </div>
+      </div>
+
+      <fieldset id="fsSc" style="display: none;">
+        <legend>
+          <label><h5>{% trans "Select Students" %}</h5></label>
+        </legend>
+
+        <div class="row">
+          <!-- Drop down for announced courses -->
+          <div class="small-2 columns">
+            <label for="acourse_list" class="right inline"> 
+              {% trans "Announced Course"%}
+            </label>
+          </div>
+          <div class="small-4 columns end">
+            <select id="acourse_list" name="acourse_list_name" disabled="disabled" style="float:left; width:95%" required>
+            </select>
+            <i style="color:red; float:left display:inline">*</i>
+            <small class="error">{% trans "Please select valid Course !!!" %} </small>
           </div>
 
-        <!-- Drop down for announced courses -->
-        <div class="left inline">
-          <label> {% trans "Announced Course"%} </label>
+          <!-- Announced Course Duration -->
+          <div class="small-2 columns">
+            <label for="acourse_list" class="right inline">
+              {% trans "Enrollment Duration" %}
+            </label>
+          </div>
+          <div class="small-4 columns end">
+            <label>From</label>
+            <label id="lblenroll_from">--/--/-- </label>
+            <label>To</label>
+            <label id="lblenroll_to">--/--/-- </label>
+          </div>
         </div>
-        <div class="small-4 columns">
-          <select id="acourse_list" name="acourse_list_name" disabled="disabled">
-          </select>
-        </div>
-      </div>
-      
-      <div class="row">
-       <div class="small-6 columns">
-       <div class="right inline">
-        <label>{% trans "Enrollment Duration"%}</label>
-       </div></div>
-       <div class="small-5 columns">
-       <div class="row">
-        <label>From</label>
-        <label id="lblenroll_from">--/--/-- </label>
-        </div>
+
         <div class="row">
-        <label>To</label>
-        <label id="lblenroll_to">--/--/-- </label></div>
-       </div>
-      </div>
-    </fieldset>
+          <div class="small-2 columns">
+            <label for="registration_year" class="right inline">
+              {% trans "Registration Year" %}
+            </label>
+          </div>
+          <div class="small-4 columns end">
+            <input type="text" id="registration_year" name="registration_year" value="" placeholder="YYYY"
+                readonly required class="date_year" style="float:left; width:10rem"/>
+            <i style="color:red; float:left display:inline">*</i>
+            <small class="error">{% trans "Please set Registration Year" %}</small>
+          </div>
+        </div>
 
-    <fieldset id="fsSc" style="display: none">
-      <legend>
-        <label> <b>{% trans "Select Students"%}</b> </label>
-      </legend>
+        <!-- Checkbox: Students Enrolled and/or Non-enrolled -->
+        <div class="row">
+          <div class="small-11 small-centered columns">
+            <input type="checkbox" id="all_students" name="all_students">
+            <label for="all_students">
+              <b>{% trans "NOTE: If selected all students (including enrolled ones) will be listed; otherwise only non-enrolled students will be shown." %}</b>
+            </label>
+          </div>
+        </div>
 
+        <!-- Find button -->
+        <div class="row">
+          <div class="small-2 small-centered columns">
+            <br>
+            <input type="button" id="btnFindES" value="Find" class="button small round expand"/>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- fieldset for listing  Students for enrolling into them /////////////////////// -->
+      <fieldset id="fsSt" style="display: none">
+        <legend>
+          <label><h5>Students : </h5></label>
+        </legend>
+        <div class="row" id="divSt">
+        </div>
+      </fieldset>
+
+      <!-- hidden variables -->
+      <input type="hidden" id="announced_courses_list" name="announced_courses_list" value="">
+      <input type="hidden" id="task_id" name="task_id" value="{{task_id}}">
+      <input type="hidden" id="enrollState" name="enrollState" value="">
+      
+      <!-- In Progress/Complete (submit) button -->
       <div class="row">
-        <div class="left inline">
-          <label for="registration_year" class="right inline">
-            {% trans "Registration Year" %}
-          </label>
+        <div class="medium-2 columns">
+          <input type="submit" id="sbtnInProgress" value="In Progress" class="button small radius expand sbtn" style="display: none">
         </div>
-        <div class="small-3 columns">
-          <input type="text" id="registration_year" name="registration_year" value="" placeholder="YYYY"
-              readonly required class="date_year" style="float:left; width:10rem"/>
-          <i style="color:red; float:left display:inline">*</i>
-          <small class="error">{% trans "Please set Registration Year" %}</small>
+        <div class="medium-2 columns end">
+          <input type="submit" id="sbtnComplete" value="Complete" class="button small radius expand sbtn" style="display: none">
         </div>
-      </div>
-
-      <!-- Checkbox: Students Enrolled and/or Non-enrolled -->
-      <div class="row">
-        <div class="small-11 small-centered columns">
-          <input type="checkbox" id="all_students" name="all_students">
-          <label for="all_students">
-            <b>{% trans "NOTE: If selected all students (including enrolled ones) will be listed; otherwise only non-enrolled students will be shown." %}</b>
-          </label>
-        </div>
-      </div>
-
-      <!-- Find button -->
-      <div class="row">
-        <div class="small-2 small-centered columns">
-          <br>
-          <input type="button" id="btnFindES" value="Find" class="button small round expand"/>
-        </div>
-      </div>
-    </fieldset>
-
-    <input type="hidden" id="announced_courses_list" name="announced_courses_list" value="">
-
-    <!-- fieldset for listing  Students for enrolling into them /////////////////////// -->
-    <fieldset id="fsSt" style="display: none">
-      <legend>
-        <label><h5>Students : </h5></label>
-      </legend>
-      <div class="row" id="divSt">
-      </div>
-    </fieldset>
-
-    <!-- Enroll (submit) button -->
-    <div class="row">
-      <div class="small-2 small-centered columns">
-        <input type="submit" id="sbtnEnroll" value="Enroll" class="button small radio expand" style="display: none">
-        <!-- <input type="button" id="sbtnEnroll" value="Complete" class="button small radio expand" > -->
       </div>
     </div>
   </form>
@@ -156,10 +166,10 @@
   // By default checkbox (all_students) is unchecked, hence kept this value
     var all_students_txt = "Students: Only Non-enrolled Student(s)";
 
-  // Function to hide fieldsets (fsAc & fsSt) & submit button (sbtnEnroll) -----------------------------------
+  // Function to hide fieldsets (fsAc & fsSt) & submit buttons (In Progress & Complete) ----------------------
     function hideFieldsetSubmit() {
-      if ($("#sbtnEnroll").css("display") != "none") {
-        $("#sbtnEnroll").toggle();
+      if ($(".sbtn").css("display") != "none") {
+        $(".sbtn").toggle();
       }
 
       if ($("#fsSt").css("display") != "none") {
@@ -188,15 +198,10 @@
 
   // If any of the Input field of fieldset (fsSc) is changed -------------------------------------------------
     $("#fsSc :input").on('change click', function(){
-      // hide fieldsets (fsAc & fsSt) & submit button (sbtnEnroll)
+      // hide fieldsets (fsAc & fsSt) & submit buttons (In Progress and Complete)
       hideFieldsetSubmit();
 
       // Enable Find button (btnFindES)
-      $("#btnFindES").removeAttr('disabled');
-    });
-  // If any of the Input field of fieldset (fsCc) is changed -------------------------------------------------
-    $("#fsCc :input").on('change click', function(){
-      hideFieldsetSubmit();
       $("#btnFindES").removeAttr('disabled');
     });
 
@@ -222,6 +227,7 @@
 
     $("select#nussd_course_type").change(function() {
       var nussd_course_type = $("#nussd_course_type").val();
+      success_state = false;
       $.ajax({
         url: "{% url 'get_announced_courses_with_ctype' group_id %}",
 
@@ -234,38 +240,84 @@
         dataType: "json",
 
         success: function(data){
-          ac_data = data["acourse_ctype_list"]
-          ac_data = JSON.parse(ac_data)
+          success_state = data["success"]
 
-          $("select#acourse_list").empty();
-          $.each(ac_data,function(i,v){
-            ac_val = v["_id"];
-            ac_name=v["name"];
-            start_en = v["attribute_set"][3]["start_enroll"]
-            end_en = v["attribute_set"][4]["end_enroll"]
-            start_en = start_en.split(' ')
-            end_en = end_en.split(' ')
+          if (success_state){
+            ac_data = data["acourse_ctype_list"]
+            ac_data = JSON.parse(ac_data)
+
+            $("select#acourse_list").empty();
             $("select#acourse_list").append(
               $("<option></option>")
-                .attr("value",ac_val)
-                .text(ac_name)
-                .attr("start_enroll_of_ac",start_en[0])
-                .attr("end_enroll_of_ac",end_en[0])
-              )
-          });
+                .attr("value", "")
+                .text("{% trans '- - - Select Course - - -' %}")
+                .attr("start_enroll_of_ac", "--/--/--")
+                .attr("end_enroll_of_ac", "--/--/--")
+            );            
+            $.each(ac_data, function(i,v){
+              ac_val = v["_id"];
+              ac_name=v["name"];
+              start_en = v["attribute_set"][3]["start_enroll"];
+              end_en = v["attribute_set"][4]["end_enroll"];
+              start_en = start_en.split(' ');
+              end_en = end_en.split(' ');
+              $("select#acourse_list").append(
+                $("<option></option>")
+                  .attr("value", ac_val)
+                  .text(ac_name)
+                  .attr("start_enroll_of_ac", start_en[0])
+                  .attr("end_enroll_of_ac", end_en[0])
+              );
+            });
 
+            $("select#acourse_list").prop("selectedIndex", 0);
+          }
 
-          $("select#acourse_list").prop("selectedIndex", 0);
+          else {
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
         },
 
         complete: function () {
-          // Enable District field
-          $("select#acourse_list").removeAttr('disabled')
-          $("#lblenroll_from").text("--/--/----")
-          $("#lblenroll_to").text("--/--/----")
-          if ($("#fsSc").css("display") == "none") {
+          if (success_state) {
+            // Enable District field
+            $("select#acourse_list").removeAttr('disabled');
+            $("#lblenroll_from").text("--/--/----");
+            $("#lblenroll_to").text("--/--/----");
+            if ($("#fsSc").css("display") == "none") {
+              $("#fsSc").toggle();
+            }
 
-            $("#fsSc").toggle()
+            // Reset Announced Courses, based on it's emrollment status (open/closed)
+            // This is done by sending list of anrollment-open announced courses 
+            {% if enrollment_open_ann_course_ids %}
+
+            enrollment_open_ann_course_arr = {{enrollment_open_ann_course_ids|safe|escape}};
+            ac_id = "{{ann_course_id}}";
+            remove_ann_course = "";
+            $("select#acourse_list option").each(function() {
+              if (!(enrollment_open_ann_course_arr.indexOf($(this).val()) >= 0)) {
+                if (ac_id == $(this).val()) {
+                  remove_ann_course = $(this).text();
+                }
+
+                $(this).remove();
+              }
+            });
+            {% endif %}
+
+            {% if ann_course_id and ann_course_id in enrollment_open_ann_course_ids %}
+            $("select#acourse_list").val("{{ann_course_id}}");
+            $("select#acourse_list").trigger("change");
+
+            {% else %}
+            $("#enrollment-content-div")
+              .empty()
+              .append("<p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> for " + remove_ann_course + " !!!</p>")
+            {% endif %}
           }
         },
       });
@@ -327,11 +379,12 @@
           complete: function(){
             if (success_state) {
               // If Announced Courese & Students found, 
-              // display fieldsets (fsAc & fsSt) & submit button (sbtnEnroll)
+              // display fieldsets (fsAc & fsSt) & submit buttons (sbtnInProgress & sbtnComplete)
               // depending upon their visibility state 
-              if ($("#sbtnEnroll").css("display") == "none") {
-                $("#sbtnEnroll").toggle();
+              if ($(".sbtn").css("display") == "none") {
+                $(".sbtn").toggle();
               }
+
               // Also toggle fieldset (fsSt)
               if ($("#fsSt").css("display") == "none") {
                 $("#fsSt legend label h5").text(all_students_txt);
@@ -340,11 +393,10 @@
             }
 
             else {
-              // Otherwise, hide submit button as well as fieldset
-              if ($("#sbtnEnroll").css("display") != "none") {
-                $("#sbtnEnroll").toggle();
+              // Otherwise, hide submit buttons as well as fieldset
+              if ($(".sbtn").css("display") != "none") {
+                $(".sbtn").toggle();
               }
-
 
               // Also toggle fieldset (fsSt)
               if ($("#fsSt").css("display") != "none") {
@@ -366,15 +418,18 @@
       }
     });
 
-  // On click of Enroll --------------------------------------------------------------------------------------
-    $(document).on("click", "#sbtnEnroll", function() {
+  // On click of InProgress/Complete -------------------------------------------------------------------------
+    $(document).on("click", ".sbtn", function() {
+    // Set which submit button is clicked
+      $("#enrollState").val($(this).val());
+
     // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
       widget_for = "student_enroll"
       class_value = ".node_id." + widget_for + "_values"
       right_drawer_len = $(class_value).size();
 
       var student_enroll_list = [];
-
+      
       if (right_drawer_len > 0) {
         $(class_value).each(function (){
           // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
@@ -384,17 +439,22 @@
         });
       }
 
-      // Setting hidden field's value as the list of element(s) in drawer2
+      // Setting hidden field's value as the list of element(s) from drawer2
       $("#student_enroll_list").val(student_enroll_list);
-      var acourse_name = $("#acourse_list").val();
-      // Setting hidden field's value as the list of checked announced_courses
-      $("#announced_courses_list").val(acourse_name);
+
+      // Setting hidden field's value as the selected value from acourse_list (dropdown)
+      $("#announced_courses_list").val($("#acourse_list").val());
     });
 {% endblock %}
 
 {% block document_ready %}
   {{block.super}}
-  
+
+  {% if nussd_course_type %}
+  $("select#nussd_course_type").val("{{nussd_course_type}}");
+  $("select#nussd_course_type").trigger("change");
+  {% endif %}
+
   // Settings for datepicker widget (with only year) --------------------------------------------------------
     $(".date_year").datepicker({
       changeYear: true,
