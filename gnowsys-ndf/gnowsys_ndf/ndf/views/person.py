@@ -12,6 +12,7 @@ from django.template import TemplateDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 
 from django_mongokit import get_database
 
@@ -27,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
 
 collection = get_database()[Node.collection_name]
 
@@ -237,7 +238,6 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     error_message = "\n PersonDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
-      
 @login_required
 def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
@@ -434,7 +434,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     error_message = "\n PersonCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
-
 @login_required
 def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
@@ -482,26 +481,192 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
     if request.method == "POST":
-      student_enroll_list = request.POST.get("student_enroll_list", "")
+      enrollState = request.POST.get("enrollState", "")
+
+      task_id = request.POST.get("task_id", "")
+      if task_id:
+        task_id = ObjectId(task_id)
+      
       announced_courses_id = request.POST.get("announced_courses_list", "")
-
-      if student_enroll_list != '':
-        student_enroll_list = [ObjectId(each.strip()) for each in student_enroll_list.split(",")]
-
       if announced_courses_id != '':
-        announced_courses_id = ObjectId(announced_courses_id)
-      print "announced_courses_id", announced_courses_id
+        announced_courses_id = ObjectId(announced_courses_id.strip())
 
-      # Fetch selected_course RelationType
-      selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
+        # Fetch announced course
+        acourse = collection.Node.one(
+          {'_id': announced_courses_id}, 
+          {'name': 1, 'relation_set.acourse_for_college': 1}
+        )
 
-      for student_id in student_enroll_list:
-        if announced_courses_id:
-          gr = create_grelation(student_id, selected_course_RT, announced_courses_id)
+        at_rt_list = ["for_acourse", "for_college", "for_university", "has_enrolled", "completed_on", "has_corresponding_task"]
+        at_rt_dict = {}
+        if acourse:
+          # Announced Course
+          at_rt_dict["for_acourse"] = acourse._id
+
+          # Announced Course -> College
+          college_id = None
+          for rel in acourse.relation_set:
+            if rel:
+              college_id = rel["acourse_for_college"][0]
+              break
+          at_rt_dict["for_college"] = college_id
+
+          # Announced Course -> College -> University (On hold)
+          university_id = None
+          # Fetch university's ObjectId from college node's relation_set once it's set up
+          at_rt_dict["for_university"] = university_id
+
+          # Students Enrolled list
+          at_rt_dict["has_enrolled"] = []
+          student_enroll_list = request.POST.get("student_enroll_list", "")
+
+          if student_enroll_list:
+            student_enroll_list = [ObjectId(each.strip()) for each in student_enroll_list.split(",")]
+          at_rt_dict["has_enrolled"] = student_enroll_list
+          
+          # Date of Enrollment completion -> Set the date on which Complete button is clicked
+          at_rt_dict["completed_on"] = None
+          if enrollState == "Complete":
+            at_rt_dict["completed_on"] = datetime.datetime.now()
+
+          # Create/Update StudentCourseEnrollment node
+          sce_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
+          
+          sce_gs_name = "StudentCourseEnrollment_" + acourse.name
+          sce_gs = collection.Node.one(
+            {'member_of': sce_gst._id, 'name': sce_gs_name, 'status': {'$in': [u"DRAFT", u"PUBLISHED"]}}
+          )
+
+          # If not found, create it
+          if not sce_gs:
+            sce_gs = collection.GSystem()
+            sce_gs.name = sce_gs_name
+            if sce_gst._id not in sce_gs.member_of:
+              sce_gs.member_of.append(sce_gst._id)
+            
+            if mis_admin._id not in sce_gs.group_set:
+              sce_gs.group_set.append(mis_admin._id)
+
+            user_id = request.user.id
+            sce_gs.created_by = user_id
+            sce_gs.modified_by = user_id
+            if user_id not in sce_gs.contributors:
+              sce_gs.contributors.append(user_id)
+
+            # This node will get PUBLISHED only when enrollState is found as "Complete"
+            sce_gs.status = u"DRAFT"
+            sce_gs.save()
+
+          if enrollState == "Complete":
+            # For Student-Course Enrollment Approval
+            # Create a task for admin(s) of the MIS_admin group
+            task_dict = {}
+            mis_admin = collection.Node.one(
+              {'_type': "Group", 'name': "MIS_admin"}, 
+              {'_id': 1, 'name': 1, 'group_admin': 1}
+            )
+            task_dict["name"] = unicode("StudentCourseApproval_Task_" + acourse.name)
+            task_dict["created_by"] = mis_admin.group_admin[0]
+            admin_user = User.objects.get(id=mis_admin.group_admin[0])
+            task_dict["created_by_name"] = admin_user.username
+            task_dict["modified_by"] = mis_admin.group_admin[0]
+            task_dict["contributors"] = [mis_admin.group_admin[0]]
+            
+            MIS_GAPP = collection.Node.one({'_type': "GSystemType", 'name': "MIS"}, {'_id': 1})
+            student_course_approval_url_link = ""
+            if MIS_GAPP:
+              site = Site.objects.get(pk=1)
+              site = site.name.__str__()
+              student_course_approval_url_link = "http://" + site + "/" + mis_admin.name.replace(" ","%20").encode('utf8') + "/dashboard/group" 
+            task_dict["content_org"] = unicode("\n- Please click [[" + student_course_approval_url_link + "][here]] to approve students.")
+
+            task_dict["start_time"] = at_rt_dict["completed_on"]
+            task_dict["end_time"] = None
+            task_dict["Status"] = u"New"
+            task_dict["Priority"] = u"High"
+
+            task_dict["group_set"] = [mis_admin._id]
+
+            task_dict["Assignee"] = []
+            for each_admin_id in mis_admin.group_admin:
+              task_dict["Assignee"].append(each_admin_id)
+
+            task_node = create_task(task_dict)
+
+            at_rt_dict["has_corresponding_task"] = [task_node._id]
+
+          if sce_gs.has_key("_id"):
+            # Save/Update GAttribute(s) and/or GRelation(s)
+
+            for at_rt_name in at_rt_list:
+              at_rt_type_node = collection.Node.one(
+                {'_type': {'$in': ["AttributeType", "RelationType"]}, 'name': at_rt_name}
+              )
+
+              if at_rt_type_node:
+                at_rt_node = None
+                
+                if at_rt_dict.has_key(at_rt_name) and at_rt_dict[at_rt_name]:
+                  if at_rt_type_node._type == "AttributeType" and at_rt_dict[at_rt_name]:
+                    at_rt_node = create_gattribute(sce_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
+
+                  elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
+                    at_rt_node = create_grelation(sce_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
+
+                  # Very important 
+                  sce_gs.reload()
+
+              else:
+                raise Exception("\n StudentCourseEnrollmentUpdateError: No AttributeType/RelationType found with given name ("+at_rt_name+") !!!\n")
+
+          # Publish enrollment node & update the enrollment task as "In Progress/Closed"
+          # task_node = collection.Node.one({'_id': task_id})
+          task_dict = {}
+          if enrollState == "Complete":
+            sce_gs.status = u"PUBLISHED"
+            sce_gs.save()
+
+            task_dict["_id"] = task_id
+            task_dict["Status"] = u"Closed"
+            task_dict["modified_by"] = request.user.id
+            task_node = create_task(task_dict)
+
+          elif enrollState == "In Progress":
+            task_dict["_id"] = task_id
+            task_dict["Status"] = u"In Progress"
+            task_dict["modified_by"] = request.user.id
+            task_node = create_task(task_dict)
+
+        else:
+          raise Exception("\n StudentCourseEnrollmentError: No Announced Course exists with given ObjectId ("+announced_courses_id+") !!! \n")
+
+      else:
+        raise Exception("\n StudentCourseEnrollmentError: No Announced Course selected !!! \n")
 
       return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
 
     else:
+      task_id = request.GET.get("task_id", "")
+      nussd_course_type = request.GET.get("nussd_course_type", "")
+      ann_course_id = request.GET.get("ann_course_id", "")
+
+      # Fetch announced course for which enrollment is open
+      sce_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
+      enrollment_open_ann_course_ids = []
+      if sce_gst:
+        sce_cur = collection.Node.find(
+          {'member_of': sce_gst._id, 'attribute_set.completed_on': {'$exists': False}, 'relation_set.has_corresponding_task': {'$exists': False}},
+          {'relation_set.for_acourse': 1}
+        )
+
+        if sce_cur.count():
+          for ac in sce_cur:
+            for rel in ac.relation_set:
+              if rel and rel.has_key("for_acourse"):
+                ac_id = rel["for_acourse"][0]
+                if ac_id not in enrollment_open_ann_course_ids:
+                  enrollment_open_ann_course_ids.append(ac_id.__str__())
+
       # Fetch required list of AttributeTypes
       fetch_ATs = ["nussd_course_type", "degree_year"]
       req_ATs = []
@@ -524,9 +689,6 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
         req_ATs.append(each)
 
       # Fetch required list of Colleges
-      # college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
-      # mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
-      # college_cur = collection.Node.find({'member_of': college._id, 'group_set': mis_admin._id}, {'name': 1}).sort('name', 1)
       college_cur = None
       
       template = "ndf/student_enroll.html"
@@ -534,7 +696,10 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
                                           'title': title, 
                                           'app_id':app_id, 'app_name': app_name, 
                                           'app_collection_set': app_collection_set, 'app_set_id': app_set_id,
-                                          'ATs': req_ATs, 'colleges': college_cur
+                                          'ATs': req_ATs, 'colleges': college_cur,
+                                          'task_id': task_id, 'nussd_course_type': nussd_course_type, 'ann_course_id': ann_course_id,
+                                          'enrollment_open_ann_course_ids': enrollment_open_ann_course_ids
                                           # 'nodes':nodes, 
                                           })
       return render_to_response(template, variable)
+

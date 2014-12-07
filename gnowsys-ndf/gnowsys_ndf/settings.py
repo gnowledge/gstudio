@@ -513,6 +513,37 @@ RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
 
+
+
+GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "Maps", "Events", "Publications"]
+
+GSTUDIO_RESOURCES_INTERACTIVITY_TYPE = [ "Active", "Expositive", "Mixed" ]
+
+GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = [ "NCF", "State", "All" ]
+
+GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = [ "Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary", "Primary and Upper Primary", "Primary, Upper Primary and Secondary", "Primary, Upper Primary, Secondary and Senior Secondary", "Secondary and Senior Secondary", "Upper Primary, Secondary and Senior Secondary", "Upper Primary and Secondary", "Upper Primary and Senior Secondary" ]
+
+GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = [ "Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy" ]
+
+GSTUDIO_RESOURCES_CURRICULAR = [ "True", "False" ]
+
+GSTUDIO_RESOURCES_AUDIENCE = [ "Teachers", "Students", "Teacher educators", "Teachers and Students", "Teachers, Students and Teacher educators" ]
+
+GSTUDIO_RESOURCES_TEXT_COMPLEXITY = [ "Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard" ]
+
+GSTUDIO_RESOURCES_LANGUAGES = [ "English","Gujarati" ,"Hindi" ,"Manipuri" ,"Marathi" ,"Mizo" ,"Telugu" ]
+
+GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above" ] 
+
+GSTUDIO_RESOURCES_TIME_REQUIRED = [ "0-2M","2-5M", "5-15M", "15-45M" ]
+
+GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above" ] 
+
+GSTUDIO_RESOURCES_READING_LEVEL = [  ] 
+
+GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
+
+
 try:
     from local_settings import *
     #print "Local settings applied"
@@ -545,33 +576,3 @@ warnings.filterwarnings(
 # USERS_ONLINE__TIME_OFFLINE = 10
 #USERS_ONLINE__CACHE_PREFIX_USER
 #USERS_ONLINE__CACHE_USERS
-
-
-GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "Maps", "Events", "Publications"]
-
-GSTUDIO_RESOURCES_INTERACTIVITY_TYPE = [ "Active", "Expositive", "Mixed" ]
-
-GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = [ "NCF", "State", "All" ]
-
-GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = [ "Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary", "Primary and Upper Primary", "Primary, Upper Primary and Secondary", "Primary, Upper Primary, Secondary and Senior Secondary", "Secondary and Senior Secondary", "Upper Primary, Secondary and Senior Secondary", "Upper Primary and Secondary", "Upper Primary and Senior Secondary" ]
-
-GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = [ "Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy" ]
-
-GSTUDIO_RESOURCES_CURRICULAR = [ "True", "False" ]
-
-GSTUDIO_RESOURCES_AUDIENCE = [ "Teachers", "Students", "Teacher educators", "Teachers and Students", "Teachers, Students and Teacher educators" ]
-
-GSTUDIO_RESOURCES_TEXT_COMPLEXITY = [ "Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard" ]
-
-GSTUDIO_RESOURCES_LANGUAGES = [ "English","Gujarati" ,"Hindi" ,"Manipuri" ,"Marathi" ,"Mizo" ,"Telugu" ]
-
-GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above" ] 
-
-GSTUDIO_RESOURCES_TIME_REQUIRED = [ "0-2M","2-5M", "5-15M", "15-45M" ]
-
-GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above" ] 
-
-GSTUDIO_RESOURCES_READING_LEVEL = [  ] 
-
-GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
-
