@@ -37,6 +37,9 @@
         padding-left:0 !important;
     }
 
+    .i:hover{
+        cursor:pointer;
+    }
 
     .hoverstyle{
         background-color:white !important;
@@ -207,6 +210,9 @@
   var course_sec_dict = {};
   var course_sec_list = [];
   var changed_names ={};
+  var cs_names_list = []
+  var css_names_list = []
+
 
 $("#course_structure_minutes").addClass("css_mins_class")
 //Adding Course Section
@@ -244,39 +250,58 @@ $("#course_structure_minutes").addClass("css_mins_class")
         alert("Please enter Name");
         event.preventDefault();
     }
+
     else{
-        var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
-        
+    
         lbl_id = "lbl_for_"+parent_id   
-
         if($(this).hasClass("save-css")){
-            parent_lbl = $("#"+parent_id).parents("li.course-section-class").find("label.lbl_of_cs").text()
+            if(css_names_list.indexOf(lbl_val)==-1){
+                css_names_list.push(lbl_val)
+                parent_lbl = $("#"+parent_id).parents("li.course-section-class").find("label.lbl_of_cs").text()
 
-            for (var i in course_sec_list){
-                for(var i2 in course_sec_list[i]){
-                    if(i2==parent_lbl){
-                        c = {}
-                        c[lbl_val]=""
-                        course_sec_list[i][i2].push(c)
+                for (var i in course_sec_list){
+                    for(var i2 in course_sec_list[i]){
+                        if(i2==parent_lbl){
+                            c = {}
+                            c[lbl_val]=""
+                            course_sec_list[i][i2].push(c)
+                        }
                     }
                 }
-
+                var str_btn="<div class='row'><div class='small-2 columns text-center'>--></div>"
+                var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label></div>"    
+                
+                $("#"+parent_id).parents("li").find("div.fold-btn-div").append("<i class='fi-minus large fold-btn'></i>").removeClass("fold-btn-div");
+                $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
+                var str_prop="<div class='small-2 columns end'><i class='fi-widget large reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div></div>"
+                $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
             }
-            var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label></div>"    
-            $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
-            var str_prop="<div class='small-2 columns end'><i class='fi-widget large reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div></div>"
+            else{
+                alert("Course Section cannot have duplicate names.")
+                event.preventDefault();
+            }
         }
 
         else{
-            course_sec_dict = {}
-            course_sec_dict[lbl_val] = []
-            course_sec_list.push(course_sec_dict)
-            $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled");
-            var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='small-4 columns lbl_of_cs' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label><i class='small-4 columns fi-pencil large edit_course_structure_name'></i>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div>"    
-            var str_prop="</div>"
-            
+            if(cs_names_list.indexOf(lbl_val)==-1){
+                cs_names_list.push(lbl_val)
+                course_sec_dict = {}
+                course_sec_dict[lbl_val] = []
+                course_sec_list.push(course_sec_dict)
+                $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled");
+                var str_btn="<div class='row'><div class='small-2 columns text-center fold-btn-div'>--></div>"
+                var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label><i class='fi-pencil large edit_course_structure_name'></i></div>"    
+                var str_prop="<div class='small-2 columns end'>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div></div>"
+
+                $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
+            }
+            else{
+                alert("Course Sub Section cannot have duplicate names.")    
+                event.preventDefault();            
+            }
         }
-        $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
+
+        
     }
   })
 
@@ -291,7 +316,6 @@ $("#course_structure_minutes").addClass("css_mins_class")
     }
     $("#"+parent_id).remove()
   });
-  
 
 // Reordering li elements
   $(document).on('click','.fi-arrow-up',function(){
@@ -316,6 +340,7 @@ $("#course_structure_minutes").addClass("css_mins_class")
 // Edit course structure name
   var lbl_text;
   $(document).on('click','.edit_course_structure_name',function(){
+
         lbl_text_id = $(this).prev().attr("id")
         if($(this).hasClass("fi-pencil")){
             lbl_text = $(this).prev().text()
@@ -336,7 +361,11 @@ $("#course_structure_minutes").addClass("css_mins_class")
                         }
                         else{
                             changed_names[lbl_text]=new_name
+
                         }
+                        var index_of_name = cs_names_list.indexOf(lbl_text)
+                        console.log(lbl_text)
+                        cs_names_list[index_of_name] = new_name;
                     }
                 }
             }
@@ -481,11 +510,11 @@ $("#course_structure_minutes").addClass("css_mins_class")
 
 //Submit course structure
   $("#form_course_structure").submit(function(event){
-    // if($("#form_course_structure").find(':input[data-invalid]').length > 0) {
-    //     alert("Please fill the minutes of all Course Subsections");
-    //     event.preventDefault();
-    // }
-    // $("#course_sec_dict_ele").val(JSON.stringify(course_sec_dict))
+    if($("#form_course_structure").find(':input[data-invalid]').length > 0) {
+        alert("Please fill the minutes of all Course Subsections");
+        event.preventDefault();
+    }
+    $("#course_sec_dict_ele").val(JSON.stringify(course_sec_dict))
     $("#form_course_structure").find(":input[required]").removeAttr("required")
     $("#form_course_structure").find(':input[data-invalid]').removeAttr("data-invalid")
     $("#course_sec_dict_ele").val(JSON.stringify(course_sec_list))
@@ -501,6 +530,7 @@ $("#course_structure_minutes").addClass("css_mins_class")
   var view_dict = {{course_collection_dict|safe|escape}}
 
   $.each(view_dict, function(cs, csvalue){
+    cs_names_list.push(cs)
 
     $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
     cloned_ele_id = id+"_cloned"+cs_cloned_id;
@@ -509,8 +539,8 @@ $("#course_structure_minutes").addClass("css_mins_class")
     lbl_id = "lbl_for_"+cloned_ele_id   
     
     var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
-    var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+cs+"</h4></label><i class='fi-pencil large edit_course_structure_name '></i>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div>"    
-    var str_prop="</div>"
+    var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+cs+"</h4></label><i class='fi-pencil large edit_course_structure_name'></i></div>"    
+    var str_prop="<div class='small-2 columns end'>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div></div>"
 
     $("#"+cloned_ele_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
     cs_cloned_id+=1
@@ -520,6 +550,7 @@ $("#course_structure_minutes").addClass("css_mins_class")
 
 
     $.each(csvalue,function(css,cssvalue){
+        css_names_list.push(css)
 
 
         $("#"+cloned_ele_id).find(".sub-section-btn").before($("#course-subsection").clone().attr('id',function(i,id){
@@ -527,13 +558,13 @@ $("#course_structure_minutes").addClass("css_mins_class")
             return cloned_ss_ele_id}).removeClass("hide"));
 
         $("#"+cloned_ele_id).find("input.sub-section-btn").attr("disabled",true)
-        css_cloned_id+=1
         lbl_id = "lbl_for_"+cloned_ss_ele_id   
 
-        var str_btn1="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
+        var str_btn1="<div class='row'><div class='small-2 columns text-center'>--></div>"
         var str_lbl1="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"'><h4>"+css+"</h4></label></div>"    
         var str_prop1="<div class='small-2 columns end'><i class='fi-widget large reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div></div>"
 
+        css_cloned_id+=1
         $("#"+cloned_ele_id).find("input.sub-section-btn").removeAttr("disabled");
         $("#"+cloned_ss_ele_id).find("div.input-cs-row").replaceWith(str_btn1+str_lbl1+str_prop1)
 

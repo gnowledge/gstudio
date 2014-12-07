@@ -969,7 +969,7 @@ def create_course_struct(request, group_id,node_id):
                     y = v.index(index2)
                     if course_collection_dict[k].has_key(k1):
                       for k2,v2 in course_sec_dict[k][y][k1].items():
-                        cs_node = collection.Node.one({'name':new_name,'member_of':cs_gst._id,'prior_node':course_node._id})
+                        cs_node = collection.Node.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id})
                         css_node=collection.Node.one({'name':k1,'member_of':css_gst._id,'prior_node':cs_node._id})
                         if(k2=="course_structure_minutes"):
                           create_gattribute(css_node._id,at_cs_hours,int(v2))
