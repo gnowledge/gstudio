@@ -43,11 +43,6 @@
 
   <style>
     {% block style %}{% endblock %}
-
-    .app.button-bar {
-      height: 45px;
-    }
-  
   </style>
 
 </head>
@@ -127,7 +122,7 @@
 
             {% if prof_pic %}
             <a href="{% url 'dashboard' request.user.pk %}">
-              <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" height="30" width="30">
+              <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
               {{ user.username }}
             </a>
             
@@ -141,7 +136,7 @@
                   
               <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "User Settings" %}</a></li>
                   
-              <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
+              <li><a class="logout" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
             </ul>
           </li>
 
