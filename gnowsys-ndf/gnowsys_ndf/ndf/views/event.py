@@ -180,11 +180,13 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
             
        #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
+  print "hello",event_gst.name
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id,'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'nodes': nodes, 'node': node,
+                        'event_gst':event_gst.name
                         # 'property_order_list': property_order_list
                       }
 

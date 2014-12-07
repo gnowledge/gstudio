@@ -42,7 +42,7 @@ table, th, td {
         <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "Read" %}</a></dd>
         <dd ><a href="#view-scheduler-calendar"><i class="fi-calendar"></i>{% trans "Events" %} </a></dd>
         <dd onClick="controler()"><a href="#view-Attendance"><i class="fi-Attendance"></i>{% trans "Attendance" %} </a></dd>
-        <dd id="Assesmentlist" onClick="Editassesment(this)"><a href="#view-Assesment"><i class="fi-Assesment"></i>{% trans "Assesment" %} </a></dd>
+        {% if event_gst == 'Exam' %}<dd id="Assesmentlist" onClick="Editassesment(this)"><a href="#view-Assesment"><i class="fi-Assesment"></i> {% trans "Assesment" %}</a></dd> {% endif %}
         <dd>
           <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
@@ -295,10 +295,7 @@ table, th, td {
           <div id="attendance">
               
           </div>
-          <div id="save">
           
-          </div>
-         
          
         
         </div>
