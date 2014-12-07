@@ -612,7 +612,8 @@
 
             {% check_group node as is_group %}
             {% if is_group %}
-              {% if user.is_superuser or node.created_by == user.id %}
+              {% check_is_gstaff groupid request.user as is_gstaff %}
+              {% if is_gstaff %}
               <a href="{% url edit_url group_name_tag %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
 
@@ -714,8 +715,12 @@
             <input type="hidden" id="groupname" value="{{node}}">
             {% if user.is_authenticated %}
               {% if user_access == "allow" %}
-               {% if user.is_superuser or node.created_by == user.id %}
-                   <li><a href="{% url 'create_sub_group' group_id %}" class="tiny round button">create subgroup</a></li>
+               {% if user.is_superuser %}
+                  <li>
+                    <a href="{% url 'create_sub_group' group_id %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New SubGroup" %}
+                    </a>
+                  </li>
                {% endif %}
               {% endif %}
             {% if user_is_joined == "joined" %}
