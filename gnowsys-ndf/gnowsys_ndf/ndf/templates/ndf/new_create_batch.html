@@ -34,6 +34,14 @@
     border:2px solid #bbb;
   }
   
+  /* Setting css-properties for reveal-modal's label */
+  div.reveal-modal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+
   .posted-by{ color: #808080; font-size: small; }
 
   .selected-resource { background-color:lightgray !important ; }
@@ -69,6 +77,11 @@
 {% endblock %}
 
 {% block body_content %}
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
 <form data-abide id="form-batch" method="POST" action="{% url 'save_batch_stud' groupid %}">{% csrf_token %}
 
   <fieldset id="stud-count" class="small-10 columns">
@@ -136,6 +149,7 @@
   //For selecting Course type
     $("select#nussd_course_type").change(function() {
       var nussd_course_type = $("#nussd_course_type").val();
+      success_state = false;
 
       $.ajax({
         url: "{% url 'get_announced_courses_with_ctype' group_id %}",
@@ -159,31 +173,44 @@
         },
 
         success: function(data){
-          ac_data = data["acourse_ctype_list"]
-          ac_data = JSON.parse(ac_data)
+          success_state = data["success"]
+          console.log(success_state)
 
-          $("select#acourse_list").empty();
-            $("select#acourse_list").append(
-              $("<option></option>")
-                .attr("value", "")
-                .text("{% trans ' - - - Select course - - - ' %}")
-            );
-          
-          $.each(ac_data, function(i,v){
-            se = v["_id"];
-            ac_name = v["name"];
-            scount_lbl = v["enrolled_stud_count"]
-            $("select#acourse_list").append(
-              $("<option></option>")
-                .attr("value", se)
-                .text(ac_name)
-                .attr("scount", scount_lbl)
-            );
-          });
+          if (success_state){
 
-          $("select#acourse_list").prop("selectedIndex", 0);
+            ac_data = data["acourse_ctype_list"]
+            ac_data = JSON.parse(ac_data)
+
+            $("select#acourse_list").empty();
+              $("select#acourse_list").append(
+                $("<option></option>")
+                  .attr("value", "")
+                  .text("{% trans ' - - - Select course - - - ' %}")
+              );
+            
+            $.each(ac_data, function(i,v){
+              se = v["_id"];
+              ac_name = v["name"];
+              scount_lbl = v["enrolled_stud_count"]
+              $("select#acourse_list").append(
+                $("<option></option>")
+                  .attr("value", se)
+                  .text(ac_name)
+                  .attr("scount", scount_lbl)
+              );
+            });
+
+            $("select#acourse_list").prop("selectedIndex", 0);
+          }
+
+          else {
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
         },
-      });
+      });//end of ajax
     });//end of nussd_course_type.change function
   
   //For selecting Announced Course type
