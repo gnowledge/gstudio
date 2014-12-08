@@ -204,7 +204,8 @@ factory_relation_types = [
             'subject_type':['Page','File', 'Topic','Pandora_video'],
             'object_type':['Page','Concept','Topic', 'File', 'Pandora_video'], 
             'inverse_name':'taught_by', 
-            'meta_type':'factory_types'
+            'meta_type':'factory_types',
+            'object_cardinality': 100
         }
     },
 
