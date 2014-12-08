@@ -31,8 +31,6 @@ from django.contrib.sites.models import Site
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
-
-
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
@@ -300,7 +298,7 @@ def switch_group_conditions(user,group_id):
 @register.assignment_tag
 def get_all_user_groups():
 	try:
-		all_groups=collection.Node.find({'_type':'Author'})
+		all_groups = collection.Node.find({'_type':'Author'}).sort('name', 1)
 		return list(all_groups)
 	except:
 		print "Exception in get_all_user_groups"
@@ -1164,123 +1162,77 @@ def get_assesses_list(node):
 
 	return assesses_list
 
-
 @register.assignment_tag
 def get_group_type(group_id, user):
-	try:
-		col_Group = db[Node.collection_name]
+    """This function checks for url's authenticity
 
-		# Splitting url-content based on backward-slashes
-		split_content = group_id.strip().split("/")
-		gid = ""
-		colg = None
+    """
+    try:
+        # Splitting url-content based on backward-slashes
+        split_content = group_id.strip().split("/")
+        
+        # Holds primary key, group's ObjectId or group's name
+        g_id = ""
+        if split_content[0] != "":
+            g_id = split_content[0]
+        else:
+            g_id = split_content[1]
 
-		if group_id == '/home/':
-			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+        group_node = None
 
-		else:  
-			# If very first character is not backward-slash
-			# Then group id/name will be the very first element in splitted url-content list
-			# Else, it will be the second element
-			if split_content[0] != "":
-				gid = split_content[0]
+        if g_id.isdigit() and 'dashboard' in group_id:
+            # User Dashboard url found
+            u_id = int(g_id)
+            user_obj = User.objects.get(pk=u_id)
 
-			else:
-				gid = split_content[1]
-			
-			# gid = group_id.replace("/", "").strip()
-			
-			if ObjectId.is_valid(gid):
-				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
+            if not user_obj.is_active:
+                error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
+                raise Http404(error_message)
 
-			else:
-				if 'dashboard' in group_id and gid != 'dashboard':
-					# It means it's a dashboard url and instead of ObjectId's check, check for django's ID
-					if user.id is not None:
-						if gid.isdigit():
-							int_gid = int(gid)
-							if int(user.id) == int_gid:
-								colg = col_Group.Node.one({'_type': "Author", 'created_by': int_gid})
-						else:
-							error_message = "Access denied: Dashboard url found, but it's an invalid django's ID ("+gid+")!!!"
-							raise Http404(error_message)
+        else:
+            # Group's url found
+            if ObjectId.is_valid(g_id):
+                # Group's ObjectId found
+                group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(g_id)})
 
-				else:
-					# Case: Here instead of group's ObjectId, name is found
-					colg = col_Group.Node.one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
+            else:
+                # Group's name found
+                group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, 'name': g_id})
 
-				if colg:
-					pass
+            if group_node:
+                # Check whether Group is PUBLIC or not
+                if not group_node.group_type == u"PUBLIC":
+                    # If Group other than Public one is found
 
-				else:		
-					colg = None
-  		
-		# Check if Group exists in the database
-		if colg is not None:
-			# Check is user logged in
-			if user.is_authenticated():
-				# Condition for group accessible to logged in user
-				if user.is_superuser or colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
-					# Condition for GAPPs accessible to gstaff (i.e. "mis", "mis-po", "batch")
-					if len(split_content) > 2 and split_content[2] != "":
-						gapp = split_content[2]
+                    if user.is_authenticated():
+                        # Check for user's authenticity & accessibility of the group
+                        if user.is_superuser or group_node.created_by == user.id or user.id in group_node.group_admin or user.id in group_node.author_set:
+                            pass
 
-						if check_is_gapp_for_gstaff(colg._id, {'name': gapp}, user):
-							return "allowed"
+                        else:
+                            error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
+                            print "\n ", error_message, "\n"
+                            raise Http404(error_message)
 
-						else:
-							error_message = "Access denied: You are not an authorized user to access this GAPP ("+gapp.upper()+")!!!"
-							raise Http404(error_message)
+                    else:
+                        # Anonymous user found which cannot access groups other than Public
+                        error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
+                        print "\n ", error_message, "\n"
+                        raise Http404(error_message)
 
-					else:
-						# If only group is specified
-						return "allowed"
+            else:
+                # If Group is not found with either given ObjectId or name in the database
+                # Then compare with a given list of names as these were used in one of the urls
+                # And still no match found, throw error
+                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
+                    error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
+                    print "\n ", error_message, "\n"
+                    raise Http404(error_message)
 
-				else:
-					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
-					raise Http404(error_message)
+        return True
 
-			else:
-				# Condition for group accessible to logged out user
-				if colg.group_type == "PUBLIC":
-					# Condition for GAPPs accessible to gstaff (i.e. "mis", "mis-po", "batch")
-					if len(split_content) > 2 and split_content[2] != "":
-						gapp = split_content[2]
-
-						if check_is_gapp_for_gstaff(colg._id, {'name': gapp}, user):
-							return "allowed"
-
-						else:
-							error_message = "Access denied: You are not an authorized user to access this GAPP ("+gapp.upper()+")!!!"
-							raise Http404(error_message)
-
-					else:
-						# If only group is specified
-						return "allowed"
-					# return "allowed"
-
-				else:
-					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
-					raise Http404(error_message)
-
-		else:
-			# If given ObjectId/name doesn't exists in database
-			# Then compare with a given list of names as these were used in one of the urls
-			# And still no match found, throw an error - Group doesn't exists
-			if gid in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
-				return "pass"
-
-			else:
-				error_message = "GroupNotFoundError: This group ("+gid+") doesn't exists!!!"
-				raise Http404(error_message)
-
-	except Http404 as e:
-		raise Http404(e)
-		
-	except Exception as e:
-		print "\n Error in get_group_type() templatetag: " + str(e) + "\n"
-		colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-		return "pass"
+    except Exception as e:
+        raise Http404(e)
 
 @register.assignment_tag
 def check_accounts_url(path):
@@ -1781,27 +1733,42 @@ def get_source_id(obj_id):
   except Exception as e:
     return 'null'
 
- 
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
-        r_list.append(obj_id._id)
-    	relation_set=obj_id.get_possible_relations(obj_id.member_of)
-	if relation_set.has_key('translation_of'):  
-		for k,v in relation_set['translation_of'].items():                      
-			if k == 'subject_or_right_subject_list':
-				for each in v:
-					dic={}
-					if (each['_id'] not in r_list):
-						r_list.append(each['_id'])
-						dic[each['_id']]=each['language']
-						translation_list.append(dic)
-						get_translation_relation(each,translation_list, r_list)
-	return translation_list
+   get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   if obj_id not in r_list:
+      r_list.append(obj_id)
+      node_sub_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
+      node_rightsub_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
+      
+      if list(node_sub_rt):
+         node_sub_rt.rewind()
+         for each in list(node_sub_rt):
+            right_subject=collection.Node.one({'_id':each.right_subject})
+            if right_subject._id not in r_list:
+               r_list.append(right_subject._id)
+      if list(node_rightsub_rt):
+         node_rightsub_rt.rewind()
+         for each in list(node_rightsub_rt):
+            right_subject=collection.Node.one({'_id':each.subject})
+            if right_subject._id not in r_list:
+               r_list.append(right_subject._id)
+      if r_list:
+         r_list.remove(obj_id)
+         for each in r_list:
+            dic={}
+            node=collection.Node.one({'_id':each})
+            dic[node._id]=node.language
+            translation_list.append(dic)
+            get_translation_relation(each,translation_list, r_list)
+   return translation_list
+
+
 
 @register.assignment_tag
 def get_possible_translations(obj_id):
         translation_list = []
 	r_list1 = []
-	return get_translation_relation(obj_id,r_list1,translation_list)
+        return get_translation_relation(obj_id._id,r_list1,translation_list)
 
 
 

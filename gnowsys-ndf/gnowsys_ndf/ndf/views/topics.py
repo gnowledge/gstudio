@@ -34,6 +34,7 @@ topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 app=collection.Node.one({'name':u'Topics','_type':'GSystemType'})
 #######################################################################################################################################
+global list_trans_coll
 list_trans_coll = []
 coll_set_dict={}
 
@@ -258,24 +259,31 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             
                                 if "Theme" in each.member_of_names_list:
                                     app_obj = theme_GST
-                                else:
+                                if "theme_item" in each.member_of_names_list:
+                                    app_obj = theme_item_GST
+                                if "topic" in each.member_of_names_list:
                                     app_obj = topic_GST
-                                   
-                                get_node_common_fields(request, theme_topic_node, group_id, app_obj, each)
-                                theme_topic_node.save()
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_obj, each))
                                 coll_set_dict[each._id]=theme_topic_node._id
+                                relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
+                                grelation=collection.GRelation()
+                                grelation.relation_type=relation_type
+                                grelation.subject=each._id
+                                grelation.right_subject=theme_topic_node._id
+                                grelation.name=u""
+                                grelation.save()
                                 
                             
                             for each in coll_set1:
-                                if "Theme" in each.member_of_names_list:
-                                    if each.collection_set:
-                                        for collset in each.collection_set:
-                                            p=coll_set_dict[each._id]
-                                            parent_node=collection.Node.one({'_id':ObjectId(str(p))})
-                                            n= coll_set_dict[collset]
-                                            sub_node=collection.Node.one({'_id':ObjectId(str(n))})
-                                            parent_node.collection_set.append(sub_node._id)
-                                            parent_node.save()
+                                #if "Theme" in each.member_of_names_list:
+                                if each.collection_set:
+                                    for collset in each.collection_set:
+                                        p=coll_set_dict[each._id]
+                                        parent_node=collection.Node.one({'_id':ObjectId(str(p))})
+                                        n= coll_set_dict[collset]
+                                        sub_node=collection.Node.one({'_id':ObjectId(str(n))})
+                                        parent_node.collection_set.append(sub_node._id)
+                                        parent_node.save()
                         
                 
                 # To return themes card view for listing theme nodes after creating new Themes
@@ -298,10 +306,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         root_themes.append(each.name)
                                 
                     if name:
-                        if not name.upper() in (theme_name.upper() for theme_name in root_themes):
-                            # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))
-                                                        
+                        if name.upper() != theme_topic_node.name.upper():
+                            if not name.upper() in (theme_name.upper() for theme_name in root_themes):
+                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))
+                        else:
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))      
+
 
                     if translate != "true":
                         # For storing and maintaning collection order
@@ -388,19 +399,29 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
                                 
                     if name:
-                        if theme_topic_node._id in root_themes_id:  
-                            if not name.upper() in (theme_name.upper() for theme_name in root_themes):
-                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST))
-                                
-                        else:                       
-                            if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
-                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST)) 
-                                
+                        if name.upper() != theme_topic_node.name.upper():
+                            # If "Name" has changed 
 
-                    if translate != "true":
-                        # For storing and maintaning collection order                        
+                            if theme_topic_node._id in root_themes_id:  
+                                # If editing node in root theme items
+                                if not name.upper() in (theme_name.upper() for theme_name in root_themes):
+                                    # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST))
+                                    
+                            else:
+                                # If editing theme item in prior_theme_collection hierarchy 
+                                if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
+                                    # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST)) 
+                           
+                        else:
+                            # If name not changed but other fields has changed
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST))  
+
+
+
+                    if translate != "true" and collection_list:
+                        # For storing and maintaning collection order         
                         if collection_list != '':
                             theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
@@ -472,9 +493,15 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             theme_topic_node.save()
                             
                         title = topic_GST.name 
-
-                        #ash #currently working #prior,teaching
-                        get_node_metadata(request,theme_topic_node,topic_GST)
+                        
+                        # To fill the metadata info while creating and editing topic node
+                        metadata = request.POST.get("metadata_info", '') 
+                        if metadata:
+                          # Only while metadata editing
+                          if metadata == "metadata":
+                            if theme_topic_node:
+                              get_node_metadata(request,theme_topic_node)
+                        # End of filling metadata
                         
                         
                         if prior_node_list != '':
@@ -522,6 +549,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
         if app_GST:
             # For adding new Theme & Topic
             if app_GST.name == "Theme" or app_GST.name == "Topic" or translate == True:
+                print "22222"
                 title = app_GST.name
                 node = ""
                 root_themes = []
@@ -633,10 +661,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
         )
-
-
-
-
+        
     return render_to_response("ndf/theme.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
                             'shelf_list': shelf_list,'shelves': shelves,
@@ -651,23 +676,21 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
 def get_coll_set(node):
   obj=collection.Node.one({'_id':ObjectId(node)})
-  if "Theme" in obj.member_of_names_list:  
+  #print obj.member_of_names_list
+  if "Topic" not in obj.member_of_names_list:  
       if  obj.collection_set:
           if obj not in list_trans_coll:
               list_trans_coll.append(obj)
-      for each in obj.collection_set:
-          n=collection.Node.one({'_id':each})
-          if "Theme" in n.member_of_names_list:  
+          for each in obj.collection_set:
+              n=collection.Node.one({'_id':each})
+              if "Topic" not in n.member_of_names_list:  
   
-              if n not in list_trans_coll:
-                  list_trans_coll.append(n)
-                  if n.collection_set:
-                      if "Theme" in n.member_of_names_list:  
+                  if n not in list_trans_coll:
+                      list_trans_coll.append(n)
+                      if n.collection_set:
+                          if "Topic" not in n.member_of_names_list:  
   
-                          get_coll_set(n._id)
-                  
-  #new_list=list_trans_coll
-  #list_trans_coll = []
+                              get_coll_set(n._id)
   return list_trans_coll
 
 def topic_detail_view(request, group_id, app_Id=None):

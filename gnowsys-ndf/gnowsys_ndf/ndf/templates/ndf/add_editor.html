@@ -17,7 +17,7 @@
 {% comment %}
 
 <!-- start of mobwrite -->
-{% if node_id %}
+<!-- {% if node_id %}
 	<script src="/static/js/mobwrite/diff_match_patch.js"></script>
 	<script src="/static/js/mobwrite/core.js"></script>
 	<script src="/static/js/mobwrite/form.js"></script>
@@ -72,12 +72,12 @@
 	setInterval(onlineuser, 5000);
 	</script>
 {% endif %}
-<!-- end of mobwrite -->
+ --><!-- end of mobwrite -->
 {% endcomment %}
 
 {% if node_id %}
 
-<input type="hidden" value="{% check_existence_textObj_mobwrite node_id %}">
+<!-- <input type="hidden" value="{#% check_existence_textObj_mobwrite node_id %#}"> -->
 <textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}" value="{{var_value}}">{{var_value}}</textarea>
 
 {% else %}

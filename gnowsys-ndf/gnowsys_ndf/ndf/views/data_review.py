@@ -129,7 +129,7 @@ def data_review(request, group_id, page_no=1):
 # ---END of data review in File app
 
 
-def get_dr_search_result_dict(request, group_id, search_text, page_no=1):
+def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
 
     group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
 
@@ -149,15 +149,17 @@ def get_dr_search_result_dict(request, group_id, search_text, page_no=1):
 
     file_id = collection.Node.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
     
-    search_text = search_text.replace("+", " ")
+    # check if request is from form or from next page
+    if request.GET.has_key("search_text"):
+        search_text = request.GET.get("search_text", "")
 
-    get_req = request.GET.copy()
-    
-    # adding values to GET req
-    get_req.update({"search_text": search_text})
-
-    # overwriting request.GET with newly created QueryDict instance get_req
-    request.GET = get_req
+    else:
+        search_text = search_text.replace("+", " ")
+        get_req = request.GET.copy()
+        # adding values to GET req
+        get_req.update({"search_text": search_text})
+        # overwriting request.GET with newly created QueryDict instance get_req
+        request.GET = get_req
 
     search_reply = json.loads(results_search(request, group_id, return_only_dict = True))
     stemmed_search_res = search_reply["stemmed"]["name"]
@@ -191,9 +193,7 @@ def get_dr_search_result_dict(request, group_id, search_text, page_no=1):
         "static_audience": GSTUDIO_RESOURCES_AUDIENCE,
         "static_status": list(STATUS_CHOICES),
         "static_textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
-    },
-    context_instance=RequestContext(request)
-    )
+    }, context_instance=RequestContext(request) )
 
 
 # saving resource object of data review
@@ -266,7 +266,7 @@ def data_review_save(request, group_id):
                 edit_summary.append(temp_edit_summ)
 
         # to fill/update attributes of the node and get updated attrs as return 
-        ga_nodes = get_node_metadata(request, file_node, GST_FILE, is_changed=True)
+        ga_nodes = get_node_metadata(request, file_node, is_changed=True)
         
         if len(ga_nodes):
             is_changed = True

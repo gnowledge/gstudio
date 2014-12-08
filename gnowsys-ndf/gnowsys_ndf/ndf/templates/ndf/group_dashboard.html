@@ -10,33 +10,7 @@
 {% endblock %}
 
 {% block style %}
-	.resource-drawer { 
-    max-height: 202px;
-    overflow-y: auto;
-  }
-
-  .style2 {
-    color: #10c1cb; 
-    font-size: 10em;
-    text-shadow: 0 1px 0 #0092b3, 0 2px 0 #0087a6, 0 3px 0 #008099, 0 4px 0 #00758c, 0 5px 0 #555, 0 6px 0 #006a80, 0 0 0 #006073, 0 8px 7px #005566;
-  }
-
-  .style-text {
-    margin: 10px 0;
-  }
-
-  .img-height {
-    height: 100%;
-  }
-
-  .div-height {
-    margin-bottom: 0.5em; 
-    height: 9em;
-  }
-
-  .margin-p5 {
-    margin-bottom: 0.5em !important;
-  }
+  {{block.super}}
 
   /* Setting css-properties for reveal-modal's label */
     div.reveal-modal > label {
@@ -44,8 +18,262 @@
       font-weight: bold;
       font-size: 1rem;
     }
+
+  /* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+    .row .row {
+      margin: 0 0;
+    }
+
+  /* css-properties for table */
+    .width_s_no {
+      width: 5%;
+    }
+
+    .counter {
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .width_Status, .width_Completed_On, .width_Enrolled, .width_Remaining, .width_Approved, .width_Rejected {
+      width: 8%;
+    }
+
+    .width_19p {
+      width: 19%;
+    }
+
+    .width_delete {
+      width: 8%;
+      line-height: 0.5em;
+      text-align: center !important;
+    }
+
+    .margin-0r {
+      margin: 0 !important;
+    }
+
+    .counter {
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .tiny.button {
+      font-size: 1em !important;
+    }
 {% endblock %}
 
 {% block body_content %}
-<h1>Group Dashboard</h1>
+<div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+  <label id="alertModalLabel"></label>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+
+<nav class="row" style="margin-top: 0.5rem;">
+  <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+    {% if approval %}
+    <dd class="active" title="Enrollment Approval Details">
+      <a href="#panel_enrollment_approval_details">
+        {% trans "Approval" %}
+      </a>
+    </dd>
+    {% endif %}
+
+    <!--
+    <dd class="{% if not approval %}active{% endif %}" title="Testing Details">
+      <a href="#panel_testing_details">
+        {% trans "Testing" %}
+      </a>
+    </dd>
+    -->
+  </dl>
+</nav>
+
+<div id="group_dashboard_details" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
+  {% if approval %}
+  <!-- Tab: Enrollment Approval Details -->
+  <div class="active content row" id="panel_enrollment_approval_details">
+    <dl class="accordion" data-accordion>
+      <!-- Enrollment Details -->
+      <dd class="accordion-navigation">
+        <a href="#enrollment_accordion">{% trans "Enrollment Details" %}</a>
+        <div id="enrollment_accordion" class="content active">
+          {% if enrollment_details %}
+          <table>
+            <thead>
+              <th class="width_s_no counter">{% trans "S. #" %}</th>
+              {% for each_column in enrollment_columns %}
+              <th class="width_{{each_column}}">{{each_column}}</th>
+              {% endfor %}
+            </thead>
+
+            <tbody>
+              {% for each in enrollment_details %}
+              <tr id="{{each|get_dict_item:'_id'}}">
+                <td class="counter">{{forloop.counter}}.</td>
+                {% for each_key in enrollment_columns %}
+                <td class="width_{{each_key}}">
+                  <a href="#" class="detail-view {{each_key}}">
+                    {{each|get_dict_item:each_key}}
+                  </a>
+                </td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>  
+          </table>
+          {% else %}
+          <h4>Nothing there to be approved!!</h4>
+          {% endif %}
+        </div>
+      </dd>
+
+      {% if enrollment_details %}
+      <!-- Approval Details -->
+      <dd class="accordion-navigation">
+        <a href="#approval_accordion">{% trans "Approval Details" %}</a>
+        <div id="approval_accordion" class="content">
+        </div>
+      </dd>
+      {% endif %}
+    </dl>
+  </div>
+  {% endif %}
+
+  {% comment %}
+  <!--
+  <div class="{% if not approval %}active {% endif %}content row" id="panel_testing_details">
+  testing 
+  </div>
+  -->
+  {% endcomment %}
+</div>
+{% endblock %}
+
+{% block script %}
+
+$(document).on("click", ".checkAllStudents", function(){
+  $(".approveStudent").prop("checked", $(this).is(":checked"));
+});
+
+$(".detail-view").click(function(event) {
+  event.preventDefault();
+
+  enrollment_id = $(this).closest("tr").attr("id");
+
+  approval_data_review = "";
+  success_state = false;
+  $.ajax({
+    url: "{% url 'get_students_for_approval' groupid %}",
+
+    data: {
+      'enrollment_id': enrollment_id,
+      'csrfmiddlewaretoken': "{{csrf_token}}"
+    },
+
+    type: "POST",
+
+    dataType: "json",
+
+    success: function(data) {
+      success_state = data["success"];
+
+      if (success_state) {
+        approval_data_review = data["approval_data_review"];
+      }
+
+      else {
+        $("#alertModalLabel").text(data["message"]);
+        $("#alertModal").removeClass("success").removeClass("warning");
+        $("#alertModal").addClass("alert");
+        $("#alertModal").foundation('reveal', 'open');
+      }
+    },
+
+    complete: function() {
+      if (success_state) {
+        $("#approval_accordion").empty().html(approval_data_review);
+        $("#enrollment_accordion").removeClass("active");
+        $("#approval_accordion").addClass("active");
+      }
+    },
+  });
+})
+
+$(document).on("click", ".btnApproval", function() {
+  students_selected = []
+  $(".approveStudent:checked").each(function() {
+    students_selected.push($(this).attr("id"));
+  });
+
+  approval_state = $(this).val();
+
+  if (students_selected.length <= 0) {
+    if (approval_state == "Approve") {
+      $("#alertModalLabel").text("Please select any students for approval !!!");
+    }
+
+    else {
+      $("#alertModalLabel").text("Please select any students for rejection !!!");
+    }
+
+    $("#alertModal").removeClass("success");
+    $("#alertModal").addClass("warning");
+    $("#alertModal").foundation('reveal', 'open');
+
+    return;
+  }
+
+  enrollment_id = $("#enrollment_id").val();
+
+  course_id = $("#course_id").val();
+
+  success_state = false
+  approved = ""
+  rejected = ""
+  remaining = ""
+  $.ajax({
+    url: "{% url 'approve_students' groupid %}",
+
+    data: {
+      'approval_state': approval_state,
+      'enrollment_id': enrollment_id,
+      'course_id': course_id,
+      'students_selected': students_selected,
+      'csrfmiddlewaretoken': "{{csrf_token}}"
+    },
+
+    type: "POST",
+
+    dataType: "json",
+
+    success: function(data) {
+      success_state = data["success"];
+
+      if (success_state) {
+        approved = data["approved"];
+        rejected = data["rejected"];
+        remaining = data["remaining"];
+      }
+
+      else {
+        $("#alertModalLabel").text(data["message"]);
+        $("#alertModal").removeClass("success").removeClass("warning");
+        $("#alertModal").addClass("alert");
+        $("#alertModal").foundation('reveal', 'open');
+      }
+    },
+
+    complete: function() {
+      if (success_state) {
+        $("#"+enrollment_id).find(".Approved").text(approved)
+        $("#"+enrollment_id).find(".Rejected").text(rejected)
+        $("#"+enrollment_id).find(".Remaining").text(remaining)
+
+        $("#approval_accordion").removeClass("active");
+        $("#enrollment_accordion").addClass("active");
+      }
+    },
+  });
+});
+
 {% endblock %}

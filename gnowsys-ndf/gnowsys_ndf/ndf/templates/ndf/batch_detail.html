@@ -18,7 +18,7 @@
 <header class="row page">
   <section class="medium-10 columns" >
     <h2>
-      <span class='node'>{{node.name}}</span>
+      <span class='node'>{{node_name_human_readble}}</span>
       {% user_access_policy groupid request.user as user_access %}
 
       {% edit_policy groupid node request.user as status %}

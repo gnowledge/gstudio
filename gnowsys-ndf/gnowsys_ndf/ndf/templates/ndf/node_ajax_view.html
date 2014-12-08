@@ -30,7 +30,8 @@
 <!-- css for drawer widget -->
 <style type = "text/css">
 
-  .movingDiv{
+  /*annotations*/
+  /*.movingDiv{
     display:none; 
     position:absolute;
     color: green;
@@ -48,7 +49,8 @@
     color: green;
     padding-left: 5px;
     padding-right: 5px;
-  }
+  }*/
+  /* ---END of annotations*/
     
   .divider-line { font-size: xx-large; color:lightgray; }
   .line-height-2 { line-height:2; }
@@ -122,33 +124,6 @@
     box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
     left: -9px; 
   
-  }
-
-  .reply-btn{
-    cursor: pointer;
-    /*margin-left: -1.3em;
-    margin-top: -1em;
-    position: relative;
-    width: 21.87rem;*/
-  }
-
-  .reply-btn:hover {
-    font-weight: bold;
-  }
-
-  .disc-replies { 
-    
-    padding:10px;
-    background-color:#d8f1f3;
-    width:27em;
-    max-width: 40em;
-    margin-left: 48px; 
-    margin-top: 10px;
-  }
-
-  .align-center {
-    margin: 0 auto;
-    display: block;
   }
 
   #html-res-iframe{
@@ -637,7 +612,8 @@
 
             {% check_group node as is_group %}
             {% if is_group %}
-              {% if user.is_superuser or node.created_by == user.id %}
+              {% check_is_gstaff groupid request.user as is_gstaff %}
+              {% if is_gstaff %}
               <a href="{% url edit_url group_name_tag %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
 
@@ -739,8 +715,12 @@
             <input type="hidden" id="groupname" value="{{node}}">
             {% if user.is_authenticated %}
               {% if user_access == "allow" %}
-               {% if user.is_superuser or node.created_by == user.id %}
-                   <li><a href="{% url 'create_sub_group' group_id %}" class="tiny round button">create subgroup</a></li>
+               {% if user.is_superuser %}
+                  <li>
+                    <a href="{% url 'create_sub_group' group_id %}" class="tiny round button">
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New SubGroup" %}
+                    </a>
+                  </li>
                {% endif %}
               {% endif %}
             {% if user_is_joined == "joined" %}

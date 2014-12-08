@@ -113,7 +113,7 @@ def file(request, group_id, file_id=None, page_no=1):
       # File search view
       title = GST_FILE.name
       
-      search_field = request.POST['search_field']
+      search_field = request.POST.get('search_field', '')
 
       datavisual = []
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
@@ -703,23 +703,21 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
-
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
             if not obj_id_instance.is_valid(f):
               alreadyUploadedFiles.append(f)
               title = mtitle
         
-        str1 = str(alreadyUploadedFiles)
+        # str1 = alreadyUploadedFiles
        
         if img_type != "": 
-            
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))
 
         elif topic_file != "": 
@@ -727,14 +725,20 @@ def submitDoc(request, group_id):
             return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
         else:
-            if str1:
-                return HttpResponseRedirect(page_url+'?var='+str1)
-            else:
-              if is_video == "True":
-                return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
-              else:
-                return HttpResponseRedirect(page_url)
-                
+            if alreadyUploadedFiles:
+                # return HttpResponseRedirect(page_url+'?var='+str1)
+                if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
+                    return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                else:
+                    if alreadyUploadedFiles[0][1]:
+                        return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                    else:
+                        return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
+
+                # if is_video == "True":
+                #     return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
+                # else:
+                #     return HttpResponseRedirect(page_url)
 
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
@@ -1262,6 +1266,15 @@ def file_edit(request,group_id,_id):
 
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
+
+        # To fill the metadata info while creating and editing file node
+        metadata = request.POST.get("metadata_info", '') 
+        if metadata:
+          # Only while metadata editing
+          if metadata == "metadata":
+            if file_node:
+              get_node_metadata(request,file_node)
+        # End of filling metadata
 
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
