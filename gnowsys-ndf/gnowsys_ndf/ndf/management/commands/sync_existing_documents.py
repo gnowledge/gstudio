@@ -24,11 +24,12 @@ class Command(BaseCommand):
 
     # Update pandora videos 'member_of', 'created_by', 'modified_by', 'contributors' field 
     pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
+    file_gst = collection.Node.one({'$and':[{'name':'File'},{'_type':'GSystemType'}]})
     auth_id = User.objects.get(username='nroer_team').pk
     if auth_id and pandora_video_st:
         res = collection.update(
             {'_type': 'File', 'member_of': {'$in': [pandora_video_st._id]}, 'created_by': {'$ne': auth_id} }, 
-            {'$set': {'created_by': auth_id, 'modified_by': auth_id}, '$push': {'contributors': auth_id} },
+            {'$set': {'created_by': auth_id, 'modified_by': auth_id, 'member_of':[file_gst._id, pandora_video_st._id]}, '$push': {'contributors': auth_id} },
             upsert=False, multi=True
         )
 
