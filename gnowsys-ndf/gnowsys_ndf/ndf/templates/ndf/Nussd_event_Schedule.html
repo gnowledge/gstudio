@@ -91,16 +91,21 @@
         </div>
         <!-- tab for batches -->
         
-        <div class= "rows">
+        <div class= "row">
             <div class="small-1 columns">
                  <label  class="right inline">
                     Batches</label>
             </div>
             <div align="left">
-               <div class="small-5 columns" align="left">
+               <div class="small-4 columns" align="left">
                       <select id="event_has_batch" name="event_has_batch">
                       </select>
-               <div>
+                      
+               </div>
+               <div class="small-7 columns">
+                 <label><font color="red">*</font></label>
+               </div>
+            
             </div>
         </div>
  </div>    
@@ -121,9 +126,13 @@
             </lable>
           </div>
       
-         <div class="small-5 columns">
+         <div class="small-4 columns">
           <select id="Module_of" name="Module_of">
           </select>
+         
+         </div>
+         <div class="small-1 columns">
+         <label><font color="red">*</font></label>
          </div>
          <div class="small-1 columns">
            <label   class="right inline">
@@ -131,10 +140,14 @@
            </lable>
          </div>
      
-         <div class="small-5 columns"> 
+         <div class="small-4 columns"> 
              <select id="session_of" name="session_of">
              </select>
+             
          </div>
+         <div class="small-1 columns">
+          <label><font color="red">*</font></label>
+         </div> 
       
       
     </div>
@@ -183,16 +196,17 @@
       
          <div class="small-1 columns">
               <label  class="right inline"> 
-                Event_Co-Ordinator
+                    Master Trainer
               </label>
             </div>
             <div class="small-5 columns">
-                     <select id="event_coordinator" name="event_coordinator" >
+                     <select id="event_coordinator" name="event_coordinator" required>
                      
                      </select>
+                     
             </div>
             <div class="small-4 columns">
-                 
+                 <label><font color="red">*</font></label>
             </div>
             <div class="small-4 columns">
                  
@@ -216,7 +230,7 @@
          
         <div class="row">
        <div class="small-12 columns" align="center">
-      <input type="submit" class="medium button" value="submit" >
+      <input type="submit" id="submit" class="medium button" value="submit" >
        </div>
        </div>
  <!-- div module sesion section Opens here" -->
@@ -231,7 +245,7 @@
 
 {% block script %}
 $(document).ready(function(){
-  clear_Diable_Elements();
+  clear_Disable_Elements();
   var event_details=""
   event_details="{{edit_details|safe}}"
 
@@ -309,7 +323,7 @@ document.getElementById('Module_of').disabled = "";
 document.getElementById('Module-session-section').visible = "True";
 document.getElementById('view').disabled = "";
 }
-function clear_Diable_Elements()
+function clear_Disable_Elements()
 {
 $('#nussd_course_name').attr('disabled','True')
 $('#nussd_course_name').empty()
@@ -321,7 +335,8 @@ $('#Module_of').attr('disabled','True')
 $('#Module_of').empty()
 $('#Module-session-section').hide()
 $('#view').attr('disabled','True')
-
+$('#submit').attr('disabled','True')
+$('#event_coordinator').attr('disabled','True')
 }
 var startDtInput = $("#start_time")
 var $a=$('#split-into3')
@@ -401,7 +416,8 @@ $.ajax({
        
        }   
       if (trainer!=""){   
-         
+         $('#event_coordinator').empty()
+         $('#event_coordinator').append($("<option></option>").attr("value","Select Trainer").text("--- Select Trainer ---"))
          $.each(trainer,function(key,val){
               $('#event_coordinator').append(
                  $("<option></option>")
@@ -409,11 +425,13 @@ $.ajax({
                   .attr("value",val.id)
                   .text(val.name)
                   );
-         
+                  
                 });   
+          
           }
           else
           {
+            clear_Disable_Elements();
           alert("No Trainers have being Assinged to this Course !!!")
           }
           } 
@@ -554,14 +572,17 @@ $("#session_of").change(function(){
 
 var session_of=$('#session_of option:selected').text()
 $("#Session").val(session_of)
+document.getElementById('event_coordinator').disabled = "";      
+});
+$('#event_coordinator').change(function(){
+
+document.getElementById('submit').disabled = "";      
 
 });
 
 
-
-
 $("#nussd_course_type").change(function(){
-  clear_Diable_Elements()
+  clear_Disable_Elements()
   var course_type=$("#nussd_course_type").val()
   var courses=""
   $("#course_type").val(course_type)
@@ -592,6 +613,7 @@ $("#nussd_course_type").change(function(){
                     );
               document.getElementById('nussd_course_name').disabled = "";
               });
+              
       }
       else
       {

@@ -292,6 +292,7 @@ table, th, td {
         {% include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
         </div>
         <div class="content" id="view-Attendance" >    
+          
           <div id="attendance">
               
           </div>
@@ -589,7 +590,7 @@ function EditAttendance(pass)
                       },
                       complete:function(){
                       $('#attendance').append("<table id='forattendance'> </table>")
-                      $('#forattendance').append("<thead><tr> <th> name </th> <th> Presence </th> </tr></thead>")
+                      $('#forattendance').append("<thead><tr> <th> name </th> <th> Presence  </th> </tr></thead>")
                       $.each(attended, function(key,val) {
                       if(pass == 'Edit'){
                                if(val.presence == 'Absent')

@@ -3872,7 +3872,7 @@ def fetch_course_name(request, group_id,Course_type):
 def fetch_course_Module(request, group_id,Course_name):
   courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
   courses=collection.Node.find({"_id":ObjectId(courses[0]['relation_set'][0]['announced_for'][0])})
-  trainers=collection.Node.find({"relation_set.master_trainer_of_course":ObjectId(Course_name)})
+  trainers=collection.Node.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
   superdict={}
   module_Detail={}
   module_list=[]

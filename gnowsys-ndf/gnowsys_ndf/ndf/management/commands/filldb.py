@@ -200,7 +200,7 @@ class Command(BaseCommand):
           glist_container.member_of.append(glist._id)
           glist_container.save()
           print "\n Eventtype Created."
-        collegeevent=collection.Node.one({"name":"CollegeEvents"})
+        collegeevent=collection.Node.one({"member_of":ObjectId(glist._id),"name":"CollegeEvents"})
         if not collegeevent:
             node = collection.GSystem()
             node.name=u"CollegeEvents"
@@ -213,14 +213,14 @@ class Command(BaseCommand):
         Event=collection.Node.find_one({'_type':"GSystemType","name":"Event"})  
         All_Event_Types=collection.Node.find({"type_of": ObjectId(Event._id)})
         Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
-        CollegeEvents=collegeevent=collection.Node.one({"name":"CollegeEvents"})
+        CollegeEvents=collection.Node.one({"name":"CollegeEvents"})
         Event_type_list=[]
         College_type_list=[]
         for i in All_Event_Types:
-            Event_Type_node=collection.Node.one({"_id":ObjectId(i._id)})
-            if (GlistItem._id not in Event_Type_node.member_of): 
-                Event_Type_node.member_of.append(GlistItem._id)
-                Event_Type_node.save()
+            
+            if (GlistItem._id not in i.member_of): 
+                i.member_of.append(GlistItem._id)
+                i.save()
             if i.name not in ['Classroom Session','Exam']:
                Event_type_list.append(i._id)
             if i.name in ['Classroom Session','Exam']:
