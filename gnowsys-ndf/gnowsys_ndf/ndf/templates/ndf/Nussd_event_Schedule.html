@@ -198,17 +198,17 @@
                  
             </div>
 
-      
+           
       </div>
-     
       <div class="hiddensection" hidden>
-      <select id="has_attendees" name="has_attendees" multiple=""   >
       <input id="course_type" name="course_type">
       <input id="course_name" name="course_name">
       <input id="Module_name" name="Module_name">
       <input id="Session" name="Session">
-               
+      <select id="has_attendees" name="has_attendees" multiple=""   >
       </select>
+              
+      
       <input type="hidden" value=1 name="iteration" id="iteration">
       </div>
       </fieldset>  
@@ -430,7 +430,8 @@ $("#nussd_course_name").change(function(){
 
   
   var course_type=$("#nussd_course_name").val()  
-  var course_name=$("#nussd_course_name").text()
+  var course_name=$("#nussd_course_name option:selected ").text()
+
   $('#course_name').val(course_name)
   $.ajax({
   
@@ -484,6 +485,7 @@ $("#event_has_batch").change(function(){
         },
       complete:function(){
         if(courses != ""){
+            $('#has_attendees').empty()
             $.each(courses, function(key,val) {
                 $('#has_attendees').append(
           $("<option></option>")
@@ -508,7 +510,7 @@ $("#Module_of").change(function(){
   
 var course_type=$("#Module_of").val()  
   var Module_of=$("#Module_of").text()
-  $("#Module_name").val(Module_of)
+  $("#Module_name option:selected ").val(Module_of)
   
 
   $.ajax({
@@ -550,7 +552,7 @@ var course_type=$("#Module_of").val()
 
 $("#session_of").change(function(){
 
-var session_of=$('#session_of').text()
+var session_of=$('#session_of option:selected').text()
 $("#Session").val(session_of)
 
 });
@@ -673,7 +675,7 @@ $("#nussd_course_type").change(function(){
           var testStartDate = new Date(parseFloat(startDtInput.datetimepicker('getDate').setMinutes(startDtInput.datetimepicker('getDate').getMinutes() + 60)));
           
           var endDate = testStartDate;
-          alert(endDate)
+
             
             //endDtInput.val(dateText);
             endDtInput.datetimepicker('setDate', endDate);

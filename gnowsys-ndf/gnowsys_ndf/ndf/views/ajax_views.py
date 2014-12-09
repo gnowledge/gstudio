@@ -1796,7 +1796,7 @@ def deletion_instances(request, group_id):
   Deletes the given node(s) and associated GAttribute(s) & GRelation(s) 
   or provides all information before deleting for confirmation.
   """
-  print "coming here"
+
   send_dict = []
   if request.is_ajax() and request.method =="POST":
     deleteobjects = request.POST['deleteobjects']
@@ -1874,9 +1874,8 @@ def deletion_instances(request, group_id):
         send_dict.append({"title":node.name,"content":delete_list})
     
     if confirm:
-      print "radhe rahde"
       return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")
-  print "reaching here",send_dict
+
   return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
 
 def get_visited_location(request, group_id):
@@ -3951,8 +3950,6 @@ def save_csv(request,group_id,app_set_instance_id=None):
         if not os.path.exists(filedir):
           os.makedirs(filedir)
         data={}
-        for i in list(json_data):
-          print "\n",ast.literal_eval(i)['Name']
         with open(filepath, 'wb') as csv_file:
           fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
           fw.writerow(dict((col,col) for col in column_header))
@@ -3963,7 +3960,6 @@ def save_csv(request,group_id,app_set_instance_id=None):
         return HttpResponse((STATIC_URL + filename))
 def get_assessment(request,group_id,app_set_instance_id):
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
-    print node
     node.get_neighbourhood(node.member_of)
     marks_list=[]
     Assesslist=[]
@@ -3975,7 +3971,6 @@ def get_assessment(request,group_id,app_set_instance_id):
             if  j.keys()[0] == 'performance_record':
                if (str(j['performance_record']['Event']) == str(app_set_instance_id)) is True:
                   val=True
-                  print "hello",j['performance_record']['marks']
                   dict1.update({'marks':j['performance_record']['marks']})
                else:
                   dict1.update({'marks':""})
