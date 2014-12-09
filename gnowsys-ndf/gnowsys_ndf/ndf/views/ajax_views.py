@@ -3099,12 +3099,13 @@ def get_announced_courses_with_ctype(request, group_id):
           each_ac["enrolled_stud_count"] = relation_coll_ac.count()
           
           acourse_ctype_list.append(each_ac)
+        response_dict["success"] = True      
       
       else:
         info_message = "No Announced Courses for enrollment are available !!!"
         response_dict["message"] = info_message
 
-      response_dict["success"] = True      
+      
       response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list, cls=NodeJSONEncoder)
 
       return HttpResponse(json.dumps(response_dict))
