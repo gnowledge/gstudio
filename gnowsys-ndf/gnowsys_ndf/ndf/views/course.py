@@ -929,7 +929,6 @@ def create_course_struct(request, group_id,node_id):
         cs_ids = []
         cs_reorder_ids = []
         # print "\n\n Sent from template\n\n",listdict
-
         #creating course structure GSystems
         if not course_collection_dict_exists:
           for course_sec_dict in listdict:
@@ -945,6 +944,7 @@ def create_course_struct(request, group_id,node_id):
               cs_new.prior_node.append(course_node._id)
               cs_new.save()
               cs_ids.append(cs_new._id)
+              cs_reorder_ids.append(cs_new._id)
               css_ids = []
               for index2 in v:
                 for css,val in index2.items():

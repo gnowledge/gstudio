@@ -211,6 +211,7 @@
   var changed_names ={};
   var cs_names_list = [];
   var css_names_list = [];
+  var all_mins_set = true;
 
 
 $("#course_structure_minutes").addClass("css_mins_class")
@@ -276,7 +277,7 @@ $("#course_structure_minutes").addClass("css_mins_class")
                 $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
             }
             else{
-                alert("Course Section cannot have duplicate names.")
+                alert("Course Sub Section cannot have duplicate names.")
                 event.preventDefault();
             }
         }
@@ -295,7 +296,7 @@ $("#course_structure_minutes").addClass("css_mins_class")
                 $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
             }
             else{
-                alert("Course Sub Section cannot have duplicate names.")    
+                alert("Course Section cannot have duplicate names.")    
                 event.preventDefault();            
             }
         }
@@ -586,20 +587,40 @@ $("#course_structure_minutes").addClass("css_mins_class")
             } 
         }
     }
+    all_mins_set=true;
 
   });
 
 //Submit course structure
   $("#form_course_structure").submit(function(event){
-    if($("#form_course_structure").find(':input[data-invalid]').length > 0) {
+    $.each(course_sec_list,function(csindex,csdict){
+        $.each(csdict,function(cskey,csslist){
+            $.each(csslist,function(cssindex,cssdict){
+                $.each(cssdict,function(csskey,propdict){
+                    if(!propdict.hasOwnProperty("course_structure_minutes")){
+                        all_mins_set = false;
+                    }
+                    else{
+                        if(propdict["course_structure_minutes"]==""){
+                            all_mins_set = false;
+                        }
+                    }
+                })
+            })
+
+        })
+    })
+
+    console.log(all_mins_set);
+    if(all_mins_set) {
+        console.log($("#form_course_structure").find(":input[data-invalid]").length)
+        $("#course_sec_dict_ele").val(JSON.stringify(course_sec_list))
+        $("#changed_names").val(JSON.stringify(changed_names))
+    }
+    else{
         alert("Please fill the minutes of all Course Subsections");
         event.preventDefault();
     }
-    $("#course_sec_dict_ele").val(JSON.stringify(course_sec_dict))
-    $("#form_course_structure").find(":input[required]").removeAttr("required")
-    $("#form_course_structure").find(':input[data-invalid]').removeAttr("data-invalid")
-    $("#course_sec_dict_ele").val(JSON.stringify(course_sec_list))
-    $("#changed_names").val(JSON.stringify(changed_names))
   });
 
 {% endblock %}
@@ -668,12 +689,13 @@ $("#course_structure_minutes").addClass("css_mins_class")
                         }
                     }
                 }
-
-
             })
-            })
+        })
+    });
   });
-  });
+  $("#form_course_structure").find(":input[required]").removeAttr("required")
+  $("#form_course_structure").find(":input[data-invalid]").removeAttr("data-invalid")
+
 
 {% endblock %}
 </script>
