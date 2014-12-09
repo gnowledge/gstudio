@@ -37,7 +37,7 @@
         padding-left:0 !important;
     }
 
-    .i:hover{
+    i:hover{
         cursor:pointer;
     }
 
@@ -58,7 +58,7 @@
     border-color:#0b8a91 !important; 
     border: 3px solid
     }
-
+    <!-- .fi-pencil .fi-widget .fi-arrow-up .fi-arrow-down { font-size: 24px; } -->
     
 {% endblock %}
 {% block body_content %} 
@@ -203,15 +203,14 @@
 {% block script %}
   {{block.super}}
 //Global var declarations
-  var cs_cloned_id = 1
-  var css_cloned_id = 1
-  var main_list = [];
+  var cs_cloned_id = 1;
+  var css_cloned_id = 1;
   var course_min_value;
-  var course_sec_dict = {};
+  // var course_sec_dict = {};
   var course_sec_list = [];
   var changed_names ={};
-  var cs_names_list = []
-  var css_names_list = []
+  var cs_names_list = [];
+  var css_names_list = [];
 
 
 $("#course_structure_minutes").addClass("css_mins_class")
@@ -271,7 +270,7 @@ $("#course_structure_minutes").addClass("css_mins_class")
                 var str_btn="<div class='row'><div class='small-2 columns text-center'>--></div>"
                 var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label></div>"    
                 
-                $("#"+parent_id).parents("li").find("div.fold-btn-div").append("<i class='fi-minus large fold-btn'></i>").removeClass("fold-btn-div");
+                $("#"+parent_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-2 columns text-center fold-btn-div'><i class='fi-minus large'></i></div>")
                 $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
                 var str_prop="<div class='small-2 columns end'><i class='fi-widget large reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div></div>"
                 $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
@@ -300,8 +299,6 @@ $("#course_structure_minutes").addClass("css_mins_class")
                 event.preventDefault();            
             }
         }
-
-        
     }
   })
 
@@ -320,21 +317,114 @@ $("#course_structure_minutes").addClass("css_mins_class")
 // Reordering li elements
   $(document).on('click','.fi-arrow-up',function(){
     var $current = $(this).closest('li');
+    class_of_lbl = $current.find('label').attr('class');
     var $previous = $current.prev('li');
-    if($previous.length !== 0){
-        $current.insertBefore($previous);
-    }
-    return false;
+    movenameup = $current.find("label."+class_of_lbl).text()
+    movenamedown = $previous.find('label.'+class_of_lbl).text()
+    var temp;
 
+    // Change order of course sub sections accordingly in the list of dicts
+    for(var i in course_sec_list){
+        for(var i2 in course_sec_list[i]){
+            for( var newk in course_sec_list[i][i2]){
+                newk = parseInt(newk)
+                for (var csk in course_sec_list[i][i2][newk]){
+                    if(course_sec_list[i][i2][newk].hasOwnProperty(movenameup)){
+                        if(newk==0){
+                            alert("You are on the Top element")
+                            return;   
+                        }
+                        temp = course_sec_list[i][i2][newk-1]
+                        course_sec_list[i][i2][newk-1] = course_sec_list[i][i2][newk]
+                        course_sec_list[i][i2][newk] = temp
+                        movenameup=""
+                        if($previous.length !== 0){
+                            $current.insertBefore($previous);
+                        }
+                        return false;
+                    }
+                } 
+            }
+        }
+    }
+    // Change order of course sections accordingly in the list of dicts
+    for(var i in course_sec_list){
+        for(var i2 in course_sec_list[i]){
+            i = parseInt(i);
+            if(course_sec_list[i].hasOwnProperty(movenameup)){
+                if(i==0){
+                    alert("You are on the Top element")
+                    return;   
+                }
+                temp = course_sec_list[i-1]
+                course_sec_list[i-1] = course_sec_list[i]
+                course_sec_list[i] = temp
+                movenameup=""
+                if($previous.length !== 0){
+                    $current.insertBefore($previous);
+                }
+                return false;
+            }
+        }
+    }
   });
 
   $(document).on('click','.fi-arrow-down',function(){
     var $current = $(this).closest('li')
+    class_of_lbl = $current.find('label').attr('class');
     var $next = $current.next('li');
-    if($next.length !== 0){
-      $current.insertAfter($next);
+    movenameup = $current.find("label."+class_of_lbl).text()
+    movenamedown = $next.find('label.'+class_of_lbl).text()
+    var temp;
+
+    // Change order of course sub sections accordingly in the list of dicts
+    for(var i in course_sec_list){
+        for(var i2 in course_sec_list[i]){
+            for( var newk in course_sec_list[i][i2]){
+                newk = parseInt(newk)
+                for (var csk in course_sec_list[i][i2][newk]){
+                    if(course_sec_list[i][i2][newk].hasOwnProperty(movenameup)){
+                        
+                        if(newk==course_sec_list[i][i2].length-1){
+                            alert("You are on the Last element")
+                            return;   
+                        }
+
+                        temp = course_sec_list[i][i2][newk+1]
+                        course_sec_list[i][i2][newk+1] = course_sec_list[i][i2][newk]
+                        course_sec_list[i][i2][newk] = temp
+                        movenameup="";
+                        if($next.length !== 0){
+                          $current.insertAfter($next);
+                        }
+                        return false;
+
+                    }
+                } 
+            }
+        }
     }
-    return false;
+    // Change order of course sections accordingly in the list of dicts
+    for(var i in course_sec_list){
+        i = parseInt(i)
+        for(var i2 in course_sec_list[i]){
+            if(course_sec_list[i].hasOwnProperty(movenameup)){
+                if(i==course_sec_list[i][i2].length-1){
+                    alert("You are on the Last element")
+                    return;   
+                }
+
+                temp = course_sec_list[i+1]
+                course_sec_list[i+1] = course_sec_list[i]
+                course_sec_list[i] = temp
+                movenameup=""
+                if($next.length !== 0){
+                  $current.insertAfter($next);
+                }
+                return false;
+            }
+        }
+    }
   });
 
 // Edit course structure name
@@ -479,8 +569,8 @@ $("#course_structure_minutes").addClass("css_mins_class")
     var assessment_chk =  $("input[name='course_structure_assessment']:checked").val()
     var assignment_chk  = $("input[name='course_structure_assignment']:checked").val()
 
-    if(assignment_chk=="Yes"){ assignment_chk=true}else{ assignment_chk=false}
-    if(assessment_chk=="Yes"){ assessment_chk=true}else{ assessment_chk=false}
+    if(assignment_chk=="Yes"){ assignment_chk=true;}else{ assignment_chk=false;}
+    if(assessment_chk=="Yes"){ assessment_chk=true;}else{ assessment_chk=false;}
 
     for(var i in course_sec_list){
         for(var i2 in course_sec_list[i]){
@@ -512,7 +602,6 @@ $("#course_structure_minutes").addClass("css_mins_class")
     $("#changed_names").val(JSON.stringify(changed_names))
   });
 
-
 {% endblock %}
 
 {% block document_ready %}
@@ -531,7 +620,7 @@ $("#course_structure_minutes").addClass("css_mins_class")
         lbl_id = "lbl_for_"+cloned_ele_id   
         
         var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus large fold-btn'></i></div>"
-        var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+csvv+"</h4></label><i class='fi-pencil large edit_course_structure_name'></i></div>"    
+        var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+csvv+"</h4></label><i class='fi-pencil large edit_course_structure_name size-24' ></i></div>"    
         var str_prop="<div class='small-2 columns end'>"+" "+"<i class='fi-arrow-down large'></i>"+" "+"<i class='fi-arrow-up large'></i></div></div>"
 
         $("#"+cloned_ele_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)

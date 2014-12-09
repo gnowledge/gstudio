@@ -927,6 +927,7 @@ def create_course_struct(request, group_id,node_id):
         listdict = json.loads(listdict)
         changed_names = json.loads(changed_names)
         cs_ids = []
+        cs_reorder_ids = []
         # print "\n\n Sent from template\n\n",listdict
 
         #creating course structure GSystems
@@ -960,7 +961,6 @@ def create_course_struct(request, group_id,node_id):
                   #add to cs collection_set
                   css_ids.append(css_new._id)
                   for propk, propv in val.items():
-                    print val
                     # add attributes to css gs
                     if(propk=="course_structure_minutes"):
                       create_gattribute(css_new._id,at_cs_hours,int(propv))
@@ -971,8 +971,8 @@ def create_course_struct(request, group_id,node_id):
               #append CSS to CS
               collection.update({'_id':cs_new._id},{'$set':{'collection_set':css_ids}},upsert=False,multi=False)
         else:
-          #if there is no change in existing and modified course structure
-          if not course_collection_list is listdict:
+          #if there is change in existing and modified course structure
+          if not course_collection_list == listdict:
             #for every course section dict
             for course_sec_dict in listdict:
               #k is course section name and v is list of its each course subsection as dict
@@ -985,11 +985,12 @@ def create_course_struct(request, group_id,node_id):
                       name_edited_node.reload()
                     else:
                       pass
-
+                  #IMP Fetch node with name 'k' as above code, if name changed, changes oldname to k 
+                  cs_node = collection.Node.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id},{'collection_set':1})
+                  css_reorder_ids = []
                   for cssd in v:
                     for cssname,cssdict in cssd.items():
                       if cssname in css_names:
-                        cs_node = collection.Node.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id})
                         css_node=collection.Node.one({'name':cssname,'member_of':css_gst._id,'prior_node':cs_node._id})
                         for propk,propv in cssdict.items():
                           if(propk==u"course_structure_minutes"):
@@ -998,6 +999,8 @@ def create_course_struct(request, group_id,node_id):
                             create_gattribute(css_node._id,at_cs_assessment,propv)
                           elif(propk==u"course_structure_assignment"):
                             create_gattribute(css_node._id,at_cs_assignment,propv)
+
+                        css_reorder_ids.append(css_node._id)
                       else:
                         css_new = collection.GSystem()
                         css_new.member_of.append(css_gst._id)
@@ -1007,7 +1010,6 @@ def create_course_struct(request, group_id,node_id):
                         css_new.created_by=int(request.user.id)
                         css_new.contributors.append(int(request.user.id))
                         #save the css gs
-                        cs_node = collection.Node.one({"name":k,"member_of":cs_gst._id,'prior_node':course_node._id},{'collection_set':1})
                         css_new.prior_node.append(cs_node._id)
                         css_new.save()
                         for propk,propv in cssdict.items():
@@ -1017,9 +1019,15 @@ def create_course_struct(request, group_id,node_id):
                             create_gattribute(css_new._id,at_cs_assessment,propv)
                           elif(propk==u"course_structure_assignment"):
                             create_gattribute(css_new._id,at_cs_assignment,propv)
-
+                        css_reorder_ids.append(css_new._id)
                         #add to cs collection_set
-                        collection.update({'_id':cs_node._id},{'$push':{'collection_set':css_new._id}}, upsert=False, multi=False)
+                    
+                  if cs_node.collection_set != css_reorder_ids:
+                    collection.update({'_id':cs_node._id},{'$set':{'collection_set':css_reorder_ids}}, upsert=False, multi=False)
+                    cs_node.reload()
+                  else:
+                    pass
+                  cs_reorder_ids.append(cs_node._id)
                 else:
 
                   cs_new = collection.GSystem()
@@ -1032,7 +1040,9 @@ def create_course_struct(request, group_id,node_id):
                   #save the cs gs
                   cs_new.prior_node.append(course_node._id)
                   cs_new.save()
+
                   cs_ids.append(cs_new._id)
+                  cs_reorder_ids.append(cs_new._id)
                   for index2 in v:
                     for css,val in index2.items():
                       css_new = collection.GSystem()
@@ -1059,10 +1069,10 @@ def create_course_struct(request, group_id,node_id):
           else:
             print "No change"
         course_node_coll_set = course_node.collection_set
-        for each in cs_ids:
-          if each not in course_node_coll_set:
-            course_node_coll_set.append(each)
-        collection.update({'_id':course_node._id},{'$set':{'collection_set':course_node_coll_set}},upsert=False,multi=False)
+        # for each in cs_ids:
+        #   if each not in course_node_coll_set:
+        #     course_node_coll_set.append(each)
+        collection.update({'_id':course_node._id},{'$set':{'collection_set':cs_reorder_ids}},upsert=False,multi=False)
         app_id = request.POST.get("app_id","")
         app_set_id = request.POST.get("app_set_id","")
 
