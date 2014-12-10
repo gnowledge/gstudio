@@ -20,11 +20,6 @@
 
 {% endblock %}
 
-<!-- left top panel -->
-{% block meta_content %}
-  <h2 class="subheader">{% trans "Gallery" %}</h2>
-{% endblock %}
-
 
 {% block help_content %}
   <h3>{% trans "Files" %}</h3>
@@ -42,345 +37,253 @@
   {% endif %}  
 {% endblock %}
 
-{% block related_content %}
-
-{% check_user_join request groupid as user_is_joined %}
-
-<ul class="side-nav">
-
-  <div class="panel"  style="background-color:#ddd;">
-    <b>{% trans "Visit" %}</b>
-    <br/><br/>
-    <dl class="tabs" data-tab >
-      <!-- all files -->
-      <dd class="active">
-        <a href="#view-all">
-          <i class="fi-eye"></i>
-          {% trans "All files" %} {% if file_pages.count > 0 %}({{ file_pages.count }}){% endif %}
-        </a>
-      </dd><br/>
-      <!-- Documents -->
-      <dd>
-        <a href="#view-doc">
-          <i class="fi-page-filled"></i>
-          {% trans "Documents" %} {% if doc_pages.count > 0 %}({{ doc_pages.count }}){% endif %}
-        </a>
-      </dd><br/>
-      <!-- Interactives -->
-      {% if interactiveCollection.count %}
-        <dd>
-          <a href="#view-interactive">
-            <i class="fi-arrows-compress"></i>
-            {% trans "Interactives" %} ({{ interactiveCollection.count }})
-          </a>
-        </dd><br/>
-      {% endif %}
-      <!-- Audio -->
-      {% if audioCollection.count %}
-        <dd>
-          <a href="#view-audio">
-            <i class="fi-music"></i>
-            {% trans "Audios" %} {% if audio_pages.count > 0 %}({{ audio_pages.count }}){% endif %}
-          </a>
-        </dd><br/>
-      {% endif %}
-      <!-- Image -->
-      <dd>
-        <a href="#view-image"><i class="fi-camera"></i>
-          {% trans "Images" %} {% if image_pages.count > 0 %}({{ image_pages.count }}){% endif %}
-        </a>
-      </dd><br/>
-      <!-- Video -->
-      {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
-
-        <dd>
-          <a href="#view-video"><i class="fi-video"></i>
-            {% trans "Videos" %} {% if video_pages.count > 0 %}({{ video_pages.count }}){% endif %}
-          </a>
-        </dd><br/>
-      {% endif %}
-      <!-- Pandora -->
-      {% if site.SITE_VIDEO == 'pandora_and_local' %}
-
-        <dd>
-          <a href="#view-pandora-video"><i class="fi-video"></i>
-            {% trans "Pandora Videos" %}
-          </a>
-        </dd><br/>
-      {% endif %}
-
-      {% if site.SITE_VIDEO == 'pandora' %}
-        <dd>
-          <a href="#view-pandora-video"><i class="fi-video"></i>
-            {% trans "Videos" %}
-            {% if video_pages.count > 0 %}({{ video_pages.count }}){% endif %}
-          </a>
-        </dd><br/>
-      {% endif %}
-
-      {% if title != "E-Library" %}
-        <dd>
-          <a href="#view-collection">
-            <i class="fi-page-multiple"></i>{% trans "Collections" %}
-          </a>
-        </dd><br/>
-      {% endif %}
-
-    </dl><br/>
-
-    {% if user.is_authenticated %}
-    {% if user_is_joined == "joined" or user_is_joined == "author" %}
-    <b>{% trans "Actions" %}</b><br/><br/>
-    
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-        
-        <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny round button">
-          {% trans "Upload File" %}
-        </a><br/><br/>
-        
-      {% endif %}
-    
-
-    <b>{% trans "Review" %}</b><br/><br/>
-    
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-
-        <a href="{% url 'data_review' group_name_tag %}" class="tiny round button">
-          {% trans "Data Review" %}
-        </a>
-      {% endif %}
-    {% endif %}
-    {% endif %}
-
-    <a href="#" data-reveal-id="library-statistics" class="tiny round button">
-      {% trans "File Statistics" %}
-    </a>
-    <div class="medium reveal-modal" id="library-statistics" data-reveal>
-      {% include "ndf/file_statistics.html" %}
-      <a class="close-reveal-modal">&#215;</a>
-    </div>
-
-  </div>
-</ul>
+<!-- left top panel -->
+{% block meta_content %}
+  <h2 class="subheader">{% trans "Gallery" %}</h2>
 {% endblock %}
+
+{% block related_content %}
+  {% check_user_join request groupid as user_is_joined %}
+
+  <div class="panel" style="background-color:#ddd;">
+    
+    <!-- radio buttons for E-Library app: CR and XCR -->
+    {% comment %}
+    <!-- 
+    {% if title == "E-Library" %}
+      <input type="radio" name="crxcr" value="cr" id="cr-rad" title="Curricular">
+        <label for="cr-rad" title="Curricular">CR</label>
+      <input type="radio" name="crxcr" value="xcr" id="xcr-rad" title="Extra Curricular">
+        <label for="xcr-rad" title="Extra Curricular">XCR</label>
+    {% endif %}
+    -->
+    {% endcomment %}  
+    
+    <ul class="side-nav">
+
+      <dl class="tabs" data-tab >
+
+        <!-- all files -->
+        <dd class="active">
+          <a href="#view-all">
+            <i class="fi-eye"></i>
+            {% trans "All files" %} {% if file_pages.count > 0 %}({{ file_pages.count }}){% endif %}
+          </a>
+        </dd><br/>
+
+        <!-- Documents -->
+        <dd>
+          <a href="#view-doc">
+            <i class="fi-page-filled"></i>
+            {% trans "Documents" %} {% if doc_pages.count > 0 %}({{ doc_pages.count }}){% endif %}
+          </a>
+        </dd><br/>
+        
+        <!-- Interactives -->
+        {% if interactiveCollection.count %}
+          <dd>
+            <a href="#view-interactive">
+              <i class="fi-arrows-compress"></i>
+              {% trans "Interactives" %} ({{ interactiveCollection.count }})
+            </a>
+          </dd><br/>
+        {% endif %}
+        
+        <!-- Audio -->
+        {% if audioCollection.count %}
+          <dd>
+            <a href="#view-audio">
+              <i class="fi-music"></i>
+              {% trans "Audios" %} {% if audio_pages.count > 0 %}({{ audio_pages.count }}){% endif %}
+            </a>
+          </dd><br/>
+        {% endif %}
+        
+        <!-- Image -->
+        <dd>
+          <a href="#view-image"><i class="fi-camera"></i>
+            {% trans "Images" %} {% if image_pages.count > 0 %}({{ image_pages.count }}){% endif %}
+          </a>
+        </dd><br/>
+        
+        <!-- Video -->
+        {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
+
+          <dd>
+            <a href="#view-video"><i class="fi-video"></i>
+              {% trans "Videos" %} {% if video_pages.count > 0 %}({{ video_pages.count }}){% endif %}
+            </a>
+          </dd><br/>
+        {% endif %}
+        
+        <!-- Pandora -->
+        {% if site.SITE_VIDEO == 'pandora_and_local' %}
+
+          <dd>
+            <a href="#view-pandora-video"><i class="fi-video"></i>
+              {% trans "Pandora Videos" %}
+            </a>
+          </dd><br/>
+        {% endif %}
+
+        {% if site.SITE_VIDEO == 'pandora' %}
+          <dd>
+            <a href="#view-pandora-video"><i class="fi-video"></i>
+              {% trans "Videos" %}
+              {% if video_pages.count > 0 %}({{ video_pages.count }}){% endif %}
+            </a>
+          </dd><br/>
+        {% endif %}
+
+        {% if title != "E-Library" %}
+          <dd>
+            <a href="#view-collection">
+              <i class="fi-page-multiple"></i> {% trans "Collections" %}
+            </a>
+          </dd><br/>
+        {% endif %}
+
+      </dl><br/>
+
+      {% if user.is_authenticated %}
+      {% if user_is_joined == "joined" or user_is_joined == "author" %}
+      <b>{% trans "Actions" %}</b><br/><br/>
+      
+        {% user_access_policy groupid request.user as user_access %}
+        {% if user_access == "allow" %}
+          
+          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny round button">
+            {% trans "Upload File" %}
+          </a><br/><br/>
+          
+        {% endif %}
+      
+
+      <b>{% trans "Review" %}</b><br/><br/>
+      
+        {% user_access_policy groupid request.user as user_access %}
+        {% if user_access == "allow" %}
+
+          <a href="{% url 'data_review' group_name_tag %}" class="tiny round button">
+            {% trans "Data Review" %}
+          </a>
+        {% endif %}
+      {% endif %}
+      {% endif %}
+
+      <a href="#" data-reveal-id="library-statistics" class="tiny round button">
+        {% trans "File Statistics" %}
+      </a>
+      <div class="medium reveal-modal" id="library-statistics" data-reveal>
+        {% include "ndf/file_statistics.html" %}
+        <a class="close-reveal-modal">&#215;</a>
+      </div>
+
+    </ul>
+  </div>
+{% endblock %}
+<!-- END of left panel -->
 
 {% block body_content %}
   {% get_group_name groupid as group_name_tag %}
 
-<div class="tabs-content gallery">
+  <div class="tabs-content gallery">
 
-  {% if already_uploaded %} 
-    <div id="message">
-      <span style="color:red">
-        {% trans "Files Listed below are already uploaded. Duplicate file uploads are not possible." %}
-      </span>
-      <ul>
-        {% for each in already_uploaded %} 
-          <li><b>"{{each}}"</b> {% trans "this file is already uploaded please choose different file" %} </li>
-        {% endfor %}
-      </ul>
+    {% if already_uploaded %} 
+      <div id="message">
+        <span style="color:red">
+          {% trans "Files Listed below are already uploaded. Duplicate file uploads are not possible." %}
+        </span>
+        <ul>
+          {% for each in already_uploaded %} 
+            <li><b>"{{each}}"</b> {% trans "this file is already uploaded please choose different file" %} </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% group_type_info groupid request.user as grouptype %}
+
+    <!-- Tab View #1 - All -->
+    <div class="content row active" id="view-all">
+
+      {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
+
     </div>
-  {% endif %}
 
-  {% group_type_info groupid request.user as grouptype %}
-
-  <!-- Tab View #1 - All -->
-  <div class="content row active" id="view-all">
-
-    {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
-
-  </div>
-
-  <!-- Tab View 2 - Documents -->
-  <div class="content" id="view-doc">
-
-    <a href='{% url "paged_file_objs" group_name_tag "doc" 1 %}' class="first-load">1</a>
-    {% comment %}
-    {% include "ndf/file_list_tab.html" with resource_type=docCollection detail_urlname="file_detail" filetype="doc" res_type_name="" page_info=doc_pages %}
-    {% endcomment %}
-  </div>
-
-
-  <!-- Tab View 3 - Interactives -->
-  {% if interactiveCollection %}
-    <div class="content" id="view-interactive">
-    <a href='{% url "paged_file_objs" group_name_tag "interactives" 1 %}' class="first-load">1</a>
-
-          {% comment %}
-      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" filetype="interactives" res_type_name="" page_info=interactive_pages %}
-    {% endcomment %}
+    <!-- Tab View 2 - Documents -->
+    <div class="content" id="view-doc">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "doc" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "doc" 1 %}' class="first-load">1</a>
+      {% endif %}
     </div>
-  {% endif %}
 
 
-  <!-- Tab View 4 - Audios -->
-  {% if audioCollection %}
-    <div class="content" id="view-audio">
-    <a href='{% url "paged_file_objs" group_name_tag "audio" 1 %}' class="first-load">1</a>
+    <!-- Tab View 3 - Interactives -->
+    {% if interactiveCollection %}
+      <div class="content" id="view-interactive">
+        {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "interactives" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "interactives" 1 %}' class="first-load">1</a>
+        {% endif %}
+      </div>
+    {% endif %}
 
-    {% comment %}
-      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" filetype="audio" res_type_name="" page_info=audio_pages %}
-    {% endcomment %}
+
+    <!-- Tab View 4 - Audios -->
+    {% if audioCollection %}
+      <div class="content" id="view-audio">
+        {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "audio" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "audio" 1 %}' class="first-load">1</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Tab View #3 - Images -->
+    <div class="content" id="view-image">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "image" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "image" 1 %}' class="first-load">1</a>
+      {% endif %}
     </div>
-  {% endif %}
 
-  <!-- Tab View #3 - Images -->
-  <div class="content" id="view-image">
-    <a href='{% url "paged_file_objs" group_name_tag "image" 1 %}' class="first-load">1</a>
+    <!-- Tab View #4 - Videos -->
+    <div class="content" id="view-video">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
 
-        {% comment %}
-    {% include "ndf/file_list_tab.html" with resource_type=imageCollection detail_urlname="image_detail" filetype="image" res_type_name="" page_info=image_pages %}
-    {% endcomment %}
-  </div>
+    <!-- Tab View #5 - pandora Videos -->
+    <div class="content" id="view-pandora-video">
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% endif %}
+    </div>
+    
+    <div class="content" id="view-collection">
+      {% get_resource_collection groupid title as file_collections %}
 
-  <!-- Tab View #4 - Videos -->
-  <div class="content" id="view-video">
-    <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
-
-    {% comment %}
-    {% include "ndf/file_list_tab.html" with resource_type=videoCollection detail_urlname="video_detail" filetype="video" res_type_name="" page_info=video_pages %}
-    {% endcomment %}
-  </div>
-
-  <!-- Tab View #5 - pandora Videos -->
-  <div class="content" id="view-pandora-video">
-    <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
-    {% comment %}
-    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" filetype="video" res_type_name="" page_info=pandora_pages %}
-    {% endcomment %}
-  </div>
-  
-  <div class="content" id="view-collection">
-
-    {% get_resource_collection groupid title as file_collections %}
-
-    {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
+      {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
+    </div>
 
   </div>
-
-</div>
 
 {% endblock %}
 
 
-<!-- Moved from videoDashboard -->
-
 {% block script %}
-
-  var eventhandler = function(e) { e.preventDefault();}
-
-  $(document).on('click',".video",function(){
-  //$('#body').css({opacity: "0.4"});
-  $("#backcover").show();
-  $('#body').bind('click', eventhandler);
-  $('#pop_video').show();
-  var video_id = this.id;
-  var video_index = $('.video').index(this)
-  var video_total = $('.video').length;
-  var pre = $(".video_pre");
-  var next = $(".video_next");
-  var url = "/{{groupid}}/video/fullvideo/"+video_id
-  $("#play_video").attr("src",url);
-  $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_id)
-  if(video_index >= 1 && video_index < video_total-1)
-  {
-   pre.attr("id",video_index-1);
-   next.attr("id",video_index+1);
- }
- else if(video_index == 0)
- {
-  pre.hide();
-  next.attr("id",video_index+1);
-}
-else if(video_index == video_total-1){
-  pre.attr("id",video_index-1);
-  next.hide();
-}
-else{
-  pre.hide();
-  next.hide();
-}
-});
-
-  $(document).on('click',"#close",function(){
-    $('#pop_video').hide();
-    $("#backcover").hide();
-    $("#play_video").attr("src","");
-    $('#body').css({opacity: "1"});
-    $('#body').unbind('click', eventhandler);
-  });
-
-  $(document).on('click',".video_pre",function(){
-    var video_id = this.id;
-    var video_index = parseInt(this.id);
-    var video_total = $('.video').length;
-    var pre = $(".video_pre");
-    var next = $(".video_next");
-    pre.show();
-    next.show();
-    var video_url = $(".video")[this.id].id
-    var url = "/{{groupid}}/video/fullvideo/"+video_url
-    $("#play_video").attr("src",url);
-    $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
-    if(video_index >= 1 && video_index < video_total-1)
-    {
-      pre.attr("id",video_index-1);
-      next.attr("id",video_index + 1);
-    }
-    else if(video_index == 0)
-    {
-      pre.hide();
-      next.attr("id",video_index+1);
-    }
-    else if(video_index == video_total-1){
-      pre.attr("id",video_index-1);
-      next.hide();
-    }
-    else{
-      pre.hide();
-      next.hide();
-    }
-  });
-
-  $(document).on('click',".video_next",function(){
-    var video_id = this.id;
-    var video_index = parseInt(this.id);
-    var video_total = $('.video').length;
-    var pre = $(".video_pre");
-    var next = $(".video_next");
-    pre.show();
-    next.show();
-    var video_url = $(".video")[this.id].id
-    var url = "/{{groupid}}/video/fullvideo/"+video_url
-    $("#play_video").attr("src",url);
-    $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
-    if(video_index >= 1 && video_index < video_total-1)
-    {
-      pre.attr("id",video_index-1);
-      next.attr("id",video_index+1);
-    }
-    else if(video_index == 0)
-    {
-      pre.hide();
-      next.attr("id",video_index+1);
-    }
-    else if(video_index == video_total-1){
-      pre.attr("id",video_index-1);
-      next.hide();
-    }
-    else{
-      pre.hide();
-      next.hide();
-    }
-  });
-
-
-  {% if is_video %}
-    alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
-  {% endif %}
-
+// <script type="text/javascript">
 
 // pagination ajax  
 $('ul.pagination a').click(function(e)
@@ -391,13 +294,13 @@ $('ul.pagination a').click(function(e)
 
 
 $("dl.tabs dd").click(function(){
-  tabDivId = $(this).children("a").attr("href");
+  var tabDivId = $(this).children("a").attr("href");
   if((tabDivId != "#view-collection") && (tabDivId != "#view-all") && (tabDivId != "view-pandora-video"))
-     {
+  {
      pageAnchor = $(tabDivId).children("a")[0];
      populateFileList(pageAnchor);
-}
-      $(this).off("click");
+  }
+  $(this).off("click");
 });
 
 
@@ -408,9 +311,12 @@ function populateFileList(pageAnchor)
         no_of_objs_pp = 24,
         url = pageAnchor.href.substr(pageAnchor.href.search(pageAnchor.host)+pageAnchor.host.length);
 
-    aaa = pageAnchor;
-
     var tabContainerDiv = $(pageAnchor).closest("div.content");
+
+    // {% if title == "E-Library" %}
+    //   var crxcr = $("input[type='radio'][name='crxcr']:checked").val();
+    // {% endif %}
+
     $.ajax({
 
       type: 'POST',
@@ -422,6 +328,9 @@ function populateFileList(pageAnchor)
         filetype: filetype,
         page_no: page_no,
         no_of_objs_pp: no_of_objs_pp,
+        // {% if title == "E-Library" %}
+        //   crxcr: crxcr,
+        // {% endif %}
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data){
@@ -437,5 +346,127 @@ function populateFileList(pageAnchor)
       }
     })
 }
+
+// $("input[type='radio'][name='crxcr']").change(function(){
+//   $("ul.pagination li.current > a").trigger("click");
+// })
+
+// --END of pagination.
+
+
+//   var eventhandler = function(e) { e.preventDefault();}
+
+//   $(document).on('click',".video",function(){
+//   //$('#body').css({opacity: "0.4"});
+//   $("#backcover").show();
+//   $('#body').bind('click', eventhandler);
+//   $('#pop_video').show();
+//   var video_id = this.id;
+//   var video_index = $('.video').index(this)
+//   var video_total = $('.video').length;
+//   var pre = $(".video_pre");
+//   var next = $(".video_next");
+//   var url = "/{{groupid}}/video/fullvideo/"+video_id
+//   $("#play_video").attr("src",url);
+//   $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_id)
+//   if(video_index >= 1 && video_index < video_total-1)
+//   {
+//    pre.attr("id",video_index-1);
+//    next.attr("id",video_index+1);
+//  }
+//  else if(video_index == 0)
+//  {
+//   pre.hide();
+//   next.attr("id",video_index+1);
+// }
+// else if(video_index == video_total-1){
+//   pre.attr("id",video_index-1);
+//   next.hide();
+// }
+// else{
+//   pre.hide();
+//   next.hide();
+// }
+// });
+
+//   $(document).on('click',"#close",function(){
+//     $('#pop_video').hide();
+//     $("#backcover").hide();
+//     $("#play_video").attr("src","");
+//     $('#body').css({opacity: "1"});
+//     $('#body').unbind('click', eventhandler);
+//   });
+
+//   $(document).on('click',".video_pre",function(){
+//     var video_id = this.id;
+//     var video_index = parseInt(this.id);
+//     var video_total = $('.video').length;
+//     var pre = $(".video_pre");
+//     var next = $(".video_next");
+//     pre.show();
+//     next.show();
+//     var video_url = $(".video")[this.id].id
+//     var url = "/{{groupid}}/video/fullvideo/"+video_url
+//     $("#play_video").attr("src",url);
+//     $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
+//     if(video_index >= 1 && video_index < video_total-1)
+//     {
+//       pre.attr("id",video_index-1);
+//       next.attr("id",video_index + 1);
+//     }
+//     else if(video_index == 0)
+//     {
+//       pre.hide();
+//       next.attr("id",video_index+1);
+//     }
+//     else if(video_index == video_total-1){
+//       pre.attr("id",video_index-1);
+//       next.hide();
+//     }
+//     else{
+//       pre.hide();
+//       next.hide();
+//     }
+//   });
+
+//   $(document).on('click',".video_next",function(){
+//     var video_id = this.id;
+//     var video_index = parseInt(this.id);
+//     var video_total = $('.video').length;
+//     var pre = $(".video_pre");
+//     var next = $(".video_next");
+//     pre.show();
+//     next.show();
+//     var video_url = $(".video")[this.id].id
+//     var url = "/{{groupid}}/video/fullvideo/"+video_url
+//     $("#play_video").attr("src",url);
+//     $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
+//     if(video_index >= 1 && video_index < video_total-1)
+//     {
+//       pre.attr("id",video_index-1);
+//       next.attr("id",video_index+1);
+//     }
+//     else if(video_index == 0)
+//     {
+//       pre.hide();
+//       next.attr("id",video_index+1);
+//     }
+//     else if(video_index == video_total-1){
+//       pre.attr("id",video_index-1);
+//       next.hide();
+//     }
+//     else{
+//       pre.hide();
+//       next.hide();
+//     }
+//   });
+
+
+  {% if is_video %}
+    alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
+  {% endif %}
+
+
+// </script>
 
 {% endblock %}

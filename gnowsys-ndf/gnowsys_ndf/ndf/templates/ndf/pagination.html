@@ -116,8 +116,23 @@
 
 				{% endif %}
 
+
 				<!-- for current page -->
-				<li class="current"><a href="">{{ page_info.current_page }}</a></li>
+				<li class="current">
+					{% if third_arg %}
+						<a href="{% url urlname first_arg second_arg third_arg page_info.current_page %}">
+							{{ page_info.current_page }}
+						</a>
+					{% elif second_arg %}
+						<a href="{% url urlname first_arg second_arg page_info.current_page %}">
+							{{ page_info.current_page }}
+						</a>
+					{% else %}
+						<a href="{% url urlname first_arg page_info.current_page %}">
+							{{ page_info.current_page }}
+						</a>
+					{% endif %}
+				</li>
 				
 
 				{% if page_info.has_next %}
