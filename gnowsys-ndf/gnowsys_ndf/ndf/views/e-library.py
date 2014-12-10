@@ -403,6 +403,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
         
         return render_to_response ("ndf/file_list_tab.html", {
                 "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
+                'title': "E-Library",
                 "resource_type": result_paginated_cur, "detail_urlname": "file_detail", 
                 "filetype": filetype, "res_type_name": "", "page_info": result_pages
             }, 
