@@ -555,6 +555,7 @@ def group_dashboard(request, group_id):
         if group_ins:
             group_id = group_ins._id
     group=collection.Node.one({"_id":ObjectId(group_id)})
+    banner_pic=""
     for each in group.relation_set:
                 print each
                 if "Group_has_profile_pic" in each:

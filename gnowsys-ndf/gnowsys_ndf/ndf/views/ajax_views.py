@@ -1617,7 +1617,7 @@ def get_data_for_event_task(request,group_id):
         nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end}})
         for i in nodes:
           attr_value={}
-          event_url="/"+str(group_id)+"/mis/54451151697ee12b7e222076/"+str(j._id) +"/"+str(i._id)
+          event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
           attr_value.update({'url':event_url})
           attr_value.update({'id':i._id})
           attr_value.update({'title':i.name})
