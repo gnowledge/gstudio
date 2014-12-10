@@ -103,18 +103,18 @@
   
 </ul>
 
-{% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
-
 {% comment %}
-
-  {% if title == "E-Library" %}
-    
-    {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
-
-  {% else %}
-
-    {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
-
-  {% endif %}
-
+{% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
 {% endcomment %}
+
+
+{% if title == "E-Library" %}
+  
+  {% include 'ndf/pagination.html' with urlname="elib_paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
+
+{% else %}
+
+  {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
+
+{% endif %}
+
