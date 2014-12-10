@@ -5,35 +5,17 @@
 {% block url %}{% url 'create_edit' groupid node %}{% endblock %}
 
 <!-- overide head block from base.html -->
-{% block head %}
 
-<!-- <script src="/static/ndf/js/tree.jquery.js"></script> -->
-<script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 
-<script type="text/javascript">
-
-  $(document).ready(function()
-  {
-    $(function() {
-      $('.tree').tree({
-       autoOpen: 0
-     });
-    });
-
-    $('.tree').bind(
-      'tree.click',
-      function(event) {
-        // The clicked node is 'event.node'
-        var node = event.node;
-        alert(node.id);
-      }
-      );
-  });
-
-</script>
-
+{% block style %}
+.row .row {
+  margin-left: 0
+}
 {% endblock %}
 
+{% block head %}
+  <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+{% endblock %}
 
 <!-- overiding block from node_detail_base.html -->
 {% block meta_content %}
@@ -61,36 +43,40 @@
 <!-- overiding block from node_detail_base.html -->
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
-<header class="row page">
-  <section class="medium-2 columns">
-    
-    <div class="label-list"> 
-      {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span> 
-      {% endfor %}
-    </div>
-  </section>
-  <section class="medium-10 columns" >
-    <h2>
-      <span class='node'>{{node.name}}</span>
-      <span><a class="button" href="{% url 'create_edit' group_name_tag node.pk %}">{% trans "Edit" %}</a></span>
-    </h2>
-    <h3 class="subheader"></h3>
-      <small>
+  <header class="row" style="margin: 1rem 0 0 0 ;">
+  <div class="row">
+    <h2 class="small-6 columns end"> {{node.name}}</h2>
+    <span class="small-6 columns  right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}">{% trans "Add Course Structure" %}</a></span>
 
-	{{ node.last_update|timesince }}{% trans "ago edited by" %} <a class="user">{% trans "User" %}</a> <a href="#view-changes"><i class="fi-clock"></i> {% trans "View history" %}</a>
-
+  </div>
+  <div class="row">
+      <small class="small-4 columns end">{{ node.last_update|timesince }}{% trans "ago edited by" %} <a class="user">{% trans "User" %}</a> <a href="#view-changes"><i class="fi-clock"></i> {% trans "View history" %}</a>
       </small>
+      
+</div>
+  </header>
 
-  </section>
-</header>
+
 
 <div class="row">
-  {% with node.html_content|safe as description %}
-  {% if description != "None" %}
-  {{ description }}
-  {% endif %}
-  {% endwith %}
+
+
+  {% for tab_name, tab_fields_list in property_order_list %}
+  <div class=" {% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+    {% for field in tab_fields_list %}
+      <div class="small-4 columns"> 
+        <label><b>{{field.altnames}}</b></label>
+        <!-- <label>{{field.altnames}}</label> -->
+      </div>
+      <div class="small-2 columns">
+          <label>{{field.value|title}}</label>
+      </div>
+    <br>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+
 </div>
 
 {% endblock %}

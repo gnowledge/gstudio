@@ -448,6 +448,10 @@ def parse_data_create_gsystem(json_file_path):
                                 curr_oid = collection.GSystem.one({ "_id": oid })
                                 # print curr_oid._id
                               else:
+                                row_list = []
+                                for e in hier_list:
+                                    row_list.append(e)
+
                                 curr_oid = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
 
                               if curr_oid:
@@ -475,11 +479,24 @@ def parse_data_create_gsystem(json_file_path):
                                 # print "oid: ", oid
                                 return oid
                               else:
-                                temp_obj = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                if temp_obj:
-                                  return temp_obj._id
+                                temp_obj = collection.GSystem.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                # temp_obj = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                if temp_obj.count() > 0:
+                                    for e in temp_obj:
+                                        if e.prior_node:
+                                            for k in e.prior_node:
+                                                obj = collection.Node.one({'_id':ObjectId(k) })
+                                                # print "\nitem: ",row_list[len(row_list)-2],"\n"
+                                                if obj.name == row_list[len(row_list)-2]:
+                                                    return e._id
+
+                                    return None
                                 else:
-                                  return None
+                                    return None
+                                # if temp_obj:
+                                #   return temp_obj._id
+                                # else:
+                                #   return None
 
                             # if any one of the item of hierarchy does not exist in database then:
                             elif not object_exist:
