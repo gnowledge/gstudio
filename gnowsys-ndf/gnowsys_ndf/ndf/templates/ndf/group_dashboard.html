@@ -7,6 +7,40 @@
   <h3>{% trans "About" %}</h3>
 
   {% blocktrans %}<b>Group Dashboard</b> Shows task(s) and activitie(s) in the site.{% endblocktrans %}
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
+      					{% csrf_token %}       
+<div   id="group_dashboard_Banner"  style="height:200px; class='div-height' width:1150px;  background-color: #b0e1df;">
+<div class="row">
+<div class="small 1 column">
+<input type="file" name="Group_has_profile_pic"  accept="image/*"  />
+</div>
+<div class="small 1 column">
+<input type="submit"  value="Save" style="font-size:15px;"  />
+</div>
+</div>  
+  {% if prof_pic_obj %}
+           <img src="{% url 'read_file' group_id prof_pic_obj.pk grid_fs_obj.filename %} " style="height:200px; width:300%; position:absolute z-index: auto; " >
+          
+          {% get_grid_fs_object prof_pic_obj as grid_fs_obj %}
+          {% endif %}   
+       
+               
+                {% comment %} <input type="text" id="txtSelectedFiles"  class="small-12 columns margin-p5" class="hide"> {% endcomment %}
+      					
+      					<input type="file" name="has_profile_pic"  class="hide" />
+                <input type="hidden" name="type" value="profile_pic">           
+                <input type="hidden" name="user" value="{{usr}}">         
+
+      					<p id="message" style="display:none">
+      						{% trans "Please wait for uploading profile picture" %}
+      					</p>
+
+</div>
+
+
+
+</form>             
+
 {% endblock %}
 
 {% block style %}
@@ -28,6 +62,11 @@
     .width_s_no {
       width: 5%;
     }
+    
+    .div-height {
+    margin-bottom: 0.5em; 
+    height: 9em;
+     }
 
     .counter {
       font-weight: bold;
@@ -56,13 +95,16 @@
       font-weight: bold;
       text-align: right;
     }
-
+.img-height {
+    height: 100%;
+  }
     .tiny.button {
       font-size: 1em !important;
     }
 {% endblock %}
 
 {% block body_content %}
+
 <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
   <label id="alertModalLabel"></label>
   <a class="close-reveal-modal">&#215;</a>
@@ -88,8 +130,74 @@
   </dl>
 </nav>
 
+<div id="containerdiv" style="border-style: solid; border-width: 1.5px; border-color: #b0e1df; padding: 0px 0px; height:380px; width:1152px; background-color: white;" >
+
+<!-- Banner Div -->
+    				
+             <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
+      					{% csrf_token %}       
+                     
+    <div   id="group_dashboard_Banner"  style="height:300px; class='div-height' width:1150px;  background-color: #b0e1df;">
+        <div>
+        <a style="border-style:solid; border-width:1.5px; padding:3px 5px; border-radius:4px" id="btnUploadBannerPic" >  Add a Banner Photo </a> </a> 
+         <input type="submit" id="submitpostid" value="Save" style="font-size:15px;"  />
+          
+          {% if banner_pic %}
+           <img src="{% url 'read_file' group_id banner_pic.pk grid_fs_obj.filename %} " style="height:300px; width:300%; position:absolute z-index: auto; " >
+          
+          {% get_grid_fs_object  banner_pic as grid_fs_obj %}
+          {% endif %}   
+        
+        <div class="row">
+          <div class="row" style="margin-top:80px; margin-left:20px; background: transparent;position:absolute z-index:1"  align="Left">
+                       
+      					
+      					<input type="file" name="has_Banner_pic" id="docFile" accept="image/*" class="hide" />
+
+                {% comment %} <input type="text" id="txtSelectedFiles"  class="small-12 columns margin-p5" class="hide"> {% endcomment %}
+      					
+                <input type="hidden" name="type" value="banner_pic">           
+                <input type="hidden" name="user" value="{{usr}}">         
+
+      					<p id="message" style="display:none">
+      						{% trans "Please wait for uploading profile picture" %}
+      					</p>
+      						
+      				</form>
+
+              </div> 
+           
+          </div>
+        </div>
+    </div>  
+    <br>
+<div class="row">    
+<div class="small-1 column">
+</div> 
+ <div class="small-11 column" > 
+  <div class="tabs" >
+    <div class="tab" >  
+      <dl class="tabs" data-tab data-options="deep_linking:true" >
+            <dd ><a  href="#Activities-div"  name="Activity" > Activity </a></dd> 
+            <dd ><a  href="#view-scheduler-calendar"  name="Schedular" > Schedular </a></dd>
+      </dl>
+    </div> 
+   </div>      
+ </div>
+</div>
+
+
+</div>    
+<!-- tab space -->    
+<!-- tab space ends here -->
+<!--banner div end here -->
+<br>
+<br>
+
+
 <div id="group_dashboard_details" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
-  {% if approval %}
+
+ {% if approval %}
   <!-- Tab: Enrollment Approval Details -->
   <div class="active content row" id="panel_enrollment_approval_details">
     <dl class="accordion" data-accordion>
@@ -146,10 +254,123 @@
   </div>
   -->
   {% endcomment %}
+
+
 </div>
+
+<div class="tabs-content">
+
+  <div class="content active" id="Activities-div">
+   <div align="center">
+   <h4 align="left"> Images </h4> 
+   <div class="row" style="border-style: solid; border-width: 1.5px; border-color: #b0e1df; padding: 0px 5px; background-color: white; height:200px;  width:800px; " >
+    {% for i in file_list %}
+      <div class="small-2 column" >
+
+    			    <div >
+    					<img src="{% url 'getFileThumbnail' group_id i.pk %}" class="img-height">
+              <h6> {{i.name|truncatechars:20 }}</h6>
+              </div>
+      </div>
+    
+    {% endfor %}
+    </div>
+  </div>  
+
+  <div align="center"> 
+  <h4 align="left"> Activities </h4>
+   <div style="border-style:solid; height:1000px;  width:800px; background-color: white ; border-width:1.5px; border-color:#b0e1df; padding:3px 5px; border-radius:4px" align="left"> 
+    {% for i in  activity_list %}
+           <h5><b>{{i.name|truncatewords:"20"}}</b></h5> 
+           <br>
+           by {{i.created_by}}
+           {{i.content}}
+           <br>
+           
+           
+           
+               
+    {% endfor %}
+    </div>
+  
+ </div> 
+</div>  
+  
+  
+
+
+<div class="content" id="view-scheduler-calendar">
+  {% include "ndf/scheduler_calender.html"  %}
+  
+  </div>
+</div>
+
+
 {% endblock %}
 
 {% block script %}
+
+$(document).ready(function(){
+
+});
+
+$("input:not('#docFile')").each(function() {
+		$(this).bind('keydown keypress keyup change', function() {
+			var search = (this.value).toLowerCase();    	
+    		var resource = (this.name); 
+    		var $li = $("#"+resource+"_drawer li.bullet-item").hide();  
+
+    		$li.filter(function() {    		    		
+      			return $(this).text().toLowerCase().indexOf(search) >= 0;
+    		}).show();
+  		});
+    });
+$("#btnUploadProfilePic").click(function() {
+    $("#docFile").trigger("click");
+  });
+
+$("#btnUploadBannerPic").click(function() {
+    $("#docFile").trigger("click");
+  });
+
+$('#docFile').on("change", function() {
+    $("#pic_div").removeClass("hide");
+
+    file_mime_type = this.files[0].type;
+    if(file_mime_type.indexOf("image/") < 0){
+      $(this).val("");
+      $('#docFile').val(this.value);
+
+      var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"
+      $("#alertModalLabel").text(message);
+      $("#alertModal").addClass("alert");
+      $("#alertModal").foundation('reveal', 'open');
+
+      $("#pic_div").addClass("hide");
+    }
+
+    
+  });
+
+	$("#submitpostid").click(function() {
+		if($("#docFile").val() != "") {	
+			$("#message").show();
+			$("#submitpostid").hide();
+		}
+
+		else {
+      var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
+      $("#alertModalLabel").text(message);
+      $("#alertModal").addClass("warning");
+      $("#alertModal").foundation('reveal', 'open');
+
+      $("#pic_div").addClass("hide");
+
+			return false;
+		}
+	});
+
+
 
 $(document).on("click", ".checkAllStudents", function(){
   $(".approveStudent").prop("checked", $(this).is(":checked"));
