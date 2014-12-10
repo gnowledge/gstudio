@@ -104,26 +104,7 @@
       <!-- Basic tab //////////////////////////////////////////////////////////////////////////////////////// -->
       <div class="active content row" id="panel_{{property_order_list.0.0}}">
         <!-- Type, Course Name -->
-        <div class="row">
-          <div class="small-2 columns">
-            <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
-              {{property_order_list.0.1.0.altnames}}
-            </label>
-          </div>
-          <div class="small-4 columns">
-            {% html_widget groupid node.pk property_order_list.0.1.0 %}
-          </div>            
-          
-          <div class="small-2 columns">
-            <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
-              {{property_order_list.0.1.1.altnames}}
-            </label>
-          </div>
-          <div class="small-4 columns">
-            {% html_widget groupid node.pk property_order_list.0.1.1 %}
-          </div>            
-        </div>
-
+        
         <!-- Code, tags -->
         <div class="row">
           <div class="small-2 columns">

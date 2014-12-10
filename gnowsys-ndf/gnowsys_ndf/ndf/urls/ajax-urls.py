@@ -40,11 +40,12 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_data_for_user_drawer/', 'get_data_for_user_drawer', name='get_data_for_user_drawer'),
     url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
 
-    # Ajax-urls required for MIS --------------------------------
+                       # Ajax-urls required for MIS --------------------------------
+                       
     url(r'^get_students_for_batches/', 'get_students_for_batches', name='get_students_for_batches'),
     url(r'^get_anncourses_allstudents/', 'get_anncourses_allstudents', name='get_anncourses_allstudents'),
     url(r'^get_courses/', 'get_courses', name='get_courses'),
-
+                       
     url(r'^get_announced_courses_with_ctype/', 'get_announced_courses_with_ctype', name='get_announced_courses_with_ctype'),
     url(r'^get_colleges/', 'get_colleges', name='get_colleges'),
     url(r'^get_districts/', 'get_districts', name='get_districts'),
@@ -52,18 +53,25 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_students/', 'get_students', name='get_students'),
     url(r'^get_students_for_approval/', 'get_students_for_approval', name='get_students_for_approval'),
     url(r'^approve_students/', 'approve_students', name='approve_students'),
-
+                    
     url(r'^get_college_wise_students_data/', 'get_college_wise_students_data', name='get_college_wise_students_data'),
     url(r'^set_user_link/', 'set_user_link', name='set_user_link'),
     url(r'^set_enrollment_code/', 'set_enrollment_code', name='set_enrollment_code'),
     url(r'^get_students_assignments/', 'get_students_assignments', name='get_students_assignments'),
     url(r'^get_course_details_for_trainer/', 'get_course_details_for_trainer', name='get_course_details_for_trainer'),
-
     url(r'^/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)$', 'event_assginee', name='event_assginee'), 
     url(r'^save_csv/(?P<app_set_instance_id>[\w-]+)$', 'save_csv', name='save_csv'),
+    url(r'^assessment/(?P<app_set_instance_id>[\w-]+)$','get_assessment',name='get_assessment'),
     url(r'^edit_task_title/', 'edit_task_title', name='edit_task_title'),
+    url(r'^get_attendees/(?P<node>[\w-]+)$', 'get_attendees', name='get_attendees'),
+    url(r'^attendees/(?P<node>[\w-]+)$', 'get_attendance', name='get_attendance'),
+    url(r'^attendees_relations/(?P<node>[\w-]+)$', 'attendees_relations', name='attendees_relations'),
+    url(r'^fetch_course_name/(?P<Course_type>[^/]+)$', 'fetch_course_name', name='fetch_course_name'),
+    url(r'^fetch_course_Module/(?P<Course_name>[^/]+)$', 'fetch_course_Module', name='fetch_course_Module'),
+    url(r'^fetch_course_session/(?P<Course_name>[^/]+)$', 'fetch_course_session', name='fetch_course_session'),    
+    url(r'^fetch_course_batches/(?P<Course_name>[^/]+)$', 'fetch_course_batches', name='fetch_course_batches'),    
+    url(r'^fetch_batch_student/(?P<Course_name>[^/]+)$', 'fetch_batch_student', name='fetch_batch_student'),    
     url(r'^events/', 'get_data_for_event_task', name='get_data_for_event_task'),
     url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
-
     url(r'^insert_picture/', 'insert_picture', name="insert_picture"),
 )

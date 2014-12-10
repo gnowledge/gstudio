@@ -48,13 +48,17 @@
   <div class="panel" style="background-color:#ddd;">
     
     <!-- radio buttons for E-Library app: CR and XCR -->
+    {% comment %}
+    <!-- 
     {% if title == "E-Library" %}
       <input type="radio" name="crxcr" value="cr" id="cr-rad" title="Curricular">
         <label for="cr-rad" title="Curricular">CR</label>
       <input type="radio" name="crxcr" value="xcr" id="xcr-rad" title="Extra Curricular">
         <label for="xcr-rad" title="Extra Curricular">XCR</label>
     {% endif %}
-
+    -->
+    {% endcomment %}  
+    
     <ul class="side-nav">
 
       <dl class="tabs" data-tab >
@@ -209,14 +213,22 @@
 
     <!-- Tab View 2 - Documents -->
     <div class="content" id="view-doc">
-      <a href='{% url "paged_file_objs" group_name_tag "doc" 1 %}' class="first-load">1</a>
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "doc" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "doc" 1 %}' class="first-load">1</a>
+      {% endif %}
     </div>
 
 
     <!-- Tab View 3 - Interactives -->
     {% if interactiveCollection %}
       <div class="content" id="view-interactive">
-        <a href='{% url "paged_file_objs" group_name_tag "interactives" 1 %}' class="first-load">1</a>
+        {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "interactives" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "interactives" 1 %}' class="first-load">1</a>
+        {% endif %}
       </div>
     {% endif %}
 
@@ -224,23 +236,39 @@
     <!-- Tab View 4 - Audios -->
     {% if audioCollection %}
       <div class="content" id="view-audio">
-        <a href='{% url "paged_file_objs" group_name_tag "audio" 1 %}' class="first-load">1</a>
+        {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "audio" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "audio" 1 %}' class="first-load">1</a>
+        {% endif %}
       </div>
     {% endif %}
 
     <!-- Tab View #3 - Images -->
     <div class="content" id="view-image">
-      <a href='{% url "paged_file_objs" group_name_tag "image" 1 %}' class="first-load">1</a>
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "image" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "image" 1 %}' class="first-load">1</a>
+      {% endif %}
     </div>
 
     <!-- Tab View #4 - Videos -->
     <div class="content" id="view-video">
-      <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% endif %}
     </div>
 
     <!-- Tab View #5 - pandora Videos -->
     <div class="content" id="view-pandora-video">
-      <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% if title == "E-Library" %}
+        <a href='{% url "elib_paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% else %}
+        <a href='{% url "paged_file_objs" group_name_tag "video" 1 %}' class="first-load">1</a>
+      {% endif %}
     </div>
     
     <div class="content" id="view-collection">
@@ -285,9 +313,9 @@ function populateFileList(pageAnchor)
 
     var tabContainerDiv = $(pageAnchor).closest("div.content");
 
-    {% if title == "E-Library" %}
-      var crxcr = $("input[type='radio'][name='crxcr']:checked").val();
-    {% endif %}
+    // {% if title == "E-Library" %}
+    //   var crxcr = $("input[type='radio'][name='crxcr']:checked").val();
+    // {% endif %}
 
     $.ajax({
 
@@ -300,9 +328,9 @@ function populateFileList(pageAnchor)
         filetype: filetype,
         page_no: page_no,
         no_of_objs_pp: no_of_objs_pp,
-        {% if title == "E-Library" %}
-          crxcr: crxcr,
-        {% endif %}
+        // {% if title == "E-Library" %}
+        //   crxcr: crxcr,
+        // {% endif %}
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data){
@@ -319,9 +347,9 @@ function populateFileList(pageAnchor)
     })
 }
 
-$("input[type='radio'][name='crxcr']").change(function(){
-  $("ul.pagination li.current > a").trigger("click");
-})
+// $("input[type='radio'][name='crxcr']").change(function(){
+//   $("ul.pagination li.current > a").trigger("click");
+// })
 
 // --END of pagination.
 
