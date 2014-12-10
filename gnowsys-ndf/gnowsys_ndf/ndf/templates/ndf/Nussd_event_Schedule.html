@@ -1,0 +1,858 @@
+{% extends "ndf/event.html" %}
+{% load ndf_tags %}
+{% load i18n %}
+{% load pagination_tags %}
+{% block head %}
+	<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+{% endblock %}
+
+
+{% block style %}
+ 
+/* CSS for Multiple-selection (or drawer) widget */
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
+
+  .margin-0 { margin: 0 !important ;}
+
+  .resource-drawer { 
+    border-color: #D3D3D3; border-style: solid; 
+    padding: 0 !important; 
+    overflow-y: auto;
+  }
+
+  .resource-drawer li.bullet-item:hover{
+    background-color: #ecf0f1; cursor:pointer;
+  }
+
+  .posted-by{ color: #808080; font-size: small; }
+
+  .selected-resource { background-color:lightgray !important ; }
+
+  .resource-type-image {
+    height:40px;    
+    background-repeat:no-repeat; background-size: 48px 48px
+  }
+
+/* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+  dl.tabs>dd a.disable {
+    pointer-events: none;
+    cursor: default;
+  }
+
+{% endblock %}
+
+{% block body_content %} 
+  <form data-abide id="form-edit-node" method="POST" action="">
+  {% csrf_token %}
+ <div class="row">
+    <fieldset>
+                <header class="row" style="margin: 1rem 0 0 0;">
+                <h2 class="medium-12 columns">
+                 {% if node %}
+                        {% trans "Editing Event:" %} {{node.name}}
+                 {% else %}
+                        {% trans "Create a New" %} {{title}} Event
+                 {% endif %}
+      </h2>
+    </header>
+
+        <div class="row">
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.9.name}}" class="right inline"> 
+                {{property_order_list.0.1.9.altnames}}
+              </label>
+            </div>
+            <div class="small-5 columns">
+                     {% html_widget groupid node.pk property_order_list.0.1.9 %}
+            </div>
+            
+           <div class="small-1 columns">
+                 <label  class="right inline">
+                    Course Name
+                </label>
+           </div>
+           <div class="small-5 columns">
+                 <select id="nussd_course_name" name="nussd_course_name" required>
+                 </select>
+           </div>
+         
+        </div>
+        <!-- tab for batches -->
+        
+        <div class= "row">
+            <div class="small-1 columns">
+                 <label  class="right inline">
+                    Batches</label>
+            </div>
+            <div align="left">
+               <div class="small-4 columns" align="left">
+                      <select id="event_has_batch" name="event_has_batch">
+                      </select>
+                      
+               </div>
+               <div class="small-7 columns">
+                 <label><font color="red">*</font></label>
+               </div>
+            
+            </div>
+        </div>
+ </div>    
+        
+         <div class= "row">
+            <div class="small-12 columns" align="center">
+                <input type="button" class="medium button" id="view" value="view">
+           </div>
+         </div>
+          
+    </fieldset>
+    <div id="Module-session-section">
+      <fieldset >
+         <div class="row" >
+          <div class="small-1 columns">
+            <label   class="right inline">
+               Module
+            </lable>
+          </div>
+      
+         <div class="small-4 columns">
+          <select id="Module_of" name="Module_of">
+          </select>
+         
+         </div>
+         <div class="small-1 columns">
+         <label><font color="red">*</font></label>
+         </div>
+         <div class="small-1 columns">
+           <label   class="right inline">
+              Sessions
+           </lable>
+         </div>
+     
+         <div class="small-4 columns"> 
+             <select id="session_of" name="session_of">
+             </select>
+             
+         </div>
+         <div class="small-1 columns">
+          <label><font color="red">*</font></label>
+         </div> 
+      
+      
+    </div>
+      <!-- section for start time and end time -->
+      
+      <div class="row">
+                  <!- section for creation of multiple section -->
+                  <div class="small-1 columns" hidden>
+                        <label  class="right inline">
+                        Split session
+                          
+                        </label>
+                  </div>
+                  <div class="small-11 columns" align="left" hidden >
+                        <input type="radio" id="split-into2" name="split-into" value="2" > 2
+                        <input type="radio" id="split-into3" name="split-into" value="3" > 3
+                  </div>
+                  
+                  <div class="session_time">
+                  
+                  
+                  </div>
+      
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+                {{property_order_list.0.1.1.altnames}}
+              </label>
+            </div>
+            <div class="small-2 columns">
+                     {% html_widget groupid node.pk property_order_list.0.1.1 %}
+            </div>
+            
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+               
+                {{property_order_list.0.1.2.altnames}}
+              </label>
+            </div>
+            <div >
+                     {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
+         
+           
+      </div>
+      <div class="row">
+      
+         <div class="small-1 columns">
+              <label  class="right inline"> 
+                    Master Trainer
+              </label>
+            </div>
+            <div class="small-5 columns">
+                     <select id="event_coordinator" name="event_coordinator" required>
+                     
+                     </select>
+                     
+            </div>
+            <div class="small-4 columns">
+                 <label><font color="red">*</font></label>
+            </div>
+            <div class="small-4 columns">
+                 
+            </div>
+
+           
+      </div>
+      <div class="hiddensection" hidden>
+      <input id="course_type" name="course_type">
+      <input id="course_name" name="course_name">
+      <input id="Module_name" name="Module_name">
+      <input id="Session" name="Session">
+      <select id="has_attendees" name="has_attendees" multiple=""   >
+      </select>
+              
+      
+      <input type="hidden" value=1 name="iteration" id="iteration">
+      </div>
+      </fieldset>  
+      
+         
+        <div class="row">
+       <div class="small-12 columns" align="center">
+      <input type="submit" id="submit" class="medium button" value="submit" >
+       </div>
+       </div>
+ <!-- div module sesion section Opens here" -->
+ </div>
+</div>
+ 
+  </form>
+  
+  
+  
+{% endblock %}
+
+{% block script %}
+$(document).ready(function(){
+  clear_Disable_Elements();
+  var event_details=""
+  event_details="{{edit_details|safe}}"
+
+  if(event_details)
+  {
+    event_details={{edit_details|safe}}
+
+
+    $('#nussd_course_name').append(
+                  $("<option></option>")
+                  .attr('id',event_details['course'].course_id)
+                  .attr('value',event_details['course'].course_id)
+                  .text(event_details['course'].course)
+                  );
+    var a=event_details['course'].course                
+    $("select[name='nussd_course_name'] option[value= a]").prop("selected", true);       
+    document.getElementById('nussd_course_name').disabled = "";
+    $('#event_has_batch').append(
+                 $("<option></option>")
+                  .attr('id',event_details['batch'].batchid)
+                  .attr('value',event_details['batch'].batchid)
+                  .text(event_details['batch'].batchname)
+                  );
+    var a=event_details['batch'].batchname                
+    $("select[name='batch'] option[value= a]").prop("selected", true);       
+    document.getElementById('Module_of').disabled = "";
+                 $('#Module_of').append(
+                 $("<option></option>")
+                 .attr('id',event_details['Module'].Moduleid)
+                 .attr('value',event_details['Module'].Moduleid)
+                 .text(event_details['Module'].Modulename)
+                  );
+    var a=event_details['Module'].Modulename                
+    $("select[name='Module_of'] option[value= a]").prop("selected", true);       
+    document.getElementById('event_coordinator').disabled = "";
+                 $('#event_coordinator').append(
+                       $("<option></option>")
+                      .attr('id',event_details['cordinator'].cordinatorid)
+                      .attr('value',event_details['cordinator'].cordinatorid)
+                      .text(event_details['cordinator'].cordinatorname)
+                      );
+    var a=event_details['cordinator'].cordinatorname                
+  
+    $("select[name='event_coordinator'] option[value= a]").prop("selected", true);       
+  
+    document.getElementById('event_has_batch').disabled = "";
+    Enable_Elements()     
+    var course_type=$("#event_has_batch").val()  
+      $.ajax({
+          url: "{% url 'fetch_batch_student' groupid 'course_type' %}".replace('course_type',String(course_type)),
+          type: "GET",
+          success: function(data){
+              courses=JSON.parse(data)
+              },
+          complete:function(){
+                if(courses != ""){
+                $.each(courses, function(key,val) {
+                     $('#has_attendees').append(
+                     $("<option></option>")
+                     .attr("id", "coursename_"+key.id)
+                     .attr("value",val.id)
+                     .attr("selected","selected")
+                     .text(val.name)
+            
+           );
+            });
+          }
+          } 
+    });
+} 
+});
+function Enable_Elements()
+{
+document.getElementById('Module_of').disabled = "";
+document.getElementById('Module-session-section').visible = "True";
+document.getElementById('view').disabled = "";
+}
+function clear_Disable_Elements()
+{
+$('#nussd_course_name').attr('disabled','True')
+$('#nussd_course_name').empty()
+$('#event_has_batch').attr('disabled','True')
+$('#event_has_batch').empty()
+$('#session_of').attr('disabled','True')
+$('#session_of').empty()
+$('#Module_of').attr('disabled','True')
+$('#Module_of').empty()
+$('#Module-session-section').hide()
+$('#view').attr('disabled','True')
+$('#submit').attr('disabled','True')
+$('#event_coordinator').attr('disabled','True')
+}
+var startDtInput = $("#start_time")
+var $a=$('#split-into3')
+$('body').click(function(e) {
+
+    var target = $(e.target), article;
+    if(target.is('#split-into2')){
+    $a=$('#split-into2')
+    }
+    else if(target.is('#split-into3')){
+    $a=$('#split-into3')
+    }
+});
+
+$('#split-into3').click(function(){
+  var counter=$('#split-into3').val()
+  /*for (i=1;i<counter;i++){
+     var $elem=$("#start_time").clone()
+     var $a=$elem.attr("id","start_time_"+i).attr("name","start_time_"+i)
+     $a.appendTo(".session_time")
+  }*/
+});
+
+
+$('#split-into2').click(function(){
+   $('#iteration').attr('value','2')
+   alert($('#iteration').val())
+  var counter=$('#split-into2').val()
+/*
+  for (i=1;i<counter;i++){
+     var $elem=$("#start_time").clone(true)
+     var $a=$elem.attr("id","start_time_"+i).attr("name","start_time_"+i)
+     $a.appendTo(".session_time")
+  }
+  */
+});
+
+
+
+$("#view").click(function(){
+
+if(!$("#nussd_course_name").val()  || ($("#nussd_course_name").val() == "Select Course Name"))
+{
+    alert("Please Select Course Name")
+}
+else
+{
+var sel_coursename=$("#nussd_course_name").val();
+
+$('#Module-session-section').show()
+$.ajax({
+      url: "{% url 'fetch_course_Module' groupid 'sel_coursename' %}".replace('sel_coursename',String(sel_coursename)),
+      type: "GET",
+      datatype:"json",
+      success: function(data){
+      courses=JSON.parse(data)
+      course=JSON.parse(courses.Module)
+      trainer=JSON.parse(courses.trainer)
+      },
+     complete:function(){
+      if(course != ""){
+                  $('#Module_of').empty()
+                  $('#Module_of').append($("<option></option>").attr("value","Select Module Name").text("--- Select Module ---"))
+                  $.each(course, function(key,val) {
+                  $('#Module_of').append(
+                  $("<option></option>")
+                      .attr("id", "coursename_"+key.id)
+                      .attr("value",val.id)
+                      .text(val.name)
+                   );
+                });
+            Enable_Elements()
+       }  
+       else
+       {
+            alert("No Module Exists for this Course type!!!")
+       
+       }   
+      if (trainer!=""){   
+         $('#event_coordinator').empty()
+         $('#event_coordinator').append($("<option></option>").attr("value","Select Trainer").text("--- Select Trainer ---"))
+         $.each(trainer,function(key,val){
+              $('#event_coordinator').append(
+                 $("<option></option>")
+                  .attr("id", "coursename_"+key.id)
+                  .attr("value",val.id)
+                  .text(val.name)
+                  );
+                  
+                });   
+          
+          }
+          else
+          {
+            clear_Disable_Elements();
+          alert("No Trainers have being Assinged to this Course !!!")
+          }
+          } 
+      });
+
+}
+
+
+   
+
+});
+
+$("#nussd_course_name").change(function(){
+
+  
+  var course_type=$("#nussd_course_name").val()  
+  var course_name=$("#nussd_course_name option:selected ").text()
+
+  $('#course_name').val(course_name)
+  $.ajax({
+  
+      url: "{% url 'fetch_course_batches' groupid 'course_type' %}".replace('course_type',String(course_type)),
+      type: "GET",
+      success: function(data){
+      courses=JSON.parse(data)
+      
+      },
+     complete:function(){
+      $('#event_has_batch').empty()
+      $('#event_has_batch').append($("<option></option>").attr("value","Select Course Name").text("--- Select Batch ---"))
+      if(courses != ""){
+              $.each(courses, function(key,val) {
+                    $('#event_has_batch').append(
+                    $("<option></option>")
+                    .attr("id", "coursename_"+key.id)
+                    .attr("value",val.id)
+                    .text(val.name)
+                    );
+               });
+          document.getElementById('event_has_batch').disabled = "";
+          }
+          else
+          {
+          alert("No Batches Found")
+          
+          document.getElementById('nussd_course_name').disabled = "";
+          $('#Module-session-section').hide()
+          $('#event_has_batch').attr('disabled','True')
+          $('#view').attr('disabled','True')
+          }
+              
+  
+          } 
+      });
+
+
+
+});
+
+$("#event_has_batch").change(function(){
+   Enable_Elements()
+    var course_type=$("#event_has_batch").val()  
+    $.ajax({
+        url: "{% url 'fetch_batch_student' groupid 'course_type' %}".replace('course_type',String(course_type)),
+        type: "GET",
+        success: function(data){
+            courses=JSON.parse(data)
+
+        },
+      complete:function(){
+        if(courses != ""){
+            $('#has_attendees').empty()
+            $.each(courses, function(key,val) {
+                $('#has_attendees').append(
+          $("<option></option>")
+            .attr("id", "coursename_"+key.id)
+            .attr("value",val.id)
+            .attr("selected","selected")
+            .text(val.name)
+            
+           );
+            });
+          }
+          } 
+      });
+
+
+
+});
+
+
+
+$("#Module_of").change(function(){
+  
+var course_type=$("#Module_of").val()  
+  var Module_of=$("#Module_of").text()
+  $("#Module_name option:selected ").val(Module_of)
+  
+
+  $.ajax({
+      url: "{% url 'fetch_course_session' groupid 'course_type' %}".replace('course_type',String(course_type)),
+      type: "GET",
+      success: function(data){
+      courses=JSON.parse(data)
+
+      },
+     complete:function(){
+      if(courses != ""){
+         $('#session_of').empty()
+         $('#session_of').append($("<option></option>").attr("value","Select Session Name").text("--- Select Session ---"))
+          $.each(courses, function(key,val) {
+              $('#session_of').append(
+               $("<option></option>")
+                .attr("id", "coursename_"+key.id)
+                .attr("value",val.id)
+                .text(val.name)
+                );
+             });
+          document.getElementById('session_of').disabled = "";
+          }
+     else
+     {
+          document.getElementById('session_of').disabled = "True";
+          alert("No Session Found!!!")
+       
+     }     
+          
+          
+          }
+           
+      });
+
+
+
+});
+
+$("#session_of").change(function(){
+
+var session_of=$('#session_of option:selected').text()
+$("#Session").val(session_of)
+document.getElementById('event_coordinator').disabled = "";      
+});
+$('#event_coordinator').change(function(){
+
+document.getElementById('submit').disabled = "";      
+
+});
+
+
+$("#nussd_course_type").change(function(){
+  clear_Disable_Elements()
+  var course_type=$("#nussd_course_type").val()
+  var courses=""
+  $("#course_type").val(course_type)
+  
+  $.ajax({
+      url: "{% url 'get_announced_courses_with_ctype' groupid  %}",
+      type: "GET",
+      dataType: "json",
+      data:{'nussd_course_type':course_type},
+      success: function(data){
+      ac_data = data["acourse_ctype_list"]
+      ac_message=data.message
+      if(ac_data)
+       {courses = JSON.parse(ac_data)
+      
+      }},
+     complete:function(){
+      if(courses != ""){
+             $('#nussd_course_name').append($("<option></option>").attr("value","Select Course Name").text("--- Select Course Name ---"))
+             $.each(courses, function(key,val) {
+                 se = val["_id"];
+                 ac_name=val["name"];
+                 $('#nussd_course_name').append(
+                 $("<option></option>")
+                 .attr("id", "coursename_"+se)
+                 .attr("value",se)
+                 .text(ac_name)
+                    );
+              document.getElementById('nussd_course_name').disabled = "";
+              });
+              
+      }
+      else
+      {
+            alert(ac_message)
+      }
+          
+          
+  
+          }
+           
+      });
+
+
+
+});
+
+// Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
+  $(document).on('closed', '[data-reveal]', function () {
+    /*
+     *  On closing of reveal-modal
+     */
+    var widget_for = $(this).attr('id').replace('_modal', '')
+
+    // First empty all values of given field (dropdown/select)
+    $("select#" + widget_for).empty();
+
+    // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
+    class_value = ".node_id." + widget_for + "_values"
+    right_drawer_len = $(class_value).size()
+
+    if (right_drawer_len > 0) {
+      $(class_value).each(function (){
+        // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
+        resource_id = $(this).val()
+        resource_name = $(this).attr('name')
+
+        // Make very first entry as given below
+        $("select#" + widget_for).append(
+            $("<option></option>")
+              .attr("value", resource_id)
+              .attr("selected", "selected")
+              .text(resource_name)
+        );
+      });
+    }
+
+    else {
+      // Make very first entry as given below
+      $("select#" + widget_for).append(
+          $("<option></option>")
+            .attr("value", "")
+            .text("- - - Select - - -")
+      );
+    }
+  });
+  lowerYearLimit = currentYear;
+  upperYearLimit = currentYear + 20;
+  
+  if(startDtInput.length > 0) {
+      $(".date_month_day_year").datetimepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy',
+        yearRange: lowerYearLimit + ":" + upperYearLimit,
+        hourGrid: 6,
+        minuteGrid: 15,
+ 
+        onClose: function(dateText, inst) {
+          if (endDtInput.val() != '') {
+            var testStartDate = startDtInput.datetimepicker('getDate');
+            var testEndDate = endDtInput.datetimepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              var endDate = new Date(parseFloat(startDate.setMinutes(startDate.getMinutes()+(60-startDate.getMinutes()))));
+              endDtInput.datetimepicker('setDate', endDate);
+
+            }
+          }
+
+          else {
+          var testStartDate = new Date(parseFloat(startDtInput.datetimepicker('getDate').setMinutes(startDtInput.datetimepicker('getDate').getMinutes() + 60)));
+          
+          var endDate = testStartDate;
+
+            
+            //endDtInput.val(dateText);
+            endDtInput.datetimepicker('setDate', endDate);
+          }
+        },
+
+        onSelect: function (selectedDateTime){
+          endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate'));
+        }
+      });
+    }
+
+  
+  
+  
+  var endDtInput = $("#end_time")
+    if(endDtInput.length > 0) {
+
+      endDtInput.datetimepicker({ 
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy',
+        yearRange: lowerYearLimit + ":" + upperYearLimit,
+        hourGrid: 6,
+        minuteGrid: 15,
+        numberOfMonths: 1,
+        onClose: function(dateText, inst) {
+          if (startDtInput.val() != '') {
+            var testStartDate = startDtInput.datetimepicker('getDate');
+            var testEndDate = endDtInput.datetimepicker('getDate');
+            var endhour= parseFloat(startDate.getMinutes())
+            var endDate = new Date(parseFloat(startDate.setMinutes(startDate.getMinutes()+(60-startDate.getMinutes()))));
+               
+            if (testStartDate > testEndDate) {
+              startDtInput.datetimepicker('setDate', endDate);
+              
+            }
+          }
+
+          else {
+            startDtInput.val(dateText);
+          }
+        },
+
+        onSelect: function (selectedDateTime){
+          startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
+        }
+      });
+    }
+
+  
+  
+  
+  currentDate = new Date();
+    var currentDay = currentDate.getDate();
+    var currentMonth = currentDate.getMonth();
+    var currentYear = currentDate.getFullYear();
+  
+  $(".date_month_day_year").datetimepicker({
+      changeMonth: true,
+      dateFormat: 'dd/mm/yy',
+      minDate: '0',
+      maxDate: '+2m',
+      defaultDate: '0',
+      hourGrid: 6,
+      minuteGrid: 15,
+      onClose: function(dateText, inst) {
+        $(this).val(dateText);
+        
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+        
+        if ($(this).attr('id') == "start_date") {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (end_date.val() != '') {
+            var testStartDate = start_date.datetimepicker('getDate');
+            var testEndDate = end_date.datetimepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              end_date.datetimepicker('setDate', testStartDate);
+            }
+
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datetimepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            end_date.val(day+"/"+month+"/"+year);
+            $(this).datetimepicker('setDate', new Date(year, (month-1), day));
+          }
+
+          $("#end_date").datetimepicker('option', 'minDate', new Date(year, (month-1), day));
+        }
+
+        else if ($(this).attr('id') == "end_date") {
+          if (month_year) {
+            month_year = month_year.split("/");
+            day = parseInt(month_year[0]);
+            month = parseInt(month_year[1]);
+            year = parseInt(month_year[2]);
+          }
+
+          if (start_date.val() != '') {
+            var testStartDate = start_date.datetimepicker('getDate');
+            var testEndDate = end_date.datetimepicker('getDate');
+
+            if (testStartDate > testEndDate) {
+              start_date.datetimepicker('setDate', testEndDate);
+            }
+
+            else {
+              $(this).val(day+"/"+month+"/"+year);
+              $(this).datetimepicker('setDate', new Date(year, (month-1), day));
+            }
+          }
+
+          else {
+            start_date.val(day+"/"+month+"/"+year);
+
+            $(this).datetimepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+      },
+
+      beforeShow: function() {
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+        
+
+        $(this).datetimepicker('option', 'defaultDate', new Date(year, (month-1), day));
+        $(this).datetimepicker('setDate', new Date(year, (month-1), day));
+      },
+    });
+
+
+
+{% endblock %}
+
+

@@ -1,4 +1,4 @@
-{% extends "ndf/mis_base.html" %}
+{% extends "ndf/event.html" %}
 {% load ndf_tags %}
 {% load i18n %}
 {% load pagination_tags %}
@@ -41,7 +41,8 @@ table, th, td {
       <dl class="row tabs" data-tab data-options="deep_linking:true">
         <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "Read" %}</a></dd>
         <dd ><a href="#view-scheduler-calendar"><i class="fi-calendar"></i>{% trans "Events" %} </a></dd>
-        <dd ><a href="#view-Attendance"><i class="fi-Attendance"></i>{% trans "Attendance" %} </a></dd>
+        <dd onClick="controler()"><a href="#view-Attendance"><i class="fi-Attendance"></i>{% trans "Attendance" %} </a></dd>
+        {% if event_gst == 'Exam' %}<dd id="Assesmentlist" onClick="Editassesment(this)"><a href="#view-Assesment"><i class="fi-Assesment"></i> {% trans "Assesment" %}</a></dd> {% endif %}
         <dd>
           <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
@@ -185,6 +186,10 @@ table, th, td {
               {% endfor %}
             </div>
           </div>
+          
+         
+          
+          
           <!--
           <br>
           <div class="row">
@@ -219,7 +224,40 @@ table, th, td {
               {% endfor %}
             </div>
           </div>
-
+           <br>
+          <div class="row">
+            <div class="small-3 columns">
+              <label>Batch:</label>
+            </div>
+            <div class="small-5 end columns">
+              <label>{{batch}}</label>
+            </div>
+          </div>
+            <br>
+        <div class="row">
+            <div class="small-3 columns">
+              <label>Course:</label>
+            </div>
+            <div class="small-5 end columns">
+              <label>{{course.name}}</label>
+            </div>
+          </div>
+          <br>
+        <div class="row">
+            <div class="small-3 columns">
+              <label>Min marks:</label>
+            </div>
+            <div class="small-3 end columns">
+              <label>{{course.attribute_set.7.max_marks}}</label>
+            </div>
+            
+            <div class="small-3 columns">
+              <label>Max Marks:</label>
+            </div>
+            <div class="small-2 end columns">
+              <label>{{course.attribute_set.6.min_marks}}</label>
+            </div>
+       </div>
         
           <br>
           <br>
@@ -231,7 +269,7 @@ table, th, td {
           {% endwith %}
         </div> <!-- End of class="content active" -->
 
-        <!-- Content for Concept Graph -->
+        <!-- Content for Concept Graph -->{% comment %}
         <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
           <a class="close-reveal-modal">&#215;</a>
           {% include "ndf/graph_concept.html" %}
@@ -248,60 +286,18 @@ table, th, td {
           <a class="close-reveal-modal">&#215;</a>
           {% include "ndf/graph_dependency.html" %}
         </div>
-
+         {% endcomment %}
         <!-- Tab View Scheduler-Calender -->
         <div class="content" id="view-scheduler-calendar" >    
         {% include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
         </div>
         <div class="content" id="view-Attendance" >    
-          {% get_event_relation node.pk as attendeesrel %}
-          {% if attendeesrel == "False" %}
           
-          {% get_attendees groupid node as attendees %}
-          <H1> Take your attendance here </H1>
           <div id="attendance">
-              <table id="table">
-                  <Thead>
-                  <th> Name </th>
-                  <th> attended </th>
-                  </Thead>
-                 {% for i in attendees %}
-                 <tr>
-                 <td> {{i.name}}</td>
-                 
-                 <td> <input type="checkbox"  class="chkbx" value="{{i.pk}}"></td>
-                 </tr>
-                 
-                 {% endfor %} 
-                  
-               </table>
-             
+              
           </div>
-          <div id="save">
-          <input class="tiny button" onclick="saveattendees()" value="Save" >
-          <input class="tiny button" onclick="TakePrint()" value="Print">
-          </div>
-         {% else %}
-         <H1> Event Attended by </H1>
-         <!-- these are those who were supposed to attend the event  -->
-           {% get_attendance groupid node as attendees %}
-     <!-- these are those who attended the meet  -->   
-           <table id="attended">
-            <Thead>
-            <th> Name</th>
-            <th> Presence </th>
-            </Thead>
-           {% for i in attendees %}    
-           <tr>
-           <td> <h6>{{i.name}}</h6> </td>
-           <td> <h6>{{i.presence}} </h6></td>
-           </tr>
-           {% endfor %}
-            </table>
-            
-        <input class="tiny button" id='d' onclick="Download()" value="Download">
-        {% endif %}
-        
+          
+         
         
         </div>
         <!-- Tab View Map Widget -->
@@ -309,7 +305,18 @@ table, th, td {
           <a class="close-reveal-modal" >&#215;</a>
           {% include "ndf/map_widget.html" with mode="read" %}
         </div>
-
+        <!-- Marks widget -->
+        
+        <div class="content" id="view-Assesment" >    
+          
+          <div id="Assesment">
+           
+          </div>
+          
+        
+        </div>
+        
+          
       </div> <!-- End of class="tabs-content" -->
 
   
@@ -345,15 +352,19 @@ table, th, td {
 
       {% edit_policy groupid node request.user as status %}
       {% if user.is_authenticated and status == "allow" and gstaff_access %}
-
+        {% comment %}
+        <!-- commented while making event as separate app 
         {% if app_name == "MIS" %}
         <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
         {% else %}
         <a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
         {% endif %}
           <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
+        </a> -->
+        {% endcomment %}
+        <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
+         <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
         </a>
-
         <ul id="edit-options" class="f-dropdown">
 
           <!-- This button publishes the drafted resource -->
@@ -383,12 +394,18 @@ table, th, td {
               - In case of Groups/Author, only to the superuser
           -->
           <li>
+            {% comment %}
+            <!--
             {% if app_name == "MIS" %}
             <a class="button small expand" href="{% url 'mis:mis_app_instance_create' groupid app_id app_set_id %}">
             {% else %}
             <a class="button small expand" href="{% url 'mis-po:mis_app_instance_create' groupid app_id app_set_id %}">
             {% endif %}
               <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+            </a>-->
+            {% endcomment %}
+            <a class="button small expand" href="{% url 'event_app_instance_create' groupid app_set_id %}">
+            <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
             </a>
           </li>
 
@@ -533,15 +550,173 @@ table, th, td {
 //   }
 // });
 
-
+ 
 // script for showing map on appearance of overlay.
+function controler()
+{
 
+          $.ajax({
+                      url: "{% url 'attendees_relations' groupid node %}",
+                      type: "GET",
+                      success: function(data){
+                      attended=JSON.parse(data)
+                      },
+                      complete:function()
+                      {
+                      if (attended == 'True')
+                      {
+                          EditAttendance(attended)             
+                      }
+                      else
+                      {
+                        
+                          TakeAttendance()        
+                      }
+                      
+                      }
+              
+                });
+
+
+}
+function EditAttendance(pass)
+{
+        $.ajax({
+                      url: "{% url 'get_attendance' groupid node %}",
+                      type: "GET",
+                      success: function(data){
+                      attended=JSON.parse(data)
+                      $('#attendance').empty()
+                      },
+                      complete:function(){
+                      $('#attendance').append("<table id='forattendance'> </table>")
+                      $('#forattendance').append("<thead><tr> <th> name </th> <th> Presence  </th> </tr></thead>")
+                      $.each(attended, function(key,val) {
+                      if(pass == 'Edit'){
+                               if(val.presence == 'Absent')
+                                     {
+             $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' class='chkbx'  value=" + val.id + " ></td>  </tr> ")
+                                     }
+                              else
+                                      {
+          $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' class='chkbx'  value=" + val.id + " checked></td >  </tr>")
+         
+                      
+                                      }
+                      }
+                      
+                      if (pass == 'True')
+                       {
+                    $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> " + val.presence + "</td >  </tr>")         
+                      
+                      }
+                      
+                      });
+                      if(pass != 'True'){
+                      $('#attendance').append("<input class='tiny button' onclick='saveattendees()' value='Save' >")
+                      $('#attendance').append("<input class='tiny button' onclick='TakePrint()' value='Print'>")
+                      }
+                      else
+                      {
+                      $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>"    )
+                      $('#attendance').append("<input class='tiny button' id='d' onclick='Download()' value='Download'>")
+        
+                 }    }
+              
+          });
+
+}
+
+function TakeAttendance()
+{
+
+
+        $.ajax({
+                      url: "{% url 'get_attendees' groupid node %}",
+                      type: "GET",
+                      success: function(data){
+                      
+                      attendees=JSON.parse(data)
+                      
+                       
+                      },
+                      complete:function(){
+                      $('#attendance').append("<table id='forattendance'> </table>")
+                      $('#forattendance').append("<thead><tr> <th> Name </th> <th> Presence </th> </tr></thead>")
+                      
+                      $.each(attendees, function(key,val) {
+       $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' class='chkbx'  value=" + val.id + "></td>  </tr>")
+                      });
+                      $('#attendance').append("<input class='tiny button' onclick='saveattendees()' value='Save' >")
+                      $('#attendance').append("<input class='tiny button' onclick='TakePrint()' value='Print'>")
+                      
+                      
+                      }
+              
+          });
+
+}
+function Editassesment(s)
+{
+if(s.id)
+{
+var s=s.id
+ }
+             $.ajax({
+                      url: "{% url 'get_assessment' groupid node.pk %}",
+                      type: "GET",
+                      success: function(data){
+                      marks=JSON.parse(data)
+                      $('#Assesment').empty()
+                      },
+                      complete:function(){
+                                  if(marks != ""){
+                                        $('#Assesment').append("<table id= 'listAssesment'> </table> ")
+                                        $("#listAssesment").append("<thead><tr> <th> Name </th> <th> Marks </th> </tr></thead>")
+                                        
+                                        $.each(marks, function(key,val) {
+                                        if (s == 'Assesmentlist'){  
+                                            $("#listAssesment").append("<tr> <td>" + val.name + 
+                                                        "</td> <td>" + val.marks + 
+                                                            "</td></tr>" )
+                                               }             
+                                           else
+                                           {      
+                                                      $("#listAssesment").append("<tr> <td>"
+                                                           + val.name + 
+                                                           "</td> <td>  <input type='number' min='0' max='200' class='marks' id="
+                                                            + val.id + " placeholder='25' value="
+                                                            +val.marks +"></td></tr>" )
+                                       
+                                       
+                                              }   
+                                        });
+                                       if (s == 'Assesmentlist'){
+                                                $('#Assesment').append(
+                                                    "<input class='tiny button 'id='Editassesment' onclick='Editassesment(this)' value='Edit' >") 
+                                                }
+                                       if(s == 'Editassesment')
+                                                 {
+                                                 
+                                                $('#Assesment').append(
+                                                    "<input class='tiny button' onclick='saveassesment()' value='Save' >") 
+                                                 
+                                                 
+                                                 }         
+                                          
+                                       }
+                                      } 
+               
+                    });
+     
+
+}
 function Download()
 {
 
 var Event_attended_by = [];
-    var table = document.getElementById("attended");
-    $("#attended").find('tr').each(function(){
+    var table = document.getElementById("forattendance");
+    $("#forattendance").find('tr').each(function(){
     var Names_attended = $(this).find('td:eq(0)').text()
     var Status_attended = $(this).find('td:eq(1)').text()
     var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'"}'
@@ -580,10 +755,24 @@ function TakePrint()
 }
 function saveattendees()
 {var attendees_list = [];
+var  absentees_list=[];
+var student_marks=[]
+var student_id=[]
+var eventid=[]
+eventid='{{node.pk}}'
+title='{{app_set_id}}'
+
     var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
     $(':checkbox:checked.chkbx').each(function () {
      attendees_list.push(this.value);
      });
+     
+     
+     $(':checkbox:not(:checked.chkbx)').each(function () {
+     absentees_list.push(this.value);
+     });
+     
+    
      if(attendees_list !="")
      {
               $.ajax({
@@ -591,19 +780,65 @@ function saveattendees()
                       type: "POST",
                       data:{
                       Assignee:attendees_list,
+                      Absents:absentees_list,
+                      Event:eventid,
                       csrfmiddlewaretoken: '{{ csrf_token }}'},
                       success: function(data){
                       alert(data);
-                      location.reload();
+                      EditAttendance('True')
                       }
                     });
      }
      else
      {
-     alert("Nothing to move foward")
+     alert("No Attendance Taken.")
      }
     
-    }
+    
+    
+ }
+    
+    
+function saveassesment()
+{var attendees_list = [];
+var  absentees_list=[];
+var student_marks=[]
+var student_id=[]
+var eventid=[]
+eventid='{{node.pk}}'
+title='{{app_set_id}}'
+
+    var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
+     
+     $('.marks').each(function(){
+       student_marks.push(this.value)
+       student_id.push(this.id)
+     });
+     
+     
+     
+    if(student_marks !="")
+     {
+              $.ajax({
+                      url: url,
+                      type: "POST",
+                      data:{
+                      student_marks:student_marks,
+                      student_id:student_id, 
+                      Event:eventid,
+                      csrfmiddlewaretoken: '{{ csrf_token }}'},
+                      success: function(data){
+                      alert(data);
+                      Editassesment('Assesmentlist')
+                      }
+                    });
+     }
+     else
+     {
+     alert("No Marks Entered")
+     }
+ }
+    
 $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
   
   map.invalidateSize();  
