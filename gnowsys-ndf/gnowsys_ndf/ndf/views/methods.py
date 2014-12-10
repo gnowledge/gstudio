@@ -662,13 +662,17 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             if node_id not in nlist:
               nlist.append(node_id)  
             else:
-              node.collection_set.append(node_id)            
+              node.collection_set.append(node_id)  
+              # After adding it to collection_set also make the 'node' as prior node for added collection element
+              gcollection.update({'_id': ObjectId(node_id), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
           
           i = i+1
 
         for each in nlist:
           if each not in node.collection_set:
             node.collection_set.append(each)
+            # After adding it to collection_set also make the 'node' as prior node for added collection element
+            gcollection.update({'_id': ObjectId(each), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
 
         # For removing collection elements from heterogeneous collection drawer only
         if not checked: 
@@ -676,6 +680,8 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             for each in nlist:
               if each not in right_drawer_list:
                 node.collection_set.remove(each)
+                # Also for removing prior node element after removing collection element
+                gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
 
         else:
           if nlist and checked:
@@ -687,6 +693,9 @@ def build_collection(node, check_collection, right_drawer_list, checked):
                 if quiz._id in obj.member_of or quizitem._id in obj.member_of:
                   if obj._id not in right_drawer_list:
                     node.collection_set.remove(obj._id)
+                    # Also for removing prior node element after removing collection element
+                    gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+
             elif checked == "Pandora Video":
               check = gcollection.Node.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
               for each in nlist:
@@ -694,6 +703,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
                 if check._id == obj.member_of[0]:
                   if obj._id not in right_drawer_list:
                     node.collection_set.remove(obj._id)
+                    gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
             else:
               check = gcollection.Node.one({'_type': 'GSystemType', 'name': unicode(checked) })
               for each in nlist:
@@ -702,10 +712,12 @@ def build_collection(node, check_collection, right_drawer_list, checked):
                   if check._id == obj.member_of[0]:
                     if obj._id not in right_drawer_list:
                       node.collection_set.remove(obj._id)
+                      gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
                 else:
                   if check._id == obj.member_of[1]: 
                     if obj._id not in right_drawer_list:
                       node.collection_set.remove(obj._id)
+                      gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
 
 
         is_changed = True
@@ -719,12 +731,14 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             obj = gcollection.Node.one({'_id': ObjectId(each) })
             if quiz._id in obj.member_of or quizitem._id in obj.member_of:
               node.collection_set.remove(obj._id)
+              gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
         elif checked == "Pandora Video":
           check = gcollection.Node.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
           for each in node.collection_set:
             obj = gcollection.Node.one({'_id': ObjectId(each) })
             if check._id == obj.member_of[0]:
               node.collection_set.remove(obj._id)
+              gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
         else:
           check = gcollection.Node.one({'_type': 'GSystemType', 'name': unicode(checked) })
           for each in node.collection_set:
@@ -732,9 +746,11 @@ def build_collection(node, check_collection, right_drawer_list, checked):
             if len(obj.member_of) < 2:
               if check._id == obj.member_of[0]:
                 node.collection_set.remove(obj._id)
+                gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
             else:
               if check._id == obj.member_of[1]: 
                 node.collection_set.remove(obj._id)
+                gcollection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
 
       else:
         node.collection_set = []
