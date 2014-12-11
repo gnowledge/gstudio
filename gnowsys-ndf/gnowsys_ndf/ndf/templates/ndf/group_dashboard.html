@@ -180,6 +180,8 @@
       <dl class="tabs" data-tab data-options="deep_linking:true" >
             <dd ><a  href="#Activities-div"  name="Activity" > Activity </a></dd> 
             <dd ><a  href="#view-scheduler-calendar"  name="Schedular" > Schedular </a></dd>
+            <dd ><a  href="#status"  name="Status" > Status </a></dd>
+            <dd ><a  href="#view-activity"  name="Approval" > Approval </a></dd>
       </dl>
     </div> 
    </div>      
@@ -195,7 +197,55 @@
 <br>
 
 
-<div id="group_dashboard_details" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;">
+
+<div class="tabs-content">
+
+  <div class="content active" id="Activities-div">
+   <div align="center">
+   <h4 align="left"> Images </h4> 
+   <div class="row" style="border-style: solid; border-width: 1.5px; border-color: #b0e1df; padding: 0px 5px; background-color: white; height:200px;  width:800px; " >
+    {% for i in file_list %}
+      <div class="small-2 column" >
+
+    			    <div >
+    					<img src="{% url 'getFileThumbnail' group_id i.pk %}" class="img-height">
+              <h6> {{i.name|truncatechars:20 }}</h6>
+              </div>
+      </div>
+    
+    {% endfor %}
+    </div>
+  </div>  
+
+  <div align="center"> 
+  <h4 align="left"> Activities </h4>
+   <div style="border-style:solid; height:1000px;  width:800px; background-color: white ; border-width:1.5px; border-color:#b0e1df; padding:3px 5px; border-radius:4px" align="left"> 
+    {% for i in  activity_list %}
+           <h5><b>{{i.name|truncatewords:"20"}}</b></h5> 
+           <br>
+           by {{i.created_by}}
+           {{i.content}}
+           <br>
+           
+           
+           
+               
+    {% endfor %}
+    </div>
+  
+ </div> 
+</div>  
+  
+  
+
+
+<div class="content" id="view-scheduler-calendar">
+  {% include "ndf/scheduler_calender.html"  %}
+  
+  </div>
+
+
+<div class="content" id="view-activity">
 
  {% if approval %}
   <!-- Tab: Enrollment Approval Details -->
@@ -254,66 +304,56 @@
   </div>
   -->
   {% endcomment %}
-
-
 </div>
-
-<div class="tabs-content">
-
-  <div class="content active" id="Activities-div">
-   <div align="center">
-   <h4 align="left"> Images </h4> 
-   <div class="row" style="border-style: solid; border-width: 1.5px; border-color: #b0e1df; padding: 0px 5px; background-color: white; height:200px;  width:800px; " >
-    {% for i in file_list %}
-      <div class="small-2 column" >
-
-    			    <div >
-    					<img src="{% url 'getFileThumbnail' group_id i.pk %}" class="img-height">
-              <h6> {{i.name|truncatechars:20 }}</h6>
-              </div>
+<div class="content" id="status" align="center">
+<div style="border-style: solid; border-width: 1.5px; border-color: #b0e1df; padding: 0px 5px; background-color: white; height:1000px;  width:800px; " >
+{% for i in activity_list %}
+   <div id="container_div" >
+    <div id="top_list" class="row" style="border-style:solid; border-width: 0.5px; border-color:#b0e1bf; background-color:#d5efdd;">
+      <div id="name-div" class="small-1 column">
+         {{i.user_details_dict.created_by}}
       </div>
+      <div id="action" class="small-2 column">
+         
+         has created
+         
+     </div> 
+     <div id="performed on" class="small-2 column">
+         {{i.name}}
+     </div>
+     <div id="performed on" class="small-7 column">
+         at  {{i.created_at|timesince}}
+     </div>
+      
+         
     
-    {% endfor %}
     </div>
-  </div>  
-
-  <div align="center"> 
-  <h4 align="left"> Activities </h4>
-   <div style="border-style:solid; height:1000px;  width:800px; background-color: white ; border-width:1.5px; border-color:#b0e1df; padding:3px 5px; border-radius:4px" align="left"> 
-    {% for i in  activity_list %}
-           <h5><b>{{i.name|truncatewords:"20"}}</b></h5> 
-           <br>
-           by {{i.created_by}}
-           {{i.content}}
-           <br>
-           
-           
-           
-               
-    {% endfor %}
-    </div>
-  
- </div> 
-</div>  
-  
-  
-
-
-<div class="content" id="view-scheduler-calendar">
-  {% include "ndf/scheduler_calender.html"  %}
-  
-  </div>
+   
+   </div>
+   
+{% endfor %}
+</div>
 </div>
 
-
+</div>
 {% endblock %}
 
 {% block script %}
 
 $(document).ready(function(){
-
+$(window).bind('scroll', loadOnScroll);
 });
+var loadOnScroll =function() {if ($(window).scrollTop() > $(document).height() - ($(window).height()*3)) {
+        // temporarily unhook the scroll event watcher so we don't call a bunch of times in a row
+        $(window).unbind();
+        // execute the load function below that will visit the JSON feed and stuff data into the HTML
+       alert("radhe")
+    }
+}
+$('#window').scroll(function(){
 
+alert("radhe")
+});
 $("input:not('#docFile')").each(function() {
 		$(this).bind('keydown keypress keyup change', function() {
 			var search = (this.value).toLowerCase();    	

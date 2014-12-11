@@ -1613,10 +1613,11 @@ def get_data_for_event_task(request,group_id):
      end=datetime.datetime(2014,int(month), 28)
      task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
     #day_list of events  
-    
+    print "asdf"
     for j in obj:
-        nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end}})
+        nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
         for i in nodes:
+          print i
           attr_value={}
           event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
           attr_value.update({'url':event_url})
@@ -4089,4 +4090,15 @@ def attendees_relations(request,group_id,node):
         
  return HttpResponse(json.dumps(a)) 
         
+def page_scroll(request,group_id,page):
+ each_page=2
+ Group_Activity = collection.Node.find(
+        {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'}]},
+        {'$or':[{'created_by':request.user.id}, {'group_set':ObjectId(group_id)}]}] 
+    }).sort('last_update', -1).limit(10)
+ paged_resources = Paginator(Group_Activity,10)
+ files_list = []
+ for each_resource in (paged_resources.page(each_page)).object_list:
+        files_list.append(each_resource)
 
+ return "page"
