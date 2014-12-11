@@ -732,7 +732,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
     global count,first_object
     is_video = ""
-    fcol = db[File.collection_name]
+    fcol = get_database()[File.collection_name]
     fileobj = fcol.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
