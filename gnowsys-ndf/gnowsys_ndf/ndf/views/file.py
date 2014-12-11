@@ -28,8 +28,9 @@ from StringIO import StringIO
 
 ############################################
 
-collection = get_database()[Node.collection_name]
-collection_tr = get_database()[Triple.collection_name]
+db = get_database()
+collection = db[Node.collection_name]
+collection_tr = db[Triple.collection_name]
 GST_FILE = collection.GSystemType.one({'name': 'File', '_type':'GSystemType'})
 GST_IMAGE = collection.GSystemType.one({'name': 'Image', '_type':'GSystemType'})
 GST_VIDEO = collection.GSystemType.one({'name': 'Video', '_type':'GSystemType'})
@@ -707,13 +708,13 @@ def submitDoc(request, group_id):
         else:
             if alreadyUploadedFiles:
                 # return HttpResponseRedirect(page_url+'?var='+str1)
-                if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
-                    return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
-                else:
-                    if alreadyUploadedFiles[0][1]:
-                        return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
-                    else:
-                        return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
+                # if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
+                return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                # else:
+                    # if alreadyUploadedFiles[0][1]:
+                        # return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+            else:
+                return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
 
                 # if is_video == "True":
                 #     return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
@@ -839,10 +840,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 t.start()
             
             '''storing thumbnail of pdf and svg files  in saved object'''        
-            if 'pdf' in filetype or 'svg' in filetype:
-                thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
-                tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
-                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+            # if 'pdf' in filetype or 'svg' in filetype:
+            #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
+            #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
+            #     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
              
             
             '''storing thumbnail of image in saved object'''
