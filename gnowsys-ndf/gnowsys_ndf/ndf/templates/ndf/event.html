@@ -1,0 +1,64 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block style %}
+  {{block.super}}
+  
+  /* Setting css-properties for app-set in left panel */
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+      /*padding:0.5em 0 0.5em 0.5em; */
+      /*margin-left: -10px !important;*/
+      background-color:#efefef;
+    }
+
+    .active-app-set-edit {
+      border-right: 4px solid #808080;
+      font-weight: bold;
+    }
+
+    .active-app-set-view {
+      border-left: 4px solid #808080;
+      font-weight: bold;
+    }
+{% endblock %}
+
+{% block meta_content %}
+<br>
+<br>
+<br>
+<ul class="side-nav">
+{% for each in app_collection_set %}
+
+     {% if app_set_id == each|safe %}
+      {% if '/new/' in request.path %}
+      <li class="active-app-set-edit">
+      {% else %}
+      <li class="active-app-set-view">
+      {% endif %}
+    {% else %}
+    <li>
+    {% endif %}    
+      <div class="row">
+          <a class="small-6 columns" href="{% url 'event_list' groupid each.pk %}" title="View all {{each.name}}">
+            {{each.name}}
+          </a>
+          <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="Add {{each.name}}">
+            +&nbsp; {% trans "Add" %}
+          </a>
+
+      </div>
+  	</li>
+    </a>
+
+{% endfor %}
+</ul>
+{% endblock %}
+{% block body_content %}
+<header class="row" style="margin: 1rem 0 0 0;">
+      <h2 class="medium-12 columns">
+    
+<h1> Select  and create events out of listed categories </h1>
+</header>
+</h2>
+{% endblock %}

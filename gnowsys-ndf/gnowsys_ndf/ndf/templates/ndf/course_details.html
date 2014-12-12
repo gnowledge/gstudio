@@ -1,11 +1,121 @@
 {% extends "ndf/mis_base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
-{% load pagination_tags %}
+{% block title %} {{title}} {% endblock %}
+{% block url %}{% url 'create_edit' groupid node %}{% endblock %}
+
+<!-- overide head block from base.html -->
 
 
-{% block body_content %} 
+{% block style %}
+.row .row {
+  margin-left: 0
 
-<h2>Page Under construction...</h2>
 
-{% endblock %}	
+#top_right_btn{
+  position: absolute,
+  right:0
+}
+
+}
+{% endblock %}
+
+{% block head %}
+  <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block meta_content %}
+
+{% endblock %}
+
+
+<!-- overiding block_related content -->
+{% block related_content %}
+<section class="medium-6 large-12 columns">
+  <h3>{% trans "Modules" %}</h3>
+  <div class ="row">
+    {% for each in node.collection_set %}
+    <!-- below div for making tree from json data -->
+    <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{each}}"></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block collection_content %}
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+  <header class="row">
+	<div class="row">
+		<h2 class="small-6 columns end"> {{node.name}}</h2>
+
+
+	</div>
+	<div class="row">
+		<small class="small-4 columns end">{{ node.last_update|timesince }}{% trans "ago edited by" %} <a class="user">{% trans "User" %}</a> <a href="#view-changes"><i class="fi-clock"></i> {% trans "View history" %}</a>
+		</small>
+	</div>
+  </header>
+
+  <fieldset>
+    <legend>
+  		{% trans "Course Registration Details "%}
+    </legend>
+	{% for tab_name, tab_fields_list in property_order_list %}
+		<div class=" {% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+			{% for field in tab_fields_list %}
+				<div class="small-6 columns"> 
+					{{field.altnames}}
+				</div>
+				<div class="small-3 columns">
+					{{field.value|title}}
+				</div>
+				<br>
+			{% endfor %}
+		</div>
+	{% endfor %}
+  </fieldset>
+
+  <fieldset>
+    <legend>
+  		{% trans "Course Structure Details "%}
+    </legend>
+    <div id="cs-div"></div>
+	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+
+  </fieldset>
+</div>
+
+{% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+  var course_sec_list = {{ course_collection_dict|safe|escape }}
+  console.log(course_sec_list)
+  for(var i in course_sec_list){
+    for(var i2 in course_sec_list[i]){
+    	cs_str = "<h6><b>"+i2+"</b></h6>"
+  		$("#cs-div").append(cs_str)
+        for( var newk in course_sec_list[i][i2]){
+            for (var csk in course_sec_list[i][i2][newk]){
+				css_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7><b>"+csk+"</b></h7><br>&nbsp;&nbsp;&nbsp;&nbsp;"
+				$("#cs-div").append(css_str)
+            	for( var prop in course_sec_list[i][i2][newk][csk]){
+            	prop_str = "&nbsp;&nbsp;"+prop+" - "+course_sec_list[i][i2][newk][csk][prop]+"<br>&nbsp;&nbsp;&nbsp;&nbsp;"
+            	$("#cs-div").append(prop_str)
+            	}
+            $("#cs-div").append("<br>")
+            }
+        }
+        $("#cs-div").append("<br>")
+    } 
+  }
+
+
+{% endblock %}
+

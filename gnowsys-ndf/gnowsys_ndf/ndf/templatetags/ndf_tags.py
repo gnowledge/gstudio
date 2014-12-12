@@ -30,8 +30,6 @@ from django.contrib.sites.models import Site
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
-
-
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
@@ -299,7 +297,7 @@ def switch_group_conditions(user,group_id):
 @register.assignment_tag
 def get_all_user_groups():
 	try:
-		all_groups=collection.Node.find({'_type':'Author'})
+		all_groups = collection.Node.find({'_type':'Author'}).sort('name', 1)
 		return list(all_groups)
 	except:
 		print "Exception in get_all_user_groups"
@@ -1163,123 +1161,77 @@ def get_assesses_list(node):
 
 	return assesses_list
 
-
 @register.assignment_tag
 def get_group_type(group_id, user):
-	try:
-		col_Group = db[Node.collection_name]
+    """This function checks for url's authenticity
 
-		# Splitting url-content based on backward-slashes
-		split_content = group_id.strip().split("/")
-		gid = ""
-		colg = None
+    """
+    try:
+        # Splitting url-content based on backward-slashes
+        split_content = group_id.strip().split("/")
+        
+        # Holds primary key, group's ObjectId or group's name
+        g_id = ""
+        if split_content[0] != "":
+            g_id = split_content[0]
+        else:
+            g_id = split_content[1]
 
-		if group_id == '/home/':
-			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+        group_node = None
 
-		else:  
-			# If very first character is not backward-slash
-			# Then group id/name will be the very first element in splitted url-content list
-			# Else, it will be the second element
-			if split_content[0] != "":
-				gid = split_content[0]
+        if g_id.isdigit() and 'dashboard' in group_id:
+            # User Dashboard url found
+            u_id = int(g_id)
+            user_obj = User.objects.get(pk=u_id)
 
-			else:
-				gid = split_content[1]
-			
-			# gid = group_id.replace("/", "").strip()
-			
-			if ObjectId.is_valid(gid):
-				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
+            if not user_obj.is_active:
+                error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
+                raise Http404(error_message)
 
-			else:
-				if 'dashboard' in group_id and gid != 'dashboard':
-					# It means it's a dashboard url and instead of ObjectId's check, check for django's ID
-					if user.id is not None:
-						if gid.isdigit():
-							int_gid = int(gid)
-							if int(user.id) == int_gid:
-								colg = col_Group.Node.one({'_type': "Author", 'created_by': int_gid})
-						else:
-							error_message = "Access denied: Dashboard url found, but it's an invalid django's ID ("+gid+")!!!"
-							raise Http404(error_message)
+        else:
+            # Group's url found
+            if ObjectId.is_valid(g_id):
+                # Group's ObjectId found
+                group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(g_id)})
 
-				else:
-					# Case: Here instead of group's ObjectId, name is found
-					colg = col_Group.Node.one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
+            else:
+                # Group's name found
+                group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, 'name': g_id})
 
-				if colg:
-					pass
+            if group_node:
+                # Check whether Group is PUBLIC or not
+                if not group_node.group_type == u"PUBLIC":
+                    # If Group other than Public one is found
 
-				else:		
-					colg = None
-  		
-		# Check if Group exists in the database
-		if colg is not None:
-			# Check is user logged in
-			if user.is_authenticated():
-				# Condition for group accessible to logged in user
-				if user.is_superuser or colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
-					# Condition for GAPPs accessible to gstaff (i.e. "mis", "mis-po", "batch")
-					if len(split_content) > 2 and split_content[2] != "":
-						gapp = split_content[2]
+                    if user.is_authenticated():
+                        # Check for user's authenticity & accessibility of the group
+                        if user.is_superuser or group_node.created_by == user.id or user.id in group_node.group_admin or user.id in group_node.author_set:
+                            pass
 
-						if check_is_gapp_for_gstaff(colg._id, {'name': gapp}, user):
-							return "allowed"
+                        else:
+                            error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
+                            print "\n ", error_message, "\n"
+                            raise Http404(error_message)
 
-						else:
-							error_message = "Access denied: You are not an authorized user to access this GAPP ("+gapp.upper()+")!!!"
-							raise Http404(error_message)
+                    else:
+                        # Anonymous user found which cannot access groups other than Public
+                        error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
+                        print "\n ", error_message, "\n"
+                        raise Http404(error_message)
 
-					else:
-						# If only group is specified
-						return "allowed"
+            else:
+                # If Group is not found with either given ObjectId or name in the database
+                # Then compare with a given list of names as these were used in one of the urls
+                # And still no match found, throw error
+                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
+                    error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
+                    print "\n ", error_message, "\n"
+                    raise Http404(error_message)
 
-				else:
-					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
-					raise Http404(error_message)
+        return True
 
-			else:
-				# Condition for group accessible to logged out user
-				if colg.group_type == "PUBLIC":
-					# Condition for GAPPs accessible to gstaff (i.e. "mis", "mis-po", "batch")
-					if len(split_content) > 2 and split_content[2] != "":
-						gapp = split_content[2]
-
-						if check_is_gapp_for_gstaff(colg._id, {'name': gapp}, user):
-							return "allowed"
-
-						else:
-							error_message = "Access denied: You are not an authorized user to access this GAPP ("+gapp.upper()+")!!!"
-							raise Http404(error_message)
-
-					else:
-						# If only group is specified
-						return "allowed"
-					# return "allowed"
-
-				else:
-					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
-					raise Http404(error_message)
-
-		else:
-			# If given ObjectId/name doesn't exists in database
-			# Then compare with a given list of names as these were used in one of the urls
-			# And still no match found, throw an error - Group doesn't exists
-			if gid in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
-				return "pass"
-
-			else:
-				error_message = "GroupNotFoundError: This group ("+gid+") doesn't exists!!!"
-				raise Http404(error_message)
-
-	except Http404 as e:
-		raise Http404(e)
-		
-	except Exception as e:
-		print "\n Error in get_group_type() templatetag: " + str(e) + "\n"
-		colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-		return "pass"
+    except Exception as e:
+        raise Http404(e)
 
 @register.assignment_tag
 def check_accounts_url(path):
@@ -1953,6 +1905,7 @@ def html_widget(groupid, node_id, field):
     #   gs.get_neighbourhood(node_member_of)
 
     # field_type = gs.structure[field['name']]
+    print "see",field
     field_type = field['data_type']
     field_altnames = field['altnames']
     field_value = field['value']
@@ -2150,16 +2103,17 @@ def get_attendees(groupid,node):
         for j in  i['has_attendees']:
                 attendieslist.append(j)
                 
-                
+ print "hello",attendieslist               
  attendee_name=[]
  #below code is meant for if a batch or member of group id  is found, fetch the attendees list-
  #from the members of the batches if members are selected from the interface their names would be returned
- attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}},{"group_admin":1})
+ #attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}},{"group_admin":1})
+ attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}})
  for i in attendees_id:
-    if i["group_admin"]:
-      User_info=(collection.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
-    else:
-      User_info=(collection.Node.find({'_id':ObjectId(i._id)}))
+    #if i["group_admin"]:
+    #  User_info=(collection.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
+    #else:
+    User_info=(collection.Node.find({'_id':ObjectId(i._id)}))
     for i in User_info:
        attendee_name.append(i)
  attendee_name_list=[]

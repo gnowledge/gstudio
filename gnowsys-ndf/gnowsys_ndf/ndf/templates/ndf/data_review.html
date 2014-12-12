@@ -137,14 +137,17 @@
 	{% check_user_join request groupid as user_is_joined %}
     {% user_access_policy groupid request.user as user_access %}
 
+<form method="GET" action="{% url 'data_review_search' group_name_tag %}">
+	
 <div class="row">
 	<div class="small-4 columns">
 		<div class="row collapse">
 			<div class="small-10 columns">
-				<input type="text" id="dr-search" placeholder="Search in the Data Review" value="{{search_text}}">
+				<input type="text" id="dr-search" name="search_text" placeholder="Search in the Data Review" value="{{search_text}}">
 			</div>
 			<div class="small-2 columns">
-				<div id="dr-search-btn" class="button postfix">Search</div>
+				<!-- <div id="dr-search-btn" class="button postfix">Search</div> -->
+				<button type="submit" class="button postfix">Search</button>
 			</div>
 		</div>
 	</div>
@@ -152,6 +155,9 @@
 		
 	</div>
 </div>
+
+</form>
+
 
 <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
 <input type="hidden" id="last-edited-row" data-edited-row-id="">
@@ -678,7 +684,6 @@
 		$("#prior_node_list").val(pn_arr);
 		$("#teaches_list").val(tch_arr);
 		// $("#assesses_list").val(assess_arr);
-
 	}
 
 	// defining keyboard shortcuts to elements
@@ -712,9 +717,7 @@
 	Mousetrap.bind('ctrl+left', function () {
 		$drContainer.animate({ scrollLeft: '-=' + $drContainer.width()*3 }, 1000, 'easeOutQuad');
 	});
-
 	// --- END of defining keyboard shortcuts to elements
-
 
 	// search in the data-review search input box
 	$("#dr-search").focus(function(){
@@ -724,42 +727,12 @@
 	$("#dr-search").blur(function(){
 		$drContainer.css("opacity", "1"); 
 	})
-
-	$("#dr-search-btn").click( function(){
-
-		var drSearchVal = $("#dr-search").val().trim();
-
-		if(drSearchVal.length > 3)
-		{
-			var plusConnectedQuery = drSearchVal.replace(/\ /g, "+");
-			var sampleSearchUrl = "{% url 'data_review_search' group_name_tag '0replaceThisString0' %}";
-			location.href = sampleSearchUrl.replace("0replaceThisString0", plusConnectedQuery);
-		}
-		else
-		{
-			alert("Please provide more than 3 characters to search !!");
-		}
-
-		{% comment %}
-		// $.ajax({
-		// 	data: {"search_text": $("#dr-search").val()},
-		// 	type:"GET",
-		// 	url: '{% url "data_review_search" groupid %}',
-		// 	success: function (data) {
-		// 		// body...
-		// 		// console.log(data);
-		// 		$drContainer.html(data)
-		// 	}
-		// });
-		{% endcomment %}
-	});
 	// ---END of search in the data-review
 
 // </script>
 {% endblock %}
 
 <!--
-
 tasks to do in data review:
 
 1. Showing draft version of different users to superuser/group-admin
@@ -771,7 +744,5 @@ tasks to do in data review:
 	2.5 cannot use the same for traversing and rendering on template.
 3. -
 4. calling create_task() method.
-5. implementing search in data review
-6. observe if all the values in the right side of drawer are of status "published" in relations.
-
+5. observe if all the values in the right side of drawer are of status "published" in relations.
 -->

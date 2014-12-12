@@ -1,61 +1,41 @@
 ''' -- Imports from python libraries -- '''
 from django.template.defaultfilters import slugify
-import hashlib # for calculating md5
-# import os -- Keep such imports here
-import json
+
+import json, hashlib, magic, subprocess, mimetypes, os, re, ox, threading
 
 ''' -- imports from installed packages -- '''
-from django.http import HttpResponseRedirect
-from django.http import HttpResponse
-from django.shortcuts import render_to_response #, render  uncomment when to use
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.shortcuts import render_to_response 
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
+from django.contrib.auth.models import User
 
 from mongokit import paginator
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO
-from gnowsys_ndf.settings import EXTRA_LANG_INFO
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_node_common_fields, set_all_urls
+from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-import magic  #for this install python-magic example:pip install python-magic
-import subprocess
-import mimetypes
-from PIL import Image, ImageDraw, ImageFile #install PIL example:pip install PIL
+from PIL import Image, ImageDraw #install PIL example:pip install PIL
 from StringIO import StringIO
-import os, re
-import subprocess
-import ox
-import threading
-from django.http import Http404
-#from string import maketrans 
 
-''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
+############################################
 
-from gnowsys_ndf.ndf.models import Node, GRelation, Triple
-from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
-from gnowsys_ndf.ndf.models import File
-from gnowsys_ndf.ndf.models import STATUS_CHOICES
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list ,set_all_urls
-from gnowsys_ndf.ndf.views.methods import create_grelation
-from gnowsys_ndf.ndf.views.methods import create_gattribute
+collection = get_database()[Node.collection_name]
+collection_tr = get_database()[Triple.collection_name]
+GST_FILE = collection.GSystemType.one({'name': 'File', '_type':'GSystemType'})
+GST_IMAGE = collection.GSystemType.one({'name': 'Image', '_type':'GSystemType'})
+GST_VIDEO = collection.GSystemType.one({'name': 'Video', '_type':'GSystemType'})
+pandora_video_st = collection.Node.one({'name':'Pandora_video', '_type':'GSystemType'})
+app=GST_FILE
 
-db = get_database()
-collection = db[Node.collection_name]
-collection_tr = db[Triple.collection_name]
-GST_FILE = collection.GSystemType.one({'name': GAPPS[1], '_type':'GSystemType'})
-GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
-GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
-pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
-app=collection.Node.one({'name':u'File','_type':'GSystemType'})
-
-# VIEWS DEFINED FOR GAPP -- 'FILE'
 
 lock=threading.Lock()
 count = 0    
@@ -113,7 +93,7 @@ def file(request, group_id, file_id=None, page_no=1):
       # File search view
       title = GST_FILE.name
       
-      search_field = request.POST['search_field']
+      search_field = request.POST.get('search_field', '')
 
       datavisual = []
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
@@ -703,23 +683,21 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
-
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
             if not obj_id_instance.is_valid(f):
               alreadyUploadedFiles.append(f)
               title = mtitle
         
-        str1 = str(alreadyUploadedFiles)
+        # str1 = alreadyUploadedFiles
        
         if img_type != "": 
-            
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))
 
         elif topic_file != "": 
@@ -727,14 +705,20 @@ def submitDoc(request, group_id):
             return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
         else:
-            if str1:
-                return HttpResponseRedirect(page_url+'?var='+str1)
-            else:
-              if is_video == "True":
-                return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
-              else:
-                return HttpResponseRedirect(page_url)
-                
+            if alreadyUploadedFiles:
+                # return HttpResponseRedirect(page_url+'?var='+str1)
+                if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
+                    return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                else:
+                    if alreadyUploadedFiles[0][1]:
+                        return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                    else:
+                        return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
+
+                # if is_video == "True":
+                #     return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
+                # else:
+                #     return HttpResponseRedirect(page_url)
 
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
