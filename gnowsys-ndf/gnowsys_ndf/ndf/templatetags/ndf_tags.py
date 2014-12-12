@@ -11,7 +11,6 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 from mongokit import paginator
-
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
@@ -1810,8 +1809,16 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
             get_translation_relation(each,translation_list, r_list)
    return translation_list
 
-
-
+@register.assignment_tag
+def get_json(node):
+   node_obj = collection.Node.one({'_id':ObjectId(str(node))})
+   return json.dumps(node_obj, cls=NodeJSONEncoder)  
+   
+@register.assignment_tag
+def str_to_dict(str1):
+    dict_format = json.loads(str1)
+    return dict_format
+    
 @register.assignment_tag
 def get_possible_translations(obj_id):
         translation_list = []
