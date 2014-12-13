@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.http import Http404
+from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -4067,12 +4068,12 @@ def get_attendance(request,group_id,node):
     if (i._id in attendieslist):
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
-      temp_attendance.update({'presence':'Present'})
+      temp_attendance.update({'presence':'True'})
       attendance.append(temp_attendance)
     else:
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
-      temp_attendance.update({'presence':'Absent'})
+      temp_attendance.update({'presence':'False'})
       attendance.append(temp_attendance) 
     temp_attendance={}
  return HttpResponse(json.dumps(attendance))
@@ -4091,14 +4092,46 @@ def attendees_relations(request,group_id,node):
  return HttpResponse(json.dumps(a)) 
         
 def page_scroll(request,group_id,page):
- each_page=2
+ print "group_id",group_id
  Group_Activity = collection.Node.find(
-        {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'}]},
-        {'$or':[{'created_by':request.user.id}, {'group_set':ObjectId(group_id)}]}] 
-    }).sort('last_update', -1).limit(10)
+        {'group_set':ObjectId(group_id)}).sort('last_update', -1).limit(10)
+ 
+ 
  paged_resources = Paginator(Group_Activity,10)
  files_list = []
- for each_resource in (paged_resources.page(each_page)).object_list:
-        files_list.append(each_resource)
+ tot_page=paged_resources.num_pages
+ if int(page) < int(tot_page):
+    page=int(page)+1
+    for each in (paged_resources.page(int(page))).object_list:
+            '''dict1={}
+            dict1.update({"id":str(each_resource._id)})
+            dict1.update({"name":str(each_resource.name)})
+            dict1.update({"created_at":str(each_resource.created_at)})
+            '''
+            print "asdf",each.name
+            if each.created_by == each.modified_by :
+               if each.last_update == each.created_at:
+                 activity =  'created'
+               else:
+                 activity =  'modified'
+            else:
+               activity =  'created'
+        
+            if each._type == 'Group':
+               user_activity.append(each)
+            each.update({'activity':activity})
+            files_list.append(each)
+            
+ else:
+      page=0           
 
- return "page"
+ 
+ return render_to_response('ndf/scrolldata.html', 
+                                  { 'activity_list': files_list,
+                                    'group_id': group_id,
+                                    'groupid':group_id,
+                                    'page':page
+                                    # 'imageCollection':imageCollection
+                                  },
+                                  context_instance = RequestContext(request)
+      )

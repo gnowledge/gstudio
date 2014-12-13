@@ -487,18 +487,16 @@ def group_dashboard(request, group_id):
     This view returns data required for group's dashboard.
     """
     gridfs = get_database()['fs.files']
-    print "passing"
     profile_pic_image=""
+    
     if request.method == "POST" :
         """
         This will take the image uploaded by user and it searches if its already availale in gridfs 
         using its md5 
         """
         if (request.POST.get('type','')=='banner_pic'):
-          print "hello"
           has_profile_pic_str = "has_Banner_pic"
         if (request.POST.get('type','')=='profile_pic'):
-          print"asDF"
           has_profile_pic_str="Group_has_profile_pic"  
         gridfs = get_database()['fs.files']
         pp = None
@@ -530,16 +528,13 @@ def group_dashboard(request, group_id):
                     profile_pic_image = create_grelation(ObjectId(group_id), has_profile_pic, right_subject)
 
                 profile_pic_image = collection.Node.one({'_type': "File", '_id': right_subject})
-                print profile_pic_image
             else:
                 # Otherwise (md5 doesn't exists)
                 # Upload image
                 # submitDoc(request, group_id)
                 field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
                 profile_pic_image = collection.Node.one({'_type': "File", 'name': unicode(pp)})
-                print "profiel_pi",profile_pic_image
                 # Create new grelation and append it to that along with given user
-                print group_id
                 gr_node = create_grelation(group_id, has_profile_pic, profile_pic_image._id)
     if ObjectId.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -557,9 +552,7 @@ def group_dashboard(request, group_id):
     group=collection.Node.one({"_id":ObjectId(group_id)})
     banner_pic=""
     for each in group.relation_set:
-                print each
                 if "Group_has_profile_pic" in each:
-                    print "sad",each
                     profile_pic_image = collection.Node.one(
                         {'_type': "File", '_id': each["Group_has_profile_pic"][0]}
                     )
@@ -631,20 +624,19 @@ def group_dashboard(request, group_id):
     File_Activity = collection.Node.find(
         {'_type':'File',
         'created_by':request.user.id,'group_set':ObjectId(group_id) 
-    }).sort('last_update', -1).limit(10)
+    }).sort('last_update', -1)
     activity_list=[]
     for i in Group_Activity:
       activity_list.append(i)
-      print i,"\n"
     file_list=[]
     for i in File_Activity:
         file_list.append(i)        
-
+    page='1'
     return render_to_response (
         "ndf/group_dashboard.html",
         {
             'group_id': group_id, 'groupid': group_id,
-            'approval': approval, 'enrollment_columns': enrollment_columns, 'enrollment_details': enrollment_details,'activity_list':activity_list,'prof_pic_obj': profile_pic_image,'banner_pic':banner_pic,'file_list':file_list
+            'approval': approval, 'enrollment_columns': enrollment_columns, 'enrollment_details': enrollment_details,'activity_list':activity_list,'prof_pic_obj': profile_pic_image,'banner_pic':banner_pic,'file_list':file_list,'page':page
         },
         context_instance=RequestContext(request)
     )
