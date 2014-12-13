@@ -425,7 +425,6 @@ def user_template_view(request,group_id):
        
     notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)
     for each in notification_object:
-      print "notification details"
       ntid = each.notice_type_id
       ntype = notification.NoticeType.objects.get(id=ntid)
       label = ntype.label.split("-")[0]
@@ -489,6 +488,20 @@ def group_dashboard(request, group_id):
     gridfs = get_database()['fs.files']
     profile_pic_image=""
     
+    if ObjectId.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+        if group_ins:
+            group_id = group_ins._id
+    
     if request.method == "POST" :
         """
         This will take the image uploaded by user and it searches if its already availale in gridfs 
@@ -536,21 +549,9 @@ def group_dashboard(request, group_id):
                 profile_pic_image = collection.Node.one({'_type': "File", 'name': unicode(pp)})
                 # Create new grelation and append it to that along with given user
                 gr_node = create_grelation(group_id, has_profile_pic, profile_pic_image._id)
-    if ObjectId.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
-        if group_ins:
-            group_id = group_ins._id
-    group=collection.Node.one({"_id":ObjectId(group_id)})
+        
     banner_pic=""
+    group=collection.Node.one({"_id":ObjectId(group_id)})
     for each in group.relation_set:
                 if "Group_has_profile_pic" in each:
                     profile_pic_image = collection.Node.one(
@@ -617,26 +618,12 @@ def group_dashboard(request, group_id):
                 data["Remaining"] = remaining_count
 
                 enrollment_details.append(data)
-    Group_Activity = collection.Node.find(
-        {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'}]},
-        {'$or':[{'created_by':request.user.id}, {'group_set':ObjectId(group_id)}]}] 
-    }).sort('last_update', -1).limit(10)
-    File_Activity = collection.Node.find(
-        {'_type':'File',
-        'created_by':request.user.id,'group_set':ObjectId(group_id) 
-    }).sort('last_update', -1)
-    activity_list=[]
-    for i in Group_Activity:
-      activity_list.append(i)
-    file_list=[]
-    for i in File_Activity:
-        file_list.append(i)        
-    page='1'
+    page='1'                
     return render_to_response (
         "ndf/group_dashboard.html",
         {
             'group_id': group_id, 'groupid': group_id,
-            'approval': approval, 'enrollment_columns': enrollment_columns, 'enrollment_details': enrollment_details,'activity_list':activity_list,'prof_pic_obj': profile_pic_image,'banner_pic':banner_pic,'file_list':file_list,'page':page
+            'approval': approval, 'enrollment_columns': enrollment_columns, 'enrollment_details': enrollment_details,'prof_pic_obj': profile_pic_image,'banner_pic':banner_pic,'page':page
         },
         context_instance=RequestContext(request)
     )

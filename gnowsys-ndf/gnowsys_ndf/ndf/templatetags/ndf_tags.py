@@ -925,15 +925,13 @@ def get_theme_node(groupid, node):
 
 @register.assignment_tag
 def get_group_name(val):
-        print "passig here"
-	GroupName = []
+         GroupName = []
 
-	for each in val.group_set: 
+	 for each in val.group_set: 
 
 		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
 		GroupName.append(grpName)
-	print "the name of the group",GroupName
-	return GroupName
+	 return GroupName
 
 @register.assignment_tag
 def get_edit_url(groupid):
@@ -995,8 +993,10 @@ def get_url(groupid):
 	                 return 'show'
                 elif type_name.name == 'Task' or type_name.name == 'task_update_history':
 	                 print "here"
-	                 return 'task_details' 
-		elif node._type == 'Group' :
+	                 return 'task_details'
+                else:
+	                  return 'None'    
+    elif node._type == 'Group' :
                     return 'group'
     elif node._type == 'File':
 		if (node.mime_type) == ("application/octet-stream"): 
