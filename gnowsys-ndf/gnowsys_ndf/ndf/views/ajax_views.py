@@ -47,6 +47,7 @@ from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
+from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 from gnowsys_ndf.mobwrite.models import ViewObj
 
