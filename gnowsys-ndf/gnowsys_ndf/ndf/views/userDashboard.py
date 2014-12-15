@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps
+from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
@@ -510,7 +510,7 @@ def group_dashboard(request, group_id):
         if (request.POST.get('type','')=='banner_pic'):
           has_profile_pic_str = "has_Banner_pic"
         if (request.POST.get('type','')=='profile_pic'):
-          has_profile_pic_str="Group_has_profile_pic"  
+          has_profile_pic_str="has_profile_pic"  
         gridfs = get_database()['fs.files']
         pp = None
         profile_pic_image=""
@@ -553,9 +553,9 @@ def group_dashboard(request, group_id):
     banner_pic=""
     group=collection.Node.one({"_id":ObjectId(group_id)})
     for each in group.relation_set:
-                if "Group_has_profile_pic" in each:
+                if "has_profile_pic" in each:
                     profile_pic_image = collection.Node.one(
-                        {'_type': "File", '_id': each["Group_has_profile_pic"][0]}
+                        {'_type': "File", '_id': each["has_profile_pic"][0]}
                     )
                 if "has_Banner_pic" in each:
                     banner_pic = collection.Node.one(
