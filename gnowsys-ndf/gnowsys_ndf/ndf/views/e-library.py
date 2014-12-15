@@ -246,6 +246,29 @@ def resource_list(request, group_id, app_id=None, page_no=1):
                                 context_instance = RequestContext(request))
 
 
+def get_group_name_id(group_name_or_id):
+
+	# if isinstance(group_name_or_id, ObjectId):
+
+
+    group_obj = collection.Node.one({ "_type": {"$in": ["Group", "Author"] }, "name": unicode(group_name_or_id) })
+
+    # checking if group_obj is valid
+    if group_obj:
+	    # checking (optimistically) passed group_name_or_id is name string.
+    	if (group_name_or_id == group_obj.name):
+	        group_name = group_name_or_id
+	        group_id = group_obj._id
+	        
+        elif (group_name_or_id == group_obj._id.__str__()):
+	    	group_id = group_name_or_id
+                group_name = group_obj._id
+                # passed group_name_or_id is _id and not name
+                
+        return group_name, group_id
+    else:
+        print "in else"
+        return None
 
 
 def elib_paged_file_objs(request, group_id, filetype, page_no):
@@ -256,16 +279,21 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
         no_of_objs_pp = 24
 
-        ins_objectid  = ObjectId()
+        # ins_objectid  = ObjectId()
 
-        if ins_objectid.is_valid(group_id) is False :
-            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-            if group_ins:
-                group_id = str(group_ins._id)
-            else :
-                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-                if auth :
-                    group_id = str(auth._id)
+        # if ins_objectid.is_valid(group_id) is False :
+        #     group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        #     if group_ins:
+        #         group_id = str(group_ins._id)
+        #     else :
+        #         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        #         if auth :
+        #             group_id = str(auth._id)
+
+        group_name_id = get_group_name_id(group_id)
+        group_name, group_id = group_name_id if group_name_id else None, None
+
+        print group_name, "------", group_id
 
         file_ins = collection.Node.find_one({'_type':"GSystemType", "name":"File"})
         if file_ins:
