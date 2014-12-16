@@ -569,9 +569,15 @@
       <div id="view-info" style="display:none;">
        {% get_json node.pk as jsonobj %}
        {% str_to_dict jsonobj as obj  %}
+       <table>
+   <tbody>
         {% for key, value in obj.items %}
-           {{key}} : {{value}} <br/>
-       {% endfor %}
+        <tr>          
+        <td> {{key}} : {{value}} </td>
+        </tr>
+        {% endfor %}
+    <tbody>   
+</table>
      </div>
 
       <div id="view-discussion" style="display:none;">

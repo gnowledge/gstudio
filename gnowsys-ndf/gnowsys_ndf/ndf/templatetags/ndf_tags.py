@@ -1769,6 +1769,27 @@ def get_json(node):
 @register.assignment_tag
 def str_to_dict(str1):
     dict_format = json.loads(str1)
+    keys_to_remove = ('_id', 'tags', 'rating', 'name', 'content_org')
+    keys_by_userid = ('modified_by', 'contributors', 'created_by' )
+    for k in keys_to_remove:
+       dict_format.pop(k, None)
+    for k, v in dict_format.items():
+       if type(dict_format[k]) == list :
+          if len(dict_format[k]) == 0:
+             dict_format[k] = "None"
+          else:
+             
+             for each in (dict_format[k]):
+                if k in keys_by_userid:
+                   user = User.objects.get(id = each)
+                   dict_format[k] = user.get_username()
+                else:   
+                   node = collection.Node.one({'_id':ObjectId(each)})
+                   dict_format[k] = node.name
+       else:
+          if type(dict_format[k]) == int :
+             user = User.objects.get(id = dict_format[k])
+             dict_format[k] = user.get_username()
     return dict_format
     
 @register.assignment_tag
