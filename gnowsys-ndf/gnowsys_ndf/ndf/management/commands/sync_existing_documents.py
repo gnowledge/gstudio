@@ -22,6 +22,50 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Update pandora videos 'member_of', 'created_by', 'modified_by', 'contributors' field 
+    pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
+    file_gst = collection.Node.one({'$and':[{'name':'File'},{'_type':'GSystemType'}]})
+    auth_id = User.objects.get(username='nroer_team').pk
+    if auth_id and pandora_video_st:
+        res = collection.update(
+            {'_type': 'File', 'member_of': {'$in': [pandora_video_st._id]}, 'created_by': {'$ne': auth_id} }, 
+            {'$set': {'created_by': auth_id, 'modified_by': auth_id, 'member_of':[file_gst._id, pandora_video_st._id]}, '$push': {'contributors': auth_id} },
+            upsert=False, multi=True
+        )
+
+        print "\n 'created_by, modified_by & contributors' field updated for pandora videos in following no. of documents: ", res['n']
+
+
+    # Update prior_node for each node in DB who has its collection_set
+    all_nodes = collection.Node.find({'_type': {'$in': ['GSystem', 'File', 'Group']},'collection_set': {'$exists': True, '$not': {'$size': 0}} })
+    count = 0
+    for each in all_nodes:
+        if each.collection_set:
+            for l in each.collection_set:
+                obj = collection.Node.one({'_id': ObjectId(l) })
+                if obj:
+                    if each._id not in obj.prior_node:
+                        collection.update({'_id':obj._id},{'$push':{'prior_node': ObjectId(each._id) }})
+                        count = count + 1
+                        
+    print "\n prior_node field updated in following no. of documents: ", count
+
+    # Updating names (Stripped) in all theme , theme_items and topic documents
+    theme_GST = collection.Node.one({'_type':'GSystemType','name': 'Theme'})
+    theme_item_GST = collection.Node.one({'_type':'GSystemType','name': 'theme_item'})
+    topic_GST = collection.Node.one({'_type':'GSystemType','name': 'Topic'})
+    if theme_GST and theme_item_GST and topic_GST:
+
+        nodes = collection.Node.find({'member_of': {'$in': [theme_GST._id, theme_item_GST._id,topic_GST._id]} })
+        count = 0
+        for each in nodes:
+            if each.name != each.name.strip():
+                collection.update({'_id':ObjectId(each._id)},{'$set': {'name': each.name.strip()} })
+                count = count + 1
+
+        print "\n Name field updated (Stripped) in following no. of documents: ", count
+        
+
     # Update's "status" field from DRAFT to PUBLISHED for all TYPE's node(s)
     res = collection.update(
         {'_type': {'$in': ["MetaType", "GSystemType", "RelationType", "AttributeType"]}, 'status': u"DRAFT"}, 
@@ -324,7 +368,7 @@ class Command(BaseCommand):
                             {'$set': {'location': []}}, 
                             upsert=False, multi=True
     )
-    print "\n location field added to following no. of documents: ", res['n'], "\n"
+    print "\n location field added to following no. of documents: ", res['n'],"\n"
 
     # Adding "language" field with no default value
     res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'language': {'$exists': False}}, 
@@ -343,5 +387,3 @@ class Command(BaseCommand):
     
     collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'access_policy': {'$in': [None, "PUBLIC"]}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
     collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'access_policy': "PRIVATE"}, {'$set': {'access_policy': u"PRIVATE"}}, upsert=False, multi=True)
-
-    

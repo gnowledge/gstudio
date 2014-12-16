@@ -84,24 +84,38 @@
   <fieldset>
     <legend>
   		{% trans "Course Structure Details "%}
-
     </legend>
-	  
-	{% for eachk,eachv in course_collection_dict.items %}
-		<b>{{eachk}}</b>
-		{% for eachkk,eachvv in eachv.items %}
-			<br>&nbsp;&nbsp;{{eachkk}}
-			{% for eachk1,eachv1 in eachvv.items %}
-				<br>
-				&nbsp;&nbsp;&nbsp;&nbsp;{{eachk1}}{% trans " ---- " %}&nbsp;&nbsp;{{eachv1}}
-			{% endfor %}
-		{% endfor %}
-		<br>
-	{% endfor %}
-
-	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+    <div id="cs-div"></div>
+	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
 
   </fieldset>
 </div>
 
 {% endblock %}
+
+{% block document_ready %}
+  {{block.super}}
+  var course_sec_list = {{ course_collection_dict|safe|escape }}
+  console.log(course_sec_list)
+  for(var i in course_sec_list){
+    for(var i2 in course_sec_list[i]){
+    	cs_str = "<h6><b>"+i2+"</b></h6>"
+  		$("#cs-div").append(cs_str)
+        for( var newk in course_sec_list[i][i2]){
+            for (var csk in course_sec_list[i][i2][newk]){
+				css_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7><b>"+csk+"</b></h7><br>&nbsp;&nbsp;&nbsp;&nbsp;"
+				$("#cs-div").append(css_str)
+            	for( var prop in course_sec_list[i][i2][newk][csk]){
+            	prop_str = "&nbsp;&nbsp;"+prop+" - "+course_sec_list[i][i2][newk][csk][prop]+"<br>&nbsp;&nbsp;&nbsp;&nbsp;"
+            	$("#cs-div").append(prop_str)
+            	}
+            $("#cs-div").append("<br>")
+            }
+        }
+        $("#cs-div").append("<br>")
+    } 
+  }
+
+
+{% endblock %}
+
