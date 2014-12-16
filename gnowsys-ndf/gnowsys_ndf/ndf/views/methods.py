@@ -956,14 +956,18 @@ def check_page_first_creation(request,node):
 	return(count)     
       
 
-def tag_info(request, group_id, tagname):
-  '''
-  Function to get all the resources related to tag
-  '''
+def tag_info(request,group_id,tagname):
+    '''
+    Function to get all the resources related to tag
+    '''  
 
+    files = db[File.collection_name]
+    file_search = files.File.find({'_type':'Group'}, 'group_set':{'$all': [ObjectId(group_id)] }, {'_type': 'Author', 'name': unicode(request.user.username) } ) #search result from file
+    
+    return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id, 'file_collection':file_search}, context_instance=RequestContext(request,{'file_collection':file_search})
 
-  return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
-
+    # return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))#
+      
 
 #code for merging two text Documents
 import difflib
