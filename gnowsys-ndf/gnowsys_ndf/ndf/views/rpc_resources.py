@@ -32,7 +32,7 @@ def resources_list(request):
 		# i = 0 
 		for each in nodes:
 			if each.attribute_set:
-				resource_dict.update({each.name: each.attribute_set})
+				resource_dict.update({each.url: {each.name: each.attribute_set} })
 
 			# i=i+1
 			# if i == 3:
