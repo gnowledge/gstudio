@@ -1478,9 +1478,10 @@ def get_prior_post_node(group_id):
 			 if base_colg is None:
 					#check for the Post Node id
 					 Post_nodeid=prior_post_node.post_node
-					 Mod_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
-					 if Mod_colg is not None:
-						#return node of the Moderated group            
+					 Mod_colg=col_Group.Group.find({'_type':u'Group','_id':{'$in':Post_nodeid}})
+                                         Mod_colg=list(Mod_colg)
+					 if list(Mod_colg) is not None:
+                                        	#return node of the Moderated group            
 						return Mod_colg
 			 else:
 					#return node of the base group
@@ -1786,7 +1787,8 @@ def str_to_dict(str1):
                 else:   
                    if type(each) != int:
                       node = collection.Node.one({'_id':ObjectId(each)})
-                      dict_format[k] = node.name
+                      if node:
+                         dict_format[k] = node.name
        else:
           if type(dict_format[k]) == int :
              user = User.objects.get(id = dict_format[k])
