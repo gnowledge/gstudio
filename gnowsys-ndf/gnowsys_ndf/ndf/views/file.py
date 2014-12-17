@@ -68,24 +68,24 @@ def file(request, group_id, file_id=None, page_no=1):
     shelf_list = {}
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     
-    if auth:
-      has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-      dbref_has_shelf = has_shelf_RT.get_dbref()
-      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-      shelf_list = {}
+    # if auth:
+    #   has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+    #   dbref_has_shelf = has_shelf_RT.get_dbref()
+    #   shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+    #   shelf_list = {}
 
-      if shelf:
-        for each in shelf:
-            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
-            shelves.append(shelf_name)
+    #   if shelf:
+    #     for each in shelf:
+    #         shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+    #         shelves.append(shelf_name)
 
-            shelf_list[shelf_name.name] = []         
-            for ID in shelf_name.collection_set:
-              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-              shelf_list[shelf_name.name].append(shelf_item.name)
+    #         shelf_list[shelf_name.name] = []         
+    #         for ID in shelf_name.collection_set:
+    #           shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+    #           shelf_list[shelf_name.name].append(shelf_item.name)
 
-      else:
-        shelves = []
+    #   else:
+    #     shelves = []
     # End of user shelf
 
     pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id, 'group_set': ObjectId(group_id) })
@@ -740,7 +740,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
     
-    
     if fileobj.fs.files.exists({"md5":filemd5}):
         coll_oid = get_database()['fs.files']
 	cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
@@ -802,7 +801,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     # Required to link temporary files with the current user who is modifying this document
                     filename_content = slugify(title) + "-" + usrname + "-"
                     fileobj.content = org2html(content_org, file_prefix = filename_content)
-                fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+
+                if not type(tags) is list:
+                    tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+                fileobj.tags = tags
             
             fileobj.save()
             files.seek(0)                                                                  #moving files cursor to start
@@ -811,9 +813,12 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             
             # For making collection if uploaded file more than one
             if count == 0:
+                # print "count : ", count, "\n\nfirst_object : ", first_object, "\n\nfileobj : ", fileobj.name
                 first_object = fileobj
             else:
+                # print "count : ", count, "\n\nfirst_object : ", first_object, "\n\nfileobj : ", fileobj.name
                 collection.File.find_and_modify({'_id':first_object._id},{'$push':{'collection_set':fileobj._id}})
+                # print "\n\nafter modify first_object : ", first_object
                 
                 
             """ 
