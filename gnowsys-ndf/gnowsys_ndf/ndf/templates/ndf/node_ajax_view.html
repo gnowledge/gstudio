@@ -323,6 +323,7 @@
           Resource Type: {{node.mime_type}}<br/><br/>          
           
           {% if node.collection_set %} 
+
             {% if 'image' in node.mime_type or 'video' in node.mime_type %}                    
             <!-- Orbit image slider only for image and video collections--> 
               
@@ -388,12 +389,17 @@
                   <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     <p>Your browser does not support the audio element </p>
                   </iframe>
+                  {% elif 'pdf' in node.mime_type %}
+                      <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
+                      <br/>
+                      <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
                 {% else %}
                   <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     {{ grid_fs_obj.filename }}
                   </a>
                 {% endif %}       
             {% endif %}
+            <!-- end of if 'image' in node.mime_type ... -->
 
           {% else %}
               {% if 'image' in node.mime_type %}
@@ -418,6 +424,10 @@
                 <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   <p>Your browser does not support the audio element </p>
                 </iframe>
+              {% elif 'pdf' in node.mime_type %}
+                <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
+                <br/>
+                <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
