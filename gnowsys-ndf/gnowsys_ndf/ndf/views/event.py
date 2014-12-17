@@ -274,7 +274,9 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   iteration=request.POST.get("iteration","")
-  for i in range(1):
+  if iteration == "":
+        iteration=1
+  for i in range(int(iteration)):
    if app_set_id:
      event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
      title = event_gst.name

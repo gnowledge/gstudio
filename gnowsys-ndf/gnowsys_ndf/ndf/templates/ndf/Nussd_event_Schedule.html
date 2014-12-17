@@ -152,7 +152,23 @@
       
     </div>
       <!-- section for start time and end time -->
-      
+      <div class="row" id="Split_Session">
+          <!-- checkbox for yes or no  split session  -->
+          <input type="checkbox" class="splitsession" >Split Session
+          <div id="select_split">
+             <div style="width:200px;"><hr> </hr></div>
+             <div id="splits">
+                  <div id="split-2">
+                  <input type="checkbox" id="chkbxsplit-2 " onClick="GenerateSplits()" value="2">2
+                  </div>
+                  <div id="split-3">
+                   <input type="checkbox" id="chkbxsplit-3" value="3">3
+                  </div>
+                  
+             </div>
+          </div>
+          
+      </div>
       <div class="row">
                   <!- section for creation of multiple section -->
                   <div class="small-1 columns" hidden>
@@ -189,8 +205,6 @@
             <div >
                      {% html_widget groupid node.pk property_order_list.0.1.2 %}
             </div>
-         
-           
       </div>
       <div class="row">
       
@@ -242,10 +256,20 @@
   
   
 {% endblock %}
-
 {% block script %}
+
+function GenerateSplits(){
+
+$("#splits").append("Start time <input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1'>")
+$("#splits").append("End time <input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required='' placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1'>")
+
+  $("#iteration").attr('value','1')
+}
+
+
 $(document).ready(function(){
-  clear_Disable_Elements();
+datetime()
+  //clear_Disable_Elements();
   var event_details=""
   event_details="{{edit_details|safe}}"
 
@@ -373,9 +397,6 @@ $('#split-into2').click(function(){
   }
   */
 });
-
-
-
 $("#view").click(function(){
 
 if(!$("#nussd_course_name").val()  || ($("#nussd_course_name").val() == "Select Course Name"))
@@ -671,92 +692,16 @@ $("#nussd_course_type").change(function(){
   });
   lowerYearLimit = currentYear;
   upperYearLimit = currentYear + 20;
-  
-  if(startDtInput.length > 0) {
-      $(".date_month_day_year").datetimepicker({ 
-        changeMonth: true,
-        changeYear: true,
-        dateFormat: 'dd/mm/yy',
-        yearRange: lowerYearLimit + ":" + upperYearLimit,
-        hourGrid: 6,
-        minuteGrid: 15,
- 
-        onClose: function(dateText, inst) {
-          if (endDtInput.val() != '') {
-            var testStartDate = startDtInput.datetimepicker('getDate');
-            var testEndDate = endDtInput.datetimepicker('getDate');
 
-            if (testStartDate > testEndDate) {
-              var endDate = new Date(parseFloat(startDate.setMinutes(startDate.getMinutes()+(60-startDate.getMinutes()))));
-              endDtInput.datetimepicker('setDate', endDate);
 
-            }
-          }
-
-          else {
-          var testStartDate = new Date(parseFloat(startDtInput.datetimepicker('getDate').setMinutes(startDtInput.datetimepicker('getDate').getMinutes() + 60)));
-          
-          var endDate = testStartDate;
-
-            
-            //endDtInput.val(dateText);
-            endDtInput.datetimepicker('setDate', endDate);
-          }
-        },
-
-        onSelect: function (selectedDateTime){
-          endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate'));
-        }
-      });
-    }
-
-  
-  
-  
-  var endDtInput = $("#end_time")
-    if(endDtInput.length > 0) {
-
-      endDtInput.datetimepicker({ 
-        changeMonth: true,
-        changeYear: true,
-        dateFormat: 'dd/mm/yy',
-        yearRange: lowerYearLimit + ":" + upperYearLimit,
-        hourGrid: 6,
-        minuteGrid: 15,
-        numberOfMonths: 1,
-        onClose: function(dateText, inst) {
-          if (startDtInput.val() != '') {
-            var testStartDate = startDtInput.datetimepicker('getDate');
-            var testEndDate = endDtInput.datetimepicker('getDate');
-            var endhour= parseFloat(startDate.getMinutes())
-            var endDate = new Date(parseFloat(startDate.setMinutes(startDate.getMinutes()+(60-startDate.getMinutes()))));
-               
-            if (testStartDate > testEndDate) {
-              startDtInput.datetimepicker('setDate', endDate);
-              
-            }
-          }
-
-          else {
-            startDtInput.val(dateText);
-          }
-        },
-
-        onSelect: function (selectedDateTime){
-          startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
-        }
-      });
-    }
-
-  
-  
-  
-  currentDate = new Date();
+currentDate = new Date();
     var currentDay = currentDate.getDate();
     var currentMonth = currentDate.getMonth();
     var currentYear = currentDate.getFullYear();
-  
+    
+function datetime(){  
   $(".date_month_day_year").datetimepicker({
+       
       changeMonth: true,
       dateFormat: 'dd/mm/yy',
       minDate: '0',
@@ -850,7 +795,7 @@ $("#nussd_course_type").change(function(){
         $(this).datetimepicker('setDate', new Date(year, (month-1), day));
       },
     });
-
+}
 
 
 {% endblock %}
