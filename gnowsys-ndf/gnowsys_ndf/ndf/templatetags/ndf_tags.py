@@ -1784,8 +1784,9 @@ def str_to_dict(str1):
                    user = User.objects.get(id = each)
                    dict_format[k] = user.get_username()
                 else:   
-                   node = collection.Node.one({'_id':ObjectId(each)})
-                   dict_format[k] = node.name
+                   if type(each) != int:
+                      node = collection.Node.one({'_id':ObjectId(each)})
+                      dict_format[k] = node.name
        else:
           if type(dict_format[k]) == int :
              user = User.objects.get(id = dict_format[k])
