@@ -35,13 +35,14 @@ class Command(BaseCommand):
 
         for each in nodes:
             grp_name = collection.Node.one({'_id': ObjectId(each.group_set[0]) }).name
-            filetype = each.mime_type.split("/")[1]
+            if "/" in each.mime_type:
+                filetype = each.mime_type.split("/")[1]
+            
+                url_link = "http://" + site + "/" + grp_name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + str(each._id) + "/" + str(each.name) + "." + str(filetype)
 
-            url_link = "http://" + site + "/" + grp_name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + str(each._id) + "/" + str(each.name) + "." + str(filetype)
-
-            if each.url != unicode(url_link):
-                collection.update({'_id':each._id},{'$set':{'url': unicode(url_link) }})
-                count = count + 1
+                if each.url != unicode(url_link):
+                    collection.update({'_id':each._id},{'$set':{'url': unicode(url_link) }})
+                    count = count + 1
 
         print "\n 'url' field updated in following no. of documents: ", count
 
