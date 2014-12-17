@@ -32,9 +32,12 @@ class Command(BaseCommand):
         site = Site.objects.get(pk=1)
         site = site.domain.__str__()
         count = 0
+
         for each in nodes:
             grp_name = collection.Node.one({'_id': ObjectId(each.group_set[0]) }).name
-            url_link = "http://" + site + "/" + grp_name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + str(each._id) + "/" + str(each.name)
+            filetype = each.mime_type.split("/")[1]
+
+            url_link = "http://" + site + "/" + grp_name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + str(each._id) + "/" + str(each.name) + "." + str(filetype)
 
             if each.url != unicode(url_link):
                 collection.update({'_id':each._id},{'$set':{'url': unicode(url_link) }})
