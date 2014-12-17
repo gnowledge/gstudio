@@ -1,12 +1,11 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-import json  
 import datetime
 from operator import itemgetter
 import csv
 import time
 import ast
-
+import json  
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -25,8 +24,6 @@ from django_mongokit import get_database
 from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
 from mongokit import paginator
-import ast
-from mongokit import paginator
 
 from stemming.porter2 import stem
 
@@ -43,17 +40,13 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
 
 from gnowsys_ndf.mobwrite.models import ViewObj
-
-import json
-from bson.objectid import ObjectId
-
-
 
  
 db = get_database()
@@ -1545,7 +1538,6 @@ def get_data_for_batch_drawer(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
         
-
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
@@ -1585,6 +1577,7 @@ def set_drawer_widget(st,coll_obj_list):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list 
+
 def get_data_for_event_task(request,group_id):
     #date creation for task type is date month and year
     day_list=[]
@@ -1724,6 +1717,7 @@ def get_data_for_event_task(request,group_id):
      return HttpResponse(json.dumps(sorted_month_list,cls=NodeJSONEncoder))
     else:
      return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder)) 
+
 def get_data_for_drawer_of_attributetype_set(request, group_id):
     '''
     this method will fetch data for designer module's drawer widget
@@ -2493,6 +2487,8 @@ def get_college_wise_students_data(request, group_id):
         "Mahila College": ["Mr. Sonu Kumar"],
         "Marwari College": ["Mr. Avinash Anand"],
         "Matsyodari Shikshan Sanstha's Arts, Commerce & Science College": ["Ms. Jyoti Kapale"],
+        "Nirmala College": [],
+        "Ranchi College": [],
         "Ranchi Women's College": ["Mr. Avinash Anand"],
         "Shiv Chhatrapati College": ["Mr. Swapnil Sardar"],
         "Shri & Smt. PK Kotawala Arts College": ["Mr. Sawan Kumar"],

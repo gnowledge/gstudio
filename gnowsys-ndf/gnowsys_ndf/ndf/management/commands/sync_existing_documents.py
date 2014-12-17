@@ -89,6 +89,7 @@ class Command(BaseCommand):
 
         for each in assignee_cur:
             # If string
+            ul_sv = []
             if type(each.object_value) in [str, unicode]:
                 if "," in each.object_value and "[" in each.object_value and "]" in each.object_value:
                     ul_sv = each.object_value.strip("[]").replace(", ", ",").replace(" ,", ",").split(",")

@@ -34,6 +34,12 @@
       font-weight: bold;
       font-size: 1rem;
     }
+    div.reveal-modal > div.row > div.columns > input.button, input.button {
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      margin: 0.8em 0 0 0 !important;
+    }
 
   .text-size-15 {
     font-size: 15px;
@@ -43,6 +49,11 @@
 {% block body_content %} 
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <label id="alertModalLabel"></label>
+    <div class="row hide">
+      <div class="small-3 small-centered columns">
+        <input type="button" id="btnConfirm" class="button tiny expand" value="Confirm" />
+      </div>
+    </div>
     <a class="close-reveal-modal">&#215;</a>
   </div>
 
@@ -223,7 +234,16 @@
 
       $("#lblenroll_from").text(start_en_dt)
       $("#lblenroll_to").text(end_en_dt)
-    });//end of .change function
+
+      {% if ann_course_id and ann_course_id in enrollment_open_ann_course_ids %}
+      $("select#nussd_course_type").attr("disabled", true);
+      $("select#acourse_list").attr("disabled", true);
+
+      // Set current year; disable field
+      $(".date_year").datepicker("setDate", new Date(parseInt(currentYear), 01, 01));
+      $(".date_year").attr("disabled", true);
+      {% endif %}
+    });
 
     $("select#nussd_course_type").change(function() {
       var nussd_course_type = $("#nussd_course_type").val();
@@ -310,14 +330,16 @@
             {% endif %}
 
             {% if ann_course_id and ann_course_id in enrollment_open_ann_course_ids %}
-            $("select#acourse_list").val("{{ann_course_id}}");
-            $("select#acourse_list").trigger("change");
+            // Set announced-course & it's duration for course-enrollment; disable field
+            $("select#acourse_list")
+              .val("{{ann_course_id}}")
+              .trigger("change");
 
             {% else %}
             $("#enrollment-content-div")
               .empty()
               .append("<p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> for " + remove_ann_course + " !!!</p>")
-            {% endif %}
+              {% endif %}
           }
         },
       });
@@ -416,14 +438,32 @@
         // of the fieldset (fsSc) is changed
         $("#btnFindES").attr('disabled', "disabled");
       }
+
+      // Reset reveal-modal content
+      $("#alertModalLabel").text("");
+      $("#alertModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+        .find("div.row").addClass("hide");
     });
 
-  // On click of InProgress/Complete -------------------------------------------------------------------------
+  // On click of InProgress/Complete/Complete-Yes ------------------------------------------------------------
+    var is_complete_confirm = false;
+
     $(document).on("click", ".sbtn", function() {
-    // Set which submit button is clicked
       $("#enrollState").val($(this).val());
 
-    // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
+      if ($("#enrollState").val() == "Complete" && !is_complete_confirm) {
+        $("#alertModalLabel").text("ATTENTION!! Be careful. This will freeze enrollment procedure. Do you wish to continue?");
+        $("#alertModal")
+          .removeClass("medium").addClass("small")
+          .addClass("alert")
+          .find("div.row").removeClass("hide");
+        $("#alertModal").foundation('reveal', 'open');
+        return false;
+      }
+
+      // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
       widget_for = "student_enroll"
       class_value = ".node_id." + widget_for + "_values"
       right_drawer_len = $(class_value).size();
@@ -444,6 +484,12 @@
 
       // Setting hidden field's value as the selected value from acourse_list (dropdown)
       $("#announced_courses_list").val($("#acourse_list").val());
+    });
+
+    $(document).on("click", "#btnConfirm", function() {
+      is_complete_confirm = true;
+
+      $("#sbtnComplete").trigger("click");
     });
 {% endblock %}
 

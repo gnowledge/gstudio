@@ -255,7 +255,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       start_time = datetime.datetime.strptime(start_time,"%m/%Y")
       #get month name (%b for abbreviation and %B for full name) and year and convert to str
 
-
     end_time = ""
     if request.POST.has_key("end_time"):
       end_time = request.POST.get("end_time", "")
@@ -284,11 +283,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       unset_ac_options = ["dummy"] # Just to execute loop at least once for Course Sub-Types other than 'Announced Course'
     
     if course_gst.name == u"Announced Course":
-      if app_set_instance_id: 
-        course_gs.get_neighbourhood(course_gs.member_of)
-        course_gs.keys()
-        collection.update({'_id':course_gs._id,'attribute_set.end_enroll': course_gs.attribute_set[4]["end_enroll"]},
-                          {'$set':{'attribute_set.$.end_enroll': end_enroll}},upsert= False, multi = False)
+      if app_set_instance_id:
+        at_type_node = collection.Node.one({'_type': "AttributeType", 'name': "end_enroll"})
+        course_gs_triple_instance = create_gattribute(course_gs._id, at_type_node, end_enroll)
         course_gs.reload()
 
       else:
@@ -307,13 +304,22 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
         for colg_ids in colg_list_cur: 
           # For each selected college
+
+          enrollment_code = ""
+          for each in colg_ids.attribute_set:
+            if each.has_key("enrollment_code"):
+              enrollment_code = each["enrollment_code"]
+              break
+
           for each in unset_ac_options:
             # each is ObjecId of the course.
             # For each selected course to Announce
             nm = ""
             # Code to be executed only for 'Announced Course' GSystem(s)
             sid, nm = each.split(">>")
-            course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
+            course_gs = collection.Node.one(
+              {'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id}
+            )
             if not course_gs:
               course_gs = collection.GSystem()
             else:
@@ -321,7 +327,13 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 nm = nm.split(" -- ")[0].lstrip().rstrip()
 
             course_node = collection.Node.one({'_id':ObjectId(sid)})
-            c_name = unicode(course_node.attribute_set[1][u'course_code'] + "_" + colg_ids.attribute_set[0][u"enrollment_code"]+"_" +start_time.strftime("%b_%Y") + "_" + end_time.strftime("%b_%Y"))
+            course_code = ""
+            for each in course_node.attribute_set:
+              if each.has_key("course_code"):
+                course_code = each["course_code"]
+                break
+
+            c_name = unicode(course_code + "_" + enrollment_code + "_" + start_time.strftime("%b_%Y") + "_" + end_time.strftime("%b_%Y"))
             request.POST["name"] = c_name
             
             is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
@@ -506,8 +518,22 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
             # Reload required so that updated attribute_set & relation_set appears
             course_gs.reload()
-            task_dict["start_time"] = course_gs.attribute_set[3]["start_enroll"]
-            task_dict["end_time"] = course_gs.attribute_set[4]["end_enroll"]
+
+            start_enroll_value = None
+            end_enroll_value = None
+            nussd_course_type_value = None
+            for each in course_gs.attribute_set:
+              if each.has_key("start_enroll"):
+                start_enroll_value = each["start_enroll"]
+              
+              elif each.has_key("end_enroll"):
+                end_enroll_value = each["end_enroll"]
+              
+              elif each.has_key("nussd_course_type"):
+                nussd_course_type_value = each["nussd_course_type"]
+
+            task_dict["start_time"] = start_enroll_value
+            task_dict["end_time"] = end_enroll_value
             glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
             task_dict["has_type"] = [collection.Node.one({'member_of': glist_gst._id, 'name': "Student-Course Enrollment"})._id]
             task_dict["Status"] = u"New"
@@ -553,13 +579,14 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               college_enrollment_url_link = "http://" + site + "/" + \
                 colg_ids.name.replace(" ","%20").encode('utf8') + \
                 "/mis/" + str(MIS_GAPP._id) + "/" + str(Student._id) + "/enroll" + \
-                "?task_id=" + str(task_node._id) + "&nussd_course_type=" + course_gs.attribute_set[0]["nussd_course_type"] + "&ann_course_id=" + str(course_gs._id)
+                "?task_id=" + str(task_node._id) + "&nussd_course_type=" + nussd_course_type_value + "&ann_course_id=" + str(course_gs._id)
 
               task_dict = {}  
               task_dict["_id"] = task_node._id
               task_dict["name"] = task_name
               task_dict["created_by_name"] = request.user.username
-              task_dict["content_org"] = "\n- Please click [[" + college_enrollment_url_link + "][here]] to enroll students in " + nm + " course.\n\n- This enrollment procedure is open for duration between " + start_time.strftime("%d-%b-%Y") + " and " + end_time.strftime("%d-%b-%Y") + "."
+              task_dict["content_org"] = "\n- Please click [[" + college_enrollment_url_link + "][here]] to enroll students in " + nm + " course." \
+                + "\n\n- This enrollment procedure is open for duration between " + start_enroll_value.strftime("%d-%b-%Y") + " and " + end_enroll_value.strftime("%d-%b-%Y") + "."
               task_node = create_task(task_dict)
 
     else:
@@ -663,7 +690,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                         'app_set_id': app_set_id,
                         'title':title,
                         'university_cur':university_cur,
-                        'property_order_list': property_order_list,
+                        'property_order_list': property_order_list
                       }
 
   if app_set_instance_id:
@@ -672,6 +699,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     for each_in in course_gs.attribute_set:
       for eachk,eachv in each_in.items():
         context_variables[eachk] = eachv
+    
     for each_in in course_gs.relation_set:
       for eachk,eachv in each_in.items():
         get_node_name = collection.Node.one({'_id':eachv[0]})
