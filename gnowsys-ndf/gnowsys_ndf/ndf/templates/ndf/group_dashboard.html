@@ -231,6 +231,7 @@ $(document).on("click", ".btnApproval", function() {
   approved = ""
   rejected = ""
   remaining = ""
+  task_status = ""
   $.ajax({
     url: "{% url 'approve_students' groupid %}",
 
@@ -253,6 +254,7 @@ $(document).on("click", ".btnApproval", function() {
         approved = data["approved"];
         rejected = data["rejected"];
         remaining = data["remaining"];
+        task_status = data["task_status"];
       }
 
       else {
@@ -265,9 +267,10 @@ $(document).on("click", ".btnApproval", function() {
 
     complete: function() {
       if (success_state) {
-        $("#"+enrollment_id).find(".Approved").text(approved)
-        $("#"+enrollment_id).find(".Rejected").text(rejected)
-        $("#"+enrollment_id).find(".Remaining").text(remaining)
+        $("#"+enrollment_id).find(".Approved").text(approved);
+        $("#"+enrollment_id).find(".Rejected").text(rejected);
+        $("#"+enrollment_id).find(".Remaining").text(remaining);
+        $("#"+enrollment_id).find(".Status").text(task_status);
 
         $("#approval_accordion").removeClass("active");
         $("#enrollment_accordion").addClass("active");
