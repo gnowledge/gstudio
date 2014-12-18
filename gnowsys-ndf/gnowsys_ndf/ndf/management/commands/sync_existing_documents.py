@@ -1,6 +1,7 @@
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 from django_mongokit import get_database
 
@@ -22,18 +23,40 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
-    # Update pandora videos 'member_of', 'created_by', 'modified_by', 'contributors' field 
+    
+    file_gst = collection.Node.one({'$and':[{'name':'File'},{'_type':'GSystemType'}]}) 
     pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
-    file_gst = collection.Node.one({'$and':[{'name':'File'},{'_type':'GSystemType'}]})
-    auth_id = User.objects.get(username='nroer_team').pk
-    if auth_id and pandora_video_st:
-        res = collection.update(
-            {'_type': 'File', 'member_of': {'$in': [pandora_video_st._id]}, 'created_by': {'$ne': auth_id} }, 
-            {'$set': {'created_by': auth_id, 'modified_by': auth_id, 'member_of':[file_gst._id, pandora_video_st._id]}, '$push': {'contributors': auth_id} },
-            upsert=False, multi=True
-        )
+    # Update the url field of all nodes 
+    if pandora_video_st:
+        nodes = collection.Node.find({'member_of': {'$nin':[pandora_video_st._id],'$in':[file_gst._id]},'access_policy':'PUBLIC' })
+        site = Site.objects.get(pk=1)
+        site = site.domain.__str__()
+        count = 0
 
-        print "\n 'created_by, modified_by & contributors' field updated for pandora videos in following no. of documents: ", res['n']
+        for each in nodes:
+            grp_name = collection.Node.one({'_id': ObjectId(each.group_set[0]) }).name
+            if "/" in each.mime_type:
+                filetype = each.mime_type.split("/")[1]
+            
+                url_link = "http://" + site + "/" + grp_name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + str(each._id) + "/" + str(each.name) + "." + str(filetype)
+
+                if each.url != unicode(url_link):
+                    collection.update({'_id':each._id},{'$set':{'url': unicode(url_link) }})
+                    count = count + 1
+
+        print "\n 'url' field updated in following no. of documents: ", count
+
+    # Update pandora videos 'member_of', 'created_by', 'modified_by', 'contributors' field 
+    if User.objects.filter(username='nroer_team').exists():
+        auth_id = User.objects.get(username='nroer_team').pk
+        if auth_id and pandora_video_st:
+            res = collection.update(
+                {'_type': 'File', 'member_of': {'$in': [pandora_video_st._id]}, 'created_by': {'$ne': auth_id} }, 
+                {'$set': {'created_by': auth_id, 'modified_by': auth_id, 'member_of':[file_gst._id, pandora_video_st._id]}, '$push': {'contributors': auth_id} },
+                upsert=False, multi=True
+            )
+
+            print "\n 'created_by, modified_by & contributors' field updated for pandora videos in following no. of documents: ", res['n']
 
 
     # Update prior_node for each node in DB who has its collection_set
