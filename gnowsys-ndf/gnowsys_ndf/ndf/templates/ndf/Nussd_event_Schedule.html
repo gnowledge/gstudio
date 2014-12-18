@@ -7,12 +7,13 @@
 	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
-
+  <script src="/static/ndf/bower_components/moment/moment.js"></script> 
   <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
   <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+	
 {% endblock %}
 
 
@@ -154,17 +155,19 @@
       <!-- section for start time and end time -->
       <div class="row" id="Split_Session">
           <!-- checkbox for yes or no  split session  -->
-          <input type="checkbox" class="splitsession" >Split Session
-          <div id="select_split">
+          <input type="checkbox" class="splitsession" id="splitsession" onClick="ShowSplits()">Split Session
+          <div id="select_split" >
              <div style="width:200px;"><hr> </hr></div>
              <div id="splits">
                   <div id="split-2">
-                  <input type="checkbox" id="chkbxsplit-2 " onClick="GenerateSplits()" value="2">2
+                  <input type="radio" id="chkbxsplit-2" name="splitinto" onClick="GenerateSplits('2')" value="2">2
                   </div>
                   <div id="split-3">
-                   <input type="checkbox" id="chkbxsplit-3" value="3">3
+                   <input type="radio" id="chkbxsplit-3" name="splitinto" onClick="GenerateSplits('3')" value="3">3
                   </div>
-                  
+                  <!-- Div for Appended Start_Date And End Date -->
+                  <div id="date-splits">
+                  </div>
              </div>
           </div>
           
@@ -180,6 +183,7 @@
                   <div class="small-11 columns" align="left" hidden >
                         <input type="radio" id="split-into2" name="split-into" value="2" > 2
                         <input type="radio" id="split-into3" name="split-into" value="3" > 3
+               
                   </div>
                   
                   <div class="session_time">
@@ -258,12 +262,35 @@
 {% endblock %}
 {% block script %}
 
-function GenerateSplits(){
+function ShowSplits()
+{
+if (document.getElementById('splitsession').checked == true)
+{
+document.getElementById("select_split").hidden=false;
+}
+if (document.getElementById('splitsession').checked == false)
+{
+document.getElementById("select_split").hidden=true;
+}
 
-$("#splits").append("Start time <input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1'>")
-$("#splits").append("End time <input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required='' placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1'>")
+}
+function GenerateSplits(splits){
+$("#date-splits").empty();
+ var i=1;
 
-  $("#iteration").attr('value','1')
+  $("#date-splits").append("Start time <input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1'>")
+  $("#date-splits").append("End time <input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required='' placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1'>")
+   if(splits == '3')
+   {
+ 
+    $("#date-splits").append("Start time <input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_2'>")
+  $("#date-splits").append("End time <input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required='' placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_2'>")
+  $("#iteration").attr('value','2')
+  }
+  else
+  {
+      $("#iteration").attr('value','3')
+  }
 }
 
 
@@ -271,6 +298,7 @@ $(document).ready(function(){
 datetime()
   //clear_Disable_Elements();
   var event_details=""
+  $('#select_split').attr('hidden','True')
   event_details="{{edit_details|safe}}"
 
   if(event_details)
@@ -555,6 +583,7 @@ var course_type=$("#Module_of").val()
   $.ajax({
       url: "{% url 'fetch_course_session' groupid 'course_type' %}".replace('course_type',String(course_type)),
       type: "GET",
+      data:{"app_set_id":'{{app_set_id}}'},
       success: function(data){
       courses=JSON.parse(data)
 
@@ -567,6 +596,7 @@ var course_type=$("#Module_of").val()
               $('#session_of').append(
                $("<option></option>")
                 .attr("id", "coursename_"+key.id)
+                .attr("minutes",val.minutes)
                 .attr("value",val.id)
                 .text(val.name)
                 );
@@ -692,14 +722,127 @@ $("#nussd_course_type").change(function(){
   });
   lowerYearLimit = currentYear;
   upperYearLimit = currentYear + 20;
+var deducted_minute=0
+var previouse_first=""
+var previouse_second=""
+
+
+function check_session_split(name)
+{
+var  curr_name=""
+var total_session_time=0
+if (deducted_minute == 0)
+{
+var total_session_time = $('#session_of option:selected').attr('minutes')
+}
+if(deducted_minute != 0)
+{
+var total_session_time = deducted_minute
+}
+alert(total_session_time)
+curr_name=name
+var val=document.getElementById(curr_name).value
+
+var str=curr_name.substring(0,3)
+if (str == "end")
+   {
+        previouse_second=curr_name
+   }
+if (str == 'sta')
+   {
+     
+      previouse_first =curr_name
+      previouse_second=""
+   }
+  
+  
+var splits = $('input[name="splitinto"]:checked').val();
+       var str=curr_name.substring(11)
+
+        var check=0
+        if (splits == 2)
+        {
+         check=1
+        }
+        if(splits == 3) 
+        {
+         check=2
+        }  
+        if( str == check )
+        {
+        enddateInput=$("#end_time_"+check+"")
+        var startDate = $("#" + previouse_first+"")
+
+        var endDate = new Date(parseFloat(startDate.datetimepicker('getDate').setMinutes(startDate.datetimepicker('getDate').getMinutes()    +       deducted_minute )));
+        enddateInput.datetimepicker('setDate', endDate);
+       }
+   
+if (previouse_first != "" && previouse_second != "")
+{
+
+     //check for the remaining time in hand 1
+     var start_time = document.getElementById(previouse_first).value
+     var end_time   = document.getElementById(previouse_second).value
+     var diff= moment.utc(moment(start_time).diff(end_time)).format("HH:mm:ss")
+     //above code give the difference from 24 hrs
+     var d = moment.duration(diff)
+     var hh = Math.floor(d.asHours())  
+     var mm = Math.floor(d.minutes())
+     diffhh = 23 -hh
+     diffmm = 60 -mm
+     diffhhm=Number(diffhh)*60
+     total_min_diff=(diffhhm + diffmm)
+     deducted_minute =  Number(total_session_time) - Number(total_min_diff)
+     
+}    
+
+  
+}
 
 
 currentDate = new Date();
-    var currentDay = currentDate.getDate();
-    var currentMonth = currentDate.getMonth();
-    var currentYear = currentDate.getFullYear();
+var currentDay = currentDate.getDate();
+var currentMonth = currentDate.getMonth();
+var currentYear = currentDate.getFullYear();
+var session_minutes= $('#session_of option:selected').attr('minutes')  
+var remain_minutes=0
+
+function set_end_date_time(num){
+   var splits = $('input[name="splitinto"]:checked').val();
+   var str=num.substring(11)
+
+        var check=0
+        if (splits == 2)
+        {
+         check=1
+        }
+        if(splits == 3) 
+        {
+         check=2
+        }  
+ 
+    if (check != 0)
+    { 
+    $("#end_time_"+check+"").datepicker('option','minDate', $("#start_time_"+check+"").datetimepicker('getDate'));
+    $("#end_time_"+check+"").timepicker('option','minDate', $("#start_time_"+check+"").datetimepicker('getDate'));
+    $("#end_time_"+check+"").timepicker('option','hourMin',$("#start_time_"+check+"").datetimepicker('getDate').getHours());
+    $("#end_time_"+check+"").timepicker('option','minuteMin',$("#start_time_"+check+"").datetimepicker('getDate').getMinutes());
+    }
+    else
+    {
     
+    $("#end_time").datepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
+    $("#end_time").timepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
+    $("#end_time").timepicker('option','hourMin',$("#start_time").datetimepicker('getDate').getHours());
+    $("#end_time").timepicker('option','minuteMin',$("#start_time").datetimepicker('getDate').getMinutes());
+    
+      
+    }
+}
 function datetime(){  
+  
+
+  
   $(".date_month_day_year").datetimepicker({
        
       changeMonth: true,
@@ -711,7 +854,8 @@ function datetime(){
       minuteGrid: 15,
       onClose: function(dateText, inst) {
         $(this).val(dateText);
-        
+        check_session_split($(this).attr('name'))
+        set_end_date_time($(this).attr('name'))
         var month_year = $(this).val();
         day = currentDay;
         month = currentMonth;

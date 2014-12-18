@@ -3910,18 +3910,33 @@ def fetch_batch_student(request, group_id,Course_name):
   except:
     return HttpResponse(json.dumps(list1)) 
 def fetch_course_session(request, group_id,Course_name):
+  print "Modulei",Course_name
   courses=collection.Node.find({"_id":ObjectId(Course_name)})
   dict1={}
   list1=[]
-  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})
+  event_type_id=request.GET.get("app_set_id","")
+  event_type_node=collection.Node.one({"_id":ObjectId(event_type_id)})
+  
+  '''if event_type_node.name == "Exam":
+      course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set},"attribute_set.course_structure_assessment":True})    
+  if event_type_node.name == "Classroom Session":
+      course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set},"attribute_set.course_structure_assessment":False})    
+  '''
+  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})    
   for i in course_modules:
-    dict1.update({"name":i.name})
-    dict1.update({"id":str(i._id)})
-    dict1.update({"minutes":'60'})
-    list1.append(dict1)
-    dict1={}
-    
+      print "helo",i.attribute_set
+      dict1.update({"name":i.name})
+      dict1.update({"id":str(i._id)})
+      for j in i.attribute_set:
+          print "asdf",j.keys()
+          if "course_structure_minutes" in j.keys()  :
+              dict1.update({"minutes":str(j["course_structure_minutes"])})
+      list1.append(dict1)
+      dict1={}
+  print list1  
   return HttpResponse(json.dumps(list1))
+    
+  
 
 def fetch_course_batches(request, group_id,Course_name):
   #courses=collection.Node.one({"_id":ObjectId(Course_name)})
