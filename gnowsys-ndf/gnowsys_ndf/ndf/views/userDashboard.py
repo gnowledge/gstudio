@@ -530,7 +530,23 @@ def group_dashboard(request, group_id):
 
                 data["_id"] = str(sce_gs._id)
                 data["College"] = sce_gs.for_college[0].name
-                data["Course"] = sce_gs.for_acourse[0].name
+                if len(sce_gs.for_acourse) > 1:
+                    # It means it's a Foundation Course's (FC) enrollment
+                    start_enroll = None
+                    end_enroll = None
+                    for each in sce_gs.for_acourse[0].attribute_set:
+                        if not each:
+                            pass
+                        elif each.has_key("start_enroll"):
+                            start_enroll = each["start_enroll"]
+                        elif each.has_key("end_enroll"):
+                            end_enroll = each["end_enroll"]
+
+                    data["Course"] = "Foundation_Course" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y")
+
+                else:
+                    # Courses other than FC
+                    data["Course"] = sce_gs.for_acourse[0].name
                 data["Completed On"] =  sce_gs.completed_on.strftime("%d/%m/%Y")
                 
                 remaining_count = None
