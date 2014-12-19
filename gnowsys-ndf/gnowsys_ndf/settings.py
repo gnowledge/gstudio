@@ -376,6 +376,7 @@ INSTALLED_APPS = (
     # 'django.contrib.flatpages',	#textb
     # 'online_status',                       #for online_users     
 #    'endless_pagination',
+	'jsonrpc',
     'registration_email',
 )
 

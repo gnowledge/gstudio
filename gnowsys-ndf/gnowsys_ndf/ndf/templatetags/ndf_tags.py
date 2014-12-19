@@ -11,7 +11,6 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 from mongokit import paginator
-
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
@@ -1479,9 +1478,10 @@ def get_prior_post_node(group_id):
 			 if base_colg is None:
 					#check for the Post Node id
 					 Post_nodeid=prior_post_node.post_node
-					 Mod_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
-					 if Mod_colg is not None:
-						#return node of the Moderated group            
+					 Mod_colg=col_Group.Group.find({'_type':u'Group','_id':{'$in':Post_nodeid}})
+                                         Mod_colg=list(Mod_colg)
+					 if list(Mod_colg) is not None:
+                                        	#return node of the Moderated group            
 						return Mod_colg
 			 else:
 					#return node of the base group
@@ -1762,8 +1762,39 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
             get_translation_relation(each,translation_list, r_list)
    return translation_list
 
-
-
+@register.assignment_tag
+def get_json(node):
+   node_obj = collection.Node.one({'_id':ObjectId(str(node))})
+   return json.dumps(node_obj, cls=NodeJSONEncoder)  
+   
+@register.assignment_tag
+def str_to_dict(str1):
+    dict_format = json.loads(str1)
+    keys_to_remove = ('_id', 'tags', 'rating', 'name', 'content_org')
+    keys_by_userid = ('modified_by', 'contributors', 'created_by' )
+    for k in keys_to_remove:
+       dict_format.pop(k, None)
+    for k, v in dict_format.items():
+       if type(dict_format[k]) == list :
+          if len(dict_format[k]) == 0:
+             dict_format[k] = "None"
+          else:
+             
+             for each in (dict_format[k]):
+                if k in keys_by_userid:
+                   user = User.objects.get(id = each)
+                   dict_format[k] = user.get_username()
+                else:   
+                   if type(each) != int:
+                      node = collection.Node.one({'_id':ObjectId(each)})
+                      if node:
+                         dict_format[k] = node.name
+       else:
+          if type(dict_format[k]) == int :
+             user = User.objects.get(id = dict_format[k])
+             dict_format[k] = user.get_username()
+    return dict_format
+    
 @register.assignment_tag
 def get_possible_translations(obj_id):
         translation_list = []
