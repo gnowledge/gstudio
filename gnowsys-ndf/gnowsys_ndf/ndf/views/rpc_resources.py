@@ -17,7 +17,7 @@ from gnowsys_ndf.ndf.models import Node
 
 collection = get_database()[Node.collection_name]
 
-@jsonrpc_method('resources') 
+@jsonrpc_method('resources', safe=True) 
 def resources_list(request):
 
 	grp = collection.Node.one({'_type':'Group','name':'home'})
