@@ -274,9 +274,12 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   iteration=request.POST.get("iteration","")
+  print "hello",iteration,request
   if iteration == "":
         iteration=1
+  print "hello",iteration
   for i in range(int(iteration)):
+   print "////////////////////////////////",i
    if app_set_id:
      event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
      title = event_gst.name
@@ -344,8 +347,10 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                   field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
 
               if "date_month_day_year" in field_instance["validators"]:
+                     print "coming here"
                      if i>0:
-                       field_value=request.POST.get(field_instance["name"]+"_"+"1")  
+                       print "coming here toj"
+                       field_value=request.POST.get(field_instance["name"]+"_"+str(i))  
                      else:
                         field_value = request.POST[field_instance["name"]]
                         
@@ -384,7 +389,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
-    if i==0:
+    if i==( (int(iteration))-1):
      return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
   event_gs.get_neighbourhood(event_gs.member_of)
   course=[]

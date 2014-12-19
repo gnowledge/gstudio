@@ -152,27 +152,7 @@
       
       
     </div>
-      <!-- section for start time and end time -->
-      <div class="row" id="Split_Session">
-          <!-- checkbox for yes or no  split session  -->
-          <input type="checkbox" class="splitsession" id="splitsession" onClick="ShowSplits()">Split Session
-          <div id="select_split" >
-             <div style="width:200px;"><hr> </hr></div>
-             <div id="splits">
-                  <div id="split-2">
-                  <input type="radio" id="chkbxsplit-2" name="splitinto" onClick="GenerateSplits('2')" value="2">2
-                  </div>
-                  <div id="split-3">
-                   <input type="radio" id="chkbxsplit-3" name="splitinto" onClick="GenerateSplits('3')" value="3">3
-                  </div>
-                  <!-- Div for Appended Start_Date And End Date -->
-                  <div id="date-splits">
-                  </div>
-             </div>
-          </div>
-          
-      </div>
-      <div class="row">
+            <div class="row">
                   <!- section for creation of multiple section -->
                   <div class="small-1 columns" hidden>
                         <label  class="right inline">
@@ -210,6 +190,31 @@
                      {% html_widget groupid node.pk property_order_list.0.1.2 %}
             </div>
       </div>
+      <!-- section for start time and end time -->
+      <div class="row" id="Split_Session">
+          <!-- checkbox for yes or no  split session  -->
+          <div class="small-12 columns">
+          <input type="checkbox" class="splitsession" id="splitsession" onClick="ShowSplits()">Split Session
+          </div>
+          <div  id="select_split" >
+             <div style="width:200px;"><hr> </hr></div>
+             <div id="splits" class="row">
+                  <div id="split-2" class="small-2 columns" >
+                  <input type="radio" id="chkbxsplit-2" name="splitinto" onClick="GenerateSplits('2')" value="2">2
+                  </div>
+                  <div id="split-3" class="small-10 columns" align="left">
+                   <input type="radio" id="chkbxsplit-3" name="splitinto" onClick="GenerateSplits('3')" value="3">3
+                  </div>
+                  <!-- Div for Appended Start_Date And End Date -->
+                  <div id="date-splits" >
+                  </div>
+             </div>
+          </div>
+          
+      </div>
+
+      
+      
       <div class="row">
       
          <div class="small-1 columns">
@@ -277,19 +282,46 @@ document.getElementById("select_split").hidden=true;
 function GenerateSplits(splits){
 $("#date-splits").empty();
  var i=1;
-
-  $("#date-splits").append("Start time <input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1'>")
-  $("#date-splits").append("End time <input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required='' placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1'>")
+  $("#date-splits").append("<label> <b>Split -1 </b></label")
+  $("#date-splits").append("<div class='row'>"+ 
+  "<div class='small-2 columns'>"+ 
+    "<label> Start time </label>"+
+  "</div>"+
+  "<div class='small-2 columns'> "+
+     "<input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1' readonly=''>"+
+  "</div>"+
+  
+  " <div class='small-2 columns'>"+
+      "<label> End time </label>"+
+   "</div>"+
+   "<div class='small-6 columns' >"+
+     "<input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
+      "</div></div>")
+   
    if(splits == '3')
    {
- 
-    $("#date-splits").append("Start time <input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_2'>")
-  $("#date-splits").append("End time <input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required='' placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_2'>")
-  $("#iteration").attr('value','2')
+ $("#date-splits").append("</br>")
+ $("#date-splits").append("<label> <b> Split -2 </b> </label")
+  $("#date-splits").append("<div class='row'>"+ 
+  "<div class='small-2 columns'>"+ 
+    "<label> Start time </label>"+
+  "</div>"+
+  "<div class='small-2 columns'> "+
+     "<input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1' readonly=''>"+
+  "</div>"+
+  
+  " <div class='small-2 columns'>"+
+      "<label> End time </label>"+
+   "</div>"+
+   "<div class='small-6 columns' >"+
+     "<input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
+      "</div></div>")
+  
+  $("#iteration").attr('value','3')
   }
   else
   {
-      $("#iteration").attr('value','3')
+      $("#iteration").attr('value','2')
   }
 }
 
@@ -739,7 +771,7 @@ if(deducted_minute != 0)
 {
 var total_session_time = deducted_minute
 }
-alert(total_session_time)
+
 curr_name=name
 var val=document.getElementById(curr_name).value
 
@@ -823,24 +855,24 @@ function set_end_date_time(num){
  
     if (check != 0)
     { 
-    $("#end_time_"+check+"").datepicker('option','minDate', $("#start_time_"+check+"").datetimepicker('getDate'));
-    $("#end_time_"+check+"").timepicker('option','minDate', $("#start_time_"+check+"").datetimepicker('getDate'));
-    $("#end_time_"+check+"").timepicker('option','hourMin',$("#start_time_"+check+"").datetimepicker('getDate').getHours());
-    $("#end_time_"+check+"").timepicker('option','minuteMin',$("#start_time_"+check+"").datetimepicker('getDate').getMinutes());
+    $("#end_time_"+check+"").datepicker('option','minDate', $("#start_time_"+ check +"").datetimepicker('getDate'));
+    $("#end_time_"+check+"").timepicker('option','minDate', $("#start_time_"+ check +"").datetimepicker('getDate'));
+    $("#end_time_"+check+"").timepicker('option','hourMin', $("#start_time_"+  check +"").datetimepicker('getDate').getHours());
+    $("#end_time_"+check+"").timepicker('option','minuteMin',$("#start_time_"+ check +"").datetimepicker('getDate').getMinutes());
     }
     else
     {
-    
     $("#end_time").datepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
     $("#end_time").timepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
     $("#end_time").timepicker('option','hourMin',$("#start_time").datetimepicker('getDate').getHours());
     $("#end_time").timepicker('option','minuteMin',$("#start_time").datetimepicker('getDate').getMinutes());
-    
-      
     }
 }
 function datetime(){  
-  
+currentDate = new Date();
+var currentDay = currentDate.getDate();
+var currentMonth = currentDate.getMonth();
+var currentYear = currentDate.getFullYear();
 
   
   $(".date_month_day_year").datetimepicker({
@@ -860,65 +892,6 @@ function datetime(){
         day = currentDay;
         month = currentMonth;
         year = currentYear;
-        
-        if ($(this).attr('id') == "start_date") {
-          if (month_year) {
-            month_year = month_year.split("/");
-            day = parseInt(month_year[0]);
-            month = parseInt(month_year[1]);
-            year = parseInt(month_year[2]);
-          }
-
-          if (end_date.val() != '') {
-            var testStartDate = start_date.datetimepicker('getDate');
-            var testEndDate = end_date.datetimepicker('getDate');
-
-            if (testStartDate > testEndDate) {
-              end_date.datetimepicker('setDate', testStartDate);
-            }
-
-            else {
-              $(this).val(day+"/"+month+"/"+year);
-              $(this).datetimepicker('setDate', new Date(year, (month-1), day));
-            }
-          }
-
-          else {
-            end_date.val(day+"/"+month+"/"+year);
-            $(this).datetimepicker('setDate', new Date(year, (month-1), day));
-          }
-
-          $("#end_date").datetimepicker('option', 'minDate', new Date(year, (month-1), day));
-        }
-
-        else if ($(this).attr('id') == "end_date") {
-          if (month_year) {
-            month_year = month_year.split("/");
-            day = parseInt(month_year[0]);
-            month = parseInt(month_year[1]);
-            year = parseInt(month_year[2]);
-          }
-
-          if (start_date.val() != '') {
-            var testStartDate = start_date.datetimepicker('getDate');
-            var testEndDate = end_date.datetimepicker('getDate');
-
-            if (testStartDate > testEndDate) {
-              start_date.datetimepicker('setDate', testEndDate);
-            }
-
-            else {
-              $(this).val(day+"/"+month+"/"+year);
-              $(this).datetimepicker('setDate', new Date(year, (month-1), day));
-            }
-          }
-
-          else {
-            start_date.val(day+"/"+month+"/"+year);
-
-            $(this).datetimepicker('setDate', new Date(year, (month-1), day));
-          }
-        }
       },
 
       beforeShow: function() {
@@ -933,8 +906,6 @@ function datetime(){
           month = parseInt(month_year[1]);
           year = parseInt(month_year[2]);
         }
-        
-
         $(this).datetimepicker('option', 'defaultDate', new Date(year, (month-1), day));
         $(this).datetimepicker('setDate', new Date(year, (month-1), day));
       },
