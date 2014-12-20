@@ -224,10 +224,8 @@
 
           success: function(data){
             success_state = data["success"];
-            $("#alertModalLabel").text(data["message"]);
-
             if (data["success"]) {
-                $("#divcolg").empty();
+              $("#divcolg").empty();
               var dict_len = Object.keys(data["unset_nc"]).length;
               $.each(data["unset_nc"], function(k, val){
                 $("#unset_nc").append(val);
@@ -240,6 +238,7 @@
             }
 
             else {
+              $("#alertModalLabel").text(data["message"]);
               $("#alertModal").removeClass("success");
               $("#alertModal").addClass("alert");
               $("#alertModal").foundation('reveal', 'open');
@@ -250,6 +249,7 @@
 
   //For selecting Course type---------------------------------------------------------------------------------------
     $("select#nussd_course_type").change(function() {
+      success_state = false;
       var nussd_course_type = $("#nussd_course_type").val();
 
       $.ajax({
@@ -266,7 +266,6 @@
         success: function(data){
           success_state = data["success"];
           if (data["success"]) {
-
             $("#unset-ac-options-div").empty();
             var dict_len = Object.keys(data["unset_nc"]).length;
             $.each(data["unset_nc"], function(k, val){
@@ -307,6 +306,8 @@
           }
 
           else {
+            $("select#nussd_course_type").prop("selectedIndex", 0);
+            $("#alertModalLabel").text(data["message"]);
             $("#alertModal").removeClass("success");
             $("#alertModal").addClass("alert");
             $("#alertModal").foundation('reveal', 'open');

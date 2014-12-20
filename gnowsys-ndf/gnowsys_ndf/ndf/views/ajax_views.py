@@ -47,6 +47,7 @@ from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
+from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 from gnowsys_ndf.mobwrite.models import ViewObj
 
@@ -2971,10 +2972,11 @@ def get_courses(request, group_id):
         for each in nc_cur:
           nc_dict[str(each._id)] = each.name
   
+        response_dict["success"] = True
+        response_dict["unset_nc"] = nc_dict
       else:
-        # Otherwise, throw exception
-        error_message = "No such ("+nussd_course_type+") type of course exists... register it first"
-        raise Exception(error_message)
+        response_dict["message"] = "No "+nussd_course_type+" type of course exists. Please register"
+        response_dict["success"] = False
 
       # Search for already created announced-courses with given criteria
       # ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
@@ -3004,9 +3006,7 @@ def get_courses(request, group_id):
       #   response_dict["unset_nc"] = nc_dict
 
       # else:
-      response_dict["success"] = True
-      response_dict["message"] = "NOTE: No match found of announced-course instance(s) with given criteria."
-      response_dict["unset_nc"] = nc_dict
+      # response_dict["message"] = "NOTE: No match found of announced-course instance(s) with given criteria."
 
       return HttpResponse(json.dumps(response_dict))
 
@@ -3184,7 +3184,6 @@ def get_colleges(request,group_id):
       #   msg_string = " List of colleges in ALL Universities."
       # else:
       colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort('name',1)
-      msg_string = " List of colleges in " + university_node.name + "."
       
       list_colg=[]                           
       for each in colg_under_univ_id:
@@ -3195,6 +3194,11 @@ def get_colleges(request,group_id):
         # If found, append them to a dict
         for each in colg_under_univ_id:
           nc_dict[str(each._id)] = each.name
+        msg_string = " List of colleges in " + university_node.name + "."
+        response_dict["success"] = True
+      else:
+        msg_string = "No college exists for the selected University"
+        response_dict["success"] = False
 
       response_dict["unset_nc"] = nc_dict
       drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, checked="announced_course_create_edit", left_drawer_content=list_colg)
@@ -3204,11 +3208,10 @@ def get_colleges(request,group_id):
                                         context_instance = RequestContext(request)
                                       )
       response_dict["drawer_widget"] = drawer_widget
-      response_dict["success"] = True
       response_dict["message"] = msg_string
       return HttpResponse(json.dumps(response_dict))
   except Exception as e:
-    error_message = "AnnouncedCourseError: " + str(e) + "!!!"
+    error_message = "CollegeFetchingError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
