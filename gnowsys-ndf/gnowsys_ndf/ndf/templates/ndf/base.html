@@ -163,7 +163,9 @@
 
           <!-- Current group selector -->
       	  <li class="has-dropdown group">
-      	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:20}}</a>
+            <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'group_dashboard' group_object.pk %}">
+              {{group_object.name|truncatechars:20}}
+            </a>
       	    
       	    <!-- If logged in show user groups -->
       	    {% if user.is_authenticated %}
