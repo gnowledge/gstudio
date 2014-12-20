@@ -924,15 +924,13 @@ def get_theme_node(groupid, node):
 
 @register.assignment_tag
 def get_group_name(val):
-        print "passig here"
-	GroupName = []
+         GroupName = []
 
-	for each in val.group_set: 
+	 for each in val.group_set: 
 
 		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
 		GroupName.append(grpName)
-	print "the name of the group",GroupName
-	return GroupName
+	 return GroupName
 
 @register.assignment_tag
 def get_edit_url(groupid):
@@ -968,37 +966,44 @@ def get_edit_url(groupid):
 			return 'image_edit'
 		else:
 			return 'file_edit'
-
+@register.assignment_tag
+def get_event_type(node):
+    event=collection.Node.one({'_id':{'$in':node.member_of}})
+    return event._id
+  
 @register.assignment_tag
 def get_url(groupid):
      
-	node = collection.Node.one({'_id': ObjectId(groupid) }) 
-	if node._type == 'GSystem':
+    node = collection.Node.one({'_id': ObjectId(groupid) }) 
+    
+    if node._type == 'GSystem':
 
-		type_name = collection.Node.one({'_id': node.member_of[0]}).name
-
-		if type_name == 'Quiz':
-			return 'quiz_details'    
-		elif type_name == 'Page':
-			return 'page_details' 
-		elif type_name == 'Theme' or type_name == 'theme_item':
-			return 'theme_page'
-		elif type_name == 'Forum':
-			return 'show'
-		elif type_name == 'Task':
-			return 'task_details'  		
-	elif node._type == 'Group' :
-		return 'group'
-
-	elif node._type == 'File':
+		type_name = collection.Node.one({'_id': node.member_of[0]})
+                if type_name.name == 'Exam' or type_name.name == "Classroom Session":
+                   return ('event_app_instance_detail')
+                if type_name.name == 'Quiz':
+                   return 'quiz_details'
+                elif type_name.name == 'Page':
+                   return 'page_details' 
+                elif type_name.name == 'Theme' or type_name == 'theme_item':
+                   return 'theme_page'
+                elif type_name.name == 'Forum':
+	                 return 'show'
+                elif type_name.name == 'Task' or type_name.name == 'task_update_history':
+	                 return 'task_details'
+                else:
+	                  return 'None'    
+    elif node._type == 'Group' :
+                    return 'group'
+    elif node._type == 'File':
 		if (node.mime_type) == ("application/octet-stream"): 
 			return 'video_detail'       
 		elif 'image' in node.mime_type:
 			return 'file_detail'
 		else:
 			return 'file_detail'
-	else:
-			return 'None'
+    else:
+			return 'group'
 
 
 @register.assignment_tag
@@ -1210,13 +1215,11 @@ def get_group_type(group_id, user):
 
                         else:
                             error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                            print "\n ", error_message, "\n"
                             raise Http404(error_message)
 
                     else:
                         # Anonymous user found which cannot access groups other than Public
                         error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                        print "\n ", error_message, "\n"
                         raise Http404(error_message)
 
             else:
@@ -1225,7 +1228,6 @@ def get_group_type(group_id, user):
                 # And still no match found, throw error
                 if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
                     error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
-                    print "\n ", error_message, "\n"
                     raise Http404(error_message)
 
         return True
@@ -1773,26 +1775,29 @@ def str_to_dict(str1):
     keys_to_remove = ('_id', 'tags', 'rating', 'name', 'content_org')
     keys_by_userid = ('modified_by', 'contributors', 'created_by' )
     for k in keys_to_remove:
-       dict_format.pop(k, None)
+      dict_format.pop(k, None)
     for k, v in dict_format.items():
-       if type(dict_format[k]) == list :
+      if type(dict_format[k]) == list :
           if len(dict_format[k]) == 0:
-             dict_format[k] = "None"
+            dict_format[k] = "None"
           else:
-             
-             for each in (dict_format[k]):
-                if k in keys_by_userid:
-                   user = User.objects.get(id = each)
-                   dict_format[k] = user.get_username()
-                else:   
-                   if type(each) != int:
-                      node = collection.Node.one({'_id':ObjectId(each)})
-                      if node:
-                         dict_format[k] = node.name
-       else:
-          if type(dict_format[k]) == int :
-             user = User.objects.get(id = dict_format[k])
-             dict_format[k] = user.get_username()
+            for each in (dict_format[k]):
+              if k in keys_by_userid:
+                user = User.objects.get(id = each)
+                dict_format[k] = user.get_username()
+              # Commented by: Avadoot Nachankar while merging commit #940
+              # The below code was causing problem as it's checking only for int
+              # whereas the code also consists of other data-types as well
+              # else:   
+              #   print "\n each: ", each, "\n"
+              #   if type(each) != int:
+              #     node = collection.Node.one({'_id':ObjectId(each)})
+              #     if node:
+              #       dict_format[k] = node.name
+      else:
+        if type(dict_format[k]) == int :
+          user = User.objects.get(id = dict_format[k])
+          dict_format[k] = user.get_username()
     return dict_format
     
 @register.assignment_tag
@@ -1987,7 +1992,6 @@ def html_widget(groupid, node_id, field):
       
       if person[0].name == "Author":
           if field.name == "has_attendees":
-              print [group[0]["group_admin"]+group[0]["author_set"]]
               field_value_choices.extend(list(collection.Node.find({'member_of': {'$in':field["object_type"]},
                                                                   'created_by':{'$in':group[0]["group_admin"]+group[0]["author_set"]},
                                                                   
@@ -2127,7 +2131,6 @@ def get_attendees(groupid,node):
         for j in  i['has_attendees']:
                 attendieslist.append(j)
                 
- print "hello",attendieslist               
  attendee_name=[]
  #below code is meant for if a batch or member of group id  is found, fetch the attendees list-
  #from the members of the batches if members are selected from the interface their names would be returned

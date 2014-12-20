@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.http import Http404
+from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -1614,12 +1615,13 @@ def get_data_for_event_task(request,group_id):
      end=datetime.datetime(2014,int(month), 28)
      task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
     #day_list of events  
-    
+
     for j in obj:
-        nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end}})
+        nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
         for i in nodes:
+          print i
           attr_value={}
-          event_url="/"+str(group_id)+"/mis/54451151697ee12b7e222076/"+str(j._id) +"/"+str(i._id)
+          event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
           attr_value.update({'url':event_url})
           attr_value.update({'id':i._id})
           attr_value.update({'title':i.name})
@@ -1636,12 +1638,21 @@ def get_data_for_event_task(request,group_id):
     recount=0
     user_assigned=[]
     #day_list of task
+    
     groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
     attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
     attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
-    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.username}).sort('last_update',-1)
-    for attr in attr_assignee :
-     task_node = collection.Node.one({'_id':attr.subject})
+    #check wheather the group is author group or the common group
+    if groupname._type == "Group":
+          GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+          task_nodes = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    if groupname._type == "Author":
+          task_nodes = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.id}).sort('last_update',-1)
+    for attr in task_nodes:
+     if groupname._type == "Group": 
+         task_node = collection.Node.one({'_id':attr._id})
+     if groupname._type == "Author":
+         task_node = collection.Node.one({'_id':attr.subject})
      if task_node:
                   attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id
                   ,'object_value':{'$gte':task_start,'$lte':task_end}
@@ -1652,6 +1663,7 @@ def get_data_for_event_task(request,group_id):
                   attr_value.update({'id':task_node._id})
                   attr_value.update({'title':task_node.name})
                   if attr1:
+                        print "hello",attr1.object_value
                         date=datetime.datetime(int(attr1.object_value[6:10]),int(attr1.object_value[0:2]),int(attr1.object_value[3:5]))
                         formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
                         attr_value.update({'start':formated_date})
@@ -4069,12 +4081,12 @@ def get_attendance(request,group_id,node):
     if (i._id in attendieslist):
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
-      temp_attendance.update({'presence':'Present'})
+      temp_attendance.update({'presence':'True'})
       attendance.append(temp_attendance)
     else:
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
-      temp_attendance.update({'presence':'Absent'})
+      temp_attendance.update({'presence':'False'})
       attendance.append(temp_attendance) 
     temp_attendance={}
  return HttpResponse(json.dumps(attendance))
@@ -4092,4 +4104,46 @@ def attendees_relations(request,group_id,node):
         
  return HttpResponse(json.dumps(a)) 
         
+def page_scroll(request,group_id,page):
 
+ Group_Activity = collection.Node.find(
+        {'group_set':ObjectId(group_id)}).sort('last_update', -1)
+
+ if Group_Activity.count() >=10:
+  paged_resources = Paginator(Group_Activity,10)
+ else:
+  paged_resources = Paginator(Group_Activity,Group_Activity.count()) 
+ files_list = []
+ user_activity = []
+ tot_page=paged_resources.num_pages
+ if int(page) <= int(tot_page):
+    if int(page) != int(tot_page):
+        page=int(page)+1
+    if int(page)=='1':
+       page='1'    
+    for each in (paged_resources.page(int(page))).object_list:
+            if each.created_by == each.modified_by :
+               if each.last_update == each.created_at:
+                 activity =  'created'
+               else:
+                 activity =  'modified'
+            else:
+               activity =  'created'
+        
+            if each._type == 'Group':
+               user_activity.append(each)
+            each.update({'activity':activity})
+            files_list.append(each)
+            
+ else:
+      page=0           
+ 
+ return render_to_response('ndf/scrolldata.html', 
+                                  { 'activity_list': files_list,
+                                    'group_id': group_id,
+                                    'groupid':group_id,
+                                    'page':page
+                                    # 'imageCollection':imageCollection
+                                  },
+                                  context_instance = RequestContext(request)
+      )

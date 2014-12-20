@@ -185,13 +185,20 @@ factory_relation_types = [
     }, 
 
     {'has_profile_pic': {
-            'subject_type':['Author'],
+            'subject_type':['Author','Group'],
+            'object_type':['Image'], 
+            'inverse_name':'profile_pic_of', 
+            'meta_type':'factory_types'
+        }
+    },
+    
+    {'has_Banner_pic': {
+            'subject_type':['Author','Group'],
             'object_type':['Image'], 
             'inverse_name':'profile_pic_of', 
             'meta_type':'factory_types'
         }
     }, 
-
     {'has_thread': {
             'subject_type':['Page', 'File'],
             'object_type':['Twist'], 
