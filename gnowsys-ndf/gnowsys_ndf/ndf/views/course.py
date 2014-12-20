@@ -1343,6 +1343,8 @@ def create_course_struct(request, group_id,node_id):
                       create_gattribute(css_new._id,at_cs_assignment,propv)
               #append CSS to CS
               collection.update({'_id':cs_new._id},{'$set':{'collection_set':css_ids}},upsert=False,multi=False)
+            course_node_coll_set = course_node.collection_set
+            collection.update({'_id':course_node._id},{'$set':{'collection_set':cs_reorder_ids}},upsert=False,multi=False)
         else:
           #if there is change in existing and modified course structure
           if not course_collection_list == listdict:
@@ -1351,10 +1353,10 @@ def create_course_struct(request, group_id,node_id):
               #k is course section name and v is list of its each course subsection as dict
               for k,v in course_sec_dict.items():#loops over course sections
                 if k in cs_names or k in changed_names.values():
-                  for old_name,new_name in changed_names.items():
-                    if (new_name==k):
-                      name_edited_node = collection.Node.one({'name':old_name,'prior_node':course_node._id,'member_of':cs_gst._id})
-                      collection.update({'_id':name_edited_node._id},{'$set':{'name':new_name}})
+                  for cs_old_name,cs_new_name in changed_names.items():
+                    if (cs_new_name==k):
+                      name_edited_node = collection.Node.one({'name':cs_old_name,'prior_node':course_node._id,'member_of':cs_gst._id})
+                      collection.update({'_id':name_edited_node._id},{'$set':{'name':cs_new_name}})
                       name_edited_node.reload()
                     else:
                       pass
@@ -1363,7 +1365,15 @@ def create_course_struct(request, group_id,node_id):
                   css_reorder_ids = []
                   for cssd in v:
                     for cssname,cssdict in cssd.items():
-                      if cssname in css_names:
+                      if cssname in css_names or cssname in changed_names.values():
+                        for old_name,new_name in changed_names.items():
+                          if (cssname==new_name):
+                            css_name_edited_node = collection.Node.one({'name':old_name,'prior_node':cs_node._id,'member_of':css_gst._id})
+                            collection.update({'_id':css_name_edited_node._id},{'$set':{'name':new_name}})
+                            css_name_edited_node.reload()
+                          else:
+                            pass
+
                         css_node=collection.Node.one({'name':cssname,'member_of':css_gst._id,'prior_node':cs_node._id})
                         for propk,propv in cssdict.items():
                           if(propk==u"course_structure_minutes"):
@@ -1439,13 +1449,13 @@ def create_course_struct(request, group_id,node_id):
 
                     #add to cs collection_set
                     collection.update({'_id':cs_new._id},{'$push':{'collection_set':css_new._id}},upsert=False,multi=False)
+            course_node_coll_set = course_node.collection_set
+            # for each in cs_ids:
+            #   if each not in course_node_coll_set:
+            #     course_node_coll_set.append(each)
+            collection.update({'_id':course_node._id},{'$set':{'collection_set':cs_reorder_ids}},upsert=False,multi=False)
           else:
             print "No change"
-        course_node_coll_set = course_node.collection_set
-        # for each in cs_ids:
-        #   if each not in course_node_coll_set:
-        #     course_node_coll_set.append(each)
-        collection.update({'_id':course_node._id},{'$set':{'collection_set':cs_reorder_ids}},upsert=False,multi=False)
         app_id = request.POST.get("app_id","")
         app_set_id = request.POST.get("app_set_id","")
 
