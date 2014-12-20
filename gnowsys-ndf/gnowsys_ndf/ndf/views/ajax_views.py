@@ -4114,6 +4114,7 @@ def page_scroll(request,group_id,page):
  else:
   paged_resources = Paginator(Group_Activity,Group_Activity.count()) 
  files_list = []
+ user_activity = []
  tot_page=paged_resources.num_pages
  if int(page) <= int(tot_page):
     if int(page) != int(tot_page):
