@@ -260,11 +260,17 @@
         {% for node in user_activity %}
           {% get_version_of_module node.pk as version %}
           {% get_url node.pk as res_type %}
+          {% if res_type != "None" %}
           <li class="card">
             {% if res_type == 'group' %}
             <a href="/{{node.pk}}">
             {% elif res_type %}
-          	<a href="{% url res_type group_id node.pk  %}"> 
+          	     {% if res_type != "event_app_instance_detail" %}
+          	        <a href="{% url res_type groupid node.pk   %}">{{i.url}} </a>
+                 {% else %}
+                    {% get_event_type node as app_set_id %}
+                    <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}} </a>         
+                 {% endif %}
             {% endif %}   
             <div id="activity">
               <header>
@@ -290,7 +296,7 @@
             </div>
             </a>      
           </li>  
-
+           {% endif %}
         {% empty %}
           {% if not searching %}
           <div class="row">
@@ -299,7 +305,7 @@
             </div>
           </div>
           {% endif %}
-
+            
         {% endfor %}
     
     		{% if dashboard_count.activity > 10 %}

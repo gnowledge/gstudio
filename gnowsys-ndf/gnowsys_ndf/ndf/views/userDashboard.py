@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps
+from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
@@ -425,7 +425,6 @@ def user_template_view(request,group_id):
        
     notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)
     for each in notification_object:
-      print "notification details"
       ntid = each.notice_type_id
       ntype = notification.NoticeType.objects.get(id=ntid)
       label = ntype.label.split("-")[0]
@@ -486,6 +485,9 @@ def group_dashboard(request, group_id):
     """
     This view returns data required for group's dashboard.
     """
+    gridfs = get_database()['fs.files']
+    profile_pic_image=""
+    
     if ObjectId.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -499,7 +501,67 @@ def group_dashboard(request, group_id):
         group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
         if group_ins:
             group_id = group_ins._id
+    
+    if request.method == "POST" :
+        """
+        This will take the image uploaded by user and it searches if its already availale in gridfs 
+        using its md5 
+        """
+        if (request.POST.get('type','')=='banner_pic'):
+          has_profile_pic_str = "has_Banner_pic"
+        if (request.POST.get('type','')=='profile_pic'):
+          has_profile_pic_str="has_profile_pic"  
+        gridfs = get_database()['fs.files']
+        pp = None
+        profile_pic_image=""
+        if has_profile_pic_str in request.FILES:
+            pp = request.FILES[has_profile_pic_str]
+            has_profile_pic = collection.Node.one({'_type': "RelationType", 'name': has_profile_pic_str})
+            # Find md5
+            pp_md5 = hashlib.md5(pp.read()).hexdigest()
+            # Check whether this md5 exists in file collection
+            gridfs_node = gridfs.one({'md5': pp_md5})
+            if gridfs_node:
+                # md5 exists
+                right_subject = gridfs_node["docid"]
+                
+                # Check whether already selected
+                is_already_selected = collection.Triple.one(
+                    {'subject': group_id, 'right_subject': right_subject, 'status': u"PUBLISHED"}
+                )
 
+                if is_already_selected:
+                    # Already selected found
+                    # Signify already selected
+                    is_already_selected = gridfs_node["filename"]
+                
+                else:
+                    # Already uploaded found
+                    # Reset already uploaded as to be selected
+                    profile_pic_image = create_grelation(ObjectId(group_id), has_profile_pic, right_subject)
+
+                profile_pic_image = collection.Node.one({'_type': "File", '_id': right_subject})
+            else:
+                # Otherwise (md5 doesn't exists)
+                # Upload image
+                # submitDoc(request, group_id)
+                field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
+                profile_pic_image = collection.Node.one({'_type': "File", 'name': unicode(pp)})
+                # Create new grelation and append it to that along with given user
+                gr_node = create_grelation(group_id, has_profile_pic, profile_pic_image._id)
+        
+    banner_pic=""
+    group=collection.Node.one({"_id":ObjectId(group_id)})
+    for each in group.relation_set:
+                if "has_profile_pic" in each:
+                    profile_pic_image = collection.Node.one(
+                        {'_type': "File", '_id': each["has_profile_pic"][0]}
+                    )
+                if "has_Banner_pic" in each:
+                    banner_pic = collection.Node.one(
+                        {'_type': "File", '_id': each["has_Banner_pic"][0]}
+                    )
+    
     # Approve StudentCourseEnrollment view
     approval = False
     enrollment_details = []
@@ -556,12 +618,12 @@ def group_dashboard(request, group_id):
                 data["Remaining"] = remaining_count
 
                 enrollment_details.append(data)
-
+    page='1'                
     return render_to_response (
         "ndf/group_dashboard.html",
         {
             'group_id': group_id, 'groupid': group_id,
-            'approval': approval, 'enrollment_columns': enrollment_columns, 'enrollment_details': enrollment_details
+            'approval': approval, 'enrollment_columns': enrollment_columns, 'enrollment_details': enrollment_details,'prof_pic_obj': profile_pic_image,'banner_pic':banner_pic,'page':page
         },
         context_instance=RequestContext(request)
     )
