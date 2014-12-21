@@ -1,12 +1,11 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-import json  
 import datetime
 from operator import itemgetter
 import csv
 import time
 import ast
-
+import json  
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -26,8 +25,6 @@ from django_mongokit import get_database
 from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
 from mongokit import paginator
-import ast
-from mongokit import paginator
 
 from stemming.porter2 import stem
 
@@ -44,18 +41,14 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
 from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 from gnowsys_ndf.mobwrite.models import ViewObj
-
-import json
-from bson.objectid import ObjectId
-
-
 
  
 db = get_database()
@@ -1066,7 +1059,6 @@ def get_module_set_list(node):
 
 list_of_collection = []
 hm_obj = HistoryManager()
-print GAPPS[8]
 GST_MODULE = gs_collection.GSystemType.one({'name': GAPPS[8]})
 
 @login_required
@@ -1547,7 +1539,6 @@ def get_data_for_batch_drawer(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
         
-
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
@@ -1587,6 +1578,7 @@ def set_drawer_widget(st,coll_obj_list):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list 
+
 def get_data_for_event_task(request,group_id):
     #date creation for task type is date month and year
     day_list=[]
@@ -1737,6 +1729,7 @@ def get_data_for_event_task(request,group_id):
      return HttpResponse(json.dumps(sorted_month_list,cls=NodeJSONEncoder))
     else:
      return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder)) 
+
 def get_data_for_drawer_of_attributetype_set(request, group_id):
     '''
     this method will fetch data for designer module's drawer widget
@@ -2506,6 +2499,8 @@ def get_college_wise_students_data(request, group_id):
         "Mahila College": ["Mr. Sonu Kumar"],
         "Marwari College": ["Mr. Avinash Anand"],
         "Matsyodari Shikshan Sanstha's Arts, Commerce & Science College": ["Ms. Jyoti Kapale"],
+        "Nirmala College": [],
+        "Ranchi College": [],
         "Ranchi Women's College": ["Mr. Avinash Anand"],
         "Shiv Chhatrapati College": ["Mr. Swapnil Sardar"],
         "Shri & Smt. PK Kotawala Arts College": ["Mr. Sawan Kumar"],
@@ -3098,7 +3093,7 @@ def get_announced_courses_with_ctype(request, group_id):
         groups_to_search_from = [ObjectId(group_id)]
         ac_cur = collection.Node.find(
           {
-            'member_of': announced_course_gt._id,'_id':{'$in':ac_of_colg},
+            'member_of': announced_course_gt._id, '_id':{'$in':ac_of_colg},
             'attribute_set.nussd_course_type': nussd_course_type,
             'attribute_set.start_enroll':{'$lte': curr_date},
             'attribute_set.end_enroll':{'$gte': curr_date}
@@ -3121,7 +3116,6 @@ def get_announced_courses_with_ctype(request, group_id):
         info_message = "No Announced Courses for enrollment are available !!!"
         response_dict["message"] = info_message
 
-      
       response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list, cls=NodeJSONEncoder)
 
       return HttpResponse(json.dumps(response_dict))
@@ -3246,16 +3240,24 @@ def get_anncourses_allstudents(request, group_id):
     if request.is_ajax() and request.method == "GET":
       registration_year = request.GET.get("registration_year", "")
       all_students = request.GET.get("all_students", "")
-      acourse_val = request.GET.get("acourse_val", "")
+      acourse_val = request.GET.getlist("acourse_val[]", "")
+
+      for i, each in enumerate(acourse_val):
+        acourse_val[i] = ObjectId(each)
 
       # Following parameters to be used for edit_drawer_widget()
       node = None
       checked = None
 
+      enrolled_stud_count = 0
+      non_enrolled_stud_count = 0
+
       # Check whether any field has missing value or not
       if registration_year == "" or all_students == "":
-        error_message = "Invalid data: No data found in any of the field(s)!!!"
-        raise Exception(error_message)
+        registration_year = datetime.datetime.now().year.__str__()
+        all_students = u"false"
+        # error_message = "Invalid data: No data found in any of the field(s)!!!"
+        # raise Exception(error_message)
 
       # Type-cast fetched field(s) into their appropriate type
       date_lte = datetime.datetime.strptime("31/12/"+registration_year, "%d/%m/%Y")
@@ -3271,8 +3273,8 @@ def get_anncourses_allstudents(request, group_id):
       }
 
       # From Announced Course node fetch College's ObjectId
-      acourse_node = collection.Node.one(
-        {'_id': ObjectId(acourse_val), 'relation_set.acourse_for_college': {'$exists': True}}, 
+      acourse_node = collection.Node.find_one(
+        {'_id': {'$in': acourse_val}, 'relation_set.acourse_for_college': {'$exists': True}}, 
         {'relation_set.acourse_for_college': 1}
       )
       for rel in acourse_node.relation_set:
@@ -3316,7 +3318,7 @@ def get_anncourses_allstudents(request, group_id):
       )
       if sce_gst:
         sce_gs = collection.Node.one(
-          {'member_of': sce_gst._id, 'relation_set.for_acourse': ObjectId(acourse_val), 'attribute_set.has_enrolled': {'$exists': True}},
+          {'member_of': sce_gst._id, 'relation_set.for_acourse': {'$all': acourse_val}, 'attribute_set.has_enrolled': {'$exists': True}},
           {'member_of': 1, 'attribute_set.has_enrolled': 1}
         )
 
@@ -3324,11 +3326,14 @@ def get_anncourses_allstudents(request, group_id):
           for attr in sce_gs.attribute_set:
             if attr:
               query.update({'_id': {'$nin': attr["has_enrolled"]}})
+              enrolled_stud_count = str(len(attr["has_enrolled"]))
 
               sce_gs.get_neighbourhood(sce_gs.member_of)
               node = sce_gs
               checked = "has_enrolled"
 
+      drawer_template_context = {}
+      res = None
       if all_students == u"true":
         all_students_text = "All students (including enrolled ones)"
 
@@ -3351,10 +3356,12 @@ def get_anncourses_allstudents(request, group_id):
           {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
         ).sort("name", 1)
 
-        all_students_text += " [Count("+str(res.count())+")]"
+        non_enrolled_stud_count = str(res.count())
+        all_students_text += " [Count("+non_enrolled_stud_count+")]"
         drawer_template_context = edit_drawer_widget("RelationType", group_id, node, None, checked, left_drawer_content=res)
 
       drawer_template_context["widget_for"] = "student_enroll"
+      drawer_template_context["groupid"] = group_id
       drawer_widget = render_to_string('ndf/drawer_widget.html', 
                                         drawer_template_context,
                                         context_instance = RequestContext(request)
@@ -3364,7 +3371,9 @@ def get_anncourses_allstudents(request, group_id):
       response_dict["drawer_widget"] = drawer_widget
 
       response_dict["success"] = True
-      response_dict["message"] = "NOTE: " + all_students_text + " are listed along with announced courses"
+      # response_dict["message"] = "NOTE: " + all_students_text + " are listed along with announced courses"
+      response_dict["enrolled_stud_count"] = enrolled_stud_count
+      response_dict["non_enrolled_stud_count"] = non_enrolled_stud_count
 
       return HttpResponse(json.dumps(response_dict))
 
@@ -3531,8 +3540,30 @@ def get_students_for_approval(request, group_id):
 
           data["pk"] = str(sce_gs._id)
           data["College"] = sce_gs.for_college[0].name
-          data["CourseId"] = sce_gs.for_acourse[0]._id
-          data["Course"] = sce_gs.for_acourse[0].name
+
+          course_id_list = []
+          for each in sce_gs.for_acourse:
+            course_id_list.append(each._id.__str__())
+          data["CourseId"] = ",".join(course_id_list)
+
+          if len(sce_gs.for_acourse) > 1:
+              # It means it's a Foundation Course's (FC) enrollment
+              start_enroll = None
+              end_enroll = None
+              for each in sce_gs.for_acourse[0].attribute_set:
+                  if not each:
+                      pass
+                  elif each.has_key("start_enroll"):
+                      start_enroll = each["start_enroll"]
+                  elif each.has_key("end_enroll"):
+                      end_enroll = each["end_enroll"]
+
+              data["Course"] = "Foundation_Course" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y")
+
+          else:
+              # Courses other than FC
+              data["Course"] = sce_gs.for_acourse[0].name
+          
           data["CompletedOn"] =  sce_gs.completed_on
           data["Enrolled"] = len(sce_gs.has_enrolled)
           approve_task = sce_gs.has_corresponding_task[0]
@@ -3616,7 +3647,10 @@ def approve_students(request, group_id):
     if request.is_ajax() and request.method == "POST":
       approval_state = request.POST.get("approval_state", "")
       enrollment_id = request.POST.get("enrollment_id", "")
+
       course_id = request.POST.get("course_id", "")
+      course_id = [ObjectId(each.strip()) for each in course_id.split(",")]
+
       students_selected = request.POST.getlist("students_selected[]", "")
 
       sce_gs = collection.Node.one(
@@ -3647,7 +3681,14 @@ def approve_students(request, group_id):
         for each in students_selected:
           student_id = ObjectId(each)
 
-          rel_node = create_grelation(student_id, selected_course_RT, ObjectId(course_id))
+          stud_node = collection.Node.one({'_id': student_id}, {'relation_set.selected_course': 1})
+          ex_course_id = []
+          for each in stud_node.relation_set:
+            if each and each.has_key("selected_course"):
+              ex_course_id = each["selected_course"]
+              break
+          new_course_id = list(set(ex_course_id + course_id))
+          rel_node = create_grelation(student_id, selected_course_RT, new_course_id)
 
           if rel_node:
             if student_id not in approved_list:
@@ -3671,6 +3712,7 @@ def approve_students(request, group_id):
       approved_count = len(approved_list)
       rejected_count = len(rejected_list)
       remaining_count = enrolled_count - (approved_count + rejected_count)
+      task_status = u"New"
 
       if remaining_count == 0:
         if enrolled_count == (approved_count + rejected_count):
@@ -3679,14 +3721,26 @@ def approve_students(request, group_id):
               Status_AT = collection.Node.one(
                 {'_type': "AttributeType", 'name': "Status"}
               )
-              attr_node = create_gattribute(rel["has_corresponding_task"][0], Status_AT, u"Closed")
+              task_status = u"Closed"
+              attr_node = create_gattribute(rel["has_corresponding_task"][0], Status_AT, task_status)
               break
+
+      else:
+        for rel in sce_gs.relation_set:
+          if rel and ("has_corresponding_task" in rel):
+            Status_AT = collection.Node.one(
+              {'_type': "AttributeType", 'name': "Status"}
+            )
+            task_status = u"In Progress"
+            attr_node = create_gattribute(rel["has_corresponding_task"][0], Status_AT, task_status)
+            break
 
       response_dict["success"] = True
       response_dict["enrolled"] = enrolled_count
       response_dict["approved"] = approved_count
       response_dict["rejected"] = rejected_count
       response_dict["remaining"] = remaining_count
+      response_dict["task_status"] = task_status
 
       return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 

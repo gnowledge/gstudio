@@ -436,6 +436,19 @@
 
         $("#announce_to_colg_list").val(announce_to_colg_list);
       {% endif %}
+
+      $('article').block({ 
+        message: '<h4>Processing... Please wait!</h4>',
+        css: { 
+          border: 'none', 
+          padding: '15px', 
+          color: '#fff !important', 
+          backgroundColor: '#10c1cb !important', 
+          '-webkit-border-radius': '10px', 
+          '-moz-border-radius': '10px', 
+          opacity: 1.0
+        }
+      });
     });
 
 {% endblock %}

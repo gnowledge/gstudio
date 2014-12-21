@@ -1934,7 +1934,6 @@ def html_widget(groupid, node_id, field):
     #   gs.get_neighbourhood(node_member_of)
 
     # field_type = gs.structure[field['name']]
-    print "see",field
     field_type = field['data_type']
     field_altnames = field['altnames']
     field_value = field['value']
