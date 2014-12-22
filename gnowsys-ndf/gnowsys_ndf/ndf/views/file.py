@@ -731,7 +731,14 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
       this will create file object and save files in gridfs collection
     """
-    global count,first_object
+    
+    global count, first_object
+    
+    # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 
+    # this is to prevent from forming collection of first object containing subsequent objects.
+    count = kwargs["count"] if kwargs.has_key("count") else count
+    first_object = kwargs["first_object"] if kwargs.has_key("first_object") else first_object
+    
     is_video = ""
     fcol = get_database()[File.collection_name]
     fileobj = fcol.File()
@@ -813,12 +820,9 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             
             # For making collection if uploaded file more than one
             if count == 0:
-                # print "count : ", count, "\n\nfirst_object : ", first_object, "\n\nfileobj : ", fileobj.name
                 first_object = fileobj
             else:
-                # print "count : ", count, "\n\nfirst_object : ", first_object, "\n\nfileobj : ", fileobj.name
                 collection.File.find_and_modify({'_id':first_object._id},{'$push':{'collection_set':fileobj._id}})
-                # print "\n\nafter modify first_object : ", first_object
                 
                 
             """ 
