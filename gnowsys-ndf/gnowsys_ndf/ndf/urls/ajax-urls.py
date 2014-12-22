@@ -74,4 +74,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^events/', 'get_data_for_event_task', name='get_data_for_event_task'),
     url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
     url(r'^insert_picture/', 'insert_picture', name="insert_picture"),
+    #url for infinite scroll down
+    url(r'^page_scroll/(?P<page>[^/]+)$', 'page_scroll', name='page_scroll'),    
 )

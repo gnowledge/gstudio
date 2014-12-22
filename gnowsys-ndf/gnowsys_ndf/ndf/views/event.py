@@ -138,6 +138,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   
   nodes = None
   if app_set_id:
+    print app_set_id,"h"
     event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = event_gst.name
   
@@ -167,6 +168,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     val=False
     for i in node.relation_set:
        if unicode('event_has_batch') in i.keys():
+            print i['event_has_batch']
             batch=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
             batch_relation=collection.Node.one({'_type':"GSystem",'_id':ObjectId(batch._id)},{'relation_set':1})
             for i in batch_relation['relation_set']:

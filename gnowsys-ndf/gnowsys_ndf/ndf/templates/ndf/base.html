@@ -29,6 +29,7 @@
 
   <!-- jQuery -->
   <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> 
+  <script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script> 
   <!--<script src="/static/ndf/bower_components/jquery-legacy/jquery.min.js"> </script>-->
 
   <!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
@@ -162,7 +163,9 @@
 
           <!-- Current group selector -->
       	  <li class="has-dropdown group">
-      	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:20}}</a>
+            <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'group_dashboard' group_object.pk %}">
+              {{group_object.name|truncatechars:20}}
+            </a>
       	    
       	    <!-- If logged in show user groups -->
       	    {% if user.is_authenticated %}
@@ -345,10 +348,6 @@
   </div>
 </div>
 
-  <center>
-    <img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif">
-  </center>
-
   <footer>
     <section class="row">
       <div class="medium-12 columns">
@@ -395,16 +394,24 @@
       $(document).foundation();
       
     // Register global ajax start and complete events to show ajax loader when request is in process
-      $( document )
+      $(document)
         .ajaxStart(function() {
-          $( "#ajax_load_image" ).show();
-          $("#content").css({"opacity":"0.1",})
+          $('article').block({ 
+            message: '<h4>Processing... Please wait!</h4>',
+            css: { 
+              border: 'none', 
+              padding: '15px', 
+              color: '#fff !important', 
+              backgroundColor: '#10c1cb !important', 
+              '-webkit-border-radius': '10px', 
+              '-moz-border-radius': '10px', 
+              opacity: 1.0
+            }
+          });
         })
-        .ajaxComplete(function() {
-          $("#ajax_load_image").hide();
-          $("#content").css({"opacity":"",})
+        .ajaxStop(function() {
+          $('article').unblock();
         });
-    
     // Toggles the display of main sidebar for 12 col article view
       var toggleMainSidebar = function(){
         $("main>aside").toggle();
