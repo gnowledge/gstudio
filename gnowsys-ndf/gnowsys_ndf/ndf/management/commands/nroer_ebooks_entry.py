@@ -264,7 +264,6 @@ def parse_data_create_gsystem(json_file_path):
                         else:
                             parsed_json_document[parsed_key] = []
                             # print "===", parsed_json_document[parsed_key]
-
                       
                     # tags:
                     if (parsed_key == "tags") and json_document[key]:
@@ -307,7 +306,7 @@ def parse_data_create_gsystem(json_file_path):
               
             # calling method to create File GSystems
             nodeid = create_resource_gsystem(parsed_json_document)
-            print type(nodeid), "nodeid ------- : ", nodeid, "\n"
+            # print type(nodeid), "nodeid ------- : ", nodeid, "\n"
             node = collection.Node.one({ "_id": ObjectId(nodeid) })
 
             # starting processing for the attributes and relations saving
@@ -498,7 +497,7 @@ def parse_data_create_gsystem(json_file_path):
                             formatted_list.append(v.strip())
 
                           right_subject_id = []
-                          rsub_id = _get_id_from_hierarchy(formatted_list)
+                          rsub_id = _get_id_from_hierarchy(formatted_list) if formatted_list else None
                           # print hierarchy_output," |||||||||||||||||||", rsub_id
 
                           # checking every item in hierarchy exist and leaf node's _id found
@@ -680,24 +679,25 @@ def check_folder_exists(resource_link, base_folder_name):
             filemd5 = hashlib.md5(files.read()).hexdigest()
             fileobj = file_collection.File()
 
-            check_obj_by_name = collection.File.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(base_folder_name) })
-
-            if fileobj.fs.files.exists({"md5":filemd5}) or check_obj_by_name:
+            if fileobj.fs.files.exists({"md5":filemd5}):
+                gridfs_obj_by_md5 = fs_files_collection.find_one({"md5":filemd5})
                 
-                cur_oid = fs_files_collection.find_one({"md5":filemd5})
-            
-                # printing appropriate error message
-                if check_obj_by_name:
-                    info_message = "\n- Resource with same name of '"+ str(base_folder_name) +"' and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name._id)
-                    print info_message
-                    log_list.append(str(info_message))
-                    return None
-                else:      
-                    info_message = "\n- Resource file exists in DB: '" + str(cur_oid._id) + "'"
+                check_obj_by_name_n_fs_ids = collection.File.find_one({
+                                        "_type":"File", 
+                                        'member_of': {'$all': [ObjectId(file_gst._id)]},
+                                        'group_set': {'$all': [ObjectId(home_group._id)]},
+                                        "name": unicode(base_folder_name),
+                                        "fs_file_ids": {"$in":[ gridfs_obj_by_md5["_id"] ]} 
+                                    })
+
+                if check_obj_by_name_n_fs_ids:
+                    # printing appropriate error message
+                    info_message = "\n- Resource with same name of '"+ str(base_folder_name) +"' and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name_n_fs_ids._id)
                     print info_message
                     log_list.append(str(info_message))
                     return None
 
+            # else process for saving/creating new object
             files.seek(0)
             language = ""
 
@@ -793,33 +793,30 @@ def create_resource_gsystem(resource_data):
     
     fileobj = file_collection.File()
 
-    check_obj_by_name = collection.File.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
-    # print "\n====", check_obj_by_name, "==== ", fileobj.fs.files.exists({"md5":filemd5})
+    if fileobj.fs.files.exists({"md5":filemd5}):
 
-    if fileobj.fs.files.exists({"md5":filemd5}) or check_obj_by_name:
+        gridfs_obj_by_md5 = fs_files_collection.find_one({"md5":filemd5})
         
-        cur_oid = fs_files_collection.find_one({"md5":filemd5})
+        check_obj_by_name_n_fs_ids = collection.File.find_one({
+                                        "_type":"File", 
+                                        'member_of': {'$all': [ObjectId(file_gst._id)]},
+                                        'group_set': {'$all': [ObjectId(home_group._id)]},
+                                        "name": unicode(resource_data["name"]),
+                                        "fs_file_ids": {"$in":[ gridfs_obj_by_md5["_id"] ]} 
+                                    })
         
-        # printing appropriate error message
-        if check_obj_by_name:
-            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name._id)
+        if check_obj_by_name_n_fs_ids:
+            # printing appropriate error message
+            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name_n_fs_ids._id)
             print info_message
             log_list.append(str(info_message))
             
-            return check_obj_by_name._id
-
-        else:      
-            info_message = "\n- Resource file exists in DB: '" + str(cur_oid._id) + "'"
-            print info_message
-            log_list.append(str(info_message))
-
-            return None
+            return check_obj_by_name_n_fs_ids._id
 
     else:
         # creating new resource
         files.seek(0)
         
-        # print "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
         info_message = "\n- Creating resource: " + str(resource_data["name"])
         log_list.append(str(info_message))
         print info_message
@@ -873,7 +870,7 @@ def unzip(source_filename, dest_dir):
 
 def update_url_field(oid, name):
 
-    url = "http://" + current_site.domain + "/" + os.getlogin() + "/file/readDoc/" + oid.__str__() + "/" + name
+    url = "http://" + str(current_site.domain) + "/" + home_group.name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + oid.__str__() + "/" + str(name)
 
     # adding remaining fields
     collection.update({"_id": oid}, {'$set': {'url': unicode(url)} }, upsert=False, multi=False )
