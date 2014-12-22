@@ -136,12 +136,6 @@
 			    }
 			);
                      
-//                     Fold/Unfold item on click
-//                     $tree.delegate(".jstree-open>a", "click.jstree", function(event){
-//                        $.jstree._reference(this).close_node(this,false,false);
-//                    }).delegate(".jstree-closed>a", "click.jstree", function(event){
-//                        $.jstree._reference(this).open_node(this,false,false);
-//});
 
     	});
 
@@ -149,10 +143,9 @@
 
 
   </script>
+
   <style>
   	#app-set-item li { padding:0.5em }
-/*	#app-set-item li:hover { background-color:#e5e5e5; }*/
-/*	.selected-app-set-item { background-color:#e5e5e5; }*/
 
 	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
         content: "\f07b";
@@ -160,6 +153,28 @@
     .jqtree-tree i {
         margin-right: 4px;
     }
+
+    /* for reingold tilford tree */
+	.node {
+	  cursor: pointer;
+	}
+
+	.node circle {
+	  fill: #fff;
+	  stroke: green;
+	  stroke-width: 1.5px;
+	}
+
+	.node text {
+	  font: 12px sans-serif;
+	}
+
+	.link {
+	  fill: none;
+	  stroke: #ccc;
+	  stroke-width: 1.5px;
+	}
+	/* for reingold tilford tree -- end */
 
   </style>
 {% endblock%}
@@ -223,32 +238,45 @@
 	{% if themes_hierarchy %}
 
 		<h2> {{node.name}}</h2> 
-		<a class="fold"><b><i class="fi-plus"></i> {% trans "Fold" %} </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
-		<a class="unfold"><b><i class="fi-minus"></i> {% trans "Unfold" %} </b></a>&nbsp;&nbsp;&nbsp;&nbsp;
-		{% if user_access == "allow" %}
+		<div class="row">
+		<div class="large-4 columns">
 
-          <a class="button tiny" data-reveal-id="view_add_page" title="Add Theme Item">
-            +&nbsp;Add Theme Item
-          </a>
+			<a class="fold"><b><i class="fi-plus"></i> {% trans "Fold" %} </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
+			<a class="unfold"><b><i class="fi-minus"></i> {% trans "Unfold" %} </b></a>&nbsp;&nbsp;&nbsp;&nbsp;
+			{% if user_access == "allow" %}
 
-          <div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
+	          <a class="button tiny" data-reveal-id="view_add_page" title="Add Theme Item">
+	            +&nbsp;Add Theme Item
+	          </a>
 
-              <h3>Add New Theme Item:</h3>
-              <!-- To enter name of theme item -->
-              <div>
-                <input class="name_id" name="name" type="text" placeholder="Enter name...">
-              </div>   <br/>           
+	          <div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
 
-              <input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
+	              <h3>Add New Theme Item:</h3>
+	              <!-- To enter name of theme item -->
+	              <div>
+	                <input class="name_id" name="name" type="text" placeholder="Enter name...">
+	              </div>   <br/>           
 
-              <a class="close-reveal-modal">&#215;</a>
+	              <input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
 
-          </div>          
-        {% endif %}
+	              <a class="close-reveal-modal">&#215;</a>
+
+	          </div>          
+	        {% endif %}
+	    </div>
+
+        <div class="large-4 columns">
 
 
+	        <a class="tree_browser" style="border: 2px solid #0eacb5; padding: 5px;"><b> {% trans "Tree Browser" %} </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
+			<a class="collapsible_tree" style="border: 2px solid #0eacb5; padding: 5px;"><b> {% trans "Collapsible Tree" %} </b></a>
+
+		</div>
+
+		<div class="large-4 columns">
 		{% if user.is_authenticated %}
     		{% if user_access == "allow" %}
+    		
     			<input class="button tiny deleteObjects right" type="button" value="Delete">
     			<span class="right"><input class="checkedAll" type="checkbox"> Select All &nbsp;&nbsp;</span>
 
@@ -261,18 +289,21 @@
 			        <div id="deletion_results"></div>
 			        <a class="close-reveal-modal">&#215;</a>
 
-		      	</div>
+		      	</div>		
 
     		{% endif %}
 		{% endif %}
-
+		</div>
+		</div>
 		<hr/>
 
 		{% if node %}
 			<!-- If "Theme" node -->
-  		
 			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>			
 		{% endif %}
+
+
+
 
 	{% endif %}
 
@@ -441,7 +472,7 @@
 	{% endif %}
 
 
-	<script type="text/javascript">
+<script type="text/javascript">
 
 		$("#add_theme_item").click(function() {
 		      $.ajax({
@@ -484,6 +515,171 @@
 	    		location.href = "{% url 'theme_page' group_name_tag app_id %}?unfold=true";	
 	    	});
 	    });	
+
+	    $(".tree_browser").click(function() {
+			$(function() {				
+				location.href = "{% url 'theme_page' group_name_tag app_id %}";
+			});
+		});
+
+
+	    $(".collapsible_tree").click(function() {
+
+			
+			$(".themes").html("");
+
+			var margin = {top: 20, right: 40, bottom: 20, left: 40},
+			    width = 960 - margin.right - margin.left,
+			    height = 800 - margin.top - margin.bottom;
+			    
+			var i = 0,
+			    duration = 750,
+			    root;
+
+			var tree = d3.layout.tree()
+			    .size([height, width]);
+
+			var diagonal = d3.svg.diagonal()
+			    .projection(function(d) { return [d.y, d.x]; });
+
+			var svg = d3.select(".themes").append("svg")
+			    .attr("width", width + margin.right + margin.left)
+			    .attr("height", height + margin.top + margin.bottom)
+			  	.append("g")
+			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			{% if node %}
+				d3.json("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(error, flare) {
+				  root = flare;
+				  root.x0 = height / 2;
+				  root.y0 = 0;
+
+				  function collapse(d) {
+				    if (d.children) {
+				      d._children = d.children;
+				      d._children.forEach(collapse);
+				      d.children = null;
+				    }
+				  }
+
+				  root.children.forEach(collapse);
+				  update(root);
+				});
+			{% endif %}
+
+			d3.select(self.frameElement).style("height", "800px");
+
+			function update(source) {
+
+			  // Compute the new tree layout.
+			  var nodes = tree.nodes(root).reverse(),
+			      links = tree.links(nodes);
+
+			  // Normalize for fixed-depth.
+			  nodes.forEach(function(d) { d.y = d.depth * 120;});
+
+
+			  // Update the nodes
+			  var node = svg.selectAll("g.node")
+			      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+			  // Enter any new nodes at the parent's previous position.
+			  var nodeEnter = node.enter().append("g")
+			      .attr("class", "node")
+			      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+			      .on("click", click);
+
+			  nodeEnter.append("circle")
+			      .attr("r", 1e-6)
+			      .style("fill", function(d) { return d._children ? "#10c1cb" : "#fff"; });
+
+			  nodeEnter.append("text")
+			      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+			      .attr("dy", "0.35em")
+			      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+			      .text(function(d) { return d.name; })
+			      .style("fill-opacity", 1e-6);
+
+			  // Transition nodes to their new position.
+			  var nodeUpdate = node.transition()
+			      .duration(duration)
+			      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+			  nodeUpdate.select("circle")
+			      .attr("r", 6.5)
+			      .style("fill", function(d) { return d._children ? "#10c1cb" : "#fff"; });
+
+			  nodeUpdate.select("text")
+			      .style("fill-opacity", 1);
+
+			  // Transition exiting nodes to the parent's new position.
+			  var nodeExit = node.exit().transition()
+			      .duration(duration)
+			      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+			      .remove();
+
+			  nodeExit.select("circle")
+			      .attr("r", 1e-6);
+
+			  nodeExit.select("text")
+			      .style("fill-opacity", 1e-6);
+
+			  // Update the links
+			  var link = svg.selectAll("path.link")
+			      .data(links, function(d) { return d.target.id; });
+
+			  // Enter any new links at the parent's previous position.
+			  link.enter().insert("path", "g")
+			      .attr("class", "link")
+			      .attr("d", function(d) {
+			        var o = {x: source.x0, y: source.y0};
+			        return diagonal({source: o, target: o});
+			      });
+
+			  // Transition links to their new position.
+			  link.transition()
+			      .duration(duration)
+			      .attr("d", diagonal);
+
+			  // Transition exiting nodes to the parent's new position.
+			  link.exit().transition()
+			      .duration(duration)
+			      .attr("d", function(d) {
+			        var o = {x: source.x, y: source.y};
+			        return diagonal({source: o, target: o});
+			      })
+			      .remove();
+
+			  // Stash the old positions for transition.
+			  nodes.forEach(function(d) {
+			    d.x0 = d.x;
+			    d.y0 = d.y;
+			  });
+			}
+
+			// Toggle children on click.
+			function click(d) {
+			  if (d.children) {
+			    d._children = d.children;
+			    d.children = null;
+			        console.log("non-leaf 1");
+			  } 
+			  else {
+			    if(d._children){
+			        d.children = d._children;
+			        d._children = null;
+			        console.log("non-leaf 2");
+				}
+				else {
+			        console.log("Leaf!");
+					$('#myModal2').foundation('reveal', 'open', "/{{group_name_tag}}/topic_details/" + d.id );     
+			    }
+			  }
+			  update(d);
+			}
+			
+
+		});
 
 	    // script for delete themes
 	    $(document).on('click',".button.deleteObjects",function(){
@@ -598,6 +794,6 @@
              $('#myModal').foundation('reveal', 'close');
 		});
 
-	</script>
+</script>
 
 {% endblock %}
