@@ -23,6 +23,15 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Replaces "for_acourse" RelationType's object_cardinality field's value from 1 to 100
+    res = collection.update(
+        {'_type': "RelationType", 'name': "for_acourse"}, 
+        {'$set': {'object_cardinality': 100}}, 
+        upsert=False, multi=False
+    )
+
+    if res['updatedExisting'] and res['nModified']:
+        print "\n Replaced 'for_acourse' RelationType's 'object_cardinality' field's value from 1 to 100."
     
     file_gst = collection.Node.one({'$and':[{'name':'File'},{'_type':'GSystemType'}]}) 
     pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
@@ -44,7 +53,8 @@ class Command(BaseCommand):
                     collection.update({'_id':each._id},{'$set':{'url': unicode(url_link) }})
                     count = count + 1
 
-        print "\n 'url' field updated in following no. of documents: ", count
+        if count:
+            print "\n 'url' field updated in following no. of documents: ", count
 
     # Update pandora videos 'member_of', 'created_by', 'modified_by', 'contributors' field 
     if User.objects.filter(username='nroer_team').exists():
@@ -56,7 +66,8 @@ class Command(BaseCommand):
                 upsert=False, multi=True
             )
 
-            print "\n 'created_by, modified_by & contributors' field updated for pandora videos in following no. of documents: ", res['n']
+            if res['updatedExisting'] and res['nModified']:
+                print "\n 'created_by, modified_by & contributors' field updated for pandora videos in following no. of documents: ", res['n']
 
 
     # Update prior_node for each node in DB who has its collection_set
@@ -71,14 +82,14 @@ class Command(BaseCommand):
                         collection.update({'_id':obj._id},{'$push':{'prior_node': ObjectId(each._id) }})
                         count = count + 1
                         
-    print "\n prior_node field updated in following no. of documents: ", count
+    if count:
+        print "\n prior_node field updated in following no. of documents: ", count
 
     # Updating names (Stripped) in all theme , theme_items and topic documents
     theme_GST = collection.Node.one({'_type':'GSystemType','name': 'Theme'})
     theme_item_GST = collection.Node.one({'_type':'GSystemType','name': 'theme_item'})
     topic_GST = collection.Node.one({'_type':'GSystemType','name': 'Topic'})
     if theme_GST and theme_item_GST and topic_GST:
-
         nodes = collection.Node.find({'member_of': {'$in': [theme_GST._id, theme_item_GST._id,topic_GST._id]} })
         count = 0
         for each in nodes:
@@ -86,7 +97,8 @@ class Command(BaseCommand):
                 collection.update({'_id':ObjectId(each._id)},{'$set': {'name': each.name.strip()} })
                 count = count + 1
 
-        print "\n Name field updated (Stripped) in following no. of documents: ", count
+        if count:
+            print "\n Name field updated (Stripped) in following no. of documents: ", count
         
 
     # Update's "status" field from DRAFT to PUBLISHED for all TYPE's node(s)
@@ -95,7 +107,8 @@ class Command(BaseCommand):
         {'$set': {'status': u"PUBLISHED"}}, 
         upsert=False, multi=True
     )
-    print "\n 'status' field updated for all TYPE's node(s) in following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'status' field updated for all TYPE's node(s) in following no. of documents: ", res['n']
 
     # Update object_value of GAttribute(s) of "Assignee" AttributeType
     # Find those whose data-type is not list/Array
@@ -112,6 +125,7 @@ class Command(BaseCommand):
 
         for each in assignee_cur:
             # If string
+            ul_sv = []
             if type(each.object_value) in [str, unicode]:
                 if "," in each.object_value and "[" in each.object_value and "]" in each.object_value:
                     ul_sv = each.object_value.strip("[]").replace(", ", ",").replace(" ,", ",").split(",")
@@ -161,7 +175,8 @@ class Command(BaseCommand):
                         )
                 res += upres['n']
 
-        print "\n Updated following no. of Assignee GAttribute document(s): ", res
+        if res:
+            print "\n Updated following no. of Assignee GAttribute document(s): ", res
 
     # Updates already created has_profile_pic grelations' status - Except latest one (PUBLISHED) others' are set to DELETED
     has_profile_pic = collection.Node.one({'_type': "RelationType", 'name': u"has_profile_pic"})
@@ -202,7 +217,8 @@ class Command(BaseCommand):
         if pub_res or del_res['n']:
             res += 1
 
-    print "\n Updated following no. of has_profile_pic GRelation document(s): ", res
+    if res:
+        print "\n Updated following no. of has_profile_pic GRelation document(s): ", res
 
     # Updates the value of object_cardinality to 100. So that teaches will behave as 1:M (one-to-many) relation.
     teaches = collection.Node.one({'_type': "RelationType", 'name': "teaches"})
@@ -222,44 +238,48 @@ class Command(BaseCommand):
                 {'$set': {'object_type': [ann_course._id]}}, 
                 upsert=False, multi=False
               )
-        print "\n Replaced object_type of 'has_course' relationship from 'NUSSD Course' to 'Announced Course'."
+        if res['updatedExisting'] and res['nModified']:
+            print "\n Replaced object_type of 'has_course' relationship from 'NUSSD Course' to 'Announced Course'."
 
     # Adds "relation_set" field (with default value as []) to all documents belonging to GSystems.
     res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'relation_set': {'$exists': False}}, 
                             {'$set': {'relation_set': []}}, 
                             upsert=False, multi=True
     )
-    print "\n 'relation_set' field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'relation_set' field added to following no. of documents: ", res['n']
 
     # Adds "attribute_set" field (with default value as []) to all documents belonging to GSystems.
     res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'attribute_set': {'$exists': False}}, 
                             {'$set': {'attribute_set': []}}, 
                             upsert=False, multi=True
     )
-    print "\n 'attribute_set' field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'attribute_set' field added to following no. of documents: ", res['n']
 
     # Adds "license" field (with default value as "") to all documents belonging to GSystems (except Author).
     res = collection.update({'_type': {'$nin': ["MetaType", "Author", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'license': {'$exists': False}}, 
                             {'$set': {'license': ""}}, 
                             upsert=False, multi=True
     )
-    print "\n 'license' field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'license' field added to following no. of documents: ", res['n']
 
     # Adding "Agency_type" field adding to group documents with default values
     res = collection.update({'_type': {'$in': ['Group']}, 'agency_type': {'$exists': False}}, 
                             {'$set': {'agency_type': "Project" }}, 
                             upsert=False, multi=True
     )
-    if res['n']:
-           print "\n 'agency_type' field added to 'Group' documents totalling to : ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+       print "\n 'agency_type' field added to 'Group' documents totalling to : ", res['n']
 
     # Adding "Agency_type" field adding to author documents with default values
     res = collection.update({'_type': {'$in': ['Author']}, 'agency_type': {'$exists': False}}, 
                             {'$set': {'agency_type': "Others" }}, 
                             upsert=False, multi=True
     )
-    if res['n']:
-           print "\n 'agency_type' field added to 'Author' documents totalling to : ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+       print "\n 'agency_type' field added to 'Author' documents totalling to : ", res['n']
 
 
     # Modify language field with unicode value if any document has language with dict datatype
@@ -273,40 +293,40 @@ class Command(BaseCommand):
                             {'$unset': {'cr_or_xcr': False }}, 
                             upsert=False, multi=True
     )
-    if res['n']:
-           print "\n Already existing 'cr_or_xcr' field removed from documents totalling to : ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+       print "\n Already existing 'cr_or_xcr' field removed from documents totalling to : ", res['n']
 
     # Adding "curricular" field with no default value
     res = collection.update({'_type': {'$in': ['Group']}, 'curricular': {'$exists': False}}, 
                             {'$set': {'curricular': False }}, 
                             upsert=False, multi=True
     )
-    print "\n 'curricular' field added to all Group documents totalling to : ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'curricular' field added to all Group documents totalling to : ", res['n']
 
     # Removing existing "partners" field with no default value
     res = collection.update({'_type': {'$in': ['Group']}, 'partners': {'$exists': True}}, 
                             {'$unset': {'partners': False }}, 
                             upsert=False, multi=True
     )
-    if res['n']:
-           print "\n Already existing 'partners' field removed from documents totalling to : ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+       print "\n Already existing 'partners' field removed from documents totalling to : ", res['n']
 
     # Adding "partner" field with no default value
     res = collection.update({'_type': {'$in': ['Group']}, 'partner': {'$exists': False}}, 
                             {'$set': {'partner': False }}, 
                             upsert=False, multi=True
     )
-    print "\n 'partner' field added to all Group documents totalling to : ", res['n']
-
-
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'partner' field added to all Group documents totalling to : ", res['n']
 
     # Adding "preferred_languages" field with no default value
     res = collection.update({'_type': {'$in': ['Author']}, 'preferred_languages': {'$exists': False}}, 
                             {'$set': {'preferred_languages': {}}}, 
                             upsert=False, multi=True
     )
-    print "\n 'preferred_languages' field added to all author documents totalling to : ", res['n']
-    
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'preferred_languages' field added to all author documents totalling to : ", res['n']
 
 
     # Adding "rating" field with no default value
@@ -314,84 +334,96 @@ class Command(BaseCommand):
                             {'$set': {'rating': []}}, 
                             upsert=False, multi=True
     )
-    print "\n 'rating' field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'rating' field added to following no. of documents: ", res['n']
     
     # Adds 'subject_scope', 'attribute_type_scope', 'object_value_scope' field (with default value as "") to all documents which belongs to GAttribute
     res = collection.update({'_type': {'$in': ["Group", "Author"]}, 'group_admin': {'$exists': False}}, 
                             {'$set': {'group_admin': []}}, 
                             upsert=False, multi=True
     )
-    print "\n 'group_admin' field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'group_admin' field added to following no. of documents: ", res['n']
 
     # Adds 'subject_scope', 'attribute_type_scope', 'object_value_scope' field (with default value as "") to all documents which belongs to GAttribute
     res = collection.update({'_type': "GAttribute", 'subject_scope': {'$exists': False}, 'attribute_type_scope': {'$exists': False}, 'object_value_scope': {'$exists': False}}, 
                             {'$set': {'subject_scope':"", 'attribute_type_scope':"", 'object_value_scope': ""}}, 
                             upsert=False, multi=True
     )
-    print "\n 'subject_scope', 'attribute_type_scope', 'object_value_scope' fields added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'subject_scope', 'attribute_type_scope', 'object_value_scope' fields added to following no. of documents: ", res['n']
 
     # Adds 'subject_scope', 'relation_type_scope', 'right_subject_scope' field (with default value as "") to all documents which belongs to GRelation
     res = collection.update({'_type': "GRelation", 'subject_scope': {'$exists': False}, 'relation_type_scope': {'$exists': False}, 'right_subject_scope': {'$exists': False}}, 
                             {'$set': {'subject_scope':"", 'relation_type_scope':"", 'right_subject_scope': ""}}, 
                             upsert=False, multi=True
     )
-    print "\n 'subject_scope', 'relation_type_scope', 'right_subject_scope' fields added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'subject_scope', 'relation_type_scope', 'right_subject_scope' fields added to following no. of documents: ", res['n']
 
     # Adds "annotations" field (with default value as []) to all documents belonging to GSystems
     res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'annotations': {'$exists': False}}, 
                             {'$set': {'annotations': []}}, 
                             upsert=False, multi=True
     )
-    print "\n annotations field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n annotations field added to following no. of documents: ", res['n']
 
     # Adds "group_set" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
     res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'group_set': {'$exists': False}}, 
                             {'$set': {'group_set': []}}, 
                             upsert=False, multi=True
     )
-    print "\n group_set field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n group_set field added to following no. of documents: ", res['n']
 
     # Adds "property_order" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
     res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'property_order': {'$exists': False}}, 
                             {'$set': {'property_order': []}}, 
                             upsert=False, multi=True
     )
-    print "\n property_order field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n property_order field added to following no. of documents: ", res['n']
 
     # Adding "modified_by" field with None as it's default value
     res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'modified_by': {'$exists': False}}, 
                             {'$set': {'modified_by': None}}, 
                             upsert=False, multi=True
     )
-    print "\n modified_by field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n modified_by field added to following no. of documents: ", res['n']
 
     # Adding "complex_data_type" field with empty list as it's default value
     res = collection.update({'_type': 'AttributeType', 'complex_data_type': {'$exists': False}}, 
                             {'$set': {'complex_data_type': []}}, 
                             upsert=False, multi=True
     )
-    print "\n complex_data_type field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n complex_data_type field added to following no. of documents: ", res['n']
 
     # Adding "post_node" field with empty list as it's default value
     res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'post_node': {'$exists': False}}, 
                             {'$set': {'post_node': []}}, 
                             upsert=False, multi=True
     )
-    print "\n post_node field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n post_node field added to following no. of documents: ", res['n']
 
     # Adding "collection_set" field with empty list as it's default value
     res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'collection_set': {'$exists': False}}, 
                             {'$set': {'collection_set': []}}, 
                             upsert=False, multi=True
     )
-    print "\n collection_set field added to following no. of documents: ", res['n']
+    if res['updatedExisting'] and res['nModified']:
+        print "\n collection_set field added to following no. of documents: ", res['n']
 
     # Adding "location" field with no default value
     res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'location': {'$exists': False}}, 
                             {'$set': {'location': []}}, 
                             upsert=False, multi=True
     )
-    print "\n location field added to following no. of documents: ", res['n'],"\n"
+    if res['updatedExisting'] and res['nModified']:
+        print "\n location field added to following no. of documents: ", res['n'],"\n"
 
     # Adding "language" field with no default value
     res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'language': {'$exists': False}}, 
