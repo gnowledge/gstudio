@@ -94,11 +94,6 @@
 			  			if (node.node_type == "Topic"){
 			  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";
 
-			               //	console.log('clicked node:' + node.id );
-			               // 	$('#myModal2').foundation('reveal', 'open', {
-			               //   	url:"/{{group_name_tag}}/topic_details/"+node.id+"",
-			               // 	} );    	      
-                                                
 			  			}
 				        
 			  		}
@@ -232,8 +227,13 @@
 
 {% block body_content %}
 {% user_access_policy groupid request.user as user_access %}
-
-      	<!-- <div id="myModal2" class="reveal-modal" style="height:500px;overflow:hidden;width:80%" data-reveal>  <a class="close-reveal-modal" >&#215;</a> </div> -->
+	
+	<!-- This overlay is for displaying topic details from collapsible tree -->
+	<div id="collaps_topic_details" class="reveal-modal" style="height:500px;overflow:hidden;width:80%" data-reveal>  
+	  	<h3>Topic details comming soon !!!</h3>
+    	<a class="close-reveal-modal" >&#215;</a> 
+	</div>
+	<!-- End of overlay -->
 
 	{% if themes_hierarchy %}
 
@@ -241,8 +241,6 @@
 		<div class="row">
 		<div class="large-4 columns">
 
-			<a class="fold"><b><i class="fi-plus"></i> {% trans "Fold" %} </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
-			<a class="unfold"><b><i class="fi-minus"></i> {% trans "Unfold" %} </b></a>&nbsp;&nbsp;&nbsp;&nbsp;
 			{% if user_access == "allow" %}
 
 	          <a class="button tiny" data-reveal-id="view_add_page" title="Add Theme Item">
@@ -267,8 +265,12 @@
 
         <div class="large-4 columns">
 
-
-	        <a class="tree_browser" style="border: 2px solid #0eacb5; padding: 5px;"><b> {% trans "Tree Browser" %} </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
+			<a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="tree_browser" style="border: 2px solid #0eacb5; padding: 5px;"><b> {% trans "Tree Browser" %} </b></a> &nbsp;&nbsp;&nbsp;
+			<ul id="hover1" class="f-dropdown" data-dropdown-content>
+				<li><a class="fold"><i class="fi-plus"></i> {% trans "Fold" %} </a></li> 
+				<li><a class="unfold"><i class="fi-minus"></i> {% trans "Unfold" %} </a></li>  
+			</ul> 
+			
 			<a class="collapsible_tree" style="border: 2px solid #0eacb5; padding: 5px;"><b> {% trans "Collapsible Tree" %} </b></a>
 
 		</div>
@@ -672,7 +674,8 @@
 				}
 				else {
 			        console.log("Leaf!");
-					$('#myModal2').foundation('reveal', 'open', "/{{group_name_tag}}/topic_details/" + d.id );     
+
+					$('#collaps_topic_details').foundation('reveal', 'open');     
 			    }
 			  }
 			  update(d);
