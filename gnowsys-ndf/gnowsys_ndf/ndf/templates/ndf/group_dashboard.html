@@ -3,43 +3,6 @@
 {% load i18n %}
 {% block title %} {{username}}'s - Dashboard  {% endblock %}
 
-{% block meta_content %}
-  <h3>{% trans "About" %}</h3>
-
-  {% blocktrans %}<b>Group Dashboard</b> Shows task(s) and activitie(s) in the site.{% endblocktrans %}
-  <br><br>
-
-  <form id="frmProfilePic" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
-    {% csrf_token %}       
-    <div id="group_picture" style="height:200px; width:220px; background-color: #b0e1df;"> 
-      <div style="position:relative";>
-        <div style="float:left;">
-          <a style="border-style:solid; border-width:3px; padding:0px 1px; border-radius:4px; border-color:#9ecac8; height:auto;" id="btnUploadGroupPic">
-            Add a Photo 
-          </a> 
-          <input type="file" name="has_profile_pic" id="groupdocfile" accept="image/*" class="hide" />
-        </div>
-        <div>
-          <input type="submit" value="Save" style="font-size:15px;" />
-        </div>
-      </div>  
-
-      {% if prof_pic_obj %}
-      {% get_grid_fs_object prof_pic_obj as grid_fs_obj %}
-      <img src="{% url 'read_file' group_id prof_pic_obj.pk grid_fs_obj.filename %} " style="height:250px; width:300%; position:absolute; z-index:auto;">
-      {% endif %}   
-      
-      <input type="file" name="has_profile_pic" class="hide" />
-      <input type="hidden" name="type" value="profile_pic" />
-      <input type="hidden" name="user" value="{{usr}}" />
-      
-      <p id="message" style="display:none">
-        {% trans "Please wait for uploading profile picture" %}
-      </p>
-    </div>
-  </form>
-{% endblock %}
-
 {% block style %}
   {{block.super}}
 
@@ -102,6 +65,45 @@
   }
 {% endblock %}
 
+{% block meta_content %}
+  <h3>{% trans "About" %}</h3>
+
+  {% blocktrans %}<b>Group Dashboard</b> Shows task(s) and activitie(s) in the site.{% endblocktrans %}
+  <br><br>
+
+  <form id="frmProfilePic" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
+    {% csrf_token %}       
+    <div id="group_picture" style="height:200px; width:200px; background-color: #b0e1df;"> 
+      {% if request.user.is_authenticated %}
+      <div style="position:relative";>
+        <div style="float:left;">
+          <a style="border-style:solid; border-width:3px; padding:0px 1px; border-radius:4px; border-color:#9ecac8; height:auto;" id="btnUploadGroupPic">
+            Add a Photo 
+          </a> 
+          <input type="file" name="has_profile_pic" id="groupdocfile" accept="image/*" class="hide" />
+        </div>
+        <div>
+          <input type="submit" value="Save" style="font-size:15px;" />
+        </div>
+      </div>
+      {% endif %}
+
+      {% if prof_pic_obj %}
+      {% get_grid_fs_object prof_pic_obj as grid_fs_obj %}
+      <img alt="Banner picture for this group." src="{% url 'read_file' group_id prof_pic_obj.pk grid_fs_obj.filename %} " style="height:250px; width:200px; position:absolute; z-index:auto;">
+      {% endif %}   
+      
+      <input type="file" name="has_profile_pic" class="hide" />
+      <input type="hidden" name="type" value="profile_pic" />
+      <input type="hidden" name="user" value="{{usr}}" />
+      
+      <p id="message" style="display:none">
+        {% trans "Please wait for uploading profile picture" %}
+      </p>
+    </div>
+  </form>
+{% endblock %}
+
 {% block body_content %}
 <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
   <label id="alertModalLabel"></label>
@@ -112,34 +114,39 @@
 <form id ="frmBanner" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
   {% csrf_token %}
   <div id="group_dashboard_Banner" style="height:300px; width:1150px; background-color: #b0e1df;">
-    <div>
-      <a style="border-style:solid; border-width:1.5px; padding:3px 5px; border-radius:4px" id="btnUploadBannerPic" >  
-      Add a Banner Photo 
-      </a>
-
-      <input type="submit" id="submitpostid" value="Save" style="font-size:15px;"  />
-      
-      {% if banner_pic %}
-      <img src="{% url 'read_file' group_id banner_pic.pk grid_fs_obj.filename %} " 
-      style="height:300px; width:1150px; position:absolute; z-index:auto;">
-      {% get_grid_fs_object  banner_pic as grid_fs_obj %}
-      {% endif %}   
-
-      <div class="row">
-        <div class="row" style="margin-top:80px; margin-left:20px; background: transparent;position:absolute z-index:1"  align="Left">
-          <input type="file" name="has_Banner_pic" id="docFile" accept="image/*" class="hide"/>
-          <input type="hidden" name="type" value="banner_pic">           
-          <input type="hidden" name="user" value="{{usr}}">         
-          <p id="message" style="display:none">
-            {% trans "Please wait for uploading profile picture" %}
-          </p>
-        </div> 
+    {% if request.user.is_authenticated %}
+    <div style="position:relative";>
+      <div style="float:left;">
+        <a style="border-style:solid; border-width:1.5px; padding:3px 5px; border-radius:4px" id="btnUploadBannerPic" >  
+        Add a Banner Photo 
+        </a>
       </div>
+      <div>
+        <input type="submit" id="submitpostid" value="Save" style="font-size:15px;"  />
+      </div>
+    </div>
+    {% endif %}
+
+    {% if banner_pic %}
+    {% get_grid_fs_object banner_pic as grid_fs_obj %}
+    <img alt="Profile picture for this group." src="{% url 'read_file' group_id banner_pic.pk grid_fs_obj.filename %}" 
+    style="height:300px; width:1150px; position:absolute; z-index:auto;">
+    {% endif %}   
+
+    <div class="row">
+      <div class="row" style="margin-top:80px; margin-left:20px; background: transparent;position:absolute z-index:1"  align="Left">
+        <input type="file" name="has_Banner_pic" id="docFile" accept="image/*" class="hide"/>
+        <input type="hidden" name="type" value="banner_pic">           
+        <input type="hidden" name="user" value="{{usr}}">         
+        <p id="message" style="display:none">
+          {% trans "Please wait for uploading profile picture" %}
+        </p>
+      </div> 
     </div>
   </div>
 </form>  
 
-<nav class="row" style="margin-top: 0.5rem;">
+<nav class="row" style="margin-top: 2em;">
   <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
     {% if approval %}
     <dd class="active" title="Enrollment Approval Details">
