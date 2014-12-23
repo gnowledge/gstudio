@@ -218,6 +218,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   course_gst = None
   course_gs = None
+  mis_admin = None
 
   property_order_list = []
 
@@ -1025,7 +1026,18 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   univ = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
-  university_cur = collection.Node.find({'member_of': univ._id}, {'name': 1}).sort('name', 1)
+  university_cur = None
+
+  if not mis_admin:
+    mis_admin = collection.Node.one(
+      {'_type': "Group", 'name': "MIS_admin"}, 
+      {'_id': 1, 'name': 1, 'group_admin': 1}
+    )
+
+  if univ and mis_admin:
+    university_cur = collection.Node.find(
+      {'member_of': univ._id, 'group_set': mis_admin._id}, {'name': 1}
+    ).sort('name', 1)
 
   default_template = "ndf/course_create_edit.html"
   context_variables = { 'groupid': group_id, 'group_id': group_id,
