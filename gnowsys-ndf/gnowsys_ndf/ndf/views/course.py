@@ -779,7 +779,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             
             # Announced Course
             at_rt_dict["for_acourse"] = course_gs._id
-
             # Announced Course -> College
             college_id = None
             for rel in course_gs.relation_set:
@@ -1352,7 +1351,7 @@ def create_course_struct(request, group_id,node_id):
             for course_sec_dict in listdict:
               #k is course section name and v is list of its each course subsection as dict
               for k,v in course_sec_dict.items():#loops over course sections
-                if k in cs_names or k in changed_names.values():
+                if k in cs_names  or k in changed_names.values():
                   for cs_old_name,cs_new_name in changed_names.items():
                     if (cs_new_name==k):
                       name_edited_node = collection.Node.one({'name':cs_old_name,'prior_node':course_node._id,'member_of':cs_gst._id})
@@ -1360,19 +1359,20 @@ def create_course_struct(request, group_id,node_id):
                       name_edited_node.reload()
                     else:
                       pass
+
                   #IMP Fetch node with name 'k' as above code, if name changed, changes oldname to k 
                   cs_node = collection.Node.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id},{'collection_set':1})
                   css_reorder_ids = []
                   for cssd in v:
                     for cssname,cssdict in cssd.items():
-                      if cssname in css_names or cssname in changed_names.values():
-                        for old_name,new_name in changed_names.items():
-                          if (cssname==new_name):
-                            css_name_edited_node = collection.Node.one({'name':old_name,'prior_node':cs_node._id,'member_of':css_gst._id})
-                            collection.update({'_id':css_name_edited_node._id},{'$set':{'name':new_name}})
-                            css_name_edited_node.reload()
-                          else:
-                            pass
+                      if cssname in css_names: #or cssname in changed_names.values():
+                        # for old_name,new_name in changed_names.items():
+                        #   if (cssname==new_name):
+                        #     css_name_edited_node = collection.Node.one({'name':old_name,'prior_node':cs_node._id,'member_of':css_gst._id})
+                        #     collection.update({'_id':css_name_edited_node._id},{'$set':{'name':new_name}})
+                        #     css_name_edited_node.reload()
+                        #   else:
+                        #     pass
 
                         css_node=collection.Node.one({'name':cssname,'member_of':css_gst._id,'prior_node':cs_node._id})
                         for propk,propv in cssdict.items():

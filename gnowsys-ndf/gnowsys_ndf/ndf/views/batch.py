@@ -40,10 +40,26 @@ def batch(request, group_id):
     else :
         pass
     batch_coll = collection.GSystem.find({'member_of': {'$all': [GST_BATCH._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    fetch_ATs = ["nussd_course_type"]
+    req_ATs = []
+    for each in fetch_ATs:
+        each = collection.Node.one({'_type': "AttributeType", 'name': each}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
+
+        if each["data_type"] == "IS()":
+            dt = "IS("
+            for v in each.complex_data_type:
+                dt = dt + "u'" + v + "'" + ", " 
+            dt = dt[:(dt.rfind(", "))] + ")"
+            each["data_type"] = dt
+
+        each["data_type"] = eval(each["data_type"])
+        each["value"] = None
+        req_ATs.append(each)
+
     
     #users_in_group = collection.Node.one({'_id':ObjectId(group_id)}).author_set
     template = "ndf/batch.html"
-    variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id, 'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id})
+    variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id, 'ATs': req_ATs,'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id})
     return render_to_response(template, variable)
 
 
