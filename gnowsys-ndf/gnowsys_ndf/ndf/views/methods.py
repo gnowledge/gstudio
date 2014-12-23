@@ -27,7 +27,7 @@ import re
 import ast
 import string
 import json
-from datetime import datetime
+from datetime import datetime,timedelta,date
 
 
 db = get_database()
@@ -975,14 +975,39 @@ def check_page_first_creation(request,node):
 def tag_info(request,group_id,tagname):
     '''
     Function to get all the resources related to tag
-    '''  
+    '''
+    #yesterdays_result = []
+    #week_ago_result = []
+    #keyword_search = []
+    #if request.method == "GET":
+        #keyword = request.GET.get("search","")
+    collection = get_database()[Node.collection_name]
+    cur = collection.Node.find({'tags':'tag1'})
+    records = []
+    for each in cur:
+        records.append(each)
+        
 
-    files = db[File.collection_name]
-    file_search = files.File.find({'_type':'Group'}, 'group_set':{'$all': [ObjectId(group_id)] }, {'_type': 'Author', 'name': unicode(request.user.username) } ) #search result from file
+
+        
+        #dic = {date.today():keyword}
+        #keyword_search.append(dic)
+
+        #yesterdays_search = {date.today()-timedelta(days=1):keyword}
+        # week_ago_search = {date.today()-timedelta(days=1):keyword}
+        #for yesterdays_search in keyword_search:
+            #yesterdays_result.append(yesterdays_search)
+
+        #for week_ago_search in keyword_search:
+           # week_ago_result.append(week_ago_search)
+        
+
+    # files = db[File.collection_name]
+    # file_search = files.File.find({'_type':'Group'}, 'group_set':{'$all': [ObjectId(group_id)] }, {'_type': 'Author', 'name': unicode(request.user.username) } ) #search result from file
     
-    return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id, 'file_collection':file_search}, context_instance=RequestContext(request,{'file_collection':file_search})
+    # return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id, 'file_collection':file_search}, context_instance=RequestContext(request,{'file_collection':file_search})
 
-    # return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))#
+    return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id,'records':records},context_instance=RequestContext(request))
       
 
 #code for merging two text Documents
