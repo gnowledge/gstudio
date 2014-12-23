@@ -211,25 +211,25 @@ class Command(BaseCommand):
             print "\n CollegeEvents Created."
   
         Event=collection.Node.find_one({'_type':"GSystemType","name":"Event"})  
-        All_Event_Types=collection.Node.find({"type_of": ObjectId(Event._id)})
-        Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
-        CollegeEvents=collection.Node.one({"name":"CollegeEvents"})
-        Event_type_list=[]
-        College_type_list=[]
-        for i in All_Event_Types:
-            
-            if (GlistItem._id not in i.member_of): 
-                i.member_of.append(GlistItem._id)
-                i.save()
-            if i.name not in ['Classroom Session','Exam']:
-               Event_type_list.append(i._id)
-            if i.name in ['Classroom Session','Exam']:
-               College_type_list.append(i._id)
-                
-        collection.update({'_id': ObjectId(Eventtype._id)}, {'$set': {'collection_set': Event_type_list}}, upsert=False, multi=False)
-        
-        collection.update({'_id': ObjectId(CollegeEvents._id)}, {'$set': {'collection_set': College_type_list}}, upsert=False, multi=False)
-        
+        if Event:
+          All_Event_Types=collection.Node.find({"type_of": ObjectId(Event._id)})
+          Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
+          CollegeEvents=collection.Node.one({"name":"CollegeEvents"})
+          Event_type_list=[]
+          College_type_list=[]
+          for i in All_Event_Types:
+              if (GlistItem._id not in i.member_of): 
+                  i.member_of.append(GlistItem._id)
+                  i.save()
+              if i.name not in ['Classroom Session','Exam']:
+                 Event_type_list.append(i._id)
+              if i.name in ['Classroom Session','Exam']:
+                 College_type_list.append(i._id)
+                  
+          collection.update({'_id': ObjectId(Eventtype._id)}, {'$set': {'collection_set': Event_type_list}}, upsert=False, multi=False)
+          
+          collection.update({'_id': ObjectId(CollegeEvents._id)}, {'$set': {'collection_set': College_type_list}}, upsert=False, multi=False)
+          
         #End of adding Event Types and CollegeEvents
         
         # Creating GSystem(s) of GList for GSTUDIO_TASK_TYPES
@@ -240,7 +240,6 @@ class Command(BaseCommand):
         glist = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
         task_type_ids = []
         # First: Creating Types as GList nodes from GSTUDIO_TASK_TYPES
-        print "\n"
         info_message = "\n"
         for gl_node_name in GSTUDIO_TASK_TYPES:
           gl_node = collection.Node.one({'_type': "GSystem", 'member_of':glist._id, 'name': gl_node_name})
@@ -568,13 +567,14 @@ def create_sts(factory_gsystem_types,user_id):
   theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
   topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
   topics = collection.Node.one({'_type': 'GSystemType', 'name': 'Topics'})
-  if not topics.collection_set:
-    topics.collection_set.append(theme_GST._id)
-    topics.collection_set.append(topic_GST._id)
-    topics.created_by = 1
-    topics.modified_by = 1
-    topics.status = u"PUBLISHED"
-    topics.save()
+  if theme_GST and topic_GST and topics:
+    if not topics.collection_set:
+      topics.collection_set.append(theme_GST._id)
+      topics.collection_set.append(topic_GST._id)
+      topics.created_by = 1
+      topics.modified_by = 1
+      topics.status = u"PUBLISHED"
+      topics.save()
 
 def clean_structure():
   '''
