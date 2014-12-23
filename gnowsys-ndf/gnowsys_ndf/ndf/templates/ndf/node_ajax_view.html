@@ -269,12 +269,22 @@
               {% for index_key, each_node in node.prior_node_dict.items %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
-              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}aaaa</a>,&nbsp;
               {% else %}
               <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-              {% endif %}
+	      {% endif %}
               {% endfor %}
             </div>
+              {% for index_key, each_node in node.prior_node_dict.items %}
+              {% get_grid_fs_object each_node as grid_fs_obj %}
+              {% if each_node.mime_type %}
+              {% else %}
+              {% get_object_value node as objvalue %}
+	      {% for k, v in objvalue.items %}
+	      {{k}} : {{v}}
+	      {% endfor %}
+              {% endif%}
+	    {% endfor %}
             {% endif %}
           </div>
 
@@ -578,8 +588,7 @@
         
       {% endif %}
       <div id="view-info" style="display:none;">
-       {% get_json node.pk as jsonobj %}
-       {% str_to_dict jsonobj as obj  %}
+       
        <table>
    <tbody>
         {% for key, value in obj.items %}

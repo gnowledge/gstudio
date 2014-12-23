@@ -1763,6 +1763,16 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
    return translation_list
 
 @register.assignment_tag
+def get_object_value(node):
+   
+   email = collection.Node.one({'_type':"AttributeType" , 'name':'email_id'}) 
+   get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': email._id})
+   if get_att:
+      att_name_value={}
+      att_name_value[email.altnames] = get_att.object_value
+      return att_name_value
+
+@register.assignment_tag
 def get_json(node):
    node_obj = collection.Node.one({'_id':ObjectId(str(node))})
    return json.dumps(node_obj, cls=NodeJSONEncoder)  
