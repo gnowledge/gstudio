@@ -239,5 +239,14 @@ factory_relation_types = [
             'meta_type': 'factory_types',
             'object_cardinality': 1
         }
+    }, 
+
+    {'has_cover_page': {
+            'subject_type': ['File'],
+            'object_type': ['File'], 
+            'inverse_name': 'cover_page_of', 
+            'meta_type': 'factory_types',
+            'object_cardinality': 1
+        }
     }
 ]
