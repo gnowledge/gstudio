@@ -36,25 +36,27 @@ class Command(BaseCommand):
     file_gst = collection.Node.one({'$and':[{'name':'File'},{'_type':'GSystemType'}]}) 
     pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
     # Update the url field of all nodes 
-    if pandora_video_st:
-        nodes = collection.Node.find({'member_of': {'$nin':[pandora_video_st._id],'$in':[file_gst._id]},'access_policy':'PUBLIC' })
-        site = Site.objects.get(pk=1)
-        site = site.domain.__str__()
-        count = 0
+    # if pandora_video_st:
+    #     nodes = collection.Node.find({'member_of': {'$nin':[pandora_video_st._id],'$in':[file_gst._id]},'access_policy':'PUBLIC' })
+    #     site = Site.objects.get(pk=1)
+    #     site = site.domain.__str__()
+    #     site = "127.0.0.1:8000" if (site == u'example.com') else site
 
-        for each in nodes:
-            grp_name = collection.Node.one({'_id': ObjectId(each.group_set[0]) }).name
-            if "/" in each.mime_type:
-                filetype = each.mime_type.split("/")[1]
+    #     count = 0
+
+    #     for each in nodes:
+    #         grp_name = collection.Node.one({'_id': ObjectId(each.group_set[0]) }).name
+    #         if "/" in each.mime_type:
+    #             filetype = each.mime_type.split("/")[1]
             
-                url_link = "http://" + site + "/" + grp_name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + str(each._id) + "/" + str(each.name) + "." + str(filetype)
+    #             url_link = "http://" + site + "/" + grp_name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + str(each._id) + "/" + str(each.name) + "." + str(filetype)
 
-                if each.url != unicode(url_link):
-                    collection.update({'_id':each._id},{'$set':{'url': unicode(url_link) }})
-                    count = count + 1
+    #             if each.url != unicode(url_link):
+    #                 collection.update({'_id':each._id},{'$set':{'url': unicode(url_link) }})
+    #                 count = count + 1
 
-        if count:
-            print "\n 'url' field updated in following no. of documents: ", count
+    #     if count:
+    #         print "\n 'url' field updated in following no. of documents: ", count
 
     # Update pandora videos 'member_of', 'created_by', 'modified_by', 'contributors' field 
     if User.objects.filter(username='nroer_team').exists():
