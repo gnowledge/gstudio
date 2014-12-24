@@ -617,6 +617,8 @@ def get_collection_list(collection_list, node):
 def get_tree_hierarchy(request, group_id, node_id):
 
     node = collection.Node.one({'_id':ObjectId(node_id)})
+    Collapsible = request.GET.get("collapsible", "");
+
     data = ""
     collection_list = []
     themes_list = []
@@ -640,7 +642,11 @@ def get_tree_hierarchy(request, group_id, node_id):
             collection_list.append({'name': obj.name, 'id': obj.pk, 'node_type': node_type})
             collection_list = get_collection_list(collection_list, obj)
 
-    data = collection_list
+
+    if Collapsible:
+      data = { "name": " ", "children": collection_list }
+    else:
+      data = collection_list
 
     return HttpResponse(json.dumps(data))
 
