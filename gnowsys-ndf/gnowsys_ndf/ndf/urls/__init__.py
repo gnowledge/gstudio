@@ -57,6 +57,8 @@ urlpatterns = patterns('',
     # django-json-rpc method calls 
     url(r'^json/browse/$', 'jsonrpc.views.browse', name='jsonrpc_browser'),
     url(r'^json/$', jsonrpc_site.dispatch, name='jsonrpc_mountpoint'),
+    # url for directly calling RPC method from browser
+    (r'^json/(?P<method>[a-zA-Z0-9.-_]+)$', jsonrpc_site.dispatch),
 
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 
