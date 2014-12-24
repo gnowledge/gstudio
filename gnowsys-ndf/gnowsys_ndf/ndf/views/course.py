@@ -1351,11 +1351,7 @@ def create_course_struct(request, group_id,node_id):
             for course_sec_dict in listdict:
               #k is course section name and v is list of its each course subsection as dict
               for k,v in course_sec_dict.items():#loops over course sections
-                print "\n\n*****",k
-                # if k in changed_names.values():
                 var = [k in val_list for val_list in changed_names.values()]
-                # else:
-                #   var=[False]
 
                 if k in cs_names  or True in var:
                   for cs_old_name,cs_new_name in changed_names.items():
@@ -1395,10 +1391,8 @@ def create_course_struct(request, group_id,node_id):
                           if(propk==u"course_structure_minutes"):
                             create_gattribute(css_node._id,at_cs_hours,int(propv))
                           elif(propk==u"course_structure_assessment"):
-                            print "\n assess", css_node._id
                             create_gattribute(css_node._id,at_cs_assessment,propv)
                           elif(propk==u"course_structure_assignment"):
-                            print "\n assign", css_node._id
                             create_gattribute(css_node._id,at_cs_assignment,propv)
 
                         css_reorder_ids.append(css_node._id)
