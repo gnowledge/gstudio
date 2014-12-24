@@ -362,7 +362,8 @@ def group_dashboard(request, group_id):
     This view returns data required for group's dashboard.
     """
     gridfs = get_database()['fs.files']
-    profile_pic_image=""
+    profile_pic_image = None
+    has_profile_pic_str = ""
     
     if ObjectId.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -425,7 +426,8 @@ def group_dashboard(request, group_id):
                 field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
                 profile_pic_image = collection.Node.one({'_type': "File", 'name': unicode(pp)})
                 # Create new grelation and append it to that along with given user
-                gr_node = create_grelation(group_id, has_profile_pic, profile_pic_image._id)
+                if profile_pic_image:
+                    gr_node = create_grelation(group_id, has_profile_pic, profile_pic_image._id)
         
     banner_pic=""
     group=collection.Node.one({"_id":ObjectId(group_id)})
