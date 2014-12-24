@@ -1762,15 +1762,19 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
             get_translation_relation(each,translation_list, r_list)
    return translation_list
 
+# returns object value of attribute 
 @register.assignment_tag
 def get_object_value(node):
-   
-   email = collection.Node.one({'_type':"AttributeType" , 'name':'email_id'}) 
-   get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': email._id})
-   if get_att:
-      att_name_value={}
-      att_name_value[email.altnames] = get_att.object_value
-      return att_name_value
+   at_set = ['house_street','town_city','state','pin_code','contact_point','email_id','telephone','website']
+   att_name_value={}
+           
+   for each in at_set:
+      attribute_type = collection.Node.one({'_type':"AttributeType" , 'name':each}) 
+      get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': attribute_type._id})
+      if get_att:
+         att_name_value[attribute_type.altnames] = get_att.object_value
+         
+   return att_name_value
 
 @register.assignment_tag
 def get_json(node):

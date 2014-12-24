@@ -275,18 +275,7 @@
 	      {% endif %}
               {% endfor %}
             </div>
-              {% for index_key, each_node in node.prior_node_dict.items %}
-              {% get_grid_fs_object each_node as grid_fs_obj %}
-              {% if each_node.mime_type %}
-              {% else %}
-              {% get_object_value node as objvalue %}
-	      {% for k, v in objvalue.items %}
-	      {{k}} : {{v}}
-	      {% endfor %}
-              {% endif%}
-	    {% endfor %}
-            {% endif %}
-          </div>
+              {% endif %}         </div>
 
           <div class="small-4 columns">
             {% get_teaches_list node as teaches_list %}
@@ -502,6 +491,27 @@
         {% endfor %}
       
         <!-- <div id="commentable-area"> -->
+	<div>
+         {% if node.prior_node|length > 0 %}
+   
+         {% for index_key, each_node in node.prior_node_dict.items %}
+         {% get_grid_fs_object each_node as grid_fs_obj %}
+         {% if "Group" in node.member_of_names_list %}
+         {% get_object_value node as objvalue %}
+	    <table>
+	      <tbody>
+		{% for key, value in objvalue.items %}
+		<tr>
+		  <td> {{key}} : {{value}} </td>
+		</tr>
+		{% endfor %}
+	      <tbody>
+	    </table>
+              {% endif%}
+	    {% endfor %}
+            {% endif %}
+
+	</div>
         <div>
           {% with node.html_content|safe as description %}
           {% if description != "None" %}
