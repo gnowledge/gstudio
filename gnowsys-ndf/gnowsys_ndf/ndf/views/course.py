@@ -1351,36 +1351,54 @@ def create_course_struct(request, group_id,node_id):
             for course_sec_dict in listdict:
               #k is course section name and v is list of its each course subsection as dict
               for k,v in course_sec_dict.items():#loops over course sections
-                if k in cs_names  or k in changed_names.values():
+                print "\n\n*****",k
+                # if k in changed_names.values():
+                var = [k in val_list for val_list in changed_names.values()]
+                # else:
+                #   var=[False]
+
+                if k in cs_names  or True in var:
                   for cs_old_name,cs_new_name in changed_names.items():
-                    if (cs_new_name==k):
+                    if k is not cs_old_name and k in cs_new_name:
                       name_edited_node = collection.Node.one({'name':cs_old_name,'prior_node':course_node._id,'member_of':cs_gst._id})
-                      collection.update({'_id':name_edited_node._id},{'$set':{'name':cs_new_name}})
+                      collection.update({'_id':name_edited_node._id},{'$set':{'name':cs_new_name[0]}})
                       name_edited_node.reload()
                     else:
                       pass
 
                   #IMP Fetch node with name 'k' as above code, if name changed, changes oldname to k 
-                  cs_node = collection.Node.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id},{'collection_set':1})
+                  cs_node = collection.Node.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id},{'name':1,'collection_set':1})
                   css_reorder_ids = []
+                  var1 = False
                   for cssd in v:
                     for cssname,cssdict in cssd.items():
-                      if cssname in css_names: #or cssname in changed_names.values():
-                        # for old_name,new_name in changed_names.items():
-                        #   if (cssname==new_name):
-                        #     css_name_edited_node = collection.Node.one({'name':old_name,'prior_node':cs_node._id,'member_of':css_gst._id})
-                        #     collection.update({'_id':css_name_edited_node._id},{'$set':{'name':new_name}})
-                        #     css_name_edited_node.reload()
-                        #   else:
-                        #     pass
+                      ab = [listings for listings in changed_names.values()]
+                      for cs_nodename in ab:
+                        if cs_node.name in cs_nodename:
+                          if cssname in cs_nodename[1].values():
+                            var1 = True
+                        else:
+                          var1 = False
+
+                      if cssname in css_names or var1 is True: 
+                        for cs_old_n,cs_val_list in changed_names.items():
+                          if len(cs_val_list)==2:
+                            if( cs_val_list[0]==k and type(cs_val_list[1]) is dict):
+                              for oldcssname,newcssname in cs_val_list[1].items():
+                                if (cssname==newcssname):
+                                  css_name_edited_node = collection.Node.one({'name':oldcssname,'prior_node':cs_node._id,'member_of':css_gst._id})
+                                  collection.update({'_id':css_name_edited_node._id},{'$set':{'name':newcssname}})
+                                  css_name_edited_node.reload()
 
                         css_node=collection.Node.one({'name':cssname,'member_of':css_gst._id,'prior_node':cs_node._id})
                         for propk,propv in cssdict.items():
                           if(propk==u"course_structure_minutes"):
                             create_gattribute(css_node._id,at_cs_hours,int(propv))
                           elif(propk==u"course_structure_assessment"):
+                            print "\n assess", css_node._id
                             create_gattribute(css_node._id,at_cs_assessment,propv)
                           elif(propk==u"course_structure_assignment"):
+                            print "\n assign", css_node._id
                             create_gattribute(css_node._id,at_cs_assignment,propv)
 
                         css_reorder_ids.append(css_node._id)
@@ -1412,7 +1430,6 @@ def create_course_struct(request, group_id,node_id):
                     pass
                   cs_reorder_ids.append(cs_node._id)
                 else:
-
                   cs_new = collection.GSystem()
                   cs_new.member_of.append(cs_gst._id)
                   #set name

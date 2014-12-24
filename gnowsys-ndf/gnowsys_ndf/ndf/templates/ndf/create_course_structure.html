@@ -308,7 +308,7 @@
 //Function to save Course Subsection
 
   function save_course_sub_section(p_id,p_lbl,l_id,l_lbl){
-    console.log("Demo css")
+    // console.log("Demo css")
     var str_btn="<div class='row'><div class='small-2 columns text-center'>--></div>"
     var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ l_id+"'><h4>"+l_lbl+"</h4></label><i class='fi-pencil small-4 columns largesize edit_course_structure_name'></i></div>" 
     $("#"+p_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-2 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
@@ -477,67 +477,76 @@
         else{
           new_name = $("#"+lbl_text_id).val();
           if(lbl_text!=new_name && new_name!=""){
-            if(cs_names_list.indexOf(new_name)==-1 && css_names_list.indexOf(new_name)==-1) {
+            if(cs_names_list.indexOf(new_name)==-1) {
               $(this).removeClass("fi-check").addClass("fi-pencil");
               if(Object.keys(changed_names).length > 0){
                 if(lbl_text_class=="lbl_of_cs"){
-                  var flag = false;
-                  // if(css_names_list.indexOf(new_name)==-1 ){
-                  //     var index_of_name = cs_names_list.indexOf(lbl_text)
-                  //     cs_names_list[index_of_name] = new_name;
-                  // }
-                  //If Course section editing for first time time after its Course subsection is being edited
-                  if(original_cs_and_css.hasOwnProperty(lbl_text)){
-                    if(changed_names.hasOwnProperty(lbl_text)){
-                      changed_names[lbl_text].shift();
-                      changed_names[lbl_text].unshift(new_name);
-                    }
-                    else{
-                      for (var p in changed_names){
-                        //renaming same course section for more than one time
-                        if(changed_names[p][0]==lbl_text){
-                          changed_names[p].shift();
-                          changed_names[p].unshift(new_name);
-                          flag=true;
+                  if(css_names_list.indexOf(new_name)==-1){
+                    
+                    var flag = false;
+                    //If Course section editing for first time time after its Course subsection is being edited
+                    if(original_cs_and_css.hasOwnProperty(lbl_text)){
+                      if(changed_names.hasOwnProperty(lbl_text)){
+                        changed_names[lbl_text].shift();
+                        changed_names[lbl_text].unshift(new_name);
+                      }
+                      else{
+                        for (var p in changed_names){
+                          //renaming same course section for more than one time
+                          if(changed_names[p][0]==lbl_text){
+                            changed_names[p].shift();
+                            changed_names[p].unshift(new_name);
+                            flag=true;
+                          }
+                        }
+                        if(!flag){
+                          changed_names[lbl_text]=[]
+                          changed_names[lbl_text].push(new_name)
                         }
                       }
-                      if(!flag){
-                        changed_names[lbl_text]=[]
-                        changed_names[lbl_text].push(new_name)
-                      }
                     }
-                  }
 
-                  else{
-                    if(changed_names.hasOwnProperty(lbl_text)){
-                      changed_names[lbl_text].shift();
-                      changed_names[lbl_text].unshift(new_name);
-                    }
                     else{
-                      for (var p in changed_names){
-                        //renaming same course section for more than one time
-                        if(changed_names[p][0]==lbl_text){
-                          changed_names[p].shift();
-                          changed_names[p].unshift(new_name);
-                          flag=true;
+                      if(changed_names.hasOwnProperty(lbl_text)){
+                        changed_names[lbl_text].shift();
+                        changed_names[lbl_text].unshift(new_name);
+                      }
+                      else{
+                        for (var p in changed_names){
+                          //renaming same course section for more than one time
+                          if(changed_names[p][0]==lbl_text){
+                            changed_names[p].shift();
+                            changed_names[p].unshift(new_name);
+                            flag=true;
+                          }
+                        }
+                        if(!flag){
+                          changed_names[lbl_text]=[]
+                          changed_names[lbl_text].push(new_name)
                         }
                       }
-                      if(!flag){
-                        changed_names[lbl_text]=[]
-                        changed_names[lbl_text].push(new_name)
+                    }
+
+                    for(var cs_name_key in css_names_dict){
+                      if(cs_name_key==lbl_text){
+                        css_names_dict[new_name]=css_names_dict[cs_name_key]
+                        delete css_names_dict[cs_name_key]
+                        break;
                       }
                     }
-                  }
-
-                  for(var cs_name_key in css_names_dict){
-                    if(cs_name_key==lbl_text){
-                      css_names_dict[new_name]=css_names_dict[cs_name_key]
-                      delete css_names_dict[cs_name_key]
-                      break;
+                    for(var i in course_sec_list){
+                        for(var i2 in course_sec_list[i]){
+                            if(i2==lbl_text){
+                                course_sec_list[i][new_name]=course_sec_list[i][i2]
+                                delete course_sec_list[i][i2]
+                                i2 = new_name;
+                                // return;
+                            }
+                        }
                     }
+
+
                   }
-
-
                 }//end of if lbl_of_cs
                 
                 //renaming course sub section
@@ -547,70 +556,70 @@
                     var fl1 = false;
                     cs_lbl = $(this).parents("li.course-section-class").find("label.lbl_of_cs").text()
                     
-                      for (var indval in css_names_dict[cs_lbl]){
-                        if(css_names_dict[cs_lbl][indval]==new_name){
-                          alert("Duplicate Course Subsection. Please select another name");
-                          event.preventDefault();
-                          return;
-                        }
+                    for (var indval in css_names_dict[cs_lbl]){
+                      if(css_names_dict[cs_lbl][indval]==new_name){
+                        console.log("cs_lbl is "+cs_lbl+" indval is "+indval+" new_name is "+new_name)
+                        alert("Duplicate Course Subsection. Please select another name");
+                        event.preventDefault();
+                        return;
                       }
-                      $.each(original_cs_and_css,function(cs,cslist){
-                        if(cs == cs_lbl){
-                          $.each(cslist,function(cssind,cssn){
-                            if(cssn == lbl_text){
-                              for (var p in changed_names){
-                                if(changed_names[p][0]==cs_lbl){
-                                  //check for respective CS if true, we are editing CSS after editing CS
-                                  css_renames={}
-                                  css_renames[lbl_text]=new_name
-                                  changed_names[cs_lbl].push(css_renames)
-                                  flag1 = true;
-                                  fl1 = true;
-                                }
-                              }
-                              if(!flag1){
-                                //Editing CSS first before editing CS
-                                changed_names[cs_lbl]=[]
-                                changed_names[cs_lbl].push(cs_lbl)
+                    }
+                    $.each(original_cs_and_css,function(cs,cslist){
+                      if(cs == cs_lbl){
+                        $.each(cslist,function(cssind,cssn){
+                          if(cssn == lbl_text){
+                            for (var p in changed_names){
+                              if(changed_names[p][0]==cs_lbl){
+                                //check for respective CS if true, we are editing CSS after editing CS
                                 css_renames={}
                                 css_renames[lbl_text]=new_name
                                 changed_names[cs_lbl].push(css_renames)
+                                flag1 = true;
                                 fl1 = true;
                               }
                             }
-                          })
-                        }
-                      })
-
-                      if(!fl1){
-                        var fl = false;
-                        css_changed_names_dict = {}
-                        for (var p in changed_names){
-                          //renaming same course section for more than one time
-                          if(changed_names[p][0]==cs_lbl){
-                            if(changed_names[p].length==2){
-                              //dict exists
-                              css_changed_names_dict = changed_names[p][1]
-                              $.each(css_changed_names_dict,function(k,v){
-                                if(v==lbl_text){
-                                  css_changed_names_dict[k]=new_name
-                                  fl = true;
-                                }
-                              })
-                            }
-                            else{
+                            if(!flag1){
+                              //Editing CSS first before editing CS
+                              changed_names[cs_lbl]=[]
+                              changed_names[cs_lbl].push(cs_lbl)
                               css_renames={}
                               css_renames[lbl_text]=new_name
-                              changed_names[p].push(css_renames)
+                              changed_names[cs_lbl].push(css_renames)
+                              fl1 = true;
                             }
                           }
-                        }
-
-                        if(!fl){
-                          css_changed_names_dict[lbl_text]=new_name
-                        }
-
+                        })
                       }
+                    })
+
+                    if(!fl1){
+                      var fl = false;
+                      css_changed_names_dict = {}
+                      for (var p in changed_names){
+                        //renaming same course section for more than one time
+                        if(changed_names[p][0]==cs_lbl){
+                          if(changed_names[p].length==2){
+                            //dict exists
+                            css_changed_names_dict = changed_names[p][1]
+                            $.each(css_changed_names_dict,function(k,v){
+                              if(v==lbl_text){
+                                css_changed_names_dict[k]=new_name
+                                fl = true;
+                              }
+                            })
+                          }
+                          else{
+                            css_renames={}
+                            css_renames[lbl_text]=new_name
+                            changed_names[p].push(css_renames)
+                          }
+                        }
+                      }
+
+                      if(!fl){
+                        css_changed_names_dict[lbl_text]=new_name
+                      }
+                    }
                 
                     for(var cs_name_key in css_names_dict){
                       if(cs_name_key==cs_lbl){
@@ -622,6 +631,23 @@
                         }
                       }
                     }
+                    for(var i in course_sec_list){
+                        for(var i2 in course_sec_list[i]){
+                            if(i2==cs_lbl){
+                                for( var newk in course_sec_list[i][i2]){
+                                    for (var csk in course_sec_list[i][i2][newk]){
+                                        if(csk==lbl_text){
+                                            course_sec_list[i][i2][newk][new_name]=course_sec_list[i][i2][newk][csk]
+                                            delete course_sec_list[i][i2][newk][csk]
+                                            csk=new_name;
+                                            // return;
+                                        }
+                                    }
+                                } 
+                            }
+                        }
+                    }
+
                 }
               }
               else{
@@ -641,6 +667,18 @@
                       break;
                     }
                   }
+
+                  for(var i in course_sec_list){
+                      for(var i2 in course_sec_list[i]){
+                          if(i2==lbl_text){
+                              course_sec_list[i][new_name]=course_sec_list[i][i2]
+                              delete course_sec_list[i][i2]
+                              i2 = new_name;
+                              // return;
+                          }
+                      }
+                  }
+                  
                 }
                 //If a Course sub section is renamed initially
                 else{
@@ -676,6 +714,23 @@
                       }
                     }
                   }
+                  for(var i in course_sec_list){
+                      for(var i2 in course_sec_list[i]){
+                          if(i2==cs_l){
+                              for( var newk in course_sec_list[i][i2]){
+                                  for (var csk in course_sec_list[i][i2][newk]){
+                                      if(csk==lbl_text){
+                                          course_sec_list[i][i2][newk][new_name]=course_sec_list[i][i2][newk][csk]
+                                          delete course_sec_list[i][i2][newk][csk]
+                                          csk=new_name;
+                                          // return;
+                                      }
+                                  }
+                              } 
+                          }
+                      }
+                  }
+
 
                 }
               }
@@ -693,28 +748,28 @@
                 }
               });
 
-              for(var i in course_sec_list){
-                  for(var i2 in course_sec_list[i]){
-                      if(i2==lbl_text){
-                          course_sec_list[i][new_name]=course_sec_list[i][i2]
-                          delete course_sec_list[i][i2]
-                          i2 = new_name;
-                          return;
-                      }
-                      else{
-                          for( var newk in course_sec_list[i][i2]){
-                              for (var csk in course_sec_list[i][i2][newk]){
-                                  if(csk==lbl_text){
-                                      course_sec_list[i][i2][newk][new_name]=course_sec_list[i][i2][newk][csk]
-                                      delete course_sec_list[i][i2][newk][csk]
-                                      csk=new_name;
-                                      return;
-                                  }
-                              }
-                          } 
-                      }
-                  }
-              }
+              // for(var i in course_sec_list){
+              //     for(var i2 in course_sec_list[i]){
+              //         if(i2==lbl_text){
+              //             course_sec_list[i][new_name]=course_sec_list[i][i2]
+              //             delete course_sec_list[i][i2]
+              //             i2 = new_name;
+              //             return;
+              //         }
+              //         else{
+              //             for( var newk in course_sec_list[i][i2]){
+              //                 for (var csk in course_sec_list[i][i2][newk]){
+              //                     if(csk==lbl_text){
+              //                         course_sec_list[i][i2][newk][new_name]=course_sec_list[i][i2][newk][csk]
+              //                         delete course_sec_list[i][i2][newk][csk]
+              //                         csk=new_name;
+              //                         return;
+              //                     }
+              //                 }
+              //             } 
+              //         }
+              //     }
+              // }
             }
             else{
               alert("Duplicate Name. Please select another name");
@@ -736,25 +791,28 @@
     lb_id = $(this).closest("li").find("label").attr("id")
     
     xy = $("#"+lb_id).parents("li.course-section-class").find("label.lbl_of_cs").text()//i2
+    $("#hidden_css_name_id").val(lb_id)
+    $("#css_name").text("Properties for '"+ lb+"'")
+    $("#css_name").css("font-size", "30px");
+    $('#course_prop').foundation('reveal', 'open');
 
     for(var i in course_sec_list){
         for(var i2 in course_sec_list[i]){
             if(i2==xy){
-                for( var newk in course_sec_list[i][i2]){
-                    // console.log(JSON.stringify(course_sec_list[i][i2]))
-                    for (var csk in course_sec_list[i][i2][newk]){
+                for( var newk in course_sec_list[i][xy]){
+                    for (var csk in course_sec_list[i][xy][newk]){
                         if(csk==lb){
-                          // console.log(lb+i2)
-                            if(course_sec_list[i][i2][newk][csk]["course_structure_minutes"]){
-                                    v = course_sec_list[i][i2][newk][csk]["course_structure_minutes"]
+                          console.log(xy+"and"+csk+" coming here ")
+                            if(course_sec_list[i][xy][newk][csk]["course_structure_minutes"]){
+                                    v = course_sec_list[i][xy][newk][csk]["course_structure_minutes"]
                                     $("#course_structure_minutes").val(v)
                             }
                             else{
                                 $("#course_structure_minutes").val("")
                             }
 
-                            if(course_sec_list[i][i2][newk][csk]["course_structure_assessment"]){
-                                    v = course_sec_list[i][i2][newk][csk]["course_structure_assessment"]
+                            if(course_sec_list[i][xy][newk][csk]["course_structure_assessment"]){
+                                    v = course_sec_list[i][xy][newk][csk]["course_structure_assessment"]
                                     if(v==true){v="Yes";}else{v="No";}
                                     $("input[name='course_structure_assessment'][value='"+v+"']").prop("checked","checked")
                             }
@@ -762,26 +820,23 @@
                                 $("input[name='course_structure_assessment'][value='No']").prop("checked","checked")
                             }
 
-                            if(course_sec_list[i][i2][newk][csk]["course_structure_assignment"]){
-                                    v = course_sec_list[i][i2][newk][csk]["course_structure_assignment"]
+                            if(course_sec_list[i][xy][newk][csk]["course_structure_assignment"]){
+                                    v = course_sec_list[i][xy][newk][csk]["course_structure_assignment"]
                                     if(v==true){v="Yes";}else{v="No";}
                                     $("input[name='course_structure_assignment'][value='"+v+"']").prop("checked","checked")
                             }
                             else{
                                 $("input[name='course_structure_assignment'][value='No']").prop("checked","checked")
                             }
+                            return;
                         }
                     }
                 } 
             }
-            break;
+            // return;
         }
     }
 
-    $("#hidden_css_name_id").val(lb_id)
-    $("#css_name").text("Properties for '"+ lb+"'")
-    $("#css_name").css("font-size", "30px");
-    $('#course_prop').foundation('reveal', 'open');
   });
 
 //Fold unfold Actions--------------------------------------------------------------------------------------------
@@ -817,16 +872,19 @@
 
     for(var i in course_sec_list){
         for(var i2 in course_sec_list[i]){
-            for( var newk in course_sec_list[i][i2]){
-                for (var csk in course_sec_list[i][i2][newk]){
-                    if(c_name==csk){
-                        course_sec_list[i][i2][newk][csk] = {}
-                        course_sec_list[i][i2][newk][csk]["course_structure_minutes"] = course_min_value;
-                        course_sec_list[i][i2][newk][csk]["course_structure_assessment"] = assessment_chk;
-                        course_sec_list[i][i2][newk][csk]["course_structure_assignment"] = assignment_chk;
-                    }
-                }
-            } 
+            // console.log("i2 is "+i2+"c_name is "+c_name)
+            if(x==i2){
+              for( var newk in course_sec_list[i][i2]){
+                  for (var csk in course_sec_list[i][i2][newk]){
+                      if(c_name==csk){
+                          course_sec_list[i][i2][newk][csk] = {}
+                          course_sec_list[i][i2][newk][csk]["course_structure_minutes"] = course_min_value;
+                          course_sec_list[i][i2][newk][csk]["course_structure_assessment"] = assessment_chk;
+                          course_sec_list[i][i2][newk][csk]["course_structure_assignment"] = assignment_chk;
+                      }
+                  }
+              } 
+            }
         }
     }
     all_mins_set=true;
