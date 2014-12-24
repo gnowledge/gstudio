@@ -639,7 +639,8 @@ def clean_structure():
 
   for each_gs in gs:
     attr_list = []  # attribute-list
-    rel_list = []   # relation-list
+    rel_list = []  # relation-list
+    inv_rel_list = []  # inverse-relation-list
 
     print " .",
     if each_gs.member_of_names_list:
@@ -651,17 +652,29 @@ def clean_structure():
     # Fetch all attributes, if created in GAttribute Triple
     # Key-value pair will be appended only for those whose entry would be found in GAttribute Triple
     # ------------------------------------------------------------------------------------
-    ga = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GAttribute", 'status': u"PUBLISHED"}}, 
-                              {'$project': {'_id': 0, 'key_val': '$attribute_type', 'value_val': '$object_value'}}
-                            ])
+    ga = collection.aggregate([
+      {'$match': {'subject': each_gs._id, '_type': "GAttribute", 'status': u"PUBLISHED"}}, 
+      {'$project': {'_id': 0, 'key_val': '$attribute_type', 'value_val': '$object_value'}}
+    ])
 
     # ------------------------------------------------------------------------------------
     # Fetch all relations, if created in GRelation Triple
     # Key-value pair will be appended only for those whose entry would be found in GRelation Triple
     # ------------------------------------------------------------------------------------
-    gr = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
-                              {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$right_subject'}}
-                            ])
+    gr = collection.aggregate([
+      {'$match': {'subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
+      {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$right_subject'}}
+    ])
+
+    # ------------------------------------------------------------------------------------
+    # Fetch all inverse-relations, if created in GRelation Triple
+    # Key-value pair will be appended only for those whose entry would be found in GRelation Triple
+    # ------------------------------------------------------------------------------------
+    inv_gr = collection.aggregate([
+      {'$match': {'right_subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
+      {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$subject'}}
+    ])
+
     if ga:
       # If any GAttribute found
       # ------------------------------------------------------------------------------------
@@ -678,18 +691,16 @@ def clean_structure():
           attr_list.append({key_node["name"]: each_gar["value_val"]})
 
     if gr:
-      # If any GRelation found
+      # If any GRelation (relation) found
       # ------------------------------------------------------------------------------------
       # Setting up rel_list
       # ------------------------------------------------------------------------------------
-      # print "\n"
       for each_grr in gr["result"]:
         if each_grr:
           key_node = get_database().dereference(each_grr["key_val"])
-          # print "\t", key_node["name"], " -- ", each_grr["value_val"]
           # Append corresponding GRelation as key-value pair in given relation-list
-          # key: relation-type name
-          # value: right_subject from GRelation document
+          # key: name field's value of relation-type's document
+          # value: right_subject field's value of GRelation document
           if not rel_list:
             rel_list.append({key_node["name"]: [each_grr["value_val"]]})
 
@@ -703,6 +714,30 @@ def clean_structure():
             if not key_found:
               rel_list.append({key_node["name"]: [each_grr["value_val"]]})
 
+    if inv_gr:
+      # If any GRelation (inverse-relation) found
+      # ------------------------------------------------------------------------------------
+      # Setting up inv_rel_list
+      # ------------------------------------------------------------------------------------
+      for each_grr in inv_gr["result"]:
+        if each_grr:
+          key_node = get_database().dereference(each_grr["key_val"])
+          # Append corresponding GRelation as key-value pair in given inverse-relation-list
+          # key: inverse_name field's value of relation-type's document
+          # value: subject field's value of GRelation document
+          if not inv_rel_list:
+            inv_rel_list.append({key_node["inverse_name"]: [each_grr["value_val"]]})
+
+          else:
+            key_found = False
+            for each in inv_rel_list:
+              if each.has_key(key_node["inverse_name"]):
+                each[key_node["inverse_name"]].append(each_grr["value_val"])
+                key_found = True
+
+            if not key_found:
+              inv_rel_list.append({key_node["inverse_name"]: [each_grr["value_val"]]})
+
     info_message = ""
     if attr_list:
       info_message += "\n\n\tAttributes: " + str(attr_list)
@@ -713,12 +748,22 @@ def clean_structure():
       info_message += "\n\n\tRelations: " + str(rel_list)
     else:
       info_message += "\n\n\tRelations: No relation found!"
+    
+    if inv_rel_list:
+      info_message += "\n\n\tInverse-Relations: " + str(inv_rel_list)
+    else:
+      info_message += "\n\n\tInverse-Relations: No inverse-relation found!"
+
     log_list.append(info_message)
 
     # ------------------------------------------------------------------------------------
     # Finally set attribute_set & relation_set of current GSystem with modified attr_list & rel_list respectively
     # ------------------------------------------------------------------------------------
-    res = collection.update({'_id': each_gs._id}, {'$set': {'attribute_set': attr_list, 'relation_set': rel_list}}, upsert=False, multi=False)
+    res = collection.update(
+      {'_id': each_gs._id}, 
+      {'$set': {'attribute_set': attr_list, 'relation_set': (rel_list + inv_rel_list)}}, 
+      upsert=False, multi=False
+    )
     if res['n']:
       info_message = "\n\n\t" + str(each_gs.name) + " updated succesfully !"
       log_list.append(info_message)
