@@ -3177,46 +3177,77 @@ def get_colleges(request,group_id):
       univ_id = ObjectId(univ_id)
 
       # Fetch the node of selected university
-      univGST = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
       university_node = collection.Node.one({'_id': univ_id}, {'relation_set': 1,'name':1})
 
       # Fetch the list of colleges that are affiliated by the selected university
-      college_ids = []
-      for each in university_node.relation_set:
-        if each.has_key("affiliated_college"):
-          college_ids = each["affiliated_college"]
+      # college_ids = []
+      # for each in university_node.relation_set:
+      #   if each.has_key("affiliated_college"):
+      #     college_ids = each["affiliated_college"]
 
       #If "Select All" checkbox is True, display all colleges from all universities
       # if all_univs == u"true":
       #   colg_under_univ_id = collection.Node.find({'member_of': college._id},{'name': 1}).sort('name',1)
       #   msg_string = " List of colleges in ALL Universities."
       # else:
-      colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort('name',1)
+      # colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort('name',1)
+      # Fetch the list of colleges that are affiliated to the selected university (univ_id)
+      colg_under_univ_id = collection.Node.find(
+        {'member_of': college._id, 'relation_set.college_affiliated_to': univ_id}, 
+        {'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1, 'relation_set.has_officer_incharge': 1}
+      ).sort('name',1)
       
-      list_colg=[]                           
+      # list_colg=[]                           
+      # for each in colg_under_univ_id:
+      #   list_colg.append(each)
+      
+      list_colg=[]
+      unassigned_PO_colg_list = []
       for each in colg_under_univ_id:
-        list_colg.append(each)
+        is_PO_exists = False
+        if each.relation_set:
+          for rel in each.relation_set:
+            if rel and rel.has_key("has_officer_incharge"):
+              if rel["has_officer_incharge"]:
+                is_PO_exists = True
+                break
 
-      nc_dict = {}
+        if is_PO_exists:
+          if each not in list_colg:
+            list_colg.append(each)
+        else:
+          if each not in unassigned_PO_colg_list:
+            unassigned_PO_colg_list.append(each.name)
+        # list_colg.append(each)
+      response_dict["unassigned_PO_colg_list"] = unassigned_PO_colg_list
+
+      if list_colg:
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, checked="announced_course_create_edit", left_drawer_content=list_colg)
+        drawer_template_context["widget_for"] = "announced_course_create_edit"
+        drawer_widget = render_to_string('ndf/drawer_widget.html', 
+                                          drawer_template_context,
+                                          context_instance = RequestContext(request)
+                                        )
+        response_dict["drawer_widget"] = drawer_widget
+        msg_string = "Following are the list of colleges where selected Course(s) should be announced:"
+
+      else:
+        msg_string = "There are no colleges under this university where selected Course(s) could be announced!!!"
+
+      # nc_dict = {}
       if colg_under_univ_id.count():
         # If found, append them to a dict
-        for each in colg_under_univ_id:
-          nc_dict[str(each._id)] = each.name
-        msg_string = " List of colleges in " + university_node.name + "."
+        # for each in colg_under_univ_id:
+        #   nc_dict[str(each._id)] = each.name
+        # msg_string = " List of colleges in " + university_node.name + "."
         response_dict["success"] = True
       else:
-        msg_string = "No college exists for the selected University"
+        msg_string = "No college is affiliated to under selected University!!!"
         response_dict["success"] = False
 
-      response_dict["unset_nc"] = nc_dict
-      drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, checked="announced_course_create_edit", left_drawer_content=list_colg)
-      drawer_template_context["widget_for"] = "announced_course_create_edit"
-      drawer_widget = render_to_string('ndf/drawer_widget.html', 
-                                        drawer_template_context,
-                                        context_instance = RequestContext(request)
-                                      )
-      response_dict["drawer_widget"] = drawer_widget
+      # response_dict["unset_nc"] = nc_dict
       response_dict["message"] = msg_string
+      
       return HttpResponse(json.dumps(response_dict))
   except Exception as e:
     error_message = "CollegeFetchingError: " + str(e) + "!!!"
