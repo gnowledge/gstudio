@@ -3953,8 +3953,9 @@ def fetch_course_batches(request, group_id,Course_name):
     return HttpResponse(json.dumps(list1))
 
 def save_csv(request,group_id,app_set_instance_id=None):
-        column_header = [u'Name', 'Presence']
+        #column_header = [u'Name', 'Presence','Attendance_marks','Assessment_marks']
         json_data=request.POST.getlist("attendance[]","")
+        column_header=request.POST.getlist("column[]","")
         t = time.strftime("%c").replace(":", "_").replace(" ", "_")
         filename = "csv/" + "Attendance_data_" + t + ".csv"
         filepath = os.path.join(STATIC_ROOT, filename)
@@ -3965,12 +3966,13 @@ def save_csv(request,group_id,app_set_instance_id=None):
         with open(filepath, 'wb') as csv_file:
           fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
           fw.writerow(dict((col,col) for col in column_header))
+          
           for row in list(json_data):
             print "data",row
             v = {}
-            v["Name"] = ast.literal_eval(row)['Name']
             fw.writerow(ast.literal_eval(row))
         return HttpResponse((STATIC_URL + filename))
+        
 def get_assessment(request,group_id,app_set_instance_id):
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     node.get_neighbourhood(node.member_of)
@@ -4121,6 +4123,7 @@ def get_attendance(request,group_id,node):
       temp_attendance.update({'Assessment_marks':"0"})
       attendance.append(temp_attendance) 
     temp_attendance={}
+ print "coming here",attendance
  return HttpResponse(json.dumps(attendance))
  
 def attendees_relations(request,group_id,node):
@@ -4156,7 +4159,7 @@ def attendees_relations(request,group_id,node):
     column_count=1
  listwa.append(a)
  listwa.append(column_count)
- print listwa
+ print "listwas",listwa
  return HttpResponse(json.dumps(listwa)) 
         
 

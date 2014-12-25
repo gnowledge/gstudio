@@ -189,6 +189,11 @@
             <div >
                      {% html_widget groupid node.pk property_order_list.0.1.2 %}
             </div>
+            <div class="small-2 columns" style="border-color:red;">
+            <label> Available Session minutes </label>
+            <div id="availabel-minutes">
+            </div>
+            </div>
       </div>
       <!-- section for start time and end time -->
       <div class="row" id="Split_Session">
@@ -213,7 +218,6 @@
           
       </div>
 
-      
       
       <div class="row">
       
@@ -268,76 +272,77 @@
 {% block script %}
 
 function ShowSplits()
-{
-if (document.getElementById('splitsession').checked == true)
-{
-document.getElementById("select_split").hidden=false;
-}
-if (document.getElementById('splitsession').checked == false)
-{
-document.getElementById("select_split").hidden=true;
-}
+  {
+      if (document.getElementById('splitsession').checked == true)
+        {
+            document.getElementById("select_split").hidden=false;
+        }
+      if (document.getElementById('splitsession').checked == false)
+        {
+          document.getElementById("select_split").hidden=true;
+          //$("#date-splits").empty();
+        }
 
-}
+  }
 function GenerateSplits(splits){
-$("#date-splits").empty();
- var i=1;
-  $("#date-splits").append("<label> <b>Split -1 </b></label")
-  $("#date-splits").append("<div class='row'>"+ 
-  "<div class='small-2 columns'>"+ 
+  document.getElementById('start_time').value = ""
+  document.getElementById('end_time').value = ""
+  $("#date-splits").empty();
+  var i=1;
+  $("#date-splits").append("<div class='row'> <div class='small-1 columns' align='right' > <label> <b>Split -1 </b></label> </div></div>")
+  $("#date-splits").append("<div class='row' align='left'>"+ 
+  " <div class='small-1 columns' align='center' >"+ 
     "<label> Start time </label>"+
   "</div>"+
-  "<div class='small-2 columns'> "+
-     "<input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1' readonly=''>"+
+  "<div class='small-2 columns' > "+
+     "<input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1' readonly=''>"+
   "</div>"+
   
-  " <div class='small-2 columns'>"+
-      "<label> End time </label>"+
-   "</div>"+
-   "<div class='small-6 columns' >"+
-     "<input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
+  " <div class='small-1 columns'>"+
+      "<label> End time </label></div>"+
+   ""+ "<div >"+
+     "<input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
       "</div></div>")
    
    if(splits == '3')
    {
  $("#date-splits").append("</br>")
- $("#date-splits").append("<label> <b> Split -2 </b> </label")
-  $("#date-splits").append("<div class='row'>"+ 
-  "<div class='small-2 columns'>"+ 
+  $("#date-splits").append("<div class='row'> <div class='small-1 columns' align='right' > <label> <b>Split -2 </b></label> </div></div>")
+  $("#date-splits").append("<div class='row' align='left'>"+ 
+  " <div class='small-1 columns' align='center' >"+ 
     "<label> Start time </label>"+
   "</div>"+
-  "<div class='small-2 columns'> "+
-     "<input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1' readonly=''>"+
+  "<div class='small-2 columns' > "+
+     "<input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_2' readonly=''>"+
   "</div>"+
   
-  " <div class='small-2 columns'>"+
-      "<label> End time </label>"+
-   "</div>"+
-   "<div class='small-6 columns' >"+
-     "<input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required=''  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
+  " <div class='small-1 columns'>"+
+      "<label> End time </label></div>"+
+   ""+ "<div >"+
+     "<input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_2' readonly=''>"+
       "</div></div>")
-  
   $("#iteration").attr('value','3')
   }
   else
   {
       $("#iteration").attr('value','2')
   }
+     datetime()
+  
 }
 
 
 $(document).ready(function(){
-datetime()
-  //clear_Disable_Elements();
-  var event_details=""
-  $('#select_split').attr('hidden','True')
-  event_details="{{edit_details|safe}}"
+ datetime()
+ clear_Disable_Elements();
+ var event_details=""
+ 
+ $('#select_split').attr('hidden','True')
+ event_details="{{edit_details|safe}}"
 
   if(event_details)
   {
     event_details={{edit_details|safe}}
-
-
     $('#nussd_course_name').append(
                   $("<option></option>")
                   .attr('id',event_details['course'].course_id)
@@ -403,48 +408,58 @@ datetime()
 });
 function Enable_Elements()
 {
-document.getElementById('Module_of').disabled = "";
-document.getElementById('Module-session-section').visible = "True";
-document.getElementById('view').disabled = "";
+    document.getElementById('Module_of').disabled = "";
+    document.getElementById('Module-session-section').visible = "True";
+    document.getElementById('view').disabled = "";
 }
 function clear_Disable_Elements()
 {
-$('#nussd_course_name').attr('disabled','True')
-$('#nussd_course_name').empty()
-$('#event_has_batch').attr('disabled','True')
-$('#event_has_batch').empty()
-$('#session_of').attr('disabled','True')
-$('#session_of').empty()
-$('#Module_of').attr('disabled','True')
-$('#Module_of').empty()
-$('#Module-session-section').hide()
-$('#view').attr('disabled','True')
-$('#submit').attr('disabled','True')
-$('#event_coordinator').attr('disabled','True')
+  $('#nussd_course_name').attr('disabled','True')
+  $('#nussd_course_name').empty()
+  $('#event_has_batch').attr('disabled','True')
+  $('#event_has_batch').empty()
+  $('#session_of').attr('disabled','True')
+  $('#splitsession').attr('disabled','True')
+  $('#session_of').empty()
+  $('#Module_of').attr('disabled','True') 
+  $('#Module_of').empty()
+  $('#Module-session-section').hide()
+  $('#view').attr('disabled','True')
+  $('#submit').attr('disabled','True')
+  $('#event_coordinator').attr('disabled','True')
+  $('#start_time_1').attr('disabled','True')
+  $('#end_time_1').attr('disabled','True')
+  $('#start_time_1').attr('disabled','True')
+  $('#end_time_1').attr('disabled','True')
+  $('#end_time').attr('disabled','True')
 }
-var startDtInput = $("#start_time")
+/*var startDtInput = $("#start_time")
 var $a=$('#split-into3')
-$('body').click(function(e) {
-
+$('body').click(function(e)
+  {
     var target = $(e.target), article;
-    if(target.is('#split-into2')){
-    $a=$('#split-into2')
+    if(target.is('#split-into2'))
+    {
+        $a=$('#split-into2')
     }
-    else if(target.is('#split-into3')){
-    $a=$('#split-into3')
+    else if(target.is('#split-into3'))
+    {
+          $a=$('#split-into3')
     }
 });
-
+*/
+/*
 $('#split-into3').click(function(){
   var counter=$('#split-into3').val()
   /*for (i=1;i<counter;i++){
      var $elem=$("#start_time").clone()
      var $a=$elem.attr("id","start_time_"+i).attr("name","start_time_"+i)
      $a.appendTo(".session_time")
-  }*/
+  }
 });
+*/
 
-
+/*
 $('#split-into2').click(function(){
    $('#iteration').attr('value','2')
    alert($('#iteration').val())
@@ -455,20 +470,23 @@ $('#split-into2').click(function(){
      var $a=$elem.attr("id","start_time_"+i).attr("name","start_time_"+i)
      $a.appendTo(".session_time")
   }
-  */
+   
 });
+
+*/
+
+
 $("#view").click(function(){
 
-if(!$("#nussd_course_name").val()  || ($("#nussd_course_name").val() == "Select Course Name"))
-{
-    alert("Please Select Course Name")
-}
-else
-{
-var sel_coursename=$("#nussd_course_name").val();
-
-$('#Module-session-section').show()
-$.ajax({
+  if(!$("#nussd_course_name").val()  || ($("#nussd_course_name").val() == "Select Course Name"))
+  {
+      alert("Please Select Course Name")
+  }
+  else
+  {
+    var sel_coursename=$("#nussd_course_name").val();
+    $('#Module-session-section').show()
+    $.ajax({
       url: "{% url 'fetch_course_Module' groupid 'sel_coursename' %}".replace('sel_coursename',String(sel_coursename)),
       type: "GET",
       datatype:"json",
@@ -650,17 +668,27 @@ var course_type=$("#Module_of").val()
 
 
 });
-
+var total_session_time = 0
+var deducted_minute = 0
 $("#session_of").change(function(){
 
-var session_of=$('#session_of option:selected').text()
-$("#Session").val(session_of)
-document.getElementById('event_coordinator').disabled = "";      
+  total_session_time = $('#session_of option:selected').attr('minutes')
+  var session_of=$('#session_of option:selected').text()
+  $("#Session").val(session_of)
+  document.getElementById('event_coordinator').disabled = "";      
+  //document.getElementById('splitsession').disabled="";
+  $("#availabel-minutes").append("<label> "+total_session_time+"<label>")
 });
+
+
 $('#event_coordinator').change(function(){
-
-document.getElementById('submit').disabled = "";      
-
+if (total_session_time == 0){
+    document.getElementById('submit').disabled = "";      
+}
+else
+{
+  document.getElementById('submit').disabled = true;      
+}
 });
 
 
@@ -752,70 +780,60 @@ $("#nussd_course_type").change(function(){
       );
     }
   });
-  lowerYearLimit = currentYear;
-  upperYearLimit = currentYear + 20;
-var deducted_minute=0
-var previouse_first=""
-var previouse_second=""
-
-
-function check_session_split(name)
+function date_validation(name)
 {
-var  curr_name=""
-var total_session_time=0
-if (deducted_minute == 0)
-{
-var total_session_time = $('#session_of option:selected').attr('minutes')
-}
-if(deducted_minute != 0)
-{
-var total_session_time = deducted_minute
-}
-
-curr_name=name
-var val=document.getElementById(curr_name).value
-
-var str=curr_name.substring(0,3)
-if (str == "end")
-   {
-        previouse_second=curr_name
-   }
-if (str == 'sta')
-   {
-     
-      previouse_first =curr_name
-      previouse_second=""
-   }
-  
-  
-var splits = $('input[name="splitinto"]:checked').val();
-       var str=curr_name.substring(11)
-
-        var check=0
-        if (splits == 2)
+  var start_time=""
+  var end_time=""
+  str=name.substring(9)
+  str2=name.substring(0,3)
+  if (str2 == 'end' )
+  {
+     alert(str)
+     if (str)
+      {
+      alert("should come here")
+      
+         start_time=document.getElementById("start_time_"+ str).value
+         end_time =document.getElementById("end_time_"+ str).value
+         
+      }
+      
+     if(!(str))
+      {
+        alert("inside")
+        start_time=document.getElementById("start_time").value
+        end_time=document.getElementById("end_time").value
+      
+      }
+        reset_session_variable(str)
+        deduct_time(start_time,end_time)
+    if (total_session_time <= 0 )
+     {
+      if(total_session_time < 0)
+      {
+          alert("please Schedule within alloted time ")
+      }
+       document.getElementById('splitsession').disabled=true;
+       show_hide_date(str)     
+     }
+     else
+     {
+       document.getElementById('splitsession').disabled="";
+       if (document.getElementById('splitsession').checked == true)
         {
-         check=1
+            if (document.getElementById("start_time_"+(Number(str)+1)))
+            {
+                document.getElementById("start_time_"+(Number(str)+1)).disabled=""
+            }
         }
-        if(splits == 3) 
-        {
-         check=2
-        }  
-        if( str == check )
-        {
-        enddateInput=$("#end_time_"+check+"")
-        var startDate = $("#" + previouse_first+"")
+       
+     }
+   }
+   set_end_date_time(name)
+}  
 
-        var endDate = new Date(parseFloat(startDate.datetimepicker('getDate').setMinutes(startDate.datetimepicker('getDate').getMinutes()    +       deducted_minute )));
-        enddateInput.datetimepicker('setDate', endDate);
-       }
-   
-if (previouse_first != "" && previouse_second != "")
-{
-
-     //check for the remaining time in hand 1
-     var start_time = document.getElementById(previouse_first).value
-     var end_time   = document.getElementById(previouse_second).value
-     var diff= moment.utc(moment(start_time).diff(end_time)).format("HH:mm:ss")
+function deduct_time(start_time,end_time)
+{    var diff= moment.utc(moment(start_time).diff(end_time)).format("HH:mm:ss")
      //above code give the difference from 24 hrs
      var d = moment.duration(diff)
      var hh = Math.floor(d.asHours())  
@@ -825,56 +843,88 @@ if (previouse_first != "" && previouse_second != "")
      diffhhm=Number(diffhh)*60
      total_min_diff=(diffhhm + diffmm)
      deducted_minute =  Number(total_session_time) - Number(total_min_diff)
-     
-}    
-
-  
+     total_session_time=deducted_minute
+     $("#availabel-minutes").empty()
+     $("#availabel-minutes").append("<label> "+total_session_time+"<label>")
 }
 
+function show_hide_date(str)
+{
+    if (!(str))
+    {  
+       document.getElementById('select_split').hidden=true 
+        $("#iteration").attr('value','1')
+    }
+    if(str ==1)
+    {
+        $('start_time_2').hide()
+        $('end_time_2').hide()
+         $("#iteration").attr('value','2')
+    }
+    
+}
 
-currentDate = new Date();
-var currentDay = currentDate.getDate();
-var currentMonth = currentDate.getMonth();
-var currentYear = currentDate.getFullYear();
-var session_minutes= $('#session_of option:selected').attr('minutes')  
-var remain_minutes=0
+function reset_session_variable(str)
+{
+var start_time=""
+var end_time=""
+  alert(str)
+  if (!(str)){
+        total_session_time=$('#session_of option:selected').attr('minutes')
+
+        }
+  if(str == 1)
+  { 
+     total_session_time=$('#session_of option:selected').attr('minutes')
+     start_time=document.getElementById('start_time').value
+     end_time=document.getElementById('end_time').value
+     deduct_time(start_time,end_time) 
+  } 
+  if (str == 2){
+        total_session_time=$('#session_of option:selected').attr('minutes')
+        start_time=document.getElementById('start_time').value
+        end_time=document.getElementById('end_time').value
+        deduct_time(start_time,end_time)
+        start_time=document.getElementById('start_time_1').value
+        end_time=document.getElementById('end_time_1').value
+        deduct_time(start_time,end_time)
+        
+   }
+        
+}
 
 function set_end_date_time(num){
-   var splits = $('input[name="splitinto"]:checked').val();
    var str=num.substring(11)
 
-        var check=0
-        if (splits == 2)
-        {
-         check=1
-        }
-        if(splits == 3) 
-        {
-         check=2
-        }  
- 
-    if (check != 0)
+       
+    if (str)
     { 
-    $("#end_time_"+check+"").datepicker('option','minDate', $("#start_time_"+ check +"").datetimepicker('getDate'));
-    $("#end_time_"+check+"").timepicker('option','minDate', $("#start_time_"+ check +"").datetimepicker('getDate'));
-    $("#end_time_"+check+"").timepicker('option','hourMin', $("#start_time_"+  check +"").datetimepicker('getDate').getHours());
-    $("#end_time_"+check+"").timepicker('option','minuteMin',$("#start_time_"+ check +"").datetimepicker('getDate').getMinutes());
+
+      $("#end_time_"+str+"").datepicker('option','minDate', $("#start_time_"+ str +"").datetimepicker('getDate'));
+      $("#end_time_"+str+"").timepicker('option','minDate', $("#start_time_"+ str +"").datetimepicker('getDate'));
+      $("#end_time_"+str+"").timepicker('option','hourMin', $("#start_time_"+  str +"").datetimepicker('getDate').getHours());
+      $("#end_time_"+str+"").timepicker('option','minuteMin',$("#start_time_"+ str +"").datetimepicker('getDate').getMinutes());
+      document.getElementById("end_time_"+str).disabled=""
+      
     }
-    else
+    if (!(str))
     {
+    
     $("#end_time").datepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
     $("#end_time").timepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
     $("#end_time").timepicker('option','hourMin',$("#start_time").datetimepicker('getDate').getHours());
     $("#end_time").timepicker('option','minuteMin',$("#start_time").datetimepicker('getDate').getMinutes());
+    document.getElementById('end_time').disabled=""
     }
-}
+    
+}    
+
 function datetime(){  
+
 currentDate = new Date();
 var currentDay = currentDate.getDate();
 var currentMonth = currentDate.getMonth();
 var currentYear = currentDate.getFullYear();
-
-  
   $(".date_month_day_year").datetimepicker({
        
       changeMonth: true,
@@ -886,8 +936,16 @@ var currentYear = currentDate.getFullYear();
       minuteGrid: 15,
       onClose: function(dateText, inst) {
         $(this).val(dateText);
-        check_session_split($(this).attr('name'))
-        set_end_date_time($(this).attr('name'))
+        date_validation($(this).attr('name'))
+        if (total_session_time == 0){
+           document.getElementById('submit').disabled = "";      
+             }
+        else
+        {
+              document.getElementById('submit').disabled = true;      
+        }
+
+          
         var month_year = $(this).val();
         day = currentDay;
         month = currentMonth;

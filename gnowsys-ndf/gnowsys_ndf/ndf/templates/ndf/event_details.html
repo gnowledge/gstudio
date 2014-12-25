@@ -720,7 +720,7 @@ if ( pass[0] == 'Edit'){
 else
 {       //$('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit"+","+pass[1]+"') value='Edit'>"    )
         $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
-        $('#attendance').append("<input class='tiny button' id='d' onclick='Download()' value='Download'>")    
+        $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")    
 
 }
 }
@@ -748,17 +748,48 @@ else
 }
 }
 
-function Download()
+function Download(save)
 {
-
+alert(save)
 var Event_attended_by = [];
+var column=[]    
     var table = document.getElementById("forattendance");
+    
+    column.push('Name')
+    column.push('Presence')
+    if (save ==2 || save == 3){
+      column.push('Attendance_marks')
+      if (save == 2 || save == 4) { 
+        column.push('Assessment_marks')
+        }
+     }    
     $("#forattendance").find('tr').each(function(){
+   
     var Names_attended = $(this).find('td:eq(0)').text()
     var Status_attended = $(this).find('td:eq(1)').text()
-    var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'"}'
+    if (!(Status_attended))
+    {
+      Status_attended='False'
+    }
+    else
+    {
+      Status_attended='True'
+    }
+    var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)
+    if ( save ==  2 || save == 3){
+      var Attendance_marks = $(this).find('td:eq(2)').text()
+      values = values + '","Attendance_marks":"'+String    (Attendance_marks) 
+    if (save ==  2 || save == 4){ 
+      var Assessment_marks = $(this).find('td:eq(3)').text()
+       values = values + '","Assessment_marks":"' + String(Assessment_marks) 
+     }
+   }
     
-    Event_attended_by.push(values)
+      /*var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'","Attendance_marks":"'+String(Attendance_marks) + '","Assessment_marks":"' + String(Assessment_marks) +'","save":"'+save_val +'"}'
+    */
+   values = values + '"}'
+   alert(values)
+   Event_attended_by.push(values)
     });
 
  val_data = ""
@@ -766,7 +797,7 @@ var Event_attended_by = [];
       url: "{% url 'save_csv' groupid node.pk %}",
       type: "POST",
       data:{attendance:Event_attended_by,
-      
+      column:column, 
       csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data){
@@ -830,7 +861,6 @@ if (!(Status_attended))
      var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'","Attendance_marks":"'+String(Attendance_marks) + '","Assessment_marks":"' + String(Assessment_marks) +'","save":"'+save_val +'"}'
     Event_attended_by.push(values)
     }); 
-    alert(Event_attended_by)
     
     
      if(Event_attended_by !="")
