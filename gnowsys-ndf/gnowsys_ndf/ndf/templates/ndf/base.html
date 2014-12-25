@@ -43,6 +43,15 @@
   {% block head %}{% endblock %}
 
   <style>
+
+    div.group-link > a{
+      color: black;
+      font-size: 1.25em;
+      /*padding-top: 0.5em;*/
+    }
+
+    div.group-link {padding-top: 0.6em;}
+
     {% block style %}{% endblock %}
   </style>
 
@@ -133,9 +142,9 @@
             </a>
             {% endif %}
             
-            <ul class="dropdown">
+            <ul class="dropdown text-center">
                   
-              <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "User Settings" %}</a></li>
+              <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a></li>
                   
               <li><a class="logout" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
             </ul>
@@ -230,7 +239,7 @@
          <nav class="drop-shadow">
           <div class="button-bar app">
 
-            <div class="medium-2 columns">
+            <div class="medium-2 columns group-link">
               <!-- <li class="left">
                 <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a> 
               </li> -->
@@ -245,7 +254,7 @@
                   </a>
                    -->
                 {% endcomment %}
-                  <a title="{{group_name_tag}}" href="{% url 'groupchange' group_object.name %}" class="group-link">
+                  <a title="{{group_name_tag}}" href="{% url 'groupchange' group_object.name %}">
                     <i class="fi-home"></i>
                     {{group_name_tag|truncatechars:20|default:" -- "}}
                   </a>
