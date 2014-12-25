@@ -230,20 +230,28 @@
          <nav class="drop-shadow">
           <div class="button-bar app">
 
-            <ul class="button-group medium-2 columns">
-              <li class="left">
-                <!-- <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a>  -->
-              </li>
+            <div class="medium-2 columns">
+              <!-- <li class="left">
+                <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a> 
+              </li> -->
 
-              <li>
+              <!-- <li> -->
                 {% if group_name_tag %}
-                <a data-tooltip aria-haspopup="true" class="has-tip" title="{{group_name_tag|default:' -- '}}" href="{% url 'groupchange' group_object.name %}" class="home button">
-                <i class="fi-home"></i>
-                  {{group_name_tag|truncatechars:20|default:" -- "}}
-                </a>
+                {% comment %}
+                  <!--               
+                  <a data-tooltip aria-haspopup="true" class="has-tip" title="{{group_name_tag|defadivt:' -- '}}" href="{% url 'groupchange' group_object.name %}" class="home button">
+                  <i class="fi-home"></i>
+                    {{group_name_tag|truncatechars:20|default:" -- "}}
+                  </a>
+                   -->
+                {% endcomment %}
+                  <a title="{{group_name_tag}}" href="{% url 'groupchange' group_object.name %}" class="group-link">
+                    <i class="fi-home"></i>
+                    {{group_name_tag|truncatechars:20|default:" -- "}}
+                  </a>
                 {% endif %}
-              </li>
-            </ul>
+              <!-- </li> -->
+            </div>
 
             {% get_gapps_iconbar request groupid %}
 
