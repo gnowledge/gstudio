@@ -3909,18 +3909,12 @@ def fetch_batch_student(request, group_id,Course_name):
   except:
     return HttpResponse(json.dumps(list1)) 
 def fetch_course_session(request, group_id,Course_name):
-  print "Modulei",Course_name
   courses=collection.Node.find({"_id":ObjectId(Course_name)})
   dict1={}
   list1=[]
   event_type_id=request.GET.get("app_set_id","")
   event_type_node=collection.Node.one({"_id":ObjectId(event_type_id)})
   
-  '''if event_type_node.name == "Exam":
-      course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set},"attribute_set.course_structure_assessment":True})    
-  if event_type_node.name == "Classroom Session":
-      course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set},"attribute_set.course_structure_assessment":False})    
-  '''
   course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})    
   for i in course_modules:
       dict1.update({"name":i.name})
@@ -4093,19 +4087,15 @@ def get_attendance(request,group_id,node):
             
             if   unicode('Assignment_marks_record') in j.keys():
                if (str(j['Assignment_marks_record']['Event']) == str(node._id)) is True:
-                  print "fallen"
                   val=True
                   assign=True
-                  print "/////",j['Assignment_marks_record'],j.keys()
                   dict1.update({'marks':j['Assignment_marks_record']['marks']})
                else:
                   dict1.update({'marks':"0"})
             if  unicode('Assessment_marks_record') in j.keys():
                if(str(j['Assessment_marks_record']['Event']) == str(node._id)) is True:
-                  print "hello"
                   val=True
                   asses=True
-                  print "/////",j['Assessment_marks_record'],j.keys()
                   dict2.update({'marks':j['Assessment_marks_record']['marks']})
                else:
                   dict2.update({'marks':"0"})         
@@ -4123,12 +4113,11 @@ def get_attendance(request,group_id,node):
       temp_attendance.update({'Assessment_marks':"0"})
       attendance.append(temp_attendance) 
     temp_attendance={}
- print "coming here",attendance
  return HttpResponse(json.dumps(attendance))
  
 def attendees_relations(request,group_id,node):
  event_has_attended=collection.Node.find({'_id':ObjectId(node)})
- listwa=[]
+ column_list=[]
  column_count=0
  course_assignment=False
  course_assessment=False
@@ -4157,9 +4146,9 @@ def attendees_relations(request,group_id,node):
     column_count=3
  if (course_assignment == False and course_assessment ==False ):                        
     column_count=1
- listwa.append(a)
- listwa.append(column_count)
- print "listwas",listwa
- return HttpResponse(json.dumps(listwa)) 
+ column_list.append(a)
+ column_list.append(column_count)
+
+ return HttpResponse(json.dumps(column_list)) 
         
 

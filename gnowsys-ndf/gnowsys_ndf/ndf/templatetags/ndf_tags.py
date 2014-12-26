@@ -1898,7 +1898,6 @@ def html_widget(groupid, node_id, field):
     #   gs.get_neighbourhood(node_member_of)
 
     # field_type = gs.structure[field['name']]
-    print "see",field
     field_type = field['data_type']
     field_altnames = field['altnames']
     field_value = field['value']
@@ -2086,81 +2085,4 @@ def get_university(college_name):
 		error_message = "UniversityFindError: " + str(e) + " !!!"
 		# raise e
 		
-@register.assignment_tag
-def get_attendees(groupid,node):
- #get all the ObjectId of the people who would attend the event
- attendieslist=[]
- #below code would give the the Object Id of Possible attendies
- for i in node.relation_set:
-     if ('has_attendees' in i): 
-        for j in  i['has_attendees']:
-                attendieslist.append(j)
-                
- print "hello",attendieslist               
- attendee_name=[]
- #below code is meant for if a batch or member of group id  is found, fetch the attendees list-
- #from the members of the batches if members are selected from the interface their names would be returned
- #attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}},{"group_admin":1})
- attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}})
- for i in attendees_id:
-    #if i["group_admin"]:
-    #  User_info=(collection.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
-    #else:
-    User_info=(collection.Node.find({'_id':ObjectId(i._id)}))
-    for i in User_info:
-       attendee_name.append(i)
- attendee_name_list=[]
- for i in attendee_name:
-    if i not in attendee_name_list:
-        attendee_name_list.append(i)
- 
- return attendee_name_list
-@register.assignment_tag  		
-def get_event_relation(node):
-  #this tag gives you where the attendance is already take or not
-  #when we take attendance we create the realtion has_attended which
-  #if the event contains has_attended relation it means attadance 
-  #is already taken for that particular event 
-  event_has_attended=collection.Node.find({'_id':ObjectId(node)},{'relation_set':1})
-  for i in event_has_attended[0].relation_set:
-      #True if (has_attended relation is their means attendance is already taken) 
-      #False (signifies attendence is not taken yet for the event)
-      if ('has_attended' in i):
-        a="True"
-      else:
-        a="False"  
-        
-  return a 
-  
-@register.assignment_tag  		
-def get_attendance(groupid,node):
- #method is written to get the presence and absence of attendees for the event
- supposedattendies=get_attendees(groupid,node)
- has_attended_event=collection.Node.find({'_id':ObjectId(node.pk)},{'relation_set':1})
- #get all the objectid
- attendieslist=[]
- for i in has_attended_event[0].relation_set:
-     if ('has_attended' in i):
-           for j in  i['has_attended']:
-                attendieslist.append(j)
- #create the table
- count=0
- attendance=[]
- temp_attendance={}
- #the below code would compare between the supposed attendees and has_attended the event
- #and accordingly mark their presence or absence for the event
-  
- for i in supposedattendies:
-    
-    if (i._id in attendieslist):
-      temp_attendance.update({'name':i.name})
-      temp_attendance.update({'presence':'Present'})
-      attendance.append(temp_attendance)
-    else: 
-      temp_attendance.update({'name':i.name})
-      temp_attendance.update({'presence':'Absent'})
-      attendance.append(temp_attendance) 
-    temp_attendance={}
- return attendance
-  
-		
+

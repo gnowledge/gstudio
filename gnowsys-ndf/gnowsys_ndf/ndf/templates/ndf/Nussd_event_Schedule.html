@@ -69,53 +69,55 @@
       </h2>
     </header>
 
-        <div class="row">
-            <div class="small-1 columns">
-              <label for="{{property_order_list.0.1.9.name}}" class="right inline"> 
+    <div class="row">
+       <div class="small-1 columns">
+          <label for="{{property_order_list.0.1.9.name}}" class="right inline"> 
                 {{property_order_list.0.1.9.altnames}}
-              </label>
-            </div>
-            <div class="small-5 columns">
-                     {% html_widget groupid node.pk property_order_list.0.1.9 %}
-            </div>
+          </label>
+       </div>
+       
+       <div class="small-5 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.9 %}
+       </div>
             
-           <div class="small-1 columns">
-                 <label  class="right inline">
-                    Course Name
-                </label>
-           </div>
-           <div class="small-5 columns">
-                 <select id="nussd_course_name" name="nussd_course_name" required>
-                 </select>
-           </div>
+       <div class="small-1 columns">
+          <label  class="right inline">
+                Course Name
+          </label>
+       </div>
+       
+       <div class="small-5 columns">
+          <select id="nussd_course_name" name="nussd_course_name" required>
+          </select>
+       </div>
          
-        </div>
-        <!-- tab for batches -->
-        
-        <div class= "row">
-            <div class="small-1 columns">
-                 <label  class="right inline">
-                    Batches</label>
-            </div>
-            <div align="left">
-               <div class="small-4 columns" align="left">
-                      <select id="event_has_batch" name="event_has_batch">
-                      </select>
+    </div>
+    <!-- tab for batches -->
+    <div class= "row">
+       <div class="small-1 columns">
+          <label  class="right inline">
+            Batches
+          </label>
+       </div>
+       <div align="left">
+          <div class="small-4 columns" align="left">
+             <select id="event_has_batch" name="event_has_batch">
+             </select>
                       
-               </div>
-               <div class="small-7 columns">
-                 <label><font color="red">*</font></label>
-               </div>
+          </div>
+          <div class="small-7 columns">
+             <label><font color="red">*</font></label>
+          </div>
             
-            </div>
-        </div>
+       </div>
+    </div>
+ <!-- has to be reomved-->
  </div>    
-        
-         <div class= "row">
-            <div class="small-12 columns" align="center">
-                <input type="button" class="medium button" id="view" value="view">
-           </div>
-         </div>
+    <div class= "row">
+          <div class="small-12 columns" align="center">
+             <input type="button" class="medium button" id="view" value="view">
+          </div>
+    </div>
           
     </fieldset>
     <div id="Module-session-section">
@@ -149,34 +151,14 @@
          <div class="small-1 columns">
           <label><font color="red">*</font></label>
          </div> 
-      
-      
     </div>
-            <div class="row">
-                  <!- section for creation of multiple section -->
-                  <div class="small-1 columns" hidden>
-                        <label  class="right inline">
-                        Split session
-                          
-                        </label>
-                  </div>
-                  <div class="small-11 columns" align="left" hidden >
-                        <input type="radio" id="split-into2" name="split-into" value="2" > 2
-                        <input type="radio" id="split-into3" name="split-into" value="3" > 3
-               
-                  </div>
-                  
-                  <div class="session_time">
-                  
-                  
-                  </div>
-      
+    <div class="row">
             <div class="small-1 columns">
               <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
                 {{property_order_list.0.1.1.altnames}}
               </label>
             </div>
-            <div class="small-2 columns">
+            <div class="small-3  columns">
                      {% html_widget groupid node.pk property_order_list.0.1.1 %}
             </div>
             
@@ -186,36 +168,42 @@
                 {{property_order_list.0.1.2.altnames}}
               </label>
             </div>
-            <div >
+            <div  class="small-3 columns" >
                      {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            
             </div>
-            <div class="small-2 columns" style="border-color:red;">
-            <label> Available Session minutes </label>
-            <div id="availabel-minutes">
+            
+            <div class="small-2 columns" >
+              <label style="position:absolute; " > Available Session Minutes </label>
+              
             </div>
-            </div>
+            <div id="available-minutes" class="small-2 columns" align="left">
+                        :0
+              </div>  
       </div>
+     
+     
       <!-- section for start time and end time -->
       <div class="row" id="Split_Session">
           <!-- checkbox for yes or no  split session  -->
           <div class="small-12 columns">
-          <input type="checkbox" class="splitsession" id="splitsession" onClick="ShowSplits()">Split Session
+               <input type="checkbox" class="splitsession" id="splitsession" onClick="ShowSplits()">Split Session
           </div>
           <div  id="select_split" >
-             <div style="width:200px;"><hr> </hr></div>
+             <div style="width:200px;"><hr> </hr>
+             </div>
              <div id="splits" class="row">
                   <div id="split-2" class="small-2 columns" >
-                  <input type="radio" id="chkbxsplit-2" name="splitinto" onClick="GenerateSplits('2')" value="2">2
+                     <input type="radio" id="chkbxsplit-2" name="splitinto" onClick="GenerateSplits('2')" value="2">2
                   </div>
                   <div id="split-3" class="small-10 columns" align="left">
-                   <input type="radio" id="chkbxsplit-3" name="splitinto" onClick="GenerateSplits('3')" value="3">3
+                      <input type="radio" id="chkbxsplit-3" name="splitinto" onClick="GenerateSplits('3')" value="3">3
                   </div>
                   <!-- Div for Appended Start_Date And End Date -->
                   <div id="date-splits" >
                   </div>
              </div>
           </div>
-          
       </div>
 
       
@@ -225,42 +213,42 @@
               <label  class="right inline"> 
                     Master Trainer
               </label>
-            </div>
-            <div class="small-5 columns">
+         </div>
+         <div class="small-5 columns">
                      <select id="event_coordinator" name="event_coordinator" required>
                      
                      </select>
-                     
-            </div>
-            <div class="small-4 columns">
-                 <label><font color="red">*</font></label>
-            </div>
-            <div class="small-4 columns">
-                 
-            </div>
-
-           
+         </div>
+         <div class="small-4 columns">
+             <label>
+                    <font color="red">*</font>
+             </label>
+         </div>
+         <div class="small-4 columns">
+          <!-- keept for spacing from left hand side -->        
+         </div>
       </div>
+      
       <div class="hiddensection" hidden>
-      <input id="course_type" name="course_type">
-      <input id="course_name" name="course_name">
-      <input id="Module_name" name="Module_name">
-      <input id="Session" name="Session">
-      <select id="has_attendees" name="has_attendees" multiple=""   >
-      </select>
+         <input id="course_type" name="course_type">
+         <input id="course_name" name="course_name">
+         <input id="Module_name" name="Module_name">
+         <input id="Session" name="Session">
+         <select id="has_attendees" name="has_attendees" multiple=""   >
+         </select>
               
       
-      <input type="hidden" value=1 name="iteration" id="iteration">
+         <input type="hidden" value=1 name="iteration" id="iteration">
       </div>
-      </fieldset>  
+  </fieldset>  
       
          
-        <div class="row">
+   <div class="row">
        <div class="small-12 columns" align="center">
-      <input type="submit" id="submit" class="medium button" value="submit" >
+             <input type="submit" id="submit" class="medium button" value="submit" >
        </div>
-       </div>
- <!-- div module sesion section Opens here" -->
+   </div>
+ <!-- div module sesion section closes here" -->
  </div>
 </div>
  
@@ -676,8 +664,8 @@ $("#session_of").change(function(){
   var session_of=$('#session_of option:selected').text()
   $("#Session").val(session_of)
   document.getElementById('event_coordinator').disabled = "";      
-  //document.getElementById('splitsession').disabled="";
-  $("#availabel-minutes").append("<label> "+total_session_time+"<label>")
+  $("#available-minutes").empty()
+  $("#available-minutes").append("<label> :"+total_session_time+"<label>")
 });
 
 
@@ -788,10 +776,9 @@ function date_validation(name)
   str2=name.substring(0,3)
   if (str2 == 'end' )
   {
-     alert(str)
+
      if (str)
       {
-      alert("should come here")
       
          start_time=document.getElementById("start_time_"+ str).value
          end_time =document.getElementById("end_time_"+ str).value
@@ -800,7 +787,6 @@ function date_validation(name)
       
      if(!(str))
       {
-        alert("inside")
         start_time=document.getElementById("start_time").value
         end_time=document.getElementById("end_time").value
       
@@ -844,8 +830,8 @@ function deduct_time(start_time,end_time)
      total_min_diff=(diffhhm + diffmm)
      deducted_minute =  Number(total_session_time) - Number(total_min_diff)
      total_session_time=deducted_minute
-     $("#availabel-minutes").empty()
-     $("#availabel-minutes").append("<label> "+total_session_time+"<label>")
+     $("#available-minutes").empty()
+     $("#available-minutes").append("<label> :"+total_session_time+"<label>")
 }
 
 function show_hide_date(str)
@@ -868,7 +854,7 @@ function reset_session_variable(str)
 {
 var start_time=""
 var end_time=""
-  alert(str)
+
   if (!(str)){
         total_session_time=$('#session_of option:selected').attr('minutes')
 
