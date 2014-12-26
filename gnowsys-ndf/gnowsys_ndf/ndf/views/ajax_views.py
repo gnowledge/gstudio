@@ -3090,6 +3090,8 @@ def get_announced_courses_with_ctype(request, group_id):
           ac_of_colg.append(ObjectId(each.subject))
           # Courses announced for this college id
 
+        
+
         # Type-cast fetched field(s) into their appropriate type
         nussd_course_type = unicode(nussd_course_type)
          
@@ -3098,8 +3100,9 @@ def get_announced_courses_with_ctype(request, group_id):
           {
             'member_of': announced_course_gt._id, '_id':{'$in':ac_of_colg},
             'attribute_set.nussd_course_type': nussd_course_type,
-            'attribute_set.start_enroll':{'$lte': curr_date},
-            'attribute_set.end_enroll':{'$gte': curr_date}
+            'status':u"PUBLISHED"
+            # 'attribute_set.start_enroll':{'$lte': curr_date},
+            # 'attribute_set.end_enroll':{'$gte': curr_date}
           }
         )
 
@@ -3112,10 +3115,10 @@ def get_announced_courses_with_ctype(request, group_id):
           
           acourse_ctype_list.append(each_ac)
         response_dict["success"] = True      
-        info_message = "Announced Courses for enrollment are available"
+        info_message = "Announced Courses are available"
       else:
         response_dict["success"] = False
-        info_message = "No Announced Courses for enrollment are available"
+        info_message = "No Announced Courses are available"
       response_dict["message"] = info_message
 
       response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list, cls=NodeJSONEncoder)
@@ -4247,7 +4250,6 @@ def get_batches_with_acourse(request, group_id):
   """
   response_dict = {'success': False, 'message': ""}
   batches_list = []
-  print "coming in get_batches_with_acourse"
   batch_gst = collection.Node.one({'_type':'GSystemType','name':'Batch'})
   try:
     if request.is_ajax() and request.method == "GET":
@@ -4256,14 +4258,12 @@ def get_batches_with_acourse(request, group_id):
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
       print "\n\n****",announced_course_id
       if(ObjectId(group_id) == mis_admin._id):
-        print "admin"
+        pass
       else:
         colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
         req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
         b = collection.Node.find({'member_of':batch_gst._id,'relation_set.has_course':ObjectId(announced_course_id)})
-        print b.count()
         for each in b:
-          # print each.name
           batches_list.append(each)
 
         response_dict["success"] = True      

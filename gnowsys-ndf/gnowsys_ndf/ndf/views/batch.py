@@ -39,7 +39,20 @@ def batch(request, group_id):
                 group_id = str(auth._id)
     else :
         pass
-    batch_coll = collection.GSystem.find({'member_of': {'$all': [GST_BATCH._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    nussd_course_type_name = ""
+    announced_course_name = ""
+
+    if request.method == "POST":
+        announced_course_name = request.POST.get("announced_course_name", "")
+        nussd_course_type_name = request.POST.get("nussd_course_name","")
+        colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
+        req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
+        batch_coll = []
+        b = collection.Node.find({'member_of':GST_BATCH._id,'relation_set.has_course':ObjectId(announced_course_name)})
+        for each in b:
+          batch_coll.append(each)
+    else:
+        batch_coll = collection.GSystem.find({'member_of': {'$all': [GST_BATCH._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     fetch_ATs = ["nussd_course_type"]
     req_ATs = []
     for each in fetch_ATs:
@@ -59,7 +72,7 @@ def batch(request, group_id):
     
     #users_in_group = collection.Node.one({'_id':ObjectId(group_id)}).author_set
     template = "ndf/batch.html"
-    variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id, 'ATs': req_ATs,'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id})
+    variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id,'nussd_course_name_var':nussd_course_type_name,'announced_course_name_var':announced_course_name, 'ATs': req_ATs,'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id})
     return render_to_response(template, variable)
 
 

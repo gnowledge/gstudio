@@ -14,6 +14,14 @@
 
 .margin-0 { margin: 0 !important ;}
 
+/* Setting css-properties for reveal-modal's label */
+div.reveal-modal > label {
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+
 .resource-drawer {
 border-color: #D3D3D3; border-style: solid;
 padding: 0 !important;
@@ -55,16 +63,19 @@ background-repeat:no-repeat; background-size: 48px 48px
 </div>
 {% endblock %}
 
-
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
 
 <header class="row">
   <dl class="tabs" data-tab>
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Batches {% if batch_coll.count %}({{ batch_coll.count }}){% endif %}</a></dd>
   </dl>
 </header>
-<fieldset>
+<form data-abide id="form-card-batch" method="POST" action="{% url 'batch' group_id %}">{% csrf_token %}
     <div class="row">
       <div class="small-2 columns">
         <label class="right inline" for="nussd_course_type">{% trans "Course Type" %}</label>
@@ -79,9 +90,11 @@ background-repeat:no-repeat; background-size: 48px 48px
         <select id="acourse_list" name="acourse_list_name" disabled="disabled">
         </select>
       </div>
+      <input type="hidden" name="nussd_course_name" id="nussd_course_name">
+      <input type="hidden" name="announced_course_name" id="announced_course_name">
+      <input type="submit" value="submit" id="submit" class="small button round">
     </div>
 
-</fieldset>
 <fieldset id="batches_of_acourse">
   <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
     {% for node in batch_coll %}
@@ -114,15 +127,15 @@ background-repeat:no-repeat; background-size: 48px 48px
     {% endfor %}
   </ul>
 </fieldset>
-{% paginate %}
+</form>
 {% endblock %}
 {% block script %}
-
+  var announced_course_name_v1 = ""
   //For selecting Course type
     $("select#nussd_course_type").change(function() {
       var nussd_course_type = $("#nussd_course_type").val();
       success_state = false;
-
+      $("#nussd_course_name").val(nussd_course_type)
       $.ajax({
         url: "{% url 'get_announced_courses_with_ctype' group_id %}",
 
@@ -136,14 +149,17 @@ background-repeat:no-repeat; background-size: 48px 48px
 
         complete: function () {
           // Enable AC field
-          $("#batches_of_acourse").empty();
+            if(announced_course_name_v1 != ""){
+              $("select#acourse_list option[value='{{announced_course_name_var}}']").prop("selected", true);
+              announced_course_name_v1 = "";
+            }
+
+
           $("select#acourse_list").removeAttr('disabled')
         },
 
         success: function(data){
           success_state = data["success"]
-          console.log(success_state)
-
           if (success_state){
 
             ac_data = data["acourse_ctype_list"]
@@ -177,50 +193,36 @@ background-repeat:no-repeat; background-size: 48px 48px
             $("#alertModal").addClass("alert");
             $("#alertModal").foundation('reveal', 'open');
             $("select#nussd_course_type").prop("selectedIndex", 0);
+            $("select#acourse_list").prop("selectedIndex", 0);
           }
         },
       });//end of ajax
     });//end of nussd_course_type.change function
 
 
-//For selecting Announced Course type
+  //For selecting Announced Course type
     $("select#acourse_list").change(function() {
         ac_id = $("#acourse_list").val();
-        console.log(ac_id)
-        success_state = false;
-
-        $.ajax({
-          url: "{% url 'get_batches_with_acourse' group_id %}",
-
-          data: {
-            ac_id: ac_id
-          },
-
-          type: "GET",
-
-          dataType: "json",
-
-          success: function(data){
-            success_state = data["success"]
-
-            if (success_state){
-              ac_data = data["batches_list"]
-              ac_data = JSON.parse(ac_data)
-              console.log(ac_data)
-              {{batch_coll}}=ac_data
-            }
-
-            else {
-              $("#alertModalLabel").text(data["message"]);
-              $("#alertModal").removeClass("success").removeClass("warning");
-              $("#alertModal").addClass("alert");
-              $("#alertModal").foundation('reveal', 'open');
-              $("select#nussd_course_type").prop("selectedIndex", 0);
-            }
-          },
-        });//end of ajax
-
+        $("#announced_course_name").val(ac_id)
     });//end of acourse_list.change function
 
 
+    $("#form-batch").submit(function(event){
+      $("#batches_of_acourse").empty();
+    })
+
+
+{% endblock %}
+
+{% block document_ready %}
+
+  {% if nussd_course_name_var != "" %}
+    $("select#nussd_course_type").val("{{nussd_course_name_var}}");
+    announced_course_name_v1 = "{{announced_course_name_var}}";
+    $('select#nussd_course_type').trigger('change');
+  {% endif %}
+
+  {% if announced_course_name_var != "" %}
+    $("select#acourse_list option[value='{{announced_course_name_var}}']").prop("selected", true);
+  {% endif %}
 {% endblock %}

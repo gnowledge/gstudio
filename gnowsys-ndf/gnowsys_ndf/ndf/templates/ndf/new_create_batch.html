@@ -135,12 +135,12 @@
     
     <div id="drawer-div"> </div><br>
     
-    <div id="batch-details" style='display: block'> </div>
-    
     <div id="move_batch_list"  class="text-center">    
       <input type='button' name='right_move' id='move_right' value='Move ALL to Right' class='button round small'>
       <input type='button' name='left_move' id='move_left' value='Move ALL to Left' class='button round small'>
     </div>
+    <div id="batch-details" style='display: block'> </div>
+    
 
     <input type='button' name='add_btn' id='add_btn' value='Add Batch' class='button round small' onclick = 'add_new_batch()' style='display: none'>
   <div>
@@ -189,8 +189,6 @@
 
         success: function(data){
           success_state = data["success"]
-          console.log(success_state)
-
           if (success_state){
 
             ac_data = data["acourse_ctype_list"]
@@ -271,7 +269,6 @@
   //Proceed to create batches for selected AC
     $("#nextbtn").click(function(event) {
       ac_id = $("#acourse_list").val();
-      console.log("ac_id: " + ac_id)
 
       if ($("#nextbtn").css("display") != "none") {
         $("#nextbtn").css("display", "none");
