@@ -34,6 +34,12 @@
       font-weight: bold;
       font-size: 1rem;
     }
+    div.reveal-modal > div.row > div.columns > input.button, input.button {
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      margin: 0.8em 0 0 0 !important;
+    }
 
   .text-size-15 {
     font-size: 15px;
@@ -43,6 +49,11 @@
 {% block body_content %} 
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <label id="alertModalLabel"></label>
+    <div class="row hide">
+      <div class="small-3 small-centered columns">
+        <input type="button" id="btnConfirm" class="button tiny expand" value="Confirm" />
+      </div>
+    </div>
     <a class="close-reveal-modal">&#215;</a>
   </div>
 
@@ -57,38 +68,41 @@
 
     <div id="enrollment-content-div">
       <!-- fieldset for selecting announced course/////////////////////////////////////////////// -->
-      <div class="row">
-        <!-- Registration Year -->
-        <div class="small-2 columns">
-          <label for="acourse_list" class="right inline"> {% trans "Course type"%} </label>
-        </div>
-        <div class="small-4 columns end">
-          {% html_widget groupid "" ATs.0 %}
-        </div>
-      </div>
-
-      <fieldset id="fsSc" style="display: none;">
+      <fieldset id="fsSc">
         <legend>
-          <label><h5>{% trans "Select Students" %}</h5></label>
+          <label><h5>{% trans "Course Details" %}</h5></label>
         </legend>
+
+        <div class="row">
+          <!-- Course Type -->
+          <div class="small-2 columns">
+            <label for="nussd_course_type" class="right inline"> {% trans "Course type"%} </label>
+          </div>
+          <div class="small-4 columns end">
+            <input type="text" id="nussd_course_type" name="nussd_course_type" value="{{nussd_course_type}}" disabled>
+          </div>
+        </div>
 
         <div class="row">
           <!-- Drop down for announced courses -->
           <div class="small-2 columns">
-            <label for="acourse_list" class="right inline"> 
+            <label for="acourse_list_div" class="right inline"> 
               {% trans "Announced Course"%}
             </label>
           </div>
           <div class="small-4 columns end">
-            <select id="acourse_list" name="acourse_list_name" disabled="disabled" style="float:left; width:95%" required>
-            </select>
-            <i style="color:red; float:left display:inline">*</i>
-            <small class="error">{% trans "Please select valid Course !!!" %} </small>
+            <div id="acourse_list_div">
+              <!--
+              <ul id="acourse_list">
+                <li id="ObjectId">Announced-Course-Name</li>
+              </ul>
+              -->
+            </div>
           </div>
 
           <!-- Announced Course Duration -->
           <div class="small-2 columns">
-            <label for="acourse_list" class="right inline">
+            <label for="enrollment_duration" class="right inline">
               {% trans "Enrollment Duration" %}
             </label>
           </div>
@@ -100,21 +114,9 @@
           </div>
         </div>
 
-        <div class="row">
-          <div class="small-2 columns">
-            <label for="registration_year" class="right inline">
-              {% trans "Registration Year" %}
-            </label>
-          </div>
-          <div class="small-4 columns end">
-            <input type="text" id="registration_year" name="registration_year" value="" placeholder="YYYY"
-                readonly required class="date_year" style="float:left; width:10rem"/>
-            <i style="color:red; float:left display:inline">*</i>
-            <small class="error">{% trans "Please set Registration Year" %}</small>
-          </div>
-        </div>
-
         <!-- Checkbox: Students Enrolled and/or Non-enrolled -->
+        {% comment %}
+        <!--
         <div class="row">
           <div class="small-11 small-centered columns">
             <input type="checkbox" id="all_students" name="all_students">
@@ -123,11 +125,12 @@
             </label>
           </div>
         </div>
+        -->
+        {% endcomment %}
 
         <!-- Find button -->
         <div class="row">
           <div class="small-2 small-centered columns">
-            <br>
             <input type="button" id="btnFindES" value="Find" class="button small round expand"/>
           </div>
         </div>
@@ -163,49 +166,17 @@
 {% block script %}
   {{block.super}}
 
-  // By default checkbox (all_students) is unchecked, hence kept this value
+  var nussd_course_type = $("#nussd_course_type").val();
+  var ann_course_id = "{{ann_course_id}}";
+  var ann_course_id_list = [];
+  var enrollment_open_ann_course_arr = {{enrollment_open_ann_course_ids|safe|escape}};
+  var acourse_val = [];
+
+  /*
+    // By default checkbox (all_students) is unchecked, hence kept this value
     var all_students_txt = "Students: Only Non-enrolled Student(s)";
-
-  // Function to hide fieldsets (fsAc & fsSt) & submit buttons (In Progress & Complete) ----------------------
-    function hideFieldsetSubmit() {
-      if ($(".sbtn").css("display") != "none") {
-        $(".sbtn").toggle();
-      }
-
-      if ($("#fsSt").css("display") != "none") {
-        $("#divSt").empty();
-        $("#fsSt").toggle();
-      }
-    }
-
-  // Default settings for date-widget on page load -----------------------------------------------------------
-    var currentYear = (new Date()).getFullYear()
-    lowerYearLimit = currentYear - 5;
-    upperYearLimit = currentYear;
-
-  // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------
-    $(document).on('focus click blur', '.date_year' ,function(){
-      $(".ui-datepicker-calendar").hide();
-      $(".ui-datepicker-month").hide();
-      $(".ui-datepicker-prev").hide();
-      $(".ui-datepicker-next").hide();
-      $("#ui-datepicker-div").position({
-        my: "center top",
-        at: "center bottom",
-        of: $(this)
-      });
-    });
-
-  // If any of the Input field of fieldset (fsSc) is changed -------------------------------------------------
-    $("#fsSc :input").on('change click', function(){
-      // hide fieldsets (fsAc & fsSt) & submit buttons (In Progress and Complete)
-      hideFieldsetSubmit();
-
-      // Enable Find button (btnFindES)
-      $("#btnFindES").removeAttr('disabled');
-    });
-
-  // Set text (all_students_txt) based on state of checkbox (all_students) -----------------------------------
+  
+    // Set text (all_students_txt) based on state of checkbox (all_students) -----------------------------------
     $("#all_students").on("change cick", function() {
       if (this.checked) {
         all_students_txt = "Student: All Student(s) [including enrolled]";
@@ -215,24 +186,23 @@
         all_students_txt = "Students: Only Non-enrolled Student(s)";
       }
     });
+    */
 
-    $("select#acourse_list").change(function() {
-      var acourse_name = $("#acourse_list").val();
-      start_en_dt = $("#acourse_list option:selected").attr("start_enroll_of_ac")
-      end_en_dt = $("#acourse_list option:selected").attr("end_enroll_of_ac")
+  // On click of Find (Setup Ajax call) ----------------------------------------------------------------------
+    $("#btnFindES").click(function() {
+      var success_state = false
 
-      $("#lblenroll_from").text(start_en_dt)
-      $("#lblenroll_to").text(end_en_dt)
-    });//end of .change function
+      $("#acourse_list li").each(function() {
+        acourse_val.push($(this).attr("id"));
+      });
 
-    $("select#nussd_course_type").change(function() {
-      var nussd_course_type = $("#nussd_course_type").val();
-      success_state = false;
       $.ajax({
-        url: "{% url 'get_announced_courses_with_ctype' group_id %}",
+        url: "{% url 'get_anncourses_allstudents' group_id %}",
 
         data: {
-          nussd_course_type: nussd_course_type
+          // registration_year: registration_year,
+          // all_students: all_students,
+          acourse_val: acourse_val
         },
 
         type: "GET",
@@ -240,173 +210,57 @@
         dataType: "json",
 
         success: function(data){
-          success_state = data["success"]
+          success_state = data["success"];
+          $("#alertModalLabel").text(data["message"]);
 
-          if (success_state){
-            ac_data = data["acourse_ctype_list"]
-            ac_data = JSON.parse(ac_data)
-
-            $("select#acourse_list").empty();
-            $("select#acourse_list").append(
-              $("<option></option>")
-                .attr("value", "")
-                .text("{% trans '- - - Select Course - - -' %}")
-                .attr("start_enroll_of_ac", "--/--/--")
-                .attr("end_enroll_of_ac", "--/--/--")
-            );            
-            $.each(ac_data, function(i,v){
-              ac_val = v["_id"];
-              ac_name=v["name"];
-              start_en = v["attribute_set"][3]["start_enroll"];
-              end_en = v["attribute_set"][4]["end_enroll"];
-              start_en = start_en.split(' ');
-              end_en = end_en.split(' ');
-              $("select#acourse_list").append(
-                $("<option></option>")
-                  .attr("value", ac_val)
-                  .text(ac_name)
-                  .attr("start_enroll_of_ac", start_en[0])
-                  .attr("end_enroll_of_ac", end_en[0])
-              );
-            });
-
-            $("select#acourse_list").prop("selectedIndex", 0);
+          if (data["success"]) {
+            // Fill divSt
+            $("#divSt").empty();
+            drawer_widget = data["drawer_widget"]
+            nesc = "<p class='text-center'>Total No. of students <i>not enrolled</i> in course which are registered in this year: <b>" + data["non_enrolled_stud_count"] + "</b></p>"
+            esc = "<p class='text-center'>Total No. of students <i>enrolled</i> in course which are registered in this year: <b>" + data["enrolled_stud_count"] + "</b></p>"
+            $("#divSt").html(nesc + esc + drawer_widget); 
           }
 
           else {
-            $("#alertModalLabel").text(data["message"]);
-            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").removeClass("success");
             $("#alertModal").addClass("alert");
             $("#alertModal").foundation('reveal', 'open');
           }
         },
 
-        complete: function () {
+        complete: function(){
           if (success_state) {
-            // Enable District field
-            $("select#acourse_list").removeAttr('disabled');
-            $("#lblenroll_from").text("--/--/----");
-            $("#lblenroll_to").text("--/--/----");
-            if ($("#fsSc").css("display") == "none") {
-              $("#fsSc").toggle();
+            // If Announced Courese & Students found, 
+            // display fieldset (fsSt) & submit buttons (sbtnInProgress & sbtnComplete)
+            // depending upon their visibility state 
+            if ($(".sbtn").css("display") == "none") {
+              $(".sbtn").toggle();
             }
 
-            // Reset Announced Courses, based on it's emrollment status (open/closed)
-            // This is done by sending list of anrollment-open announced courses 
-            {% if enrollment_open_ann_course_ids %}
+            // Also toggle fieldset (fsSt)
+            if ($("#fsSt").css("display") == "none") {
+              $("#fsSt legend label h5").text("Enroll following listed Students:");
+              $("#fsSt").toggle();
+            }
 
-            enrollment_open_ann_course_arr = {{enrollment_open_ann_course_ids|safe|escape}};
-            ac_id = "{{ann_course_id}}";
-            remove_ann_course = "";
-            $("select#acourse_list option").each(function() {
-              if (!(enrollment_open_ann_course_arr.indexOf($(this).val()) >= 0)) {
-                if (ac_id == $(this).val()) {
-                  remove_ann_course = $(this).text();
-                }
-
-                $(this).remove();
-              }
-            });
-            {% endif %}
-
-            {% if ann_course_id and ann_course_id in enrollment_open_ann_course_ids %}
-            $("select#acourse_list").val("{{ann_course_id}}");
-            $("select#acourse_list").trigger("change");
-
-            {% else %}
-            $("#enrollment-content-div")
-              .empty()
-              .append("<p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> for " + remove_ann_course + " !!!</p>")
-            {% endif %}
+            $("#btnFindES").attr("disabled", true);
           }
-        },
-      });
-    });
 
-  // On click of Find (Setup Ajax call) ----------------------------------------------------------------------
-    $("#btnFindES").click(function(event) {
-      event.preventDefault();
+          else {
+            // Otherwise, hide submit buttons as well as fieldset
+            if ($(".sbtn").css("display") != "none") {
+              $(".sbtn").toggle();
+            }
 
-      // Forcefully blur all input elements, so that mandatory fields 
-      // become data-invalid if not fill
-      $(this).parents("fieldset").find(':input[required]').blur();
-
-      // Then check no. of data-invalid fields
-      // if count == 0, then only proceed to make ajax-call & 
-      // later on, on successful returned O/P, displaying Announce(submit) button
-      if($(this).parents("fieldset").find(':input[data-invalid]').length == 0) {
-        var registration_year = $("#registration_year").val();
-        var all_students = $("#all_students").prop("checked");
-        var success_state = false
-        var acourse_val = $("#acourse_list").val();
-
-        // All field(s) have valid I/P, make ajax-call
-        $.ajax({
-          url: "{% url 'get_anncourses_allstudents' group_id %}",
-
-          data: {
-            registration_year: registration_year,
-            all_students: all_students,
-            acourse_val: acourse_val
-          },
-
-          type: "GET",
-
-          dataType: "json",
-
-          success: function(data){
-            success_state = data["success"];
-            $("#alertModalLabel").text(data["message"]);
-
-            if (data["success"]) {
-              $("#alertModal").removeClass("alert");
-              $("#alertModal").addClass("success");
-              $("#alertModal").foundation('reveal', 'open');
-
-              // Fill divSt
+            // Also toggle fieldset (fsSt)
+            if ($("#fsSt").css("display") != "none") {
               $("#divSt").empty();
-              drawer_widget = data["drawer_widget"]
-              $("#divSt").html(drawer_widget); 
-            }
-
-            else {
-              $("#alertModal").removeClass("success");
-              $("#alertModal").addClass("alert");
-              $("#alertModal").foundation('reveal', 'open');
-            }
-          },
-
-          complete: function(){
-            if (success_state) {
-              // If Announced Courese & Students found, 
-              // display fieldsets (fsAc & fsSt) & submit buttons (sbtnInProgress & sbtnComplete)
-              // depending upon their visibility state 
-              if ($(".sbtn").css("display") == "none") {
-                $(".sbtn").toggle();
-              }
-
-              // Also toggle fieldset (fsSt)
-              if ($("#fsSt").css("display") == "none") {
-                $("#fsSt legend label h5").text(all_students_txt);
-                $("#fsSt").toggle();
-              }
-            }
-
-            else {
-              // Otherwise, hide submit buttons as well as fieldset
-              if ($(".sbtn").css("display") != "none") {
-                $(".sbtn").toggle();
-              }
-
-              // Also toggle fieldset (fsSt)
-              if ($("#fsSt").css("display") != "none") {
-                $("#divSt").empty();
-                $("#fsSt").toggle();
-              }
+              $("#fsSt").toggle();
             }
           }
-        });
-      }
+        }
+      });
     });
 
   // On close event of reveal-modal (alertModal) -------------------------------------------------------------
@@ -416,14 +270,32 @@
         // of the fieldset (fsSc) is changed
         $("#btnFindES").attr('disabled', "disabled");
       }
+
+      // Reset reveal-modal content & it's setting
+      $("#alertModalLabel").text("");
+      $("#alertModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+        .find("div.row").addClass("hide");
     });
 
-  // On click of InProgress/Complete -------------------------------------------------------------------------
+  // On click of InProgress/Complete/Complete-Yes ------------------------------------------------------------
+    var is_complete_confirm = false;
+
     $(document).on("click", ".sbtn", function() {
-    // Set which submit button is clicked
       $("#enrollState").val($(this).val());
 
-    // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
+      if ($("#enrollState").val() == "Complete" && !is_complete_confirm) {
+        $("#alertModalLabel").text("ATTENTION!! Be careful. This will freeze enrollment procedure. Do you wish to continue?");
+        $("#alertModal")
+          .removeClass("medium").addClass("small")
+          .addClass("alert")
+          .find("div.row").removeClass("hide");
+        $("#alertModal").foundation('reveal', 'open');
+        return false;
+      }
+
+      // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
       widget_for = "student_enroll"
       class_value = ".node_id." + widget_for + "_values"
       right_drawer_len = $(class_value).size();
@@ -443,75 +315,99 @@
       $("#student_enroll_list").val(student_enroll_list);
 
       // Setting hidden field's value as the selected value from acourse_list (dropdown)
-      $("#announced_courses_list").val($("#acourse_list").val());
+      $("#announced_courses_list").val(acourse_val);
+
+      $("#nussd_course_type").removeAttr("disabled");
+    });
+
+    $(document).on("click", "#btnConfirm", function() {
+      is_complete_confirm = true;
+
+      $("#sbtnComplete").trigger("click");
     });
 {% endblock %}
 
 {% block document_ready %}
   {{block.super}}
 
-  {% if nussd_course_type %}
-  $("select#nussd_course_type").val("{{nussd_course_type}}");
-  $("select#nussd_course_type").trigger("change");
-  {% endif %}
+  var success_state = false;
 
-  // Settings for datepicker widget (with only year) --------------------------------------------------------
-    $(".date_year").datepicker({
-      changeYear: true,
-      dateFormat: 'yy',
-      yearRange: lowerYearLimit + ":" + upperYearLimit,
+  if (nussd_course_type) {
+    $.ajax({
+      url: "{% url 'get_announced_courses_with_ctype' group_id %}",
 
-      onClose: function(dateText, inst) {
-        $(this).val(dateText);
-        
-        var year = dateText;
+      data: {
+        nussd_course_type: nussd_course_type
+      },
 
-        if (year) {
-          year = parseInt(year);
+      type: "GET",
+
+      dataType: "json",
+
+      success: function(data){
+        success_state = data["success"]
+
+        if (success_state){
+          ac_data = data["acourse_ctype_list"]
+          ac_data = JSON.parse(ac_data)
+
+          $("#acourse_list_div").empty();
+          $("#acourse_list_div").append("<ul id='acourse_list'></ul>");
+          $.each(ac_data, function(i,v){
+            ac_val = v["_id"];
+            ac_name=v["name"];
+            start_en = v["attribute_set"][3]["start_enroll"];
+            end_en = v["attribute_set"][4]["end_enroll"];
+            start_en = start_en.split(' ');
+            end_en = end_en.split(' ');
+
+            $("#acourse_list").append("<li id='" + ac_val + "'>" + ac_name + "</li>");
+
+            $("#lblenroll_from").text(start_en[0]);
+            $("#lblenroll_to").text(end_en[0]);
+
+            ann_course_id_list.push(ac_val);
+          });
         }
 
         else {
-          year = currentYear;
+          $("#alertModalLabel").text(data["message"]);
+          $("#alertModal").removeClass("success").removeClass("warning");
+          $("#alertModal").addClass("alert");
+          $("#alertModal").foundation('reveal', 'open');
         }
-
-        $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
-        $(this).datepicker('setDate', new Date(year, 1, 1));
       },
 
-      beforeShow: function() {
-        var year = $(this).val();
+      complete: function () {
+        if (success_state) {
+          if (nussd_course_type == "Foundation Course" && ann_course_id == "") {
+            is_in_open = true;
+            $.each(ann_course_id_list, function(i, v) {
+              if (!(enrollment_open_ann_course_arr.indexOf(v) >= 0)) {
+                is_in_open = false;
+                return false;
+              }
+            });
 
-        if (year) {
-          year = parseInt(year);
+            if (!is_in_open) {
+              $("#enrollment-content-div")
+                .empty()
+                .append("<p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> for Foundation Course !!!</p>")
+            }
+          }
+
+          else {
+            {% if ann_course_id and ann_course_id not in enrollment_open_ann_course_ids %}
+              $("#enrollment-content-div")
+                .empty()
+                .append("<p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> !!!</p>")
+            {% endif %}
+          }
         }
-
-        else {
-          year = currentYear;
-        }
-
-        $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
-        $(this).datepicker('setDate', new Date(year, 1, 1));
       },
-
-      onChangeMonthYear: function(year, month, inst){
-        $(this).val(year);
-      }
     });
-
-  // Retrieve group-name & match with list of college-names from dropdown --------------------------------
-    var group_name_str = "{{group_name_tag|safe}}";
-
-    $("#college option").each(function(){
-      // If group-name matches with that of college-name, 
-      // then select that college from drop-down and disable it
-      if (group_name_str.trim() == $(this).text().trim()) {
-        $(this).attr("selected", true);
-        $(this).parent().attr("disabled", "disabled");
-      }
-    });
+  }
 
   // If Find button is disabled, enable it
-    if ($("#btnFindES").attr("disabled") == "disabled") {
-      $("#btnFindES").removeAttr("disabled");
-    }
+    $("#btnFindES").removeAttr("disabled");
 {% endblock %}

@@ -193,7 +193,9 @@
       <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-
+     {% comment %}
+      <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
+      {% endcomment %}
       <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
         
           {% if all_replies %}
@@ -208,6 +210,7 @@
 
         </a>
       </dd>
+
 
     </dl>
   </h1>
@@ -574,7 +577,19 @@
         </div>
         
       {% endif %}
-      
+      <div id="view-info" style="display:none;">
+       {% get_json node.pk as jsonobj %}
+       {% str_to_dict jsonobj as obj  %}
+       <table>
+   <tbody>
+        {% for key, value in obj.items %}
+        <tr>          
+        <td> {{key}} : {{value}} </td>
+        </tr>
+        {% endfor %}
+    <tbody>   
+</table>
+     </div>
 
       <div id="view-discussion" style="display:none;">
       <!-- discussion content area -->
@@ -962,15 +977,29 @@
 
   $(document).on('click','.view-discussion',function(){
     $("#view-page").css("display", "none");
+    $("#view-info").css("display", "none");
     $(".page-view").removeClass("active");
+    $(".info-view").removeClass("active");
     $(".discussion-view").addClass("active");    
     $("#view-discussion").css("display", "block");
 
   });
 
+  $(document).on('click','.view-info',function(){
+    $("#view-page").css("display", "none");
+    $("#view-discussion").css("display", "none");
+    $(".page-view").removeClass("active");
+    $(".discussion-view").removeClass("active");    
+    $(".info-view").addClass("active");    
+    $("#view-info").css("display", "block");
+
+  });
+
   $(document).on('click','.view-page',function(){
     $("#view-discussion").css("display", "none");
+    $("#view-info").css("display", "none");
     $(".discussion-view").removeClass("active");
+    $(".info-view").removeClass("active");
     $(".page-view").addClass("active");    
     $("#view-page").css("display", "block");
   });
@@ -1090,5 +1119,5 @@
     })
 
   });
-
+  
 </script>

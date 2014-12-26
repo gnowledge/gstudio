@@ -1,0 +1,44 @@
+{% load ndf_tags %}
+{% if page != 0  %}
+
+<div class="content" id="status" align="center">
+<div style="border-style: solid; border-width: 1.5px; border-color: #cfedeb;  background-color: white; height:auto;  width:900px; " >
+
+{% for i in activity_list %}
+  {% get_url i.pk as res_type %}
+   {% if res_type != "None" %}
+   <div id="container_div" >
+    <div id="top_list" class="row" style="border-top-style:solid; border-bottom-style:solid; border-width: 0.1px; border-color:#b0e1c7; width:900px; background-color:#f7fcfb;">
+      <div id="name-div" class="small-1 column">
+          <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
+      </div>
+      <div id="action" class="small-2 column">
+         has  {{i.activity}}
+         
+     </div> 
+     <div id="create_type" class="small-1 column">
+        
+        {% if res_type != "event_app_instance_detail" %}
+        <a href="{% url res_type groupid i.pk   %}">{{i.url}} </a>
+         
+        {% else %}
+        {% get_event_type i as app_set_id %}
+         <a href="{% url res_type groupid app_set_id i.pk  %}">{{i.url}} </a>         
+        {% endif %}
+     </div>
+     <div id="performed on" class="small-5 column" align="left">
+           {{i.created_at|timesince}} ago
+     </div>
+      {% if i.url == 'file' %} <a href="{% url res_type groupid i.pk   %}"> <div> <img src="{% url 'getFileThumbnail' group_id i.pk %}" style="height:100%"> </div>{% endif %}</a>
+         
+    
+    </div>
+   
+   </div>
+{% endif %}   
+{% endfor %}
+</div>
+</div>
+
+</div>
+{% endif %}
