@@ -972,29 +972,48 @@ def check_page_first_creation(request,node):
 	return(count)     
       
 
-def tag_info(request,group_id,tagname):
+def tag_info(request, group_id, tagname=None):
     '''
     Function to get all the resources related to tag
     '''
-    #yesterdays_result = []
-    #week_ago_result = []
-    #keyword_search = []
-    #if request.method == "GET":
-        #keyword = request.GET.get("search","")
-    collection = get_database()[Node.collection_name]
-    cur = collection.Node.find({'tags':'tag1'})
-    records = []
-    for each in cur:
-        records.append(each)
+    a = []
+    keyword_search = []
+    yesterdays_result = []
+    week_ago_result = []
+    today = date.today()
+    yesterdays_search = {date.today()-timedelta(days=1)}
+    week_ago_search = {date.today()-timedelta(days=1)}
+    cur = None
+    if request.method == "GET":
+        keyword = request.GET.get("search","")
+        collection = get_database()[Node.collection_name]
+        cur = collection.Node.find({'tags':{'$regex':keyword}})
+        dic = {date.today():keyword}
+        keyword_search.append(dic)
+        print "dic:",dic
+        print "keyword_search is:",keyword_search
+        #print "keyword", keyword
+        #print "dict:", dic
+
+        #for test in keyword_search:
+            #if test.keys()[0] == today:
+                #a.append(test)
+                #print "a is:",a
+                #print "type of a",type(a)
+        #for each in cur:
+            #print "in cur variable i got the whole search data:",each
+        
+    
+    #else:
+        #collection = get_database()[Node.collection_name]
+        #cur = collection.Node.find({'tags':tagname})
+
+
         
 
 
         
-        #dic = {date.today():keyword}
-        #keyword_search.append(dic)
 
-        #yesterdays_search = {date.today()-timedelta(days=1):keyword}
-        # week_ago_search = {date.today()-timedelta(days=1):keyword}
         #for yesterdays_search in keyword_search:
             #yesterdays_result.append(yesterdays_search)
 
@@ -1007,7 +1026,11 @@ def tag_info(request,group_id,tagname):
     
     # return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id, 'file_collection':file_search}, context_instance=RequestContext(request,{'file_collection':file_search})
 
-    return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id,'records':records},context_instance=RequestContext(request))
+    return render_to_response(
+        "ndf/tag_browser.html", 
+        {'group_id': group_id, 'groupid': group_id, 'cur': cur},
+        context_instance=RequestContext(request)
+    )
       
 
 #code for merging two text Documents
