@@ -57,14 +57,27 @@ def event(request, group_id):
  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":unicode(Eventtype)},{'collection_set': 1})
  
  app_collection_set=[]
+ Mis_admin_list=[]
+ #check for the mis group Admin
+ #check for exam session to be created only by the Mis_Admin
+
+ Add=""
+ Mis_admin=collection.Node.find({"name":"MIS_admin"})
+ Mis_admin_list=Mis_admin[0].group_admin
+ Mis_admin_list.append(Mis_admin[0].created_by)
+ if request.user.id in Mis_admin_list:
+    Add="Allow"  
+ else: 
+    Add= "Stop"    
+ print "radhe",Add   
  if Event_Types:
     for eachset in Event_Types.collection_set:
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
  return render_to_response('ndf/event.html',{'app_collection_set':app_collection_set,
                                              'groupid':group_id,
                                              'group_id':group_id,
-                                             'group_name':group_id
-                                                        
+                                             'group_name':group_id,
+                                             'Add':Add
                                             },
                               context_instance = RequestContext(request)
                           )
@@ -180,15 +193,26 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
             
        #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
+  Add=""
+  Mis_admin=collection.Node.find({"name":"MIS_admin"})
+  Mis_admin_list=Mis_admin[0].group_admin
+  Mis_admin_list.append(Mis_admin[0].created_by)
+  if request.user.id in Mis_admin_list:
+    Add="Allow"  
+  else: 
+    Add= "Stop"    
+
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id,'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'nodes': nodes, 'node': node,
-                        'event_gst':event_gst.name
+                        'event_gst':event_gst.name,
+                        'Add':Add
                         # 'property_order_list': property_order_list
                       }
 
+  
   if batch :
       context_variables.update({'batch':batch}) 
       if course:
@@ -274,12 +298,9 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   iteration=request.POST.get("iteration","")
-  print "hello",iteration,request
   if iteration == "":
         iteration=1
-  print "hello",iteration
   for i in range(int(iteration)):
-   print "////////////////////////////////",i
    if app_set_id:
      event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
      title = event_gst.name
@@ -347,9 +368,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                   field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
 
               if "date_month_day_year" in field_instance["validators"]:
-                     print "coming here"
                      if i>0:
-                       print "coming here toj"
                        field_value=request.POST.get(field_instance["name"]+"_"+str(i))  
                      else:
                         field_value = request.POST[field_instance["name"]]
@@ -377,8 +396,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               for i, field_value in enumerate(field_value_list):
                 field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
-
-              event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value_list)
+              if field_value_list:
+                event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value_list)
               # if isinstance(event_gs_triple_instance, list):
               #   print "\n"
               #   for each in event_gs_triple_instance:
@@ -408,6 +427,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 session_of=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})                     
                 module=collection.Node.one({'_type':"GSystem",'_id':{'$in':session_of.prior_node}})
   event_gs.event_coordinator
+  Add=""
+  Mis_admin=collection.Node.find({"name":"MIS_admin"})
+  Mis_admin_list=Mis_admin[0].group_admin
+  Mis_admin_list.append(Mis_admin[0].created_by)
+  if request.user.id in Mis_admin_list:
+    Add="Allow"  
+  else: 
+    Add= "Stop"    
+
     
   if event_gst.name == u'Classroom Session' or event_gst.name == u'Exam':
      template="ndf/Nussd_event_Schedule.html"
@@ -418,8 +446,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                         'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
-                        'property_order_list': property_order_list
-                        
+                        'property_order_list': property_order_list,
+                        'Add':Add
                       }
 
   if app_set_instance_id:

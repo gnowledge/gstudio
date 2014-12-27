@@ -97,26 +97,63 @@
                  <label  class="right inline">
                     Batches</label>
             </div>
-            <div align="left">
                <div class="small-4 columns" align="left">
                       <select id="event_has_batch" name="event_has_batch">
                       </select>
                       
                </div>
-               <div class="small-7 columns">
+               
+            
+            {% if title == 'Exam' %}  
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+                {{property_order_list.0.1.1.altnames}}
+              </label>
+            </div>
+            <div class="small-2 columns">
+                     {% html_widget groupid node.pk property_order_list.0.1.1 %}
+            </div>
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+                 {{property_order_list.0.1.2.altnames}}
+              </label>
+            </div>
+            <div >
+                     {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
+         </div>   
+         <div class="row">   
+            <div class="small-12 columns" align="center">
+              <input type="submit" id="submit" class="medium button" value="submit" >
+            </div>
+         </div>  
+         {% else %} 
+            <div class="small-7 columns">
                  <label><font color="red">*</font></label>
                </div>
-            
-            </div>
-        </div>
- </div>    
+              
+         
+         {% endif %}
         
+        
+ </div>    
          <div class= "row">
             <div class="small-12 columns" align="center">
                 <input type="button" class="medium button" id="view" value="view">
            </div>
          </div>
-          
+      <div class="hiddensection" hidden>
+      <input id="course_type" name="course_type">
+      <input id="course_name" name="course_name">
+      <input id="Module_name" name="Module_name">
+      <input id="Session" name="Session">
+      <select id="has_attendees" name="has_attendees" multiple="">
+      </select>
+              
+      
+      <input type="hidden" value=1 name="iteration" id="iteration">
+      </div>
+    
     </fieldset>
     <div id="Module-session-section">
       <fieldset >
@@ -241,18 +278,7 @@
 
            
       </div>
-      <div class="hiddensection" hidden>
-      <input id="course_type" name="course_type">
-      <input id="course_name" name="course_name">
-      <input id="Module_name" name="Module_name">
-      <input id="Session" name="Session">
-      <select id="has_attendees" name="has_attendees" multiple=""   >
-      </select>
-              
-      
-      <input type="hidden" value=1 name="iteration" id="iteration">
-      </div>
-      </fieldset>  
+            </fieldset>  
       
          
         <div class="row">
@@ -392,6 +418,7 @@ $(document).ready(function(){
           complete:function(){
                 if(courses != ""){
                 $.each(courses, function(key,val) {
+                     alert("coming here")
                      $('#has_attendees').append(
                      $("<option></option>")
                      .attr("id", "coursename_"+key.id)
@@ -408,7 +435,10 @@ $(document).ready(function(){
 });
 function Enable_Elements()
 {
-    document.getElementById('Module_of').disabled = "";
+  if(  document.getElementById('Module_of'))
+  {
+     document.getElementById('Module_of').disabled = "";
+  }
     document.getElementById('Module-session-section').visible = "True";
     document.getElementById('view').disabled = "";
 }
@@ -423,15 +453,26 @@ function clear_Disable_Elements()
   $('#session_of').empty()
   $('#Module_of').attr('disabled','True') 
   $('#Module_of').empty()
+  if ( '{{title}}' == 'Exam' )
+  {
+      $('#Module-session-section').empty()
+      $('#view').hide()
+  }
+  else{
+
   $('#Module-session-section').hide()
-  $('#view').attr('disabled','True')
-  $('#submit').attr('disabled','True')
   $('#event_coordinator').attr('disabled','True')
   $('#start_time_1').attr('disabled','True')
   $('#end_time_1').attr('disabled','True')
   $('#start_time_1').attr('disabled','True')
   $('#end_time_1').attr('disabled','True')
   $('#end_time').attr('disabled','True')
+
+  }
+
+  $('#view').attr('disabled','True')
+  enable_submit()
+  
 }
 /*var startDtInput = $("#start_time")
 var $a=$('#split-into3')
@@ -679,16 +720,20 @@ $("#session_of").change(function(){
   //document.getElementById('splitsession').disabled="";
   $("#availabel-minutes").append("<label> "+total_session_time+"<label>")
 });
-
-
-$('#event_coordinator').change(function(){
-if (total_session_time == 0){
-    document.getElementById('submit').disabled = "";      
-}
+function enable_submit()
+{
+  if (total_session_time == 0){
+      document.getElementById('submit').disabled = "";      
+  }
 else
 {
-  document.getElementById('submit').disabled = true;      
+    document.getElementById('submit').disabled = true;      
 }
+
+}
+
+$('#event_coordinator').change(function(){
+ enable_submit()
 });
 
 
@@ -936,14 +981,11 @@ var currentYear = currentDate.getFullYear();
       minuteGrid: 15,
       onClose: function(dateText, inst) {
         $(this).val(dateText);
-        date_validation($(this).attr('name'))
-        if (total_session_time == 0){
-           document.getElementById('submit').disabled = "";      
-             }
-        else
+        if ( '{{title}}' != 'Exam' )
         {
-              document.getElementById('submit').disabled = true;      
-        }
+          date_validation($(this).attr('name'))
+          enable_submit()
+        }  
 
           
         var month_year = $(this).val();

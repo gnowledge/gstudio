@@ -42,7 +42,6 @@ table, th, td {
         <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "Read" %}</a></dd>
         <dd ><a href="#view-scheduler-calendar"><i class="fi-calendar"></i>{% trans "Events" %} </a></dd>
         <dd onClick="controler()"><a href="#view-Attendance"><i class="fi-Attendance"></i>{% trans "Attendance" %} </a></dd>
-        {% if event_gst == 'Exam' %}<dd id="Assesmentlist" onClick="Editassesment(this)"><a href="#view-Assesment"><i class="fi-Assesment"></i> {% trans "Assesment" %}</a></dd> {% endif %}
         <dd>
           <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph" %}</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
@@ -305,18 +304,7 @@ table, th, td {
           <a class="close-reveal-modal" >&#215;</a>
           {% include "ndf/map_widget.html" with mode="read" %}
         </div>
-        <!-- Marks widget -->
-        
-        <div class="content" id="view-Assesment" >    
-          
-          <div id="Assesment">
-           
-          </div>
-          
-        
-        </div>
-        
-          
+                  
       </div> <!-- End of class="tabs-content" -->
 
   
@@ -572,7 +560,6 @@ function controler()
                       }
                       else
                       {
-                        
                           EditAttendance(attended)        
                       }
                       
@@ -597,6 +584,7 @@ function EditAttendance(columns)
                       },
                       complete:function(){
                       $('#attendance').append("<table id='forattendance'> </table>")
+
                       drawTable(attended,columns)
                       }
           });
@@ -626,7 +614,7 @@ column4="<th> Assessment Marks </th>"
       {
          
      }
-      if (pass[1] == 4 )
+      if (pass[1] == 4 || pass[1] == 5 )
       {
        column3=""
       }
@@ -656,7 +644,7 @@ $.each(attended, function(key,val) {
       {
          
       }
-      if (pass[1] == 4 )
+      if (pass[1] == 4 ||pass[1] == 5 )
       {
        column3_data=""
        column3data=""
@@ -685,14 +673,6 @@ if ( pass[0] == 'Edit'){
                             else
                              {} 
                   
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
                              }
                      else
                               {
@@ -886,47 +866,14 @@ if (!(Status_attended))
     
  }
     
-    
-function saveassesment()
-{var attendees_list = [];
-var  absentees_list=[];
-var student_marks=[]
-var student_id=[]
-var eventid=[]
-eventid='{{node.pk}}'
-title='{{app_set_id}}'
+ /*   
+alert('{{course.attribute_set.7.max_marks}}')
+$('.Assesstxtbx').focusin(function(){
 
-    var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
-     
-     $('.marks').each(function(){
-       student_marks.push(this.value)
-       student_id.push(this.id)
-     });
-     
-     
-     
-    if(student_marks !="")
-     {
-              $.ajax({
-                      url: url,
-                      type: "POST",
-                      data:{
-                      student_marks:student_marks,
-                      student_id:student_id, 
-                      Event:eventid,
-                      csrfmiddlewaretoken: '{{ csrf_token }}'},
-                      success: function(data){
-                      alert(data);
-                      Editassesment('Assesmentlist')
-                      }
-                    });
-     }
-     else
-     {
-     alert("No Marks Entered")
-     }
- }
-    
+
+alert("change was took palce")
+});
+*/    
 $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
   
   map.invalidateSize();  
