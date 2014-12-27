@@ -138,7 +138,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   
   nodes = None
   if app_set_id:
-    print app_set_id,"h"
     event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = event_gst.name
   
@@ -168,7 +167,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     val=False
     for i in node.relation_set:
        if unicode('event_has_batch') in i.keys():
-            print i['event_has_batch']
             batch=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
             batch_relation=collection.Node.one({'_type':"GSystem",'_id':ObjectId(batch._id)},{'relation_set':1})
             for i in batch_relation['relation_set']:
@@ -276,7 +274,9 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   iteration=request.POST.get("iteration","")
-  for i in range(1):
+  if iteration == "":
+        iteration=1
+  for i in range(int(iteration)):
    if app_set_id:
      event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
      title = event_gst.name
@@ -345,7 +345,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
               if "date_month_day_year" in field_instance["validators"]:
                      if i>0:
-                       field_value=request.POST.get(field_instance["name"]+"_"+"1")  
+                       field_value=request.POST.get(field_instance["name"]+"_"+str(i))  
                      else:
                         field_value = request.POST[field_instance["name"]]
                         
@@ -384,7 +384,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
-    if i==0:
+    if i==( (int(iteration))-1):
      return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
   event_gs.get_neighbourhood(event_gs.member_of)
   course=[]
