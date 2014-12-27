@@ -41,8 +41,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata
-from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
@@ -3928,41 +3927,40 @@ def insert_picture(request, group_id):
 # =============================================================================
 
 def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
- assigneelist=request.POST.getlist("Assignee[]","")
- absentlist=request.POST.getlist("Absents[]","")
+ #assigneelist=request.POST.getlist("Assignee[]","")
+ #absentlist=request.POST.getlist("Absents[]","")
  Event=   request.POST.getlist("Event","")
- student_marks=   request.POST.getlist("student_marks[]","")
- student_id=   request.POST.getlist("student_id[]","")
-
- oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
- j=0
- student_details=collection.Node.find({"_type":"AttributeType","name":"performance_record"})
- #code for assesment 
- if student_marks:
-     for i in (student_id):
-        student=collection.Node.one({"_id":ObjectId(i)})
-        student_dict={}
-        student_dict.update({"marks":student_marks[j],'Event':ObjectId(Event[0])})
-        create_gattribute(ObjectId(i),student_details[0], student_dict)
-        j=j+1
-     return HttpResponse("Assesment Marks Saved")    
- else:       
-        #code for assesment    
-        create_grelation(ObjectId(app_set_instance_id), oid,assigneelist)
-        #create relation for student record
-        student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
+ #student_marks=   request.POST.getlist("student_marks[]","")
+ #student_id=   request.POST.getlist("student_id[]","")
  
-        for i in (assigneelist):
-            student=collection.Node.one({"_id":ObjectId(i)})
-            dict1={}
-            dict1.update({"atandance":"Present"})
-            create_gattribute(ObjectId(i),student_details[0], dict1)
-        for i in (absentlist):
-            student=collection.Node.one({"_id":ObjectId(i)})
-            student_dict={}
-            student_dict.update({"atandance":"Absent",'Event':ObjectId(Event[0])})
-            create_gattribute(ObjectId(i),student_details[0], student_dict)
-        return HttpResponse("attendance taken")
+ Event_attended_by=request.POST.getlist("Event_attended_by[]","")
+ 
+ oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
+ Assignment_rel=collection.Node.find({"_type":"AttributeType","name":"Assignment_marks_record"})
+ Assessmentmarks_rel=collection.Node.find({"_type":"AttributeType","name":"Assessment_marks_record"})
+ student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
+ #code for saving Attendance and Assesment of Assignment And Assesment Session
+ attendedlist=[]
+ print Event_attended_by
+ for info in Event_attended_by:
+     a=ast.literal_eval(info)
+     if (a['Name'] != 'undefined'):
+      student_dict={}
+      if (a['save'] == '2' or a['save'] == '3'):
+        student_dict.update({"marks":a['Attendance_marks'],'Event':ObjectId(Event[0])})
+        create_gattribute(ObjectId(a['Name']),Assignment_rel[0], student_dict)
+      if(a['save'] == '2' or  a['save'] == '4'):
+        student_dict.update({"marks":a['Assessment_marks'],'Event':ObjectId(Event[0])})
+        create_gattribute(ObjectId(a['Name']),Assessmentmarks_rel[0], student_dict)
+      create_gattribute(ObjectId(a['Name']),student_details[0],{"atandance":a['Presence'],'Event':ObjectId(Event[0])})
+      
+      if(a['Presence'] == 'True'):
+          attendedlist.append(a['Name'])
+ create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)    
+        
+  
+ return HttpResponse("Details Entered")  
+        
 def fetch_course_name(request, group_id,Course_type):
   courses=collection.Node.find({"attribute_set.nussd_course_type":unicode(Course_type)})
   
@@ -4019,15 +4017,21 @@ def fetch_course_session(request, group_id,Course_name):
   courses=collection.Node.find({"_id":ObjectId(Course_name)})
   dict1={}
   list1=[]
-  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})
+  event_type_id=request.GET.get("app_set_id","")
+  event_type_node=collection.Node.one({"_id":ObjectId(event_type_id)})
+  
+  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})    
   for i in course_modules:
-    dict1.update({"name":i.name})
-    dict1.update({"id":str(i._id)})
-    dict1.update({"minutes":'60'})
-    list1.append(dict1)
-    dict1={}
-    
+      dict1.update({"name":i.name})
+      dict1.update({"id":str(i._id)})
+      for j in i.attribute_set:
+          if "course_structure_minutes" in j.keys()  :
+              dict1.update({"minutes":str(j["course_structure_minutes"])})
+      list1.append(dict1)
+      dict1={}
   return HttpResponse(json.dumps(list1))
+    
+  
 
 def fetch_course_batches(request, group_id,Course_name):
   #courses=collection.Node.one({"_id":ObjectId(Course_name)})
@@ -4048,8 +4052,9 @@ def fetch_course_batches(request, group_id,Course_name):
     return HttpResponse(json.dumps(list1))
 
 def save_csv(request,group_id,app_set_instance_id=None):
-        column_header = [u'Name', 'Presence']
+        #column_header = [u'Name', 'Presence','Attendance_marks','Assessment_marks']
         json_data=request.POST.getlist("attendance[]","")
+        column_header=request.POST.getlist("column[]","")
         t = time.strftime("%c").replace(":", "_").replace(" ", "_")
         filename = "csv/" + "Attendance_data_" + t + ".csv"
         filepath = os.path.join(STATIC_ROOT, filename)
@@ -4060,11 +4065,13 @@ def save_csv(request,group_id,app_set_instance_id=None):
         with open(filepath, 'wb') as csv_file:
           fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
           fw.writerow(dict((col,col) for col in column_header))
+          
           for row in list(json_data):
+            print "data",row
             v = {}
-            v["Name"] = ast.literal_eval(row)['Name']
             fw.writerow(ast.literal_eval(row))
         return HttpResponse((STATIC_URL + filename))
+        
 def get_assessment(request,group_id,app_set_instance_id):
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     node.get_neighbourhood(node.member_of)
@@ -4107,7 +4114,7 @@ def get_attendees(request,group_id,node):
  attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}})
  for i in attendees_id:
     #if i["group_admin"]:
-    #  User_info=(collection.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
+    #  User_info=(collectigeton.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
     #else:
     User_info=(collection.Node.find({'_id':ObjectId(i._id)}))
     for i in User_info:
@@ -4168,32 +4175,86 @@ def get_attendance(request,group_id,node):
  #the below code would compare between the supposed attendees and has_attended the event
  #and accordingly mark their presence or absence for the event
   
+ node.get_neighbourhood(node.member_of)
+ Assess_marks_list=[]
+ Assign_marks_list=[]
+ Assesslist=[]
+ marks_list=[]
+ val=False
+ assign=False
+ asses=False
  for i in attendee_name_list:
     if (i._id in attendieslist):
+      attendees=collection.Node.one({"_id":ObjectId(i._id)})
+      dict1={}
+      dict2={}
+      for j in  attendees.attribute_set:
+            
+            if   unicode('Assignment_marks_record') in j.keys():
+               if (str(j['Assignment_marks_record']['Event']) == str(node._id)) is True:
+                  val=True
+                  assign=True
+                  dict1.update({'marks':j['Assignment_marks_record']['marks']})
+               else:
+                  dict1.update({'marks':"0"})
+            if  unicode('Assessment_marks_record') in j.keys():
+               if(str(j['Assessment_marks_record']['Event']) == str(node._id)) is True:
+                  val=True
+                  asses=True
+                  dict2.update({'marks':j['Assessment_marks_record']['marks']})
+               else:
+                  dict2.update({'marks':"0"})         
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
-      temp_attendance.update({'presence':'True'})
+      temp_attendance.update({'presence':'Present'})
+      temp_attendance.update({'Assignment_marks':dict1['marks']})
+      temp_attendance.update({'Assessment_marks':dict2['marks']})
       attendance.append(temp_attendance)
     else:
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
-      temp_attendance.update({'presence':'False'})
+      temp_attendance.update({'presence':'Absent'})
+      temp_attendance.update({'Assignment_marks':"0"})
+      temp_attendance.update({'Assessment_marks':"0"})
       attendance.append(temp_attendance) 
     temp_attendance={}
  return HttpResponse(json.dumps(attendance))
  
 def attendees_relations(request,group_id,node):
- event_has_attended=collection.Node.find({'_id':ObjectId(node)},{'relation_set':1})
- a=[]
+ event_has_attended=collection.Node.find({'_id':ObjectId(node)})
+ column_list=[]
+ column_count=0
+ course_assignment=False
+ course_assessment=False
  for i in event_has_attended[0].relation_set:
       #True if (has_attended relation is their means attendance is already taken) 
       #False (signifies attendence is not taken yet for the event)
       if ('has_attended' in i):
-        a="True"
+        a = "True"
       else:
-        a="False"  
-        
- return HttpResponse(json.dumps(a)) 
+        a = "False"   
+      if ('session_of' in i):
+         session=collection.Node.one({"_id":{'$in':i['session_of']}})
+         for i in session.attribute_set:
+              if unicode('course_structure_assignment') in i:   
+               if i['course_structure_assignment'] == True:
+                  course_assignment=True
+              if unicode('course_structure_assessment') in i:    
+               if i['course_structure_assessment'] == True:
+                  course_assessment=True
+                  
+ if (course_assessment == True and course_assignment == True) :
+    column_count=2
+ if course_assessment == True:
+    column_count=4
+ if course_assignment ==True:
+    column_count=3
+ if (course_assignment == False and course_assessment ==False ):                        
+    column_count=1
+ column_list.append(a)
+ column_list.append(column_count)
+
+ return HttpResponse(json.dumps(column_list)) 
         
 def page_scroll(request,group_id,page):
 
