@@ -1616,7 +1616,6 @@ def get_data_for_event_task(request,group_id):
     for j in obj:
         nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
         for i in nodes:
-          print i
           attr_value={}
           event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
           attr_value.update({'url':event_url})
@@ -1660,7 +1659,6 @@ def get_data_for_event_task(request,group_id):
                   attr_value.update({'id':task_node._id})
                   attr_value.update({'title':task_node.name})
                   if attr1:
-                        print "hello",attr1.object_value
                         date=datetime.datetime(int(attr1.object_value[6:10]),int(attr1.object_value[0:2]),int(attr1.object_value[3:5]))
                         formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
                         attr_value.update({'start':formated_date})
@@ -3802,7 +3800,6 @@ def get_students_for_batches(request, group_id):
       btn_id = request.GET.get('btn_id', "")
       batch_id = request.GET.get('node_id', "")
       ac_id = request.GET.get('ac_id', "")
-      print "\n\nAC id",ac_id
 
       batch_name_index = 1
       batches_for_same_course = []
@@ -3832,7 +3829,7 @@ def get_students_for_batches(request, group_id):
         if rel and rel.has_key("acourse_for_college"):
           college_id = rel["acourse_for_college"][0]
           break
-      print "\n\ncolg id with name",college_id
+
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
       res = collection.Node.find(
         {
@@ -3846,7 +3843,7 @@ def get_students_for_batches(request, group_id):
         },
         {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
       ).sort("name", 1) 
-      print "\n\n",res.count()
+
       drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
       drawer_template_context["widget_for"] = "new_create_batch"
       drawer_widget = render_to_string(
@@ -3941,7 +3938,7 @@ def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_
  student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
- print Event_attended_by
+
  for info in Event_attended_by:
      a=ast.literal_eval(info)
      if (a['Name'] != 'undefined'):
@@ -4067,7 +4064,6 @@ def save_csv(request,group_id,app_set_instance_id=None):
           fw.writerow(dict((col,col) for col in column_header))
           
           for row in list(json_data):
-            print "data",row
             v = {}
             fw.writerow(ast.literal_eval(row))
         return HttpResponse((STATIC_URL + filename))
@@ -4207,8 +4203,10 @@ def get_attendance(request,group_id,node):
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
       temp_attendance.update({'presence':'Present'})
-      temp_attendance.update({'Assignment_marks':dict1['marks']})
-      temp_attendance.update({'Assessment_marks':dict2['marks']})
+      if dict1.has_key('marks'):
+        temp_attendance.update({'Assignment_marks':dict1['marks']})
+      if dict2.has_key('marks'):
+        temp_attendance.update({'Assessment_marks':dict2['marks']})
       attendance.append(temp_attendance)
     else:
       temp_attendance.update({'id':str(i._id)})
@@ -4243,14 +4241,15 @@ def attendees_relations(request,group_id,node):
                if i['course_structure_assessment'] == True:
                   course_assessment=True
                   
- if (course_assessment == True and course_assignment == True) :
-    column_count=2
  if course_assessment == True:
-    column_count=4
- if course_assignment ==True:
-    column_count=3
- if (course_assignment == False and course_assessment ==False ):                        
-    column_count=1
+    column_count = 4
+ if course_assignment == True:
+    column_count = 3
+ if (course_assessment == True and course_assignment == True):
+    column_count = 2
+ if (course_assignment == False and course_assessment == False):                        
+    column_count = 1
+ 
  column_list.append(a)
  column_list.append(column_count)
 
@@ -4317,7 +4316,6 @@ def get_batches_with_acourse(request, group_id):
       # Fetch field(s) from GET object
       announced_course_id = request.GET.get("ac_id", "")
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
-      print "\n\n****",announced_course_id
       if(ObjectId(group_id) == mis_admin._id):
         pass
       else:
