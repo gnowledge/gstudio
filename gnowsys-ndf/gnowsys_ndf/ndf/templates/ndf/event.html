@@ -30,7 +30,7 @@
 <ul class="side-nav">
 {% for each in app_collection_set %}
 
-     {% if app_set_id == each|safe %}
+     {% if app_set_isd == each|safe %}
       {% if '/new/' in request.path %}
       <li class="active-app-set-edit">
       {% else %}

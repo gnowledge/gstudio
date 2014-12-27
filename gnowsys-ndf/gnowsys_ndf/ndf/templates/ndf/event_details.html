@@ -628,8 +628,8 @@ $.each(attended, function(key,val) {
        column2_data="<td> " + val.presence + "</td >"
        column3_data="<td class='Assigntxtbx'> " + val.Assignment_marks + "</td >"
        column4_data= "<td class='Assesstxtbx'> "  + val.Assessment_marks + "</td > " 
-       column3data="<td><input type='text' class='Assigntxtbx' id="+val.id+"Assignment" + " value= "+ val.Assignment_marks + " </td>"
-       column4data="<td> <input type='text' class='Assesstxtbx' id="+val.id+"Assessment" +" value= "+ val.Assessment_marks + " </td>"  
+       column3data="<td><input type='text' onblur='validate_txtbx(this)' class='Assigntxtbx' id="+val.id+"Assignment" + " value= "+ val.Assignment_marks + " </td>"
+       column4data="<td> <input type='text' onblur='validate_txtbx(this)' class='Assesstxtbx' id="+val.id+"Assessment" +" value= "+ val.Assessment_marks + " </td>"  
       
       
 
@@ -866,14 +866,16 @@ if (!(Status_attended))
     
  }
     
- /*   
-alert('{{course.attribute_set.7.max_marks}}')
-$('.Assesstxtbx').focusin(function(){
-
-
-alert("change was took palce")
-});
-*/    
+   
+function validate_txtbx(input)
+{ 
+  
+  if (Number(input.value) >= Number('{{course.attribute_set.6.min_marks}}') && Number(input.value) <= Number('{{course.attribute_set.7.max_marks}}') )
+  {
+    alert("validatewa hoigava")
+  }
+}
+    
 $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
   
   map.invalidateSize();  
