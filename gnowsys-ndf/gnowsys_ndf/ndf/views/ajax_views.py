@@ -3048,7 +3048,6 @@ def get_announced_courses_with_ctype(request, group_id):
              NUSSD-Courses [if match not found]
   """
   response_dict = {'success': False, 'message': ""}
-  
   try:
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
@@ -3078,12 +3077,10 @@ def get_announced_courses_with_ctype(request, group_id):
                                          'group_set':ObjectId(group_id),
                                         'attribute_set.nussd_course_type': nussd_course_type
                                         })
-
       else:
         colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
         req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
         #Get college id of corresponding college_group_id
-        
         acourse_for_college_RT = collection.Node.one({'_type': "RelationType", 'name': "acourse_for_college"})
         relation_coll = collection.Triple.find(
           {'_type': 'GRelation', 'relation_type.$id': acourse_for_college_RT._id, 'right_subject': req_colg_id._id}
@@ -3093,6 +3090,8 @@ def get_announced_courses_with_ctype(request, group_id):
           ac_of_colg.append(ObjectId(each.subject))
           # Courses announced for this college id
 
+        
+
         # Type-cast fetched field(s) into their appropriate type
         nussd_course_type = unicode(nussd_course_type)
          
@@ -3101,8 +3100,9 @@ def get_announced_courses_with_ctype(request, group_id):
           {
             'member_of': announced_course_gt._id, '_id':{'$in':ac_of_colg},
             'attribute_set.nussd_course_type': nussd_course_type,
-            'attribute_set.start_enroll':{'$lte': curr_date},
-            'attribute_set.end_enroll':{'$gte': curr_date}
+            'status':u"PUBLISHED"
+            # 'attribute_set.start_enroll':{'$lte': curr_date},
+            # 'attribute_set.end_enroll':{'$gte': curr_date}
           }
         )
 
@@ -3115,12 +3115,11 @@ def get_announced_courses_with_ctype(request, group_id):
           
           acourse_ctype_list.append(each_ac)
         response_dict["success"] = True      
-      
+        info_message = "Announced Courses are available"
       else:
-        error_message = "No Announced Course found"
-        raise Exception(error_message)
-        info_message = "No Announced Courses for enrollment are available !!!"
-        response_dict["message"] = info_message
+        response_dict["success"] = False
+        info_message = "No Announced Courses are available"
+      response_dict["message"] = info_message
 
       response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list, cls=NodeJSONEncoder)
 
@@ -3804,6 +3803,7 @@ def get_students_for_batches(request, group_id):
       btn_id = request.GET.get('btn_id', "")
       batch_id = request.GET.get('node_id', "")
       ac_id = request.GET.get('ac_id', "")
+      print "\n\nAC id",ac_id
 
       batch_name_index = 1
       batches_for_same_course = []
@@ -3833,21 +3833,21 @@ def get_students_for_batches(request, group_id):
         if rel and rel.has_key("acourse_for_college"):
           college_id = rel["acourse_for_college"][0]
           break
-
+      print "\n\ncolg id with name",college_id
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
       res = collection.Node.find(
         {
           '_id': {'$nin': batch_member_list},
           'member_of': student._id,
-          '$or': [
-            {'group_set': ObjectId(group_id)},
-            {'relation_set.student_belongs_to_college': college_id}
-          ],
+          # '$or': [
+          #   {'group_set': ObjectId(group_id)},
+          #   {'relation_set.student_belongs_to_college': college_id}
+          # ],
           'relation_set.selected_course': ObjectId(ac_id)
         },
         {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
       ).sort("name", 1) 
-
+      print "\n\n",res.count()
       drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
       drawer_template_context["widget_for"] = "new_create_batch"
       drawer_widget = render_to_string(
@@ -4238,3 +4238,47 @@ def page_scroll(request,group_id,page):
                                   },
                                   context_instance = RequestContext(request)
       )
+
+def get_batches_with_acourse(request, group_id):
+  """
+  This view returns list of batches that match given criteria
+  along with Announced-course for which match doesn't exists.
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  """
+  response_dict = {'success': False, 'message': ""}
+  batches_list = []
+  batch_gst = collection.Node.one({'_type':'GSystemType','name':'Batch'})
+  try:
+    if request.is_ajax() and request.method == "GET":
+      # Fetch field(s) from GET object
+      announced_course_id = request.GET.get("ac_id", "")
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
+      print "\n\n****",announced_course_id
+      if(ObjectId(group_id) == mis_admin._id):
+        pass
+      else:
+        colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
+        req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
+        b = collection.Node.find({'member_of':batch_gst._id,'relation_set.has_course':ObjectId(announced_course_id)})
+        for each in b:
+          batches_list.append(each)
+
+        response_dict["success"] = True      
+        info_message = "Batch for this course is available"
+      response_dict["message"] = info_message
+
+      
+      response_dict["batches_list"] = json.dumps(batches_list, cls=NodeJSONEncoder)
+
+      return HttpResponse(json.dumps(response_dict))
+
+    else:
+      error_message = " BatchFetchError: Either not an ajax call or not a GET request!!!"
+      return HttpResponse(json.dumps({'message': " BatchCourseFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+  except Exception as e:
+    error_message = "\n BatchFetchError: " + str(e) + "!!!"
+    return HttpResponse(json.dumps({'message': error_message}))
