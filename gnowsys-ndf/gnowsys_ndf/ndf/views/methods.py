@@ -1871,12 +1871,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             upsert=False, multi=False
           )
 
-          collection.update(
-            {'_id': right_subject_id_or_list}, 
-            {'$addToSet': {'relation_set': {relation_type_node.inverse_name: [subject_id]}}}, 
-            upsert=False, multi=False
-          )
-
         else:
           collection.update(
             {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
@@ -1884,6 +1878,23 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             upsert=False, multi=False
           )
 
+        right_subject = collection.Node.one({'_id': right_subject_id_or_list}, {'relation_set': 1})
+
+        inv_rel_exists = False
+        for each_dict in right_subject.relation_set:
+          if relation_type_node.inverse_name in each_dict:
+            inv_rel_exists = True
+            break
+
+        if not inv_rel_exists:
+          # Fetch corresponding document & append into it's relation_set
+          collection.update(
+            {'_id': right_subject_id_or_list}, 
+            {'$addToSet': {'relation_set': {relation_type_node.inverse_name: [subject_id]}}}, 
+            upsert=False, multi=False
+          )
+
+        else:
           collection.update(
             {'_id': right_subject_id_or_list, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
             {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
