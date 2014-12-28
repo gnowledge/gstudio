@@ -1813,7 +1813,7 @@ def deletion_instances(request, group_id):
 
     for each in  deleteobjects.split(","):
       delete_list = []
-      node = collection.Node.one({ '_id': ObjectId(each)})
+      node = collection.Node.one({'_id': ObjectId(each)})
       left_relations = collection.Node.find({"_type":"GRelation", "subject":node._id})
       right_relations = collection.Node.find({"_type":"GRelation", "right_subject":node._id})
       attributes = collection.Node.find({"_type":"GAttribute", "subject":node._id})
@@ -1821,20 +1821,46 @@ def deletion_instances(request, group_id):
       # When confirm holds "yes" value, all given node(s) is/are deleted.
       # Otherwise, required information is provided for confirmation before deletion.
       if confirm:
-        # Deleting GRelations where given node is used as right subject
-        for eachobject in right_relations:
-          # If given node is used in relationship with any other node (as right_subject)
-          # Then this node's ObjectId must be removed from relation_set field of other node
-          collection.update({'_id': eachobject.subject, 'relation_set.'+eachobject.relation_type.name: {'$exists': True}}, 
-            {'$pull': {'relation_set.$.'+eachobject.relation_type.name: node._id}}, 
+        # Deleting GRelation(s) where given node is used as "subject"
+        for each_left_gr in left_relations:
+          # Special case
+          if each_left_gr.relation_type.name == "has_login":
+            auth_node = collection.Node.one(
+              {'_id': each_left_gr.right_subject},
+              {'created_by': 1}
+            )
+
+            if auth_node:
+              collection.update(
+                {'_type': "Group", '$or': [{'group_admin': auth_node.created_by}, {'author_set': auth_node.created_by}]},
+                {'$pull': {'group_admin': auth_node.created_by, 'author_set': auth_node.created_by}},
+                upsert=False, multi=True
+              )
+
+          # If given node is used in relationship with any other node (as subject)
+          # Then given node's ObjectId must be removed from "relation_set" field 
+          # of other node, referred under key as inverse-name of the RelationType
+          collection.update(
+            {'_id': each_left_gr.right_subject, 'relation_set.'+each_left_gr.relation_type.inverse_name: {'$exists': True}}, 
+            {'$pull': {'relation_set.$.'+each_left_gr.relation_type.inverse_name: node._id}}, 
             upsert=False, multi=False
           )
-          eachobject.delete()
+          each_left_gr.delete()
 
-        all_associates = list(left_relations)+list(attributes)
-        # Deleting GAttributes and GRelations where given node is used as left subject
-        for eachobject in all_associates:
-          eachobject.delete()
+        # Deleting GRelation(s) where given node is used as "right_subject"
+        for each_right_gr in right_relations:
+          # If given node is used in relationship with any other node (as subject)
+          # Then given node's ObjectId must be removed from "relation_set" field 
+          # of other node, referred under key as name of the RelationType
+          collection.update({'_id': each_right_gr.subject, 'relation_set.'+each_right_gr.relation_type.name: {'$exists': True}}, 
+            {'$pull': {'relation_set.$.'+each_right_gr.relation_type.name: node._id}}, 
+            upsert=False, multi=False
+          )
+          each_right_gr.delete()
+
+        # Deleting GAttribute(s)
+        for each_ga in attributes:
+          each_ga.delete()
         
         # Finally deleting given node
         node.delete()
@@ -1851,9 +1877,9 @@ def deletion_instances(request, group_id):
             if each.relation_type.altnames:
               if ";" in each.relation_type.altnames:
                 alt_names = each.relation_type.altnames.split(";")[0]
-            list_rel.append(alt_names + ": " + rname)
+            list_rel.append(alt_names + " (Relation): " + rname)
 
-          delete_list.append({'left_relations':list_rel})
+          delete_list.append({'left_relations': list_rel})
         
         if right_relations :
           list_rel = []
@@ -1866,9 +1892,9 @@ def deletion_instances(request, group_id):
             if each.relation_type.altnames:
               if ";" in each.relation_type.altnames:
                 alt_names = each.relation_type.altnames.split(";")[1]
-            list_rel.append(alt_names + ": " + lname)
+            list_rel.append(alt_names + " (Inverse-Relation): " + lname)
 
-          delete_list.append({'right_relations':list_rel})
+          delete_list.append({'right_relations': list_rel})
         
         if attributes :
           list_att = []
@@ -1876,11 +1902,11 @@ def deletion_instances(request, group_id):
             alt_names = each.attribute_type.name
             if each.attribute_type.altnames:
               alt_names = each.attribute_type.altnames
-            list_att.append(alt_names + ": " + str(each.object_value))
+            list_att.append(alt_names + " (Attribute): " + str(each.object_value))
 
-          delete_list.append({'attributes':list_att})
+          delete_list.append({'attributes': list_att})
         
-        send_dict.append({"title":node.name,"content":delete_list})
+        send_dict.append({"title": node.name, "content": delete_list})
     
     if confirm:
       return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")
