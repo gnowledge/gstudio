@@ -275,10 +275,16 @@ function ShowSplits()
 
   }
 function GenerateSplits(splits){
-  document.getElementById('start_time').value = ""
-  document.getElementById('end_time').value = ""
-  $("#date-splits").empty();
+  //document.getElementById('start_time').value = ""
+  //document.getElementById('end_time').value = ""
   var i=1;
+  if (splits == 2)
+  {
+      $("#date-splits").empty();
+  
+  }
+  if( !(document.getElementById("start_time_1")) )
+  {
   $("#date-splits").append("<div class='row'> <div class='small-1 columns' align='right' > <label> <b>Split -1 </b></label> </div></div>")
   $("#date-splits").append("<div class='row' align='left'>"+ 
   " <div class='small-1 columns' align='center' >"+ 
@@ -293,7 +299,7 @@ function GenerateSplits(splits){
    ""+ "<div >"+
      "<input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
       "</div></div>")
-   
+  } 
    if(splits == '3')
    {
  $("#date-splits").append("</br>")
@@ -305,13 +311,13 @@ function GenerateSplits(splits){
   "<div class='small-2 columns' > "+
      "<input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_2' readonly=''>"+
   "</div>"+
-  
-  " <div class='small-1 columns'>"+
+   " <div class='small-1 columns'>"+
       "<label> End time </label></div>"+
    ""+ "<div >"+
      "<input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_2' readonly=''>"+
       "</div></div>")
-  $("#iteration").attr('value','3')
+   
+    $("#iteration").attr('value','3')
   }
   else
   {
@@ -319,10 +325,12 @@ function GenerateSplits(splits){
   }
      datetime()
   
+   
 }
 
 
 $(document).ready(function(){
+ document.getElementById('form-edit-node').reset()
  datetime()
  clear_Disable_Elements();
  var event_details=""
@@ -841,7 +849,11 @@ function show_hide_date(str)
     if (!(str))
     {  
        document.getElementById('select_split').hidden=true 
-        $("#iteration").attr('value','1')
+       document.getElementById('splitsession').checked=false
+       document.getElementById('chkbxsplit-2').checked=false
+       document.getElementById('chkbxsplit-3').checked=false
+       $("#date-splits").empty();
+       $("#iteration").attr('value','1')
     }
     if(str ==1)
     {
