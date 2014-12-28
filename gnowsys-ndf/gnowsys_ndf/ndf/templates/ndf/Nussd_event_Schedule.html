@@ -821,7 +821,6 @@ function date_validation(name)
       {
           alert("Please schedule session within given allotted time!")
       }
-       document.getElementById('splitsession').disabled=true;
        show_hide_date(str)     
      }
      else
@@ -864,6 +863,7 @@ function show_hide_date(str)
        document.getElementById('splitsession').checked=false
        document.getElementById('chkbxsplit-2').checked=false
        document.getElementById('chkbxsplit-3').checked=false
+       document.getElementById('splitsession').disabled=true;
        $("#date-splits").empty();
        $("#iteration").attr('value','1')
     }
@@ -875,7 +875,6 @@ function show_hide_date(str)
     }
     
 }
-
 function reset_session_variable(str)
 {
 var start_time=""
@@ -883,13 +882,27 @@ var end_time=""
 
   if (!(str)){
         total_session_time=$('#session_of option:selected').attr('minutes')
-
+       if (document.getElementById('start_time_1')){
+       document.getElementById('start_time_1').value=""}
+       if ( document.getElementById('end_time_1')){
+       document.getElementById('end_time_1').value=""
+       }
+       if(document.getElementById('start_time_2')){
+       document.getElementById('start_time_2').value=""}
+       if ( document.getElementById('end_time_2')){
+       document.getElementById('end_time_2').value=""
+       }
         }
   if(str == 1)
   { 
      total_session_time=$('#session_of option:selected').attr('minutes')
      start_time=document.getElementById('start_time').value
      end_time=document.getElementById('end_time').value
+     if(document.getElementById('start_time_2')){
+       document.getElementById('start_time_2').value=""}
+       if ( document.getElementById('end_time_2')){
+       document.getElementById('end_time_2').value=""
+       }  
      deduct_time(start_time,end_time) 
   } 
   if (str == 2){
