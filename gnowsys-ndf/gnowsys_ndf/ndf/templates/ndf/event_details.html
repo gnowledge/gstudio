@@ -436,7 +436,6 @@ table, th, td {
 {% endblock %}
 
 {% block script %}
-// <script type="text/javascript">
 
 // $(document).on('click',".checkedAll",function(){
 //   if($(this).is(":checked")==true){
@@ -750,7 +749,6 @@ else
 
 function Download(save)
 {
-alert(save)
 var Event_attended_by = [];
 var column=[]    
     var table = document.getElementById("forattendance");
@@ -797,7 +795,6 @@ var column=[]
       /*var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'","Attendance_marks":"'+String(Attendance_marks) + '","Assessment_marks":"' + String(Assessment_marks) +'","save":"'+save_val +'"}'
     */
    values = values + '"}'
-   alert(values)
    Event_attended_by.push(values)
     });
 
@@ -840,7 +837,6 @@ var eventid=[]
 var Event_attended_by=[]
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
-  alert(save_val)
     var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
     /*$(':checkbox:checked.chkbx').each(function () {
      attendees_list.push(this.value);
@@ -925,7 +921,6 @@ title='{{app_set_id}}'
                       Event:eventid,
                       csrfmiddlewaretoken: '{{ csrf_token }}'},
                       success: function(data){
-                      alert(data);
                       Editassesment('Assesmentlist')
                       }
                     });
@@ -940,7 +935,4 @@ $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[d
   
   map.invalidateSize();  
 });
-
-
-// </script>
 {% endblock %}	

@@ -1616,7 +1616,6 @@ def get_data_for_event_task(request,group_id):
     for j in obj:
         nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
         for i in nodes:
-          print i
           attr_value={}
           event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
           attr_value.update({'url':event_url})
@@ -1660,7 +1659,6 @@ def get_data_for_event_task(request,group_id):
                   attr_value.update({'id':task_node._id})
                   attr_value.update({'title':task_node.name})
                   if attr1:
-                        print "hello",attr1.object_value
                         date=datetime.datetime(int(attr1.object_value[6:10]),int(attr1.object_value[0:2]),int(attr1.object_value[3:5]))
                         formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
                         attr_value.update({'start':formated_date})
@@ -3047,7 +3045,6 @@ def get_announced_courses_with_ctype(request, group_id):
              NUSSD-Courses [if match not found]
   """
   response_dict = {'success': False, 'message': ""}
-  
   try:
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
@@ -3077,12 +3074,10 @@ def get_announced_courses_with_ctype(request, group_id):
                                          'group_set':ObjectId(group_id),
                                         'attribute_set.nussd_course_type': nussd_course_type
                                         })
-
       else:
         colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
         req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
         #Get college id of corresponding college_group_id
-        
         acourse_for_college_RT = collection.Node.one({'_type': "RelationType", 'name': "acourse_for_college"})
         relation_coll = collection.Triple.find(
           {'_type': 'GRelation', 'relation_type.$id': acourse_for_college_RT._id, 'right_subject': req_colg_id._id}
@@ -3092,6 +3087,8 @@ def get_announced_courses_with_ctype(request, group_id):
           ac_of_colg.append(ObjectId(each.subject))
           # Courses announced for this college id
 
+        
+
         # Type-cast fetched field(s) into their appropriate type
         nussd_course_type = unicode(nussd_course_type)
          
@@ -3100,8 +3097,9 @@ def get_announced_courses_with_ctype(request, group_id):
           {
             'member_of': announced_course_gt._id, '_id':{'$in':ac_of_colg},
             'attribute_set.nussd_course_type': nussd_course_type,
-            'attribute_set.start_enroll':{'$lte': curr_date},
-            'attribute_set.end_enroll':{'$gte': curr_date}
+            'status':u"PUBLISHED"
+            # 'attribute_set.start_enroll':{'$lte': curr_date},
+            # 'attribute_set.end_enroll':{'$gte': curr_date}
           }
         )
 
@@ -3114,12 +3112,11 @@ def get_announced_courses_with_ctype(request, group_id):
           
           acourse_ctype_list.append(each_ac)
         response_dict["success"] = True      
-      
+        info_message = "Announced Courses are available"
       else:
-        error_message = "No Announced Course found"
-        raise Exception(error_message)
-        info_message = "No Announced Courses for enrollment are available !!!"
-        response_dict["message"] = info_message
+        response_dict["success"] = False
+        info_message = "No Announced Courses are available"
+      response_dict["message"] = info_message
 
       response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list, cls=NodeJSONEncoder)
 
@@ -3838,10 +3835,10 @@ def get_students_for_batches(request, group_id):
         {
           '_id': {'$nin': batch_member_list},
           'member_of': student._id,
-          '$or': [
-            {'group_set': ObjectId(group_id)},
-            {'relation_set.student_belongs_to_college': college_id}
-          ],
+          # '$or': [
+          #   {'group_set': ObjectId(group_id)},
+          #   {'relation_set.student_belongs_to_college': college_id}
+          # ],
           'relation_set.selected_course': ObjectId(ac_id)
         },
         {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
@@ -3941,7 +3938,7 @@ def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_
  student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
- print Event_attended_by
+
  for info in Event_attended_by:
      a=ast.literal_eval(info)
      if (a['Name'] != 'undefined'):
@@ -4067,7 +4064,6 @@ def save_csv(request,group_id,app_set_instance_id=None):
           fw.writerow(dict((col,col) for col in column_header))
           
           for row in list(json_data):
-            print "data",row
             v = {}
             fw.writerow(ast.literal_eval(row))
         return HttpResponse((STATIC_URL + filename))
@@ -4207,8 +4203,10 @@ def get_attendance(request,group_id,node):
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
       temp_attendance.update({'presence':'Present'})
-      temp_attendance.update({'Assignment_marks':dict1['marks']})
-      temp_attendance.update({'Assessment_marks':dict2['marks']})
+      if dict1.has_key('marks'):
+        temp_attendance.update({'Assignment_marks':dict1['marks']})
+      if dict2.has_key('marks'):
+        temp_attendance.update({'Assessment_marks':dict2['marks']})
       attendance.append(temp_attendance)
     else:
       temp_attendance.update({'id':str(i._id)})
@@ -4243,14 +4241,15 @@ def attendees_relations(request,group_id,node):
                if i['course_structure_assessment'] == True:
                   course_assessment=True
                   
- if (course_assessment == True and course_assignment == True) :
-    column_count=2
  if course_assessment == True:
-    column_count=4
- if course_assignment ==True:
-    column_count=3
- if (course_assignment == False and course_assessment ==False ):                        
-    column_count=1
+    column_count = 4
+ if course_assignment == True:
+    column_count = 3
+ if (course_assessment == True and course_assignment == True):
+    column_count = 2
+ if (course_assignment == False and course_assessment == False):                        
+    column_count = 1
+ 
  column_list.append(a)
  column_list.append(column_count)
 
@@ -4299,3 +4298,46 @@ def page_scroll(request,group_id,page):
                                   },
                                   context_instance = RequestContext(request)
       )
+
+def get_batches_with_acourse(request, group_id):
+  """
+  This view returns list of batches that match given criteria
+  along with Announced-course for which match doesn't exists.
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  """
+  response_dict = {'success': False, 'message': ""}
+  batches_list = []
+  batch_gst = collection.Node.one({'_type':'GSystemType','name':'Batch'})
+  try:
+    if request.is_ajax() and request.method == "GET":
+      # Fetch field(s) from GET object
+      announced_course_id = request.GET.get("ac_id", "")
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
+      if(ObjectId(group_id) == mis_admin._id):
+        pass
+      else:
+        colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
+        req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
+        b = collection.Node.find({'member_of':batch_gst._id,'relation_set.has_course':ObjectId(announced_course_id)})
+        for each in b:
+          batches_list.append(each)
+
+        response_dict["success"] = True      
+        info_message = "Batch for this course is available"
+      response_dict["message"] = info_message
+
+      
+      response_dict["batches_list"] = json.dumps(batches_list, cls=NodeJSONEncoder)
+
+      return HttpResponse(json.dumps(response_dict))
+
+    else:
+      error_message = " BatchFetchError: Either not an ajax call or not a GET request!!!"
+      return HttpResponse(json.dumps({'message': " BatchCourseFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+  except Exception as e:
+    error_message = "\n BatchFetchError: " + str(e) + "!!!"
+    return HttpResponse(json.dumps({'message': error_message}))
