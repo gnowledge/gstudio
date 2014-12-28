@@ -288,13 +288,17 @@ function ShowSplits()
 
   }
 function GenerateSplits(splits){
-  document.getElementById('start_time').value = "";
-  document.getElementById('end_time').value = "";
-
-  $("#date-splits").empty();
+  //document.getElementById('start_time').value = ""
+  //document.getElementById('end_time').value = ""
   var i=1;
+  if (splits == 2)
+  {
+      $("#date-splits").empty();
   
-  $("#date-splits").append("<div class='row' style='margin-top: 1em;'> <div class='small-1 columns' align='right' > <label> <b>{% trans "Split-1" %}</b></label> </div></div>")
+  }
+  if( !(document.getElementById("start_time_1")) )
+  {
+  $("#date-splits").append("<div class='row'> <div class='small-1 columns' align='right' > <label> <b>Split -1 </b></label> </div></div>")
   $("#date-splits").append("<div class='row' align='left'>"+ 
   " <div class='small-1 columns' align='center' >"+ 
     "<label for='start_time_1' class='right inline'> {% trans "Start time" %} </label>"+
@@ -308,7 +312,7 @@ function GenerateSplits(splits){
    ""+ "<div >"+
      "<input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
       "</div></div>")
-   
+  } 
    if(splits == '3')
    {
   $("#date-splits").append("<div class='row' style='margin-top: 1em;'> <div class='small-1 columns' align='right' > <label> <b>{% trans "Split-2" %}</b></label> </div></div>")
@@ -319,13 +323,13 @@ function GenerateSplits(splits){
   "<div class='small-2 columns' > "+
      "<input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_2' readonly=''>"+
   "</div>"+
-  
-  " <div class='small-1 columns'>"+
-      "<label for='end_time_1' class='right inline'> {% trans "End time" %} </label></div>"+
+   " <div class='small-1 columns'>"+
+      "<label> End time </label></div>"+
    ""+ "<div >"+
      "<input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_2' readonly=''>"+
       "</div></div>")
-  $("#iteration").attr('value','3')
+   
+    $("#iteration").attr('value','3')
   }
   else
   {
@@ -333,10 +337,12 @@ function GenerateSplits(splits){
   }
      datetime()
   
+   
 }
 
 
 $(document).ready(function(){
+ document.getElementById('form-edit-node').reset()
  datetime()
  clear_Disable_Elements();
  var event_details=""
@@ -815,7 +821,6 @@ function date_validation(name)
       {
           alert("Please schedule session within given allotted time!")
       }
-       document.getElementById('splitsession').disabled=true;
        show_hide_date(str)     
      }
      else
@@ -855,7 +860,12 @@ function show_hide_date(str)
     if (!(str))
     {  
        document.getElementById('select_split').hidden=true 
-        $("#iteration").attr('value','1')
+       document.getElementById('splitsession').checked=false
+       document.getElementById('chkbxsplit-2').checked=false
+       document.getElementById('chkbxsplit-3').checked=false
+       document.getElementById('splitsession').disabled=true;
+       $("#date-splits").empty();
+       $("#iteration").attr('value','1')
     }
     if(str ==1)
     {
@@ -865,7 +875,6 @@ function show_hide_date(str)
     }
     
 }
-
 function reset_session_variable(str)
 {
 var start_time=""
@@ -873,13 +882,27 @@ var end_time=""
 
   if (!(str)){
         total_session_time=$('#session_of option:selected').attr('minutes')
-
+       if (document.getElementById('start_time_1')){
+       document.getElementById('start_time_1').value=""}
+       if ( document.getElementById('end_time_1')){
+       document.getElementById('end_time_1').value=""
+       }
+       if(document.getElementById('start_time_2')){
+       document.getElementById('start_time_2').value=""}
+       if ( document.getElementById('end_time_2')){
+       document.getElementById('end_time_2').value=""
+       }
         }
   if(str == 1)
   { 
      total_session_time=$('#session_of option:selected').attr('minutes')
      start_time=document.getElementById('start_time').value
      end_time=document.getElementById('end_time').value
+     if(document.getElementById('start_time_2')){
+       document.getElementById('start_time_2').value=""}
+       if ( document.getElementById('end_time_2')){
+       document.getElementById('end_time_2').value=""
+       }  
      deduct_time(start_time,end_time) 
   } 
   if (str == 2){
