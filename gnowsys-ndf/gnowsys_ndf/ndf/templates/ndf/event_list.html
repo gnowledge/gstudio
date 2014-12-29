@@ -22,35 +22,7 @@
       <div id="deletion_results"></div>
       <a class="close-reveal-modal"> &#215;</a>
     </div>
-<!--
-    <div id="linkModal" class="reveal-modal small" data-reveal>
-      <center>
-      {% blocktrans %}<h3>Link user-account to respective user-details</h3>
-      <p>NOTE: Please provide username of the user (i.e. student/voluntary-teacher), that he/she has registered on to the website.</p>
-      {% endblocktrans %}
-      </center>
 
-      <form id="linkform" data-abide>
-        <div class="row">
-          <div class="small-2 small-offset-2 columns">
-            <label for="link_to" class="inline left">{% trans "Username:" %}</label>
-          </div>
-          <div class="small-6 columns end">
-            <input id="link_to" name="link_to" type="text" required >
-            <small class="error">{% trans "Please fill username!" %}</small>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="small-4 small-offset-4 columns end">
-            <input type="button" class="button small link_to_ac" value="Link to User A/C" disabled />
-          </div>
-        </div>
-      </form>
-
-      <a class="close-reveal-modal">{% trans "&#215" %};</a>
-    </div>
--->
     {% if gstaff_access %}
       <input class="button deleteObjects" type="button" value="Delete">
     {% endif %}
@@ -72,8 +44,9 @@
           <th width="20"> <input class="checkedAll" type="checkbox" ></th>
           <th>Title</th>
 
+          {% if gstaff_access %}
           <th>Edit</th>
-          
+          {% endif %}
       </tr>
     </thead>
     
@@ -130,7 +103,6 @@
     
    
     var selectedobject = $(".objectsCheckbox input:checked");
-   alert(selectedobject) 
     // $('#myModal').foundation('reveal', 'open');
     // $('#myModal').foundation('reveal', 'close');
     
@@ -249,29 +221,4 @@
     $('#myModal').foundation('reveal', 'close');
   });
 
- 
-  function get_enrollment_code(node_id) {
-    alert("node_id: " + node_id)
-
-    $.ajax({
-      url:"{% url 'set_enrollment_code' groupid %}",
-
-      data: {
-        node_id: node_id,
-        csrfmiddlewaretoken: "{{csrf_token}}"
-      },
-
-      type: "POST",
-
-      dataType: "html",
-
-      success: function(data) {
-        $("#enrollement_code_"+node_id).html("Enrollment Code: <br><b>"+data+"</b>")
-      },
-
-      error: function(data) {
-        alert("EnrollementCodeError: Either not an ajax call or not a POST request!!!")
-      }
-    });
-  }
 {% endblock %}  

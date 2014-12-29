@@ -304,8 +304,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   property_order_list = get_property_order_with_value(person_gs)#.property_order
 
   if request.method == "POST":
-    has_login_rt = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
-
     # [A] Save person-node's base-field(s)
     is_changed = get_node_common_fields(request, person_gs, group_id, person_gst)
 
@@ -324,9 +322,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
           field_instance_type = type(field_instance)
 
           if field_instance_type in [AttributeType, RelationType]:
-            if field_instance["name"] == "attendees":
-              continue
-
             field_data_type = field_set['data_type']
 
             # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
@@ -380,13 +375,62 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
               person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value_list)
 
-    # [C] Code to link GSystem Node and Author node via "has_login" relationship
+    # [C] Code to link GSystem Node and Author node via "has_login" relationship;
+    #     and Subscribe the Author node to College group if user "Program Officer"
     person_gs.reload()
-    for each in person_gs.attribute_set:
-      if "email_id" in each:
-        auth_node = collection.Node.one({'_type': "Author", 'email': each["email_id"]})
-        if auth_node:
-          gr_node = create_grelation(person_gs._id, has_login_rt, auth_node._id)
+    auth_node = None
+    for attr in person_gs.attribute_set:
+      if "email_id" in attr:
+        if attr["email_id"]:
+          auth_node = collection.Node.one({'_type': "Author", 'email': attr["email_id"]})
+          break
+
+    if auth_node:
+      has_login_rt = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
+      if has_login_rt:
+        # Linking GSystem Node and Author node via "has_login" relationship;
+        gr_node = create_grelation(person_gs._id, has_login_rt, auth_node._id)
+      
+      if "Program Officer" in person_gs.member_of_names_list:
+        # If Person node (GSystem) is of Program Officer type
+        # then only go for subscription
+        college_id_list = []
+        # Fetch College's ObjectId to which Program Officer is assigned (via "officer_incharge_of")
+        for rel in person_gs.relation_set:
+          if "officer_incharge_of" in rel:
+            if rel["officer_incharge_of"]:
+              for college_id in rel["officer_incharge_of"]:
+                if college_id not in college_id_list:
+                  college_id_list.append(college_id)
+              
+              break  # break outer-loop (of relation_set)
+
+        if college_id_list:
+          # If College's ObjectId exists (list as PO might be assigned to more than one college)
+          # Then prepare a list of their corresponding private group(s) (via "has_group")
+          college_cur = collection.Node.find(
+            {'_id': {'$in': college_id_list}},
+            {'relation_set.has_group': 1}
+          )
+
+          college_group_id_list = []
+          for college in college_cur:
+            for rel in college.relation_set:
+              if rel and "has_group" in rel:
+                if rel["has_group"]:
+                  if rel["has_group"][0] not in college_group_id_list:
+                    college_group_id_list.append(rel["has_group"][0])
+                  
+                  break  # break inner-loop (college.relation_set)
+
+          if college_group_id_list:
+            # If college-group list exists
+            # Then update their group_admin field (append PO's created_by)
+            res = collection.update(
+              {'_id': {'$in': college_group_id_list}},
+              {'$addToSet': {'group_admin': auth_node.created_by}},
+              upsert=False, multi=True
+            )
 
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   

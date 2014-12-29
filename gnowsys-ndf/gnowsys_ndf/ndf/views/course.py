@@ -1,6 +1,7 @@
 ''' -- imports from python libraries -- '''
 # from datetime import datetime
 import datetime
+import json
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
@@ -15,7 +16,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 
 from django_mongokit import get_database
-import json  
 try:
   from bson import ObjectId
 except ImportError:  # old pymongo
@@ -299,7 +299,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
           {'_id':1, 'name':1, 'attribute_set': 1, 'relation_set': 1}
         )
 
-        officer_incharge_of_rt = collection.Node.one({'_type': "RelationType", 'name': "officer_incharge_of"})
         MIS_GAPP = collection.Node.one({'_type': "GSystemType", 'name': "MIS"}, {'_id': 1})
         Student = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
 
@@ -527,6 +526,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             # Reload required so that updated attribute_set & relation_set appears
             course_gs.reload()
 
+            task_node = None
             start_enroll_value = None
             end_enroll_value = None
             nussd_course_type_value = None
@@ -552,34 +552,32 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             task_dict["Assignee"] = []
             task_dict["group_set"] = []
             # Fetch Program Officers' ObjectIds from
-            # College's inverse GRelation "officer_incharge_of"
-            PO_list = collection.Triple.find(
-              {'_type': "GRelation", 'relation_type.$id': officer_incharge_of_rt._id, 'right_subject': colg_ids._id},
-              {'subject': 1}
+            # College node's relation i.e, "has_officer_incharge"
+            PO_id_list = []
+            for rel in colg_ids.relation_set:
+              if rel and rel.has_key("has_officer_incharge"):
+                if rel["has_officer_incharge"]:
+                  PO_id_list = rel["has_officer_incharge"]
+
+            # From Program Officer node(s) assigned to college using PO_id_list
+            # From each node's 'has_login' relation fetch corresponding Author node
+            PO_cur = collection.Node.find(
+              {'_id': {'$in': PO_id_list}, 'attribute_set.email_id': {'$exists': True}, 'relation_set.has_login': {'$exists': True}},
+              {'name': 1, 'attribute_set.email_id': 1, 'relation_set.has_login': 1}
             )
-
-            # From 'subject' fetch corresponding Program Officer node
-            # From that node's 'has_login' relation fetch corresponding Author node
-            for each in PO_list:
-              PO = collection.Node.one(
-                {'_id': each.subject, 'attribute_set.email_id': {'$exists': True}, 'relation_set.has_login': {'$exists': True}},
-                {'name': 1, 'attribute_set.email_id': 1, 'relation_set.has_login': 1}
-              )
-
+            for PO in PO_cur:
               PO_auth = None
               for rel in PO.relation_set:
-                if rel:
+                if rel and rel.has_key("has_login"):
                   PO_auth = collection.Node.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
                   if PO_auth:
-                    # task_dict["Assignee"].append(PO_auth.name)
-                    # task_dict["group_set"] = [PO_auth._id]
                     if PO_auth.created_by not in task_dict["Assignee"]:
                       task_dict["Assignee"].append(PO_auth.created_by)
                     if PO_auth._id not in task_dict["group_set"]:
                       task_dict["group_set"].append(PO_auth._id)
 
-              task_node = create_task(task_dict)
-
+            task_node = create_task(task_dict)
+            
             # Set content_org for the task with link having ObjectId of it's own          
             if MIS_GAPP and Student:
               site = Site.objects.get(pk=1)
@@ -595,6 +593,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               task_dict["created_by_name"] = request.user.username
               task_dict["content_org"] = "\n- Please click [[" + college_enrollment_url_link + "][here]] to enroll students in " + nussd_course_type \
                 + "\n\n- This enrollment procedure is open for duration between " + start_enroll_value.strftime("%d-%b-%Y") + " and " + end_enroll_value.strftime("%d-%b-%Y") + "."
+
               task_node = create_task(task_dict)
 
           else:
@@ -696,6 +695,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               # Reload required so that updated attribute_set & relation_set appears
               course_gs.reload()
 
+              task_node = None
               start_enroll_value = None
               end_enroll_value = None
               nussd_course_type_value = None
@@ -721,33 +721,31 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               task_dict["Assignee"] = []
               task_dict["group_set"] = []
               # Fetch Program Officers' ObjectIds from
-              # College's inverse GRelation "officer_incharge_of"
-              PO_list = collection.Triple.find(
-                {'_type': "GRelation", 'relation_type.$id': officer_incharge_of_rt._id, 'right_subject': colg_ids._id},
-                {'subject': 1}
+              # College node's relation i.e, "has_officer_incharge"
+              PO_id_list = []
+              for rel in colg_ids.relation_set:
+                if rel and rel.has_key("has_officer_incharge"):
+                  if rel["has_officer_incharge"]:
+                    PO_id_list = rel["has_officer_incharge"]
+
+              # From Program Officer node(s) assigned to college using PO_id_list
+              # From each node's 'has_login' relation fetch corresponding Author node
+              PO_cur = collection.Node.find(
+                {'_id': {'$in': PO_id_list}, 'attribute_set.email_id': {'$exists': True}, 'relation_set.has_login': {'$exists': True}},
+                {'name': 1, 'attribute_set.email_id': 1, 'relation_set.has_login': 1}
               )
-
-              # From 'subject' fetch corresponding Program Officer node
-              # From that node's 'has_login' relation fetch corresponding Author node
-              for each in PO_list:
-                PO = collection.Node.one(
-                  {'_id': each.subject, 'attribute_set.email_id': {'$exists': True}, 'relation_set.has_login': {'$exists': True}},
-                  {'name': 1, 'attribute_set.email_id': 1, 'relation_set.has_login': 1}
-                )
-
+              for PO in PO_cur:
                 PO_auth = None
                 for rel in PO.relation_set:
-                  if rel:
+                  if rel and rel.has_key("has_login"):
                     PO_auth = collection.Node.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
                     if PO_auth:
-                      # task_dict["Assignee"].append(PO_auth.name)
-                      # task_dict["group_set"] = [PO_auth._id]
                       if PO_auth.created_by not in task_dict["Assignee"]:
                         task_dict["Assignee"].append(PO_auth.created_by)
                       if PO_auth._id not in task_dict["group_set"]:
                         task_dict["group_set"].append(PO_auth._id)
 
-                task_node = create_task(task_dict)
+              task_node = create_task(task_dict)
 
               # Set content_org for the task with link having ObjectId of it's own          
               if MIS_GAPP and Student:
@@ -764,8 +762,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 task_dict["created_by_name"] = request.user.username
                 task_dict["content_org"] = "\n- Please click [[" + college_enrollment_url_link + "][here]] to enroll students in " + nm + " course." \
                   + "\n\n- This enrollment procedure is open for duration between " + start_enroll_value.strftime("%d-%b-%Y") + " and " + end_enroll_value.strftime("%d-%b-%Y") + "."
+                
                 task_node = create_task(task_dict)
-
+    
     else:
       is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
       
@@ -1197,27 +1196,40 @@ def create_course_struct(request, group_id,node_id):
             for course_sec_dict in listdict:
               #k is course section name and v is list of its each course subsection as dict
               for k,v in course_sec_dict.items():#loops over course sections
-                if k in cs_names or k in changed_names.values():
+                var = [k in val_list for val_list in changed_names.values()]
+
+                if k in cs_names  or True in var:
                   for cs_old_name,cs_new_name in changed_names.items():
-                    if (cs_new_name==k):
+                    if k is not cs_old_name and k in cs_new_name:
                       name_edited_node = collection.Node.one({'name':cs_old_name,'prior_node':course_node._id,'member_of':cs_gst._id})
-                      collection.update({'_id':name_edited_node._id},{'$set':{'name':cs_new_name}})
+                      collection.update({'_id':name_edited_node._id},{'$set':{'name':cs_new_name[0]}})
                       name_edited_node.reload()
                     else:
                       pass
+
                   #IMP Fetch node with name 'k' as above code, if name changed, changes oldname to k 
-                  cs_node = collection.Node.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id},{'collection_set':1})
+                  cs_node = collection.Node.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id},{'name':1,'collection_set':1})
                   css_reorder_ids = []
+                  var1 = False
                   for cssd in v:
                     for cssname,cssdict in cssd.items():
-                      if cssname in css_names or cssname in changed_names.values():
-                        for old_name,new_name in changed_names.items():
-                          if (cssname==new_name):
-                            css_name_edited_node = collection.Node.one({'name':old_name,'prior_node':cs_node._id,'member_of':css_gst._id})
-                            collection.update({'_id':css_name_edited_node._id},{'$set':{'name':new_name}})
-                            css_name_edited_node.reload()
-                          else:
-                            pass
+                      ab = [listings for listings in changed_names.values()]
+                      for cs_nodename in ab:
+                        if cs_node.name in cs_nodename:
+                          if cssname in cs_nodename[1].values():
+                            var1 = True
+                        else:
+                          var1 = False
+
+                      if cssname in css_names or var1 is True: 
+                        for cs_old_n,cs_val_list in changed_names.items():
+                          if len(cs_val_list)==2:
+                            if( cs_val_list[0]==k and type(cs_val_list[1]) is dict):
+                              for oldcssname,newcssname in cs_val_list[1].items():
+                                if (cssname==newcssname):
+                                  css_name_edited_node = collection.Node.one({'name':oldcssname,'prior_node':cs_node._id,'member_of':css_gst._id})
+                                  collection.update({'_id':css_name_edited_node._id},{'$set':{'name':newcssname}})
+                                  css_name_edited_node.reload()
 
                         css_node=collection.Node.one({'name':cssname,'member_of':css_gst._id,'prior_node':cs_node._id})
                         for propk,propv in cssdict.items():
@@ -1257,7 +1269,6 @@ def create_course_struct(request, group_id,node_id):
                     pass
                   cs_reorder_ids.append(cs_node._id)
                 else:
-
                   cs_new = collection.GSystem()
                   cs_new.member_of.append(cs_gst._id)
                   #set name
