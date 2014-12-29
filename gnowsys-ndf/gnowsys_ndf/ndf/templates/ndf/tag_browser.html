@@ -39,45 +39,38 @@
 
 {% block body_content %} 
 
-    <!-- <div class="wrapper">
-        <input type="text" name="Search_tags" class="searchField" autocomplete="off" placeholder="tagname"/>
-        <button id="Jump_To" value="cur" onclick="myFunction()">Jump_To</button>
-    </div>
-    <p id="demo"></p>
-
-    <script>
-      function myFunction() {
-      var x = document.getElementById("Jump_To").value;
-      document.getElementById("demo").innerHTML = x;
-    }
-    </script>
- -->
+ 
           <!--<div class="pos_right">asdsdsd</div>
     			<div class="pos_left">asdddfff</div>
     			<div class="block">jjjj</div>-->
-<!-- <header class="row">
-    <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Batches {% if batch_coll.count %}({{ batch_coll.count }}){% endif %}</a></dd>
-    </dl>
-</header> -->
+
+<form id ="cur" action="{% url 'tag_info' group_id %}" method="GET">
+    <div class="Wrapper">
+        <input type = "text" name = "search"  maxlength = "20" placeholder = " search other files by tagname" textarea = "">
+        <input type = "submit" value = "jump_to">
+    </div>
+</form>
+<hr></hr>
+{% if tagname %}
+    <h1>Tagname <mark>{{tagname}}</mark> related all files</h1>
+{% endif %}
+
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-{% if records %}
-{% for each in records %}
-
+{%  for each in cur %}
 <li class="card">
     <a href="{% url 'page_details' group_id each.pk %}">
     <header>
       <div class="label-list">
-        {% for tag in each.tags%}
-          <span class="label">{{tag}}</span><!--</a>-->
+        {% for tag in each.tags %}
+          <span class="label"><mark>{{tag}}</mark></span>
         {% endfor %}
       </div>
         
       <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
 
-      <h4>{{ each.name|truncatechars:20 }}</h4>
-        <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+          <h4>{{ each.name|truncatechars:10 }}</h4>
+            <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
       <div>
         <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
@@ -91,6 +84,5 @@
 </li>
 
 {% endfor %}
-{% endif %}
 </ul>
 {% endblock %}	

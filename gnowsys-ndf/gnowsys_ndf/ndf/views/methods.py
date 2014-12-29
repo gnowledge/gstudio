@@ -972,11 +972,10 @@ def check_page_first_creation(request,node):
 	return(count)     
       
 
-def tag_info(request, group_id, tagname=None):
+def tag_info(request, group_id, tagname = None):
     '''
     Function to get all the resources related to tag
     '''
-    a = []
     keyword_search = []
     yesterdays_result = []
     week_ago_result = []
@@ -984,7 +983,13 @@ def tag_info(request, group_id, tagname=None):
     yesterdays_search = {date.today()-timedelta(days=1)}
     week_ago_search = {date.today()-timedelta(days=1)}
     cur = None
-    if request.method == "GET":
+    
+    if tagname:
+        if ObjectId(group_id) == 'True':
+            collection = get_database()[Node.collection_name]
+            cur = collection.Node.find({'tags':tagname})#,{'$in':{'_id':ObjectId(group_id)}},'$or':[{'access_policy':u'PUBLIC'}, '$and':[{'access_policy':u'PRIVATE'},{'status': u'PUBLISHED'}] ])
+
+    elif request.method == "GET":
         keyword = request.GET.get("search","")
         collection = get_database()[Node.collection_name]
         cur = collection.Node.find({'tags':{'$regex':keyword}})
@@ -992,43 +997,12 @@ def tag_info(request, group_id, tagname=None):
         keyword_search.append(dic)
         print "dic:",dic
         print "keyword_search is:",keyword_search
-        #print "keyword", keyword
-        #print "dict:", dic
-
-        #for test in keyword_search:
-            #if test.keys()[0] == today:
-                #a.append(test)
-                #print "a is:",a
-                #print "type of a",type(a)
-        #for each in cur:
-            #print "in cur variable i got the whole search data:",each
-        
     
-    #else:
-        #collection = get_database()[Node.collection_name]
-        #cur = collection.Node.find({'tags':tagname})
-
-
         
-
-
         
-
-        #for yesterdays_search in keyword_search:
-            #yesterdays_result.append(yesterdays_search)
-
-        #for week_ago_search in keyword_search:
-           # week_ago_result.append(week_ago_search)
-        
-
-    # files = db[File.collection_name]
-    # file_search = files.File.find({'_type':'Group'}, 'group_set':{'$all': [ObjectId(group_id)] }, {'_type': 'Author', 'name': unicode(request.user.username) } ) #search result from file
-    
-    # return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id, 'file_collection':file_search}, context_instance=RequestContext(request,{'file_collection':file_search})
-
     return render_to_response(
         "ndf/tag_browser.html", 
-        {'group_id': group_id, 'groupid': group_id, 'cur': cur},
+        {'group_id': group_id, 'groupid': group_id, 'cur': cur,'tagname':tagname},
         context_instance=RequestContext(request)
     )
       
