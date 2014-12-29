@@ -4,6 +4,7 @@ import csv
 import json
 # import ast
 import datetime
+import zipfile
 import urllib2
 import hashlib
 import magic
@@ -20,6 +21,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 # from django.http import Http404
 from django.template.defaultfilters import slugify
+from django.contrib.sites.models import Site
 
 from django_mongokit import get_database
 from mongokit import IS
@@ -35,7 +37,6 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
-# from gnowsys_ndf.ndf.management.commands.data_entry import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
@@ -43,22 +44,31 @@ from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 ##############################################################################
 
 
-SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
+SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files/nroer_ebooks_csv")
+EBOOKS_ROOT = os.path.expanduser("~") + "/nroer_ebooks/"
+
+# needed for getting uploaded documents link in content_org
+current_site = Site.objects.get_current()
+current_site.domain = "127.0.0.1:8000" if (current_site.domain == u'example.com') else current_site.domain
 
 log_list = []  # To hold intermediate errors
+
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 collection = get_database()[Node.collection_name]
+file_collection = get_database()[File.collection_name]
+fs_files_collection = get_database()['fs.files']
+
 file_gst = collection.GSystemType.one({"name": "File"})
 home_group = collection.Group.one({"name": "home", "_type": "Group"})
 theme_gst = collection.GSystemType.one({"name": "Theme"})
 theme_item_gst = collection.GSystemType.one({"name": "theme_item"})
 topic_gst = collection.GSystemType.one({"name": "Topic"})
-GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type': 'GSystemType'})
-
+GST_IMAGE = collection.GSystemType.one({'name': 'Image', '_type': 'GSystemType'})
+nroer_id = User.objects.get(username="nroer_team").id
 
 class Command(BaseCommand):
-    help = "\n\tFor saving data in gstudio DB from NROER schema files. This will create 'File' type GSystem instances.\n\tCSV file condition: The first row should contain DB names.\n"
+    help = "\n\tFor saving E-Book data in gstudio DB from NROER E-Book schema files. This will create 'File' type GSystem instances."
 
     def handle(self, *args, **options):
         try:
@@ -182,14 +192,6 @@ def parse_data_create_gsystem(json_file_path):
         node = collection.File()
         node_keys = node.keys()
         node_structure = node.structure
-        # print "\n\n---------------", node_keys
-
-        # for index, strtype in node_structure.items():
-        #   if type(strtype) == type:
-        #     strtype = strtype.__name__
-        #   else:
-        #     strtype = strtype.__str__()
-        #     # print "~~~~" + strtype
 
         json_documents_list_spaces = json_documents_list
         json_documents_list = []
@@ -210,11 +212,21 @@ def parse_data_create_gsystem(json_file_path):
 
     for i, json_document in enumerate(json_documents_list):
       
-        info_message = "\n\n\n********** Processing row number : ["+ str(i)+ "] **********"
+        info_message = "\n\n\n******************** Processing row number : ["+ str(i)+ "] ********************"
         print info_message
         log_list.append(str(info_message))
         
         try:
+
+            # print "base_folder : ", json_document["base_folder"]
+            # print "file_name : ", json_document["file_name"]
+            is_base_folder = check_folder_exists(json_document["file_name"], json_document["base_folder"])
+            # print "is_base_folder : ", is_base_folder
+
+            if is_base_folder:
+                info_message = "- File gsystem holding collection is created. Having name : '" + str(json_document["base_folder"]) + "' and ObjectId : '" + str(is_base_folder) + "'"
+                print info_message
+                log_list.append(info_message)
 
             parsed_json_document = {}
             attribute_relation_list = []
@@ -225,7 +237,8 @@ def parse_data_create_gsystem(json_file_path):
                 if parsed_key in node_keys:
                     # print parsed_key
 
-                    # adding the default field values e.g: created_by, member_of
+                    # adding the default field values like: created_by, member_of, ...
+
                     # created_by:
                     if parsed_key == "created_by":
                         if json_document[key]:
@@ -233,8 +246,9 @@ def parse_data_create_gsystem(json_file_path):
                             if temp_user_id:
                                 parsed_json_document[parsed_key] = temp_user_id
                         else:
-                            parsed_json_document[parsed_key] = get_user_id("nroer_team")
-                        # print "---", parsed_json_document[parsed_key]
+                            # parsed_json_document[parsed_key] = get_user_id("nroer_team")
+                            parsed_json_document[parsed_key] = nroer_id
+                       # print "---", parsed_json_document[parsed_key]
                       
                     # contributors:
                     elif parsed_key == "contributors":
@@ -252,7 +266,7 @@ def parse_data_create_gsystem(json_file_path):
                             # print "===", parsed_json_document[parsed_key]
                       
                     # tags:
-                    elif (parsed_key == "tags") and json_document[key]:
+                    if (parsed_key == "tags") and json_document[key]:
                         tag_list = json_document[key].replace("\n", "").split(",")
                         temp_tag_list = []
                         for each_tag in tag_list:
@@ -261,13 +275,12 @@ def parse_data_create_gsystem(json_file_path):
                         parsed_json_document[parsed_key] = temp_tag_list
                         # print parsed_json_document[parsed_key]
                       
-                    #member_of:
+                    # member_of:
                     elif parsed_key == "member_of":
                         parsed_json_document[parsed_key] = [file_gst._id]
                         # print parsed_json_document[parsed_key]
                       
                       # --- END of adding the default field values
-
 
                     # processing for remaining fields
                     elif node_structure[parsed_key] == unicode:
@@ -293,7 +306,7 @@ def parse_data_create_gsystem(json_file_path):
               
             # calling method to create File GSystems
             nodeid = create_resource_gsystem(parsed_json_document)
-            # print type(nodeid), "-------", nodeid, "\n"
+            # print type(nodeid), "nodeid ------- : ", nodeid, "\n"
             node = collection.Node.one({ "_id": ObjectId(nodeid) })
 
             # starting processing for the attributes and relations saving
@@ -402,6 +415,7 @@ def parse_data_create_gsystem(json_file_path):
                     if is_relation:
                         relation_list.append(key)
 
+                # print "relation_list : ", relation_list
                 if not relation_list:
                     # No possible relations defined for this node
                     info_message = "\n!! ("+str(node.name)+"): No possible relations defined for this node.\n"
@@ -415,25 +429,16 @@ def parse_data_create_gsystem(json_file_path):
                 for key in relation_list:
                   is_relation = True
 
+
                   for rel_key, rel_value in gst_possible_relations_dict.iteritems():
                     if key == rel_key: # commented because teaches is only relation being used for time being
                     # if key == "teaches":
                       is_relation = False
 
                       if json_document[key]:
-                        # Here semi-colon(';') is used instead of comma(',')
-                        # Beacuse one of the value may contain comma(',') which causes problem in finding required value in database
-                        # if ";" not in json_document[key]:
-                        #   # Necessary to inform perform_eval_type() that handle this value as list
-                        #   json_document[key] = "\""+json_document[key]+"\", "
-
-                        # else:
-                        #   formatted_value = ""
-                        #   for v in json_document[key].split(";"):
-                        #       formatted_value += "\""+v.strip(" ")+"\", "
-                        #   json_document[key] = formatted_value
 
                         # -----------------------------
+                        hierarchy_output = None
                         def _get_id_from_hierarchy(hier_list, oid=None):
                           '''
                           Returns the last hierarchical element's ObjectId.
@@ -441,22 +446,19 @@ def parse_data_create_gsystem(json_file_path):
                           e.g.
                           hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
                           '''
-                          # print oid
+                          
                           if len(hier_list) >= 2:
                             # print hier_list, "len(hier_list) : ", len(hier_list)
                             try:
+
                               if oid:
                                 curr_oid = collection.GSystem.one({ "_id": oid })
                                 # print "curr_oid._id", curr_oid._id
-                              else:
-                                row_list = []
-                                for e in hier_list:
-                                    row_list.append(e)
 
+                              else:
                                 curr_oid = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
 
                               if curr_oid:
-                                object_exist = True
                                 next_oid = collection.GSystem.one({ 
                                                           "name": hier_list[1],
                                                           'group_set': {'$all': [ObjectId(home_group._id)]},
@@ -468,54 +470,22 @@ def parse_data_create_gsystem(json_file_path):
                                 hier_list.remove(hier_list[0])
                                 # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
 
-                                if (len(hier_list) == 1) and next_oid:
-                                    print "retun successfully"
-                                    return next_oid._id
                                 _get_id_from_hierarchy(hier_list, next_oid._id)
                               else:
-                                object_exists = False
-                                # print "retun NOT successfully"
+                                error_message = "!! ObjectId of curr_oid does not found."
+                                print error_message
+                                log_list.append(error_message)
 
                             except Exception as e:
                               error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
-                              # print error_message
+                              print error_message
                               log_list.append(error_message)
-                            
-                            if len(hier_list) == 1:
-                              if oid:
-                                # print "oid: ", oid
-                                return oid
-                              else:
-                                # print "else - hier_list : ", hier_list
-                                temp_obj = collection.GSystem.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                # temp_obj = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                # print temp_obj
-                                if temp_obj.count() > 0:
-                                    for e in temp_obj:
-                                        if e.prior_node:
-                                            for k in e.prior_node:
-                                                obj = collection.Node.one({'_id':ObjectId(k) })
-                                                print "\nitem: ",row_list[len(row_list)-2],"\n"
-                                                if obj.name == row_list[len(row_list)-2]:
-                                                    # print e._id
-                                                    return e._id
 
-                                    return None
-                                else:
-                                    return None
-                                # if temp_obj:
-                                #   return temp_obj._id
-                                # else:
-                                #   return None
+                          else:
+                            global hierarchy_output
+                            hierarchy_output = oid if oid else None
 
-                            # if any one of the item of hierarchy does not exist in database then:
-                            elif not object_exist:
-                              temp_obj = collection.GSystem.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                              if temp_obj:
-                                return temp_obj._id
-                              else:
-                                return None
-
+                          return hierarchy_output
                           # -----------------------------                  
 
                         # most often the data is hierarchy sep by ":"
@@ -527,7 +497,8 @@ def parse_data_create_gsystem(json_file_path):
                             formatted_list.append(v.strip())
 
                           right_subject_id = []
-                          rsub_id = _get_id_from_hierarchy(formatted_list)
+                          rsub_id = _get_id_from_hierarchy(formatted_list) if formatted_list else None
+                          # print hierarchy_output," |||||||||||||||||||", rsub_id
 
                           # checking every item in hierarchy exist and leaf node's _id found
                           if rsub_id:
@@ -558,14 +529,7 @@ def parse_data_create_gsystem(json_file_path):
                           # print "\njson_document[key]: ", json_document[key]
 
                           subject_id = node._id
-                          # print "subject_id : ", subject_id
-                          # print "node.name: ", node.name
-                          # Here we are appending list of ObjectIds of GSystemType's type_of field 
-                          # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
-                          # This is because some of the RelationType's are holding Base class's ObjectId
-                          # and not that of the Derived one's
-                          # Delibrately keeping GSystemType's ObjectId first in the list
-                          # And hence, used $in operator in the query!
+
                           rel_subject_type = []
                           rel_subject_type.append(file_gst._id)
                           
@@ -577,7 +541,6 @@ def parse_data_create_gsystem(json_file_path):
                                                                             {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
                                                                     'subject_type': {'$in': rel_subject_type}
                                                             })
-
 
                           right_subject_id_or_list = []
                           right_subject_id_or_list.append(ObjectId(right_subject_id))
@@ -612,8 +575,9 @@ def parse_data_create_gsystem(json_file_path):
                         break
 
               # print relation_list
-            else:
-                info_message = "\n!! Either resource is already created or file is already saved into gridfs/DB"
+
+            else:  # node object or attribute_relation_list does not exist.
+                info_message = "\n!! Either resource is already created -- OR -- file is already saved into gridfs/DB -- OR -- file does not exists."
                 print info_message
                 log_list.append(str(info_message))
 
@@ -625,17 +589,188 @@ def parse_data_create_gsystem(json_file_path):
             log_list.append(str(error_message))
 
 
+def check_folder_exists(resource_link, base_folder_name):
+
+    resource_code = resource_link[:5]
+    ebook_zip_file = EBOOKS_ROOT + resource_code + "dd.zip"
+    # print "ebook_zip_file : ", ebook_zip_file
+
+    if (os.path.exists(ebook_zip_file)):  # check if .zip exists
+        ebook_unzip_folder = EBOOKS_ROOT + resource_code + "dd"
+        # print "ebook_unzip_folder", ebook_unzip_folder
+
+        if (not (os.path.isdir(ebook_unzip_folder))) and zipfile.is_zipfile(ebook_zip_file):
+            # creating the folder for the first time
+
+            info_message = "- Folder does NOT exists. So extracting and creating a new one"
+            print info_message
+            log_list.append(str(info_message))
+            
+            # calling method to unzip the zip file
+            unzip(ebook_zip_file, ebook_unzip_folder)
+
+            # ----------------------- for cover page -----------------------
+            files_subfolder = ebook_unzip_folder + "/" + os.walk(ebook_unzip_folder).next()[1][0]
+            files_list = os.listdir(files_subfolder)
+            # print "files_list : ", files_list
+
+            # gathering the cover page with .jpg/.png format 
+            cover_page_list = [i for i in files_list if i.lower().endswith(('.jpg', '.png'))]
+            # print "cover_page_list : ", cover_page_list
+            
+            if cover_page_list:
+                cover_page_name = cover_page_list[0]
+                # print "cover_page_name : ", cover_page_name
+                cover_page_path = files_subfolder + "/" + cover_page_name
+                # print "cover_page_path : ", cover_page_path
+
+                if os.path.exists(cover_page_path):
+
+                    info_message = "\n- Cover page found for : '" + str(base_folder_name) + "' found. Having name : '" + cover_page_name + "'."
+                    print info_message
+                    log_list.append(str(info_message))
+
+                    cover_pg_link = "file://" + cover_page_path
+                    files = urllib2.urlopen(cover_pg_link)
+                    files = io.BytesIO(files.read())
+                    files.name = cover_page_name # as per requirements in save_file()
+
+                    filemd5 = hashlib.md5(files.read()).hexdigest()
+                    fileobj = file_collection.File()
+
+                    if fileobj.fs.files.exists({"md5":filemd5}):
+                        info_message = "\n- Cover page resource exists in DB: '" + str(cur_oid._id) + "'"
+                        print info_message
+                        log_list.append(str(info_message))
+                    else:
+                        files.seek(0)
+                        content_org = ""
+                        tags = []
+                        img_type = None
+                        language = ""
+
+                        cover_page_oid, video = save_file(files, cover_page_name, nroer_id, home_group._id, content_org, tags, img_type, language, "nroer_team", u"PUBLIC", count=0, first_object="")
+
+                        cover_page_url = update_url_field(cover_page_oid, cover_page_name)
+                        # cover_page_in_content_org = "[[http://" + current_site.domain + "/" + os.getlogin() + "/file/readDoc/" + cover_page_oid.__str__() + "/" + cover_page_name + "]]"
+                        # print "cover_page_in_content_org : ", cover_page_in_content_org
+            else:
+                cover_page_url = None
+                cover_page_oid = None
+
+                info_message = "\n- NO cover page found for : '" + str(base_folder_name) + "'"
+                print info_message
+                log_list.append(str(info_message))
+
+            # ----------------------- END cover page processing -----------------------
+
+            # overwritting resource link
+            resource_link = ebook_zip_file
+            # print "resource_link : ", resource_link
+
+            name = base_folder_name
+            content_org = cover_page_url if cover_page_url else ""
+
+            resource_link = "file://" + resource_link
+            files = urllib2.urlopen(resource_link)
+            files = io.BytesIO(files.read())
+            files.name = resource_code + "dd.zip" # as per requirements in save_file()
+
+            filemd5 = hashlib.md5(files.read()).hexdigest()
+            fileobj = file_collection.File()
+
+            if fileobj.fs.files.exists({"md5":filemd5}):
+                gridfs_obj_by_md5 = fs_files_collection.find_one({"md5":filemd5})
+                
+                check_obj_by_name_n_fs_ids = collection.File.find_one({
+                                        "_type":"File", 
+                                        'member_of': {'$all': [ObjectId(file_gst._id)]},
+                                        'group_set': {'$all': [ObjectId(home_group._id)]},
+                                        "name": unicode(base_folder_name),
+                                        "fs_file_ids": {"$in":[ gridfs_obj_by_md5["_id"] ]} 
+                                    })
+
+                if check_obj_by_name_n_fs_ids:
+                    # printing appropriate error message
+                    info_message = "\n- Resource with same name of '"+ str(base_folder_name) +"' and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name_n_fs_ids._id)
+                    print info_message
+                    log_list.append(str(info_message))
+                    return None
+
+            # else process for saving/creating new object
+            files.seek(0)
+            language = ""
+
+            fileobj_oid, video = save_file(files, name, nroer_id, home_group._id, content_org, [], None, language, "nroer_team", u"PUBLIC", count=0, first_object="")
+
+            # creating grelation "has_cover_page"
+            if fileobj_oid and cover_page_oid:
+
+                update_url_field(fileobj_oid, resource_code + "dd.zip")
+                relation_type_node = collection.Node.one({'_type': "RelationType", 'name': "has_cover_page", 'subject_type': {'$in': [file_gst._id]} })
+                gr_node = create_grelation(fileobj_oid, relation_type_node, cover_page_oid)
+
+                if gr_node:
+                    info_message = "\n- GRelation 'has_cover_page' processing done."
+                    print info_message
+                    log_list.append(str(info_message))
+                else:
+                    info_message = "\n!! GRelation 'has_cover_page' could not be created successfully."
+                    print info_message
+                    log_list.append(str(info_message))
+
+            return fileobj_oid
+
+        elif os.path.isdir(ebook_unzip_folder):
+            # Folder already created.
+            # print "----------- folder already exists"
+            return None
+            
+    else:
+        # otherwise return None and break the flow
+        errror_message = "\n!! Resource with name of : '"+ str(base_folder_name) +"' cannot be created. \n\t - Because resource file containing ZIP : '" + ebook_zip_file + "' does not exists."
+        print errror_message
+        log_list.append(str(errror_message))
+        return None
+
+
 def create_resource_gsystem(resource_data):
-  
+
     # fetching resource from url
-    resource_link = resource_data.get("resource_link")  # actual download file link
+    resource_link = resource_data.get("file_name")  # actual download file name
+    ebook_unzip_folder = EBOOKS_ROOT + resource_link[:5] + "dd"
+
+    if os.path.isdir(ebook_unzip_folder):
+        # Folder already created.
+        # print "folder already exists"
+        
+        resource_link = ebook_unzip_folder + "/" + str(os.listdir(ebook_unzip_folder)[0]) + "/" + resource_link
+        # overwritting resource link
+        # print "resource_link : ", resource_link
+
+        if os.path.exists(resource_link):
+            # checking if file path exists
+            resource_link = "file://" + resource_link
+            files = urllib2.urlopen(resource_link)
+            files = io.BytesIO(files.read())
+        else:
+            # otherwise return None and break the flow
+            errror_message = "\n!! Resource with name of : '"+ str(resource_data["name"]) +"' cannot be created. \n\t - Because resource file : '" + str(resource_link) + "' does not exists."
+            print errror_message
+            log_list.append(str(errror_message))
+            return None
+    else:
+        # otherwise return None and break the flow
+        errror_message = "\n!! Resource with name of : '"+ str(resource_data["name"]) +"' cannot be created. \n\t - Because resource file contained in folder : '" + str(ebook_unzip_folder) + "' does not exists."
+        print errror_message
+        log_list.append(str(errror_message))
+        return None
+
     filename = resource_link.split("/")[-1]  # actual download file name with extension. e.g: neuron.jpg 
     name = unicode(resource_data["name"])  # name to be given to gsystem
-    files = urllib2.urlopen(resource_link)
-    files = io.BytesIO(files.read())
-    files.name = filename
+    files.name = filename # as per requirements in save_file()
 
-    userid = resource_data["created_by"]
+    userid = nroer_id
     content_org = resource_data["content_org"]
 
     # processing tags
@@ -655,208 +790,109 @@ def create_resource_gsystem(resource_data):
     access_policy = None
 
     filemd5 = hashlib.md5(files.read()).hexdigest()
-    # size, unit = getFileSize(files)
-    # size = {'size':round(size, 2), 'unit':unicode(unit)}
     
-    fcol = get_database()[File.collection_name]
-    fileobj = fcol.File()
+    fileobj = file_collection.File()
 
-    check_obj_by_name = collection.File.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
-    # print "\n====", check_obj_by_name, "==== ", fileobj.fs.files.exists({"md5":filemd5})
+    if fileobj.fs.files.exists({"md5":filemd5}):
 
-    if fileobj.fs.files.exists({"md5":filemd5}) or check_obj_by_name:
+        gridfs_obj_by_md5 = fs_files_collection.find_one({"md5":filemd5})
         
-        coll_oid = get_database()['fs.files']
-        cur_oid = coll_oid.find_one({"md5":filemd5})
+        check_obj_by_name_n_fs_ids = collection.File.find_one({
+                                        "_type":"File", 
+                                        'member_of': {'$all': [ObjectId(file_gst._id)]},
+                                        'group_set': {'$all': [ObjectId(home_group._id)]},
+                                        "name": unicode(resource_data["name"]),
+                                        "fs_file_ids": {"$in":[ gridfs_obj_by_md5["_id"] ]} 
+                                    })
         
-        # printing appropriate error message
-        if check_obj_by_name:
-            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name._id)
+        if check_obj_by_name_n_fs_ids:
+            # printing appropriate error message
+            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name_n_fs_ids._id)
             print info_message
             log_list.append(str(info_message))
-        else:      
-            info_message = "\n- Resource file exists in DB: '" + str(cur_oid._id) + "'"
-            print info_message
-            log_list.append(str(info_message))
-
-        # return check_obj_by_name
-        return None
+            
+            return check_obj_by_name_n_fs_ids._id
 
     else:
         # creating new resource
         files.seek(0)
-        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC")
-        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
         
         info_message = "\n- Creating resource: " + str(resource_data["name"])
         log_list.append(str(info_message))
         print info_message
+
+        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC")
         
-        # filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
-
-        # filling values in fileobj
-        # name = unicode(resource_data["name"])
-        # fileobj.name = name
-        # fileobj.created_by = resource_data["created_by"]
-        # fileobj.group_set.append(home_group._id)
-        # fileobj.member_of.append(file_gst._id)
+        # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
         
-        # storing content_org and content
-        # content_org = resource_data["content_org"]
+        if fileobj_oid:
+            # resource is saved in to gridfs along with gsystem creation successfully.
 
-        # if content_org:
-        #     fileobj.content_org = unicode(content_org)
-        #     # Required to link temporary files with the current user who is modifying this document
-        #     # usrname = request.user.username
-        #     filename = slugify(name) + "-" + "nroer_team"
-        #     fileobj.content = org2html(content_org, file_prefix=filename)
+            # featured value
+            resource_data["featured"] = True if (resource_data["featured"] == 1) else False
 
-        # fileobj.tags = resource_data["tags"]
+            # adding remaining fields
+            collection.update(
+                                {"_id": fileobj_oid},
+                                {'$set': 
+                                    {
+                                        'status': u"PUBLISHED",
+                                        'altnames': resource_data["altnames"].strip(),
+                                        'featured': resource_data["featured"]
+                                    } 
+                                },
+                                upsert=False, multi=False
+                            )
 
-        # tags:
-        # if not type(resource_data["tags"]) is list:
-        #     tag_list = resource_data["tags"].replace("\n", "").split(",")
-        #     temp_tag_list = []
-        #     for each_tag in tag_list:
-        #       if each_tag:
-        #         temp_tag_list.append(each_tag.strip())
-        #     fileobj.tags = temp_tag_list
-        # else:
-        #     fileobj.tags = resource_data["tags"]
+            update_url_field(fileobj_oid, filename)
 
-        # fileobj.language = resource_data["language"]
-        # username = User.objects.get(id=userid).username
-        # fileobj.access_policy = u"PUBLIC"
-        # print title, "\n----------\n", userid, "\n", group_id, "\n", content_org, "\n", tags, "\n", language, "\n", access_policy
+            info_message = "\n- Created resource/GSystem object of name: '" + unicode(name) + "' having ObjectId: " + unicode(fileobj_oid)
+            log_list.append(info_message)
+            print info_message
 
-        # fileobj.altnames = resource_data["altnames"]
-        # fileobj.featured = resource_data["featured"]
-        # fileobj.license = resource_data["license"]
+            log_list.append("\n- Saved resource into gridfs. \n")
+            # print "\n----------", fileobj
+     
+            # fileobj_oid is ObjectId("68jhgc..........") and not whole document
+            return fileobj_oid
 
-        # if resource_data[contributors]
-        #   contrib_list = resource_data[contributors].split(",")
-
-        #   temp_contributors = []
-        #   for each_user in contrib_list:
-        #     user_id = get_user_id(each_user.strip())
-        #     if user_id:
-        #       temp_contributors.append(user_id)
-        #       resource_data[contributors] = temp_contributors
-        # else:
-        #   resource_data[contributors] = []
-
-        # fileobj.contributors = resource_data[contributors]
-        # user_id = get_user_id("nroer_team")
-        # fileobj.contributors.append(user_id)
-
-        # fileobj.status = u"PUBLISHED"
-
-        # fileobj.file_size = size
-        # fileobj.mime_type = filetype
-        # fileobj.modified_by = user_id
-        # fileobj.save()
-
-        info_message = "\n- Created resource/GSystem object of name: '" + unicode(name) + "' having ObjectId: " + unicode(fileobj_oid)
-        log_list.append(info_message)
-        print info_message
-
-        # files.seek(0)
-        # objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
-        # collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
-
-        log_list.append("\n- Saved resource into gridfs. \n")
-        # print "\n----------", fileobj
-        
-        # filetype1 = mimetypes.guess_type(filename)[0]
-        # print filetype1
-
-        # '''storing thumbnail of pdf and svg files  in saved object'''        
-        # if 'pdf' in filetype or 'svg' in filetype:
-        #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
-        #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
-        #     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-         
-        
-        # '''storing thumbnail of image in saved object'''
-        # if 'image' in filetype:
-        #     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
-        #     thumbnailimg = convert_image_thumbnail(files)
-        #     tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
-        #     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-            
-        #     files.seek(0)
-        #     mid_size_img = convert_mid_size_image(files)
-        #     if  mid_size_img:
-        #         mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-        #         collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
-    
-        return fileobj_oid
+        else:
+            return None
 
 
-# def getFileSize(File):
-#     """
-#     obtain file size if provided file object
-#     """
-#     try:
-#         File.seek(0,os.SEEK_END)
-#         num = int(File.tell())
-#         for x in ['bytes','KB','MB','GB','TB']:
-#             if num < 1024.0:
-#                 return  (num, x)
-#             num /= 1024.0
-#     except Exception as e:
-#         error_message = "Unabe to calucalate size" + e
-#         print error_message
-#         log_list.append(str(error_message))
-#         return 0,'bytes'
+def unzip(source_filename, dest_dir):
+    '''
+    extracts given source .zip file to destination directory.
+    '''
+    with zipfile.ZipFile(source_filename, "r") as zf:
+        zf.extractall(dest_dir)
 
 
-# def convert_pdf_thumbnail(files,_id):
-#     '''
-#     convert pdf file's thumnail
-#     '''
-#     filename = str(_id)
-#     os.system("mkdir -p "+ "/tmp"+"/"+filename+"/")
-#     fd = open('%s/%s/%s' % (str("/tmp"),str(filename),str(filename)), 'wb')
-#     files.seek(0)
-#     fd.write(files.read())
-#     fd.close()
-#     subprocess.check_call(['convert', '-thumbnail', '128x128',str("/tmp/"+filename+"/"+filename+"[0]"),str("/tmp/"+filename+"/"+filename+"-thumbnail.png")])
-#     thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
-#     return thumb_pdf
+def update_url_field(oid, name):
+
+    url = "http://" + str(current_site.domain) + "/" + home_group.name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + oid.__str__() + "/" + str(name)
+
+    # adding remaining fields
+    collection.update({"_id": oid}, {'$set': {'url': unicode(url)} }, upsert=False, multi=False )
+
+    return "[[" + url + "]]"
 
 
-# def convert_image_thumbnail(files):
-#     """
-#     convert image file into thumbnail
-#     """
-#     files.seek(0)
-#     thumb_io = StringIO()
-#     size = 128, 128
-#     img = Image.open(StringIO(files.read()))
-#     img.thumbnail(size, Image.ANTIALIAS)
-#     img.save(thumb_io, "JPEG")
-#     thumb_io.seek(0)
-#     return thumb_io
+# relations to be created:
+# has_cover_page
+# cover_page_of
 
+# things noticed in CSV as contrast to resources CSV : 
 
-# def convert_mid_size_image(files):
-#     '''
-#     convert image into 1000 pixel size userd for image gallery
-#     '''
-#     mid_size_img = StringIO()
-#     img = Image.open(StringIO(files.read()))
-#     width, height = img.size
+# - fields that have in resources CSV and not in e-book CSV:
+#     - created_by, license, translation_of, adaptation_of, contributors, prior_node
 
-#     widthRatio = 1000 / float(width)
-#     heightRatio = 1000 / float(height)
+# - fields that have in e-book and not in CSV resources CSV :
+#     - base_folder (contains subject name. e.g: Mathematics-XI)
 
-#     width = int(float(width) * float(widthRatio))
-#     height = int(float(height) * float(heightRatio))
+# - difference in the field:
+#     - file_name : 
+#         - In resources.csv: http://nroer.gov.in/gstudio/resources/images/show/34615/
+#         - In e-book.csv: kemh101.pdf
 
-#     size = width, height
-
-#     img.resize(size, Image.ANTIALIAS)
-#     img.save(mid_size_img, "JPEG")
-#     mid_size_img.seek(0)
-#     return mid_size_img
+# first five characters from .zip file will be checked with file_name

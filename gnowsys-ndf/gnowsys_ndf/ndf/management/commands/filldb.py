@@ -211,25 +211,25 @@ class Command(BaseCommand):
             print "\n CollegeEvents Created."
   
         Event=collection.Node.find_one({'_type':"GSystemType","name":"Event"})  
-        All_Event_Types=collection.Node.find({"type_of": ObjectId(Event._id)})
-        Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
-        CollegeEvents=collection.Node.one({"name":"CollegeEvents"})
-        Event_type_list=[]
-        College_type_list=[]
-        for i in All_Event_Types:
-            
-            if (GlistItem._id not in i.member_of): 
-                i.member_of.append(GlistItem._id)
-                i.save()
-            if i.name not in ['Classroom Session','Exam']:
-               Event_type_list.append(i._id)
-            if i.name in ['Classroom Session','Exam']:
-               College_type_list.append(i._id)
-                
-        collection.update({'_id': ObjectId(Eventtype._id)}, {'$set': {'collection_set': Event_type_list}}, upsert=False, multi=False)
-        
-        collection.update({'_id': ObjectId(CollegeEvents._id)}, {'$set': {'collection_set': College_type_list}}, upsert=False, multi=False)
-        
+        if Event:
+          All_Event_Types=collection.Node.find({"type_of": ObjectId(Event._id)})
+          Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
+          CollegeEvents=collection.Node.one({"name":"CollegeEvents"})
+          Event_type_list=[]
+          College_type_list=[]
+          for i in All_Event_Types:
+              if (GlistItem._id not in i.member_of): 
+                  i.member_of.append(GlistItem._id)
+                  i.save()
+              if i.name not in ['Classroom Session','Exam']:
+                 Event_type_list.append(i._id)
+              if i.name in ['Classroom Session','Exam']:
+                 College_type_list.append(i._id)
+                  
+          collection.update({'_id': ObjectId(Eventtype._id)}, {'$set': {'collection_set': Event_type_list}}, upsert=False, multi=False)
+          
+          collection.update({'_id': ObjectId(CollegeEvents._id)}, {'$set': {'collection_set': College_type_list}}, upsert=False, multi=False)
+          
         #End of adding Event Types and CollegeEvents
         
         # Creating GSystem(s) of GList for GSTUDIO_TASK_TYPES
@@ -240,7 +240,6 @@ class Command(BaseCommand):
         glist = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
         task_type_ids = []
         # First: Creating Types as GList nodes from GSTUDIO_TASK_TYPES
-        print "\n"
         info_message = "\n"
         for gl_node_name in GSTUDIO_TASK_TYPES:
           gl_node = collection.Node.one({'_type': "GSystem", 'member_of':glist._id, 'name': gl_node_name})
@@ -568,13 +567,14 @@ def create_sts(factory_gsystem_types,user_id):
   theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
   topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
   topics = collection.Node.one({'_type': 'GSystemType', 'name': 'Topics'})
-  if not topics.collection_set:
-    topics.collection_set.append(theme_GST._id)
-    topics.collection_set.append(topic_GST._id)
-    topics.created_by = 1
-    topics.modified_by = 1
-    topics.status = u"PUBLISHED"
-    topics.save()
+  if theme_GST and topic_GST and topics:
+    if not topics.collection_set:
+      topics.collection_set.append(theme_GST._id)
+      topics.collection_set.append(topic_GST._id)
+      topics.created_by = 1
+      topics.modified_by = 1
+      topics.status = u"PUBLISHED"
+      topics.save()
 
 def clean_structure():
   '''
@@ -639,7 +639,8 @@ def clean_structure():
 
   for each_gs in gs:
     attr_list = []  # attribute-list
-    rel_list = []   # relation-list
+    rel_list = []  # relation-list
+    inv_rel_list = []  # inverse-relation-list
 
     print " .",
     if each_gs.member_of_names_list:
@@ -651,17 +652,29 @@ def clean_structure():
     # Fetch all attributes, if created in GAttribute Triple
     # Key-value pair will be appended only for those whose entry would be found in GAttribute Triple
     # ------------------------------------------------------------------------------------
-    ga = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GAttribute", 'status': u"PUBLISHED"}}, 
-                              {'$project': {'_id': 0, 'key_val': '$attribute_type', 'value_val': '$object_value'}}
-                            ])
+    ga = collection.aggregate([
+      {'$match': {'subject': each_gs._id, '_type': "GAttribute", 'status': u"PUBLISHED"}}, 
+      {'$project': {'_id': 0, 'key_val': '$attribute_type', 'value_val': '$object_value'}}
+    ])
 
     # ------------------------------------------------------------------------------------
     # Fetch all relations, if created in GRelation Triple
     # Key-value pair will be appended only for those whose entry would be found in GRelation Triple
     # ------------------------------------------------------------------------------------
-    gr = collection.aggregate([{'$match': {'subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
-                              {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$right_subject'}}
-                            ])
+    gr = collection.aggregate([
+      {'$match': {'subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
+      {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$right_subject'}}
+    ])
+
+    # ------------------------------------------------------------------------------------
+    # Fetch all inverse-relations, if created in GRelation Triple
+    # Key-value pair will be appended only for those whose entry would be found in GRelation Triple
+    # ------------------------------------------------------------------------------------
+    inv_gr = collection.aggregate([
+      {'$match': {'right_subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
+      {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$subject'}}
+    ])
+
     if ga:
       # If any GAttribute found
       # ------------------------------------------------------------------------------------
@@ -678,18 +691,16 @@ def clean_structure():
           attr_list.append({key_node["name"]: each_gar["value_val"]})
 
     if gr:
-      # If any GRelation found
+      # If any GRelation (relation) found
       # ------------------------------------------------------------------------------------
       # Setting up rel_list
       # ------------------------------------------------------------------------------------
-      # print "\n"
       for each_grr in gr["result"]:
         if each_grr:
           key_node = get_database().dereference(each_grr["key_val"])
-          # print "\t", key_node["name"], " -- ", each_grr["value_val"]
           # Append corresponding GRelation as key-value pair in given relation-list
-          # key: relation-type name
-          # value: right_subject from GRelation document
+          # key: name field's value of relation-type's document
+          # value: right_subject field's value of GRelation document
           if not rel_list:
             rel_list.append({key_node["name"]: [each_grr["value_val"]]})
 
@@ -703,6 +714,30 @@ def clean_structure():
             if not key_found:
               rel_list.append({key_node["name"]: [each_grr["value_val"]]})
 
+    if inv_gr:
+      # If any GRelation (inverse-relation) found
+      # ------------------------------------------------------------------------------------
+      # Setting up inv_rel_list
+      # ------------------------------------------------------------------------------------
+      for each_grr in inv_gr["result"]:
+        if each_grr:
+          key_node = get_database().dereference(each_grr["key_val"])
+          # Append corresponding GRelation as key-value pair in given inverse-relation-list
+          # key: inverse_name field's value of relation-type's document
+          # value: subject field's value of GRelation document
+          if not inv_rel_list:
+            inv_rel_list.append({key_node["inverse_name"]: [each_grr["value_val"]]})
+
+          else:
+            key_found = False
+            for each in inv_rel_list:
+              if each.has_key(key_node["inverse_name"]):
+                each[key_node["inverse_name"]].append(each_grr["value_val"])
+                key_found = True
+
+            if not key_found:
+              inv_rel_list.append({key_node["inverse_name"]: [each_grr["value_val"]]})
+
     info_message = ""
     if attr_list:
       info_message += "\n\n\tAttributes: " + str(attr_list)
@@ -713,12 +748,22 @@ def clean_structure():
       info_message += "\n\n\tRelations: " + str(rel_list)
     else:
       info_message += "\n\n\tRelations: No relation found!"
+    
+    if inv_rel_list:
+      info_message += "\n\n\tInverse-Relations: " + str(inv_rel_list)
+    else:
+      info_message += "\n\n\tInverse-Relations: No inverse-relation found!"
+
     log_list.append(info_message)
 
     # ------------------------------------------------------------------------------------
     # Finally set attribute_set & relation_set of current GSystem with modified attr_list & rel_list respectively
     # ------------------------------------------------------------------------------------
-    res = collection.update({'_id': each_gs._id}, {'$set': {'attribute_set': attr_list, 'relation_set': rel_list}}, upsert=False, multi=False)
+    res = collection.update(
+      {'_id': each_gs._id}, 
+      {'$set': {'attribute_set': attr_list, 'relation_set': (rel_list + inv_rel_list)}}, 
+      upsert=False, multi=False
+    )
     if res['n']:
       info_message = "\n\n\t" + str(each_gs.name) + " updated succesfully !"
       log_list.append(info_message)
