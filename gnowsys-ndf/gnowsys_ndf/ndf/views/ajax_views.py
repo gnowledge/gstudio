@@ -3969,7 +3969,6 @@ def save_csv(request,group_id,app_set_instance_id=None):
           fw.writerow(dict((col,col) for col in column_header))
           
           for row in list(json_data):
-            print "data",row
             v = {}
             fw.writerow(ast.literal_eval(row))
         return HttpResponse((STATIC_URL + filename))
