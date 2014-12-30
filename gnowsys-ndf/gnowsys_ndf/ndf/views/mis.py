@@ -21,11 +21,9 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-# from gnowsys_ndf.ndf.views.methods import *
-# from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.views.organization import *
 from gnowsys_ndf.ndf.views.course import *
-from gnowsys_ndf.ndf.views.event import *
 from gnowsys_ndf.ndf.views.person import *
 
 collection = get_database()[Node.collection_name]

@@ -376,7 +376,7 @@ def setup_default_gapps():
   This sets up default GAPPS for group(s).
   '''
 
-  default_gapps_names_list = ["Page", "File", "Forum", "MIS"] #, "Task", "Meeting"]
+  default_gapps_names_list = ["Page", "File", "Forum", "MIS", "Task", "Batch", "Event"]# "Meeting"]
   info_message = "\n Default GAPPS names: " + str(default_gapps_names_list)
 
   # Fetch GAPPS and populate their document-node in a different list

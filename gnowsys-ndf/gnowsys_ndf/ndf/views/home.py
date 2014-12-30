@@ -26,7 +26,7 @@ from gnowsys_ndf.ndf.models import GSystemType,Node
 
 def homepage(request):	
 
-	return render_to_response("ndf/base.html",context_instance=RequestContext(request))
+    return render_to_response("ndf/base.html",context_instance=RequestContext(request))
 
 
 
@@ -35,7 +35,6 @@ class HomeRedirectView(RedirectView):
     pattern_name = 'home'
 
     def get_redirect_url(self, *args, **kwargs):
-     
     	if self.request.user.is_authenticated():
             collection = get_database()[Node.collection_name]
             auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
@@ -73,11 +72,11 @@ class HomeRedirectView(RedirectView):
             # This will return a string in url as username and allows us to redirect into user group as soon as user logsin.
             #return "/{0}/".format(auth.pk)
             if GSTUDIO_SITE_LANDING_PAGE == 'home':
-                return "/home/"		
+                return "/home/dashboard/group"
             else:    
                 return "/{0}/dashboard".format(self.request.user.id)     
         else:
             # If user is not loggedin it will redirect to home as our base group.
-            return "/home/"		
+            return "/home/dashboard/group"
 
     

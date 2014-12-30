@@ -2,7 +2,10 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load pagination_tags %}
+
 {% block head %}
+  {{block.super}}
+
 	<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
 	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
@@ -13,83 +16,107 @@
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
   <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
-	
 {% endblock %}
 
-
 {% block style %}
- 
-/* CSS for Multiple-selection (or drawer) widget */
-  .divider-line { font-size: xx-large; color:lightgray; }
-  .line-height-2 { line-height:2; }
-  .line-height-2pt5 { line-height:2.5; }
-  .fontsize-x-large { font-size: x-large; }
+  {{block.super}}
+  /* CSS for Multiple-selection (or drawer) widget */
+    .divider-line { font-size: xx-large; color:lightgray; }
+    .line-height-2 { line-height:2; }
+    .line-height-2pt5 { line-height:2.5; }
+    .fontsize-x-large { font-size: x-large; }
 
-  .margin-0 { margin: 0 !important ;}
+    .margin-0 { margin: 0 !important ;}
 
-  .resource-drawer { 
-    border-color: #D3D3D3; border-style: solid; 
-    padding: 0 !important; 
-    overflow-y: auto;
-  }
+    .resource-drawer { 
+      border-color: #D3D3D3; border-style: solid; 
+      padding: 0 !important; 
+      overflow-y: auto;
+    }
 
-  .resource-drawer li.bullet-item:hover{
-    background-color: #ecf0f1; cursor:pointer;
-  }
+    .resource-drawer li.bullet-item:hover{
+      background-color: #ecf0f1; cursor:pointer;
+    }
 
-  .posted-by{ color: #808080; font-size: small; }
+    .posted-by{ color: #808080; font-size: small; }
 
-  .selected-resource { background-color:lightgray !important ; }
+    .selected-resource { background-color:lightgray !important ; }
 
-  .resource-type-image {
-    height:40px;    
-    background-repeat:no-repeat; background-size: 48px 48px
-  }
+    .resource-type-image {
+      height:40px;    
+      background-repeat:no-repeat; background-size: 48px 48px
+    }
 
-/* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
-  dl.tabs>dd a.disable {
-    pointer-events: none;
-    cursor: default;
-  }
+  /* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+    dl.tabs>dd a.disable {
+      pointer-events: none;
+      cursor: default;
+    }
 
+    .row .row {
+      margin: 0 0;
+    }
+
+  /* Resetting css-properties for fieldset (also legend, input) */
+    /* fieldset (padding-bottom) */ 
+    fieldset {
+      padding: 1.25rem !important;
+    }
+
+    /* legend (background-color) */
+    fieldset legend {
+      background-color: transparent !important;
+    }
+
+    /* input (margin) */
+    fieldset input {
+      margin: 0 !important;
+    }
+
+  /* Setting css-properties for small.error */
+    small.error {
+      padding: 0 0 0 0.5rem !important;
+      margin-top: 1rem !important;
+      position: relative !important;
+    }
 {% endblock %}
 
 {% block body_content %} 
   <form data-abide id="form-edit-node" method="POST" action="">
   {% csrf_token %}
- <div class="row">
-    <fieldset>
-                <header class="row" style="margin: 1rem 0 0 0;">
-                <h2 class="medium-12 columns">
-                 {% if node %}
-                        {% trans "Editing Event:" %} {{node.name}}
-                 {% else %}
-                        {% trans "Create a New" %} {{title}} Event
-                 {% endif %}
-      </h2>
-    </header>
+  <header class="row" style="margin: 1rem 0 0 0;">
+    <h2 class="medium-12 columns">
+      {% if node %}
+      {% trans "Editing Event:" %} {{node.name}}
+      
+      {% else %}
+      {% trans "Create a New" %} {{title}} {% trans "Event" %}
+      
+      {% endif %}
+    </h2>
+  </header>
 
-        <div class="row">
-            <div class="small-1 columns">
-              <label for="{{property_order_list.0.1.9.name}}" class="right inline"> 
+  <fieldset>
+    <div class="row" style="margin-top: 0.5rem;">
+       <div class="small-1 columns">
+          <label for="{{property_order_list.0.1.9.name}}" class="right inline"> 
                 {{property_order_list.0.1.9.altnames}}
-              </label>
-            </div>
-            <div class="small-5 columns">
+          </label>
+       </div>
+       <div class="small-5 columns">
                      {% html_widget groupid node.pk property_order_list.0.1.9 %}
-            </div>
+       </div>
             
-           <div class="small-1 columns">
+       <div class="small-2 columns">
                  <label  class="right inline">
                     Course Name
                 </label>
-           </div>
-           <div class="small-5 columns">
+        </div>
+        <div class="small-4 columns" align="left">
                  <select id="nussd_course_name" name="nussd_course_name" required>
                  </select>
-           </div>
-         
-        </div>
+         </div>
+    </div>
         <!-- tab for batches -->
         
         <div class= "row">
@@ -110,10 +137,10 @@
                 {{property_order_list.0.1.1.altnames}}
               </label>
             </div>
-            <div class="small-2 columns">
+            <div class="small-3 columns">
                      {% html_widget groupid node.pk property_order_list.0.1.1 %}
             </div>
-            <div class="small-1 columns">
+            <div class="small-1 columns" align="left">
               <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
                  {{property_order_list.0.1.2.altnames}}
               </label>
@@ -155,129 +182,110 @@
       <input type="hidden" value=1 name="iteration" id="iteration">
       </div>
     
-    </fieldset>
-    <div id="Module-session-section">
-      <fieldset >
-         <div class="row" >
-          <div class="small-1 columns">
-            <label   class="right inline">
-               Module
-            </lable>
-          </div>
-      
-         <div class="small-4 columns">
-          <select id="Module_of" name="Module_of">
+  </fieldset>
+
+  <div id="Module-session-section">
+    <fieldset >
+      <div class="row">
+        <div class="small-1 columns">
+          <label class="right inline">
+            {% trans "Module:" %}
+          </lable>
+        </div>
+    
+        <div class="small-4 columns">
+          <select id="Module_of" name="Module_of" style="float:left; width:95%">
           </select>
-         
-         </div>
-         <div class="small-1 columns">
-         <label><font color="red">*</font></label>
-         </div>
-         <div class="small-1 columns">
-           <label   class="right inline">
-              Sessions
-           </lable>
-         </div>
-     
-         <div class="small-4 columns"> 
-             <select id="session_of" name="session_of">
-             </select>
-             
-         </div>
-         <div class="small-1 columns">
-          <label><font color="red">*</font></label>
-         </div> 
-      
-      
-    </div>
-            <div class="row">
-                  <!- section for creation of multiple section -->
-                  <div class="small-1 columns" hidden>
-                        <label  class="right inline">
-                        Split session
-                          
-                        </label>
-                  </div>
-                  <div class="small-11 columns" align="left" hidden >
-                        <input type="radio" id="split-into2" name="split-into" value="2" > 2
-                        <input type="radio" id="split-into3" name="split-into" value="3" > 3
-               
-                  </div>
-                  
-                  <div class="session_time">
-                  
-                  
-                  </div>
-      
-            <div class="small-1 columns">
-              <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
-                {{property_order_list.0.1.1.altnames}}
-              </label>
-            </div>
-            <div class="small-2 columns">
-                     {% html_widget groupid node.pk property_order_list.0.1.1 %}
-            </div>
-            
-            <div class="small-1 columns">
-              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
-               
-                {{property_order_list.0.1.2.altnames}}
-              </label>
-            </div>
-            <div >
-                     {% html_widget groupid node.pk property_order_list.0.1.2 %}
-            </div>
-            <div class="small-2 columns" style="border-color:red;">
-            <label> Available Session minutes </label>
-            <div id="availabel-minutes">
-            </div>
-            </div>
+          <i style="color:red; float:left display:inline">*</i>
+        </div>
+
+        <div class="small-1 columns">
+          <label class="right inline">
+            {% trans "Sessions:" %}
+          </label>
+        </div>
+   
+        <div class="small-4 columns end"> 
+          <select id="session_of" name="session_of" style="float:left; width:95%">
+          </select>
+          <i style="color:red; float:left display:inline">*</i>
+        </div>
       </div>
+
+      <div class="row">
+        <div class="small-1 columns">
+          <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+            {{property_order_list.0.1.1.altnames}}
+          </label>
+        </div>
+        <div class="small-2 columns">
+          {% html_widget groupid node.pk property_order_list.0.1.1 %}
+        </div>
+          
+        <div class="small-1 columns">
+          <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+            {{property_order_list.0.1.2.altnames}}
+          </label>
+        </div>
+        <div class="small-2 columns">
+          {% html_widget groupid node.pk property_order_list.0.1.2 %}
+        </div>
+          
+        <div class="small-2 columns">
+          <label for="{{property_order_list.0.1.2.name}}" class="right inline">
+            {% trans "Remainig time (in minutes):" %}
+          </label>
+        </div>
+        <div id="available-minutes" class="small-1 columns end">
+          <label for="{{property_order_list.0.1.2.name}}" class="inline">0</label>
+        </div>  
+      </div>
+   
       <!-- section for start time and end time -->
       <div class="row" id="Split_Session">
-          <!-- checkbox for yes or no  split session  -->
-          <div class="small-12 columns">
-          <input type="checkbox" class="splitsession" id="splitsession" onClick="ShowSplits()">Split Session
-          </div>
-          <div  id="select_split" >
-             <div style="width:200px;"><hr> </hr></div>
-             <div id="splits" class="row">
-                  <div id="split-2" class="small-2 columns" >
-                  <input type="radio" id="chkbxsplit-2" name="splitinto" onClick="GenerateSplits('2')" value="2">2
-                  </div>
-                  <div id="split-3" class="small-10 columns" align="left">
-                   <input type="radio" id="chkbxsplit-3" name="splitinto" onClick="GenerateSplits('3')" value="3">3
-                  </div>
-                  <!-- Div for Appended Start_Date And End Date -->
-                  <div id="date-splits" >
-                  </div>
-             </div>
-          </div>
+        <!-- checkbox for yes or no  split session  -->
+        <div class="small-11 small-offset-1 columns end">
+          <input type="checkbox" class="splitsession" id="splitsession" onClick="ShowSplits()">{% trans "Split Session" %}
           
+          <div id="select_split">
+            <hr/>
+            <!--
+            <div style="width:200px;">
+            </div>
+            -->
+            
+            <div id="splits" class="row">
+              <div id="split-2" class="small-1 columns" >
+                <input type="radio" id="chkbxsplit-2" name="splitinto" onClick="GenerateSplits('2')" value="2" style="right-padding:2px;">2
+              </div>
+              
+              <div id="split-3" class="small-1 columns end">
+                <input type="radio" id="chkbxsplit-3" name="splitinto" onClick="GenerateSplits('3')" value="3" style="right-padding:2px;">3
+              </div>
+              
+              <!-- Div for Appended Start_Date And End Date -->
+              <div id="date-splits" class="small-12 columns">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      
-      <div class="row">
-      
-         <div class="small-1 columns">
-              <label  class="right inline"> 
-                    Master Trainer
-              </label>
-            </div>
-            <div class="small-5 columns">
-                     <select id="event_coordinator" name="event_coordinator" required>
-                     
-                     </select>
-                     
-            </div>
-            <div class="small-4 columns">
-                 <label><font color="red">*</font></label>
-            </div>
-            <div class="small-4 columns">
-                 
-            </div>
+      <div class="row" style="margin-top: 1em;">
+        <div class="small-2 columns">
+          <label class="right inline"> 
+            {% trans "Voluntary Teacher" %}
+          </label>
+        </div>
+        <div class="small-5 columns">
+          <select id="event_coordinator" name="event_coordinator" required style="float:left; width:95%">
+          </select>
+          <i style="color:red; float:left display:inline">*</i>
+        </div>
 
-           
+        <div class="small-4 columns end">
+          <!-- keept for spacing from left hand side -->        
+        </div>
       </div>
             </fieldset>  
       
@@ -295,7 +303,9 @@
   
   
   
+
 {% endblock %}
+
 {% block script %}
 
 function ShowSplits()
@@ -312,43 +322,48 @@ function ShowSplits()
 
   }
 function GenerateSplits(splits){
-  document.getElementById('start_time').value = ""
-  document.getElementById('end_time').value = ""
-  $("#date-splits").empty();
+  //document.getElementById('start_time').value = ""
+  //document.getElementById('end_time').value = ""
   var i=1;
+  if (splits == 2)
+  {
+      $("#date-splits").empty();
+  
+  }
+  if( !(document.getElementById("start_time_1")) )
+  {
   $("#date-splits").append("<div class='row'> <div class='small-1 columns' align='right' > <label> <b>Split -1 </b></label> </div></div>")
   $("#date-splits").append("<div class='row' align='left'>"+ 
   " <div class='small-1 columns' align='center' >"+ 
-    "<label> Start time </label>"+
+    "<label for='start_time_1' class='right inline'> {% trans "Start time" %} </label>"+
   "</div>"+
   "<div class='small-2 columns' > "+
      "<input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1' readonly=''>"+
   "</div>"+
   
   " <div class='small-1 columns'>"+
-      "<label> End time </label></div>"+
+      "<label for='end_time_1' class='right inline'> {% trans "End time" %} </label></div>"+
    ""+ "<div >"+
      "<input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
       "</div></div>")
-   
+  } 
    if(splits == '3')
    {
- $("#date-splits").append("</br>")
-  $("#date-splits").append("<div class='row'> <div class='small-1 columns' align='right' > <label> <b>Split -2 </b></label> </div></div>")
+  $("#date-splits").append("<div class='row' style='margin-top: 1em;'> <div class='small-1 columns' align='right' > <label> <b>{% trans "Split-2" %}</b></label> </div></div>")
   $("#date-splits").append("<div class='row' align='left'>"+ 
   " <div class='small-1 columns' align='center' >"+ 
-    "<label> Start time </label>"+
+    "<label for='start_time_2' class='right inline'> {% trans "Start time" %} </label>"+
   "</div>"+
   "<div class='small-2 columns' > "+
      "<input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_2' readonly=''>"+
   "</div>"+
-  
-  " <div class='small-1 columns'>"+
+   " <div class='small-1 columns'>"+
       "<label> End time </label></div>"+
    ""+ "<div >"+
      "<input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_2' readonly=''>"+
       "</div></div>")
-  $("#iteration").attr('value','3')
+   
+    $("#iteration").attr('value','3')
   }
   else
   {
@@ -356,10 +371,12 @@ function GenerateSplits(splits){
   }
      datetime()
   
+   
 }
 
 
 $(document).ready(function(){
+ document.getElementById('form-edit-node').reset()
  datetime()
  clear_Disable_Elements();
  var event_details=""
@@ -492,7 +509,7 @@ $('body').click(function(e)
 */
 /*
 $('#split-into3').click(function(){
-  var counter=$('#split-into3').val()
+  var counter=$('#split-into3').val();
   /*for (i=1;i<counter;i++){
      var $elem=$("#start_time").clone()
      var $a=$elem.attr("id","start_time_"+i).attr("name","start_time_"+i)
@@ -504,7 +521,6 @@ $('#split-into3').click(function(){
 /*
 $('#split-into2').click(function(){
    $('#iteration').attr('value','2')
-   alert($('#iteration').val())
   var counter=$('#split-into2').val()
 /*
   for (i=1;i<counter;i++){
@@ -722,12 +738,14 @@ $("#session_of").change(function(){
   var session_of=$('#session_of option:selected').text()
   $("#Session").val(session_of)
   document.getElementById('event_coordinator').disabled = "";      
-  //document.getElementById('splitsession').disabled="";
-  $("#availabel-minutes").append("<label> "+total_session_time+"<label>")
+  $("#available-minutes").empty()
+  $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
 });
+
 function enable_submit()
 {
-  if (total_session_time == 0){
+  vt_selected_index = $("#event_coordinator :selected").index();
+  if (total_session_time == 0 && vt_selected_index != 0 ){
       document.getElementById('submit').disabled = "";      
   }
 else
@@ -735,9 +753,11 @@ else
     document.getElementById('submit').disabled = true;      
 }
 
+
 }
 
 $('#event_coordinator').change(function(){
+  
  enable_submit()
 });
 
@@ -838,10 +858,9 @@ function date_validation(name)
   str2=name.substring(0,3)
   if (str2 == 'end' )
   {
-     alert(str)
+
      if (str)
       {
-      alert("should come here")
       
          start_time=document.getElementById("start_time_"+ str).value
          end_time =document.getElementById("end_time_"+ str).value
@@ -850,7 +869,6 @@ function date_validation(name)
       
      if(!(str))
       {
-        alert("inside")
         start_time=document.getElementById("start_time").value
         end_time=document.getElementById("end_time").value
       
@@ -861,9 +879,8 @@ function date_validation(name)
      {
       if(total_session_time < 0)
       {
-          alert("please Schedule within alloted time ")
+          alert("Please schedule session within given allotted time!")
       }
-       document.getElementById('splitsession').disabled=true;
        show_hide_date(str)     
      }
      else
@@ -894,8 +911,8 @@ function deduct_time(start_time,end_time)
      total_min_diff=(diffhhm + diffmm)
      deducted_minute =  Number(total_session_time) - Number(total_min_diff)
      total_session_time=deducted_minute
-     $("#availabel-minutes").empty()
-     $("#availabel-minutes").append("<label> "+total_session_time+"<label>")
+     $("#available-minutes").empty()
+     $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
 }
 
 function show_hide_date(str)
@@ -903,7 +920,12 @@ function show_hide_date(str)
     if (!(str))
     {  
        document.getElementById('select_split').hidden=true 
-        $("#iteration").attr('value','1')
+       document.getElementById('splitsession').checked=false
+       document.getElementById('chkbxsplit-2').checked=false
+       document.getElementById('chkbxsplit-3').checked=false
+       document.getElementById('splitsession').disabled=true;
+       $("#date-splits").empty();
+       $("#iteration").attr('value','1')
     }
     if(str ==1)
     {
@@ -913,21 +935,34 @@ function show_hide_date(str)
     }
     
 }
-
 function reset_session_variable(str)
 {
 var start_time=""
 var end_time=""
-  alert(str)
+
   if (!(str)){
         total_session_time=$('#session_of option:selected').attr('minutes')
-
+       if (document.getElementById('start_time_1')){
+       document.getElementById('start_time_1').value=""}
+       if ( document.getElementById('end_time_1')){
+       document.getElementById('end_time_1').value=""
+       }
+       if(document.getElementById('start_time_2')){
+       document.getElementById('start_time_2').value=""}
+       if ( document.getElementById('end_time_2')){
+       document.getElementById('end_time_2').value=""
+       }
         }
   if(str == 1)
   { 
      total_session_time=$('#session_of option:selected').attr('minutes')
      start_time=document.getElementById('start_time').value
      end_time=document.getElementById('end_time').value
+     if(document.getElementById('start_time_2')){
+       document.getElementById('start_time_2').value=""}
+       if ( document.getElementById('end_time_2')){
+       document.getElementById('end_time_2').value=""
+       }  
      deduct_time(start_time,end_time) 
   } 
   if (str == 2){
@@ -986,6 +1021,7 @@ var currentYear = currentDate.getFullYear();
       minuteGrid: 15,
       onClose: function(dateText, inst) {
         $(this).val(dateText);
+
         if ( '{{title}}' != 'Exam' )
         {
           date_validation($(this).attr('name'))
@@ -1017,6 +1053,21 @@ var currentYear = currentDate.getFullYear();
     });
 }
 
+$("#submit").click(function() {
+
+  $('article').block({ 
+    message: '<h4>Processing... Please wait!</h4>',
+    css: { 
+      border: 'none', 
+      padding: '15px', 
+      color: '#fff !important', 
+      backgroundColor: '#10c1cb !important', 
+      '-webkit-border-radius': '10px', 
+      '-moz-border-radius': '10px', 
+      opacity: 1.0
+    }
+  });
+});
 
 {% endblock %}
 
