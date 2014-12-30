@@ -6,16 +6,15 @@
 {% block meta_content %}
   <h3>{% trans "About" %}</h3>
 
-  {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}<br><br>
-  <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}<b><br> 
-   <a href="#" data-reveal-id="library-statistics" class="tiny round button">
+  {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}<br><br><br>
+  <b>{% trans "Total Rating" %}: &nbsp;{{total_activity_rating}}</b>
+  <a href="#" data-reveal-id="activity-statistics" class="tiny round button">
       {% trans "Activity Statistics" %}
     </a>
-    <div class="medium reveal-modal" id="library-statistics" data-reveal>
+ <div class="medium reveal-modal" id="activity-statistics" data-reveal>
       {% include "ndf/activity_statistics.html" %}
       <a class="close-reveal-modal">&#215;</a>
     </div>
-  
 {% endblock %}
 
 {% block style %}
@@ -70,7 +69,7 @@
     			{% if user.is_authenticated %}
     				{% if prof_pic_obj %}
               <div class="div-height">
-    					<img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height">
+    					<img src="{% url 'getImageThumbnail' group_id prof_pic_obj %}" class="img-height">
               </div>
 
     				{% else %}
@@ -113,17 +112,15 @@
       </div>
 
   		<div class="small-10 columns">
-
         <h2 class="style-text">{{username}}</h2>
-
         <h5>
   			{% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
         {% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
         {% trans "Pages created" %}: &nbsp;{{page_count}}<br>
+       <!-- {% trans "Activity Rating" %}: &nbsp;{{page_create_rate}}<br> -->
         <!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
         {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
-        {% trans "Forum" %}: &nbsp;{{forum_count}}<br>
-        <!--{% trans "Forums created" %}: {{forum_count}} -->
+        
         </h5>
   		</div>
   	</div>
@@ -143,20 +140,94 @@
     <dd class="active"><a href="#group" id="p1">Groups </a></dd>
     
     {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
-    <dd ><a href="#Activity" id="p3">My Activities </a></dd>			
+    <dd><a href="#Activity" id="p3">My Activities </a></dd>			
     <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
-       
   
-    
+     <dd ><a href="#Ratings" id="p6">Activity Rating </a></dd>
+   
   </dl>
 
   <!-- Tab views -->
+
   <div class="tabs-content">
     <div class="content" id="view-scheduler-calendar">
       {% include "ndf/scheduler_calender.html"  %}
     </div>
+	
+   <!-- Ratings- Pie Chart 
+	<div class="content active" id="Ratings">
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Pie layout</title>
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+		<style type="text/css">
 
-    <div class="content active" id="group">
+			text {
+				font-family: sans-serif;
+				font-size: 12px;
+				fill: white;
+			}
+
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+			//Width and height
+			var w = 400;
+			var h = 400;
+
+			var dataset = [{{page_create_rate}},{{file_create_rate}},5];
+
+			var outerRadius = w / 2;
+			var innerRadius = 0;
+			var arc = d3.svg.arc()
+							.innerRadius(innerRadius)
+							.outerRadius(outerRadius);
+			
+			var pie = d3.layout.pie();
+			
+			//Easy colors accessible via a 10-step ordinal scale
+			var color = d3.scale.category10();
+
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+			
+			//Set up groups
+			var arcs = svg.selectAll("g.arc")
+						  .data(pie(dataset))
+						  .enter()
+						  .append("g")
+						  .attr("class", "arc")
+						  .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+			
+			//Draw arc paths
+			arcs.append("path")
+			    .attr("fill", function(d, i) {
+			    	return color(i);
+			    })
+			    .attr("d", arc);
+			
+			//Labels
+			arcs.append("text")
+			    .attr("transform", function(d) {
+			    	return "translate(" + arc.centroid(d) + ")";
+			    })
+			    .attr("text-anchor", "middle")
+			    .text(function(d) {
+			    	return d.value;
+			    });
+						
+		</script>
+	</body>
+</html>
+			</div>
+	-->
+    <div class="content" id="group">
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
         {% for node in user_groups %}
           {% get_version_of_module node.pk as version %}
@@ -270,23 +341,17 @@
         {% endif %}
       </ul>
     </div>
-
+	
     <div class="content" id="Activity">
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
         {% for node in user_activity %}
           {% get_version_of_module node.pk as version %}
           {% get_url node.pk as res_type %}
-          {% if res_type != "None" %}
           <li class="card">
             {% if res_type == 'group' %}
             <a href="/{{node.pk}}">
             {% elif res_type %}
-          	     {% if res_type != "event_app_instance_detail" %}
-          	        <a href="{% url res_type groupid node.pk   %}">{{i.url}} </a>
-                 {% else %}
-                    {% get_event_type node as app_set_id %}
-                    <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}} </a>         
-                 {% endif %}
+          	<a href="{% url res_type group_id node.pk  %}"> 
             {% endif %}   
             <div id="activity">
               <header>
@@ -312,7 +377,7 @@
             </div>
             </a>      
           </li>  
-           {% endif %}
+
         {% empty %}
           {% if not searching %}
           <div class="row">
@@ -321,7 +386,7 @@
             </div>
           </div>
           {% endif %}
-            
+
         {% endfor %}
     
     		{% if dashboard_count.activity > 10 %}
@@ -358,7 +423,7 @@
 
     file_mime_type = this.files[0].type;
     if(file_mime_type.indexOf("image/") < 0){
-      $(this).val("")
+      $(this).val("");
       $('#docFile').val(this.value);
 
       var message = "{% trans 'Only image files should be selected for setting your profile picture!' %}"

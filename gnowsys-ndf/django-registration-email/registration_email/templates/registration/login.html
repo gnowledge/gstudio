@@ -1,0 +1,37 @@
+{% extends "registration/registration_base.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block masthead %}
+<h2>{% trans "Login" %}</h2>
+{% endblock %}
+
+{% block content %}
+<form method="post" action=".">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+        {{ form.username.errors }}
+        <label for="id_username">{% trans "Email" %}</label>
+        {{ form.username }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.password.errors }}
+        {{ form.password.label_tag }}
+        {{ form.password }}
+    </div>
+    <div class="fieldWrapper">
+        {{ form.remember_me.errors }}
+        {{ form.remember_me.label_tag }}
+        {{ form.remember_me }}
+    </div>
+    <div class="fieldWrapper">
+        <a href="{% url "auth_password_reset" %}">{% trans "Forgot your password?" %}</a>
+        <a href="{% url "registration_register" %}">{% trans "Register a new account" %}</a>?
+    </div>
+    <input type="hidden" name="next" value="{{ next }}" />
+    <input type="submit" value="{% trans "Login" %}">
+</form>
+{% endblock %}

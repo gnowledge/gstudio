@@ -544,6 +544,10 @@ GSTUDIO_RESOURCES_READING_LEVEL = [  ]
 
 GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
 
+GSTUDIO_RESOURCES_CREATION_RATING = 5
+
+GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
+
 
 try:
     from local_settings import *
