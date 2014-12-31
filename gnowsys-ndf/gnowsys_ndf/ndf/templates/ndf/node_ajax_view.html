@@ -193,7 +193,9 @@
       <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-
+     {% comment %}
+      <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
+      {% endcomment %}
       <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
         
           {% if all_replies %}
@@ -208,6 +210,7 @@
 
         </a>
       </dd>
+
 
     </dl>
   </h1>
@@ -266,14 +269,13 @@
               {% for index_key, each_node in node.prior_node_dict.items %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
-              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}aaaa</a>,&nbsp;
               {% else %}
               <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-              {% endif %}
+	      {% endif %}
               {% endfor %}
             </div>
-            {% endif %}
-          </div>
+              {% endif %}         </div>
 
           <div class="small-4 columns">
             {% get_teaches_list node as teaches_list %}
@@ -489,6 +491,27 @@
         {% endfor %}
       
         <!-- <div id="commentable-area"> -->
+	<div>
+         {% if node.prior_node|length > 0 %}
+   
+         {% for index_key, each_node in node.prior_node_dict.items %}
+         {% get_grid_fs_object each_node as grid_fs_obj %}
+         {% if "Group" in node.member_of_names_list %}
+         {% get_object_value node as objvalue %}
+	    <table>
+	      <tbody>
+		{% for key, value in objvalue.items %}
+		<tr>
+		  <td> {{key}} : {{value}} </td>
+		</tr>
+		{% endfor %}
+	      <tbody>
+	    </table>
+              {% endif%}
+	    {% endfor %}
+            {% endif %}
+
+	</div>
         <div>
           {% with node.html_content|safe as description %}
           {% if description != "None" %}
@@ -574,7 +597,18 @@
         </div>
         
       {% endif %}
-      
+      <div id="view-info" style="display:none;">
+       
+       <table>
+   <tbody>
+        {% for key, value in obj.items %}
+        <tr>          
+        <td> {{key}} : {{value}} </td>
+        </tr>
+        {% endfor %}
+    <tbody>   
+</table>
+     </div>
 
       <div id="view-discussion" style="display:none;">
       <!-- discussion content area -->
@@ -962,15 +996,29 @@
 
   $(document).on('click','.view-discussion',function(){
     $("#view-page").css("display", "none");
+    $("#view-info").css("display", "none");
     $(".page-view").removeClass("active");
+    $(".info-view").removeClass("active");
     $(".discussion-view").addClass("active");    
     $("#view-discussion").css("display", "block");
 
   });
 
+  $(document).on('click','.view-info',function(){
+    $("#view-page").css("display", "none");
+    $("#view-discussion").css("display", "none");
+    $(".page-view").removeClass("active");
+    $(".discussion-view").removeClass("active");    
+    $(".info-view").addClass("active");    
+    $("#view-info").css("display", "block");
+
+  });
+
   $(document).on('click','.view-page',function(){
     $("#view-discussion").css("display", "none");
+    $("#view-info").css("display", "none");
     $(".discussion-view").removeClass("active");
+    $(".info-view").removeClass("active");
     $(".page-view").addClass("active");    
     $("#view-page").css("display", "block");
   });
@@ -1090,5 +1138,5 @@
     })
 
   });
-
+  
 </script>

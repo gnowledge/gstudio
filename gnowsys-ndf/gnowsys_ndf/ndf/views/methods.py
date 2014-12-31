@@ -1609,15 +1609,13 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         for i, each in enumerate(right_subject_id_or_list):
           right_subject_id_or_list[i] = ObjectId(each)
 
-
     if multi_relations:
       # For dealing with multiple relations (one to many)
 
       # Iterate and find all relationships (including DELETED ones' also)
-      nodes = collection.Triple.find({'_type': "GRelation", 
-                                      'subject': subject_id, 
-                                      'relation_type.$id': relation_type_node._id
-                                    })
+      nodes = collection.Triple.find(
+        {'_type': "GRelation", 'subject': subject_id, 'relation_type.$id': relation_type_node._id}
+      )
 
       gr_node_list = []
 
@@ -1629,10 +1627,17 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             right_subject_id_or_list.remove(n.right_subject)
             gr_node_list.append(n)
 
-            collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                              {'$addToSet': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
-                              upsert=False, multi=False
-                            )
+            collection.update(
+              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+              {'$addToSet': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
+              upsert=False, multi=False
+            )
+
+            collection.update(
+              {'_id': n.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+              {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+              upsert=False, multi=False
+            )
 
         else:
           # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
@@ -1641,21 +1646,26 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
           n.save()
           info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
-          collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                            {'$pull': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
-                            upsert=False, multi=False
-                          )
+          collection.update(
+            {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+            {'$pull': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
+            upsert=False, multi=False
+          )
+
+          collection.update(
+            {'_id': n.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+            {'$pull': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+            upsert=False, multi=False
+          )
 
       if right_subject_id_or_list:
         # If still ObjectId list persists, it means either they are new ones' or from deleted ones'
         # For deleted one's, find them and modify their status to PUBLISHED
         # For newer one's, create them as new document
         for nid in right_subject_id_or_list:
-          gr_node = collection.Triple.one({'_type': "GRelation", 
-                                            'subject': subject_id, 
-                                            'relation_type.$id': relation_type_node._id,
-                                            'right_subject': nid
-                                          })
+          gr_node = collection.Triple.one(
+            {'_type': "GRelation", 'subject': subject_id, 'relation_type.$id': relation_type_node._id, 'right_subject': nid}
+          )
 
           if gr_node is None:
             # New one found so create it
@@ -1679,15 +1689,41 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             if not rel_exists:
               # Fetch corresponding document & append into it's relation_set
-              collection.update({'_id': subject_id}, 
-                                {'$addToSet': {'relation_set': {relation_type_node.name: [nid]}}}, 
-                                upsert=False, multi=False
-                              )
+              collection.update(
+                {'_id': subject_id}, 
+                {'$addToSet': {'relation_set': {relation_type_node.name: [nid]}}}, 
+                upsert=False, multi=False
+              )
+
             else:
-              collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                                {'$addToSet': {'relation_set.$.'+relation_type_node.name: nid}}, 
-                                upsert=False, multi=False
-                              )
+              collection.update(
+                {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                {'$addToSet': {'relation_set.$.'+relation_type_node.name: nid}}, 
+                upsert=False, multi=False
+              )
+
+            right_subject = collection.Node.one({'_id': nid}, {'relation_set': 1})
+
+            inv_rel_exists = False
+            for each_dict in right_subject.relation_set:
+              if relation_type_node.inverse_name in each_dict:
+                inv_rel_exists = True
+                break
+
+            if not inv_rel_exists:
+              # Fetch corresponding document & append into it's relation_set
+              collection.update(
+                {'_id': nid}, 
+                {'$addToSet': {'relation_set': {relation_type_node.inverse_name: [subject_id]}}}, 
+                upsert=False, multi=False
+              )
+
+            else:
+              collection.update(
+                {'_id': nid, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+                {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+                upsert=False, multi=False
+              )
 
             gr_node_list.append(gr_node)
 
@@ -1699,10 +1735,17 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
               info_message = " MultipleGRelation: GRelation ("+gr_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
 
-              collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                                {'$addToSet': {'relation_set.$.'+relation_type_node.name: gr_node.right_subject}}, 
-                                upsert=False, multi=False
-                              )
+              collection.update(
+                {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                {'$addToSet': {'relation_set.$.'+relation_type_node.name: gr_node.right_subject}}, 
+                upsert=False, multi=False
+              )
+
+              collection.update(
+                {'_id': gr_node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+                {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+                upsert=False, multi=False
+              )
 
               gr_node_list.append(gr_node)
 
@@ -1722,10 +1765,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
       else:
         right_subject_id_or_list = ObjectId(right_subject_id_or_list)
 
-      gr_node_cur = collection.Triple.find({'_type': "GRelation", 
-                                            'subject': subject_id, 
-                                            'relation_type.$id': relation_type_node._id
-                                          })
+      gr_node_cur = collection.Triple.find(
+        {'_type': "GRelation", 'subject': subject_id,'relation_type.$id': relation_type_node._id}
+      )
 
       for node in gr_node_cur:
         if node.right_subject == right_subject_id_or_list:
@@ -1743,10 +1785,22 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
               upsert=False, multi=False
             )
 
+            collection.update(
+              {'_id': node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+              {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+              upsert=False, multi=False
+            )
+
           elif node.status == u"PUBLISHED":
             collection.update(
               {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
               {'$addToSet': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
+              upsert=False, multi=False
+            )
+
+            collection.update(
+              {'_id': node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+              {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
               upsert=False, multi=False
             )
             info_message = " SingleGRelation: GRelation ("+node.name+") already exists !\n"
@@ -1761,17 +1815,31 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             node.status = u"DELETED"
             node.save()
 
-            collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                              {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
-                              upsert=False, multi=False
-                            )
+            collection.update(
+              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+              {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
+              upsert=False, multi=False
+            )
+
+            collection.update(
+              {'_id': node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+              {'$pull': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+              upsert=False, multi=False
+            )
             info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
           
           elif node.status == u'DELETED':
-            collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                              {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
-                              upsert=False, multi=False
-                            )
+            collection.update(
+              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+              {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
+              upsert=False, multi=False
+            )
+
+            collection.update(
+              {'_id': node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+              {'$pull': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+              upsert=False, multi=False
+            )
             info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
 
       if gr_node is None:
@@ -1797,16 +1865,41 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
         if not rel_exists:
           # Fetch corresponding document & append into it's relation_set
-          collection.update({'_id': subject_id}, 
-                            {'$addToSet': {'relation_set': {relation_type_node.name: [right_subject_id_or_list]}}}, 
-                            upsert=False, multi=False
-                          )
+          collection.update(
+            {'_id': subject_id}, 
+            {'$addToSet': {'relation_set': {relation_type_node.name: [right_subject_id_or_list]}}}, 
+            upsert=False, multi=False
+          )
 
         else:
-          collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                            {'$addToSet': {'relation_set.$.'+relation_type_node.name: right_subject_id_or_list}}, 
-                            upsert=False, multi=False
-                          )
+          collection.update(
+            {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+            {'$addToSet': {'relation_set.$.'+relation_type_node.name: right_subject_id_or_list}}, 
+            upsert=False, multi=False
+          )
+
+        right_subject = collection.Node.one({'_id': right_subject_id_or_list}, {'relation_set': 1})
+
+        inv_rel_exists = False
+        for each_dict in right_subject.relation_set:
+          if relation_type_node.inverse_name in each_dict:
+            inv_rel_exists = True
+            break
+
+        if not inv_rel_exists:
+          # Fetch corresponding document & append into it's relation_set
+          collection.update(
+            {'_id': right_subject_id_or_list}, 
+            {'$addToSet': {'relation_set': {relation_type_node.inverse_name: [subject_id]}}}, 
+            upsert=False, multi=False
+          )
+
+        else:
+          collection.update(
+            {'_id': right_subject_id_or_list, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+            {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+            upsert=False, multi=False
+          )
 
       return gr_node
 

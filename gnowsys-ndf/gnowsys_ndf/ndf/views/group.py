@@ -630,8 +630,9 @@ def create_sub_group(request,group_id):
           if group_id:
               colg.prior_node.append(group_ins._id)
           colg.save()
-          #save subgroup_id in post_node of parent group 
-          group_ins.post_node.append(colg._id)
+          #save subgroup_id in the collection_set of parent group 
+          group_ins.collection_set.append(colg._id)
+          #group_ins.post_node.append(colg._id)
           group_ins.save()
     
           if colg.edit_policy == "EDITABLE_MODERATED":

@@ -45,6 +45,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_students_for_batches/', 'get_students_for_batches', name='get_students_for_batches'),
     url(r'^get_anncourses_allstudents/', 'get_anncourses_allstudents', name='get_anncourses_allstudents'),
     url(r'^get_courses/', 'get_courses', name='get_courses'),
+    url(r'^get_batches_with_acourse/', 'get_batches_with_acourse', name='get_batches_with_acourse'),
                        
     url(r'^get_announced_courses_with_ctype/', 'get_announced_courses_with_ctype', name='get_announced_courses_with_ctype'),
     url(r'^get_colleges/', 'get_colleges', name='get_colleges'),
@@ -74,4 +75,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^events/', 'get_data_for_event_task', name='get_data_for_event_task'),
     url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
     url(r'^insert_picture/', 'insert_picture', name="insert_picture"),
+    #url for infinite scroll down
+    url(r'^page_scroll/(?P<page>[^/]+)$', 'page_scroll', name='page_scroll'),    
 )

@@ -40,7 +40,8 @@
     "onepage-scroll": "#latest",
     "open-sans-fontface": "~1.1.0",
     "mousetrap": "~1.4.6",
-    "pdfjs-build": "*"
+    "pdfjs-build": "*",
+    "blockui": "*"
   },
   "resolutions": {
     "jquery": "2.1.1"
