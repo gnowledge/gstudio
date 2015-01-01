@@ -24,12 +24,22 @@
 				</select>				
 			</div>
 			<div class="small-1 small-pull-1 columns">
-				<input type="button" class="button tiny" value="Apply filter">
+				<input type="button" class="button tiny" value="Apply filter" id="filter-btn">
 			</div>
 		</div>
 	</div>
 </div>
 
 <script type="text/javascript">
-	
+
+	$("#filter-btn").click(function(){
+
+		var selFieldValue = $("select[name='search-field-value'] :selected").val(),
+			selFieldText  = $("select[name='search-field-value'] :selected").text();
+
+		$("#applied-filters").append("<div class='filters label'>" + selFieldText + "</div>")
+		// alert(selFieldText + ";;;;" + selFieldValue)
+
+	})
+
 </script>
