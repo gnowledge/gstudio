@@ -246,31 +246,6 @@ def resource_list(request, group_id, app_id=None, page_no=1):
                                 context_instance = RequestContext(request))
 
 
-def get_group_name_id(group_name_or_id):
-
-	# if isinstance(group_name_or_id, ObjectId):
-
-
-    group_obj = collection.Node.one({ "_type": {"$in": ["Group", "Author"] }, "name": unicode(group_name_or_id) })
-
-    # checking if group_obj is valid
-    if group_obj:
-	    # checking (optimistically) passed group_name_or_id is name string.
-    	if (group_name_or_id == group_obj.name):
-	        group_name = group_name_or_id
-	        group_id = group_obj._id
-	        
-        elif (group_name_or_id == group_obj._id.__str__()):
-	    	group_id = group_name_or_id
-                group_name = group_obj._id
-                # passed group_name_or_id is _id and not name
-                
-        return group_name, group_id
-    else:
-        print "in else"
-        return None
-
-
 def elib_paged_file_objs(request, group_id, filetype, page_no):
     '''
     Method to implement pagination in File and E-Library app.
