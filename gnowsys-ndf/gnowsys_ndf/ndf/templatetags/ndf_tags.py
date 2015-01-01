@@ -20,7 +20,7 @@ from gnowsys_ndf.settings import *
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
-from gnowsys_ndf.ndf.views.methods import get_drawers
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -607,6 +607,66 @@ def get_gapps_iconbar(request, group_id):
 		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
+@register.assignment_tag
+def get_nroer_menu(request, group_name_or_id):
+
+	url_str = request.META["PATH_INFO"]
+	url_split = url_str.split("/")
+
+	# removing "" in the url_split
+	url_split = filter(lambda x: x != "", url_split)
+	# print "url_split : ", url_split
+
+	# initializing of variables
+	selected_gapp = menu_level_one_selected = selected_gapp_formated = ""
+	menu_level_one_list = selected_gapp_list = []
+	mapping = {"eLibrary": "e-library"}
+
+	# the dict that will be returned
+	nroer_menu_dict = {
+						'menu_level_one_list': menu_level_one_list,
+						'menu_level_one_selected': menu_level_one_selected,
+						'selected_gapp': selected_gapp,
+						'selected_gapp_list': selected_gapp_list,
+						'mapping': mapping
+					}
+
+	if (len(url_split) > 1) and (url_split[1] != "dashboard"):
+		selected_gapp = url_split[1]  # expecting e-library etc. type of extract
+		selected_gapp_formated = selected_gapp.replace("-", "")
+	else:
+		menu_level_one_selected = group_name_or_id  # because url_split[0] can be ObjectId
+
+	# print "selected_gapp : ", selected_gapp
+	# print "selected_gapp_formated : ", selected_gapp_formated
+	# print "menu_level_one_selected : ", menu_level_one_selected
+
+	menu_level_one_list = []
+
+	for menu_level_one in GSTUDIO_NROER_MENU:
+
+		temp_menu_level_one_key = menu_level_one.keys()[0]
+		temp_selected_gapp_list = menu_level_one[temp_menu_level_one_key]
+		
+		menu_level_one_list.append(temp_menu_level_one_key)
+
+		if menu_level_one_selected and (menu_level_one_selected.lower() == temp_menu_level_one_key.lower()):
+			nroer_menu_dict["selected_gapp_list"] = temp_selected_gapp_list
+			nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
+
+		if selected_gapp_formated:
+			for k, each_menu_dict in menu_level_one.iteritems():
+				if selected_gapp_formated in [i.lower() for i in each_menu_dict]:
+					nroer_menu_dict["selected_gapp"] = selected_gapp_formated
+					nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
+					nroer_menu_dict["selected_gapp_list"] = each_menu_dict
+
+	nroer_menu_dict["menu_level_one_list"] = menu_level_one_list
+	# print "nroer_menu_dict ::::\n", nroer_menu_dict
+
+	return nroer_menu_dict
+
+
 global_thread_rep_counter = 0	# global variable to count thread's total reply
 global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
 def thread_reply_count( oid ):
@@ -922,15 +982,15 @@ def get_theme_node(groupid, node):
 		return True
 
 
-@register.assignment_tag
-def get_group_name(val):
-         GroupName = []
+# @register.assignment_tag
+# def get_group_name(val):
+#          GroupName = []
 
-	 for each in val.group_set: 
+# 	 for each in val.group_set: 
 
-		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
-		GroupName.append(grpName)
-	 return GroupName
+# 		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
+# 		GroupName.append(grpName)
+# 	 return GroupName
 
 @register.assignment_tag
 def get_edit_url(groupid):
