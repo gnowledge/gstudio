@@ -87,7 +87,7 @@ def get_metadata(efile):
 	# To fetch collection elements of resource
 	if efile.collection_set:
 		for m in efile.collection_set:
-			coll_obj = collection.Node.one({'_id': ObjectId(n) })
+			coll_obj = collection.Node.one({'_id': ObjectId(m) })
 			coll_list.append(coll_obj.name)
 	
 	efile['collection_set'] = coll_list
