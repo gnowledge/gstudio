@@ -217,7 +217,7 @@
   </div>
   {% endif %}
 
-  <div class="{% if not approval %}active {% endif %}content row" id="status" align="center">
+  <div class="content row {% if not approval %}active {% endif %}" id="status" align="center">
   </div>
 
   <div class="content row" id="view-scheduler-calendar">
@@ -233,15 +233,19 @@
   var counter = 1;
 
   function scrolling(){
-    if ($('#status').attr('class') == "content active") {
+   
+    if ($('#status').attr('class') == "content row active") {
+      
       $(window).bind('scroll', loadOnScroll);
       count = 0;
     }
   }
-  window.onscroll = scrolling();
+
+
+  window.onscroll = scrolling;
 
   var loadOnScroll = function() {
-    if ($(window).scrollTop()+$(window).height() >= $(document).height()) {
+  if ($(window).scrollTop()+$(window).height() >= $(document).height()) {
       $(window).unbind();
     
       // execute the load function below that will visit the JSON feed and stuff data into the HTML
