@@ -3949,7 +3949,7 @@ def insert_picture(request, group_id):
 
 # =============================================================================
 
-def event_assginee(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
+def event_assginee(request, group_id, app_set_instance_id=None):
  #assigneelist=request.POST.getlist("Assignee[]","")
  #absentlist=request.POST.getlist("Absents[]","")
  Event=   request.POST.getlist("Event","")

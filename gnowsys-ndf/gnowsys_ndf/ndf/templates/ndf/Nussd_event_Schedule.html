@@ -192,12 +192,20 @@
         </div>
           
         <div class="small-2 columns">
-          <label for="{{property_order_list.0.1.2.name}}" class="right inline">
+          <label class="right inline">
             {% trans "Remainig time (in minutes):" %}
           </label>
         </div>
         <div id="available-minutes" class="small-1 columns end">
-          <label for="{{property_order_list.0.1.2.name}}" class="inline">0</label>
+          <label  class="inline">0</label>
+        </div>
+        <div class="small-2 columns">
+          <label class="right inline">
+            {% trans "Alloted time (in minutes):" %}
+          </label>
+        </div>
+        <div id="Alloted-minutes" class="small-1 columns end">
+          <label  class="inline">0</label>
         </div>  
       </div>
    
@@ -687,6 +695,8 @@ $("#session_of").change(function(){
   document.getElementById('event_coordinator').disabled = "";      
   $("#available-minutes").empty()
   $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
+  $("#Alloted-minutes").empty()
+  $("#Alloted-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
 });
 
 
@@ -802,15 +812,15 @@ function date_validation(name)
      if (str)
       {
       
-         start_time=document.getElementById("start_time_"+ str).value
-         end_time =document.getElementById("end_time_"+ str).value
+         start_time= new Date(document.getElementById("start_time_"+ str).value)
+         end_time = new Date(document.getElementById("end_time_"+ str).value)
          
       }
       
      if(!(str))
       {
-        start_time=document.getElementById("start_time").value
-        end_time=document.getElementById("end_time").value
+        start_time=new Date(document.getElementById("start_time").value)
+        end_time=new Date(document.getElementById("end_time").value)
       
       }
         reset_session_variable(str)
@@ -840,15 +850,18 @@ function date_validation(name)
 }  
 
 function deduct_time(start_time,end_time)
-{    var diff= moment.utc(moment(start_time).diff(end_time)).format("HH:mm:ss")
-     //above code give the difference from 24 hrs
-     var d = moment.duration(diff)
-     var hh = Math.floor(d.asHours())  
-     var mm = Math.floor(d.minutes())
-     diffhh = 23 -hh
-     diffmm = 60 -mm
-     diffhhm=Number(diffhh)*60
-     total_min_diff=(diffhhm + diffmm)
+{    
+     var difference = start_time.getTime() - end_time.getTime();
+     var daysDifference = Math.floor(difference/1000/60/60/24);
+     difference -= daysDifference*1000*60*60*24
+     var hoursDifference = Math.floor(difference/1000/60/60);
+     difference -= hoursDifference*1000*60*60
+     var minutesDifference = Math.floor(difference/1000/60);
+     difference -= minutesDifference*1000*60 
+     var secondsDifference = Math.floor(difference/1000);
+     diffhh = 23-hoursDifference
+     diffmm = 60-minutesDifference
+     total_min_diff=((Number(diffhh)*60) + Number(diffmm))
      deducted_minute =  Number(total_session_time) - Number(total_min_diff)
      total_session_time=deducted_minute
      $("#available-minutes").empty()
@@ -880,8 +893,9 @@ function reset_session_variable(str)
 var start_time=""
 var end_time=""
 
-  if (!(str)){
-        total_session_time=$('#session_of option:selected').attr('minutes')
+  if (!(str))
+      {
+       total_session_time=$('#session_of option:selected').attr('minutes')
        if (document.getElementById('start_time_1')){
        document.getElementById('start_time_1').value=""}
        if ( document.getElementById('end_time_1')){
@@ -896,8 +910,8 @@ var end_time=""
   if(str == 1)
   { 
      total_session_time=$('#session_of option:selected').attr('minutes')
-     start_time=document.getElementById('start_time').value
-     end_time=document.getElementById('end_time').value
+     start_time=new Date(document.getElementById('start_time').value)
+     end_time=new Date(document.getElementById('end_time').value)
      if(document.getElementById('start_time_2')){
        document.getElementById('start_time_2').value=""}
        if ( document.getElementById('end_time_2')){
@@ -907,11 +921,11 @@ var end_time=""
   } 
   if (str == 2){
         total_session_time=$('#session_of option:selected').attr('minutes')
-        start_time=document.getElementById('start_time').value
-        end_time=document.getElementById('end_time').value
+        start_time=new Date(document.getElementById('start_time').value)
+        end_time=new Date(document.getElementById('end_time').value)
         deduct_time(start_time,end_time)
-        start_time=document.getElementById('start_time_1').value
-        end_time=document.getElementById('end_time_1').value
+        start_time=new Date(document.getElementById('start_time_1').value)
+        end_time=new Date(document.getElementById('end_time_1').value)
         deduct_time(start_time,end_time)
         
    }
