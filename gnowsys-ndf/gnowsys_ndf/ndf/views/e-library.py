@@ -1,4 +1,3 @@
-
 ''' -- imports from installed packages -- ''' 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -17,6 +16,7 @@ from mongokit import paginator
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
 from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 #######################################################################################################################################
 
@@ -254,21 +254,21 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
         no_of_objs_pp = 24
 
-        # ins_objectid  = ObjectId()
+        ins_objectid  = ObjectId()
 
-        # if ins_objectid.is_valid(group_id) is False :
-        #     group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        #     if group_ins:
-        #         group_id = str(group_ins._id)
-        #     else :
-        #         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        #         if auth :
-        #             group_id = str(auth._id)
+        if ins_objectid.is_valid(group_id) is False :
+            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+            if group_ins:
+                group_id = str(group_ins._id)
+            else :
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                if auth :
+                    group_id = str(auth._id)
 
-        group_name_id = get_group_name_id(group_id)
-        group_name, group_id = group_name_id if group_name_id else None, None
+        # group_name_id = get_group_name_id(group_id)
+        # group_name, group_id = group_name_id if group_name_id else None, None
 
-        print group_name, "------", group_id
+        # print group_name, "------", group_id
 
         file_ins = collection.Node.find_one({'_type':"GSystemType", "name":"File"})
         if file_ins:
