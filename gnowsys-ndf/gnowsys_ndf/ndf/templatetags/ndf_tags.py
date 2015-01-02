@@ -633,6 +633,10 @@ def get_nroer_menu(request, group_name_or_id):
 
 	if (len(url_split) > 1) and (url_split[1] != "dashboard"):
 		selected_gapp = url_split[1]  # expecting e-library etc. type of extract
+
+		# handling conditions of "e-library" = "file" and vice-versa.
+		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+
 		selected_gapp_formated = selected_gapp.replace("-", "")
 	else:
 		menu_level_one_selected = group_name_or_id  # because url_split[0] can be ObjectId

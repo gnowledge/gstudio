@@ -87,7 +87,10 @@
      <section class="top-bar-section">
 
       <!-- Left Nav Section -->
-      {% if domain_name == "example.com" %} <!-- example.com needs to be changed to nroer.metastudio.org -->
+
+      <!-- add example.com in place of nroer.metastudio.org to check locally -->
+      {% if domain_name == "nroer.metastudio.org" %} 
+      
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
 
@@ -97,8 +100,8 @@
               Home
             </a>
           </li>
-          <li>
-            <a href="" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
+          <li>          
+            <a href="{% url 'GAPPS' group_object.pk "e-library" %}" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
@@ -314,7 +317,10 @@
             </div>
 
             <!-- group level gapps which appears at LHS of search bar -->
-            {% if domain_name == "example.com" %}
+
+            <!-- add "example.com" in place of "nroer.metastudio.org" to check locally -->
+            {% if domain_name == "nroer.metastudio.org" %} 
+            
             <!-- NROER level-two menu -->
 
               <ul class="button-group nroer-menu">
