@@ -45,6 +45,7 @@ def resources_list(request):
 		efile = None
 		ebooks_dict = {}
 		ebook_res = []
+		ebook_res_list = []
 		ebook_collection_set = []
 
 		# i = 0 
@@ -61,7 +62,6 @@ def resources_list(request):
 			efile = each
 			ebook = get_metadata(efile)
 			ebooks_dict.update({ str(ebook) : ebook_res })
-
 			# After updating ebook metadata, now process its collection elements
 			if ebook_collection_set:
 				for res in ebook_collection_set:
@@ -70,9 +70,14 @@ def resources_list(request):
 												  {'_id':0, 'name':1, 'attribute_set':1, 'created_by':1, 'relation_set':1, 'collection_set':1, 'content_org':1, 'language':1, 'mime_type':1, 'start_publication':1, 'url':1})
 					
 					efile = res_obj
-					ebook_res = get_metadata(efile)
-					ebooks_dict.update({ str(ebook) : ebook_res })
-		
+					ebook_res = get_metadata(efile)					
+					for eb in ebook_res:
+						# Taken all collection element of ebook (zip) file
+						ebook_res_list.append(eb)
+
+				# Update json { ebook (zip) file document : Its collection elements along with metadata }
+				ebooks_dict.update({ str(ebook) : ebook_res_list })
+					
 
 			# i=i+1
 			# if i == 2:
@@ -107,9 +112,9 @@ def get_metadata(efile):
 		for m in efile.collection_set:
 			coll_obj = collection.Node.one({'_id': ObjectId(m) })
 			coll_list.append(coll_obj.name)
-	
-	efile['collection_set'] = coll_list
 
+	efile['collection_set'] = coll_list
+	
 	# Update entire node dict into string values 
 	for k in efile:
 		node_dict = {str(k): efile[k]}
