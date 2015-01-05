@@ -1,4 +1,3 @@
-
 ''' -- imports from installed packages -- ''' 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -17,6 +16,7 @@ from mongokit import paginator
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
 from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 #######################################################################################################################################
 
@@ -246,8 +246,6 @@ def resource_list(request, group_id, app_id=None, page_no=1):
                                 context_instance = RequestContext(request))
 
 
-
-
 def elib_paged_file_objs(request, group_id, filetype, page_no):
     '''
     Method to implement pagination in File and E-Library app.
@@ -266,6 +264,11 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
                 auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
                 if auth :
                     group_id = str(auth._id)
+
+        # group_name_id = get_group_name_id(group_id)
+        # group_name, group_id = group_name_id if group_name_id else None, None
+
+        # print group_name, "------", group_id
 
         file_ins = collection.Node.find_one({'_type':"GSystemType", "name":"File"})
         if file_ins:
