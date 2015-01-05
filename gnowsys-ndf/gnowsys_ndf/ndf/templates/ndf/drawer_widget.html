@@ -564,8 +564,8 @@
         alert("Nothing to move.");
         return;
       }
-      $("#{{widget_for}}_drawer2").html("")
-      $("#{{widget_for}}_drawer1").append(all_li_ele)
+      $("#{{widget_for}}_drawer1").append($(all_li_ele).clone(true));
+      $(all_li_ele).remove();
       update_drawer_count()
     })
 
@@ -577,9 +577,9 @@
         return;
       }
       searchbar = $("#{{widget_for}}_drawer1 li:first-child")
-      $("#{{widget_for}}_drawer1").html("")
       $("#{{widget_for}}_drawer1").append(searchbar)
-      $("#{{widget_for}}_drawer2").append(all_li_ele)
+      $("#{{widget_for}}_drawer2").append($(all_li_ele).clone(true));
+      $(all_li_ele).remove();
       update_drawer_count()
     })
 
