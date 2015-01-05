@@ -19,7 +19,7 @@
           function(event) {
               // The clicked node is 'event.node'
               var node = event.node;
-              var node_type = node.node_type;
+              // var node_type = node.node_type;
 
               $.ajax({
                   type: "POST",
@@ -31,23 +31,38 @@
                   },
                   success: function(data) {
 
-                    if (node_type == "Page"){
-                      window.history.pushState("", "", "/{{group_name_tag}}/page/"+node.id+"");
-                    }
-                    else if(node_type == "File"){
-                      window.history.pushState("", "", "/{{group_name_tag}}/file/"+node.id+"");  
-                    }
-                    else if (node_type == "Term"){
-                      window.history.pushState("", "", "/{{group_name_tag}}/term/"+node.id+"");
-                    }
-                    else if (node_type == "Topic"){
-                      window.history.pushState("", "", "/{{group_name_tag}}/topic_details/"+node.id+"");
-                    }
+                    // if (node_type == "Page"){
+                    //  window.history.pushState("", "", "/{{group_name_tag}}/page/"+node.id+"");
+                    // }
+                    // else if(node_type == "File"){
+                    //   window.history.pushState("", "", "/{{group_name_tag}}/file/"+node.id+"");  
+                    // }
+                    // else if (node_type == "Term"){
+                    //   window.history.pushState("", "", "/{{group_name_tag}}/term/"+node.id+"");
+                    // }
+                    // else if (node_type == "Topic"){
+                    //   window.history.pushState("", "", "/{{group_name_tag}}/topic_details/"+node.id+"");
+                    // }
                     
-                    $("#ajax_load_image").hide();
-                    $("#content").css({"opacity":""})
+                    // $("#ajax_load_image").hide();
+                    // $("#content").css({"opacity":""})
                     $("#view_page").html(data);
 
+                  }
+              });
+
+              $.ajax({
+                  type: "POST",
+                  url: "{% url 'collection_view' group_id %}",
+                  datatype: "html",
+                  data:{
+                    node_id: node.id,
+                    breadcrumbs_list: "{{breadcrumbs_list}}",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+                  success: function(data) {
+
+                    $("#view_collection").html(data);
                   }
               });
             
@@ -59,210 +74,55 @@
     });
   </script>
 
+  
+
 {% endblock %}
   
-  <h3><a class="current" style="color:black;">{{node.name}}</a></h3>
-  
+  <ul class="breadcrumbs"> 
+    {% for e in breadcrumbs_list %}
+        <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+    {% endfor %}
+  </ul>
+
   <div style="background-color:#ddd;overflow: auto;">
     <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
   </div>
 
-  
+<script type="text/javascript">
 
-{% comment %}
-<!-- <ul class="side-nav collection">
+  $(".current").click(function() {
+    
+    $.ajax({
+        type: "POST",
+        url: "{% url 'collection_view' group_id %}",
+        datatype: "html",
+        data:{
+          node_id: this.id,
+          breadcrumbs_list: "{{breadcrumbs_list}}",
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
 
-  {% for key,value in breadcrumbs_list %}
-  {% get_memberof_name key as member_of_name %}
-  
-  <li id="{{key}}" class="active collection">
-      <h5>
-        <a>
-        <div class="row" title="{{ member_of_name }} - {{ value }}">
-         
-          <div class="small-12 columns" name="{{key}}">{{ value | truncatechars:20 }}
-          </div>
-        </div>
-        </a>
-      </h5>
-     
-  </li>
+          $("#view_collection").html(data);
 
-  {% endfor %}
-
-  {% if node.collection_dict|length > 0 %}
-
-    {% for index_key, each_node in node.collection_dict.items %}
-    {% get_memberof_name each_node.pk as member_of_name %}
-
-      <li id="{{each_node.pk}}">
-        <a>
-        <div class="row" name="{{each_node.pk}}" title="{{member_of_name}} | {{ each_node.mime_type }}: {{ each_node.name }}">
-          <div class="small-5 columns">
-
-            {% if member_of_name == "File" %}
-              {% if "/zip" in each_node.mime_type %}
-                <i class="fi-archive"></i>
-              {% elif "image" in each_node.mime_type %}
-                <img src="{% url 'getImageThumbnail' group_id each_node.pk %}">
-              {% elif "/pdf" in each_node.mime_type %}
-                <img src="{% url 'getFileThumbnail' group_id each_node.pk %}">
-              {% elif "ogg" in each_node.mime_type or "video" in each_node.mime_type %}
-                <i class="fi-video"></i>
-              {% else %}
-                <i class="fi-folder"></i>
-              {% endif %}
-            {% elif member_of_name == "Page" %}
-              <i class="fi-page-filled"></i>
-            {% elif member_of_name == "Forum" %}
-              <i class="fi-comments"></i>
-            {% elif member_of_name == "Quiz" %}
-              <i class="fi-graph-bar"></i>
-            {% endif %}
-
-          
-          </div>
-          <div class="small-7 columns" >
-            {{ each_node.name | truncatechars:20 }}
-          </div>
-        </div>
-        </a>
-      </li>
-
-    {% endfor %}
-  {% endif%}
-  
-</ul>
- -->
-{% endcomment %}
-
-<script>
-
-  $(document).on('click', '.current', function (e) {
+        }
+    }); 
 
     $.ajax({
         type: "POST",
         url: "{% url 'collection_nav' group_id %}",
         datatype: "html",
         data:{
-          node_id: "{{node.pk}}",
+          node_id: this.id,
           csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function(data) {
           $("#view_page").html(data);
-
         }
-    });
+    }); 
+   
 
   });
 
-// // #################################################
-
-// $(document).on('click', '.side-nav.collection li', function (e) {
-    
-//     // to access in success block
-//     var currObj = this;
-
-//     $.ajax({
-
-//       type: "POST",
-//       url: "{% url 'collection_nav' group_id %}",
-//       datatype: "html",
-//       data:{
-//         node_id: this.id,
-//         csrfmiddlewaretoken: '{{ csrf_token }}'
-//       },
-      
-//       success: function(data) {
-        
-//         // removing active class from other li
-//         $(".side-nav > li").removeClass("active");
-
-//         // adding active to this li
-//         $(currObj).addClass("active");
-        
-//         // console.trace()
-//         // var prevHTML = $(document).children();
-//         $("#view_page").html(data);
-//         // $("#view_page").foundation({bindings:'events'});
-//         $("#view-map-widget, a[data-reveal-id='view-map-widget'], a[href='#view-graph']").foundation();
-//         $("#view-discussion, a[href='#view-discussion']").foundation();
-//         $("dl.row.tabs").foundation();
-//         $("div.tabs-content").foundation();
-//         // $("dd > a[href='#view-discussion']").foundation();
-//         // $("#graph-hover").foundation({dropdown:{is_hover:false,active_class:'open'});        
-//         // window.history.pushState(“object or string”, “Title”, “/new-url”);
-//         // window.history.pushState({"html":prevHTML, "pageTitle":"try"},"", "#try");
-//         // window.location.hash = this.id;
-//       }
-
-//     });
-//   });
-
-  // {% comment %}
-  // $(".select").click(function() {
-
-  // 	$.ajax({
-  //     type: "POST",
-  //     url: "{% url 'collection_nav' groupid %}",
-  //     datatype: "html",
-  //     data:{
-  //       node_id: this.name,
-  //       csrfmiddlewaretoken: '{{ csrf_token }}'
-  //     },
-  //     success: function(data) {
-  //       $("#view_page").html(data);
-  //     }
-  //   });
-
-  // 	$.ajax({
-  //     type: "POST",
-  //     url: "{% url 'collection_view' groupid %}",
-  //     datatype: "html",
-  //     data:{
-  //       node_id: this.name,
-  //       breadcrumbs_list: '{{ breadcrumbs_list }}',
-  //       csrfmiddlewaretoken: '{{ csrf_token }}'
-  //     },
-  //     success: function(data) {
-  //       $("#view_collection").html(data);
-  //     }
-  //   });
-
-  // });
-
-  // $("aside .breadcrumbs a").click(function() {
-
-  //   $.ajax({
-  //     type: "POST",
-  //     url: "{% url 'collection_nav' groupid %}",
-  //     datatype: "html",
-  //     data:{
-  //       node_id: this.name,
-  //       csrfmiddlewaretoken: '{{ csrf_token }}'
-  //     },
-  //     success: function(data) {
-  //       $("#view_page").html(data);
-  //     }
-  //   });
-
-  //   $.ajax({
-  //     type: "POST",
-  //     url: "{% url 'collection_view' groupid %}",
-  //     datatype: "html",
-  //     data:{
-  //       node_id: this.name,
-  //       modify_option: 'delete',
-  //       breadcrumbs_list: '{{ breadcrumbs_list }}',
-  //       csrfmiddlewaretoken: '{{ csrf_token }}'
-  //     },
-  //     success: function(data) {
-  //       $("#view_collection").html(data);
-  //     }
-  //   });
-
-
-  // });
-  // {% endcomment %} 
-
 </script>
+
