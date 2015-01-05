@@ -514,7 +514,7 @@ RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
 
-
+GSTUDIO_SITE_NAME = ""  # holds the name of site. e.g: "nroer", "tiss" etc.
 
 GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "Maps", "Events", "Publications"]
 

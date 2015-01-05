@@ -17,6 +17,10 @@ from mongokit import IS
 from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
+try:
+	from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
+except ImportError:
+	pass
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
@@ -669,6 +673,12 @@ def get_nroer_menu(request, group_name_or_id):
 	# print "nroer_menu_dict ::::\n", nroer_menu_dict
 
 	return nroer_menu_dict
+
+
+@register.assignment_tag
+def get_site_name_from_settings():
+	# print "GSTUDIO_SITE_NAME : ", GSTUDIO_SITE_NAME
+	return GSTUDIO_SITE_NAME
 
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
