@@ -76,57 +76,57 @@ background-repeat:no-repeat; background-size: 48px 48px
   </dl>
 </header>
 <form data-abide id="form-card-batch" method="POST" action="{% url 'batch' group_id %}">{% csrf_token %}
-    <div class="row">
-      <div class="small-2 columns">
-        <label class="right inline" for="nussd_course_type">{% trans "Course Type" %}</label>
-      </div>
-      <div class="small-4 columns end">
-        {% html_widget groupid "" ATs.0 %}
-      </div>
-      <div class="small-2 columns">
-        <label class="right inline" for="acourse_list">{% trans "Name of Course" %}</label>
-      </div>
-      <div class="small-4 columns end">
-        <select id="acourse_list" name="acourse_list_name" disabled="disabled">
-        </select>
-      </div>
-      <input type="hidden" name="nussd_course_name" id="nussd_course_name">
-      <input type="hidden" name="announced_course_name" id="announced_course_name">
-      <input type="submit" value="submit" id="submit" class="small button round">
+  <div class="row">
+    <div class="small-2 columns">
+      <label class="right inline" for="nussd_course_type">{% trans "Course Type" %}</label>
     </div>
+    <div class="small-3 columns end">
+      {% html_widget groupid "" ATs.0 %}
+    </div>
+    <div class="small-2 columns">
+      <label class="right inline" for="acourse_list">{% trans "Name of Course" %}</label>
+    </div>
+    <div class="small-3 columns end">
+      <select id="acourse_list" name="acourse_list_name" disabled="disabled">
+      </select>
+    </div>
+    <input type="hidden" name="nussd_course_name" id="nussd_course_name">
+    <input type="hidden" name="announced_course_name" id="announced_course_name">
+    <input type="submit" value="VIEW" id="submit" class="small button  tiny">
+  </div>
 
-<fieldset id="batches_of_acourse">
-  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-    {% for node in batch_coll %}
-
-    <li class="card">
-      <div id="group">
-        <header>
-         <a href="{% url 'detail' groupid node %}">
-          <div class="label-list">
-            {% for tag in node.tags|slice:":3" %}
-              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-            {% endfor %}
+  <fieldset id="batches_of_acourse">
+    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+      {% for node in batch_coll %}
+      <li class="card">
+        <span data-tooltip title="{{ node.altnames }}">
+          <div id="group">
+            <header>
+             <a href="{% url 'detail' groupid node %}">
+              <div class="label-list">
+                {% for tag in node.tags|slice:":3" %}
+                  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                {% endfor %}
+              </div>
+              <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+              <!-- <h4>{{ node.name|truncatechars:20 }}</h4> -->
+              <h4>{{ node.altnames}}</h4>
+              
+              <div>
+                <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                <br/>
+                by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                </small>
+              </div>
+            </header>
+            <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+           </a> 
           </div>
-            
-          <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
-          <h4>{{ node.name|truncatechars:20 }}</h4>
-
-          <div>
-            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-            <br/>
-            by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-            </small>
-          </div>
-        </header>
-        <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-       </a> 
-      </div>
-    </li>
-    {% endfor %}
-  </ul>
-</fieldset>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+  </fieldset>
 </form>
 {% endblock %}
 {% block script %}
@@ -198,7 +198,6 @@ background-repeat:no-repeat; background-size: 48px 48px
         },
       });//end of ajax
     });//end of nussd_course_type.change function
-
 
   //For selecting Announced Course type
     $("select#acourse_list").change(function() {
