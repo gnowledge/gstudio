@@ -109,16 +109,18 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       app_id = str(app._id)
   else:'''
   app = collection.Node.one({'_id': ObjectId(app_id)})
-
+  
   #app_name = app.name 
 
   app_set = ""
   app_collection_set = []
   title = ""
-
+  marks_enter= ""
+   
   event_gst = None
   event_gs = None
-
+  reschedule = True
+  marks_enter=""
   property_order_list = []
 
   #template_prefix = "mis"
@@ -192,10 +194,29 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                             course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
                              
             batch=batch.name
-            
+    for i in node.attribute_set:
+      if unicode("reschedule_attendance") in i.keys():
+         reschedule=i['reschedule_attendance'] 
+      if unicode("marks_entered") in i.keys():
+          marks=i["marks_entered"]
+          if marks != 'False':          
+                for i in node.relation_set:
+                    if unicode("session_of") in i.keys():
+                        session_id = collection.Node.one({"_id":i['session_of'][0]}) 
+                        for j in session_id.attribute_set:
+                            if unicode('course_structure_assignment') in i:   
+                               if i['course_structure_assignment'] == True:
+                                    marks_enter=True
+                            if unicode('course_structure_assessment') in i:    
+                               if i['course_structure_assessment'] == True:
+                                    marks_enter=True
+          if marks == False:
+              marks_enter = False                           
+              
+              
+           
        #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
-  Add="Stop"
   Mis_admin=collection.Node.find({"name":"MIS_admin"})
   try:
     Mis_admin_list=Mis_admin[0].group_admin
@@ -206,14 +227,18 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
      Add= "Stop"
   except:
     Add="Stop"       
-
+  #fecth the data
+        
+          
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id,'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'nodes': nodes, 'node': node,
                         'event_gst':event_gst.name,
-                        'Add':Add
+                        'Add':Add,
+                        'reschedule':reschedule,
+                        'marks_enter':marks_enter
                         # 'property_order_list': property_order_list
                       }
 

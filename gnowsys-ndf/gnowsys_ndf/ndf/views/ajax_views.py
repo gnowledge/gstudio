@@ -41,12 +41,12 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
 from gnowsys_ndf.ndf.views.methods import create_gattribute
-
+from datetime import date,time,timedelta
 from gnowsys_ndf.mobwrite.models import ViewObj
 
  
@@ -3948,7 +3948,53 @@ def insert_picture(request, group_id):
 
 
 # =============================================================================
-
+def reschedule_task(request,group_id,node):
+ task_dict={}
+ #name of the programe officer who has initiated this task
+ '''Required keys: _id[optional], name, group_set, created_by, modified_by, contributors, content_org,
+        created_by_name, Status, Priority, start_time, end_time, Assignee, has_type
+ '''
+ 
+ task_groupset=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+ 
+ a=[]
+ b=[]
+ c=[]
+ dekha=False
+ listing=task_groupset.group_admin
+ listing.append(1)
+ if request.user.id in listing:
+    reschedule_attendance=collection.Node.one({"name":"reschedule_attendance"})
+    marks_entered=collection.Node.find({"_type":"AttributeType","name":"marks_entered"})
+    end_time=collection.Node.one({"name":"end_time"})
+    date1=datetime.date.today()
+    ti=time(0,0)
+    b=datetime.datetime.combine(date1,ti)
+    create_gattribute(ObjectId(node),end_time,b) 
+    create_gattribute(ObjectId(node),reschedule_attendance,True)
+    create_gattribute(ObjectId(node),marks_entered[0],True)
+    
+ else:
+    path=request.POST.get('path','')
+    b.append(task_groupset._id)
+    task_dict["Assignee"] = []
+    task_dict.update({'name':unicode('Reschedule Task')})
+    task_dict.update({'group_set':b})
+    task_dict.update({'created_by':7})
+    task_dict.update({'modified_by':7})
+    #task_dict.update({'contributors':a.append(7)})
+    task_dict.update({'content_org':unicode("Please Re-Schedule the Following event"+"   \t " + path)})
+    task_dict.update({'created_by_name':'pramod'})
+    task_dict.update({'Status':unicode("New")}) 
+    task_dict.update({'Priority':unicode('Normal')})
+    #task_dict.update({'start_time':''})
+    #task_dict.update({'end_time':''})
+    #task_dict.update({'Assignee':1})
+    task_dict["Assignee"].append(1)
+    #create_task(task_dict)
+ print "asdassad"
+ return HttpResponse("Task Created")
+ 
 def event_assginee(request, group_id,app_set_instance_id=None):
  #assigneelist=request.POST.getlist("Assignee[]","")
  #absentlist=request.POST.getlist("Absents[]","")
@@ -3957,12 +4003,14 @@ def event_assginee(request, group_id,app_set_instance_id=None):
  #student_id=   request.POST.getlist("student_id[]","")
  
  Event_attended_by=request.POST.getlist("Event_attended_by[]","")
- 
+ marks=request.POST.getlist("marks","")
+ assessmentdone=request.POST.get("assessmentdone","") 
  oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
  Assignment_rel=collection.Node.find({"_type":"AttributeType","name":"Assignment_marks_record"})
  Assessmentmarks_rel=collection.Node.find({"_type":"AttributeType","name":"Assessment_marks_record"})
  performance_record=collection.Node.find({"_type":"AttributeType","name":"performance_record"})
  student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
+ marks_entered=collection.Node.find({"_type":"AttributeType","name":"marks_entered"})
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
  for info in Event_attended_by:
@@ -3981,9 +4029,10 @@ def event_assginee(request, group_id,app_set_instance_id=None):
       create_gattribute(ObjectId(a['Name']),student_details[0],{"atandance":a['Presence'],'Event':ObjectId(Event[0])})
       if(a['Presence'] == 'True'):
           attendedlist.append(a['Name'])
- create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)    
-        
-  
+
+ if assessmentdone == 'True':
+     create_gattribute(ObjectId(app_set_instance_id),marks_entered[0],False)
+ create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)
  return HttpResponse("Details Entered")  
         
 def fetch_course_name(request, group_id,Course_type):
