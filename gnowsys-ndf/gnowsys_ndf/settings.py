@@ -425,7 +425,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
 
-GROUP_AGENCY_TYPES=["Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
+GROUP_AGENCY_TYPES=["Other", "Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
 
 AUTHOR_AGENCY_TYPES=["Student","Teacher","TeacherTrainer","Faculty","Researcher","Others"]
 
