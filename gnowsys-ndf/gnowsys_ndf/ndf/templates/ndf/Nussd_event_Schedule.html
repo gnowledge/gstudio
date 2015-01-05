@@ -338,12 +338,14 @@ function GenerateSplits(splits){
       "</div></div>")
    
     $("#iteration").attr('value','3')
+    
   }
   else
   {
       $("#iteration").attr('value','2')
+      date_validation($('#end_time').attr('name'))
   }
-     datetime()
+     
   
    
 }
@@ -802,6 +804,7 @@ $("#nussd_course_type").change(function(){
   });
 function date_validation(name)
 {
+
   var start_time=""
   var end_time=""
   str=name.substring(9)
@@ -866,6 +869,11 @@ function deduct_time(start_time,end_time)
      total_session_time=deducted_minute
      $("#available-minutes").empty()
      $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
+     /* temprory path */
+     if ( total_session_time !=0 )
+     {
+          document.getElementById('submit').disabled = true;      
+     }
 }
 
 function show_hide_date(str)
@@ -959,7 +967,6 @@ function set_end_date_time(num){
 }    
 
 function datetime(){  
-
 currentDate = new Date();
 var currentDay = currentDate.getDate();
 var currentMonth = currentDate.getMonth();
