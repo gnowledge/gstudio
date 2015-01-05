@@ -3077,12 +3077,7 @@ def get_announced_courses_with_ctype(request, group_id):
       nussd_course_type = request.GET.get("nussd_course_type", "")
       acourse_ctype_list = []
       ac_of_colg = []
-      
-      nussd_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "NUSSD Course"})
-      if not nussd_course_gt:
-        # If not found, throw exception
-        error_message = "'NUSSD Course' (GSystemType) doesn't exists... Please create it first"
-        raise Exception(error_message)
+      # curr_date = datetime.datetime.now()
 
       # Fetch "Announced Course" GSystemType
       announced_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
@@ -3090,40 +3085,39 @@ def get_announced_courses_with_ctype(request, group_id):
         # If not found, throw exception
         error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first"
         raise Exception(error_message)
-      curr_date = datetime.datetime.now()
 
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
       selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
 
       if(ObjectId(group_id) == mis_admin._id):
-        ac_cur = collection.Node.find({'member_of': announced_course_gt._id,
-                                         'group_set':ObjectId(group_id),
-                                        'attribute_set.nussd_course_type': nussd_course_type
-                                        })
+        ac_cur = collection.Node.find(
+          {'member_of': announced_course_gt._id, 'group_set':ObjectId(group_id), 'attribute_set.nussd_course_type': nussd_course_type}
+        )
       else:
         colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
-        req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
-        #Get college id of corresponding college_group_id
-        acourse_for_college_RT = collection.Node.one({'_type': "RelationType", 'name': "acourse_for_college"})
-        relation_coll = collection.Triple.find(
-          {'_type': 'GRelation', 'relation_type.$id': acourse_for_college_RT._id, 'right_subject': req_colg_id._id}
+
+        # Fetch Courses announced for given college (or college group)
+
+        # Get college node & courses announced for it from college group's ObjectId
+        req_colg_id = collection.Node.one(
+          {'member_of':colg_gst._id, 'relation_set.has_group': ObjectId(group_id)},
+          {'relation_set.college_has_acourse': 1}
         )
 
-        for each in relation_coll:
-          ac_of_colg.append(ObjectId(each.subject))
-          # Courses announced for this college id
-
-        
+        for rel in req_colg_id.relation_set:
+          if rel and rel.has_key("college_has_acourse"):
+            ac_of_colg = rel["college_has_acourse"]
 
         # Type-cast fetched field(s) into their appropriate type
         nussd_course_type = unicode(nussd_course_type)
-         
-        groups_to_search_from = [ObjectId(group_id)]
+        
+        # Keeping only those announced courses which are active (i.e. PUBLISHED)
         ac_cur = collection.Node.find(
           {
-            'member_of': announced_course_gt._id, '_id':{'$in':ac_of_colg},
+            '_id': {'$in': ac_of_colg}, 'member_of': announced_course_gt._id, 
             'attribute_set.nussd_course_type': nussd_course_type,
-            'status':u"PUBLISHED"
+            # 'relation_set.course_selected': {'$exists': True, '$not': {'$size': 0}},
+            'status': u"PUBLISHED"
             # 'attribute_set.start_enroll':{'$lte': curr_date},
             # 'attribute_set.end_enroll':{'$gte': curr_date}
           }
@@ -3131,19 +3125,26 @@ def get_announced_courses_with_ctype(request, group_id):
 
       if ac_cur.count():
         for each_ac in ac_cur:
-          relation_coll_ac = collection.Triple.find(
-            {'_type': 'GRelation', 'relation_type.$id': selected_course_RT._id, 'right_subject': each_ac._id}
-          )
-          each_ac["enrolled_stud_count"] = relation_coll_ac.count()
-          
+          # NOTE: This ajax-call is used in various templates
+          # Following is used especially only in new_create_batch.html
+          # Fetch enrolled students count from announced course node's course_selected
+          enrolled_stud_count = 0
+          for rel in each_ac.relation_set:
+            if rel and rel.has_key("course_selected"):
+              enrolled_stud_count = len(rel["course_selected"])
+              break
+
+          each_ac["enrolled_stud_count"] = enrolled_stud_count
           acourse_ctype_list.append(each_ac)
+        
         response_dict["success"] = True      
         info_message = "Announced Courses are available"
+     
       else:
         response_dict["success"] = False
         info_message = "No Announced Courses are available"
-      response_dict["message"] = info_message
 
+      response_dict["message"] = info_message
       response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list, cls=NodeJSONEncoder)
 
       return HttpResponse(json.dumps(response_dict))
@@ -3153,7 +3154,7 @@ def get_announced_courses_with_ctype(request, group_id):
       return HttpResponse(json.dumps({'message': " AnnouncedCourseFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
 
   except Exception as e:
-    error_message = "\n AnnouncedCourseFetchError: " + str(e) + "!!!"
+    error_message = "\n AnnouncedCourseFetchError: Either you are in user group or something went wrong!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
 def get_colleges(request,group_id):
@@ -3308,8 +3309,13 @@ def get_anncourses_allstudents(request, group_id):
       node = None
       checked = None
 
+      lower_year_limit = ""
+      upper_year_limit = ""
+
       enrolled_stud_count = 0
       non_enrolled_stud_count = 0
+
+      colg_of_acourse_id = None
 
       # Check whether any field has missing value or not
       if registration_year == "" or all_students == "":
@@ -3317,29 +3323,46 @@ def get_anncourses_allstudents(request, group_id):
         all_students = u"false"
         # error_message = "Invalid data: No data found in any of the field(s)!!!"
         # raise Exception(error_message)
-
-      # Type-cast fetched field(s) into their appropriate type
-      date_lte = datetime.datetime.strptime("31/12/"+registration_year, "%d/%m/%Y")
-      date_gte = datetime.datetime.strptime("1/1/"+registration_year, "%d/%m/%Y")
       
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
-
-      colg_of_acourse_id = None
-      query = {
-        'member_of': student._id, 
-        'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
-        'relation_set.student_belongs_to_college': ObjectId(colg_of_acourse_id)
-      }
 
       # From Announced Course node fetch College's ObjectId
       acourse_node = collection.Node.find_one(
         {'_id': {'$in': acourse_val}, 'relation_set.acourse_for_college': {'$exists': True}}, 
-        {'relation_set.acourse_for_college': 1}
+        {'attribute_set': 1, 'relation_set.acourse_for_college': 1}
       )
       for rel in acourse_node.relation_set:
         if rel:
           colg_of_acourse_id = rel["acourse_for_college"][0]
           break
+
+      for attr in acourse_node.attribute_set:
+        if attr and attr.has_key("start_time"):
+          lower_year_limit = attr["start_time"].year.__str__()
+        elif attr and attr.has_key("end_time"):
+          upper_year_limit = attr["end_time"].year.__str__()
+
+      if not lower_year_limit or not upper_year_limit:
+        if not lower_year_limit:
+          if upper_year_limit:
+            lower_year_limit = upper_year_limit
+          else:
+            lower_year_limit = datetime.datetime.now().year.__str__()
+
+        if not upper_year_limit:
+          if lower_year_limit:
+            upper_year_limit = lower_year_limit
+          else:
+            upper_year_limit = datetime.datetime.now().year.__str__()
+
+      date_gte = datetime.datetime.strptime("1/1/"+lower_year_limit, "%d/%m/%Y")
+      date_lte = datetime.datetime.strptime("31/12/"+upper_year_limit, "%d/%m/%Y")
+
+      query = {
+        'member_of': student._id, 
+        'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
+        'relation_set.student_belongs_to_college': ObjectId(colg_of_acourse_id)
+      }
 
       # If College's ObjectId exists, fetch respective College's group
       if colg_of_acourse_id:
@@ -3392,6 +3415,7 @@ def get_anncourses_allstudents(request, group_id):
               checked = "has_enrolled"
 
       drawer_template_context = {}
+      drawer_widget = ""
       res = None
       if all_students == u"true":
         all_students_text = "All students (including enrolled ones)"
@@ -3402,7 +3426,6 @@ def get_anncourses_allstudents(request, group_id):
         ).sort("name", 1)
 
         all_students_text += " [Count("+str(res.count())+")]"
-        drawer_template_context = edit_drawer_widget("RelationType", group_id, node, None, checked, left_drawer_content=res)
 
       elif all_students == u"false":
         all_students_text = "Only non-enrolled students"
@@ -3417,14 +3440,15 @@ def get_anncourses_allstudents(request, group_id):
 
         non_enrolled_stud_count = str(res.count())
         all_students_text += " [Count("+non_enrolled_stud_count+")]"
-        drawer_template_context = edit_drawer_widget("RelationType", group_id, node, None, checked, left_drawer_content=res)
 
-      drawer_template_context["widget_for"] = "student_enroll"
-      drawer_template_context["groupid"] = group_id
-      drawer_widget = render_to_string('ndf/drawer_widget.html', 
-                                        drawer_template_context,
-                                        context_instance = RequestContext(request)
-                                      )
+      if res.count():
+        drawer_template_context = edit_drawer_widget("RelationType", group_id, node, None, checked, left_drawer_content=res)
+        drawer_template_context["widget_for"] = "student_enroll"
+        drawer_template_context["groupid"] = group_id
+        drawer_widget = render_to_string('ndf/drawer_widget.html', 
+          drawer_template_context,
+          context_instance = RequestContext(request)
+        )
 
       response_dict["announced_courses"] = []
       response_dict["drawer_widget"] = drawer_widget
