@@ -96,7 +96,7 @@
 
         <ul class="left">
           <li>
-            <a href="{% url 'group_dashboard' group_object.pk %}" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}>
+            <a href="/home/dashboard/group" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}>
               Home
             </a>
           </li>
@@ -106,13 +106,13 @@
             </a>
           </li>
           <li>
-            <a href="" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
+            <a href="{% url 'group_dashboard' 'State Partners' %}" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
               Partners
             </a>
           </li>
           <li>
-            <a href="" {% if nroer_menu.menu_level_one_selected == "Group" %}class="active"{% endif %}>
-              Group
+            <a href="{% url 'group_dashboard' 'Teachers' %}" {% if nroer_menu.menu_level_one_selected == "Groups" %}class="active"{% endif %}>
+              Groups
             </a>
           </li>
         </ul>
