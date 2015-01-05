@@ -3112,12 +3112,11 @@ def get_announced_courses_with_ctype(request, group_id):
         nussd_course_type = unicode(nussd_course_type)
         
         # Keeping only those announced courses which are active (i.e. PUBLISHED)
-        # And also which has enrolled students via "course_selected" check
         ac_cur = collection.Node.find(
           {
             '_id': {'$in': ac_of_colg}, 'member_of': announced_course_gt._id, 
             'attribute_set.nussd_course_type': nussd_course_type,
-            'relation_set.course_selected': {'$exists': True, '$not': {'$size': 0}},
+            # 'relation_set.course_selected': {'$exists': True, '$not': {'$size': 0}},
             'status': u"PUBLISHED"
             # 'attribute_set.start_enroll':{'$lte': curr_date},
             # 'attribute_set.end_enroll':{'$gte': curr_date}
@@ -3136,11 +3135,7 @@ def get_announced_courses_with_ctype(request, group_id):
               break
 
           each_ac["enrolled_stud_count"] = enrolled_stud_count
-
-          if each_ac["enrolled_stud_count"] > 0:
-            # To make sure that only those announced courses are added
-            # which has students enrolled into it
-            acourse_ctype_list.append(each_ac)
+          acourse_ctype_list.append(each_ac)
         
         response_dict["success"] = True      
         info_message = "Announced Courses are available"
@@ -3159,7 +3154,7 @@ def get_announced_courses_with_ctype(request, group_id):
       return HttpResponse(json.dumps({'message': " AnnouncedCourseFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
 
   except Exception as e:
-    error_message = "\n AnnouncedCourseFetchError: " + str(e) + "!!!"
+    error_message = "\n AnnouncedCourseFetchError: Either you are in user group or something went wrong!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
 def get_colleges(request,group_id):
