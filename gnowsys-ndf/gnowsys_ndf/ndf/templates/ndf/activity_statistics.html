@@ -11,10 +11,13 @@ var h = 300;
 var r = h/2;
 var color = d3.scale.category10();
 
-var data = [{"label":"Registration", "value":5}, 
-                  {"label":"Pages Created", "value":"{{page_create_rate}}"}, 
-                  {"label":"Files Uploaded", "value":"{{file_create_rate}}"},
-                  {"label":"Forums Created", "value":"{{forum_create_rate}}"}];
+var data = [{"label":"Pages Created", "value":"{{page_create_rate}}"}, 
+            {"label":"Files Uploaded", "value":"{{file_create_rate}}"},
+            {"label":"Quiz Created", "value":"{{quiz_create_rate}}"},
+            {"label":"Forums Created", "value":"{{forum_create_rate}}"},
+            {"label":"Threads Created", "value":"{{thread_create_rate}}"},
+            {"label": "Reply", "value":"{{reply_create_rate}}"},
+            {"label":"Registration", "value":5}];
 
 
 var vis = d3.select('#chart').append("svg:svg").data([data]).attr("width", w).attr("height", h).append("svg:g").attr("transform", "translate(" + r + "," + r + ")");
