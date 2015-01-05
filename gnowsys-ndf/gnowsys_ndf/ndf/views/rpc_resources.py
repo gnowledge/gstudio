@@ -38,35 +38,89 @@ def resources_list(request):
 			# Filter only ebooks based on "mime_type:zip"
 			nodes = collection.Node.find(
 				{'member_of': {'$nin':[Pandora_GST._id],'$in':[File_GST._id]}, 'access_policy':'PUBLIC','group_set':ObjectId(grp._id), 'mime_type': 'application/zip', 'created_by': auth_id },
-				{'_id':0, 'name':1, 'attribute_set':1, 'created_by':1, 'relation_set':1, 'content_org':1, 'language':1, 'mime_type':1, 'start_publication':1, 'url':1}
+				{'_id':0, 'name':1, 'attribute_set':1, 'created_by':1, 'relation_set':1, 'collection_set':1, 'content_org':1, 'language':1, 'mime_type':1, 'start_publication':1, 'url':1}
 			)
 
-		resource_list = []
-		relation_set = {}
-		t_list = []
 		
+		efile = None
+		ebooks_dict = {}
+		ebook_res = []		
+		ebook_collection_set = []
+
 		# i = 0 
 		for each in nodes:
-			# To get the teaches relaion with particular object
-			if each.relation_set:
-				for e in each.relation_set:
-					for k in e[e.keys()[0]]:
-						obj = collection.Node.one({'_id': ObjectId(k) })
-						t_list.append(obj.name)
-					relation_set.update({ e.keys()[0] : t_list })
+			if each.collection_set:
+				'''
+				"ebook_collection_set" variable Keeps resource collection_set as list of ObjectId's for further iteration
+				because "efile = each" statement bellow, changes the collection_set as a list of unicode values
+				Since "each" is dict and getting updated with unicode values in collection_set in "get_metadata()" function
+				'''
+				ebook_collection_set = each.collection_set
 
-			each['relation_set'] = relation_set
+			# This is for updating fields in string values to show the metadata of ebook i.e zip file
+			efile = each
+			ebook = get_metadata(efile)
+			ebooks_dict.update({ str(ebook) : ebook_res })
+			# After updating ebook metadata, now process its collection elements
+			if ebook_collection_set:
+				ebook_res_list = []
+				for res in ebook_collection_set:
+					# Selected particular fields only of resource object as bellow
+					res_obj = collection.Node.one({'_id': ObjectId(res) },
+												  {'_id':0, 'name':1, 'attribute_set':1, 'created_by':1, 'relation_set':1, 'collection_set':1, 'content_org':1, 'language':1, 'mime_type':1, 'start_publication':1, 'url':1})
+					
+					efile = res_obj
+					ebook_res = get_metadata(efile)					
+					for eb in ebook_res:
+						# Taken all collection element of ebook (zip) file
+						ebook_res_list.append(eb)
 
-			for k in each:
-				node_dict = {str(k): each[k]}
-				each.pop(k)
-				each.update(node_dict)
-
-			resource_list.append(each)
+				# Update json { ebook (zip) file document : Its collection elements along with metadata }
+				ebooks_dict.update({ str(ebook) : ebook_res_list })
+					
 
 			# i=i+1
-			# if i == 3:
+			# if i == 2:
 				# break
 
-	# print "\n",json.dumps(resource_dict),"\n"
-	return json.dumps(resource_list)
+	# print "\n",json.dumps(ebooks_dict),"\n"
+	return json.dumps(ebooks_dict)
+
+
+def get_metadata(efile):
+	'''
+	This function converts "relation_set" object values in defined relation from ObjectId to unicode names
+	also changes "collection_set" from ObjectId to unicode names
+	also makes all the keys in string format in resource dict and shows all metadata together
+	'''
+	resource_list = []
+	relation_set = {}
+	t_list = []
+	coll_list=[]
+	# To get the teaches relaion with particular object
+	if efile.relation_set:
+		for e in efile.relation_set:
+			for k in e[e.keys()[0]]:
+				obj = collection.Node.one({'_id': ObjectId(k) })
+				t_list.append(obj.name)
+			relation_set.update({ e.keys()[0] : t_list })
+
+	efile['relation_set'] = relation_set
+
+	# To fetch collection elements of resource
+	if efile.collection_set:
+		for m in efile.collection_set:
+			coll_obj = collection.Node.one({'_id': ObjectId(m) })
+			coll_list.append(coll_obj.name)
+
+	efile['collection_set'] = coll_list
+	
+	# Update entire node dict into string values 
+	for k in efile:
+		node_dict = {str(k): efile[k]}
+		efile.pop(k)
+		efile.update(node_dict)
+
+	resource_list.append(efile)
+	
+	return resource_list

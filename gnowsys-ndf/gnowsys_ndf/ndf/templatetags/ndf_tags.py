@@ -1836,9 +1836,10 @@ def get_object_value(node):
            
    for each in at_set:
       attribute_type = collection.Node.one({'_type':"AttributeType" , 'name':each}) 
-      get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': attribute_type._id})
-      if get_att:
-         att_name_value[attribute_type.altnames] = get_att.object_value
+      if attribute_type:
+      	get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': attribute_type._id})
+      	if get_att:
+        	att_name_value[attribute_type.altnames] = get_att.object_value
          
    return att_name_value
 
