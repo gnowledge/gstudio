@@ -44,8 +44,7 @@ def resources_list(request):
 		
 		efile = None
 		ebooks_dict = {}
-		ebook_res = []
-		ebook_res_list = []
+		ebook_res = []		
 		ebook_collection_set = []
 
 		# i = 0 
@@ -64,6 +63,7 @@ def resources_list(request):
 			ebooks_dict.update({ str(ebook) : ebook_res })
 			# After updating ebook metadata, now process its collection elements
 			if ebook_collection_set:
+				ebook_res_list = []
 				for res in ebook_collection_set:
 					# Selected particular fields only of resource object as bellow
 					res_obj = collection.Node.one({'_id': ObjectId(res) },
