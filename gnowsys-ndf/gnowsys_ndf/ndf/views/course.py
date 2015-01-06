@@ -352,7 +352,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 course_code = each["course_code"]
                 break
 
-            c_name = unicode(course_code + "_" + college_enrollment_code + "_" + start_time.strftime("%b_%Y") + "_" + end_time.strftime("%b_%Y"))
+            c_name = unicode(course_code + "_" + college_enrollment_code + "_" + start_time.strftime("%b_%Y") + "-" + end_time.strftime("%b_%Y"))
             request.POST["name"] = c_name
             
             is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
@@ -1157,12 +1157,12 @@ def create_course_struct(request, group_id,node_id):
     if course_collection_list:
       course_collection_dict_exists = True
 
-    eval_type = course_node.attribute_set[5][u"evaluation_type"]
-    #If evaluation_type flag is True, it is Final. If False, it is Continous
-    if(eval_type==u"Final"):
-        eval_type_flag = True
-    else:
-        eval_type_flag = False
+    # eval_type = course_node.attribute_set[5][u"evaluation_type"]
+    # #If evaluation_type flag is True, it is Final. If False, it is Continous
+    # if(eval_type==u"Final"):
+    #     eval_type_flag = True
+    # else:
+    #     eval_type_flag = False
 
     if request.method=="POST":
         listdict = request.POST.get("course_sec_dict_ele","")
@@ -1358,7 +1358,7 @@ def create_course_struct(request, group_id,node_id):
                                     'course_collection_list':json.dumps(course_collection_list),
                                     'property_order_list':property_order_list_cs,
                                     'property_order_list_css':property_order_list_css,
-                                    'eval_type_flag': eval_type_flag
+                                    #'eval_type_flag': eval_type_flag
                                   },
                                   context_instance = RequestContext(request)
         )
