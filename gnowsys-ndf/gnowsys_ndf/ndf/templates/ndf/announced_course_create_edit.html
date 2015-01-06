@@ -495,21 +495,13 @@
       // Valid, move to next step
       
       {% if not node %}
-        widget_for = "announced_course_create_edit"
-        class_value = ".node_id." + widget_for + "_values"
-        right_drawer_len = $(class_value).size();
-
         var announce_to_colg_list = [];
+        colg_in_rt_drawer = $("#announced_course_create_edit_drawer2 li input")
+        $.each(colg_in_rt_drawer,function(i,v){
+          announce_to_colg_list.push(v.getAttribute('name'))
+        })
 
-        if (right_drawer_len > 0) {
-          $(class_value).each(function (){
-            // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
-            resource_name = $(this).attr('name');
-            /*resource_id = $(this).val()*/;
-
-            announce_to_colg_list.push(resource_name);
-          });
-
+        if (announce_to_colg_list.length > 0) {
           var nussd_course_type = $("#nussd_course_type").val()
           var nussd_course_type_list = []
           nussd_course_type_list.push(nussd_course_type);
