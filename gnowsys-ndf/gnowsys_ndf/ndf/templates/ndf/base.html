@@ -64,8 +64,8 @@
     {% get_group_object groupid as group_object %}
     {% get_site_variables as site %}
 
-    <!-- "get_site_info" gives site name with .com/.org (example.com in the case of localhost) -->
-    {% get_site_info as domain_name %}
+    <!-- "get_site_name_from_settings" gives site name specified in local_settings.py -->
+    {% get_site_name_from_settings as site_name %}
 
     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
@@ -88,15 +88,15 @@
 
       <!-- Left Nav Section -->
 
-      <!-- add example.com in place of nroer.metastudio.org to check locally -->
-      {% if domain_name == "nroer.metastudio.org" %} 
+      <!-- add GSTUDIO_SITE_NAME = "nroer" in the local_settings.py file, to check locally -->
+      {% if site_name == "nroer" %} 
       
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
 
         <ul class="left">
           <li>
-            <a href="{% url 'group_dashboard' group_object.pk %}" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}>
+            <a href="/home/dashboard/group" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}>
               Home
             </a>
           </li>
@@ -106,13 +106,13 @@
             </a>
           </li>
           <li>
-            <a href="" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
+            <a href="{% url 'group_dashboard' 'State Partners' %}" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
               Partners
             </a>
           </li>
           <li>
-            <a href="" {% if nroer_menu.menu_level_one_selected == "Group" %}class="active"{% endif %}>
-              Group
+            <a href="{% url 'group_dashboard' 'Teachers' %}" {% if nroer_menu.menu_level_one_selected == "Groups" %}class="active"{% endif %}>
+              Groups
             </a>
           </li>
         </ul>
@@ -318,8 +318,8 @@
 
             <!-- group level gapps which appears at LHS of search bar -->
 
-            <!-- add "example.com" in place of "nroer.metastudio.org" to check locally -->
-            {% if domain_name == "nroer.metastudio.org" %} 
+            <!-- add GSTUDIO_SITE_NAME = "nroer" in the local_settings.py file, to check locally -->
+            {% if site_name == "nroer" %} 
             
             <!-- NROER level-two menu -->
 

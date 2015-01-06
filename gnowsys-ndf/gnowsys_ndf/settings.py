@@ -425,7 +425,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
 
-GROUP_AGENCY_TYPES=["Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
+GROUP_AGENCY_TYPES=["Other", "Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
 
 AUTHOR_AGENCY_TYPES=["Student","Teacher","TeacherTrainer","Faculty","Researcher","Others"]
 
@@ -514,7 +514,7 @@ RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
 
-
+GSTUDIO_SITE_NAME = ""  # holds the name of site. e.g: "nroer", "tiss" etc.
 
 GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "Maps", "Events", "Publications"]
 

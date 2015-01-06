@@ -17,6 +17,10 @@ from mongokit import IS
 from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
+try:
+	from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
+except ImportError:
+	pass
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
@@ -617,7 +621,7 @@ def get_gapps_iconbar(request, group_id):
 
 
 @register.assignment_tag
-def get_nroer_menu(request, group_name_or_id):
+def get_nroer_menu(request, group_name):
 
 	url_str = request.META["PATH_INFO"]
 	url_split = url_str.split("/")
@@ -629,7 +633,8 @@ def get_nroer_menu(request, group_name_or_id):
 	# initializing of variables
 	selected_gapp = menu_level_one_selected = selected_gapp_formated = ""
 	menu_level_one_list = selected_gapp_list = []
-	mapping = {"eLibrary": "e-library"}
+	mapping = { "eLibrary": "e-library", "Curated Zone": "topics",
+				"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners" }
 
 	# the dict that will be returned
 	nroer_menu_dict = {
@@ -645,11 +650,38 @@ def get_nroer_menu(request, group_name_or_id):
 
 		# handling conditions of "e-library" = "file" and vice-versa.
 		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+		if selected_gapp.lower() in [i.lower() for i in mapping.values()]:
+			for k, v in mapping.iteritems():
+				if selected_gapp.lower() == v.lower():
+					selected_gapp = k.lower()
 
 		selected_gapp_formated = selected_gapp.replace("-", "")
-	else:
-		menu_level_one_selected = group_name_or_id  # because url_split[0] can be ObjectId
 
+	elif group_name == "home":  # only for "home" group
+		menu_level_one_selected = group_name
+
+	else:  # for group's other than home
+
+		# getting all the keys from GSTUDIO_NROER_MENU
+		all_sub_menu_values = []
+		for each_d in GSTUDIO_NROER_MENU:
+			for i in each_d.values():
+				all_sub_menu_values += i
+
+		if group_name.lower() in [i.lower() for i in all_sub_menu_values]:
+			# if group_name directly appear to be in all the values in GSTUDIO_NROER_MENU
+			# e.g: Teachers, Interest Group's
+			selected_gapp = group_name
+			selected_gapp_formated = group_name.lower()
+		elif group_name.lower() in [i.lower() for i in mapping.values()]:
+			# if group_name appears in mapping's value then get it's key.
+			# e.g: States, Individuals
+			for k, v in mapping.iteritems():
+				if group_name.lower() == v.lower():
+					selected_gapp = k.lower()
+					selected_gapp_formated = k.lower()
+
+	# [i.keys()[0].lower() for i in GSTUDIO_NROER_MENU]
 	# print "selected_gapp : ", selected_gapp
 	# print "selected_gapp_formated : ", selected_gapp_formated
 	# print "menu_level_one_selected : ", menu_level_one_selected
@@ -660,6 +692,7 @@ def get_nroer_menu(request, group_name_or_id):
 
 		temp_menu_level_one_key = menu_level_one.keys()[0]
 		temp_selected_gapp_list = menu_level_one[temp_menu_level_one_key]
+		# print temp_selected_gapp_list
 		
 		menu_level_one_list.append(temp_menu_level_one_key)
 
@@ -678,6 +711,13 @@ def get_nroer_menu(request, group_name_or_id):
 	# print "nroer_menu_dict ::::\n", nroer_menu_dict
 
 	return nroer_menu_dict
+# ---------- END of get_nroer_menu -----------
+
+
+@register.assignment_tag
+def get_site_name_from_settings():
+	# print "GSTUDIO_SITE_NAME : ", GSTUDIO_SITE_NAME
+	return GSTUDIO_SITE_NAME
 
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
@@ -1845,9 +1885,10 @@ def get_object_value(node):
            
    for each in at_set:
       attribute_type = collection.Node.one({'_type':"AttributeType" , 'name':each}) 
-      get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': attribute_type._id})
-      if get_att:
-         att_name_value[attribute_type.altnames] = get_att.object_value
+      if attribute_type:
+      	get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': attribute_type._id})
+      	if get_att:
+        	att_name_value[attribute_type.altnames] = get_att.object_value
          
    return att_name_value
 

@@ -91,6 +91,8 @@
       {% if prof_pic_obj %}
       {% get_grid_fs_object prof_pic_obj as grid_fs_obj %}
       <img alt="Banner picture for this group." src="{% url 'read_file' group_id prof_pic_obj.pk grid_fs_obj.filename %} " style="height:250px; width:200px; position:absolute; z-index:auto;">
+      {% else %}
+      <img src="/static/ndf/images/metaStudio-profile.svg" alt="Banner picture for this group." width="100%" height="100%" style="background-color:white; border:solid 1px darkgray;">
       {% endif %}   
       
       <input type="file" name="has_profile_pic" class="hide" />
@@ -115,7 +117,7 @@
   {% csrf_token %}
   <div id="group_dashboard_Banner" style="height:300px; width:1150px; background-color: #b0e1df;">
     {% if request.user.is_authenticated %}
-    <div style="position:relative";>
+    <div style="position:relative;">
       <div style="float:left;">
         <a style="border-style:solid; border-width:1.5px; padding:3px 5px; border-radius:4px" id="btnUploadBannerPic" >  
         Add a Banner Photo 
@@ -131,6 +133,8 @@
     {% get_grid_fs_object banner_pic as grid_fs_obj %}
     <img alt="Profile picture for this group." src="{% url 'read_file' group_id banner_pic.pk grid_fs_obj.filename %}" 
     style="height:300px; width:1150px; position:absolute; z-index:auto;">
+    {% else %}
+      <img src="/static/ndf/images/metastudio-site-banner.png" alt="Banner picture for this group." width="100%" style="background-color:white; border:solid 1px darkgray;">
     {% endif %}   
 
     <div class="row">
@@ -217,7 +221,7 @@
   </div>
   {% endif %}
 
-  <div class="{% if not approval %}active {% endif %}content row" id="status" align="center">
+  <div class="content row {% if not approval %}active {% endif %}" id="status" align="center">
   </div>
 
   <div class="content row" id="view-scheduler-calendar">
@@ -233,15 +237,19 @@
   var counter = 1;
 
   function scrolling(){
-    if ($('#status').attr('class') == "content active") {
+   
+    if ($('#status').attr('class') == "content row active") {
+      
       $(window).bind('scroll', loadOnScroll);
       count = 0;
     }
   }
-  window.onscroll = scrolling();
+
+
+  window.onscroll = scrolling;
 
   var loadOnScroll = function() {
-    if ($(window).scrollTop()+$(window).height() >= $(document).height()) {
+  if ($(window).scrollTop()+$(window).height() >= $(document).height()) {
       $(window).unbind();
     
       // execute the load function below that will visit the JSON feed and stuff data into the HTML
