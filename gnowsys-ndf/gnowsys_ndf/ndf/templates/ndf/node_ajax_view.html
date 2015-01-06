@@ -202,7 +202,7 @@
               {% trans "Join Discussion" %} ({{ all_replies | length }})
             </span>
           {% else %}
-            <span title="{% trans 'Be the first to start a discussion' %}">
+	    <span title="{% trans 'Be the first to start a discussion' %}">
               {% trans "Begin Discussion" %}
             </span>
           {% endif %}
@@ -490,6 +490,14 @@
         {% endfor %}
       
         <!-- <div id="commentable-area"> -->
+        <div>
+          {% with node.html_content|safe as description %}
+          {% if description != "None" %}
+          <span itemprop="{{schema.1.description}}">{{ description }}</span>
+          {% endif %}
+          {% endwith %}
+        </div>
+        <br/>
 	<div>
          {% if node.prior_node|length > 0 %}
    
@@ -497,7 +505,7 @@
          {% get_grid_fs_object each_node as grid_fs_obj %}
          {% if "Group" in node.member_of_names_list %}
          {% get_object_value node as objvalue %}
-	    <table>
+	    <table style="width:60%; border-width:0px;" >
 	      <tbody>
 		{% for key, value in objvalue.items %}
 		<tr>
@@ -512,13 +520,6 @@
             {% endif %}
 
 	</div>
-        <div>
-          {% with node.html_content|safe as description %}
-          {% if description != "None" %}
-          <span itemprop="{{schema.1.description}}">{{ description }}</span>
-          {% endif %}
-          {% endwith %}
-        </div>
         <!-- </div> -->
         <!-- Resource contents of topic -->
 

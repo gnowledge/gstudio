@@ -1,5 +1,5 @@
 ''' -- imports from python libraries -- '''
-import re, magic
+import re, magic, collections
 from time import time
 
 ''' -- imports from installed packages -- '''
@@ -314,6 +314,15 @@ def get_group_object(group_id = None):
 	except invalid_id:
 		group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return group_object
+
+@register.assignment_tag
+def get_states_object(request):
+   colln=db[Node.collection_name]
+   group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'State Partners'}]})
+   return group_object
+
+
+
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -1831,8 +1840,8 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
 # returns object value of attribute 
 @register.assignment_tag
 def get_object_value(node):
-   at_set = ['house_street','town_city','state','pin_code','contact_point','email_id','telephone','website']
-   att_name_value={}
+   at_set = ['contact_point','house_street','town_city','state','pin_code','email_id','telephone','website']
+   att_name_value= collections.OrderedDict()
            
    for each in at_set:
       attribute_type = collection.Node.one({'_type':"AttributeType" , 'name':each}) 
