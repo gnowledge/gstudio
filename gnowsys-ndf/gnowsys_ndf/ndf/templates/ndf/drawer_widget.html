@@ -564,8 +564,11 @@
         alert("Nothing to move.");
         return;
       }
-      $("#{{widget_for}}_drawer1").append($(all_li_ele).clone(true));
-      $(all_li_ele).remove();
+      if($(all_li_ele).hasClass("selected-resource")){
+        $(all_li_ele).removeClass("selected-resource")
+      }
+      $("#{{widget_for}}_drawer2").html("");
+      $("#{{widget_for}}_drawer1").append(all_li_ele);
       update_drawer_count()
     })
 
@@ -576,10 +579,12 @@
         alert("Nothing to move.");
         return;
       }
-      searchbar = $("#{{widget_for}}_drawer1 li:first-child")
-      $("#{{widget_for}}_drawer1").append(searchbar)
-      $("#{{widget_for}}_drawer2").append($(all_li_ele).clone(true));
-      $(all_li_ele).remove();
+      if($(all_li_ele).hasClass("selected-resource")){
+        $(all_li_ele).removeClass("selected-resource")
+      }
+
+      $("#{{widget_for}}_drawer1 li:not(:first-child)").remove()
+      $("#{{widget_for}}_drawer2").append(all_li_ele);
       update_drawer_count()
     })
 
