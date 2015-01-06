@@ -101,7 +101,7 @@
             </a>
           </li>
           <li>          
-            <a href="{% url 'GAPPS' group_object.pk "e-library" %}" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
+            <a href="{% url 'GAPPS' group_name_tag|default:'home' 'e-library' %}" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
@@ -326,7 +326,19 @@
               <ul class="button-group nroer-menu">
                 {% for each_menu in nroer_menu.selected_gapp_list %}
                   <li {% if each_menu|lower == nroer_menu.selected_gapp|cut:"-" %}class="active"{% endif %}>
-                    <a class="button" href="">{{each_menu}}</a>
+                    <a class="button"
+                    {% if each_menu in nroer_menu.mapping.groups %}
+                      {% for k, v in nroer_menu.mapping.items %}
+                        {% if k == each_menu %} href="{% url 'group_dashboard' v %}"{% endif %}
+                      {% endfor %}
+                    {% elif each_menu in nroer_menu.mapping.gapps %}
+                      {% for k, v in nroer_menu.mapping.items %}
+                        {% if k == each_menu %}
+                          href="{% url 'GAPPS' group_name_tag v %}"
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                    >{{each_menu}}</a>
                   </li>
                 {% endfor %}
               </ul>

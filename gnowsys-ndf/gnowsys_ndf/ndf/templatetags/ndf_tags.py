@@ -624,8 +624,10 @@ def get_nroer_menu(request, group_name):
 	# initializing of variables
 	selected_gapp = menu_level_one_selected = selected_gapp_formated = ""
 	menu_level_one_list = selected_gapp_list = []
-	mapping = { "eLibrary": "e-library", "Curated Zone": "topics",
-				"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners" }
+	mapping = {"eLibrary": "e-library", "Curated Zone": "topics",
+				"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
+				"Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
+				}
 
 	# the dict that will be returned
 	nroer_menu_dict = {
@@ -641,6 +643,7 @@ def get_nroer_menu(request, group_name):
 
 		# handling conditions of "e-library" = "file" and vice-versa.
 		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+
 		if selected_gapp.lower() in [i.lower() for i in mapping.values()]:
 			for k, v in mapping.iteritems():
 				if selected_gapp.lower() == v.lower():
@@ -653,13 +656,13 @@ def get_nroer_menu(request, group_name):
 
 	else:  # for group's other than home
 
-		# getting all the keys from GSTUDIO_NROER_MENU
-		all_sub_menu_values = []
-		for each_d in GSTUDIO_NROER_MENU:
-			for i in each_d.values():
-				all_sub_menu_values += i
+		# getting all the values of all keys from GSTUDIO_NROER_MENU
+		# all_sub_menu_values = []
+		# for each_d in GSTUDIO_NROER_MENU:
+		# 	for i in each_d.values():
+		# 		all_sub_menu_values += i
 
-		if group_name.lower() in [i.lower() for i in all_sub_menu_values]:
+		if group_name.lower() in [i.lower() for i in mapping.keys()]:
 			# if group_name directly appear to be in all the values in GSTUDIO_NROER_MENU
 			# e.g: Teachers, Interest Group's
 			selected_gapp = group_name
@@ -693,12 +696,19 @@ def get_nroer_menu(request, group_name):
 
 		if selected_gapp_formated:
 			for k, each_menu_dict in menu_level_one.iteritems():
-				if selected_gapp_formated in [i.lower() for i in each_menu_dict]:
+				if each_menu_dict and (selected_gapp_formated in [i.lower() for i in each_menu_dict]):
 					nroer_menu_dict["selected_gapp"] = selected_gapp_formated
 					nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
 					nroer_menu_dict["selected_gapp_list"] = each_menu_dict
 
 	nroer_menu_dict["menu_level_one_list"] = menu_level_one_list
+
+	# sending details about which are groups and which are gapps
+	mapping["groups"] = ["States", "Institutions", "Individuals", "Teachers", "Interest Groups", "Schools"]
+	mapping["gapps"] = ["Curated Zone", "eLibrary", "eBooks", "eCourses", "Events"]
+	# print mapping
+
+	nroer_menu_dict["mapping"] = mapping
 	# print "nroer_menu_dict ::::\n", nroer_menu_dict
 
 	return nroer_menu_dict
