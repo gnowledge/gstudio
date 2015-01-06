@@ -195,7 +195,9 @@
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
       {% comment %}
       <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
-      {% endcomment %} 
+      {% endcomment %}
+      {% if "Group" not in node.member_of_names_list %}
+	   
       <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
           {% if all_replies %}
             <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
@@ -205,11 +207,12 @@
 	    <span title="{% trans 'Be the first to start a discussion' %}">
               {% trans "Begin Discussion" %}
             </span>
-          {% endif %}
+	  {% endif %}
 
         </a>
       </dd>
-
+      {% endif %}
+      
 
     </dl>
   </h1>
@@ -262,6 +265,7 @@
         <div class="row">
           <div class="small-4 columns">
             {% if node.prior_node|length > 0 %}
+	    {% if "Group" not in node.member_of_names_list %}
             <div class="panel">
 
               <h6>{% trans "You may want to read these first: " %}</h6>
@@ -274,6 +278,7 @@
 	      {% endif %}
               {% endfor %}
             </div>
+	    {% endif %}
               {% endif %}         </div>
 
           <div class="small-4 columns">
