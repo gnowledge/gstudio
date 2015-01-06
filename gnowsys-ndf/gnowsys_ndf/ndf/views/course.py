@@ -1157,8 +1157,11 @@ def create_course_struct(request, group_id,node_id):
     if course_collection_list:
       course_collection_dict_exists = True
 
-    # eval_type = course_node.attribute_set[5][u"evaluation_type"]
-    # #If evaluation_type flag is True, it is Final. If False, it is Continous
+    # for attr in course_node.attribute_set:
+    #   if attr.has_key("evaluation_type"):
+    #     eval_type = attr["evaluation_type"]
+
+    #If evaluation_type flag is True, it is Final. If False, it is Continous
     # if(eval_type==u"Final"):
     #     eval_type_flag = True
     # else:
@@ -1357,7 +1360,7 @@ def create_course_struct(request, group_id,node_id):
                                     'coll_node_css':coll_node_css,
                                     'course_collection_list':json.dumps(course_collection_list),
                                     'property_order_list':property_order_list_cs,
-                                    'property_order_list_css':property_order_list_css,
+                                    'property_order_list_css':property_order_list_css
                                     #'eval_type_flag': eval_type_flag
                                   },
                                   context_instance = RequestContext(request)
