@@ -169,12 +169,6 @@
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
     
     <section class="medium-9 columns" >
-      <ul class="breadcrumbs">
-        <li><a href="/{{groupid}}">{{groupid}}</a></li>
-        <li><a href="#">{% trans "Collection Name " %}</a></li>
-      </ul>
-
-       
       
       <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
 
@@ -190,7 +184,21 @@
       <h1 class="subheader">
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
-      <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      {% if topic %}
+        <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+
+        <ul id="hover1" class="f-dropdown" data-dropdown-content>
+          <li class="view_list" id="Images"><a><i class="fi-photo"></i> {% trans "Images" %} </a></li> 
+          <li class="view_list" id="Videos"><a><i class="fi-play-circle"></i> {% trans "Videos" %} </a></li>  
+          <li class="view_list" id="Audios"><a><i class="fi-music"></i> {% trans "Audios" %} </a></li>  
+          <li class="view_list" id="Documents"><a><i class="fi-page-filled"></i> {% trans "Documents" %} </a></li>  
+          <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {% trans "Interactives" %} </a></li>  
+        </ul>
+        
+      {% else %}
+        <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      {% endif %}
+      
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
      {% comment %}
@@ -261,7 +269,8 @@
       <!-- Tab content -->
       <div class="content active commentable-section" id="view-page" data-section-id="1">
         <div class="row">
-          <div class="small-4 columns">
+          {% comment %}
+          <!-- <div class="small-4 columns">
             {% if node.prior_node|length > 0 %}
             <div class="panel">
 
@@ -272,10 +281,13 @@
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}aaaa</a>,&nbsp;
               {% else %}
               <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          }
 	      {% endif %}
               {% endfor %}
             </div>
               {% endif %}         </div>
+ -->
+          {% endcomment %}
 
           <div class="small-4 columns">
             {% get_teaches_list node as teaches_list %}
@@ -525,9 +537,10 @@
         {% if topic %}
           <!-- <div class="content" id="view-graph">  </div> -->
 
-          <div class="content" id="contents"> 
-            
-            {% get_contents node.pk as contents %}
+          
+          <div class="content_d" id="contents"> 
+          {% comment %}  
+            <!-- {% get_contents node.pk as contents %}
             {% for k,v in contents.items %}    
 
               <fieldset id="{{k}}">
@@ -553,9 +566,10 @@
                 {% endfor %}
               </fieldset>
 
-            {% endfor %}          
-
+            {% endfor %}           -->
+          {% endcomment %}
           </div>
+
         {% endif %}
         <!-- End of displaying topic page contents -->
       </div>
@@ -568,7 +582,7 @@
         <!-- Content for Concept Graph -->
         <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
           <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
-          {% include "ndf/graph_concept.html" %}
+          <!-- {#% include "ndf/graph_concept.html" %#} -->
         </div>
         
         <!-- Content for Collection Graph -->
@@ -591,7 +605,7 @@
         <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
           <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
           <a class="close-reveal-modal" >&#215;</a>
-          {% include "ndf/map_widget.html" with mode="read" %}
+          <!-- {#% include "ndf/map_widget.html" with mode="read" %#} -->
           <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
           <!-- #{#%# endif %} -->
         </div>
@@ -819,7 +833,7 @@
     <!-- Below code/widgets will only be shown for all resource instances/documents
          which are neither Topic nor Concept
     -->
-    <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></li>
+    <!-- <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {#% trans "Location" %#}</a></li> -->
 
     <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
     </li>
@@ -981,9 +995,9 @@
   var svgdata;
   $(document).ready(function() {
       $(function() {
-        // For topic node landing page concept svg graph
-        svgdata = $('#chart-concept svg');
-        $('#view-graph').append(svgdata);
+        // For topic node landing page concept svg graph commented for time being
+        // svgdata = $('#chart-concept svg');
+        // $('#view-graph').append(svgdata);
 
       });
   });
@@ -992,6 +1006,42 @@
   $(document).on('click','#clickConceptGraph',function(){
     $('#view-concept-graph #chart-concept').append(svgdata); 
     $('#view-concept-graph').foundation('reveal', 'open'); 
+  });
+
+  // select particular type to display contents in topic page
+  $(".view_list").click(function() {
+    
+    $.ajax({
+      type: "POST",
+      url: "{% url 'get_topic_contents' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: '{{node.pk}}',
+        selected: this.id,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) { 
+
+        data_obj = JSON.parse(data);
+        var k = Object.keys(data_obj);
+        var len = data_obj[k].length;
+
+        cont_list = []
+        for (var i = 0; i < len; i++) { 
+          var res_id = data_obj[k][i][1]
+          cont_list.push("<a data-id="+res_id+" href='{% url 'image_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' />"+data_obj[k][i][0]+"</a>");
+        } 
+
+        var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
+
+        $(".content_d").html(cont);
+
+        $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
+        $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
+
+      }
+    });
+
   });
 
   $(document).on('click','.view-discussion',function(){
@@ -1030,75 +1080,75 @@
 
   $(document).on('close', '#view-concept-graph[data-reveal]', function () {
     $('#view-graph').append(svgdata);
-  })
+  });
   
 
-  $(document).on('open', '#view-map-widget[data-reveal]', function () {  
+//   $(document).on('open', '#view-map-widget[data-reveal]', function () {  
     
-    $.ajax({
-  url: "{% url 'get_visited_location' groupid %}",
-  success: function(data){ 
+//     $.ajax({
+//   url: "{#% url 'get_visited_location' groupid %#}",
+//   success: function(data){ 
 
-    data = JSON.parse(data);
+//     data = JSON.parse(data);
 
-    var lastVisitedLocationVal = data;
+//     var lastVisitedLocationVal = data;
     
-    if(lastVisitedLocationVal){
+//     if(lastVisitedLocationVal){
 
-      if(lastVisitedLocationVal == "[]"){
-        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-      }
+//       if(lastVisitedLocationVal == "[]"){
+//         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+//       }
 
-      if(lastVisitedLocationVal.length > 0){
-            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-            var zoom = lastVisitedLocationVal.pop(),
-                lng = lastVisitedLocationVal[1],
-                lat = lastVisitedLocationVal[0];
-              map.setView([lat, lng], zoom);
-            }
-    }
-    else if( tempArr.length )
-    {
-      var group = new L.featureGroup(tempArr)
-          map.fitBounds(group.getBounds());
-    }
+//       if(lastVisitedLocationVal.length > 0){
+//             // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+//             var zoom = lastVisitedLocationVal.pop(),
+//                 lng = lastVisitedLocationVal[1],
+//                 lat = lastVisitedLocationVal[0];
+//               map.setView([lat, lng], zoom);
+//             }
+//     }
+//     else if( tempArr.length )
+//     {
+//       var group = new L.featureGroup(tempArr)
+//           map.fitBounds(group.getBounds());
+//     }
 
-  }
-});
+//   }
+// });
 
-  });
+//   });
 
 
-  $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+//   $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
       
-    map.invalidateSize();  
+//     map.invalidateSize();  
 
-    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
-    // if(lastVisitedLocationVal){
+//     // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+//     // if(lastVisitedLocationVal){
 
-    //   if(lastVisitedLocationVal == "[]"){
-    //     lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-    //   }
+//     //   if(lastVisitedLocationVal == "[]"){
+//     //     lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+//     //   }
 
-    //   if(lastVisitedLocationVal.length > 0){
-    //         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-    //         var zoom = lastVisitedLocationVal.pop(),
-    //             lng = lastVisitedLocationVal[1],
-    //             lat = lastVisitedLocationVal[0];
-    //           map.setView([lat, lng], zoom);
-    //         }
-    // }
+//     //   if(lastVisitedLocationVal.length > 0){
+//     //         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+//     //         var zoom = lastVisitedLocationVal.pop(),
+//     //             lng = lastVisitedLocationVal[1],
+//     //             lat = lastVisitedLocationVal[0];
+//     //           map.setView([lat, lng], zoom);
+//     //         }
+//     // }
 
 
-    // if( tempArr.length )
-    // {
-    //   var group = new L.featureGroup(tempArr)
-    //       map.fitBounds(group.getBounds());
-    // }
+//     // if( tempArr.length )
+//     // {
+//     //   var group = new L.featureGroup(tempArr)
+//     //       map.fitBounds(group.getBounds());
+//     // }
 
-    // map.setView([lat, lng], zoom);
+//     // map.setView([lat, lng], zoom);
 
-  });
+//   });
 
   // iframe for html content  
   function adjustIframeHt(){
