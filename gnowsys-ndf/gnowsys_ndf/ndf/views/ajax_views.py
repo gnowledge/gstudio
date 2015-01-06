@@ -3162,6 +3162,8 @@ def get_colleges(request,group_id):
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
       univ_id = request.GET.get("univ_id", "")
+      start_time = request.GET.get("start_time", "")
+      end_time = request.GET.get("end_time", "")
       # all_univs = request.GET.get("all_univs", "")
       
       # Check whether any field has missing value or not
@@ -3185,34 +3187,24 @@ def get_colleges(request,group_id):
       
       # Type-cast fetched field(s) into their appropriate type
       univ_id = ObjectId(univ_id)
+      start_time = datetime.datetime.strptime(start_time, "%m/%Y")
+      end_time = datetime.datetime.strptime(end_time, "%m/%Y")
 
       # Fetch the node of selected university
-      university_node = collection.Node.one({'_id': univ_id}, {'relation_set': 1,'name':1})
+      university_node = collection.Node.one(
+        {'_id': univ_id}, 
+        {'relation_set': 1,'name':1}
+      )
 
-      # Fetch the list of colleges that are affiliated by the selected university
-      # college_ids = []
-      # for each in university_node.relation_set:
-      #   if each.has_key("affiliated_college"):
-      #     college_ids = each["affiliated_college"]
-
-      #If "Select All" checkbox is True, display all colleges from all universities
-      # if all_univs == u"true":
-      #   colg_under_univ_id = collection.Node.find({'member_of': college._id},{'name': 1}).sort('name',1)
-      #   msg_string = " List of colleges in ALL Universities."
-      # else:
-      # colg_under_univ_id = collection.Node.find({'member_of': college._id, '_id': {'$in': college_ids}},{'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}).sort('name',1)
       # Fetch the list of colleges that are affiliated to the selected university (univ_id)
       colg_under_univ_id = collection.Node.find(
         {'member_of': college._id, 'relation_set.college_affiliated_to': univ_id}, 
-        {'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1, 'relation_set.has_officer_incharge': 1}
+        {'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1, 'relation_set.has_officer_incharge': 1, 'relation_set.college_has_acourse': 1}
       ).sort('name',1)
-      
-      # list_colg=[]                           
-      # for each in colg_under_univ_id:
-      #   list_colg.append(each)
       
       list_colg=[]
       unassigned_PO_colg_list = []
+      already_announced_in_colg_list = []
       for each in colg_under_univ_id:
         is_PO_exists = False
         if each.relation_set:
@@ -3220,15 +3212,29 @@ def get_colleges(request,group_id):
             if rel and rel.has_key("has_officer_incharge"):
               if rel["has_officer_incharge"]:
                 is_PO_exists = True
-                break
 
-        if is_PO_exists:
+            if rel and rel.has_key("college_has_acourse"):
+              if rel["college_has_acourse"]:
+                acourse_exists = collection.Node.find_one(
+                  {'_id': {'$in': rel["college_has_acourse"]}, 'attribute_set.start_time': start_time, 'attribute_set.end_time': end_time}
+                )
+
+                if acourse_exists:
+                  if each._id not in already_announced_in_colg_list:
+                    already_announced_in_colg_list.append(each.name)
+
+        if each.name in already_announced_in_colg_list:
+          continue
+
+        elif is_PO_exists:
           if each not in list_colg:
             list_colg.append(each)
+        
         else:
           if each not in unassigned_PO_colg_list:
             unassigned_PO_colg_list.append(each.name)
-        # list_colg.append(each)
+
+      response_dict["already_announced_in_colg_list"] = already_announced_in_colg_list
       response_dict["unassigned_PO_colg_list"] = unassigned_PO_colg_list
 
       if list_colg:
