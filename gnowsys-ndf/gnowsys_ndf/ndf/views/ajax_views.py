@@ -25,6 +25,7 @@ from django_mongokit import get_database
 from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
 from mongokit import paginator
+from django.contrib.sites.models import Site
 
 from stemming.porter2 import stem
 
@@ -3963,37 +3964,46 @@ def reschedule_task(request,group_id,node):
  dekha=False
  listing=task_groupset.group_admin
  listing.append(1)
+ return_message=""
  if request.user.id in listing:
     reschedule_attendance=collection.Node.one({"name":"reschedule_attendance"})
-    marks_entered=collection.Node.find({"_type":"AttributeType","name":"marks_entered"})
+    marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     end_time=collection.Node.one({"name":"end_time"})
     date1=datetime.date.today()
     ti=time(0,0)
     b=datetime.datetime.combine(date1,ti)
     create_gattribute(ObjectId(node),end_time,b) 
     create_gattribute(ObjectId(node),reschedule_attendance,True)
-    create_gattribute(ObjectId(node),marks_entered[0],True)
-    
+    create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+    return_message="Event Re-scheduled."
  else:
+    Mis_admin=collection.Node.find({"name":"MIS_admin"})
+    Mis_admin_list=Mis_admin[0].group_admin
+    Mis_admin_list.append(Mis_admin[0].created_by)
     path=request.POST.get('path','')
+    site = Site.objects.get(pk=1)
+    site = site.name.__str__()
+    event_reschedule_link = "http://" + site + path
     b.append(task_groupset._id)
-    task_dict["Assignee"] = []
+    glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+    task_type = collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id
+    task_dict.update({"has_type" : task_type})
     task_dict.update({'name':unicode('Reschedule Task')})
     task_dict.update({'group_set':b})
-    task_dict.update({'created_by':7})
-    task_dict.update({'modified_by':7})
-    #task_dict.update({'contributors':a.append(7)})
-    task_dict.update({'content_org':unicode("Please Re-Schedule the Following event"+"   \t " + path)})
-    task_dict.update({'created_by_name':'pramod'})
+    task_dict.update({'created_by':request.user.id})
+    task_dict.update({'modified_by':request.user.id})
+    task_dict.update({'content_org':unicode("Please Re-Schedule the Following event"+"   \t " "\n- Please click [[" + event_reschedule_link + "][here]] to reschedule event")})
+    task_dict.update({'created_by_name':request.user.username})
     task_dict.update({'Status':unicode("New")}) 
     task_dict.update({'Priority':unicode('Normal')})
-    #task_dict.update({'start_time':''})
-    #task_dict.update({'end_time':''})
-    #task_dict.update({'Assignee':1})
-    task_dict["Assignee"].append(1)
-    #create_task(task_dict)
- print "asdassad"
- return HttpResponse("Task Created")
+    date1=datetime.date.today()
+    ti=time(0,0)
+    Today=datetime.datetime.combine(date1,ti)
+    task_dict.update({'start_time':Today})
+    task_dict.update({'Assignee':Mis_admin_list})
+    create_task(task_dict)
+    return_message="Intimation is sent to central office soon you will get update."
+ return HttpResponse(return_message)
  
 def event_assginee(request, group_id,app_set_instance_id=None):
  #assigneelist=request.POST.getlist("Assignee[]","")
@@ -4010,7 +4020,7 @@ def event_assginee(request, group_id,app_set_instance_id=None):
  Assessmentmarks_rel=collection.Node.find({"_type":"AttributeType","name":"Assessment_marks_record"})
  performance_record=collection.Node.find({"_type":"AttributeType","name":"performance_record"})
  student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
- marks_entered=collection.Node.find({"_type":"AttributeType","name":"marks_entered"})
+ marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
  for info in Event_attended_by:
@@ -4031,7 +4041,7 @@ def event_assginee(request, group_id,app_set_instance_id=None):
           attendedlist.append(a['Name'])
 
  if assessmentdone == 'True':
-     create_gattribute(ObjectId(app_set_instance_id),marks_entered[0],False)
+     create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
  create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)
  return HttpResponse("Details Entered")  
         
@@ -4211,7 +4221,6 @@ def get_attendance(request,group_id,node):
  node=collection.Node.one({'_id':ObjectId(node)})
  attendieslist=[]
  #below code would give the the Object Id of Possible attendies
- print node.relation_set
  for i in node.relation_set:
      if ('has_attendees' in i): 
         for j in  i['has_attendees']:

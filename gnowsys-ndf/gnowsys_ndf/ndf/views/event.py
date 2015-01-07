@@ -62,16 +62,17 @@ def event(request, group_id):
  #check for exam session to be created only by the Mis_Admin
 
  Add=""
- Mis_admin=collection.Node.find({"name":"MIS_admin"})
- try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+ Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+ if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
- except:
+        Add= "Stop"
+ else:
     Add="Stop"       
+
  if Event_Types:
     for eachset in Event_Types.collection_set:
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
@@ -197,8 +198,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     for i in node.attribute_set:
       if unicode("reschedule_attendance") in i.keys():
          reschedule=i['reschedule_attendance'] 
-      if unicode("marks_entered") in i.keys():
-          marks=i["marks_entered"]
+      if unicode("marks_entry_completed") in i.keys():
+          marks=i["marks_entry_completed"]
           if marks != 'False':          
                 for i in node.relation_set:
                     if unicode("session_of") in i.keys():
@@ -217,15 +218,15 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
            
        #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
-  Mis_admin=collection.Node.find({"name":"MIS_admin"})
-  try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+  Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+  if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
-  except:
+        Add= "Stop"
+  else:
     Add="Stop"       
   #fecth the data
         
@@ -293,7 +294,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   title = ""
   session_of=""
   module=""
-
+  Add=""
+  
   event_gst = None
   event_gs = None
 
@@ -462,16 +464,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 session_of=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})                     
                 module=collection.Node.one({'_type':"GSystem",'_id':{'$in':session_of.prior_node}})
   event_gs.event_coordinator
-  Add=""
-  Mis_admin=collection.Node.find({"name":"MIS_admin"})
-  try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+  Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+  if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
-  except:
+        Add= "Stop"
+  else:
     Add="Stop"       
 
     

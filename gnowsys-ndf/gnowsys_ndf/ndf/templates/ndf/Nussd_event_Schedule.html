@@ -436,7 +436,6 @@ $(document).ready(function(){
           complete:function(){
                 if(courses != ""){
                 $.each(courses, function(key,val) {
-                     alert("coming here")
                      $('#has_attendees').append(
                      $("<option></option>")
                      .attr("id", "coursename_"+key.id)
