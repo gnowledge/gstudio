@@ -164,7 +164,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       # nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [event_gst._id]}}))
       nodes = collection.Node.find({'member_of': event_gst._id, 'name': {'$regex': search, '$options': 'i'}})
     else:
-      nodes = collection.Node.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)})
+      nodes = collection.Node.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
       
   node = None
   marks_list=[]

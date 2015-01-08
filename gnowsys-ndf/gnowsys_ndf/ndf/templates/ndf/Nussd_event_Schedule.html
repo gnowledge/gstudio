@@ -183,7 +183,7 @@
       </div>
     
   </fieldset>
-
+{% if title != 'Exam' %}
   <div id="Module-session-section">
     <fieldset >
       <div class="row">
@@ -305,6 +305,7 @@
        </div>
  <!-- div module sesion section Opens here" -->
  </div>
+ {% endif %}
 </div>
  
   </form>
@@ -461,14 +462,18 @@ $(document).ready(function(){
     });
 } 
 });
+
 function Enable_Elements()
 {
   if(  document.getElementById('Module_of'))
   {
      document.getElementById('Module_of').disabled = "";
   }
+  if (document.getElementById('Module-session-section'))
+   {
     document.getElementById('Module-session-section').visible = "True";
     document.getElementById('view').disabled = "";
+   }
 }
 function clear_Disable_Elements()
 {
@@ -483,11 +488,10 @@ function clear_Disable_Elements()
   $('#Module_of').empty()
   if ( '{{title}}' == 'Exam' )
   {
-      $('#Module-session-section').empty()
+      //$('#Module-session-section').empty()
       $('#view').hide()
   }
   else{
-
   $('#Module-session-section').hide()
   $('#event_coordinator').attr('disabled','True')
   $('#start_time_1').attr('disabled','True')
@@ -495,7 +499,6 @@ function clear_Disable_Elements()
   $('#start_time_1').attr('disabled','True')
   $('#end_time_1').attr('disabled','True')
   $('#end_time').attr('disabled','True')
-
   }
 
   $('#view').attr('disabled','True')

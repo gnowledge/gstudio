@@ -540,6 +540,7 @@ table, th, td {
 
  
 // script for showing map on appearance of overlay.
+
 function controler()
 {
           //checks wheather the has_attende relation is createad or not 
@@ -600,8 +601,17 @@ else
 {
     pass[0] ='Edit'
 }
+checkbox1="<input type=checkbox class='selall' onClick=mark_all_present() id='selall'>"
 column1="<th> name </th>"
-column2="<th> Presence </th>"
+if ( pass[0] == 'Edit')
+{
+  column2="<th> Presence " + checkbox1 +"</th>" 
+}
+else
+{
+
+  column2="<th> Presence </th>"
+}  
 column3="<th> Assignment Marks </th>"
 column4="<th> Assessment Marks </th>"
      if(pass[1] == 1)
@@ -888,6 +898,25 @@ function validate_txtbx(input)
   }
 }
    
+function mark_all_present()
+{
+   $(':checkbox.chkbx').each(function () {
+      if ($(':checkbox.selall')[0].checked == true)
+        {
+        this.checked=true
+        enablemarks(this)
+        }
+        if ($(':checkbox.selall')[0].checked == false)
+        {
+        this.checked=false
+        enablemarks(this)
+        }
+     });
+
+ 
+
+  
+}
 $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
   
   map.invalidateSize();  
