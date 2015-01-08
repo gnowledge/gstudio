@@ -34,6 +34,7 @@ collection = get_database()[Node.collection_name]
 GST_COURSE = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 app = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 
+@login_required
 def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
@@ -962,7 +963,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     app = collection.Node.one({'_id': ObjectId(app_id)})
 
   app_name = app.name 
-
   # app_name = "mis"
   app_set = ""
   app_collection_set = []
@@ -998,7 +998,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   if app_set_id:
     course_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = course_gst.name
-  
     template = "ndf/course_list.html"
     if request.method=="POST":
       search = request.POST.get("search","")
@@ -1051,6 +1050,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
+                        'course_gst_name':course_gst.name,
                         'title':title,
                         'course_collection_dict':json.dumps(course_collection_list),
                         'course_collection_dict_exists':course_collection_dict_exists,
@@ -1078,7 +1078,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     error_message = "\n CourseDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
-
+@login_required
 def create_course_struct(request, group_id,node_id):
     """
     This view is to create the structure of the Course.
@@ -1365,5 +1365,3 @@ def create_course_struct(request, group_id,node_id):
                                   },
                                   context_instance = RequestContext(request)
         )
-
-  
