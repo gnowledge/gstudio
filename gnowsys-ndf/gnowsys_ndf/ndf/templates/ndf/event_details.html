@@ -819,7 +819,7 @@ var eventid=[]
 var Event_attended_by=[]
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
-    var url="{% url 'event_assginee' groupid  node.pk  %}"
+    var url="{% url 'event_assginee' groupid node.pk %}"
     /*$(':checkbox:checked.chkbx').each(function () {
      attendees_list.push(this.value);
      });

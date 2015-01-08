@@ -2,8 +2,24 @@
 {% load pagination_tags %}
 {% load ndf_tags %}
 
+<style type="text/css">
+  .lbl_count_div {
+    //width: 320px;
+    position: relative;
+    padding: 10px !important;
+    border-color:#0b8a91 !important;
+    border: 5px solid gray;
+    margin: 0; 
+  }
+</style>
 <div>
   <!-- Title only row -->
+  {% if is_RT == "RelationType" %}
+    <div class='row drawer_count_lbl'>
+      <label class='small-1 columns  lbl_count_div left_drawer_count_lbl' style='float: left;'> </label>
+      <label class='small-1 columns lbl_count_div right_drawer_count_lbl' style='float: right;'> </label>
+    </div>
+  {% endif %}
   <div class="row">
     <div class="small-5 columns">
       {% trans "Select from following drawer: " %}
@@ -181,7 +197,6 @@
 
         <!-- <div class="text-center" > <a class="prev"><< prev</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="next">next >></a> </div> -->
       </ul>
-      
     </div>
 
     <!-- For arrows Up, Down, Left, Right -->
@@ -219,67 +234,70 @@
           <i class="button fi-arrow-left coll-arrows"></i>
         </span>
 
-      {% endif %}
-     	     
+      {% endif %}	     
    </div>
 
    <!-- For collection created on RHS -->
-   <div class="small-5 columns resource-drawer">
+    <div class="small-5 columns resource-drawer">
 
-    <ul class="{{widget_for}} pricing-table" id="{{widget_for}}_drawer2">        
-      {% if drawer2 != "None" %}
+      <ul class="{{widget_for}} pricing-table" id="{{widget_for}}_drawer2">        
+        {% if drawer2 != "None" %}
 
-      {% for value in drawer2 %}
+        {% for value in drawer2 %}
 
-      <li class="bullet-item" value="{{value.pk}}" > 
-        <input type="hidden" class="node_id {{widget_for}}_values" value="{{value.pk}}" name="{{value.name}}" />
-        <div class="row">
-          <div class="small-1 columns resource-type-image" 
-          style="background-image: url({% if 'image' in value.mime_type %}
-                                            {% url 'getFileThumbnail' groupid value.pk %}
-                                         {% elif 'video' in value.mime_type and 'Pandora_video' in value.member_of_names_list %} 
-                                            {% get_source_id value.pk as source_id %}
-                                            'http://wetube.gnowledge.org/{{source_id}}/icon128.jpg'
-                                         {% elif 'video' not in value.mime_type %}
-                                            /static/ndf/images/doc.png
-                                         {% endif %}
-                                        ); ">
-              {% if 'video' in value.mime_type and value.member_of_names_list|join:', ' != "Pandora_video" %}
-                <video width="40px;" src="{% url 'getFileThumbnail' groupid value.pk %}"/>                  
-              {% endif %}
+        <li class="bullet-item" value="{{value.pk}}" > 
+          <input type="hidden" class="node_id {{widget_for}}_values" value="{{value.pk}}" name="{{value.name}}" />
+          <div class="row">
+            <div class="small-1 columns resource-type-image" 
+            style="background-image: url({% if 'image' in value.mime_type %}
+                                              {% url 'getFileThumbnail' groupid value.pk %}
+                                           {% elif 'video' in value.mime_type and 'Pandora_video' in value.member_of_names_list %} 
+                                              {% get_source_id value.pk as source_id %}
+                                              'http://wetube.gnowledge.org/{{source_id}}/icon128.jpg'
+                                           {% elif 'video' not in value.mime_type %}
+                                              /static/ndf/images/doc.png
+                                           {% endif %}
+                                          ); ">
+                {% if 'video' in value.mime_type and value.member_of_names_list|join:', ' != "Pandora_video" %}
+                  <video width="40px;" src="{% url 'getFileThumbnail' groupid value.pk %}"/>                  
+                {% endif %}
 
-          </div>
-
-          <div class="small-11 columns">
-
-            <div class="row">
-              <!-- <div class="small-5 columns text-left"> -->
-              <div class="small-12 columns text-left">
-                <b> {{value.name}} </b>   
-              </div>                
-              <!-- <div class="small-7 columns text-right"> -->
-              <div class="small-12 columns text-left" style="padding-top:3px">
-                <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
-              </div>     
             </div>
 
-            <div class="row">
-              <div class="small-12 columns text-left" style="padding-top:5px;">
-		{{ value.html_content|safe|striptags|truncatechars:50 }}
+            <div class="small-11 columns">
+
+              <div class="row">
+                <!-- <div class="small-5 columns text-left"> -->
+                <div class="small-12 columns text-left">
+                  <b> {{value.name}} </b>   
+                </div>                
+                <!-- <div class="small-7 columns text-right"> -->
+                <div class="small-12 columns text-left" style="padding-top:3px">
+                  <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                </div>     
               </div>
-           </div>
+
+              <div class="row">
+                <div class="small-12 columns text-left" style="padding-top:5px;">
+  		{{ value.html_content|safe|striptags|truncatechars:50 }}
+                </div>
+             </div>
+            </div>
           </div>
-        </div>
 
-      </li>
-      {% endfor %}
+        </li>
+        {% endfor %}
 
-      {% endif %}
-    </ul>
-
-  </div>
+        {% endif %}
+      </ul>
+    </div>
   <!-- End of Collection created on RHS -->
-
+  {% if is_RT == "RelationType" %}
+    <div id="move_list"  class="text-center">    
+      <input type='button' id='{{widget_for}}_move_all_right' value='Move ALL to Right' class='button round small'>
+      <input type='button' id='{{widget_for}}_move_all_left' value='Move ALL to Left' class='button round small'>
+    </div>  
+  {% endif %}
 </div>
 </div>
 
@@ -294,7 +312,11 @@
     if ("{{search_name}}"){
       $(".search_items").val("{{search_name}}");
     }
+    {% if is_RT == "RelationType" %}
+      update_drawer_count();
+    {% endif %}
   });
+
 
   //To allocate space of 10 resources listing for drawers.
   liHeight = $("#{{widget_for}}_drawer1 > li").outerHeight();
@@ -325,6 +347,17 @@
     }
   });
 
+
+  //Function to display number of elements in both drawers
+  function update_drawer_count(){
+    left_drawer_count = 0
+    right_drawer_count = 0
+    left_drawer_count = $("#{{widget_for}}_drawer1").children("li").size()-1
+    right_drawer_count = $("#{{widget_for}}_drawer2").children("li").size()
+    $(".right_drawer_count_lbl").text(right_drawer_count)
+    $(".left_drawer_count_lbl").text(left_drawer_count)
+  }
+
   //For left drawer selected resources and right button click
   $("#{{widget_for}}_btnRight").click(function() {
     $("#{{widget_for}}_drawer1 li.selected-resource input.node_id").addClass("{{widget_for}}_values");
@@ -350,7 +383,9 @@
           cn_arr.push($(this).val());
         }
       });
-      
+    }
+    else{
+      update_drawer_count();
     }
   });
 
@@ -368,6 +403,9 @@
     $(selectedOpts).remove();
     // var innerhtml = $("#{{widget_for}}_drawer1").html()
     // $(".{{widget_for}}.pricing-table.drawer1").html(innerhtml);
+    if (is_RT == "RelationType") {
+      update_drawer_count();
+    }
   });
 
   function checkUpDownButton() {
@@ -518,7 +556,36 @@
       }
     }
   });
+
+  // Moving ALL elements from left drawer to right drawer
+    $("#{{widget_for}}_move_all_left").click(function(event) {
+      var all_li_ele = $("#{{widget_for}}_drawer2 li")
+      if (all_li_ele.length == 0) {
+        alert("Nothing to move.");
+        return;
+      }
+      if($(all_li_ele).hasClass("selected-resource")){
+        $(all_li_ele).removeClass("selected-resource")
+      }
+      $("#{{widget_for}}_drawer2").html("");
+      $("#{{widget_for}}_drawer1").append(all_li_ele);
+      update_drawer_count()
+    })
+
+  // Moving ALL elements from right drawer to left drawer
+    $("#{{widget_for}}_move_all_right").click(function(event) {
+      var all_li_ele = $("#{{widget_for}}_drawer1 li:not(:first-child)")
+      if (all_li_ele.length == 0) {
+        alert("Nothing to move.");
+        return;
+      }
+      if($(all_li_ele).hasClass("selected-resource")){
+        $(all_li_ele).removeClass("selected-resource")
+      }
+
+      $("#{{widget_for}}_drawer1 li:not(:first-child)").remove()
+      $("#{{widget_for}}_drawer2").append(all_li_ele);
+      update_drawer_count()
+    })
+
 </script>
-
-
-
