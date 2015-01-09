@@ -57,9 +57,10 @@
 
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-{%  for each in cur %}
+{%  for each in search_result %}
 <li class="card">
     <a href="{% url 'page_details' group_id each.pk %}">
+        
     <header>
       <div class="label-list">
         {% for tag in each.tags %}
