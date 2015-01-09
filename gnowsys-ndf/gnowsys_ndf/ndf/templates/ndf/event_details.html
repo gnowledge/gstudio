@@ -838,7 +838,7 @@ var eventid=[]
 var Event_attended_by=[]
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
-    var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
+    var url="{% url 'event_assginee' groupid node.pk %}"
     /*$(':checkbox:checked.chkbx').each(function () {
      attendees_list.push(this.value);
      });
@@ -902,7 +902,7 @@ var eventid=[]
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
 
-    var url="{% url 'event_assginee' groupid app_id app_set_id node.pk %}"
+    var url="{% url 'event_assginee' groupid  node.pk %}"
      
      $('.marks').each(function(){
        student_marks.push(this.value)
