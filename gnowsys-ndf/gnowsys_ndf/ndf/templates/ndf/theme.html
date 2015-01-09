@@ -524,15 +524,15 @@
 			});
 		});
 
+// --- start of D3 collapsible tree ---
 
 	    $(".collapsible_tree").click(function() {
-
 			
 			$(".themes").html("");
 
 			var margin = {top: 20, right: 40, bottom: 20, left: 40},
-			    width = 960 - margin.right - margin.left,
-			    height = 800 - margin.top - margin.bottom;
+			    width = Math.max($(".themes").width(), 960) - margin.right - margin.left,
+			    height = Math.max($(".themes").height(), 800) - margin.top - margin.bottom;
 			    
 			var i = 0,
 			    duration = 750,
@@ -553,7 +553,7 @@
 			{% if node %}
 				d3.json("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(error, flare) {
 				  root = flare;
-				  root.x0 = height / 2;
+				  root.x0 = height / 2; // the point from where it starts it's animation.
 				  root.y0 = 0;
 
 				  function collapse(d) {
@@ -578,8 +578,7 @@
 			      links = tree.links(nodes);
 
 			  // Normalize for fixed-depth.
-			  nodes.forEach(function(d) { d.y = d.depth * 120;});
-
+			  nodes.forEach(function(d) { d.y = d.depth * 150;});
 
 			  // Update the nodes
 			  var node = svg.selectAll("g.node")
@@ -589,6 +588,7 @@
 			  var nodeEnter = node.enter().append("g")
 			      .attr("class", "node")
 			      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+			      .attr("title", function(d) { return d.name; })
 			      .on("click", click);
 
 			  nodeEnter.append("circle")
@@ -681,9 +681,9 @@
 			  }
 			  update(d);
 			}
-			
-
 		});
+
+// ---END of D3 collapsible tree
 
 	    // script for delete themes
 	    $(document).on('click',".button.deleteObjects",function(){
