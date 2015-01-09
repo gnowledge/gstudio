@@ -4,14 +4,19 @@
 {% block title %}{% trans "Activation complete" %}{% endblock %}
 
 {% block body_content %}
-
 	{% url 'auth_login' as auth_login_url %}
 
-	<br/>
-	<h3>{% trans "Thanks, activation complete!" %}</h3>
-	<br/>
-	<h4> <a href='{{ auth_login_url }}'>{% trans "You may now login using the username and password." %}</a></h4>
-
+    <div class="row" style="margin: 1.2rem 0;">
+        <div class="small-12 medium-10 large-10 small-centered medium-centered large-centered columns">
+            <div class="row">
+                <div class="small-12 medium-10 large-10 columns end text-center">
+                <img src="/static/ndf/images/dot.jpg" height="20%" width="20%" />
+                <h2>{% trans "Account successfully activated." %}</h2>
+                <h4>{% trans "Please " %}<a href='{{ auth_login_url }}'>{% trans "Sign In" %}</a>{% trans " here." %}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 
