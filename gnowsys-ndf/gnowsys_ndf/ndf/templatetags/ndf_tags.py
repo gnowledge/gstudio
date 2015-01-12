@@ -1032,6 +1032,26 @@ def get_create_url(groupid):
     return 'uploadDoc'
 	
 
+
+@register.assignment_tag
+def get_prior_node(node_id):
+
+	obj = collection.Node.one({'_id':ObjectId(node_id) })
+	prior = []
+	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+	if topic_GST._id in obj.member_of:
+
+		if obj.prior_node:
+			for each in obj.prior_node:
+				node = collection.Node.one({'_id': ObjectId(each) })
+				prior.append(( node._id , node.name ))
+
+		return prior
+
+	return prior
+
+
+
 @register.assignment_tag
 def get_contents(node_id, selected):
 
