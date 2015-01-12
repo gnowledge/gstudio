@@ -41,35 +41,34 @@ def batch(request, group_id):
         pass
     nussd_course_type_name = ""
     announced_course_name = ""
+    print group_id
 
     if request.method == "POST":
-        announced_course_name = request.POST.get("announced_course_name", "")
-        nussd_course_type_name = request.POST.get("nussd_course_name","")
-        colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
-        req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
-        batch_coll = []
-        b = collection.Node.find({'member_of':GST_BATCH._id,'relation_set.has_course':ObjectId(announced_course_name)})
-        for each in b:
-          batch_coll.append(each)
+      announced_course_name = request.POST.get("announced_course_name", "")
+      nussd_course_type_name = request.POST.get("nussd_course_name","")
+      colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
+      req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
+      batch_coll = collection.Node.find({'member_of':GST_BATCH._id,'relation_set.has_course':ObjectId(announced_course_name)})
+      # for each_batch in batch_coll:
+      #   each_batch['batch_name_human_readble'] = (each_batch.name).replace('_',' ')
     else:
-        batch_coll = collection.GSystem.find({'member_of': {'$all': [GST_BATCH._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+      batch_coll = collection.Node.find({'member_of': GST_BATCH._id,'relation_set.batch_in_group':ObjectId(group_id)})
     fetch_ATs = ["nussd_course_type"]
     req_ATs = []
     for each in fetch_ATs:
-        each = collection.Node.one({'_type': "AttributeType", 'name': each}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
+      each = collection.Node.one({'_type': "AttributeType", 'name': each}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
 
-        if each["data_type"] == "IS()":
-            dt = "IS("
-            for v in each.complex_data_type:
-                dt = dt + "u'" + v + "'" + ", " 
-            dt = dt[:(dt.rfind(", "))] + ")"
-            each["data_type"] = dt
+      if each["data_type"] == "IS()":
+          dt = "IS("
+          for v in each.complex_data_type:
+              dt = dt + "u'" + v + "'" + ", " 
+          dt = dt[:(dt.rfind(", "))] + ")"
+          each["data_type"] = dt
 
-        each["data_type"] = eval(each["data_type"])
-        each["value"] = None
-        req_ATs.append(each)
+      each["data_type"] = eval(each["data_type"])
+      each["value"] = None
+      req_ATs.append(each)
 
-    
     #users_in_group = collection.Node.one({'_id':ObjectId(group_id)}).author_set
     template = "ndf/batch.html"
     variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id,'nussd_course_name_var':nussd_course_type_name,'announced_course_name_var':announced_course_name, 'ATs': req_ATs,'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id})
@@ -167,6 +166,9 @@ def save_batch(batch_name, user_list, group_id, request, ac_id):
         b_node.created_by = int(request.user.id)
         b_node.group_set.append(ObjectId(group_id))
         b_node.name = batch_name
+        b_node.name = batch_name
+        b_node['altnames'] = batch_name.replace('_',' ')
+
         b_node.contributors.append(int(request.user.id))
         b_node.modified_by = int(request.user.id)
         b_node.save()
@@ -197,7 +199,7 @@ def detail(request, group_id, _id):
         n = collection.Node.one({'_id':ObjectId(each.right_subject)})
         student_coll.append(n)
     template = "ndf/batch_detail.html"
-    variable = RequestContext(request, {'node':node,'node_name_human_readble':(node.name).replace('_',' '), 'appId':app._id, 'groupid':group_id, 'group_id': group_id,'title':GST_BATCH.name, 'student_coll':student_coll})
+    variable = RequestContext(request, {'node':node,'node_name_human_readable':(node.name).replace('_',' '), 'appId':app._id, 'groupid':group_id, 'group_id': group_id,'title':GST_BATCH.name, 'student_coll':student_coll})
     return render_to_response(template, variable)
 
 

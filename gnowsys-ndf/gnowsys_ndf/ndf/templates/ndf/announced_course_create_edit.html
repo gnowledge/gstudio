@@ -167,6 +167,17 @@
             </div>
           </div>
 
+          <div class="row hide" id="already_announced_in_colg_list_div">
+            <div class="small-12 columns">
+              <label><h6><b>Following are the college(s) in which Course(s) are announced for given duration:</b></h6></label>
+            </div>
+            <div class="small-12 columns">
+              <ol id="already_announced_in_colg_list_ol">
+                <!-- Append li elements that will hold college names -->
+              </ol>
+            </div>
+          </div>
+
           <div class="row hide" id="unassigned_PO_college_div">
             <div class="small-12 columns">
               <label><h6><b>Following are the college(s) for which Program Officer(s) is/are either not registered or not subscribed to their respective college group(s):</b></h6></label>
@@ -224,7 +235,6 @@
     <input type="hidden" id="name" name="name" value="">
     <input type="hidden" id="announce_to_colg_list" name="announce_to_colg_list" value="">
   </form>
-  
 {% endblock %}
 
 {% block script %}
@@ -241,18 +251,52 @@
     $("#end_enroll").val("");
   }
 
+  function reset_college_fs() {
+    $("#start_enroll").val("");
+    $("#end_enroll").val("");
+    $("#fsEnrollDuration").addClass("hide");
+
+    if ($("#divcolg").children.length > 0) {
+      $("#divcolg").empty();
+    }
+
+    $("#already_announced_in_colg_list_div").addClass("hide");
+    $("#unassigned_PO_college_div").addClass("hide");
+
+    $("#univ_cur").prop("selectedIndex", 0);
+    $("#fsCollege").addClass("hide");
+
+    $("#start_time").val("");
+    $("#end_time").val("");
+  }
+
   var announce_course_in_college = false;
 
   //Selct university------------------------------------------------------------------------------------------------------
     $("select#univ_cur").change(function() {
+      if ($("#start_time").val() == "" || $("#end_time").val() == "") {
+        $("#univ_cur").prop("selectedIndex", 0);
+
+        $("#alertModalLabel").text("Course period: Please set proper values for it's duration!!!");
+        $("#alertModal").removeClass("success").removeClass("warning");
+        $("#alertModal").addClass("alert");
+        $("#alertModal").foundation('reveal', 'open');
+
+        return;
+      }
+
       univ_id = $("select#univ_cur").val();
+      start_time = $("#start_time").val();
+      end_time = $("#end_time").val();
       announce_course_in_college = false;
 
       $.ajax({
         url: "{% url 'get_colleges' group_id %}",
 
         data: {
-          univ_id: univ_id
+          univ_id: univ_id,
+          start_time: start_time,
+          end_time: end_time
         },
 
         type: "GET",
@@ -285,8 +329,6 @@
         success: function(data){
           success_state = data["success"];
           if (data["success"]) {
-            $("#divcolg").empty();
-
             /*              
             var dict_len = Object.keys(data["unset_nc"]).length;
             $.each(data["unset_nc"], function(k, val){
@@ -294,19 +336,53 @@
             });
             */
 
+            // Fill already_announced_in_colg_list_div
+            already_announced_in_colg_list = data["already_announced_in_colg_list"]
+            if (already_announced_in_colg_list.length > 0) {
+              $("#already_announced_in_colg_list_div").removeClass("hide");
+
+              if ($("#already_announced_in_colg_list_ol").children().length > 0) {
+                $("#already_announced_in_colg_list_ol").empty();
+              } 
+              $.each(already_announced_in_colg_list, function(index, val){
+                $("#already_announced_in_colg_list_ol").append("<li>" + val + "</li>");
+              });
+            }
+
+            else {
+              if ($("#already_announced_in_colg_list_ol").children().length > 0) {
+                $("#already_announced_in_colg_list_ol").empty();
+              }
+
+              $("#already_announced_in_colg_list_div").addClass("hide");
+            }
+
             // Fill unassigned_PO_college_div
             unassigned_PO_colg_list = data["unassigned_PO_colg_list"]
             if (unassigned_PO_colg_list.length > 0) {
               $("#unassigned_PO_college_div").removeClass("hide");
 
-              $("#unassigned_PO_college_ol").empty();
+              if ($("#unassigned_PO_college_ol").children().length > 0) {
+                $("#unassigned_PO_college_ol").empty();
+              } 
               $.each(unassigned_PO_colg_list, function(index, val){
                 $("#unassigned_PO_college_ol").append("<li>" + val + "</li>");
               });
             }
 
+            else {
+              if ($("#unassigned_PO_college_ol").children().length > 0) {
+                $("#unassigned_PO_college_ol").empty();
+              }
+
+              $("#unassigned_PO_college_div").addClass("hide");
+            }
+
             // Fill divcolg
-            $("#divcolg").empty();
+            if ($("#divcolg").children().length > 0) {
+              $("#divcolg").empty();
+            } 
+
             var text_head = "<div class='small-12 columns'> " +
               "<label><h6><b>" + data["message"] + "</b></h6></label>" +
               "</div>";
@@ -335,6 +411,8 @@
     $("select#nussd_course_type").change(function() {
       success_state = false;
       var nussd_course_type = $("#nussd_course_type").val();
+
+      reset_college_fs();
 
       $.ajax({
         url: "{% url 'get_courses' group_id %}",
@@ -495,21 +573,13 @@
       // Valid, move to next step
       
       {% if not node %}
-        widget_for = "announced_course_create_edit"
-        class_value = ".node_id." + widget_for + "_values"
-        right_drawer_len = $(class_value).size();
-
         var announce_to_colg_list = [];
+        colg_in_rt_drawer = $("#announced_course_create_edit_drawer2 li input")
+        $.each(colg_in_rt_drawer,function(i,v){
+          announce_to_colg_list.push(v.getAttribute('name'))
+        })
 
-        if (right_drawer_len > 0) {
-          $(class_value).each(function (){
-            // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
-            resource_name = $(this).attr('name');
-            /*resource_id = $(this).val()*/;
-
-            announce_to_colg_list.push(resource_name);
-          });
-
+        if (announce_to_colg_list.length > 0) {
           var nussd_course_type = $("#nussd_course_type").val()
           var nussd_course_type_list = []
           nussd_course_type_list.push(nussd_course_type);
@@ -657,7 +727,7 @@
   // Course: start & end date-widgets --------------------------------------------------------------------------
     var currentYear = (new Date()).getFullYear();
     var currentMonth = (new Date()).getMonth();
-    lowerYearLimit = currentYear;
+    lowerYearLimit = currentYear - 2;
     upperYearLimit = currentYear + 5;
     var startDtInput = $("#sc #start_time");
     var endDtInput = $("#sc #end_time");

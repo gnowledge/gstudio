@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
+from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
@@ -34,6 +34,7 @@ collection = get_database()[Node.collection_name]
 GST_COURSE = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 app = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 
+@login_required
 def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
@@ -251,10 +252,8 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
     start_time = ""
     if request.POST.has_key("start_time"):
-      #convert string into datetime object
       start_time = request.POST.get("start_time", "")
       start_time = datetime.datetime.strptime(start_time,"%m/%Y")
-      #get month name (%b for abbreviation and %B for full name) and year and convert to str
 
     end_time = ""
     if request.POST.has_key("end_time"):
@@ -296,20 +295,40 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
         colg_list_cur = collection.Node.find(
           {'name': {'$in': colg_names}, 'member_of': colg_gst._id}, 
-          {'_id':1, 'name':1, 'attribute_set': 1, 'relation_set': 1}
+          {'_id':1, 'name':1, 'attribute_set.enrollment_code': 1, 'relation_set.college_affiliated_to': 1, 'relation_set.has_officer_incharge': 1}
         )
 
         MIS_GAPP = collection.Node.one({'_type': "GSystemType", 'name': "MIS"}, {'_id': 1})
         Student = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
 
-        for colg_ids in colg_list_cur: 
+        for college_node in colg_list_cur: 
           # For each selected college
 
-          enrollment_code = ""
-          for each in colg_ids.attribute_set:
-            if each.has_key("enrollment_code"):
-              enrollment_code = each["enrollment_code"]
-              break
+          # Fetch following relation & attribute from college node
+          # Program Officers' ObjectIds from "has_officer_incharge" (Relation)
+          # University ObjectId from "college_affiliated_to" (Inverse-Relation)
+          # Enrollment code from "enrollment_code" (Attribute)
+          college_enrollment_code = ""
+          university_id = None
+          college_id = None
+          PO_id_list = []
+
+          if college_node:
+            college_id = college_node._id
+
+            for attr in college_node.attribute_set:
+              if attr and attr.has_key("enrollment_code"):
+                college_enrollment_code = attr["enrollment_code"]
+                break
+
+            for rel in college_node.relation_set:
+              if rel and rel.has_key("college_affiliated_to"):
+                if rel["college_affiliated_to"]:
+                  university_id = rel["college_affiliated_to"][0]
+
+              if rel and rel.has_key("has_officer_incharge"):
+                if rel["has_officer_incharge"]:
+                  PO_id_list = rel["has_officer_incharge"]
 
           ann_course_id_list = []
           for each in unset_ac_options:
@@ -334,7 +353,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 course_code = each["course_code"]
                 break
 
-            c_name = unicode(course_code + "_" + enrollment_code + "_" + start_time.strftime("%b_%Y") + "_" + end_time.strftime("%b_%Y"))
+            c_name = unicode(course_code + "_" + college_enrollment_code + "_" + start_time.strftime("%b_%Y") + "-" + end_time.strftime("%b_%Y"))
             request.POST["name"] = c_name
             
             is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
@@ -420,22 +439,23 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                         #Pass ObjectId of selected Course
 
                       elif field_instance["name"] == "acourse_for_college":
-                        field_value = colg_ids._id
+                        field_value = college_node._id
                         #Pass ObjectId of selected College
                       
                       course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value)
 
             ann_course_id_list.append(course_gs._id)
 
+          mis_admin = collection.Node.one(
+            {'_type': "Group", 'name': "MIS_admin"}, 
+            {'_id': 1, 'name': 1, 'group_admin': 1}
+          )
+
           if nussd_course_type == "Foundation Course":
             # Create only one StudentCourseEnrollment node for all Announced Course(s)
             # of type Foundation Course
 
             # [1] Create StudentCourseEnrollment node
-            mis_admin = collection.Node.one(
-              {'_type': "Group", 'name': "MIS_admin"}, 
-              {'_id': 1, 'name': 1, 'group_admin': 1}
-            )
             course_gs.reload()
 
             # [1.1] Prepare pre-requisites for saving StudentCourseEnrollment node
@@ -446,16 +466,12 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             at_rt_dict["for_acourse"] = ann_course_id_list
 
             # Announced Course -> College
-            college_id = None
-            for rel in course_gs.relation_set:
-              if rel and rel.has_key("acourse_for_college"):
-                college_id = rel["acourse_for_college"][0]
-                break
-            at_rt_dict["for_college"] = college_id
+            if not college_id:
+              college_id = college_node._id
 
-            # Announced Course -> College -> University (On hold)
-            university_id = None
-            # Fetch university's ObjectId from college node's relation_set once it's set up
+            # Announced Course -> College -> University
+            # Fetch university's ObjectId from college node's relation_set 
+            # i.e., fetched above and stored in "university_id"
             at_rt_dict["for_university"] = university_id
 
             # Students Enrolled list
@@ -463,7 +479,8 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
             sce_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
             
-            sce_gs_name = "StudentCourseEnrollment" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_" + nussd_course_type.replace(" ", "_")
+            # sce_gs_name = "StudentCourseEnrollment" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_" + nussd_course_type.replace(" ", "_")
+            sce_gs_name = "StudentCourseEnrollment" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_FC_" + college_enrollment_code + "_" + start_time.strftime("%b-%Y") + "_" + end_time.strftime("%b-%Y")
             sce_gs = collection.Node.one(
               {'member_of': sce_gst._id, 'name': sce_gs_name, 'status': {'$in': [u"DRAFT", u"PUBLISHED"]}}
             )
@@ -515,8 +532,8 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             # [2] Create task for PO of respective college 
             # for Student-Course Enrollment
             task_dict = {}
-            # task_dict["name"] = unicode(colg_ids.attribute_set[0]["enrollment_code"] + " -- " + nm + " -- " + "StudentCourseEnrollment" + " -- " + start_enroll.strftime("%d/%m/%Y") + " -- " + end_enroll.strftime("%d/%m/%Y"))
-            task_name = unicode("StudentCourseEnrollment_Task" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_" + nussd_course_type.replace(" ", "_"))
+            # task_dict["name"] = unicode(college_node.attribute_set[0]["enrollment_code"] + " -- " + nm + " -- " + "StudentCourseEnrollment" + " -- " + start_enroll.strftime("%d/%m/%Y") + " -- " + end_enroll.strftime("%d/%m/%Y"))
+            task_name = unicode("StudentCourseEnrollment_Task" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_FC_" + college_enrollment_code + "_" + start_time.strftime("%b-%Y") + "_" + end_time.strftime("%b-%Y"))
             task_dict["name"] = task_name
             task_dict["created_by"] = request.user.id
             task_dict["created_by_name"] = request.user.username
@@ -542,8 +559,20 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
             task_dict["start_time"] = start_enroll_value
             task_dict["end_time"] = end_enroll_value
+            
             glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
-            task_dict["has_type"] = [collection.Node.one({'member_of': glist_gst._id, 'name': "Student-Course Enrollment"})._id]
+            task_type_node = None
+            # Here, GSTUDIO_TASK_TYPES[3] := 'Student-Course Enrollment'
+            task_dict["has_type"] = []
+            if glist_gst:
+              task_type_node = collection.Node.one(
+                {'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[3]},
+                {'_id': 1}
+              )
+
+              if task_type_node:
+                task_dict["has_type"].append(task_type_node._id)
+            
             task_dict["Status"] = u"New"
             task_dict["Priority"] = u"High"
 
@@ -554,7 +583,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             # Fetch Program Officers' ObjectIds from
             # College node's relation i.e, "has_officer_incharge"
             PO_id_list = []
-            for rel in colg_ids.relation_set:
+            for rel in college_node.relation_set:
               if rel and rel.has_key("has_officer_incharge"):
                 if rel["has_officer_incharge"]:
                   PO_id_list = rel["has_officer_incharge"]
@@ -583,8 +612,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               site = Site.objects.get(pk=1)
               site = site.name.__str__()
               college_enrollment_url_link = "http://" + site + "/" + \
-                colg_ids.name.replace(" ","%20").encode('utf8') + \
+                college_node.name.replace(" ","%20").encode('utf8') + \
                 "/mis/" + str(MIS_GAPP._id) + "/" + str(Student._id) + "/enroll" + \
+                "/" + str(sce_gs._id) + \
                 "?task_id=" + str(task_node._id) + "&nussd_course_type=" + nussd_course_type_value
 
               task_dict = {}  
@@ -601,10 +631,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             # of type Domain Part-I and Domain Part-II
             for each in ann_course_id_list:
               # [1] Create StudentCourseEnrollment node
-              mis_admin = collection.Node.one(
-                {'_type': "Group", 'name': "MIS_admin"}, 
-                {'_id': 1, 'name': 1, 'group_admin': 1}
-              )
               course_gs.reload()
 
               # [1.1] Prepare pre-requisites for saving StudentCourseEnrollment node
@@ -615,16 +641,12 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               at_rt_dict["for_acourse"] = each
 
               # Announced Course -> College
-              college_id = None
-              for rel in course_gs.relation_set:
-                if rel and rel.has_key("acourse_for_college"):
-                  college_id = rel["acourse_for_college"][0]
-                  break
-              at_rt_dict["for_college"] = college_id
+              if not college_id:
+                college_id = college_node._id
 
-              # Announced Course -> College -> University (On hold)
-              university_id = None
-              # Fetch university's ObjectId from college node's relation_set once it's set up
+              # Announced Course -> College -> University
+              # Fetch university's ObjectId from college node's relation_set 
+              # i.e., fetched above and stored in "university_id"
               at_rt_dict["for_university"] = university_id
 
               # Students Enrolled list
@@ -632,7 +654,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
               sce_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
               
-              sce_gs_name = "StudentCourseEnrollment_" + course_gs.name
+              sce_gs_name = "StudentCourseEnrollment" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_" + course_gs.name
               sce_gs = collection.Node.one(
                 {'member_of': sce_gst._id, 'name': sce_gs_name, 'status': {'$in': [u"DRAFT", u"PUBLISHED"]}}
               )
@@ -684,7 +706,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               # [2] Create task for PO of respective college 
               # for Student-Course Enrollment
               task_dict = {}
-              # task_dict["name"] = unicode(colg_ids.attribute_set[0]["enrollment_code"] + " -- " + nm + " -- " + "StudentCourseEnrollment" + " -- " + start_enroll.strftime("%d/%m/%Y") + " -- " + end_enroll.strftime("%d/%m/%Y"))
               task_name = unicode("StudentCourseEnrollment_Task" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_" + course_gs.name)
               task_dict["name"] = task_name
               task_dict["created_by"] = request.user.id
@@ -711,8 +732,20 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
               task_dict["start_time"] = start_enroll_value
               task_dict["end_time"] = end_enroll_value
+
               glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
-              task_dict["has_type"] = [collection.Node.one({'member_of': glist_gst._id, 'name': "Student-Course Enrollment"})._id]
+              task_type_node = None
+              # Here, GSTUDIO_TASK_TYPES[3] := 'Student-Course Enrollment'
+              task_dict["has_type"] = []
+              if glist_gst:
+                task_type_node = collection.Node.one(
+                  {'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[3]},
+                  {'_id': 1}
+                )
+
+                if task_type_node:
+                  task_dict["has_type"].append(task_type_node._id)
+
               task_dict["Status"] = u"New"
               task_dict["Priority"] = u"High"
 
@@ -720,13 +753,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
               task_dict["Assignee"] = []
               task_dict["group_set"] = []
-              # Fetch Program Officers' ObjectIds from
-              # College node's relation i.e, "has_officer_incharge"
-              PO_id_list = []
-              for rel in colg_ids.relation_set:
-                if rel and rel.has_key("has_officer_incharge"):
-                  if rel["has_officer_incharge"]:
-                    PO_id_list = rel["has_officer_incharge"]
 
               # From Program Officer node(s) assigned to college using PO_id_list
               # From each node's 'has_login' relation fetch corresponding Author node
@@ -752,8 +778,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 site = Site.objects.get(pk=1)
                 site = site.name.__str__()
                 college_enrollment_url_link = "http://" + site + "/" + \
-                  colg_ids.name.replace(" ","%20").encode('utf8') + \
+                  college_node.name.replace(" ","%20").encode('utf8') + \
                   "/mis/" + str(MIS_GAPP._id) + "/" + str(Student._id) + "/enroll" + \
+                  "/" + str(sce_gs._id) + \
                   "?task_id=" + str(task_node._id) + "&nussd_course_type=" + nussd_course_type_value + "&ann_course_id=" + str(course_gs._id)
 
                 task_dict = {}  
@@ -850,7 +877,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                   #Pass ObjectId of selected Course
 
                 elif field_instance["name"] == "acourse_for_college":
-                  field_value = colg_ids._id
+                  field_value = college_node._id
                   #Pass ObjectId of selected College
                 
                 course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value)
@@ -875,8 +902,8 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
-                        'title':title,
-                        'university_cur':university_cur,
+                        'title': title,
+                        'university_cur': university_cur,
                         'property_order_list': property_order_list
                       }
 
@@ -889,7 +916,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     
     for each_in in course_gs.relation_set:
       for eachk,eachv in each_in.items():
-        get_node_name = collection.Node.one({'_id':eachv[0]})
+        get_node_name = collection.Node.one({'_id': eachv[0]})
         context_variables[eachk] = get_node_name.name
 
   try:
@@ -936,7 +963,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     app = collection.Node.one({'_id': ObjectId(app_id)})
 
   app_name = app.name 
-
   # app_name = "mis"
   app_set = ""
   app_collection_set = []
@@ -972,7 +998,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   if app_set_id:
     course_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = course_gst.name
-  
     template = "ndf/course_list.html"
     if request.method=="POST":
       search = request.POST.get("search","")
@@ -1025,6 +1050,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
+                        'course_gst_name':course_gst.name,
                         'title':title,
                         'course_collection_dict':json.dumps(course_collection_list),
                         'course_collection_dict_exists':course_collection_dict_exists,
@@ -1052,7 +1078,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     error_message = "\n CourseDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
-
+@login_required
 def create_course_struct(request, group_id,node_id):
     """
     This view is to create the structure of the Course.
@@ -1131,12 +1157,15 @@ def create_course_struct(request, group_id,node_id):
     if course_collection_list:
       course_collection_dict_exists = True
 
-    eval_type = course_node.attribute_set[5][u"evaluation_type"]
+    # for attr in course_node.attribute_set:
+    #   if attr.has_key("evaluation_type"):
+    #     eval_type = attr["evaluation_type"]
+
     #If evaluation_type flag is True, it is Final. If False, it is Continous
-    if(eval_type==u"Final"):
-        eval_type_flag = True
-    else:
-        eval_type_flag = False
+    # if(eval_type==u"Final"):
+    #     eval_type_flag = True
+    # else:
+    #     eval_type_flag = False
 
     if request.method=="POST":
         listdict = request.POST.get("course_sec_dict_ele","")
@@ -1331,10 +1360,8 @@ def create_course_struct(request, group_id,node_id):
                                     'coll_node_css':coll_node_css,
                                     'course_collection_list':json.dumps(course_collection_list),
                                     'property_order_list':property_order_list_cs,
-                                    'property_order_list_css':property_order_list_css,
-                                    'eval_type_flag': eval_type_flag
+                                    'property_order_list_css':property_order_list_css
+                                    #'eval_type_flag': eval_type_flag
                                   },
                                   context_instance = RequestContext(request)
         )
-
-  
