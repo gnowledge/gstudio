@@ -637,7 +637,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 
 
     if Collapsible:
-      data = { "name": " ", "children": collection_list }
+      data = { "name": theme_node.name, "children": collection_list }
     else:
       data = collection_list
 
