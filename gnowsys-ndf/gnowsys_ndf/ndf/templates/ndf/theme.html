@@ -688,8 +688,10 @@
 				plotCollapsibleTree(treeData)	    			
 	    	}
 	    	else{
+	    		{% if node %}
 			    $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;})
 			    .done(function(){plotCollapsibleTree(treeData)});
+			    {% endif %}
 	    	}
 		});
 		
