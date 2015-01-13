@@ -43,8 +43,7 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
 from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 from gnowsys_ndf.mobwrite.models import ViewObj
@@ -106,74 +105,62 @@ def terms_list(request, group_id):
             
 # This ajax view renders the output as "node view" by clicking on collections
 def collection_nav(request, group_id):
-    imageCollection=""
-    if request.is_ajax() and request.method == "POST":    
-      node_id = request.POST.get("node_id", '')
-      
-      # collection = db[Node.collection_name]
-      # imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
-      #                                         '_type': 'File', 
-      #                                         '$or': [
-      #                                             {'$or': [
-      #                                               {'access_policy': u"PUBLIC"},
-      #                                                 {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-      #                                               ]
-      #                                             }
-      #                                           ,
-      #                                           {'$and': [
-      #                                             {'$or': [
-      #                                               {'access_policy': u"PUBLIC"},
-      #                                               {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-      #                                               ]
-      #                                             }
-      #                                             ]
-      #                                           }
-      #                                         ],
-      #                                         'group_set': {'$all': [ObjectId(group_id)]}
-      #                                       }).sort("last_update", -1)
+  '''
+  This ajax function retunrs the node on main template, when clicked on collection hierarchy
+  '''
+  if request.is_ajax() and request.method == "POST":    
+    node_id = request.POST.get("node_id", '')
+
+    topic = ""
+    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    if topic_GST._id in node_obj.member_of:
+      topic = "topic"
 
 
-      node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    # node_obj.get_neighbourhood(node_obj.member_of)
 
-      node_obj.get_neighbourhood(node_obj.member_of)
-
-      return render_to_response('ndf/node_ajax_view.html', 
-                                  { 'node': node_obj,
-                                    'group_id': group_id,
-                                    'groupid':group_id
-                                    # 'imageCollection':imageCollection
-                                  },
-                                  context_instance = RequestContext(request)
-      )
+    return render_to_response('ndf/node_ajax_view.html', 
+                                { 'node': node_obj,
+                                  'group_id': group_id,
+                                  'groupid':group_id,
+                                  'app_id': node_id, 'topic':topic
+                                },
+                                context_instance = RequestContext(request)
+    )
 
 # This view handles the collection list of resource and its breadcrumbs
 def collection_view(request, group_id):
-
+  '''
+  This ajax function returns breadcrumbs_list for clicked node in collection hierarchy
+  '''
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
-    modify_option = request.POST.get("modify_option", '')
     breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
 
-    collection = db[Node.collection_name]
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-
     breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
     breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
 
-    # This is for breadcrumbs on collection which manipulates the breadcrumbs list (By clicking on breadcrumbs_list elements)
-    if modify_option:
-      tupl = ( str(node_obj._id), node_obj.name )
-      Index = breadcrumbs_list.index(tupl) + 1
-      # Arranges the breadcrumbs according to the breadcrumbs_list indexes
-      breadcrumbs_list = [i for i in breadcrumbs_list if breadcrumbs_list.index(i) in range(Index)]  
-      # Removes the adjacent duplicate elements in breadcrumbs_list
-      breadcrumbs_list = [ breadcrumbs_list[i] for i in range(len(breadcrumbs_list)) if i == 0 or breadcrumbs_list[i-1] != breadcrumbs_list[i] ]
-
-    else:
-      # This is for adding the collection elements in breadcrumbs_list from navigation through collection of resource.
+    b_list = []
+    for each in breadcrumbs_list:
+      b_list.append(each[0])
+    
+    if str(node_obj._id) not in b_list:
+      # Add the tuple if clicked node is not there in breadcrumbs list
       breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
+    else:
+      # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+      for e in reversed(breadcrumbs_list):
+        if node_id in e:
+          break
+        else:
+          breadcrumbs_list.remove(e)
+        
 
-    return render_to_response('ndf/collection_ajax_view.html', 
+  # print "\nbreadcrumbs_list: ",breadcrumbs_list,"\n"
+
+  return render_to_response('ndf/collection_ajax_view.html', 
                                   { 'node': node_obj,
                                     'group_id': group_id,
                                     'groupid':group_id,
@@ -181,6 +168,7 @@ def collection_view(request, group_id):
                                   },
                                  context_instance = RequestContext(request)
     )
+
 
 @login_required
 def shelf(request, group_id):
@@ -580,6 +568,18 @@ def search_drawer(request, group_id):
       )    
       
 
+def get_topic_contents(request, group_id):
+    
+  if request.is_ajax() and request.method == "POST":
+    node_id = request.POST.get("node_id", '')
+    selected = request.POST.get("selected", '')
+    # node = collection.Node.one({'_id': ObjectId(node_id) })
+
+    contents = get_contents(node_id, selected)
+
+    return HttpResponse(json.dumps(contents))
+      
+
 ####Bellow part is for manipulating theme topic hierarchy####
 def get_collection_list(collection_list, node):
   inner_list = []
@@ -643,7 +643,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 
 
     if Collapsible:
-      data = { "name": " ", "children": collection_list }
+      data = { "name": theme_node.name, "children": collection_list }
     else:
       data = collection_list
 
