@@ -79,7 +79,7 @@ def get_group_name_id(group_name_or_id):
                   
             return group_name, group_id
 
-    return None
+    return None, None
 
     
 def check_delete(main):
