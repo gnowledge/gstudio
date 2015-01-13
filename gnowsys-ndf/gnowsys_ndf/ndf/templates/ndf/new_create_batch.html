@@ -295,7 +295,7 @@
               });
               batch_user_list_dict[batch_node["name"]] = arr_batch_mem_nodes
               batch_user_list_list[batch_node["name"]] = batch_user_list_list_arr
-              batch_det_str = "<ul class='button-group'><li><a href='#' class='button edit_batch' id='"+batch_node["name"]+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a></li><li><a href='#' class='button alert delete_batch'> Delete </a></li></ul><br>"
+              batch_det_str = "<ul class='button-group'><li><a href='#' class='button edit_batch' id='"+batch_node["name"]+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a></li><li><a href='#' class='button alert delete_batch_class'> Delete </a></li></ul><br>"
               $("#batch-details").append(batch_det_str)
             });
 
@@ -314,7 +314,9 @@
             $("#add_btn").toggle();
           }
           {% if node %}
-            $("#"+"{{node.name}}").trigger('click')
+            console.log("triggering ")
+
+            $("#batch_node"+"{{node.name}}").trigger('click')
           {% endif %}
 
         }
@@ -322,7 +324,7 @@
     });//end of nextbtn.click()
 
   // On click of Batch link to delete
-    $(document).on("click",".delete_batch", function(event){
+    $(document).on("click",".delete_batch_class", function(event){
       console.log("del")
     });
 
@@ -386,7 +388,7 @@
         else{
           batch_user_list_dict[batch_name] = arr
           //Display the Batch details
-          batch_det_str="<ul class='button-group'><li><a href='#' class='button edit_batch' id='"+batch_name+"'>" + batch_name + "  --  " + arr.length + " members.</a></li><li><a href='#' class='button alert delete_batch'>Delete</a></li></ul><br>"
+          batch_det_str="<ul class='button-group'><li><a href='#' class='button edit_batch' id='"+batch_name+"'>" + batch_name + "  --  " + arr.length + " members.</a></li><li><a href='#' class='button alert delete_batch_class'>Delete</a></li></ul><br>"
           $("#batch-details").append(batch_det_str)
           batch_name_index += 1;
         }

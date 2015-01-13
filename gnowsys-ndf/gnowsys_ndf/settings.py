@@ -324,6 +324,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'gnowsys_ndf.ndf.statsmiddleware.StatsMiddleware',
     #'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
     # 'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -569,6 +570,18 @@ GSTUDIO_NROER_MENU = [{"Home":[]}, {"Repository":["Curated Zone", "eLibrary", "e
 #        'LOCATION': 'default-cache'
 #    }
 #}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'DefaultCache:',
+    },
+    'webtemplates': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'WebTemplates:',
+        'TIMEOUT': 200, # Cache for 10 seconds.
+    },
+}
 
 #USER_ONLINE_TIMEOUT = 300
 
