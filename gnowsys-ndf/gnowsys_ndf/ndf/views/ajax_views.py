@@ -111,14 +111,20 @@ def collection_nav(request, group_id):
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
 
+    topic = ""
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    if topic_GST._id in node_obj.member_of:
+      topic = "topic"
+
+
     # node_obj.get_neighbourhood(node_obj.member_of)
 
     return render_to_response('ndf/node_ajax_view.html', 
                                 { 'node': node_obj,
                                   'group_id': group_id,
                                   'groupid':group_id,
-                                  'app_id': node_id
+                                  'app_id': node_id, 'topic':topic
                                 },
                                 context_instance = RequestContext(request)
     )
