@@ -4312,10 +4312,10 @@ def attendees_relations(request,group_id,node):
  return HttpResponse(json.dumps(column_list)) 
         
 def page_scroll(request,group_id,page):
-
+  
  Group_Activity = collection.Node.find(
         {'group_set':ObjectId(group_id)}).sort('last_update', -1)
-
+ 
  if Group_Activity.count() >=10:
   paged_resources = Paginator(Group_Activity,10)
  else:
@@ -4324,11 +4324,12 @@ def page_scroll(request,group_id,page):
  user_activity = []
  tot_page=paged_resources.num_pages
  if int(page) <= int(tot_page):
-    if int(page) != int(tot_page):
+    if int(page)==1:
+       page='1'  
+    if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
-    if int(page)=='1':
-       page='1'    
     for each in (paged_resources.page(int(page))).object_list:
+            print each.name,"\n"
             if each.created_by == each.modified_by :
                if each.last_update == each.created_at:
                  activity =  'created'
