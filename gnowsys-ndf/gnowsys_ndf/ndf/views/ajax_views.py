@@ -43,8 +43,7 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
 from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 from gnowsys_ndf.mobwrite.models import ViewObj
@@ -112,14 +111,20 @@ def collection_nav(request, group_id):
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
 
+    topic = ""
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    if topic_GST._id in node_obj.member_of:
+      topic = "topic"
+
+
     # node_obj.get_neighbourhood(node_obj.member_of)
 
     return render_to_response('ndf/node_ajax_view.html', 
                                 { 'node': node_obj,
                                   'group_id': group_id,
                                   'groupid':group_id,
-                                  'app_id': node_id
+                                  'app_id': node_id, 'topic':topic
                                 },
                                 context_instance = RequestContext(request)
     )
@@ -561,6 +566,18 @@ def search_drawer(request, group_id):
                                 },
                                 context_instance=RequestContext(request)
       )    
+      
+
+def get_topic_contents(request, group_id):
+    
+  if request.is_ajax() and request.method == "POST":
+    node_id = request.POST.get("node_id", '')
+    selected = request.POST.get("selected", '')
+    # node = collection.Node.one({'_id': ObjectId(node_id) })
+
+    contents = get_contents(node_id, selected)
+
+    return HttpResponse(json.dumps(contents))
       
 
 ####Bellow part is for manipulating theme topic hierarchy####
