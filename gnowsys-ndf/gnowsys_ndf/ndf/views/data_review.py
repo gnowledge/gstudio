@@ -3,8 +3,8 @@
 import json
 
 ''' -- imports from installed packages -- '''
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response #, render  uncomment when to use
+from django.http import HttpResponse
+from django.shortcuts import render_to_response  # , render  #uncomment when to use
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 
@@ -16,17 +16,17 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from django.http import Http404
+# from django.http import Http404
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.ndf.models import Node, GRelation, Triple
-from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
-from gnowsys_ndf.ndf.models import File
+from gnowsys_ndf.ndf.models import Node  # , GRelation, Triple
+# from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
+# from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.models import STATUS_CHOICES
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list ,set_all_urls
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields  # , create_grelation_list ,set_all_urls
 from gnowsys_ndf.ndf.views.methods import create_grelation
-from gnowsys_ndf.ndf.views.methods import create_gattribute
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page
+# from gnowsys_ndf.ndf.views.methods import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_group_name_id
 # from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.search_views import results_search
 
@@ -45,8 +45,11 @@ from gnowsys_ndf.settings import GSTUDIO_RESOURCES_LANGUAGES
 db = get_database()
 collection = db[Node.collection_name]
 # collection_tr = db[Triple.collection_name]
-GST_FILE = collection.GSystemType.one({'name': u'File', '_type':'GSystemType'})
-pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
+GST_FILE = collection.GSystemType.one({'name': u'File', '_type': 'GSystemType'})
+pandora_video_st = collection.Node.one({'$and': [{'name': 'Pandora_video'}, {'_type': 'GSystemType'}]})
+
+file_id = collection.Node.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
+page_id = collection.Node.find_one({'_type': "GSystemType", "name": "Page"}, {"_id": 1})
 
 
 # data review in File app
@@ -57,27 +60,27 @@ def data_review(request, group_id, page_no=1):
     '''
     # getting group obj from name
 
-    group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
+    # group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
 
-    # checking if passed group_id is group name or group Id
-    if group_obj and (group_id == group_obj.name):
-        # group_name = group_id
-        group_id = group_obj._id
+    # # checking if passed group_id is group name or group Id
+    # if group_obj and (group_id == group_obj.name):
+    #     # group_name = group_id
+    #     group_id = group_obj._id
       
-    else:  # passes group_id is _id and not name
-        ins_objectid = ObjectId()
-        if ins_objectid.is_valid(group_id):
-            # retrieve Obj by _id
-            group_obj = collection.Node.one({"_id": ObjectId(group_id)})
-            if group_obj:
-                # group_name = group_obj.name
-                group_id = group_id       # for clarity
+    # else:  # passes group_id is _id and not name
+    #     ins_objectid = ObjectId()
+    #     if ins_objectid.is_valid(group_id):
+    #         # retrieve Obj by _id
+    #         group_obj = collection.Node.one({"_id": ObjectId(group_id)})
+    #         if group_obj:
+    #             # group_name = group_obj.name
+    #             group_id = group_id       # for clarity
 
-    file_id = collection.Node.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
+    group_name, group_id = get_group_name_id(group_id)
 
     files_obj = collection.Node.find({'$or': [
-                                    {'member_of': {'$all': [ObjectId(file_id._id)]},
-                                    '_type': 'File', 'fs_file_ids': {'$ne': []},
+                                    {'member_of': {'$in': [ObjectId(file_id._id), ObjectId(page_id._id)]},
+                                    # '_type': 'File', 'fs_file_ids': {'$ne': []},
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$or': [
                                         {'access_policy': u"PUBLIC"},
@@ -131,24 +134,8 @@ def data_review(request, group_id, page_no=1):
 
 def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
 
-    group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
+    group_name, group_id = get_group_name_id(group_id)
 
-    # checking if passed group_id is group name or group Id
-    if group_obj and (group_id == group_obj.name):
-        # group_name = group_id
-        group_id = group_obj._id
-      
-    else:  # passes group_id is _id and not name
-        ins_objectid = ObjectId()
-        if ins_objectid.is_valid(group_id):
-            # retrieve Obj by _id
-            group_obj = collection.Node.one({"_id": ObjectId(group_id)})
-            if group_obj:
-                # group_name = group_obj.name
-                group_id = group_id       # for clarity
-
-    file_id = collection.Node.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
-    
     # check if request is from form or from next page
     if request.GET.has_key("search_text"):
         search_text = request.GET.get("search_text", "")
@@ -162,11 +149,14 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
         request.GET = get_req
 
     search_reply = json.loads(results_search(request, group_id, return_only_dict = True))
-    stemmed_search_res = search_reply["stemmed"]["name"]
-    result_ids_list = [ ObjectId(each_dict["_id"]) for each_dict in stemmed_search_res ]
-    files_obj = collection.Node.find({ "_id": {"$in": result_ids_list}, "_type": "File" })
+    exact_search_res = search_reply["exact"]["name"]
+    result_ids_list = [ ObjectId(each_dict["_id"]) for each_dict in exact_search_res ]
+    result_cur = collection.Node.find({
+                                    "_id": {"$in": result_ids_list},
+                                    'member_of': {'$in': [ObjectId(file_id._id), ObjectId(page_id._id)]}
+                                    })
 
-    paged_resources = paginator.Paginator(files_obj, page_no, 10)
+    paged_resources = paginator.Paginator(result_cur, page_no, 10)
 
     # list to hold resources instances with it's attributes and relations
     files_list = []
@@ -177,23 +167,23 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
         files_list.append(collection.GSystem(each_resource))
 
     return render_to_response("ndf/data_review.html",
-    {
-        "group_id": group_id, "groupid": group_id,
-        "files": files_list, "page_info": paged_resources,
-        "urlname": "data_review_search_page", 
-        "second_arg": search_text, "search_text": search_text, 
-        "static_educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
-        # "static_language": EXTRA_LANG_INFO,
-        "static_language": GSTUDIO_RESOURCES_LANGUAGES,
-        "static_educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
-        "static_interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
-        "static_educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
-        "static_educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
-        "static_curricular": GSTUDIO_RESOURCES_CURRICULAR,
-        "static_audience": GSTUDIO_RESOURCES_AUDIENCE,
-        "static_status": list(STATUS_CHOICES),
-        "static_textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
-    }, context_instance=RequestContext(request) )
+                {
+                    "group_id": group_id, "groupid": group_id,
+                    "files": files_list, "page_info": paged_resources,
+                    "urlname": "data_review_search_page",
+                    "second_arg": search_text, "search_text": search_text,
+                    "static_educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+                    # "static_language": EXTRA_LANG_INFO,
+                    "static_language": GSTUDIO_RESOURCES_LANGUAGES,
+                    "static_educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
+                    "static_interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
+                    "static_educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
+                    "static_educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
+                    "static_curricular": GSTUDIO_RESOURCES_CURRICULAR,
+                    "static_audience": GSTUDIO_RESOURCES_AUDIENCE,
+                    "static_status": list(STATUS_CHOICES),
+                    "static_textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
+                }, context_instance=RequestContext(request))
 
 
 # saving resource object of data review
@@ -204,21 +194,22 @@ def data_review_save(request, group_id):
     '''
 
     userid = request.user.pk
+    group_name, group_id = get_group_name_id(group_id)
 
-    # getting group obj from name
-    group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
+    # # getting group obj from name
+    # group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
 
-    # checking if passed group_id is group name or group Id
-    if group_obj and (group_id == group_obj.name):
-        group_id = group_obj._id
+    # # checking if passed group_id is group name or group Id
+    # if group_obj and (group_id == group_obj.name):
+    #     group_id = group_obj._id
   
-    else:  # passes group_id is _id and not name
-        ins_objectid = ObjectId()
-        if ins_objectid.is_valid(group_id):
-            # retrieve Obj by _id
-            group_obj = collection.Node.one({"_id": ObjectId(group_id)})
-            if group_obj:
-                group_id = group_id       # for clarity
+    # else:  # passes group_id is _id and not name
+    #     ins_objectid = ObjectId()
+    #     if ins_objectid.is_valid(group_id):
+    #         # retrieve Obj by _id
+    #         group_obj = collection.Node.one({"_id": ObjectId(group_id)})
+    #         if group_obj:
+    #             group_id = group_id       # for clarity
 
     node_oid = request.POST.get("node_oid", "")
     node_details = request.POST.get("node_details", "")
@@ -265,7 +256,7 @@ def data_review_save(request, group_id):
 
                 edit_summary.append(temp_edit_summ)
 
-        # to fill/update attributes of the node and get updated attrs as return 
+        # to fill/update attributes of the node and get updated attrs as return
         ga_nodes = get_node_metadata(request, file_node, is_changed=True)
         
         if len(ga_nodes):
@@ -280,11 +271,11 @@ def data_review_save(request, group_id):
 
                 edit_summary.append(temp_edit_summ)
         
-        teaches_list = request.POST.get('teaches','')  # get the teaches list
+        teaches_list = request.POST.get('teaches', '')  # get the teaches list
         prev_teaches_list = request.POST.get("teaches_prev", "")  # get the before-edit teaches list
 
         # check if teaches list exist means nodes added/removed for teaches relation_type
-        # also check for if previous teaches list made empty with prev_teaches_list 
+        # also check for if previous teaches list made empty with prev_teaches_list
         if (teaches_list != '') or prev_teaches_list:
 
             teaches_list = teaches_list.split(",") if teaches_list else []
@@ -358,7 +349,7 @@ def data_review_save(request, group_id):
         if is_changed:
             file_node.save()
 
-        print edit_summary
+        # print edit_summary
 
     return HttpResponse(file_node.status)
 
