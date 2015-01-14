@@ -4037,23 +4037,29 @@ def reschedule_task(request,group_id,node):
  
 
 def event_assginee(request, group_id, app_set_instance_id=None):
- #assigneelist=request.POST.getlist("Assignee[]","")
- #absentlist=request.POST.getlist("Absents[]","")
  Event=   request.POST.getlist("Event","")
- #student_marks=   request.POST.getlist("student_marks[]","")
- #student_id=   request.POST.getlist("student_id[]","")
  
  Event_attended_by=request.POST.getlist("Event_attended_by[]","")
+ 
  marks=request.POST.getlist("marks","")
+ 
  assessmentdone=request.POST.get("assessmentdone","") 
+ 
  oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
+ 
  Assignment_rel=collection.Node.find({"_type":"AttributeType","name":"Assignment_marks_record"})
+ 
  Assessmentmarks_rel=collection.Node.find({"_type":"AttributeType","name":"Assessment_marks_record"})
+ 
  performance_record=collection.Node.find({"_type":"AttributeType","name":"performance_record"})
+ 
  student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
+ 
  marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
+ 
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
+ 
  for info in Event_attended_by:
      a=ast.literal_eval(info)
      if (a['Name'] != 'undefined'):
@@ -4074,6 +4080,8 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  if assessmentdone == 'True':
      create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
  create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)
+ 
+ 
  return HttpResponse("Details Entered")  
         
 def fetch_course_name(request, group_id,Course_type):
@@ -4388,9 +4396,25 @@ def attendees_relations(request,group_id,node):
    column_count=5
    column_list.append('True')
    column_list.append(column_count) 
-  
- 
-
+ node = collection.Node.one({"_id":ObjectId(node)}) 
+ for i in node.relation_set:
+        if unicode("session_of") in i.keys():
+           session_id = collection.Node.one({"_id":i['session_of'][0]}) 
+           for j in session_id.attribute_set:
+              if unicode('course_structure_assignment') in j:   
+                 if j['course_structure_assignment'] == True:
+                     marks_enter=True
+              if unicode('course_structure_assessment') in j:    
+                 if j['course_structure_assessment'] == True:
+                     marks_enter=True
+ for i in node.attribute_set:
+    if unicode("reschedule_attendance") in i.keys():
+       reschedule=i['reschedule_attendance'] 
+    if unicode("marks_entry_completed") in i.keys():
+        marks=i["marks_entry_completed"]
+ column_list.append(reschedule)
+ column_list.append(marks)
+ print "\n column details",column_list
  return HttpResponse(json.dumps(column_list)) 
 
         

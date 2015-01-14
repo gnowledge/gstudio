@@ -541,6 +541,10 @@ table, th, td {
 
  
 // script for showing map on appearance of overlay.
+
+//reschedule = ""
+//marks_enter = ""
+
 function controler()
 {
           //checks wheather the has_attende relation is createad or not 
@@ -585,9 +589,10 @@ function EditAttendance(columns)
                       },
                       complete:function(){
                       $('#attendance').append("<table id='forattendance'> </table>")
-
+                      reschedule = columns[2]
+                      marks_enter = columns[3]
                       drawTable(attended,columns)
-                      if('{{reschedule}}' == 'False')
+                      if(reschedule == 'False')
                       {
                           disableAttendance();
                       }
@@ -724,16 +729,16 @@ else
 {     
         
       $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")
-      if('{{reschedule}}' == 'True' || '{{marks_enter}}' == 'True'){
-            
-            if('{{marks_enter}}' != 'False')
+      
+      if(reschedule == true || marks_enter  == true){
+            if(marks_enter != false)
             {
               $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
             }
       }
-      if('{{reschedule}}' == 'False' || '{{marks_enter}}' == 'False')
+      if(reschedule == false || marks_enter == false)
       {
-        $('#attendance').append("<input class='tiny button'  onclick=reschedule() value='Re-Schedule'>" )
+        $('#attendance').append("<input class='tiny button'  onclick=reschedule_event() value='Re-Schedule'>" )
       }
           
       
@@ -742,7 +747,7 @@ else
 
 }
 
-function reschedule()
+function reschedule_event()
 {
 $.ajax({
    url:"{% url 'reschedule_task' groupid node.pk  %}",
@@ -754,7 +759,8 @@ $.ajax({
    success:function(data)
    {
    alert(data)
-   location.reload();
+   controler()
+   //location.reload();
    }
    });
    
@@ -878,6 +884,7 @@ var assessmentdone=""
 var attendancedone=""
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
+
     var url="{% url 'event_assginee' groupid  node.pk  %}"
     
     $("#forattendance").find('tr').each(function(){
@@ -898,6 +905,7 @@ if (!(Status_attended))
      var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'","Attendance_marks":"'+String(Attendance_marks) + '","Assessment_marks":"' + String(Assessment_marks) +'","save":"'+save_val +'"}'
     Event_attended_by.push(values)
     }); 
+    
     if ($('#assessmentchkbx').is(':checked')) 
     {
     assessmentdone='True'
@@ -916,6 +924,7 @@ if (!(Status_attended))
                       Event:eventid,
                       csrfmiddlewaretoken: '{{ csrf_token }}'},
                       success: function(data){
+                      alert(data)
                       controler()
                       }
                     });
