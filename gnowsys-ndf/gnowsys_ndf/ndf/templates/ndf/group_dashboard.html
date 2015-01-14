@@ -6,16 +6,17 @@
 {% block style %}
   {{block.super}}
 
-    
+    /*
     .div-height {
-    margin-bottom: 0.5em; 
-    height: 9em;
-     }
+      margin-bottom: 0.5em; 
+      height: 9em;
+    }
 
     .counter {
       font-weight: bold;
       text-align: right;
     }
+    */
 
     .width_Status, .width_Completed_On, .width_Enrolled, .width_Remaining, .width_Approved, .width_Rejected {
       width: 8%;
@@ -67,8 +68,6 @@
       {% endif %}   
       
       {% if request.user.is_authenticated %}
-      
-      
       
       <input type="file" name="has_profile_pic" class="hide" />
       <input type="hidden" name="type" value="profile_pic" />
@@ -156,7 +155,7 @@
 <!-- end of checking for banner in nroer menu -->
 
 <nav class="row" style="margin-top: 2em;">
-  <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+  <dl class="tabs small-12 columns" data-tab data-options="deep_linking:false">
     {% if approval %}
     <dd class="active" title="Enrollment Approval Details">
       <a href="#panel_enrollment_approval_details">
@@ -236,6 +235,8 @@
 {% endblock %}
 
 {% block script %}
+// <script type="text/javascript">
+  
   {{block.super}}
   var count = 0;
   var morecount = 0;
@@ -243,19 +244,19 @@
 
   function scrolling(){
    
-    if ($('#status').attr('class') == "content row active") {
+    if ($('#status').hasClass('active')) {
       
       $(window).bind('scroll', loadOnScroll);
       count = 0;
     }
   }
 
-
   window.onscroll = scrolling;
 
   var loadOnScroll = function() {
   if ($(window).scrollTop()+$(window).height() >= $(document).height()) {
-      $(window).unbind();
+
+      $(window).unbind("scroll");
     
       // execute the load function below that will visit the JSON feed and stuff data into the HTML
       if (count == 0) {
@@ -276,6 +277,7 @@
       
         success:function(data){
           if(String(data)) {
+            // alert(data)
             $("#status").append(data);
             counter = counter+1;
           }
@@ -520,3 +522,4 @@ $(document).on("click", ".btnApproval", function() {
 
   loaddata();
 {% endblock %}
+// </script>
