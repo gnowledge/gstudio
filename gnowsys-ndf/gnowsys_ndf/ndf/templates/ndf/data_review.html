@@ -137,27 +137,28 @@
 	{% check_user_join request groupid as user_is_joined %}
     {% user_access_policy groupid request.user as user_access %}
 
+<!-- form for search in the data-review -->
 <form method="GET" action="{% url 'data_review_search' group_name_tag %}">
 	
-<div class="row">
-	<div class="small-4 columns">
-		<div class="row collapse">
-			<div class="small-10 columns">
-				<input type="text" id="dr-search" name="search_text" placeholder="Search in the Data Review" value="{{search_text}}">
-			</div>
-			<div class="small-2 columns">
-				<!-- <div id="dr-search-btn" class="button postfix">Search</div> -->
-				<button type="submit" class="button postfix">Search</button>
+	<div class="row">
+		<div class="small-4 columns">
+			<div class="row collapse">
+				<div class="small-10 columns">
+					<input type="text" id="dr-search" name="search_text" placeholder="Search in the Data Review" value="{{search_text}}">
+				</div>
+				<div class="small-2 columns">
+					<!-- <div id="dr-search-btn" class="button postfix">Search</div> -->
+					<button type="submit" class="button postfix">Search</button>
+				</div>
 			</div>
 		</div>
+		<div class="small-8 columns">
+			<!-- kept for future-use/filters -->
+		</div>
 	</div>
-	<div class="small-8 columns">
-		
-	</div>
-</div>
 
 </form>
-
+<!-- END of form for search in the data-review -->
 
 <input type="hidden" id="currently-edited-row" data-edited-row-id="" data-edited-row-name="">
 <input type="hidden" id="last-edited-row" data-edited-row-id="">
