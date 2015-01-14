@@ -546,12 +546,12 @@ GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
 
 GSTUDIO_NROER_MENU = [{"Home":[]}, {"Repository":["Curated Zone", "eLibrary", "eBooks", "eCourses", "Events"]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-# try:
-#     from local_settings import *
-#     #print "Local settings applied"
-# except:
-#     #print "Default settings applied"
-#     pass
+try:
+    from local_settings import *
+    #print "Local settings applied"
+except:
+    #print "Default settings applied"
+    pass
 
 # #textb
 # import warnings

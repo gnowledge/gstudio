@@ -34,6 +34,7 @@ collection = get_database()[Node.collection_name]
 GST_COURSE = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 app = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 
+@login_required
 def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
@@ -352,7 +353,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 course_code = each["course_code"]
                 break
 
-            c_name = unicode(course_code + "_" + college_enrollment_code + "_" + start_time.strftime("%b_%Y") + "_" + end_time.strftime("%b_%Y"))
+            c_name = unicode(course_code + "_" + college_enrollment_code + "_" + start_time.strftime("%b_%Y") + "-" + end_time.strftime("%b_%Y"))
             request.POST["name"] = c_name
             
             is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
@@ -962,7 +963,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     app = collection.Node.one({'_id': ObjectId(app_id)})
 
   app_name = app.name 
-
   # app_name = "mis"
   app_set = ""
   app_collection_set = []
@@ -998,7 +998,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   if app_set_id:
     course_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = course_gst.name
-  
     template = "ndf/course_list.html"
     if request.method=="POST":
       search = request.POST.get("search","")
@@ -1051,6 +1050,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
+                        'course_gst_name':course_gst.name,
                         'title':title,
                         'course_collection_dict':json.dumps(course_collection_list),
                         'course_collection_dict_exists':course_collection_dict_exists,
@@ -1078,7 +1078,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     error_message = "\n CourseDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
-
+@login_required
 def create_course_struct(request, group_id,node_id):
     """
     This view is to create the structure of the Course.
@@ -1157,12 +1157,15 @@ def create_course_struct(request, group_id,node_id):
     if course_collection_list:
       course_collection_dict_exists = True
 
-    eval_type = course_node.attribute_set[5][u"evaluation_type"]
+    # for attr in course_node.attribute_set:
+    #   if attr.has_key("evaluation_type"):
+    #     eval_type = attr["evaluation_type"]
+
     #If evaluation_type flag is True, it is Final. If False, it is Continous
-    if(eval_type==u"Final"):
-        eval_type_flag = True
-    else:
-        eval_type_flag = False
+    # if(eval_type==u"Final"):
+    #     eval_type_flag = True
+    # else:
+    #     eval_type_flag = False
 
     if request.method=="POST":
         listdict = request.POST.get("course_sec_dict_ele","")
@@ -1357,10 +1360,8 @@ def create_course_struct(request, group_id,node_id):
                                     'coll_node_css':coll_node_css,
                                     'course_collection_list':json.dumps(course_collection_list),
                                     'property_order_list':property_order_list_cs,
-                                    'property_order_list_css':property_order_list_css,
-                                    'eval_type_flag': eval_type_flag
+                                    'property_order_list_css':property_order_list_css
+                                    #'eval_type_flag': eval_type_flag
                                   },
                                   context_instance = RequestContext(request)
         )
-
-  
