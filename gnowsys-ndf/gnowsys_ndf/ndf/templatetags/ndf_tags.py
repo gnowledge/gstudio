@@ -17,10 +17,14 @@ from mongokit import IS
 from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
+try:
+	from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
+except ImportError:
+	pass
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
-from gnowsys_ndf.ndf.views.methods import get_drawers
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -607,6 +611,116 @@ def get_gapps_iconbar(request, group_id):
 		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
+@register.assignment_tag
+def get_nroer_menu(request, group_name):
+
+	url_str = request.META["PATH_INFO"]
+	url_split = url_str.split("/")
+
+	# removing "" in the url_split
+	url_split = filter(lambda x: x != "", url_split)
+	# print "url_split : ", url_split
+
+	# initializing of variables
+	selected_gapp = menu_level_one_selected = selected_gapp_formated = ""
+	menu_level_one_list = selected_gapp_list = []
+	mapping = {"eLibrary": "e-library", "Curated Zone": "topics",
+				"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
+				"Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
+				}
+
+	# the dict that will be returned
+	nroer_menu_dict = {
+						'menu_level_one_list': menu_level_one_list,
+						'menu_level_one_selected': menu_level_one_selected,
+						'selected_gapp': selected_gapp,
+						'selected_gapp_list': selected_gapp_list,
+						'mapping': mapping
+					}
+
+	if (len(url_split) > 1) and (url_split[1] != "dashboard"):
+		selected_gapp = url_split[1]  # expecting e-library etc. type of extract
+
+		# handling conditions of "e-library" = "file" and vice-versa.
+		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+
+		if selected_gapp.lower() in [i.lower() for i in mapping.values()]:
+			for k, v in mapping.iteritems():
+				if selected_gapp.lower() == v.lower():
+					selected_gapp = k.lower()
+
+		selected_gapp_formated = selected_gapp.replace("-", "")
+
+	elif group_name == "home":  # only for "home" group
+		menu_level_one_selected = group_name
+
+	else:  # for group's other than home
+
+		# getting all the values of all keys from GSTUDIO_NROER_MENU
+		# all_sub_menu_values = []
+		# for each_d in GSTUDIO_NROER_MENU:
+		# 	for i in each_d.values():
+		# 		all_sub_menu_values += i
+
+		if group_name.lower() in [i.lower() for i in mapping.keys()]:
+			# if group_name directly appear to be in all the values in GSTUDIO_NROER_MENU
+			# e.g: Teachers, Interest Group's
+			selected_gapp = group_name
+			selected_gapp_formated = group_name.lower()
+		elif group_name.lower() in [i.lower() for i in mapping.values()]:
+			# if group_name appears in mapping's value then get it's key.
+			# e.g: States, Individuals
+			for k, v in mapping.iteritems():
+				if group_name.lower() == v.lower():
+					selected_gapp = k.lower()
+					selected_gapp_formated = k.lower()
+
+	# [i.keys()[0].lower() for i in GSTUDIO_NROER_MENU]
+	# print "selected_gapp : ", selected_gapp
+	# print "selected_gapp_formated : ", selected_gapp_formated
+	# print "menu_level_one_selected : ", menu_level_one_selected
+
+	menu_level_one_list = []
+
+	for menu_level_one in GSTUDIO_NROER_MENU:
+
+		temp_menu_level_one_key = menu_level_one.keys()[0]
+		temp_selected_gapp_list = menu_level_one[temp_menu_level_one_key]
+		# print temp_selected_gapp_list
+		
+		menu_level_one_list.append(temp_menu_level_one_key)
+
+		if menu_level_one_selected and (menu_level_one_selected.lower() == temp_menu_level_one_key.lower()):
+			nroer_menu_dict["selected_gapp_list"] = temp_selected_gapp_list
+			nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
+
+		if selected_gapp_formated:
+			for k, each_menu_dict in menu_level_one.iteritems():
+				if each_menu_dict and (selected_gapp_formated in [i.lower() for i in each_menu_dict]):
+					nroer_menu_dict["selected_gapp"] = selected_gapp_formated
+					nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
+					nroer_menu_dict["selected_gapp_list"] = each_menu_dict
+
+	nroer_menu_dict["menu_level_one_list"] = menu_level_one_list
+
+	# sending details about which are groups and which are gapps
+	mapping["groups"] = ["States", "Institutions", "Individuals", "Teachers", "Interest Groups", "Schools"]
+	mapping["gapps"] = ["Curated Zone", "eLibrary", "eBooks", "eCourses", "Events"]
+	# print mapping
+
+	nroer_menu_dict["mapping"] = mapping
+	# print "nroer_menu_dict ::::\n", nroer_menu_dict
+
+	return nroer_menu_dict
+# ---------- END of get_nroer_menu -----------
+
+
+@register.assignment_tag
+def get_site_name_from_settings():
+	# print "GSTUDIO_SITE_NAME : ", GSTUDIO_SITE_NAME
+	return GSTUDIO_SITE_NAME
+
+
 global_thread_rep_counter = 0	# global variable to count thread's total reply
 global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
 def thread_reply_count( oid ):
@@ -922,15 +1036,15 @@ def get_theme_node(groupid, node):
 		return True
 
 
-@register.assignment_tag
-def get_group_name(val):
-         GroupName = []
+# @register.assignment_tag
+# def get_group_name(val):
+#          GroupName = []
 
-	 for each in val.group_set: 
+# 	 for each in val.group_set: 
 
-		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
-		GroupName.append(grpName)
-	 return GroupName
+# 		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
+# 		GroupName.append(grpName)
+# 	 return GroupName
 
 @register.assignment_tag
 def get_edit_url(groupid):
@@ -1032,6 +1146,26 @@ def get_create_url(groupid):
     return 'uploadDoc'
 	
 
+
+@register.assignment_tag
+def get_prior_node(node_id):
+
+	obj = collection.Node.one({'_id':ObjectId(node_id) })
+	prior = []
+	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+	if topic_GST._id in obj.member_of:
+
+		if obj.prior_node:
+			for each in obj.prior_node:
+				node = collection.Node.one({'_id': ObjectId(each) })
+				prior.append(( node._id , node.name ))
+
+		return prior
+
+	return prior
+
+
+
 @register.assignment_tag
 def get_contents(node_id):
 
@@ -1063,7 +1197,9 @@ def get_contents(node_id):
 
 		if rel_obj._type == "File":
 			gattr = collection.Node.one({'_type': 'AttributeType', 'name': u'educationaluse'})
-			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id})
+			# list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
+			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id })
+
 			for attr in list_gattr:
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
 				if attr.object_value == "Images":
@@ -1077,7 +1213,7 @@ def get_contents(node_id):
 				elif attr.object_value == "Documents":
 					document_contents.append((left_obj.name, left_obj._id))
 
-				
+							
 	if image_contents:
 		contents['Images'] = image_contents
 	
