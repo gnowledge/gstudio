@@ -24,7 +24,7 @@ class Command(BaseCommand):
           Event = collection.Node.find({"_type":"GSystemType","name":{'$in':["Classroom Session","Exam"]}})
 
           yesterday = date.today() - timedelta(1)
-          day_before_yesterday=date.today() - timedelta(22)
+          day_before_yesterday=date.today() - timedelta(2)
           date1=datetime.date.today()
           ti=time(0,0)
           Today=datetime.datetime.combine(date1,ti)
@@ -42,7 +42,7 @@ class Command(BaseCommand):
               Mis_admin_name=user_obj.username
           
           try:
-              Attendance_Event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.end_time":{'$gte':day_before_yesterday}})
+              Attendance_Event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.end_time":{'$gte':day_before_yesterday,'$lt':Today}})
 
               Attendance_marked_event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"relation_set.has_attended":{"$exists":False},"attribute_set.start_time":{'$gte':yesterday,'lt':Today}})
 
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                             "activity": "Attendance not marked",
                             "conjunction": "-"
                         })
-                  notification.create_notice_type(render_label,"Attendance is not marked"+ i.name +"\n Please enter marks  Attendance would be blocked after" + str(no_of_days) + "days" , "notification")
+                  notification.create_notice_type(render_label,"Attendance is not marked for "+ i.name +" Event \n Attendance would be blocked after" + str(no_of_days) + "days" , "notification")
                   notification.send(to_user_list, render_label, {"from_user": Mis_admin_name})
           except Exception as e:
               error_message = "\n Event Error: " + str(e) + " !!!\n"

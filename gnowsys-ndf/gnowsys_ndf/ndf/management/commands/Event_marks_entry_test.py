@@ -15,7 +15,7 @@ class Command(BaseCommand):
     
 
     def handle(self, *args, **options):
-            Event = collection.Node.find({"name":{'$in':["Classroom Session","Exam"]}})
+            Event = collection.Node.find({"_type":"GSystemType","name":{'$in':["Classroom Session","Exam"]}})
 
             marks_enter = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.marks_entered":True})
             Mis_admin = collection.Node.one({"_type":"Group","name":"MIS_admin"})

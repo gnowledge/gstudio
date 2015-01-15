@@ -4382,6 +4382,8 @@ def attendees_relations(request,group_id,node):
    #3 :- popuplate only Asssignment marks Columns
    #4 :- populate only Assesment marks Columns
    #1 :- populate Only Attendance taking part donot populate Assesment and Attendance taking part
+   reschedule =True
+   marks =True
    if course_assessment == True:
      column_count = 4
    if course_assignment == True:
@@ -4414,7 +4416,6 @@ def attendees_relations(request,group_id,node):
         marks=i["marks_entry_completed"]
  column_list.append(reschedule)
  column_list.append(marks)
- print "\n column details",column_list
  return HttpResponse(json.dumps(column_list)) 
 
         
