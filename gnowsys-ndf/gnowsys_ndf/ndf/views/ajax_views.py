@@ -4329,7 +4329,7 @@ def page_scroll(request,group_id,page):
     if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
     for each in (paged_resources.page(int(page))).object_list:
-            print each.name,"\n"
+            # print each.name,"\n"
             if each.created_by == each.modified_by :
                if each.last_update == each.created_at:
                  activity =  'created'
