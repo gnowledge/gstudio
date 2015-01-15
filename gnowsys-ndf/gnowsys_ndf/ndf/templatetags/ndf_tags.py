@@ -1146,6 +1146,26 @@ def get_create_url(groupid):
     return 'uploadDoc'
 	
 
+
+@register.assignment_tag
+def get_prior_node(node_id):
+
+	obj = collection.Node.one({'_id':ObjectId(node_id) })
+	prior = []
+	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+	if topic_GST._id in obj.member_of:
+
+		if obj.prior_node:
+			for each in obj.prior_node:
+				node = collection.Node.one({'_id': ObjectId(each) })
+				prior.append(( node._id , node.name ))
+
+		return prior
+
+	return prior
+
+
+
 @register.assignment_tag
 def get_contents(node_id):
 
@@ -1177,7 +1197,9 @@ def get_contents(node_id):
 
 		if rel_obj._type == "File":
 			gattr = collection.Node.one({'_type': 'AttributeType', 'name': u'educationaluse'})
-			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id})
+			# list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
+			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id })
+
 			for attr in list_gattr:
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
 				if attr.object_value == "Images":
@@ -1191,7 +1213,7 @@ def get_contents(node_id):
 				elif attr.object_value == "Documents":
 					document_contents.append((left_obj.name, left_obj._id))
 
-				
+							
 	if image_contents:
 		contents['Images'] = image_contents
 	

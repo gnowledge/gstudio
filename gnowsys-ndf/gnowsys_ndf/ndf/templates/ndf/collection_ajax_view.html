@@ -80,7 +80,15 @@
   
   <ul class="breadcrumbs"> 
     {% for e in breadcrumbs_list %}
-        <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+        {% if topic %}
+          {% get_prior_node e.0 as prior %}
+            {% if prior %}              
+              <li><b><a style="color:black;">{{prior.0.1}}</a></b></li>
+              <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+            {% endif %}
+        {% else %}
+          <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+        {% endif %}
     {% endfor %}
   </ul>
 
