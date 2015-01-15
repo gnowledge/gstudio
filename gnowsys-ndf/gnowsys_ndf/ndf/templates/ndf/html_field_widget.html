@@ -34,8 +34,7 @@
           {% if not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
           maxlength="{{field.max_digits|default_if_none:''}}"
-          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
-          class="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}"
+          class = "{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
           style="float:left; width:95%"
     />
     <script type="text/javascript">
@@ -68,9 +67,24 @@
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if field.editable and not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
-          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
+          class="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
     />
+    <script type="text/javascript">
+    // Ensure that it is a number and stop the keypress while entering hours for course subsection prop
+      $(".input_only_text").keydown(function (e) {
+        if ((e.keyCode > 64 && e.keyCode < 91) || (e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9){
+          return true;
+        }  
+        else{
+          return false;
+        }      
+      });
+
+    </script>
+
     {% if is_required_field or field.validators %}
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
@@ -83,11 +97,8 @@
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if field.editable and not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
-          {% if field.max_digits %}
-            maxlength="{{field.max_digits|default_if_none:''}}"
-          {% endif %}
-          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
-          class="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}"
+          maxlength="{{field.max_digits|default_if_none:''}}" 
+          class = "{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
     />
 
