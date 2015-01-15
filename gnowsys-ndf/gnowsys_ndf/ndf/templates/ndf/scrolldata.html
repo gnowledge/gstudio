@@ -12,15 +12,16 @@
 {% for i in activity_list %}
   {% get_url i.pk as res_type %}
    {% if res_type != "None" %}
-   <div id="container_div" >
+   <div class="container-div">
     <div id="top_list" class="row" style=" background-color:#f7fcfb;">
-      <div id="name-div" class="small-1 column" style="word-wrap: break-word;">
+      <div id="name-div" class="small-2 column" style="word-wrap: break-word;">
           <a href="{% url 'dashboard' i.created_by %}"> {{i.user_details_dict.created_by}} </a>
       </div>
+
       <div id="action" class="small-2 column">
          has  {{i.activity}}
-         
      </div> 
+
      <div id="create_type" class="small-2 column" style="word-wrap: break-word; " >
         
         {% if res_type != "event_app_instance_detail" %}
@@ -34,7 +35,7 @@
      <div id="performed on" class="small-2 column"  style="word-wrap: break-word;" >
            {{i.created_at|timesince}} ago
      </div>
-     <div class="small-5 column" align="center" >
+     <div class="small-2 small-pull-2 column" align="center" >
         {% if 'image' in i.mime_type %}
         <a href="{% url res_type groupid i.pk   %}"> <div> <img src="{% url 'getFileThumbnail' group_id i.pk %}" style="height:50px; width:50px;"> </div>
         </a>
