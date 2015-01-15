@@ -1,4 +1,3 @@
-
 {% extends "ndf/base.html" %}
 {% load i18n %}
 
@@ -205,8 +204,6 @@
        display: none;
   }
 
-
-
   </style>
 {% endblock%}
 
@@ -222,7 +219,6 @@
 {% block meta_content %}
 {% if user.is_authenticated %}
 {% user_access_policy groupid request.user as user_access %}
-
 
 <ul class="no-bullet" id="app-set-item"> 
 
@@ -737,7 +733,7 @@
 				// });
 			{% endif %}
 
-			d3.select(self.frameElement).style("height", "800px");
+			// d3.select(self.frameElement).style("height", "800px");
 
 			function update(source) {
 
@@ -840,10 +836,16 @@
 			        d._children = null;
 			        // console.log("non-leaf 2");
 				}
-				else {
+				else if (d.node_type == "Topic"){
 			        // console.log("Leaf!");
+			        var a = document.createElement('a');
+					a.setAttribute('href', "/{{group_name_tag}}/topic_details/"+d.id+"");
+					a.setAttribute('target', '_blank');
+					document.body.appendChild(a);
+					a.click();
+					a.remove();
 			        // location.href = "/{{group_name_tag}}/topic_details/"+d.id+"";
-					$('#collaps_topic_details').foundation('reveal', 'open');     
+					// $('#collaps_topic_details').foundation('reveal', 'open');     
 			    }
 			  }
 			  update(d);
