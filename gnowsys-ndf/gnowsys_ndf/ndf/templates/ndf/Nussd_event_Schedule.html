@@ -873,19 +873,22 @@ function date_validation(name)
 
      if (str)
       {
-      
-         start_time= new Date(document.getElementById("start_time_"+ str).value)
-         end_time = new Date(document.getElementById("end_time_"+ str).value)
+         start_time = new Date($('#start_time_'+str).datetimepicker('getDate')) 
+         end_time = new Date($('#end_time_'+str).datetimepicker('getDate'))  
          
+
       }
       
      if(!(str))
       {
-        start_time=new Date(document.getElementById("start_time").value)
-        end_time=new Date(document.getElementById("end_time").value)
-      
+        start_time = new Date($('#start_time').datetimepicker('getDate')) 
+        end_time = new Date($('#end_time').datetimepicker('getDate'))  
+        //start_time=new Date(Date(document.getElementById("start_time").value))
+        //end_time=new Date(Date(document.getElementById("end_time").value))
+       
       }
         reset_session_variable(str)
+        alert(document.getElementById("start_time").value)
         deduct_time(start_time,end_time)
     if (total_session_time <= 0 )
      {
@@ -912,8 +915,7 @@ function date_validation(name)
 }  
 
 function deduct_time(start_time,end_time)
-{    
-     var difference = start_time.getTime() - end_time.getTime();
+{    var difference = start_time.getTime() - end_time.getTime();
      var daysDifference = Math.floor(difference/1000/60/60/24);
      difference -= daysDifference*1000*60*60*24
      var hoursDifference = Math.floor(difference/1000/60/60);
@@ -977,8 +979,10 @@ var end_time=""
   if(str == 1)
   { 
      total_session_time=$('#session_of option:selected').attr('minutes')
-     start_time=new Date(document.getElementById('start_time').value)
-     end_time=new Date(document.getElementById('end_time').value)
+     start_time = new Date($('#start_time').datetimepicker('getDate')) 
+     end_time = new Date($('#end_time').datetimepicker('getDate'))  
+     //start_time=new Date(Date(document.getElementById('start_time').value))
+     //end_time=new Date(Date(document.getElementById('end_time').value))
      if(document.getElementById('start_time_2')){
        document.getElementById('start_time_2').value=""}
        if ( document.getElementById('end_time_2')){
@@ -988,11 +992,11 @@ var end_time=""
   } 
   if (str == 2){
         total_session_time=$('#session_of option:selected').attr('minutes')
-        start_time=new Date(document.getElementById('start_time').value)
-        end_time=new Date(document.getElementById('end_time').value)
+        start_time = new Date($('#start_time').datetimepicker('getDate')) 
+        end_time = new Date($('#end_time').datetimepicker('getDate'))  
         deduct_time(start_time,end_time)
-        start_time=new Date(document.getElementById('start_time_1').value)
-        end_time=new Date(document.getElementById('end_time_1').value)
+        start_time = new Date($('#start_time_1').datetimepicker('getDate')) 
+        end_time = new Date($('#end_time_1').datetimepicker('getDate'))  
         deduct_time(start_time,end_time)
         
    }
@@ -1034,6 +1038,7 @@ var currentYear = currentDate.getFullYear();
        
       changeMonth: true,
       dateFormat: 'dd/mm/yy',
+      
       minDate: '0',
       maxDate: '+2m',
       defaultDate: '0',
