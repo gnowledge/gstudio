@@ -27,7 +27,7 @@ body{
         margin:0;
     }
     .active{
-        background-color:black!important;
+        background-color:$theme-text-color!important;
     }
     h1{
         .flag{
