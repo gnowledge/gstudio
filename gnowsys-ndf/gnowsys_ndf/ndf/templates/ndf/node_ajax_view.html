@@ -186,6 +186,20 @@
 
       {% if topic %}
         <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+        <dd class="filters-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-filters"><i class=""></i> {% trans "Filter based on" %}</a></dd>
+
+        <ul id="hover1" class="f-dropdown" data-dropdown-content>
+
+        {% get_metadata_values as metadata %}
+        {% for k,v in metadata.items %}
+
+          {% if k == "educationallevel" %}            
+            <li class="view_list" id="{{k}}"><a> {% trans "Educational Level" %} </a></li> 
+          {% elif k == "educationalsubject" %}
+            <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li> 
+          {% endif %}
+          
+        {% endfor %}
 
         <!-- <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
  -->
@@ -207,20 +221,22 @@
       <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
       {% endcomment %}
 
-      <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
-        
-          {% if all_replies %}
-            <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
-              {% trans "Join Discussion" %} ({{ all_replies | length }})
-            </span>
-          {% else %}            
-            <span title="{% trans 'Be the first to start a discussion' %}">
-              {% trans "Begin Discussion" %}
-            </span>
-          {% endif %}
+      {% if node|is_File %}         
+        <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
+          
+            {% if all_replies %}
+              <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
+                {% trans "Join Discussion" %} ({{ all_replies | length }})
+              </span>
+            {% else %}            
+              <span title="{% trans 'Be the first to start a discussion' %}">
+                {% trans "Begin Discussion" %}
+              </span>
+            {% endif %}
 
-        </a>
-      </dd>
+          </a>
+        </dd>
+      {% endif %}
 
     </dl>
   </h1>
@@ -583,6 +599,10 @@
         <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
           <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
           <!-- {#% include "ndf/graph_concept.html" %#} -->
+        </div>
+
+        <div id="view-levels" style="display:none;">
+          ghtr
         </div>
         
         <!-- Content for Collection Graph -->
@@ -1065,6 +1085,8 @@
   $(document).on('click','.view-discussion',function(){
     $("#view-page").css("display", "none");
     $("#view-info").css("display", "none");
+    $("#view-filters").css("display", "none");
+    $(".filters-view").removeClass("active");
     $(".page-view").removeClass("active");
     $(".info-view").removeClass("active");
     $(".discussion-view").addClass("active");    
@@ -1075,6 +1097,9 @@
   $(document).on('click','.view-info',function(){
     $("#view-page").css("display", "none");
     $("#view-discussion").css("display", "none");
+    $("#view-info").css("display", "none");
+    $("#view-filters").css("display", "none");
+    $(".filters-view").removeClass("active");
     $(".page-view").removeClass("active");
     $(".discussion-view").removeClass("active");    
     $(".info-view").addClass("active");    
@@ -1082,9 +1107,23 @@
 
   });
 
+  $(document).on('click','.view-filters',function(){
+    $("#view-page").css("display", "none");
+    $("#view-discussion").css("display", "none");
+    $("#view-info").css("display", "none");
+    $(".page-view").removeClass("active");
+    $(".info-view").removeClass("active");    
+    $(".discussion-view").removeClass("active");    
+    $(".filters-view").addClass("active");    
+    // $("#view-filters").css("display", "block");
+
+  });
+
   $(document).on('click','.view-page',function(){
     $("#view-discussion").css("display", "none");
     $("#view-info").css("display", "none");
+    $("#view-filters").css("display", "none");
+    $(".filters-view").removeClass("active");
     $(".discussion-view").removeClass("active");
     $(".info-view").removeClass("active");
     $(".page-view").addClass("active");    
