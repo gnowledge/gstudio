@@ -63,6 +63,7 @@
     
     {% get_group_object groupid as group_object %}
     {% get_site_variables as site %}
+    {% check_accounts_url request.path as is_ac_url %}
 
     <!-- "get_site_name_from_settings" gives site name specified in local_settings.py -->
     {% get_site_name_from_settings as site_name %}
@@ -82,7 +83,7 @@
           <a href="#">{% trans "Menu" %}</a>
         </li>
 
-     </ul>
+      </ul>
 
      <section class="top-bar-section">
 
@@ -251,7 +252,6 @@
 
         <!-- Else show login link -->
         {% else %}
-        {% check_accounts_url request.path as is_ac_url %}
         <!-- 
         check_accounts_url:
           If accounts related url exists in path, then returns True; otherwise False
@@ -267,8 +267,7 @@
             <i class="fi-key"></i> {% trans "Login" %}
           </a>
         </li>
-
-          {% endif %}
+        {% endif %}
         </ul>  
         <!-- Closes Right Nav section -->
 
@@ -289,100 +288,107 @@
           </ul>
         </aside>
 
-        <main class="row">  
-         <nav class="drop-shadow">
-          <div class="button-bar app">
+        <main class="row">
+          {% if not is_ac_url %}
+          <!--
+          This menu-bar is meant especially for group which is selected 
+          from group's dropdown visible on site-bar.
 
-            <!-- one that appears on left top, under main logo -->
-            <div class="medium-2 columns group-link">
-              <!-- <li class="left">
-                <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a> 
-              </li> -->
+          Must be visible only when visiting a group.
 
-              <!-- <li> -->
-              {% if group_name_tag %}
-                {% comment %}
-                  <!--               
-                  <a data-tooltip aria-haspopup="true" class="has-tip" title="{{group_name_tag|defadivt:' -- '}}" href="{% url 'groupchange' group_object.name %}" class="home button">
-                  <i class="fi-home"></i>
-                    {{group_name_tag|truncatechars:20|default:" -- "}}
+          Hence, via checking url (using 'check_accounts_url' templatetag) 
+          restricting visibility of this menu-bar.
+          -->
+          <nav class="drop-shadow">
+            <div class="button-bar app">
+              <!-- one that appears on left top, under main logo -->
+              <div class="medium-2 columns group-link">
+                <!-- <li class="left">
+                  <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a> 
+                </li> -->
+
+                <!-- <li> -->
+                {% if group_name_tag %}
+                  {% comment %}
+                    <!--               
+                    <a data-tooltip aria-haspopup="true" class="has-tip" title="{{group_name_tag|defadivt:' -- '}}" href="{% url 'groupchange' group_object.name %}" class="home button">
+                    <i class="fi-home"></i>
+                      {{group_name_tag|truncatechars:20|default:" -- "}}
+                    </a>
+                     -->
+                  {% endcomment %}
+                  <a title="{{group_name_tag}}" href="{% url 'groupchange' group_object.name %}">
+                    <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
                   </a>
-                   -->
-                {% endcomment %}
-                <a title="{{group_name_tag}}" href="{% url 'groupchange' group_object.name %}">
-                  <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
-                </a>
+                {% endif %}
+                <!-- </li> -->
+              </div>
+
+              <!-- group level gapps which appears at LHS of search bar -->
+
+              <!-- add GSTUDIO_SITE_NAME = "nroer" in the local_settings.py file, to check locally -->
+              {% if site_name == "nroer" %} 
+              
+              <!-- NROER level-two menu -->
+
+                <ul class="button-group nroer-menu">
+                  {% for each_menu in nroer_menu.selected_gapp_list %}
+                    <li {% if each_menu|lower == nroer_menu.selected_gapp|cut:"-" %}class="active"{% endif %}>
+                      <a class="button"
+                      {% if each_menu in nroer_menu.mapping.groups %}
+                        {% for k, v in nroer_menu.mapping.items %}
+                          {% if k == each_menu %} href="{% url 'group_dashboard' v %}"{% endif %}
+                        {% endfor %}
+                      {% elif each_menu in nroer_menu.mapping.gapps %}
+                        {% for k, v in nroer_menu.mapping.items %}
+                          {% if k == each_menu %}
+                            href="{% url 'GAPPS' group_name_tag v %}"
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                      >{{each_menu}}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+
+              <!-- END of NROER level two menu -->
+              {% else %}
+                {% get_gapps_iconbar request groupid %}
               {% endif %}
-              <!-- </li> -->
-            </div>
 
-            <!-- group level gapps which appears at LHS of search bar -->
+              <ul class="tools button-group medium-2 columns right">
+                
+                <!-- search in the app bar -->
+                <li class="has-form">
+                  <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                    name="search_form" method="GET" >
+                    <div class="row collapse">
+                      <div class="large-10 columns">
+                        <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                      </div>
+                      <div class="large-2 columns">
+                        <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
+                      </div>
+                    </div>
+                  </form>
+                </li>
 
-            <!-- add GSTUDIO_SITE_NAME = "nroer" in the local_settings.py file, to check locally -->
-            {% if site_name == "nroer" %} 
-            
-            <!-- NROER level-two menu -->
-
-              <ul class="button-group nroer-menu">
-                {% for each_menu in nroer_menu.selected_gapp_list %}
-                  <li {% if each_menu|lower == nroer_menu.selected_gapp|cut:"-" %}class="active"{% endif %}>
-                    <a class="button"
-                    {% if each_menu in nroer_menu.mapping.groups %}
-                      {% for k, v in nroer_menu.mapping.items %}
-                        {% if k == each_menu %} href="{% url 'group_dashboard' v %}"{% endif %}
-                      {% endfor %}
-                    {% elif each_menu in nroer_menu.mapping.gapps %}
-                      {% for k, v in nroer_menu.mapping.items %}
-                        {% if k == each_menu %}
-                          href="{% url 'GAPPS' group_name_tag v %}"
-                        {% endif %}
-                      {% endfor %}
-                    {% endif %}
-                    >{{each_menu}}</a>
-                  </li>
-                {% endfor %}
+                <!-- help documentation for every app -->
+                <!--
+                <li class="right">
+                  <a id="toggle-help" class="button right-off-canvas-toggle" >
+                    <i class='button fi-lightbulb'></i>
+                  </a>
+                </li>
+                --> 
               </ul>
-
-            <!-- END of NROER level two menu -->
-            {% else %}
-              {% get_gapps_iconbar request groupid %}
-            {% endif %}
-
-            <ul class="tools button-group medium-2 columns right">
-              
-              <!-- search in the app bar -->
-              <li class="has-form">
-                <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-                  name="search_form" method="GET" >
-                  <div class="row collapse">
-                    <div class="large-10 columns">
-                      <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
-                    </div>
-                    <div class="large-2 columns">
-                      <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
-                    </div>
-                  </div>
-                </form>
-              </li>
-
-              <!-- help documentation for every app -->
-              <!--
-              <li class="right">
-                <a id="toggle-help" class="button right-off-canvas-toggle" >
-                  <i class='button fi-lightbulb'></i>
-                </a>
-              </li>
-              --> 
-
-            </ul>
-              
             </div>
           </nav>
-          <!-- Start of sidebar section (main aside) -->
+          {% endif %}
 
+          <!-- Start of sidebar section (main aside) -->
           <aside class="medium-2 columns">
             <div>
-
               <header>
                 {% block meta_content %}  {% endblock %} 
                 {% block concern_information %} {% endblock %}
@@ -400,14 +406,14 @@
               </section>
 
               <div>
-               {% block add_resource_content %}  {% endblock %}
-             </div>    
-           </div>
-         </aside>
-         <!-- End of related content -->  
+              {% block add_resource_content %}  {% endblock %}
+              </div>
+            </div>
+          </aside>
+          <!-- End of related content -->
 
-         <!-- Start of content section -->
-         <article class="medium-10 columns">
+          <!-- Start of content section -->
+          <article class="medium-10 columns">
           <!-- The actual body content -->
           <!-- Url redirection -->
 
@@ -421,7 +427,7 @@
           <input type="hidden" value="{{newgroup}}"> 
           <input type="hidden" value="{{groupid}}"> 
 
-        </article>
+          </article>
         {% block data_review_pagination %}  {% endblock %}
         <!-- End of content section --> 
       </main>

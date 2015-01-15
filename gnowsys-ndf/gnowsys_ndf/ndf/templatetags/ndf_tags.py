@@ -1372,19 +1372,19 @@ def get_group_type(group_id, user):
         raise Http404(e)
 
 @register.assignment_tag
-def check_accounts_url(path):
+def check_accounts_url(url_path):
 	'''
 	Checks whether the given path is of accounts related or not
-	Accounts means regarding login/logout or password-reset and all!
+	Accounts means regarding account's registrtion/activation, 
+	login/logout or password-reset and all!
 
 	Arguments:
-	path -- Lastly visited url by the user taken from request object
+	path -- Visited url by the user taken from request object
 
 	Returns:
 	A boolean value indicating the same
 	'''
-
-	if "accounts" in path:
+	if "accounts" in url_path and "/group" not in url_path:
 		return True
 
 	else:

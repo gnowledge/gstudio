@@ -428,7 +428,9 @@ META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
 
 GROUP_AGENCY_TYPES=["Other", "Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
 
-AUTHOR_AGENCY_TYPES=["Student","Teacher","TeacherTrainer","Faculty","Researcher","Others"]
+AUTHOR_AGENCY_TYPES = [
+    "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
+]
 
 # Built-in GAPPS list 
 # DON'T EDIT THIS LIST - for listing purpose on gapps-menubar/gapps-iconbar, instead make use of below one in local_setting file
