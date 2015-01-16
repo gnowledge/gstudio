@@ -203,24 +203,25 @@
       
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-     {% comment %}
       <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
-      {% endcomment %}
+      {% if "Group" not in node.member_of_names_list %}
 
       <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
-        
           {% if all_replies %}
             <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
               {% trans "Join Discussion" %} ({{ all_replies | length }})
             </span>
-          {% else %}            
-            <span title="{% trans 'Be the first to start a discussion' %}">
+
+          {% else %}
+	    <span title="{% trans 'Be the first to start a discussion' %}">
               {% trans "Begin Discussion" %}
             </span>
-          {% endif %}
+	  {% endif %}
 
         </a>
       </dd>
+      {% endif %}
+      
 
     </dl>
   </h1>
@@ -274,6 +275,7 @@
           {% comment %}
           <!-- <div class="small-4 columns">
             {% if node.prior_node|length > 0 %}
+	    {% if "Group" not in node.member_of_names_list %}
             <div class="panel">
 
               <h6>{% trans "You may want to read these first: " %}</h6>
@@ -287,6 +289,7 @@
 	      {% endif %}
               {% endfor %}
             </div>
+	    {% endif %}
               {% endif %}         </div>
  -->
           {% endcomment %}
@@ -505,27 +508,6 @@
         {% endfor %}
       
         <!-- <div id="commentable-area"> -->
-	<div>
-         {% if node.prior_node|length > 0 %}
-   
-         {% for index_key, each_node in node.prior_node_dict.items %}
-         {% get_grid_fs_object each_node as grid_fs_obj %}
-         {% if "Group" in node.member_of_names_list %}
-         {% get_object_value node as objvalue %}
-	    <table>
-	      <tbody>
-		{% for key, value in objvalue.items %}
-		<tr>
-		  <td> {{key}} : {{value}} </td>
-		</tr>
-		{% endfor %}
-	      <tbody>
-	    </table>
-              {% endif%}
-	    {% endfor %}
-            {% endif %}
-
-	</div>
         <div>
           {% with node.html_content|safe as description %}
           {% if description != "None" %}
@@ -533,6 +515,34 @@
           {% endif %}
           {% endwith %}
         </div>
+        <br/>
+	<div>
+         {% if node.prior_node|length > 0 %}
+   
+         {% for index_key, each_node in node.prior_node_dict.items %}
+         {% get_grid_fs_object each_node as grid_fs_obj %}
+         {% if "Group" in node.member_of_names_list %}
+         {% get_object_value node as objvalue %}
+	    <table style="width:60%; border-width:0px;" >
+	      <tbody>
+		{% for key, value in objvalue.items %}
+		<tr>
+		  {% if key == "Website" %}
+		  <td align ="left"> {{key}}</td>  
+		 <td align = "right"><a href="{{value}}">{{value}}</a> </td>
+                  {% else %}
+		  <td align ="left"> {{key}}</td>  
+		  <td align = "right">{{value}}</td>
+		  {% endif %}
+		</tr>
+	{% endfor %}
+	      <tbody>
+	    </table>
+              {% endif%}
+	    {% endfor %}
+            {% endif %}
+
+	</div>
         <!-- </div> -->
         <!-- Resource contents of topic -->
 
@@ -612,16 +622,40 @@
         
       {% endif %}
       <div id="view-info" style="display:none;">
-       
-       <table>
-   <tbody>
-        {% for key, value in obj.items %}
-        <tr>          
-        <td> {{key}} : {{value}} </td>
-        </tr>
-        {% endfor %}
-    <tbody>   
-</table>
+       <br/>
+	<table style="width:100%; border-width:0px; font-weight:bold" >
+	  <tbody>
+	    {% get_json node.pk as jsonobj %}
+	    {% str_to_dict jsonobj as obj %}
+    
+	    {% for key, value in obj.items %}
+	    <tr>
+	      <td align ="left"> {{key|del_underscore|title}}</td>
+              
+	      <td align = "right"> 
+		{% if "None" not in value %}
+		{% if key|is_in:"attribute_set, file_size, relation_set" %}
+	     
+		{% for k, v in value.items %}
+		{{k}} : {{v}}<br/>
+		{% endfor %}
+		{% elif key|is_in:"group_set ,collection_set, member_of, tags, prior_node, post_node" %}
+		{% for each in value %}
+		{{each}}</br>
+	    	{% endfor %}
+		{% else %}
+		{{value}}
+		{% endif %}
+	      </td>
+	      {% else %}	     
+	      {{value}}</td>
+             {% endif %}
+	    </tr>
+	    {% endfor %}
+	  <tbody>
+	</table>
+
+
      </div>
 
       <div id="view-discussion" style="display:none;">
