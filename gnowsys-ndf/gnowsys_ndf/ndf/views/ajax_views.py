@@ -46,7 +46,7 @@ from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
 from gnowsys_ndf.ndf.views.methods import create_gattribute
-from datetime import date,time,timedelta
+#from datetime import date,time,timedelta
 from gnowsys_ndf.mobwrite.models import ViewObj
 
  
@@ -4001,7 +4001,7 @@ def reschedule_task(request,group_id,node):
     marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     end_time=collection.Node.one({"name":"end_time"})
     date1=datetime.date.today()
-    ti=time(0,0)
+    ti=datetime.time(0,0)
     b=datetime.datetime.combine(date1,ti)
     create_gattribute(ObjectId(node),end_time,b) 
     create_gattribute(ObjectId(node),reschedule_attendance,True)
@@ -4028,7 +4028,7 @@ def reschedule_task(request,group_id,node):
     task_dict.update({'Status':unicode("New")}) 
     task_dict.update({'Priority':unicode('Normal')})
     date1=datetime.date.today()
-    ti=time(0,0)
+    ti=datetime.time(0,0)
     Today=datetime.datetime.combine(date1,ti)
     task_dict.update({'start_time':Today})
     task_dict.update({'Assignee':Mis_admin_list})

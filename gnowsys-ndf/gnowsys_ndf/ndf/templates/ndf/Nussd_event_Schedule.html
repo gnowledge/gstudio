@@ -861,6 +861,7 @@ $("#nussd_course_type").change(function(){
       );
     }
   });
+  
 function date_validation(name)
 {
 
@@ -883,12 +884,9 @@ function date_validation(name)
       {
         start_time = new Date($('#start_time').datetimepicker('getDate')) 
         end_time = new Date($('#end_time').datetimepicker('getDate'))  
-        //start_time=new Date(Date(document.getElementById("start_time").value))
-        //end_time=new Date(Date(document.getElementById("end_time").value))
-       
+        
       }
         reset_session_variable(str)
-        alert(document.getElementById("start_time").value)
         deduct_time(start_time,end_time)
     if (total_session_time <= 0 )
      {
@@ -981,8 +979,6 @@ var end_time=""
      total_session_time=$('#session_of option:selected').attr('minutes')
      start_time = new Date($('#start_time').datetimepicker('getDate')) 
      end_time = new Date($('#end_time').datetimepicker('getDate'))  
-     //start_time=new Date(Date(document.getElementById('start_time').value))
-     //end_time=new Date(Date(document.getElementById('end_time').value))
      if(document.getElementById('start_time_2')){
        document.getElementById('start_time_2').value=""}
        if ( document.getElementById('end_time_2')){
