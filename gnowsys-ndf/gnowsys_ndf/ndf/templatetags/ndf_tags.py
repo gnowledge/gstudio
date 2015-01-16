@@ -1176,7 +1176,7 @@ def get_prior_node(node_id):
 
 
 @register.assignment_tag
-def get_contents(node_id, selected):
+def get_contents(node_id):
 
 	contents = {}
 	image_contents = []
@@ -1206,21 +1206,21 @@ def get_contents(node_id, selected):
 
 		if rel_obj._type == "File":
 			gattr = collection.Node.one({'_type': 'AttributeType', 'name': u'educationaluse'})
-			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
+			# list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
+			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id })
 
 			for attr in list_gattr:
-				left_obj = collection.Node.one({'_id': ObjectId(rel_obj._id) })
-
-				if selected == "Images":
-					image_contents.append( (str(left_obj.name), str(left_obj._id)) )
-				elif selected == "Videos":
-					video_contents.append( (str(left_obj.name), str(left_obj._id)) )
-				elif selected == "Audios":
-					audio_contents.append( (str(left_obj.name), str(left_obj._id)) )
-				elif selected == "Interactives":
-					interactive_contents.append( (str(left_obj.name), str(left_obj._id)) )
-				elif selected == "Documents":
-					document_contents.append( (str(left_obj.name), str(left_obj._id)) )
+				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
+				if attr.object_value == "Images":
+					image_contents.append((left_obj.name, left_obj._id))
+				elif attr.object_value == "Videos":
+					video_contents.append((left_obj.name, left_obj._id))
+				elif attr.object_value == "Audios":
+					audio_contents.append((left_obj.name, left_obj._id))
+				elif attr.object_value == "Interactives":
+					interactive_contents.append((left_obj.name, left_obj._id))
+				elif attr.object_value == "Documents":
+					document_contents.append((left_obj.name, left_obj._id))
 
 							
 	if image_contents:
@@ -1381,19 +1381,19 @@ def get_group_type(group_id, user):
         raise Http404(e)
 
 @register.assignment_tag
-def check_accounts_url(path):
+def check_accounts_url(url_path):
 	'''
 	Checks whether the given path is of accounts related or not
-	Accounts means regarding login/logout or password-reset and all!
+	Accounts means regarding account's registrtion/activation, 
+	login/logout or password-reset and all!
 
 	Arguments:
-	path -- Lastly visited url by the user taken from request object
+	path -- Visited url by the user taken from request object
 
 	Returns:
 	A boolean value indicating the same
 	'''
-
-	if "accounts" in path:
+	if "accounts" in url_path and "/group" not in url_path:
 		return True
 
 	else:
