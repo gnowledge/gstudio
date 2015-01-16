@@ -629,7 +629,7 @@
     
 	    {% for key, value in obj.items %}
 	    <tr>
-	      <td align ="left"> {{key}}</td>
+	      <td align ="left"> {{key|del_underscore|title}}</td>
               
 	      <td align = "right"> 
 		{% if "None" not in value %}

@@ -1938,13 +1938,20 @@ def is_in(var, args):
     arg_list = [arg.strip() for arg in args.split(',')]
     return var in arg_list
 
+@register.filter("del_underscore")
+# filter added to remove underscore from string
+def del_underscore(var):
+   var = var.replace("_"," ")   
+   return var 
+
+
 
 @register.assignment_tag
 # this function used for info-box implementation 
 # which convert str to dict type & returns dict which used for rendering in template 
 def str_to_dict(str1):
     dict_format = json.loads(str1, object_pairs_hook = collections.OrderedDict)
-    keys_to_remove = ('_id','access_policy','fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required') # keys needs to hide
+    keys_to_remove = ('_id','access_policy','rating', 'fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required') # keys needs to hide
     keys_by_ids = ('member_of', 'group_set', 'collection_set','prior_node') # keys holds list of ids
     keys_by_userid = ('modified_by', 'contributors', 'created_by', 'author_set') # keys holds dada from User table
     keys_by_dict = ('attribute_set', 'relation_set')
@@ -1965,15 +1972,17 @@ def str_to_dict(str1):
                                 dict_format[k] = name_list
               
       if k in keys_by_userid:
-        if type(dict_format[k]) == list :
-                for userid in dict_format[k]:
-                        user = User.objects.get(id = userid)
-                        if user:
+       
+              if type(dict_format[k]) == list :
+                      for userid in dict_format[k]:
+                              user = User.objects.get(id = userid)
+                              if user:
                                 dict_format[k] = user.get_username()
-        else: 
-                user = User.objects.get(id = v)
-                if user:
-                        dict_format[k] = user.get_username()
+              else: 
+                      if v != []:
+                              user = User.objects.get(id = v)
+                              if user:
+                                      dict_format[k] = user.get_username()
 
       if k in keys_by_dict:
               att_dic = {}
