@@ -185,15 +185,17 @@
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
       {% if topic %}
-        <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+        <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
 
-        <ul id="hover1" class="f-dropdown" data-dropdown-content>
-          <li class="view_list" id="Images"><a><i class="fi-photo"></i> {% trans "Images" %} </a></li> 
-          <li class="view_list" id="Videos"><a><i class="fi-play-circle"></i> {% trans "Videos" %} </a></li>  
-          <li class="view_list" id="Audios"><a><i class="fi-music"></i> {% trans "Audios" %} </a></li>  
-          <li class="view_list" id="Documents"><a><i class="fi-page-filled"></i> {% trans "Documents" %} </a></li>  
-          <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {% trans "Interactives" %} </a></li>  
-        </ul>
+        <!-- <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
+ -->
+        <!-- <ul id="hover1" class="f-dropdown" data-dropdown-content>
+          <li class="view_list" id="Images"><a><i class="fi-photo"></i> {#% trans "Images" %#} </a></li> 
+          <li class="view_list" id="Videos"><a><i class="fi-play-circle"></i> {#% trans "Videos" %#} </a></li>  
+          <li class="view_list" id="Audios"><a><i class="fi-music"></i> {#% trans "Audios" %#} </a></li>  
+          <li class="view_list" id="Documents"><a><i class="fi-page-filled"></i> {#% trans "Documents" %#} </a></li>  
+          <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {#% trans "Interactives" %#} </a></li>  
+        </ul> -->
         
       {% else %}
         <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
@@ -204,13 +206,14 @@
      {% comment %}
       <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
       {% endcomment %}
+
       <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
         
           {% if all_replies %}
             <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
               {% trans "Join Discussion" %} ({{ all_replies | length }})
             </span>
-          {% else %}
+          {% else %}            
             <span title="{% trans 'Be the first to start a discussion' %}">
               {% trans "Begin Discussion" %}
             </span>
@@ -218,7 +221,6 @@
 
         </a>
       </dd>
-
 
     </dl>
   </h1>
@@ -539,8 +541,7 @@
 
           
           <div class="topic_content" id="contents"> 
-          {% comment %}  
-            <!-- {% get_contents node.pk as contents %}
+            {% get_contents node.pk as contents %}
             {% for k,v in contents.items %}    
 
               <fieldset id="{{k}}">
@@ -566,8 +567,7 @@
                 {% endfor %}
               </fieldset>
 
-            {% endfor %}           -->
-          {% endcomment %}
+            {% endfor %}          
           </div>
 
         {% endif %}
@@ -1009,58 +1009,58 @@
   });
 
   // select particular type to display contents in topic page
-  $(".view_list").click(function() {
+  // $(".view_list").click(function() {
     
-    var selected = this.id;
+  //   var selected = this.id;
 
-    $.ajax({
-      type: "POST",
-      url: "{% url 'get_topic_contents' groupid %}",
-      datatype: "html",
-      data:{
-        node_id: '{{node.pk}}',
-        selected: selected,
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function(data) { 
+  //   $.ajax({
+  //     type: "POST",
+  //     url: "{#% url 'get_topic_contents' groupid %#}",
+  //     datatype: "html",
+  //     data:{
+  //       node_id: '{{node.pk}}',
+  //       selected: selected,
+  //       csrfmiddlewaretoken: '{{ csrf_token }}'
+  //     },
+  //     success: function(data) { 
 
-        data_obj = JSON.parse(data);
-        if (data != "{}"){
+  //       data_obj = JSON.parse(data);
+  //       if (data != "{}"){
 
-          var k = Object.keys(data_obj);
-          var len = data_obj[k].length;
+  //         var k = Object.keys(data_obj);
+  //         var len = data_obj[k].length;
 
-          cont_list = []
-          for (var i = 0; i < len; i++) { 
-            var res_id = data_obj[k][i][1]
-            if (k == "Images"){
-              cont_list.push("<a data-id="+res_id+" href='{% url 'image_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
-            }
-            else if(k == "Videos"){
-              cont_list.push("<a data-id="+res_id+" href='{% url 'video_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-            }
-            else{
-              cont_list.push("<a data-id="+res_id+" href='{% url 'file_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-            }
+  //         cont_list = []
+  //         for (var i = 0; i < len; i++) { 
+  //           var res_id = data_obj[k][i][1]
+  //           if (k == "Images"){
+  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'image_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
+  //           }
+  //           else if(k == "Videos"){
+  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'video_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+  //           }
+  //           else{
+  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'file_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+  //           }
             
-          } 
+  //         } 
 
-          cont_list = cont_list.join(" ")
-          var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
+  //         cont_list = cont_list.join(" ")
+  //         var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
 
-          $(".topic_content").html(cont);
+  //         $(".topic_content").html(cont);
 
-          $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
-          $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
-        }
-        else{
-          var cont = "<h3>No "+selected+" in this topic</h3>"
-          $(".topic_content").html(cont);
-        }
-      }
-    });
+  //         $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
+  //         $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
+  //       }
+  //       else{
+  //         var cont = "<h3>No "+selected+" in this topic</h3>"
+  //         $(".topic_content").html(cont);
+  //       }
+  //     }
+  //   });
 
-  });
+  // });
 
   $(document).on('click','.view-discussion',function(){
     $("#view-page").css("display", "none");

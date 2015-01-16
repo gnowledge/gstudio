@@ -569,16 +569,16 @@ def search_drawer(request, group_id):
       )    
       
 
-def get_topic_contents(request, group_id):
+# def get_topic_contents(request, group_id):
     
-  if request.is_ajax() and request.method == "POST":
-    node_id = request.POST.get("node_id", '')
-    selected = request.POST.get("selected", '')
-    # node = collection.Node.one({'_id': ObjectId(node_id) })
+#   if request.is_ajax() and request.method == "POST":
+#     node_id = request.POST.get("node_id", '')
+#     selected = request.POST.get("selected", '')
+#     # node = collection.Node.one({'_id': ObjectId(node_id) })
 
-    contents = get_contents(node_id, selected)
+#     contents = get_contents(node_id, selected)
 
-    return HttpResponse(json.dumps(contents))
+#     return HttpResponse(json.dumps(contents))
       
 
 ####Bellow part is for manipulating theme topic hierarchy####
@@ -1593,29 +1593,28 @@ def get_data_for_event_task(request,group_id):
     event_count={}
     list31=[1,3,5,7,8,10,12]
     list30=[4,6,9,11]
+    currentYear = datetime.datetime.now().year
     #create the date format in unix format for querying it from data 
     #Task attribute_type start time's object value takes the only date 
     #in month/date/year format 
     #As events are quried from the nodes which store the date time in unix format
-    
     month=request.GET.get('start','')[5:7]
     year=request.GET.get('start','')[0:4]
-    start = datetime.datetime(2014, int(month), 1)
+    start = datetime.datetime(int(currentYear), int(month), 1)
     task_start=str(int(month))+"/"+"01"+"/"+str(int(year))
     
     if int(month) in list31:
-     end=datetime.datetime(2014,int(month), 31)
+     end=datetime.datetime(int(currentYear),int(month), 31)
      task_end=str(int(month))+"/"+"31"+"/"+str(int(year))
     elif int(month) in list30:
-     end=datetime.datetime(2014,int(month), 30)
+     end=datetime.datetime(int(currentYear),int(month), 30)
      task_end=str(int(month))+"/"+"30"+"/"+str(int(year))
     else:
-     end=datetime.datetime(2014,int(month), 28)
+     end=datetime.datetime(int(currentYear),int(month), 28)
      task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
     #day_list of events  
-
     for j in obj:
-        nodes = collection.Node.find({'member_of': j._id,'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
+        nodes = collection.Node.find({'member_of': ObjectId(j._id),'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
         for i in nodes:
           attr_value={}
           event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
@@ -1626,7 +1625,8 @@ def get_data_for_event_task(request,group_id):
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           attr_value.update({'start':formated_date})
           day_list.append(dict(attr_value))
-
+    
+    
     count=0
     dummylist=[]
     date=""
@@ -1683,8 +1683,7 @@ def get_data_for_event_task(request,group_id):
     date_changed=[]
     if request.GET.get('view','') == 'month':
      for i in day_list:
-        
-        if date == i['start'] or date == "":
+        if date == (i['start'].split("T")[0]) or date == "":
            if date_changed:
              dummylist=date_changed
              date_changed=[]  
@@ -1698,6 +1697,7 @@ def get_data_for_event_task(request,group_id):
             count=count +  1
             date_changed=[]
             date_changed.append(i)
+            
             if len(dummylist) > 3:
              attr_value={}
              dummylist=[]
@@ -1705,7 +1705,7 @@ def get_data_for_event_task(request,group_id):
              attr_value.update({'title':'+3'})
              attr_value.update({'start':date})
              dummylist.append(dict(attr_value)) 
-        date=i['start']    
+        date=i['start'].split("T")[0]    
         if changed == "true" :
               for i in dummylist:
                    sorted_month_list.append(i)
@@ -1717,6 +1717,7 @@ def get_data_for_event_task(request,group_id):
        final_changed_dates=date_changed
      else:
        final_changed_dates=dummylist
+
        
      dummylist=[]
      date_changed=[]
@@ -4437,7 +4438,7 @@ def page_scroll(request,group_id,page):
     if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
     for each in (paged_resources.page(int(page))).object_list:
-            print each.name,"\n"
+            # print each.name,"\n"
             if each.created_by == each.modified_by :
                if each.last_update == each.created_at:
                  activity =  'created'
