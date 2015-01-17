@@ -109,9 +109,6 @@
 
   // State-wise District selection ---------------------------------------------------------------------------------
 
-    // Disable District field, later on will be enabled after a state is selected
-    $("select#organization_belongs_to_district").attr('disabled', 'disabled')
-
     $("select#organization_belongs_to_state").change(function() {
       // Get selected State's value (ObjectId) and selected-index
       selected_state_id = $(this).val()
