@@ -1,5 +1,5 @@
 ''' -- imports from python libraries -- '''
-import re, magic
+import re, magic, collections
 from time import time
 
 ''' -- imports from installed packages -- '''
@@ -318,6 +318,15 @@ def get_group_object(group_id = None):
 	except invalid_id:
 		group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return group_object
+
+@register.assignment_tag
+def get_states_object(request):
+   colln=db[Node.collection_name]
+   group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'State Partners'}]})
+   return group_object
+
+
+
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -1903,8 +1912,8 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
 # returns object value of attribute 
 @register.assignment_tag
 def get_object_value(node):
-   at_set = ['house_street','town_city','state','pin_code','contact_point','email_id','telephone','website']
-   att_name_value={}
+   at_set = ['contact_point','house_street','town_city','state','pin_code','email_id','telephone','website']
+   att_name_value= collections.OrderedDict()
            
    for each in at_set:
       attribute_type = collection.Node.one({'_type':"AttributeType" , 'name':each}) 
@@ -1916,39 +1925,88 @@ def get_object_value(node):
    return att_name_value
 
 @register.assignment_tag
+# return json data of object
 def get_json(node):
    node_obj = collection.Node.one({'_id':ObjectId(str(node))})
-   return json.dumps(node_obj, cls=NodeJSONEncoder)  
+   return json.dumps(node_obj, cls=NodeJSONEncoder, sort_keys = True)  
    
+@register.filter("is_in")
+# filter added to test if vaiable is inside of list or dict
+def is_in(var, args):
+    if args is None:
+        return False
+    arg_list = [arg.strip() for arg in args.split(',')]
+    return var in arg_list
+
+@register.filter("del_underscore")
+# filter added to remove underscore from string
+def del_underscore(var):
+   var = var.replace("_"," ")   
+   return var 
+
+
+
 @register.assignment_tag
+# this function used for info-box implementation 
+# which convert str to dict type & returns dict which used for rendering in template 
 def str_to_dict(str1):
-    dict_format = json.loads(str1)
-    keys_to_remove = ('_id', 'tags', 'rating', 'name', 'content_org')
-    keys_by_userid = ('modified_by', 'contributors', 'created_by' )
+    dict_format = json.loads(str1, object_pairs_hook = collections.OrderedDict)
+    keys_to_remove = ('_id','access_policy','rating', 'fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required') # keys needs to hide
+    keys_by_ids = ('member_of', 'group_set', 'collection_set','prior_node') # keys holds list of ids
+    keys_by_userid = ('modified_by', 'contributors', 'created_by', 'author_set') # keys holds dada from User table
+    keys_by_dict = ('attribute_set', 'relation_set')
+    keys_by_filesize = ('file_size')
     for k in keys_to_remove:
       dict_format.pop(k, None)
     for k, v in dict_format.items():
       if type(dict_format[k]) == list :
           if len(dict_format[k]) == 0:
-            dict_format[k] = "None"
-          else:
-            for each in (dict_format[k]):
-              if k in keys_by_userid:
-                user = User.objects.get(id = each)
-                dict_format[k] = user.get_username()
-              # Commented by: Avadoot Nachankar while merging commit #940
-              # The below code was causing problem as it's checking only for int
-              # whereas the code also consists of other data-types as well
-              # else:   
-              #   print "\n each: ", each, "\n"
-              #   if type(each) != int:
-              #     node = collection.Node.one({'_id':ObjectId(each)})
-              #     if node:
-              #       dict_format[k] = node.name
-      else:
-        if type(dict_format[k]) == int :
-          user = User.objects.get(id = dict_format[k])
-          dict_format[k] = user.get_username()
+                  dict_format[k] = "None"
+      if k in keys_by_ids:
+        name_list = []
+        if "None" not in dict_format[k]:
+                for ids in dict_format[k]:
+                        node = collection.Node.one({'_id':ObjectId(ids)})
+                        if node:
+                                name_list.append(str(node.name))
+                                dict_format[k] = name_list
+              
+      if k in keys_by_userid:
+       
+              if type(dict_format[k]) == list :
+                      for userid in dict_format[k]:
+                              user = User.objects.get(id = userid)
+                              if user:
+                                dict_format[k] = user.get_username()
+              else: 
+                      if v != []:
+                              user = User.objects.get(id = v)
+                              if user:
+                                      dict_format[k] = user.get_username()
+
+      if k in keys_by_dict:
+              att_dic = {}
+              if "None" not in dict_format[k]:
+
+                      if type(dict_format[k]) != str and k == "attribute_set":
+                      
+                              for att in dict_format[k]:
+                                      for k1, v1 in att.items():
+                                              att_dic[k1] = v1
+                                              dict_format[k] = att_dic    
+                      if k == "relation_set":
+                              for each in dict_format[k]:
+                                      for k1, v1 in each.items():
+                                              for rel in v1:
+                                                      rel =collection.Node.one({'_id':ObjectId(rel)})
+                                                      att_dic[k1] = rel.name
+                                      dict_format[k] = att_dic                          
+                                
+      if k in keys_by_filesize:
+              filesize_dic = {}
+              for k1, v1 in dict_format[k].items():
+                      filesize_dic[k1] = v1
+              dict_format[k] = filesize_dic               
     return dict_format
     
 @register.assignment_tag
@@ -1957,16 +2015,6 @@ def get_possible_translations(obj_id):
 	r_list1 = []
         return get_translation_relation(obj_id._id,r_list1,translation_list)
 
-
-
-	#code commented in case required for groups not assigned edit_policy        
-	#elif group_type is  None:
-	#  group=user_access_policy(groupid,request.user)
-	#  if group == "allow":
-	#   if resnode.status == "DRAFT":
-	#      return "allow"
-			
-	
 
 #textb
 @register.filter("mongo_id")
