@@ -440,7 +440,14 @@
           }
         }
         else{
-          alert("Please select students");
+          if(left_drawer_count < 26){
+            alertlabel = "Please add Remaining students to the batch. As " + (left_drawer_count-1) + " cannot form a new batch.";
+          }
+          else{
+            alertlabel = "Please select atleast 30 students";
+          }
+          $("#alertModalLabel").text(alertlabel);
+          $("#alertModal").foundation('reveal', 'open');
           return false;
         }
     };
