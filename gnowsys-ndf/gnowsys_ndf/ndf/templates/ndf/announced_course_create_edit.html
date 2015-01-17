@@ -102,7 +102,7 @@
           {% else %}
             <fieldset id="unset-ac" class="hide">
               <legend>
-                <label><h5>Select Course : <input type="checkbox" id="selectAllOptions" checked="" /> Select/Deselect All</h5></label>
+                <label><h5>Select Course : </h5></label>
               </legend>
               
               <div class="row" id="unset-ac-options-div" style="padding-bottom: 1rem;">
@@ -440,6 +440,7 @@
 
       success: function(data){
         success_state = data["success"];
+
         if (data["success"]) {
           if ($("#unset-ac-options-div").children.length > 0) {
             $("#unset-ac-options-div").empty();
@@ -456,8 +457,15 @@
             }
             
             v = k + ">>" + val;
+  
+            input_type = "checkbox";
+            if (nussd_course_type != "Foundation Course") {
+              input_type = "radio";
+            }
+            
+            v = k + ">>" + val;
 
-            input_chk += "<input type='checkbox' name='unset-ac-options' class='unsetOption' checked='' value='"+v+"'/>" + 
+            input_chk += "<input type='"+input_type+"' name='unset-ac-options' class='unsetOption' checked='' value='"+v+"'/>" + 
                           "<label>"+val+"</label>" +
                           "</div>";
             $("#unset-ac-options-div").append(input_chk);
@@ -467,13 +475,12 @@
 
           // If nussd_course_type is Foundation Course disable all checkboxes
           if (nussd_course_type == "Foundation Course") {
-            $("#selectAllOptions").attr("disabled", "disabled");
             $(".unsetOption").attr("disabled", "disabled");
           }
 
           else {
-            $("#selectAllOptions").removeAttr("disabled", "disabled");
             $(".unsetOption").removeAttr("disabled", "disabled");
+            $(".unsetOption:first").prop("checked", true);
           }
 
           // Fill divSt
@@ -497,7 +504,6 @@
         if (success_state) {
           // Also toggle unset-ac fieldset
           if ($("#unset-ac").hasClass("hide")) {
-            $("#selectAllOptions").prop("checked", true);
             $("#unset-ac").removeClass("hide")
           }
 
@@ -554,27 +560,7 @@
     $(".ui-datepicker-calendar").hide();
   });
 
-  // Select/Deselect all checbox(es) ['unset-ac-options'] based on state of checkbox ['selectAllOptions'] ----------
-  $("#selectAllOptions").bind("change", function(){
-    selectAllState = this.checked;
-
-    /* Reset University's drop down
-       In order to check whether updated list of domain course(s) announced in given University
-      */
-    reset_college_fs();
-    $("#fsCollege").removeClass("hide");
-
-    $("input[name='unset-ac-options']").each(function() {
-      $(this).prop("checked", selectAllState);
-    });
-
-    // Enable/Disable Announce (submit) button, if none of the checkbox is selected
-    if ($("input[name='unset-ac-options']:checked").size() == 0) {
-      $("#announce-course").attr("disabled", "disabled");
-    }
-  });
-
-  // Select/Deselect selectAllOptions checkbox & Enable/Disable Announce (submit) button ---------------------------
+  // Enable/Disable Announce (submit) button ---------------------------
   $(document).on("change click", ".unsetOption", function(){
     optionState = $(this).prop("checked");
 
@@ -583,19 +569,6 @@
       */
     reset_college_fs();
     $("#fsCollege").removeClass("hide");
-    
-    // Select/Deselect selectAllOptions checkbox
-    if (!optionState) {
-      // If any of the checkbox unchecked, uncheck selectAllOptions checkbox
-      $("#selectAllOptions").prop("checked", optionState);
-    }
-
-    else {
-      // If any of the checkbox checked, check selectAllOptions checkbox only when all of them are checked
-      if ($("input[name='unset-ac-options']:checked").size() == $("input[name='unset-ac-options']").size()) {
-        $("#selectAllOptions").prop("checked", optionState);
-      }
-    }
 
     // Enable/Disable Announce (submit) button, if none of the checkbox is selected
     if ($("input[name='unset-ac-options']:checked").size() == 0) {
@@ -636,7 +609,6 @@
           $("#announce_to_colg_list").val(announce_to_colg_list);
   
           if (announce_course_in_college) {
-            $("#selectAllOptions").removeAttr("disabled", "disabled");
             $(".unsetOption").removeAttr("disabled", "disabled");
           }        
 
@@ -661,7 +633,6 @@
           
           // Disable only when "Foundation Course" selected as Course Type
           if ($("#nussd_course_type :selected").index() == 0) {
-            $("#selectAllOptions").attr("disabled", "disabled");
             $(".unsetOption").attr("disabled", "disabled");
           }
 
