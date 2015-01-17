@@ -3158,135 +3158,177 @@ def get_announced_courses_with_ctype(request, group_id):
     error_message = "\n AnnouncedCourseFetchError: Either you are in user group or something went wrong!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
-def get_colleges(request,group_id):
-  """
-  This view returns list of college(s) that are affiliated to 
-  the selected University
 
-  Arguments:
-  group_id - ObjectId of the currently selected group
-  univ_id - ObjectId of currently selected University
-  nussd_course_type - Type of NUSSD course
+def get_colleges(request, group_id):
+    """This view returns HttpResponse with following data:
+      - List of college(s) affiliated to given university where
+        Program Officer is not subscribed
+      - List of college(s) affiliated to given university where
+        Course(s) is/are already announced for given duration
+      - List of college(s) affiliated to given university where
+        Course(s) is/are not announced for given duration
 
-  Returns:
-  A dictionary consisting of following key-value pairs:-
-  success - Boolean giving the state of ajax call
-  message - Basestring giving the error/information message
-  unset_nc - dictionary consisting of announced-course(s) [if match found] and/or 
-             NUSSD-Courses [if match not found]
-  """
-  response_dict = {'success': False, 'message': ""}
-  try:
-    if request.is_ajax() and request.method == "GET":
-      # Fetch field(s) from GET object
-      univ_id = request.GET.get("univ_id", "")
-      start_time = request.GET.get("start_time", "")
-      end_time = request.GET.get("end_time", "")
-      # all_univs = request.GET.get("all_univs", "")
-      
-      # Check whether any field has missing value or not
-      if univ_id == "":
-        error_message = "Invalid data: No data found in any of the field(s)!!!"
-        raise Exception(error_message)
+    Arguments:
+    group_id - ObjectId of the currently selected group
+    univ_id - ObjectId of currently selected University
+    start_time - Start time of announcement (MM/YYYY)
+    end_time - End time of announcement (MM/YYYY)
+    dc_courses_id_list - List of ObjectId(s) of Course(s)
 
-      # Fetch "Announced Course" GSystemType
-      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
-      if not mis_admin:
-        # If not found, throw exception
-        error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
-        raise Exception(error_message)
+    Returns:
+    A dictionary consisting of following key-value pairs:-
+    success - Boolean giving the state of ajax call
+    message - Basestring giving the error/information message
+    unassigned_PO_colg_list - List of college(s) affiliated to given university
+      where Program Officer is not subscribed
+    already_announced_in_colg_list - List of college(s) affiliated to given
+      university where Course(s) is/are already announced for given duration
+    drawer_widget - Drawer containing list of college(s) affiliated to given
+      university where Course(s) is/are not announced for given duration
+    """
 
-      # Fetch all college groups
-      college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'name': 1})
-      if not college:
-        # If not found, throw exception
-        error_message = "'College' (GSystemType) doesn't exists... Please create it first"
-        raise Exception(error_message)
-      
-      # Type-cast fetched field(s) into their appropriate type
-      univ_id = ObjectId(univ_id)
-      start_time = datetime.datetime.strptime(start_time, "%m/%Y")
-      end_time = datetime.datetime.strptime(end_time, "%m/%Y")
+    response_dict = {'success': False, 'message': ""}
+    try:
+        if request.is_ajax() and request.method == "GET":
+            # Fetch field(s) from GET object
+            univ_id = request.GET.get("univ_id", "")
+            start_time = request.GET.get("start_time", "")
+            end_time = request.GET.get("end_time", "")
+            dc_courses_id_list = request.GET.getlist("dc_courses_id_list[]")
+            # all_univs = request.GET.get("all_univs", "")
 
-      # Fetch the node of selected university
-      university_node = collection.Node.one(
-        {'_id': univ_id}, 
-        {'relation_set': 1,'name':1}
-      )
+            # Check whether any field has missing value or not
+            if univ_id == "" or start_time == "" or end_time == "":
+                error_message = "Invalid data: " \
+                    "No data found in any of the field(s)!!!"
+                raise Exception(error_message)
 
-      # Fetch the list of colleges that are affiliated to the selected university (univ_id)
-      colg_under_univ_id = collection.Node.find(
-        {'member_of': college._id, 'relation_set.college_affiliated_to': univ_id}, 
-        {'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1, 'relation_set.has_officer_incharge': 1, 'relation_set.college_has_acourse': 1}
-      ).sort('name',1)
-      
-      list_colg=[]
-      unassigned_PO_colg_list = []
-      already_announced_in_colg_list = []
-      for each in colg_under_univ_id:
-        is_PO_exists = False
-        if each.relation_set:
-          for rel in each.relation_set:
-            if rel and rel.has_key("has_officer_incharge"):
-              if rel["has_officer_incharge"]:
-                is_PO_exists = True
+            # Fetch "Announced Course" GSystemType
+            mis_admin = collection.Node.one(
+                {'_type': "Group", 'name': "MIS_admin"}, {'name': 1}
+            )
+            if not mis_admin:
+                # If not found, throw exception
+                error_message = "'MIS_admin' (Group) doesn't exists... " \
+                    "Please create it first"
+                raise Exception(error_message)
 
-            if rel and rel.has_key("college_has_acourse"):
-              if rel["college_has_acourse"]:
-                acourse_exists = collection.Node.find_one(
-                  {'_id': {'$in': rel["college_has_acourse"]}, 'attribute_set.start_time': start_time, 'attribute_set.end_time': end_time}
+            # Fetch all college groups
+            college = collection.Node.one(
+                {'_type': "GSystemType", 'name': "College"}, {'name': 1}
+            )
+            if not college:
+                # If not found, throw exception
+                error_message = "'College' (GSystemType) doesn't exists... "\
+                    "Please create it first"
+                raise Exception(error_message)
+
+            # Type-cast fetched field(s) into their appropriate type
+            univ_id = ObjectId(univ_id)
+            start_time = datetime.datetime.strptime(start_time, "%m/%Y")
+            end_time = datetime.datetime.strptime(end_time, "%m/%Y")
+            dc_courses_id_list = [ObjectId(dc) for dc in dc_courses_id_list]
+
+            # Fetch the node of selected university
+            # university_node = collection.Node.one(
+            #     {'_id': univ_id},
+            #     {'relation_set': 1, 'name': 1}
+            # )
+
+            # Fetch the list of colleges that are affiliated to
+            # the selected university (univ_id)
+            colg_under_univ_id = collection.Node.find(
+                {
+                    'member_of': college._id,
+                    'relation_set.college_affiliated_to': univ_id
+                },
+                {
+                    'name': 1, 'member_of': 1, 'created_by': 1,
+                    'created_at': 1, 'content': 1,
+                    'relation_set.has_officer_incharge': 1,
+                    'relation_set.college_has_acourse': 1
+                }
+            ).sort('name', 1)
+
+            list_colg = []
+            unassigned_PO_colg_list = []
+            already_announced_in_colg_list = []
+            for each in colg_under_univ_id:
+                is_PO_exists = False
+                if each.relation_set:
+                    for rel in each.relation_set:
+                        if rel and "has_officer_incharge" in rel:
+                            if rel["has_officer_incharge"]:
+                                is_PO_exists = True
+
+                        if rel and "college_has_acourse" in rel:
+                            if rel["college_has_acourse"]:
+                                if dc_courses_id_list:
+                                    acourse_exists = collection.Node.find_one(
+                                        {'_id': {'$in': rel["college_has_acourse"]}, 'relation_set.announced_for': {'$in': dc_courses_id_list}, 'attribute_set.start_time': start_time, 'attribute_set.end_time': end_time}
+                                    )
+                                else:
+                                    acourse_exists = collection.Node.find_one(
+                                        {'_id': {'$in': rel["college_has_acourse"]}, 'attribute_set.start_time': start_time, 'attribute_set.end_time': end_time}
+                                    )
+
+                                if acourse_exists:
+                                    if each._id not in already_announced_in_colg_list:
+                                        already_announced_in_colg_list.append(each.name)
+
+                if each.name in already_announced_in_colg_list:
+                    continue
+
+                elif is_PO_exists:
+                    if each not in list_colg:
+                        list_colg.append(each)
+
+                else:
+                    if each not in unassigned_PO_colg_list:
+                        unassigned_PO_colg_list.append(each.name)
+
+            response_dict["already_announced_in_colg_list"] = \
+                already_announced_in_colg_list
+
+            response_dict["unassigned_PO_colg_list"] = unassigned_PO_colg_list
+
+            if list_colg:
+                drawer_template_context = edit_drawer_widget(
+                    "RelationType", group_id, None, None,
+                    checked="announced_course_create_edit",
+                    left_drawer_content=list_colg
                 )
+                drawer_template_context["widget_for"] = \
+                    "announced_course_create_edit"
+                drawer_widget = render_to_string(
+                    'ndf/drawer_widget.html', drawer_template_context,
+                    context_instance=RequestContext(request)
+                )
+                response_dict["drawer_widget"] = drawer_widget
+                msg_string = "Following are the list of colleges where " + \
+                    "selected Course(s) should be announced:"
 
-                if acourse_exists:
-                  if each._id not in already_announced_in_colg_list:
-                    already_announced_in_colg_list.append(each.name)
+            else:
+                msg_string = "There are no colleges under this university " + \
+                    "where selected Course(s) could be announced!!!"
 
-        if each.name in already_announced_in_colg_list:
-          continue
+            # nc_dict = {}
+            if colg_under_univ_id.count():
+                response_dict["success"] = True
+            else:
+                msg_string = "No college is affiliated to under selected " + \
+                    "University!!!"
+                response_dict["success"] = False
 
-        elif is_PO_exists:
-          if each not in list_colg:
-            list_colg.append(each)
-        
-        else:
-          if each not in unassigned_PO_colg_list:
-            unassigned_PO_colg_list.append(each.name)
+            # response_dict["unset_nc"] = nc_dict
+            response_dict["message"] = msg_string
 
-      response_dict["already_announced_in_colg_list"] = already_announced_in_colg_list
-      response_dict["unassigned_PO_colg_list"] = unassigned_PO_colg_list
+            return HttpResponse(json.dumps(response_dict))
 
-      if list_colg:
-        drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, checked="announced_course_create_edit", left_drawer_content=list_colg)
-        drawer_template_context["widget_for"] = "announced_course_create_edit"
-        drawer_widget = render_to_string('ndf/drawer_widget.html', 
-                                          drawer_template_context,
-                                          context_instance = RequestContext(request)
-                                        )
-        response_dict["drawer_widget"] = drawer_widget
-        msg_string = "Following are the list of colleges where selected Course(s) should be announced:"
-
-      else:
-        msg_string = "There are no colleges under this university where selected Course(s) could be announced!!!"
-
-      # nc_dict = {}
-      if colg_under_univ_id.count():
-        # If found, append them to a dict
-        # for each in colg_under_univ_id:
-        #   nc_dict[str(each._id)] = each.name
-        # msg_string = " List of colleges in " + university_node.name + "."
-        response_dict["success"] = True
-      else:
-        msg_string = "No college is affiliated to under selected University!!!"
-        response_dict["success"] = False
-
-      # response_dict["unset_nc"] = nc_dict
-      response_dict["message"] = msg_string
-      
-      return HttpResponse(json.dumps(response_dict))
-  except Exception as e:
-    error_message = "CollegeFetchingError: " + str(e) + "!!!"
-    response_dict["message"] = error_message
-    return HttpResponse(json.dumps(response_dict))
+    except Exception as e:
+        error_message = "CollegeFetchError: " + str(e) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
 
 def get_anncourses_allstudents(request, group_id):
   """

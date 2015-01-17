@@ -240,7 +240,7 @@
 {% block script %}
   {{block.super}}
 
-  // Reset all inputs
+  // Inputs reset functions
   function reset_fields() {
     $("#nussd_course_type").prop("selectedIndex", 0);
     $("#univ_cur").prop("selectedIndex", 0);
@@ -273,294 +273,343 @@
   var announce_course_in_college = false;
 
   //Selct university------------------------------------------------------------------------------------------------------
-    $("select#univ_cur").change(function() {
-      if ($("#start_time").val() == "" || $("#end_time").val() == "") {
-        $("#univ_cur").prop("selectedIndex", 0);
+  $("select#univ_cur").change(function() {
+    is_all_courses_not_selected = $("input[name='unset-ac-options']:checked").size();
+    if (!(is_all_courses_not_selected) || $("#start_time").val() == "" || $("#end_time").val() == "") {
+      $("#univ_cur").prop("selectedIndex", 0);
 
-        $("#alertModalLabel").text("Course period: Please set proper values for it's duration!!!");
-        $("#alertModal").removeClass("success").removeClass("warning");
-        $("#alertModal").addClass("alert");
-        $("#alertModal").foundation('reveal', 'open');
+      $("#alertModalLabel").text("Either course is not selected or course period duration is not set properly!!!");
+      $("#alertModal").removeClass("success").removeClass("warning");
+      $("#alertModal").addClass("alert");
+      $("#alertModal").foundation('reveal', 'open');
 
-        return;
-      }
+      return;
+    }
 
-      univ_id = $("select#univ_cur").val();
-      start_time = $("#start_time").val();
-      end_time = $("#end_time").val();
-      announce_course_in_college = false;
+    univ_id = $("select#univ_cur").val();
+    start_time = $("#start_time").val();
+    end_time = $("#end_time").val();
+    announce_course_in_college = false;
+    dc_courses_id_list = [];
 
-      $.ajax({
-        url: "{% url 'get_colleges' group_id %}",
+    // Fetch ObjectId of course(s) (in string format) for course type other than "Foundation Course"
+    if ($("#nussd_course_type :selected").index() > 1) {
+      $("input[name='unset-ac-options']:checked").each(function() {
+        dc_course_id =  $(this).val(); 
+        dc_course_id = dc_course_id.substring(0, dc_course_id.indexOf(">")); 
 
-        data: {
-          univ_id: univ_id,
-          start_time: start_time,
-          end_time: end_time
-        },
+        dc_courses_id_list.push(dc_course_id);
+      });
+    }
 
-        type: "GET",
+    $.ajax({
+      url: "{% url 'get_colleges' group_id %}",
 
-        dataType: "json",
+      data: {
+        univ_id: univ_id,
+        dc_courses_id_list: dc_courses_id_list,
+        start_time: start_time,
+        end_time: end_time
+      },
 
-        complete: function(data){
-          if (announce_course_in_college) {
-            if ($("#fsEnrollDuration").hasClass("hide")) {
-              $("#fsEnrollDuration").removeClass("hide");
-            }
+      type: "GET",
 
-            if ($("#announce-course").hasClass("hide")) {
-              $("#announce-course").removeClass("hide");
-            }
+      dataType: "json",
+
+      complete: function(data){
+        if (announce_course_in_college) {
+          if ($("#fsEnrollDuration").hasClass("hide")) {
+            $("#fsEnrollDuration").removeClass("hide");
           }
 
-          else {
-            if (!$("#fsEnrollDuration").hasClass("hide")) {
-              $("#fsEnrollDuration").addClass("hide");
-            }
-
-            if (!$("#announce-course").hasClass("hide")) {
-              $("#announce-course").addClass("hide");
-            }
-
+          if ($("#announce-course").hasClass("hide")) {
+            $("#announce-course").removeClass("hide");
           }
-        },
+        }
 
-        success: function(data){
-          success_state = data["success"];
-          if (data["success"]) {
-            /*              
-            var dict_len = Object.keys(data["unset_nc"]).length;
-            $.each(data["unset_nc"], function(k, val){
-              $("#unset_nc").append(val);
-            });
-            */
+        else {
+          if (!$("#fsEnrollDuration").hasClass("hide")) {
+            $("#fsEnrollDuration").addClass("hide");
+          }
 
-            // Fill already_announced_in_colg_list_div
-            already_announced_in_colg_list = data["already_announced_in_colg_list"]
-            if (already_announced_in_colg_list.length > 0) {
-              $("#already_announced_in_colg_list_div").removeClass("hide");
+          if (!$("#announce-course").hasClass("hide")) {
+            $("#announce-course").addClass("hide");
+          }
 
-              if ($("#already_announced_in_colg_list_ol").children().length > 0) {
-                $("#already_announced_in_colg_list_ol").empty();
-              } 
-              $.each(already_announced_in_colg_list, function(index, val){
-                $("#already_announced_in_colg_list_ol").append("<li>" + val + "</li>");
-              });
-            }
+        }
+      },
 
-            else {
-              if ($("#already_announced_in_colg_list_ol").children().length > 0) {
-                $("#already_announced_in_colg_list_ol").empty();
-              }
+      success: function(data){
+        success_state = data["success"];
+        if (data["success"]) {
+          /*
+          var dict_len = Object.keys(data["unset_nc"]).length;
+          $.each(data["unset_nc"], function(k, val){
+            $("#unset_nc").append(val);
+          });
+          */
 
-              $("#already_announced_in_colg_list_div").addClass("hide");
-            }
+          // Fill already_announced_in_colg_list_div
+          already_announced_in_colg_list = data["already_announced_in_colg_list"]
+          if (already_announced_in_colg_list.length > 0) {
+            $("#already_announced_in_colg_list_div").removeClass("hide");
 
-            // Fill unassigned_PO_college_div
-            unassigned_PO_colg_list = data["unassigned_PO_colg_list"]
-            if (unassigned_PO_colg_list.length > 0) {
-              $("#unassigned_PO_college_div").removeClass("hide");
-
-              if ($("#unassigned_PO_college_ol").children().length > 0) {
-                $("#unassigned_PO_college_ol").empty();
-              } 
-              $.each(unassigned_PO_colg_list, function(index, val){
-                $("#unassigned_PO_college_ol").append("<li>" + val + "</li>");
-              });
-            }
-
-            else {
-              if ($("#unassigned_PO_college_ol").children().length > 0) {
-                $("#unassigned_PO_college_ol").empty();
-              }
-
-              $("#unassigned_PO_college_div").addClass("hide");
-            }
-
-            // Fill divcolg
-            if ($("#divcolg").children().length > 0) {
-              $("#divcolg").empty();
+            if ($("#already_announced_in_colg_list_ol").children().length > 0) {
+              $("#already_announced_in_colg_list_ol").empty();
             } 
-
-            var text_head = "<div class='small-12 columns'> " +
-              "<label><h6><b>" + data["message"] + "</b></h6></label>" +
-              "</div>";
-            if (data.hasOwnProperty("drawer_widget")) {
-              drawer_widget = data["drawer_widget"];
-              $("#divcolg").html(text_head + drawer_widget);
-              announce_course_in_college = true;
-            }
-
-            else {
-              $("#divcolg").html(text_head); 
-            }
+            $.each(already_announced_in_colg_list, function(index, val){
+              $("#already_announced_in_colg_list_ol").append("<li>" + val + "</li>");
+            });
           }
 
           else {
-            $("#alertModalLabel").text(data["message"]);
-            $("#alertModal").removeClass("success");
-            $("#alertModal").addClass("alert");
-            $("#alertModal").foundation('reveal', 'open');
+            if ($("#already_announced_in_colg_list_ol").children().length > 0) {
+              $("#already_announced_in_colg_list_ol").empty();
+            }
+
+            $("#already_announced_in_colg_list_div").addClass("hide");
           }
-        }//end of success block
-      });//end of ajax call
-    });
+
+          // Fill unassigned_PO_college_div
+          unassigned_PO_colg_list = data["unassigned_PO_colg_list"]
+          if (unassigned_PO_colg_list.length > 0) {
+            $("#unassigned_PO_college_div").removeClass("hide");
+
+            if ($("#unassigned_PO_college_ol").children().length > 0) {
+              $("#unassigned_PO_college_ol").empty();
+            } 
+            $.each(unassigned_PO_colg_list, function(index, val){
+              $("#unassigned_PO_college_ol").append("<li>" + val + "</li>");
+            });
+          }
+
+          else {
+            if ($("#unassigned_PO_college_ol").children().length > 0) {
+              $("#unassigned_PO_college_ol").empty();
+            }
+
+            $("#unassigned_PO_college_div").addClass("hide");
+          }
+
+          // Fill divcolg
+          if ($("#divcolg").children().length > 0) {
+            $("#divcolg").empty();
+          } 
+
+          var text_head = "<div class='small-12 columns'> " +
+            "<label><h6><b>" + data["message"] + "</b></h6></label>" +
+            "</div>";
+          if (data.hasOwnProperty("drawer_widget")) {
+            drawer_widget = data["drawer_widget"];
+            $("#divcolg").html(text_head + drawer_widget);
+            announce_course_in_college = true;
+          }
+
+          else {
+            $("#divcolg").html(text_head); 
+          }
+        }
+
+        else {
+          $("#alertModalLabel").text(data["message"]);
+          $("#alertModal").removeClass("success");
+          $("#alertModal").addClass("alert");
+          $("#alertModal").foundation('reveal', 'open');
+        }
+      }//end of success block
+    });//end of ajax call
+  });
 
   //For selecting Course type---------------------------------------------------------------------------------------
-    $("select#nussd_course_type").change(function() {
-      success_state = false;
-      var nussd_course_type = $("#nussd_course_type").val();
+  $("select#nussd_course_type").change(function() {
+    success_state = false;
+    var nussd_course_type = $("#nussd_course_type").val();
 
-      reset_college_fs();
+    reset_college_fs();
 
-      $.ajax({
-        url: "{% url 'get_courses' group_id %}",
+    $.ajax({
+      url: "{% url 'get_courses' group_id %}",
 
-        data: {
-          nussd_course_type: nussd_course_type
-        },
+      data: {
+        nussd_course_type: nussd_course_type
+      },
 
-        type: "GET",
+      type: "GET",
 
-        dataType: "json",
+      dataType: "json",
 
-        success: function(data){
-          success_state = data["success"];
-          if (data["success"]) {
+      success: function(data){
+        success_state = data["success"];
+        if (data["success"]) {
+          if ($("#unset-ac-options-div").children.length > 0) {
             $("#unset-ac-options-div").empty();
-            var dict_len = Object.keys(data["unset_nc"]).length;
-            $.each(data["unset_nc"], function(k, val){
-              input_chk = ""
-              if (dict_len != 1) {
-                input_chk += "<div class='small-12 columns'>" 
-              }
-
-              else {
-                input_chk += "<div class='small-12 columns end'>" 
-              }
-              
-              v = k + ">>" + val;
-
-              input_chk += "<input type='checkbox' name='unset-ac-options' class='unsetOption' checked='' value='"+v+"'/>" + 
-                            "<label>"+val+"</label>" +
-                            "</div>";
-              $("#unset-ac-options-div").append(input_chk);
-
-              dict_len = dict_len - 1;
-            });
-
-            // If nussd_course_type is Foundation Course disable all checkboxes
-            if (nussd_course_type == "Foundation Course") {
-              $("#selectAllOptions").attr("disabled", "disabled");
-              $(".unsetOption").attr("disabled", "disabled");
+          }
+          var dict_len = Object.keys(data["unset_nc"]).length;
+          $.each(data["unset_nc"], function(k, val){
+            input_chk = ""
+            if (dict_len != 1) {
+              input_chk += "<div class='small-12 columns'>" 
             }
 
             else {
-              $("#selectAllOptions").removeAttr("disabled", "disabled");
-              $(".unsetOption").removeAttr("disabled", "disabled");
+              input_chk += "<div class='small-12 columns end'>" 
             }
+            
+            v = k + ">>" + val;
 
-            // Fill divSt
+            input_chk += "<input type='checkbox' name='unset-ac-options' class='unsetOption' checked='' value='"+v+"'/>" + 
+                          "<label>"+val+"</label>" +
+                          "</div>";
+            $("#unset-ac-options-div").append(input_chk);
+
+            dict_len = dict_len - 1;
+          });
+
+          // If nussd_course_type is Foundation Course disable all checkboxes
+          if (nussd_course_type == "Foundation Course") {
+            $("#selectAllOptions").attr("disabled", "disabled");
+            $(".unsetOption").attr("disabled", "disabled");
+          }
+
+          else {
+            $("#selectAllOptions").removeAttr("disabled", "disabled");
+            $(".unsetOption").removeAttr("disabled", "disabled");
+          }
+
+          // Fill divSt
+          if ($("#divSt").children.length > 0) {
             $("#divSt").empty();
-            drawer_widget = data["drawer_widget"]
-            $("#divSt").html(drawer_widget); 
+          }
+          drawer_widget = data["drawer_widget"]
+          $("#divSt").html(drawer_widget); 
+        }
+
+        else {
+          $("select#nussd_course_type").prop("selectedIndex", 0);
+          $("#alertModalLabel").text(data["message"]);
+          $("#alertModal").removeClass("success");
+          $("#alertModal").addClass("alert");
+          $("#alertModal").foundation('reveal', 'open');
+        }
+      },
+
+      complete: function(){
+        if (success_state) {
+          // Also toggle unset-ac fieldset
+          if ($("#unset-ac").hasClass("hide")) {
+            $("#selectAllOptions").prop("checked", true);
+            $("#unset-ac").removeClass("hide")
           }
 
-          else {
-            $("select#nussd_course_type").prop("selectedIndex", 0);
-            $("#alertModalLabel").text(data["message"]);
-            $("#alertModal").removeClass("success");
-            $("#alertModal").addClass("alert");
-            $("#alertModal").foundation('reveal', 'open');
-          }
-        },
-
-        complete: function(){
-          if (success_state) {
-            // Also toggle unset-ac fieldset
-            if ($("#unset-ac").hasClass("hide")) {
-              $("#selectAllOptions").prop("checked", true);
-              $("#unset-ac").removeClass("hide")
-            }
-
-            if ($("#course_dur").css("display") == "none") {
-              $("#course_dur").toggle()
-            }
-  
-            if ($("#fsCollege").hasClass("hide")) {
-              $("#fsCollege").removeClass("hide")
-            }
+          if ($("#course_dur").css("display") == "none") {
+            $("#course_dur").toggle()
           }
 
-          else {
-            // Otherwise, hide button as well as fieldset
-            if (!$("#announce-course").hasClass("hide")) {
-              $("#announce-course").addClass("hide")
-            }
-
-            // Also toggle unset-ac fieldset
-            if (!$("#unset-ac").hasClass("hide")) {
-              $("#unset-ac-options-div").empty();
-              $("#unset-ac").addClass("hide")
-            }
+          if ($("#fsCollege").hasClass("hide")) {
+            $("#fsCollege").removeClass("hide")
           }
         }
-      });
+
+        else {
+          // Otherwise, hide button as well as fieldset
+          if (!$("#announce-course").hasClass("hide")) {
+            $("#announce-course").addClass("hide")
+          }
+
+          // Also toggle unset-ac fieldset
+          if (!$("#unset-ac").hasClass("hide")) {
+            if ($("#unset-ac-options-div").children.length > 0) {
+              $("#unset-ac-options-div").empty();
+            }
+            $("#unset-ac").addClass("hide")
+          }
+        }
+      }
     });
+  });
 
   // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
-    $(".content").on('click', '.tab_next', function(event){
-      event.preventDefault();
+  $(".content").on('click', '.tab_next', function(event){
+    event.preventDefault();
 
-      // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
-      $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+    $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
 
-      // Then check no. of data-invalid fields
-      // if count == 0, then only proceed to next tab
-      if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
-        // Valid, move to next step
+    // Then check no. of data-invalid fields
+    // if count == 0, then only proceed to next tab
+    if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+      // Valid, move to next step
 
-        $('.active').removeClass('active').next().addClass('active');
-      }
-    });
+      $('.active').removeClass('active').next().addClass('active');
+    }
+  });
 
-    $(".content").on('click', '.tab_prev' ,function(event){
-      event.preventDefault();
-      $('.active').removeClass('active').prev().addClass('active');
-    });
+  $(".content").on('click', '.tab_prev' ,function(event){
+    event.preventDefault();
+    $('.active').removeClass('active').prev().addClass('active');
+  });
 
   // Only keeping month's & year's drop-down and hiding other datepicker's elements --------------------------------
-    $(document).on('focus click', '.date_month_day_year' ,function(){
-      $(".ui-datepicker-calendar").hide();
-    });
+  $(document).on('focus click', '.date_month_day_year' ,function(){
+    $(".ui-datepicker-calendar").hide();
+  });
 
   // Select/Deselect all checbox(es) ['unset-ac-options'] based on state of checkbox ['selectAllOptions'] ----------
-    $("#selectAllOptions").bind("change", function(){
-      selectAllState = this.checked;
-      $("input[name='unset-ac-options']").each(function() {
-        $(this).prop("checked", selectAllState);
+  $("#selectAllOptions").bind("change", function(){
+    selectAllState = this.checked;
 
-      // Enable/Disable Announce (submit) button, if none of the checkbox is selected
-        $("#announce-course").attr("disabled", !selectAllState);
-      });
+    /* Reset University's drop down
+       In order to check whether updated list of domain course(s) announced in given University
+      */
+    reset_college_fs();
+    $("#fsCollege").removeClass("hide");
+
+    $("input[name='unset-ac-options']").each(function() {
+      $(this).prop("checked", selectAllState);
     });
-
-  // Select/Deselect selectAllOptions checkbox & Enable/Disable Announce (submit) button ---------------------------
-    $(document).on("change click", ".unsetOption", function(){
-      optionState = $(this).prop("checked");
-      
-    // Select/Deselect selectAllOptions checkbox, if any of the unset-check-options is unchecked
-      if (!optionState) {
-        selectAll = $("#selectAllOptions");
-        if (selectAll.prop("checked")) {
-          selectAll.prop("checked", optionState);
-        }
-      }
 
     // Enable/Disable Announce (submit) button, if none of the checkbox is selected
-      $("#announce-course").attr("disabled", !optionState);
-    });
+    if ($("input[name='unset-ac-options']:checked").size() == 0) {
+      $("#announce-course").attr("disabled", "disabled");
+    }
+  });
+
+  // Select/Deselect selectAllOptions checkbox & Enable/Disable Announce (submit) button ---------------------------
+  $(document).on("change click", ".unsetOption", function(){
+    optionState = $(this).prop("checked");
+
+    /* Reset University's drop down
+       In order to check whether updated list of domain course(s) announced in given University
+      */
+    reset_college_fs();
+    $("#fsCollege").removeClass("hide");
+    
+    // Select/Deselect selectAllOptions checkbox
+    if (!optionState) {
+      // If any of the checkbox unchecked, uncheck selectAllOptions checkbox
+      $("#selectAllOptions").prop("checked", optionState);
+    }
+
+    else {
+      // If any of the checkbox checked, check selectAllOptions checkbox only when all of them are checked
+      if ($("input[name='unset-ac-options']:checked").size() == $("input[name='unset-ac-options']").size()) {
+        $("#selectAllOptions").prop("checked", optionState);
+      }
+    }
+
+    // Enable/Disable Announce (submit) button, if none of the checkbox is selected
+    if ($("input[name='unset-ac-options']:checked").size() == 0) {
+      $("#announce-course").attr("disabled", "disabled");
+    }
+
+    else {
+      // If any of the course of type "Domain Course" is selected
+      // Then enable Announce (submit) button
+      if (optionState) {
+        $("#announce-course").attr("disabled", !optionState);
+      }
+    }
+  });
 
   // On click of Register/Update -----------------------------------------------------------------------------------
   $(document).on("click", "#announce-course", function(event) {
@@ -576,7 +625,7 @@
         var announce_to_colg_list = [];
         colg_in_rt_drawer = $("#announced_course_create_edit_drawer2 li input")
         $.each(colg_in_rt_drawer,function(i,v){
-          announce_to_colg_list.push(v.getAttribute('name'))
+          announce_to_colg_list.push(v.getAttribute('name'));
         })
 
         if (announce_to_colg_list.length > 0) {
@@ -610,8 +659,11 @@
           $("#alertModal").addClass("alert");
           $("#alertModal").foundation('reveal', 'open');
           
-          $("#selectAllOptions").attr("disabled", "disabled");
-          $(".unsetOption").attr("disabled", "disabled");
+          // Disable only when "Foundation Course" selected as Course Type
+          if ($("#nussd_course_type :selected").index() == 0) {
+            $("#selectAllOptions").attr("disabled", "disabled");
+            $(".unsetOption").attr("disabled", "disabled");
+          }
 
           event.preventDefault();
         }
@@ -625,307 +677,308 @@
 {% endblock %}
 
 {% block document_ready %}
-    {{block.super}}
-    
-    reset_fields();
+  {{block.super}}
+  
+  reset_fields();
 
-    {% if node %}
-      $('#start_enroll').attr("disabled",true);
-      $('#nussd_course_type').attr("disabled", true);
-      $("#start_time").attr("disabled",true);
-      $("#end_time").attr("disabled",true);
+  {% if node %}
+    $('#start_enroll').attr("disabled",true);
+    $('#nussd_course_type').attr("disabled", true);
+    $("#start_time").attr("disabled",true);
+    $("#end_time").attr("disabled",true);
 
-      $('#nussd_course_type').val("{{nussd_course_type}}");
+    $('#nussd_course_type').val("{{nussd_course_type}}");
 
-      if ($("#course_dur").css("display") == "none") {
-        $("#course_dur").toggle()
-      }
+    if ($("#course_dur").css("display") == "none") {
+      $("#course_dur").toggle()
+    }
 
-      if ($("#fsCollege").hasClass("hide")) {
-        $("#fsCollege").removeClass("hide")
-      }
+    if ($("#fsCollege").hasClass("hide")) {
+      $("#fsCollege").removeClass("hide")
+    }
 
-      if ($("#fsEnrollDuration").hasClass("hide")) {
-        $("#fsEnrollDuration").removeClass("hide")
-      }
+    if ($("#fsEnrollDuration").hasClass("hide")) {
+      $("#fsEnrollDuration").removeClass("hide")
+    }
 
-      $(".tab-nav").children(".for-next").append("<input type='submit' id='announce-course' class='small button ' value='Update' style='float:right;'>")
+    $(".tab-nav").children(".for-next").append("<input type='submit' id='announce-course' class='small button ' value='Update' style='float:right;'>")
 
-      if($("#announce-course").hasClass("hide")){
-        $("#announce-course").removeClass("hide")
-      }
+    if($("#announce-course").hasClass("hide")){
+      $("#announce-course").removeClass("hide")
+    }
 
-      if ($("#announce-course").css("display") == "none") {
-        $("#announce-course").toggle()
-      }
-    {% endif %}
+    if ($("#announce-course").css("display") == "none") {
+      $("#announce-course").toggle()
+    }
+  {% endif %}
 
-    $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
-    $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
+  $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
+  $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
 
-  // Change placeholders for date widgets
-    // From DD/MM/YYYY HH:MM to MM/YYYY
-    $(".dmy").each(function(i) {
-      $(this).attr("placeholder", "MM/DD/YYYY");
-      if ($(this).attr("id") == "start_enroll") {
-        var st = "{{node.start_enroll|date:'d/m/Y'}}"
-        $(this).val(st)
-      }
+  /* Change placeholders for date widgets
+     From DD/MM/YYYY HH:MM to MM/YYYY
+    */
+  $(".dmy").each(function(i) {
+    $(this).attr("placeholder", "MM/DD/YYYY");
+    if ($(this).attr("id") == "start_enroll") {
+      var st = "{{node.start_enroll|date:'d/m/Y'}}"
+      $(this).val(st)
+    }
 
-      else if ($(this).attr("id") == "end_enroll") {
-        var et = "{{node.end_enroll|date:'d/m/Y'}}"
-        $(this).val(et)
-      }
-    });
+    else if ($(this).attr("id") == "end_enroll") {
+      var et = "{{node.end_enroll|date:'d/m/Y'}}"
+      $(this).val(et)
+    }
+  });
 
-    // From DD/MM/YYYY HH:MM to DD/MM/YYYY
-    $(".date_month_day_year").each(function(i) {
-      // Below code is required because in validators "d/m/Y H:i" is set
-      // In order to override that, below code is overwritten
-      if ($(this).attr("id") == "start_time") {
-        $(this).attr("placeholder", "MM/YYYY");
-        var st = "{{node.start_time|date:'m/Y'}}"
-        $(this).val(st)
-      }
+  // From DD/MM/YYYY HH:MM to DD/MM/YYYY
+  $(".date_month_day_year").each(function(i) {
+    // Below code is required because in validators "d/m/Y H:i" is set
+    // In order to override that, below code is overwritten
+    if ($(this).attr("id") == "start_time") {
+      $(this).attr("placeholder", "MM/YYYY");
+      var st = "{{node.start_time|date:'m/Y'}}"
+      $(this).val(st)
+    }
 
-      else if ($(this).attr("id") == "end_time") {
-        $(this).attr("placeholder", "MM/YYYY");
-        var et = "{{node.end_time|date:'m/Y'}}"
-        $(this).val(et)
-      }
-    });
+    else if ($(this).attr("id") == "end_time") {
+      $(this).attr("placeholder", "MM/YYYY");
+      var et = "{{node.end_time|date:'m/Y'}}"
+      $(this).val(et)
+    }
+  });
 
   // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
-    $(".content").each(function(i) {
-      totalTabs = $(".content").size() - 1
+  $(".content").each(function(i) {
+    totalTabs = $(".content").size() - 1
 
-      if (i != totalTabs) {
-        // Not in last tab
-        $(this).children(".tab-nav").children(".for-next")
-          .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
-      }
+    if (i != totalTabs) {
+      // Not in last tab
+      $(this).children(".tab-nav").children(".for-next")
+        .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
+    }
 
-      if (i == totalTabs) {
-        // Only in last tab
-        var is_existing_nussd_course = "{{node.pk|default_if_none:''}}";
-        var submit_btn_label = '{% trans "Announce" %}' // By default considering registering a new nussd_course
-        if (is_existing_nussd_course) {
-          // If value (ObjectId) found, it means updating existing nussd_course record
-          submit_btn_label = '{% trans "Update" %}'
-        }
-        $(this).children(".tab-nav").children(".for-next")
-          .append("<input type='submit' id='announce-course' class='small button expand hide' value='"+submit_btn_label+"' style='float:right;' />");
+    if (i == totalTabs) {
+      // Only in last tab
+      var is_existing_nussd_course = "{{node.pk|default_if_none:''}}";
+      var submit_btn_label = '{% trans "Announce" %}' // By default considering registering a new nussd_course
+      if (is_existing_nussd_course) {
+        // If value (ObjectId) found, it means updating existing nussd_course record
+        submit_btn_label = '{% trans "Update" %}'
       }
+      $(this).children(".tab-nav").children(".for-next")
+        .append("<input type='submit' id='announce-course' class='small button expand hide' value='"+submit_btn_label+"' style='float:right;' />");
+    }
 
-      if (i != 0) {
-        // Not in first tab
-        $(this).children(".tab-nav").children(".for-prev")
-          .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
-      }
-    });
+    if (i != 0) {
+      // Not in first tab
+      $(this).children(".tab-nav").children(".for-prev")
+        .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
+    }
+  });
 
   // Course: start & end date-widgets --------------------------------------------------------------------------
-    var currentYear = (new Date()).getFullYear();
-    var currentMonth = (new Date()).getMonth();
-    lowerYearLimit = currentYear - 2;
-    upperYearLimit = currentYear + 5;
-    var startDtInput = $("#sc #start_time");
-    var endDtInput = $("#sc #end_time");
+  var currentYear = (new Date()).getFullYear();
+  var currentMonth = (new Date()).getMonth();
+  lowerYearLimit = currentYear - 2;
+  upperYearLimit = currentYear + 5;
+  var startDtInput = $("#sc #start_time");
+  var endDtInput = $("#sc #end_time");
 
-    $(".date_month_day_year").datepicker({
-      changeMonth: true,
-      changeYear: true,
-      dateFormat: 'mm/yy',
-      yearRange: lowerYearLimit + ":" + upperYearLimit,
-      minDate: new Date(lowerYearLimit, currentMonth, 1),
-      maxDate: new Date(upperYearLimit, currentMonth, 1),
-      defaultDate: new Date(lowerYearLimit, currentMonth, 1),
+  $(".date_month_day_year").datepicker({
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'mm/yy',
+    yearRange: lowerYearLimit + ":" + upperYearLimit,
+    minDate: new Date(lowerYearLimit, currentMonth, 1),
+    maxDate: new Date(upperYearLimit, currentMonth, 1),
+    defaultDate: new Date(lowerYearLimit, currentMonth, 1),
 
-      onClose: function(dateText, inst) {
-        $(this).val(dateText);
-        
-        var month_year = $(this).val();
+    onClose: function(dateText, inst) {
+      $(this).val(dateText);
+      
+      var month_year = $(this).val();
 
-        var month = 1
-        var year = lowerYearLimit
+      var month = 1
+      var year = lowerYearLimit
 
-        if ($(this).attr('id') == "start_time") {
-          if (month_year) {
-            month_year = month_year.split("/")
-            month = parseInt(month_year[0])
-            year = parseInt(month_year[1])
-          }
-
-          if (endDtInput.val() != '') {
-            var testStartDate = startDtInput.datepicker('getDate');
-            var testEndDate = endDtInput.datepicker('getDate');
-
-            if (testStartDate > testEndDate) {
-              endDtInput.datepicker('setDate', testStartDate);
-            }
-
-            else {
-              $(this).val(month+"/"+year);
-              $(this).datepicker('setDate', new Date(year, (month-1), 1));
-            }
-          }
-
-          else {
-            endDtInput.val(month+"/"+year);
-
-            $(this).datepicker('setDate', new Date(year, (month-1), 1));
-          }
-
-          $("#end_time.date_month_day_year").datepicker('option', 'minDate', new Date(year, (month-1), 1));
-        }
-
-        else if ($(this).attr('id') == "end_time") {
-          if (month_year) {
-            month_year = month_year.split("/")
-            month = parseInt(month_year[0]);
-            year = parseInt(month_year[1]);
-          }
-
-          if (startDtInput.val() != '') {
-            var testStartDate = startDtInput.datepicker('getDate');
-            var testEndDate = endDtInput.datepicker('getDate');
-
-            if (testStartDate > testEndDate) {
-              startDtInput.datepicker('setDate', testEndDate);
-            }
-
-            else {
-              $(this).val(month+"/"+year);
-              $(this).datepicker('setDate', new Date(year, (month-1), 1));
-            }
-          }
-
-          else {
-            startDtInput.val(month+"/"+year);
-            $(this).datepicker('setDate', new Date(year, (month-1), 1));
-          }
-        }
-      },
-
-      beforeShow: function() {
-        var month_year = $(this).val();
-        month = currentMonth;
-        year = lowerYearLimit
-
+      if ($(this).attr('id') == "start_time") {
         if (month_year) {
           month_year = month_year.split("/")
           month = parseInt(month_year[0])
           year = parseInt(month_year[1])
         }
 
-        $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
-        $(this).datepicker('setDate', new Date(year, (month-1), 1));
-      },
+        if (endDtInput.val() != '') {
+          var testStartDate = startDtInput.datepicker('getDate');
+          var testEndDate = endDtInput.datepicker('getDate');
 
-      onChangeMonthYear: function(year, month, inst){
-        $(this).val(month+"/"+year);
+          if (testStartDate > testEndDate) {
+            endDtInput.datepicker('setDate', testStartDate);
+          }
 
-        if ($(this).attr("id") == "start_date") {
-          $("#end_date").val(month+"/"+year);
+          else {
+            $(this).val(month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), 1));
+          }
         }
-        
+
+        else {
+          endDtInput.val(month+"/"+year);
+
+          $(this).datepicker('setDate', new Date(year, (month-1), 1));
+        }
+
+        $("#end_time.date_month_day_year").datepicker('option', 'minDate', new Date(year, (month-1), 1));
       }
-    });
+
+      else if ($(this).attr('id') == "end_time") {
+        if (month_year) {
+          month_year = month_year.split("/")
+          month = parseInt(month_year[0]);
+          year = parseInt(month_year[1]);
+        }
+
+        if (startDtInput.val() != '') {
+          var testStartDate = startDtInput.datepicker('getDate');
+          var testEndDate = endDtInput.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            startDtInput.datepicker('setDate', testEndDate);
+          }
+
+          else {
+            $(this).val(month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), 1));
+          }
+        }
+
+        else {
+          startDtInput.val(month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), 1));
+        }
+      }
+    },
+
+    beforeShow: function() {
+      var month_year = $(this).val();
+      month = currentMonth;
+      year = lowerYearLimit
+
+      if (month_year) {
+        month_year = month_year.split("/")
+        month = parseInt(month_year[0])
+        year = parseInt(month_year[1])
+      }
+
+      $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), 1));
+      $(this).datepicker('setDate', new Date(year, (month-1), 1));
+    },
+
+    onChangeMonthYear: function(year, month, inst){
+      $(this).val(month+"/"+year);
+
+      if ($(this).attr("id") == "start_date") {
+        $("#end_date").val(month+"/"+year);
+      }
+      
+    }
+  });
 
   // Enroll: start & end date-widgets --------------------------------------------------------------------------
-    var startEnrollDt = $("#start_enroll");
-    var endEnrollDt = $("#end_enroll");
-    currentDate = new Date();
-    var currentDay = currentDate.getDate();
-    var currentMonth = currentDate.getMonth();
-    var currentYear = currentDate.getFullYear();
+  var startEnrollDt = $("#start_enroll");
+  var endEnrollDt = $("#end_enroll");
+  currentDate = new Date();
+  var currentDay = currentDate.getDate();
+  var currentMonth = currentDate.getMonth();
+  var currentYear = currentDate.getFullYear();
 
-    $(".dmy").datepicker({
-      changeMonth: true,
-      dateFormat: 'dd/mm/yy',
-      minDate: '0',
-      maxDate: '+2m',
-      defaultDate: '0',
+  $(".dmy").datepicker({
+    changeMonth: true,
+    dateFormat: 'dd/mm/yy',
+    minDate: '0',
+    maxDate: '+2m',
+    defaultDate: '0',
 
-      onClose: function(dateText, inst) {
-        $(this).val(dateText);
-        
-        var month_year = $(this).val();
-        day = currentDay;
-        month = currentMonth;
-        year = currentYear;
-        
-        if ($(this).attr('id') == "start_enroll") {
-          if (month_year) {
-            month_year = month_year.split("/");
-            day = parseInt(month_year[0]);
-            month = parseInt(month_year[1]);
-            year = parseInt(month_year[2]);
-          }
-
-          if (endEnrollDt.val() != '') {
-            var testStartDate = startEnrollDt.datepicker('getDate');
-            var testEndDate = endEnrollDt.datepicker('getDate');
-
-            if (testStartDate > testEndDate) {
-              endEnrollDt.datepicker('setDate', testStartDate);
-            }
-
-            else {
-              $(this).val(day+"/"+month+"/"+year);
-              $(this).datepicker('setDate', new Date(year, (month-1), day));
-            }
-          }
-
-          else {
-            endEnrollDt.val(day+"/"+month+"/"+year);
-            $(this).datepicker('setDate', new Date(year, (month-1), day));
-          }
-          $("#end_enroll").datepicker('option', 'minDate', new Date(year, (month-1), day));
-        }
-
-        else if ($(this).attr('id') == "end_enroll") {
-          if (month_year) {
-            month_year = month_year.split("/");
-            day = parseInt(month_year[0]);
-            month = parseInt(month_year[1]);
-            year = parseInt(month_year[2]);
-          }
-
-          if (startEnrollDt.val() != '') {
-            var testStartDate = startEnrollDt.datepicker('getDate');
-            var testEndDate = endEnrollDt.datepicker('getDate');
-
-            if (testStartDate > testEndDate) {
-              startEnrollDt.datepicker('setDate', testEndDate);
-            }
-            else {
-              $(this).val(day+"/"+month+"/"+year);
-              $(this).datepicker('setDate', new Date(year, (month-1), day));
-            }
-          }
-
-          else {
-            startEnrollDt.val(day+"/"+month+"/"+year);
-            $(this).datepicker('setDate', new Date(year, (month-1), day));
-          }
-        }
-      },
-
-      beforeShow: function() {
-        var month_year = $(this).val();
-        day = currentDay;
-        month = currentMonth;
-        year = currentYear;
-
+    onClose: function(dateText, inst) {
+      $(this).val(dateText);
+      
+      var month_year = $(this).val();
+      day = currentDay;
+      month = currentMonth;
+      year = currentYear;
+      
+      if ($(this).attr('id') == "start_enroll") {
         if (month_year) {
           month_year = month_year.split("/");
           day = parseInt(month_year[0]);
           month = parseInt(month_year[1]);
           year = parseInt(month_year[2]);
         }
-        $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
-        $(this).datepicker('setDate', new Date(year, (month-1), day));
-      },
-    });
+
+        if (endEnrollDt.val() != '') {
+          var testStartDate = startEnrollDt.datepicker('getDate');
+          var testEndDate = endEnrollDt.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            endEnrollDt.datepicker('setDate', testStartDate);
+          }
+
+          else {
+            $(this).val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+
+        else {
+          endEnrollDt.val(day+"/"+month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        }
+        $("#end_enroll").datepicker('option', 'minDate', new Date(year, (month-1), day));
+      }
+
+      else if ($(this).attr('id') == "end_enroll") {
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        if (startEnrollDt.val() != '') {
+          var testStartDate = startEnrollDt.datepicker('getDate');
+          var testEndDate = endEnrollDt.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            startEnrollDt.datepicker('setDate', testEndDate);
+          }
+          else {
+            $(this).val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+
+        else {
+          startEnrollDt.val(day+"/"+month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        }
+      }
+    },
+
+    beforeShow: function() {
+      var month_year = $(this).val();
+      day = currentDay;
+      month = currentMonth;
+      year = currentYear;
+
+      if (month_year) {
+        month_year = month_year.split("/");
+        day = parseInt(month_year[0]);
+        month = parseInt(month_year[1]);
+        year = parseInt(month_year[2]);
+      }
+      $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+      $(this).datepicker('setDate', new Date(year, (month-1), day));
+    },
+  });
 {% endblock %}
