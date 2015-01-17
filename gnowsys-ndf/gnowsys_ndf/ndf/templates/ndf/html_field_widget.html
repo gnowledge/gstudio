@@ -83,6 +83,17 @@
         }      
       });
 
+      $(".text_allow_space").keydown(function (e) {
+        if ((e.keyCode > 64 && e.keyCode < 91) || (e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9 || e.keyCode==32){
+          return true;
+        }  
+        else{
+          return false;
+        }      
+      });
+
     </script>
 
     {% if is_required_field or field.validators %}
