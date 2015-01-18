@@ -4012,17 +4012,19 @@ def reschedule_task(request,group_id,node):
     date1=datetime.date.today() + timedelta(2)
     ti=datetime.time(0,0)
     b=datetime.datetime.combine(date1,ti)
+    print "the example of time delta******* :-",b
     if  reschedule_type == 'event_reschedule' :
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True})  
          values.append("Event is Re-scheduled")
          values.append(False)
+         return_message = "Event Dates Re-Schedule Opened" 
 
     else:
          
          create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True})
          create_gattribute(ObjectId(node),marks_entry_completed[0],True)
-    return_message="Event Re-scheduled."
+         return_message="Event Re-scheduled."
  else:
     Mis_admin=collection.Node.find({"name":"MIS_admin"})
     Mis_admin_list=Mis_admin[0].group_admin
@@ -4050,7 +4052,7 @@ def reschedule_task(request,group_id,node):
     task_dict.update({'Assignee':Mis_admin_list})
     create_task(task_dict)
     return_message="Intimation is sent to central office soon you will get update."
- return HttpResponse(json.dumps(values))
+ return HttpResponse(return_message)
  
 
 def event_assginee(request, group_id, app_set_instance_id=None):
@@ -4428,6 +4430,7 @@ def attendees_relations(request,group_id,node):
                      marks_enter=True
  for i in node.attribute_set:
     if unicode("reschedule_attendance") in i.keys():
+      if unicode('reschedule_allow') in i['reschedule_attendance']: 
        reschedule=i['reschedule_attendance']['reschedule_allow'] 
     if unicode("marks_entry_completed") in i.keys():
         marks=i["marks_entry_completed"]

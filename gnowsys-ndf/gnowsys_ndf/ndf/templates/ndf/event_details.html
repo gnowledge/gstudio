@@ -65,7 +65,6 @@ table, th, td {
                             <div class="small-3 columns">
                               <label>Start time:</label> 
                             </div>
-                            {{node.start_time}} 
                             <div class="small-5 end columns">
                               <label>{{node.start_time}}</label> 
                             </div>
@@ -190,7 +189,7 @@ table, th, td {
 
                       {% edit_policy groupid node request.user as status %}
                       {% if user.is_authenticated and status == "allow" and gstaff_access %}
-                        <div id = 'Edit'> 
+                        <div id = 'Edit' hidden> 
                               <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
                                <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
                               </a>
@@ -278,13 +277,14 @@ table, th, td {
       if ( current_datetime < save_date )
       {
         flashText()     
+        $('#Edit').show()
       } 
     
      }
 
     if (current_datetime > save_date  || !(close_time) )
       {
-          alert("execute")
+          
           $('#Edit').hide()
           $('#countdown').hide()
           
@@ -307,6 +307,7 @@ table, th, td {
       var difference = current_datetime.getTime() - save_date.getTime();
       <!-- gets the hours mins second remaing for event to close -->
       var daysDifference = Math.floor(difference/1000/60/60/24);
+      var dayDifference = -daysDifference 
       difference -= daysDifference*1000*60*60*24
       var hoursDifference = Math.floor(difference/1000/60/60);
       difference -= hoursDifference*1000*60*60
@@ -315,14 +316,15 @@ table, th, td {
       var secondsDifference = Math.floor(difference/1000);
 
       $('#date').empty()
-      if ( daysDifference > 0)
+
+      if ( dayDifference > 0)
       {
-        $('#date').append(save_date.toDateString() + "," + " "+ ( 23 - hoursDifference  ) + " : "+ (60 - minutesDifference ) + ":" + (60 - secondsDifference))
+        $('#date').append("<h4>" + save_date.toDateString() + "," + " "+ ( 23 - hoursDifference  ) + " : "+ (59 - minutesDifference ) + ":" + (60 - secondsDifference) + "</h4>")
       }
       
-      if ( daysDifference <= 0)
+      if ( dayDifference <= 0)
       {
-        $('#date').append( ( 23 - hoursDifference  ) + " : "+ (60 - minutesDifference ) + ":" + (60 - secondsDifference))
+        $('#date').append( ( 23 - hoursDifference  ) + " : "+ (59 - minutesDifference ) + ":" + (60 - secondsDifference))
       }
       
   }   
@@ -547,27 +549,24 @@ else
 
 function reschedule_event(type)
 {
-$.ajax({
-   url:"{% url 'reschedule_task' groupid node.pk  %}",
-   type:"POST",
-   data:{
-       path:'{{request.path}}',
-       reschedule_type:type,
-       csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-   success:function(data)
-   {
+    $.ajax({
+             url:"{% url 'reschedule_task' groupid node.pk  %}",
+             type:"POST",
+             data:{
+                 path:'{{request.path}}',
+                 reschedule_type:type,
+                 csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+             success:function(data)
+             {
 
-    if ( type != 'event_reschedule') 
-        {
-         alert("controler is executing ")
-        controler()
-        }
-   }
-   });
+              if ( type != 'event_reschedule') 
+                  {
+                   controler()
+                  }
+             }
+         });
   
-   
-
 }
 
 function enablemarks(value)
