@@ -17,7 +17,6 @@
         {% user_access_policy groupid request.user as user_access %}
         {% if user.is_superuser or node.created_by == user.id %}
         <span><a class="button tiny" href="{% url 'edit' groupid node.pk %}">{% trans "Edit" %}</a>
-        <a class="button alert tiny" href="{% url 'delete_batch' group_name_tag node %}?next={{request.path}}">{% trans "Delete" %} </a>
         </span>
         {% endif %}
         {% endif %}
@@ -27,17 +26,15 @@
       {% with node.last_update|timesince as timesince %}
           {{timesince}} {% trans "ago edited by  " %}<a class="user">{% trans "User" %}</a> <a href="#view-changes"><i class="fi-clock"></i> {% trans "View history " %}</a>
         </small>{% endwith%}
-
-
     </section>
   </header>
   <div class="row">
-  <h3> Members: </h3>
-  {% for each in student_coll %}
-    <div>
-      {{each.name}}<br><br>
-    </div>
-  {% endfor %}
+    <h4> This batch has following {{student_coll|length}} Members: </h4>
+    {% for each in student_coll %}
+      <div>
+        &nbsp;&nbsp;&nbsp;&nbsp; <b>{{ forloop.counter }}. {{each.name}}<b><br>
+      </div>
+    {% endfor %}
   </div>
 {% endblock %}
 
