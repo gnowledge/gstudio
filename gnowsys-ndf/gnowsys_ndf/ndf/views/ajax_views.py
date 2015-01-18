@@ -3980,6 +3980,12 @@ def insert_picture(request, group_id):
 
 
 # =============================================================================
+def close_event(request,group_id,node):
+    reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+    print datetime.date
+    create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":datetime.datetime.today(),"reschedule_allow":False})
+
+    return HttpResponse("event closed") 
 
 def reschedule_task(request,group_id,node):
  task_dict={}
@@ -3996,16 +4002,26 @@ def reschedule_task(request,group_id,node):
  listing=task_groupset.group_admin
  listing.append(1)
  return_message=""
+ values=[]
  if request.user.id in listing:
-    reschedule_attendance=collection.Node.one({"name":"reschedule_attendance"})
+    reschedule_attendance=collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
     marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
+    reschedule_type = request.POST.get('reschedule_type','')
     end_time=collection.Node.one({"name":"end_time"})
-    date1=datetime.date.today()
+    from datetime import date,time,timedelta
+    date1=datetime.date.today() + timedelta(2)
     ti=datetime.time(0,0)
     b=datetime.datetime.combine(date1,ti)
-    create_gattribute(ObjectId(node),end_time,b) 
-    create_gattribute(ObjectId(node),reschedule_attendance,True)
-    create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+    if  reschedule_type == 'event_reschedule' :
+         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+         create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True})  
+         values.append("Event is Re-scheduled")
+         values.append(False)
+
+    else:
+         
+         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True})
+         create_gattribute(ObjectId(node),marks_entry_completed[0],True)
     return_message="Event Re-scheduled."
  else:
     Mis_admin=collection.Node.find({"name":"MIS_admin"})
@@ -4034,7 +4050,7 @@ def reschedule_task(request,group_id,node):
     task_dict.update({'Assignee':Mis_admin_list})
     create_task(task_dict)
     return_message="Intimation is sent to central office soon you will get update."
- return HttpResponse(return_message)
+ return HttpResponse(json.dumps(values))
  
 
 def event_assginee(request, group_id, app_set_instance_id=None):
@@ -4412,7 +4428,7 @@ def attendees_relations(request,group_id,node):
                      marks_enter=True
  for i in node.attribute_set:
     if unicode("reschedule_attendance") in i.keys():
-       reschedule=i['reschedule_attendance'] 
+       reschedule=i['reschedule_attendance']['reschedule_allow'] 
     if unicode("marks_entry_completed") in i.keys():
         marks=i["marks_entry_completed"]
  column_list.append(reschedule)
