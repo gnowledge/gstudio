@@ -135,6 +135,98 @@
     background-color: tomato;    
   }
   
+/*Style for dropdown*/
+
+ul#navigation {
+  position:relative;
+  float:left;
+}
+
+ul#navigation li {
+  display:inline;
+  float:left;
+  position:relative;
+}
+
+ul#navigation li a {
+  padding:7px 7px;
+  text-shadow:1px 1px 0px #fff;
+  display:inline-block;
+}
+
+ul#navigation li a:hover {
+  background:#f8f8f8;
+  color:#282828;
+}
+
+ul#navigation li:hover > a {
+  background:#fff;
+}
+
+/* Drop-Down Navigation */
+ul#navigation li:hover > ul
+{
+  visibility:visible;
+  opacity:1;
+}
+
+ul#navigation ul, ul#navigation ul li ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;    
+  visibility:hidden;
+  position: absolute;
+  z-index: 99999;
+  width:180px;
+  background:#f8f8f8;
+  box-shadow:1px 1px 3px #ccc;
+  opacity:0;
+  -webkit-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  -moz-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  -o-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  transition:opacity 0.2s linear, visibility 0.2s linear;   
+}
+
+ul#navigation ul {
+    top: 43px;
+    left: 1px;
+}
+
+ul#navigation ul li ul {
+    top: 0;
+    left: 181px;
+}
+
+ul#navigation ul li {
+  clear:both;
+  width:100%;
+  border:0 none;
+  border-bottom:1px solid #c9c9c9;
+}
+
+ul#navigation ul li a {
+  background:none;
+  padding:7px 15px;
+  color:#616161;
+  text-shadow:1px 1px 0px #fff;
+  text-decoration:none;
+  display:inline-block;
+  border:0 none;
+  float:left;
+  clear:both;
+  width:100%;
+}
+
+ul#navigation li a.first {
+  border-left: 0 none;
+}
+
+ul#navigation li a.last {
+  border-right: 0 none;
+}
+
+/*end dropdown style*/
+
 
 </style>
 
@@ -186,21 +278,53 @@
 
       {% if topic %}
         <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
-        <dd class="filters-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-filters"><i class=""></i> {% trans "Filter based on" %}</a></dd>
+        <dd class="filters-view">
 
-        <ul id="hover1" class="f-dropdown" data-dropdown-content>
+          <nav id="nav">
+          <ul id="navigation">
+            <li><a href="#" class="view-filters"><i class="fi-list"></i> {% trans "Filter based on" %} </a>
+              <ul>
+                {% get_metadata_values as metadata %}
+                {% for k,v in metadata.items %}
+                  {% if k == "educationallevel" %}            
+                    <li class="view_list" id="{{k}}">
+                      <a> {% trans "Educational Level" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li><a href="#">{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li> 
+                  {% elif k == "educationalsubject" %}
+                    <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li> 
+                  {% endif %}
+
+                {% endfor %}
+              </ul>
+            </li>
+          </ul>
+          </nav>
+        </dd>
+
+
+       <!--  <ul id="hover1" class="f-dropdown" data-dropdown-content>
+
+        
 
         {% get_metadata_values as metadata %}
         {% for k,v in metadata.items %}
 
           {% if k == "educationallevel" %}            
-            <li class="view_list" id="{{k}}"><a> {% trans "Educational Level" %} </a></li> 
+            <li class="view_list" id="{{k}}">
+              <a> {% trans "Educational Level" %} </a>
+            </li> 
           {% elif k == "educationalsubject" %}
             <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li> 
           {% endif %}
           
         {% endfor %}
-
+        </ul>
+        </dd> -->
         <!-- <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
  -->
         <!-- <ul id="hover1" class="f-dropdown" data-dropdown-content>
