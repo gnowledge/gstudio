@@ -48,8 +48,11 @@
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <label id="alertModalLabel"></label>
     <div class="row hide">
-      <div class="small-3 small-centered columns">
-        <input type="button" id="btnConfirm" class="button tiny expand" value="Confirm" />
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
       </div>
     </div>
     <a class="close-reveal-modal">&#215;</a>
@@ -301,7 +304,7 @@
       $("#enrollState").val($(this).val());
 
       if ($("#enrollState").val() == "Complete" && !is_complete_confirm) {
-        $("#alertModalLabel").text("Be careful. This will freeze enrollment procedure. Do you wish to continue?");
+        $("#alertModalLabel").text("This will not allow further enrollments. Do you want to continue?");
         $("#alertModal")
           .removeClass("medium").addClass("small")
           .addClass("alert")
@@ -331,11 +334,17 @@
       $("#nussd_course_type").removeAttr("disabled");
     });
 
-    $(document).on("click", "#btnConfirm", function() {
+    $(document).on("click", "#btnConfirmYes", function() {
       is_complete_confirm = true;
-
+      $("#alertModal").foundation('reveal', 'close');
       $("#sbtnComplete").trigger("click");
     });
+    $(document).on("click", "#btnConfirmNo", function() {
+      is_complete_confirm = false;
+      $("#alertModal").foundation('reveal', 'close');
+    });
+
+
 {% endblock %}
 
 {% block document_ready %}
