@@ -4104,6 +4104,7 @@ def reschedule_task(request,group_id,node):
     task_dict.update({'start_time':Today})
     task_dict.update({'Assignee':Mis_admin_list})
     create_task(task_dict)
+    print "comingher "
     return_message="Intimation is sent to central office soon you will get update."
  return HttpResponse(return_message)
  
