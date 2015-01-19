@@ -20,7 +20,8 @@ from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
 db = get_database()
 collection = db[File.collection_name]
-GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+gapp_mt = collection.Node.one({'_type': "MetaType", 'name': META_TYPE[0]})
+GST_IMAGE = collection.Node.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 
 def imageDashboard(request, group_id, image_id=None):
     '''
