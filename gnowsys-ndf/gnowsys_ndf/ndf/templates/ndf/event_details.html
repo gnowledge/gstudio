@@ -266,7 +266,7 @@ table, th, td {
         close_time = ""
       }
   }
- 
+          
  function enable_disable_edit()
   {
     <!--  this method whould decide wheather check time of disable edit -->
@@ -287,10 +287,12 @@ table, th, td {
           
           $('#Edit').hide()
           $('#countdown').hide()
-          
-    $('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")
+          $('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")
           clearInterval(nIntervId);        
-          closeEvent()
+         if ('{{reschedule}}' == 'True')
+           { 
+              closeEvent()
+           } 
       }  
     
 
@@ -559,7 +561,11 @@ function reschedule_event(type)
                 },
              success:function(data)
              {
-
+              if (data == 'Event Dates Re-Schedule Opened')
+                 {
+                    location.reload()
+                  
+                 }
               if ( type != 'event_reschedule') 
                   {
                    controler()

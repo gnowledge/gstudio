@@ -190,7 +190,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
            if (unicode('reschedule_till') in i['event_edit_reschedule']) == True:
               reschedule_time = i['event_edit_reschedule']['reschedule_till']  
               reschedule = i['event_edit_reschedule']['reschedule_allow']
-              print i['event_edit_reschedule']
           except:
                pass 
     for i in node.relation_set:

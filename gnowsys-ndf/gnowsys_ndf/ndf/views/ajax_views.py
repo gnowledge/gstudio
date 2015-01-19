@@ -4012,17 +4012,28 @@ def reschedule_task(request,group_id,node):
     date1=datetime.date.today() + timedelta(2)
     ti=datetime.time(0,0)
     b=datetime.datetime.combine(date1,ti)
-    print "the example of time delta******* :-",b
+    #fetch event
+    event_node = collection.Node.one({"_id":ObjectId(node)})
+    reschedule_dates = []
+    
     if  reschedule_type == 'event_reschedule' :
+         for i in event_node.attribute_set:
+	       if unicode('event_edit_reschedule') in i.keys():
+	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
+	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
+
+         reschedule_dates.append(b)
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
-         create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True})  
-         values.append("Event is Re-scheduled")
-         values.append(False)
+         create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
          return_message = "Event Dates Re-Schedule Opened" 
 
     else:
-         
-         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True})
+    	 for i in event_node.attribute_set:
+	       if unicode('reschedule_attendance') in i.keys():
+	    	   if unicode ('reschedule_dates') in i['reschedule_attendance']:
+	    	   	  reschedule_dates = i['reschedule_attendance']['reschedule_dates']
+         reschedule_dates.append(b)
+         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
          create_gattribute(ObjectId(node),marks_entry_completed[0],True)
          return_message="Event Re-scheduled."
  else:
