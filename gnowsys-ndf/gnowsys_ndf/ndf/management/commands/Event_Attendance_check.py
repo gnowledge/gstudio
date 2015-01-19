@@ -42,7 +42,7 @@ class Command(BaseCommand):
               Mis_admin_name=user_obj.username
           
           try:
-              print "\nasdf",Today
+              
            
               Attendance_Event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.end_time":{'$gte':day_before_yesterday,'$lt':Today}})
 
