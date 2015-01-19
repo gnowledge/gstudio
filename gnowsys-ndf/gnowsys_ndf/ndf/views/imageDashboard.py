@@ -14,7 +14,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import File
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
+from gnowsys_ndf.settings import META_TYPE, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata

@@ -1,7 +1,8 @@
-{% extends "ndf/mis_base.html" %}
+{% extends "ndf/mis_base_create_edit.html" %}
 {% load ndf_tags %}
 {% load i18n %}
 
+  
 {% block title %}
   {% trans "Students List View" %}
 {% endblock %}
@@ -111,7 +112,7 @@
     <!-- University & College -->
     <div class="row filter">
       <!-- University -->
-      <div class="small-12 large-6 columns">
+      <div class="small-5 large-5 columns">
         <label for="{{lstFilters.1.name}}">
           {{lstFilters.1.altnames}}
         </label>
@@ -119,11 +120,19 @@
       </div>
 
       <!-- College -->
-      <div class="small-12 large-6 columns">
+      <div class="small-5 large-5 columns">
         <label for="{{lstFilters.2.name}}">
           {{lstFilters.2.altnames}}
         </label>
         {% html_widget groupid node.pk lstFilters.2 %}
+      </div>
+
+      <div class="small-2 large-2 columns end">
+        <label> Select Year
+        </label>
+        <input type="text" class="date_year" id="datepicker_year" required readonly="" placeholder="YYYY" style="float:left; width:85%"/>
+        <i style="color:red; display:inline">*</i>
+        <small class="error">{% trans "Please select year" %} </small>
       </div>
     </div>
 
@@ -206,6 +215,21 @@
 {% endblock %}
 
 {% block script %}
+
+
+  // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+    $(document).on('focus click blur', '.date_year' ,function(){
+      $(".ui-datepicker-calendar").hide();
+      $(".ui-datepicker-month").hide();
+      $(".ui-datepicker-prev").hide();
+      $(".ui-datepicker-next").hide();
+      $("#ui-datepicker-div").position({
+        at: "center bottom",
+        my: "center top",
+        of: $(this)
+      }); 
+    });
+
   // On click of "college_wise_data"
     $("#get_college_wise_data").click(function(event) {
       success_state = false;
@@ -455,6 +479,7 @@
         ajax_request_data['groupid'] = "{{groupid}}"
         ajax_request_data['app_id'] = "{{app_id}}"
         ajax_request_data['app_set_id'] = "{{app_set_id}}"
+        ajax_request_data['reg_year'] = $("#datepicker_year").val() 
 
 
         // Iterate rows with class set as 'filter' and class not set as 'hide'
@@ -481,7 +506,7 @@
 
           success: function(data) {
             success_state = data["success"];
-            // $("#alertModalLabel").text(data["message"]);
+            $("#alertModalLabel").text(data["message"]);
 
             if (success_state) {
               // $("#alertModal").removeClass("alert");
@@ -510,7 +535,35 @@
 
 {% block document_ready %}
   {{block.super}}
-  
+    var currentYear = (new Date()).getFullYear()
+    lowerYearLimit = currentYear - 5;
+
+    // Settings for datepicker widget (only for year) --------------------------------------------------------------
+      $(".date_year").datepicker({
+        changeYear: true,
+        dateFormat: 'yy',
+        yearRange: lowerYearLimit + ":" + currentYear,
+        minDate: new Date(lowerYearLimit, 1 - 1, 1),
+        maxDate: '0',
+        defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText)
+        },
+
+        beforeShow: function() {
+          var year = $(this).val();
+          if (year) {
+            $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+            $(this).datepicker('setDate', new Date(year, 1, 1));
+          }
+        },
+
+        onChangeMonthYear: function(year, month, inst){
+          $(this).val(year)
+        }
+      });
+
   // If university selected, then trigger 'change' event for respective university-widget
     university_widget = $("select#student_belongs_to_university");
     is_selected = university_widget.find(":selected").index();

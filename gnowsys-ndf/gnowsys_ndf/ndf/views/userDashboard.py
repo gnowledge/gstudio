@@ -25,7 +25,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import META_TYPE,GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 #######################################################################################################################################
