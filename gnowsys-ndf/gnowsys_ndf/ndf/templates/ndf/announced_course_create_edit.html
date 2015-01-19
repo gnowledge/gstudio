@@ -241,16 +241,6 @@
   {{block.super}}
 
   // Inputs reset functions
-  function reset_fields() {
-    $("#nussd_course_type").prop("selectedIndex", 0);
-    $("#univ_cur").prop("selectedIndex", 0);
-
-    $("#start_time").val("");
-    $("#end_time").val("");
-    $("#start_enroll").val("");
-    $("#end_enroll").val("");
-  }
-
   function reset_college_fs() {
     $("#start_enroll").val("");
     $("#end_enroll").val("");
@@ -264,16 +254,16 @@
     $("#unassigned_PO_college_div").addClass("hide");
 
     $("#univ_cur").prop("selectedIndex", 0);
-    $("#fsCollege").addClass("hide");
-
-    $("#start_time").val("");
-    $("#end_time").val("");
   }
 
   var announce_course_in_college = false;
 
   //Selct university------------------------------------------------------------------------------------------------------
   $("select#univ_cur").change(function() {
+    if ($(this).prop("selectedIndex") == 0) {
+      return;
+    }
+
     is_all_courses_not_selected = $("input[name='unset-ac-options']:checked").size();
     if (!(is_all_courses_not_selected) || $("#start_time").val() == "" || $("#end_time").val() == "") {
       $("#univ_cur").prop("selectedIndex", 0);
@@ -650,7 +640,8 @@
 {% block document_ready %}
   {{block.super}}
   
-  reset_fields();
+  $("#nussd_course_type").prop("selectedIndex", 0);
+  reset_college_fs();
 
   {% if node %}
     $('#start_enroll').attr("disabled",true);
@@ -661,7 +652,7 @@
     $('#nussd_course_type').val("{{nussd_course_type}}");
 
     if ($("#course_dur").css("display") == "none") {
-      $("#course_dur").toggle()
+      $("#course_dur").toggle();
     }
 
     if ($("#fsCollege").hasClass("hide")) {
@@ -674,7 +665,7 @@
 
     $(".tab-nav").children(".for-next").append("<input type='submit' id='announce-course' class='small button ' value='Update' style='float:right;'>")
 
-    if($("#announce-course").hasClass("hide")){
+    if($("#announce-course").hasClass("hide")) {
       $("#announce-course").removeClass("hide")
     }
 
@@ -852,7 +843,8 @@
       if ($(this).attr("id") == "start_date") {
         $("#end_date").val(month+"/"+year);
       }
-      
+
+      reset_college_fs();
     }
   });
 
