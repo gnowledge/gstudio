@@ -4024,7 +4024,6 @@ def insert_picture(request, group_id):
 # =============================================================================
 def close_event(request,group_id,node):
     reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
-    print datetime.date
     create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":datetime.datetime.today(),"reschedule_allow":False})
 
     return HttpResponse("event closed") 
@@ -4104,7 +4103,6 @@ def reschedule_task(request,group_id,node):
     task_dict.update({'start_time':Today})
     task_dict.update({'Assignee':Mis_admin_list})
     create_task(task_dict)
-    print "comingher "
     return_message="Intimation is sent to central office soon you will get update."
  return HttpResponse(return_message)
  

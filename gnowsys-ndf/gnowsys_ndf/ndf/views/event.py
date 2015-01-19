@@ -496,13 +496,16 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
     if session_of:
        event_detail["sessionname"]=str(session_of.name)
        event_detail["sessionid"]=str(session_of._id)
+       for i in session_of.attribute_set:
+         if unicode('course_structure_minutes') in i.keys():
+          event_detail["sessionminutes"] = str(i['course_structure_minutes'])
+       
        events["session"]=event_detail
     event_detail={}
     if module:
        event_detail["Modulename"]=str(module.name)
        event_detail["Moduleid"]=str(module._id)
        events["Module"]=event_detail
-
     context_variables['node'] = event_gs
     context_variables['edit_details']=events
     
