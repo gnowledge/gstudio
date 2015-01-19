@@ -232,12 +232,20 @@
         </div>
           
         <div class="small-2 columns">
-          <label for="{{property_order_list.0.1.2.name}}" class="right inline">
+          <label class="right inline">
             {% trans "Remainig time (in minutes):" %}
           </label>
         </div>
         <div id="available-minutes" class="small-1 columns end">
-          <label for="{{property_order_list.0.1.2.name}}" class="inline">0</label>
+          <label  class="inline">0</label>
+        </div>
+        <div class="small-2 columns">
+          <label class="right inline">
+            {% trans "Alloted time (in minutes):" %}
+          </label>
+        </div>
+        <div id="Alloted-minutes" class="small-1 columns end">
+          <label  class="inline">0</label>
         </div>  
       </div>
    
@@ -364,12 +372,14 @@ function GenerateSplits(splits){
       "</div></div>")
    
     $("#iteration").attr('value','3')
+    
   }
   else
   {
       $("#iteration").attr('value','2')
+      date_validation($('#end_time').attr('name'))
   }
-     datetime()
+     
   
    
 }
@@ -436,7 +446,6 @@ $(document).ready(function(){
           complete:function(){
                 if(courses != ""){
                 $.each(courses, function(key,val) {
-                     alert("coming here")
                      $('#has_attendees').append(
                      $("<option></option>")
                      .attr("id", "coursename_"+key.id)
@@ -740,6 +749,8 @@ $("#session_of").change(function(){
   document.getElementById('event_coordinator').disabled = "";      
   $("#available-minutes").empty()
   $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
+  $("#Alloted-minutes").empty()
+  $("#Alloted-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
 });
 
 function enable_submit()
@@ -850,8 +861,10 @@ $("#nussd_course_type").change(function(){
       );
     }
   });
+  
 function date_validation(name)
 {
+
   var start_time=""
   var end_time=""
   str=name.substring(9)
@@ -861,17 +874,17 @@ function date_validation(name)
 
      if (str)
       {
-      
-         start_time=document.getElementById("start_time_"+ str).value
-         end_time =document.getElementById("end_time_"+ str).value
+         start_time = new Date($('#start_time_'+str).datetimepicker('getDate')) 
+         end_time = new Date($('#end_time_'+str).datetimepicker('getDate'))  
          
+
       }
       
      if(!(str))
       {
-        start_time=document.getElementById("start_time").value
-        end_time=document.getElementById("end_time").value
-      
+        start_time = new Date($('#start_time').datetimepicker('getDate')) 
+        end_time = new Date($('#end_time').datetimepicker('getDate'))  
+        
       }
         reset_session_variable(str)
         deduct_time(start_time,end_time)
@@ -900,19 +913,26 @@ function date_validation(name)
 }  
 
 function deduct_time(start_time,end_time)
-{    var diff= moment.utc(moment(start_time).diff(end_time)).format("HH:mm:ss")
-     //above code give the difference from 24 hrs
-     var d = moment.duration(diff)
-     var hh = Math.floor(d.asHours())  
-     var mm = Math.floor(d.minutes())
-     diffhh = 23 -hh
-     diffmm = 60 -mm
-     diffhhm=Number(diffhh)*60
-     total_min_diff=(diffhhm + diffmm)
+{    var difference = start_time.getTime() - end_time.getTime();
+     var daysDifference = Math.floor(difference/1000/60/60/24);
+     difference -= daysDifference*1000*60*60*24
+     var hoursDifference = Math.floor(difference/1000/60/60);
+     difference -= hoursDifference*1000*60*60
+     var minutesDifference = Math.floor(difference/1000/60);
+     difference -= minutesDifference*1000*60 
+     var secondsDifference = Math.floor(difference/1000);
+     diffhh = 23-hoursDifference
+     diffmm = 60-minutesDifference
+     total_min_diff=((Number(diffhh)*60) + Number(diffmm))
      deducted_minute =  Number(total_session_time) - Number(total_min_diff)
      total_session_time=deducted_minute
      $("#available-minutes").empty()
      $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
+     /* temprory path */
+     if ( total_session_time !=0 )
+     {
+          document.getElementById('submit').disabled = true;      
+     }
 }
 
 function show_hide_date(str)
@@ -940,8 +960,9 @@ function reset_session_variable(str)
 var start_time=""
 var end_time=""
 
-  if (!(str)){
-        total_session_time=$('#session_of option:selected').attr('minutes')
+  if (!(str))
+      {
+       total_session_time=$('#session_of option:selected').attr('minutes')
        if (document.getElementById('start_time_1')){
        document.getElementById('start_time_1').value=""}
        if ( document.getElementById('end_time_1')){
@@ -956,8 +977,8 @@ var end_time=""
   if(str == 1)
   { 
      total_session_time=$('#session_of option:selected').attr('minutes')
-     start_time=document.getElementById('start_time').value
-     end_time=document.getElementById('end_time').value
+     start_time = new Date($('#start_time').datetimepicker('getDate')) 
+     end_time = new Date($('#end_time').datetimepicker('getDate'))  
      if(document.getElementById('start_time_2')){
        document.getElementById('start_time_2').value=""}
        if ( document.getElementById('end_time_2')){
@@ -967,11 +988,11 @@ var end_time=""
   } 
   if (str == 2){
         total_session_time=$('#session_of option:selected').attr('minutes')
-        start_time=document.getElementById('start_time').value
-        end_time=document.getElementById('end_time').value
+        start_time = new Date($('#start_time').datetimepicker('getDate')) 
+        end_time = new Date($('#end_time').datetimepicker('getDate'))  
         deduct_time(start_time,end_time)
-        start_time=document.getElementById('start_time_1').value
-        end_time=document.getElementById('end_time_1').value
+        start_time = new Date($('#start_time_1').datetimepicker('getDate')) 
+        end_time = new Date($('#end_time_1').datetimepicker('getDate'))  
         deduct_time(start_time,end_time)
         
    }
@@ -1005,7 +1026,6 @@ function set_end_date_time(num){
 }    
 
 function datetime(){  
-
 currentDate = new Date();
 var currentDay = currentDate.getDate();
 var currentMonth = currentDate.getMonth();
@@ -1014,6 +1034,7 @@ var currentYear = currentDate.getFullYear();
        
       changeMonth: true,
       dateFormat: 'dd/mm/yy',
+      
       minDate: '0',
       maxDate: '+2m',
       defaultDate: '0',

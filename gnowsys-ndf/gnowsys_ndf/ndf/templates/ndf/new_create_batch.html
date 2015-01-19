@@ -22,15 +22,6 @@
     overflow-y: auto;
   }
 
-  .lbl_count_div {
-    //width: 320px;
-    position: relative;
-    padding: 10px;
-    border-color:#0b8a91 !important;
-    border: 5px solid gray;
-    margin: 0; 
-  }
-
   .resource-drawer li.bullet-item:hover{
     background-color: #ecf0f1; cursor:pointer;
   }
@@ -85,10 +76,20 @@
 {% endblock %}
 
 {% block body_content %}
-  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
-    <label id="alertModalLabel"></label>
+
+  <div id="alertModal" class="reveal-modal small alert alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"> </label>
+    <div class="row hide">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+      </div>
+    </div>
     <a class="close-reveal-modal">&#215;</a>
   </div>
+
 
 <form data-abide id="form-batch" method="POST" action="{% url 'save_batch_stud' groupid %}">{% csrf_token %}
 
@@ -133,15 +134,9 @@
 
     <br>
     
-    <div id="drawer-div"> </div><br>
-    
-    <div id="move_batch_list"  class="text-center">    
-      <input type='button' name='right_move' id='move_right' value='Move ALL to Right' class='button round small'>
-      <input type='button' name='left_move' id='move_left' value='Move ALL to Left' class='button round small'>
-    </div>
+    <div id="drawer-div"> </div><br>    
     <div id="batch-details" style='display: block'> </div>
     
-
     <input type='button' name='add_btn' id='add_btn' value='Add Batch' class='button round small' onclick = 'add_new_batch()' style='display: none'>
   <div>
     <input type="submit" class="button right inline" id="save_batch" name="save_batch" value="Save" disabled="disabled" style='display: none'>&nbsp;&nbsp;
@@ -212,20 +207,25 @@
                   .attr("scount", scount_lbl)
               );
             });
-
             $("select#acourse_list").prop("selectedIndex", 0);
           }
-
           else {
             $("#alertModalLabel").text(data["message"]);
-            $("#alertModal").removeClass("success").removeClass("warning");
-            $("#alertModal").addClass("alert");
             $("#alertModal").foundation('reveal', 'open');
             $("select#nussd_course_type").prop("selectedIndex", 0);
+            $("select#acourse_list").empty();
           }
         },
       });//end of ajax
     });//end of nussd_course_type.change function
+
+  // On close event of reveal-modal (alertModal) -------------------------------------------------------------
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      // Reset reveal-modal content & it's setting
+      $("#alertModalLabel").text("");
+      $("#alertModal").find("div.row").addClass("hide");
+    });
+
   
   //For selecting Announced Course type
     $("select#acourse_list").change(function() {
@@ -289,9 +289,6 @@
             drawer_widget = data["drawer_widget"];
             ac_name_as_prefix = $("#acourse_list option:selected").text()
             $("#drawer-div").html(drawer_widget);
-            $("#drawer-div").before("<div class='row'><label class='small-1 columns  lbl_count_div' id='left_drawer_count_lbl' style='float: left;'></label><label class='small-1 columns lbl_count_div' id ='right_drawer_count_lbl' style='float: right;'></label></div>")
-            update_drawer_count()
-
             scount_lbl = data["student_count"]
             $("#stud_count").css("font-size", "53px");
             $("#stud_count").text(scount_lbl)
@@ -313,8 +310,7 @@
               });
               batch_user_list_dict[batch_node["name"]] = arr_batch_mem_nodes
               batch_user_list_list[batch_node["name"]] = batch_user_list_list_arr
-              batch_det_str="<a href='' class='edit_batch' id='"+batch_node["name"]+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a><br>"
-              <!-- batch_det_str="<a href='' class='edit_batch' id='"+batch_node["name"].replace(/ /g,'_')+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a><br>" -->
+              batch_det_str = "<ul class='button-group'><li><a href='#' class='button edit_batch' id='"+batch_node["name"]+"'>"+batch_node["name"]+"  --  " + arr_batch_mem_nodes.length + " members.</a></li></ul><br>"
               $("#batch-details").append(batch_det_str)
             });
 
@@ -333,15 +329,14 @@
             $("#add_btn").toggle();
           }
           {% if node %}
-            $("#"+"{{node.name}}").trigger('click')
+            $("#{{node.name}}").trigger('click')
           {% endif %}
-
         }
       });
     });//end of nextbtn.click()
 
   // On click of Batch link 
-    $(document).on("click","a.edit_batch", function(event){
+    $(document).on("click",".edit_batch", function(event){
 
       if ($("#new_create_batch_drawer2").children("li").length==0){
         edit_batch_name = $(this).attr('id');
@@ -354,7 +349,6 @@
             $("#new_create_batch_drawer2").append(batch_user_list_dict[edit_batch_name][i])
           }
         }
-        update_drawer_count()
         if ($("#drawer_head").css("display") == "none") {
           $("#drawer_head").toggle()
         }
@@ -375,112 +369,95 @@
         return false;
       }
     });
+  
+  // Confirm create batch reveal modal
+    var create_batch_flag = false;
+    $(document).on("click", "#btnConfirmYes", function() {
+      create_batch_flag = true;
+      $("#alertModal").foundation('reveal', 'close');
+      add_new_batch();
+      });
+
+      $(document).on("click", "#btnConfirmNo", function() {
+        create_batch_flag = false;
+        $("#alertModal").foundation('reveal', 'close');
+      });
 
   //Add new batch
     function add_new_batch(event){
       
-      //Fetch the value of "#drawer_head" which will be key for above dict
-      batch_name= $("#drawer_head").val()
-      batch_user_list_list[batch_name] = []
-      scount_lbl = $("#new_create_batch_drawer1").children("li").length-1
-      $("#stud_count").css("font-size", "53px");
-      $("#stud_count").text(scount_lbl)
+        //Fetch the value of "#drawer_head" which will be key for above dict
+        batch_name= $("#drawer_head").val()
+        batch_user_list_list[batch_name] = []
 
-      arr = [] //Value for above key
-      arr1 = []
-      //Add the right drawer resources to this list.
-      $("#new_create_batch_drawer2").children("li").each(function(c,v){arr.push(v);arr1.push(v.getAttribute("value"))});
+        arr = [] //Value for above key
+        arr1 = []
+        //Add the right drawer resources to this list.
+        $("#new_create_batch_drawer2").children("li").each(function(c,v){arr.push(v);arr1.push(v.getAttribute("value"))});
+        left_drawer_count = $("#new_create_batch_drawer1").children("li").length
+        if ((arr.length >= 30 && left_drawer_count >= 26) || (arr.length >= 25 && left_drawer_count == 1)) {
+          if(!create_batch_flag){
+            $("#alertModal").foundation('reveal', 'open');
+            $("#alertModal").find("div.row").removeClass("hide");
+            lbl = "Batch once created CANNOT be deleted. Confirm to proceed. Do you want to continue?"
+            $("#alertModalLabel").text(lbl);
 
-      if (arr.length>=20 || scount_lbl==0) {
-        $("#save_batch").removeAttr("disabled")
-        if(batch_user_list_dict.hasOwnProperty(batch_name)){
-          batch_user_list_dict[batch_name] = arr
-          $("#"+batch_name).text(batch_name + " -- " + arr.length+" members");
+
+          }
+          if(create_batch_flag){
+            create_batch_flag = false;
+            $("#save_batch").removeAttr("disabled")
+            $("#stud_count").css("font-size", "53px");
+            $("#stud_count").text(left_drawer_count-1)
+
+            if(batch_user_list_dict.hasOwnProperty(batch_name)){
+              batch_user_list_dict[batch_name] = arr
+              $("#"+batch_name).text(batch_name + " -- " + arr.length+" members");
+            }
+            else{
+              batch_user_list_dict[batch_name] = arr
+              //Display the Batch details
+              batch_det_str="<ul class='button-group'><li><a href='#' class='button edit_batch' id='"+batch_name+"'>" + batch_name + "  --  " + arr.length + " members.</a></li></ul><br>"
+              $("#batch-details").append(batch_det_str)
+              batch_name_index += 1;
+            }
+            batch_user_list_list[batch_name] = arr1
+
+            //Remove these resources from right drawer.
+            $("#new_create_batch_drawer2").html("")
+            if($("#new_create_batch_drawer1").children("li").length==1)
+            {
+              $("#drawer_head").css("display","none")
+              $("#add_btn").css("display","none")
+            }
+            else{
+              $("#drawer_head").attr("value",ac_name_as_prefix + "_Batch_"+ batch_name_index);
+            }
+
+            if ($("#batch-details").css("display") == "none") {
+              $("#batch-details").toggle()
+            }
+          }
         }
         else{
-          batch_user_list_dict[batch_name] = arr
-          //Display the Batch details
-          batch_det_str="<a href='' class='edit_batch' id='"+batch_name+"'>" + batch_name + "  --  " + arr.length + " members.</a><br>"
-          $("#batch-details").append(batch_det_str)
-          batch_name_index += 1;
+          if(left_drawer_count < 26){
+            alertlabel = "Please add Remaining students to the batch. As " + (left_drawer_count-1) + " cannot form a new batch.";
+          }
+          else{
+            alertlabel = "Please select atleast 30 students";
+          }
+          $("#alertModalLabel").text(alertlabel);
+          $("#alertModal").foundation('reveal', 'open');
+          return false;
         }
-        batch_user_list_list[batch_name] = arr1
-
-        //Remove these resources from right drawer.
-        $("#new_create_batch_drawer2").html("")
-        if($("#new_create_batch_drawer1").children("li").length==1)
-        {
-          $("#drawer_head").css("display","none")
-          $("#add_btn").css("display","none")
-        }
-        else{
-          $("#drawer_head").attr("value",ac_name_as_prefix + "_Batch_"+ batch_name_index);
-        }
-        update_drawer_count()
-      }
-
-      else{
-        alert("Batch must have more than 20 members");
-        event.preventDefault();
-      }
-
-      if ($("#batch-details").css("display") == "none") {
-        $("#batch-details").toggle()
-      }
     };
-  // Moving elements from left drawer to right drawer
-    $("#move_left").click(function(event) {
-      var all_li_ele = $("#new_create_batch_drawer2 li")
-      if (all_li_ele.length == 0) {
-        alert("Nothing to move.");
-        return;
-      }
-      $("#new_create_batch_drawer2").html("")
-      $("#new_create_batch_drawer1").append(all_li_ele)
-      update_drawer_count()
-    })
-
-  // Moving elements from right drawer to left drawer
-    $("#move_right").click(function(event) {
-      var all_li_ele = $("#new_create_batch_drawer1 li:not(:first-child)")
-      if (all_li_ele.length == 0) {
-        alert("Nothing to move.");
-        return;
-      }
-      searchbar = $("#new_create_batch_drawer1 li:first-child")
-      $("#new_create_batch_drawer1").html("")
-      $("#new_create_batch_drawer1").append(searchbar)
-      $("#new_create_batch_drawer2").append(all_li_ele)
-      update_drawer_count()
-    })
 
 
   //Saving students to batch as batch members
     $("#form-batch").submit(function(event){
-      if ($("#new_create_batch_drawer2").children("li").length>1){
-        alert("Please either add the students to Batch or rollback");
-        event.preventDefault();
-      }
-      else{    
         $("#batch_user_list_dict").val(JSON.stringify(batch_user_list_list))
         $("#ac_id").val(ac_id)
-      }
-      
     }); // end of save_after_create_batch
-
-
-  //Function to display number of elements in both drawers
-
-  function update_drawer_count(){
-    left_drawer_count = $("#new_create_batch_drawer1").children("li").size()-1
-    right_drawer_count = $("#new_create_batch_drawer2").children("li").size()
-    $("#right_drawer_count_lbl").text(right_drawer_count)
-    $("#left_drawer_count_lbl").text(left_drawer_count)
-  }
-
-  $(document).on('click','#new_create_batch_btnRight , #new_create_batch_btnLeft', function(){
-    update_drawer_count()
-  })
 
 {% endblock %}
 

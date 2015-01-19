@@ -184,7 +184,11 @@ def parse_data_create_gtype(json_file_path):
         json_document['name'] = unicode(json_document['name'])
         json_document['altnames'] = unicode(json_document['altnames'])
         json_document['help_text'] = unicode(json_document['help_text'])
-      
+        if (json_document['max_digits']):
+          json_document['max_digits'] = int(json_document['max_digits'])
+        else:
+          json_document['max_digits'] = None
+
         if not json_document['required'].istitle():
           json_document['required'] = ast.literal_eval(json_document['required'].title())
 

@@ -541,6 +541,10 @@ table, th, td {
 
  
 // script for showing map on appearance of overlay.
+
+//reschedule = ""
+//marks_enter = ""
+
 function controler()
 {
           //checks wheather the has_attende relation is createad or not 
@@ -555,6 +559,8 @@ function controler()
                       },
                       complete:function()
                       {
+                      reschedule = attended[2]
+                      marks_enter = attended[3]
                       if (attended[0] == 'True')
                       {
                           EditAttendance(attended)             
@@ -585,9 +591,8 @@ function EditAttendance(columns)
                       },
                       complete:function(){
                       $('#attendance').append("<table id='forattendance'> </table>")
-
                       drawTable(attended,columns)
-                      if('{{reschedule}}' == 'False')
+                      if(reschedule == false)
                       {
                           disableAttendance();
                       }
@@ -709,10 +714,11 @@ if ( pass[0] == 'Edit'){
       if (pass[1] == '2' || pass[1] == '4' || pass[1] == '3')
       {
         $('#attendance').append("<div class='row'>" 
-        
+         + "<div class='small-8 columns'> "
          + " <fieldset>   "
-         + "<input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done"
-         + "</fieldset> </div>")
+         + " <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done"
+         + " <br> <span style='color:red;'> Note:- Edit option will be closed after asessment is done. </span> "
+         + " </fieldset> </div></div>")
       }
         $('#attendance').append("<br>")
         $('#attendance').append("<input class='tiny button' onclick='saveattendees("+pass[1]+")' value='Save' >")
@@ -724,16 +730,16 @@ else
 {     
         
       $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")
-      if('{{reschedule}}' == 'True' || '{{marks_enter}}' == 'True'){
-            
-            if('{{marks_enter}}' != 'False')
+      
+      if(reschedule == true || marks_enter  == true){
+            if(marks_enter != false)
             {
               $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
             }
       }
-      if('{{reschedule}}' == 'False' || '{{marks_enter}}' == 'False')
+      if(reschedule == false || marks_enter == false)
       {
-        $('#attendance').append("<input class='tiny button'  onclick=reschedule() value='Re-Schedule'>" )
+        $('#attendance').append("<input class='tiny button'  onclick=reschedule_event() value='Re-Schedule'>" )
       }
           
       
@@ -742,7 +748,7 @@ else
 
 }
 
-function reschedule()
+function reschedule_event()
 {
 $.ajax({
    url:"{% url 'reschedule_task' groupid node.pk  %}",
@@ -753,7 +759,8 @@ $.ajax({
       },
    success:function(data)
    {
-   //window.reload()
+    alert(data)
+    controler()
    }
    });
    
@@ -877,6 +884,7 @@ var assessmentdone=""
 var attendancedone=""
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
+
     var url="{% url 'event_assginee' groupid  node.pk  %}"
     
     $("#forattendance").find('tr').each(function(){
@@ -897,6 +905,7 @@ if (!(Status_attended))
      var values = '{"Name":"'+ String(Names_attended) +'","Presence":"'+String(Status_attended)+'","Attendance_marks":"'+String(Attendance_marks) + '","Assessment_marks":"' + String(Assessment_marks) +'","save":"'+save_val +'"}'
     Event_attended_by.push(values)
     }); 
+    
     if ($('#assessmentchkbx').is(':checked')) 
     {
     assessmentdone='True'
@@ -915,6 +924,7 @@ if (!(Status_attended))
                       Event:eventid,
                       csrfmiddlewaretoken: '{{ csrf_token }}'},
                       success: function(data){
+                      alert(data)
                       controler()
                       }
                     });

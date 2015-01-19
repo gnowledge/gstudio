@@ -62,16 +62,17 @@ def event(request, group_id):
  #check for exam session to be created only by the Mis_Admin
 
  Add=""
- Mis_admin=collection.Node.find({"name":"MIS_admin"})
- try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+ Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+ if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
- except:
+        Add= "Stop"
+ else:
     Add="Stop"       
+
  if Event_Types:
     for eachset in Event_Types.collection_set:
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
@@ -120,7 +121,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   event_gst = None
   event_gs = None
   reschedule = True
-  marks_enter=""
+  marks=""
   property_order_list = []
 
   #template_prefix = "mis"
@@ -194,38 +195,18 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                             course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
                              
             batch=batch.name
-    for i in node.attribute_set:
-      if unicode("reschedule_attendance") in i.keys():
-         reschedule=i['reschedule_attendance'] 
-      if unicode("marks_entered") in i.keys():
-          marks=i["marks_entered"]
-          if marks != 'False':          
-                for i in node.relation_set:
-                    if unicode("session_of") in i.keys():
-                        session_id = collection.Node.one({"_id":i['session_of'][0]}) 
-                        for j in session_id.attribute_set:
-                            if unicode('course_structure_assignment') in i:   
-                               if i['course_structure_assignment'] == True:
-                                    marks_enter=True
-                            if unicode('course_structure_assessment') in i:    
-                               if i['course_structure_assessment'] == True:
-                                    marks_enter=True
-          if marks == False:
-              marks_enter = False                           
-              
-              
            
-       #   print "\n node.keys(): ", node.keys(), "\n"
+  #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
-  Mis_admin=collection.Node.find({"name":"MIS_admin"})
-  try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+  Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+  if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
-  except:
+        Add= "Stop"
+  else:
     Add="Stop"       
   #fecth the data
         
@@ -237,9 +218,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         'nodes': nodes, 'node': node,
                         'event_gst':event_gst.name,
                         'Add':Add,
-                        'reschedule':reschedule,
-                        'marks_enter':marks_enter
-                        # 'property_order_list': property_order_list
+                         # 'property_order_list': property_order_list
                       }
 
   
@@ -293,7 +272,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   title = ""
   session_of=""
   module=""
-
+  Add=""
+  
   event_gst = None
   event_gs = None
 
@@ -462,16 +442,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 session_of=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})                     
                 module=collection.Node.one({'_type':"GSystem",'_id':{'$in':session_of.prior_node}})
   event_gs.event_coordinator
-  Add=""
-  Mis_admin=collection.Node.find({"name":"MIS_admin"})
-  try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+  Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+  if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
-  except:
+        Add= "Stop"
+  else:
     Add="Stop"       
 
     

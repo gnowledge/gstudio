@@ -1,5 +1,3 @@
-<!ATTLIST acourse_list_name start_enroll_of_ac CDATA #IMPLIED>
-<!ATTLIST acourse_list_name end_enroll_of_ac CDATA #IMPLIED>
 {% extends "ndf/mis_base_create_edit.html" %}
 {% load i18n %}
 {% load ndf_tags %}
@@ -50,8 +48,11 @@
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <label id="alertModalLabel"></label>
     <div class="row hide">
-      <div class="small-3 small-centered columns">
-        <input type="button" id="btnConfirm" class="button tiny expand" value="Confirm" />
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
       </div>
     </div>
     <a class="close-reveal-modal">&#215;</a>
@@ -141,24 +142,29 @@
         <legend>
           <label><h5>Students : </h5></label>
         </legend>
+        
         <div class="row" id="divSt">
         </div>
-      </fieldset>
 
-      <!-- hidden variables -->
-      <input type="hidden" id="announced_courses_list" name="announced_courses_list" value="">
-      <input type="hidden" id="task_id" name="task_id" value="{{task_id}}">
-      <input type="hidden" id="enrollState" name="enrollState" value="">
-      
-      <!-- In Progress/Complete (submit) button -->
-      <div class="row">
-        <div class="medium-2 columns">
-          <input type="submit" id="sbtnInProgress" value="In Progress" class="button small radius expand sbtn" style="display: none">
+        <!-- hidden variables -->
+        <input type="hidden" id="announced_courses_list" name="announced_courses_list" value="">
+        <input type="hidden" id="task_id" name="task_id" value="{{task_id}}">
+        <input type="hidden" id="enrollState" name="enrollState" value="">
+        
+        <!-- In Progress/Complete (submit) button -->
+        <div class="row hide" id="sbtn_div">
+          <div class="medium-4 medium-centered columns">
+            <div class="row">
+              <div class="medium-5 columns">
+                <input type="submit" id="sbtnInProgress" value="In Progress" class="button small radius expand sbtn" >
+              </div>
+              <div class="medium-5 medium-offset-2 columns end">
+                <input type="submit" id="sbtnComplete" value="Complete" class="button small radius expand sbtn">
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="medium-2 columns end">
-          <input type="submit" id="sbtnComplete" value="Complete" class="button small radius expand sbtn" style="display: none">
-        </div>
-      </div>
+      </fieldset>
     </div>
   </form>
 {% endblock %}
@@ -190,7 +196,8 @@
 
   // On click of Find (Setup Ajax call) ----------------------------------------------------------------------
     $("#btnFindES").click(function() {
-      var success_state = false
+      var success_state = false;
+      var non_enrolled_students = 0;
 
       $("#acourse_list li").each(function() {
         acourse_val.push($(this).attr("id"));
@@ -211,14 +218,23 @@
 
         success: function(data){
           success_state = data["success"];
-          $("#alertModalLabel").text(data["message"]);
 
           if (data["success"]) {
             // Fill divSt
+            drawer_widget = ""
+            nesc = ""
+            esc = ""
+            non_enrolled_students = parseInt(data["non_enrolled_stud_count"]);
+
             $("#divSt").empty();
-            drawer_widget = data["drawer_widget"]
-            nesc = "<p class='text-center'>Total No. of students <i>not enrolled</i> in course which are registered in this year: <b>" + data["non_enrolled_stud_count"] + "</b></p>"
-            esc = "<p class='text-center'>Total No. of students <i>enrolled</i> in course which are registered in this year: <b>" + data["enrolled_stud_count"] + "</b></p>"
+            if (non_enrolled_students > 0) {
+              drawer_widget = data["drawer_widget"]
+              nesc = "<p class='text-center'>Total No. of students <i>not enrolled</i> in course which are registered in this year: <b>" + data["non_enrolled_stud_count"] + "</b></p>"
+              esc = "<p class='text-center'>Total No. of students <i>enrolled</i> in course which are registered in this year: <b>" + data["enrolled_stud_count"] + "</b></p>"
+            }
+            else {
+              nesc = "<p class='text-center'><b>No Students registered for this year!!!" + "</b></p>"
+            }
             $("#divSt").html(nesc + esc + drawer_widget); 
           }
 
@@ -234,13 +250,13 @@
             // If Announced Courese & Students found, 
             // display fieldset (fsSt) & submit buttons (sbtnInProgress & sbtnComplete)
             // depending upon their visibility state 
-            if ($(".sbtn").css("display") == "none") {
-              $(".sbtn").toggle();
+            if (non_enrolled_students && $("#sbtn_div").hasClass("hide")) {
+              $("#sbtn_div").removeClass("hide");
             }
 
             // Also toggle fieldset (fsSt)
             if ($("#fsSt").css("display") == "none") {
-              $("#fsSt legend label h5").text("Enroll following listed Students:");
+              $("#fsSt legend label h5").text("Enroll following listed Student(s):");
               $("#fsSt").toggle();
             }
 
@@ -249,13 +265,15 @@
 
           else {
             // Otherwise, hide submit buttons as well as fieldset
-            if ($(".sbtn").css("display") != "none") {
-              $(".sbtn").toggle();
+            if (!$("#sbtn_div").hasClass("hide")) {
+              $("#sbtn_div").addClass("hide");
             }
 
             // Also toggle fieldset (fsSt)
             if ($("#fsSt").css("display") != "none") {
-              $("#divSt").empty();
+              if ($("#divSt").children().length > 0) {
+                $("#divSt").empty();
+              }
               $("#fsSt").toggle();
             }
           }
@@ -286,7 +304,7 @@
       $("#enrollState").val($(this).val());
 
       if ($("#enrollState").val() == "Complete" && !is_complete_confirm) {
-        $("#alertModalLabel").text("ATTENTION!! Be careful. This will freeze enrollment procedure. Do you wish to continue?");
+        $("#alertModalLabel").text("This will not allow further enrollments. Do you want to continue?");
         $("#alertModal")
           .removeClass("medium").addClass("small")
           .addClass("alert")
@@ -296,19 +314,15 @@
       }
 
       // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
-      widget_for = "student_enroll"
-      class_value = ".node_id." + widget_for + "_values"
-      right_drawer_len = $(class_value).size();
-
       var student_enroll_list = [];
+      stud_in_rt_drawer = $("#student_enroll_drawer2 li")
       
-      if (right_drawer_len > 0) {
-        $(class_value).each(function (){
-          // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
-          // resource_name = $(this).attr('name');
-          resource_id = $(this).val();
-          student_enroll_list.push(resource_id);
-        });
+      $.each(stud_in_rt_drawer,function(i,v){
+        student_enroll_list.push(v.getAttribute('value'))
+      })
+
+      if (student_enroll_list.length > 0) {
+        //Enable disable buttons code
       }
 
       // Setting hidden field's value as the list of element(s) from drawer2
@@ -320,11 +334,17 @@
       $("#nussd_course_type").removeAttr("disabled");
     });
 
-    $(document).on("click", "#btnConfirm", function() {
+    $(document).on("click", "#btnConfirmYes", function() {
       is_complete_confirm = true;
-
+      $("#alertModal").foundation('reveal', 'close');
       $("#sbtnComplete").trigger("click");
     });
+    $(document).on("click", "#btnConfirmNo", function() {
+      is_complete_confirm = false;
+      $("#alertModal").foundation('reveal', 'close');
+    });
+
+
 {% endblock %}
 
 {% block document_ready %}
@@ -333,79 +353,68 @@
   var success_state = false;
 
   if (nussd_course_type) {
-    $.ajax({
-      url: "{% url 'get_announced_courses_with_ctype' group_id %}",
+    if (enrollment_open_ann_course_arr.length <= 0) {
+      if ($("#enrollment-content-div").children().length > 0) {
+        $("#enrollment-content-div").empty();
+      } 
+      $("#enrollment-content-div").append("<p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> for {{title}} !!!</p>");
+    }
 
-      data: {
-        nussd_course_type: nussd_course_type
-      },
+    else {
+      $.ajax({
+        url: "{% url 'get_announced_courses_with_ctype' group_id %}",
 
-      type: "GET",
+        data: {
+          nussd_course_type: nussd_course_type
+        },
 
-      dataType: "json",
+        type: "GET",
 
-      success: function(data){
-        success_state = data["success"]
+        dataType: "json",
 
-        if (success_state){
-          ac_data = data["acourse_ctype_list"]
-          ac_data = JSON.parse(ac_data)
+        success: function(data){
+          success_state = data["success"]
 
-          $("#acourse_list_div").empty();
-          $("#acourse_list_div").append("<ul id='acourse_list'></ul>");
-          $.each(ac_data, function(i,v){
-            ac_val = v["_id"];
-            ac_name=v["name"];
-            start_en = v["attribute_set"][3]["start_enroll"];
-            end_en = v["attribute_set"][4]["end_enroll"];
-            start_en = start_en.split(' ');
-            end_en = end_en.split(' ');
+          if (success_state){
+            ac_data = data["acourse_ctype_list"]
+            ac_data = JSON.parse(ac_data);
 
-            $("#acourse_list").append("<li id='" + ac_val + "'>" + ac_name + "</li>");
+            if ($("#acourse_list_div").children().length > 0) {
+              $("#acourse_list_div").empty();
+            }
+            $("#acourse_list_div").append("<ul id='acourse_list'></ul>");
+            $.each(ac_data, function(i,v){
+              ac_val = v["_id"];
 
-            $("#lblenroll_from").text(start_en[0]);
-            $("#lblenroll_to").text(end_en[0]);
+              if (enrollment_open_ann_course_arr.indexOf(ac_val) >= 0) {
+                ac_name = v["name"];
+                start_en = v["attribute_set"][3]["start_enroll"];
+                end_en = v["attribute_set"][4]["end_enroll"];
+                start_en = start_en.split(' ');
+                end_en = end_en.split(' ');
 
-            ann_course_id_list.push(ac_val);
-          });
-        }
+                $("#acourse_list").append("<li id='" + ac_val + "'>" + ac_name + "</li>");
 
-        else {
-          $("#alertModalLabel").text(data["message"]);
-          $("#alertModal").removeClass("success").removeClass("warning");
-          $("#alertModal").addClass("alert");
-          $("#alertModal").foundation('reveal', 'open');
-        }
-      },
+                $("#lblenroll_from").text(start_en[0]);
+                $("#lblenroll_to").text(end_en[0]);
 
-      complete: function () {
-        if (success_state) {
-          if (nussd_course_type == "Foundation Course" && ann_course_id == "") {
-            is_in_open = true;
-            $.each(ann_course_id_list, function(i, v) {
-              if (!(enrollment_open_ann_course_arr.indexOf(v) >= 0)) {
-                is_in_open = false;
-                return false;
+                ann_course_id_list.push(ac_val);
               }
             });
-
-            if (!is_in_open) {
-              $("#enrollment-content-div")
-                .empty()
-                .append("<p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> for Foundation Course !!!</p>")
-            }
           }
 
           else {
-            {% if ann_course_id and ann_course_id not in enrollment_open_ann_course_ids %}
-              $("#enrollment-content-div")
-                .empty()
-                .append("<p class='medium-9 medium-centered columns alert-box alert radius text-center text-size-15'>Student-Course enrollment is <b>CLOSED</b> !!!</p>")
-            {% endif %}
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
           }
-        }
-      },
-    });
+        },
+
+        complete: function () {
+        },
+      });
+    }
   }
 
   // If Find button is disabled, enable it

@@ -1,5 +1,5 @@
 ''' -- imports from python libraries -- '''
-import re, magic
+import re, magic, collections
 from time import time
 
 ''' -- imports from installed packages -- '''
@@ -17,10 +17,14 @@ from mongokit import IS
 from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
+try:
+	from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
+except ImportError:
+	pass
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
-from gnowsys_ndf.ndf.views.methods import get_drawers
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -315,6 +319,15 @@ def get_group_object(group_id = None):
 		group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return group_object
 
+@register.assignment_tag
+def get_states_object(request):
+   colln=db[Node.collection_name]
+   group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'State Partners'}]})
+   return group_object
+
+
+
+
 @register.simple_tag
 def get_all_users_to_invite():
 	try:
@@ -605,6 +618,116 @@ def get_gapps_iconbar(request, group_id):
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		group_id=gpid._id
 		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+
+
+@register.assignment_tag
+def get_nroer_menu(request, group_name):
+
+	url_str = request.META["PATH_INFO"]
+	url_split = url_str.split("/")
+
+	# removing "" in the url_split
+	url_split = filter(lambda x: x != "", url_split)
+	# print "url_split : ", url_split
+
+	# initializing of variables
+	selected_gapp = menu_level_one_selected = selected_gapp_formated = ""
+	menu_level_one_list = selected_gapp_list = []
+	mapping = {"eLibrary": "e-library", "Curated Zone": "topics",
+				"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
+				"Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
+				}
+
+	# the dict that will be returned
+	nroer_menu_dict = {
+						'menu_level_one_list': menu_level_one_list,
+						'menu_level_one_selected': menu_level_one_selected,
+						'selected_gapp': selected_gapp,
+						'selected_gapp_list': selected_gapp_list,
+						'mapping': mapping
+					}
+
+	if (len(url_split) > 1) and (url_split[1] != "dashboard"):
+		selected_gapp = url_split[1]  # expecting e-library etc. type of extract
+
+		# handling conditions of "e-library" = "file" and vice-versa.
+		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+
+		if selected_gapp.lower() in [i.lower() for i in mapping.values()]:
+			for k, v in mapping.iteritems():
+				if selected_gapp.lower() == v.lower():
+					selected_gapp = k.lower()
+
+		selected_gapp_formated = selected_gapp.replace("-", "")
+
+	elif group_name == "home":  # only for "home" group
+		menu_level_one_selected = group_name
+
+	else:  # for group's other than home
+
+		# getting all the values of all keys from GSTUDIO_NROER_MENU
+		# all_sub_menu_values = []
+		# for each_d in GSTUDIO_NROER_MENU:
+		# 	for i in each_d.values():
+		# 		all_sub_menu_values += i
+
+		if group_name.lower() in [i.lower() for i in mapping.keys()]:
+			# if group_name directly appear to be in all the values in GSTUDIO_NROER_MENU
+			# e.g: Teachers, Interest Group's
+			selected_gapp = group_name
+			selected_gapp_formated = group_name.lower()
+		elif group_name.lower() in [i.lower() for i in mapping.values()]:
+			# if group_name appears in mapping's value then get it's key.
+			# e.g: States, Individuals
+			for k, v in mapping.iteritems():
+				if group_name.lower() == v.lower():
+					selected_gapp = k.lower()
+					selected_gapp_formated = k.lower()
+
+	# [i.keys()[0].lower() for i in GSTUDIO_NROER_MENU]
+	# print "selected_gapp : ", selected_gapp
+	# print "selected_gapp_formated : ", selected_gapp_formated
+	# print "menu_level_one_selected : ", menu_level_one_selected
+
+	menu_level_one_list = []
+
+	for menu_level_one in GSTUDIO_NROER_MENU:
+
+		temp_menu_level_one_key = menu_level_one.keys()[0]
+		temp_selected_gapp_list = menu_level_one[temp_menu_level_one_key]
+		# print temp_selected_gapp_list
+		
+		menu_level_one_list.append(temp_menu_level_one_key)
+
+		if menu_level_one_selected and (menu_level_one_selected.lower() == temp_menu_level_one_key.lower()):
+			nroer_menu_dict["selected_gapp_list"] = temp_selected_gapp_list
+			nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
+
+		if selected_gapp_formated:
+			for k, each_menu_dict in menu_level_one.iteritems():
+				if each_menu_dict and (selected_gapp_formated in [i.lower() for i in each_menu_dict]):
+					nroer_menu_dict["selected_gapp"] = selected_gapp_formated
+					nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
+					nroer_menu_dict["selected_gapp_list"] = each_menu_dict
+
+	nroer_menu_dict["menu_level_one_list"] = menu_level_one_list
+
+	# sending details about which are groups and which are gapps
+	mapping["groups"] = ["States", "Institutions", "Individuals", "Teachers", "Interest Groups", "Schools"]
+	mapping["gapps"] = ["Curated Zone", "eLibrary", "eBooks", "eCourses", "Events"]
+	# print mapping
+
+	nroer_menu_dict["mapping"] = mapping
+	# print "nroer_menu_dict ::::\n", nroer_menu_dict
+
+	return nroer_menu_dict
+# ---------- END of get_nroer_menu -----------
+
+
+@register.assignment_tag
+def get_site_name_from_settings():
+	# print "GSTUDIO_SITE_NAME : ", GSTUDIO_SITE_NAME
+	return GSTUDIO_SITE_NAME
 
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
@@ -922,15 +1045,15 @@ def get_theme_node(groupid, node):
 		return True
 
 
-@register.assignment_tag
-def get_group_name(val):
-         GroupName = []
+# @register.assignment_tag
+# def get_group_name(val):
+#          GroupName = []
 
-	 for each in val.group_set: 
+# 	 for each in val.group_set: 
 
-		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
-		GroupName.append(grpName)
-	 return GroupName
+# 		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
+# 		GroupName.append(grpName)
+# 	 return GroupName
 
 @register.assignment_tag
 def get_edit_url(groupid):
@@ -1032,6 +1155,26 @@ def get_create_url(groupid):
     return 'uploadDoc'
 	
 
+
+@register.assignment_tag
+def get_prior_node(node_id):
+
+	obj = collection.Node.one({'_id':ObjectId(node_id) })
+	prior = []
+	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+	if topic_GST._id in obj.member_of:
+
+		if obj.prior_node:
+			for each in obj.prior_node:
+				node = collection.Node.one({'_id': ObjectId(each) })
+				prior.append(( node._id , node.name ))
+
+		return prior
+
+	return prior
+
+
+
 @register.assignment_tag
 def get_contents(node_id):
 
@@ -1063,7 +1206,9 @@ def get_contents(node_id):
 
 		if rel_obj._type == "File":
 			gattr = collection.Node.one({'_type': 'AttributeType', 'name': u'educationaluse'})
-			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id})
+			# list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
+			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id })
+
 			for attr in list_gattr:
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
 				if attr.object_value == "Images":
@@ -1077,7 +1222,7 @@ def get_contents(node_id):
 				elif attr.object_value == "Documents":
 					document_contents.append((left_obj.name, left_obj._id))
 
-				
+							
 	if image_contents:
 		contents['Images'] = image_contents
 	
@@ -1236,19 +1381,19 @@ def get_group_type(group_id, user):
         raise Http404(e)
 
 @register.assignment_tag
-def check_accounts_url(path):
+def check_accounts_url(url_path):
 	'''
 	Checks whether the given path is of accounts related or not
-	Accounts means regarding login/logout or password-reset and all!
+	Accounts means regarding account's registrtion/activation, 
+	login/logout or password-reset and all!
 
 	Arguments:
-	path -- Lastly visited url by the user taken from request object
+	path -- Visited url by the user taken from request object
 
 	Returns:
 	A boolean value indicating the same
 	'''
-
-	if "accounts" in path:
+	if "accounts" in url_path and "/group" not in url_path:
 		return True
 
 	else:
@@ -1764,40 +1909,104 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
             get_translation_relation(each,translation_list, r_list)
    return translation_list
 
+# returns object value of attribute 
 @register.assignment_tag
+def get_object_value(node):
+   at_set = ['contact_point','house_street','town_city','state','pin_code','email_id','telephone','website']
+   att_name_value= collections.OrderedDict()
+           
+   for each in at_set:
+      attribute_type = collection.Node.one({'_type':"AttributeType" , 'name':each}) 
+      if attribute_type:
+      	get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': attribute_type._id})
+      	if get_att:
+        	att_name_value[attribute_type.altnames] = get_att.object_value
+         
+   return att_name_value
+
+@register.assignment_tag
+# return json data of object
 def get_json(node):
    node_obj = collection.Node.one({'_id':ObjectId(str(node))})
-   return json.dumps(node_obj, cls=NodeJSONEncoder)  
+   return json.dumps(node_obj, cls=NodeJSONEncoder, sort_keys = True)  
    
+@register.filter("is_in")
+# filter added to test if vaiable is inside of list or dict
+def is_in(var, args):
+    if args is None:
+        return False
+    arg_list = [arg.strip() for arg in args.split(',')]
+    return var in arg_list
+
+@register.filter("del_underscore")
+# filter added to remove underscore from string
+def del_underscore(var):
+   var = var.replace("_"," ")   
+   return var 
+
+
+
 @register.assignment_tag
+# this function used for info-box implementation 
+# which convert str to dict type & returns dict which used for rendering in template 
 def str_to_dict(str1):
-    dict_format = json.loads(str1)
-    keys_to_remove = ('_id', 'tags', 'rating', 'name', 'content_org')
-    keys_by_userid = ('modified_by', 'contributors', 'created_by' )
+    dict_format = json.loads(str1, object_pairs_hook = collections.OrderedDict)
+    keys_to_remove = ('_id','access_policy','rating', 'fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required') # keys needs to hide
+    keys_by_ids = ('member_of', 'group_set', 'collection_set','prior_node') # keys holds list of ids
+    keys_by_userid = ('modified_by', 'contributors', 'created_by', 'author_set') # keys holds dada from User table
+    keys_by_dict = ('attribute_set', 'relation_set')
+    keys_by_filesize = ('file_size')
     for k in keys_to_remove:
       dict_format.pop(k, None)
     for k, v in dict_format.items():
       if type(dict_format[k]) == list :
           if len(dict_format[k]) == 0:
-            dict_format[k] = "None"
-          else:
-            for each in (dict_format[k]):
-              if k in keys_by_userid:
-                user = User.objects.get(id = each)
-                dict_format[k] = user.get_username()
-              # Commented by: Avadoot Nachankar while merging commit #940
-              # The below code was causing problem as it's checking only for int
-              # whereas the code also consists of other data-types as well
-              # else:   
-              #   print "\n each: ", each, "\n"
-              #   if type(each) != int:
-              #     node = collection.Node.one({'_id':ObjectId(each)})
-              #     if node:
-              #       dict_format[k] = node.name
-      else:
-        if type(dict_format[k]) == int :
-          user = User.objects.get(id = dict_format[k])
-          dict_format[k] = user.get_username()
+                  dict_format[k] = "None"
+      if k in keys_by_ids:
+        name_list = []
+        if "None" not in dict_format[k]:
+                for ids in dict_format[k]:
+                        node = collection.Node.one({'_id':ObjectId(ids)})
+                        if node:
+                                name_list.append(str(node.name))
+                                dict_format[k] = name_list
+              
+      if k in keys_by_userid:
+       
+              if type(dict_format[k]) == list :
+                      for userid in dict_format[k]:
+                              user = User.objects.get(id = userid)
+                              if user:
+                                dict_format[k] = user.get_username()
+              else: 
+                      if v != []:
+                              user = User.objects.get(id = v)
+                              if user:
+                                      dict_format[k] = user.get_username()
+
+      if k in keys_by_dict:
+              att_dic = {}
+              if "None" not in dict_format[k]:
+
+                      if type(dict_format[k]) != str and k == "attribute_set":
+                      
+                              for att in dict_format[k]:
+                                      for k1, v1 in att.items():
+                                              att_dic[k1] = v1
+                                              dict_format[k] = att_dic    
+                      if k == "relation_set":
+                              for each in dict_format[k]:
+                                      for k1, v1 in each.items():
+                                              for rel in v1:
+                                                      rel =collection.Node.one({'_id':ObjectId(rel)})
+                                                      att_dic[k1] = rel.name
+                                      dict_format[k] = att_dic                          
+                                
+      if k in keys_by_filesize:
+              filesize_dic = {}
+              for k1, v1 in dict_format[k].items():
+                      filesize_dic[k1] = v1
+              dict_format[k] = filesize_dic               
     return dict_format
     
 @register.assignment_tag
@@ -1806,16 +2015,6 @@ def get_possible_translations(obj_id):
 	r_list1 = []
         return get_translation_relation(obj_id._id,r_list1,translation_list)
 
-
-
-	#code commented in case required for groups not assigned edit_policy        
-	#elif group_type is  None:
-	#  group=user_access_policy(groupid,request.user)
-	#  if group == "allow":
-	#   if resnode.status == "DRAFT":
-	#      return "allow"
-			
-	
 
 #textb
 @register.filter("mongo_id")
