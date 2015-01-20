@@ -44,11 +44,12 @@
     			<div class="pos_left">asdddfff</div>
     			<div class="block">jjjj</div>-->
 
-<form id ="cur" action="{% url 'tag_info' group_id %}" method="GET">
-    <div class="Wrapper">
-        <input type = "text" name = "search"  maxlength = "20" placeholder = " search other files by tagname" textarea = "">
-        <input type = "submit" value = "jump_to">
-    </div>
+<form id ="search_result" action="{% url 'tag_info' group_id %}" method="GET">
+    <p class = "Focus" id = "">
+        <b>Jump to:</b>
+        <input type = "text" name = "search"  style ="width:300px;" maxlength = "20" placeholder = " search other files by tagname" textarea = "">
+        <input type = "submit" value = "GO">
+    </p>
 </form>
 <hr></hr>
 {% if tagname %}

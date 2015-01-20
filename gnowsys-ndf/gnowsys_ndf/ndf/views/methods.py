@@ -981,26 +981,46 @@ def tag_info(request, group_id, tagname = None):
     yesterdays_result = []
     week_ago_result = []
     search_result = []
-    group_cur_list = [] #for normalUser and AutheticatedUser
+    group_cur_list = [] #for AutheticatedUser
     private_group_cur_list = [] #for Superuser
     today = date.today()
     yesterdays_search = {date.today()-timedelta(days=1)}
-    week_ago_search = {date.today()-timedelta(days=1)}
+    week_ago_search = {date.today()-timedelta(days=7)}
     userid = request.user.id
-    
     collection = get_database()[Node.collection_name]
-    group_cur = collection.Node.find({'_type':"Group",
-                                        '$or':[ {'created_by':userid},
-                                                {'group_admin':userid},
-                                                {'author_set':userid},
-                                                {'group_set':u"PUBLIC"}
-                                              ]
+
+    if request.user.is_authenticated():       #Autheticate user can see all public files  
+        group_cur = collection.Node.find({'_type':'Group',
+                                           '$or':[ {'created_by':userid},
+                                                 {'group_admin':userid},
+                                                 {'author_set':userid},
+                                                 {'group_set':u'PUBLIC'}
+                                               ]
                                     }      
                                 )
-    for each in group_cur:
-        group_cur_list.append(each._id)
-    
-    private_group_cur = collection.Node.find({'_type':"Group",
+        for each in group_cur:
+            group_cur_list.append(each._id)
+
+        if tagname:
+            cur = collection.Node.find( {'tags':tagname,
+                                         'group_set':{'$in':group_cur_list},
+                                        'status':u'PUBLISHED'
+                                    }
+                             )
+            for every in cur:
+                search_result.append(every)
+        elif request.method == "GET":
+            keyword = request.GET.get("search","")
+            cur = collection.Node.find({
+                                        'tags':{'$regex':keyword},
+                                        'group_set':{'$in':group_cur_list},
+                                        'status':u'PUBLISHED'
+                                    })
+            for every in cur:
+                search_result.append(every)
+     
+    elif request.user.is_superuser:  #Superuser can see private an public files 
+        private_group_cur = collection.Node.find({'_type':"Group",
                                         '$or':[ {'created_by':userid},
                                                 {'group_admin':userid},
                                                 {'author_set':userid},
@@ -1009,93 +1029,47 @@ def tag_info(request, group_id, tagname = None):
                                               ]
                                     }      
                                 )
-    for each in private_group_cur:
-        private_group_cur_list.append(each._id)
-
-    #dic = {date.today():keyword}
-    #keyword_search.append(dic)
-    #print "dic:",dic
-    #print "keyword_search is:",keyword_search
-
-    if request.user.is_authenticated():       #Autheticate user can see all public files which is published 
+        for each in private_group_cur:
+            private_group_cur_list.append(each._id)
         if tagname:
-            collection = get_database()[Node.collection_name]
-            for each in group_cur_list:
-                cur = collection.Node.find( {   'tags':tagname,
-                                            'group_set':{'$in':[each]},
-                                            'status':u'PUBLISHED',
-                                            'visibility_policy':u'ANNOUNCED'
-                                        }
-                                 )
-                for every in cur:
-                    search_result.append(every)
-        elif request.method == "GET":
-            keyword = request.GET.get("search","")
-            collection = get_database()[Node.collection_name]
-            for each in group_cur_list:
-                cur = collection.Node.find({
-                                        'tags':{'$regex':keyword},
-                                        'group_set':{'$in':[each]},
-                                        'status':u'PUBLISHED',
-                                        'visibility_policy':u'ANNOUNCED'
-                                    })
-                for every in cur:
-                    search_result.append(every)
-        
-    elif request.user.is_superuser:  #Superuser can see private an public files 
-        if tagname:
-            collection = get_database()[Node.collection_name]
-            for each in private_group_cur_list:
-                cur = collection.Node.find( {  'tags':tagname,
-                                       'group_set':{'$in':[each] },
-                                       'status':u'PUBLISHED',
-                                       'visibility_policy':u'ANNOUNCED'
+            cur = collection.Node.find( {  'tags':tagname,
+                                       'group_set':{'$in':private_group_cur},
+                                       'status':u'PUBLISHED'
                                     }
                                  )
-                for every in cur:
-                    search_result.append(every)
+            for every in cur:
+                search_result.append(every)
 
         elif request.method == "GET":
             keyword = request.GET.get("search","")
-            collection = get_database()[Node.collection_name]
-            for each in private_group_cur_list:
-                cur = collection.Node.find({
+            cur = collection.Node.find({
                                         'tags':{'$regex':keyword},
-                                        'group_set':{'$in':[each]},
-                                        'status':u'PUBLISHED',
-                                        'visibility_policy':u'ANNOUNCED'
+                                        'group_set':{'$in':private_group_cur_list},
+                                        'status':u'PUBLISHED'
                                     })
-                for every in cur:
-                    search_result.append(every)
+            for every in cur:
+                search_result.append(every)
 
     else:        #Normal user can see all public files which is published 
         if tagname:
-            collection = get_database()[Node.collection_name]
-            for each in group_cur_list:
-                cur = collection.Node.find( {  'tags':tagname,
-                                       'group_set':{'$in':[each] },
-                                       'status':u'PUBLISHED', 
-                                       'subscription_policy':u'OPEN',
-                                       'visibility_policy':u'ANNOUNCED'
-                                    }
+            cur = collection.Node.find( {  'tags':tagname,
+                                            'access_policy':u'PUBLIC',
+                                            'status':u'PUBLISHED'
+                                        }
                                  )
-                for every in cur:
-                    search_result.append(every)
+            for every in cur:
+                search_result.append(every)
 
         elif request.method == "GET":
             keyword = request.GET.get("search","")
-            collection = get_database()[Node.collection_name]
-            for each in group_cur_list:
-                cur = collection.Node.find({
+            cur = collection.Node.find({
                                             'tags':{'$regex':keyword},
-                                            'group_set':{'$in':[each]},
-                                            'status':u'PUBLISHED',
-                                            'subscription_policy':u'OPEN',
-                                            'visibility_policy':u'ANNOUNCED'
+                                            'access_policy':u'PUBLIC',
+                                            'status':u'PUBLISHED'
                                         }
                                     )
-                for every in cur:
-                    search_result.append(every)
+            for every in cur:
+                search_result.append(every)
     return render_to_response(
         "ndf/tag_browser.html", 
         {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname},
