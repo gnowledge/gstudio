@@ -2435,6 +2435,49 @@ def get_students(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
+
+def get_statewise_data(request, group_id):
+    """
+    This view returns a download link of CSV created consisting of students statistical data based on degree_year for each college.
+
+    Arguments:
+    group_id - ObjectId of the currently selected group
+
+    Returns:
+    A dictionary consisting of following key-value pairs:-
+    success - Boolean giving the state of ajax call
+    message - Basestring giving the error/information message
+    download_link - file path of CSV created
+    """
+    response_dict = {'success': False, 'message': ""}
+
+    try:
+        if request.is_ajax() and request.method == "GET":
+            groupid = request.GET.get("groupid", None)
+
+            state_val = request.GET.get("state_val", None)
+            print "\n state_val: ", state_val, "\n"
+
+            response_dict["success"] = True
+            response_dict["download_link"] = (STATIC_URL + filename)
+            return HttpResponse(json.dumps(response_dict))
+
+        else:
+            error_message = "CollegeSummaryDataError: Either not an ajax call or not a POST request!!!"
+            response_dict["message"] = error_message
+            return HttpResponse(json.dumps(response_dict))
+
+    except OSError as oe:
+        error_message = "CollegeSummaryDataError: " + str(oe) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
+
+    except Exception as e:
+        error_message = "CollegeSummaryDataError: " + str(e) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
+
+
 def get_college_wise_students_data(request, group_id):
   """
   This view returns a download link of CSV created consisting of students statistical data based on degree_year for each college.
@@ -2569,6 +2612,7 @@ def get_college_wise_students_data(request, group_id):
     error_message = "CollegeSummaryDataError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
+
 
 def set_user_link(request, group_id):
   """
