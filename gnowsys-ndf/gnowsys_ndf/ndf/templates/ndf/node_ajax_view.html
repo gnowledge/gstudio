@@ -151,7 +151,7 @@ ul#navigation li {
 ul#navigation li a {
   padding:7px 7px;
   text-shadow:1px 1px 0px #fff;
-  display:inline-block;
+  display:inline-block;  
 }
 
 ul#navigation li a:hover {
@@ -178,6 +178,7 @@ ul#navigation ul, ul#navigation ul li ul {
   position: absolute;
   z-index: 99999;
   width:180px;
+  /*width: 30em !important;*/
   background:#f8f8f8;
   box-shadow:1px 1px 3px #ccc;
   opacity:0;
@@ -223,6 +224,11 @@ ul#navigation li a.first {
 
 ul#navigation li a.last {
   border-right: 0 none;
+}
+
+.edu-sub-li {
+  background-color:#f8f8f8;
+  width: 30em !important;
 }
 
 /*end dropdown style*/
@@ -277,13 +283,13 @@ ul#navigation li a.last {
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
       {% if topic %}
-        <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+        <dd class="active page-view view_list"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
         <dd class="filters-view">
 
           <nav id="nav">
           <ul id="navigation">
             <li><a href="#" class="view-filters"><i class="fi-list"></i> {% trans "Filter based on" %} </a>
-              <ul>
+              <ul id="view-elements">
                 {% get_metadata_values as metadata %}
                 {% for k,v in metadata.items %}
                   {% if k == "educationallevel" %}            
@@ -291,12 +297,12 @@ ul#navigation li a.last {
                       <a> {% trans "Educational Level" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
-                          <li class="view_list" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
                         {% endfor %}
                       </ul>
                     </li> 
-                  {% elif k == "educationalsubject" %}
-                    <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li> 
+                  <!-- {#% elif k == "educationalsubject" %#}
+                    <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li>  -->
                   {% endif %}
 
                 {% endfor %}
@@ -322,7 +328,7 @@ ul#navigation li a.last {
       
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-      <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
+      <dd class="info-view"><a class="view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       {% if "Group" not in node.member_of_names_list %}
 
         {% if node|is_File %}         
@@ -1173,6 +1179,8 @@ ul#navigation li a.last {
   // select particular type to display contents in topic page
   $(".view_list").click(function() {
     
+    $("#view-elements").css("display", "none");  // 'ul' and 'li' should be disabled after selection
+
     var selected = this.id;
     var choice = this.title;
 
@@ -1191,39 +1199,61 @@ ul#navigation li a.last {
         data_obj = JSON.parse(data);
 
         if (data != "{}"){
+          var k = Object.keys(data_obj); // To get the keys from incomming data
+          if (selected){
+            fs = "<b><i><u>"+ choice +" level resources: </u></i></b><br/>"  // Fieldset for one element
+          }
+          else{
+            fs = ""  // Fieldset for one element
+          }
 
-          var k = Object.keys(data_obj);
-          var len = data_obj[k].length;
+          // For loop the list of keys to evaluate values
+          for (var m = 0; m < k.length; m++) { 
+            var key = k[m];  
+            var len = data_obj[key].length;  // length of list as a value of key
+            cont_list = ""  // variable to create html data to show the thumbnail and url
 
-          cont_list = []
-          for (var i = 0; i < len; i++) { 
-            var res_id = data_obj[k][i][1]
-            if (k == "Images"){
-              cont_list.push("<a data-id="+res_id+" href='{#% url 'image_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
-            }
-            else if(k == "Videos"){
-              cont_list.push("<a data-id="+res_id+" href='{#% url 'video_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-            }
-            else{
-              cont_list.push("<a data-id="+res_id+" href='{#% url 'file_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-            }
-            
-          } 
+            // For loop the list of values for key defined in a list(eg: for list of images, videos)
+            for (var i = 0; i < len; i++) { 
+              var res_id = data_obj[key][i][1]
+              if (key == "Images"){
+                cont_list += "<a data-id="+res_id+" href='{% url 'image_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+              else if(key == "Videos"){
+                cont_list += "<a data-id="+res_id+" href='{% url 'video_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+              else{
+                cont_list += "<a data-id="+res_id+" href='{% url 'file_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'>"+data_obj[key][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+            } 
 
-          cont_list = cont_list.join(" ")
-          var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
+            // fs variable will contain the contents list for a topic each time this variable will append with new values
+            fs = fs + "<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
 
-          $(".topic_content").html("");
-          $(".topic_content").html(cont);
+          }
 
-          $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
-          $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
+          $(".topic_content").html(fs); // render the html data 'fs' in topic contents div
+
+          // Both bellow statements will take the variable values used in above html code and replace with required attributes 
+          $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link;
+          })
+          $("img[data-id]").each(function(){
+            var tempSrc = $(this).attr("data-src");  
+            // 'src' identified by browser when it finds <img> tag and very first time we take temp variable to store the resource id 
+            // and then replace that temp variable in 'src' variable to get the value for 'replace_with_id' variable 
+            var res_link = tempSrc.replace("replace_with_id", $(this).attr("data-id"));
+            this.src=res_link;
+          })
+          
         }
         else{
-          var cont = "<h3>No "+selected+" in this topic</h3>"
-          $(".topic_content").html("");
+          // If no resource found for topic it will show bellow statement
+          var cont = "<h3>No resources available for '"+choice+"' level in this topic</h3>"
           $(".topic_content").html(cont);
         }
+
+        // After successfull return of data in success just enable the 'ul' and 'li' for filtering options
+        $("#view-elements").css("display", "block");
       }
     });
 
@@ -1255,14 +1285,15 @@ ul#navigation li a.last {
   });
 
   $(document).on('click','.view-filters',function(){
-    $("#view-page").css("display", "none");
     $("#view-discussion").css("display", "none");
     $("#view-info").css("display", "none");
-    $(".page-view").removeClass("active");
-    $(".info-view").removeClass("active");    
-    $(".discussion-view").removeClass("active");    
-    $(".filters-view").addClass("active");    
-    // $("#view-filters").css("display", "block");
+    $(".discussion-view").removeClass("active");
+    $(".info-view").removeClass("active");
+    $(".page-view").removeClass("active");    
+    $(".filters-view").addClass("active");
+    $("#view-page").css("display", "block");
+    $(".topic_content").css("display", "block");
+    $("#view-filters").css("display", "block");
 
   });
 
