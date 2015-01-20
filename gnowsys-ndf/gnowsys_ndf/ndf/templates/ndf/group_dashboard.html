@@ -140,6 +140,7 @@
     <!-- this div is used for spaceing between the button Add phot button and profile picture area -->
   </div>
     
+  {% comment %}
   {% if request.user.is_authenticated %}
     <div style="position:relative;">
       <div style="float:left;">
@@ -152,6 +153,7 @@
       </div>
     </div>
     {% endif %}
+  {% endcomment %}
 
 </form>  
 
