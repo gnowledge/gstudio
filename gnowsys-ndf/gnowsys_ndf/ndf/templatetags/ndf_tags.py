@@ -1176,7 +1176,7 @@ def get_prior_node(node_id):
 
 
 @register.assignment_tag
-def get_contents(node_id):
+def get_contents(node_id, selected, choice):
 
 	contents = {}
 	image_contents = []
@@ -1185,6 +1185,11 @@ def get_contents(node_id):
 	page_contents = []
 	audio_contents = []
 	interactive_contents = []
+	name = ""
+	ob_id = ""
+
+	print "\nselected: ",selected,"\n"
+	print "choice: ",choice,"\n"
 
 	obj = collection.Node.one({'_id': ObjectId(node_id) })
 
@@ -1211,16 +1216,37 @@ def get_contents(node_id):
 
 			for attr in list_gattr:
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
-				if attr.object_value == "Images":
-					image_contents.append((left_obj.name, left_obj._id))
-				elif attr.object_value == "Videos":
-					video_contents.append((left_obj.name, left_obj._id))
-				elif attr.object_value == "Audios":
-					audio_contents.append((left_obj.name, left_obj._id))
-				elif attr.object_value == "Interactives":
-					interactive_contents.append((left_obj.name, left_obj._id))
-				elif attr.object_value == "Documents":
-					document_contents.append((left_obj.name, left_obj._id))
+				
+				if selected:
+					if left_obj.attribute_set[4][selected] == choice:
+						name = str(left_obj.name)
+						ob_id = str(left_obj._id)
+
+						if attr.object_value == "Images":
+							image_contents.append((name, ob_id))
+						elif attr.object_value == "Videos":
+							video_contents.append((name, ob_id))
+						elif attr.object_value == "Audios":
+							audio_contents.append((name, ob_id))
+						elif attr.object_value == "Interactives":
+							interactive_contents.append((name, ob_id))
+						elif attr.object_value == "Documents":
+							document_contents.append((name, ob_id))
+
+				else:
+					name = str(left_obj.name)
+					ob_id = str(left_obj._id)
+
+					if attr.object_value == "Images":
+						image_contents.append((name, ob_id))
+					elif attr.object_value == "Videos":
+						video_contents.append((name, ob_id))
+					elif attr.object_value == "Audios":
+						audio_contents.append((name, ob_id))
+					elif attr.object_value == "Interactives":
+						interactive_contents.append((name, ob_id))
+					elif attr.object_value == "Documents":
+						document_contents.append((name, ob_id))
 
 							
 	if image_contents:
@@ -1239,7 +1265,7 @@ def get_contents(node_id):
 		contents['Interactives'] = interactive_contents
 	
 
-	# print "\n",contents,"\n"
+	print "\n",contents,"\n"
 	return contents
 
 
