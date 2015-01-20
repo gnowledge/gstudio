@@ -450,7 +450,7 @@ ul#navigation li a.last {
             {% endif %}
           </div>
 
-          <div class="small-4 columns">
+          <div class="small-4 small-pull-4 columns">
             <!-- {#% if node.assesses %#} -->
             {% get_assesses_list node as assesses_list %}
             {% if assesses_list %}
@@ -484,9 +484,11 @@ ul#navigation li a.last {
               
               <ul data-orbit data-options="variable_height: true;timer:false;">              
                 <li class="active">
-                  <center>                    
+                  <center>                   
                   {% if 'image' in node.mime_type %}
+                  <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                    </a>
                   {% elif 'Pandora_video' in node.member_of_names_list %}
                     {% get_source_id node.pk as source_id %}
                     <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
@@ -510,7 +512,9 @@ ul#navigation li a.last {
                   <li>
                     <center>
                       {% if 'image' in obj.mime_type %}
+                      <a class="th" href="{% url 'read_file' group_name_tag k grid_fs_obj.filename %}">
                         <img src="{% url 'get_mid_size_img' group_name_tag k %}" /> 
+                      </a>
                       {% elif 'Pandora_video' in obj.member_of_names_list %}
                         {% get_source_id k as source_id %}
                         <!-- <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls> -->
@@ -558,7 +562,9 @@ ul#navigation li a.last {
 
           {% else %}
               {% if 'image' in node.mime_type %}
-                <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                  <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                </a>
               {% elif 'Pandora_video' in node.member_of_names_list %}
                 {% get_source_id node.pk as source_id %}
                 <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
@@ -1111,8 +1117,7 @@ ul#navigation li a.last {
 
   </section>
 
-    
-    
+
 <script type="text/javascript">
 
   // publishing resource in other groups

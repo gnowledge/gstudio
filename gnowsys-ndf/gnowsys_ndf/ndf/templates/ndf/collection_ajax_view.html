@@ -74,7 +74,17 @@
     });
   </script>
 
+<style type="text/css">
   
+  .collection {
+    border: solid thin #ddd;
+    margin-bottom: 1em;
+    overflow: auto;
+  }
+
+  .collection > ul li:nth-child(odd) { background: #ddd; }
+  
+</style>  
 
 {% endblock %}
   
@@ -92,7 +102,7 @@
     {% endfor %}
   </ul>
 
-  <div style="background-color:#ddd;overflow: auto;">
+  <div>
     <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
   </div>
 
