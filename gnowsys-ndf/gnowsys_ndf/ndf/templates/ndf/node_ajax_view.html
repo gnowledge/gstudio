@@ -135,6 +135,98 @@
     background-color: tomato;    
   }
   
+/*Style for dropdown*/
+
+ul#navigation {
+  position:relative;
+  float:left;
+}
+
+ul#navigation li {
+  display:inline;
+  float:left;
+  position:relative;
+}
+
+ul#navigation li a {
+  padding:7px 7px;
+  text-shadow:1px 1px 0px #fff;
+  display:inline-block;
+}
+
+ul#navigation li a:hover {
+  background:#f8f8f8;
+  color:#282828;
+}
+
+ul#navigation li:hover > a {
+  background:#fff;
+}
+
+/* Drop-Down Navigation */
+ul#navigation li:hover > ul
+{
+  visibility:visible;
+  opacity:1;
+}
+
+ul#navigation ul, ul#navigation ul li ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;    
+  visibility:hidden;
+  position: absolute;
+  z-index: 99999;
+  width:180px;
+  background:#f8f8f8;
+  box-shadow:1px 1px 3px #ccc;
+  opacity:0;
+  -webkit-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  -moz-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  -o-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  transition:opacity 0.2s linear, visibility 0.2s linear;   
+}
+
+ul#navigation ul {
+    top: 43px;
+    left: 1px;
+}
+
+ul#navigation ul li ul {
+    top: 0;
+    left: 181px;
+}
+
+ul#navigation ul li {
+  clear:both;
+  width:100%;
+  border:0 none;
+  border-bottom:1px solid #c9c9c9;
+}
+
+ul#navigation ul li a {
+  background:none;
+  padding:7px 15px;
+  color:#616161;
+  text-shadow:1px 1px 0px #fff;
+  text-decoration:none;
+  display:inline-block;
+  border:0 none;
+  float:left;
+  clear:both;
+  width:100%;
+}
+
+ul#navigation li a.first {
+  border-left: 0 none;
+}
+
+ul#navigation li a.last {
+  border-right: 0 none;
+}
+
+/*end dropdown style*/
+
 
 </style>
 
@@ -186,20 +278,33 @@
 
       {% if topic %}
         <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
-        <dd class="filters-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-filters"><i class=""></i> {% trans "Filter based on" %}</a></dd>
+        <dd class="filters-view">
 
-        <ul id="hover1" class="f-dropdown" data-dropdown-content>
+          <nav id="nav">
+          <ul id="navigation">
+            <li><a href="#" class="view-filters"><i class="fi-list"></i> {% trans "Filter based on" %} </a>
+              <ul>
+                {% get_metadata_values as metadata %}
+                {% for k,v in metadata.items %}
+                  {% if k == "educationallevel" %}            
+                    <li>
+                      <a> {% trans "Educational Level" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li> 
+                  {% elif k == "educationalsubject" %}
+                    <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li> 
+                  {% endif %}
 
-        {% get_metadata_values as metadata %}
-        {% for k,v in metadata.items %}
-
-          {% if k == "educationallevel" %}            
-            <li class="view_list" id="{{k}}"><a> {% trans "Educational Level" %} </a></li> 
-          {% elif k == "educationalsubject" %}
-            <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li> 
-          {% endif %}
-          
-        {% endfor %}
+                {% endfor %}
+              </ul>
+            </li>
+          </ul>
+          </nav>
+        </dd>
 
         <!-- <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
  -->
@@ -217,30 +322,29 @@
       
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-     {% comment %}
       <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
-      {% endcomment %}
+      {% if "Group" not in node.member_of_names_list %}
 
-      {% if node|is_File %}         
-        <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
-          
-            {% if all_replies %}
-              <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
-                {% trans "Join Discussion" %} ({{ all_replies | length }})
-              </span>
-            {% else %}            
-              <span title="{% trans 'Be the first to start a discussion' %}">
-                {% trans "Begin Discussion" %}
-              </span>
-            {% endif %}
+        {% if node|is_File %}         
+          <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
+            
+              {% if all_replies %}
+                <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
+                  {% trans "Join Discussion" %} ({{ all_replies | length }})
+                </span>
+              {% else %}            
+                <span title="{% trans 'Be the first to start a discussion' %}">
+                  {% trans "Begin Discussion" %}
+                </span>
+              {% endif %}
 
-          </a>
-        </dd>
+            </a>
+          </dd>
+        {% endif %}
+
       {% endif %}
-
     </dl>
   </h1>
-
   <!-- new  -->
 
   {% if schema.0 %}
@@ -290,6 +394,7 @@
           {% comment %}
           <!-- <div class="small-4 columns">
             {% if node.prior_node|length > 0 %}
+	    {% if "Group" not in node.member_of_names_list %}
             <div class="panel">
 
               <h6>{% trans "You may want to read these first: " %}</h6>
@@ -303,6 +408,7 @@
 	      {% endif %}
               {% endfor %}
             </div>
+	    {% endif %}
               {% endif %}         </div>
  -->
           {% endcomment %}
@@ -325,7 +431,7 @@
             {% endif %}
           </div>
 
-          <div class="small-4 columns">
+          <div class="small-4 small-pull-4 columns">
             <!-- {#% if node.assesses %#} -->
             {% get_assesses_list node as assesses_list %}
             {% if assesses_list %}
@@ -359,9 +465,11 @@
               
               <ul data-orbit data-options="variable_height: true;timer:false;">              
                 <li class="active">
-                  <center>                    
+                  <center>                   
                   {% if 'image' in node.mime_type %}
+                  <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                    </a>
                   {% elif 'Pandora_video' in node.member_of_names_list %}
                     {% get_source_id node.pk as source_id %}
                     <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
@@ -385,7 +493,9 @@
                   <li>
                     <center>
                       {% if 'image' in obj.mime_type %}
+                      <a class="th" href="{% url 'read_file' group_name_tag k grid_fs_obj.filename %}">
                         <img src="{% url 'get_mid_size_img' group_name_tag k %}" /> 
+                      </a>
                       {% elif 'Pandora_video' in obj.member_of_names_list %}
                         {% get_source_id k as source_id %}
                         <!-- <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls> -->
@@ -433,7 +543,9 @@
 
           {% else %}
               {% if 'image' in node.mime_type %}
-                <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                  <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                </a>
               {% elif 'Pandora_video' in node.member_of_names_list %}
                 {% get_source_id node.pk as source_id %}
                 <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
@@ -521,27 +633,6 @@
         {% endfor %}
       
         <!-- <div id="commentable-area"> -->
-	<div>
-         {% if node.prior_node|length > 0 %}
-   
-         {% for index_key, each_node in node.prior_node_dict.items %}
-         {% get_grid_fs_object each_node as grid_fs_obj %}
-         {% if "Group" in node.member_of_names_list %}
-         {% get_object_value node as objvalue %}
-	    <table>
-	      <tbody>
-		{% for key, value in objvalue.items %}
-		<tr>
-		  <td> {{key}} : {{value}} </td>
-		</tr>
-		{% endfor %}
-	      <tbody>
-	    </table>
-              {% endif%}
-	    {% endfor %}
-            {% endif %}
-
-	</div>
         <div>
           {% with node.html_content|safe as description %}
           {% if description != "None" %}
@@ -549,6 +640,34 @@
           {% endif %}
           {% endwith %}
         </div>
+        <br/>
+	<div>
+         {% if node.prior_node|length > 0 %}
+   
+         {% for index_key, each_node in node.prior_node_dict.items %}
+         {% get_grid_fs_object each_node as grid_fs_obj %}
+         {% if "Group" in node.member_of_names_list %}
+         {% get_object_value node as objvalue %}
+	    <table style="width:60%; border-width:0px;" >
+	      <tbody>
+		{% for key, value in objvalue.items %}
+		<tr>
+		  {% if key == "Website" %}
+		  <td align ="left"> {{key}}</td>  
+		 <td align = "right"><a href="{{value}}">{{value}}</a> </td>
+                  {% else %}
+		  <td align ="left"> {{key}}</td>  
+		  <td align = "right">{{value}}</td>
+		  {% endif %}
+		</tr>
+	{% endfor %}
+	      <tbody>
+	    </table>
+              {% endif%}
+	    {% endfor %}
+            {% endif %}
+
+	</div>
         <!-- </div> -->
         <!-- Resource contents of topic -->
 
@@ -557,7 +676,7 @@
 
           
           <div class="topic_content" id="contents"> 
-            {% get_contents node.pk as contents %}
+            {% get_contents node.pk None None as contents %}
             {% for k,v in contents.items %}    
 
               <fieldset id="{{k}}">
@@ -632,16 +751,40 @@
         
       {% endif %}
       <div id="view-info" style="display:none;">
-       
-       <table>
-   <tbody>
-        {% for key, value in obj.items %}
-        <tr>          
-        <td> {{key}} : {{value}} </td>
-        </tr>
-        {% endfor %}
-    <tbody>   
-</table>
+       <br/>
+	<table style="width:100%; border-width:0px; font-weight:bold" >
+	  <tbody>
+	    {% get_json node.pk as jsonobj %}
+	    {% str_to_dict jsonobj as obj %}
+    
+	    {% for key, value in obj.items %}
+	    <tr>
+	      <td align ="left"> {{key|del_underscore|title}}</td>
+              
+	      <td align = "right"> 
+		{% if "None" not in value %}
+		{% if key|is_in:"attribute_set, file_size, relation_set" %}
+	     
+		{% for k, v in value.items %}
+		{{k}} : {{v}}<br/>
+		{% endfor %}
+		{% elif key|is_in:"group_set ,collection_set, member_of, tags, prior_node, post_node" %}
+		{% for each in value %}
+		{{each}}</br>
+	    	{% endfor %}
+		{% else %}
+		{{value}}
+		{% endif %}
+	      </td>
+	      {% else %}	     
+	      {{value}}</td>
+             {% endif %}
+	    </tr>
+	    {% endfor %}
+	  <tbody>
+	</table>
+
+
      </div>
 
       <div id="view-discussion" style="display:none;">
@@ -955,8 +1098,7 @@
 
   </section>
 
-    
-    
+
 <script type="text/javascript">
 
   // publishing resource in other groups
@@ -1029,58 +1171,63 @@
   });
 
   // select particular type to display contents in topic page
-  // $(".view_list").click(function() {
+  $(".view_list").click(function() {
     
-  //   var selected = this.id;
+    var selected = this.id;
+    var choice = this.title;
 
-  //   $.ajax({
-  //     type: "POST",
-  //     url: "{#% url 'get_topic_contents' groupid %#}",
-  //     datatype: "html",
-  //     data:{
-  //       node_id: '{{node.pk}}',
-  //       selected: selected,
-  //       csrfmiddlewaretoken: '{{ csrf_token }}'
-  //     },
-  //     success: function(data) { 
+    $.ajax({
+      type: "POST",
+      url: "{% url 'get_topic_contents' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: '{{node.pk}}',
+        selected: selected,
+        choice: choice,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) { 
 
-  //       data_obj = JSON.parse(data);
-  //       if (data != "{}"){
+        data_obj = JSON.parse(data);
 
-  //         var k = Object.keys(data_obj);
-  //         var len = data_obj[k].length;
+        if (data != "{}"){
 
-  //         cont_list = []
-  //         for (var i = 0; i < len; i++) { 
-  //           var res_id = data_obj[k][i][1]
-  //           if (k == "Images"){
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'image_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
-  //           }
-  //           else if(k == "Videos"){
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'video_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-  //           }
-  //           else{
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'file_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-  //           }
+          var k = Object.keys(data_obj);
+          var len = data_obj[k].length;
+
+          cont_list = []
+          for (var i = 0; i < len; i++) { 
+            var res_id = data_obj[k][i][1]
+            if (k == "Images"){
+              cont_list.push("<a data-id="+res_id+" href='{#% url 'image_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
+            }
+            else if(k == "Videos"){
+              cont_list.push("<a data-id="+res_id+" href='{#% url 'video_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            }
+            else{
+              cont_list.push("<a data-id="+res_id+" href='{#% url 'file_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            }
             
-  //         } 
+          } 
 
-  //         cont_list = cont_list.join(" ")
-  //         var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
+          cont_list = cont_list.join(" ")
+          var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
 
-  //         $(".topic_content").html(cont);
+          $(".topic_content").html("");
+          $(".topic_content").html(cont);
 
-  //         $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
-  //         $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
-  //       }
-  //       else{
-  //         var cont = "<h3>No "+selected+" in this topic</h3>"
-  //         $(".topic_content").html(cont);
-  //       }
-  //     }
-  //   });
+          $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
+          $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
+        }
+        else{
+          var cont = "<h3>No "+selected+" in this topic</h3>"
+          $(".topic_content").html("");
+          $(".topic_content").html(cont);
+        }
+      }
+    });
 
-  // });
+  });
 
   $(document).on('click','.view-discussion',function(){
     $("#view-page").css("display", "none");

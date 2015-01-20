@@ -32,10 +32,30 @@
     <input type="tel" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if not field.editable %}readonly{% endif %} 
-          {% if is_required_field %}required{% endif %} 
-          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
+          {% if is_required_field %}required{% endif %}
+          min="{{field.max_digits|default_if_none:''}}"
+          maxlength="{{field.max_digits|default_if_none:''}}"
+          class = "{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
           style="float:left; width:95%"
+          pattern="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}" 
     />
+    <script type="text/javascript">
+    // Ensure that it is a number and stop the keypress while entering hours for course subsection prop
+      $(".input_only_num").keydown(function (e) {
+            // Allow ctrl+A
+        if ((e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9) {
+                     // let it happen, don't do anything
+                     return;
+            }
+       // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }        
+      });
+    </script>
+
     {% if is_required_field or field.validators %}
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
@@ -48,9 +68,37 @@
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if field.editable and not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
-          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
+          class="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
+          pattern="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}" 
+
     />
+    <script type="text/javascript">
+    // Ensure that it is a alphabet and stop the keypress while entering hours for course subsection prop
+      $(".input_only_text").keydown(function (e) {
+        if ((e.keyCode > 64 && e.keyCode < 91) || (e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9){
+          return true;
+        }  
+        else{
+          return false;
+        }      
+      });
+
+      $(".text_allow_space").keydown(function (e) {
+        if ((e.keyCode > 64 && e.keyCode < 91) || (e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9 || e.keyCode==32){
+          return true;
+        }  
+        else{
+          return false;
+        }      
+      });
+
+    </script>
+
     {% if is_required_field or field.validators %}
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
@@ -63,10 +111,32 @@
           placeholder="{{field.help_text|default_if_none:''}}" 
           {% if field.editable and not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
-          maxlength="{{field.maxlength}}" 
-          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
+          maxlength="{{field.max_digits|default_if_none:''}}" 
+          class = "{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
+          pattern="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}" 
+
     />
+
+    <script type="text/javascript">
+    // Ensure that it is a number and stop the keypress while entering hours for course subsection prop
+      $(".input_only_num").keydown(function (e) {
+            // Allow ctrl+A
+        if ((e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9) {
+                     // let it happen, don't do anything
+                     return;
+            }
+       // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }        
+      });
+
+    </script>
+
+
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% trans "Please fill valid" %} {{field.altnames}}! </small>
