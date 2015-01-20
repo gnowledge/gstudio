@@ -287,11 +287,11 @@ ul#navigation li a.last {
                 {% get_metadata_values as metadata %}
                 {% for k,v in metadata.items %}
                   {% if k == "educationallevel" %}            
-                    <li class="view_list" id="{{k}}">
+                    <li>
                       <a> {% trans "Educational Level" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
-                          <li><a href="#">{% trans opts %}</a></li>
+                          <li class="view_list" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
                         {% endfor %}
                       </ul>
                     </li> 
@@ -306,25 +306,6 @@ ul#navigation li a.last {
           </nav>
         </dd>
 
-
-       <!--  <ul id="hover1" class="f-dropdown" data-dropdown-content>
-
-        
-
-        {% get_metadata_values as metadata %}
-        {% for k,v in metadata.items %}
-
-          {% if k == "educationallevel" %}            
-            <li class="view_list" id="{{k}}">
-              <a> {% trans "Educational Level" %} </a>
-            </li> 
-          {% elif k == "educationalsubject" %}
-            <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li> 
-          {% endif %}
-          
-        {% endfor %}
-        </ul>
-        </dd> -->
         <!-- <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
  -->
         <!-- <ul id="hover1" class="f-dropdown" data-dropdown-content>
@@ -695,7 +676,7 @@ ul#navigation li a.last {
 
           
           <div class="topic_content" id="contents"> 
-            {% get_contents node.pk as contents %}
+            {% get_contents node.pk None None as contents %}
             {% for k,v in contents.items %}    
 
               <fieldset id="{{k}}">
@@ -1190,58 +1171,63 @@ ul#navigation li a.last {
   });
 
   // select particular type to display contents in topic page
-  // $(".view_list").click(function() {
+  $(".view_list").click(function() {
     
-  //   var selected = this.id;
+    var selected = this.id;
+    var choice = this.title;
 
-  //   $.ajax({
-  //     type: "POST",
-  //     url: "{#% url 'get_topic_contents' groupid %#}",
-  //     datatype: "html",
-  //     data:{
-  //       node_id: '{{node.pk}}',
-  //       selected: selected,
-  //       csrfmiddlewaretoken: '{{ csrf_token }}'
-  //     },
-  //     success: function(data) { 
+    $.ajax({
+      type: "POST",
+      url: "{% url 'get_topic_contents' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: '{{node.pk}}',
+        selected: selected,
+        choice: choice,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) { 
 
-  //       data_obj = JSON.parse(data);
-  //       if (data != "{}"){
+        data_obj = JSON.parse(data);
 
-  //         var k = Object.keys(data_obj);
-  //         var len = data_obj[k].length;
+        if (data != "{}"){
 
-  //         cont_list = []
-  //         for (var i = 0; i < len; i++) { 
-  //           var res_id = data_obj[k][i][1]
-  //           if (k == "Images"){
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'image_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
-  //           }
-  //           else if(k == "Videos"){
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'video_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-  //           }
-  //           else{
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'file_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-  //           }
+          var k = Object.keys(data_obj);
+          var len = data_obj[k].length;
+
+          cont_list = []
+          for (var i = 0; i < len; i++) { 
+            var res_id = data_obj[k][i][1]
+            if (k == "Images"){
+              cont_list.push("<a data-id="+res_id+" href='{#% url 'image_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
+            }
+            else if(k == "Videos"){
+              cont_list.push("<a data-id="+res_id+" href='{#% url 'video_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            }
+            else{
+              cont_list.push("<a data-id="+res_id+" href='{#% url 'file_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+            }
             
-  //         } 
+          } 
 
-  //         cont_list = cont_list.join(" ")
-  //         var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
+          cont_list = cont_list.join(" ")
+          var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
 
-  //         $(".topic_content").html(cont);
+          $(".topic_content").html("");
+          $(".topic_content").html(cont);
 
-  //         $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
-  //         $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
-  //       }
-  //       else{
-  //         var cont = "<h3>No "+selected+" in this topic</h3>"
-  //         $(".topic_content").html(cont);
-  //       }
-  //     }
-  //   });
+          $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
+          $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
+        }
+        else{
+          var cont = "<h3>No "+selected+" in this topic</h3>"
+          $(".topic_content").html("");
+          $(".topic_content").html(cont);
+        }
+      }
+    });
 
-  // });
+  });
 
   $(document).on('click','.view-discussion',function(){
     $("#view-page").css("display", "none");
