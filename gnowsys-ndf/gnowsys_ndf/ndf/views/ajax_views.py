@@ -569,16 +569,17 @@ def search_drawer(request, group_id):
       )    
       
 
-# def get_topic_contents(request, group_id):
+def get_topic_contents(request, group_id):
     
-#   if request.is_ajax() and request.method == "POST":
-#     node_id = request.POST.get("node_id", '')
-#     selected = request.POST.get("selected", '')
-#     # node = collection.Node.one({'_id': ObjectId(node_id) })
+  if request.is_ajax() and request.method == "POST":
+    node_id = request.POST.get("node_id", '')
+    selected = request.POST.get("selected", '')
+    choice = request.POST.get("choice", '')
+    # node = collection.Node.one({'_id': ObjectId(node_id) })
 
-#     contents = get_contents(node_id, selected)
+    contents = get_contents(node_id, selected, choice)
 
-#     return HttpResponse(json.dumps(contents))
+    return HttpResponse(json.dumps(contents))
       
 
 ####Bellow part is for manipulating theme topic hierarchy####
