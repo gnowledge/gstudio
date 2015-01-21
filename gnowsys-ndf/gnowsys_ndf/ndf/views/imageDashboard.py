@@ -14,13 +14,14 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import File
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
+from gnowsys_ndf.settings import META_TYPE, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
 db = get_database()
 collection = db[File.collection_name]
-GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+gapp_mt = collection.Node.one({'_type': "MetaType", 'name': META_TYPE[0]})
+GST_IMAGE = collection.Node.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 
 def imageDashboard(request, group_id, image_id=None):
     '''
