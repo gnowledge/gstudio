@@ -135,6 +135,104 @@
     background-color: tomato;    
   }
   
+/*Style for dropdown*/
+
+ul#navigation {
+  position:relative;
+  float:left;
+}
+
+ul#navigation li {
+  display:inline;
+  float:left;
+  position:relative;
+}
+
+ul#navigation li a {
+  padding:7px 7px;
+  text-shadow:1px 1px 0px #fff;
+  display:inline-block;  
+}
+
+ul#navigation li a:hover {
+  background:#f8f8f8;
+  color:#282828;
+}
+
+ul#navigation li:hover > a {
+  background:#fff;
+}
+
+/* Drop-Down Navigation */
+ul#navigation li:hover > ul
+{
+  visibility:visible;
+  opacity:1;
+}
+
+ul#navigation ul, ul#navigation ul li ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;    
+  visibility:hidden;
+  position: absolute;
+  z-index: 99999;
+  width:180px;
+  /*width: 30em !important;*/
+  background:#f8f8f8;
+  box-shadow:1px 1px 3px #ccc;
+  opacity:0;
+  -webkit-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  -moz-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  -o-transition:opacity 0.2s linear, visibility 0.2s linear; 
+  transition:opacity 0.2s linear, visibility 0.2s linear;   
+}
+
+ul#navigation ul {
+    top: 43px;
+    left: 1px;
+}
+
+ul#navigation ul li ul {
+    top: 0;
+    left: 181px;
+}
+
+ul#navigation ul li {
+  clear:both;
+  width:100%;
+  border:0 none;
+  border-bottom:1px solid #c9c9c9;
+}
+
+ul#navigation ul li a {
+  background:none;
+  padding:7px 15px;
+  color:#616161;
+  text-shadow:1px 1px 0px #fff;
+  text-decoration:none;
+  display:inline-block;
+  border:0 none;
+  float:left;
+  clear:both;
+  width:100%;
+}
+
+ul#navigation li a.first {
+  border-left: 0 none;
+}
+
+ul#navigation li a.last {
+  border-right: 0 none;
+}
+
+.edu-sub-li {
+  background-color:#f8f8f8;
+  width: 30em !important;
+}
+
+/*end dropdown style*/
+
 
 </style>
 
@@ -185,7 +283,34 @@
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
       {% if topic %}
-        <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+        <dd class="active page-view view_list"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+        <dd class="filters-view">
+
+          <nav id="nav">
+          <ul id="navigation">
+            <li><a href="#" class="view-filters"><i class="fi-list"></i> {% trans "Filter based on" %} </a>
+              <ul id="view-elements">
+                {% get_metadata_values as metadata %}
+                {% for k,v in metadata.items %}
+                  {% if k == "educationallevel" %}            
+                    <li>
+                      <a> {% trans "Educational Level" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li> 
+                  <!-- {#% elif k == "educationalsubject" %#}
+                    <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li>  -->
+                  {% endif %}
+
+                {% endfor %}
+              </ul>
+            </li>
+          </ul>
+          </nav>
+        </dd>
 
         <!-- <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
  -->
@@ -203,29 +328,29 @@
       
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-      <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
+      <dd class="info-view"><a class="view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       {% if "Group" not in node.member_of_names_list %}
 
-      <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
-          {% if all_replies %}
-            <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
-              {% trans "Join Discussion" %} ({{ all_replies | length }})
-            </span>
+        {% if node|is_File %}         
+          <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
+            
+              {% if all_replies %}
+                <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
+                  {% trans "Join Discussion" %} ({{ all_replies | length }})
+                </span>
+              {% else %}            
+                <span title="{% trans 'Be the first to start a discussion' %}">
+                  {% trans "Begin Discussion" %}
+                </span>
+              {% endif %}
 
-          {% else %}
-	    <span title="{% trans 'Be the first to start a discussion' %}">
-              {% trans "Begin Discussion" %}
-            </span>
-	  {% endif %}
+            </a>
+          </dd>
+        {% endif %}
 
-        </a>
-      </dd>
       {% endif %}
-      
-
     </dl>
   </h1>
-
   <!-- new  -->
 
   {% if schema.0 %}
@@ -557,7 +682,7 @@
 
           
           <div class="topic_content" id="contents"> 
-            {% get_contents node.pk as contents %}
+            {% get_contents node.pk None None as contents %}
             {% for k,v in contents.items %}    
 
               <fieldset id="{{k}}">
@@ -599,6 +724,10 @@
         <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
           <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
           <!-- {#% include "ndf/graph_concept.html" %#} -->
+        </div>
+
+        <div id="view-levels" style="display:none;">
+          ghtr
         </div>
         
         <!-- Content for Collection Graph -->
@@ -1048,62 +1177,93 @@
   });
 
   // select particular type to display contents in topic page
-  // $(".view_list").click(function() {
+  $(".view_list").click(function() {
     
-  //   var selected = this.id;
+    $("#view-elements").css("display", "none");  // 'ul' and 'li' should be disabled after selection
 
-  //   $.ajax({
-  //     type: "POST",
-  //     url: "{#% url 'get_topic_contents' groupid %#}",
-  //     datatype: "html",
-  //     data:{
-  //       node_id: '{{node.pk}}',
-  //       selected: selected,
-  //       csrfmiddlewaretoken: '{{ csrf_token }}'
-  //     },
-  //     success: function(data) { 
+    var selected = this.id;
+    var choice = this.title;
 
-  //       data_obj = JSON.parse(data);
-  //       if (data != "{}"){
+    $.ajax({
+      type: "POST",
+      url: "{% url 'get_topic_contents' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: '{{node.pk}}',
+        selected: selected,
+        choice: choice,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) { 
 
-  //         var k = Object.keys(data_obj);
-  //         var len = data_obj[k].length;
+        data_obj = JSON.parse(data);
 
-  //         cont_list = []
-  //         for (var i = 0; i < len; i++) { 
-  //           var res_id = data_obj[k][i][1]
-  //           if (k == "Images"){
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'image_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
-  //           }
-  //           else if(k == "Videos"){
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'video_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-  //           }
-  //           else{
-  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'file_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-  //           }
-            
-  //         } 
+        if (data != "{}"){
+          var k = Object.keys(data_obj); // To get the keys from incomming data
+          if (selected){
+            fs = "<b><i><u>"+ choice +" level resources: </u></i></b><br/>"  // Fieldset for one element
+          }
+          else{
+            fs = ""  // Fieldset for one element
+          }
 
-  //         cont_list = cont_list.join(" ")
-  //         var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
+          // For loop the list of keys to evaluate values
+          for (var m = 0; m < k.length; m++) { 
+            var key = k[m];  
+            var len = data_obj[key].length;  // length of list as a value of key
+            cont_list = ""  // variable to create html data to show the thumbnail and url
 
-  //         $(".topic_content").html(cont);
+            // For loop the list of values for key defined in a list(eg: for list of images, videos)
+            for (var i = 0; i < len; i++) { 
+              var res_id = data_obj[key][i][1]
+              if (key == "Images"){
+                cont_list += "<a data-id="+res_id+" href='{% url 'image_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+              else if(key == "Videos"){
+                cont_list += "<a data-id="+res_id+" href='{% url 'video_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+              else{
+                cont_list += "<a data-id="+res_id+" href='{% url 'file_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'>"+data_obj[key][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              }
+            } 
 
-  //         $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
-  //         $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
-  //       }
-  //       else{
-  //         var cont = "<h3>No "+selected+" in this topic</h3>"
-  //         $(".topic_content").html(cont);
-  //       }
-  //     }
-  //   });
+            // fs variable will contain the contents list for a topic each time this variable will append with new values
+            fs = fs + "<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
 
-  // });
+          }
+
+          $(".topic_content").html(fs); // render the html data 'fs' in topic contents div
+
+          // Both bellow statements will take the variable values used in above html code and replace with required attributes 
+          $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link;
+          })
+          $("img[data-id]").each(function(){
+            var tempSrc = $(this).attr("data-src");  
+            // 'src' identified by browser when it finds <img> tag and very first time we take temp variable to store the resource id 
+            // and then replace that temp variable in 'src' variable to get the value for 'replace_with_id' variable 
+            var res_link = tempSrc.replace("replace_with_id", $(this).attr("data-id"));
+            this.src=res_link;
+          })
+          
+        }
+        else{
+          // If no resource found for topic it will show bellow statement
+          var cont = "<h3>No resources available for '"+choice+"' level in this topic</h3>"
+          $(".topic_content").html(cont);
+        }
+
+        // After successfull return of data in success just enable the 'ul' and 'li' for filtering options
+        $("#view-elements").css("display", "block");
+      }
+    });
+
+  });
 
   $(document).on('click','.view-discussion',function(){
     $("#view-page").css("display", "none");
     $("#view-info").css("display", "none");
+    $("#view-filters").css("display", "none");
+    $(".filters-view").removeClass("active");
     $(".page-view").removeClass("active");
     $(".info-view").removeClass("active");
     $(".discussion-view").addClass("active");    
@@ -1114,6 +1274,9 @@
   $(document).on('click','.view-info',function(){
     $("#view-page").css("display", "none");
     $("#view-discussion").css("display", "none");
+    $("#view-info").css("display", "none");
+    $("#view-filters").css("display", "none");
+    $(".filters-view").removeClass("active");
     $(".page-view").removeClass("active");
     $(".discussion-view").removeClass("active");    
     $(".info-view").addClass("active");    
@@ -1121,9 +1284,24 @@
 
   });
 
+  $(document).on('click','.view-filters',function(){
+    $("#view-discussion").css("display", "none");
+    $("#view-info").css("display", "none");
+    $(".discussion-view").removeClass("active");
+    $(".info-view").removeClass("active");
+    $(".page-view").removeClass("active");    
+    $(".filters-view").addClass("active");
+    $("#view-page").css("display", "block");
+    $(".topic_content").css("display", "block");
+    $("#view-filters").css("display", "block");
+
+  });
+
   $(document).on('click','.view-page',function(){
     $("#view-discussion").css("display", "none");
     $("#view-info").css("display", "none");
+    $("#view-filters").css("display", "none");
+    $(".filters-view").removeClass("active");
     $(".discussion-view").removeClass("active");
     $(".info-view").removeClass("active");
     $(".page-view").addClass("active");    
