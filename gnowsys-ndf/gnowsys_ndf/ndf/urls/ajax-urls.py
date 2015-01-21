@@ -57,6 +57,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^approve_students/', 'approve_students', name='approve_students'),
                     
     url(r'^get_college_wise_students_data/', 'get_college_wise_students_data', name='get_college_wise_students_data'),
+    url(r'^rechedule_event/(?P<node>[\w-]+)$','reschedule_task',name='reschedule_task'),
     url(r'^set_user_link/', 'set_user_link', name='set_user_link'),
     url(r'^set_enrollment_code/', 'set_enrollment_code', name='set_enrollment_code'),
     url(r'^get_students_assignments/', 'get_students_assignments', name='get_students_assignments'),

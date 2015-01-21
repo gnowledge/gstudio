@@ -30,7 +30,7 @@
 <ul class="side-nav">
 {% for each in app_collection_set %}
 
-     {% if app_set_id == each|safe %}
+     {% if app_set_isd == each|safe %}
       {% if '/new/' in request.path %}
       <li class="active-app-set-edit">
       {% else %}
@@ -43,10 +43,19 @@
           <a class="small-6 columns" href="{% url 'event_list' groupid each.pk %}" title="View all {{each.name}}">
             {{each.name}}
           </a>
-          <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="Add {{each.name}}">
+          {% if each.name == "Exam" %}
+            {% if Add == "Allow" %}
+            <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="Add {{each.name}}">
+            +&nbsp; {% trans "Add" %}
+            {% endif %}
+          </a>
+          {% else %}
+          
+             <a class="small-6 columns" href="{% url 'event_app_instance_create' groupid each.pk %}" title="Add {{each.name}}">
             +&nbsp; {% trans "Add" %}
           </a>
-
+          
+          {% endif %}
       </div>
   	</li>
     </a>
