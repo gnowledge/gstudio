@@ -2153,7 +2153,8 @@ def delComment(request, group_id):
 
 def get_students(request, group_id):
   """
-  This view returns list of students along with required data based on selection criteria.
+  This view returns list of students along with required data based on selection criteria
+  to student_data_review.html
 
   Arguments:
   group_id - ObjectId of the currently selected group
@@ -2171,6 +2172,7 @@ def get_students(request, group_id):
       groupid = request.POST.get("groupid", None)
       app_id = request.POST.get("app_id", None)
       app_set_id = request.POST.get("app_set_id", None)
+      stud_reg_year = str(request.POST.get("reg_year", None))
 
       person_gst = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'name': 1, 'type_of': 1})
 
@@ -2224,9 +2226,9 @@ def get_students(request, group_id):
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
       query["member_of"] = student._id
 
-      date_lte = datetime.datetime.strptime("31/12/2014", "%d/%m/%Y")
-      date_gte = datetime.datetime.strptime("1/1/2014", "%d/%m/%Y")
-      query["attribute_set.registration_date"] = {'$gte': date_gte, '$lte': date_lte}
+      date_lte = datetime.datetime.strptime("31/12/"+stud_reg_year, "%d/%m/%Y")
+      date_gte = datetime.datetime.strptime("1/1/"+stud_reg_year, "%d/%m/%Y")
+      query["attribute_set.registration_date"] = {'$gte': date_gte, '$lte': date_lte} 
 
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
 
@@ -2252,14 +2254,12 @@ def get_students(request, group_id):
         if college_groupid:
           group_set_to_check.append(college_groupid)
         group_set_to_check.append(mis_admin._id)
-
       else:
         # Otherwise, append given group's ObjectId
         group_set_to_check.append(groupid)
 
       query.update({'group_set': {'$in': group_set_to_check}})
       query.update({'status': u"PUBLISHED"})
-
       rec = collection.aggregate([{'$match': query},
                                   {'$project': {'_id': 0,
                                                 'stud_id': '$_id', 
@@ -2293,7 +2293,6 @@ def get_students(request, group_id):
                                   }},
                                   {'$sort': {'Name': 1}}
             ])
-
       json_data = []
       filename = ""
       column_header = []
@@ -2374,10 +2373,8 @@ def get_students(request, group_id):
         filename = "csv/" + "student_registration_data_" + t + ".csv"
         filepath = os.path.join(STATIC_ROOT, filename)
         filedir = os.path.dirname(filepath)
-
         if not os.path.exists(filedir):
           os.makedirs(filedir)
-          
         with open(filepath, 'wb') as csv_file:
           fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
           fw.writerow(dict((col,col) for col in column_header))
@@ -2394,13 +2391,13 @@ def get_students(request, group_id):
           data = []
           for ch in column_header:
             data.append(each[ch])
-
           json_data[i] = data
 
       university = collection.Node.one({'_id': ObjectId(university_id)}, {'name': 1})
       college = collection.Node.one({'_id': ObjectId(query["relation_set.student_belongs_to_college"])})
       students_count = len(json_data)
 
+      response_dict["success"] = True
       student_list = render_to_string('ndf/student_data_review.html', 
                                         {'groupid': groupid, 'app_id': app_id, 'app_set_id': app_set_id, 
                                          'university': university, 'college': college, 'students_count': students_count, 'half_count': students_count/2,
@@ -2408,12 +2405,8 @@ def get_students(request, group_id):
                                         },
                                         context_instance = RequestContext(request)
                                     )
-
-      response_dict["success"] = True
       response_dict["students_data_review"] = student_list
-
       return HttpResponse(json.dumps(response_dict))
-
     else:
       error_message = "StudentFindError: Either not an ajax call or not a POST request!!!"
       response_dict["message"] = error_message
