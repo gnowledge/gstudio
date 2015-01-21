@@ -1,11 +1,10 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import datetime
-from operator import itemgetter
 import csv
 import time
 import ast
-import json  
+import json
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -13,26 +12,20 @@ from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.http import Http404
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django_mongokit import get_database
-from django.utils import simplejson
-from django.core.serializers.json import DjangoJSONEncoder
 from mongokit import paginator
 from django.contrib.sites.models import Site
 
-from stemming.porter2 import stem
-
 try:
-  from bson import ObjectId
+    from bson import ObjectId
 except ImportError:  # old pymongo
-  from pymongo.objectid import ObjectId
+    from pymongo.objectid import ObjectId
 
 
 ''' -- imports from application folders/files -- '''
@@ -56,8 +49,8 @@ collection = db[Node.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
-#This function is used to check (while creating a new group) group exists or not
-#This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
+# This function is used to check (while creating a new group) group exists or not
+# This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 
 class Encoder(json.JSONEncoder):
 	def default(self, obj):
@@ -2453,13 +2446,106 @@ def get_statewise_data(request, group_id):
 
     try:
         if request.is_ajax() and request.method == "GET":
-            groupid = request.GET.get("groupid", None)
-
+            # Fetching selected state's name
             state_val = request.GET.get("state_val", None)
-            print "\n state_val: ", state_val, "\n"
+
+            mis_admin = collection.Node.one(
+                {'_type': "Group", 'name': "MIS_admin"},
+                {'_id': 1}
+            )
+
+            # Fetching selected state's node
+            state_gst = collection.Node.one(
+                {'_type': "GSystemType", 'name': "State"}
+            )
+            state_gs = collection.Node.one(
+                {
+                    'member_of': state_gst._id,
+                    'name': {'$regex': state_val, '$options': "i"},
+                    'group_set': mis_admin._id
+                }
+            )
+
+            # Fetching universities belonging to that state
+            university_gst = collection.Node.one(
+                {'_type': "GSystemType", 'name': "University"}
+            )
+            university_cur = collection.Node.find(
+                {
+                    'member_of': university_gst._id,
+                    'group_set': mis_admin._id,
+                    'relation_set.organization_belongs_to_state': state_gs._id
+                },
+                {
+                    'name': 1,
+                    'relation_set.affiliated_college': 1
+                }
+            ).sort('name', 1)
+
+            student_gst = collection.Node.one(
+                {'_type': "GSystemType", 'name': "Student"}
+            )
+
+            university_wise_data = {}
+            # Fetching university-wise data
+            for each_univ in university_cur:
+                university_wise_data[each_univ.name] = {}
+
+                # Fetching college(s) affiliated to given university
+                colleges_id_list = []
+                for rel in each_univ.relation_set:
+                    if rel and "affiliated_college" in rel:
+                        colleges_id_list = rel["affiliated_college"]
+                        break
+
+                # Fetching college-wise data
+                college_cur = collection.Node.find(
+                    {'_id': {'$in': colleges_id_list}}
+                ).sort('name', 1)
+
+                for each_college in college_cur:
+                    university_wise_data[each_univ.name][each_college.name] = {}
+                    rec = collection.aggregate([
+                        {
+                            '$match': {
+                                'member_of': student_gst._id,
+                                'relation_set.student_belongs_to_college': each_college._id,
+                                # 'attribute_set.registration_date': {
+                                #     '$gte': date_gte, '$lte': date_lte
+                                # },
+                                'status': u"PUBLISHED"
+                            }
+                        },
+                        {
+                            '$group': {
+                                '_id': {
+                                    'College': '$each_college.name',
+                                    'Degree Year': '$attribute_set.degree_year'
+                                },
+                                'No of students': {'$sum': 1}
+                            }
+                        }
+                    ])
+
+                    data = {}
+                    for res in rec["result"]:
+                        if res["_id"]["Degree Year"]:
+                            data[res["_id"]["Degree Year"][0]] = \
+                                res["No of students"]
+
+                    if "I" not in data:
+                        data["I"] = 0
+                    if "II" not in data:
+                        data["II"] = 0
+                    if "III" not in data:
+                        data["III"] = 0
+
+                    data["Total"] = data["I"] + data["II"] + data["III"]
+
+                    university_wise_data[each_univ.name][each_college.name] = data
 
             response_dict["success"] = True
-            response_dict["download_link"] = (STATIC_URL + filename)
+            response_dict["university_wise_data"] = university_wise_data
             return HttpResponse(json.dumps(response_dict))
 
         else:
@@ -2509,6 +2595,7 @@ def get_college_wise_students_data(request, group_id):
                                          {'_id': 1, 'name': 1, 'relation_set': 1}).sort('name', 1)
 
       json_data = []
+
       for i, each in enumerate(college_cur):
         data = {}
         college_group_id = None
@@ -2561,8 +2648,8 @@ def get_college_wise_students_data(request, group_id):
         "City Women's College": ["Ms. Rajni Sharma"],
         "Comrade Godavari Shamrao Parulekar College of Arts, Commerce & Science": ["Mr. Rahul Sable"],
         "Faculty of Arts": ["Mr. Jokhim", "Ms. Tusharika Kumbhar"],
-        "Gaya College":  ["Ms. Rishvana Sheik"],
-        "Govt. M. H. College of Home Science & Science for Women, Autonomous": [], 
+        "Gaya College": ["Ms. Rishvana Sheik"],
+        "Govt. M. H. College of Home Science & Science for Women, Autonomous": [],
         "Govt. Mahakoshal Arts and Commerce College": ["Ms. Davis Yadav"],
         "Govt. Mahaprabhu Vallabhacharya Post Graduate College": ["Mr. Gaurav Sharma"],
         "Govt. Rani Durgavati Post Graduate College": ["Mr. Asad Ullah"],
@@ -2590,12 +2677,17 @@ def get_college_wise_students_data(request, group_id):
       with open(filepath, 'wb') as csv_file:
         fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
         fw.writerow(dict((col,col) for col in column_header))
+
         for row in json_data:
-          row[u"Program Officer"] = ", ".join(PO[row[u"College"]])
+          if row[u"College"] not in PO or not PO[row[u"College"]]:
+            row[u"Program Officer"] = "Not assigned yet"
+          else:
+            row[u"Program Officer"] = ", ".join(PO[row[u"College"]])
           fw.writerow(row)
 
       response_dict["success"] = True
       response_dict["download_link"] = (STATIC_URL + filename)
+
       return HttpResponse(json.dumps(response_dict))
 
     else:
