@@ -29,6 +29,8 @@ def lang_pref(request):
         lan_dict['primary']=request.LANGUAGE_CODE
         lan_dict['default']=u"en"
         auth.preferred_languages=lan_dict
+        if not auth.agency_type: 
+            auth.agency_type = "Other"  # Sets default value for agency_type as "Other"
         auth.modified_by=request.user.id
         auth.save()
     if appid:
