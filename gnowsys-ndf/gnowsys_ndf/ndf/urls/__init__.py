@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls import *
@@ -6,13 +7,15 @@ from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 
 from registration.backends.default.views import RegistrationView
+from registration.backends.default.views import ActivationView
+from registration_email.forms import EmailRegistrationForm
+from jsonrpc import jsonrpc_site
 
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error
 from gnowsys_ndf.ndf.forms import *
 from gnowsys_ndf.ndf.views.home import HomeRedirectView, homepage
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
-from jsonrpc import jsonrpc_site
 from gnowsys_ndf.ndf.views import rpc_resources
 
 admin.autodiscover()
@@ -124,8 +127,25 @@ urlpatterns = patterns('',
         },
         name='password_reset'
     ),
-    (r'^accounts/', include('registration_email.backends.default.urls')),
-    url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
+
+    url(r'^accounts/activate/(?P<activation_key>\w+)/$',
+        ActivationView.as_view(
+            template_name='registration/activation_complete.html',
+            get_success_url=getattr(
+                settings, 'REGISTRATION_EMAIL_ACTIVATE_SUCCESS_URL',
+                lambda request, user: '/accounts/activate/complete/'),
+        ),
+        name='registration_activate'),
+    url(r'^accounts/register/$',
+        RegistrationView.as_view(
+            form_class=EmailRegistrationForm,
+            get_success_url=getattr(
+                settings, 'REGISTRATION_EMAIL_REGISTER_SUCCESS_URL',
+                lambda request, user: '/accounts/register/complete/'),
+        ),
+        name='registration_register'),
+
+    url(r'^accounts/', include('registration_email.backends.default.urls')),
    # --end of django-registration
 
     url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),

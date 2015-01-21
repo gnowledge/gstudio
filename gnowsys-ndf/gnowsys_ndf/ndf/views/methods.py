@@ -44,6 +44,44 @@ coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
 
+
+def get_group_name_id(group_name_or_id):
+    '''
+      This method takes possible group name/id as an argument and returns group name and id.
+      As method name suggests, returned result is "group_name" first and "group_id" second.
+
+      Example: res_group_name, res_group_id = get_group_name_id(group_name_or_id)
+      - "res_group_name" will contain name of the group.
+      - "res_group_id" will contain _id/ObjectId of the group.
+    '''
+
+    # case-1: argument - "group_name_or_id" is ObjectId
+    if ObjectId.is_valid(group_name_or_id):
+        group_obj = collection.Node.one({"_id": ObjectId(group_name_or_id)})
+
+        # checking if group_obj is valid
+        if group_obj:
+            # if (group_name_or_id == group_obj._id):
+            group_id = group_name_or_id
+            group_name = group_obj.name
+
+            return group_name, group_id
+
+    # case-2: argument - "group_name_or_id" is group name
+    else:            
+        group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"] }, "name": unicode(group_name_or_id)})
+
+        # checking if group_obj is valid
+        if group_obj:
+            # if (group_name_or_id == group_obj.name):
+            group_name = group_name_or_id
+            group_id = group_obj._id
+                  
+            return group_name, group_id
+
+    return None, None
+
+    
 def check_delete(main):
   try:
     def check(*args, **kwargs):

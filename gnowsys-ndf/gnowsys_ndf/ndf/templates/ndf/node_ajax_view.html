@@ -169,12 +169,6 @@
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
     
     <section class="medium-9 columns" >
-      <ul class="breadcrumbs">
-        <li><a href="/{{groupid}}">{{groupid}}</a></li>
-        <li><a href="#">{% trans "Collection Name " %}</a></li>
-      </ul>
-
-       
       
       <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
 
@@ -190,27 +184,44 @@
       <h1 class="subheader">
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
-      <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      {% if topic %}
+        <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+
+        <!-- <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
+ -->
+        <!-- <ul id="hover1" class="f-dropdown" data-dropdown-content>
+          <li class="view_list" id="Images"><a><i class="fi-photo"></i> {#% trans "Images" %#} </a></li> 
+          <li class="view_list" id="Videos"><a><i class="fi-play-circle"></i> {#% trans "Videos" %#} </a></li>  
+          <li class="view_list" id="Audios"><a><i class="fi-music"></i> {#% trans "Audios" %#} </a></li>  
+          <li class="view_list" id="Documents"><a><i class="fi-page-filled"></i> {#% trans "Documents" %#} </a></li>  
+          <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {#% trans "Interactives" %#} </a></li>  
+        </ul> -->
+        
+      {% else %}
+        <dd class="active page-view"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      {% endif %}
+      
       <!-- calling ndf tags for discussion replies -->
       {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-     {% comment %}
       <dd class="info-view"><a class="view-info"><i class=""></i> {% trans "Info Box" %}</a></dd>
-      {% endcomment %}
+      {% if "Group" not in node.member_of_names_list %}
+
       <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
-        
           {% if all_replies %}
             <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
               {% trans "Join Discussion" %} ({{ all_replies | length }})
             </span>
+
           {% else %}
-            <span title="{% trans 'Be the first to start a discussion' %}">
+	    <span title="{% trans 'Be the first to start a discussion' %}">
               {% trans "Begin Discussion" %}
             </span>
-          {% endif %}
+	  {% endif %}
 
         </a>
       </dd>
-
+      {% endif %}
+      
 
     </dl>
   </h1>
@@ -261,8 +272,10 @@
       <!-- Tab content -->
       <div class="content active commentable-section" id="view-page" data-section-id="1">
         <div class="row">
-          <div class="small-4 columns">
+          {% comment %}
+          <!-- <div class="small-4 columns">
             {% if node.prior_node|length > 0 %}
+	    {% if "Group" not in node.member_of_names_list %}
             <div class="panel">
 
               <h6>{% trans "You may want to read these first: " %}</h6>
@@ -272,10 +285,14 @@
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}aaaa</a>,&nbsp;
               {% else %}
               <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          }
 	      {% endif %}
               {% endfor %}
             </div>
+	    {% endif %}
               {% endif %}         </div>
+ -->
+          {% endcomment %}
 
           <div class="small-4 columns">
             {% get_teaches_list node as teaches_list %}
@@ -295,7 +312,7 @@
             {% endif %}
           </div>
 
-          <div class="small-4 columns">
+          <div class="small-4 small-pull-4 columns">
             <!-- {#% if node.assesses %#} -->
             {% get_assesses_list node as assesses_list %}
             {% if assesses_list %}
@@ -329,9 +346,11 @@
               
               <ul data-orbit data-options="variable_height: true;timer:false;">              
                 <li class="active">
-                  <center>                    
+                  <center>                   
                   {% if 'image' in node.mime_type %}
+                  <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                    </a>
                   {% elif 'Pandora_video' in node.member_of_names_list %}
                     {% get_source_id node.pk as source_id %}
                     <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
@@ -355,7 +374,9 @@
                   <li>
                     <center>
                       {% if 'image' in obj.mime_type %}
+                      <a class="th" href="{% url 'read_file' group_name_tag k grid_fs_obj.filename %}">
                         <img src="{% url 'get_mid_size_img' group_name_tag k %}" /> 
+                      </a>
                       {% elif 'Pandora_video' in obj.member_of_names_list %}
                         {% get_source_id k as source_id %}
                         <!-- <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls> -->
@@ -403,7 +424,9 @@
 
           {% else %}
               {% if 'image' in node.mime_type %}
-                <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                  <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
+                </a>
               {% elif 'Pandora_video' in node.member_of_names_list %}
                 {% get_source_id node.pk as source_id %}
                 <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
@@ -491,27 +514,6 @@
         {% endfor %}
       
         <!-- <div id="commentable-area"> -->
-	<div>
-         {% if node.prior_node|length > 0 %}
-   
-         {% for index_key, each_node in node.prior_node_dict.items %}
-         {% get_grid_fs_object each_node as grid_fs_obj %}
-         {% if "Group" in node.member_of_names_list %}
-         {% get_object_value node as objvalue %}
-	    <table>
-	      <tbody>
-		{% for key, value in objvalue.items %}
-		<tr>
-		  <td> {{key}} : {{value}} </td>
-		</tr>
-		{% endfor %}
-	      <tbody>
-	    </table>
-              {% endif%}
-	    {% endfor %}
-            {% endif %}
-
-	</div>
         <div>
           {% with node.html_content|safe as description %}
           {% if description != "None" %}
@@ -519,14 +521,42 @@
           {% endif %}
           {% endwith %}
         </div>
+        <br/>
+	<div>
+         {% if node.prior_node|length > 0 %}
+   
+         {% for index_key, each_node in node.prior_node_dict.items %}
+         {% get_grid_fs_object each_node as grid_fs_obj %}
+         {% if "Group" in node.member_of_names_list %}
+         {% get_object_value node as objvalue %}
+	    <table style="width:60%; border-width:0px;" >
+	      <tbody>
+		{% for key, value in objvalue.items %}
+		<tr>
+		  {% if key == "Website" %}
+		  <td align ="left"> {{key}}</td>  
+		 <td align = "right"><a href="{{value}}">{{value}}</a> </td>
+                  {% else %}
+		  <td align ="left"> {{key}}</td>  
+		  <td align = "right">{{value}}</td>
+		  {% endif %}
+		</tr>
+	{% endfor %}
+	      <tbody>
+	    </table>
+              {% endif%}
+	    {% endfor %}
+            {% endif %}
+
+	</div>
         <!-- </div> -->
         <!-- Resource contents of topic -->
 
         {% if topic %}
           <!-- <div class="content" id="view-graph">  </div> -->
 
-          <div class="content" id="contents"> 
-            
+          
+          <div class="topic_content" id="contents"> 
             {% get_contents node.pk as contents %}
             {% for k,v in contents.items %}    
 
@@ -554,8 +584,8 @@
               </fieldset>
 
             {% endfor %}          
-
           </div>
+
         {% endif %}
         <!-- End of displaying topic page contents -->
       </div>
@@ -568,7 +598,7 @@
         <!-- Content for Concept Graph -->
         <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
           <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
-          {% include "ndf/graph_concept.html" %}
+          <!-- {#% include "ndf/graph_concept.html" %#} -->
         </div>
         
         <!-- Content for Collection Graph -->
@@ -591,23 +621,47 @@
         <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
           <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
           <a class="close-reveal-modal" >&#215;</a>
-          {% include "ndf/map_widget.html" with mode="read" %}
+          <!-- {#% include "ndf/map_widget.html" with mode="read" %#} -->
           <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
           <!-- #{#%# endif %} -->
         </div>
         
       {% endif %}
       <div id="view-info" style="display:none;">
-       
-       <table>
-   <tbody>
-        {% for key, value in obj.items %}
-        <tr>          
-        <td> {{key}} : {{value}} </td>
-        </tr>
-        {% endfor %}
-    <tbody>   
-</table>
+       <br/>
+	<table style="width:100%; border-width:0px; font-weight:bold" >
+	  <tbody>
+	    {% get_json node.pk as jsonobj %}
+	    {% str_to_dict jsonobj as obj %}
+    
+	    {% for key, value in obj.items %}
+	    <tr>
+	      <td align ="left"> {{key|del_underscore|title}}</td>
+              
+	      <td align = "right"> 
+		{% if "None" not in value %}
+		{% if key|is_in:"attribute_set, file_size, relation_set" %}
+	     
+		{% for k, v in value.items %}
+		{{k}} : {{v}}<br/>
+		{% endfor %}
+		{% elif key|is_in:"group_set ,collection_set, member_of, tags, prior_node, post_node" %}
+		{% for each in value %}
+		{{each}}</br>
+	    	{% endfor %}
+		{% else %}
+		{{value}}
+		{% endif %}
+	      </td>
+	      {% else %}	     
+	      {{value}}</td>
+             {% endif %}
+	    </tr>
+	    {% endfor %}
+	  <tbody>
+	</table>
+
+
      </div>
 
       <div id="view-discussion" style="display:none;">
@@ -819,7 +873,7 @@
     <!-- Below code/widgets will only be shown for all resource instances/documents
          which are neither Topic nor Concept
     -->
-    <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></li>
+    <!-- <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {#% trans "Location" %#}</a></li> -->
 
     <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
     </li>
@@ -921,8 +975,7 @@
 
   </section>
 
-    
-    
+
 <script type="text/javascript">
 
   // publishing resource in other groups
@@ -981,9 +1034,9 @@
   var svgdata;
   $(document).ready(function() {
       $(function() {
-        // For topic node landing page concept svg graph
-        svgdata = $('#chart-concept svg');
-        $('#view-graph').append(svgdata);
+        // For topic node landing page concept svg graph commented for time being
+        // svgdata = $('#chart-concept svg');
+        // $('#view-graph').append(svgdata);
 
       });
   });
@@ -993,6 +1046,60 @@
     $('#view-concept-graph #chart-concept').append(svgdata); 
     $('#view-concept-graph').foundation('reveal', 'open'); 
   });
+
+  // select particular type to display contents in topic page
+  // $(".view_list").click(function() {
+    
+  //   var selected = this.id;
+
+  //   $.ajax({
+  //     type: "POST",
+  //     url: "{#% url 'get_topic_contents' groupid %#}",
+  //     datatype: "html",
+  //     data:{
+  //       node_id: '{{node.pk}}',
+  //       selected: selected,
+  //       csrfmiddlewaretoken: '{{ csrf_token }}'
+  //     },
+  //     success: function(data) { 
+
+  //       data_obj = JSON.parse(data);
+  //       if (data != "{}"){
+
+  //         var k = Object.keys(data_obj);
+  //         var len = data_obj[k].length;
+
+  //         cont_list = []
+  //         for (var i = 0; i < len; i++) { 
+  //           var res_id = data_obj[k][i][1]
+  //           if (k == "Images"){
+  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'image_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");  
+  //           }
+  //           else if(k == "Videos"){
+  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'video_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'><img data-id="+res_id+" src='{#% url 'getFileThumbnail' group_name_tag 'replace_with_id' %#}' /> <br/><div>"+data_obj[k][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+  //           }
+  //           else{
+  //             cont_list.push("<a data-id="+res_id+" href='{#% url 'file_detail' group_name_tag 'replace_with_id' %#}' style='display: inline-block'>"+data_obj[k][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+  //           }
+            
+  //         } 
+
+  //         cont_list = cont_list.join(" ")
+  //         var cont = "<fieldset> <legend>"+k+"</legend>"+ cont_list +"</fieldset>"        
+
+  //         $(".topic_content").html(cont);
+
+  //         $("a[data-id]").each(function(){var res_link = this.href.replace("replace_with_id", $(this).attr("data-id")); this.href=res_link})
+  //         $("img[data-id]").each(function(){var res_link = this.src.replace("replace_with_id", $(this).attr("data-id")); this.src=res_link})
+  //       }
+  //       else{
+  //         var cont = "<h3>No "+selected+" in this topic</h3>"
+  //         $(".topic_content").html(cont);
+  //       }
+  //     }
+  //   });
+
+  // });
 
   $(document).on('click','.view-discussion',function(){
     $("#view-page").css("display", "none");
@@ -1030,75 +1137,75 @@
 
   $(document).on('close', '#view-concept-graph[data-reveal]', function () {
     $('#view-graph').append(svgdata);
-  })
+  });
   
 
-  $(document).on('open', '#view-map-widget[data-reveal]', function () {  
+//   $(document).on('open', '#view-map-widget[data-reveal]', function () {  
     
-    $.ajax({
-  url: "{% url 'get_visited_location' groupid %}",
-  success: function(data){ 
+//     $.ajax({
+//   url: "{#% url 'get_visited_location' groupid %#}",
+//   success: function(data){ 
 
-    data = JSON.parse(data);
+//     data = JSON.parse(data);
 
-    var lastVisitedLocationVal = data;
+//     var lastVisitedLocationVal = data;
     
-    if(lastVisitedLocationVal){
+//     if(lastVisitedLocationVal){
 
-      if(lastVisitedLocationVal == "[]"){
-        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-      }
+//       if(lastVisitedLocationVal == "[]"){
+//         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+//       }
 
-      if(lastVisitedLocationVal.length > 0){
-            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-            var zoom = lastVisitedLocationVal.pop(),
-                lng = lastVisitedLocationVal[1],
-                lat = lastVisitedLocationVal[0];
-              map.setView([lat, lng], zoom);
-            }
-    }
-    else if( tempArr.length )
-    {
-      var group = new L.featureGroup(tempArr)
-          map.fitBounds(group.getBounds());
-    }
+//       if(lastVisitedLocationVal.length > 0){
+//             // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+//             var zoom = lastVisitedLocationVal.pop(),
+//                 lng = lastVisitedLocationVal[1],
+//                 lat = lastVisitedLocationVal[0];
+//               map.setView([lat, lng], zoom);
+//             }
+//     }
+//     else if( tempArr.length )
+//     {
+//       var group = new L.featureGroup(tempArr)
+//           map.fitBounds(group.getBounds());
+//     }
 
-  }
-});
+//   }
+// });
 
-  });
+//   });
 
 
-  $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+//   $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
       
-    map.invalidateSize();  
+//     map.invalidateSize();  
 
-    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
-    // if(lastVisitedLocationVal){
+//     // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+//     // if(lastVisitedLocationVal){
 
-    //   if(lastVisitedLocationVal == "[]"){
-    //     lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-    //   }
+//     //   if(lastVisitedLocationVal == "[]"){
+//     //     lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+//     //   }
 
-    //   if(lastVisitedLocationVal.length > 0){
-    //         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-    //         var zoom = lastVisitedLocationVal.pop(),
-    //             lng = lastVisitedLocationVal[1],
-    //             lat = lastVisitedLocationVal[0];
-    //           map.setView([lat, lng], zoom);
-    //         }
-    // }
+//     //   if(lastVisitedLocationVal.length > 0){
+//     //         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+//     //         var zoom = lastVisitedLocationVal.pop(),
+//     //             lng = lastVisitedLocationVal[1],
+//     //             lat = lastVisitedLocationVal[0];
+//     //           map.setView([lat, lng], zoom);
+//     //         }
+//     // }
 
 
-    // if( tempArr.length )
-    // {
-    //   var group = new L.featureGroup(tempArr)
-    //       map.fitBounds(group.getBounds());
-    // }
+//     // if( tempArr.length )
+//     // {
+//     //   var group = new L.featureGroup(tempArr)
+//     //       map.fitBounds(group.getBounds());
+//     // }
 
-    // map.setView([lat, lng], zoom);
+//     // map.setView([lat, lng], zoom);
 
-  });
+//   });
 
   // iframe for html content  
   function adjustIframeHt(){
