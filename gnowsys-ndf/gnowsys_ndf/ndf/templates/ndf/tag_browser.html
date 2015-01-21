@@ -30,32 +30,26 @@
    					float:right;
     			}
 {%endcomment%}
-
-
-   		
+    h1 { font-size: 200%;}  
+    b { font-size: 150%;}
 {% endblock %}
 
-
-
 {% block body_content %} 
-
- 
           <!--<div class="pos_right">asdsdsd</div>
     			<div class="pos_left">asdddfff</div>
     			<div class="block">jjjj</div>-->
 
 <form id ="search_result" action="{% url 'tag_info' group_id %}" method="GET">
-    <p class = "Focus" id = "">
-        <b>Jump to:</b>
-        <input type = "text" name = "search"  style ="width:300px;" maxlength = "20" placeholder = " search other files by tagname" textarea = "">
+    <p class="Focus"> 
+        <b>Jump To:</b> 
+        <input type = "text" name = "search"  style ="width:300px;" maxlength = "20" placeholder = " search other files by tagname" >
         <input type = "submit" value = "GO">
     </p>
 </form>
 <hr></hr>
 {% if tagname %}
-    <h1>Tagname <mark>{{tagname}}</mark> related all files</h1>
+    <h1>Tagname <strong>{{tagname}}</strong> related all files</h1>
 {% endif %}
-
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 {%  for each in search_result %}
