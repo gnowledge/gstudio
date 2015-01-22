@@ -2,6 +2,13 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% block title %} Tag Browser {% endblock %}
+
+{% block meta_content %}
+    <h1 class="subheader">{% trans "What are Tags?" %}</h1><hr/>
+    <p class="subheader">{% blocktrans %}<b>Tag</b> which is like a keyword or category label.Tags help you find photos,videos,files and pages which have something in common.</p>{% endblocktrans%}
+
+{% endblock %}
+
 {% block style %}
 {%comment%}
    	.block{ border: 2px solid #a1a1a1;
@@ -30,7 +37,9 @@
    					float:right;
     			}
 {%endcomment%}
-    h1 { font-size: 200%;}  
+    h1,h2 { font-size: 200%;}
+    p { font-size: 100%; }  
+    i { font-size: 110%;}
     b { font-size: 150%;}
 {% endblock %}
 
@@ -39,35 +48,35 @@
     			<div class="pos_left">asdddfff</div>
     			<div class="block">jjjj</div>-->
 
-<form id ="search_result" action="{% url 'tag_info' group_id %}" method="GET">
+<form id ="search_result" action="{% url 'tag_info' group_id %}" method="GET" onsubmit="document.getElementById('submit_button').disabled = 1;">
     <p class="Focus"> 
         <b>Jump To:</b> 
         <input type = "text" name = "search"  style ="width:300px;" maxlength = "20" placeholder = " search other files by tagname" >
-        <input type = "submit" value = "GO">
+        <input type = "submit" value = 'GO'>
     </p>
 </form>
 <hr></hr>
 {% if tagname %}
-    <h1>Tagname <strong>{{tagname}}</strong> related all files</h1>
+    {% if search_result %}
+        <h2>Tagname <strong><i>{{tagname}}</i></strong> related contain : {{total}}</h2>
+    {% elif not search_result %}
+        <h2>Not such <strong><i>{{tagname}}</i></strong> tagname,{{total_length}} result found</h2>
+    {% endif %}
 {% endif %}
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 {%  for each in search_result %}
 <li class="card">
     <a href="{% url 'page_details' group_id each.pk %}">
-        
     <header>
       <div class="label-list">
         {% for tag in each.tags %}
           <span class="label"><mark>{{tag}}</mark></span>
         {% endfor %}
       </div>
-        
       <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
-          <h4>{{ each.name|truncatechars:10 }}</h4>
+            <h3>{{ each.name|truncatechars:10 }}</h3>
             <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-
       <div>
         <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
         <br/>
@@ -78,7 +87,6 @@
     </header>
    </a> 
 </li>
-
 {% endfor %}
 </ul>
 {% endblock %}	

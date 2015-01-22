@@ -1015,12 +1015,12 @@ def tag_info(request, group_id, tagname = None):
     Function to get all the resources related to tag
     '''
     cur = None
-    keyword_search = []
+    total = None
+    total_length = None
     yesterdays_result = []
     week_ago_result = []
     search_result = []
     group_cur_list = [] #for AutheticatedUser
-    private_group_cur_list = [] #for Superuser
     today = date.today()
     yesterdays_search = {date.today()-timedelta(days=1)}
     week_ago_search = {date.today()-timedelta(days=7)}
@@ -1028,14 +1028,15 @@ def tag_info(request, group_id, tagname = None):
     collection = get_database()[Node.collection_name]
 
     if not tagname:
-        tagname = request.GET.get("search","")
-
+        tagname = request.GET.get("search","").lower()
+         
     if request.user.is_authenticated():       #Autheticate user can see all public files  
         group_cur = collection.Node.find({'_type':'Group',
                                            '$or':[ {'created_by':userid},
                                                  {'group_admin':userid},
                                                  {'author_set':userid},
-                                                 {'group_type':u'PUBLIC'}
+                                                 {'group_type':u'PUBLIC'},
+                                                 {'group_type':u'PRIVATE'}
                                                ]
                                     }      
                                 )
@@ -1048,9 +1049,13 @@ def tag_info(request, group_id, tagname = None):
                                          'status':u'PUBLISHED'
                                     }
                              )
-            for every in cur:
+            for every in cur: 
                 search_result.append(every)
-         
+
+        total = len(search_result)
+        if len(search_result) == 0:
+            total_length = len(search_result)
+                
     elif request.user.is_superuser:  #Superuser can see private an public files 
         if tagname:
             cur = collection.Node.find( {'tags':tagname,
@@ -1062,7 +1067,9 @@ def tag_info(request, group_id, tagname = None):
             for every in cur:
                 search_result.append(every)
 
-        
+        total = len(search_result)
+        if len(search_result) == 0:
+            total_length = len(search_result)    
 
     else: #UNauthenticated user can see all public files.
         if tagname:
@@ -1074,9 +1081,13 @@ def tag_info(request, group_id, tagname = None):
             for every in cur:
                 search_result.append(every)
 
+        total = len(search_result)
+        if len(search_result) == 0:
+            total_length = len(search_result)
+
     return render_to_response(
         "ndf/tag_browser.html", 
-        {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname},
+        {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},
         context_instance=RequestContext(request)
     )
       
