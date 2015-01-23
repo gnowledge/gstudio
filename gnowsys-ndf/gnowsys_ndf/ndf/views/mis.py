@@ -153,13 +153,27 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       university_gst = collection.Node.one({'_type': "GSystemType", 'name': "University"})
       student_gst = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
 
-      university_cur = collection.Node.find({'member_of': university_gst._id}).sort('name', 1)
+      mis_admin = collection.Node.one(
+          {'_type': "Group", 'name': "MIS_admin"},
+          {'_id': 1}
+      )
+
+      university_cur = collection.Node.find(
+        {'member_of': university_gst._id, 'group_set': mis_admin._id},
+        {'name': 1, 'relation_set.affiliated_college': 1}
+      ).sort('name', 1)
 
       for each_university in university_cur:
+        affiliated_college_ids_list = []
+        for rel in each_university.relation_set:
+          if rel and "affiliated_college" in rel:
+            affiliated_college_ids_list = rel["affiliated_college"]
+            break
+
         students_cur = collection.Node.find(
           {
             'member_of': student_gst._id,
-            'relation_set.student_belongs_to_university': each_university._id
+            'relation_set.student_belongs_to_college': {'$in': affiliated_college_ids_list}
           }
         )
 
