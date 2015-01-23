@@ -27,6 +27,7 @@ import re
 import ast
 import string
 import json
+import locale
 from datetime import datetime,timedelta,date
 
 
@@ -1024,6 +1025,7 @@ def tag_info(request, group_id, tagname = None):
     today = date.today()
     yesterdays_search = {date.today()-timedelta(days=1)}
     week_ago_search = {date.today()-timedelta(days=7)}
+    locale.setlocale(locale.LC_ALL, '')
     userid = request.user.id
     collection = get_database()[Node.collection_name]
 
@@ -1053,9 +1055,10 @@ def tag_info(request, group_id, tagname = None):
                 search_result.append(every)
 
         total = len(search_result)
+        total = locale.format("%d", total, grouping=True)
         if len(search_result) == 0:
             total_length = len(search_result)
-                
+
     elif request.user.is_superuser:  #Superuser can see private an public files 
         if tagname:
             cur = collection.Node.find( {'tags':tagname,
@@ -1068,13 +1071,15 @@ def tag_info(request, group_id, tagname = None):
                 search_result.append(every)
 
         total = len(search_result)
+        total = locale.format("%d", total, grouping=True)
         if len(search_result) == 0:
             total_length = len(search_result)    
 
     else: #UNauthenticated user can see all public files.
         if tagname:
             cur = collection.Node.find( {  'tags':tagname,
-                                            'group_type':u'PUBLIC',
+                                           'group_type':u'PUBLIC',
+                                           'access_policy':u'PUBLIC',
                                            'status':u'PUBLISHED'
                                         }
                                  )
@@ -1082,9 +1087,10 @@ def tag_info(request, group_id, tagname = None):
                 search_result.append(every)
 
         total = len(search_result)
+        total = locale.format("%d", total, grouping=True)
         if len(search_result) == 0:
             total_length = len(search_result)
-
+            
     return render_to_response(
         "ndf/tag_browser.html", 
         {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},
