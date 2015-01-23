@@ -54,7 +54,9 @@
 {% endblock %}
 
 {% block body_content %} 
+  {% get_group_name groupid as groupname %}
   <form data-abide id="form-edit-node" method="POST" action="">
+    
     {% csrf_token %}
 
     <header class="row" style="margin: 1rem 0 0 0;">
@@ -92,12 +94,25 @@
       <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
         {% for field in tab_fields_list %}
         <div class="row">
+          {% if groupname != "MIS_admin"  %}
+              {% if  field.altnames != 'Organised by' %} 
           <div class="small-2 columns"> 
             <label for="{{field.name}}" class="right inline"> {{field.altnames}} </label>
           </div>
           <div class="small-5 end columns">
             {% html_widget groupid node.pk field %}
           </div>
+           {% endif %}
+          {% endif %}
+          
+          {% if groupname == "MIS_admin"  %}
+          <div class="small-2 columns"> 
+            <label for="{{field.name}}" class="right inline"> {{field.altnames}} </label>
+          </div>
+          <div class="small-5 end columns">
+            {% html_widget groupid node.pk field %}
+          </div>
+          {% endif %}
         </div>
         {% endfor %}
 
@@ -136,25 +151,7 @@
 {% block script %}
   {{block.super}}
 
-  $.ajax({
-      url: "{% url 'fetch_course_name' 'Foundation Course' groupid  %}",
-      type: "GET",
-      success: function(data){
-      courses=JSON.parse(data)
-      },
-     complete:function(){
-       $.each(courses, function(key,val) {
-        $('#cname').append(
-          $("<option></option>")
-            .attr("id", "coursename_"+key.id)
-            .attr("value", key)
-            .text(val.name)
-           );
-            });
-          } 
-      });
-  }
-
+ 
   
 
 
@@ -257,7 +254,7 @@
       $(this).removeAttr('disabled');
     });
 
-    alert("coming...");
+    
 
     $('article').block({ 
       message: '<h4>Processing... Please wait!</h4>',
