@@ -1176,7 +1176,7 @@ def get_prior_node(node_id):
 
 
 @register.assignment_tag
-def get_contents(node_id):
+def get_contents(node_id, selected, choice):
 
 	contents = {}
 	image_contents = []
@@ -1185,6 +1185,8 @@ def get_contents(node_id):
 	page_contents = []
 	audio_contents = []
 	interactive_contents = []
+	name = ""
+	ob_id = ""
 
 	obj = collection.Node.one({'_id': ObjectId(node_id) })
 
@@ -1211,16 +1213,37 @@ def get_contents(node_id):
 
 			for attr in list_gattr:
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
-				if attr.object_value == "Images":
-					image_contents.append((left_obj.name, left_obj._id))
-				elif attr.object_value == "Videos":
-					video_contents.append((left_obj.name, left_obj._id))
-				elif attr.object_value == "Audios":
-					audio_contents.append((left_obj.name, left_obj._id))
-				elif attr.object_value == "Interactives":
-					interactive_contents.append((left_obj.name, left_obj._id))
-				elif attr.object_value == "Documents":
-					document_contents.append((left_obj.name, left_obj._id))
+				
+				if selected:
+					if left_obj.attribute_set[4][selected] == choice:
+						name = str(left_obj.name)
+						ob_id = str(left_obj._id)
+
+						if attr.object_value == "Images":
+							image_contents.append((name, ob_id))
+						elif attr.object_value == "Videos":
+							video_contents.append((name, ob_id))
+						elif attr.object_value == "Audios":
+							audio_contents.append((name, ob_id))
+						elif attr.object_value == "Interactives":
+							interactive_contents.append((name, ob_id))
+						elif attr.object_value == "Documents":
+							document_contents.append((name, ob_id))
+
+				else:
+					name = str(left_obj.name)
+					ob_id = str(left_obj._id)
+
+					if attr.object_value == "Images":
+						image_contents.append((name, ob_id))
+					elif attr.object_value == "Videos":
+						video_contents.append((name, ob_id))
+					elif attr.object_value == "Audios":
+						audio_contents.append((name, ob_id))
+					elif attr.object_value == "Interactives":
+						interactive_contents.append((name, ob_id))
+					elif attr.object_value == "Documents":
+						document_contents.append((name, ob_id))
 
 							
 	if image_contents:
@@ -1242,48 +1265,7 @@ def get_contents(node_id):
 	# print "\n",contents,"\n"
 	return contents
 
-
-	# page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'}) 
-
-	# obj = collection.Node.one({'_id': ObjectId(node_id) })
-	# if obj.collection_set:
-	# 	for each in obj.collection_set:
-	# 		coll_obj = collection.Node.one({'_id': ObjectId(each) })
-
-	# 		if coll_obj.has_key("mime_type"):
-	# 			if 'image' in coll_obj.mime_type:
-	# 				image_contents.append((coll_obj.name, coll_obj._id))
-	# 			elif 'video' in coll_obj.mime_type:
-	# 				video_contents.append((coll_obj.name, coll_obj._id))
-	# 			else:
-	# 				if coll_obj._type == "File":
-	# 					document_contents.append((coll_obj.name, coll_obj._id))
-	# 		else: 
-	# 			if page_GST._id in coll_obj.member_of:
-	# 				page_contents.append((coll_obj.name, coll_obj._id))
 	
-
-	# 	if not image_contents:
-	# 		image_contents.append("None")
-	# 	elif image_contents:
-	# 		contents['image_contents'] = image_contents
-
-	# 	if not video_contents:
-	# 		video_contents.append("None")
-	# 	elif video_contents:
-	# 		contents['video_contents'] = video_contents
-
-	# 	if not document_contents:
-	# 		document_contents.append("None")
-	# 	elif document_contents:
-	# 		contents['document_contents'] = document_contents
-		
-	# 	if page_contents:
-	# 		contents['page_contents'] = page_contents		
-
-	# # print "\n",document_contents,"\n"
-	# return contents
-
 
 @register.assignment_tag
 def get_teaches_list(node):
