@@ -123,7 +123,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   reschedule = True
   marks=""
   property_order_list = []
-
+  
   #template_prefix = "mis"
 
   if request.user:
@@ -218,6 +218,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         'nodes': nodes, 'node': node,
                         'event_gst':event_gst.name,
                         'Add':Add,
+                         'Eventtype':Eventtype, 
                          # 'property_order_list': property_order_list
                       }
 

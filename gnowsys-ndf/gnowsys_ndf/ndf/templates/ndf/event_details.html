@@ -169,6 +169,10 @@ table, th, td {
             </div>
           </div>
 
+          {% if  Eventtype == 'Eventtype' %}
+          
+          
+          {%  if node.event_organised_by %}
           <br>
           <div class="row">
             <div class="small-3 columns">
@@ -186,6 +190,8 @@ table, th, td {
             </div>
           </div>
           
+          {% endif %}
+          {% endif %}
          
           
           
@@ -225,6 +231,7 @@ table, th, td {
           </div>
           {% endif %}
            <br>
+         {% if Eventtype == 'CollegeEvents' %}  
           <div class="row">
             <div class="small-3 columns">
               <label>Batch:</label>
@@ -258,7 +265,7 @@ table, th, td {
               <label>{{course.attribute_set.6.min_marks}}</label>
             </div>
        </div>
-        
+        {% endif %}
           <br>
           <br>
           {% with node.html_content|safe as description %}
