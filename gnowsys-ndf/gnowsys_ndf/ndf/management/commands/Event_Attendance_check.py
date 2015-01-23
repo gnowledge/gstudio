@@ -42,14 +42,20 @@ class Command(BaseCommand):
               Mis_admin_name=user_obj.username
           
           try:
+              
+           
               Attendance_Event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.end_time":{'$gte':day_before_yesterday,'$lt':Today}})
+
+              rescheduled_events=collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.reschedule_attendance.reschedule_till":{'$gt':yesterday}})
 
               Attendance_marked_event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"relation_set.has_attended":{"$exists":False},"attribute_set.start_time":{'$gte':yesterday,'lt':Today}})
 
               reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+              for i in rescheduled_events:
+                create_gattribute(ObjectId(i._id),reschedule_attendance,{"reschedule_allow":False})
               
               for i in Attendance_Event:
-                create_gattribute(ObjectId(i._id),reschedule_attendance,False)
+                 create_gattribute(ObjectId(i._id),reschedule_attendance,{"reschedule_allow":False})
 
               for i in Attendance_marked_event:
                 for j in i.attribute_set:

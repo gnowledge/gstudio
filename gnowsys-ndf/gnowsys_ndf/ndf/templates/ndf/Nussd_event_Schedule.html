@@ -388,7 +388,15 @@ function GenerateSplits(splits){
 $(document).ready(function(){
  document.getElementById('form-edit-node').reset()
  datetime()
- clear_Disable_Elements();
+ if (!'{{node}}')
+   {clear_Disable_Elements();
+   }
+ 
+ if ('{{node}}')
+ {
+  
+    $('#view').hide()
+ }  
  var event_details=""
  
  $('#select_split').attr('hidden','True')
@@ -430,10 +438,22 @@ $(document).ready(function(){
                       .attr('value',event_details['cordinator'].cordinatorid)
                       .text(event_details['cordinator'].cordinatorname)
                       );
-    var a=event_details['cordinator'].cordinatorname                
-  
+    var a = event_details['cordinator'].cordinatorname
     $("select[name='event_coordinator'] option[value= a]").prop("selected", true);       
-  
+    
+    enable_submit()
+   $('#session_of').append(
+          $("<option></option>")
+                      .attr('id',event_details['session'].sessionid)
+                      .attr('value',event_details['session'].sessionid)
+                      .text(event_details['session'].sessionname)
+                      .attr('minutes',event_details['session'].sessionminutes)
+                      );
+    var event_session = event_details['session'].sessionname
+    total_session_time = event_details['session'].sessionminutes
+    $("#available-minutes").empty()
+    $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
+    $("select[name='session_of'] option[value= event_session]").prop("selected", true);       
     document.getElementById('event_has_batch').disabled = "";
     Enable_Elements()     
     var course_type=$("#event_has_batch").val()  
@@ -759,10 +779,15 @@ function enable_submit()
   if (total_session_time == 0 && vt_selected_index != 0 ){
       document.getElementById('submit').disabled = "";      
   }
-else
+else 
 {
     document.getElementById('submit').disabled = true;      
 }
+
+if('{{node}}')
+ {
+  document.getElementById('submit').disabled = "";      
+ }
 
 
 }
