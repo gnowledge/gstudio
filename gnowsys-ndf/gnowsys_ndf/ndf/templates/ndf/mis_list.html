@@ -4,9 +4,11 @@
 {% load pagination_tags %}
 
 {% block title %} {{ title }} {% endblock %}
+
 {% block head %}
   <script type="text/javascript" src="http://davidlynch.org/projects/maphilight/jquery.maphilight.js"></script>
 {% endblock %}
+
 {% block style %}
   {{block.super}}
 
@@ -66,6 +68,13 @@
 
 {% block meta_content %}
   {% check_is_gstaff groupid request.user as gstaff_access %}
+  
+  {% comment %}
+  <!-- 
+    get_features_with_special_rights: Returns list of feature(s) for which creation rights should not be given
+  -->
+  {% endcomment %}
+  {% get_features_with_special_rights groupid request.user as features_list %}
 
   <ul class="side-nav"> 
   	<li>
@@ -91,7 +100,7 @@
             {{each.name}} ({{count}})
           </a>
 
-          {% if gstaff_access %}
+          {% if gstaff_access and each.name not in features_list %}
           <a class="large-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
             +&nbsp;Add
           </a>
@@ -162,7 +171,7 @@
         <li>
           <b>{{university_name}}</b>
           <ol> 
-            <i>Students registered</i>: <code><{{students_count}}</code>
+            <i>Students registered</i>: <code>{{students_count}}</code>
           </ol>
         </li>
         {% endfor %}
