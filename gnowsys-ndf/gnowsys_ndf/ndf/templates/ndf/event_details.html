@@ -95,54 +95,63 @@ table, th, td {
                               <label>{{node.end_time}}</label>
                             </div>
                           </div>
-
-                          
-                        
-
                           <br>
-                          <div class="row">
-                            <div class="small-3 columns">
-                              <label>Event organised by:</label>
-                            </div>
-                            <div class="small-5 end columns">
-                              {% for details in node.event_organised_by %}
-                                <label>
-                                {% if forloop.counter != 1 %}
-                                
-                                {% endif %}
-                                {{details.name}}
-                                </label>
-                              {% endfor %}
-                            </div>
-                          </div>
-                          
+                          {% if  Eventtype == 'Eventtype' %}
+                               {%  if node.event_organised_by %}
+                                  <br>
+                                  <div class="row">
+                                    <div class="small-3 columns">
+                                      <label>Event organised by:</label>
+                                    </div>
+                                    <div class="small-5 end columns">
+                                      {% for details in node.event_organised_by %}
+                                        <label>
+                                        {% if forloop.counter != 1 %}
+                                        ,
+                                        {% endif %}
+                                        {{details.name}}
+                                        </label>
+                                      {% endfor %}
+                                    </div>
+                                  </div>
+                                  
+                                  {% endif %}
+                                  {% endif %}
+                                 
+                                  
+                                  
+                                  <br> 
+                                 {% if node.event_coordinator %} 
+                                  <div class="row">
+                                    <div class="small-3 columns">
+                                      <label>Event Co-ordinator:</label>
+                                    </div>
+                                    <div class="small-5 end columns">
+                                      {% for details in node.event_coordinator %}
+                                        <label>
+                                        {% if forloop.counter != 1 %}
+                                        {% endif %}
+                                        {{details.name}}
+                                        </label>
+                                      {% endfor %}
+                                    </div>
+                                  </div>
+                                  {% endif %}
+                                   <br>
+                                 {% if Eventtype == 'CollegeEvents' %}  
+                                  <div class="row">
+                                    <div class="small-3 columns">
+                                      <label>Batch:</label>
+                                    </div>
+                                    <div class="small-5 end columns">
+                                      <label>{{batch}}</label>
+                                    </div>
+                                  </div>
+                                    <br>
+                                </div>
+
                          <br> 
-                         {% if node.event_coordinator %} 
-                          <div class="row">
-                            <div class="small-3 columns">
-                              <label>Event Co-ordinator:</label>
-                            </div>
-                            <div class="small-5 end columns">
-                              {% for details in node.event_coordinator %}
-                                <label>
-                                {% if forloop.counter != 1 %}
-                                {% endif %}
-                                {{details.name}}
-                                </label>
-                              {% endfor %}
-                            </div>
-                          </div>
-                          {% endif %}
-                           <br>
-                          <div class="row">
-                            <div class="small-3 columns">
-                              <label>Batch:</label>
-                            </div>
-                            <div class="small-5 end columns">
-                              <label>{{batch}}</label>
-                            </div>
-                          </div>
-                            <br>
+                        
                         <div class="row">
                             <div class="small-3 columns">
                               <label>Course:</label>
@@ -262,8 +271,7 @@ table, th, td {
                  </div> <!-- End of class="tabs-content" -->
       </div>
 
-</div>
-
+          
 {% endblock %}
 
 {% block script %}
