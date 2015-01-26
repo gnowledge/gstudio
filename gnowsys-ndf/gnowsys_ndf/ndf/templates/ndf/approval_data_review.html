@@ -6,10 +6,6 @@
         text-align: center;
     }
 
-    .width_s_no {
-        width: 5%;
-    }
-    
     .counter {
         font-weight: bold;
         text-align: right;
@@ -18,6 +14,28 @@
     .margin-0r {
         margin: 0 !important;
     }
+
+    table {
+        border-collapse: collapse;
+        overflow-x: scroll;
+        display: block;
+    }
+    thead {
+        background-color: #EFEFEF;
+    }
+    thead, tbody {
+        display: block;
+    }
+    tbody {
+        overflow-y: scroll;
+        overflow-x: hidden;
+        height: 300px;
+    }
+    td, th {
+        min-width: 183px;
+        height: 25px;
+        border: 1px lightblue;
+    }   
 
 </style>
 
@@ -40,10 +58,10 @@
   </div>
 </div>
 {% if approval_nodes %}
-<table>
+<table align="center" id="table_data">
     <thead>
     <tr>
-        <th class="width_s_no counter">{% trans "S. #" %}</th>
+        <th class="text-center">{% trans "Sr. #" %}</th>
         <th class="text-center">{% trans "Approve/Reject" %}<br><input type="checkbox" class="margin-0r checkAllStudents"></th>
         {% for col in enrollment_columns %}
         <th>{{col}}</th>
@@ -55,10 +73,10 @@
     {% regroup approval_nodes|dictsort:"Name" by Name as approval_nodes_sort_by_name %}
     {% for sn in approval_nodes_sort_by_name %}
     <tr>
-        <td class="width_s_no counter">{{forloop.counter}}.</td>
+        <td class="text-center">{{forloop.counter}}.</td>
         <td class="text-center"><input type="checkbox" class="margin-0r approveStudent" id="{{sn.list.0|get_dict_item:'_id'}}"></td>
         {% for col in enrollment_columns %}
-        <td class="width_{{col}}">{{sn.list.0|get_dict_item:col}}</td>
+        <td>{{sn.list.0|get_dict_item:col}}</td>
         {% endfor %}
     </tr>
     {% endfor %}
@@ -78,7 +96,6 @@
     </div>
 </div>
 
-
 <script type="text/javascript">
   $(document).foundation();
 
@@ -89,4 +106,11 @@
   bind('ajaxStop', function(){
     $(this).hide();
   });
+
+$("#table_data tbody tr").click(function(e){
+  if (e.target.type != 'checkbox' && e.target.tagName != 'A'){
+    var cb = $(this).find("input[type=checkbox]");
+    cb.trigger('click');
+  }
+});
 </script>
