@@ -228,6 +228,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         'Add':Add,
                         'reschedule_time' : reschedule_time,
                         'reschedule'    : reschedule, 
+                        'Eventtype':Eventtype,
                          # 'property_order_list': property_order_list
                       }
 

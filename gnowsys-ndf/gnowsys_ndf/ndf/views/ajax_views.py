@@ -4027,6 +4027,21 @@ def close_event(request,group_id,node):
     create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":datetime.datetime.today(),"reschedule_allow":False})
 
     return HttpResponse("event closed") 
+def save_time(request,group_id,node):
+  start_time = request.POST.get('start_time','')
+  end_time = request.POST.get('end_time','')
+  reschedule_event_start = collection.Node.one({"_type":"AttributeType","name":"start_time"})
+  reschedule_event_end = collection.Node.one({"_type":"AttributeType","name":"end_time"})
+  create_gattribute(ObjectId(node),reschedule_event_start,start_time) 
+  create_gattribute(ObjectId(node),reschedule_event_end,end_time) 
+  return HttpResponse("time changed") 
+def check_date(request,group_id,node):
+    test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$gt':datetime.datetime.today()}})
+    if test_output.count() != 0:
+       message = "event Open" 
+    if test_output.count == 0:
+       message = "event closed"   
+    return HttpResponse("event closed") 
 
 def reschedule_task(request,group_id,node):
  task_dict={}

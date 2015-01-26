@@ -5,11 +5,23 @@
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
 {% block head %}  
+{{block.super}}
 
   <!-- Scripts required for D3 graph -->
   <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
   <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
   <script type="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+  
+  <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+  <script src="/static/ndf/bower_components/moment/moment.js"></script> 
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
 {% endblock %}
 
@@ -68,9 +80,13 @@ table, th, td {
                             <div class="small-5 end columns">
                               <label>{{node.start_time}}</label> 
                             </div>
+                            <div id='Edit_start_time' > 
+                                <a  onclick="checkDate()" class="tiny button">  Edit 
+                                </a>
+                            </div>
+                            <div id='reschedule'>
+                            </div>
                           </div>
-
-                          <br>
                           <div class="row">
                             <div class="small-3 columns">
                               <label>End time:</label>
@@ -79,6 +95,9 @@ table, th, td {
                               <label>{{node.end_time}}</label>
                             </div>
                           </div>
+
+                          
+                        
 
                           <br>
                           <div class="row">
@@ -194,13 +213,7 @@ table, th, td {
                                <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
                               </a>
                         </div>
-                        <div id='reschedule'>
-                        </div>
-                        <div id="countdown">
-                               <label id="message" style="color:red;"> Event-Reschedule would be closed after:</label>
-                               <label id='date'>  </label>     
-                             
-                        </div>
+                        
                         <ul id="edit-options" class="f-dropdown">
 
                           <li>
@@ -215,7 +228,27 @@ table, th, td {
  
                   </div> <!-- End of class="content active" -->
 
-                 <div class="content" id="view-Attendance" >    
+                 <div id="myModal" class="small reveal-modal" animation="None" data-reveal>
+                    <div class = "row"> 
+                       <div class = "small-2 columns">
+                         <label> Start_time </label>
+                       </div>  
+                       <div class = "small-4 columns"> 
+                         <input id="start_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time">
+                       </div>  
+                       <div class = "small-2 columns">
+                         <label> End_time </label>
+                       </div>
+                       
+                       <div class = "small-4 columns">  
+                         <input id="end_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="end_time">
+                       </div>  
+                    </div>     
+                    <div class="save" align="center">
+                       <input type="button" class="small button" onclick="saveTime()" value ="Save"> 
+                    </div> 
+                 </div>                
+                       <div class="content" id="view-Attendance" >    
                         
                         <div id="attendance">
                             
@@ -235,102 +268,25 @@ table, th, td {
 
 {% block script %}
  eventreschedule=""
- <!-- start_time is the time after which event would close -->
- <!-- if start_time of session is passed and a reschedule is allowed -->
- <!-- then the start _time would be reschdule time after which the event would close -->
- 
-          
- start_time = '{{node.start_time|date:"c" }}'
- reschdule_time = '{{reschedule_time|date:"c"}}'
- nIntervId = setInterval(enable_disable_edit, 500);
- start_time1()
 
- function start_time1()
+
+if ('{{Eventtype}}' == 'Eventtype')
   {
-    <!-- would decide the close time of the event -->  
-     current_datetime = new Date (Date())
-     save_date = new Date(start_time)
-     reschedule_date = new Date('{{reschedule_time|date:"c"}}')
-     if (current_datetime < save_date) 
-       {
-         
-          close_time = save_date 
-       } 
-     else if ( current_datetime < reschedule_date)
-       {
-          close_time = reschdule_time
-       }
-     else 
-      {
- 
-        close_time = ""
-      }
-  }
-          
- function enable_disable_edit()
-  {
-    <!--  this method whould decide wheather check time of disable edit -->
-   if (close_time) 
-    {
-    current_datetime = new Date (Date())
-    save_date = new Date(close_time)
-      if ( current_datetime < save_date )
-      {
-        flashText()     
-        $('#Edit').show()
-      } 
-    
-     }
-
-    if (current_datetime > save_date  || !(close_time) )
-      {
-          
-          $('#Edit').hide()
-          $('#countdown').hide()
-          $('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")
-          clearInterval(nIntervId);        
-         if ('{{reschedule}}' == 'True')
-           { 
-              closeEvent()
-           } 
-      }  
-    
-
+      $('#Edit').show()
 
   }
 
- function flashText()
-  { 
-      
-      <!-- method to show the remaining time after which edit option would be closed -->
-      <!-- take the difference -->
-      current_datetime = new Date (Date())
-      save_date = new Date(close_time)
-      var difference = current_datetime.getTime() - save_date.getTime();
-      <!-- gets the hours mins second remaing for event to close -->
-      var daysDifference = Math.floor(difference/1000/60/60/24);
-      var dayDifference = -daysDifference 
-      difference -= daysDifference*1000*60*60*24
-      var hoursDifference = Math.floor(difference/1000/60/60);
-      difference -= hoursDifference*1000*60*60
-      var minutesDifference = Math.floor(difference/1000/60);
-      difference -= minutesDifference*1000*60 
-      var secondsDifference = Math.floor(difference/1000);
+if ('{{reschedule}}' == 'False')
+{
+    add_reschedule()
+    $('#Edit_start_time').hide()
+}
 
-      $('#date').empty()
+function add_reschedule(){
 
-      if ( dayDifference > 0)
-      {
-        $('#date').append("<h4>" + save_date.toDateString() + "," + " "+ ( 23 - hoursDifference  ) + " : "+ (59 - minutesDifference ) + ":" + (60 - secondsDifference) + "</h4>")
-      }
-      
-      if ( dayDifference <= 0)
-      {
-        $('#date').append( ( 23 - hoursDifference  ) + " : "+ (59 - minutesDifference ) + ":" + (60 - secondsDifference))
-      }
-      
-  }   
-
+ $('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")
+}
+ 
 function closeEvent()
 {
 
@@ -346,6 +302,32 @@ function closeEvent()
           });
     
 }
+
+function checkDate()
+{
+    $.ajax({
+
+             url:"{% url 'check_date' groupid node %}",
+             type: "POST",
+             data:{
+             csrfmiddlewaretoken: '{{ csrf_token }}'},
+             success: function(data){
+                $('#myModal').foundation('reveal', 'open');
+                if (data == 'event open')
+                   { 
+                     //eventreschedule = "True"
+                    $('#myModal').foundation('reveal', 'open'); 
+                   }
+                if (data == 'event closed')
+                  {
+                    alert("Time to reschdule event has passed please request to central office")
+                    add_reschedule()
+                    closeEvent();
+                  }   
+             }
+          });
+}
+
 function controler()
 {
           //checks wheather the has_attende relation is createad or not 
@@ -401,7 +383,26 @@ function EditAttendance(columns)
           });
 
 }
+function saveTime()
+{
+     var start_time = $('#start_time').val()
+     var end_time   = $('#end_time').val()
+     $.ajax({
+               url:"{% url 'save_time' groupid node %}",
+               type: "POST",
+               data:{
+               start_time:start_time,
+               end_time:end_time,
+               csrfmiddlewaretoken: '{{ csrf_token }}'},
+               success: function(data){
+               alert("bhai kaam hogaya")
+               }
+             
+            });
 
+    
+
+}
 function disableAttendance()
 {
     $(':checkbox.chkbx').each(function () 
@@ -766,4 +767,46 @@ $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[d
   
   map.invalidateSize();  
 });
+
+currentDate = new Date();
+var currentDay = currentDate.getDate();
+var currentMonth = currentDate.getMonth();
+var currentYear = currentDate.getFullYear();
+
+$(".date_month_day_year").datetimepicker({
+       
+      changeMonth: true,
+      dateFormat: 'dd/mm/yy',
+      
+      minDate: '0',
+      maxDate: '+2m',
+      defaultDate: '0',
+      hourGrid: 6,
+      minuteGrid: 15,
+      onClose: function(dateText, inst) {
+        $(this).val(dateText);
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+      },
+
+      beforeShow: function() {
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+        $(this).datetimepicker('option', 'defaultDate', new Date(year, (month-1), day));
+        $(this).datetimepicker('setDate', new Date(year, (month-1), day));
+      }
+    });  
+
+
 {% endblock %}	
