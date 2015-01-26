@@ -3122,6 +3122,7 @@ def get_courses(request, group_id):
         response_dict["message"] = error_message
         return HttpResponse(json.dumps(response_dict))
 
+
 def get_announced_courses_with_ctype(request, group_id):
     """
     This view returns list of announced-course(s) that match given criteria
@@ -3133,95 +3134,114 @@ def get_announced_courses_with_ctype(request, group_id):
 
     Returns:
     A dictionary consisting of following key-value pairs:-
-    acourse_ctype_list - list consisting of announced-course(s) [if match found] and/or 
-               NUSSD-Courses [if match not found]
+    acourse_ctype_list - list consisting of announced-course(s)
+         and/or NUSSD-Courses [if match not found]
     """
     response_dict = {'success': False, 'message': ""}
     try:
-      if request.is_ajax() and request.method == "GET":
-        # Fetch field(s) from GET object
-        nussd_course_type = request.GET.get("nussd_course_type", "")
-        acourse_ctype_list = []
-        ac_of_colg = []
-        # curr_date = datetime.datetime.now()
+        if request.is_ajax() and request.method == "GET":
+            # Fetch field(s) from GET object
+            nussd_course_type = request.GET.get("nussd_course_type", "")
+            ann_course_type = request.GET.get("ann_course_type", "1")
+            acourse_ctype_list = []
+            ac_of_colg = []
+            # curr_date = datetime.datetime.now()
 
-        # Fetch "Announced Course" GSystemType
-        announced_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
-        if not announced_course_gt:
-          # If not found, throw exception
-          error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first!"
-          raise Exception(error_message)
+            # Fetch "Announced Course" GSystemType
+            announced_course_gt = collection.Node.one(
+                {'_type': "GSystemType", 'name': "Announced Course"}
+            )
+            if not announced_course_gt:
+                # If not found, throw exception
+                error_message = "Announced Course (GSystemType) doesn't " \
+                    + "exists... Please create it first!"
+                raise Exception(error_message)
 
-        mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
-        selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
+            mis_admin = collection.Node.one(
+                {'_type': "Group", 'name': "MIS_admin"}
+            )
 
-        if(ObjectId(group_id) == mis_admin._id):
-          ac_cur = collection.Node.find(
-            {'member_of': announced_course_gt._id, 'group_set':ObjectId(group_id), 'attribute_set.nussd_course_type': nussd_course_type}
-          )
+            # Type-cast fetched field(s) into their appropriate type
+            nussd_course_type = unicode(nussd_course_type)
+            ann_course_type = int(ann_course_type)
+
+            if(ObjectId(group_id) == mis_admin._id):
+                ac_cur = collection.Node.find({
+                    'member_of': announced_course_gt._id,
+                    'group_set': ObjectId(group_id),
+                    'attribute_set.nussd_course_type': nussd_course_type
+                })
+
+            else:
+                colg_gst = collection.Node.one(
+                    {'_type': "GSystemType", 'name': 'College'}
+                )
+
+                # Fetch Courses announced for given college (or college group)
+                # Get college node & courses announced for it from
+                # college group's ObjectId
+                req_colg_id = collection.Node.one({
+                    'member_of': colg_gst._id,
+                    'relation_set.has_group': ObjectId(group_id)
+                }, {
+                    'relation_set.college_has_acourse': 1
+                })
+
+                for rel in req_colg_id.relation_set:
+                    if rel and "college_has_acourse" in rel:
+                        ac_of_colg = rel["college_has_acourse"]
+
+                # Keeping only those announced courses which are active
+                # (i.e. PUBLISHED)
+                ac_cur = collection.Node.find({
+                    '_id': {'$in': ac_of_colg},
+                    'member_of': announced_course_gt._id,
+                    'attribute_set.nussd_course_type': nussd_course_type,
+                    # 'relation_set.course_selected': {'$exists': True, '$not': {'$size': 0}},
+                    'status': u"PUBLISHED"
+                    # 'attribute_set.start_enroll':{'$lte': curr_date},
+                    # 'attribute_set.end_enroll':{'$gte': curr_date}
+                })
+
+            if ac_cur.count():
+                for each_ac in ac_cur:
+                    # NOTE: This ajax-call is used in various templates
+                    # Following is used especially only in new_create_batch.html
+                    # Fetch enrolled students count from announced course node's course_selected
+                    enrolled_stud_count = 0
+                    for rel in each_ac.relation_set:
+                        if rel and rel in "course_selected":
+                            enrolled_stud_count = len(rel["course_selected"])
+                            break
+
+                    each_ac["enrolled_stud_count"] = enrolled_stud_count
+                    acourse_ctype_list.append(each_ac)
+
+                response_dict["success"] = True
+                info_message = "Announced Courses are available"
+
+            else:
+                response_dict["success"] = False
+                info_message = "No Announced Courses are available"
+
+            response_dict["message"] = info_message
+            response_dict["acourse_ctype_list"] = json.dumps(
+                acourse_ctype_list, cls=NodeJSONEncoder
+            )
+
+            return HttpResponse(json.dumps(response_dict))
+
         else:
-          colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
-
-          # Fetch Courses announced for given college (or college group)
-
-          # Get college node & courses announced for it from college group's ObjectId
-          req_colg_id = collection.Node.one(
-            {'member_of':colg_gst._id, 'relation_set.has_group': ObjectId(group_id)},
-            {'relation_set.college_has_acourse': 1}
-          )
-
-          for rel in req_colg_id.relation_set:
-            if rel and rel.has_key("college_has_acourse"):
-              ac_of_colg = rel["college_has_acourse"]
-
-          # Type-cast fetched field(s) into their appropriate type
-          nussd_course_type = unicode(nussd_course_type)
-          
-          # Keeping only those announced courses which are active (i.e. PUBLISHED)
-          ac_cur = collection.Node.find(
-            {
-              '_id': {'$in': ac_of_colg}, 'member_of': announced_course_gt._id, 
-              'attribute_set.nussd_course_type': nussd_course_type,
-              # 'relation_set.course_selected': {'$exists': True, '$not': {'$size': 0}},
-              'status': u"PUBLISHED"
-              # 'attribute_set.start_enroll':{'$lte': curr_date},
-              # 'attribute_set.end_enroll':{'$gte': curr_date}
-            }
-          )
-
-        if ac_cur.count():
-          for each_ac in ac_cur:
-            # NOTE: This ajax-call is used in various templates
-            # Following is used especially only in new_create_batch.html
-            # Fetch enrolled students count from announced course node's course_selected
-            enrolled_stud_count = 0
-            for rel in each_ac.relation_set:
-              if rel and rel.has_key("course_selected"):
-                enrolled_stud_count = len(rel["course_selected"])
-                break
-
-            each_ac["enrolled_stud_count"] = enrolled_stud_count
-            acourse_ctype_list.append(each_ac)
-          
-          response_dict["success"] = True      
-          info_message = "Announced Courses are available"
-       
-        else:
-          response_dict["success"] = False
-          info_message = "No Announced Courses are available"
-
-        response_dict["message"] = info_message
-        response_dict["acourse_ctype_list"] = json.dumps(acourse_ctype_list, cls=NodeJSONEncoder)
-
-        return HttpResponse(json.dumps(response_dict))
-
-      else:
-        error_message = " AnnouncedCourseFetchError: Either not an ajax call or not a GET request!!!"
-        return HttpResponse(json.dumps({'message': " AnnouncedCourseFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+            error_message = " AnnouncedCourseFetchError - Something went wrong in " \
+                + "ajax call !!! \n\n Please contact system administrator."
+            return HttpResponse(json.dumps({
+                'message': error_message
+            }))
 
     except Exception as e:
-      error_message = "\n AnnouncedCourseFetchError: Either you are in user group or something went wrong!!!"
-      return HttpResponse(json.dumps({'message': error_message}))
+        error_message = "\n AnnouncedCourseFetchError: Either you are in user " \
+            + "group or something went wrong!!!"
+        return HttpResponse(json.dumps({'message': error_message}))
 
 
 def get_colleges(request, group_id):

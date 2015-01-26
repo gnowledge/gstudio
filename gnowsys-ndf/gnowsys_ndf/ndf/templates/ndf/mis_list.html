@@ -77,10 +77,6 @@
   {% get_features_with_special_rights groupid request.user as features_list %}
 
   <ul class="side-nav"> 
-  	<li>
-  		<a></a>
-  	</li>
-
     {% for each in app_collection_set %}
     {% get_memberof_objects_count each.pk groupid as count %}
 
