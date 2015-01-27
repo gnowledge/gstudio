@@ -123,7 +123,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   reschedule = True
   marks=""
   property_order_list = []
-
+  
   #template_prefix = "mis"
 
   if request.user:
@@ -218,6 +218,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         'nodes': nodes, 'node': node,
                         'event_gst':event_gst.name,
                         'Add':Add,
+                         'Eventtype':Eventtype, 
                          # 'property_order_list': property_order_list
                       }
 
@@ -273,7 +274,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   session_of=""
   module=""
   Add=""
-  
+  announced_course =""
+  batch =""
   event_gst = None
   event_gs = None
 
@@ -474,13 +476,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
       event_detail["cordinatorname"]=str(event_gs.event_coordinator[0].name) 
       event_detail["cordinatorid"]=str(event_gs.event_coordinator[0]._id)
       events["cordinator"]=event_detail
-    event_detail["course"]=str(announced_course.name) 
-    event_detail["course_id"]=str(announced_course._id)
-    events["course"]=event_detail
+    if announced_course:
+      event_detail["course"]=str(announced_course.name) 
+      event_detail["course_id"]=str(announced_course._id)
+      events["course"]=event_detail
     event_detail={}
-    event_detail["batchname"]=str(batch.name)
-    event_detail["batchid"]=str(batch._id)
-    events["batch"]=event_detail
+    if batch:  
+      event_detail["batchname"]=str(batch.name)
+      event_detail["batchid"]=str(batch._id)
+      events["batch"]=event_detail
     event_detail={}
     if session_of:
        event_detail["sessionname"]=str(session_of.name)
