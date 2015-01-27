@@ -60,9 +60,7 @@ table, th, td {
   
   <div class="row">
 
-    
-
-      <div class="tabs-content">
+    <div class="tabs-content">
 
                   <div class="content active" id="view-page">
                       <section class="medium-9 columns">    
@@ -74,30 +72,31 @@ table, th, td {
                           </ul>
 
                           <div class="row">
-                            <div class="small-3 columns">
-                              <label>Start time:</label> 
-                            </div>
-                            <div class="small-5 end columns">
-                              <label>{{node.start_time}}</label> 
-                            </div>
-                            <div id='Edit_start_time' > 
-                                <a  onclick="checkDate()" class="tiny button">  Edit 
-                                </a>
-                            </div>
-                            <div id='reschedule'>
-                            </div>
+                              <div class="small-3 columns">
+                                <label>Start time:</label> 
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{node.start_time}}</label> 
+                              </div>
+                              
+                              <div id='Edit_start_time'> 
+                                  <a  onclick="checkDate()" class="tiny button">  Edit 
+                                  </a>
+                              </div>
+                              <div id='reschedule'>
+                              </div>
                           </div>
                           <div class="row">
-                            <div class="small-3 columns">
-                              <label>End time:</label>
-                            </div>
-                            <div class="small-5 end columns">
-                              <label>{{node.end_time}}</label>
-                            </div>
+                              <div class="small-3 columns">
+                                <label>End time:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{node.end_time}}</label>
+                              </div>
                           </div>
                           <br>
                           {% if  Eventtype == 'Eventtype' %}
-                               {%  if node.event_organised_by %}
+                             {%  if node.event_organised_by %}
                                   <br>
                                   <div class="row">
                                     <div class="small-3 columns">
@@ -115,29 +114,27 @@ table, th, td {
                                     </div>
                                   </div>
                                   
-                                  {% endif %}
-                                  {% endif %}
+                            {% endif %}
+                          {% endif %}
                                  
-                                  
-                                  
                                   <br> 
-                                 {% if node.event_coordinator %} 
-                                  <div class="row">
-                                    <div class="small-3 columns">
-                                      <label>Event Co-ordinator:</label>
-                                    </div>
-                                    <div class="small-5 end columns">
-                                      {% for details in node.event_coordinator %}
-                                        <label>
-                                        {% if forloop.counter != 1 %}
-                                        {% endif %}
-                                        {{details.name}}
-                                        </label>
-                                      {% endfor %}
-                                    </div>
-                                  </div>
-                                  {% endif %}
-                                   <br>
+                         {% if node.event_coordinator %} 
+                          <div class="row">
+                            <div class="small-3 columns">
+                              <label>Event Co-ordinator:</label>
+                            </div>
+                            <div class="small-5 end columns">
+                              {% for details in node.event_coordinator %}
+                                <label>
+                                {% if forloop.counter != 1 %}
+                                {% endif %}
+                                {{details.name}}
+                                </label>
+                              {% endfor %}
+                            </div>
+                          </div>
+                          {% endif %}
+                           <br>
                                  {% if Eventtype == 'CollegeEvents' %}  
                                   <div class="row">
                                     <div class="small-3 columns">
@@ -148,10 +145,7 @@ table, th, td {
                                     </div>
                                   </div>
                                     <br>
-                                </div>
-
-                         <br> 
-                        
+                                
                         <div class="row">
                             <div class="small-3 columns">
                               <label>Course:</label>
@@ -176,7 +170,7 @@ table, th, td {
                               <label>{{course.attribute_set.6.min_marks}}</label>
                             </div>
                        </div>
-                        
+                          {% endif %} 
                           <br>
                           <br>
                           {% with node.html_content|safe as description %}
@@ -235,9 +229,17 @@ table, th, td {
                       {% endif %}
                     </section>
  
-                  </div> <!-- End of class="content active" -->
+                 </div> <!-- End of class="content active" -->
 
                  <div id="myModal" class="small reveal-modal" animation="None" data-reveal>
+                    <div class = "row">
+                      <div>
+                          <h5> <b> Reschedule Session Dates </b> </h5>
+                      </div>
+                      <div id="total_session_time"> 
+                          
+                      </div>
+                    </div>
                     <div class = "row"> 
                        <div class = "small-2 columns">
                          <label> Start_time </label>
@@ -277,22 +279,69 @@ table, th, td {
 {% block script %}
  eventreschedule=""
 
+session_time  = ""
+session_time  = get_time_diff('{{node.start_time|date:"c"}}','{{node.end_time|date:"c"}}')
+$('#total_session_time').append("<label>  Total Session time" + session_time + "</label>")  
+
+function get_time_diff(start_time , end_time)
+ {
+     start_time = new Date(start_time)
+     end_time =new Date(end_time)
+     var difference = start_time.getTime() - end_time.getTime();
+     var daysDifference = Math.floor(difference/1000/60/60/24);
+     difference -= daysDifference*1000*60*60*24
+     var hoursDifference = Math.floor(difference/1000/60/60);
+     difference -= hoursDifference*1000*60*60
+     var minutesDifference = Math.floor(difference/1000/60);
+     difference -= minutesDifference*1000*60 
+     var secondsDifference = Math.floor(difference/1000);
+     diffhh = 23-hoursDifference
+     diffmm = 60-minutesDifference
+     total_min_diff=((Number(diffhh)*60) + Number(diffmm))
+     session_time = total_min_diff    
+     
+     return session_time 
+ }
 
 if ('{{Eventtype}}' == 'Eventtype')
   {
       $('#Edit').show()
-
+     
+     $('#Edit_start_time').hide()
+  
   }
-
 if ('{{reschedule}}' == 'False')
-{
-    add_reschedule()
-    $('#Edit_start_time').hide()
+        {
+            add_reschedule()
+            $('#Edit_start_time').hide()
+        }
+
+if ('{{reschedule}}' == 'True')
+      {
+          
+          $('#Edit_start_time').show()
+      }
+
+if ('{{Eventtype}}' == 'Collegetype')
+ {
+
+    $('#Edit_start_time').show()
+ }  
+
+
+
+function remove_reschedule(){
+
+    $('#reschedule').hide()
+    $('#Edit_start_time').show() 
 }
+
+
 
 function add_reschedule(){
 
  $('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")
+ $('#Edit_start_time').hide()
 }
  
 function closeEvent()
@@ -303,6 +352,7 @@ function closeEvent()
                url:"{% url 'close_event' groupid node %}",
                type: "POST",
                data:{
+               
                csrfmiddlewaretoken: '{{ csrf_token }}'},
                success: function(data){
                }
@@ -313,17 +363,17 @@ function closeEvent()
 
 function checkDate()
 {
-    $.ajax({
+    
+   $.ajax({
 
              url:"{% url 'check_date' groupid node %}",
              type: "POST",
              data:{
+             reschedule:'{{reschedule}}',
              csrfmiddlewaretoken: '{{ csrf_token }}'},
              success: function(data){
-                $('#myModal').foundation('reveal', 'open');
-                if (data == 'event open')
+                if (data == 'event Open')
                    { 
-                     //eventreschedule = "True"
                     $('#myModal').foundation('reveal', 'open'); 
                    }
                 if (data == 'event closed')
@@ -393,8 +443,11 @@ function EditAttendance(columns)
 }
 function saveTime()
 {
-     var start_time = $('#start_time').val()
-     var end_time   = $('#end_time').val()
+     alert(session_time)
+     var start_time = new Date($("#start_time").datetimepicker('getDate')
+     var end_time   = new Date($('#end_time").datetimepicker('getDate')
+     time_diff = get_time_diff(start_time,end_time)
+     alert("the dif time"+time_diff)
      $.ajax({
                url:"{% url 'save_time' groupid node %}",
                type: "POST",
@@ -403,7 +456,8 @@ function saveTime()
                end_time:end_time,
                csrfmiddlewaretoken: '{{ csrf_token }}'},
                success: function(data){
-               alert("bhai kaam hogaya")
+               alert(data)
+               $('#myModal').foundation('reveal', 'close');
                }
              
             });

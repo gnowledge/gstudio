@@ -406,6 +406,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 field_value = request.POST[field_instance["name"]]
               # field_instance_type = "GAttribute"
               # print "\n Parsing data for: ", field_instance["name"]
+              print "*******************",field_data_type,field_value
               if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
               elif field_instance["name"] in ["dob", "registration_date"]:
