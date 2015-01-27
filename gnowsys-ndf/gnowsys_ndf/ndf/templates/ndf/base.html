@@ -75,7 +75,7 @@
         <li class="name">
           {% get_site_variables as site %}
             <h1>
-              <a href="/home/dashboard/group" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
+              <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
             </h1>
         </li>
 
@@ -97,7 +97,11 @@
 
         <ul class="left">
           <li>
-            <a href="/home/dashboard/group" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}>
+           <!--
+            <a href="/home/dashboard/group" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}> 
+              Home
+            </a> -->
+            <a href="/home/" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}> 
               Home
             </a>
           </li>
@@ -123,7 +127,7 @@
 
         <!-- Current group selector -->
         <li class="has-dropdown group">
-          <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'group_dashboard' group_object.pk %}">
+          <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
             {{group_object.name|truncatechars:20}}
           </a>
           
@@ -152,7 +156,7 @@
                   {{group_node.name|truncatechars:20}} (User group)
                 </a>
                 {% else %}
-                <a data-tooltip aria-haspopup="true" class="has-tip tip-right" title="{{group_node.name|default:' -- '}}" class="group" href="{% url 'group_dashboard' group_node.pk %}">
+                <a data-tooltip aria-haspopup="true" class="has-tip tip-right" title="{{group_node.name|default:' -- '}}" class="group" href="{% url 'groupchange' group_node.name %}">
                   {{group_node.name|truncatechars:20}}
                 </a>
                 {% endif %}
@@ -317,8 +321,12 @@
                     </a>
                      -->
                   {% endcomment %}
-                  <a title="{{group_name_tag}}" href="{% url 'groupchange' group_object.name %}">
-                    <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
+                  <a title="Activities" href="{% url 'group_dashboard' group_object.pk %}"
+                    {% comment %}
+                       <!--
+                       <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}} -->
+                    {% endcomment %}
+                  <i class="fi-align-justify"></i> Activities 
                   </a>
                 {% endif %}
                 <!-- </li> -->
