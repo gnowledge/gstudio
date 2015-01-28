@@ -57,19 +57,24 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
     (r'^(?P<group_id>[^/]+)/ratings', include('gnowsys_ndf.ndf.urls.ratings')),                 
     (r'^(?P<group_id>[^/]+)/topics', include('gnowsys_ndf.ndf.urls.topics')),
-    # django-json-rpc method calls 
+
+    # -- django-json-rpc method calls --
     url(r'^json/browse/$', 'jsonrpc.views.browse', name='jsonrpc_browser'),
     url(r'^json/$', jsonrpc_site.dispatch, name='jsonrpc_mountpoint'),
     # url for directly calling RPC method from browser
     (r'^json/(?P<method>[a-zA-Z0-9.-_]+)$', jsonrpc_site.dispatch),
+    # ---end of django-json-rpc
 
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 
     (r'^(?P<group_id>[^/]+)/e-library', include('gnowsys_ndf.ndf.urls.e-library')),
     (r'^(?P<group_id>[^/]+)/term', include('gnowsys_ndf.ndf.urls.term')),
-    (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis', namespace='mis'), {'app_name': "MIS"}),
     (r'^(?P<group_id>[^/]+)/event', include('gnowsys_ndf.ndf.urls.event')),
+
+    # -- mis --
+    (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis', namespace='mis'), {'app_name': "MIS"}),
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis', namespace='mis-po'), {'app_name': "MIS-PO"}),
+    # ---end of mis
 
     # meeting app
     # (r'^online/', include('online_status.urls')),   #for online_users.
@@ -81,7 +86,7 @@ urlpatterns = patterns('',
     
     (r'^(?P<group_id>[^/]+)/data-review', include('gnowsys_ndf.ndf.urls.data_review')),
     (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
-    (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
+    # (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
 
     # --discussion--
     url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.methods.create_discussion', name='create_discussion'),    
@@ -89,21 +94,25 @@ urlpatterns = patterns('',
     url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_delete_reply', name='discussion_delete_reply'),    
     # --end of discussion
 
-    #url(r'^(?P<group_id>[^/]+)/visualize', 'gnowsys_ndf.ndf.views.visualize.graphs', name='visualize'),
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
     
     url(r'^(?P<group_id>[^/]+)/$', 'gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),    
-    #(r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.group')),
-    url(r'^(?P<group_id>[^/]+)/annotationlibInSelText$', 'gnowsys_ndf.ndf.views.ajax_views.annotationlibInSelText', name='annotationlibInSelText'),
-    url(r'^(?P<group_id>[^/]+)/delComment$', 'gnowsys_ndf.ndf.views.ajax_views.delComment', name='delComment'),
+
+    # -- annotations --
+    # url(r'^(?P<group_id>[^/]+)/annotationlibInSelText$', 'gnowsys_ndf.ndf.views.ajax_views.annotationlibInSelText', name='annotationlibInSelText'),
+    # url(r'^(?P<group_id>[^/]+)/delComment$', 'gnowsys_ndf.ndf.views.ajax_views.delComment', name='delComment'),
+    # ---end of annotations
+
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
 
+    # -- custom apps --
     (r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)', include('gnowsys_ndf.ndf.urls.custom_app')),    
     # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', custom_app_view, name='GAPPS'),       
     # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', custom_app_view, name='GAPPS_set'),
     # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)$', custom_app_view, name='GAPPS_set_instance'),
     # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)/edit/$', custom_app_new_view, name='GAPPS_set_instance_edit'),
     # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/new/$', custom_app_new_view, name='GAPPS_set_new_instance'),
+    # --- end of custom apps
     
     # (r'^home','gnowsys_ndf.ndf.views.group.group_dashboard'),
     # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
