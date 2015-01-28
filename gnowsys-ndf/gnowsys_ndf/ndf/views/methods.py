@@ -1018,6 +1018,7 @@ def tag_info(request, group_id, tagname = None):
     cur = None
     total = None
     total_length = None
+    a = None
     yesterdays_result = []
     week_ago_result = []
     search_result = []
@@ -1031,7 +1032,7 @@ def tag_info(request, group_id, tagname = None):
 
     if not tagname:
         tagname = request.GET.get("search","").lower()
-         
+  
     if request.user.is_authenticated():       #Autheticate user can see all public files  
         group_cur = collection.Node.find({'_type':'Group',
                                            '$or':[ {'created_by':userid},
@@ -1046,7 +1047,7 @@ def tag_info(request, group_id, tagname = None):
             group_cur_list.append(each._id)
 
         if tagname:
-            cur = collection.Node.find( {'tags':tagname,
+            cur = collection.Node.find( {'tags':{'$in':[tagname]},
                                          'group_set':{'$in':group_cur_list},
                                          'status':u'PUBLISHED'
                                     }
@@ -1061,7 +1062,7 @@ def tag_info(request, group_id, tagname = None):
 
     elif request.user.is_superuser:  #Superuser can see private an public files 
         if tagname:
-            cur = collection.Node.find( {'tags':tagname,
+            cur = collection.Node.find( {'tags':{'$in':[tagname]},
                                          'access_policy':u'PUBLIC',
                                          'access_policy':u'PRIVATE',   
                                          'status':u'PUBLISHED'
@@ -1077,7 +1078,7 @@ def tag_info(request, group_id, tagname = None):
 
     else: #UNauthenticated user can see all public files.
         if tagname:
-            cur = collection.Node.find( {  'tags':tagname,
+            cur = collection.Node.find( {  'tags':{'$in':[tagname]},
                                            'group_type':u'PUBLIC',
                                            'access_policy':u'PUBLIC',
                                            'status':u'PUBLISHED'
@@ -1096,7 +1097,7 @@ def tag_info(request, group_id, tagname = None):
         {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},
         context_instance=RequestContext(request)
     )
-      
+
 
 #code for merging two text Documents
 import difflib
