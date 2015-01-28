@@ -41,7 +41,8 @@
     "open-sans-fontface": "~1.1.0",
     "mousetrap": "~1.4.6",
     "pdfjs-build": "*",
-    "blockui": "*"
+    "blockui": "*",
+    "datatables-plugins": "~1.0.1"
   },
   "resolutions": {
     "jquery": "2.1.1"
