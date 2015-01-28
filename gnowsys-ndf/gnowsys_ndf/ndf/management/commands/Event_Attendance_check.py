@@ -44,15 +44,17 @@ class Command(BaseCommand):
           try:
               
            
-              Attendance_Event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.end_time":{'$gte':day_before_yesterday,'$lt':Today}})
+              Attendance_Event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.start_time":{'$gte':day_before_yesterday,'$lt':Today}})
 
               rescheduled_events=collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.reschedule_attendance.reschedule_till":{'$gt':yesterday}})
 
               Attendance_marked_event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"relation_set.has_attended":{"$exists":False},"attribute_set.start_time":{'$gte':yesterday,'lt':Today}})
 
               reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+              reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
               for i in rescheduled_events:
                 create_gattribute(ObjectId(i._id),reschedule_attendance,{"reschedule_allow":False})
+                create_gattribute(ObjectId(i._id),reschedule_event,{"reschedule_allow":False})
               
               for i in Attendance_Event:
                  create_gattribute(ObjectId(i._id),reschedule_attendance,{"reschedule_allow":False})
