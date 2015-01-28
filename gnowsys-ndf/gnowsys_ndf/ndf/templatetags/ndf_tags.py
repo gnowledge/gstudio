@@ -1523,8 +1523,10 @@ def user_access_policy(node, user):
       user_access = True
 
     else:
-      group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
-
+      # group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+      group_name, group_id = get_group_name_id(node)
+      group_node = collection.Node.one({"_id": group_id})
+      
       if user.id == group_node.created_by:
         user_access = True
 
