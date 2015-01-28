@@ -1526,7 +1526,7 @@ def user_access_policy(node, user):
       # group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
       group_name, group_id = get_group_name_id(node)
       group_node = collection.Node.one({"_id": group_id})
-      
+
       if user.id == group_node.created_by:
         user_access = True
 
@@ -1709,7 +1709,10 @@ def get_publish_policy(request, groupid, res_node):
   resnode = collection.Node.one({"_id": ObjectId(res_node._id)})
 
   if resnode.status == "DRAFT":
-    node = collection.Node.one({"_id": ObjectId(groupid)})
+    # node = collection.Node.one({"_id": ObjectId(groupid)})
+
+  	group_name, group_id = get_group_name_id(groupid)
+	node = collection.Node.one({"_id": group_id})
 
     group_type = group_type_info(groupid)
     group = user_access_policy(groupid,request.user)
