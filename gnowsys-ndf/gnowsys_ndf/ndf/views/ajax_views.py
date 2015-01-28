@@ -4098,8 +4098,12 @@ def save_time(request,group_id,node):
   reschedule_event_start = collection.Node.one({"_type":"AttributeType","name":"start_time"})
   reschedule_event_end = collection.Node.one({"_type":"AttributeType","name":"end_time"})
   reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+  print start_time
+  print end_time
   start_time= parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
   end_time= parse_template_data(datetime.datetime,end_time, date_format_string="%d/%m/%Y %H:%M")
+  print start_time
+  print end_time
   create_gattribute(ObjectId(node),reschedule_event_start,start_time) 
   create_gattribute(ObjectId(node),reschedule_event_end,end_time) 
   reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})

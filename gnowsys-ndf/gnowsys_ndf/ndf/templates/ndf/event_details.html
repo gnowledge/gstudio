@@ -232,32 +232,36 @@ table, th, td {
                  </div> <!-- End of class="content active" -->
 
                  <div id="myModal" class="small reveal-modal" animation="None" data-reveal>
-                    <div class = "row">
-                      <div>
-                          <h5> <b> Reschedule Session Dates </b> </h5>
-                      </div>
-                      <div id="total_session_time"> 
-                          
-                      </div>
-                    </div>
-                    <div class = "row"> 
-                       <div class = "small-2 columns">
-                         <label> Start_time </label>
-                       </div>  
-                       <div class = "small-4 columns"> 
-                         <input id="start_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time">
-                       </div>  
-                       <div class = "small-2 columns">
-                         <label> End_time </label>
-                       </div>
-                       
-                       <div class = "small-4 columns">  
-                         <input id="end_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="end_time">
-                       </div>  
-                    </div>     
-                    <div class="save" align="center">
-                       <input type="button" class="small button" onclick="saveTime()" value ="Save"> 
-                    </div> 
+                   <fieldset> 
+                          <div class = "row">
+                            <div class="small-6 columns">
+                                <h6> <b> Reschedule Session Dates </b> </h6>
+                            </div>
+                            <div id="total_session_time" align ="right"> 
+                                
+                            </div>
+
+                          </div>
+                          <br>
+                          <div class = "row"> 
+                             <div class = "small-2 columns">
+                               <label> Start_time </label>
+                             </div>  
+                             <div class = "small-4 columns"> 
+                               <input id="start_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time">
+                             </div>  
+                             <div class = "small-2 columns">
+                               <label> End_time </label>
+                             </div>
+                             
+                             <div class = "small-4 columns">  
+                               <input id="end_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="end_time">
+                             </div>  
+                          </div>     
+                          <div class="save" align="center">
+                             <input type="button" class="small button" onclick="saveTime()" value ="Save"> 
+                          </div> 
+                    </fieldset> 
                  </div>                
                        <div class="content" id="view-Attendance" >    
                         
@@ -279,9 +283,10 @@ table, th, td {
 {% block script %}
  eventreschedule=""
 
-session_time  = ""
-session_time  = get_time_diff('{{node.start_time|date:"c"}}','{{node.end_time|date:"c"}}')
-$('#total_session_time').append("<label>  Total Session time" + session_time + "</label>")  
+session_time  = 0
+session_time  = get_time_diff("{{node.start_time|date:'c'}}","{{node.end_time|date:'c'}}")
+
+$('#total_session_time').append("<label>  <h6> <b> Total Session time :" + session_time + "minutes<b> </b> </h6></label>")  
 
 function get_time_diff(start_time , end_time)
  {
@@ -298,9 +303,7 @@ function get_time_diff(start_time , end_time)
      diffhh = 23-hoursDifference
      diffmm = 60-minutesDifference
      total_min_diff=((Number(diffhh)*60) + Number(diffmm))
-     session_time = total_min_diff    
-     
-     return session_time 
+     return total_min_diff    
  }
 
 if ('{{Eventtype}}' == 'Eventtype')
@@ -444,24 +447,32 @@ function EditAttendance(columns)
 function saveTime()
 {
      alert(session_time)
-     var start_time = new Date($("#start_time").datetimepicker('getDate')
-     var end_time   = new Date($('#end_time").datetimepicker('getDate')
-     time_diff = get_time_diff(start_time,end_time)
+      
+      
+     time_diff = get_time_diff(new Date($("#start_time").datetimepicker('getDate')),new Date($("#end_time").datetimepicker('getDate')))
      alert("the dif time"+time_diff)
-     $.ajax({
-               url:"{% url 'save_time' groupid node %}",
-               type: "POST",
-               data:{
-               start_time:start_time,
-               end_time:end_time,
-               csrfmiddlewaretoken: '{{ csrf_token }}'},
-               success: function(data){
-               alert(data)
-               $('#myModal').foundation('reveal', 'close');
-               }
-             
-            });
-
+     var start_time = $("#start_time").val()
+     var end_time   = $("#end_time").val()
+     alert(Number(time_diff) == Number(session_time))
+     if (Number(time_diff) == Number(session_time)) 
+        {     $.ajax({
+                     url:"{% url 'save_time' groupid node %}",
+                     type: "POST",
+                     data:{
+                     start_time:start_time,
+                     end_time:end_time,
+                     csrfmiddlewaretoken: '{{ csrf_token }}'},
+                     success: function(data){
+                     alert(data)
+                     $('#myModal').foundation('reveal', 'close');
+                     }
+                   
+                  });
+        }
+     else
+         {
+            alert("session time should be exactly same as previouse alloted time")
+         }     
     
 
 }
@@ -627,7 +638,7 @@ function reschedule_event(type)
               alert(data) 
               if (data == 'Event Dates Re-Schedule Opened')
                  {
-                    location.reload()
+                    remove_reschedule()
                   
                  }
               if ( type != 'event_reschedule') 
