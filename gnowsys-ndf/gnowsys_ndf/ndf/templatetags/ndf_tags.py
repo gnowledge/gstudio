@@ -1712,7 +1712,7 @@ def get_publish_policy(request, groupid, res_node):
 	    
 	    # node = collection.Node.one({"_id": ObjectId(groupid)})
 		
-		group_name, group_id = get_group_name_id(group_id)
+		group_name, group_id = get_group_name_id(groupid)
 		node = collection.Node.one({"_id": ObjectId(group_id)})
 
 		group_type = group_type_info(groupid)
