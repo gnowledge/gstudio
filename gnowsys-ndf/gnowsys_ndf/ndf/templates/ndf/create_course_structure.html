@@ -23,6 +23,11 @@
     fieldset input {
       margin: 0 !important;
     }
+    .edit_course_structure_name{
+      width: 30%;
+    }
+
+
 
   /* Setting css-properties for reveal-modal's label */
     div.reveal-modal > label {
@@ -45,7 +50,9 @@
         border-color:#0b8a91;
         border-width:2px;
         color:#0b8a91 !important;
-        height:42px;
+        height:33px;
+        margin-top: 4px;
+        padding: 0px;
     }
 
     .hoverstyle:hover{
@@ -53,10 +60,16 @@
       color:white !important;
     }
 
-    li.course-section-class, li.course-sub-section-class{
-      border-color:#0b8a91 !important; 
+    li.course-section-class{
+      border-color:#757b80 !important; 
       margin: 10px !important;
-      border: 1px solid;
+      border: 3px solid;
+    }
+
+    li.course-sub-section-class{
+      border-color:#b0b3b6 !important; 
+      margin: 10px !important;
+      border: 3px solid;
     }
 
     #name{
@@ -76,6 +89,14 @@
     .course-sub-section-class:hover .css_setting{
       display:block;
     }
+
+    .lbl_of_cs{
+      white-space: nowrap;
+      width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .course-section-class:hover .cs_setting{
       display:block;
     }
@@ -102,8 +123,8 @@
           {% html_widget groupid coll_node_cs.pk property_order_list.0.1.0 %}
         </div>
           <div class="small-6 columns">
-            <input type="button" value="Save" class="button small round save-cs">
-            <input type="button" value="Cancel" class="button small round cancel-cs">
+            <input type="button" value="Save" class="button small hoverstyle round save-cs">
+            <input type="button" value="Cancel" class="button small hoverstyle round cancel-cs">
           </div>
        </div>
 
@@ -125,8 +146,8 @@
           {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.0 %}
         </div>
           <div class="small-4 columns">
-                <input type="button" value="Save" class="button small round save-cs save-css" >
-                <input type="button" value="Cancel" class="button small round cancel-cs cancel-css" >
+                <input type="button" value="Save" class="button small hoverstyle round save-cs save-css" >
+                <input type="button" value="Cancel" class="button small hoverstyle round cancel-cs cancel-css" >
           </div>
         </div>
     </li>
@@ -215,7 +236,7 @@
 {% block script %}
   {{block.super}}
 
-//Global var declarations---------------------------------------------------------------------------
+//Global var declarations------------------------------------------------------------------------------
   var cs_cloned_id = 1;
   var css_cloned_id = 1;
   var course_min_value;
@@ -239,7 +260,7 @@
     cs_cloned_id+=1
   }  
 
-//Adding Course Subsection---------------------------------------------------------------------------
+//Adding Course Subsection-----------------------------------------------------------------------------
   $(document).on('click','.sub-section-btn',function(){
       parent_id = $(this).parents("li").attr("id")
       $("#"+parent_id).find("input.sub-section-btn").attr("disabled",true)
@@ -250,7 +271,7 @@
       css_cloned_id+=1
   });
 
-//Save Course Section and Course Subsection-----------------------------------------------------
+//Save Course Section and Course Subsection------------------------------------------------------------
   $(document).on('click','.save-cs',function(){
     parent_id = $(this).parents("li").attr("id")
     lbl_val = $("#"+parent_id).find("input[id='name']").val()
@@ -289,8 +310,8 @@
                 course_sec_dict[lbl_val] = []
                 course_sec_list.push(course_sec_dict)
                 $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled");
-                var str_btn="<div class='row'><div class='small-2 columns text-center fold-btn-div'>--></div>"
-                var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+lbl_val+"</h4></label><i class='fi-pencil small-4 columns largesize edit_course_structure_name'></i></div>"    
+                var str_btn="<div class='row'><div class='small-2 columns text-center fold-btn-div'><i class='fi-page-copy largesize'></i></div>"
+                var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"' style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:right;'></i></div>"    
                 var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
                 $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
@@ -303,12 +324,10 @@
     }
   })
 
-
-//Function to save Course Subsection
-
+//Function to save Course Subsection-------------------------------------------------------------------
   function save_course_sub_section(p_id,p_lbl,l_id,l_lbl){
-    var str_btn="<div class='row'><div class='small-2 columns text-center'>--></div>"
-    var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ l_id+"'><h4>"+l_lbl+"</h4></label><i class='fi-pencil small-4 columns largesize edit_course_structure_name'></i></div>" 
+    var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-page largesize'></i></div>"
+    var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ l_id+"' style='float:left;'>"+l_lbl+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div>" 
     $("#"+p_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-2 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
     $("#"+p_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
     var str_prop="<div class='small-2 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
@@ -326,7 +345,7 @@
     }
   }
 
-// Cancel Course Section and Course Subsection----------------------------------------------------
+// Cancel Course Section and Course Subsection---------------------------------------------------------
   $(document).on('click','.cancel-cs',function(){
     parent_id = $(this).parents("li").attr("id")
     if($(this).hasClass("cancel-css")){
@@ -338,7 +357,7 @@
     $("#"+parent_id).remove()
   });
 
-// Reordering li elements to move UP------------------------------------------------------------------
+// Reordering li elements to move UP-------------------------------------------------------------------
   $(document).on('click','.fi-arrow-up',function(){
     var $current = $(this).closest('li');
     class_of_lbl = $current.find('label').attr('class');
@@ -393,7 +412,7 @@
     }
   });
 
-// Reordering li elements to move DOWN---------------------------------------------------------------------
+// Reordering li elements to move DOWN-----------------------------------------------------------------
   $(document).on('click','.fi-arrow-down',function(){
     var $current = $(this).closest('li')
     class_of_lbl = $current.find('label').attr('class');
@@ -446,7 +465,7 @@
     }
     });
 
-// Rename Edit course structure name------------------------------------------------------------------------
+// Rename Edit course structure name-------------------------------------------------------------------
   var lbl_text;
   $(document).on('click','.edit_course_structure_name',function(){
         
@@ -457,13 +476,13 @@
           if(lbl_text_id_of_opened){
             lbl_text_class_of_opened = $("#"+lbl_text_id_of_opened).attr('class')
             lbl_text_of_opened = $("#"+lbl_text_id_of_opened).val()
-            $("#"+lbl_text_id_of_opened).replaceWith("<label name='lbl_name' class='"+lbl_text_class_of_opened+"' id='"+lbl_text_id_of_opened+"'><h4>"+ lbl_text_of_opened+"</h4></label>")
+            $("#"+lbl_text_id_of_opened).replaceWith("<label name='lbl_name' class='"+lbl_text_class_of_opened+"' id='"+lbl_text_id_of_opened+"' style='float:left;'>"+ lbl_text_of_opened+"</label>")
             $(".ul-course-section").find(".fi-check").removeClass("fi-check").addClass("fi-pencil")
           }
           lbl_text = $(this).prev().text()
           lbl_text_class = $(this).prev().attr('class')
           $(this).removeClass("fi-pencil").addClass("fi-check");
-          $("#"+lbl_text_id).replaceWith("<input type='text' id='"+lbl_text_id+"' class='"+lbl_text_class+"' value='"+ lbl_text +"'>")
+          $("#"+lbl_text_id).replaceWith("<input type='text' id='"+lbl_text_id+"' class='"+lbl_text_class+"' value='"+ lbl_text +"' style='float:left;'>")
           $("#"+lbl_text_id).focus();
         }
         else{
@@ -721,7 +740,7 @@
                   }
                 }
               }
-              $("#"+lbl_text_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+lbl_text_id+"'><h4>"+ new_name+"</h4></label>")
+              $("#"+lbl_text_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+lbl_text_id+"' style='float:left;'>"+ new_name+"</label>")
 
               $.each(cs_names_list, function(i,v){
                 if(cs_names_list[i]==lbl_text){
@@ -741,13 +760,13 @@
             }
           }
           else{
-            $("#"+lbl_text_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+lbl_text_id+"'><h4>"+ lbl_text+"</h4></label>")
+            $("#"+lbl_text_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+lbl_text_id+"' style='float:left;'>"+ lbl_text+"</label>")
             $(this).removeClass("fi-check").addClass("fi-pencil");
           }
         }
     });
 
-// Set label name and mins in reveal modal with respective course name-----------------------------------
+// Set label name and mins in reveal modal with respective course name---------------------------------
   $(document).on('click','.reveal_prop_form',function(){
 
     $(".css_mins_class").val('');
@@ -799,7 +818,7 @@
     $('#course_prop').foundation('reveal', 'open');
   });
 
-//Fold unfold Actions--------------------------------------------------------------------------------------------
+//Fold unfold Actions----------------------------------------------------------------------------------
   $(document).on('click','.fold-btn',function(){
     parent_id = $(this).parents("li").attr("id");
     if($("#"+parent_id).hasClass("hidden_children")){
@@ -815,7 +834,7 @@
     
   });
 
-//Done button in reveal modal -----------------------------------------------------------------------------------
+//Done button in reveal modal -------------------------------------------------------------------------
   $(document).on('click','.set_prop_class',function(){
     course_min_value = $(".css_mins_class").val()
     $('#course_prop').foundation('reveal', 'close');
@@ -848,7 +867,7 @@
     all_mins_set=true;
   });
 
-//Submit course structure ---------------------------------------------------------------------------------------
+//Submit course structure -----------------------------------------------------------------------------
   $("#form_course_structure").submit(function(event){
     $.each(course_sec_list,function(csindex,csdict){
         $.each(csdict,function(cskey,csslist){
@@ -894,7 +913,7 @@
         lbl_id = "lbl_for_"+cloned_ele_id   
         
         var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
-        var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"'><h4>"+csvv+"</h4></label><i class='fi-pencil largesize edit_course_structure_name' ></i></div>"    
+        var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"' style='float:left;'>"+csvv+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:right;' ></i></div>"    
         var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
         $("#"+cloned_ele_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
@@ -907,15 +926,14 @@
 
         $.each(csvalue,function(css,cssvalue){
             $.each(cssvalue,function(css1,cssvalue1){
-                // css_names_.push(css1)
                 $("#"+cloned_ele_id).find(".sub-section-btn").before($("#course-subsection").clone().attr('id',function(i,id){
                     cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
                     return cloned_ss_ele_id}).removeClass("hide"));
                 $("#"+cloned_ele_id).find("input.sub-section-btn").attr("disabled",true)
                 lbl_id = "lbl_for_"+cloned_ss_ele_id   
 
-                var str_btn1="<div class='row'><div class='small-2 columns text-center'>--></div>"
-                var str_lbl1="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"'><h4>"+css1+"</h4></label><i class='fi-pencil largesize edit_course_structure_name' ></i></div>"    
+                var str_btn1="<div class='row'><div class='small-2 columns text-center'><i class='fi-page largesize'></i></div>"
+                var str_lbl1="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"' style='float:left;'>"+css1+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div>"    
                 var str_prop1="<div class='small-2 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
                 css_cloned_id+=1

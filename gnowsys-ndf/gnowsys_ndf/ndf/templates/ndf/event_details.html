@@ -56,8 +56,8 @@ table, th, td {
         <dd><a href="#view-comments"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
       </dl>
     </section>
-  </header>
-
+  </header> 
+  
   <div class="row">
 
     <section class="medium-9 columns">
@@ -169,6 +169,10 @@ table, th, td {
             </div>
           </div>
 
+          {% if  Eventtype == 'Eventtype' %}
+          
+          
+          {%  if node.event_organised_by %}
           <br>
           <div class="row">
             <div class="small-3 columns">
@@ -186,6 +190,8 @@ table, th, td {
             </div>
           </div>
           
+          {% endif %}
+          {% endif %}
          
           
           
@@ -225,6 +231,7 @@ table, th, td {
           </div>
           {% endif %}
            <br>
+         {% if Eventtype == 'CollegeEvents' %}  
           <div class="row">
             <div class="small-3 columns">
               <label>Batch:</label>
@@ -258,7 +265,7 @@ table, th, td {
               <label>{{course.attribute_set.6.min_marks}}</label>
             </div>
        </div>
-        
+        {% endif %}
           <br>
           <br>
           {% with node.html_content|safe as description %}
@@ -297,7 +304,8 @@ table, th, td {
               
           </div>
           
-         
+          <div id="atten_asses_cmpl">
+          </div>
         
         </div>
         <!-- Tab View Map Widget -->
@@ -555,6 +563,8 @@ function controler()
                       },
                       complete:function()
                       {
+                      reschedule = attended[2]
+                      marks_enter = attended[3]
                       if (attended[0] == 'True')
                       {
                           EditAttendance(attended)             
@@ -585,11 +595,21 @@ function EditAttendance(columns)
                       },
                       complete:function(){
                       $('#attendance').append("<table id='forattendance'> </table>")
-
                       drawTable(attended,columns)
+                      if(reschedule == false)
+                      {
+                          disableAttendance();
+                      }
                       }
           });
 
+}
+
+function disableAttendance()
+{
+    $(':checkbox.chkbx').each(function () 
+    { this.disabled = true})
+     
 }
 
 function drawTable(attended,columns)
@@ -632,8 +652,8 @@ column4="<th> Assessment Marks </th>"
       {
        column4=""
       }
-$('#forattendance').append("<thead><tr>"+ column1+column2+column3+column4 + "</tr></thead>")  
-$.each(attended, function(key,val) {
+       $('#forattendance').append("<thead><tr>"+ column1+column2+column3+column4 + "</tr></thead>")  
+       $.each(attended, function(key,val) {
        column1_data="<td>" + val.name +"</td>"
        column2_data="<td> " + val.presence + "</td >"
        column3_data="<td class='Assigntxtbx'> " + val.Assignment_marks + "</td >"
@@ -665,6 +685,7 @@ $.each(attended, function(key,val) {
        column4data=""
       }     
 if ( pass[0] == 'Edit'){
+
           
                      if(val.presence == 'Absent')
                               {
@@ -676,12 +697,13 @@ if ( pass[0] == 'Edit'){
                                   document.getElementById(val.id+"Assignment").disabled = true;
                                 }
                             else
-                                  {}
-                            if (document.getElementById(val.id+"Assessment")){
-                                                        document.getElementById(val.id+"Assessment").disabled = true;
+                                {}
+                            if (document.getElementById(val.id+"Assessment"))
+                               {
+                                            document.getElementById(val.id+"Assessment").disabled = true;
                                }
                             else
-                             {} 
+                               {} 
                   
                              }
                      else
@@ -697,23 +719,67 @@ else{
        
        
        $('#forattendance').append("<tr>"+ column1_data + column2_data + column3_data + column4_data   + "</tr>")         
- 
+
     }
   });
   
 if ( pass[0] == 'Edit'){
+      if (pass[1] == '2' || pass[1] == '4' || pass[1] == '3')
+      {
+        $('#attendance').append("<div class='row'>" 
+         + "<div class='small-8 columns'> "
+         + " <fieldset>   "
+         + " <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done"
+         + " <br> <span style='color:red;'> Note:- Edit option will be closed after asessment is done. </span> "
+         + " </fieldset> </div></div>")
+      }
+        $('#attendance').append("<br>")
         $('#attendance').append("<input class='tiny button' onclick='saveattendees("+pass[1]+")' value='Save' >")
         $('#attendance').append("<input class='tiny button' onclick='TakePrint()' value='Print'>")
                    
 
 }
 else
-{       //$('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit"+","+pass[1]+"') value='Edit'>"    )
-        $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
-        $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")    
+{     
+        
+      $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")
+      
+      if(reschedule == true || marks_enter  == true){
+            if(marks_enter != false)
+            {
+              $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
+            }
+      }
+      if(reschedule == false || marks_enter == false)
+      {
+        $('#attendance').append("<input class='tiny button'  onclick=reschedule_event() value='Re-Schedule'>" )
+      }
+          
+      
+}
+
 
 }
+
+function reschedule_event()
+{
+$.ajax({
+   url:"{% url 'reschedule_task' groupid node.pk  %}",
+   type:"POST",
+   data:{
+       path:'{{request.path}}',
+       csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+   success:function(data)
+   {
+    alert(data)
+    controler()
+   }
+   });
+   
+
 }
+
 function enablemarks(value)
 {
 
@@ -827,25 +893,19 @@ var student_marks=[]
 var student_id=[]
 var eventid=[]
 var Event_attended_by=[]
+var assessmentdone=""
+var attendancedone=""
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
-    var url="{% url 'event_assginee' groupid node.pk %}"
-    /*$(':checkbox:checked.chkbx').each(function () {
-     attendees_list.push(this.value);
-     });
-     
-     
-     $(':checkbox:not(:checked.chkbx)').each(function () {
-     absentees_list.push(this.value);
-     });
-     
-    */
-    $("#forattendance").find('tr').each(function(){
-    var Names_attended = $(this).find('.chkbx').val()
-    var Status_attended = $(this).find('.chkbx:checked').val()
-    var Attendance_marks = $(this).find('.Assigntxtbx').val()
-    var Assessment_marks = $(this).find('.Assesstxtbx').val()
-    
+
+var url="{% url 'event_assginee' groupid  node.pk  %}"
+
+$("#forattendance").find('tr').each(function(){
+var Names_attended = $(this).find('.chkbx').val()
+var Status_attended = $(this).find('.chkbx:checked').val()
+var Attendance_marks = $(this).find('.Assigntxtbx').val()
+var Assessment_marks = $(this).find('.Assesstxtbx').val()
+
    
 if (!(Status_attended))
     {
@@ -859,17 +919,25 @@ if (!(Status_attended))
     Event_attended_by.push(values)
     }); 
     
-    
+    if ($('#assessmentchkbx').is(':checked')) 
+    {
+    assessmentdone='True'
+    }
+       
+   
      if(Event_attended_by !="")
      {
               $.ajax({
                       url: url,
                       type: "POST",
                       data:{
+                      marks:'{{marks_enter}}',
+                      assessmentdone:assessmentdone,
                       Event_attended_by:Event_attended_by,
                       Event:eventid,
                       csrfmiddlewaretoken: '{{ csrf_token }}'},
                       success: function(data){
+                      alert(data)
                       controler()
                       }
                     });

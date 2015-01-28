@@ -20,7 +20,15 @@
 	{% url 'auth_password_reset' as auth_pwd_reset_url %}
 	{% url 'registration_register' as register_url %}
 
-	<div class="row">
+    <div class="row" style="margin: 1.2rem 0;">
+        <div class="small-8 medium-8 large-8 small-centered medium-centered large-centered columns">
+            <div class="row">
+                <div class="small-8 medium-8 large-8 columns end text-center">
+                <h2>{% trans "Log In" %}</h2>
+                </div>
+            </div>
+        </div>
+
 		<div class="small-8 large-8 small-centered large-centered columns">
 			<br/>
 			{% if form.errors %}

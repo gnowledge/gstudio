@@ -8,7 +8,7 @@
   {{block.super}}
 	th {	text-align:left;	}
 	table td {	padding:0.5em;	}
-	table ul   {	color:#ff3232;	}
+	table ul {	color:#ff3232;	}
 
   label { font-size: 15px; }
 
@@ -76,7 +76,12 @@
           </div>
           <div class="small-6 large-6 columns end">
             {{form.password1}}
-            <p style="color: green; font-weight: bold;">{% trans "NOTE: Password must contain atleast 8 characters, one uppercase letter and one numeral" %}</p>
+            <small style="color: green; font-weight: bold;">{% trans "NOTE: " %}</small>
+            <ul style="color: green; font-weight: normal;">
+                <li>{% trans "Password must contain atleast 8 characters," %}</li>
+                <li>{% trans "One uppercase letter, and" %}</li>
+                <li>{% trans "One numeral" %}</li>
+            </ul>
           </div>
         </div>
 

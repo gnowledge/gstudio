@@ -81,14 +81,15 @@
 	{% endfor %}
   </fieldset>
 
-  <fieldset>
-    <legend>
-  		{% trans "Course Structure Details "%}
-    </legend>
-    <div id="cs-div"></div>
-	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
-
-  </fieldset>
+  {% if course_gst_name == "NUSSD Course" %}
+    <fieldset>
+      <legend>
+    		{% trans "Course Structure Details "%}
+      </legend>
+      <div id="cs-div"></div>
+  	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+    </fieldset>
+  {% endif %}
 </div>
 
 {% endblock %}

@@ -62,16 +62,17 @@ def event(request, group_id):
  #check for exam session to be created only by the Mis_Admin
 
  Add=""
- Mis_admin=collection.Node.find({"name":"MIS_admin"})
- try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+ Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+ if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
- except:
+        Add= "Stop"
+ else:
     Add="Stop"       
+
  if Event_Types:
     for eachset in Event_Types.collection_set:
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
@@ -109,18 +110,20 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       app_id = str(app._id)
   else:'''
   app = collection.Node.one({'_id': ObjectId(app_id)})
-
+  
   #app_name = app.name 
 
   app_set = ""
   app_collection_set = []
   title = ""
-
+  marks_enter= ""
+   
   event_gst = None
   event_gs = None
-
+  reschedule = True
+  marks=""
   property_order_list = []
-
+  
   #template_prefix = "mis"
 
   if request.user:
@@ -192,29 +195,31 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                             course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
                              
             batch=batch.name
-            
-       #   print "\n node.keys(): ", node.keys(), "\n"
+           
+  #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
-  Add="Stop"
-  Mis_admin=collection.Node.find({"name":"MIS_admin"})
-  try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+  Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+  if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
-  except:
+        Add= "Stop"
+  else:
     Add="Stop"       
-
+  #fecth the data
+        
+          
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id,'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'nodes': nodes, 'node': node,
                         'event_gst':event_gst.name,
-                        'Add':Add
-                        # 'property_order_list': property_order_list
+                        'Add':Add,
+                         'Eventtype':Eventtype, 
+                         # 'property_order_list': property_order_list
                       }
 
   
@@ -268,7 +273,9 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   title = ""
   session_of=""
   module=""
-
+  Add=""
+  announced_course =""
+  batch =""
   event_gst = None
   event_gs = None
 
@@ -437,16 +444,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 session_of=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})                     
                 module=collection.Node.one({'_type':"GSystem",'_id':{'$in':session_of.prior_node}})
   event_gs.event_coordinator
-  Add=""
-  Mis_admin=collection.Node.find({"name":"MIS_admin"})
-  try:
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
+  Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+  if  Mis_admin:
+    Mis_admin_list=Mis_admin.group_admin
+    Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-     Add="Allow"  
+        Add="Allow"  
     else: 
-     Add= "Stop"
-  except:
+        Add= "Stop"
+  else:
     Add="Stop"       
 
     
@@ -470,13 +476,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
       event_detail["cordinatorname"]=str(event_gs.event_coordinator[0].name) 
       event_detail["cordinatorid"]=str(event_gs.event_coordinator[0]._id)
       events["cordinator"]=event_detail
-    event_detail["course"]=str(announced_course.name) 
-    event_detail["course_id"]=str(announced_course._id)
-    events["course"]=event_detail
+    if announced_course:
+      event_detail["course"]=str(announced_course.name) 
+      event_detail["course_id"]=str(announced_course._id)
+      events["course"]=event_detail
     event_detail={}
-    event_detail["batchname"]=str(batch.name)
-    event_detail["batchid"]=str(batch._id)
-    events["batch"]=event_detail
+    if batch:  
+      event_detail["batchname"]=str(batch.name)
+      event_detail["batchid"]=str(batch._id)
+      events["batch"]=event_detail
     event_detail={}
     if session_of:
        event_detail["sessionname"]=str(session_of.name)

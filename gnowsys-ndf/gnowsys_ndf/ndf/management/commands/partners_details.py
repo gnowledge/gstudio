@@ -12,7 +12,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
-import xlrd,csv
+import csv
 from collections import defaultdict
 
 ####################################################################################################################
