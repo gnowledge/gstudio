@@ -4087,6 +4087,7 @@ def insert_picture(request, group_id):
 
 # =============================================================================
 
+
 def reschedule_task(request,group_id,node):
  task_dict={}
  #name of the programe officer who has initiated this task
@@ -4144,6 +4145,7 @@ def reschedule_task(request,group_id,node):
  
 
 def event_assginee(request, group_id, app_set_instance_id=None):
+ 
  Event=   request.POST.getlist("Event","")
  
  Event_attended_by=request.POST.getlist("Event_attended_by[]","")
@@ -4465,6 +4467,9 @@ def attendees_relations(request,group_id,node):
  column_count=0
  course_assignment=False
  course_assessment=False
+ reschedule =True
+ marks =True
+   
  member_of=collection.Node.one({"_id":{'$in':event_has_attended[0].member_of}})
  if member_of.name != "Exam":
    for i in event_has_attended[0].relation_set:
@@ -4489,8 +4494,6 @@ def attendees_relations(request,group_id,node):
    #3 :- popuplate only Asssignment marks Columns
    #4 :- populate only Assesment marks Columns
    #1 :- populate Only Attendance taking part donot populate Assesment and Attendance taking part
-   reschedule =True
-   marks =True
    if course_assessment == True:
      column_count = 4
    if course_assignment == True:

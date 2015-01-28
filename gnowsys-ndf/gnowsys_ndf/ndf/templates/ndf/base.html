@@ -97,10 +97,6 @@
 
         <ul class="left">
           <li>
-           <!--
-            <a href="/home/dashboard/group" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}> 
-              Home
-            </a> -->
             <a href="/home/" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}> 
               Home
             </a>
@@ -111,12 +107,12 @@
             </a>
           </li>
           <li>
-            <a href="{% url 'group_dashboard' 'State Partners' %}" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
+            <a href="{% url 'groupchange' 'State Partners' %}" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
               Partners
             </a>
           </li>
           <li>
-            <a href="{% url 'group_dashboard' 'Teachers' %}" {% if nroer_menu.menu_level_one_selected == "Groups" %}class="active"{% endif %}>
+            <a href="{% url 'groupchange' 'Teachers' %}" {% if nroer_menu.menu_level_one_selected == "Groups" %}class="active"{% endif %}>
               Groups
             </a>
           </li>
@@ -321,12 +317,13 @@
                     </a>
                      -->
                   {% endcomment %}
-                  <a title="Activities" href="{% url 'group_dashboard' group_object.pk %}"
+                  <a title="Activities" href="{% url 'group_dashboard' group_object.name %}"
                     {% comment %}
-                       <!--
-                       <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}} -->
+                      <!--
+                        <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
+                      -->
                     {% endcomment %}
-                  <i class="fi-align-justify"></i> Activities 
+                    <i class="fi-results"></i> Activities 
                   </a>
                 {% endif %}
                 <!-- </li> -->
@@ -345,7 +342,7 @@
                       <a class="button"
                       {% if each_menu in nroer_menu.mapping.groups %}
                         {% for k, v in nroer_menu.mapping.items %}
-                          {% if k == each_menu %} href="{% url 'group_dashboard' v %}"{% endif %}
+                          {% if k == each_menu %} href="{% url 'groupchange' v %}"{% endif %}
                         {% endfor %}
                       {% elif each_menu in nroer_menu.mapping.gapps %}
                         {% for k, v in nroer_menu.mapping.items %}
