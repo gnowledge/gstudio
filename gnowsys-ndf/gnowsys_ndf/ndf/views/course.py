@@ -298,9 +298,11 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             unset_ac_options = ["dummy"]
 
         if course_gst.name == u"Announced Course":
-            announce_to_colg_list = request.POST.getlist(
-                "announce_to_colg_list"
+            announce_to_colg_list = request.POST.get(
+                "announce_to_colg_list", ""
             )
+
+            announce_to_colg_list = [ObjectId(colg_id) for colg_id in announce_to_colg_list.split(",")]
 
             colg_ids = []
             # Parsing ObjectId -- from string format to ObjectId
