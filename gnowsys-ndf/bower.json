@@ -42,7 +42,8 @@
     "mousetrap": "~1.4.6",
     "pdfjs-build": "*",
     "blockui": "*",
-    "datatables-plugins": "~1.0.1"
+    "datatables-plugins": "~1.0.1",
+    "DataTables": "~1.10.4"
   },
   "resolutions": {
     "jquery": "2.1.1"
