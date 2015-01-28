@@ -14,53 +14,21 @@
     .margin-0r {
         margin: 0 !important;
     }
-
-    table {
-        border-collapse: collapse;
-        display: block;
-        width: 90%;
-    }
-    thead, tbody {
-        display: block;
-    }
-    tbody {
-        overflow-y: scroll;
-        overflow-x: hidden;
-        height: 300px;
-    }
     tr {
     cursor: pointer;
     }
 
-    .appr_rej , .width_set_class {
-        min-width: 205px;
-    }   
-
-    .table_caption{
-      width:600%;
-      caption-side: top;
-    }
-
-    input[type=checkbox] {
-      /* All browsers except webkit*/
-      transform: scale(1.25);
-
-      /* Webkit browsers*/
-      -webkit-transform: scale(1.25);
-    }
-
 </style>
 
-<link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
 {% if approval_nodes %}
 <table align="center" id="table_data">
-<caption class="table_caption" ><h4><b>{{enrollment_details.College}}</b></h4><h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5><h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6></caption>
+<caption><h4><b>{{enrollment_details.College}}</b></h4><h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5><h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6></caption>
     <thead>
     <tr>
         <th class="text-center">{% trans "Sr. #" %}</th>
-        <th class="text-center appr_rej">{% trans "Approve/Reject" %}<br><input type="checkbox" class="margin-0r checkAllStudents"></th>
+        <th class="text-center">{% trans "Approve/Reject" %}<br><input type="checkbox" class="margin-0r checkAllStudents"></th>
         {% for col in enrollment_columns %}
-        <th class="width_set_class">{{col}}</th>
+        <th>{{col}}</th>
         {% endfor %}
     </tr>
     </thead>
@@ -70,9 +38,9 @@
     {% for sn in approval_nodes_sort_by_name %}
     <tr>
         <td class="text-center">{{forloop.counter}}.</td>
-        <td class="text-center appr_rej"><input type="checkbox" class="margin-0r approveStudent" id="{{sn.list.0|get_dict_item:'_id'}}"></td>
+        <td class="text-center"><input type="checkbox" class="margin-0r approveStudent" id="{{sn.list.0|get_dict_item:'_id'}}"></td>
         {% for col in enrollment_columns %}
-        <td class="width_set_class">{{sn.list.0|get_dict_item:col}}</td>
+        <td>{{sn.list.0|get_dict_item:col}}</td>
         {% endfor %}
     </tr>
     {% endfor %}
@@ -93,6 +61,10 @@
 </div>
 
 <script type="text/javascript">
+
+$(document).ready( function () {
+  var table = $('#table_data').DataTable();
+} );
 
   $(document).foundation();
 
