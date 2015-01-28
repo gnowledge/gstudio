@@ -4098,12 +4098,8 @@ def save_time(request,group_id,node):
   reschedule_event_start = collection.Node.one({"_type":"AttributeType","name":"start_time"})
   reschedule_event_end = collection.Node.one({"_type":"AttributeType","name":"end_time"})
   reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
-  print start_time
-  print end_time
   start_time= parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
   end_time= parse_template_data(datetime.datetime,end_time, date_format_string="%d/%m/%Y %H:%M")
-  print start_time
-  print end_time
   create_gattribute(ObjectId(node),reschedule_event_start,start_time) 
   create_gattribute(ObjectId(node),reschedule_event_end,end_time) 
   reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
@@ -4118,10 +4114,8 @@ def save_time(request,group_id,node):
 def check_date(request,group_id,node):
     reschedule = request.POST.get('reschedule','')
     test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$gt':datetime.datetime.today()}})
-    print "sadf",test_output.count()
     if test_output.count()  == 0 and reschedule == 'True':
        test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.event_edit_reschedule.reschedule_till":{'$gt':datetime.datetime.today()}})
-    print "sadf-----",test_output.count()
     if test_output.count() != 0:
        message = "event Open" 
     if test_output.count() == 0:

@@ -446,14 +446,9 @@ function EditAttendance(columns)
 }
 function saveTime()
 {
-     alert(session_time)
-      
-      
      time_diff = get_time_diff(new Date($("#start_time").datetimepicker('getDate')),new Date($("#end_time").datetimepicker('getDate')))
-     alert("the dif time"+time_diff)
      var start_time = $("#start_time").val()
      var end_time   = $("#end_time").val()
-     alert(Number(time_diff) == Number(session_time))
      if (Number(time_diff) == Number(session_time)) 
         {     $.ajax({
                      url:"{% url 'save_time' groupid node %}",
