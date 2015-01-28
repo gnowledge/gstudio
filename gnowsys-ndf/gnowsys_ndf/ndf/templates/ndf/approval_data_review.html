@@ -17,16 +17,17 @@
     tr {
     cursor: pointer;
     }
-
+    .selected{
+      background-color: skyblue !important;
+    }
 </style>
 
 {% if approval_nodes %}
-<table align="center" id="table_data">
-<caption><h4><b>{{enrollment_details.College}}</b></h4><h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5><h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6></caption>
+<table align="center" id="table_data" class="display" cellspacing="0">
+    <caption><h4><b>{{enrollment_details.College}}</b></h4><h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5><h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6></caption>
     <thead>
     <tr>
         <th class="text-center">{% trans "Sr. #" %}</th>
-        <th class="text-center">{% trans "Approve/Reject" %}<br><input type="checkbox" class="margin-0r checkAllStudents"></th>
         {% for col in enrollment_columns %}
         <th>{{col}}</th>
         {% endfor %}
@@ -36,9 +37,8 @@
     <tbody>
     {% regroup approval_nodes|dictsort:"Name" by Name as approval_nodes_sort_by_name %}
     {% for sn in approval_nodes_sort_by_name %}
-    <tr>
+    <tr id="{{sn.list.0|get_dict_item:'_id'}}">
         <td class="text-center">{{forloop.counter}}.</td>
-        <td class="text-center"><input type="checkbox" class="margin-0r approveStudent" id="{{sn.list.0|get_dict_item:'_id'}}"></td>
         {% for col in enrollment_columns %}
         <td>{{sn.list.0|get_dict_item:col}}</td>
         {% endfor %}
@@ -62,9 +62,14 @@
 
 <script type="text/javascript">
 
-$(document).ready( function () {
-  var table = $('#table_data').DataTable();
-} );
+  $(document).ready( function () {
+    $('#table_data').DataTable();
+
+    $('#table_data tbody').on( 'click', 'tr', function () {
+        $(this).toggleClass('selected');
+    });
+ 
+  });
 
   $(document).foundation();
 
@@ -76,11 +81,4 @@ $(document).ready( function () {
     $(this).hide();
   });
 
-$("#table_data tbody tr").click(function(e){
-  if (e.target.type != 'checkbox'){
-    var cb = $(this).find("input[type=checkbox]");
-    cb.trigger('click');
-  }
-});
- 
 </script>

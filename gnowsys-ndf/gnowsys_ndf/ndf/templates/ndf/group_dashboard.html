@@ -452,7 +452,7 @@ $(".detail-view").click(function(event) {
 
 $(document).on("click", ".btnApproval", function() {
   students_selected = []
-  $(".approveStudent:checked").each(function() {
+  $(".selected").each(function() {
     students_selected.push($(this).attr("id"));
   });
 
