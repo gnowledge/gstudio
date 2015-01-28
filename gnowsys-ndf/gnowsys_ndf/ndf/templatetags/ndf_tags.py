@@ -1525,8 +1525,8 @@ def user_access_policy(node, user):
     else:
       # group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
       group_name, group_id = get_group_name_id(node)
-      group_node = collection.Node.one({"_id": group_id})
-      
+      group_node = collection.Node.one({"_id": ObjectId(group_id)})
+
       if user.id == group_node.created_by:
         user_access = True
 
@@ -1706,41 +1706,45 @@ def check_is_gapp_for_gstaff(groupid, app_dict, user):
 
 @register.assignment_tag
 def get_publish_policy(request, groupid, res_node):
-  resnode = collection.Node.one({"_id": ObjectId(res_node._id)})
+	resnode = collection.Node.one({"_id": ObjectId(res_node._id)})
 
-  if resnode.status == "DRAFT":
-    node = collection.Node.one({"_id": ObjectId(groupid)})
+	if resnode.status == "DRAFT":
+	    
+	    # node = collection.Node.one({"_id": ObjectId(groupid)})
+		
+		group_name, group_id = get_group_name_id(group_id)
+		node = collection.Node.one({"_id": ObjectId(group_id)})
 
-    group_type = group_type_info(groupid)
-    group = user_access_policy(groupid,request.user)
-    ver = node.current_version
-    
-    if request.user.id:
-      if group_type == "Moderated":
-      	base_group=get_prior_post_node(groupid)
-      	if base_group is not None:
-      		if base_group.status == "DRAFT" or node.status == "DRAFT":
-    				return "allow"
+		group_type = group_type_info(groupid)
+		group = user_access_policy(groupid,request.user)
+		ver = node.current_version
 
-      elif node.edit_policy == "NON_EDITABLE":
-        if resnode._type == "Group":
-        	if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
-        		return "stop"
-        if group == "allow":          
-        	if resnode.status == "DRAFT": 
-        			return "allow"    
+		if request.user.id:
+			if group_type == "Moderated":
+				base_group=get_prior_post_node(groupid)
+				if base_group is not None:
+					if base_group.status == "DRAFT" or node.status == "DRAFT":
+						return "allow"
 
-      elif node.edit_policy == "EDITABLE_NON_MODERATED":
-        #condition for groups
-        if resnode._type == "Group":
-          if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
-            # print "\n version = 1.1\n"
-            return "stop"
+			elif node.edit_policy == "NON_EDITABLE":
+				if resnode._type == "Group":
+					if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+						return "stop"
+		        if group == "allow":          
+		        	if resnode.status == "DRAFT": 
+		        			return "allow"    
 
-        if group == "allow":
-          # print "\n group = allow\n"
-          if resnode.status == "DRAFT": 
-            return "allow"
+			elif node.edit_policy == "EDITABLE_NON_MODERATED":
+		        #condition for groups
+				if resnode._type == "Group":
+					if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+		            	# print "\n version = 1.1\n"
+						return "stop"
+
+		        if group == "allow":
+		          # print "\n group = allow\n"
+		          if resnode.status == "DRAFT": 
+		            return "allow"
 
 
 @register.assignment_tag
