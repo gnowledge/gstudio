@@ -18,12 +18,12 @@
     cursor: pointer;
     }
     .selected{
-      background-color: skyblue !important;
+      background-color: #D5D3D3 !important;
     }
 </style>
 
 {% if approval_nodes %}
-<table align="center" id="table_data" class="display" cellspacing="0">
+<table align="center" id="table_data" class="display" cellspacing="0" width="100%">
     <caption><h4><b>{{enrollment_details.College}}</b></h4><h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5><h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6></caption>
     <thead>
     <tr>
@@ -68,7 +68,6 @@
     $('#table_data tbody').on( 'click', 'tr', function () {
         $(this).toggleClass('selected');
     });
- 
   });
 
   $(document).foundation();
