@@ -3,6 +3,16 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
 {% block style %}
   {{block.super}}
 
@@ -31,6 +41,11 @@
 
     #announce-course.hide{
       display: none;
+    }
+
+    /* DataTables css-properties */
+    .selected {
+      background-color: skyblue !important;
     }
 {% endblock %}
 
@@ -110,6 +125,8 @@
                 <a href="#panel_announce_course">Select Announce Course(s)</a>
                 <div id="panel_announce_course" class="content active">
                   <p>Please select course type.</p>
+                  <table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">
+                  </table>
                 </div>
               </dd>
             </dl>
@@ -133,28 +150,37 @@
   // On close event of reveal-modal (alertModal) -------------------------------------------------------------
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
       // Reset reveal-modal content & it's setting
-      $("#alertModalLabel").text("");
+      $("#alertModalLabel").text("<p>Please select course type.</p>");
       $("#alertModal")
         .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
         .addClass("medium")
         .find("div.row").addClass("hide");
     });
 
-  //For selecting Course type---------------------------------------------------------------------------------------
+  /* Change event: Coures Type
+    * Populate Announced Courses in data-table of selected course type
+    */
   $("select#nussd_course_type").change(function() {
     if ($(this).prop("selectedIndex") == 0) {
+      $("#panel_announce_course").html("<p>Please select course type.</p>")
       return;
     }
 
     success_state = false;
     var nussd_course_type = $("#nussd_course_type").val();
+    var start_enroll = $("#start_enroll").val();
+    var end_enroll = $("#end_enroll").val();
+    var column_headers = {};
+    var ac_data_set = [];
 
     $.ajax({
       url: "{% url 'get_announced_courses_with_ctype' group_id %}",
 
       data: {
         nussd_course_type: nussd_course_type,
-        ann_course_type: 1
+        ann_course_type: 1,
+        start_enroll: start_enroll,
+        end_enroll: end_enroll
       },
 
       type: "GET",
@@ -174,40 +200,62 @@
       success: function(data){
         success_state = data["success"]
         if (success_state){
-          ac_data = data["acourse_ctype_list"]
-          ac_data = JSON.parse(ac_data)
+          column_headers = data["column_headers"];
+          console.log("column_headers: " + JSON.stringify(column_headers));
+          ac_data_set = data["ac_data_set"];
+          console.log("ac_data_set: " + JSON.stringify(ac_data_set));
+          console.log("ac_data_set: " + ac_data_set.length);
 
-          $("select#acourse_list").empty();
-            $("select#acourse_list").append(
-              $("<option></option>")
-                .attr("value", "")
-                .text("{% trans ' - - - Select course - - - ' %}")
-            );
-          
-          $.each(ac_data, function(i,v){
-            se = v["_id"];
-            ac_name = v["name"];
-            scount_lbl = v["enrolled_stud_count"]
-            $("select#acourse_list").append(
-              $("<option></option>")
-                .attr("value", se)
-                .text(ac_name)
-                .attr("scount", scount_lbl)
-            );
-          });
+          dataTable_columns_set = [];
+
+          if (ac_data_set.length > 0) {
+            // Define table
+            ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table"></table>';
+            $("#panel_announce_course").html(ac_table);
+
+            // Prepare title & data headers used in dataTable
+            $.each(column_headers, function(index, v) {
+              d = {};
+              d["data"] = v[0];
+              d["title"] = v[1];
+              dataTable_columns_set.push(d);
+            });
+
+            // Set defintion dataTable
+            $("#ac_table").dataTable({
+              "data": ac_data_set,
+              "columns": dataTable_columns_set,
+              "createdRow": function ( row, data, index ) {
+                // Attaching Announced Course's ObjectId to each row (i.e., assigning to it's id attribute)
+                $(row).attr("id", data["ac_id"]);
+              }
+            });
+          }
         }
         else {
-          console.log("data-message: " + data["message"]);
+          $("select#nussd_course_type").prop("selectedIndex", 0);
+          
           $("#alertModalLabel").text(data["message"]);
           $("#alertModal").addClass("alert").addClass("small");
           $("#alertModal").foundation('reveal', 'open');
-          $("select#nussd_course_type").prop("selectedIndex", 0);
         }
       },
     });//end of ajax
-
   });
 
+  var selected_ann_courses_ids = [];
+  $(document).on( 'click', '#ac_table tbody tr', function () {
+    var id = this.id;
+    var index = $.inArray(id, selected_ann_courses_ids);
+
+    if ( index === -1 ) {
+      selected_ann_courses_ids.push( id );
+    } else {
+      selected_ann_courses_ids.splice( index, 1 );
+    }
+
+    $(this).toggleClass('selected');
+  } );
 {% endblock %}
 
 {% block document_ready %}

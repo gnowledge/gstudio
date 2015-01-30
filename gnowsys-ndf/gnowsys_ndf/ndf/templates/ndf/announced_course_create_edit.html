@@ -22,13 +22,17 @@
       margin: 0 !important;
     }
 
-  /* Setting css-properties for reveal-modal's label */
-    div.reveal-modal > label {
+  /* Setting css-properties for reveal-modal's paragraph */
+    div.reveal-modal > label, div#alertModalDiv > p {
       color: white;
       font-weight: bold;
       font-size: 1rem;
     }
-
+    div#alertModalDiv > p > a {
+      color: yellow;
+      font-weight: bold;
+      font-size: 1rem;
+    }
     #announce-course.hide{
       display: none;
     }
@@ -37,6 +41,7 @@
 {% block body_content %} 
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <label id="alertModalLabel"></label>
+    <div id="alertModalDiv"></div>
     <a class="close-reveal-modal">&#215;</a>
   </div>
 
@@ -254,25 +259,23 @@
       return;
     }
 
+    nussd_course_type = $("#nussd_course_type").val();
     univ_id = $("select#univ_cur").val();
     start_time = $("#start_time").val();
     end_time = $("#end_time").val();
     announce_course_in_college = false;
     dc_courses_id_list = [];
 
-    // Fetch ObjectId of course(s) (in string format) for course type other than "Foundation Course"
-    if ($("#nussd_course_type :selected").index() > 1) {
-      $("input[name='unset-ac-options']:checked").each(function() {
-        dc_course_id =  $(this).val(); 
-
-        dc_courses_id_list.push(dc_course_id);
-      });
-    }
+    $("input[name='unset-ac-options']:checked").each(function() {
+      dc_course_id =  $(this).val(); 
+      dc_courses_id_list.push(dc_course_id);
+    });
 
     $.ajax({
-      url: "{% url 'get_colleges' group_id %}",
+      url: "{% url 'get_colleges' group_id app_id %}",
 
       data: {
+        nussd_course_type: nussd_course_type,
         univ_id: univ_id,
         dc_courses_id_list: dc_courses_id_list,
         start_time: start_time,
@@ -370,7 +373,8 @@
         }
 
         else {
-          $("#alertModalLabel").text(data["message"]);
+          $("select#univ_cur").prop("selectedIndex", 0);
+          $("#alertModalDiv").html("<p>" + data["message"] + "</p>");
           $("#alertModal").removeClass("success");
           $("#alertModal").addClass("alert");
           $("#alertModal").foundation('reveal', 'open');
@@ -450,7 +454,7 @@
 
         else {
           $("select#nussd_course_type").prop("selectedIndex", 0);
-          $("#alertModalLabel").text(data["message"]);
+          $("#alertModalDiv").html("<p>" + data["message"] + "</p>");
           $("#alertModal").removeClass("success");
           $("#alertModal").addClass("alert");
           $("#alertModal").foundation('reveal', 'open');

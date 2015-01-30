@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.http import Http404
+from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -3145,6 +3146,9 @@ def get_announced_courses_with_ctype(request, group_id):
             ann_course_type = request.GET.get("ann_course_type", "1")
             acourse_ctype_list = []
             ac_of_colg = []
+            start_enroll = ""
+            end_enroll = ""
+            query = {}
             # curr_date = datetime.datetime.now()
 
             # Fetch "Announced Course" GSystemType
@@ -3165,11 +3169,87 @@ def get_announced_courses_with_ctype(request, group_id):
             nussd_course_type = unicode(nussd_course_type)
             ann_course_type = int(ann_course_type)
 
+            if ann_course_type == 1:
+                # Return all Announced Course(s) for which enrollment not started yet
+                query = {
+                    "member_of": announced_course_gt._id,
+                    "group_set": ObjectId(mis_admin._id),
+                    "status": "PUBLISHED",
+                    "attribute_set.nussd_course_type": nussd_course_type,
+                    "attribute_set.ann_course_closure": u"Open",
+                    "relation_set.course_has_enrollment": {"$exists": False}
+                }
+
+                college = {}
+                course = {}
+                ac_data_set = []
+
+                rec = collection.aggregate([
+                    {
+                        '$match': query
+                    }, {
+                        '$project': {
+                            '_id': 0,
+                            'ac_id': "$_id",
+                            'name': '$name',
+                            'course': '$relation_set.announced_for',
+                            'college': '$relation_set.acourse_for_college',
+                            'created_at': "$created_at"
+                        }
+                    },
+                    {
+                        '$sort': {'created_at': 1}
+                    }
+                ])
+
+                for each in rec["result"]:
+                    if each["college"]:
+                        colg_id = each["college"][0][0]
+                        if colg_id not in college:
+                            c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1})
+                            each["college"] = c.name
+                            college[colg_id] = {}
+                            college[colg_id]["name"] = each["college"]
+                            for rel in c.relation_set:
+                                if rel and "college_affiliated_to" in rel:
+                                    univ_id = rel["college_affiliated_to"][0]
+                                    u = collection.Node.one({"_id": univ_id}, {"name": 1})
+                                    each.update({"university": u.name})
+                                    college[colg_id]["university"] = each["university"]
+                        else:
+                            each["college"] = college[colg_id]["name"]
+                            each.update({"university": college[colg_id]["university"]})
+
+                    if each["course"]:
+                        course_id = each["course"][0][0]
+                        if course_id not in course:
+                            each["course"] = collection.Node.one({"_id": course_id}).name
+                            course[course_id] = each["course"]
+                        else:
+                            each["course"] = course[course_id]
+
+                    ac_data_set.append(each)
+
+                column_headers = [
+                    ("name", "Announced Course Name"),
+                    ("course", "Course Name"),
+                    ("college", "College"),
+                    ("university", "University")
+                ]
+
+                response_dict["success"] = True
+                response_dict["message"] = ""
+                response_dict["column_headers"] = column_headers
+                response_dict["ac_data_set"] = ac_data_set
+                return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
             if(ObjectId(group_id) == mis_admin._id):
                 ac_cur = collection.Node.find({
                     'member_of': announced_course_gt._id,
                     'group_set': ObjectId(group_id),
                     'attribute_set.nussd_course_type': nussd_course_type
+                }, {
+                    "name": 1, "attribute_set": 1, "relation_set": 1
                 })
 
             else:
@@ -3201,6 +3281,8 @@ def get_announced_courses_with_ctype(request, group_id):
                     'status': u"PUBLISHED"
                     # 'attribute_set.start_enroll':{'$lte': curr_date},
                     # 'attribute_set.end_enroll':{'$gte': curr_date}
+                }, {
+                    "name": 1, "attribute_set": 1, "relation_set": 1
                 })
 
             if ac_cur.count():
@@ -3209,12 +3291,13 @@ def get_announced_courses_with_ctype(request, group_id):
                     # Following is used especially only in new_create_batch.html
                     # Fetch enrolled students count from announced course node's course_selected
                     enrolled_stud_count = 0
-                    for rel in each_ac.relation_set:
-                        if rel and rel in "course_selected":
-                            enrolled_stud_count = len(rel["course_selected"])
-                            break
+                    if ann_course_type != 1:
+                        for rel in each_ac.relation_set:
+                            if rel and "course_selected" in rel:
+                                enrolled_stud_count = len(rel["course_selected"])
+                                break
 
-                    each_ac["enrolled_stud_count"] = enrolled_stud_count
+                        each_ac["enrolled_stud_count"] = enrolled_stud_count
                     acourse_ctype_list.append(each_ac)
 
                 response_dict["success"] = True
@@ -3244,7 +3327,7 @@ def get_announced_courses_with_ctype(request, group_id):
         return HttpResponse(json.dumps({'message': error_message}))
 
 
-def get_colleges(request, group_id):
+def get_colleges(request, group_id, app_id):
     """This view returns HttpResponse with following data:
       - List of college(s) affiliated to given university where
         Program Officer is not subscribed
@@ -3264,7 +3347,7 @@ def get_colleges(request, group_id):
     A dictionary consisting of following key-value pairs:-
     success - Boolean giving the state of ajax call
     message - Basestring giving the error/information message
-    unassigned_PO_colg_list - List of college(s) affiliated to given university
+    unassigned_po_colg_list - List of college(s) affiliated to given university
       where Program Officer is not subscribed
     already_announced_in_colg_list - List of college(s) affiliated to given
       university where Course(s) is/are already announced for given duration
@@ -3276,19 +3359,9 @@ def get_colleges(request, group_id):
     try:
         if request.is_ajax() and request.method == "GET":
             # Fetch field(s) from GET object
-            univ_id = request.GET.get("univ_id", "")
-            start_time = request.GET.get("start_time", "")
-            end_time = request.GET.get("end_time", "")
-            dc_courses_id_list = request.GET.getlist("dc_courses_id_list[]")
-            # all_univs = request.GET.get("all_univs", "")
+            nussd_course_type = request.GET.get("nussd_course_type", "")
+            print "\n nussd_course_type: ", nussd_course_type, "\n"
 
-            # Check whether any field has missing value or not
-            if univ_id == "" or start_time == "" or end_time == "":
-                error_message = "Invalid data: " \
-                    "No data found in any of the field(s)!!!"
-                raise Exception(error_message)
-
-            # Fetch "Announced Course" GSystemType
             mis_admin = collection.Node.one(
                 {'_type': "Group", 'name': "MIS_admin"}, {'name': 1}
             )
@@ -3296,6 +3369,69 @@ def get_colleges(request, group_id):
                 # If not found, throw exception
                 error_message = "'MIS_admin' (Group) doesn't exists... " \
                     "Please create it first!"
+                raise Exception(error_message)
+
+            """
+            # Fetch "Announced Course" GSystemType
+            announced_course_gt = collection.Node.one(
+                {'_type': "GSystemType", 'name': "Announced Course"}
+            )
+            if not announced_course_gt:
+                # If not found, throw exception
+                error_message = "Announced Course (GSystemType) doesn't " \
+                    + "exists... Please create it first!"
+                raise Exception(error_message)
+
+            # Search for Announced Course(s) for which enrollement is not begun
+            ac_cur = collection.Node.find({
+                'member_of': announced_course_gt._id,
+                'group_set': ObjectId(mis_admin._id),
+                'status': u"PUBLISHED",
+                'attribute_set.nussd_course_type': nussd_course_type,
+                'relation_set.course_has_enrollment': {"$exists": False}
+            })
+
+            if ac_cur.count() > 0:
+                # If announced courses found,
+                # Then provide a link to initiate Enrollment
+                # in HttpRresponse
+                sce_gst = collection.Node.one({
+                    "_type": "GSystemType", "name": "StudentCourseEnrollment"
+                }, {
+                    "_id": 1
+                })
+                django_url = reverse(
+                    'mis:mis_app_instance_create',
+                    kwargs={
+                        'group_id': group_id, 'app_id': app_id,
+                        'app_set_id': sce_gst._id
+                    }
+                )
+                site = Site.objects.get(pk=1)
+                site = site.name.__str__()
+                protocol_text = request.META["wsgi.url_scheme"]
+                url_text = protocol_text + "://" + site + django_url
+                msg_string = "Before announcing course (" + nussd_course_type + ") for given duration, " \
+                    + "you must initiate Student-Course enrollment for already " \
+                    + "announced course. <br/>To do so " \
+                    + "<a href='" + url_text + "'>click here</a>."
+                response_dict["message"] = msg_string
+                response_dict["success"] = False
+
+                return HttpResponse(json.dumps(response_dict))
+
+            """
+            univ_id = request.GET.get("univ_id", "")
+            start_time = request.GET.get("start_time", "")
+            end_time = request.GET.get("end_time", "")
+            dc_courses_id_list = request.GET.getlist("dc_courses_id_list[]")
+            print "\n dc_courses_id_list: ", dc_courses_id_list, "\n"
+            # all_univs = request.GET.get("all_univs", "")
+
+            # Check whether any field has missing value or not
+            if univ_id == "" or start_time == "" or end_time == "":
+                error_message = "Invalid data: " \
+                    "No data found in any of the field(s)!!!"
                 raise Exception(error_message)
 
             # Fetch all college groups
@@ -3336,26 +3472,27 @@ def get_colleges(request, group_id):
             ).sort('name', 1)
 
             list_colg = []
-            unassigned_PO_colg_list = []
+            unassigned_po_colg_list = []
             already_announced_in_colg_list = []
             for each in colg_under_univ_id:
-                is_PO_exists = False
+                is_po_exists = False
                 if each.relation_set:
                     for rel in each.relation_set:
                         if rel and "has_officer_incharge" in rel:
                             if rel["has_officer_incharge"]:
-                                is_PO_exists = True
+                                is_po_exists = True
 
                         if rel and "college_has_acourse" in rel:
                             if rel["college_has_acourse"]:
                                 if dc_courses_id_list:
-                                    acourse_exists = collection.Node.find_one(
-                                        {'_id': {'$in': rel["college_has_acourse"]}, 'relation_set.announced_for': {'$in': dc_courses_id_list}, 'attribute_set.start_time': start_time, 'attribute_set.end_time': end_time}
-                                    )
-                                else:
-                                    acourse_exists = collection.Node.find_one(
-                                        {'_id': {'$in': rel["college_has_acourse"]}, 'attribute_set.start_time': start_time, 'attribute_set.end_time': end_time}
-                                    )
+                                    acourse_exists = collection.Node.find_one({
+                                        '_id': {'$in': rel["college_has_acourse"]},
+                                        'relation_set.announced_for': {'$in': dc_courses_id_list},
+                                        'attribute_set.start_time': start_time,
+                                        'attribute_set.end_time': end_time,
+                                        'attribute_set.ann_course_closure': "Open",
+                                        'status': "PUBLISHED"
+                                    })
 
                                 if acourse_exists:
                                     if each._id not in already_announced_in_colg_list:
@@ -3364,18 +3501,18 @@ def get_colleges(request, group_id):
                 if each.name in already_announced_in_colg_list:
                     continue
 
-                elif is_PO_exists:
+                elif is_po_exists:
                     if each not in list_colg:
                         list_colg.append(each)
 
                 else:
-                    if each not in unassigned_PO_colg_list:
-                        unassigned_PO_colg_list.append(each.name)
+                    if each not in unassigned_po_colg_list:
+                        unassigned_po_colg_list.append(each.name)
 
             response_dict["already_announced_in_colg_list"] = \
                 already_announced_in_colg_list
 
-            response_dict["unassigned_PO_colg_list"] = unassigned_PO_colg_list
+            response_dict["unassigned_PO_colg_list"] = unassigned_po_colg_list
 
             if list_colg:
                 drawer_template_context = edit_drawer_widget(
