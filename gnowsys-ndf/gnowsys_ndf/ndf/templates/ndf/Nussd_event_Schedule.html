@@ -436,8 +436,6 @@ function check_remaining_time(start_time,end_time)
          total_min_diff=((Number(diffhh)*60) + Number(diffmm))
          deducted_minute =  Number(total_session_time) - Number(total_min_diff)
          total_session_time=deducted_minute
-         alert("totalream"+total_session_time)
-         alert("deductedminute"+deducted_minute)
          
   }
 function date_validation(name)
@@ -466,8 +464,7 @@ function date_validation(name)
 	          
 	           if (total_session_time == 0) 
 	             {
-	               alert("zero point "+name)
-                   reset_time(name)
+	                reset_time(name)
                    reset = 1
                  }
               if (reset == 0)   
@@ -534,9 +531,8 @@ function set_date(name)
 function reset_time(name)
  {
    total_session_time = $('#session_of option:selected').attr('minutes') 
-    alert(last_start_time)
+    
     str1 = name.substring(9)
-   alert(str1)
    /*for (i=0;i<=last_start_time;i++) 
     {*/
      var i = 0 
