@@ -59,6 +59,13 @@
             editable: false,
             eventBackgroundColor:'#23000',
         
+            eventLimit: true, // for all non-agenda views
+            views: {
+                month:
+                 {
+                    eventLimit: 5 // adjust to 6 only for agendaWeek/agendaDay
+                 }
+            },
             eventClick: function(calevent) {
                 if (calevent.title == "+3") {
                     $('#calendar').fullCalendar('changeView', 'agendaDay'/* or 'basicDay' */);
@@ -90,6 +97,7 @@
                                         id:sData[i].id,
                                         title: sData[i].title,
                                         start: sData[i].start,
+                                        backgroundColor:sData[i].backgroundColor,
                                         url: sData[i].url
                                     }]
                                 };   

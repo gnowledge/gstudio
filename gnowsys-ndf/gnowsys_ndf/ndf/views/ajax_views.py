@@ -1380,7 +1380,7 @@ def graph_nodes(request, group_id):
       
     #   vall = vall.altnames if ( len(vall['altnames'])) else _get_node_info(vall['subject_or_right_subject_list'][0])
     #   node_metadata += '{"screen_name":"' + str(vall) + '", "_id":"'+ str(i) +'_n"},'
-    #   node_relations += '{"type":"'+ keyy +'", "from":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
+    #   node_relations += '{"type":"'+ keyy +'", "f**rom":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
     # print "\nkey : ", key, "=====", val
 
 
@@ -1607,20 +1607,58 @@ def get_data_for_event_task(request,group_id):
      end=datetime.datetime(int(currentYear),int(month), 28)
      task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
     #day_list of events  
-    for j in obj:
-        nodes = collection.Node.find({'member_of': ObjectId(j._id),'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
-        for i in nodes:
+     for j in obj:
+        '''
+          nodes = collection.Node.find({'member_of': ObjectId(j._id),'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
+          
+         
+          for i in nodes:
+            attr_value={}
+            event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
+            attr_value.update({'url':event_url})
+            attr_value.update({'id':i._id})
+            attr_value.update({'title':i.name})
+            date=i.attribute_set[0]['start_time']
+            formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+            attr_value.update({'start':formated_date})
+            attr_value.update({'backgroundColor':'green'})
+            day_list.append(dict(attr_value))
+        '''
+        #All the Rescheduled ones 
+        nodes = collection.Node.find({'member_of': ObjectId(j._id),'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}}},{'attribute_set.event_edit_reschedule.reschedule_dates':1})
+        for k in nodes:
+          for a in k.attribute_set: 
+             if  unicode('event_edit_reschedule') in a:
+                for v in a['event_edit_reschedule']['reschedule_dates']:
+                      attr_value={}
+                      event_url="None"
+                      attr_value.update({'url':"None"})
+                      attr_value.update({'id':k._id})
+                      attr_value.update({'title':'trail'})
+                      date = v 
+                      formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+                      attr_value.update({'start':formated_date})
+                      attr_value.update({'backgroundColor':'#ffd700'})
+                      day_list.append(dict(attr_value)) 
+          
+        #ALl the Events Whoes attendanc are not held
+        '''nodes = collection.Node.find({"member_of":ObjectId(j._id),"relation_set.has_attended":{"$exists":False}})
+        for k in nodes:
           attr_value={}
-          event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
-          attr_value.update({'url':event_url})
-          attr_value.update({'id':i._id})
-          attr_value.update({'title':i.name})
-          date=i.attribute_set[0]['start_time']
-          formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+          event_url="None"
+          attr_value.update({'url':"None"})
+          attr_value.update({'id':k._id})
+          attr_value.update({'title':k.name})
+          try:
+            date=k.attribute_set[0]['start_time']
+            formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+          except:
+            date =datetime.datetime.today()  
+            formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           attr_value.update({'start':formated_date})
-          day_list.append(dict(attr_value))
-    
-    
+          attr_value.update({'backgroundColor':'red'})
+          day_list.append(dict(attr_value)) 
+          '''
     count=0
     dummylist=[]
     date=""
@@ -1676,56 +1714,7 @@ def get_data_for_event_task(request,group_id):
     
     date_changed=[]
     if request.GET.get('view','') == 'month':
-     for i in day_list:
-        if date == (i['start'].split("T")[0]) or date == "":
-           if date_changed:
-             dummylist=date_changed
-             date_changed=[]  
-           dummylist.append(i)
-           count=count +  1
-           changed="false"
-        else:
-            changed="true"
-            recount=count
-            count=0
-            count=count +  1
-            date_changed=[]
-            date_changed.append(i)
-            
-            if len(dummylist) > 3:
-             attr_value={}
-             dummylist=[]
-             attr_value.update({'id':i['id']})
-             attr_value.update({'title':'+3'})
-             attr_value.update({'start':date})
-             dummylist.append(dict(attr_value)) 
-        date=i['start'].split("T")[0]    
-        if changed == "true" :
-              for i in dummylist:
-                   sorted_month_list.append(i)
-              changed="false"
-              dummylist=[]
-                   
-     final_changed_dates=[]
-     if date_changed:
-       final_changed_dates=date_changed
-     else:
-       final_changed_dates=dummylist
-
-       
-     dummylist=[]
-     date_changed=[]
-     if len(final_changed_dates)>3 :
-             attr_value={}
-             attr_value.update({'id':final_changed_dates[0]['id']})
-             attr_value.update({'title':'+3'})
-             attr_value.update({'start':final_changed_dates[0]['start']})
-             dummylist.append(dict(attr_value))
-             final_changed_dates=[]
-             final_changed_dates=dummylist 
-     for i in final_changed_dates:
-           sorted_month_list.append(i)  
-     return HttpResponse(json.dumps(sorted_month_list,cls=NodeJSONEncoder))
+     return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder))
     else:
      return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder)) 
 
