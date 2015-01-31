@@ -296,7 +296,9 @@
 $(document).ready(function(){
 datetime()
 document.getElementById('form-edit-node').reset()
-clear_Disable_Elements(); 
+if (!('{{edit_details}}'))
+{clear_Disable_Elements();}
+
 
 });
 
@@ -325,13 +327,7 @@ function clear_Disable_Elements()
             $('#Module-session-section').hide()
             $('#event_coordinator').attr('disabled','True')
             document.getElementById('end_time').disabled = ""
-            /*
-            $('#start_time_1').attr('disabled','True')
-            $('#end_time_1').attr('disabled','True')
-            $('#start_time_1').attr('disabled','True')
-            $('#end_time_1').attr('disabled','True')
-            $('#end_time').attr('disabled','True')
-             */ 
+          
           }
 
         $('#view').attr('disabled','True')
@@ -348,8 +344,9 @@ function append_time()
 }
 
 
-  if(event_details)
+  if('{{edit_details}}')
   {
+    alert("didnt comeher")
     event_details={{edit_details|safe}}
     $('#nussd_course_name').append(
                   $("<option></option>")
@@ -399,21 +396,22 @@ function append_time()
               },
           complete:function(){
                 if(courses != ""){
-                $.each(courses, function(key,val) {
-                     $('#has_attendees').append(
-                     $("<option></option>")
-                     .attr("id", "coursename_"+key.id)
-                     .attr("value",val.id)
-                     .attr("selected","selected")
-                     .text(val.name)
-            
-           );
-            });
-          }
+                        $.each(courses, function(key,val) 
+                        {
+                             $('#has_attendees').append(
+                             $("<option></option>")
+                             .attr("id", "coursename_"+key.id)
+                             .attr("value",val.id)
+                             .attr("selected","selected")
+                             .text(val.name)
+                            );
+                        });
+                    }
           } 
     });
 } 
-});
+
+
 function Enable_Elements()
 {
   if(  document.getElementById('Module_of'))
@@ -443,6 +441,7 @@ function enable_start_time_end_time(str)
     
  
  }
+
 
 function remove_start_end_time(start_from , remove_till)
  {
@@ -934,14 +933,17 @@ $("#view").click(function(){
       onClose: function(dateText, inst) {
         $(this).val(dateText);
         
-        /* if ( '{{title}}' != 'Exam' )
+         if ( '{{title}}' != 'Exam' )
         {
           date_validation($(this).attr('name'))
+          
+        }  
+        else
+        {
           enable_submit()
         }  
-          */
           
-        date_validation($(this).attr('name'))
+        
 
         var month_year = $(this).val();
         day = currentDay;

@@ -77,9 +77,7 @@ table, th, td {
                               <label>{{node.end_time}}</label>
                             </div>
                           </div>
-
-                          <br>
-                          
+                        <br>
                           {% if  Eventtype == 'Eventtype' %}
                             {%  if node.event_organised_by %}
                                 <br>
@@ -139,7 +137,7 @@ table, th, td {
                               <div class="small-5 end columns">
                                 <label>{{course.name}}</label>
                               </div>
-                            </div>
+                          </div>
                             <br>
                           
                           <div class="row">
@@ -147,20 +145,20 @@ table, th, td {
                                 <label>Min marks:</label>
                               </div>
                               <div class="small-3 end columns">
-                                <label>{{course.attribute_set.7.max_marks}}</label>
+                                <label>{{course.attribute_set.6.min_marks}}</label>
+
                               </div>
-                              
+                                
                               <div class="small-3 columns">
                                 <label>Max Marks:</label>
                               </div>
                               <div class="small-2 end columns">
-                                <label>{{course.attribute_set.6.min_marks}}</label>
+                                  <label>{{course.attribute_set.7.max_marks}}</label>  
                               </div>
                          </div>
                           {% endif %}
                             <br>
-                          </div>
-                        <br>
+                          
                           <br>
                           {% with node.html_content|safe as description %}
                           {% if description != "None" %}
@@ -185,7 +183,7 @@ table, th, td {
                             {% if forloop.last and forloop.counter > 5 %}
                             <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">. . .</a>
                             
-                            {% else %}
+                            {% else %}  
                             <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
 
                             {% endif %}
