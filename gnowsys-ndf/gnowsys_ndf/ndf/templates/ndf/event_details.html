@@ -198,20 +198,13 @@ table, th, td {
 
                       {% edit_policy groupid node request.user as status %}
                       {% if user.is_authenticated and status == "allow" and gstaff_access %}
-                        <div id = 'Edit' hidden> 
+                        <div id = 'Edit' > 
                               <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
                                <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
                               </a>
                         </div>
-                        <div id='reschedule'>
-                        </div>
-                        <div id="countdown">
-                               <label id="message" style="color:red;"> Event-Reschedule would be closed after:</label>
-                               <label id='date'>  </label>     
-                             
-                        </div>
+                        
                         <ul id="edit-options" class="f-dropdown">
-
                           <li>
                             <a class="button small expand" href="{% url 'event_app_instance_create' groupid app_set_id %}">
                             <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
@@ -244,102 +237,9 @@ table, th, td {
 
 {% block script %}
  eventreschedule=""
- <!-- start_time is the time after which event would close -->
- <!-- if start_time of session is passed and a reschedule is allowed -->
- <!-- then the start _time would be reschdule time after which the event would close -->
  
           
- start_time = '{{node.start_time|date:"c" }}'
- reschdule_time = '{{reschedule_time|date:"c"}}'
- nIntervId = setInterval(enable_disable_edit, 500);
- start_time1()
-
- function start_time1()
-  {
-    <!-- would decide the close time of the event -->  
-     current_datetime = new Date (Date())
-     save_date = new Date(start_time)
-     reschedule_date = new Date('{{reschedule_time|date:"c"}}')
-     if (current_datetime < save_date) 
-       {
-         
-          close_time = save_date 
-       } 
-     else if ( current_datetime < reschedule_date)
-       {
-          close_time = reschdule_time
-       }
-     else 
-      {
  
-        close_time = ""
-      }
-  }
-          
- function enable_disable_edit()
-  {
-    <!--  this method whould decide wheather check time of disable edit -->
-   if (close_time) 
-    {
-    current_datetime = new Date (Date())
-    save_date = new Date(close_time)
-      if ( current_datetime < save_date )
-      {
-        flashText()     
-        $('#Edit').show()
-      } 
-    
-     }
-
-    if (current_datetime > save_date  || !(close_time) )
-      {
-          
-          $('#Edit').hide()
-          $('#countdown').hide()
-          $('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")
-          clearInterval(nIntervId);        
-         if ('{{reschedule}}' == 'True')
-           { 
-              closeEvent()
-           } 
-      }  
-    
-
-
- }
-
- function flashText()
-  { 
-      
-      <!-- method to show the remaining time after which edit option would be closed -->
-      <!-- take the difference -->
-      current_datetime = new Date (Date())
-      save_date = new Date(close_time)
-      var difference = current_datetime.getTime() - save_date.getTime();
-      <!-- gets the hours mins second remaing for event to close -->
-      var daysDifference = Math.floor(difference/1000/60/60/24);
-      var dayDifference = -daysDifference 
-      difference -= daysDifference*1000*60*60*24
-      var hoursDifference = Math.floor(difference/1000/60/60);
-      difference -= hoursDifference*1000*60*60
-      var minutesDifference = Math.floor(difference/1000/60);
-      difference -= minutesDifference*1000*60 
-      var secondsDifference = Math.floor(difference/1000);
-
-      $('#date').empty()
-
-      if ( dayDifference > 0)
-      {
-        $('#date').append("<h4>" + save_date.toDateString() + "," + " "+ ( 23 - hoursDifference  ) + " : "+ (59 - minutesDifference ) + ":" + (60 - secondsDifference) + "</h4>")
-      }
-      
-      if ( dayDifference <= 0)
-      {
-        $('#date').append( ( 23 - hoursDifference  ) + " : "+ (59 - minutesDifference ) + ":" + (60 - secondsDifference))
-      }
-      
-  }   
-
 function closeEvent()
 {
 
