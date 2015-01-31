@@ -154,9 +154,8 @@
         </div>
 
         <div class="row">
-          <div class="small-4 small-centered columns">
-            <input type="hidden" id="ac_cname_cl_uv_ids" name="ac_cname_cl_uv_ids" value="" />
-            <input type="submit" class="small button expand" id="update_enroll" value="Update Enrollment">
+          <div class="small-2 small-offset-9 columns end">
+            <input type="submit" class="button small expand" id="update_enroll" value="Update Enrollment">
           </div>
         </div>
 
@@ -288,10 +287,11 @@
           if (ac_data_set.length > 0) {
             // Define table
             ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
-              '<input type="button" class="button tiny" value="Select All" onclick="select_all_rows()">' +
-              '&nbsp;<input type="button" class="button tiny" value="De-Select All" onclick="deselect_all_rows()">' +
+              '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
+              '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
               '<label id="lbl_displ"></label>' +
               '</table>';
+
             $("#panel_announce_course").html(ac_table);
 
             // Prepare title & data headers used in dataTable
@@ -303,7 +303,7 @@
             });
 
             // Set defintion dataTable
-            $("#ac_table").dataTable({
+            sce_dt_var = $("#ac_table").dataTable({
               "data": ac_data_set,
               "columns": dataTable_columns_set,
               "createdRow": function ( row, data, index ) {
@@ -332,29 +332,21 @@
    */
   $(document).on( 'click', '#ac_table tbody tr', function () {
     $(this).toggleClass('selected');
+    $("#lbl_displ").text("")
   } );
 
+
   //On click of select All, highlight all rows
-    function select_all_rows(){
-      if($(".row_rec").length == $(".row_rec.selected").length) {
-        $("#lbl_displ").text("All " + $(".row_rec").length + " rows are already selected")
-      }
-      else{
-        $("#ac_table tr.row_rec").addClass("selected");
-        $("#lbl_displ").text("All " + $(".row_rec").length + " rows are selected")
-      }
-    };
+    $(document).on('click','.select_all_rows',function(){
+      $(sce_dt_var.fnGetNodes()).addClass('selected')
+      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " rows are selected")
+    });
 
   //On click of De-Select All, remove highlight from all rows
-    function deselect_all_rows(){
-      if($(".row_rec.selected").length == 0){
-        $("#lbl_displ").text("All " + $(".row_rec").length + " rows are already de-selected")
-      }
-      else{
-        $("#lbl_displ").text("All " + $(".row_rec.selected").length + " rows are de-selected")
-        $("#ac_table tr.row_rec").removeClass("selected");
-      }
-    };
+    $(document).on('click','.deselect_all_rows',function(){
+        $("#lbl_displ").text("All rows are de-selected")
+        $(sce_dt_var.fnGetNodes()).removeClass("selected");
+    });
 
   /*
    * Click event: "Create Enrollment" button
@@ -362,12 +354,13 @@
   $("#create_enroll").click( function (event) {
     var ac_cname_cl_uv_ids = [];
     
-    $("#ac_table tr.selected").each(function () {
+    sce_dt_var.$("tr.selected").each(function () {
       var ann_course_id = this.id;
       ann_course_id = ann_course_id.split(",");
       var ann_course_name = $(this).find("td:nth-child(1)").text();
       var course_name = $(this).find("td:nth-child(2)").text();
       var college_id = $(this).find("td:nth-child(3)").attr("id");
+      console.log(JSON.stringify(college_id));
       var university_id = $(this).find("td:nth-child(4)").attr("id");
     
       var combined_ids = [ann_course_id, ann_course_name, course_name, college_id, university_id];
@@ -388,6 +381,7 @@
 
 {% block document_ready %}
   {{block.super}}
+  var sce_dt_var;
 
   $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
   $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");

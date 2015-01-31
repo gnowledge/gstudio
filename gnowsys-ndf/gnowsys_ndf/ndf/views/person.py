@@ -542,6 +542,7 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
     start_enroll = ""
     end_enroll = ""
     enrollment_closed = False
+    enrollment_reopen = False
     total_student_enroll_list = []
     student_enroll_list = []
     college_enrollment_code = ""
@@ -565,6 +566,8 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
             end_enroll = sce_gs.end_enroll
             if sce_gs.enrollment_status == u"CLOSED":
                 enrollment_closed = True
+            elif sce_gs.enrollment_status == u"PENDING":
+                enrollment_reopen = True
             total_student_enroll_list = sce_gs.has_enrolled
 
             for attr in sce_gs.for_acourse[0].attribute_set:
@@ -581,6 +584,7 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
     if request.method == "POST":
         enroll_state = request.POST.get("enrollState", "")
         nussd_course_type = request.POST.get("nussd_course_type", "")
+        at_rt_list = ["start_enroll", "end_enroll", "for_acourse", "for_college", "for_university", "enrollment_status", "has_enrolled", "has_enrollment_task", "has_approval_task", "has_current_approval_task"]
 
         mis_admin = collection.Node.one({
             '_type': "Group", 'name': "MIS_admin"
@@ -608,25 +612,33 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
             }, {
                 '_id': 1
             })
+
+            sce_gst = collection.Node.one({
+                "_type": "GSystemType", "name": "StudentCourseEnrollment"
+            })
             student_course_reopen_enrollment_url_link = ""
             site = Site.objects.get(pk=1)
             site = site.name.__str__()
             student_course_reopen_enrollment_url_link = "http://" + site + "/" + \
-                mis_admin.name.replace(" ", "%20").encode('utf8') + "/dashboard/group"
+                mis_admin.name.replace(" ", "%20").encode('utf8') + \
+                "/mis/" + str(MIS_GAPP._id) + "/" + str(sce_gst._id) + "/edit" + \
+                "/" + str(sce_gs._id)
+
             task_dict["content_org"] = "\n- Please click [[" + \
-                student_course_reopen_enrollment_url_link + "][here]] to approve students."
+                student_course_reopen_enrollment_url_link + "][here]] to re-open enrollment."
+
             task_dict["content_org"] = unicode(task_dict["content_org"])
 
-            task_dict["start_time"] = completed_on
+            task_dict["start_time"] = datetime.datetime.now()
             task_dict["end_time"] = None
 
             glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
             task_type_node = None
-            # Here, GSTUDIO_TASK_TYPES[4] := 'Student-Course Enrollment Approval'
+            # Here, GSTUDIO_TASK_TYPES[7] := 'Re-open Student-Course Enrollment'
             task_dict["has_type"] = []
             if glist_gst:
                 task_type_node = collection.Node.one({
-                    'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[4]
+                    'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[7]
                 }, {
                     '_id': 1
                 })
@@ -645,43 +657,31 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
 
             task_node = create_task(task_dict)
 
-            enrollment_task_dict = {}
-            approval_task_dict = {}
-            for each_task in sce_gs.attribute_set:
-                if "has_approval_task" in each_task:
-                    if each_task["has_approval_task"]:
-                        approval_task_dict = each_task["has_approval_task"]
+            # Update StudentCourseEnrollment node's enrollment_status to "PENDING"
+            at_rt_dict["enrollment_status"] = u"PENDING"
 
-                if "has_enrollment_task" in each_task:
-                    if each_task["has_enrollment_task"]:
-                        enrollment_task_dict = each_task["has_enrollment_task"]
+            for at_rt_name in at_rt_list:
+                if at_rt_name in at_rt_dict:
+                    at_rt_type_node = collection.Node.one({
+                        '_type': {'$in': ["AttributeType", "RelationType"]},
+                        'name': at_rt_name
+                    })
 
-            if str(task_node._id) not in approval_task_dict:
-                approval_task_dict[str(task_node._id)] = {}
+                    if at_rt_type_node:
+                        at_rt_node = None
 
-            at_rt_dict["has_approval_task"] = approval_task_dict
+                        if at_rt_type_node._type == "AttributeType" and at_rt_dict[at_rt_name]:
+                            at_rt_node = create_gattribute(sce_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
 
-            # Update the enrollment task as "Closed"
-            task_dict = {}
-            task_dict["_id"] = task_id
-            task_dict["Status"] = u"Closed"
-            task_dict["modified_by"] = user_id
-            task_node = create_task(task_dict)
+                        elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
+                            at_rt_node = create_grelation(sce_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
 
-            # Set completion status for closed enrollment task in StudentCourseEnrollment node's has_enrollment_task
-            if str(task_id) in enrollment_task_dict:
-                enrollment_task_dict[str(task_dict)] = {
-                    "completed_on": completed_on, "completed_by": user_id
-                }
-                at_rt_dict["has_enrollment_task"] = enrollment_task_dict
-
-            # Update StudentCourseEnrollment node's enrollment_status to "CLOSED"
-            at_rt_dict["enrollment_status"] = u"CLOSED"
-
+            return HttpResponseRedirect(reverse(app_name.lower() + ":" + template_prefix + '_enroll',
+                kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id, "app_set_instance_id": app_set_instance_id}
+            ))
 
         else:
             # enroll_state is either "Complete"/"InProgress"
-
             task_id = request.POST.get("task_id", "")
             if task_id:
                 task_id = ObjectId(task_id)
@@ -690,21 +690,22 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
             # if announced_courses_id:
             # announced_courses_id = [ObjectId(each.strip()) for each in announced_courses_id.split(",")]
 
-            at_rt_list = ["start_enroll", "end_enroll", "for_acourse", "for_college", "for_university", "enrollment_status", "has_enrolled", "has_enrollment_task", "has_approval_task"]
-            at_rt_dict = {}
-
             # Students Enrolled list
             at_rt_dict["has_enrolled"] = []
-            student_enroll_list = request.POST.get("student_enroll_list", "")
 
+            student_enroll_list = request.POST.get("student_enroll_list", "")
             if student_enroll_list:
                 student_enroll_list = [ObjectId(each.strip()) for each in student_enroll_list.split(",")]
+            else:
+                student_enroll_list = []
+
+            if not total_student_enroll_list:
+                total_student_enroll_list = []
             at_rt_dict["has_enrolled"] = total_student_enroll_list + student_enroll_list
 
             if enroll_state == "Complete":
                 # For Student-Course Enrollment Approval
                 # Create a task for admin(s) of the MIS_admin group
-
                 completed_on = datetime.datetime.now()
 
                 if nussd_course_type == "Foundation Course":
@@ -781,7 +782,8 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
                     approval_task_dict[str(task_node._id)] = {}
 
                 at_rt_dict["has_approval_task"] = approval_task_dict
-
+                at_rt_dict["has_current_approval_task"] = [task_node._id]
+                
                 # Update the enrollment task as "Closed"
                 task_dict = {}
                 task_dict["_id"] = task_id
@@ -791,7 +793,7 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
 
                 # Set completion status for closed enrollment task in StudentCourseEnrollment node's has_enrollment_task
                 if str(task_id) in enrollment_task_dict:
-                    enrollment_task_dict[str(task_dict)] = {
+                    enrollment_task_dict[str(task_id)] = {
                         "completed_on": completed_on, "completed_by": user_id
                     }
                     at_rt_dict["has_enrollment_task"] = enrollment_task_dict
@@ -805,9 +807,6 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
                 task_dict["Status"] = u"In Progress"
                 task_dict["modified_by"] = user_id
                 task_node = create_task(task_dict)
-
-                # Update StudentCourseEnrollment node's enrollment_status to "PENDING"
-                at_rt_dict["enrollment_status"] = u"PENDING"
 
         # Save/Update GAttribute(s) and/or GRelation(s)
         for at_rt_name in at_rt_list:
@@ -834,6 +833,7 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
     else:
         task_id = request.GET.get("task_id", "")
         nussd_course_type = request.GET.get("nussd_course_type", "")
+        print "\n nussd_course_type: ", nussd_course_type, "\n"
         ann_course_id = request.GET.get("ann_course_id", "")
 
         # Populate Announced courses of given enrollment
@@ -879,7 +879,7 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
             'task_id': task_id, 'nussd_course_type': nussd_course_type,
             'ann_course_id': ann_course_id, #'ann_course_id_list': ann_course_id_list,
             'ann_course_list': ann_course_list, "start_enroll": start_enroll, "end_enroll": end_enroll,
-            "enrollment_closed": enrollment_closed
+            "enrollment_closed": enrollment_closed, "enrollment_reopen": enrollment_reopen
             # 'enrollment_open_ann_course_ids': enrollment_open_ann_course_ids
             # 'nodes':nodes,
         })

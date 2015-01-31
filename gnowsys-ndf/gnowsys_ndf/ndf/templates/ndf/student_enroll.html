@@ -55,8 +55,15 @@
 
   /* DataTables css-properties */
     .selected {
-      background-color: skyblue !important;
+      background-color: #D3D3D3 !important;
     }
+
+    #lbl_displ {
+      color: #0b8a91;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
 {% endblock %}
 
 {% block body_content %} 
@@ -90,6 +97,11 @@
         <div class="small-3 small-centered columns">
           <input type="submit" id="re_open_enrollment" name="re_open_enrollment" value="Re-open Enrollment" class="button medium expand" />
         </div>
+      </div>
+
+      {% elif enrollment_reopen %}
+      <div class="row">
+        <p class='medium-9 medium-centered columns alert-box info radius text-center text-size-15'>Your request to re-open enrollment for this course has been sent to Admin. You will get a Task assigned, if Admin accepts your request!!!</p>
       </div>
 
       {% else %}
@@ -204,6 +216,7 @@
   var ann_course_id = "{{ann_course_id}}";
   var ann_course_id_list = [];
   var acourse_val = [];
+  var sce_dt_var = "";
 
   /* 
    * Click event: "Student data" Row of DataTable
@@ -211,7 +224,10 @@
    */
   $(document).on( 'click', '#student_data_table tbody tr', function () {
     $(this).toggleClass('selected');
+    $("#lbl_displ").text("")
   } );
+
+
 
 
   // On click of Find (Setup Ajax call) ----------------------------------------------------------------------
@@ -259,7 +275,12 @@
 
               if (students_data_set.length > 0) {
                 // Define table
-                student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table"></table>';
+                student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
+                '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
+                '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
+                '<label id="lbl_displ"></label>' +
+                '</table>';
+
                 $("#divSt").html(nesc + esc + student_data_table); 
 
                 // Prepare title & data headers used in dataTable
@@ -271,7 +292,7 @@
                 });
 
                 // Set defintion dataTable
-                $("#student_data_table").dataTable({
+                sce_dt_var = $("#student_data_table").dataTable({
                   "data": students_data_set,
                   "columns": dataTable_columns_set,
                   "createdRow": function ( row, data, index ) {
@@ -333,6 +354,20 @@
       });
     });
 
+  //On click of select All, highlight all rows
+    $(document).on('click','.select_all_rows',function(){
+      $(sce_dt_var.fnGetNodes()).addClass('selected')
+      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " rows are selected")
+    });
+
+  //On click of De-Select All, remove highlight from all rows
+    $(document).on('click','.deselect_all_rows',function(){
+        $("#lbl_displ").text("All rows are de-selected")
+        $(sce_dt_var.fnGetNodes()).removeClass("selected");
+    });
+
+
+
   // On close event of reveal-modal (alertModal) -------------------------------------------------------------
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
       if ($(this).hasClass('success')) {
@@ -367,7 +402,7 @@
 
       // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
       var student_enroll_list = [];
-      $("#student_data_table tr.selected").each(function () {
+      student_dt_var.$("tr.selected").each(function () {
         student_enroll_list.push(this.id);
       } );
 

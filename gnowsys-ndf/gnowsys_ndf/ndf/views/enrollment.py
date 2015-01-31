@@ -75,7 +75,9 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
     enrollment_gst = None
     enrollment_gs = None
     mis_admin = None
-
+    latest_completed_on = None
+    lock_start_enroll = False # Will only be True while editing (i.e. Re-opening Enrollment)
+    
     property_order_list = []
 
     template = ""
@@ -112,9 +114,22 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
         enrollment_gs.member_of.append(enrollment_gst._id)
 
     if app_set_instance_id:
-        enrollment_gs = collection.Node.one(
-            {'_type': "GSystem", '_id': ObjectId(app_set_instance_id)}
-        )
+        enrollment_gs = collection.Node.one({
+            '_type': "GSystem", '_id': ObjectId(app_set_instance_id)
+        })
+
+        for attr in enrollment_gs.attribute_set:
+            if attr and "has_enrollment_task" in attr:
+                td = attr["has_enrollment_task"]
+                latest_completed_on = None # Must hold latest completed_on
+                for k, completed_by_on in td.items():
+                    if latest_completed_on:
+                        if "completed_on" in completed_by_on and latest_completed_on < completed_by_on["completed_on"]:
+                            # Put latest changed date
+                            latest_completed_on = completed_by_on["completed_on"]
+                    else:
+                        if "completed_on" in completed_by_on and completed_by_on["completed_on"]:
+                            latest_completed_on = completed_by_on["completed_on"]
 
     property_order_list = get_property_order_with_value(enrollment_gs)
 
@@ -134,10 +149,20 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
             nussd_course_type = request.POST.get("nussd_course_type", "")
             nussd_course_type = unicode(nussd_course_type)
 
+        print "\n start_enroll: ", start_enroll
+        print "\n end_enroll: ", end_enroll
+        print "\n nussd_course_type: ", nussd_course_type
+
+        if latest_completed_on:
+            if latest_completed_on < end_enroll:
+                lock_start_enroll = True
+
+        print "\n lock_start_enroll: ", lock_start_enroll
+
         at_rt_list = ["start_enroll", "end_enroll", "for_acourse", "for_college", "for_university", "enrollment_status", "has_enrolled", "has_enrollment_task", "has_approval_task"]
         at_rt_dict = {}
 
-        ac_cname_cl_uv_ids = ""
+        ac_cname_cl_uv_ids = []
         ann_course_ids = None
         course_name = None
         college_id = None
@@ -152,16 +177,248 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
             ac_cname_cl_uv_ids = request.POST.get("ac_cname_cl_uv_ids", "")
             ac_cname_cl_uv_ids = json.loads(ac_cname_cl_uv_ids)
 
-            for each_set in ac_cname_cl_uv_ids:
-                if each_set:
-                    ann_course_ids = each_set[0]
-                    ann_course_name = each_set[1]
-                    course_name = each_set[2]
-                    college_id = each_set[3]
-                    university_id = each_set[4]
+        else:
+            if enrollment_gs:
+                ac_cname_cl_uv_ids = []
+
+                for rel in enrollment_gs.relation_set:
+                    if rel and "for_acourse" in rel:
+                        ann_course_ids_set = rel["for_acourse"]
+
+                if len(ann_course_ids_set) > 1 or "Foundation_Course" in enrollment_gs.name:
+                    # Foundation
+                    print "UC"
+                else:
+                    # Domain
+                    for each_ac in ann_course_ids_set:
+                        ann_course_ids = [each_ac]
+
+                        ann_course_node = collection.Node.one({
+                            "_id": ObjectId(each_ac)
+                        })
+
+                        ann_course_node.get_neighbourhood(ann_course_node.member_of)
+
+                        # Ann course name
+                        ann_course_name = ann_course_node.name
+
+                        # course name
+                        course_name = ann_course_node.announced_for[0].name
+
+                        for each_attr in ann_course_node.announced_for[0].attribute_set:
+                            if each_attr and "nussd_course_type" in each_attr:
+                                nussd_course_type = each_attr["nussd_course_type"]
+                                break
+
+                        # College
+                        college_id = ann_course_node.acourse_for_college[0]["_id"]
+
+                        # University
+                        for colg_rel in ann_course_node.acourse_for_college[0].relation_set:
+                            if colg_rel and "college_affiliated_to" in colg_rel:
+                                university_id = colg_rel["college_affiliated_to"][0]
+                                break
+
+                        ac_cname_cl_uv_ids.append([ann_course_ids, ann_course_name, course_name, college_id, university_id])
+
+            # for each_set in ac_cname_cl_uv_ids:
+            #     if each_set:
+            #         ann_course_ids = each_set[0]
+            #         ann_course_name = each_set[1]
+            #         course_name = each_set[2]
+            #         college_id = each_set[3]
+            #         university_id = each_set[4]
 
         if nussd_course_type == "Foundation Course":
-            print "\n needs to be done"
+            for each_fc_set in ac_cname_cl_uv_ids:
+                print each_fc_set,"\n"
+                fc_set = each_fc_set[0]
+                ann_course_name = each_fc_set[1]
+                course_name = each_fc_set[2]
+                college_id = each_fc_set[3]
+                university_id = each_fc_set[4]
+
+                fc_set = [ObjectId(each_fc) for each_fc in each_fc_set[0]]
+                at_rt_dict["for_acourse"] = fc_set
+                print "acourse_id",fc_set
+                acourse_id = fc_set
+                at_rt_dict["for_acourse"] = acourse_id
+                at_rt_dict["enrollment_status"] = u"OPEN"
+                at_rt_dict["start_enroll"] = start_enroll
+                at_rt_dict["end_enroll"] = end_enroll
+                at_rt_dict["for_college"] = college_id
+
+                task_group_set = []
+                if college_id not in college_po:
+                    print "in colg po",college_id
+                    college_node = collection.Node.one({
+                        "_id": ObjectId(college_id)
+                    }, {
+                        "name": 1,
+                        "relation_set.has_group": 1,
+                        "relation_set.has_officer_incharge": 1
+                    })
+
+                    for rel in college_node.relation_set:
+                        if rel and "has_officer_incharge" in rel:
+                            college_po[college_id] = rel["has_officer_incharge"]
+                        if rel and "has_group" in rel:
+                            task_group_set.append(rel["has_group"][0])
+
+                at_rt_dict["for_university"] = ObjectId(university_id)
+                enrollment_gst = collection.Node.one({
+                    '_type': "GSystemType", 'name': "StudentCourseEnrollment"
+                })
+
+                enrollment_gs_name = "StudentCourseEnrollment" \
+                    + "_" + ann_course_name
+                enrollment_gs = collection.Node.one({
+                    'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
+                    'status': u"PUBLISHED"
+                })
+
+                # If not found, create it
+                if not enrollment_gs:
+                    enrollment_gs = collection.GSystem()
+                    enrollment_gs.name = enrollment_gs_name
+                    if enrollment_gst._id not in enrollment_gs.member_of:
+                        enrollment_gs.member_of.append(enrollment_gst._id)
+
+                    if mis_admin._id not in enrollment_gs.group_set:
+                        enrollment_gs.group_set.append(mis_admin._id)
+
+                    user_id = request.user.id
+                    enrollment_gs.created_by = user_id
+                    enrollment_gs.modified_by = user_id
+                    if user_id not in enrollment_gs.contributors:
+                        enrollment_gs.contributors.append(user_id)
+
+                    enrollment_gs.status = u"PUBLISHED"
+                    enrollment_gs.save()
+
+                if "_id" in enrollment_gs:
+                    # [2] Create task for PO of respective college
+                    # for Student-Course Enrollment
+                    task_dict = {}
+                    task_name = "StudentCourseEnrollment_Task" + "_" + \
+                        start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + \
+                        "_" + course_name
+                    task_name = unicode(task_name)
+                    task_dict["name"] = task_name
+                    task_dict["created_by"] = request.user.id
+                    task_dict["created_by_name"] = request.user.username
+                    task_dict["modified_by"] = request.user.id
+                    task_dict["contributors"] = [request.user.id]
+
+                    task_node = None
+
+                    task_dict["start_time"] = start_enroll
+                    task_dict["end_time"] = end_enroll
+
+                    glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+                    task_type_node = None
+                    # Here, GSTUDIO_TASK_TYPES[3] := 'Student-Course Enrollment'
+                    task_dict["has_type"] = []
+                    if glist_gst:
+                        task_type_node = collection.Node.one(
+                            {'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[3]},
+                            {'_id': 1}
+                        )
+
+                        if task_type_node:
+                            task_dict["has_type"].append(task_type_node._id)
+
+                    task_dict["Status"] = u"New"
+                    task_dict["Priority"] = u"High"
+
+                    task_dict["content_org"] = u""
+
+                    task_dict["Assignee"] = []
+                    task_dict["group_set"] = []
+
+                    # From Program Officer node(s) assigned to college using college_po[college_id]
+                    # From each node's 'has_login' relation fetch corresponding Author node
+                    po_cur = collection.Node.find({
+                        '_id': {'$in': college_po[college_id]},
+                        'attribute_set.email_id': {'$exists': True},
+                        'relation_set.has_login': {'$exists': True}
+                    }, {
+                        'name': 1, 'attribute_set.email_id': 1,
+                        'relation_set.has_login': 1
+                    })
+                    for PO in po_cur:
+                        po_auth = None
+                        for rel in PO.relation_set:
+                            if rel and "has_login" in rel:
+                                po_auth = collection.Node.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
+                                if po_auth:
+                                    if po_auth.created_by not in task_dict["Assignee"]:
+                                        task_dict["Assignee"].append(po_auth.created_by)
+                                    if po_auth._id not in task_dict["group_set"]:
+                                        task_dict["group_set"].append(po_auth._id)
+
+                    # Appending college group's ObjectId to group_set
+                    task_dict["group_set"].extend(task_group_set)
+
+                    task_node = create_task(task_dict)
+
+                    MIS_GAPP = collection.Node.one({
+                        "_type": "GSystemType", "name": "MIS"
+                    })
+
+                    Student = collection.Node.one({
+                        "_type": "GSystemType", "name": "Student"
+                    })
+
+                    # Set content_org for the task with link having ObjectId of it's own
+                    if MIS_GAPP and Student:
+                        site = Site.objects.get(pk=1)
+                        site = site.name.__str__()
+                        college_enrollment_url_link = "http://" + site + "/" + \
+                            college_node.name.replace(" ", "%20").encode('utf8') + \
+                            "/mis/" + str(MIS_GAPP._id) + "/" + str(Student._id) + "/enroll" + \
+                            "/" + str(enrollment_gs._id) + \
+                            "?task_id=" + str(task_node._id) + "&nussd_course_type=" + \
+                            nussd_course_type
+
+                        task_dict = {}
+                        task_dict["_id"] = task_node._id
+                        task_dict["name"] = task_name
+                        task_dict["created_by_name"] = request.user.username
+                        task_dict["content_org"] = "\n- Please click [[" + college_enrollment_url_link + "][here]] to enroll students in " + \
+                            ann_course_name + " course." + "\n\n- This enrollment procedure is open for duration between " + \
+                            start_enroll.strftime("%d-%b-%Y") + " and " + end_enroll.strftime("%d-%b-%Y") + "."
+
+                        task_node = create_task(task_dict)
+
+                    enrollment_task_dict = {}
+                    for each_enrollment in enrollment_gs.attribute_set:
+                        if "has_enrollment_task" in each_enrollment:
+                            if each_enrollment["has_enrollment_task"]:
+                                enrollment_task_dict = each_enrollment["has_enrollment_task"]
+                                break
+
+                    if str(task_node._id) not in enrollment_task_dict:
+                        enrollment_task_dict[str(task_node._id)] = {}
+
+                    at_rt_dict["has_enrollment_task"] = enrollment_task_dict
+                    # Save/Update GAttribute(s) and/or GRelation(s)
+                    for at_rt_name in at_rt_list:
+                        if at_rt_name in at_rt_dict:
+                            at_rt_type_node = collection.Node.one({
+                                '_type': {'$in': ["AttributeType", "RelationType"]},
+                                'name': at_rt_name
+                            })
+
+                            if at_rt_type_node:
+                                at_rt_node = None
+
+                                if at_rt_type_node._type == "AttributeType" and at_rt_dict[at_rt_name]:
+                                    at_rt_node = create_gattribute(enrollment_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
+
+                                elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
+                                    at_rt_node = create_grelation(enrollment_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
+
         else:
             for each_set in ac_cname_cl_uv_ids:
                 acourse_id = ObjectId(each_set[0][0])
@@ -196,8 +453,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     '_type': "GSystemType", 'name': "StudentCourseEnrollment"
                 })
 
-                enrollment_gs_name = "StudentCourseEnrollment" + "_" \
-                    + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") \
+                enrollment_gs_name = "StudentCourseEnrollment" \
                     + "_" + ann_course_name
                 enrollment_gs = collection.Node.one({
                     'member_of': enrollment_gst._id, 'name': enrollment_gs_name,

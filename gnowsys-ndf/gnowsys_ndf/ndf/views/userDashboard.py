@@ -461,9 +461,11 @@ def group_dashboard(request, group_id):
             enrollment_columns = ["College", "Course", "Completed On", "Status", "Enrolled", "Remaining", "Approved", "Rejected"]
             for sce_gs in sce_cur:
                 sce_gs.get_neighbourhood(sce_gs.member_of)
+                print "\n sce_gs._id: ", sce_gs._id
                 data = {}
 
-                approve_task = sce_gs.has_corresponding_task[0]
+                # approve_task = sce_gs.has_corresponding_task[0]
+                approve_task = sce_gs.has_current_approval_task[0]
                 approve_task.get_neighbourhood(approve_task.member_of)
                 data["Status"] = approve_task.Status
                 # Check for corresponding task's status

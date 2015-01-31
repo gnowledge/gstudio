@@ -3276,7 +3276,7 @@ def get_announced_courses_with_ctype(request, group_id):
                                         each["university_id"] = u._id
                             else:
                                 each["college"] = college[colg_id]["name"]
-                                each["college_id"] = college[colg_id]
+                                each["college_id"] = colg_id
                                 each.update({"university": college[colg_id]["university"]})
                                 each.update({"university_id": college[colg_id]["university_id"]})
 
