@@ -183,7 +183,7 @@
       </div>
     
   </fieldset>
-
+{% if title != 'Exam' %}
   <div id="Module-session-section">
     <fieldset >
       <div class="row">
@@ -282,6 +282,7 @@
        </div>
  <!-- div module sesion section Opens here" -->
  </div>
+ {% endif %}
 </div>
  
   </form>
@@ -346,14 +347,84 @@ function append_time()
       $("#Alloted-minutes").append("<label for='end_time' class='inline'>"+$('#session_of option:selected').attr('minutes') +"<label>")
 }
 
+
+  if(event_details)
+  {
+    event_details={{edit_details|safe}}
+    $('#nussd_course_name').append(
+                  $("<option></option>")
+                  .attr('id',event_details['course'].course_id)
+                  .attr('value',event_details['course'].course_id)
+                  .text(event_details['course'].course)
+                  );
+    var a=event_details['course'].course                
+    $("select[name='nussd_course_name'] option[value= a]").prop("selected", true);       
+    document.getElementById('nussd_course_name').disabled = "";
+    $('#event_has_batch').append(
+                 $("<option></option>")
+                  .attr('id',event_details['batch'].batchid)
+                  .attr('value',event_details['batch'].batchid)
+                  .text(event_details['batch'].batchname)
+                  );
+    var a=event_details['batch'].batchname                
+    $("select[name='batch'] option[value= a]").prop("selected", true);       
+    document.getElementById('Module_of').disabled = "";
+                 $('#Module_of').append(
+                 $("<option></option>")
+                 .attr('id',event_details['Module'].Moduleid)
+                 .attr('value',event_details['Module'].Moduleid)
+                 .text(event_details['Module'].Modulename)
+                  );
+    var a=event_details['Module'].Modulename                
+    $("select[name='Module_of'] option[value= a]").prop("selected", true);       
+    document.getElementById('event_coordinator').disabled = "";
+                 $('#event_coordinator').append(
+                       $("<option></option>")
+                      .attr('id',event_details['cordinator'].cordinatorid)
+                      .attr('value',event_details['cordinator'].cordinatorid)
+                      .text(event_details['cordinator'].cordinatorname)
+                      );
+    var a=event_details['cordinator'].cordinatorname                
+  
+    $("select[name='event_coordinator'] option[value= a]").prop("selected", true);       
+  
+    document.getElementById('event_has_batch').disabled = "";
+    Enable_Elements()     
+    var course_type=$("#event_has_batch").val()  
+      $.ajax({
+          url: "{% url 'fetch_batch_student' groupid 'course_type' %}".replace('course_type',String(course_type)),
+          type: "GET",
+          success: function(data){
+              courses=JSON.parse(data)
+              },
+          complete:function(){
+                if(courses != ""){
+                $.each(courses, function(key,val) {
+                     $('#has_attendees').append(
+                     $("<option></option>")
+                     .attr("id", "coursename_"+key.id)
+                     .attr("value",val.id)
+                     .attr("selected","selected")
+                     .text(val.name)
+            
+           );
+            });
+          }
+          } 
+    });
+} 
+});
 function Enable_Elements()
 {
   if(  document.getElementById('Module_of'))
   {
      document.getElementById('Module_of').disabled = "";
   }
+  if (document.getElementById('Module-session-section'))
+   {
     document.getElementById('Module-session-section').visible = "True";
     document.getElementById('view').disabled = "";
+   }
 }
 last_start_time =""
 

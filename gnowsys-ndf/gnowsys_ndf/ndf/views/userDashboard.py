@@ -25,7 +25,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import META_TYPE,GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 #######################################################################################################################################
@@ -33,7 +33,8 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 db = get_database()
 collection = db[Node.collection_name]
 collection_tr = db[Triple.collection_name]
-GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+gapp_mt = collection.Node.one({'_type': "MetaType", 'name': META_TYPE[0]})
+GST_IMAGE = collection.Node.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
 ins_objectid  = ObjectId()
 

@@ -6,10 +6,6 @@
         text-align: center;
     }
 
-    .width_s_no {
-        width: 5%;
-    }
-    
     .counter {
         font-weight: bold;
         text-align: right;
@@ -18,32 +14,18 @@
     .margin-0r {
         margin: 0 !important;
     }
+    tr {
+    cursor: pointer;
+    }
 
 </style>
 
-<link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
-<div class="row">
-  <div class="large-9 large-centered columns text-center">
-    <h3>{{enrollment_details.College}}</h3>
-  </div>
-</div>
-
-<div class="row">
-  <div class="large-9 large-centered columns text-center">
-    <h4>{% trans "Course Code: " %}{{enrollment_details.Course}}</h4>
-  </div>
-</div>
-
-<div class="row">
-  <div class="large-9 large-centered columns text-center">
-    <h6>{% trans "Enrollment Completed On: " %}{{enrollment_details.CompletedOn|date:"d-M-Y"}}</h6>
-  </div>
-</div>
 {% if approval_nodes %}
-<table>
+<table align="center" id="table_data">
+<caption><h4><b>{{enrollment_details.College}}</b></h4><h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5><h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6></caption>
     <thead>
     <tr>
-        <th class="width_s_no counter">{% trans "S. #" %}</th>
+        <th class="text-center">{% trans "Sr. #" %}</th>
         <th class="text-center">{% trans "Approve/Reject" %}<br><input type="checkbox" class="margin-0r checkAllStudents"></th>
         {% for col in enrollment_columns %}
         <th>{{col}}</th>
@@ -55,10 +37,10 @@
     {% regroup approval_nodes|dictsort:"Name" by Name as approval_nodes_sort_by_name %}
     {% for sn in approval_nodes_sort_by_name %}
     <tr>
-        <td class="width_s_no counter">{{forloop.counter}}.</td>
+        <td class="text-center">{{forloop.counter}}.</td>
         <td class="text-center"><input type="checkbox" class="margin-0r approveStudent" id="{{sn.list.0|get_dict_item:'_id'}}"></td>
         {% for col in enrollment_columns %}
-        <td class="width_{{col}}">{{sn.list.0|get_dict_item:col}}</td>
+        <td>{{sn.list.0|get_dict_item:col}}</td>
         {% endfor %}
     </tr>
     {% endfor %}
@@ -78,8 +60,12 @@
     </div>
 </div>
 
-
 <script type="text/javascript">
+
+$(document).ready( function () {
+  var table = $('#table_data').DataTable();
+} );
+
   $(document).foundation();
 
   $('#loading-image')
@@ -89,4 +75,12 @@
   bind('ajaxStop', function(){
     $(this).hide();
   });
+
+$("#table_data tbody tr").click(function(e){
+  if (e.target.type != 'checkbox'){
+    var cb = $(this).find("input[type=checkbox]");
+    cb.trigger('click');
+  }
+});
+ 
 </script>
