@@ -260,7 +260,8 @@ table, th, td {
                           </div>     
                           <div class="save" align="center">
                              <input type="button" class="small button" onclick="saveTime()" value ="Save"> 
-                          </div> 
+                          </div>
+                      <a class="close-reveal-modal">&#215;</a>      
                     </fieldset> 
                  </div>                
                        <div class="content" id="view-Attendance" >    
@@ -366,7 +367,8 @@ function closeEvent()
 
 function checkDate()
 {
-    
+   
+
    $.ajax({
 
              url:"{% url 'check_date' groupid node %}",
@@ -383,7 +385,6 @@ function checkDate()
                   {
                     alert("Time to reschdule event has passed please request to central office")
                     add_reschedule()
-                    closeEvent();
                   }   
              }
           });
@@ -634,6 +635,7 @@ function reschedule_event(type)
               if (data == 'Event Dates Re-Schedule Opened')
                  {
                     remove_reschedule()
+                    location.reload();
                   
                  }
               if ( type != 'event_reschedule') 

@@ -4128,8 +4128,7 @@ def check_date(request,group_id,node):
       for i in a:
           if unicode('reschedule_allow') in i:
               a['reschedule_allow'] = False
-          print a               
-          create_gattribute(ObjectId(node),reschedule_event,a)
+              create_gattribute(ObjectId(node),reschedule_event,a)
       
       message = "event closed"   
     return HttpResponse(message) 
@@ -4151,7 +4150,7 @@ def reschedule_task(request,group_id,node):
  return_message=""
  values=[]
  if request.user.id in listing:
-    print "coming here"
+    
     reschedule_attendance=collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
     marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
@@ -4163,12 +4162,12 @@ def reschedule_task(request,group_id,node):
     #fetch event
     event_node = collection.Node.one({"_id":ObjectId(node)})
     reschedule_dates = []
-    
     if  reschedule_type == 'event_reschedule' :
          for i in event_node.attribute_set:
 	       if unicode('event_edit_reschedule') in i.keys():
 	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
 	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
+	    	   
 
          reschedule_dates.append(b)
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
