@@ -43,9 +43,15 @@
       display: none;
     }
 
-    /* DataTables css-properties */
+  /* DataTables css-properties */
     .selected {
-      background-color: skyblue !important;
+      background-color: #D3D3D3 !important;
+    }
+
+    #lbl_displ {
+      color: #0b8a91;
+      font-weight: bold;
+      font-size: 1rem;
     }
 {% endblock %}
 
@@ -83,6 +89,78 @@
 
     <div id="course-enrollment-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
       <div class="active content row" id="panel_{{property_order_list.0.0}}">
+        {% if node %}
+        <div class="row">
+          <div class="small-2 columns">
+            <label class="right inline"> 
+              {% trans "Announced Course" %}
+            </label>
+          </div>
+          <div class="small-3 columns end">
+            <div style="padding-top: 8px;">
+              {{for_acourse}}
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="small-2 columns">
+            <label class="right inline"> 
+              {% trans "College" %}
+            </label>
+          </div>
+          <div class="small-3 columns">
+            <div style="padding-top: 8px;">
+              {{for_college}}
+            </div>
+          </div>
+
+          <div class="small-2 columns">
+            <label class="right inline"> 
+              {% trans "University" %}
+            </label>
+          </div>
+          <div class="small-3 columns end">
+            <div style="padding-top: 8px;">
+              {{for_university}}
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="small-2 columns">
+            <label class="right inline">Enrollment Duration</label>
+          </div>
+
+          <div class="small-1 columns">
+            <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+              {% trans "From" %}
+            </label>
+          </div>
+
+          <div class="small-2 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.1 %}
+          </div>
+
+          <div class="small-1 columns">
+            <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+              {% trans "To" %}
+            </label>
+          </div>
+
+          <div class="small-2 columns end">
+            {% html_widget groupid node.pk property_order_list.0.1.2 %}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="small-4 small-centered columns">
+            <input type="hidden" id="ac_cname_cl_uv_ids" name="ac_cname_cl_uv_ids" value="" />
+            <input type="submit" class="small button expand" id="update_enroll" value="Update Enrollment">
+          </div>
+        </div>
+
+        {% else %}
         <div class="row">
           <div class="small-2 columns">
             <label class="right inline">Enrollment Duration</label>
@@ -135,9 +213,11 @@
 
         <div class="row">
           <div class="small-4 small-centered columns">
-            <input type="button" class="small button expand" value="Create Enrollment">
+            <input type="hidden" id="ac_cname_cl_uv_ids" name="ac_cname_cl_uv_ids" value="" />
+            <input type="submit" class="small button expand" id="create_enroll" value="Create Enrollment">
           </div>
         </div>
+        {% endif %}
       </div>
     </div>
 
@@ -157,9 +237,10 @@
         .find("div.row").addClass("hide");
     });
 
-  /* Change event: Coures Type
-    * Populate Announced Courses in data-table of selected course type
-    */
+  /*
+   * Change event: "Coures Type" drop-dwon
+   * Populate Announced Courses in data-table of selected course type
+   */
   $("select#nussd_course_type").change(function() {
     if ($(this).prop("selectedIndex") == 0) {
       $("#panel_announce_course").html("<p>Please select course type.</p>")
@@ -201,16 +282,16 @@
         success_state = data["success"]
         if (success_state){
           column_headers = data["column_headers"];
-          console.log("column_headers: " + JSON.stringify(column_headers));
           ac_data_set = data["ac_data_set"];
-          console.log("ac_data_set: " + JSON.stringify(ac_data_set));
-          console.log("ac_data_set: " + ac_data_set.length);
-
           dataTable_columns_set = [];
 
           if (ac_data_set.length > 0) {
             // Define table
-            ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table"></table>';
+            ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
+              '<input type="button" class="button tiny" value="Select All" onclick="select_all_rows()">' +
+              '&nbsp;<input type="button" class="button tiny" value="De-Select All" onclick="deselect_all_rows()">' +
+              '<label id="lbl_displ"></label>' +
+              '</table>';
             $("#panel_announce_course").html(ac_table);
 
             // Prepare title & data headers used in dataTable
@@ -227,7 +308,9 @@
               "columns": dataTable_columns_set,
               "createdRow": function ( row, data, index ) {
                 // Attaching Announced Course's ObjectId to each row (i.e., assigning to it's id attribute)
-                $(row).attr("id", data["ac_id"]);
+                $(row).attr("id", data["ac_id"]).addClass("row_rec");
+                $(row).find("td:nth-child(3)").attr("id", data["college_id"]);
+                $(row).find("td:nth-child(4)").attr("id", data["university_id"]);
               }
             });
           }
@@ -243,18 +326,63 @@
     });//end of ajax
   });
 
-  var selected_ann_courses_ids = [];
+  /* 
+   * Click event: "Announced Course" Row of DataTable
+   * Select/Deselect Announced Course
+   */
   $(document).on( 'click', '#ac_table tbody tr', function () {
-    var id = this.id;
-    var index = $.inArray(id, selected_ann_courses_ids);
+    $(this).toggleClass('selected');
+  } );
 
-    if ( index === -1 ) {
-      selected_ann_courses_ids.push( id );
-    } else {
-      selected_ann_courses_ids.splice( index, 1 );
+  //On click of select All, highlight all rows
+    function select_all_rows(){
+      if($(".row_rec").length == $(".row_rec.selected").length) {
+        $("#lbl_displ").text("All " + $(".row_rec").length + " rows are already selected")
+      }
+      else{
+        $("#ac_table tr.row_rec").addClass("selected");
+        $("#lbl_displ").text("All " + $(".row_rec").length + " rows are selected")
+      }
+    };
+
+  //On click of De-Select All, remove highlight from all rows
+    function deselect_all_rows(){
+      if($(".row_rec.selected").length == 0){
+        $("#lbl_displ").text("All " + $(".row_rec").length + " rows are already de-selected")
+      }
+      else{
+        $("#lbl_displ").text("All " + $(".row_rec.selected").length + " rows are de-selected")
+        $("#ac_table tr.row_rec").removeClass("selected");
+      }
+    };
+
+  /*
+   * Click event: "Create Enrollment" button
+   */
+  $("#create_enroll").click( function (event) {
+    var ac_cname_cl_uv_ids = [];
+    
+    $("#ac_table tr.selected").each(function () {
+      var ann_course_id = this.id;
+      ann_course_id = ann_course_id.split(",");
+      var ann_course_name = $(this).find("td:nth-child(1)").text();
+      var course_name = $(this).find("td:nth-child(2)").text();
+      var college_id = $(this).find("td:nth-child(3)").attr("id");
+      var university_id = $(this).find("td:nth-child(4)").attr("id");
+    
+      var combined_ids = [ann_course_id, ann_course_name, course_name, college_id, university_id];
+      
+      ac_cname_cl_uv_ids.push( combined_ids );
+    });
+
+    if (ac_cname_cl_uv_ids.length > 0) {
+      $("#ac_cname_cl_uv_ids").val(JSON.stringify(ac_cname_cl_uv_ids));
     }
 
-    $(this).toggleClass('selected');
+    else {
+      // Popup message saying Please select atleast one of the given Announced Course(s)
+      event.preventDefault();
+    }
   } );
 {% endblock %}
 

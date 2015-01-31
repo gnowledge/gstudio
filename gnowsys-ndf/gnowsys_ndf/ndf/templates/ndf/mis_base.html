@@ -28,11 +28,14 @@
 {% block meta_content %}
   {% check_is_gstaff groupid request.user as gstaff_access %}
 
-  <ul class="side-nav"> 
-  	<li>
-  		<a></a>
-  	</li>
+  {% comment %}
+  <!-- 
+    get_features_with_special_rights: Returns list of feature(s) for which creation rights should not be given
+  -->
+  {% endcomment %}
+  {% get_features_with_special_rights groupid request.user as features_list %}
 
+  <ul class="side-nav"> 
     {% for each in app_collection_set %}
     {% get_memberof_objects_count each.pk groupid as count %}
 
@@ -48,20 +51,12 @@
     
       <div class="row">
         {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
-          {% if app_name == "MIS" %}
           <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-          {% else %}
-          <a class="small-8 columns" href="{% url 'mis-po:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-          {% endif %}
             {{each.name}} ({{count}})
           </a>
 
-          {% if gstaff_access %}
-          {% if app_name == "MIS" %}
+          {% if gstaff_access and each.name not in features_list %}
           <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-          {% else %}
-          <a class="small-4 columns" href="{% url 'mis-po:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-          {% endif %}
             +&nbsp; {% trans "Add" %}
           </a>
           {% endif %}

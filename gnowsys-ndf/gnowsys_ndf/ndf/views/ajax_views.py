@@ -3184,6 +3184,112 @@ def get_announced_courses_with_ctype(request, group_id):
                 course = {}
                 ac_data_set = []
 
+                if nussd_course_type == "Foundation Course":
+                    rec = collection.aggregate([{
+                        "$match": {
+                            "member_of": announced_course_gt._id,
+                            "group_set": ObjectId(mis_admin._id),
+                            "status": "PUBLISHED",
+                            "attribute_set.nussd_course_type": nussd_course_type,
+                            "attribute_set.ann_course_closure": u"Open",
+                            "relation_set.course_has_enrollment": {"$exists": False}
+                        }
+                    }, {
+                        '$group': {
+                            "_id": {
+                                "start_time": "$attribute_set.start_time",
+                                "end_time": "$attribute_set.end_time",
+                                'college': '$relation_set.acourse_for_college'
+                            },
+                            "foundation_course": {"$addToSet": {'ac_id': "$_id", 'course': '$relation_set.announced_for', 'created_at': "$created_at"}},
+                            "fc_ann_ids": {"$addToSet": "$_id"}
+                        }
+                    }, {
+                        '$sort': {'created_at': 1}
+                    }])
+
+                    for each in rec["result"]:
+                        newrec = {}
+                        if each['_id']["college"]:
+                            colg_id = each['_id']["college"][0][0]
+                            if colg_id not in college:
+                                c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1,"attribute_set.enrollment_code":1})
+                                newrec[u"college"] = c.name
+                                newrec[u"college_id"] = c._id
+                                newrec[u"created_at"] = each["foundation_course"][0]["created_at"]
+                                college[colg_id] = {}
+                                college[colg_id]["name"] = newrec[u"college"]
+                                for rel in c.relation_set:
+                                    if rel and "college_affiliated_to" in rel:
+                                        univ_id = rel["college_affiliated_to"][0]
+                                        u = collection.Node.one({"_id": univ_id}, {"name": 1})
+                                        each.update({"university": u.name})
+                                        college[colg_id]["university"] = each["university"]
+                                        college[colg_id]["university_id"] = u._id
+                                        newrec[u"university"] = u.name
+                                        newrec[u"university_id"] = u._id
+                            else:
+                                newrec["college"] = college[colg_id]["name"]
+                                newrec["college_id"] = college[colg_id]
+                                newrec.update({"university": college[colg_id]["university"]})
+                                newrec.update({"university_": college[colg_id]["university_id"]})
+
+                        newrec[u"course"] = "Foundation Course"
+                        newrec[u"ac_id"] = each["fc_ann_ids"]
+                        newrec[u"name"] = "Foundation_Course_" + c["attribute_set"][0]["enrollment_code"] + "_" + each["_id"]["start_time"][0].strftime('%Y') + "_" + each["_id"]["end_time"][0].strftime('%Y')
+                        ac_data_set.append(newrec)
+
+                else:
+                    rec = collection.aggregate([
+                        {
+                            '$match': query
+                        }, {
+                            '$project': {
+                                '_id': 0,
+                                'ac_id': "$_id",
+                                'name': '$name',
+                                'course': '$relation_set.announced_for',
+                                'college': '$relation_set.acourse_for_college',
+                                'created_at': "$created_at"
+                            }
+                        },
+                        {
+                            '$sort': {'created_at': 1}
+                        }
+                    ])
+                    for each in rec["result"]:
+                        if each["college"]:
+                            colg_id = each["college"][0][0]
+                            if colg_id not in college:
+                                c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1})
+                                each["college"] = c.name
+                                each["college_id"] = c._id
+                                college[colg_id] = {}
+                                college[colg_id]["name"] = each["college"]
+                                for rel in c.relation_set:
+                                    if rel and "college_affiliated_to" in rel:
+                                        univ_id = rel["college_affiliated_to"][0]
+                                        u = collection.Node.one({"_id": univ_id}, {"name": 1})
+                                        each.update({"university": u.name})
+                                        college[colg_id]["university"] = each["university"]
+                                        college[colg_id]["university_id"] = u._id
+                                        each["university_id"] = u._id
+                            else:
+                                each["college"] = college[colg_id]["name"]
+                                each["college_id"] = college[colg_id]
+                                each.update({"university": college[colg_id]["university"]})
+                                each.update({"university_id": college[colg_id]["university_id"]})
+
+                        if each["course"]:
+                            course_id = each["course"][0][0]
+                            if course_id not in course:
+                                each["course"] = collection.Node.one({"_id": course_id}).name
+                                course[course_id] = each["course"]
+                            else:
+                                each["course"] = course[course_id]
+                        ac_data_set.append(each)
+
+                """
                 rec = collection.aggregate([
                     {
                         '$match': query
@@ -3229,6 +3335,7 @@ def get_announced_courses_with_ctype(request, group_id):
                             each["course"] = course[course_id]
 
                     ac_data_set.append(each)
+                """
 
                 column_headers = [
                     ("name", "Announced Course Name"),
@@ -3360,7 +3467,6 @@ def get_colleges(request, group_id, app_id):
         if request.is_ajax() and request.method == "GET":
             # Fetch field(s) from GET object
             nussd_course_type = request.GET.get("nussd_course_type", "")
-            print "\n nussd_course_type: ", nussd_course_type, "\n"
 
             mis_admin = collection.Node.one(
                 {'_type': "Group", 'name': "MIS_admin"}, {'name': 1}
@@ -3425,7 +3531,6 @@ def get_colleges(request, group_id, app_id):
             start_time = request.GET.get("start_time", "")
             end_time = request.GET.get("end_time", "")
             dc_courses_id_list = request.GET.getlist("dc_courses_id_list[]")
-            print "\n dc_courses_id_list: ", dc_courses_id_list, "\n"
             # all_univs = request.GET.get("all_univs", "")
 
             # Check whether any field has missing value or not
@@ -3712,24 +3817,30 @@ def get_anncourses_allstudents(request, group_id):
         non_enrolled_stud_count = str(res.count())
         all_students_text += " [Count("+non_enrolled_stud_count+")]"
 
-      if res.count():
-        drawer_template_context = edit_drawer_widget("RelationType", group_id, node, None, checked, left_drawer_content=res)
-        drawer_template_context["widget_for"] = "student_enroll"
-        drawer_template_context["groupid"] = group_id
-        drawer_widget = render_to_string('ndf/drawer_widget.html', 
-          drawer_template_context,
-          context_instance = RequestContext(request)
-        )
+      # if res.count():
+      #   drawer_template_context = edit_drawer_widget("RelationType", group_id, node, None, checked, left_drawer_content=res)
+      #   drawer_template_context["widget_for"] = "student_enroll"
+      #   drawer_template_context["groupid"] = group_id
+      #   drawer_widget = render_to_string('ndf/drawer_widget.html', 
+      #     drawer_template_context,
+      #     context_instance = RequestContext(request)
+      #   )
 
       response_dict["announced_courses"] = []
-      response_dict["drawer_widget"] = drawer_widget
+      # response_dict["drawer_widget"] = drawer_widget
+      
+      column_headers = [
+        ("name", "Student Name")
+      ]
+      response_dict["column_headers"] = column_headers
+      response_dict["students_data_set"] = list(res)
 
       response_dict["success"] = True
       # response_dict["message"] = "NOTE: " + all_students_text + " are listed along with announced courses"
       response_dict["enrolled_stud_count"] = enrolled_stud_count
       response_dict["non_enrolled_stud_count"] = non_enrolled_stud_count
 
-      return HttpResponse(json.dumps(response_dict))
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
     else:
       error_message = "EnrollInCourseError: Either not an ajax call or not a GET request!!!"
