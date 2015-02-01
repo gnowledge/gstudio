@@ -1582,8 +1582,7 @@ def set_drawer_widget(st,coll_obj_list):
 def get_data_for_event_task(request,group_id):
     #date creation for task type is date month and year
     day_list=[]
-    event = collection.Node.one({'_type': "GSystemType", 'name': "Event"})
-    obj = collection.Node.find({'type_of': event._id})
+    append = day_list.append
     event_count={}
     list31=[1,3,5,7,8,10,12]
     list30=[4,6,9,11]
@@ -1592,11 +1591,11 @@ def get_data_for_event_task(request,group_id):
     #Task attribute_type start time's object value takes the only date 
     #in month/date/year format 
     #As events are quried from the nodes which store the date time in unix format
-    month=request.GET.get('start','')[5:7]
-    year=request.GET.get('start','')[0:4]
+    no = request.GET.get('no','')
+    month = request.GET.get('start','')[5:7]
+    year = request.GET.get('start','')[0:4]
     start = datetime.datetime(int(currentYear), int(month), 1)
-    task_start=str(int(month))+"/"+"01"+"/"+str(int(year))
-    
+    task_start = str(int(month))+"/"+"01"+"/"+str(int(year))
     if int(month) in list31:
      end=datetime.datetime(int(currentYear),int(month), 31)
      task_end=str(int(month))+"/"+"31"+"/"+str(int(year))
@@ -1607,116 +1606,106 @@ def get_data_for_event_task(request,group_id):
      end=datetime.datetime(int(currentYear),int(month), 28)
      task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
     #day_list of events  
-     for j in obj:
-        '''
-          nodes = collection.Node.find({'member_of': ObjectId(j._id),'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
-          
-         
-          for i in nodes:
-            attr_value={}
-            event_url="/"+str(group_id)+"/event/"+str(j._id) +"/"+str(i._id)
-            attr_value.update({'url':event_url})
-            attr_value.update({'id':i._id})
-            attr_value.update({'title':i.name})
-            date=i.attribute_set[0]['start_time']
-            formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-            attr_value.update({'start':formated_date})
-            attr_value.update({'backgroundColor':'green'})
-            day_list.append(dict(attr_value))
-        '''
+    
+    if no == '1' or no == '2' or no == '3':
+       #condition to search events only in case of above condition so that it
+       #doesnt gets executed when we are looking for other data
+       event = collection.Node.one({'_type': "GSystemType", 'name': "Event"})
+       obj = collection.Node.find({'type_of': event._id},{'_id':1})
+       all_list = [ each_gst._id for each_gst in obj ] 
+    if no == '1':    
+        nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':all_list},'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
+        for i in nodes:
+          attr_value={}
+          update = attr_value.update
+          event_url="/"+str(group_id)+"/event/"+str(i.member_of[0]) +"/"+str(i._id)
+          update({'url':event_url})
+          update({'id':i._id})
+          update({'title':i.name})
+          date=i.attribute_set[0]['start_time']
+          formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+          update({'start':formated_date})
+          update({'backgroundColor':'green'})
+          append(dict(attr_value))
+    if no == '2':    
         #All the Rescheduled ones 
-        nodes = collection.Node.find({'member_of': ObjectId(j._id),'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}}},{'attribute_set.event_edit_reschedule.reschedule_dates':1})
+        nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':list(all_list)},'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}},'group_set':ObjectId(group_id)},{'attribute_set.event_edit_reschedule.reschedule_dates':1})
         for k in nodes:
           for a in k.attribute_set: 
              if  unicode('event_edit_reschedule') in a:
                 for v in a['event_edit_reschedule']['reschedule_dates']:
                       attr_value={}
-                      event_url="None"
-                      attr_value.update({'url':"None"})
-                      attr_value.update({'id':k._id})
-                      attr_value.update({'title':'trail'})
+                      update = attr_value.update
+                      event_url=" "
+                      update({'url':event_url})
+                      update({'id':k._id})
+                      update({'title':'trail'})
                       date = v 
                       formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-                      attr_value.update({'start':formated_date})
-                      attr_value.update({'backgroundColor':'#ffd700'})
-                      day_list.append(dict(attr_value)) 
-          
-        #ALl the Events Whoes attendanc are not held
-        '''nodes = collection.Node.find({"member_of":ObjectId(j._id),"relation_set.has_attended":{"$exists":False}})
-        for k in nodes:
-          attr_value={}
-          event_url="None"
-          attr_value.update({'url':"None"})
-          attr_value.update({'id':k._id})
-          attr_value.update({'title':k.name})
-          try:
-            date=k.attribute_set[0]['start_time']
-            formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-          except:
-            date =datetime.datetime.today()  
-            formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-          attr_value.update({'start':formated_date})
-          attr_value.update({'backgroundColor':'red'})
-          day_list.append(dict(attr_value)) 
-          '''
-    count=0
-    dummylist=[]
-    date=""
-    sorted_month_list=[]
-    changed="false"
-    recount=0
-    user_assigned=[]
-    #day_list of task
-    
-    groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
-    attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
-    #check wheather the group is author group or the common group
-    if groupname._type == "Group":
-          GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
-          task_nodes = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-    if groupname._type == "Author":
-          task_nodes = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.id}).sort('last_update',-1)
-    for attr in task_nodes:
-     if groupname._type == "Group": 
-         task_node = collection.Node.one({'_id':attr._id})
-     if groupname._type == "Author":
-         task_node = collection.Node.one({'_id':attr.subject})
-     if task_node:
-                  attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id
-                  ,'object_value':{'$gte':task_start,'$lte':task_end}
-                   })	
-                  attr_value={}
-                  task_url="/" + groupname.name +"/" + "task"+"/" + str(task_node._id)
+                      update({'start':formated_date})
+                      update({'backgroundColor':'#ffd700'})
+                      append(dict(attr_value)) 
+    if no == '3':      
+          #ALl the Events Whoes attendanc are not held
+          nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':list(all_list)},"relation_set.has_attended":{"$exists":False},'group_set':ObjectId(group_id),'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
+          for k in nodes:
+            attr_value={}
+            update =attr_value.update
+            event_url=event_url="/"+str(group_id)+"/event/"+str(k.member_of[0]) +"/"+str(k._id)
+            update({'url':event_url})
+            update({'id':k._id})
+            update({'title':k.name})
+            try:
+              date=k.attribute_set[0]['start_time']
+              formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+            except:
+              date =datetime.datetime.today()  
+              formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+            update({'start':formated_date})
+            update({'backgroundColor':'red'})
+            append(dict(attr_value)) 
                   
-                  attr_value.update({'id':task_node._id})
-                  attr_value.update({'title':task_node.name})
-                  if attr1:
-                        date=datetime.datetime(int(attr1.object_value[6:10]),int(attr1.object_value[0:2]),int(attr1.object_value[3:5]))
-                        formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-                        attr_value.update({'start':formated_date})
-                  else: 
-                        date=task_node.created_at
-                        formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-                        attr_value.update({'start':formated_date})     
-                  attr_value.update({'url':task_url})
-                  user_assigned.append(attr_value) 
-    day_lists=[]
     date=""
-    listdate=[]
-    #Sorting of events and task's
-    #below code is used to replace more than 3 event or task on the particular date 
-    #value +3 so instead of all the task and events on the single day it would show 
-    #+3 
-    for i in user_assigned:
-        day_list.append(dict(i))
-    day_list.sort(key=lambda item:item['start'])
+    user_assigned=[]
+    user_append = user_assigned.append
+    #day_list of task
+    if no == '4': 
+          groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
+          attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+          attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
+          #check wheather the group is author group or the common group
+          if groupname._type == "Group":
+                GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+                task_nodes = collection.GSystem.find({'member_of':GST_TASK._id, 'group_set': ObjectId(group_id)})
+          if groupname._type == "Author":
+                task_nodes = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.id}).sort('last_update',-1)
+          for attr in task_nodes:
+           if groupname._type == "Group": 
+               task_node = collection.Node.one({'_id':attr._id})
+           if groupname._type == "Author":
+               task_node = collection.Node.one({'_id':attr.subject})
+           if task_node:
+                        attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id
+                        ,'object_value':{'$gte':task_start,'$lte':task_end}
+                         })	
+                        attr_value={}
+                        update = attr_value.update
+                        task_url="/" + groupname.name +"/" + "task"+"/" + str(task_node._id)
+                        update({'id':task_node._id})
+                        update({'title':task_node.name})
+                        if attr1:
+                              date = attr1.object_value
+                              formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+                              update({'start':formated_date})
+                        else: 
+                              date=task_node.created_at
+                              formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+                              attr_value.update({'start':formated_date})     
+                        update({'url':task_url})
+                        append(attr_value) 
     
-    date_changed=[]
-    if request.GET.get('view','') == 'month':
-     return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder))
-    else:
-     return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder)) 
+    
+    return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder)) 
 
 def get_data_for_drawer_of_attributetype_set(request, group_id):
     '''
@@ -4140,7 +4129,7 @@ def reschedule_task(request,group_id,node):
  return_message=""
  values=[]
  if request.user.id in listing:
-    print "coming here"
+    
     reschedule_attendance=collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
     marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
