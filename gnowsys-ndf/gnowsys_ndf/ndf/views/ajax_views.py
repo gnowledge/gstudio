@@ -1625,11 +1625,11 @@ def get_data_for_event_task(request,group_id):
           date=i.attribute_set[0]['start_time']
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           update({'start':formated_date})
-          update({'backgroundColor':'green'})
+          #update({'backgroundColor':'blue'})
           append(dict(attr_value))
     if no == '2':    
         #All the Rescheduled ones 
-        nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':list(all_list)},'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}},'group_set':ObjectId(group_id)},{'attribute_set.event_edit_reschedule.reschedule_dates':1})
+        nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':list(all_list)},'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}},'group_set':ObjectId(group_id)},{'attribute_set.event_edit_reschedule.reschedule_dates':1,"name":1})
         for k in nodes:
           for a in k.attribute_set: 
              if  unicode('event_edit_reschedule') in a:
@@ -1639,7 +1639,7 @@ def get_data_for_event_task(request,group_id):
                       event_url=" "
                       update({'url':event_url})
                       update({'id':k._id})
-                      update({'title':'trail'})
+                      update({'title':k.name})
                       date = v 
                       formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
                       update({'start':formated_date})
