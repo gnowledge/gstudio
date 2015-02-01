@@ -49,7 +49,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_batches_with_acourse/', 'get_batches_with_acourse', name='get_batches_with_acourse'),
                        
     url(r'^get_announced_courses_with_ctype/', 'get_announced_courses_with_ctype', name='get_announced_courses_with_ctype'),
-    url(r'^get_colleges/', 'get_colleges', name='get_colleges'),
+    url(r'^get_colleges/(?P<app_id>[\w-]+)$', 'get_colleges', name='get_colleges'),
     url(r'^get_districts/', 'get_districts', name='get_districts'),
     url(r'^get_affiliated_colleges/', 'get_affiliated_colleges', name='get_affiliated_colleges'),
     url(r'^get_students/', 'get_students', name='get_students'),
