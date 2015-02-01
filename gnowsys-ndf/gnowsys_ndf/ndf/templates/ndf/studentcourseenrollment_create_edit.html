@@ -90,132 +90,134 @@
     <div id="course-enrollment-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
       <div class="active content row" id="panel_{{property_order_list.0.0}}">
         {% if node %}
-        <div class="row">
-          <div class="small-2 columns">
-            <label class="right inline"> 
-              {% trans "Announced Course" %}
-            </label>
-          </div>
-          <div class="small-3 columns end">
-            <div style="padding-top: 8px;">
-              {{for_acourse}}
+          <div class="row">
+            <div class="small-2 columns">
+              <label class="right inline"> 
+                {% trans "Announced Course" %}
+              </label>
             </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="small-2 columns">
-            <label class="right inline"> 
-              {% trans "College" %}
-            </label>
-          </div>
-          <div class="small-3 columns">
-            <div style="padding-top: 8px;">
-              {{for_college}}
+            <div class="small-3 columns end">
+              <div style="padding-top: 8px;">
+                {{for_acourse}}
+              </div>
             </div>
           </div>
 
-          <div class="small-2 columns">
-            <label class="right inline"> 
-              {% trans "University" %}
-            </label>
-          </div>
-          <div class="small-3 columns end">
-            <div style="padding-top: 8px;">
-              {{for_university}}
+          <div class="row">
+            <div class="small-2 columns">
+              <label class="right inline"> 
+                {% trans "College" %}
+              </label>
+            </div>
+            <div class="small-3 columns">
+              <div style="padding-top: 8px;">
+                {{for_college}}
+              </div>
+            </div>
+
+            <div class="small-2 columns">
+              <label class="right inline"> 
+                {% trans "University" %}
+              </label>
+            </div>
+            <div class="small-3 columns end">
+              <div style="padding-top: 8px;">
+                {{for_university}}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="row">
-          <div class="small-2 columns">
-            <label class="right inline">Enrollment Duration</label>
+          <div class="row">
+            <div class="small-2 columns">
+              <label class="right inline">Enrollment Duration</label>
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+                {% trans "From" %}
+              </label>
+            </div>
+
+            <div class="small-2 columns">
+              {% html_widget groupid node.pk property_order_list.0.1.1 %}
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+                {% trans "To" %}
+              </label>
+            </div>
+
+            <div class="small-2 columns end">
+              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
           </div>
 
-          <div class="small-1 columns">
-            <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
-              {% trans "From" %}
-            </label>
+          <div class="row">
+            <div class="small-2 small-offset-9 columns end">
+              <input type="hidden" id="reopen_task_id" name="reopen_task_id" value="{{reopen_task_id}}" />
+              <input type="submit" class="button small expand" id="update_enroll" value="Update Enrollment">
+            </div>
           </div>
-
-          <div class="small-2 columns">
-            {% html_widget groupid node.pk property_order_list.0.1.1 %}
-          </div>
-
-          <div class="small-1 columns">
-            <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
-              {% trans "To" %}
-            </label>
-          </div>
-
-          <div class="small-2 columns end">
-            {% html_widget groupid node.pk property_order_list.0.1.2 %}
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="small-2 small-offset-9 columns end">
-            <input type="submit" class="button small expand" id="update_enroll" value="Update Enrollment">
-          </div>
-        </div>
 
         {% else %}
-        <div class="row">
-          <div class="small-2 columns">
-            <label class="right inline">Enrollment Duration</label>
+          <div class="row">
+            <div class="small-2 columns">
+              <label class="right inline">Enrollment Duration</label>
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+                {% trans "From" %}
+              </label>
+            </div>
+
+            <div class="small-2 columns">
+              {% html_widget groupid node.pk property_order_list.0.1.1 %}
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+                {% trans "To" %}
+              </label>
+            </div>
+
+            <div class="small-2 columns end">
+              {% html_widget groupid node.pk property_order_list.0.1.2 %}
+            </div>
+
+            <div class="small-1 columns">
+              <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
+                {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
+              </label>
+            </div>
+            <div class="small-3 columns">
+              {% html_widget groupid node.pk property_order_list.0.1.0 %}
+            </div>
           </div>
 
-          <div class="small-1 columns">
-            <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
-              {% trans "From" %}
-            </label>
+          <div class="row">
+            <div class="small-12 columns">
+              <dl class="accordion" data-accordion>
+                <dd class="accordion-navigation">
+                  <a href="#panel_announce_course">Select Announce Course(s)</a>
+                  <div id="panel_announce_course" class="content active">
+                    <p>Please select course type.</p>
+                    <table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">
+                    </table>
+                  </div>
+                </dd>
+              </dl>
+            </div>
           </div>
 
-          <div class="small-2 columns">
-            {% html_widget groupid node.pk property_order_list.0.1.1 %}
+          <div class="row">
+            <div class="small-4 small-centered columns">
+              <input type="hidden" id="ac_cname_cl_uv_ids" name="ac_cname_cl_uv_ids" value="" />
+              <input type="submit" class="small button expand" id="create_enroll" value="Create Enrollment">
+            </div>
           </div>
 
-          <div class="small-1 columns">
-            <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
-              {% trans "To" %}
-            </label>
-          </div>
-
-          <div class="small-2 columns end">
-            {% html_widget groupid node.pk property_order_list.0.1.2 %}
-          </div>
-
-          <div class="small-1 columns">
-            <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
-              {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
-            </label>
-          </div>
-          <div class="small-3 columns">
-            {% html_widget groupid node.pk property_order_list.0.1.0 %}
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="small-12 columns">
-            <dl class="accordion" data-accordion>
-              <dd class="accordion-navigation">
-                <a href="#panel_announce_course">Select Announce Course(s)</a>
-                <div id="panel_announce_course" class="content active">
-                  <p>Please select course type.</p>
-                  <table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">
-                  </table>
-                </div>
-              </dd>
-            </dl>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="small-4 small-centered columns">
-            <input type="hidden" id="ac_cname_cl_uv_ids" name="ac_cname_cl_uv_ids" value="" />
-            <input type="submit" class="small button expand" id="create_enroll" value="Create Enrollment">
-          </div>
-        </div>
         {% endif %}
       </div>
     </div>
@@ -225,6 +227,9 @@
 
 {% block script %}
   {{block.super}}
+  var sce_dt_var;
+  var old_end_enroll;
+  var new_end_enroll;
 
   // On close event of reveal-modal (alertModal) -------------------------------------------------------------
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
@@ -314,6 +319,15 @@
               }
             });
           }
+
+          else {
+            $("select#nussd_course_type").prop("selectedIndex", 0);
+            $("#panel_announce_course").html("<p>Please select course type.</p>")
+
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").addClass("warning").addClass("small");
+            $("#alertModal").foundation('reveal', 'open');
+          }
         }
         else {
           $("select#nussd_course_type").prop("selectedIndex", 0);
@@ -360,7 +374,6 @@
       var ann_course_name = $(this).find("td:nth-child(1)").text();
       var course_name = $(this).find("td:nth-child(2)").text();
       var college_id = $(this).find("td:nth-child(3)").attr("id");
-      console.log(JSON.stringify(college_id));
       var university_id = $(this).find("td:nth-child(4)").attr("id");
     
       var combined_ids = [ann_course_id, ann_course_name, course_name, college_id, university_id];
@@ -377,11 +390,27 @@
       event.preventDefault();
     }
   } );
+
+  /*
+   * Click event: "Update Enrollment" button
+   */
+  $("#update_enroll").click( function (event) {
+    new_end_enroll = $('#end_enroll').val();
+
+    if (new_end_enroll <= old_end_enroll) {
+      event.preventDefault();
+      
+      $("#alertModalLabel").text("To date of enrollment duration must have greater value set than the previous (" + old_end_enroll + ")");
+      $("#alertModal").addClass("alert").addClass("small");
+      $("#alertModal").foundation('reveal', 'open');
+    }
+  } );
 {% endblock %}
 
 {% block document_ready %}
   {{block.super}}
-  var sce_dt_var;
+
+  old_end_enroll = $("#end_enroll").val();
 
   $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
   $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");

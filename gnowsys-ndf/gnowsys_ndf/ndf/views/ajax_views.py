@@ -3143,7 +3143,7 @@ def get_announced_courses_with_ctype(request, group_id):
         if request.is_ajax() and request.method == "GET":
             # Fetch field(s) from GET object
             nussd_course_type = request.GET.get("nussd_course_type", "")
-            ann_course_type = request.GET.get("ann_course_type", "1")
+            ann_course_type = request.GET.get("ann_course_type", "0")
             acourse_ctype_list = []
             ac_of_colg = []
             start_enroll = ""
@@ -3183,6 +3183,7 @@ def get_announced_courses_with_ctype(request, group_id):
                 college = {}
                 course = {}
                 ac_data_set = []
+                records_list = []
 
                 if nussd_course_type == "Foundation Course":
                     rec = collection.aggregate([{
@@ -3208,36 +3209,38 @@ def get_announced_courses_with_ctype(request, group_id):
                         '$sort': {'created_at': 1}
                     }])
 
-                    for each in rec["result"]:
-                        newrec = {}
-                        if each['_id']["college"]:
-                            colg_id = each['_id']["college"][0][0]
-                            if colg_id not in college:
-                                c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1,"attribute_set.enrollment_code":1})
-                                newrec[u"college"] = c.name
-                                newrec[u"college_id"] = c._id
-                                newrec[u"created_at"] = each["foundation_course"][0]["created_at"]
-                                college[colg_id] = {}
-                                college[colg_id]["name"] = newrec[u"college"]
-                                for rel in c.relation_set:
-                                    if rel and "college_affiliated_to" in rel:
-                                        univ_id = rel["college_affiliated_to"][0]
-                                        u = collection.Node.one({"_id": univ_id}, {"name": 1})
-                                        each.update({"university": u.name})
-                                        college[colg_id]["university"] = each["university"]
-                                        college[colg_id]["university_id"] = u._id
-                                        newrec[u"university"] = u.name
-                                        newrec[u"university_id"] = u._id
-                            else:
-                                newrec["college"] = college[colg_id]["name"]
-                                newrec["college_id"] = college[colg_id]
-                                newrec.update({"university": college[colg_id]["university"]})
-                                newrec.update({"university_": college[colg_id]["university_id"]})
+                    records_list = rec["result"]
+                    if records_list:
+                        for each in records_list:
+                            newrec = {}
+                            if each['_id']["college"]:
+                                colg_id = each['_id']["college"][0][0]
+                                if colg_id not in college:
+                                    c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1,"attribute_set.enrollment_code":1})
+                                    newrec[u"college"] = c.name
+                                    newrec[u"college_id"] = c._id
+                                    newrec[u"created_at"] = each["foundation_course"][0]["created_at"]
+                                    college[colg_id] = {}
+                                    college[colg_id]["name"] = newrec[u"college"]
+                                    for rel in c.relation_set:
+                                        if rel and "college_affiliated_to" in rel:
+                                            univ_id = rel["college_affiliated_to"][0]
+                                            u = collection.Node.one({"_id": univ_id}, {"name": 1})
+                                            each.update({"university": u.name})
+                                            college[colg_id]["university"] = each["university"]
+                                            college[colg_id]["university_id"] = u._id
+                                            newrec[u"university"] = u.name
+                                            newrec[u"university_id"] = u._id
+                                else:
+                                    newrec["college"] = college[colg_id]["name"]
+                                    newrec["college_id"] = college[colg_id]
+                                    newrec.update({"university": college[colg_id]["university"]})
+                                    newrec.update({"university_": college[colg_id]["university_id"]})
 
-                        newrec[u"course"] = "Foundation Course"
-                        newrec[u"ac_id"] = each["fc_ann_ids"]
-                        newrec[u"name"] = "Foundation_Course_" + c["attribute_set"][0]["enrollment_code"] + "_" + each["_id"]["start_time"][0].strftime('%Y') + "_" + each["_id"]["end_time"][0].strftime('%Y')
-                        ac_data_set.append(newrec)
+                            newrec[u"course"] = "Foundation Course"
+                            newrec[u"ac_id"] = each["fc_ann_ids"]
+                            newrec[u"name"] = "Foundation_Course_" + c["attribute_set"][0]["enrollment_code"] + "_" + each["_id"]["start_time"][0].strftime('%Y') + "_" + each["_id"]["end_time"][0].strftime('%Y')
+                            ac_data_set.append(newrec)
 
                 else:
                     rec = collection.aggregate([
@@ -3257,85 +3260,41 @@ def get_announced_courses_with_ctype(request, group_id):
                             '$sort': {'created_at': 1}
                         }
                     ])
-                    for each in rec["result"]:
-                        if each["college"]:
-                            colg_id = each["college"][0][0]
-                            if colg_id not in college:
-                                c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1})
-                                each["college"] = c.name
-                                each["college_id"] = c._id
-                                college[colg_id] = {}
-                                college[colg_id]["name"] = each["college"]
-                                for rel in c.relation_set:
-                                    if rel and "college_affiliated_to" in rel:
-                                        univ_id = rel["college_affiliated_to"][0]
-                                        u = collection.Node.one({"_id": univ_id}, {"name": 1})
-                                        each.update({"university": u.name})
-                                        college[colg_id]["university"] = each["university"]
-                                        college[colg_id]["university_id"] = u._id
-                                        each["university_id"] = u._id
-                            else:
-                                each["college"] = college[colg_id]["name"]
-                                each["college_id"] = colg_id
-                                each.update({"university": college[colg_id]["university"]})
-                                each.update({"university_id": college[colg_id]["university_id"]})
 
-                        if each["course"]:
-                            course_id = each["course"][0][0]
-                            if course_id not in course:
-                                each["course"] = collection.Node.one({"_id": course_id}).name
-                                course[course_id] = each["course"]
-                            else:
-                                each["course"] = course[course_id]
-                        ac_data_set.append(each)
+                    records_list = rec["result"]
+                    if records_list:
+                        for each in rec["result"]:
+                            if each["college"]:
+                                colg_id = each["college"][0][0]
+                                if colg_id not in college:
+                                    c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1})
+                                    each["college"] = c.name
+                                    each["college_id"] = c._id
+                                    college[colg_id] = {}
+                                    college[colg_id]["name"] = each["college"]
+                                    for rel in c.relation_set:
+                                        if rel and "college_affiliated_to" in rel:
+                                            univ_id = rel["college_affiliated_to"][0]
+                                            u = collection.Node.one({"_id": univ_id}, {"name": 1})
+                                            each.update({"university": u.name})
+                                            college[colg_id]["university"] = each["university"]
+                                            college[colg_id]["university_id"] = u._id
+                                            each["university_id"] = u._id
+                                else:
+                                    each["college"] = college[colg_id]["name"]
+                                    each["college_id"] = colg_id
+                                    each.update({"university": college[colg_id]["university"]})
+                                    each.update({"university_id": college[colg_id]["university_id"]})
 
-                """
-                rec = collection.aggregate([
-                    {
-                        '$match': query
-                    }, {
-                        '$project': {
-                            '_id': 0,
-                            'ac_id': "$_id",
-                            'name': '$name',
-                            'course': '$relation_set.announced_for',
-                            'college': '$relation_set.acourse_for_college',
-                            'created_at': "$created_at"
-                        }
-                    },
-                    {
-                        '$sort': {'created_at': 1}
-                    }
-                ])
+                            if each["course"]:
+                                course_id = each["course"][0][0]
+                                if course_id not in course:
+                                    each["course"] = collection.Node.one({"_id": course_id}).name
+                                    course[course_id] = each["course"]
+                                else:
+                                    each["course"] = course[course_id]
 
-                for each in rec["result"]:
-                    if each["college"]:
-                        colg_id = each["college"][0][0]
-                        if colg_id not in college:
-                            c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1})
-                            each["college"] = c.name
-                            college[colg_id] = {}
-                            college[colg_id]["name"] = each["college"]
-                            for rel in c.relation_set:
-                                if rel and "college_affiliated_to" in rel:
-                                    univ_id = rel["college_affiliated_to"][0]
-                                    u = collection.Node.one({"_id": univ_id}, {"name": 1})
-                                    each.update({"university": u.name})
-                                    college[colg_id]["university"] = each["university"]
-                        else:
-                            each["college"] = college[colg_id]["name"]
-                            each.update({"university": college[colg_id]["university"]})
-
-                    if each["course"]:
-                        course_id = each["course"][0][0]
-                        if course_id not in course:
-                            each["course"] = collection.Node.one({"_id": course_id}).name
-                            course[course_id] = each["course"]
-                        else:
-                            each["course"] = course[course_id]
-
-                    ac_data_set.append(each)
-                """
+                            ac_data_set.append(each)
 
                 column_headers = [
                     ("name", "Announced Course Name"),
@@ -3344,10 +3303,16 @@ def get_announced_courses_with_ctype(request, group_id):
                     ("university", "University")
                 ]
 
+                if records_list:
+                    # If Announced Course(s) records found
+                    response_dict["column_headers"] = column_headers
+                    response_dict["ac_data_set"] = ac_data_set
+                else:
+                    # Else, where No Announced Course exist
+                    response_dict["ac_data_set"] = records_list
+                    response_dict["message"] = "No Announced Course found of selected type (" + nussd_course_type + ") !"
+
                 response_dict["success"] = True
-                response_dict["message"] = ""
-                response_dict["column_headers"] = column_headers
-                response_dict["ac_data_set"] = ac_data_set
                 return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
             if(ObjectId(group_id) == mis_admin._id):
@@ -4018,20 +3983,21 @@ def get_students_for_approval(request, group_id):
               for each in sce_gs.for_acourse[0].attribute_set:
                   if not each:
                       pass
-                  elif each.has_key("start_enroll"):
-                      start_enroll = each["start_enroll"]
-                  elif each.has_key("end_enroll"):
-                      end_enroll = each["end_enroll"]
+                  elif "start_time" in each:
+                      start_time = each["start_time"]
+                  elif "end_time" in each:
+                      end_time = each["end_time"]
 
-              data["Course"] = "Foundation_Course" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y")
+              data["Course"] = "Foundation_Course" + "_" + start_time.strftime("%b-%Y") + "_" + end_time.strftime("%b-%Y")
 
           else:
               # Courses other than FC
               data["Course"] = sce_gs.for_acourse[0].name
           
-          data["CompletedOn"] =  sce_gs.completed_on
+          # data["CompletedOn"] = sce_gs.completed_on
           data["Enrolled"] = len(sce_gs.has_enrolled)
-          approve_task = sce_gs.has_corresponding_task[0]
+          # approve_task = sce_gs.has_current_approval_task[0]
+          approve_task = sce_gs.has_current_approval_task[0]
           approve_task.get_neighbourhood(approve_task.member_of)
           # Code should be written in create_task: rename it create_update_task
           # Patch: doing here only
@@ -4119,8 +4085,8 @@ def approve_students(request, group_id):
       students_selected = request.POST.getlist("students_selected[]", "")
 
       sce_gs = collection.Node.one(
-        {'_id': ObjectId(enrollment_id), 'group_set': ObjectId(group_id), 'relation_set.has_corresponding_task': {'$exists': True}, 'status': u"PUBLISHED"},
-        {'name': 1, 'member_of': 1, 'attribute_set': 1, 'relation_set.has_corresponding_task': 1}
+        {'_id': ObjectId(enrollment_id), 'group_set': ObjectId(group_id), 'relation_set.has_current_approval_task': {'$exists': True}, 'status': u"PUBLISHED"},
+        {'name': 1, 'member_of': 1, 'attribute_set': 1, 'relation_set.has_current_approval_task': 1}
       )
 
       selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
@@ -4182,22 +4148,22 @@ def approve_students(request, group_id):
       if remaining_count == 0:
         if enrolled_count == (approved_count + rejected_count):
           for rel in sce_gs.relation_set:
-            if rel and ("has_corresponding_task" in rel):
+            if rel and ("has_current_approval_task" in rel):
               Status_AT = collection.Node.one(
                 {'_type': "AttributeType", 'name': "Status"}
               )
               task_status = u"Closed"
-              attr_node = create_gattribute(rel["has_corresponding_task"][0], Status_AT, task_status)
+              attr_node = create_gattribute(rel["has_current_approval_task"][0], Status_AT, task_status)
               break
 
       else:
         for rel in sce_gs.relation_set:
-          if rel and ("has_corresponding_task" in rel):
+          if rel and ("has_current_approval_task" in rel):
             Status_AT = collection.Node.one(
               {'_type': "AttributeType", 'name': "Status"}
             )
             task_status = u"In Progress"
-            attr_node = create_gattribute(rel["has_corresponding_task"][0], Status_AT, task_status)
+            attr_node = create_gattribute(rel["has_current_approval_task"][0], Status_AT, task_status)
             break
 
       response_dict["success"] = True
