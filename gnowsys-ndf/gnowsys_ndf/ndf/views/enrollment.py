@@ -84,6 +84,8 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
     template = ""
     template_prefix = "mis"
 
+    user_id = request.user.id
+
     if request.user:
         if auth is None:
             auth = collection.Node.one(
@@ -506,7 +508,6 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     if college_group_id not in enrollment_gs.group_set:
                         enrollment_gs.group_set.append(college_group_id)
 
-                    user_id = request.user.id
                     enrollment_gs.created_by = user_id
                     enrollment_gs.modified_by = user_id
                     if user_id not in enrollment_gs.contributors:
