@@ -69,7 +69,6 @@
 
 <script type="text/javascript">
     var appr_dt_var;
-  
     appr_dt_var = $('#table_data').dataTable();
 
     $('#table_data tbody').on( 'click', 'tr', function () {
@@ -88,87 +87,86 @@
         $(appr_dt_var.fnGetNodes()).removeClass("selected");
     });
 
+    $(document).on("click", ".btnApproval", function() {
+      students_selected = []
+      appr_dt_var.$("tr.selected").each(function() {
+        students_selected.push($(this).attr("id"));
+      });
 
-$(document).on("click", ".btnApproval", function() {
-  students_selected = []
-  appr_dt_var.$("tr.selected").each(function() {
-    students_selected.push($(this).attr("id"));
-  });
+      approval_state = $(this).val();
 
-  approval_state = $(this).val();
+      if (students_selected.length <= 0) {
+        if (approval_state == "Approve") {
+          $("#alertModalLabel").text("Please select any students for approval !!!");
+        }
 
-  if (students_selected.length <= 0) {
-    if (approval_state == "Approve") {
-      $("#alertModalLabel").text("Please select any students for approval !!!");
-    }
+        else {
+          $("#alertModalLabel").text("Please select any students for rejection !!!");
+        }
 
-    else {
-      $("#alertModalLabel").text("Please select any students for rejection !!!");
-    }
-
-    $("#alertModal").removeClass("success");
-    $("#alertModal").addClass("warning");
-    $("#alertModal").foundation('reveal', 'open');
-
-    return;
-  }
-
-  enrollment_id = $("#enrollment_id").val();
-
-  course_id = $("#course_id").val();
-
-  success_state = false
-  approved = ""
-  rejected = ""
-  remaining = ""
-  task_status = ""
-  $.ajax({
-    url: "{% url 'approve_students' groupid %}",
-
-    data: {
-      'approval_state': approval_state,
-      'enrollment_id': enrollment_id,
-      'course_id': course_id,
-      'students_selected': students_selected,
-      'csrfmiddlewaretoken': "{{csrf_token}}"
-    },
-
-    type: "POST",
-
-    dataType: "json",
-
-    success: function(data) {
-      success_state = data["success"];
-
-      if (success_state) {
-        approved = data["approved"];
-        rejected = data["rejected"];
-        remaining = data["remaining"];
-        task_status = data["task_status"];
-      }
-
-      else {
-        $("#alertModalLabel").text(data["message"]);
-        $("#alertModal").removeClass("success").removeClass("warning");
-        $("#alertModal").addClass("alert");
+        $("#alertModal").removeClass("success");
+        $("#alertModal").addClass("warning");
         $("#alertModal").foundation('reveal', 'open');
-      }
-    },
 
-    complete: function() {
-      if (success_state) {
-        $("#"+enrollment_id).find(".Approved").text(approved);
-        $("#"+enrollment_id).find(".Rejected").text(rejected);
-        $("#"+enrollment_id).find(".Remaining").text(remaining);
-        $("#"+enrollment_id).find(".Status").text(task_status);
-
-        $("#approval_accordion").html("");
-        $("#approval_accordion").removeClass("active");
-        $("#enrollment_accordion").addClass("active");
+        return;
       }
-    },
-  });
-});
+
+      enrollment_id = $("#enrollment_id").val();
+
+      course_id = $("#course_id").val();
+
+      success_state = false
+      approved = ""
+      rejected = ""
+      remaining = ""
+      task_status = ""
+      $.ajax({
+        url: "{% url 'approve_students' groupid %}",
+
+        data: {
+          'approval_state': approval_state,
+          'enrollment_id': enrollment_id,
+          'course_id': course_id,
+          'students_selected': students_selected,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data) {
+          success_state = data["success"];
+
+          if (success_state) {
+            approved = data["approved"];
+            rejected = data["rejected"];
+            remaining = data["remaining"];
+            task_status = data["task_status"];
+          }
+
+          else {
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        },
+
+        complete: function() {
+          if (success_state) {
+            $("#"+enrollment_id).find(".Approved").text(approved);
+            $("#"+enrollment_id).find(".Rejected").text(rejected);
+            $("#"+enrollment_id).find(".Remaining").text(remaining);
+            $("#"+enrollment_id).find(".Status").text(task_status);
+
+            $("#approval_accordion").html("");
+            $("#approval_accordion").removeClass("active");
+            $("#enrollment_accordion").addClass("active");
+          }
+        },
+      });
+    });
 
     $(document).foundation();
 
@@ -179,5 +177,4 @@ $(document).on("click", ".btnApproval", function() {
     bind('ajaxStop', function(){
       $(this).hide();
     });
-
 </script>

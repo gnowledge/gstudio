@@ -72,11 +72,13 @@ class HomeRedirectView(RedirectView):
             # This will return a string in url as username and allows us to redirect into user group as soon as user logsin.
             #return "/{0}/".format(auth.pk)
             if GSTUDIO_SITE_LANDING_PAGE == 'home':
-                return "/home/dashboard/group"
+                #return "/home/dashboard/group"
+                return "/home/"
             else:    
                 return "/{0}/dashboard".format(self.request.user.id)     
         else:
             # If user is not loggedin it will redirect to home as our base group.
-            return "/home/dashboard/group"
+            #return "/home/dashboard/group"
+            return "/home/"
 
     

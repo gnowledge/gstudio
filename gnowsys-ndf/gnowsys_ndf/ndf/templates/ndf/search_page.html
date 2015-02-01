@@ -17,8 +17,8 @@
 {% block body_content %} 
 
 <hr>
-			<h3>Results</h3>
-			<div id="results" width="100%" style="position:relative">
+      <div id="results" width="100%" style="position:relative">
+			
 			
 			</div>
 
@@ -235,12 +235,19 @@
       $("#results").html(html_div[page_no]);
 
       pages = "<h6>Pages:</h6><hr>";
-      pages += "<ul style='float:left; list-style-type:none;'>";
-      for (i=0; i < cur_page+1; i++) {
-        pages+= "<span onClick='changePage(" + i + ")' style='cursor:pointer;font-weight:bold;padding-left:10px'>" + (i+1) + "</span>";
+      if(results_in_current_page>0){
+        pages += "<ul style='float:left; list-style-type:none;'>";
+        for (i=0; i < cur_page+1; i++) {
+          pages+= "<span onClick='changePage(" + i + ")' style='cursor:pointer;font-weight:bold;padding-left:10px'>" + (i+1) + "</span>";
+        }
+        pages+="</ul>";
+        $("#pages").html(pages);
+        $("#results").prepend("<h3>Results</h3>")
       }
-      pages+="</ul>";
-      $("#pages").html(pages);
+      else{
+        $("#results").html("<h3>No results found</h3>")
+        $("#pages").html("");
+      }
     };
   });
 

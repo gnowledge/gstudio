@@ -169,6 +169,10 @@ table, th, td {
             </div>
           </div>
 
+          {% if  Eventtype == 'Eventtype' %}
+          
+          
+          {%  if node.event_organised_by %}
           <br>
           <div class="row">
             <div class="small-3 columns">
@@ -186,6 +190,8 @@ table, th, td {
             </div>
           </div>
           
+          {% endif %}
+          {% endif %}
          
           
           
@@ -225,6 +231,7 @@ table, th, td {
           </div>
           {% endif %}
            <br>
+         {% if Eventtype == 'CollegeEvents' %}  
           <div class="row">
             <div class="small-3 columns">
               <label>Batch:</label>
@@ -258,7 +265,7 @@ table, th, td {
               <label>{{course.attribute_set.6.min_marks}}</label>
             </div>
        </div>
-        
+        {% endif %}
           <br>
           <br>
           {% with node.html_content|safe as description %}
@@ -542,9 +549,6 @@ table, th, td {
  
 // script for showing map on appearance of overlay.
 
-//reschedule = ""
-//marks_enter = ""
-
 function controler()
 {
           //checks wheather the has_attende relation is createad or not 
@@ -617,8 +621,17 @@ else
 {
     pass[0] ='Edit'
 }
+checkbox1="<input type=checkbox class='selall' onClick=mark_all_present() id='selall'>"
 column1="<th> name </th>"
-column2="<th> Presence </th>"
+if ( pass[0] == 'Edit')
+{
+  column2="<th> Presence " + checkbox1 +"</th>" 
+}
+else
+{
+
+  column2="<th> Presence </th>"
+}  
 column3="<th> Assignment Marks </th>"
 column4="<th> Assessment Marks </th>"
      if(pass[1] == 1)
@@ -885,14 +898,14 @@ var attendancedone=""
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
 
-    var url="{% url 'event_assginee' groupid  node.pk  %}"
-    
-    $("#forattendance").find('tr').each(function(){
-    var Names_attended = $(this).find('.chkbx').val()
-    var Status_attended = $(this).find('.chkbx:checked').val()
-    var Attendance_marks = $(this).find('.Assigntxtbx').val()
-    var Assessment_marks = $(this).find('.Assesstxtbx').val()
-    
+var url="{% url 'event_assginee' groupid  node.pk  %}"
+
+$("#forattendance").find('tr').each(function(){
+var Names_attended = $(this).find('.chkbx').val()
+var Status_attended = $(this).find('.chkbx:checked').val()
+var Attendance_marks = $(this).find('.Assigntxtbx').val()
+var Assessment_marks = $(this).find('.Assesstxtbx').val()
+
    
 if (!(Status_attended))
     {
@@ -953,6 +966,25 @@ function validate_txtbx(input)
   }
 }
    
+function mark_all_present()
+{
+   $(':checkbox.chkbx').each(function () {
+      if ($(':checkbox.selall')[0].checked == true)
+        {
+        this.checked=true
+        enablemarks(this)
+        }
+        if ($(':checkbox.selall')[0].checked == false)
+        {
+        this.checked=false
+        enablemarks(this)
+        }
+     });
+
+ 
+
+  
+}
 $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
   
   map.invalidateSize();  
