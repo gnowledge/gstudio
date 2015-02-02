@@ -1619,8 +1619,6 @@ def get_data_for_event_task(request,group_id):
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           attr_value.update({'start':formated_date})
           day_list.append(dict(attr_value))
-    
-    
     count=0
     dummylist=[]
     date=""
@@ -4109,7 +4107,7 @@ def save_time(request,group_id,node):
                  a = i['event_edit_reschedule']
   a['reschedule_till'] = start_time               
   create_gattribute(ObjectId(node),reschedule_event,a)    
-  return HttpResponse("time changed") 
+  return HttpResponse("Session rescheduled") 
 
 def check_date(request,group_id,node):
     reschedule = request.POST.get('reschedule','')
@@ -4158,7 +4156,8 @@ def reschedule_task(request,group_id,node):
     from datetime import date,time,timedelta
     date1=datetime.date.today() + timedelta(2)
     ti=datetime.time(0,0)
-    b=datetime.datetime.combine(date1,ti)
+    start_time = request.POST.get('reschedule_date','')
+    b = parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
     #fetch event
     event_node = collection.Node.one({"_id":ObjectId(node)})
     reschedule_dates = []
@@ -4167,9 +4166,7 @@ def reschedule_task(request,group_id,node):
 	       if unicode('event_edit_reschedule') in i.keys():
 	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
 	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
-	    	   
-
-         reschedule_dates.append(b)
+	       reschedule_dates.append(b)  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
          return_message = "Event Dates Re-Schedule Opened" 
@@ -4177,7 +4174,7 @@ def reschedule_task(request,group_id,node):
     else:
     	 for i in event_node.attribute_set:
 	       if unicode('reschedule_attendance') in i.keys():
-	    	   if unicode ('reschedule_dates') in i['reschedule_attendance']:
+	    	   if unicode ('reschedul1e_dates') in i['reschedule_attendance']:
 	    	   	  reschedule_dates = i['reschedule_attendance']['reschedule_dates']
          reschedule_dates.append(b)
          create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
@@ -4209,7 +4206,7 @@ def reschedule_task(request,group_id,node):
     task_dict.update({'start_time':Today})
     task_dict.update({'Assignee':Mis_admin_list})
     create_task(task_dict)
-    return_message="Intimation is sent to central office soon you will get update."
+    return_message="Message is sent to central office soon you will get update."
  return HttpResponse(return_message)
  
 

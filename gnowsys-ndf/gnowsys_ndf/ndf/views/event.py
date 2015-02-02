@@ -212,9 +212,9 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     Mis_admin_list=Mis_admin.group_admin
     Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-        Add="Allow"  
+        Add = "Allow"  
     else: 
-        Add= "Stop"
+        Add = "Stop"
   else:
     Add="Stop"       
   #fecth the data
