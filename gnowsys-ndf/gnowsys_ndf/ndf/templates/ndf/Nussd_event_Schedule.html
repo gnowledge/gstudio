@@ -346,7 +346,7 @@ function append_time()
 
   if('{{edit_details}}')
   {
-    alert("didnt comeher")
+    
     event_details={{edit_details|safe}}
     $('#nussd_course_name').append(
                   $("<option></option>")
@@ -435,9 +435,8 @@ function enable_start_time_end_time(str)
      }
         start_from = str_name
         remove_till = last_start_time
+        reset_time(str)
         remove_start_end_time(start_from,remove_till)
-        reset_time(str)     
-     
     
  
  }
@@ -458,8 +457,7 @@ function remove_start_end_time(start_from , remove_till)
     for (i=start_from  ; i<=remove_till ; i++)
       {
        $('#split' + '_' + i).remove()
-       $('#split' + '_' + i).remove()
-       $('.session_time br:first').remove(); 
+       $('.session_time br:last').remove(); 
       }
   last_start_time = start_from  
  }
@@ -542,7 +540,6 @@ function date_validation(name)
 	           
 	           if ( Number(last_start_time) > Number(str1))
 				     { 
-			     		alert("deducting"+last_start_time)
 			     		enable_start_time_end_time(name) 
 				     	last_start_time=str1
 
@@ -562,14 +559,17 @@ function date_validation(name)
 		               {
 			              document.getElementById('start_time' + '_' +last_start_time ).value=""
 			              document.getElementById('end_time' + '_' +last_start_time ).value=""
-			           }
+			               reset_time(name)  
+                 }
 				      if (!(last_start_time))
 				       { 
 				          document.getElementById('start_time').value=""
-			              document.getElementById('end_time').value=""
-			           }
+			            document.getElementById('end_time').value=""
+			            total_session_time = $('#session_of option:selected').attr('minutes') 
+
+                 }
 			            	
-		             reset_time(name)		      
+		             		      
 	            }       
 	            
 	            
@@ -608,7 +608,8 @@ function reset_time(name)
      var i = 0 
      if(!(str1))
      {
-     	start_time = new Date($('#start_time').datetimepicker('getDate')) 
+      
+      start_time = new Date($('#start_time').datetimepicker('getDate')) 
 		           end_time   = new Date($('#end_time').datetimepicker('getDate'))  
 		  			check_remaining_time(start_time,end_time)
 		    
@@ -616,9 +617,9 @@ function reset_time(name)
      }
      if(str1)
      {
-      while(Number(i) != Number(str1)+1 )
+      while(Number(i) != Number(str1) + 1 )
       {
-      alert("entry")
+      
        if (i == 0)
 	         {  
 		           start_time = new Date($('#start_time').datetimepicker('getDate')) 
@@ -627,14 +628,15 @@ function reset_time(name)
 		     }
        else
 	         {
-		          if  ($('#start_time'+ '_' + i)){ 
+		          
+              if  ($('#start_time'+ '_' + i).val() != ""){ 
 		            start_time = new Date($('#start_time'+ '_' + i).datetimepicker('getDate')) 
 		            end_time   = new Date($('#end_time' + '_' + i).datetimepicker('getDate'))
-		            }
-	         	check_remaining_time(start_time,end_time)
+		            check_remaining_time(start_time,end_time)
+                }
+	         	
 	         }
-	    alert(start_time + "End time:" + end_time)     
-        i= Number(i)+1
+	      i= Number(i)+1
        } 
     /*}*/
    }
@@ -675,9 +677,6 @@ $("#nussd_course_name").change(function(){
                     }
              } 
         });
-
-
-
 });
 
 $("#event_has_batch").change(function(){
@@ -711,9 +710,6 @@ $("#event_has_batch").change(function(){
                       }
               } 
           });
-
-
-
 });
 
 
