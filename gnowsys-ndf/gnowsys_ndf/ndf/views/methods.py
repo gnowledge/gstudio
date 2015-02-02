@@ -1789,7 +1789,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             else:
               error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
-              raise Exception(error_message)
+              # raise Exception(error_message)
 
       return gr_node_list
 

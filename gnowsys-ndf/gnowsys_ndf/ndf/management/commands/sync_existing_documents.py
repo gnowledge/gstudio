@@ -23,6 +23,15 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Renames RelaionType names -- "has_corresponding_task" to "has_current_approval_task"
+    res = collection.update(
+        {'_type': "RelationType", 'name': u"has_corresponding_task"}, 
+        {'$set': {'name': u"has_current_approval_task"}}, 
+        upsert=False, multi=False
+    )
+    if res['updatedExisting'] and res['nModified']:
+        print "\n 'name' field updated of RelationType (Renamed from has_corresponding_task to has_current_approval_task)"
+
     # Replaces "for_acourse" RelationType's object_cardinality field's value from 1 to 100
     res = collection.update(
         {'_type': "RelationType", 'name': "for_acourse"}, 
@@ -101,7 +110,6 @@ class Command(BaseCommand):
 
         if count:
             print "\n Name field updated (Stripped) in following no. of documents: ", count
-        
 
     # Update's "status" field from DRAFT to PUBLISHED for all TYPE's node(s)
     res = collection.update(
