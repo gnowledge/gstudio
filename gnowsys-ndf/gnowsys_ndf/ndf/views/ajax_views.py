@@ -3636,11 +3636,13 @@ def get_anncourses_allstudents(request, group_id):
   """
   response_dict = {'success': False, 'message': ""}
   all_students_text = ""
-
+  query = {}
   try:
     if request.is_ajax() and request.method == "GET":
-      registration_year = request.GET.get("registration_year", "")
+      registration_year = str(request.GET.get("registration_year", ""))
       all_students = request.GET.get("all_students", "")
+      degree_year = request.GET.get("degree_year", "")
+      degree_name = request.GET.get("degree_name", "")
       acourse_val = request.GET.getlist("acourse_val[]", "")
 
       for i, each in enumerate(acourse_val):
@@ -3660,11 +3662,9 @@ def get_anncourses_allstudents(request, group_id):
 
       # Check whether any field has missing value or not
       if registration_year == "" or all_students == "":
-        registration_year = datetime.datetime.now().year.__str__()
+        # registration_year = datetime.datetime.now().year.__str__()
         all_students = u"false"
         # error_message = "Invalid data: No data found in any of the field(s)!!!"
-        # raise Exception(error_message)
-      
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
 
       # From Announced Course node fetch College's ObjectId
@@ -3677,33 +3677,35 @@ def get_anncourses_allstudents(request, group_id):
           colg_of_acourse_id = rel["acourse_for_college"][0]
           break
 
-      for attr in acourse_node.attribute_set:
-        if attr and attr.has_key("start_time"):
-          lower_year_limit = attr["start_time"].year.__str__()
-        elif attr and attr.has_key("end_time"):
-          upper_year_limit = attr["end_time"].year.__str__()
+      # for attr in acourse_node.attribute_set:
+      #   if attr and attr.has_key("start_time"):
+      #     lower_year_limit = attr["start_time"].year.__str__()
+      #   elif attr and attr.has_key("end_time"):
+      #     upper_year_limit = attr["end_time"].year.__str__()
 
-      if not lower_year_limit or not upper_year_limit:
-        if not lower_year_limit:
-          if upper_year_limit:
-            lower_year_limit = upper_year_limit
-          else:
-            lower_year_limit = datetime.datetime.now().year.__str__()
+      # if not lower_year_limit or not upper_year_limit:
+      #   if not lower_year_limit:
+      #     if upper_year_limit:
+      #       lower_year_limit = upper_year_limit
+      #     else:
+      #       lower_year_limit = datetime.datetime.now().year.__str__()
 
-        if not upper_year_limit:
-          if lower_year_limit:
-            upper_year_limit = lower_year_limit
-          else:
-            upper_year_limit = datetime.datetime.now().year.__str__()
+      #   if not upper_year_limit:
+      #     if lower_year_limit:
+      #       upper_year_limit = lower_year_limit
+      #     else:
+      #       upper_year_limit = datetime.datetime.now().year.__str__()
 
-      date_gte = datetime.datetime.strptime("1/1/"+lower_year_limit, "%d/%m/%Y")
-      date_lte = datetime.datetime.strptime("31/12/"+upper_year_limit, "%d/%m/%Y")
+      date_gte = datetime.datetime.strptime("1/1/"+registration_year, "%d/%m/%Y")
+      date_lte = datetime.datetime.strptime("31/12/"+registration_year, "%d/%m/%Y")
 
-      query = {
-        'member_of': student._id, 
-        'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
-        'relation_set.student_belongs_to_college': ObjectId(colg_of_acourse_id)
-      }
+      # query = {
+      #   'member_of': student._id, 
+      #   'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
+      #   # 'attribute_set.degree_year':degree_year,
+      #   # 'attribute_set.degree_name':degree_name,
+      #   'relation_set.student_belongs_to_college': ObjectId(colg_of_acourse_id)
+      # }
 
       # If College's ObjectId exists, fetch respective College's group
       if colg_of_acourse_id:
@@ -3722,16 +3724,22 @@ def get_anncourses_allstudents(request, group_id):
                   {
                     'member_of': student._id, 
                     'group_set': rel["has_group"][0], 
-                    'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte}
+                    'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
                   },
                   {
                     'member_of': student._id, 
                     'relation_set.student_belongs_to_college': ObjectId(colg_of_acourse_id), 
-                    'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte}
+                    'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
                   }
                 ]
               }
               break
+
+      if degree_year:
+        query.update({'attribute_set.degree_year': degree_year })
+
+      if degree_name:
+        query.update({'attribute_set.degree_name': degree_name })
 
       # Check whether StudentCourseEnrollment created for given acourse_val
       # Set node as StudentCourseEnrollment node
@@ -3758,15 +3766,27 @@ def get_anncourses_allstudents(request, group_id):
       drawer_template_context = {}
       drawer_widget = ""
       res = None
+
       if all_students == u"true":
         all_students_text = "All students (including enrolled ones)"
+        res = collection.aggregate([
+            {
+                '$match': query
+            }, {
+                '$project': {
+                    '_id': 1,
+                    'name': '$name',
+                    'degree_name': '$attribute_set.degree_name',
+                    'degree_year':'$attribute_set.degree_year',
+                    'registration_year':'$attribute_set.registration_year'
+                }
+            },
+            {
+                '$sort': {'name': 1}
+            }
+        ])
 
-        res = collection.Node.find(
-          query,
-          {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
-        ).sort("name", 1)
-
-        all_students_text += " [Count("+str(res.count())+")]"
+        all_students_text += " [Count("+str(len(res["result"]))+")]"
 
       elif all_students == u"false":
         all_students_text = "Only non-enrolled students"
@@ -3774,34 +3794,51 @@ def get_anncourses_allstudents(request, group_id):
         # Find students which are not enrolled in selected announced course
         query.update({'relation_set.selected_course': {'$ne': acourse_node._id}})
 
-        res = collection.Node.find(
-          query,
-          {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
-        ).sort("name", 1)
+        res = collection.aggregate([
+            {
+                '$match': query
+            }, {
+                '$project': {
+                    '_id': 1,
+                    'name': '$name',
+                    'degree_name': '$attribute_set.degree_name',
+                    'degree_year':'$attribute_set.degree_year',
+                    'registration_year':'$attribute_set.registration_year'
+                }
+            },
+            {
+                '$sort': {'name': 1}
+            }
+        ])
 
-        non_enrolled_stud_count = str(res.count())
+        non_enrolled_stud_count = str(len(res["result"]))
         all_students_text += " [Count("+non_enrolled_stud_count+")]"
 
       # if res.count():
       #   drawer_template_context = edit_drawer_widget("RelationType", group_id, node, None, checked, left_drawer_content=res)
       #   drawer_template_context["widget_for"] = "student_enroll"
       #   drawer_template_context["groupid"] = group_id
-      #   drawer_widget = render_to_string('ndf/drawer_widget.html', 
+      #   drawer_widget = render_to_string('ndf/drawer_widget.html',
       #     drawer_template_context,
       #     context_instance = RequestContext(request)
       #   )
 
       response_dict["announced_courses"] = []
       # response_dict["drawer_widget"] = drawer_widget
-      
-      column_headers = [
-        ("name", "Student Name")
-      ]
-      response_dict["column_headers"] = column_headers
-      response_dict["students_data_set"] = list(res)
 
-      response_dict["success"] = True
-      # response_dict["message"] = "NOTE: " + all_students_text + " are listed along with announced courses"
+      column_headers = [
+          ("name", "Name"),
+          ("degree_name", "Degree"),
+          ("degree_year", "Year"),
+      ]
+
+      response_dict["column_headers"] = column_headers
+      if res["result"]:
+        response_dict["students_data_set"] = res["result"]
+        response_dict["success"] = True
+      else:
+        response_dict["success"] = False
+        response_dict["message"] = "No filtered results found"
       response_dict["enrolled_stud_count"] = enrolled_stud_count
       response_dict["non_enrolled_stud_count"] = non_enrolled_stud_count
 
