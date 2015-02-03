@@ -1964,14 +1964,16 @@ def str_to_dict(str1):
        
               if type(dict_format[k]) == list :
                       for userid in dict_format[k]:
-                              user = User.objects.get(id = userid)
-                              if user:
-                                dict_format[k] = user.get_username()
+                      		  if User.objects.filter(id = userid).exists():
+	                              user = User.objects.get(id = userid)
+	                              if user:
+	                                dict_format[k] = user.get_username()
               else: 
                       if v != []:
-                              user = User.objects.get(id = v)
-                              if user:
-                                      dict_format[k] = user.get_username()
+                      		  if User.objects.filter(id = userid).exists():
+	                              user = User.objects.get(id = v)
+	                              if user:
+	                                dict_format[k] = user.get_username()
 
       if k in keys_by_dict:
               att_dic = {}

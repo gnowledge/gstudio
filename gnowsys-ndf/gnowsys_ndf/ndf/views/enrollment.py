@@ -1234,7 +1234,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
         # Populate Announced courses of given enrollment
         if not enrollment_closed:
             # Fetch required list of AttributeTypes
-            fetch_ats = ["nussd_course_type", "degree_year"]
+            fetch_ats = ["nussd_course_type", "degree_year","degree_name"]
 
             for each in fetch_ats:
                 each = collection.Node.one({

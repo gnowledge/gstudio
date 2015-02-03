@@ -155,6 +155,57 @@
         </div>
         -->
         {% endcomment %}
+    <div id="filter_students_to_enroll" class="tabs-content" style="padding: 0px 5px; width:1150px;">
+      <!-- Tab: Enrollment Approval Details -->
+      <div class="active content row" id="panel_enrollment_approval_details">
+        <dl class="accordion" data-accordion>
+          <!-- Enrollment Details -->
+          <dd class="accordion-navigation">
+            <a href="#filter_stud_accordion">{% trans "Filter Students" %}</a>
+            <div id="filter_stud_accordion" class="content active">
+              <div class="row">
+                
+                <div class="small-2 large-2 columns end">
+                  <label> Registration Year
+                  </label>
+                  <input type="text" class="date_year" id="datepicker_year" required readonly="" placeholder="YYYY" style="float:left; width:85%"/>
+                  <i style="color:red; display:inline">*</i>
+                  <small class="error">{% trans "Please select year" %} </small>
+                </div>
+
+                <!-- Filter dropdown -->
+                <div class="small-2 large-2 columns end">
+                  <label> Select Filter
+                  </label>
+                  <select id="student_filter">
+                    <option class="no_selection">Select Filter</option>
+                    <option id="year_of_study_opt">Year of Study</option>
+                    <option id="stream_opt">Stream</option>
+                  </select>
+                </div>
+                </div>
+                <div class="row">
+
+                  <!-- Year of study dropdown -->
+                  <div class="small-3 large-3 columns end hide" id="year_of_study_div" >
+                    <label>Select Year</label>
+                    {% html_widget groupid "" ATs.1 %}
+                  </div>
+
+
+                  <!-- Stream dropdown -->
+                  <div class="small-4 large-3 columns end hide" id="stream_div">
+                    <label>Select Year</label>
+                    {% html_widget groupid "" ATs.2 %}
+                  </div>
+
+
+              </div>
+            </div>
+          </dd>
+        </dl>
+      </div>
+    </div>
 
         <!-- Find button -->
         <div class="row">
@@ -215,14 +266,52 @@
     $("#lbl_displ").text("")
   } );
 
+  // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+    $(document).on('focus click blur', '.date_year' ,function(){
+      $(".ui-datepicker-calendar").hide();
+      $(".ui-datepicker-month").hide();
+      $(".ui-datepicker-prev").hide();
+      $(".ui-datepicker-next").hide();
+      $("#ui-datepicker-div").position({
+        at: "center bottom",
+        my: "center top",
+        of: $(this)
+      }); 
+    });
 
+  // On changing filter dropdown
+    $("select#student_filter").on("change", function() {
+      selected_option_id = $(this).find('option:selected').attr('id')
+      if(selected_option_id == "year_of_study_opt"){
+        $("#year_of_study_div").removeClass("hide")
+      }
+      else if(selected_option_id == "stream_opt"){
+        $("#stream_div").removeClass("hide")
+      }
+    })
 
+  
 
   // On click of Find (Setup Ajax call) ----------------------------------------------------------------------
-    $("#btnFindES").click(function() {
+    $("#btnFindES").click(function(event) {
+    
+    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+    $("#form-edit-node").find(':input[required]').blur();
+
+    if($("#form-edit-node").find(':input[data-invalid]').length == 0){
+      registration_year = $("#datepicker_year").val()
       var success_state = false;
       var non_enrolled_students = 0;
+      var degree_name = ""
+      var degree_year = ""
 
+      if($("select#degree_name option:selected").index() > 0) {
+       degree_name = $("select#degree_name").val()
+      }
+      
+      if($("select#degree_year option:selected").index() > 0) {
+       degree_year = $("select#degree_year").val()
+      }
       $("#acourse_list li").each(function() {
         acourse_val.push($(this).attr("id"));
       });
@@ -231,9 +320,10 @@
         url: "{% url 'get_anncourses_allstudents' group_id %}",
 
         data: {
-          // registration_year: registration_year,
-          // all_students: all_students,
-          acourse_val: acourse_val
+          registration_year: $("#datepicker_year").val() ,
+          acourse_val: acourse_val,
+          degree_year: degree_year,
+          degree_name: degree_name
         },
 
         type: "GET",
@@ -242,7 +332,6 @@
 
         success: function(data){
           success_state = data["success"];
-
           if (data["success"]) {
             // Fill divSt
             drawer_widget = ""
@@ -302,6 +391,7 @@
           else {
             $("#alertModal").removeClass("success");
             $("#alertModal").addClass("alert");
+             $("#alertModalLabel").text(data["message"]);
             $("#alertModal").foundation('reveal', 'open');
           }
         },
@@ -321,7 +411,7 @@
               $("#fsSt").toggle();
             }
 
-            $("#btnFindES").attr("disabled", true);
+            //$("#btnFindES").attr("disabled", true);
           }
 
           else {
@@ -340,6 +430,11 @@
           }
         }
       });
+    }
+    else{
+      alert("Please fill required fields");
+      event.preventDefault();
+    }
     });
 
   //On click of select All, highlight all rows
@@ -391,7 +486,6 @@
       sce_dt_var.$("tr.selected").each(function () {
         student_enroll_list.push(this.id);
       } );
-
       $("#student_enroll_list").val(student_enroll_list);
 
       // Setting hidden field's value as the selected value from acourse_list (dropdown)
@@ -418,8 +512,39 @@
 {% block document_ready %}
   {{block.super}}
 
+  $(":not(#datepicker_year)").removeAttr("required")
+  
   var success_state = false;
+  var currentYear = (new Date()).getFullYear()
+  lowerYearLimit = currentYear - 5;
 
   // If Find button is disabled, enable it
     $("#btnFindES").removeAttr("disabled");
+
+  // Settings for datepicker widget (only for year) --------------------------------------------------------------
+    $(".date_year").datepicker({
+      changeYear: true,
+      dateFormat: 'yy',
+      yearRange: lowerYearLimit + ":" + currentYear,
+      minDate: new Date(lowerYearLimit, 1 - 1, 1),
+      maxDate: '0',
+      defaultDate: new Date(lowerYearLimit, 1 - 1, 1),
+
+      onClose: function(dateText, inst) {
+        $(this).val(dateText)
+      },
+
+      beforeShow: function() {
+        var year = $(this).val();
+        if (year) {
+          $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+          $(this).datepicker('setDate', new Date(year, 1, 1));
+        }
+      },
+
+      onChangeMonthYear: function(year, month, inst){
+        $(this).val(year)
+      }
+    });
+
 {% endblock %}

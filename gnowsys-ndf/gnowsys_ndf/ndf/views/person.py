@@ -329,7 +329,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             if field_instance_type == AttributeType:
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
-                
+                user_id = request.user.id
                 if field_instance["name"] in request.FILES:
                   field_value = request.FILES[field_instance["name"]]
 
