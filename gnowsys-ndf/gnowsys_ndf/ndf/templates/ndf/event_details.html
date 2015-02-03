@@ -31,6 +31,13 @@
 table, th, td {
    border: 1px solid #F5F5DC;
 } 
+
+ #lbl_displ
+  {
+     color: #0b8a91;
+     font-weight: bold;
+     font-size: 1rem;
+   }
 </style>
 
 <div id="view_event">
@@ -55,14 +62,18 @@ table, th, td {
         <dd onClick="controler()"><a href="#view-Attendance"><i class="fi-Attendance"></i>{% trans "Attendance" %} </a></dd>
         
       </dl>
+        
     </section>
   </header> 
   
   <div class="row">
 
      <div class="tabs-content">
-                  <div class="content active" id="view-page">
+                  
+              <div class="content active" id="view-page">
                       <section class="medium-9 columns">    
+                       <div id="message">
+                       </div>
                        <fieldset>   
                           <ul class="inline-list">
                           {% if user.is_authenticated %}
@@ -294,9 +305,13 @@ table, th, td {
 
                        <div class="content" id="view-Attendance" >    
                         
+                        <div  id  = "attendance_reschedule">
+                        </div>
+                      
                         <div id="attendance">
                             
                         </div>
+
                         
                         <div id="atten_asses_cmpl">
                         </div>
@@ -376,17 +391,24 @@ function remove_reschedule(){
 
 function add_reschedule(){
 
- 
- if ('{{Add}}' == 'Allow'){
-          
-          $('#reschedule').append("<input class='tiny button' onclick=reschedule_time('event_reschedule') value='Reschedule'>")
-          
-          }
-        if('{{Add}}' == 'Stop')
-          {
-          		$('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")	
-          }
- $('#Edit_start_time').hide()
+         if ('{{Add}}' == 'Allow'){
+                  
+                  $('#reschedule').append("<input class='tiny button' onclick=reschedule_time('event_reschedule') value='Reschedule'>")
+                  
+                  }
+         if ('{{task_date}}' != 'False')
+             { 
+      
+                if('{{Add}}' == 'Stop')
+                  {
+                  		$('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")	
+                  }
+                $('#Edit_start_time').hide()
+            }
+ if ('{{task_date}}' == 'False' && '{{Add}}' == 'Stop'){  
+      $('#message').empty()
+      $('#message').append("<label id = 'lbl_displ' > Your request to reschedule the event has been sent to Admin </label>")
+   }
 }
  
 function closeEvent()
@@ -502,6 +524,7 @@ function saveTime()
                      success: function(data){
                      alert(data)
                      $('#myModal').foundation('reveal', 'close');
+                     location.reload();
                      }
                    
                   });
@@ -662,12 +685,21 @@ else
       if(reschedule == false || marks_enter == false)
       {
         if ('{{Add}}' == 'Allow'){
-          $('#attendance').append("<input class='tiny button'  onclick=reschedule_time() value='Re-Schedule'>" )
+          $('#attendance').append("<input class='tiny button'  onclick=reschedule_time('attendance_reschedule') value='Re-Schedule'>" )
           }
-        if('{{Add}}' == 'Stop')
+        if ('{{task_attendance}}' != 'False')
+             {  
+                if('{{Add}}' == 'Stop')
+                  {
+                  		$('#attendance').append("<input class='tiny button'  onclick=reschedule_event('attendance_reschedule') value='Re-Schedule'>" )
+                  }
+             }  
+        if ('{{task_attendance}}' == 'False')
           {
-          		$('#attendance').append("<input class='tiny button'  onclick=reschedule_event() value='Re-Schedule'>" )
-          }  
+              $('#attendance_reschedule').empty()
+              $('#attendance_reschedule').append("<label id = 'lbl_displ'   >  Your request to reschedule the event has been sent to Admin  </label>")
+
+          }          
       }
           
       
@@ -689,7 +721,6 @@ function reschedule_time(type)
 
 function reschedule_event(type)
 {
-    
    var start_time =  $("#start_time_1").val()
      $.ajax({
              url:"{% url 'reschedule_task' groupid node.pk  %}",
@@ -702,17 +733,30 @@ function reschedule_event(type)
                 },
              success:function(data)
              {
-              $('#reschedulemodal').foundation('reveal', 'close');
+              alert(data)
+              if ('{{Add}}' == 'Allow'){
+                  $('#reschedulemodal').foundation('reveal', 'close');
+              }
               if (data == 'Event Dates Re-Schedule Opened')
                  {
                     remove_reschedule()
                     location.reload();
-                  
                  }
+             
               if ( type != 'event_reschedule') 
                   {
                    controler()
                   }
+              if (type == 'attendance_reschedule')
+              {
+                location.reload();
+              }
+
+               if ( type == 'event_reschedule') 
+                  {
+                   location.reload();
+                                    }
+                 
              }
          }); 
   

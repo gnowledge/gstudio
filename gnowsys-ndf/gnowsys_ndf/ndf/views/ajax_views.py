@@ -4412,19 +4412,23 @@ def reschedule_task(request,group_id,node):
          reschedule_dates.append(b)  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
+         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+         create_gattribute(ObjectId(node),reschedule_event,True)
          return_message = "Event Dates Re-Schedule Opened" 
 
     else:
         for i in event_node.attribute_set:
             if unicode('reschedule_attendance') in i.keys():
-                print " hello ",i['reschedule_attendance']
                 if unicode ('reschedule_dates') in i['reschedule_attendance']:
                     reschedule_dates = i['reschedule_attendance']['reschedule_dates']
         reschedule_dates.append(b)
         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
         create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
+	create_gattribute(ObjectId(node),reschedule_event,True)
         return_message="Event Re-scheduled"
  else:
+    reschedule_type = request.POST.get('reschedule_type','')
     Mis_admin=collection.Node.find({"name":"MIS_admin"})
     Mis_admin_list=Mis_admin[0].group_admin
     Mis_admin_list.append(Mis_admin[0].created_by)
@@ -4433,6 +4437,12 @@ def reschedule_task(request,group_id,node):
     site = site.name.__str__()
     event_reschedule_link = "http://" + site + path
     b.append(task_groupset._id)
+    if  reschedule_type == 'event_reschedule' :
+	    reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+	    create_gattribute(ObjectId(node),reschedule_event,False)
+    else:
+    	reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
+	create_gattribute(ObjectId(node),reschedule_event,False)
     glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
     task_type = collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id
     task_dict.update({"has_type" : task_type})
