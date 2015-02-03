@@ -218,7 +218,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   else:
     Add="Stop"       
   #fecth the data
-  print reschedule_time      
+      
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id,'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
@@ -302,7 +302,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
       for eachset in Event_Types.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
-  print "Asfsafsadf"
+
   Group_type=collection.Node.one({'_id':ObjectId(group_id)})
   Group_name=collection.Node.one({'_type':'GSystem','name':unicode(Group_type.name)})
   Eventtype='Eventtype'

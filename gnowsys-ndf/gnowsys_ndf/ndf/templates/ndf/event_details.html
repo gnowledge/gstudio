@@ -61,7 +61,6 @@ table, th, td {
   <div class="row">
 
      <div class="tabs-content">
-
                   <div class="content active" id="view-page">
                       <section class="medium-9 columns">    
                        <fieldset>   
@@ -94,31 +93,30 @@ table, th, td {
                                 <label>{{node.end_time}}</label>
                               </div>
                           </div>
-
-                          <br>
+                        <br>
                           {% if  Eventtype == 'Eventtype' %}
-                             {%  if node.event_organised_by %}
-                                  <br>
-                                  <div class="row">
-                                    <div class="small-3 columns">
-                                      <label>Event organised by:</label>
-                                    </div>
-                                    <div class="small-5 end columns">
-                                      {% for details in node.event_organised_by %}
-                                        <label>
-                                        {% if forloop.counter != 1 %}
-                                        ,
-                                        {% endif %}
-                                        {{details.name}}
-                                        </label>
-                                      {% endfor %}
-                                    </div>
+                            {%  if node.event_organised_by %}
+                                <br>
+                                <div class="row">
+                                  <div class="small-3 columns">
+                                    <label>Event organised by:</label>
                                   </div>
-                                  
-                            {% endif %}
+                                  <div class="small-5 end columns">
+                                    {% for details in node.event_organised_by %}
+                                      <label>
+                                      {% if forloop.counter != 1 %}
+                                      ,
+                                      {% endif %}
+                                      {{details.name}}
+                                      </label>
+                                    {% endfor %}
+                                  </div>
+                                </div>
+                                
                           {% endif %}
-                                 
-                                  <br> 
+                          {% endif %}
+                         <br> 
+                         
                          {% if node.event_coordinator %} 
                           <div class="row">
                             <div class="small-3 columns">
@@ -177,6 +175,7 @@ table, th, td {
                           {% endif %}
                             <br>
                           
+                          <br>
                           {% with node.html_content|safe as description %}
                           {% if description != "None" %}
                           <label>Brief description about event:</label>
@@ -215,7 +214,7 @@ table, th, td {
 
                       {% edit_policy groupid node request.user as status %}
                       {% if user.is_authenticated and status == "allow" and gstaff_access %}
-                        <div id = 'Edit' > 
+                        <div id = 'Edit' hidden> 
                               <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
                                <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
                               </a>
@@ -314,6 +313,7 @@ table, th, td {
 
  eventreschedule=""
 
+
 session_time  = 0
 session_time  = get_time_diff("{{node.start_time|date:'c'}}","{{node.end_time|date:'c'}}")
 
@@ -339,27 +339,29 @@ function get_time_diff(start_time , end_time)
 
 if ('{{Eventtype}}' == 'Eventtype')
   {
-      $('#Edit').show()
-     
+     $('#Edit').show()
      $('#Edit_start_time').hide()
   
   }
-if ('{{reschedule}}' == 'False')
-        {
-            add_reschedule()
-            $('#Edit_start_time').hide()
-        }
 
-if ('{{reschedule}}' == 'True')
+
+
+
+if ('{{Eventtype}}' == 'CollegeEvents')
+ {
+    $('#Edit_start_time').show()
+    if ('{{reschedule}}' == 'True')
       {
           
           $('#Edit_start_time').show()
       }
+    if ('{{reschedule}}' == 'False')
+      {
+            add_reschedule()
+            $('#Edit_start_time').hide()
+      }
 
-if ('{{Eventtype}}' == 'Collegetype')
- {
 
-    $('#Edit_start_time').show()
  }  
 
 
