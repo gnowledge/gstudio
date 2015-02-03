@@ -4051,12 +4051,13 @@ def get_students_for_approval(request, group_id):
             approval_nodes.append(nn)
 
           half_count = len(approval_nodes) / 2
+
           approval_list = render_to_string('ndf/approval_data_review.html', 
             {
               'groupid': group_id, 'group_id': group_id,
               'enrollment_details': data, 'enrollment_columns': enrollment_columns, 'approval_nodes': approval_nodes, 'half_count': half_count
             },
-            context_instance = RequestContext(request)
+            context_instance=RequestContext(request)
           )
 
           response_dict["success"] = True
@@ -4069,116 +4070,169 @@ def get_students_for_approval(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
+
 def approve_students(request, group_id):
-  """This returns approved and/or rejected students count respectively.
-  """
-  try:
-    response_dict = {'success': False, 'message': ""}
+    """This returns approved and/or rejected students count respectively.
+    """
+    try:
+        response_dict = {'success': False, 'message': ""}
 
-    if request.is_ajax() and request.method == "POST":
-      approval_state = request.POST.get("approval_state", "")
-      enrollment_id = request.POST.get("enrollment_id", "")
+        if request.is_ajax() and request.method == "POST":
+            approval_state = request.POST.get("approval_state", "")
+            enrollment_id = request.POST.get("enrollment_id", "")
 
-      course_id = request.POST.get("course_id", "")
-      course_id = [ObjectId(each.strip()) for each in course_id.split(",")]
+            course_ids = request.POST.get("course_id", "")
+            course_ids = [(ObjectId(each.strip()), each.strip()) for each in course_ids.split(",")]
 
-      students_selected = request.POST.getlist("students_selected[]", "")
+            students_selected = request.POST.getlist("students_selected[]", "")
 
-      sce_gs = collection.Node.one(
-        {'_id': ObjectId(enrollment_id), 'group_set': ObjectId(group_id), 'relation_set.has_current_approval_task': {'$exists': True}, 'status': u"PUBLISHED"},
-        {'name': 1, 'member_of': 1, 'attribute_set': 1, 'relation_set.has_current_approval_task': 1}
-      )
+            sce_gs = collection.aggregate([{
+                "$match": {
+                    "_id": ObjectId(enrollment_id), "group_set": ObjectId(group_id),
+                    "relation_set.has_current_approval_task": {"$exists": True},
+                    "status": u"PUBLISHED"
+                }
+            }, {
+                "$project": {
+                    "has_enrolled": "$attribute_set.has_enrolled",
+                    "has_approved": "$attribute_set.has_approved",
+                    "has_rejected": "$attribute_set.has_rejected",
+                    "has_current_approval_task": "$relation_set.has_current_approval_task"
+                }
+            }])
 
-      selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
+            remaining_count = None
+            enrolled_list = []
+            approved_list = []
+            rejected_list = []
+            approved_or_rejected_list = []
 
-      remaining_count = None
-      enrolled_list = []
-      approved_list = []
-      rejected_list = []
-      for attr in sce_gs.attribute_set:
-        if attr.has_key("has_enrolled"):
-          enrolled_list = attr["has_enrolled"]
+            enrolled_list = sce_gs["result"][0]["has_enrolled"]
+            if enrolled_list:
+                enrolled_list = enrolled_list[0]
 
-        elif attr.has_key("has_approved"):
-          approved_list = attr["has_approved"]
-        
-        elif attr.has_key("has_rejected"):
-          rejected_list = attr["has_rejected"]
+            approved_list = sce_gs["result"][0]["has_approved"]
+            if approved_list:
+                approved_list = approved_list[0]
 
-      if approval_state == "Approve":
-        has_approved_AT = collection.Node.one(
-          {'_type': "AttributeType", 'name': "has_approved"}
-        )
-        for each in students_selected:
-          student_id = ObjectId(each)
+            rejected_list = sce_gs["result"][0]["has_rejected"]
+            if rejected_list:
+                rejected_list = rejected_list[0]
 
-          stud_node = collection.Node.one({'_id': student_id}, {'relation_set.selected_course': 1})
-          ex_course_id = []
-          for each in stud_node.relation_set:
-            if each and each.has_key("selected_course"):
-              ex_course_id = each["selected_course"]
-              break
-          new_course_id = list(set(ex_course_id + course_id))
-          rel_node = create_grelation(student_id, selected_course_RT, new_course_id)
+            at_name = ""
+            course_enrollment_status_text = u""
+            has_approved_or_rejected_at = None
+            if approval_state == "Approve":
+                at_name = "has_approved"
+                course_enrollment_status_text = u"Enrollment Approved"
+                approved_or_rejected_list = approved_list
 
-          if rel_node:
-            if student_id not in approved_list:
-              approved_list.append(student_id)
-        
-        attr_node = create_gattribute(ObjectId(enrollment_id), has_approved_AT, approved_list)
+            elif approval_state == "Reject":
+                at_name = "has_rejected"
+                course_enrollment_status_text = u"Enrollment Rejected"
+                approved_or_rejected_list = rejected_list
 
-      elif approval_state == "Reject":
-        has_rejected_AT = collection.Node.one(
-          {'_type': "AttributeType", 'name': "has_rejected"}
-        )
-        for each in students_selected:
-          student_id = ObjectId(each)
+            course_enrollment_status_at = collection.Node.one({
+                '_type': "AttributeType", 'name': "course_enrollment_status"
+            })
+            # For each student, approve enrollment into given course(Domain)/courses(Foundation Course)
+            # For that update value as "Enrollment Approved" against corresponding course (Course ObjectId)
+            # in "course_enrollment_status" attribute of respective student
+            # This should be done only for Course(s) which exists in "selected_course" relation for that student
+            for each in students_selected:
+                # Fetch student node along with selected_course and course_enrollment_status
+                student_id = ObjectId(each)
+                stud_node = collection.aggregate([{
+                    "$match": {
+                        "_id": student_id
+                    }
+                }, {
+                    "$project": {
+                        "selected_course": "$relation_set.selected_course",
+                        "course_enrollment_status": "$attribute_set.course_enrollment_status"
+                    }
+                }])
 
-          if student_id not in rejected_list:
-            rejected_list.append(student_id)
+                # Fetch selected_course ObjectIds -- Course(s) in which student is enrolled
+                selected_course = stud_node["result"][0]["selected_course"]
+                if selected_course:
+                    selected_course = selected_course[0]
 
-        attr_node = create_gattribute(ObjectId(enrollment_id), has_rejected_AT, rejected_list)
+                # Fetch course_enrollment_status -- Holding Course(s) along with it's enrollment status
+                course_enrollment_status = stud_node["result"][0]["course_enrollment_status"]
+                if course_enrollment_status:
+                    course_enrollment_status = course_enrollment_status[0]
 
-      enrolled_count = len(enrolled_list)
-      approved_count = len(approved_list)
-      rejected_count = len(rejected_list)
-      remaining_count = enrolled_count - (approved_count + rejected_count)
-      task_status = u"New"
+                for each_course_id, str_course_id in course_ids:
+                    # If ObjectId exists in selected_course and ObjectId(in string format)
+                    # exists as key in course_enrollment_status
+                    # Then only update status as "Enrollment Approved"/"Enrollment Rejected"
+                    if each_course_id in selected_course and str_course_id in course_enrollment_status:
+                        course_enrollment_status.update({str_course_id: course_enrollment_status_text})
+                        at_node = create_gattribute(student_id, course_enrollment_status_at, course_enrollment_status)
 
-      if remaining_count == 0:
-        if enrolled_count == (approved_count + rejected_count):
-          for rel in sce_gs.relation_set:
-            if rel and ("has_current_approval_task" in rel):
-              Status_AT = collection.Node.one(
-                {'_type': "AttributeType", 'name': "Status"}
-              )
-              task_status = u"Closed"
-              attr_node = create_gattribute(rel["has_current_approval_task"][0], Status_AT, task_status)
-              break
+                        if at_node:
+                            # If status updated, then only update approved_or_rejected_list
+                            # by appending given student's ObjectId into it
+                            if student_id not in approved_or_rejected_list:
+                                approved_or_rejected_list.append(student_id)
 
-      else:
-        for rel in sce_gs.relation_set:
-          if rel and ("has_current_approval_task" in rel):
-            Status_AT = collection.Node.one(
-              {'_type': "AttributeType", 'name': "Status"}
+            has_approved_or_rejected_at = collection.Node.one({
+                '_type': "AttributeType", 'name': at_name
+            })
+            attr_node = create_gattribute(
+                ObjectId(enrollment_id),
+                has_approved_or_rejected_at,
+                approved_or_rejected_list
             )
-            task_status = u"In Progress"
-            attr_node = create_gattribute(rel["has_current_approval_task"][0], Status_AT, task_status)
-            break
 
-      response_dict["success"] = True
-      response_dict["enrolled"] = enrolled_count
-      response_dict["approved"] = approved_count
-      response_dict["rejected"] = rejected_count
-      response_dict["remaining"] = remaining_count
-      response_dict["task_status"] = task_status
+            # Update student's counts in enrolled, approved & rejecetd list
+            enrolled_count = len(enrolled_list)
 
-      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+            if approval_state == "Approve":
+                approved_count = len(approved_or_rejected_list)
+            else:
+                approved_count = len(approved_list)
 
-  except Exception as e:
-    error_message = "ApproveStudentsError: " + str(e) + "!!!"
-    response_dict["message"] = error_message
-    return HttpResponse(json.dumps(response_dict))
+            if approval_state == "Reject":
+                rejected_count = len(approved_or_rejected_list)
+            else:
+                rejected_count = len(rejected_list)
+
+            remaining_count = enrolled_count - (approved_count + rejected_count)
+
+            # Update status of Approval task
+            has_current_approval_task_id = sce_gs["result"][0]["has_current_approval_task"]
+            if has_current_approval_task_id:
+                has_current_approval_task_id = has_current_approval_task_id[0]
+
+            task_status_at = collection.Node.one({
+                '_type': "AttributeType", 'name': "Status"
+            })
+
+            task_status_value = ""
+            if remaining_count == 0:
+                if enrolled_count == (approved_count + rejected_count):
+                    task_status_value = u"Closed"
+            else:
+                task_status_value = u"In Progress"
+
+            attr_node = create_gattribute(has_current_approval_task_id[0], task_status_at, task_status_value)
+
+            response_dict["success"] = True
+            response_dict["enrolled"] = enrolled_count
+            response_dict["approved"] = approved_count
+            response_dict["rejected"] = rejected_count
+            response_dict["remaining"] = remaining_count
+            response_dict["task_status"] = task_status_value
+
+            return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+    except Exception as e:
+        error_message = "ApproveStudentsError: " + str(e) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
+
 
 def get_students_for_batches(request, group_id):
   """
