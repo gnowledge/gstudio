@@ -4085,6 +4085,11 @@ def insert_picture(request, group_id):
 
 # =============================================================================
 def close_event(request,group_id,node):
+	#close_event checks if the event start date is greater than or less than current date time
+	#if current date time if greater than event time than it changes tha edit button 
+	#on the Gui to reschedule and in database puts the current date and time for reference check
+	#till when the event is allowed to reschedule
+
     reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
     create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":datetime.datetime.today(),"reschedule_allow":False})
 
@@ -4102,6 +4107,9 @@ def save_time(request,group_id,node):
   create_gattribute(ObjectId(node),reschedule_event_end,end_time) 
   reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
   event_node = collection.Node.one({"_id":ObjectId(node)})  
+  # below code gets the old value from the database 
+  # if value exists it append new value to it 
+  # else a new time is assigned to it 
   for i in event_node.attribute_set:
                if unicode('event_edit_reschedule') in i.keys():
                  a = i['event_edit_reschedule']
@@ -4166,20 +4174,21 @@ def reschedule_task(request,group_id,node):
 	       if unicode('event_edit_reschedule') in i.keys():
 	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
 	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
-	       reschedule_dates.append(b)  
+         reschedule_dates.append(b)  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
          return_message = "Event Dates Re-Schedule Opened" 
 
     else:
-    	 for i in event_node.attribute_set:
-	       if unicode('reschedule_attendance') in i.keys():
-	    	   if unicode ('reschedul1e_dates') in i['reschedule_attendance']:
-	    	   	  reschedule_dates = i['reschedule_attendance']['reschedule_dates']
-         reschedule_dates.append(b)
-         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
-         create_gattribute(ObjectId(node),marks_entry_completed[0],True)
-         return_message="Event Re-scheduled."
+        for i in event_node.attribute_set:
+            if unicode('reschedule_attendance') in i.keys():
+                print " hello ",i['reschedule_attendance']
+                if unicode ('reschedule_dates') in i['reschedule_attendance']:
+                    reschedule_dates = i['reschedule_attendance']['reschedule_dates']
+        reschedule_dates.append(b)
+        create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
+        create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        return_message="Event Re-scheduled"
  else:
     Mis_admin=collection.Node.find({"name":"MIS_admin"})
     Mis_admin_list=Mis_admin[0].group_admin
