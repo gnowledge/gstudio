@@ -5,11 +5,23 @@
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
 {% block head %}  
+{{block.super}}
 
   <!-- Scripts required for D3 graph -->
   <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
   <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
   <script type="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+  
+  <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+  <script src="/static/ndf/bower_components/moment/moment.js"></script> 
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
 {% endblock %}
 
@@ -19,6 +31,13 @@
 table, th, td {
    border: 1px solid #F5F5DC;
 } 
+
+ #lbl_displ
+  {
+     color: #0b8a91;
+     font-weight: bold;
+     font-size: 1rem;
+   }
 </style>
 
 <div id="view_event">
@@ -43,15 +62,18 @@ table, th, td {
         <dd onClick="controler()"><a href="#view-Attendance"><i class="fi-Attendance"></i>{% trans "Attendance" %} </a></dd>
         
       </dl>
+        
     </section>
   </header> 
   
   <div class="row">
 
      <div class="tabs-content">
-
-                  <div class="content active" id="view-page">
+                  
+              <div class="content active" id="view-page">
                       <section class="medium-9 columns">    
+                       <div id="message">
+                       </div>
                        <fieldset>   
                           <ul class="inline-list">
                           {% if user.is_authenticated %}
@@ -60,22 +82,27 @@ table, th, td {
                           </ul>
 
                           <div class="row">
-                            <div class="small-3 columns">
-                              <label>Start time:</label> 
-                            </div>
-                            <div class="small-5 end columns">
-                              <label>{{node.start_time}}</label> 
-                            </div>
+                              <div class="small-3 columns">
+                                <label>Start time:</label> 
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{node.start_time}}</label> 
+                              </div>
+                              
+                              <div id='Edit_start_time'> 
+                                  <a  onclick="checkDate()" class="tiny button">  Edit 
+                                  </a>
+                              </div>
+                              <div id='reschedule'>
+                              </div>
                           </div>
-
-                          <br>
                           <div class="row">
-                            <div class="small-3 columns">
-                              <label>End time:</label>
-                            </div>
-                            <div class="small-5 end columns">
-                              <label>{{node.end_time}}</label>
-                            </div>
+                              <div class="small-3 columns">
+                                <label>End time:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{node.end_time}}</label>
+                              </div>
                           </div>
                         <br>
                           {% if  Eventtype == 'Eventtype' %}
@@ -198,7 +225,7 @@ table, th, td {
 
                       {% edit_policy groupid node request.user as status %}
                       {% if user.is_authenticated and status == "allow" and gstaff_access %}
-                        <div id = 'Edit' > 
+                        <div id = 'Edit' hidden> 
                               <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
                                <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
                               </a>
@@ -215,30 +242,174 @@ table, th, td {
                       {% endif %}
                     </section>
  
-                  </div> <!-- End of class="content active" -->
+                 </div> <!-- End of class="content active" -->
 
-                 <div class="content" id="view-Attendance" >    
+                 <div id="myModal" class="small reveal-modal" animation="None" data-reveal>
+                   <fieldset> 
+                          <div class = "row">
+                            <div class="small-6 columns">
+                                <h6> <b> Reschedule Session Dates </b> </h6>
+                            </div>
+                            <div id="total_session_time" align ="right"> 
+                                
+                            </div>
+
+                          </div>
+                          <br>
+                          <div class = "row"> 
+                             <div class = "small-2 columns">
+                               <label> Start_time </label>
+                             </div>  
+                             <div class = "small-4 columns"> 
+                               <input id="start_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time">
+                             </div>  
+                             <div class = "small-2 columns">
+                               <label> End_time </label>
+                             </div>
+                             
+                             <div class = "small-4 columns">  
+                               <input id="end_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="end_time">
+                             </div>  
+                          </div>     
+                          <div class="save" align="center">
+                             <input type="button" class="tiny button" onclick="saveTime()" value ="Save"> 
+                          </div>
+                          <div class = "row"> 
+                            <div id='note'>
+                               <label style = "color:red;"> Note:- Please schedule session same as total time </label>
+                            </div>
+                          </div> 
+                      <a class="close-reveal-modal">&#215;</a>      
+                    </fieldset> 
+                 </div>                
+                 <div id = "reschedulemodal" class="small reveal-modal" animation="None" data-reveal>
+                   <fieldset> 
+                          <div class = "row">
+                            
+                          <div class = "row">
+                               <div class = "small-5 columns">
+                              	 <label><b>Reschedule Session till : </b></label>
+                               </div>  
+                              <div class = "small-2 columns">  
+                               <input id="start_time_1" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time_1">
+                              </div>
+                              <div class = "small-2 columns" id = 'reschedule_save' aling="left">  
+                                 
+                              </div>
+                          </div>
+
+                      <a class="close-reveal-modal">&#215;</a>      
+                    </fieldset> 
+                 </div>                
+
+
+                       <div class="content" id="view-Attendance" >    
                         
+                        <div  id  = "attendance_reschedule">
+                        </div>
+                      
                         <div id="attendance">
                             
                         </div>
+
                         
                         <div id="atten_asses_cmpl">
                         </div>
-                      
                       </div>
                       <!-- Tab View Map Widget -->
                  </div> <!-- End of class="tabs-content" -->
       </div>
 
-</div>
-
+          
 {% endblock %}
 
 {% block script %}
+
+
  eventreschedule=""
- 
+
+
+session_time  = 0
+session_time  = get_time_diff("{{node.start_time|date:'c'}}","{{node.end_time|date:'c'}}")
+
+$('#total_session_time').append("<label>  <h6> <b> Total Session time :" + session_time + "minutes<b> </b> </h6></label>")  
+
+function get_time_diff(start_time , end_time)
+ {
+     start_time = new Date(start_time)
+     end_time =new Date(end_time)
+     var difference = start_time.getTime() - end_time.getTime();
+     var daysDifference = Math.floor(difference/1000/60/60/24);
+     difference -= daysDifference*1000*60*60*24
+     var hoursDifference = Math.floor(difference/1000/60/60);
+     difference -= hoursDifference*1000*60*60
+     var minutesDifference = Math.floor(difference/1000/60);
+     difference -= minutesDifference*1000*60 
+     var secondsDifference = Math.floor(difference/1000);
+     diffhh = 23-hoursDifference
+     diffmm = 60-minutesDifference
+     total_min_diff=((Number(diffhh)*60) + Number(diffmm))
+     return total_min_diff    
+ }
+
+if ('{{Eventtype}}' == 'Eventtype')
+  {
+     $('#Edit').show()
+     $('#Edit_start_time').hide()
+  
+  }
+
+
+
+
+if ('{{Eventtype}}' == 'CollegeEvents')
+ {
+    $('#Edit_start_time').show()
+    if ('{{reschedule}}' == 'True')
+      {
           
+          $('#Edit_start_time').show()
+      }
+    if ('{{reschedule}}' == 'False')
+      {
+            add_reschedule()
+            $('#Edit_start_time').hide()
+      }
+
+
+ }  
+
+
+
+function remove_reschedule(){
+
+    $('#reschedule').hide()
+    $('#Edit_start_time').show() 
+}
+
+
+
+function add_reschedule(){
+
+         if ('{{Add}}' == 'Allow'){
+                  
+                  $('#reschedule').append("<input class='tiny button' onclick=reschedule_time('event_reschedule') value='Reschedule'>")
+                  
+                  }
+         if ('{{task_date}}' != 'False')
+             { 
+      
+                if('{{Add}}' == 'Stop')
+                  {
+                  		$('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")	
+                  }
+                $('#Edit_start_time').hide()
+            }
+ if ('{{task_date}}' == 'False' && '{{Add}}' == 'Stop'){  
+      $('#message').empty()
+      $('#message').append("<label id = 'lbl_displ' > Your request to reschedule the event has been sent to Admin </label>")
+   }
+}
  
 function closeEvent()
 {
@@ -248,6 +419,7 @@ function closeEvent()
                url:"{% url 'close_event' groupid node %}",
                type: "POST",
                data:{
+               
                csrfmiddlewaretoken: '{{ csrf_token }}'},
                success: function(data){
                }
@@ -255,6 +427,32 @@ function closeEvent()
           });
     
 }
+
+function checkDate()
+{
+   
+
+   $.ajax({
+
+             url:"{% url 'check_date' groupid node %}",
+             type: "POST",
+             data:{
+             reschedule:'{{reschedule}}',
+             csrfmiddlewaretoken: '{{ csrf_token }}'},
+             success: function(data){
+                if (data == 'event Open')
+                   { 
+                    $('#myModal').foundation('reveal', 'open'); 
+                   }
+                if (data == 'event closed')
+                  {
+                    alert("Time to reschdule event has passed please request to central office")
+                    add_reschedule()
+                  }   
+             }
+          });
+}
+
 function controler()
 {
           //checks wheather the has_attende relation is createad or not 
@@ -310,7 +508,34 @@ function EditAttendance(columns)
           });
 
 }
+function saveTime()
+{
+     time_diff = get_time_diff(new Date($("#start_time").datetimepicker('getDate')),new Date($("#end_time").datetimepicker('getDate')))
+     var start_time = $("#start_time").val()
+     var end_time   = $("#end_time").val()
+     if (Number(time_diff) == Number(session_time)) 
+        {     $.ajax({
+                     url:"{% url 'save_time' groupid node %}",
+                     type: "POST",
+                     data:{
+                     start_time:start_time,
+                     end_time:end_time,
+                     csrfmiddlewaretoken: '{{ csrf_token }}'},
+                     success: function(data){
+                     alert(data)
+                     $('#myModal').foundation('reveal', 'close');
+                     location.reload();
+                     }
+                   
+                  });
+        }
+     else
+         {
+            alert("session time should be exactly same as previouse alloted time")
+         }     
+    
 
+}
 function disableAttendance()
 {
     $(':checkbox.chkbx').each(function () 
@@ -327,8 +552,10 @@ else
 {
     pass[0] ='Edit'
 }
+
+column1="<th> Name </th>"
+column2="<th> Presence </th>"
 checkbox1="<input type=checkbox class='selall' onClick=mark_all_present() id='selall'>"
-column1="<th> name </th>"
 if ( pass[0] == 'Edit')
 {
   column2="<th> Presence " + checkbox1 +"</th>" 
@@ -449,7 +676,6 @@ else
 {     
         
       $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")
-      
       if(reschedule == true || marks_enter  == true){
             if(marks_enter != false)
             {
@@ -458,7 +684,22 @@ else
       }
       if(reschedule == false || marks_enter == false)
       {
-        $('#attendance').append("<input class='tiny button'  onclick=reschedule_event() value='Re-Schedule'>" )
+        if ('{{Add}}' == 'Allow'){
+          $('#attendance').append("<input class='tiny button'  onclick=reschedule_time('attendance_reschedule') value='Re-Schedule'>" )
+          }
+        if ('{{task_attendance}}' != 'False')
+             {  
+                if('{{Add}}' == 'Stop')
+                  {
+                  		$('#attendance').append("<input class='tiny button'  onclick=reschedule_event('attendance_reschedule') value='Re-Schedule'>" )
+                  }
+             }  
+        if ('{{task_attendance}}' == 'False')
+          {
+              $('#attendance_reschedule').empty()
+              $('#attendance_reschedule').append("<label id = 'lbl_displ'   >  Your request to reschedule the event has been sent to Admin  </label>")
+
+          }          
       }
           
       
@@ -467,30 +708,57 @@ else
 
 }
 
+function reschedule_time(type)
+{
+    var event_type = ""
+    event_type  = String(type)
+    $('#reschedule_save').empty()
+    $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+    $('#reschedulemodal').foundation('reveal', 'open');
+    
+
+}
+
 function reschedule_event(type)
 {
-    $.ajax({
+   var start_time =  $("#start_time_1").val()
+     $.ajax({
              url:"{% url 'reschedule_task' groupid node.pk  %}",
              type:"POST",
              data:{
                  path:'{{request.path}}',
                  reschedule_type:type,
+                 reschedule_date:start_time,
                  csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
              success:function(data)
              {
-              alert(data) 
+              alert(data)
+              if ('{{Add}}' == 'Allow'){
+                  $('#reschedulemodal').foundation('reveal', 'close');
+              }
               if (data == 'Event Dates Re-Schedule Opened')
                  {
-                    location.reload()
-                  
+                    remove_reschedule()
+                    location.reload();
                  }
+             
               if ( type != 'event_reschedule') 
                   {
                    controler()
                   }
+              if (type == 'attendance_reschedule')
+              {
+                location.reload();
+              }
+
+               if ( type == 'event_reschedule') 
+                  {
+                   location.reload();
+                                    }
+                 
              }
-         });
+         }); 
   
 }
 
@@ -703,4 +971,46 @@ $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[d
   
   map.invalidateSize();  
 });
+
+currentDate = new Date();
+var currentDay = currentDate.getDate();
+var currentMonth = currentDate.getMonth();
+var currentYear = currentDate.getFullYear();
+
+$(".date_month_day_year").datetimepicker({
+       
+      changeMonth: true,
+      dateFormat: 'dd/mm/yy',
+      
+      minDate: '0',
+      maxDate: '+2m',
+      defaultDate: '0',
+      hourGrid: 6,
+      minuteGrid: 15,
+      onClose: function(dateText, inst) {
+        $(this).val(dateText);
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+      },
+
+      beforeShow: function() {
+        var month_year = $(this).val();
+        day = currentDay;
+        month = currentMonth;
+        year = currentYear;
+
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+        $(this).datetimepicker('option', 'defaultDate', new Date(year, (month-1), day));
+        $(this).datetimepicker('setDate', new Date(year, (month-1), day));
+      }
+    });  
+
+
 {% endblock %}	

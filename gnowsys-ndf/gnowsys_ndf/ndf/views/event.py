@@ -122,6 +122,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   event_gs = None
   reschedule = True
   reschedule_time = ""
+  event_task_date_reschedule = ""
+  event_task_Attendance_reschedule = ""
   marks=""
   property_order_list = []
   
@@ -184,6 +186,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     node.get_neighbourhood(node.member_of)
     course=[]
     val=False
+    
     for i in node.attribute_set:
        if unicode('event_edit_reschedule') in i.keys():
           try: 
@@ -191,7 +194,13 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
               reschedule_time = i['event_edit_reschedule']['reschedule_till']  
               reschedule = i['event_edit_reschedule']['reschedule_allow']
           except:
-               pass 
+               pass
+       if (unicode('event_attendance_task')) in i.keys():
+           event_task_Attendance_reschedule = i['event_attendance_task']
+            
+       if(unicode('event_date_task')) in i.keys():
+           event_task_date_reschedule = i['event_date_task']     
+                
     for i in node.relation_set:
        if unicode('event_has_batch') in i.keys():
             batch=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
@@ -212,13 +221,13 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     Mis_admin_list=Mis_admin.group_admin
     Mis_admin_list.append(Mis_admin.created_by)
     if request.user.id in Mis_admin_list:
-        Add="Allow"  
+        Add = "Allow"  
     else: 
-        Add= "Stop"
+        Add = "Stop"
   else:
     Add="Stop"       
   #fecth the data
-  print reschedule_time      
+      
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id,'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
@@ -228,6 +237,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         'Add':Add,
                         'reschedule_time' : reschedule_time,
                         'reschedule'    : reschedule, 
+                        'task_date' : event_task_date_reschedule,
+                        'task_attendance' : event_task_Attendance_reschedule,
                         'Eventtype':Eventtype, 
                          # 'property_order_list': property_order_list
                       }
@@ -302,7 +313,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
       for eachset in Event_Types.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
-  print "Asfsafsadf"
+
   Group_type=collection.Node.one({'_id':ObjectId(group_id)})
   Group_name=collection.Node.one({'_type':'GSystem','name':unicode(Group_type.name)})
   Eventtype='Eventtype'

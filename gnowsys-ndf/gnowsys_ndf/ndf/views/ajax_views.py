@@ -36,7 +36,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
 from gnowsys_ndf.ndf.views.methods import create_gattribute
@@ -1620,8 +1620,6 @@ def get_data_for_event_task(request,group_id):
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           attr_value.update({'start':formated_date})
           day_list.append(dict(attr_value))
-    
-    
     count=0
     dummylist=[]
     date=""
@@ -4412,10 +4410,59 @@ def insert_picture(request, group_id):
 
 # =============================================================================
 def close_event(request,group_id,node):
+	#close_event checks if the event start date is greater than or less than current date time
+	#if current date time if greater than event time than it changes tha edit button 
+	#on the Gui to reschedule and in database puts the current date and time for reference check
+	#till when the event is allowed to reschedule
+
     reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
     create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":datetime.datetime.today(),"reschedule_allow":False})
 
     return HttpResponse("event closed") 
+def save_time(request,group_id,node):
+  start_time = request.POST.get('start_time','')
+  end_time = request.POST.get('end_time','')
+  
+  reschedule_event_start = collection.Node.one({"_type":"AttributeType","name":"start_time"})
+  reschedule_event_end = collection.Node.one({"_type":"AttributeType","name":"end_time"})
+  reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+  start_time= parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
+  end_time= parse_template_data(datetime.datetime,end_time, date_format_string="%d/%m/%Y %H:%M")
+  create_gattribute(ObjectId(node),reschedule_event_start,start_time) 
+  create_gattribute(ObjectId(node),reschedule_event_end,end_time) 
+  reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+  event_node = collection.Node.one({"_id":ObjectId(node)})  
+  # below code gets the old value from the database 
+  # if value exists it append new value to it 
+  # else a new time is assigned to it 
+  for i in event_node.attribute_set:
+               if unicode('event_edit_reschedule') in i.keys():
+                 a = i['event_edit_reschedule']
+  a['reschedule_till'] = start_time               
+  create_gattribute(ObjectId(node),reschedule_event,a)    
+  return HttpResponse("Session rescheduled") 
+
+def check_date(request,group_id,node):
+    reschedule = request.POST.get('reschedule','')
+    test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$gt':datetime.datetime.today()}})
+    if test_output.count()  == 0 and reschedule == 'True':
+       test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.event_edit_reschedule.reschedule_till":{'$gt':datetime.datetime.today()}})
+    if test_output.count() != 0:
+       message = "event Open" 
+    if test_output.count() == 0:
+      reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+      event_node = collection.Node.one({"_id":ObjectId(node)})  
+      a=""
+      for i in event_node.attribute_set:
+               if unicode('event_edit_reschedule') in i.keys():
+                 a = i['event_edit_reschedule']
+      for i in a:
+          if unicode('reschedule_allow') in i:
+              a['reschedule_allow'] = False
+              create_gattribute(ObjectId(node),reschedule_event,a)
+      
+      message = "event closed"   
+    return HttpResponse(message) 
 
 
 def reschedule_task(request,group_id,node):
@@ -4431,10 +4478,11 @@ def reschedule_task(request,group_id,node):
  b=[]
  c=[]
  listing=task_groupset.group_admin
- listing.append(1)
+ listing.append(task_groupset.created_by)
  return_message=""
  values=[]
  if request.user.id in listing:
+    
     reschedule_attendance=collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
     marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
@@ -4442,32 +4490,36 @@ def reschedule_task(request,group_id,node):
     from datetime import date,time,timedelta
     date1=datetime.date.today() + timedelta(2)
     ti=datetime.time(0,0)
-    b=datetime.datetime.combine(date1,ti)
+    start_time = request.POST.get('reschedule_date','')
+    b = parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
     #fetch event
     event_node = collection.Node.one({"_id":ObjectId(node)})
     reschedule_dates = []
-    
     if  reschedule_type == 'event_reschedule' :
          for i in event_node.attribute_set:
 	       if unicode('event_edit_reschedule') in i.keys():
 	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
 	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
-
-         reschedule_dates.append(b)
+         reschedule_dates.append(b)  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
+         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+         create_gattribute(ObjectId(node),reschedule_event,True)
          return_message = "Event Dates Re-Schedule Opened" 
 
     else:
-    	 for i in event_node.attribute_set:
-	       if unicode('reschedule_attendance') in i.keys():
-	    	   if unicode ('reschedule_dates') in i['reschedule_attendance']:
-	    	   	  reschedule_dates = i['reschedule_attendance']['reschedule_dates']
-         reschedule_dates.append(b)
-         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
-         create_gattribute(ObjectId(node),marks_entry_completed[0],True)
-         return_message="Event Re-scheduled."
+        for i in event_node.attribute_set:
+            if unicode('reschedule_attendance') in i.keys():
+                if unicode ('reschedule_dates') in i['reschedule_attendance']:
+                    reschedule_dates = i['reschedule_attendance']['reschedule_dates']
+        reschedule_dates.append(b)
+        create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
+        create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
+	create_gattribute(ObjectId(node),reschedule_event,True)
+        return_message="Event Re-scheduled"
  else:
+    reschedule_type = request.POST.get('reschedule_type','')
     Mis_admin=collection.Node.find({"name":"MIS_admin"})
     Mis_admin_list=Mis_admin[0].group_admin
     Mis_admin_list.append(Mis_admin[0].created_by)
@@ -4476,6 +4528,12 @@ def reschedule_task(request,group_id,node):
     site = site.name.__str__()
     event_reschedule_link = "http://" + site + path
     b.append(task_groupset._id)
+    if  reschedule_type == 'event_reschedule' :
+	    reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+	    create_gattribute(ObjectId(node),reschedule_event,False)
+    else:
+    	reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
+	create_gattribute(ObjectId(node),reschedule_event,False)
     glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
     task_type = collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id
     task_dict.update({"has_type" : task_type})
@@ -4493,7 +4551,7 @@ def reschedule_task(request,group_id,node):
     task_dict.update({'start_time':Today})
     task_dict.update({'Assignee':Mis_admin_list})
     create_task(task_dict)
-    return_message="Intimation is sent to central office soon you will get update."
+    return_message="Message is sent to central office soon you will get update."
  return HttpResponse(return_message)
  
 
