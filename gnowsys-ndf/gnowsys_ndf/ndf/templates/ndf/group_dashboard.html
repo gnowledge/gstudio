@@ -110,13 +110,6 @@
   </form>
 {% endblock %}
 
-{% block head %}
-  {% if approval %}
-    <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
-    <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
-    <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
-  {% endif %}
-{% endblock %}
 
 {% block body_content %}
 <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
@@ -258,8 +251,6 @@
 {% endblock %}
 
 {% block script %}
-// <script type="text/javascript">
-  
   {{block.super}}
   var count = 0;
   var morecount = 0;
@@ -462,4 +453,3 @@ $(".detail-view").click(function(event) {
 
   loaddata();
 {% endblock %}
-// </script>
