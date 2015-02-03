@@ -168,7 +168,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       # nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [event_gst._id]}}))
       nodes = collection.Node.find({'member_of': event_gst._id, 'name': {'$regex': search, '$options': 'i'}})
     else:
-      nodes = collection.Node.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)})
+      nodes = collection.Node.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
       
   node = None
   marks_list=[]
@@ -228,7 +228,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         'Add':Add,
                         'reschedule_time' : reschedule_time,
                         'reschedule'    : reschedule, 
-                        'Eventtype':Eventtype,
+                        'Eventtype':Eventtype, 
                          # 'property_order_list': property_order_list
                       }
 
@@ -406,7 +406,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 field_value = request.POST[field_instance["name"]]
               # field_instance_type = "GAttribute"
               # print "\n Parsing data for: ", field_instance["name"]
-              print "*******************",field_data_type,field_value
               if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
               elif field_instance["name"] in ["dob", "registration_date"]:

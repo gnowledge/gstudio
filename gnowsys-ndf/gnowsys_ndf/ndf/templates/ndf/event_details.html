@@ -60,7 +60,7 @@ table, th, td {
   
   <div class="row">
 
-    <div class="tabs-content">
+     <div class="tabs-content">
 
                   <div class="content active" id="view-page">
                       <section class="medium-9 columns">    
@@ -94,6 +94,7 @@ table, th, td {
                                 <label>{{node.end_time}}</label>
                               </div>
                           </div>
+
                           <br>
                           {% if  Eventtype == 'Eventtype' %}
                              {%  if node.event_organised_by %}
@@ -135,44 +136,47 @@ table, th, td {
                           </div>
                           {% endif %}
                            <br>
-                                 {% if Eventtype == 'CollegeEvents' %}  
-                                  <div class="row">
-                                    <div class="small-3 columns">
-                                      <label>Batch:</label>
-                                    </div>
-                                    <div class="small-5 end columns">
-                                      <label>{{batch}}</label>
-                                    </div>
-                                  </div>
-                                    <br>
-                                
-                        <div class="row">
-                            <div class="small-3 columns">
-                              <label>Course:</label>
+
+                          {% if Eventtype == 'CollegeEvents' %}  
+                            <div class="row">
+                              <div class="small-3 columns">
+                                <label>Batch:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{batch}}</label>
+                              </div>
                             </div>
-                            <div class="small-5 end columns">
-                              <label>{{course.name}}</label>
-                            </div>
+                              <br>
+                          
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Course:</label>
+                              </div>
+                              <div class="small-5 end columns">
+                                <label>{{course.name}}</label>
+                              </div>
                           </div>
-                          <br>
-                         <div class="row">
-                            <div class="small-3 columns">
-                              <label>Min marks:</label>
-                            </div>
-                            <div class="small-3 end columns">
-                              <label>{{course.attribute_set.7.max_marks}}</label>
-                            </div>
-                            
-                            <div class="small-3 columns">
-                              <label>Max Marks:</label>
-                            </div>
-                            <div class="small-2 end columns">
-                              <label>{{course.attribute_set.6.min_marks}}</label>
-                            </div>
-                       </div>
-                          {% endif %} 
-                          <br>
-                          <br>
+                            <br>
+                          
+                          <div class="row">
+                              <div class="small-3 columns">
+                                <label>Min marks:</label>
+                              </div>
+                              <div class="small-3 end columns">
+                                <label>{{course.attribute_set.6.min_marks}}</label>
+
+                              </div>
+                                
+                              <div class="small-3 columns">
+                                <label>Max Marks:</label>
+                              </div>
+                              <div class="small-2 end columns">
+                                  <label>{{course.attribute_set.7.max_marks}}</label>  
+                              </div>
+                         </div>
+                          {% endif %}
+                            <br>
+                          
                           {% with node.html_content|safe as description %}
                           {% if description != "None" %}
                           <label>Brief description about event:</label>
@@ -196,7 +200,7 @@ table, th, td {
                             {% if forloop.last and forloop.counter > 5 %}
                             <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">. . .</a>
                             
-                            {% else %}
+                            {% else %}  
                             <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
 
                             {% endif %}
@@ -211,14 +215,13 @@ table, th, td {
 
                       {% edit_policy groupid node request.user as status %}
                       {% if user.is_authenticated and status == "allow" and gstaff_access %}
-                        <div id = 'Edit' hidden> 
+                        <div id = 'Edit' > 
                               <a href="{% url 'event_app_instance_edit' groupid  app_set_id node %}" class="small button split edit">
                                <i class="fi-pencil"></i> Edit <span data-dropdown="edit-options"></span>
                               </a>
                         </div>
                         
                         <ul id="edit-options" class="f-dropdown">
-
                           <li>
                             <a class="button small expand" href="{% url 'event_app_instance_create' groupid app_set_id %}">
                             <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
@@ -524,8 +527,19 @@ else
 {
     pass[0] ='Edit'
 }
+
 column1="<th> Name </th>"
 column2="<th> Presence </th>"
+checkbox1="<input type=checkbox class='selall' onClick=mark_all_present() id='selall'>"
+if ( pass[0] == 'Edit')
+{
+  column2="<th> Presence " + checkbox1 +"</th>" 
+}
+else
+{
+
+  column2="<th> Presence </th>"
+}  
 column3="<th> Assignment Marks </th>"
 column4="<th> Assessment Marks </th>"
      if(pass[1] == 1)
@@ -820,14 +834,14 @@ var attendancedone=""
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
 
-    var url="{% url 'event_assginee' groupid  node.pk  %}"
-    
-    $("#forattendance").find('tr').each(function(){
-    var Names_attended = $(this).find('.chkbx').val()
-    var Status_attended = $(this).find('.chkbx:checked').val()
-    var Attendance_marks = $(this).find('.Assigntxtbx').val()
-    var Assessment_marks = $(this).find('.Assesstxtbx').val()
-    
+var url="{% url 'event_assginee' groupid  node.pk  %}"
+
+$("#forattendance").find('tr').each(function(){
+var Names_attended = $(this).find('.chkbx').val()
+var Status_attended = $(this).find('.chkbx:checked').val()
+var Attendance_marks = $(this).find('.Assigntxtbx').val()
+var Assessment_marks = $(this).find('.Assesstxtbx').val()
+
    
 if (!(Status_attended))
     {
@@ -888,6 +902,25 @@ function validate_txtbx(input)
   }
 }
    
+function mark_all_present()
+{
+   $(':checkbox.chkbx').each(function () {
+      if ($(':checkbox.selall')[0].checked == true)
+        {
+        this.checked=true
+        enablemarks(this)
+        }
+        if ($(':checkbox.selall')[0].checked == false)
+        {
+        this.checked=false
+        enablemarks(this)
+        }
+     });
+
+ 
+
+  
+}
 $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
   
   map.invalidateSize();  
