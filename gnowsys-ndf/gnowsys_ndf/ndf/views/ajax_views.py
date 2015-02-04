@@ -1655,7 +1655,7 @@ def get_data_for_event_task(request,group_id):
                       date = v 
                       formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
                       update({'start':formated_date})
-                      update({'backgroundColor':'#ffd700'})
+                      update({'backgroundColor':'#7e7e7e'})
                       append(dict(attr_value)) 
     date=""
     user_assigned=[]
