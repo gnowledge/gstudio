@@ -3440,56 +3440,6 @@ def get_colleges(request, group_id, app_id):
                     "Please create it first!"
                 raise Exception(error_message)
 
-            """
-            # Fetch "Announced Course" GSystemType
-            announced_course_gt = collection.Node.one(
-                {'_type': "GSystemType", 'name': "Announced Course"}
-            )
-            if not announced_course_gt:
-                # If not found, throw exception
-                error_message = "Announced Course (GSystemType) doesn't " \
-                    + "exists... Please create it first!"
-                raise Exception(error_message)
-
-            # Search for Announced Course(s) for which enrollement is not begun
-            ac_cur = collection.Node.find({
-                'member_of': announced_course_gt._id,
-                'group_set': ObjectId(mis_admin._id),
-                'status': u"PUBLISHED",
-                'attribute_set.nussd_course_type': nussd_course_type,
-                'relation_set.course_has_enrollment': {"$exists": False}
-            })
-
-            if ac_cur.count() > 0:
-                # If announced courses found,
-                # Then provide a link to initiate Enrollment
-                # in HttpRresponse
-                sce_gst = collection.Node.one({
-                    "_type": "GSystemType", "name": "StudentCourseEnrollment"
-                }, {
-                    "_id": 1
-                })
-                django_url = reverse(
-                    'mis:mis_app_instance_create',
-                    kwargs={
-                        'group_id': group_id, 'app_id': app_id,
-                        'app_set_id': sce_gst._id
-                    }
-                )
-                site = Site.objects.get(pk=1)
-                site = site.name.__str__()
-                protocol_text = request.META["wsgi.url_scheme"]
-                url_text = protocol_text + "://" + site + django_url
-                msg_string = "Before announcing course (" + nussd_course_type + ") for given duration, " \
-                    + "you must initiate Student-Course enrollment for already " \
-                    + "announced course. <br/>To do so " \
-                    + "<a href='" + url_text + "'>click here</a>."
-                response_dict["message"] = msg_string
-                response_dict["success"] = False
-
-                return HttpResponse(json.dumps(response_dict))
-
-            """
             univ_id = request.GET.get("univ_id", "")
             start_time = request.GET.get("start_time", "")
             end_time = request.GET.get("end_time", "")
@@ -3665,7 +3615,6 @@ def get_anncourses_allstudents(request, group_id):
       sce_gs = collection.Node.one({'_id':ObjectId(sce_gs_id)},
         {'member_of': 1, 'attribute_set.has_enrolled': 1, 'relation_set.for_college':1}
       )
-
       # From Announced Course node fetch College's ObjectId
       # acourse_node = collection.Node.find_one(
       #   {'_id': {'$in': acourse_val}, 'relation_set.acourse_for_college': {'$exists': True}}, 
@@ -3724,15 +3673,6 @@ def get_anncourses_allstudents(request, group_id):
       # Check whether StudentCourseEnrollment created for given acourse_val
       # Set node as StudentCourseEnrollment node
       # and checked as "has_enrolled", i.e. AT of StudentCourseEnrollment node
-      # sce_gst = collection.Node.one(
-      #   {'_type': "GSystemType", 'name': "StudentCourseEnrollment"}
-      # )
-      # if sce_gst:
-      #   print "before fetching sce"
-      # sce_gs = collection.Node.one(
-      #   {'member_of': sce_gst._id, 'relation_set.for_acourse': {'$all': acourse_val}, 'attribute_set.has_enrolled': {'$exists': True}},
-      #   {'member_of': 1, 'attribute_set.has_enrolled': 1}
-      # )
       enrolled_stud_list = []
       if sce_gs:
         for attr in sce_gs.attribute_set:
@@ -3770,7 +3710,7 @@ def get_anncourses_allstudents(request, group_id):
         non_enrolled_stud_count = total_students_count - int(enrolled_stud_count)
 
       elif all_students == u"false":
-        query.update({'_id': {'$nin': attr["has_enrolled"]}})
+        query.update({'_id': {'$nin': enrolled_stud_list}})
         all_students_text = "Only non-enrolled students"
 
         # Find students which are not enrolled in selected announced course
@@ -4042,6 +3982,7 @@ def get_students_for_approval(request, group_id):
           # Update Enrolled students list
           updated_enrolled_students_list = []
           for each_id in enrolled_students_list:
+            each_id = unicode(each_id)
             if (each_id not in approved_students_list) and (each_id not in rejected_students_list):
               updated_enrolled_students_list.append(each_id)
           
@@ -4159,7 +4100,6 @@ def approve_students(request, group_id):
                         "course_enrollment_status": "$attribute_set.course_enrollment_status"
                     }
                 }])
-
                 # Fetch selected_course ObjectIds -- Course(s) in which student is enrolled
                 selected_course = stud_node["result"][0]["selected_course"]
                 if selected_course:
@@ -4177,12 +4117,11 @@ def approve_students(request, group_id):
                     if each_course_id in selected_course and str_course_id in course_enrollment_status:
                         course_enrollment_status.update({str_course_id: course_enrollment_status_text})
                         at_node = create_gattribute(student_id, course_enrollment_status_at, course_enrollment_status)
-
                         if at_node:
                             # If status updated, then only update approved_or_rejected_list
                             # by appending given student's ObjectId into it
                             if student_id not in approved_or_rejected_list:
-                                approved_or_rejected_list.append(student_id)
+                                    approved_or_rejected_list.append(student_id)
 
             has_approved_or_rejected_at = collection.Node.one({
                 '_type': "AttributeType", 'name': at_name
@@ -4192,6 +4131,7 @@ def approve_students(request, group_id):
                 has_approved_or_rejected_at,
                 approved_or_rejected_list
             )
+
 
             # Update student's counts in enrolled, approved & rejecetd list
             enrolled_count = len(enrolled_list)
@@ -4267,7 +4207,9 @@ def get_students_for_batches(request, group_id):
       batch_member_list = []
       
       batch_gst = collection.Node.one({'_type':"GSystemType", 'name':"Batch"})
+
       batch_for_group = collection.Node.find({'member_of': batch_gst._id, 'relation_set.has_course': ObjectId(ac_id)})
+      
       for each1 in batch_for_group:
         existing_batch = collection.Node.one({'_id': ObjectId(each1._id)})
         batch_name_index += 1
@@ -4280,19 +4222,30 @@ def get_students_for_batches(request, group_id):
       
       # College's ObjectId is required, if student record can't be found 
       # using group's ObjectId
-      # A use-case where records created via csv file apends MIS_admin group's 
+      # A use-case where records created via csv file appends MIS_admin group's 
       # ObjectId in group_set field & not college-group's ObjectId
-      ann_course = collection.Node.one({'_id': ObjectId(ac_id)}, {'relation_set.acourse_for_college': 1})
-      college_id = None
+      ann_course = collection.Node.one({'_id': ObjectId(ac_id)}, {'relation_set.acourse_for_college': 1,"relation_set.course_has_enrollment":1})
+      sce_id = None
       for rel in ann_course.relation_set:
-        if rel and rel.has_key("acourse_for_college"):
-          college_id = rel["acourse_for_college"][0]
+        if rel and "course_has_enrollment" in rel:
+          sce_id = rel["course_has_enrollment"][0]
           break
 
+      sce_node = collection.Node.one({"_id":ObjectId(sce_id)},{"attribute_set.has_approved":1})
+
+      approved_students_list = []
+      for attr in sce_node.attribute_set:
+        if attr and "course_has_enrollment" in attr:
+          approved_students_list = attr["course_has_enrollment"][0]
+          break
+
+      approve_not_in_batch_studs = [stud_id for stud_id in approved_students_list if stud_id not in batch_member_list]
+
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+
       res = collection.Node.find(
         {
-          '_id': {'$nin': batch_member_list},
+          '_id': {'$nin': approve_not_in_batch_studs},
           'member_of': student._id,
           # '$or': [
           #   {'group_set': ObjectId(group_id)},
@@ -4302,6 +4255,7 @@ def get_students_for_batches(request, group_id):
         },
         {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
       ).sort("name", 1) 
+
 
       drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
       drawer_template_context["widget_for"] = "new_create_batch"
@@ -4931,7 +4885,6 @@ def page_scroll(request,group_id,page):
     if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
     for each in (paged_resources.page(int(page))).object_list:
-            # print each.name,"\n"
             if each.created_by == each.modified_by :
                if each.last_update == each.created_at:
                  activity =  'created'

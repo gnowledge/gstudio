@@ -1044,9 +1044,6 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 student_enroll_list = []
 
             at_rt_dict["has_enrolled"] = total_student_enroll_list
-            print "demo",at_rt_dict["has_enrolled"]
-            if None in at_rt_dict["has_enrolled"]:
-                print "\n\n\nnone found\n\n\n"
             if enroll_state == "Complete":
                 # For Student-Course Enrollment Approval
                 # Create a task for admin(s) of the MIS_admin group
@@ -1212,27 +1209,22 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
 
                 selected_course_ids = ann_course_ids + prev_selected_course_ids
                 try:
-                    gr_node = create_grelation(each_student._id, selected_course_rt, selected_course_ids)
-
-
+                    gr_node = create_grelation(each_student["_id"], selected_course_rt, selected_course_ids)
                     #try block is used to avoid "Multiple results found" error
                     try:
                         course_enrollment_status = {}
                         if each_student["course_enrollment_status"]:
                             course_enrollment_status = each_student["course_enrollment_status"][0]
-                        else:
-                            course_enrollment_status = each_student["course_enrollment_status"]
 
                         for each_course_id in selected_course_ids:
                             str_course_id = str(each_course_id)
                             if str_course_id not in course_enrollment_status:
                                 course_enrollment_status.update({str_course_id: u"Enrolled"})
-
-                        at_node = create_gattribute(each_student._id, course_enrollment_status_at, course_enrollment_status)
-                    except:
-                        gr_node = create_grelation(each_student._id, selected_course_rt, prev_selected_course_ids)
+                        at_node = create_gattribute(each_student["_id"], course_enrollment_status_at, course_enrollment_status)
+                    except Exception as e:
+                        gr_node = create_grelation(each_student["_id"], selected_course_rt, prev_selected_course_ids)
                         continue
-                except:
+                except Exception as e:
                     continue
 
         # Save/Update GAttribute(s) and/or GRelation(s)
