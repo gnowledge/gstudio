@@ -4495,6 +4495,10 @@ def reschedule_task(request,group_id,node):
     #fetch event
     event_node = collection.Node.one({"_id":ObjectId(node)})
     reschedule_dates = []
+    #for any type change the event status to re-schdueled if the request comes 
+    #for generating a task for reschdueling a event
+    event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+    create_gattribute(ObjectId(node),event_status,unicode('reschdueled'))
     if  reschedule_type == 'event_reschedule' :
          for i in event_node.attribute_set:
 	       if unicode('event_edit_reschedule') in i.keys():
@@ -4598,6 +4602,8 @@ def event_assginee(request, group_id, app_set_instance_id=None):
           attendedlist.append(a['Name'])
 
  if assessmentdone == 'True':
+     event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+     create_gattribute(ObjectId(node),event_status,unicode('Completed'))
      create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
  create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)
  
