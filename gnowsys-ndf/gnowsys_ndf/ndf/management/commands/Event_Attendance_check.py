@@ -63,7 +63,7 @@ class Command(BaseCommand):
                   reschedule_dates = j['reschedule_attendance']
              reschedule_dates["reschedule_allow"] = False
              create_gattribute(ObjectId(i._id),reschedule_attendance,reschedule_dates)
-          
+              
           reschedule_dates={}
           for i in rescheduled_events:
               for j in i.attribute_set:
@@ -82,6 +82,9 @@ class Command(BaseCommand):
 
           
           for i in Attendance_marked_event:
+            event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+            create_gattribute(ObjectId(node),event_status,unicode('Incomplete'))
+            
             for j in i.attribute_set:
               if unicode("start_time") in j.keys():
                    if (j["start_time"] >= day_before_yesterday and j["start_time"] <  yesterday):

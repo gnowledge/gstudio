@@ -96,6 +96,7 @@
         <div class="row">
           {% if groupname != "MIS_admin"  %}
               {% if  field.altnames != 'Organised by' %} 
+                  
           <div class="small-2 columns"> 
             <label for="{{field.name}}" class="right inline"> {{field.altnames}} </label>
           </div>
@@ -106,12 +107,14 @@
           {% endif %}
           
           {% if groupname == "MIS_admin"  %}
+            {% if field.altnames != 'Event Status' %}
           <div class="small-2 columns"> 
             <label for="{{field.name}}" class="right inline"> {{field.altnames}} </label>
           </div>
           <div class="small-5 end columns">
             {% html_widget groupid node.pk field %}
           </div>
+            {% endif %} 
           {% endif %}
         </div>
         {% endfor %}
@@ -144,6 +147,9 @@
         </div>    
       </div>
       -->
+       <div id="hidden" hidden>
+        <input id="event_status" name="event_status" value="Scheduled">
+       <div>
     </div>
   </form>
 
