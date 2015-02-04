@@ -41,14 +41,19 @@ def event(request, group_id):
  else :
     pass
  #view written just to show the landing page of the events
+ group_inverse_rel_id = "" 
  Group_type=collection.Node.one({'_id':ObjectId(group_id)})
- Group_name=collection.Node.one({'_type':'GSystem','name':unicode(Group_type.name)})
+ for i in Group_type.relation_set:
+     if unicode("group_of") in i.keys():
+        group_inverse_rel_id = i['group_of']
+ Group_name = collection.Node.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
  Eventtype='Eventtype'
  if Group_name:
-      if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
-           Eventtype='CollegeEvents'     
-      else:
-           Eventtype='Eventtype'
+
+    if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
+         Eventtype='CollegeEvents'     
+    else:
+         Eventtype='Eventtype'
       
  Glisttype=collection.Node.find({"name":"GList"})
  #bug
@@ -140,10 +145,16 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   '''
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  group_inverse_rel_id = "" 
   Group_type=collection.Node.one({'_id':ObjectId(group_id)})
-  Group_name=collection.Node.one({'_type':'GSystem','name':unicode(Group_type.name)})
+  for i in Group_type.relation_set:
+       if unicode("group_of") in i.keys():
+          group_inverse_rel_id = i['group_of']
+  
+  Group_name = collection.Node.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
   Eventtype='Eventtype'
   if Group_name:
+
       if (any( unicode('has_group') in d for d in Group_name.relation_set)) == True:
            Eventtype='CollegeEvents'     
       else:
@@ -314,8 +325,12 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
 
+  group_inverse_rel_id = "" 
   Group_type=collection.Node.one({'_id':ObjectId(group_id)})
-  Group_name=collection.Node.one({'_type':'GSystem','name':unicode(Group_type.name)})
+  for i in Group_type.relation_set:
+       if unicode("group_of") in i.keys():
+          group_inverse_rel_id = i['group_of']
+  Group_name = collection.Node.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
   Eventtype='Eventtype'
   if Group_name:
 
@@ -323,7 +338,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
            Eventtype='CollegeEvents'     
       else:
            Eventtype='Eventtype'
-
   Glisttype=collection.Node.find({"name":"GList"})
   Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
   app_collection_set=[]
