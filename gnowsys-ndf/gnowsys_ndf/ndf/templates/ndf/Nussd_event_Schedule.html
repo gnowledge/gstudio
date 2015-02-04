@@ -183,7 +183,7 @@
       </div>
     
   </fieldset>
-
+{% if title != 'Exam' %}
   <div id="Module-session-section">
     <fieldset >
       <div class="row">
@@ -252,33 +252,9 @@
       <!-- section for start time and end time -->
       <div class="row" id="Split_Session">
         <!-- checkbox for yes or no  split session  -->
-        <div class="small-11 small-offset-1 columns end">
-          <input type="checkbox" class="splitsession" id="splitsession" onClick="ShowSplits()">{% trans "Split Session" %}
-          
-          <div id="select_split">
-            <hr/>
-            <!--
-            <div style="width:200px;">
-            </div>
-            -->
-            
-            <div id="splits" class="row">
-              <div id="split-2" class="small-1 columns" >
-                <input type="radio" id="chkbxsplit-2" name="splitinto" onClick="GenerateSplits('2')" value="2" style="right-padding:2px;">2
-              </div>
-              
-              <div id="split-3" class="small-1 columns end">
-                <input type="radio" id="chkbxsplit-3" name="splitinto" onClick="GenerateSplits('3')" value="3" style="right-padding:2px;">3
-              </div>
-              
-              <!-- Div for Appended Start_Date And End Date -->
-              <div id="date-splits" class="small-12 columns">
-              </div>
-            </div>
-          </div>
         </div>
+      <div class="session_time">
       </div>
-
       <div class="row" style="margin-top: 1em;">
         <div class="small-2 columns">
           <label class="right inline"> 
@@ -290,11 +266,12 @@
           </select>
           <i style="color:red; float:left display:inline">*</i>
         </div>
-
+ 
         <div class="small-4 columns end">
           <!-- keept for spacing from left hand side -->        
         </div>
       </div>
+     
             </fieldset>  
       
          
@@ -305,6 +282,7 @@
        </div>
  <!-- div module sesion section Opens here" -->
  </div>
+ {% endif %}
 </div>
  
   </form>
@@ -315,95 +293,60 @@
 {% endblock %}
 
 {% block script %}
+$(document).ready(function(){
+datetime()
+document.getElementById('form-edit-node').reset()
+if (!('{{edit_details}}'))
+{clear_Disable_Elements();}
 
-function ShowSplits()
-  {
-      if (document.getElementById('splitsession').checked == true)
-        {
-            document.getElementById("select_split").hidden=false;
-        }
-      if (document.getElementById('splitsession').checked == false)
-        {
-          document.getElementById("select_split").hidden=true;
-          //$("#date-splits").empty();
-        }
 
-  }
-function GenerateSplits(splits){
-  //document.getElementById('start_time').value = ""
-  //document.getElementById('end_time').value = ""
-  var i=1;
-  if (splits == 2)
-  {
-      $("#date-splits").empty();
-  
-  }
-  if( !(document.getElementById("start_time_1")) )
-  {
-  $("#date-splits").append("<div class='row'> <div class='small-1 columns' align='right' > <label> <b>Split -1 </b></label> </div></div>")
-  $("#date-splits").append("<div class='row' align='left'>"+ 
-  " <div class='small-1 columns' align='center' >"+ 
-    "<label for='start_time_1' class='right inline'> {% trans "Start time" %} </label>"+
-  "</div>"+
-  "<div class='small-2 columns' > "+
-     "<input id='start_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_1' readonly=''>"+
-  "</div>"+
-  
-  " <div class='small-1 columns'>"+
-      "<label for='end_time_1' class='right inline'> {% trans "End time" %} </label></div>"+
-   ""+ "<div >"+
-     "<input id='end_time_1' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_1' readonly=''>"+
-      "</div></div>")
-  } 
-   if(splits == '3')
-   {
-  $("#date-splits").append("<div class='row' style='margin-top: 1em;'> <div class='small-1 columns' align='right' > <label> <b>{% trans "Split-2" %}</b></label> </div></div>")
-  $("#date-splits").append("<div class='row' align='left'>"+ 
-  " <div class='small-1 columns' align='center' >"+ 
-    "<label for='start_time_2' class='right inline'> {% trans "Start time" %} </label>"+
-  "</div>"+
-  "<div class='small-2 columns' > "+
-     "<input id='start_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required placeholder='DD/MM/YYYY HH:MM' value='' name='start_time_2' readonly=''>"+
-  "</div>"+
-   " <div class='small-1 columns'>"+
-      "<label> End time </label></div>"+
-   ""+ "<div >"+
-     "<input id='end_time_2' class='date_month_day_year' type='text' onClick='datetime()' style='float:left; width:10rem' required  placeholder='DD/MM/YYYY HH:MM' value='' name='end_time_2' readonly=''>"+
-      "</div></div>")
-   
-    $("#iteration").attr('value','3')
-    
-  }
-  else
-  {
-      $("#iteration").attr('value','2')
-      date_validation($('#end_time').attr('name'))
-  }
-     
-  
-   
+});
+
+function clear_Disable_Elements()
+{ 
+
+        <!--  this method would disable all the page --> 
+        $('#nussd_course_name').attr('disabled','True')
+        $('#nussd_course_name').empty()
+        $('#event_has_batch').attr('disabled','True')
+        $('#event_has_batch').empty()
+        $('#session_of').attr('disabled','True')
+        $('#splitsession').attr('disabled','True')
+        $('#session_of').empty()
+        $('#Module_of').attr('disabled','True') 
+        $('#Module_of').empty()
+        document.getElementById('submit').disabled = true;      
+        if ( '{{title}}' == 'Exam' )
+          {
+            $('#Module-session-section').empty()
+            $('#view').hide()
+          }
+        else
+          {
+
+            $('#Module-session-section').hide()
+            $('#event_coordinator').attr('disabled','True')
+            document.getElementById('end_time').disabled = ""
+          
+          }
+
+        $('#view').attr('disabled','True')
 }
 
 
-$(document).ready(function(){
- document.getElementById('form-edit-node').reset()
- datetime()
- if (!'{{node}}')
-   {clear_Disable_Elements();
-   }
- 
- if ('{{node}}')
- {
-  
-    $('#view').hide()
- }  
- var event_details=""
- 
- $('#select_split').attr('hidden','True')
- event_details="{{edit_details|safe}}"
+function append_time()
+{
+      <!-- append the remaining time of the session -->
+      $("#available-minutes").empty()
+      $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
+      $("#Alloted-minutes").empty()
+      $("#Alloted-minutes").append("<label for='end_time' class='inline'>"+$('#session_of option:selected').attr('minutes') +"<label>")
+}
 
-  if(event_details)
+
+  if('{{edit_details}}')
   {
+    
     event_details={{edit_details|safe}}
     $('#nussd_course_name').append(
                   $("<option></option>")
@@ -438,22 +381,10 @@ $(document).ready(function(){
                       .attr('value',event_details['cordinator'].cordinatorid)
                       .text(event_details['cordinator'].cordinatorname)
                       );
-    var a = event_details['cordinator'].cordinatorname
+    var a=event_details['cordinator'].cordinatorname                
+  
     $("select[name='event_coordinator'] option[value= a]").prop("selected", true);       
-    
-    enable_submit()
-   $('#session_of').append(
-          $("<option></option>")
-                      .attr('id',event_details['session'].sessionid)
-                      .attr('value',event_details['session'].sessionid)
-                      .text(event_details['session'].sessionname)
-                      .attr('minutes',event_details['session'].sessionminutes)
-                      );
-    var event_session = event_details['session'].sessionname
-    total_session_time = event_details['session'].sessionminutes
-    $("#available-minutes").empty()
-    $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
-    $("select[name='session_of'] option[value= event_session]").prop("selected", true);       
+  
     document.getElementById('event_has_batch').disabled = "";
     Enable_Elements()     
     var course_type=$("#event_has_batch").val()  
@@ -465,332 +396,398 @@ $(document).ready(function(){
               },
           complete:function(){
                 if(courses != ""){
-                $.each(courses, function(key,val) {
-                     $('#has_attendees').append(
-                     $("<option></option>")
-                     .attr("id", "coursename_"+key.id)
-                     .attr("value",val.id)
-                     .attr("selected","selected")
-                     .text(val.name)
-            
-           );
-            });
-          }
+                        $.each(courses, function(key,val) 
+                        {
+                             $('#has_attendees').append(
+                             $("<option></option>")
+                             .attr("id", "coursename_"+key.id)
+                             .attr("value",val.id)
+                             .attr("selected","selected")
+                             .text(val.name)
+                            );
+                        });
+                    }
           } 
     });
 } 
-});
+
+
 function Enable_Elements()
 {
   if(  document.getElementById('Module_of'))
   {
      document.getElementById('Module_of').disabled = "";
   }
+  if (document.getElementById('Module-session-section'))
+   {
     document.getElementById('Module-session-section').visible = "True";
     document.getElementById('view').disabled = "";
+   }
 }
-function clear_Disable_Elements()
-{
-  $('#nussd_course_name').attr('disabled','True')
-  $('#nussd_course_name').empty()
-  $('#event_has_batch').attr('disabled','True')
-  $('#event_has_batch').empty()
-  $('#session_of').attr('disabled','True')
-  $('#splitsession').attr('disabled','True')
-  $('#session_of').empty()
-  $('#Module_of').attr('disabled','True') 
-  $('#Module_of').empty()
-  if ( '{{title}}' == 'Exam' )
-  {
-      $('#Module-session-section').empty()
-      $('#view').hide()
-  }
-  else{
+last_start_time =""
 
-  $('#Module-session-section').hide()
-  $('#event_coordinator').attr('disabled','True')
-  $('#start_time_1').attr('disabled','True')
-  $('#end_time_1').attr('disabled','True')
-  $('#start_time_1').attr('disabled','True')
-  $('#end_time_1').attr('disabled','True')
-  $('#end_time').attr('disabled','True')
+function enable_start_time_end_time(str)
+ {
+    str_name = str.substring(9)
+    if (str)
+     {
+        //document.getElementById('end_time'+ '_' + str ).disabled = ""
+     }
+        start_from = str_name
+        remove_till = last_start_time
+        reset_time(str)
+        remove_start_end_time(start_from,remove_till)
+    
+ 
+ }
 
-  }
 
-  $('#view').attr('disabled','True')
-  enable_submit()
-  
-}
-/*var startDtInput = $("#start_time")
-var $a=$('#split-into3')
-$('body').click(function(e)
-  {
-    var target = $(e.target), article;
-    if(target.is('#split-into2'))
+function remove_start_end_time(start_from , remove_till)
+ {
+    <!-- removes all the start and end time widgets if some one tries to modify in between elements -->
+    if (! start_from)
     {
-        $a=$('#split-into2')
+      start_from = 1
+    
     }
-    else if(target.is('#split-into3'))
+    else if (start_from)
     {
-          $a=$('#split-into3')
+      start_from = Number(start_from) + 1
     }
-});
-*/
-/*
-$('#split-into3').click(function(){
-  var counter=$('#split-into3').val();
-  /*for (i=1;i<counter;i++){
-     var $elem=$("#start_time").clone()
-     var $a=$elem.attr("id","start_time_"+i).attr("name","start_time_"+i)
-     $a.appendTo(".session_time")
+    for (i=start_from  ; i<=remove_till ; i++)
+      {
+       $('#split' + '_' + i).remove()
+       $('.session_time br:last').remove(); 
+      }
+  last_start_time = start_from  
+ }
+function  GenerateSplits ()
+ {    
+     last_start_time = Number(last_start_time) + 1;
+     $(".session_time").append("<div class='row' id=" + "split" + "_" + last_start_time+"> </div>")
+     <!-- split secssion start_time -->
+     <!-- start time label append -->
+
+     $("#split" + "_" + last_start_time + ""  ).append("<b>Split no." + last_start_time +"</b>")
+     //$("#split" + "_" + last_start_time + ""  ).append("<hr>")
+     $("#split" + "_" + last_start_time + ""  ).append("<div class='small-1 columns' id=" + "split_start_time_label" + "_" + last_start_time+"> </div>")
+     $("#split_start_time_label" + "_" + last_start_time + ""  ).append("Start_time")
+     <!-- date time widget append -->
+     $("#split" + "_" + last_start_time + ""  ).append("<div class='small-2 columns' id=" + "split_start_time" + "_" + last_start_time+"> </div>")
+     
+     $("#split_start_time" + "_" + last_start_time + ""  ).append($("#start_time").clone().attr("id","start_time_"+last_start_time).attr("name","start_time_"+last_start_time).removeClass("hasDatepicker").val(''))
+     
+     <!-- split secssion end_time -->
+     $("#split" + "_" + last_start_time + ""  ).append("<div class='small-1 columns' id=" + "split_end_time_label" + "_" + last_start_time+"> </div>")
+     $("#split_end_time_label" + "_" + last_start_time + ""  ).append("End_time")
+
+     $("#split" + "_" + last_start_time + ""  ).append("<div class='small-2 columns' id=" + "split_end_time" + "_" + last_start_time+"> </div>")
+
+     $("#split_end_time" + "_" + last_start_time + ""  ).append($("#end_time").clone().attr("id","end_time_"+last_start_time).attr("name","end_time_"+last_start_time).removeClass("hasDatepicker").val(''))
+
+     $("#split" + "_" + last_start_time + ""  ).append("<div class='small-8 columns'> </div>")
+     $(".session_time").append("<br>") 
+ }
+
+function check_remaining_time(start_time,end_time)
+  {     
+         var difference = start_time.getTime() - end_time.getTime();
+         var daysDifference = Math.floor(difference/1000/60/60/24);
+         difference -= daysDifference*1000*60*60*24
+         var hoursDifference = Math.floor(difference/1000/60/60);
+         difference -= hoursDifference*1000*60*60
+         var minutesDifference = Math.floor(difference/1000/60);
+         difference -= minutesDifference*1000*60 
+         var secondsDifference = Math.floor(difference/1000);
+         diffhh = 23-hoursDifference
+         diffmm = 60-minutesDifference
+         total_min_diff=((Number(diffhh)*60) + Number(diffmm))
+         deducted_minute =  Number(total_session_time) - Number(total_min_diff)
+         total_session_time=deducted_minute
+         
   }
-});
-*/
-
-/*
-$('#split-into2').click(function(){
-   $('#iteration').attr('value','2')
-  var counter=$('#split-into2').val()
-/*
-  for (i=1;i<counter;i++){
-     var $elem=$("#start_time").clone(true)
-     var $a=$elem.attr("id","start_time_"+i).attr("name","start_time_"+i)
-     $a.appendTo(".session_time")
-  }
-   
-});
-
-*/
-
-
-$("#view").click(function(){
-
-  if(!$("#nussd_course_name").val()  || ($("#nussd_course_name").val() == "Select Course Name"))
+function date_validation(name)
   {
-      alert("Please Select Course Name")
-  }
-  else
-  {
-    var sel_coursename=$("#nussd_course_name").val();
-    $('#Module-session-section').show()
-    $.ajax({
-      url: "{% url 'fetch_course_Module' groupid 'sel_coursename' %}".replace('sel_coursename',String(sel_coursename)),
-      type: "GET",
-      datatype:"json",
-      success: function(data){
-      courses=JSON.parse(data)
-      course=JSON.parse(courses.Module)
-      trainer=JSON.parse(courses.trainer)
-      },
-     complete:function(){
-      if(course != ""){
-                  $('#Module_of').empty()
-                  $('#Module_of').append($("<option></option>").attr("value","Select Module Name").text("--- Select Module ---"))
-                  $.each(course, function(key,val) {
-                  $('#Module_of').append(
-                  $("<option></option>")
-                      .attr("id", "coursename_"+key.id)
-                      .attr("value",val.id)
-                      .text(val.name)
-                   );
-                });
-            Enable_Elements()
-       }  
-       else
-       {
-            alert("No Module Exists for this Course type!!!")
+     str1 = name.substring(9)
+     str = name.substring(0,3)
+     var reset = 0
+     //last_start_time = str1   
+      
+     if (str == 'sta')
+       {set_date(name)}
+     
+
+     if (str == 'end')
+       {  
+              if (!str1)
+	            {  
+	               start_time = new Date($('#start_time').datetimepicker('getDate')) 
+	               end_time   = new Date($('#end_time').datetimepicker('getDate'))  
+	            }
+	          if(str1)
+	            {
+	                start_time = new Date($('#start_time'+ '_' + last_start_time).datetimepicker('getDate')) 
+	                end_time   = new Date($('#end_time' + '_' + last_start_time).datetimepicker('getDate'))
+	            } 
+	          
+	           if (total_session_time == 0) 
+	             {
+	                reset_time(name)
+                   reset = 1
+                 }
+              if (reset == 0)   
+	           {check_remaining_time(start_time,end_time)}
+	           
+	           if ( Number(last_start_time) > Number(str1))
+				     { 
+			     		enable_start_time_end_time(name) 
+				     	last_start_time=str1
+
+				     }
+
+
+	           if (total_session_time > 0)
+	            {
+	                GenerateSplits()
+	                $("#iteration").attr('value',last_start_time)
+	                datetime()
+	                
+	            } 
+	          else if (total_session_time < 0)
+	            {
+		              if (last_start_time)
+		               {
+			              document.getElementById('start_time' + '_' +last_start_time ).value=""
+			              document.getElementById('end_time' + '_' +last_start_time ).value=""
+			               reset_time(name)  
+                 }
+				      if (!(last_start_time))
+				       { 
+				          document.getElementById('start_time').value=""
+			            document.getElementById('end_time').value=""
+			            total_session_time = $('#session_of option:selected').attr('minutes') 
+
+                 }
+			            	
+		             		      
+	            }       
+	            
+	            
+        }
+ append_time()       
+ enable_submit()
+}  
+function set_date(name)
+ {
+  str = name.substring(11)
+  if (!str)
+     {
+       $("#end_time").datepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
+       $("#end_time").timepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
+       $("#end_time").timepicker('option','hourMin', $("#start_time").datetimepicker('getDate').getHours());
+	   $("#end_time").timepicker('option','minuteMin',$("#start_time").datetimepicker('getDate').getMinutes());
+     } 
+    if (str)
+     {
        
-       }   
-      if (trainer!=""){   
-         $('#event_coordinator').empty()
-         $('#event_coordinator').append($("<option></option>").attr("value","Select Trainer").text("--- Select Trainer ---"))
-         $.each(trainer,function(key,val){
-              $('#event_coordinator').append(
-                 $("<option></option>")
-                  .attr("id", "coursename_"+key.id)
-                  .attr("value",val.id)
-                  .text(val.name)
-                  );
-                  
-                });   
-          
-          }
-          else
-          {
-            clear_Disable_Elements();
-          alert("No Trainers have being Assinged to this Course !!!")
-          }
-          } 
-      });
+        $("#end_time_"+str+"").datepicker('option','minDate', $("#start_time_"+ str +"").datetimepicker('getDate'));
+        $("#end_time_"+str+"").timepicker('option','minDate', $("#start_time_"+ str +"").datetimepicker('getDate'));
+        $("#end_time_"+str+"").timepicker('option','hourMin', $("#start_time_"+  str +"").datetimepicker('getDate').getHours());
+	    $("#end_time_"+str+"").timepicker('option','minuteMin',$("#start_time_"+ str +"").datetimepicker('getDate').getMinutes());
+	    }
+ }
 
-}
+ 
+function reset_time(name)
+ {
+   total_session_time = $('#session_of option:selected').attr('minutes') 
+    
+    str1 = name.substring(9)
+   /*for (i=0;i<=last_start_time;i++) 
+    {*/
+     var i = 0 
+     if(!(str1))
+     {
+      
+      start_time = new Date($('#start_time').datetimepicker('getDate')) 
+		           end_time   = new Date($('#end_time').datetimepicker('getDate'))  
+		  			check_remaining_time(start_time,end_time)
+		    
 
-
-   
-
-});
-
+     }
+     if(str1)
+     {
+      while(Number(i) != Number(str1) + 1 )
+      {
+      
+       if (i == 0)
+	         {  
+		           start_time = new Date($('#start_time').datetimepicker('getDate')) 
+		           end_time   = new Date($('#end_time').datetimepicker('getDate'))  
+		  			check_remaining_time(start_time,end_time)
+		     }
+       else
+	         {
+		          
+              if  ($('#start_time'+ '_' + i).val() != ""){ 
+		            start_time = new Date($('#start_time'+ '_' + i).datetimepicker('getDate')) 
+		            end_time   = new Date($('#end_time' + '_' + i).datetimepicker('getDate'))
+		            check_remaining_time(start_time,end_time)
+                }
+	         	
+	         }
+	      i= Number(i)+1
+       } 
+    /*}*/
+   }
+ }
 $("#nussd_course_name").change(function(){
 
-  
   var course_type=$("#nussd_course_name").val()  
   var course_name=$("#nussd_course_name option:selected ").text()
-
   $('#course_name').val(course_name)
   $.ajax({
   
-      url: "{% url 'fetch_course_batches' groupid 'course_type' %}".replace('course_type',String(course_type)),
-      type: "GET",
-      success: function(data){
-      courses=JSON.parse(data)
-      
-      },
-     complete:function(){
-      $('#event_has_batch').empty()
-      $('#event_has_batch').append($("<option></option>").attr("value","Select Course Name").text("--- Select Batch ---"))
-      if(courses != ""){
-              $.each(courses, function(key,val) {
-                    $('#event_has_batch').append(
-                    $("<option></option>")
-                    .attr("id", "coursename_"+key.id)
-                    .attr("value",val.id)
-                    .text(val.name)
-                    );
-               });
-          document.getElementById('event_has_batch').disabled = "";
-          }
-          else
-          {
-          alert("No Batches Found")
-          
-          document.getElementById('nussd_course_name').disabled = "";
-          $('#Module-session-section').hide()
-          $('#event_has_batch').attr('disabled','True')
-          $('#view').attr('disabled','True')
-          }
-              
-  
-          } 
-      });
-
-
-
+            url: "{% url 'fetch_course_batches' groupid 'course_type' %}".replace('course_type',String(course_type)),
+            type: "GET",
+            success: function(data){
+            courses=JSON.parse(data)},
+            complete:function(){
+            $('#event_has_batch').empty()
+            $('#event_has_batch').append($("<option></option>").attr("value","Select Course Name").text("--- Select Batch ---"))
+            if(courses != "")
+              {
+                    $.each(courses, function(key,val) {
+                          $('#event_has_batch').append(
+                          $("<option></option>")
+                          .attr("id", "coursename_"+key.id)
+                          .attr("value",val.id)
+                          .text(val.name)
+                          );
+                     });
+                    document.getElementById('event_has_batch').disabled = "";
+                    }
+                    else
+                    {
+                    alert("No Batches Found")
+                    document.getElementById('nussd_course_name').disabled = "";
+                    $('#Module-session-section').hide()
+                    $('#event_has_batch').attr('disabled','True')
+                    $('#view').attr('disabled','True')
+                    }
+             } 
+        });
 });
 
 $("#event_has_batch").change(function(){
-   Enable_Elements()
-    var batch_name=$("#event_has_batch option:selected ").text()
-
-  $('#batch_name').val(batch_name)
   
-    var course_type=$("#event_has_batch").val()  
-    $.ajax({
-        url: "{% url 'fetch_batch_student' groupid 'course_type' %}".replace('course_type',String(course_type)),
-        type: "GET",
-        success: function(data){
-            courses=JSON.parse(data)
-
-        },
-      complete:function(){
-        if(courses != ""){
-            $('#has_attendees').empty()
-            $.each(courses, function(key,val) {
-                $('#has_attendees').append(
-          $("<option></option>")
-            .attr("id", "coursename_"+key.id)
-            .attr("value",val.id)
-            .attr("selected","selected")
-            .text(val.name)
-            
-           );
-            });
-          }
-          } 
-      });
-
-
-
+  Enable_Elements()
+  var batch_name=$("#event_has_batch option:selected ").text()
+  $('#batch_name').val(batch_name)
+  var course_type=$("#event_has_batch").val()  
+  $.ajax({
+            url: "{% url 'fetch_batch_student' groupid 'course_type' %}".replace('course_type',String(course_type)),
+            type: "GET",
+            success: function(data){
+                courses=JSON.parse(data)},
+            complete:function()
+             {
+                    if(courses != "")
+                     {
+                        $('#has_attendees').empty()
+                        $.each(courses, function(key,val)
+                          {
+                            $('#has_attendees').append
+                               (
+                                    $("<option></option>")
+                                    .attr("id", "coursename_"+key.id)
+                                    .attr("value",val.id)
+                                    .attr("selected","selected")
+                                    .text(val.name)
+                                    
+                                );
+                          });
+                      }
+              } 
+          });
 });
 
 
 
 $("#Module_of").change(function(){
   
-var course_type=$("#Module_of").val()  
+  var course_type=$("#Module_of").val()  
   var Module_of=$("#Module_of").text()
   $("#Module_name option:selected ").val(Module_of)
-  
-
   $.ajax({
-      url: "{% url 'fetch_course_session' groupid 'course_type' %}".replace('course_type',String(course_type)),
-      type: "GET",
-      data:{"app_set_id":'{{app_set_id}}'},
-      success: function(data){
-      courses=JSON.parse(data)
-
-      },
-     complete:function(){
-      if(courses != ""){
-         $('#session_of').empty()
-         $('#session_of').append($("<option></option>").attr("value","Select Session Name").text("--- Select Session ---"))
-          $.each(courses, function(key,val) {
-              $('#session_of').append(
-               $("<option></option>")
-                .attr("id", "coursename_"+key.id)
-                .attr("minutes",val.minutes)
-                .attr("value",val.id)
-                .text(val.name)
-                );
-             });
-          document.getElementById('session_of').disabled = "";
-          }
-     else
-     {
-          document.getElementById('session_of').disabled = "True";
-          alert("No Session Found!!!")
-       
-     }     
-          
-          
-          }
+            url: "{% url 'fetch_course_session' groupid 'course_type' %}".replace('course_type',String(course_type)),
+            type: "GET",
+            data:{"app_set_id":'{{app_set_id}}'},
+            success: function(data)
+            {
+              
+              courses=JSON.parse(data)
+            },
+            complete:function()
+             {
+                    if(courses != "")
+                     {
+                           $('#session_of').empty()
+                           $('#session_of').append($("<option></option>").attr("value","Select Session Name").text("--- Select Session ---"))
+                            $.each(courses, function(key,val)
+                             {
+                                $('#session_of').append(
+                                 $("<option></option>")
+                                  .attr("id", "coursename_"+key.id)
+                                  .attr("minutes",val.minutes)
+                                  .attr("value",val.id)
+                                  .text(val.name)
+                                  );
+                              });
+                            document.getElementById('session_of').disabled = "";
+                      }
+                   else
+                     {
+                        document.getElementById('session_of').disabled = "True";
+                        alert("No Session Found!!!")
+                     }     
+              }
            
       });
 
 
 
 });
+
+
+
 var total_session_time = 0
 var deducted_minute = 0
-$("#session_of").change(function(){
 
+$("#session_of").change(function(){
   total_session_time = $('#session_of option:selected').attr('minutes')
   var session_of=$('#session_of option:selected').text()
   $("#Session").val(session_of)
   document.getElementById('event_coordinator').disabled = "";      
-  $("#available-minutes").empty()
-  $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
-  $("#Alloted-minutes").empty()
-  $("#Alloted-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
+  append_time() 
 });
+
 
 function enable_submit()
 {
-  vt_selected_index = $("#event_coordinator :selected").index();
-  if (total_session_time == 0 && vt_selected_index != 0 ){
-      document.getElementById('submit').disabled = "";      
-  }
-else 
-{
-    document.getElementById('submit').disabled = true;      
+    vt_selected_index = $("#event_coordinator :selected").index();
+    if (total_session_time == 0 && vt_selected_index != 0 )
+       {
+          document.getElementById('submit').disabled = "";      
+       }
+    else 
+       {
+          document.getElementById('submit').disabled = true;      
+       }
+
+    
 }
 
-if('{{node}}')
- {
-  document.getElementById('submit').disabled = "";      
- }
-
-
-}
 
 $('#event_coordinator').change(function(){
   
@@ -805,257 +802,121 @@ $("#nussd_course_type").change(function(){
   $("#course_type").val(course_type)
   
   $.ajax({
-      url: "{% url 'get_announced_courses_with_ctype' groupid  %}",
-      type: "GET",
-      dataType: "json",
-      data:{'nussd_course_type':course_type},
-      success: function(data){
-      ac_data = data["acourse_ctype_list"]
-      ac_message=data.message
-      if(ac_data)
-       {courses = JSON.parse(ac_data)
-      
-      }},
-     complete:function(){
-      if(courses != ""){
-             $('#nussd_course_name').append($("<option></option>").attr("value","Select Course Name").text("--- Select Course Name ---"))
-             $.each(courses, function(key,val) {
-                 se = val["_id"];
-                 ac_name=val["name"];
-                 $('#nussd_course_name').append(
-                 $("<option></option>")
-                 .attr("id", "coursename_"+se)
-                 .attr("value",se)
-                 .text(ac_name)
-                    );
-              document.getElementById('nussd_course_name').disabled = "";
-              });
-              
-      }
-      else
-      {
-            alert(ac_message)
-      }
-          
-          
-  
-          }
-           
-      });
-
-
-
+              url: "{% url 'get_announced_courses_with_ctype' groupid  %}",
+              type: "GET",
+              dataType: "json",
+              data:{'nussd_course_type':course_type},
+              success: function(data)
+              {
+                  ac_data = data["acourse_ctype_list"]
+                  ac_message=data.message
+                  if(ac_data)
+                   {courses = JSON.parse(ac_data)
+                   }
+              },
+             complete:function()
+             {
+                    if(courses != "")
+                    {
+                           $('#nussd_course_name').append($("<option></option>").attr("value","Select Course Name").text("--- Select Course Name ---"))
+                           $.each(courses, function(key,val) 
+                            {
+                                   se = val["_id"];
+                                   ac_name=val["name"];
+                                   $('#nussd_course_name').append(
+                                   $("<option></option>")
+                                   .attr("id", "coursename_"+se)
+                                   .attr("value",se)
+                                   .text(ac_name)
+                                      );
+                                document.getElementById('nussd_course_name').disabled = "";
+                            });
+                            
+                    }
+                    else
+                    {
+                          alert(ac_message)
+                    }
+                        
+             }
+                   
+       });
 });
 
-// Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
-  $(document).on('closed', '[data-reveal]', function () {
-    /*
-     *  On closing of reveal-modal
-     */
-    var widget_for = $(this).attr('id').replace('_modal', '')
+$("#view").click(function(){
 
-    // First empty all values of given field (dropdown/select)
-    $("select#" + widget_for).empty();
-
-    // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
-    class_value = ".node_id." + widget_for + "_values"
-    right_drawer_len = $(class_value).size()
-
-    if (right_drawer_len > 0) {
-      $(class_value).each(function (){
-        // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
-        resource_id = $(this).val()
-        resource_name = $(this).attr('name')
-
-        // Make very first entry as given below
-        $("select#" + widget_for).append(
-            $("<option></option>")
-              .attr("value", resource_id)
-              .attr("selected", "selected")
-              .text(resource_name)
-        );
-      });
-    }
-
-    else {
-      // Make very first entry as given below
-      $("select#" + widget_for).append(
-          $("<option></option>")
-            .attr("value", "")
-            .text("- - - Select - - -")
-      );
-    }
-  });
-  
-function date_validation(name)
-{
-
-  var start_time=""
-  var end_time=""
-  str=name.substring(9)
-  str2=name.substring(0,3)
-  if (str2 == 'end' )
+  if(!$("#nussd_course_name").val()  || ($("#nussd_course_name").val() == "Select Course Name"))
   {
-
-     if (str)
-      {
-         start_time = new Date($('#start_time_'+str).datetimepicker('getDate')) 
-         end_time = new Date($('#end_time_'+str).datetimepicker('getDate'))  
-         
-
+      alert("Please Select Course Name")
+  }
+  else
+   {
+        var sel_coursename=$("#nussd_course_name").val();
+        $('#Module-session-section').show()
+        $.ajax({
+                  url: "{% url 'fetch_course_Module' groupid 'sel_coursename' %}".replace('sel_coursename',String(sel_coursename)),
+                  type: "GET",
+                  datatype:"json",
+                  success: function(data)
+                   {
+                      courses=JSON.parse(data)
+                      course=JSON.parse(courses.Module)
+                      trainer=JSON.parse(courses.trainer)
+                   },
+                  complete:function()
+                    {
+                        if(course != "")
+                           {
+                                    $('#Module_of').empty()
+                                    $('#Module_of').append($("<option></option>").attr("value","Select Module Name").text("--- Select Module ---"))
+                                    $.each(course, function(key,val) {
+                                    $('#Module_of').append(
+                                    $("<option></option>")
+                                        .attr("id", "coursename_"+key.id)
+                                        .attr("value",val.id)
+                                        .text(val.name)
+                                     );
+                                  });
+                                  Enable_Elements()
+                           }  
+                        else
+                         {
+                              alert("No Module Exists for this Course type!!!")
+                         
+                         }   
+                        if (trainer!="")
+                         {   
+                               $('#event_coordinator').empty()
+                               $('#event_coordinator').append($("<option></option>").attr("value","Select Trainer").text("--- Select Trainer ---"))
+                               $.each(trainer,function(key,val){
+                                    $('#event_coordinator').append(
+                                       $("<option></option>")
+                                        .attr("id", "coursename_"+key.id)
+                                        .attr("value",val.id)
+                                        .text(val.name)
+                                        );
+                                        
+                                      });   
+                                
+                          }
+                        else
+                          {
+                             clear_Disable_Elements();
+                             alert("No Trainers have being Assinged to this Course !!!")
+                          }
+                   } 
+              });
       }
-      
-     if(!(str))
-      {
-        start_time = new Date($('#start_time').datetimepicker('getDate')) 
-        end_time = new Date($('#end_time').datetimepicker('getDate'))  
-        
-      }
-        reset_session_variable(str)
-        deduct_time(start_time,end_time)
-    if (total_session_time <= 0 )
-     {
-      if(total_session_time < 0)
-      {
-          alert("Please schedule session within given allotted time!")
-      }
-       show_hide_date(str)     
-     }
-     else
-     {
-       document.getElementById('splitsession').disabled="";
-       if (document.getElementById('splitsession').checked == true)
-        {
-            if (document.getElementById("start_time_"+(Number(str)+1)))
-            {
-                document.getElementById("start_time_"+(Number(str)+1)).disabled=""
-            }
-        }
-       
-     }
-   }
-   set_end_date_time(name)
-}  
+ });     
 
-function deduct_time(start_time,end_time)
-{    var difference = start_time.getTime() - end_time.getTime();
-     var daysDifference = Math.floor(difference/1000/60/60/24);
-     difference -= daysDifference*1000*60*60*24
-     var hoursDifference = Math.floor(difference/1000/60/60);
-     difference -= hoursDifference*1000*60*60
-     var minutesDifference = Math.floor(difference/1000/60);
-     difference -= minutesDifference*1000*60 
-     var secondsDifference = Math.floor(difference/1000);
-     diffhh = 23-hoursDifference
-     diffmm = 60-minutesDifference
-     total_min_diff=((Number(diffhh)*60) + Number(diffmm))
-     deducted_minute =  Number(total_session_time) - Number(total_min_diff)
-     total_session_time=deducted_minute
-     $("#available-minutes").empty()
-     $("#available-minutes").append("<label for='end_time' class='inline'>"+total_session_time+"<label>")
-     /* temprory path */
-     if ( total_session_time !=0 )
-     {
-          document.getElementById('submit').disabled = true;      
-     }
-}
+  function datetime()
+   { 
+    currentDate = new Date();
+    var currentDay = currentDate.getDate();
+    var currentMonth = currentDate.getMonth();
+    var currentYear = currentDate.getFullYear();
 
-function show_hide_date(str)
-{
-    if (!(str))
-    {  
-       document.getElementById('select_split').hidden=true 
-       document.getElementById('splitsession').checked=false
-       document.getElementById('chkbxsplit-2').checked=false
-       document.getElementById('chkbxsplit-3').checked=false
-       document.getElementById('splitsession').disabled=true;
-       $("#date-splits").empty();
-       $("#iteration").attr('value','1')
-    }
-    if(str ==1)
-    {
-        $('start_time_2').hide()
-        $('end_time_2').hide()
-         $("#iteration").attr('value','2')
-    }
-    
-}
-function reset_session_variable(str)
-{
-var start_time=""
-var end_time=""
-
-  if (!(str))
-      {
-       total_session_time=$('#session_of option:selected').attr('minutes')
-       if (document.getElementById('start_time_1')){
-       document.getElementById('start_time_1').value=""}
-       if ( document.getElementById('end_time_1')){
-       document.getElementById('end_time_1').value=""
-       }
-       if(document.getElementById('start_time_2')){
-       document.getElementById('start_time_2').value=""}
-       if ( document.getElementById('end_time_2')){
-       document.getElementById('end_time_2').value=""
-       }
-        }
-  if(str == 1)
-  { 
-     total_session_time=$('#session_of option:selected').attr('minutes')
-     start_time = new Date($('#start_time').datetimepicker('getDate')) 
-     end_time = new Date($('#end_time').datetimepicker('getDate'))  
-     if(document.getElementById('start_time_2')){
-       document.getElementById('start_time_2').value=""}
-       if ( document.getElementById('end_time_2')){
-       document.getElementById('end_time_2').value=""
-       }  
-     deduct_time(start_time,end_time) 
-  } 
-  if (str == 2){
-        total_session_time=$('#session_of option:selected').attr('minutes')
-        start_time = new Date($('#start_time').datetimepicker('getDate')) 
-        end_time = new Date($('#end_time').datetimepicker('getDate'))  
-        deduct_time(start_time,end_time)
-        start_time = new Date($('#start_time_1').datetimepicker('getDate')) 
-        end_time = new Date($('#end_time_1').datetimepicker('getDate'))  
-        deduct_time(start_time,end_time)
-        
-   }
-        
-}
-
-function set_end_date_time(num){
-   var str=num.substring(11)
-
-       
-    if (str)
-    { 
-
-      $("#end_time_"+str+"").datepicker('option','minDate', $("#start_time_"+ str +"").datetimepicker('getDate'));
-      $("#end_time_"+str+"").timepicker('option','minDate', $("#start_time_"+ str +"").datetimepicker('getDate'));
-      $("#end_time_"+str+"").timepicker('option','hourMin', $("#start_time_"+  str +"").datetimepicker('getDate').getHours());
-      $("#end_time_"+str+"").timepicker('option','minuteMin',$("#start_time_"+ str +"").datetimepicker('getDate').getMinutes());
-      document.getElementById("end_time_"+str).disabled=""
-      
-    }
-    if (!(str))
-    {
-    
-    $("#end_time").datepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
-    $("#end_time").timepicker('option','minDate', $("#start_time").datetimepicker('getDate'));
-    $("#end_time").timepicker('option','hourMin',$("#start_time").datetimepicker('getDate').getHours());
-    $("#end_time").timepicker('option','minuteMin',$("#start_time").datetimepicker('getDate').getMinutes());
-    document.getElementById('end_time').disabled=""
-    }
-    
-}    
-
-function datetime(){  
-currentDate = new Date();
-var currentDay = currentDate.getDate();
-var currentMonth = currentDate.getMonth();
-var currentYear = currentDate.getFullYear();
-  $(".date_month_day_year").datetimepicker({
+   $(".date_month_day_year").datetimepicker({
        
       changeMonth: true,
       dateFormat: 'dd/mm/yy',
@@ -1067,14 +928,19 @@ var currentYear = currentDate.getFullYear();
       minuteGrid: 15,
       onClose: function(dateText, inst) {
         $(this).val(dateText);
-
-        if ( '{{title}}' != 'Exam' )
+        
+         if ( '{{title}}' != 'Exam' )
         {
           date_validation($(this).attr('name'))
+          
+        }  
+        else
+        {
           enable_submit()
         }  
-
           
+        
+
         var month_year = $(this).val();
         day = currentDay;
         month = currentMonth;
@@ -1097,7 +963,7 @@ var currentYear = currentDate.getFullYear();
         $(this).datetimepicker('setDate', new Date(year, (month-1), day));
       },
     });
-}
+  }
 
 $("#submit").click(function() {
 
@@ -1116,5 +982,6 @@ $("#submit").click(function() {
 });
 
 {% endblock %}
+
 
 

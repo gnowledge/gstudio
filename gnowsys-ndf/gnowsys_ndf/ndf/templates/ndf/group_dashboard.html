@@ -3,6 +3,16 @@
 {% load i18n %}
 {% block title %} {{username}}'s - Dashboard  {% endblock %}
 
+{% block head %}
+  {{block.super}}
+
+  {% if approval %}
+    <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+    <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+    <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+  {% endif %}
+{% endblock %}
+
 {% block style %}
   {{block.super}}
 
@@ -241,8 +251,6 @@
 {% endblock %}
 
 {% block script %}
-// <script type="text/javascript">
-  
   {{block.super}}
   var count = 0;
   var morecount = 0;
@@ -394,10 +402,6 @@
 
 // ================================================================
 
-$(document).on("click", ".checkAllStudents", function(){
-  $(".approveStudent").prop("checked", $(this).is(":checked"));
-});
-
 $(".detail-view").click(function(event) {
   event.preventDefault();
 
@@ -442,85 +446,6 @@ $(".detail-view").click(function(event) {
   });
 })
 
-$(document).on("click", ".btnApproval", function() {
-  students_selected = []
-  $(".approveStudent:checked").each(function() {
-    students_selected.push($(this).attr("id"));
-  });
-
-  approval_state = $(this).val();
-
-  if (students_selected.length <= 0) {
-    if (approval_state == "Approve") {
-      $("#alertModalLabel").text("Please select any students for approval !!!");
-    }
-
-    else {
-      $("#alertModalLabel").text("Please select any students for rejection !!!");
-    }
-
-    $("#alertModal").removeClass("success");
-    $("#alertModal").addClass("warning");
-    $("#alertModal").foundation('reveal', 'open');
-
-    return;
-  }
-
-  enrollment_id = $("#enrollment_id").val();
-
-  course_id = $("#course_id").val();
-
-  success_state = false
-  approved = ""
-  rejected = ""
-  remaining = ""
-  task_status = ""
-  $.ajax({
-    url: "{% url 'approve_students' groupid %}",
-
-    data: {
-      'approval_state': approval_state,
-      'enrollment_id': enrollment_id,
-      'course_id': course_id,
-      'students_selected': students_selected,
-      'csrfmiddlewaretoken': "{{csrf_token}}"
-    },
-
-    type: "POST",
-
-    dataType: "json",
-
-    success: function(data) {
-      success_state = data["success"];
-
-      if (success_state) {
-        approved = data["approved"];
-        rejected = data["rejected"];
-        remaining = data["remaining"];
-        task_status = data["task_status"];
-      }
-
-      else {
-        $("#alertModalLabel").text(data["message"]);
-        $("#alertModal").removeClass("success").removeClass("warning");
-        $("#alertModal").addClass("alert");
-        $("#alertModal").foundation('reveal', 'open');
-      }
-    },
-
-    complete: function() {
-      if (success_state) {
-        $("#"+enrollment_id).find(".Approved").text(approved);
-        $("#"+enrollment_id).find(".Rejected").text(rejected);
-        $("#"+enrollment_id).find(".Remaining").text(remaining);
-        $("#"+enrollment_id).find(".Status").text(task_status);
-
-        $("#approval_accordion").removeClass("active");
-        $("#enrollment_accordion").addClass("active");
-      }
-    },
-  });
-});
 {% endblock %}
 
 {% block document_ready %}
@@ -528,4 +453,3 @@ $(document).on("click", ".btnApproval", function() {
 
   loaddata();
 {% endblock %}
-// </script>

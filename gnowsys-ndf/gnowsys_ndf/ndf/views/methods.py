@@ -1477,7 +1477,6 @@ def parse_template_data(field_data_type, field_value, **kwargs):
     raise Exception(error_message)
 
 def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
-
   ga_node = None
   info_message = ""
   old_object_value = None
@@ -1522,7 +1521,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
   else:
     # Code for updation
     is_ga_node_changed = False
-    
     try:
       if (not object_value) and type(object_value) != bool:
         old_object_value = ga_node.object_value
@@ -1587,7 +1585,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
             info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
 
             # Fetch corresponding document & update it's attribute_set with proper value
-            collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
+            collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: {"$exists": True}}, 
                               {'$set': {'attribute_set.$.'+attribute_type_node.name: ga_node.object_value}}, 
                               upsert=False, multi=False)
         else:
@@ -1789,7 +1787,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             else:
               error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
-              raise Exception(error_message)
+              # raise Exception(error_message)
 
       return gr_node_list
 
