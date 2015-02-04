@@ -837,7 +837,6 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     template_prefix = "mis"
 
     user_id = int(request.user.id)  # getting django user id
-    # user_name = unicode(request.user.username)  # getting django user name
 
     if user_id:
         if auth is None:
@@ -862,6 +861,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     sce_gs = None
     sce_last_update = None
     ann_course_list = []
+    ann_course_ids = []
     ann_course_name = ""
     nussd_course_type = ""
     start_time = ""
@@ -892,6 +892,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
 
             for each in sce_gs.for_acourse:
                 ann_course_list.append([str(each._id), each.name])
+                ann_course_ids.append(each._id)
                 ann_course_name = each.name
 
             start_enroll = sce_gs.start_enroll
@@ -1155,6 +1156,51 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 # Update StudentCourseEnrollment node's last_update field
                 sce_gs.last_update = datetime.datetime.today()
 
+            # Set course enrollment status of each announced course for each student
+            # 1) Append to "selected_course" (RelationType)
+            # 2) Set enrollment status for that announce course
+            #    in "course_enrollment_status" (AttributeType) as "Enrolled"
+
+            # Fetch students which are not enrolled to given announced course(s)
+            student_cur = collection.Node.find({
+                "_id": {"$in": total_student_enroll_list},
+                "relation_set.selected_course": {"$nin": ann_course_ids}
+            })
+            # }, {
+            #     "relation_set.selected_course": 1, "name": 1, "attribute_set.course_enrollment_status": 1
+            # })
+
+            selected_course_rt = collection.Node.one({
+                "_type": "RelationType", "name": "selected_course"
+            })
+            course_enrollment_status_at = collection.Node.one({
+                "_type": "AttributeType", "name": "course_enrollment_status"
+            })
+
+            for each_student in student_cur:
+                for rel in each_student.relation_set:
+                    selected_course_ids = []
+                    if rel and "selected_course" in rel:
+                        selected_course_ids = rel["selected_course"]
+                        break
+
+                selected_course_ids = ann_course_ids + selected_course_ids
+                gr_node = create_grelation(each_student._id, selected_course_rt, selected_course_ids)
+
+                course_enrollment_status = {}
+                for attr in each_student.attribute_set:
+                    if attr and "course_enrollment_status" in attr:
+                        course_enrollment_status = attr["course_enrollment_status"]
+                        break
+
+                for each_course_id in selected_course_ids:
+                    str_course_id = str(each_course_id)
+                    if str_course_id not in course_enrollment_status:
+                        course_enrollment_status.update({str_course_id: u"Enrolled"})
+                at_node = create_gattribute(each_student._id, course_enrollment_status_at, course_enrollment_status)
+
+                each_student.reload()
+
         # Save/Update GAttribute(s) and/or GRelation(s)
         for at_rt_name in at_rt_list:
             if at_rt_name in at_rt_dict:
@@ -1188,7 +1234,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
         # Populate Announced courses of given enrollment
         if not enrollment_closed:
             # Fetch required list of AttributeTypes
-            fetch_ats = ["nussd_course_type", "degree_year"]
+            fetch_ats = ["nussd_course_type", "degree_year","degree_name"]
 
             for each in fetch_ats:
                 each = collection.Node.one({
