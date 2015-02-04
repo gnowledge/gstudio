@@ -150,9 +150,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   for i in Group_type.relation_set:
        if unicode("group_of") in i.keys():
           group_inverse_rel_id = i['group_of']
-  print "asfdasdf",(group_inverse_rel_id)
-  if group_inverse_rel_id :
-    Group_name = collection.Node.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
+  
+  Group_name = collection.Node.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
   Eventtype='Eventtype'
   if Group_name:
 

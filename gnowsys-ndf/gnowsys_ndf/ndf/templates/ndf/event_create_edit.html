@@ -96,13 +96,14 @@
         <div class="row">
           {% if groupname != "MIS_admin"  %}
               {% if  field.altnames != 'Organised by' %} 
-                  
+                {% if field.altnames != 'Event Status' %}      
           <div class="small-2 columns"> 
             <label for="{{field.name}}" class="right inline"> {{field.altnames}} </label>
           </div>
           <div class="small-5 end columns">
             {% html_widget groupid node.pk field %}
           </div>
+            {% endif %}
            {% endif %}
           {% endif %}
           
