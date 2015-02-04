@@ -50,7 +50,7 @@ class Command(BaseCommand):
           
           rescheduled_events = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.event_edit_reschedule.reschedule_till":{'$gt':yesterday}}) 
           
-          Attendance_marked_event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"relation_set.has_attended":{"$exists":False},"attribute_set.start_time":{'$gte':yesterday,'lt':Today}})
+          Attendance_marked_event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"relation_set.has_attended":{"$exists":False},"attribute_set.start_time":{'$gte':yesterday}})
 
           reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
           
@@ -83,7 +83,7 @@ class Command(BaseCommand):
           
           for i in Attendance_marked_event:
             event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
-            create_gattribute(ObjectId(node),event_status,unicode('Incomplete'))
+            create_gattribute(ObjectId(i._id),event_status,unicode('Incomplete'))
             
             for j in i.attribute_set:
               if unicode("start_time") in j.keys():

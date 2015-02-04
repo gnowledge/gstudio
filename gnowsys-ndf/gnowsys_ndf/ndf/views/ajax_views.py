@@ -1608,12 +1608,13 @@ def get_data_for_event_task(request,group_id):
      task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
     #day_list of events  
     
-    if no == '1' or no == '2' or no == '3':
+    if no == '1' or no == '2':
        #condition to search events only in case of above condition so that it
        #doesnt gets executed when we are looking for other data
        event = collection.Node.one({'_type': "GSystemType", 'name': "Event"})
        obj = collection.Node.find({'type_of': event._id},{'_id':1})
        all_list = [ each_gst._id for each_gst in obj ] 
+    
     if no == '1':    
         nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':all_list},'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
         for i in nodes:
@@ -1626,7 +1627,17 @@ def get_data_for_event_task(request,group_id):
           date=i.attribute_set[0]['start_time']
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           update({'start':formated_date})
-          #update({'backgroundColor':'blue'})
+          for j in i.attribute_set:
+                if unicode('event_status') in j.keys():  
+                  if j['event_status'] == 'Scheduled':  
+                        #Default Color Blue would be applied
+                        pass
+                  if j['event_status'] == 'rescheduled':
+                        update({'backgroundColor':'#ffd700'})
+                  if j['event_status'] == 'Completed':
+                        update({'backgroundColor':'green'})
+                  if j['event_status'] == 'Incomplete':      
+                        update({'backgroundColor':'red'})
           append(dict(attr_value))
     if no == '2':    
         #All the Rescheduled ones 
@@ -1646,30 +1657,11 @@ def get_data_for_event_task(request,group_id):
                       update({'start':formated_date})
                       update({'backgroundColor':'#ffd700'})
                       append(dict(attr_value)) 
-    if no == '3':      
-          #ALl the Events Whoes attendanc are not held
-          nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':list(all_list)},"relation_set.has_attended":{"$exists":False},'group_set':ObjectId(group_id),'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
-          for k in nodes:
-            attr_value={}
-            update =attr_value.update
-            event_url=event_url="/"+str(group_id)+"/event/"+str(k.member_of[0]) +"/"+str(k._id)
-            update({'url':event_url})
-            update({'id':k._id})
-            update({'title':k.name})
-            try:
-              date=k.attribute_set[0]['start_time']
-              formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-            except:
-              date =datetime.datetime.today()  
-              formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-            update({'start':formated_date})
-            update({'backgroundColor':'red'})
-            append(dict(attr_value)) 
     date=""
     user_assigned=[]
     user_append = user_assigned.append
     #day_list of task
-    if no == '4': 
+    if no == '3': 
           groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
           attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
           attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
@@ -4477,7 +4469,7 @@ def reschedule_task(request,group_id,node):
     #for any type change the event status to re-schdueled if the request comes 
     #for generating a task for reschdueling a event
     event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
-    create_gattribute(ObjectId(node),event_status,unicode('reschdueled'))
+    create_gattribute(ObjectId(node),event_status,unicode('rescheduled'))
     if  reschedule_type == 'event_reschedule' :
          for i in event_node.attribute_set:
 	       if unicode('event_edit_reschedule') in i.keys():
