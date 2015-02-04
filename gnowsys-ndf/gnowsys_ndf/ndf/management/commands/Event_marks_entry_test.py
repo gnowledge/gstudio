@@ -7,6 +7,8 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.notification import models as notification
 from django.template import RequestContext
 from django.core.mail import send_mail
+from django.core.management.base import BaseCommand, CommandError
+
 collection = get_database()[Node.collection_name]
 
 class Command(BaseCommand):
@@ -28,6 +30,8 @@ class Command(BaseCommand):
 
             for i in marks_enter:
               to_user_list = []
+              event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+              create_gattribute(ObjectId(i._id),event_status,unicode('Incomplete'))
               node = collection.Node.one({"_id":{'$in':i.group_set}})
               for j in node.group_admin:
                  user_obj = User.objects.get(id = j)
