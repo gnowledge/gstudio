@@ -19,8 +19,8 @@ from gnowsys_ndf.ndf.views.methods import create_grelation
 
 db = get_database()
 collection = db[Node.collection_name]
-GST_BATCH = collection.GSystemType.one({'name': GAPPS[9]})
-app = collection.GSystemType.one({'name': GAPPS[9]})
+GST_BATCH = collection.GSystemType.one({'name': "Batch"})
+app = collection.GSystemType.one({'name': "Batch"})
 
 def batch(request, group_id):
     """

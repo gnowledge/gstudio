@@ -3641,17 +3641,14 @@ def get_anncourses_allstudents(request, group_id):
       all_students = request.GET.get("all_students", "")
       degree_year = request.GET.get("degree_year", "")
       degree_name = request.GET.get("degree_name", "")
+      sce_gs_id = request.GET.get("sce_gs_id", "")
       acourse_val = request.GET.getlist("acourse_val[]", "")
-
       for i, each in enumerate(acourse_val):
         acourse_val[i] = ObjectId(each)
 
       # Following parameters to be used for edit_drawer_widget()
-      node = None
-      checked = None
-
-      lower_year_limit = ""
-      upper_year_limit = ""
+      # node = None
+      # checked = None
 
       enrolled_stud_count = 0
       non_enrolled_stud_count = 0
@@ -3665,34 +3662,19 @@ def get_anncourses_allstudents(request, group_id):
         # error_message = "Invalid data: No data found in any of the field(s)!!!"
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
 
-      # From Announced Course node fetch College's ObjectId
-      acourse_node = collection.Node.find_one(
-        {'_id': {'$in': acourse_val}, 'relation_set.acourse_for_college': {'$exists': True}}, 
-        {'attribute_set': 1, 'relation_set.acourse_for_college': 1}
+      sce_gs = collection.Node.one({'_id':ObjectId(sce_gs_id)},
+        {'member_of': 1, 'attribute_set.has_enrolled': 1, 'relation_set.for_college':1}
       )
-      for rel in acourse_node.relation_set:
+
+      # From Announced Course node fetch College's ObjectId
+      # acourse_node = collection.Node.find_one(
+      #   {'_id': {'$in': acourse_val}, 'relation_set.acourse_for_college': {'$exists': True}}, 
+      #   {'attribute_set': 1, 'relation_set.acourse_for_college': 1}
+      # )
+      for rel in sce_gs.relation_set:
         if rel:
-          colg_of_acourse_id = rel["acourse_for_college"][0]
+          colg_of_acourse_id = rel["for_college"][0]
           break
-
-      # for attr in acourse_node.attribute_set:
-      #   if attr and attr.has_key("start_time"):
-      #     lower_year_limit = attr["start_time"].year.__str__()
-      #   elif attr and attr.has_key("end_time"):
-      #     upper_year_limit = attr["end_time"].year.__str__()
-
-      # if not lower_year_limit or not upper_year_limit:
-      #   if not lower_year_limit:
-      #     if upper_year_limit:
-      #       lower_year_limit = upper_year_limit
-      #     else:
-      #       lower_year_limit = datetime.datetime.now().year.__str__()
-
-      #   if not upper_year_limit:
-      #     if lower_year_limit:
-      #       upper_year_limit = lower_year_limit
-      #     else:
-      #       upper_year_limit = datetime.datetime.now().year.__str__()
 
       date_gte = datetime.datetime.strptime("1/1/"+registration_year, "%d/%m/%Y")
       date_lte = datetime.datetime.strptime("31/12/"+registration_year, "%d/%m/%Y")
@@ -3714,7 +3696,7 @@ def get_anncourses_allstudents(request, group_id):
 
         if colg_of_acourse:
           for rel in colg_of_acourse.relation_set:
-            if rel:
+            if rel and "has_group" in rel:
               # If rel exists, it means it's has_group
               # then update query
               query = {
@@ -3742,27 +3724,27 @@ def get_anncourses_allstudents(request, group_id):
       # Check whether StudentCourseEnrollment created for given acourse_val
       # Set node as StudentCourseEnrollment node
       # and checked as "has_enrolled", i.e. AT of StudentCourseEnrollment node
-      sce_gst = collection.Node.one(
-        {'_type': "GSystemType", 'name': "StudentCourseEnrollment"}
-      )
-      if sce_gst:
-        sce_gs = collection.Node.one(
-          {'member_of': sce_gst._id, 'relation_set.for_acourse': {'$all': acourse_val}, 'attribute_set.has_enrolled': {'$exists': True}},
-          {'member_of': 1, 'attribute_set.has_enrolled': 1}
-        )
+      # sce_gst = collection.Node.one(
+      #   {'_type': "GSystemType", 'name': "StudentCourseEnrollment"}
+      # )
+      # if sce_gst:
+      #   print "before fetching sce"
+      # sce_gs = collection.Node.one(
+      #   {'member_of': sce_gst._id, 'relation_set.for_acourse': {'$all': acourse_val}, 'attribute_set.has_enrolled': {'$exists': True}},
+      #   {'member_of': 1, 'attribute_set.has_enrolled': 1}
+      # )
+      enrolled_stud_list = []
+      if sce_gs:
+        for attr in sce_gs.attribute_set:
+          if attr and "has_enrolled" in attr:
+            enrolled_stud_list = attr["has_enrolled"]
+            enrolled_stud_count = str(len(attr["has_enrolled"]))
+            break
 
-        if sce_gs:
-          for attr in sce_gs.attribute_set:
-            if attr:
-              query.update({'_id': {'$nin': attr["has_enrolled"]}})
-              enrolled_stud_count = str(len(attr["has_enrolled"]))
+            # sce_gs.get_neighbourhood(sce_gs.member_of)
+            # node = sce_gs
+            # checked = "has_enrolled"
 
-              sce_gs.get_neighbourhood(sce_gs.member_of)
-              node = sce_gs
-              checked = "has_enrolled"
-
-      drawer_template_context = {}
-      drawer_widget = ""
       res = None
 
       if all_students == u"true":
@@ -3783,14 +3765,17 @@ def get_anncourses_allstudents(request, group_id):
                 '$sort': {'name': 1}
             }
         ])
-
-        all_students_text += " [Count("+str(len(res["result"]))+")]"
+        total_students_count = len(res["result"])
+        all_students_text += " [Count("+str(total_students_count)+")]"
+        non_enrolled_stud_count = total_students_count - int(enrolled_stud_count)
 
       elif all_students == u"false":
+        query.update({'_id': {'$nin': attr["has_enrolled"]}})
         all_students_text = "Only non-enrolled students"
 
         # Find students which are not enrolled in selected announced course
-        query.update({'relation_set.selected_course': {'$ne': acourse_node._id}})
+        # query.update({'relation_set.selected_course': {'$ne': acourse_node._id}})
+        query.update({'relation_set.selected_course': {'$nin': acourse_val}})
 
         res = collection.aggregate([
             {
@@ -3808,21 +3793,10 @@ def get_anncourses_allstudents(request, group_id):
                 '$sort': {'name': 1}
             }
         ])
-
         non_enrolled_stud_count = str(len(res["result"]))
         all_students_text += " [Count("+non_enrolled_stud_count+")]"
 
-      # if res.count():
-      #   drawer_template_context = edit_drawer_widget("RelationType", group_id, node, None, checked, left_drawer_content=res)
-      #   drawer_template_context["widget_for"] = "student_enroll"
-      #   drawer_template_context["groupid"] = group_id
-      #   drawer_widget = render_to_string('ndf/drawer_widget.html',
-      #     drawer_template_context,
-      #     context_instance = RequestContext(request)
-      #   )
-
-      response_dict["announced_courses"] = []
-      # response_dict["drawer_widget"] = drawer_widget
+      # response_dict["announced_courses"] = []
 
       column_headers = [
           ("name", "Name"),
@@ -3831,11 +3805,9 @@ def get_anncourses_allstudents(request, group_id):
       ]
 
       response_dict["column_headers"] = column_headers
-      if res["result"]:
-        response_dict["students_data_set"] = res["result"]
-        response_dict["success"] = True
-      else:
-        response_dict["success"] = False
+      response_dict["success"] = True
+      response_dict["students_data_set"] = res["result"]
+      if not res["result"]:
         response_dict["message"] = "No filtered results found"
       response_dict["enrolled_stud_count"] = enrolled_stud_count
       response_dict["non_enrolled_stud_count"] = non_enrolled_stud_count
