@@ -98,7 +98,9 @@
             </div>
             <div class="small-3 columns end">
               <div style="padding-top: 8px;">
-                {{for_acourse}}
+              {% for every_ac in for_acourse %}
+                {{every_ac}} <br>
+              {% endfor %}              
               </div>
             </div>
           </div>
@@ -111,7 +113,9 @@
             </div>
             <div class="small-3 columns">
               <div style="padding-top: 8px;">
-                {{for_college}}
+              {% for every_ac in for_college %}
+                {{every_ac}}
+              {% endfor %}              
               </div>
             </div>
 
@@ -122,7 +126,9 @@
             </div>
             <div class="small-3 columns end">
               <div style="padding-top: 8px;">
-                {{for_university}}
+              {% for every_ac in for_university %}
+                {{every_ac}}
+              {% endfor %}              
               </div>
             </div>
           </div>
