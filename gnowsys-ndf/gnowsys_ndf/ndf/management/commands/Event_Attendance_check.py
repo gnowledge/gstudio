@@ -83,7 +83,7 @@ class Command(BaseCommand):
           
           for i in Attendance_marked_event:
             event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
-            create_gattribute(ObjectId(node),event_status,unicode('Incomplete'))
+            create_gattribute(ObjectId(i._id),event_status,unicode('Incomplete'))
             
             for j in i.attribute_set:
               if unicode("start_time") in j.keys():
