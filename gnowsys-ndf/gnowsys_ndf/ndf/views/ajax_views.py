@@ -4545,7 +4545,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
      event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
      create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
      if attendancesession != str(1):
-	 create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],True)
+	 create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
  reschedule_dates={}
  if attendancedone == 'True':
     for j in event_node.attribute_set:
@@ -4884,7 +4884,6 @@ def attendees_relations(request,group_id,node):
        reschedule=i['reschedule_attendance']['reschedule_allow'] 
     if unicode("marks_entry_completed") in i.keys():
         marks=i["marks_entry_completed"]
- print "reschedule",reschedule,"marks",marks
  column_list.append(reschedule)
  column_list.append(marks)
  return HttpResponse(json.dumps(column_list)) 

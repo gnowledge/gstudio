@@ -541,7 +541,7 @@ function disableAttendance()
     $(':checkbox.chkbx').each(function () 
     { this.disabled = true})
     $('#selall').attr('disabled','true')
-
+    $('#attendancediv').hide()
 }
 
 function drawTable(attended,columns)
@@ -667,8 +667,8 @@ if ( pass[0] == 'Edit'){
         $('#attendance').append("<div class='row'>" 
          + "<div class='small-8 columns'> "
          + " <fieldset>   "
-         + " <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done"
-         + " <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done"
+         + "<div id='assessmentdiv'> <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done </div>"
+         + "<div id='attendancediv'> <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done </div>"
          + " <br> <span style='color:red;'> Note:- Edit option will be closed after asessment is done. </span> "
          + " </fieldset> </div></div>")
       }
@@ -927,8 +927,7 @@ if (!(Status_attended))
       {
           attendancedone = 'True'
       }
-     alert("cominghere")  
-    alert(pass[1])
+    
      if(Event_attended_by !="")
      {
               $.ajax({
