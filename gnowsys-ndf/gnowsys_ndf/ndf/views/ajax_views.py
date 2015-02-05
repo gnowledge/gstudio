@@ -4624,18 +4624,38 @@ def fetch_course_name(request, group_id,Course_type):
   return HttpResponse(json.dumps(course_list))
   
 def fetch_course_Module(request, group_id,Course_name):
-  courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
-  courses=collection.Node.find({"_id":ObjectId(courses[0]['relation_set'][0]['announced_for'][0])})
-  trainers=collection.Node.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
+  batch = request.GET.get('batchid','')
   superdict={}
   module_Detail={}
   module_list=[]
+  event_type_ids=[]
+  courses = collection.Node.one({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
+  eventtypes = collection.Node.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
+  for i in eventtypes:
+  	  event_type_ids.append(i._id)
+  for i in courses.relation_set:
+    if unicode('announced_for') in i.keys():
+      	announced_for = i['announced_for']  
+  courses=collection.Node.find({"_id":{'$in':announced_for}})
+  trainers=collection.Node.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
   course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})
+  #condition for all the modules to be listed is session in it should not be part of the event
+  checklist=[]
   for i in course_modules:
-    module_Detail.update({"name":i.name})
-    module_Detail.update({"id":str(i._id)})
-    module_list.append(module_Detail)
-    module_Detail={}
+    checklist = i.collection_set
+    #check if this collection_set exists in any
+    event = collection.Node.find({"member_of":{'$in':event_type_ids},"relation_set.session_of":{'$elemMatch':{'$in':i.collection_set}}
+    	                  ,'relation_set.event_has_batch':ObjectId(batch)})
+    for k in event:
+    	 for j in k.relation_set:
+             if unicode('session_of') in j.keys():
+             	if j['session_of'][0] in checklist:  
+             		checklist.remove(j['session_of'][0])
+    if len(checklist) > 0:         		
+	    module_Detail.update({"name":i.name})
+	    module_Detail.update({"id":str(i._id)})
+	    module_list.append(module_Detail)
+	    module_Detail={}
   
   trainerlist=[]
   trainer_detail={}
@@ -4650,11 +4670,14 @@ def fetch_course_Module(request, group_id,Course_name):
 
 def fetch_batch_student(request, group_id,Course_name):
   try:
-    courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
+    courses=collection.Node.one({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
     dict1={}
     list1=[]
     a = courses[0].relation_set[0]
-    for i in a['has_batch_member']:
+    for i in courses.relation_set:
+    	 if unicode('has_batch_member') in i.keys():
+           has_batch = i['has_batch_member']    	 	
+    for i in has_batch:
      dict1.update({"id":str(i)})
      list1.append(dict1)
      dict1={}
@@ -4662,22 +4685,38 @@ def fetch_batch_student(request, group_id,Course_name):
   except:
     return HttpResponse(json.dumps(list1)) 
 def fetch_course_session(request, group_id,Course_name):
-  courses=collection.Node.find({"_id":ObjectId(Course_name)})
-  dict1={}
-  list1=[]
-  event_type_id=request.GET.get("app_set_id","")
-  event_type_node=collection.Node.one({"_id":ObjectId(event_type_id)})
+  try:  
+	  courses=collection.Node.one({"_id":ObjectId(Course_name)})
+	  batch = request.GET.get('batchid','')
+	  dict1={}
+	  list1=[]
+	  checklist = []
+	  event_type_ids = []
+	  checklist =  courses.collection_set
+	  eventtypes = collection.Node.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
+	  for i in eventtypes:
+	  	  event_type_ids.append(i._id)
+          
+	  module_node  = collection.Node.find({"member_of":{'$in':event_type_ids},"relation_set.session_of":{'$elemMatch':{'$in':checklist}}
+	    	                  ,'relation_set.event_has_batch':ObjectId(batch)})
+	  for i in module_node:
+	     for k in i.relation_set:
+		if unicode('session_of') in k.keys():
+		   if k['session_of'][0] in checklist:  
+		       checklist.remove(k['session_of'][0])
+	  course_modules=collection.Node.find({"_id":{'$in':checklist}})    
+	  for i in course_modules:
+	      dict1.update({"name":i.name})
+	      dict1.update({"id":str(i._id)})
+	      for j in i.attribute_set:
+	          if "course_structure_minutes" in j.keys()  :
+	              dict1.update({"minutes":str(j["course_structure_minutes"])})
+	      list1.append(dict1)
+	      dict1={}
+	  return HttpResponse(json.dumps(list1))
+  except:
+    return HttpResponse(json.dumps(list1)) 	      
   
-  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})    
-  for i in course_modules:
-      dict1.update({"name":i.name})
-      dict1.update({"id":str(i._id)})
-      for j in i.attribute_set:
-          if "course_structure_minutes" in j.keys()  :
-              dict1.update({"minutes":str(j["course_structure_minutes"])})
-      list1.append(dict1)
-      dict1={}
-  return HttpResponse(json.dumps(list1))
     
   
 
