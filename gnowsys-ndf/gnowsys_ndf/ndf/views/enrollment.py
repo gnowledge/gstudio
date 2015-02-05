@@ -76,9 +76,9 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
     mis_admin = None
     college_group_id = None
     latest_completed_on = None
-    lock_start_enroll = False # Will only be True while editing (i.e. Re-opening Enrollment)
+    unlock_enroll = False # Will only be True while editing (i.e. Re-opening Enrollment)
     reopen_task_id = None
-
+    enrollment_last_date = None
     property_order_list = []
 
     template = ""
@@ -133,8 +133,16 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     else:
                         if "completed_on" in completed_by_on and completed_by_on["completed_on"]:
                             latest_completed_on = completed_by_on["completed_on"]
+            elif attr and "end_enroll" in attr:
+                enrollment_last_date = attr["end_enroll"]
 
     property_order_list = get_property_order_with_value(enrollment_gs)
+
+    if enrollment_last_date:
+        enrollment_last_date = enrollment_last_date.date()
+        current_date = datetime.datetime.now().date()
+        if enrollment_last_date <= current_date:
+            unlock_enroll = True
 
     if request.method == "POST":
         start_enroll = ""
@@ -156,10 +164,6 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
         if "reopen_task_id" in request.POST:
             reopen_task_id = request.POST.get("reopen_task_id", "")
             reopen_task_id = ObjectId(reopen_task_id)
-
-        if latest_completed_on:
-            if latest_completed_on < end_enroll:
-                lock_start_enroll = True
 
         at_rt_list = ["start_enroll", "end_enroll", "for_acourse", "for_college", "for_university", "enrollment_status", "has_enrolled", "has_enrollment_task", "has_approval_task"]
         at_rt_dict = {}
@@ -338,8 +342,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     # for Student-Course Enrollment
                     task_dict = {}
                     task_name = "StudentCourseEnrollment_Task" + "_" + \
-                        start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + \
-                        "_" + course_name
+                        start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_" + course_name
                     task_name = unicode(task_name)
                     task_dict["name"] = task_name
                     task_dict["created_by"] = request.user.id
@@ -668,7 +671,8 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
         'app_collection_set': app_collection_set,
         'app_set_id': app_set_id,
         'title': title,
-        'property_order_list': property_order_list
+        'property_order_list': property_order_list,
+        'unlock_enroll':unlock_enroll
     }
 
     if app_set_instance_id:

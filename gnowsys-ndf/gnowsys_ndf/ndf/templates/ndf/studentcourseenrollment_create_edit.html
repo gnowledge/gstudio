@@ -234,8 +234,6 @@
 {% block script %}
   {{block.super}}
   var sce_dt_var;
-  var old_end_enroll;
-  var new_end_enroll;
 
   // On close event of reveal-modal (alertModal) -------------------------------------------------------------
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
@@ -414,16 +412,8 @@
    * Click event: "Update Enrollment" button
    */
   $("#update_enroll").click( function (event) {
-    new_end_enroll = $('#end_enroll').val();
-
-    if (new_end_enroll <= old_end_enroll) {
-      event.preventDefault();
-      
-      $("#alertModalLabel").text("To date of enrollment duration must have greater value set than the previous (" + old_end_enroll + ")");
-      $("#alertModal").addClass("alert").addClass("small");
-      $("#alertModal").foundation('reveal', 'open');
-    }
-
+    $("#start_enroll").removeAttr("disabled");
+    $("#end_enroll").removeAttr("disabled");
     $('article').block({ 
       message: '<h4>Processing... Please wait!</h4>',
       css: { 
@@ -441,8 +431,6 @@
 
 {% block document_ready %}
   {{block.super}}
-
-  old_end_enroll = $("#end_enroll").val();
 
   $('#start_enroll').removeClass("date_month_day_year").addClass("dmy");
   $('#end_enroll').removeClass("date_month_day_year").addClass("dmy");
@@ -559,4 +547,14 @@
       $(this).datepicker('setDate', new Date(year, (month-1), day));
     },
   });
+  {% if node %}
+    {% if unlock_enroll %}
+      //allow to edit end_enroll date
+      $("#end_enroll").removeAttr("disabled")
+    {% else %}
+      //don't allow to edit enrollment dates
+      $("#end_enroll").attr("disabled",true)
+    {% endif %}
+    $("#start_enroll").attr("disabled",true)
+  {% endif %}
 {% endblock %}
