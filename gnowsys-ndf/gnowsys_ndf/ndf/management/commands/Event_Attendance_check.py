@@ -41,43 +41,74 @@ class Command(BaseCommand):
               user_obj = User.objects.get(id=Mis_admin.created_by)
               Mis_admin_name=user_obj.username
           
-          try:
-              Attendance_Event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.end_time":{'$gte':day_before_yesterday,'$lt':Today}})
-
-              Attendance_marked_event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"relation_set.has_attended":{"$exists":False},"attribute_set.start_time":{'$gte':yesterday,'lt':Today}})
-
-              reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+          
               
-              for i in Attendance_Event:
-                create_gattribute(ObjectId(i._id),reschedule_attendance,False)
+           
+          Attendance_Event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.start_time":{'$gte':day_before_yesterday,'$lt':Today}})
 
-              for i in Attendance_marked_event:
-                for j in i.attribute_set:
-                  if unicode("start_time") in j.keys():
-                       if (j["start_time"] >= day_before_yesterday and j["start_time"] <  yesterday):
-                          no_of_days = 2
-                       if (j["start_time"] >=  yesterday and j["start_time"] < Today):
-                          no_of_days = 1
-                        
-                to_user_list=[]
-                #node is the node of the college Group
-                node = collection.Node.one({"_type":"Group","_id":{'$in':i.group_set}})
-                for j in node.group_admin:
-                  user_obj = User.objects.get(id=j)
-                  if user_obj not in to_user_list:
-                          to_user_list.append(user_obj)
-                  render_label = render_to_string(
-                        "notification/label.html",
-                        {
-                            "sender": Mis_admin_name,
-                            "activity": "Attendance not marked",
-                            "conjunction": "-"
-                        })
-                  notification.create_notice_type(render_label,"Attendance is not marked for "+ i.name +" Event \n Attendance would be blocked after" + str(no_of_days) + "days" , "notification")
-                  notification.send(to_user_list, render_label, {"from_user": Mis_admin_name})
-          except Exception as e:
-              error_message = "\n Event Error: " + str(e) + " !!!\n"
-              raise Exception(error_message)
+          rescheduled_Attendance_events=collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.reschedule_attendance.reschedule_till":{'$gt':yesterday}})
+          
+          rescheduled_events = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"attribute_set.event_edit_reschedule.reschedule_till":{'$gt':yesterday}}) 
+          
+          Attendance_marked_event = collection.Node.find({"member_of":{'$in':[ObjectId(Event[0]._id),ObjectId(Event[1]._id)]},"relation_set.has_attended":{"$exists":False},"attribute_set.start_time":{'$gte':yesterday,'lt':Today}})
+
+          reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+          
+          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+          
+          reschedule_dates = {}
+          for i in Attendance_Event:
+             for j in i.attribute_set:
+               if unicode('reschedule_attendance') in j.keys():
+                  reschedule_dates = j['reschedule_attendance']
+             reschedule_dates["reschedule_allow"] = False
+             create_gattribute(ObjectId(i._id),reschedule_attendance,reschedule_dates)
+              
+          reschedule_dates={}
+          for i in rescheduled_events:
+              for j in i.attribute_set:
+                       if unicode('event_edit_reschedule') in j.keys():
+                         reschedule_dates = j['event_edit_reschedule']
+              reschedule_dates['reschedule_allow'] = False
+              create_gattribute(ObjectId(i._id),reschedule_event,reschedule_dates)
+              
+          reschedule_dates={}
+          for i in rescheduled_Attendance_events:
+             for j in i.attribute_set:
+               if unicode('reschedule_attendance') in j .keys():
+                  reschedule_dates = j['reschedule_attendance']
+               reschedule_dates["reschedule_allow"] = False
+             create_gattribute(ObjectId(i._id),reschedule_attendance,reschedule_dates)
+
+          
+          for i in Attendance_marked_event:
+            event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+            create_gattribute(ObjectId(i._id),event_status,unicode('Incomplete'))
+            
+            for j in i.attribute_set:
+              if unicode("start_time") in j.keys():
+                   if (j["start_time"] >= day_before_yesterday and j["start_time"] <  yesterday):
+                      no_of_days = 2
+                   if (j["start_time"] >=  yesterday and j["start_time"] < Today):
+                      no_of_days = 1
+                    
+            to_user_list=[]
+            #node is the node of the college Group
+            node = collection.Node.one({"_type":"Group","_id":{'$in':i.group_set}})
+            for j in node.group_admin:
+              user_obj = User.objects.get(id=j)
+              if user_obj not in to_user_list:
+                      to_user_list.append(user_obj)
+              render_label = render_to_string(
+                    "notification/label.html",
+                    {
+                        "sender": Mis_admin_name,
+                        "activity": "Attendance not marked",
+                        "conjunction": "-"
+                    })
+              notification.create_notice_type(render_label,"Attendance is not marked for "+ i.name +" Event \n Attendance would be blocked after" + str(no_of_days) + "days" , "notification")
+              notification.send(to_user_list, render_label, {"from_user": Mis_admin_name})
+       
               
             
             

@@ -286,7 +286,6 @@ def user_preferences(request,group_id,auth_id):
         return HttpResponse("Failure")
 
 def user_template_view(request,group_id):
-    
     auth_group = None
     group_list=[]
     group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}}).limit(4)
@@ -429,7 +428,7 @@ def group_dashboard(request, group_id):
                 # Create new grelation and append it to that along with given user
                 if profile_pic_image:
                     gr_node = create_grelation(group_id, has_profile_pic, profile_pic_image._id)
-        
+
     banner_pic=""
     group=collection.Node.one({"_id":ObjectId(group_id)})
     for each in group.relation_set:
@@ -443,7 +442,7 @@ def group_dashboard(request, group_id):
                         banner_pic = collection.Node.one(
                             {'_type': "File", '_id': each["has_Banner_pic"][0]}
                         )
-    
+
     # Approve StudentCourseEnrollment view
     approval = False
     enrollment_details = []
@@ -451,10 +450,14 @@ def group_dashboard(request, group_id):
 
     sce_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
     if sce_gst:
-        sce_cur = collection.Node.find(
-            {'member_of': sce_gst._id, 'group_set': ObjectId(group_id), 'status': u"PUBLISHED"},
-            {'member_of': 1}
-        )
+        # Get StudentCourseEnrollment nodes which are there for approval
+        sce_cur = collection.Node.find({
+            'member_of': sce_gst._id, 'group_set': ObjectId(group_id),
+            "attribute_set.enrollment_status": {"$nin": [u"OPEN"]},
+            'status': u"PUBLISHED"
+        }, {
+            'member_of': 1
+        })
 
         if sce_cur.count():
             approval = True
@@ -463,7 +466,8 @@ def group_dashboard(request, group_id):
                 sce_gs.get_neighbourhood(sce_gs.member_of)
                 data = {}
 
-                approve_task = sce_gs.has_corresponding_task[0]
+                # approve_task = sce_gs.has_corresponding_task[0]
+                approve_task = sce_gs.has_current_approval_task[0]
                 approve_task.get_neighbourhood(approve_task.member_of)
                 data["Status"] = approve_task.Status
                 # Check for corresponding task's status
@@ -481,18 +485,18 @@ def group_dashboard(request, group_id):
                     for each in sce_gs.for_acourse[0].attribute_set:
                         if not each:
                             pass
-                        elif each.has_key("start_enroll"):
-                            start_enroll = each["start_enroll"]
-                        elif each.has_key("end_enroll"):
-                            end_enroll = each["end_enroll"]
+                        elif "start_time" in each:
+                            start_time = each["start_time"]
+                        elif "end_time" in each:
+                            end_time = each["end_time"]
 
-                    data["Course"] = "Foundation_Course" + "_" + start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y")
+                    data["Course"] = "Foundation_Course" + "_" + start_time.strftime("%d-%b-%Y") + "_" + end_time.strftime("%d-%b-%Y")
 
                 else:
                     # Courses other than FC
                     data["Course"] = sce_gs.for_acourse[0].name
-                data["Completed On"] =  sce_gs.completed_on.strftime("%d/%m/%Y")
-                
+                # data["Completed On"] = sce_gs.completed_on.strftime("%d/%m/%Y")
+
                 remaining_count = None
                 enrolled_list = []
                 approved_list = []
