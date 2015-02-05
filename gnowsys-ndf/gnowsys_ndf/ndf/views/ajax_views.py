@@ -1632,7 +1632,7 @@ def get_data_for_event_task(request,group_id):
                   if j['event_status'] == 'Scheduled':  
                         #Default Color Blue would be applied
                         pass
-                  if j['event_status'] == 'rescheduled':
+                  if j['event_status'] == 'Rescheduled':
                         update({'backgroundColor':'#ffd700'})
                   if j['event_status'] == 'Completed':
                         update({'backgroundColor':'green'})
@@ -4469,7 +4469,7 @@ def reschedule_task(request,group_id,node):
     #for any type change the event status to re-schdueled if the request comes 
     #for generating a task for reschdueling a event
     event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
-    create_gattribute(ObjectId(node),event_status,unicode('rescheduled'))
+    create_gattribute(ObjectId(node),event_status,unicode('Rescheduled'))
     if  reschedule_type == 'event_reschedule' :
          for i in event_node.attribute_set:
 	       if unicode('event_edit_reschedule') in i.keys():
