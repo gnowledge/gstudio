@@ -29,6 +29,8 @@ import string
 import json
 import locale
 from datetime import datetime,timedelta,date
+import csv
+from collections import Counter
 
 
 db = get_database()
@@ -1017,8 +1019,7 @@ def tag_info(request, group_id, tagname = None):
     '''
     cur = None
     total = None
-    total_length = None
-    a = None
+    total_length = None  
     yesterdays_result = []
     week_ago_result = []
     search_result = []
@@ -1031,9 +1032,26 @@ def tag_info(request, group_id, tagname = None):
     collection = get_database()[Node.collection_name]
 
     if not tagname:
-        tagname = request.GET.get("search","").lower()
-  
-    if request.user.is_authenticated():       #Autheticate user can see all public files  
+        tagname = request.GET["search"].lower()
+
+    if request.user.is_superuser:  #Superuser can see private an public files 
+        if tagname:
+            cur = collection.Node.find( {'tags':{'$in':[tagname]},
+                                          '$or':[   {'access_policy':u'PUBLIC'},
+                                                    {'access_policy':u'PRIVATE'}
+                                                ],   
+                                         'status':u'PUBLISHED'
+                                    }
+                                 )
+            for every in cur:
+                search_result.append(every)
+
+        total = len(search_result)
+        total = locale.format("%d", total, grouping=True)
+        if len(search_result) == 0:
+            total_length = len(search_result)    
+
+    elif request.user.is_authenticated():   #Autheticate user can see all public files  
         group_cur = collection.Node.find({'_type':'Group',
                                            '$or':[ {'created_by':userid},
                                                  {'group_admin':userid},
@@ -1060,26 +1078,9 @@ def tag_info(request, group_id, tagname = None):
         if len(search_result) == 0:
             total_length = len(search_result)
 
-    elif request.user.is_superuser:  #Superuser can see private an public files 
-        if tagname:
-            cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                         'access_policy':u'PUBLIC',
-                                         'access_policy':u'PRIVATE',   
-                                         'status':u'PUBLISHED'
-                                    }
-                                 )
-            for every in cur:
-                search_result.append(every)
-
-        total = len(search_result)
-        total = locale.format("%d", total, grouping=True)
-        if len(search_result) == 0:
-            total_length = len(search_result)    
-
     else: #UNauthenticated user can see all public files.
         if tagname:
-            cur = collection.Node.find( {  'tags':{'$in':[tagname]},
-                                           'group_type':u'PUBLIC',
+            cur = collection.Node.find( { 'tags':{'$in':[tagname]},
                                            'access_policy':u'PUBLIC',
                                            'status':u'PUBLISHED'
                                         }
@@ -1093,7 +1094,7 @@ def tag_info(request, group_id, tagname = None):
             total_length = len(search_result)
             
     return render_to_response(
-        "ndf/tag_browser.html", 
+        "ndf/tag_browser.html",
         {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},
         context_instance=RequestContext(request)
     )

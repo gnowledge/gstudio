@@ -129,7 +129,7 @@ $(document).ready(function()
 <!-- overide meta_content block from base.html -->
 {% block meta_content %}
 
-<h4><i class="fi-torsos"></i>{{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}</h4>
+<h4><i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}</h4>
 {% endblock %}
 
 {% block app_action_list %}
