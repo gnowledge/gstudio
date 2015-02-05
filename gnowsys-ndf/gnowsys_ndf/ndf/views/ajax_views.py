@@ -4603,7 +4603,6 @@ def fetch_batch_student(request, group_id,Course_name):
     courses=collection.Node.one({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
     dict1={}
     list1=[]
-    a = courses[0].relation_set[0]
     for i in courses.relation_set:
     	 if unicode('has_batch_member') in i.keys():
            has_batch = i['has_batch_member']    	 	
