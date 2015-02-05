@@ -900,6 +900,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 },
                 {   'member_of':1,
                     'name':1,
+                    'last_update':1,
                     'attribute_set.start_enroll':1,
                     'attribute_set.end_enroll':1,
                     'attribute_set.has_enrollment_task':1
