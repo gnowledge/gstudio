@@ -3356,6 +3356,7 @@ def get_announced_courses_with_ctype(request, group_id):
                 })
 
             if ac_cur.count():
+                sce_gs_dict = {}
                 for each_ac in ac_cur:
                     # NOTE: This ajax-call is used in various templates
                     # Following is used especially only in new_create_batch.html
@@ -3363,11 +3364,31 @@ def get_announced_courses_with_ctype(request, group_id):
                     enrolled_stud_count = 0
                     if ann_course_type != 1:
                         for rel in each_ac.relation_set:
-                            if rel and "course_selected" in rel:
-                                enrolled_stud_count = len(rel["course_selected"])
+                            if rel and "course_has_enrollment" in rel:
+                                if rel["course_has_enrollment"]:
+                                    sce_gs_id = rel["course_has_enrollment"][0]
+                                    str_sce_gs_id = str(sce_gs_id)
+                                    if str_sce_gs_id in sce_gs_dict:
+                                        enrolled_stud_count = sce_gs_dict[str_sce_gs_id]
+                                        break
+
+                                    sce_gs_node = collection.Node.one({
+                                        "_id": ObjectId(sce_gs_id)
+                                    }, {
+                                        "attribute_set.has_approved": 1
+                                    })
+
+                                    sce_gs_dict[str_sce_gs_id] = enrolled_stud_count
+                                    for attr in sce_gs_node.attribute_set:
+                                        if attr and "has_approved" in attr:
+                                            if attr["has_approved"]:
+                                                enrolled_stud_count = len(attr["has_approved"])
+                                                sce_gs_dict[str_sce_gs_id] = enrolled_stud_count
+                                            break
                                 break
 
                         each_ac["enrolled_stud_count"] = enrolled_stud_count
+
                     acourse_ctype_list.append(each_ac)
 
                 response_dict["success"] = True
@@ -3982,7 +4003,6 @@ def get_students_for_approval(request, group_id):
           # Update Enrolled students list
           updated_enrolled_students_list = []
           for each_id in enrolled_students_list:
-            each_id = unicode(each_id)
             if (each_id not in approved_students_list) and (each_id not in rejected_students_list):
               updated_enrolled_students_list.append(each_id)
           
@@ -4053,6 +4073,7 @@ def approve_students(request, group_id):
             enrolled_list = []
             approved_list = []
             rejected_list = []
+            error_id_list = []
             approved_or_rejected_list = []
 
             enrolled_list = sce_gs["result"][0]["has_enrolled"]
@@ -4109,29 +4130,38 @@ def approve_students(request, group_id):
                 course_enrollment_status = stud_node["result"][0]["course_enrollment_status"]
                 if course_enrollment_status:
                     course_enrollment_status = course_enrollment_status[0]
+                else:
+                    course_enrollment_status = {}
 
                 for each_course_id, str_course_id in course_ids:
                     # If ObjectId exists in selected_course and ObjectId(in string format)
                     # exists as key in course_enrollment_status
                     # Then only update status as "Enrollment Approved"/"Enrollment Rejected"
                     if each_course_id in selected_course and str_course_id in course_enrollment_status:
-                        course_enrollment_status.update({str_course_id: course_enrollment_status_text})
-                        at_node = create_gattribute(student_id, course_enrollment_status_at, course_enrollment_status)
-                        if at_node:
-                            # If status updated, then only update approved_or_rejected_list
-                            # by appending given student's ObjectId into it
-                            if student_id not in approved_or_rejected_list:
-                                    approved_or_rejected_list.append(student_id)
+                        # course_enrollment_status.update({str_course_id: course_enrollment_status_text})
+                        course_enrollment_status[str_course_id] = course_enrollment_status_text
+                        try:
+                            at_node = create_gattribute(student_id, course_enrollment_status_at, course_enrollment_status)
+                            if at_node:
+                                # If status updated, then only update approved_or_rejected_list
+                                # by appending given student's ObjectId into it
+                                if student_id not in approved_or_rejected_list:
+                                        approved_or_rejected_list.append(student_id)
+                        except Exception as e:
+                            error_id_list.append(student_id)
+                            continue
 
             has_approved_or_rejected_at = collection.Node.one({
                 '_type': "AttributeType", 'name': at_name
             })
-            attr_node = create_gattribute(
-                ObjectId(enrollment_id),
-                has_approved_or_rejected_at,
-                approved_or_rejected_list
-            )
-
+            try:
+                attr_node = create_gattribute(
+                    ObjectId(enrollment_id),
+                    has_approved_or_rejected_at,
+                    approved_or_rejected_list
+                )
+            except Exception as e:
+                error_id_list.append(enrollment_id)
 
             # Update student's counts in enrolled, approved & rejecetd list
             enrolled_count = len(enrolled_list)
@@ -4164,7 +4194,10 @@ def approve_students(request, group_id):
             else:
                 task_status_value = u"In Progress"
 
-            attr_node = create_gattribute(has_current_approval_task_id[0], task_status_at, task_status_value)
+            try:
+                attr_node = create_gattribute(has_current_approval_task_id[0], task_status_at, task_status_value)
+            except Exception as e:
+                error_id_list.append(has_current_approval_task_id[0])
 
             response_dict["success"] = True
             response_dict["enrolled"] = enrolled_count
@@ -4235,8 +4268,8 @@ def get_students_for_batches(request, group_id):
 
       approved_students_list = []
       for attr in sce_node.attribute_set:
-        if attr and "course_has_enrollment" in attr:
-          approved_students_list = attr["course_has_enrollment"][0]
+        if attr and "has_approved" in attr:
+          approved_students_list = attr["has_approved"]
           break
 
       approve_not_in_batch_studs = [stud_id for stud_id in approved_students_list if stud_id not in batch_member_list]
@@ -4245,13 +4278,13 @@ def get_students_for_batches(request, group_id):
 
       res = collection.Node.find(
         {
-          '_id': {'$nin': approve_not_in_batch_studs},
-          'member_of': student._id,
+          '_id': {"$in": approve_not_in_batch_studs},
+          'member_of': student._id
           # '$or': [
           #   {'group_set': ObjectId(group_id)},
           #   {'relation_set.student_belongs_to_college': college_id}
           # ],
-          'relation_set.selected_course': ObjectId(ac_id)
+          # 'relation_set.selected_course': ObjectId(ac_id)
         },
         {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
       ).sort("name", 1) 
@@ -4269,7 +4302,7 @@ def get_students_for_batches(request, group_id):
       response_dict["drawer_widget"] = drawer_widget
       response_dict["student_count"] = res.count()
       response_dict["batch_name_index"] = batch_name_index
-      response_dict["batches_for_same_course"] = json.dumps(batch_mem_dict,cls=NodeJSONEncoder)
+      response_dict["batches_for_same_course"] = json.dumps(batch_mem_dict, cls=NodeJSONEncoder)
 
       return HttpResponse(json.dumps(response_dict))
     else:

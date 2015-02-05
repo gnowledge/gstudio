@@ -490,6 +490,19 @@
 
       // Setting hidden field's value as the selected value from acourse_list (dropdown)
       $("#announced_courses_list").val(acourse_val);
+
+      $('article').block({ 
+        message: '<h4>Processing... Please wait!</h4>',
+        css: { 
+          border: 'none', 
+          padding: '15px', 
+          color: '#fff !important', 
+          backgroundColor: '#10c1cb !important', 
+          '-webkit-border-radius': '10px', 
+          '-moz-border-radius': '10px', 
+          opacity: 1.0
+        }
+      });
     });
 
     $(document).on("click", "#btnConfirmYes", function() {

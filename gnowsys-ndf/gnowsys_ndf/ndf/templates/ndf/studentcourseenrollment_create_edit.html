@@ -383,6 +383,19 @@
 
     if (ac_cname_cl_uv_ids.length > 0) {
       $("#ac_cname_cl_uv_ids").val(JSON.stringify(ac_cname_cl_uv_ids));
+
+      $('article').block({ 
+        message: '<h4>Processing... Please wait!</h4>',
+        css: { 
+          border: 'none', 
+          padding: '15px', 
+          color: '#fff !important', 
+          backgroundColor: '#10c1cb !important', 
+          '-webkit-border-radius': '10px', 
+          '-moz-border-radius': '10px', 
+          opacity: 1.0
+        }
+      });
     }
 
     else {
@@ -404,6 +417,19 @@
       $("#alertModal").addClass("alert").addClass("small");
       $("#alertModal").foundation('reveal', 'open');
     }
+
+    $('article').block({ 
+      message: '<h4>Processing... Please wait!</h4>',
+      css: { 
+        border: 'none', 
+        padding: '15px', 
+        color: '#fff !important', 
+        backgroundColor: '#10c1cb !important', 
+        '-webkit-border-radius': '10px', 
+        '-moz-border-radius': '10px', 
+        opacity: 1.0
+      }
+    });
   } );
 {% endblock %}
 
