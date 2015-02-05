@@ -882,6 +882,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     end_time = ""
     start_enroll = ""
     end_enroll = ""
+    enrollment_task = {}
     enrollment_closed = False
     enrollment_reopen = False
     total_student_enroll_list = []
@@ -895,21 +896,59 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     if app_set_instance_id:
         if ObjectId.is_valid(app_set_instance_id):
             sce_gs = collection.Node.one({
-                '_id': ObjectId(app_set_instance_id)
-            })
-            sce_gs.get_neighbourhood(sce_gs.member_of)
+                   '_id': ObjectId(app_set_instance_id)
+                },
+                {   'member_of':1,
+                    'name':1,
+                    'attribute_set.start_enroll':1,
+                    'attribute_set.end_enroll':1,
+                    'attribute_set.has_enrollment_task':1
+                }
+            )
 
-            for task_objectid, task_details_dict in sce_gs.has_enrollment_task.items():
+            for attr in sce_gs.attribute_set:
+                if attr and "start_enroll" in attr:
+                    start_enroll = attr["start_enroll"]
+                elif attr and "end_enroll" in attr:
+                    end_enroll = attr["end_enroll"]
+                elif attr and "has_enrollment_task" in attr:
+                    enrollment_task = attr["has_enrollment_task"]
+
+            for task_objectid, task_details_dict in enrollment_task.items():
                 if not task_details_dict:
                     task_id = ObjectId(task_objectid)
+
+            #Check the end_enroll date on landing, if its past, set status of sce_gs to "closed"
+            if end_enroll:
+                end_enroll = end_enroll.date()
+                current_date = datetime.datetime.now().date()
+                if end_enroll < current_date:
+                    #close sce_gs
+                    at_type_node = collection.Node.one({
+                        '_type': "AttributeType",
+                        'name': u"enrollment_status"
+                    })
+                    if at_type_node:
+                        at_node = None
+                        at_node = create_gattribute(sce_gs._id, at_type_node,u"CLOSED")
+                        if at_node:
+                            #Change status of Task to Closed
+                            task_at_type_node = collection.Node.one({
+                                '_type': "AttributeType",
+                                'name': u"Status"
+                            })
+                            if task_at_type_node:
+                                task_at_node = None
+                                task_at_node = create_gattribute(task_id, task_at_type_node,u"Closed")
+                            sce_gs.reload()
+
+            sce_gs.get_neighbourhood(sce_gs.member_of)
 
             for each in sce_gs.for_acourse:
                 ann_course_list.append([str(each._id), each.name])
                 ann_course_ids.append(each._id)
                 ann_course_name = each.name
 
-            start_enroll = sce_gs.start_enroll
-            end_enroll = sce_gs.end_enroll
             if sce_gs.enrollment_status in [u"APPROVAL", u"CLOSED"]:
                 enrollment_closed = True
             elif sce_gs.enrollment_status in u"PENDING":
