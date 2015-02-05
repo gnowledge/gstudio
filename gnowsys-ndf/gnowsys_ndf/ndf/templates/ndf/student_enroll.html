@@ -143,18 +143,16 @@
         </div>
 
         <!-- Checkbox: Students Enrolled and/or Non-enrolled -->
-        {% comment %}
-        <!--
+        
         <div class="row">
           <div class="small-11 small-centered columns">
             <input type="checkbox" id="all_students" name="all_students">
             <label for="all_students">
-              <b>{% trans "NOTE: If selected all students (including enrolled ones) will be listed; otherwise only non-enrolled students will be shown." %}</b>
+              <b>{% trans "NOTE: Display enrolled students also." %}</b>
             </label>
           </div>
         </div>
-        -->
-        {% endcomment %}
+        
     <div id="filter_students_to_enroll" class="tabs-content" style="padding: 0px 5px; width:1150px;">
       <!-- Tab: Enrollment Approval Details -->
       <div class="active content row" id="panel_enrollment_approval_details">
@@ -252,7 +250,7 @@
 
 {% block script %}
   {{block.super}}
-
+  var sce_gs_id;
   var ann_course_id_list = [];
   var acourse_val = [];
   var sce_dt_var = "";
@@ -290,8 +288,6 @@
       }
     })
 
-  
-
   // On click of Find (Setup Ajax call) ----------------------------------------------------------------------
     $("#btnFindES").click(function(event) {
     
@@ -302,8 +298,9 @@
       registration_year = $("#datepicker_year").val()
       var success_state = false;
       var non_enrolled_students = 0;
-      var degree_name = ""
-      var degree_year = ""
+      var degree_name = "";
+      var degree_year = "";
+      var all_students = $("#all_students").prop("checked");
 
       if($("select#degree_name option:selected").index() > 0) {
        degree_name = $("select#degree_name").val()
@@ -315,15 +312,16 @@
       $("#acourse_list li").each(function() {
         acourse_val.push($(this).attr("id"));
       });
-
       $.ajax({
         url: "{% url 'get_anncourses_allstudents' group_id %}",
 
         data: {
+          sce_gs_id: sce_gs_id,
           registration_year: $("#datepicker_year").val() ,
           acourse_val: acourse_val,
           degree_year: degree_year,
-          degree_name: degree_name
+          degree_name: degree_name,
+          all_students: all_students
         },
 
         type: "GET",
@@ -338,49 +336,51 @@
             students_data_set = ""
             nesc = ""
             esc = ""
+            displ_stat = ""
             non_enrolled_students = parseInt(data["non_enrolled_stud_count"]);
+            students_data_set = data["students_data_set"];
 
-            if (non_enrolled_students > 0) {
-              drawer_widget = data["drawer_widget"]
+            if (students_data_set.length > 0) {
+              nesc = "<p class='text-center'>No. of students <b><i>not enrolled</i></b> in this course : <b>" + data["non_enrolled_stud_count"] + "</b></p>"
+              esc = "<p class='text-center'>No. of students <b><i>enrolled</i></b> in this course : <b>" + data["enrolled_stud_count"] + "</b></p>"
+              if(all_students){
+                displ_stat = "<p class='text-center'> Displaying <b><i>enrolled</i></b> and <b><i>non-enrolled</i></b> students</p>"
+              }
+              else{
+                displ_stat = "<p class='text-center'> Displaying only <b><i>non-enrolled</i></b> students</p>"
+              }
 
-              nesc = "<p class='text-center'>Total No. of students <i>not enrolled</i> in course which are registered in this year: <b>" + data["non_enrolled_stud_count"] + "</b></p>"
-              esc = "<p class='text-center'>Total No. of students <i>enrolled</i> in course which are registered in this year: <b>" + data["enrolled_stud_count"] + "</b></p>"
-
-              students_data_set = data["students_data_set"];
               column_headers = data["column_headers"];
               dataTable_columns_set = [];
 
-              if (students_data_set.length > 0) {
-                // Define table
-                student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
-                '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
-                '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
-                '<label id="lbl_displ"></label>' +
-                '</table>';
+              // Define table
+              student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
+              '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
+              '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
+              '<label id="lbl_displ"></label>' +
+              '</table>';
 
-                $("#divSt").html(nesc + esc + student_data_table); 
+              $("#divSt").html(nesc + esc + displ_stat + student_data_table); 
 
-                // Prepare title & data headers used in dataTable
-                $.each(column_headers, function(index, v) {
-                  d = {};
-                  d["data"] = v[0];
-                  d["title"] = v[1];
-                  dataTable_columns_set.push(d);
-                });
+              // Prepare title & data headers used in dataTable
+              $.each(column_headers, function(index, v) {
+                d = {};
+                d["data"] = v[0];
+                d["title"] = v[1];
+                dataTable_columns_set.push(d);
+              });
 
-                // Set defintion dataTable
-                sce_dt_var = $("#student_data_table").dataTable({
-                  "data": students_data_set,
-                  "columns": dataTable_columns_set,
-                  "createdRow": function ( row, data, index ) {
-                    // Attaching Student's ObjectId to each row (i.e., assigning to it's id attribute)
-                    $(row).attr("id", data["_id"]);
-                    // $(row).find("td:nth-child(3)").attr("id", data["college_id"]);
-                    // $(row).find("td:nth-child(4)").attr("id", data["university_id"]);
-                  }
-                });
-              }
-
+              // Set defintion dataTable
+              sce_dt_var = $("#student_data_table").dataTable({
+                "data": students_data_set,
+                "columns": dataTable_columns_set,
+                "createdRow": function ( row, data, index ) {
+                  // Attaching Student's ObjectId to each row (i.e., assigning to it's id attribute)
+                  $(row).attr("id", data["_id"]);
+                  // $(row).find("td:nth-child(3)").attr("id", data["college_id"]);
+                  // $(row).find("td:nth-child(4)").attr("id", data["university_id"]);
+                }
+              });
             }
             else {
               nesc = "<p class='text-center'><b>No Students registered for this year!!!" + "</b></p>"
@@ -401,7 +401,7 @@
             // If Announced Courese & Students found, 
             // display fieldset (fsSt) & submit buttons (sbtnInProgress & sbtnComplete)
             // depending upon their visibility state 
-            if (non_enrolled_students && $("#sbtn_div").hasClass("hide")) {
+            if ((students_data_set.length > 0) && $("#sbtn_div").hasClass("hide")) {
               $("#sbtn_div").removeClass("hide");
             }
 
@@ -449,7 +449,7 @@
         $(sce_dt_var.fnGetNodes()).removeClass("selected");
     });
 
-  // On close event of reveal-modal (alertModal) -------------------------------------------------------------
+    // On close evar sce_gs_idvent of reveal-modal (alertModal)  = {{ app_set_instance_id }}-------------------------------------------------------------
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
       if ($(this).hasClass('success')) {
         // Disable 'Find' button, which gets enable only when any of the input element
@@ -490,6 +490,19 @@
 
       // Setting hidden field's value as the selected value from acourse_list (dropdown)
       $("#announced_courses_list").val(acourse_val);
+
+      $('article').block({ 
+        message: '<h4>Processing... Please wait!</h4>',
+        css: { 
+          border: 'none', 
+          padding: '15px', 
+          color: '#fff !important', 
+          backgroundColor: '#10c1cb !important', 
+          '-webkit-border-radius': '10px', 
+          '-moz-border-radius': '10px', 
+          opacity: 1.0
+        }
+      });
     });
 
     $(document).on("click", "#btnConfirmYes", function() {
@@ -504,13 +517,15 @@
     });
 
   // On click of Re-open Enrollment --------------------------------------------------------------------------
-  $("#re_open_enrollment").click(function (event) {
-    $("#enrollState").val($(this).val());
-  });
+    $("#re_open_enrollment").click(function (event) {
+      $("#enrollState").val($(this).val());
+    });
 {% endblock %}
 
 {% block document_ready %}
   {{block.super}}
+
+  sce_gs_id = "{{ app_set_instance_id }}"
 
   $(":not(#datepicker_year)").removeAttr("required")
   

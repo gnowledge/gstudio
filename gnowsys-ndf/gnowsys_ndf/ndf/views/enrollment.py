@@ -4,10 +4,10 @@ import datetime
 import json
 
 ''' -- imports from installed packages -- '''
-from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
+from django.http import HttpResponseRedirect  #, HttpResponse uncomment when to use
 from django.http import HttpResponse
 from django.http import Http404
-from django.shortcuts import render_to_response #, render  uncomment when to use
+from django.shortcuts import render_to_response  #, render  uncomment when to use
 from django.template import RequestContext
 from django.template import TemplateDoesNotExist
 from django.core.urlresolvers import reverse
@@ -1044,7 +1044,6 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 student_enroll_list = []
 
             at_rt_dict["has_enrolled"] = total_student_enroll_list
-
             if enroll_state == "Complete":
                 # For Student-Course Enrollment Approval
                 # Create a task for admin(s) of the MIS_admin group
@@ -1162,10 +1161,22 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
             #    in "course_enrollment_status" (AttributeType) as "Enrolled"
 
             # Fetch students which are not enrolled to given announced course(s)
-            student_cur = collection.Node.find({
-                "_id": {"$in": total_student_enroll_list},
-                "relation_set.selected_course": {"$nin": ann_course_ids}
-            })
+            # student_cur = collection.Node.find({
+            #     "_id": {"$in": total_student_enroll_list},
+            #     "relation_set.selected_course": {"$nin": ann_course_ids}
+            # })
+            student_cur = collection.aggregate([{
+                "$match": {
+                    "_id": {"$in": total_student_enroll_list},
+                    "relation_set.selected_course": {"$nin": ann_course_ids}
+                }
+            }, {
+                "$project": {
+                    "_id": 1,
+                    "selected_course": "$relation_set.selected_course",
+                    "course_enrollment_status": "$attribute_set.course_enrollment_status",
+                }
+            }])
             # }, {
             #     "relation_set.selected_course": 1, "name": 1, "attribute_set.course_enrollment_status": 1
             # })
@@ -1177,29 +1188,44 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 "_type": "AttributeType", "name": "course_enrollment_status"
             })
 
-            for each_student in student_cur:
-                for rel in each_student.relation_set:
-                    selected_course_ids = []
-                    if rel and "selected_course" in rel:
-                        selected_course_ids = rel["selected_course"]
-                        break
+            for each_student in student_cur["result"]:
+                # for rel in each_student.relation_set:
+                #     selected_course_ids = []
+                #     if rel and "selected_course" in rel:
+                #         selected_course_ids = rel["selected_course"]
+                #         break
+                prev_selected_course_ids = []
+                selected_course_ids = []
+                if each_student["selected_course"]:
+                    prev_selected_course_ids = each_student["selected_course"][0]
+                else:
+                    prev_selected_course_ids = each_student["selected_course"]
 
-                selected_course_ids = ann_course_ids + selected_course_ids
-                gr_node = create_grelation(each_student._id, selected_course_rt, selected_course_ids)
+                # course_enrollment_status = {}
+                # for attr in each_student.attribute_set:
+                #     if attr and "course_enrollment_status" in attr:
+                #         course_enrollment_status = attr["course_enrollment_status"]
+                #         break
 
-                course_enrollment_status = {}
-                for attr in each_student.attribute_set:
-                    if attr and "course_enrollment_status" in attr:
-                        course_enrollment_status = attr["course_enrollment_status"]
-                        break
+                selected_course_ids = ann_course_ids + prev_selected_course_ids
+                try:
+                    gr_node = create_grelation(each_student["_id"], selected_course_rt, selected_course_ids)
+                    #try block is used to avoid "Multiple results found" error
+                    try:
+                        course_enrollment_status = {}
+                        if each_student["course_enrollment_status"]:
+                            course_enrollment_status = each_student["course_enrollment_status"][0]
 
-                for each_course_id in selected_course_ids:
-                    str_course_id = str(each_course_id)
-                    if str_course_id not in course_enrollment_status:
-                        course_enrollment_status.update({str_course_id: u"Enrolled"})
-                at_node = create_gattribute(each_student._id, course_enrollment_status_at, course_enrollment_status)
-
-                each_student.reload()
+                        for each_course_id in selected_course_ids:
+                            str_course_id = str(each_course_id)
+                            if str_course_id not in course_enrollment_status:
+                                course_enrollment_status.update({str_course_id: u"Enrolled"})
+                        at_node = create_gattribute(each_student["_id"], course_enrollment_status_at, course_enrollment_status)
+                    except Exception as e:
+                        gr_node = create_grelation(each_student["_id"], selected_course_rt, prev_selected_course_ids)
+                        continue
+                except Exception as e:
+                    continue
 
         # Save/Update GAttribute(s) and/or GRelation(s)
         for at_rt_name in at_rt_list:
