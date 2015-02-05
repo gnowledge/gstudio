@@ -4416,6 +4416,7 @@ def reschedule_task(request,group_id,node):
     reschedule_attendance=collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
     marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
+    session = request.POST.get('session','')
     end_time=collection.Node.one({"name":"end_time"})
     from datetime import date,time,timedelta
     date1=datetime.date.today() + timedelta(2)
@@ -4448,7 +4449,8 @@ def reschedule_task(request,group_id,node):
                     reschedule_dates = i['reschedule_attendance']['reschedule_dates']
         reschedule_dates.append(b)
         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
-        create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        if session != str(1):
+          create_gattribute(ObjectId(node),marks_entry_completed[0],True)
         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
 	create_gattribute(ObjectId(node),reschedule_event,True)
         return_message="Event Re-scheduled"
@@ -4497,7 +4499,11 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  
  marks=request.POST.getlist("marks","")
  
- assessmentdone=request.POST.get("assessmentdone","") 
+ assessmentdone = request.POST.get("assessmentdone","") 
+ 
+ attendancedone = request.POST.get("attendancedone","")
+
+ attendancesession = request.POST.get("attendancesession","")
  
  oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
  
@@ -4511,6 +4517,10 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  
  marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
  
+ reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+
+ event_node = collection.Node.one({"_id":ObjectId(app_set_instance_id)})
+
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
  
@@ -4533,8 +4543,20 @@ def event_assginee(request, group_id, app_set_instance_id=None):
 
  if assessmentdone == 'True':
      event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
-     create_gattribute(ObjectId(node),event_status,unicode('Completed'))
-     create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
+     create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
+     if attendancesession != str(1):
+	 create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],True)
+ reschedule_dates={}
+ if attendancedone == 'True':
+    for j in event_node.attribute_set:
+       if unicode('reschedule_attendance') in j.keys():
+          reschedule_dates = j['reschedule_attendance']
+    reschedule_dates["reschedule_allow"] = False
+    create_gattribute(ObjectId(app_set_instance_id),reschedule_attendance,reschedule_dates)
+    if attendancesession == str(1):
+    	event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+        create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
+
  create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)
  
  
@@ -4814,8 +4836,8 @@ def attendees_relations(request,group_id,node):
  column_count=0
  course_assignment=False
  course_assessment=False
- reschedule =True
- marks =True
+ reschedule = True
+ marks = False
    
  member_of=collection.Node.one({"_id":{'$in':event_has_attended[0].member_of}})
  if member_of.name != "Exam":
@@ -4856,22 +4878,13 @@ def attendees_relations(request,group_id,node):
    column_list.append('True')
    column_list.append(column_count) 
  node = collection.Node.one({"_id":ObjectId(node)}) 
- for i in node.relation_set:
-        if unicode("session_of") in i.keys():
-           session_id = collection.Node.one({"_id":i['session_of'][0]}) 
-           for j in session_id.attribute_set:
-              if unicode('course_structure_assignment') in j:   
-                 if j['course_structure_assignment'] == True:
-                     marks_enter=True
-              if unicode('course_structure_assessment') in j:    
-                 if j['course_structure_assessment'] == True:
-                     marks_enter=True
  for i in node.attribute_set:
     if unicode("reschedule_attendance") in i.keys():
       if unicode('reschedule_allow') in i['reschedule_attendance']: 
        reschedule=i['reschedule_attendance']['reschedule_allow'] 
     if unicode("marks_entry_completed") in i.keys():
         marks=i["marks_entry_completed"]
+ print "reschedule",reschedule,"marks",marks
  column_list.append(reschedule)
  column_list.append(marks)
  return HttpResponse(json.dumps(column_list)) 
