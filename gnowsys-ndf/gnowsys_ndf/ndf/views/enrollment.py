@@ -76,9 +76,9 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
     mis_admin = None
     college_group_id = None
     latest_completed_on = None
-    lock_start_enroll = False # Will only be True while editing (i.e. Re-opening Enrollment)
+    unlock_enroll = False # Will only be True while editing (i.e. Re-opening Enrollment)
     reopen_task_id = None
-
+    enrollment_last_date = None
     property_order_list = []
 
     template = ""
@@ -133,8 +133,16 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     else:
                         if "completed_on" in completed_by_on and completed_by_on["completed_on"]:
                             latest_completed_on = completed_by_on["completed_on"]
+            elif attr and "end_enroll" in attr:
+                enrollment_last_date = attr["end_enroll"]
 
     property_order_list = get_property_order_with_value(enrollment_gs)
+
+    if enrollment_last_date:
+        enrollment_last_date = enrollment_last_date.date()
+        current_date = datetime.datetime.now().date()
+        if enrollment_last_date <= current_date:
+            unlock_enroll = True
 
     if request.method == "POST":
         start_enroll = ""
@@ -156,10 +164,6 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
         if "reopen_task_id" in request.POST:
             reopen_task_id = request.POST.get("reopen_task_id", "")
             reopen_task_id = ObjectId(reopen_task_id)
-
-        if latest_completed_on:
-            if latest_completed_on < end_enroll:
-                lock_start_enroll = True
 
         at_rt_list = ["start_enroll", "end_enroll", "for_acourse", "for_college", "for_university", "enrollment_status", "has_enrolled", "has_enrollment_task", "has_approval_task"]
         at_rt_dict = {}
@@ -186,7 +190,6 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                 for rel in enrollment_gs.relation_set:
                     if rel and "for_acourse" in rel:
                         ann_course_ids_set = rel["for_acourse"]
-
                 if len(ann_course_ids_set) > 1 or "Foundation_Course" in enrollment_gs.name:
                     # Foundation
                     ann_course_ids = ann_course_ids_set
@@ -197,8 +200,6 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     ann_course_node.get_neighbourhood(ann_course_node.member_of)
 
-                    # Ann course name
-                    ann_course_name = ann_course_node.name
 
                     start_time_ac = ann_course_node.start_time.strftime("%Y")
                     end_time_ac = ann_course_node.end_time.strftime("%Y")
@@ -223,8 +224,11 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                             colg_code = colg_attr["enrollment_code"]
                             break
 
+                    # Ann course name
+                    ann_course_name = "Foundation_Course_" + str(colg_code) + "_" + str(start_time_ac) + "_" + str(end_time_ac)
+
                     # course name
-                    course_name = "Foundation_Course_" + str(colg_code) + "_" + str(start_time_ac) + "_" + str(end_time_ac)
+                    course_name = ann_course_node.announced_for[0].name
 
                     ac_cname_cl_uv_ids.append([ann_course_ids, ann_course_name, course_name, college_id, university_id])
 
@@ -268,7 +272,6 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                 course_name = each_fc_set[2]
                 college_id = each_fc_set[3]
                 university_id = each_fc_set[4]
-
                 fc_set = [ObjectId(each_fc) for each_fc in each_fc_set[0]]
                 at_rt_dict["for_acourse"] = fc_set
                 acourse_id = fc_set
@@ -277,6 +280,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                 at_rt_dict["start_enroll"] = start_enroll
                 at_rt_dict["end_enroll"] = end_enroll
                 at_rt_dict["for_college"] = college_id
+                announced_course_list = [u"Announced Course"]
 
                 task_group_set = []
                 if college_id not in college_po:
@@ -299,14 +303,17 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                 enrollment_gst = collection.Node.one({
                     '_type': "GSystemType", 'name': "StudentCourseEnrollment"
                 })
+                if enrollment_gs and "_id" in enrollment_gs :
+                    enrollment_gs_name = enrollment_gs.name
+                else:
+                    enrollment_gs_name = "StudentCourseEnrollment" \
+                        + "_" + ann_course_name
 
-                enrollment_gs_name = "StudentCourseEnrollment" \
-                    + "_" + ann_course_name
-                enrollment_gs = collection.Node.one({
-                    'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
-                    "group_set": [mis_admin._id, college_group_id],
-                    'status': u"PUBLISHED"
-                })
+                    enrollment_gs = collection.Node.one({
+                        'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
+                        "group_set": [mis_admin._id, college_group_id],
+                        'status': u"PUBLISHED"
+                    })
 
                 # If not found, create it
                 if not enrollment_gs:
@@ -335,8 +342,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     # for Student-Course Enrollment
                     task_dict = {}
                     task_name = "StudentCourseEnrollment_Task" + "_" + \
-                        start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + \
-                        "_" + course_name
+                        start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + "_" + course_name
                     task_name = unicode(task_name)
                     task_dict["name"] = task_name
                     task_dict["created_by"] = request.user.id
@@ -665,7 +671,8 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
         'app_collection_set': app_collection_set,
         'app_set_id': app_set_id,
         'title': title,
-        'property_order_list': property_order_list
+        'property_order_list': property_order_list,
+        'unlock_enroll':unlock_enroll
     }
 
     if app_set_instance_id:
@@ -678,8 +685,15 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
         for each_in in enrollment_gs.relation_set:
             for eachk, eachv in each_in.items():
-                get_node_name = collection.Node.one({'_id': eachv[0]})
-                context_variables[eachk] = get_node_name.name
+                l_labels = []
+                if eachk == "for_acourse":
+                    for every_ac in eachv:
+                        get_node_name = collection.Node.one({'_id': every_ac})
+                        l_labels.append(get_node_name.name)
+                else:
+                    get_node_name = collection.Node.one({'_id': eachv[0]})
+                    l_labels.append(get_node_name.name)
+                context_variables[eachk] = l_labels
 
     try:
         return render_to_response(
@@ -868,6 +882,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     end_time = ""
     start_enroll = ""
     end_enroll = ""
+    enrollment_task = {}
     enrollment_closed = False
     enrollment_reopen = False
     total_student_enroll_list = []
@@ -881,22 +896,60 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     if app_set_instance_id:
         if ObjectId.is_valid(app_set_instance_id):
             sce_gs = collection.Node.one({
-                '_id': ObjectId(app_set_instance_id)
-            })
+                   '_id': ObjectId(app_set_instance_id)
+                },
+                {   'member_of':1,
+                    'name':1,
+                    'last_update':1,
+                    'attribute_set.start_enroll':1,
+                    'attribute_set.end_enroll':1,
+                    'attribute_set.has_enrollment_task':1
+                }
+            )
 
-            sce_gs.get_neighbourhood(sce_gs.member_of)
+            for attr in sce_gs.attribute_set:
+                if attr and "start_enroll" in attr:
+                    start_enroll = attr["start_enroll"]
+                elif attr and "end_enroll" in attr:
+                    end_enroll = attr["end_enroll"]
+                elif attr and "has_enrollment_task" in attr:
+                    enrollment_task = attr["has_enrollment_task"]
 
-            for task_objectid, task_details_dict in sce_gs.has_enrollment_task.items():
+            for task_objectid, task_details_dict in enrollment_task.items():
                 if not task_details_dict:
                     task_id = ObjectId(task_objectid)
+
+            #Check the end_enroll date on landing, if its past, set status of sce_gs to "closed"
+            if end_enroll:
+                end_enroll = end_enroll.date()
+                current_date = datetime.datetime.now().date()
+                if end_enroll < current_date:
+                    #close sce_gs
+                    at_type_node = collection.Node.one({
+                        '_type': "AttributeType",
+                        'name': u"enrollment_status"
+                    })
+                    if at_type_node:
+                        at_node = None
+                        at_node = create_gattribute(sce_gs._id, at_type_node,u"CLOSED")
+                        if at_node:
+                            #Change status of Task to Closed
+                            task_at_type_node = collection.Node.one({
+                                '_type': "AttributeType",
+                                'name': u"Status"
+                            })
+                            if task_at_type_node:
+                                task_at_node = None
+                                task_at_node = create_gattribute(task_id, task_at_type_node,u"Closed")
+                            sce_gs.reload()
+
+            sce_gs.get_neighbourhood(sce_gs.member_of)
 
             for each in sce_gs.for_acourse:
                 ann_course_list.append([str(each._id), each.name])
                 ann_course_ids.append(each._id)
                 ann_course_name = each.name
 
-            start_enroll = sce_gs.start_enroll
-            end_enroll = sce_gs.end_enroll
             if sce_gs.enrollment_status in [u"APPROVAL", u"CLOSED"]:
                 enrollment_closed = True
             elif sce_gs.enrollment_status in u"PENDING":
@@ -923,6 +976,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
         mis_admin = collection.Node.one({
             '_type': "Group", 'name': "MIS_admin"
         })
+
         if enroll_state == "Re-open Enrollment":
             task_dict["name"] = ""
             if nussd_course_type == "Foundation Course":
@@ -1019,7 +1073,6 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
 
                         elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
                             at_rt_node = create_grelation(sce_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
-
             return HttpResponseRedirect(reverse(app_name.lower() + ":" + template_prefix + '_enroll',
                 kwargs={'group_id': group_id, "app_id": app_id, "app_set_id": app_set_id, "app_set_instance_id": app_set_instance_id}
             ))
