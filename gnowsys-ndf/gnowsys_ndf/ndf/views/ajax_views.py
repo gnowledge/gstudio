@@ -4533,7 +4533,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
 
  if assessmentdone == 'True':
      event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
-     create_gattribute(ObjectId(node),event_status,unicode('Completed'))
+     create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
      create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
  create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)
  
