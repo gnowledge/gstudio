@@ -203,14 +203,15 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
           try: 
            if (unicode('reschedule_till') in i['event_edit_reschedule']) == True:
               reschedule_time = i['event_edit_reschedule']['reschedule_till']  
+           if (unicode('reschedule_allow') in i['event_edit_reschedule']):    
               reschedule = i['event_edit_reschedule']['reschedule_allow']
           except:
                pass
        if (unicode('event_attendance_task')) in i.keys():
-           event_task_Attendance_reschedule = i['event_attendance_task']
+           event_task_Attendance_reschedule = i['event_attendance_task']['Reschedule_Task']
             
        if(unicode('event_date_task')) in i.keys():
-           event_task_date_reschedule = i['event_date_task']     
+           event_task_date_reschedule = i['event_date_task']['Reschedule_Task']     
                 
     for i in node.relation_set:
        if unicode('event_has_batch') in i.keys():
