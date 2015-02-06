@@ -724,7 +724,9 @@ $("#Module_of").change(function(){
   $.ajax({
             url: "{% url 'fetch_course_session' groupid 'course_type' %}".replace('course_type',String(course_type)),
             type: "GET",
-            data:{"app_set_id":'{{app_set_id}}'},
+            data:{"app_set_id":'{{app_set_id}}',
+                  'batchid':$("#event_has_batch").val(),
+                 },
             success: function(data)
             {
               
@@ -858,6 +860,7 @@ $("#view").click(function(){
         $.ajax({
                   url: "{% url 'fetch_course_Module' groupid 'sel_coursename' %}".replace('sel_coursename',String(sel_coursename)),
                   type: "GET",
+                  data:{'batchid':$("#event_has_batch").val()},
                   datatype:"json",
                   success: function(data)
                    {
@@ -884,7 +887,7 @@ $("#view").click(function(){
                         else
                          {
                               alert("No Module Exists for this Course type!!!")
-                         
+                              $('#Module-session-section').hide();
                          }   
                         if (trainer!="")
                          {   
@@ -903,8 +906,9 @@ $("#view").click(function(){
                           }
                         else
                           {
-                             clear_Disable_Elements();
+                             $('#Module-session-section').hide();
                              alert("No Trainers have being Assinged to this Course !!!")
+                              
                           }
                    } 
               });

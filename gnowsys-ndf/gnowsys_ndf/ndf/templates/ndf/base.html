@@ -317,13 +317,13 @@
                     </a>
                      -->
                   {% endcomment %}
-                  <a title="Activities" href="{% url 'group_dashboard' group_object.name %}"
+                  <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}"
                     {% comment %}
                       <!--
                         <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
                       -->
                     {% endcomment %}
-                    <i class="fi-results"></i> Activities 
+                    <i class="fi-results"></i> Updates 
                   </a>
                 {% endif %}
                 <!-- </li> -->
