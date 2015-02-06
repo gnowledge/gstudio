@@ -4375,6 +4375,7 @@ def save_time(request,group_id,node):
 def check_date(request,group_id,node):
     reschedule = request.POST.get('reschedule','')
     test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$gt':datetime.datetime.today()}})
+    a = {}
     if test_output.count()  == 0 and reschedule == 'True':
        test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.event_edit_reschedule.reschedule_till":{'$gt':datetime.datetime.today()}})
     if test_output.count() != 0:
@@ -4386,11 +4387,16 @@ def check_date(request,group_id,node):
       for i in event_node.attribute_set:
                if unicode('event_edit_reschedule') in i.keys():
                  a = i['event_edit_reschedule']
-      for i in a:
-          if unicode('reschedule_allow') in i:
-              a['reschedule_allow'] = False
-              create_gattribute(ObjectId(node),reschedule_event,a)
+      if a:
+          for i in a:
+              if unicode('reschedule_allow') in i:
+                  a['reschedule_allow'] = False
+          create_gattribute(ObjectId(node),reschedule_event,a)        
+      else:
+          create_gattribute(ObjectId(node),reschedule_event,{'reschedule_allow':False})
+                         
       
+      event_node = collection.Node.one({"_id":ObjectId(node)})
       message = "event closed"   
     return HttpResponse(message) 
 
@@ -4430,16 +4436,24 @@ def reschedule_task(request,group_id,node):
     #for generating a task for reschdueling a event
     event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
     create_gattribute(ObjectId(node),event_status,unicode('Rescheduled'))
+    task_id= {}
     if  reschedule_type == 'event_reschedule' :
          for i in event_node.attribute_set:
 	       if unicode('event_edit_reschedule') in i.keys():
 	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
 	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
+         if unicode("event_date_task") in i.keys():
+              task_id = i["event_date_task"]
+         if task_id:
+            task_node = collection.Node.find({"_id":ObjectId(task_id['Task'])})
+            task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+            create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
+         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+         task_id['Reschedule_Task'] = True
+         create_gattribute(ObjectId(node),reschedule_event,task_id)
          reschedule_dates.append(b)  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
-         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
-         create_gattribute(ObjectId(node),reschedule_event,True)
          return_message = "Event Dates Re-Schedule Opened" 
 
     else:
@@ -4447,12 +4461,20 @@ def reschedule_task(request,group_id,node):
             if unicode('reschedule_attendance') in i.keys():
                 if unicode ('reschedule_dates') in i['reschedule_attendance']:
                     reschedule_dates = i['reschedule_attendance']['reschedule_dates']
+            if unicode("event_attendance_task") in i.keys():
+              task_id = i["event_attendance_task"]
+        if task_id:
+            task_node = collection.Node.find({"_id":ObjectId(task_id['Task'])})
+            task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+            create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))
+
         reschedule_dates.append(b)
         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
         if session != str(1):
           create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        task_id['Reschedule_Task'] = True
         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
-	create_gattribute(ObjectId(node),reschedule_event,True)
+	create_gattribute(ObjectId(node),reschedule_event,task_id)
         return_message="Event Re-scheduled"
  else:
     reschedule_type = request.POST.get('reschedule_type','')
@@ -4464,12 +4486,6 @@ def reschedule_task(request,group_id,node):
     site = site.name.__str__()
     event_reschedule_link = "http://" + site + path
     b.append(task_groupset._id)
-    if  reschedule_type == 'event_reschedule' :
-	    reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
-	    create_gattribute(ObjectId(node),reschedule_event,False)
-    else:
-    	reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
-	create_gattribute(ObjectId(node),reschedule_event,False)
     glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
     task_type = collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id
     task_dict.update({"has_type" : task_type})
@@ -4486,7 +4502,14 @@ def reschedule_task(request,group_id,node):
     Today=datetime.datetime.combine(date1,ti)
     task_dict.update({'start_time':Today})
     task_dict.update({'Assignee':Mis_admin_list})
-    create_task(task_dict)
+    task = create_task(task_dict)
+    
+    if  reschedule_type == 'event_reschedule' :
+      reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+      create_gattribute(ObjectId(node),reschedule_event,{'Task':ObjectId(task._id),'Reschedule_Task':False})
+    else:
+      reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
+      create_gattribute(ObjectId(node),reschedule_event,{'Task':ObjectId(task._id),'Reschedule_Task':False})
     return_message="Message is sent to central office soon you will get update."
  return HttpResponse(return_message)
  

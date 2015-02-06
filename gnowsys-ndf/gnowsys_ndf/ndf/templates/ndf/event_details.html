@@ -327,7 +327,7 @@ table, th, td {
 
 
  eventreschedule=""
-
+pass = ""
 
 session_time  = 0
 session_time  = get_time_diff("{{node.start_time|date:'c'}}","{{node.end_time|date:'c'}}")
@@ -738,13 +738,19 @@ function reschedule_time(type)
 function reschedule_event(type)
 {
    var start_time =  $("#start_time_1").val()
+   var session =""  
+     if (pass)
+     {
+        session = pass[1]
+     
+     }
      $.ajax({
              url:"{% url 'reschedule_task' groupid node.pk  %}",
              type:"POST",
              data:{
-                 path:'{{request.path}}',
+                 path:"{{request.path}}",
+                 session:session,
                  reschedule_type:type,
-                 session:pass[1],
                  reschedule_date:start_time,
                  csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
