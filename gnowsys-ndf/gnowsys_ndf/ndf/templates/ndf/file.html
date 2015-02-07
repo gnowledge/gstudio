@@ -212,7 +212,7 @@
 
 {% block body_content %}
   
-  {% if files.count > 1 %}
+  {% if files.count > 1  and title == "E-Library" %}
     {% get_filters_data "File" as filter_dict %}
     {% include "ndf/filters.html" with filter_dict=filter_dict %}
   {% endif %}
@@ -325,11 +325,11 @@
     isFilterChanged = false;
 
   function ddLHSBindEvents(){
-    // body...
+
     $("dl.tabs dd").click(function(e){
 
       var tabDivId = $(this).children("a").attr("href");
-      
+
       if((tabDivId != "#view-collection") && (tabDivId != "view-pandora-video"))
       {
         var pageAnchor = $(tabDivId).children("a.first-load")[0];
@@ -356,24 +356,23 @@
     });
 
   }
+  
   ddLHSBindEvents();
+
   function populateFileList(pageAnchor)
   {
-    // alert("triggered : " + pageAnchor);
+
     var filetype = pageAnchor.href.split("/")[5],
         page_no = pageAnchor.text.trim(),
         no_of_objs_pp = 24,
         url = pageAnchor.href.substr(pageAnchor.href.search(pageAnchor.host)+pageAnchor.host.length);
 
     // getting already added filers as an array of objects, holding entire properties of it.
-    var filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
-    // alert(filtersObjArr);
+    {% if title == "E-Library" %}
+      var filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+    {% endif %}
 
     var tabContainerDiv = $(pageAnchor).closest("div.content");
-
-    // {% if title == "E-Library" %}
-    //   var crxcr = $("input[type='radio'][name='crxcr']:checked").val();
-    // {% endif %}
 
     $.ajax({
 
@@ -386,10 +385,11 @@
         filetype: filetype,
         page_no: page_no,
         no_of_objs_pp: no_of_objs_pp,
-        filters: filtersObjArr,
-        // {% if title == "E-Library" %}
-        //   crxcr: crxcr,
-        // {% endif %}
+  
+        {% if title == "E-Library" %}
+          filters: filtersObjArr,
+        {% endif %}
+  
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data){
@@ -398,16 +398,15 @@
 
         // making newly loaded html pagination <a> non clickable and bind with populateFileList()
         $(tabContainerDiv).find("ul.pagination a").click(function(e){
+
           e.preventDefault();
           populateFileList(this);
+
           });
-          // alert("in success")
-          if(isFilterChanged)
-          {
-            updateLHSpanelCounters();
-          }
+
+          if(isFilterChanged) { updateLHSpanelCounters(); }
         }
-      })
+      });
     }
 
     // providing function to handle filtering part
@@ -439,7 +438,7 @@
   {
     var educationaluse_stats = $("div[data-educationaluse-stats]").attr("data-educationaluse-stats")
 
-    console.log("innnn : " + educationaluse_stats);
+    // console.log("innnn : " + educationaluse_stats);
 
     educationaluse_stats = JSON.parse(educationaluse_stats);
 

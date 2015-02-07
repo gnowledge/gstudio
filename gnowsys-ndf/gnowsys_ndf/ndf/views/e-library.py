@@ -130,7 +130,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 										] 
 									}).sort("last_update", -1)
 
-	print "files.count : ", files.count()
+	# print "files.count : ", files.count()
 
 	# coll = []
 	# for each in files:
@@ -155,8 +155,8 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 				educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 			educationaluse_stats["all"] = files.count()
 
-		print "educationaluse_stats : ", educationaluse_stats
-		print "eu_list : ", len(eu_list)
+		# print "educationaluse_stats : ", educationaluse_stats
+		# print "eu_list : ", len(eu_list)
 		
 		result_paginated_cur = files
 		result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
@@ -325,7 +325,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
 		filters = request.POST.get("filters", "")
 		filters = json.loads(filters)
-		print "filters in E-Library : ", filters
+		# print "filters in E-Library : ", filters
 
 		# declaring empty (deliberately to avoid errors), query dict to be pass-on in query
 		query_dict = [{}]
@@ -347,7 +347,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 								each_filter["selFieldText"] = False
 						temp_dict["attribute_set." + each_filter["selFieldValue"]] = each_filter["selFieldText"]
 						temp_list.append(temp_dict)
-						print "temp_list : ", temp_list
+						# print "temp_list : ", temp_list
 					elif each_filter["selFieldGstudioType"] == "field":
 						temp_dict[each_filter["selFieldValue"]] = each_filter["selFieldText"]
 						temp_list.append(temp_dict)
@@ -355,7 +355,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 				if temp_list:			        	
 					query_dict.append({ "$or": temp_list})
 
-		print "query_dict : ", query_dict
+		# print "query_dict : ", query_dict
 
 		files = collection.Node.find({
 										'$or':[
@@ -381,7 +381,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 											] 
 										}).sort("last_update", -1)
 
-		print "files.count : ", files.count()
+		# print "files.count : ", files.count()
 
 		# coll = []
 		# for each in files:
@@ -407,7 +407,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 					educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 				educationaluse_stats["all"] = files.count()
 
-			print "educationaluse_stats : ", educationaluse_stats
+			# print "educationaluse_stats : ", educationaluse_stats
 			# print "eu_list : ", len(eu_list)
 			
 			result_paginated_cur = files
