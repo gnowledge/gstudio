@@ -103,11 +103,6 @@
   
 </ul>
 
-{% comment %}
-{% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
-{% endcomment %}
-
-
 {% if title == "E-Library" %}
   
   {% include 'ndf/pagination.html' with urlname="elib_paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
@@ -118,3 +113,4 @@
 
 {% endif %}
 
+<div class="hide" data-educationaluse-stats='{{ educationaluse_stats }}'></div>
