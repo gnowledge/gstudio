@@ -57,13 +57,13 @@
     //Sets the stars in the rating bar based on loaded values
     function setRating(){
         userRating = parseInt($(".rating-bar").attr("data-user-rating"));
-        avgRating = parseFloat($(".rating-bar").attr("data-avg-rating"));
+        avgRating = parseFloat($(".rating-bar").attr("data-avg-rating")).toFixed(2);
         //If the user has already rated, set the stars to the user rating, else set to the average value
         if( userRating ){
             setStars( userRating );
         }
         else{
-            setStars( avgRating );
+            setStars( Math.round(avgRating) );
             $(".rating-bar").addClass("unrated");
         }
         //Update the average value text
