@@ -2343,3 +2343,174 @@ def create_task(task_dict, task_type_creation="single"):
           notification.send(to_user_list, render_label, {"from_user": from_user})
 
     return task_node
+
+
+def get_student_enrollment_code(college_id, college_group_id=None):
+    """Returns new student's enrollment code
+
+    Enrollment Code is combination of following values:
+    Code: (MH/SNG/15/xxxx)
+    - 2-letters state code
+    - 3-letters college code
+    - 2-digits year of registration
+    - 4-digits Auto-generated No.
+
+    Arguments:
+    college_id: ObjectId of college's node
+    college_group_id [Optional]: ObjectId of college's group node
+
+    Returns:
+    Newly created enrollment code for student node
+    """
+
+    new_student_enrollment_code = u""
+    last_enrollment_code = u""
+    enrollment_code_except_num = u""
+    college_id = ObjectId(college_id)
+    if college_group_id:
+        college_group_id = ObjectId(college_group_id)
+    college_name = u""
+    college_code = u""
+    state_code = u""
+    two_digit_year_code = u""
+    student_count = 0
+    four_digit_num = u""
+
+    # If registering very first student, then create enrollment code
+    # Else fetch enrollment code from last registered student node
+
+    # Fetch college enrollemnt code
+    college_node = collection.aggregate([{
+        "$match": {
+            "_id": college_id
+        }
+    }, {
+        "$project": {
+            "college_name": "$name",
+            "college_code": "$attribute_set.enrollment_code",
+            "college_group_id": "$relation_set.has_group",
+            "state_id": "$relation_set.organization_belongs_to_state"
+        }
+    }])
+
+    college_node = college_node["result"]
+    if college_node:
+        college_node = college_node[0]
+        colg_group_id = college_node["college_group_id"]
+        if colg_group_id:
+            colg_group_id = ObjectId(colg_group_id[0][0])
+            if colg_group_id != college_group_id:
+                # Reset college_group_id as passed is not given
+                # college node's group id
+                college_group_id = colg_group_id
+
+        college_name = college_node["college_name"]
+
+        # Set College enrollment code
+        college_code = college_node["college_code"]
+        if college_code:
+            college_code = college_code[0]
+
+        if not college_name or not college_code:
+            raise Exception("Either name or enrollment code is not set for given college's ObjectId(" + str(college_id) + ") !!!")
+
+        # Set Last two digits of current year
+        current_year = str(datetime.today().year)
+        two_digit_year_code = current_year[-2:]
+
+        # Fetch total no. of students registered for current year
+        # Along with enrollment code of last registered student
+        date_gte = datetime.strptime("1/1/" + current_year, "%d/%m/%Y")
+        date_lte = datetime.strptime("31/12/" + current_year, "%d/%m/%Y")
+        student_gst = collection.Node.one({
+            "_type": "GSystemType",
+            "name": "Student"
+        })
+        res = collection.aggregate([{
+            "$match": {
+                "member_of": student_gst._id,
+                "group_set": college_group_id,
+                "relation_set.student_belongs_to_college": college_id,
+                "attribute_set.registration_date": {'$gte': date_gte, '$lte': date_lte},
+                "status": u"PUBLISHED"
+            }
+        }, {
+            "$sort": {
+                "created_at": 1
+            }
+        }, {
+            "$group": {
+                "_id": {
+                    "college": college_name,
+                    "registration_year": current_year
+                },
+                "count": {
+                    "$sum": 1
+                },
+                "last_enrollment_code": {
+                    "$last": "$attribute_set.enrollment_code"
+                }
+            }
+        }])
+
+        student_data_result = res["result"]
+        if student_data_result:
+            student_count = student_data_result[0]["count"]
+            last_enrollment_code = student_data_result[0]["last_enrollment_code"]
+            if last_enrollment_code:
+                last_enrollment_code = last_enrollment_code[0]
+
+            if last_enrollment_code and student_count:
+                # Fetch student enrollment code of last registered student node
+                enrollment_code_except_num, four_digit_num = last_enrollment_code.rsplit("/", 1)
+                four_digit_num = int(last_enrollment_code[-4:])
+
+                if four_digit_num == student_count:
+                    # 4. Four digit number of student's count (new) set
+                    four_digit_num = "%04d" % (student_count + 1)
+                    new_student_enrollment_code = u"%(enrollment_code_except_num)s/%(four_digit_num)s" % locals()
+
+                else:
+                    raise Exception("Inconsistent Data Found (Student count & last enrollment code's number doesn't match) !!!")
+            else:
+                raise Exception("Invalid Data Found (Student count & last enrollment code) !!!")
+        else:
+            # Registering very first student node
+            # Create enrollment code, hence fetch state node's state-code
+            state_id = college_node["state_id"]
+            if state_id:
+                state_id = ObjectId(state_id[0][0])
+
+                # Fetch state code
+                state_node = collection.aggregate([{
+                    "$match": {
+                        "_id": state_id
+                    }
+                }, {
+                    "$project": {
+                        "state_name": "$name",
+                        "state_code": "$attribute_set.state_code"
+                    }
+                }])
+
+                # 2. State code set
+                state_node = state_node["result"]
+                if state_node:
+                    state_node = state_node[0]
+                    state_name = state_node["state_name"]
+                    state_code = state_node["state_code"]
+                    if state_code:
+                        state_code = state_code[0]
+                    else:
+                        raise Exception("No state code found for given state(" + state_name + ")")
+
+                # 4. Four digit number of student's count (new) set
+                four_digit_num = "%04d" % (student_count + 1)
+
+                new_student_enrollment_code = u"%(state_code)s/%(college_code)s/%(two_digit_year_code)s/%(four_digit_num)s" % locals()
+            else:
+                raise Exception("Either state not set or inconsistent state value found for given college(" + college_name + ") !!!")
+
+        return new_student_enrollment_code
+    else:
+        raise Exception("No college node exists with given college's ObjectId(" + str(college_id) + ") !!!")

@@ -27,9 +27,9 @@ from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 ####################################################################################################################
 
-# TODO: 
+# TODO:
 # 1) Name of attributes/relation in property_order field needs to be replaced with their respective ObjectIds
-# 2) regex query needs to be modified because in current situation it's not considering names with space 
+# 2) regex query needs to be modified because in current situation it's not considering names with space
 #    - searching for terms till it finds first space
 
 SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
@@ -44,16 +44,29 @@ gsystem_type_node = None
 gsystem_type_id = None
 gsystem_type_name = ""
 
-mis_group = collection.Node.one({'_type': "Group", 
-                                 '$or': [{'name': {'$regex': u"MIS_admin", '$options': 'i'}}, 
-                                         {'altnames': {'$regex': u"MIS_admin", '$options': 'i'}}],
-                                 'group_type': "PRIVATE"
-                                }, 
-                                {'created_by': 1})
-if(mis_group != None):                            
-	group_id =  mis_group._id
-	user_id =  mis_group.created_by  # User who created the above private group
+mis_group = collection.Node.one({
+    '_type': "Group",
+    '$or': [{
+        'name': {'$regex': u"MIS_admin", '$options': 'i'}
+    }, {
+        'altnames': {'$regex': u"MIS_admin", '$options': 'i'}
+    }],
+    'group_type': "PRIVATE"
+}, {
+    'created_by': 1
+})
 
+if mis_group is not None:
+    group_id = mis_group._id
+    user_id = mis_group.created_by  # User who created the above private group
+
+college_gst = collection.Node.one({
+    "_type": "GSystemType",
+    "name": "College"
+})
+college_dict = {}
+attr_type_dict = {}
+rel_type_dict = {}
 
 class Command(BaseCommand):
     help = "Based on "
@@ -89,20 +102,19 @@ class Command(BaseCommand):
                         log_list.append(error_message)
                         raise Exception(error_message)
 
-
                     file_extension = os.path.splitext(file_name)[1]
 
                     if "csv" in file_extension:
                         # Process csv file and convert it to json format at first
                         info_message = "\n CSVType: Following file (" + file_path + ") found!!!"
                         log_list.append(info_message)
-                    
+
                         try:
                             csv_file_path = file_path
                             json_file_name = file_name.rstrip("csv") + "json"
                             json_file_path = os.path.join(SCHEMA_ROOT, json_file_name)
                             json_file_content = ""
-                        
+
                             with open(csv_file_path, 'rb') as csv_file:
                                 csv_file_content = csv.DictReader(csv_file, delimiter=",")
                                 json_file_content = []
@@ -110,9 +122,9 @@ class Command(BaseCommand):
                                     json_file_content.append(row)
 
                             with open(json_file_path, 'w') as json_file:
-                                json.dump(json_file_content, 
-                                          json_file, 
-                                          indent=4, 
+                                json.dump(json_file_content,
+                                          json_file,
+                                          indent=4,
                                           sort_keys=False)
 
                             if os.path.exists(json_file_path):
@@ -140,7 +152,7 @@ class Command(BaseCommand):
                         log_list.append(info_message)
 
                         parse_data_create_gsystem(file_path)
-                    
+
                         # End of processing json file
 
                         info_message = "\n Task finised: Successfully processed json-file.\n"
@@ -172,6 +184,7 @@ class Command(BaseCommand):
 # -----------------------------------------------------------------------------------------------------------------
 # Function that process json data according to the structure field
 # -----------------------------------------------------------------------------------------------------------------
+
 
 def parse_data_create_gsystem(json_file_path):
     json_file_content = ""
@@ -315,15 +328,26 @@ def parse_data_create_gsystem(json_file_path):
                                     perform_eval_type(key, json_document, "GSystem")
 
                                 subject_id = node._id
-                                attribute_type_node = collection.Node.one({'_type': "AttributeType", 
-                                                                           '$or': [{'name': {'$regex': "^"+attr_key+"$", '$options': 'i'}}, 
-                                                                                   {'altnames': {'$regex': "^"+attr_key+"$", '$options': 'i'}}]
-                                                                       })
+
+                                attribute_type_node = None
+                                if attr_key in attr_type_dict:
+                                    attribute_type_node = attr_type_dict[attr_key]
+                                else:
+                                    attribute_type_node = collection.Node.one({
+                                        '_type': "AttributeType",
+                                        '$or': [{
+                                            'name': {'$regex': "^" + attr_key + "$", '$options': 'i'}
+                                        }, {
+                                            'altnames': {'$regex': "^" + attr_key + "$", '$options': 'i'}
+                                        }]
+                                    })
+                                    attr_type_dict[attr_key] = attribute_type_node
+
                                 object_value = json_document[key]
 
                                 ga_node = None
 
-                                info_message = "\n Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
+                                info_message = "\n Creating GAttribute (" + node.name + " -- " + attribute_type_node.name + " -- " + str(json_document[key]) + ") ...\n"
                                 log_list.append(info_message)
                                 ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
 
@@ -331,7 +355,7 @@ def parse_data_create_gsystem(json_file_path):
                                 break
 
                             else:
-                                error_message = "\n DataNotFound: No data found for field ("+attr_key+") while creating GSystem ("+gsystem_type_name+" -- "+node.name+") !!!\n"
+                                error_message = "\n DataNotFound: No data found for field ("+attr_key+") while creating GSystem (" + gsystem_type_name + " -- " + node.name + ") !!!\n"
                                 log_list.append(error_message)
 
                     if is_relation:
@@ -341,69 +365,125 @@ def parse_data_create_gsystem(json_file_path):
                     # No possible relations defined for this node
                     info_message = "\n "+gsystem_type_name+" ("+node.name+"): No possible relations defined for this node !!!\n"
                     log_list.append(info_message)
-                    return
 
-                gst_possible_relations_dict = node.get_possible_relations(gsystem_type_id)
+                else:
+                    gst_possible_relations_dict = node.get_possible_relations(gsystem_type_id)
 
-                # Write code for setting relations
-                for key in relation_list:
-                    is_relation = True
+                    # Write code for setting relations
+                    for key in relation_list:
+                        is_relation = True
 
-                    for rel_key, rel_value in gst_possible_relations_dict.iteritems():
-                        if key == rel_value['altnames'].lower() or key == rel_key.lower():
-                            is_relation = False
+                        for rel_key, rel_value in gst_possible_relations_dict.iteritems():
+                            if key == rel_value['altnames'].lower() or key == rel_key.lower():
+                                is_relation = False
 
-                            if json_document[key]:
-                                # Here semi-colon(';') is used instead of comma(',')
-                                # Beacuse one of the value may contain comma(',') which causes problem in finding required value in database
-                                if ";" not in json_document[key]:
-                                    # Necessary to inform perform_eval_type() that handle this value as list
-                                    json_document[key] = "\""+json_document[key]+"\", "
+                                if json_document[key]:
+                                    # Here semi-colon(';') is used instead of comma(',')
+                                    # Beacuse one of the value may contain comma(',') which causes problem in finding required value in database
+                                    if ";" not in json_document[key]:
+                                        # Necessary to inform perform_eval_type() that handle this value as list
+                                        json_document[key] = "\""+json_document[key]+"\", "
+
+                                    else:
+                                        formatted_value = ""
+                                        for v in json_document[key].split(";"):
+                                            formatted_value += "\""+v.strip(" ")+"\", "
+                                        json_document[key] = formatted_value
+
+                                    info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
+                                    log_list.append(info_message)
+
+                                    perform_eval_type(key, json_document, "GSystem", "GSystem")
+
+                                    # for right_subject_id in json_document[key]:
+                                    subject_id = node._id
+
+                                    # Here we are appending list of ObjectIds of GSystemType's type_of field 
+                                    # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
+                                    # This is because some of the RelationType's are holding Base class's ObjectId
+                                    # and not that of the Derived one's
+                                    # Delibrately keeping GSystemType's ObjectId first in the list
+                                    # And hence, used $in operator in the query!
+                                    rel_subject_type = []
+                                    rel_subject_type.append(gsystem_type_id)
+                                    if gsystem_type_node.type_of:
+                                        rel_subject_type.extend(gsystem_type_node.type_of)
+
+                                    relation_type_node = None
+                                    if rel_key in rel_type_dict:
+                                        relation_type_node = rel_type_dict[rel_key]
+                                    else:
+                                        relation_type_node = collection.Node.one({
+                                            '_type': "RelationType",
+                                            '$or': [{
+                                                'name': {'$regex': "^" + rel_key + "$", '$options': 'i'}
+                                            }, {
+                                                'altnames': {'$regex': "^" + rel_key + "$", '$options': 'i'}
+                                            }],
+                                            'subject_type': {'$in': rel_subject_type}
+                                        })
+                                        rel_type_dict[rel_key] = relation_type_node
+
+                                    info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(json_document[key])+") ...\n"
+                                    log_list.append(info_message)
+                                    gr_node = create_grelation(subject_id, relation_type_node, json_document[key])
+
+                                    if college_gst._id in relation_type_node.object_type:
+                                        # Fetch college node's group id
+                                        # Append it to node's group_set
+                                        node_group_set = node.group_set
+                                        is_group_set_changed = False
+
+                                        # Iterate through each college
+                                        # Find it's corresponding group's ObjectId
+                                        # Append it to node's group_set
+                                        for each in json_document[key]:
+                                            each = ObjectId(each)
+                                            each_str = str(each)
+                                            if each_str in college_dict:
+                                                college_group_id = college_dict[each_str]
+                                                if college_group_id not in node_group_set:
+                                                    node_group_set.append(college_group_id)
+                                                    is_group_set_changed = True
+                                            else:
+                                                # If not found in college_dict
+                                                # Then find and update college_dict
+                                                college_node = collection.aggregate([{
+                                                    "$match": {"_id": each}
+                                                }, {
+                                                    "$project": {"group_id": "$relation_set.has_group"}
+                                                }])
+
+                                                college_node = college_node["result"]
+                                                if college_node:
+                                                    college_node = college_node[0]
+                                                    college_group_id = college_node["group_id"]
+                                                    if college_group_id:
+                                                        college_group_id = college_group_id[0][0]
+                                                        college_dict[each_str] = college_group_id
+                                                        node_group_set.append(college_group_id)
+                                                        is_group_set_changed = True
+
+                                        # Update node's group_set with updated list
+                                        # if changed
+                                        if is_group_set_changed:
+                                            collection.update({
+                                                "_id": subject_id
+                                            }, {
+                                                "$set": {"group_set": node_group_set}
+                                            },
+                                                upsert=False, multi=False
+                                            )
+
+                                    # To break outer for loop if key found
+                                    break
 
                                 else:
-                                    formatted_value = ""
-                                    for v in json_document[key].split(";"):
-                                        formatted_value += "\""+v.strip(" ")+"\", "
-                                    json_document[key] = formatted_value
+                                    error_message = "\n DataNotFound: No data found for relation ("+rel_key+") while creating GSystem ("+gsystem_type_name+" -- "+node.name+") !!!\n"
+                                    log_list.append(error_message)
+                                    # print error_message
 
-                                info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
-                                log_list.append(info_message)
-
-                                perform_eval_type(key, json_document, "GSystem", "GSystem")
-
-                                # for right_subject_id in json_document[key]:
-                                subject_id = node._id
-
-                                # Here we are appending list of ObjectIds of GSystemType's type_of field 
-                                # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
-                                # This is because some of the RelationType's are holding Base class's ObjectId
-                                # and not that of the Derived one's
-                                # Delibrately keeping GSystemType's ObjectId first in the list
-                                # And hence, used $in operator in the query!
-                                rel_subject_type = []
-                                rel_subject_type.append(gsystem_type_id)
-                                if gsystem_type_node.type_of:
-                                    rel_subject_type.extend(gsystem_type_node.type_of)
-
-                                relation_type_node = collection.Node.one({'_type': "RelationType", 
-                                                                          '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
-                                                                                  {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
-                                                                          'subject_type': {'$in': rel_subject_type}
-                                                                  })
-
-                                info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(json_document[key])+") ...\n"
-                                log_list.append(info_message)
-                                gr_node = create_grelation(subject_id, relation_type_node, json_document[key])
-
-                                # To break outer for loop if key found
-                                break
-
-                            else:
-                                error_message = "\n DataNotFound: No data found for relation ("+rel_key+") while creating GSystem ("+gsystem_type_name+" -- "+node.name+") !!!\n"
-                                log_list.append(error_message)
-                                # print error_message
-
-                                break
+                                    break
 
 
         except Exception as e:
@@ -623,7 +703,7 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
     except Exception as e:
         if u"\u201c" in json_document[eval_field]:
             json_document[eval_field] = json_document[eval_field].replace(u"\u201c", "\"")
-            
+
         if u"\u201d" in json_document[eval_field]:
             json_document[eval_field] = json_document[eval_field].replace(u"\u201d", "\"")
 
@@ -636,7 +716,6 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
             error_message = "\n InvalidDataError: For " + type_to_create + " ("+json_document['name']+") invalid data found -- " + str(e) + "!!!\n"
             log_list.append(error_message)
             raise Exception(error_message)
-
 
     type_list = []
     for data in json_document[eval_field]:
