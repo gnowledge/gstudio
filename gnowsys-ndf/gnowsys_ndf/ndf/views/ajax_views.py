@@ -4374,6 +4374,7 @@ def save_time(request,group_id,node):
   # below code gets the old value from the database 
   # if value exists it append new value to it 
   # else a new time is assigned to it 
+  a = {}
   for i in event_node.attribute_set:
                if unicode('event_edit_reschedule') in i.keys():
                  a = i['event_edit_reschedule']
@@ -4496,8 +4497,9 @@ def reschedule_task(request,group_id,node):
     event_reschedule_link = "http://" + site + path
     b.append(task_groupset._id)
     glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+    task_type = []
     task_type = collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id
-    task_dict.update({"has_type" : task_type})
+    task_dict.update({"has_type" :task_type})
     task_dict.update({'name':unicode('Reschedule Task')})
     task_dict.update({'group_set':b})
     task_dict.update({'created_by':request.user.id})
