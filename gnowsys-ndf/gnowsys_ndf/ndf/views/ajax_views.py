@@ -4368,7 +4368,8 @@ def save_time(request,group_id,node):
   # below code gets the old value from the database 
   # if value exists it append new value to it 
   # else a new time is assigned to it 
-  a={}
+
+  a = {}
   for i in event_node.attribute_set:
                if unicode('event_edit_reschedule') in i.keys():
                  a = i['event_edit_reschedule']

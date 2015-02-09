@@ -223,8 +223,11 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                    for i in  announced_course.relation_set:
                       if unicode('announced_for') in i.keys():
                             course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
-                             
             batch=batch.name
+       elif unicode('session_of') in i.keys():
+            event_has_session = collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})
+            session_node = collection.Node.one({'_id':ObjectId(event_has_session._id)},{'attribute_set':1})
+
            
   #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
@@ -266,6 +269,18 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
     # return render_to_response([template, default_template], 
+
+  if session_node:
+    session_min_marks = ""
+    session_max_marks = ""
+    for attr in session_node.attribute_set:
+      if attr and u"min_marks" in attr:
+        session_min_marks = attr[u"min_marks"]
+      elif attr and u"max_marks" in attr:
+        session_max_marks = attr[u"max_marks"]
+    context_variables.update({'session_min_marks':session_min_marks})
+    context_variables.update({'session_max_marks':session_max_marks})
+
   return render_to_response(template, 
                               context_variables,
                               context_instance = RequestContext(request)
