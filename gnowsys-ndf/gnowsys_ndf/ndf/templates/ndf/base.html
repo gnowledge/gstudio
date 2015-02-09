@@ -73,7 +73,6 @@
       <ul class="title-area ">
         
         <li class="name">
-          {% get_site_variables as site %}
             <h1>
               <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
             </h1>
@@ -468,13 +467,11 @@
       <div class="medium-12 columns">
         <ul class="inline-list">
           <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
-          {% if user.is_authenticated %}
           <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
           <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
           <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
           <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
           <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
-          {% endif %}
           <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
         </ul>   
       </div>
@@ -604,12 +601,21 @@
 
     // start of document.ready()
       $(document).ready(function(){
-        $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
-              
-        {% block document_ready %} {% endblock %}
+  
+        try{
 
-        // function defined in app.js to check the font and load it asynchronously.
-        checkOpenSansFont();
+          $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
+                
+          {% block document_ready %} {% endblock %}
+
+        }
+        finally{
+  
+          // function defined in app.js to check the font and load it asynchronously.
+          checkOpenSansFont();
+  
+        }
+  
       });
 
     {% block script %} {% endblock %} 
