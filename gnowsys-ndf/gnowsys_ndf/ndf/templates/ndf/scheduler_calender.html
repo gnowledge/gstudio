@@ -59,78 +59,53 @@
             editable: false,
             eventBackgroundColor:'#23000',
         
-            eventClick: function(calevent) {
-                if (calevent.title == "+3") {
+            eventLimit: true, // for all non-agenda views
+            views: {
+                month:
+                 {
+                    eventLimit: 5 // adjust to 6 only for agendaWeek/agendaDay
+                 }
+            },
+            eventLimitClick: function(cellInfo, jsEvent) {
+                    
                     $('#calendar').fullCalendar('changeView', 'agendaDay'/* or 'basicDay' */);
                     var moment = $('#calendar').fullCalendar('getDate');
-                    $('#calendar').fullCalendar('gotoDate', (calevent.start).format());
-                }     
+                    $('#calendar').fullCalendar('gotoDate', cellInfo.date);
+                     
             },
                                 
             viewRender: function(view) {
-                var date=$('#calendar').fullCalendar('getDate');
                 var groupid='{{groupid}}';
+                 $('#calendar').fullCalendar( 'removeEvents');
+                for (i=1;i<=3;i++)
+                {
+                    ajaxcalls(i)
+                }
                 
-                if (view.name == 'month') {
-                    $.ajax({
-                        url: "{% url 'get_data_for_event_task' groupid %}",
-
-                        data: {
-                            view:'month',
-                            start:date.format()
-                        },
-
-                        type: "GET",
-                        success: function(data) {
-                            sData = jQuery.parseJSON(data);
-                            $('#calendar').fullCalendar( 'removeEvents');
-                            for(i=0;i<sData.length;i++) {
-                                var source = { 
-                                    events: [{   
-                                        id:sData[i].id,
-                                        title: sData[i].title,
-                                        start: sData[i].start,
-                                        url: sData[i].url
-                                    }]
-                                };   
-                                $('#calendar').fullCalendar( 'addEventSource', source );
-                            }
-                        }
-                    });
-                }
-
-                else {
-                    $.ajax({
-                        url: "{% url 'get_data_for_event_task' groupid %}",
-
-                        data: {
-                            view:'day',
-                            start:date.format()
-                        },
-
-                        type: "GET",
-                        success: function(data) {
-                            sData = jQuery.parseJSON(data);
-                            $('#calendar').fullCalendar('removeEvents');
-                            for(i=0;i<sData.length;i++) {
-                                var source = { 
-                                    events: [{   
-                                        id: sData[i].id,
-                                        title: sData[i].title,
-                                        start: sData[i].start,
-                                        url: sData[i].url
-                                    }]
-                                };   
-
-                                $('#calendar').fullCalendar( 'addEventSource', source );
-                            }
-                        }
-                    });
-                }
             }
         });
     });
         
+    function ajaxcalls(no)
+    {
+
+        var date=$('#calendar').fullCalendar('getDate');
+        $.ajax({
+                        url: "{% url 'get_data_for_event_task' groupid %}",
+
+                        data: {
+                            view:'month',
+                            start:date.format(),
+                            no:no
+                        },
+
+                        type: "GET",
+                        success: function(data) {
+                            sData = jQuery.parseJSON(data);
+                            $('#calendar').fullCalendar( 'addEventSource', sData );
+                        }
+                    });
+    }    
     /* initialize the calendar 
     -------------------------- */
     

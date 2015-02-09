@@ -1523,7 +1523,9 @@ def user_access_policy(node, user):
       user_access = True
 
     else:
-      group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+      # group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+      group_name, group_id = get_group_name_id(node)
+      group_node = collection.Node.one({"_id": ObjectId(group_id)})
 
       if user.id == group_node.created_by:
         user_access = True
@@ -1673,72 +1675,77 @@ def check_is_gstaff(groupid, user):
 
 @register.assignment_tag
 def check_is_gapp_for_gstaff(groupid, app_dict, user):
-  """
-  This restricts view of MIS & MIS-PO GApps to only GStaff members (super-user, creator, admin-user) of the group. 
-  That is, other subscribed-members of the group can't even see these GApps.
+    """
+    This restricts view of MIS & MIS-PO GApp to only GStaff members
+    (super-user, creator, admin-user) of the group.
+    That is, other subscribed-members of the group can't even see these GApps.
 
-  Arguments:
-  groupid -- ObjectId of the currently selected group
-  app_dict -- A dictionary consisting of following key-value pair
-              - 'id': ObjectId of the GApp
-              - 'name': name of the GApp
-  user - User object taken from request object
+    Arguments:
+    groupid -- ObjectId of the currently selected group
+    app_dict -- A dictionary consisting of following key-value pair
+                - 'id': ObjectId of the GApp
+                - 'name': name of the GApp
+    user - User object taken from request object
 
-  Returns:
-  A bool value indicating:-
-  True --  if user is superuser, creator or admin of the group
-  False -- if user is just a subscribed-member of the group
-  """
+    Returns:
+    A bool value indicating:-
+    True --  if user is superuser, creator or admin of the group
+    False -- if user is just a subscribed-member of the group
+    """
 
-  try:
-    if app_dict["name"].lower() in ["mis", "mis-po", "batch"]:
-      return check_is_gstaff(groupid, user)
+    try:
+        if app_dict["name"].lower() in ["mis", "mis-po", "batch"]:
+            return check_is_gstaff(groupid, user)
 
-    else:
-      return True
+        else:
+            return True
 
-  except Exception as e:
-    error_message = "\n GroupAdminCheckError (For MIS & MIS-PO): " + str(e) + " \n"
-    raise Http404(error_message)
+    except Exception as e:
+        error_message = "\n GroupAdminCheckError (For MIS): " + str(e) + " \n"
+        raise Http404(error_message)
 
 
 @register.assignment_tag
 def get_publish_policy(request, groupid, res_node):
-  resnode = collection.Node.one({"_id": ObjectId(res_node._id)})
+	resnode = collection.Node.one({"_id": ObjectId(res_node._id)})
 
-  if resnode.status == "DRAFT":
-    node = collection.Node.one({"_id": ObjectId(groupid)})
+	if resnode.status == "DRAFT":
+	    
+	    # node = collection.Node.one({"_id": ObjectId(groupid)})
+		
+		group_name, group_id = get_group_name_id(groupid)
+		node = collection.Node.one({"_id": ObjectId(group_id)})
 
-    group_type = group_type_info(groupid)
-    group = user_access_policy(groupid,request.user)
-    ver = node.current_version
-    
-    if request.user.id:
-      if group_type == "Moderated":
-      	base_group=get_prior_post_node(groupid)
-      	if base_group is not None:
-      		if base_group.status == "DRAFT" or node.status == "DRAFT":
-    				return "allow"
+		group_type = group_type_info(groupid)
+		group = user_access_policy(groupid,request.user)
+		ver = node.current_version
 
-      elif node.edit_policy == "NON_EDITABLE":
-        if resnode._type == "Group":
-        	if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
-        		return "stop"
-        if group == "allow":          
-        	if resnode.status == "DRAFT": 
-        			return "allow"    
+		if request.user.id:
+			if group_type == "Moderated":
+				base_group=get_prior_post_node(groupid)
+				if base_group is not None:
+					if base_group.status == "DRAFT" or node.status == "DRAFT":
+						return "allow"
 
-      elif node.edit_policy == "EDITABLE_NON_MODERATED":
-        #condition for groups
-        if resnode._type == "Group":
-          if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
-            # print "\n version = 1.1\n"
-            return "stop"
+			elif node.edit_policy == "NON_EDITABLE":
+				if resnode._type == "Group":
+					if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+						return "stop"
+		        if group == "allow":          
+		        	if resnode.status == "DRAFT": 
+		        			return "allow"    
 
-        if group == "allow":
-          # print "\n group = allow\n"
-          if resnode.status == "DRAFT": 
-            return "allow"
+			elif node.edit_policy == "EDITABLE_NON_MODERATED":
+		        #condition for groups
+				if resnode._type == "Group":
+					if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+		            	# print "\n version = 1.1\n"
+						return "stop"
+
+		        if group == "allow":
+		          # print "\n group = allow\n"
+		          if resnode.status == "DRAFT": 
+		            return "allow"
 
 
 @register.assignment_tag
@@ -1957,14 +1964,16 @@ def str_to_dict(str1):
        
               if type(dict_format[k]) == list :
                       for userid in dict_format[k]:
-                              user = User.objects.get(id = userid)
-                              if user:
-                                dict_format[k] = user.get_username()
+                      		  if User.objects.filter(id = userid).exists():
+	                              user = User.objects.get(id = userid)
+	                              if user:
+	                                dict_format[k] = user.get_username()
               else: 
                       if v != []:
-                              user = User.objects.get(id = v)
-                              if user:
-                                      dict_format[k] = user.get_username()
+                      		  if User.objects.filter(id = userid).exists():
+	                              user = User.objects.get(id = v)
+	                              if user:
+	                                dict_format[k] = user.get_username()
 
       if k in keys_by_dict:
               att_dic = {}
@@ -2274,31 +2283,74 @@ def get_file_node(request, file_name=""):
 
 	return new_file_list	
 
+
 @register.filter(name='jsonify')
 def jsonify(value):
-  """
-  Parses python value into json-type (useful in converting python list/dict into javascript/json object).
-  """
-  return json.dumps(value, cls=NodeJSONEncoder)
+    """Parses python value into json-type (useful in converting
+    python list/dict into javascript/json object).
+    """
+
+    return json.dumps(value, cls=NodeJSONEncoder)
+
 
 @register.assignment_tag
 def get_university(college_name):
-	"""
-	Returns university name to which given college is affiliated to.
-	"""
-	try:
-		college = collection.Node.one({'_type': "GSystemType", 'name': u"College"})
-		sel_college = collection.Node.one({'member_of': college._id, 'name': unicode(college_name)})
+    """
+    Returns university name to which given college is affiliated to.
+    """
+    try:
+        college = collection.Node.one({
+            '_type': "GSystemType", 'name': u"College"
+        })
 
-		university_name = None
-		if sel_college:
-			university = collection.Node.one({'_type': "GSystemType", 'name': u"University"})
-			sel_university = collection.Node.one({'member_of': university._id, 'relation_set.affiliated_college': sel_college._id})
-			university_name = sel_university.name
+        sel_college = collection.Node.one({
+            'member_of': college._id, 'name': unicode(college_name)
+        })
 
-		return university_name
-	except Exception as e:
-		error_message = "UniversityFindError: " + str(e) + " !!!"
-		# raise e
-		
+        university_name = None
+        if sel_college:
+            university = collection.Node.one({
+                '_type': "GSystemType", 'name': u"University"
+            })
+            sel_university = collection.Node.one({
+                'member_of': university._id,
+                'relation_set.affiliated_college': sel_college._id
+            })
+            university_name = sel_university.name
 
+        return university_name
+    except Exception as e:
+        error_message = "UniversityFindError: " + str(e) + " !!!"
+        raise Exception(error_message)
+
+
+@register.assignment_tag
+def get_features_with_special_rights(group_id_or_name, user):
+    """Returns list of features with special rights.
+
+    If group is MIS_admin and user belongs to gstaff, then only give
+    creation rights to list of feature(s) within MIS GApp shown as following:
+      1. StudentCourseEnrollment
+
+    For feature(s) included in list, don't provide creation rights.
+
+    Arguments:
+    group_id_or_name -- Name/ObjectId of the group
+    user -- Logged-in user object (django-specific)
+
+    Returns:
+    List having names of feature(s) included in MIS GApp
+    """
+    # List of feature(s) for which creation rights should not be given
+    features_with_special_rights = ["StudentCourseEnrollment"]
+
+    mis_admin = collection.Node.one({
+        "_type": "Group", "name": "MIS_admin"
+    })
+
+    if (group_id_or_name == mis_admin.name or
+            group_id_or_name == str(mis_admin._id)):
+        if mis_admin.is_gstaff(user):
+            features_with_special_rights = []
+
+    return features_with_special_rights
