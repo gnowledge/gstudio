@@ -1723,8 +1723,8 @@ def get_publish_policy(request, groupid, res_node):
 		if request.user.id:
 			if group_type == "Moderated":
 				base_group=get_prior_post_node(groupid)
-				if base_group is not None:
-					if base_group.status == "DRAFT" or node.status == "DRAFT":
+				if base_group and (base_group[len(base_group) - 1] is not None):
+					if base_group[len(base_group) - 1].status == "DRAFT" or node.status == "DRAFT":
 						return "allow"
 
 			elif node.edit_policy == "NON_EDITABLE":
