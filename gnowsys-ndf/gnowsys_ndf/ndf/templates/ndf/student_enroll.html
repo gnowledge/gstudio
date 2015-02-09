@@ -69,7 +69,7 @@
 {% block body_content %} 
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
     <label id="alertModalLabel"></label>
-    <div class="row hide">
+    <div class="row complete_inp_enroll hide">
       <div class="small-3 small-offset-3 columns">
         <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
       </div>
@@ -196,8 +196,6 @@
                     <label>Select Year</label>
                     {% html_widget groupid "" ATs.2 %}
                   </div>
-
-
               </div>
             </div>
           </dd>
@@ -231,10 +229,10 @@
           <div class="medium-4 medium-centered columns">
             <div class="row">
               <div class="medium-5 columns">
-                <input type="submit" id="sbtnInProgress" value="In Progress" class="button small radius expand sbtn" >
+                <input type="submit" id="sbtnInProgress" value="In Progress" class="button small radius expand sbtn" disabled="disabled" >
               </div>
               <div class="medium-5 medium-offset-2 columns end">
-                <input type="submit" id="sbtnComplete" value="Complete" class="button small radius expand sbtn">
+                <input type="submit" id="sbtnComplete" value="Complete" class="button small radius expand sbtn" disabled="disabled">
               </div>
             </div>
           </div>
@@ -255,14 +253,14 @@
   var acourse_val = [];
   var sce_dt_var = "";
 
-  /* 
-   * Click event: "Student data" Row of DataTable
-   * Select/Deselect Student Record
-   */
+   
+  // Click event: "Student data" Row of DataTable
   $(document).on( 'click', '#student_data_table tbody tr', function () {
     $(this).toggleClass('selected');
     $("#lbl_displ").text("")
-  } );
+    $("#sbtnComplete").removeAttr("disabled")
+    $("#sbtnInProgress").removeAttr("disabled")
+  });
 
   // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
     $(document).on('focus click blur', '.date_year' ,function(){
@@ -441,15 +439,19 @@
     $(document).on('click','.select_all_rows',function(){
       $(sce_dt_var.fnGetNodes()).addClass('selected')
       $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " rows are selected")
+      $("#sbtnComplete").removeAttr("disabled")
+      $("#sbtnInProgress").attr("disabled",true)
     });
 
   //On click of De-Select All, remove highlight from all rows
     $(document).on('click','.deselect_all_rows',function(){
         $("#lbl_displ").text("All rows are de-selected")
         $(sce_dt_var.fnGetNodes()).removeClass("selected");
+        $("#sbtnComplete").attr("disabled",true)
+        $("#sbtnInProgress").attr("disabled",true)
     });
 
-    // On close evar sce_gs_idvent of reveal-modal (alertModal)  = {{ app_set_instance_id }}-------------------------------------------------------------
+    // On close evar sce_gs_idvent of reveal-modal (alertModal)  = {{ app_set_instance_id }}---------------------
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
       if ($(this).hasClass('success')) {
         // Disable 'Find' button, which gets enable only when any of the input element
@@ -462,25 +464,29 @@
       $("#alertModal")
         .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
         .addClass("medium")
-        .find("div.row").addClass("hide");
+        .find("div.complete_inp_enroll").addClass("hide")
     });
 
   // On click of InProgress/Complete/Complete-Yes ------------------------------------------------------------
     var is_complete_confirm = false;
+    var is_inprogress_confirm = false;
 
     $(document).on("click", ".sbtn", function(event) {
       $("#enrollState").val($(this).val());
-
-      if ($("#enrollState").val() == "Complete" && !is_complete_confirm) {
-        $("#alertModalLabel").text("This will not allow further enrollments. Do you want to continue?");
+      if ( !is_inprogress_confirm && !is_complete_confirm) {
+        if(!is_inprogress_confirm){
+          $("#alertModalLabel").text("You can come back to enroll more students to this course again. This will not complete your enrollment task. Do you want to continue?");
+        }
+        else if(!is_complete_confirm){
+          $("#alertModalLabel").text("This will not allow further enrollments. Do you want to continue?");
+        }
         $("#alertModal")
           .removeClass("medium").addClass("small")
           .addClass("alert")
-          .find("div.row").removeClass("hide");
+          .find("div.complete_inp_enroll").removeClass("hide")
         $("#alertModal").foundation('reveal', 'open');
         return false;
       }
-
       // Fetching class name of hidden input element(s) of drawer2 from drawer-widget('student_enroll')
       var student_enroll_list = [];
       sce_dt_var.$("tr.selected").each(function () {
@@ -505,14 +511,26 @@
       });
     });
 
+    //Complete/In Progress
     $(document).on("click", "#btnConfirmYes", function() {
-      is_complete_confirm = true;
+      if ($("#enrollState").val() == "Complete"){
+        is_complete_confirm = true;
+        $("#sbtnComplete").trigger("click");
+        }
+      else if ($("#enrollState").val() == "In Progress"){
+        is_inprogress_confirm = true;
+        $("#sbtnInProgress").trigger("click");
+      }
       $("#alertModal").foundation('reveal', 'close');
-      $("#sbtnComplete").trigger("click");
     });
 
     $(document).on("click", "#btnConfirmNo", function() {
-      is_complete_confirm = false;
+      if ($("#enrollState").val() == "Complete"){
+        is_complete_confirm = false;
+      }
+      else if ($("#enrollState").val() == "In Progress"){
+        is_inprogress_confirm = false;
+      }
       $("#alertModal").foundation('reveal', 'close');
     });
 
@@ -561,5 +579,4 @@
         $(this).val(year)
       }
     });
-
 {% endblock %}
