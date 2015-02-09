@@ -127,7 +127,8 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 												'member_of': ObjectId(pandora_video_st._id), 
 												'group_set': ObjectId(group_id) 
 											}
-										] 
+										],
+										'status': u"PUBLISHED"
 									}).sort("last_update", -1)
 
 	# print "files.count : ", files.count()
@@ -378,7 +379,8 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 													'member_of': ObjectId(pandora_video_st._id), 
 													'group_set': ObjectId(group_id) 
 												}
-											] 
+											],
+											'status': u"PUBLISHED"
 										}).sort("last_update", -1)
 
 		# print "files.count : ", files.count()

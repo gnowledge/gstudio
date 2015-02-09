@@ -95,13 +95,8 @@
         {% get_nroer_menu request group_name_tag as nroer_menu %}
 
         <ul class="left">
-          <li>
-            <a href="/home/" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}> 
-              Home
-            </a>
-          </li>
           <li>          
-            <a href="{% url 'GAPPS' group_name_tag|default:'home' 'topics' %}" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
+            <a href="{% url 'GAPPS' 'home' 'topics' %}" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
