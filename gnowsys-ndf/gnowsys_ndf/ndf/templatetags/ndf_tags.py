@@ -2354,3 +2354,58 @@ def get_features_with_special_rights(group_id_or_name, user):
             features_with_special_rights = []
 
     return features_with_special_rights
+
+
+@register.assignment_tag
+def get_filters_data(gst_name):
+	'''
+	Returns the static data needed by filters. The data to be return will in following format:
+	{ 
+		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]},
+		... ,
+		... ,
+		"key_name": { "data_type": "<int>/<string>/<...>", "type": "attribute/field", "value": ["val1", "val2"]} 
+	}
+	'''
+
+	static_mapping = {
+                    "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+                    "language": GSTUDIO_RESOURCES_LANGUAGES,
+                    # "educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
+                    "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
+                    "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
+                    "educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
+                    "curricular": GSTUDIO_RESOURCES_CURRICULAR,
+                    "audience": GSTUDIO_RESOURCES_AUDIENCE,
+                    "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
+				}
+
+	# following attr's values need to be get/not in settings:
+	# timerequired, other_contributors, creator, age_range, readinglevel, adaptation_of, source, basedonurl
+
+	filter_dict = {}
+
+	gst = collection.Node.one({'_type':"GSystemType", "name": unicode(gst_name)})
+	poss_attr = gst.get_possible_attributes(gst._id)
+
+	exception_list = ["educationaluse"]
+
+	for k, v in poss_attr.iteritems():
+
+		if (k in exception_list) or not static_mapping.has_key(k):
+			continue
+
+		filter_dict[k] = {
+	    					"data_type": v["data_type"].__name__,
+	    					"type" : "attribute",
+	    					"value": json.dumps(static_mapping.get(k, []))
+	    				}
+
+	# additional filters:
+
+	filter_dict["language"] = { 
+								"data_type": "basestring", "type": "field",
+								"value": json.dumps(static_mapping["language"]) 
+							}
+
+	return filter_dict
