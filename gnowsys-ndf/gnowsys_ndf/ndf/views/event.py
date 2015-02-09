@@ -376,9 +376,9 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
       event_gs.status = u"PUBLISHED"
     if (request.POST.get("name","")) == "":
         if event_gst.name == "Exam":
-           name=slugify(request.POST.get("course_type",""))+ "--"+ slugify(request.POST.get("course_name",""))+ "--"+slugify           (request.POST.get("batch_name",""))
+           name = "Exam" + "--" + slugify(request.POST.get("batch_name",""))
         else:
-           name=slugify(request.POST.get("course_type",""))+ "--"+ slugify(request.POST.get("course_name",""))+ "--"+slugify           (request.POST.get("Module_name",""))+ "--"+slugify(request.POST.get("Session",""))
+           name= "Class" + "--"+ slugify(request.POST.get("course_name",""))
         event_gs.name=name 
     
     event_gs.save(is_changed=is_changed)

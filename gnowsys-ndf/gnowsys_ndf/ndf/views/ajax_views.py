@@ -1653,10 +1653,13 @@ def get_data_for_event_task(request,group_id):
                       update({'id':k._id})
                       update({'title':k.name})
                       date = v 
-                      formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-                      update({'start':formated_date})
-                      update({'backgroundColor':'#7e7e7e'})
-                      append(dict(attr_value)) 
+                      try:
+                              formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
+                              update({'start':formated_date})
+                              update({'backgroundColor':'#7e7e7e'})
+                              append(dict(attr_value))
+                      except:
+                              pass  
     date=""
     user_assigned=[]
     user_append = user_assigned.append
@@ -4428,6 +4431,7 @@ def reschedule_task(request,group_id,node):
     from datetime import date,time,timedelta
     date1=datetime.date.today() + timedelta(2)
     ti=datetime.time(0,0)
+    event_start_time = ""
     start_time = request.POST.get('reschedule_date','')
     b = parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
     #fetch event
@@ -4440,24 +4444,21 @@ def reschedule_task(request,group_id,node):
     task_id= {}
     if  reschedule_type == 'event_reschedule' :
          for i in event_node.attribute_set:
-	       if unicode('event_edit_reschedule') in i.keys():
-	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
-	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
-         if unicode("event_date_task") in i.keys():
-              task_id = i["event_date_task"]
-         print "the task ", task_id
-         
+	         if unicode('event_edit_reschedule') in i.keys():
+        	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
+        	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
+                 if unicode("event_date_task") in i.keys():
+                      task_id = i["event_date_task"]
+                 if unicode("start_time") in i.keys():
+                      event_start_time = i["start_time"]  
          if task_id:
-            for i in task_id:
-              if unicode('Task')  ==  i:
-                 tid = i
                  task_node = collection.Node.find({"_id":ObjectId(task_id["Task"])})
                  task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
-            create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
+                 create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
          task_id['Reschedule_Task'] = True
          create_gattribute(ObjectId(node),reschedule_event,task_id)
-         reschedule_dates.append(b)  
+         reschedule_dates.append(event_start_time)  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
          return_message = "Event Dates Re-Schedule Opened" 
@@ -4469,15 +4470,14 @@ def reschedule_task(request,group_id,node):
                     reschedule_dates = i['reschedule_attendance']['reschedule_dates']
             if unicode("event_attendance_task") in i.keys():
               task_id = i["event_attendance_task"]
+            if unicode("start_time") in i.keys():
+                      event_start_time = i["start_time"]  
         if task_id:
-            for i in task_id:
-              if unicode('Task') in i.keys():
-                 tid = i['Task']
-                 task_node = collection.Node.find({"_id":ObjectId(tid)})
-                 task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
-            create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))
+                task_node = collection.Node.find({"_id":ObjectId(task_id['Task'])})
+                task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+                create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))
 
-        reschedule_dates.append(b)
+        reschedule_dates.append(event_start_time)
         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
         if session != str(1):
           create_gattribute(ObjectId(node),marks_entry_completed[0],True)
@@ -4903,61 +4903,65 @@ def get_attendance(request,group_id,node):
  return HttpResponse(json.dumps(attendance))
  
 def attendees_relations(request,group_id,node):
- event_has_attended=collection.Node.find({'_id':ObjectId(node)})
- column_list=[]
- column_count=0
- course_assignment=False
- course_assessment=False
- reschedule = True
- marks = False
-   
- member_of=collection.Node.one({"_id":{'$in':event_has_attended[0].member_of}})
- if member_of.name != "Exam":
-   for i in event_has_attended[0].relation_set:
-      #True if (has_attended relation is their means attendance is already taken) 
-      #False (signifies attendence is not taken yet for the event)
-      if ('has_attended' in i):
-        a = "True"
-      else:
-        a = "False"   
-      if ('session_of' in i):
-         session=collection.Node.one({"_id":{'$in':i['session_of']}})
-         for i in session.attribute_set:
-              if unicode('course_structure_assignment') in i:   
-               if i['course_structure_assignment'] == True:
-                  course_assignment=True
-              if unicode('course_structure_assessment') in i:    
-               if i['course_structure_assessment'] == True:
-                  course_assessment=True
-                  
-   # meaning of the numbers 
-   #2 :- populate both assesment and assignment marks columns
-   #3 :- popuplate only Asssignment marks Columns
-   #4 :- populate only Assesment marks Columns
-   #1 :- populate Only Attendance taking part donot populate Assesment and Attendance taking part
-   if course_assessment == True:
-     column_count = 4
-   if course_assignment == True:
-     column_count = 3
-   if (course_assessment == True and course_assignment == True):
-     column_count = 2
-   if (course_assignment == False and course_assessment == False):                        
-     column_count = 1
-   column_list.append(a)
-   column_list.append(column_count)  
+ test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$lt':datetime.datetime.today()}})
+ if test_output.count() != 0: 
+         event_has_attended=collection.Node.find({'_id':ObjectId(node)})
+         column_list=[]
+         column_count=0
+         course_assignment=False
+         course_assessment=False
+         reschedule = True
+         marks = False
+           
+         member_of=collection.Node.one({"_id":{'$in':event_has_attended[0].member_of}})
+         if member_of.name != "Exam":
+           for i in event_has_attended[0].relation_set:
+              #True if (has_attended relation is their means attendance is already taken) 
+              #False (signifies attendence is not taken yet for the event)
+              if ('has_attended' in i):
+                a = "True"
+              else:
+                a = "False"   
+              if ('session_of' in i):
+                 session=collection.Node.one({"_id":{'$in':i['session_of']}})
+                 for i in session.attribute_set:
+                      if unicode('course_structure_assignment') in i:   
+                       if i['course_structure_assignment'] == True:
+                          course_assignment=True
+                      if unicode('course_structure_assessment') in i:    
+                       if i['course_structure_assessment'] == True:
+                          course_assessment=True
+                          
+           # meaning of the numbers 
+           #2 :- populate both assesment and assignment marks columns
+           #3 :- popuplate only Asssignment marks Columns
+           #4 :- populate only Assesment marks Columns
+           #1 :- populate Only Attendance taking part donot populate Assesment and Attendance taking part
+           if course_assessment == True:
+             column_count = 4
+           if course_assignment == True:
+             column_count = 3
+           if (course_assessment == True and course_assignment == True):
+             column_count = 2
+           if (course_assignment == False and course_assessment == False):                        
+             column_count = 1
+           column_list.append(a)
+           column_list.append(column_count)  
+         else:
+           column_count=5
+           column_list.append('True')
+           column_list.append(column_count) 
+         node = collection.Node.one({"_id":ObjectId(node)}) 
+         for i in node.attribute_set:
+            if unicode("reschedule_attendance") in i.keys():
+              if unicode('reschedule_allow') in i['reschedule_attendance']: 
+               reschedule=i['reschedule_attendance']['reschedule_allow'] 
+            if unicode("marks_entry_completed") in i.keys():
+                marks=i["marks_entry_completed"]
+         column_list.append(reschedule)
+         column_list.append(marks)
  else:
-   column_count=5
-   column_list.append('True')
-   column_list.append(column_count) 
- node = collection.Node.one({"_id":ObjectId(node)}) 
- for i in node.attribute_set:
-    if unicode("reschedule_attendance") in i.keys():
-      if unicode('reschedule_allow') in i['reschedule_attendance']: 
-       reschedule=i['reschedule_attendance']['reschedule_allow'] 
-    if unicode("marks_entry_completed") in i.keys():
-        marks=i["marks_entry_completed"]
- column_list.append(reschedule)
- column_list.append(marks)
+         column_list=[]
  return HttpResponse(json.dumps(column_list)) 
 
         
