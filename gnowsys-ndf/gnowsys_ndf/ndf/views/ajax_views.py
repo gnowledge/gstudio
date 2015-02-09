@@ -4365,6 +4365,7 @@ def save_time(request,group_id,node):
   # below code gets the old value from the database 
   # if value exists it append new value to it 
   # else a new time is assigned to it 
+  a = {}
   for i in event_node.attribute_set:
                if unicode('event_edit_reschedule') in i.keys():
                  a = i['event_edit_reschedule']
@@ -4375,6 +4376,7 @@ def save_time(request,group_id,node):
 def check_date(request,group_id,node):
     reschedule = request.POST.get('reschedule','')
     test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$gt':datetime.datetime.today()}})
+    a = {}
     if test_output.count()  == 0 and reschedule == 'True':
        test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.event_edit_reschedule.reschedule_till":{'$gt':datetime.datetime.today()}})
     if test_output.count() != 0:
@@ -4386,11 +4388,16 @@ def check_date(request,group_id,node):
       for i in event_node.attribute_set:
                if unicode('event_edit_reschedule') in i.keys():
                  a = i['event_edit_reschedule']
-      for i in a:
-          if unicode('reschedule_allow') in i:
-              a['reschedule_allow'] = False
-              create_gattribute(ObjectId(node),reschedule_event,a)
+      if a:
+          for i in a:
+              if unicode('reschedule_allow') in i:
+                  a['reschedule_allow'] = False
+          create_gattribute(ObjectId(node),reschedule_event,a)        
+      else:
+          create_gattribute(ObjectId(node),reschedule_event,{'reschedule_allow':False})
+                         
       
+      event_node = collection.Node.one({"_id":ObjectId(node)})
       message = "event closed"   
     return HttpResponse(message) 
 
@@ -4416,6 +4423,7 @@ def reschedule_task(request,group_id,node):
     reschedule_attendance=collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
     marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
+    session = request.POST.get('session','')
     end_time=collection.Node.one({"name":"end_time"})
     from datetime import date,time,timedelta
     date1=datetime.date.today() + timedelta(2)
@@ -4429,16 +4437,24 @@ def reschedule_task(request,group_id,node):
     #for generating a task for reschdueling a event
     event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
     create_gattribute(ObjectId(node),event_status,unicode('Rescheduled'))
+    task_id= {}
     if  reschedule_type == 'event_reschedule' :
          for i in event_node.attribute_set:
 	       if unicode('event_edit_reschedule') in i.keys():
 	    	   if unicode ('reschedule_dates') in i['event_edit_reschedule']:
 	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
+         if unicode("event_date_task") in i.keys():
+              task_id = i["event_date_task"]
+         if task_id:
+            task_node = collection.Node.find({"_id":ObjectId(task_id['Task'])})
+            task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+            create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
+         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+         task_id['Reschedule_Task'] = True
+         create_gattribute(ObjectId(node),reschedule_event,task_id)
          reschedule_dates.append(b)  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
-         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
-         create_gattribute(ObjectId(node),reschedule_event,True)
          return_message = "Event Dates Re-Schedule Opened" 
 
     else:
@@ -4446,11 +4462,20 @@ def reschedule_task(request,group_id,node):
             if unicode('reschedule_attendance') in i.keys():
                 if unicode ('reschedule_dates') in i['reschedule_attendance']:
                     reschedule_dates = i['reschedule_attendance']['reschedule_dates']
+            if unicode("event_attendance_task") in i.keys():
+              task_id = i["event_attendance_task"]
+        if task_id:
+            task_node = collection.Node.find({"_id":ObjectId(task_id['Task'])})
+            task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+            create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))
+
         reschedule_dates.append(b)
         create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
-        create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        if session != str(1):
+          create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        task_id['Reschedule_Task'] = True
         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
-	create_gattribute(ObjectId(node),reschedule_event,True)
+	create_gattribute(ObjectId(node),reschedule_event,task_id)
         return_message="Event Re-scheduled"
  else:
     reschedule_type = request.POST.get('reschedule_type','')
@@ -4462,15 +4487,10 @@ def reschedule_task(request,group_id,node):
     site = site.name.__str__()
     event_reschedule_link = "http://" + site + path
     b.append(task_groupset._id)
-    if  reschedule_type == 'event_reschedule' :
-	    reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
-	    create_gattribute(ObjectId(node),reschedule_event,False)
-    else:
-    	reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
-	create_gattribute(ObjectId(node),reschedule_event,False)
     glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+    task_type = []
     task_type = collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id
-    task_dict.update({"has_type" : task_type})
+    task_dict.update({"has_type" :task_type})
     task_dict.update({'name':unicode('Reschedule Task')})
     task_dict.update({'group_set':b})
     task_dict.update({'created_by':request.user.id})
@@ -4484,7 +4504,14 @@ def reschedule_task(request,group_id,node):
     Today=datetime.datetime.combine(date1,ti)
     task_dict.update({'start_time':Today})
     task_dict.update({'Assignee':Mis_admin_list})
-    create_task(task_dict)
+    task = create_task(task_dict)
+    
+    if  reschedule_type == 'event_reschedule' :
+      reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+      create_gattribute(ObjectId(node),reschedule_event,{'Task':ObjectId(task._id),'Reschedule_Task':False})
+    else:
+      reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
+      create_gattribute(ObjectId(node),reschedule_event,{'Task':ObjectId(task._id),'Reschedule_Task':False})
     return_message="Message is sent to central office soon you will get update."
  return HttpResponse(return_message)
  
@@ -4497,7 +4524,11 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  
  marks=request.POST.getlist("marks","")
  
- assessmentdone=request.POST.get("assessmentdone","") 
+ assessmentdone = request.POST.get("assessmentdone","") 
+ 
+ attendancedone = request.POST.get("attendancedone","")
+
+ attendancesession = request.POST.get("attendancesession","")
  
  oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
  
@@ -4511,6 +4542,10 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  
  marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
  
+ reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+
+ event_node = collection.Node.one({"_id":ObjectId(app_set_instance_id)})
+
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
  
@@ -4533,8 +4568,21 @@ def event_assginee(request, group_id, app_set_instance_id=None):
 
  if assessmentdone == 'True':
      event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
-     create_gattribute(ObjectId(node),event_status,unicode('Completed'))
-     create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
+     create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
+     if attendancesession != str(1):
+	 create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
+ reschedule_dates={}
+ 
+ if attendancedone == 'True':
+    for j in event_node.attribute_set:
+       if unicode('reschedule_attendance') in j.keys():
+          reschedule_dates = j['reschedule_attendance']
+    reschedule_dates["reschedule_allow"] = False
+    create_gattribute(ObjectId(app_set_instance_id),reschedule_attendance,reschedule_dates)
+    if attendancesession == str(1):
+    	event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+        create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
+
  create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)
  
  
@@ -4554,18 +4602,38 @@ def fetch_course_name(request, group_id,Course_type):
   return HttpResponse(json.dumps(course_list))
   
 def fetch_course_Module(request, group_id,Course_name):
-  courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
-  courses=collection.Node.find({"_id":ObjectId(courses[0]['relation_set'][0]['announced_for'][0])})
-  trainers=collection.Node.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
+  batch = request.GET.get('batchid','')
   superdict={}
   module_Detail={}
   module_list=[]
+  event_type_ids=[]
+  courses = collection.Node.one({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
+  eventtypes = collection.Node.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
+  for i in eventtypes:
+  	  event_type_ids.append(i._id)
+  for i in courses.relation_set:
+    if unicode('announced_for') in i.keys():
+      	announced_for = i['announced_for']  
+  courses=collection.Node.find({"_id":{'$in':announced_for}})
+  trainers=collection.Node.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
   course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})
+  #condition for all the modules to be listed is session in it should not be part of the event
+  checklist=[]
   for i in course_modules:
-    module_Detail.update({"name":i.name})
-    module_Detail.update({"id":str(i._id)})
-    module_list.append(module_Detail)
-    module_Detail={}
+    checklist = i.collection_set
+    #check if this collection_set exists in any
+    event = collection.Node.find({"member_of":{'$in':event_type_ids},"relation_set.session_of":{'$elemMatch':{'$in':i.collection_set}}
+    	                  ,'relation_set.event_has_batch':ObjectId(batch)})
+    for k in event:
+    	 for j in k.relation_set:
+             if unicode('session_of') in j.keys():
+             	if j['session_of'][0] in checklist:  
+             		checklist.remove(j['session_of'][0])
+    if len(checklist) > 0:         		
+	    module_Detail.update({"name":i.name})
+	    module_Detail.update({"id":str(i._id)})
+	    module_list.append(module_Detail)
+	    module_Detail={}
   
   trainerlist=[]
   trainer_detail={}
@@ -4580,11 +4648,13 @@ def fetch_course_Module(request, group_id,Course_name):
 
 def fetch_batch_student(request, group_id,Course_name):
   try:
-    courses=collection.Node.find({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
+    courses=collection.Node.one({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
     dict1={}
     list1=[]
-    a = courses[0].relation_set[0]
-    for i in a['has_batch_member']:
+    for i in courses.relation_set:
+    	 if unicode('has_batch_member') in i.keys():
+           has_batch = i['has_batch_member']    	 	
+    for i in has_batch:
      dict1.update({"id":str(i)})
      list1.append(dict1)
      dict1={}
@@ -4592,22 +4662,38 @@ def fetch_batch_student(request, group_id,Course_name):
   except:
     return HttpResponse(json.dumps(list1)) 
 def fetch_course_session(request, group_id,Course_name):
-  courses=collection.Node.find({"_id":ObjectId(Course_name)})
-  dict1={}
-  list1=[]
-  event_type_id=request.GET.get("app_set_id","")
-  event_type_node=collection.Node.one({"_id":ObjectId(event_type_id)})
+  try:  
+	  courses=collection.Node.one({"_id":ObjectId(Course_name)})
+	  batch = request.GET.get('batchid','')
+	  dict1={}
+	  list1=[]
+	  checklist = []
+	  event_type_ids = []
+	  checklist =  courses.collection_set
+	  eventtypes = collection.Node.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
+	  for i in eventtypes:
+	  	  event_type_ids.append(i._id)
+          
+	  module_node  = collection.Node.find({"member_of":{'$in':event_type_ids},"relation_set.session_of":{'$elemMatch':{'$in':checklist}}
+	    	                  ,'relation_set.event_has_batch':ObjectId(batch)})
+	  for i in module_node:
+	     for k in i.relation_set:
+		if unicode('session_of') in k.keys():
+		   if k['session_of'][0] in checklist:  
+		       checklist.remove(k['session_of'][0])
+	  course_modules=collection.Node.find({"_id":{'$in':checklist}})    
+	  for i in course_modules:
+	      dict1.update({"name":i.name})
+	      dict1.update({"id":str(i._id)})
+	      for j in i.attribute_set:
+	          if "course_structure_minutes" in j.keys()  :
+	              dict1.update({"minutes":str(j["course_structure_minutes"])})
+	      list1.append(dict1)
+	      dict1={}
+	  return HttpResponse(json.dumps(list1))
+  except:
+    return HttpResponse(json.dumps(list1)) 	      
   
-  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})    
-  for i in course_modules:
-      dict1.update({"name":i.name})
-      dict1.update({"id":str(i._id)})
-      for j in i.attribute_set:
-          if "course_structure_minutes" in j.keys()  :
-              dict1.update({"minutes":str(j["course_structure_minutes"])})
-      list1.append(dict1)
-      dict1={}
-  return HttpResponse(json.dumps(list1))
     
   
 
@@ -4814,8 +4900,8 @@ def attendees_relations(request,group_id,node):
  column_count=0
  course_assignment=False
  course_assessment=False
- reschedule =True
- marks =True
+ reschedule = True
+ marks = False
    
  member_of=collection.Node.one({"_id":{'$in':event_has_attended[0].member_of}})
  if member_of.name != "Exam":
@@ -4856,16 +4942,6 @@ def attendees_relations(request,group_id,node):
    column_list.append('True')
    column_list.append(column_count) 
  node = collection.Node.one({"_id":ObjectId(node)}) 
- for i in node.relation_set:
-        if unicode("session_of") in i.keys():
-           session_id = collection.Node.one({"_id":i['session_of'][0]}) 
-           for j in session_id.attribute_set:
-              if unicode('course_structure_assignment') in j:   
-                 if j['course_structure_assignment'] == True:
-                     marks_enter=True
-              if unicode('course_structure_assessment') in j:    
-                 if j['course_structure_assessment'] == True:
-                     marks_enter=True
  for i in node.attribute_set:
     if unicode("reschedule_attendance") in i.keys():
       if unicode('reschedule_allow') in i['reschedule_attendance']: 

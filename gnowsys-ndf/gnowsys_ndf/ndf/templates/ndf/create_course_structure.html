@@ -156,23 +156,21 @@
       <input type="button" class="button expand round hoverstyle course-sec-btn" value="Add Course Section" onclick="add_course_section()">
     </ul>
 
-    <div id="course_prop" class="reveal-modal small" data-reveal style="height:500px;"> 
+    <div id="course_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
         <div class="row">
             <h3><label id="css_name"></label></h3>
         </div>
-        <br><br><br>
         <div class="row">
-          <div class="small-3 columns">
-            <label for="{{property_order_list_css.0.1.1.name}}" class="right inline"> 
+          <div class="small-6 columns">
+            <label for="{{property_order_list_css.0.1.1.name}}"> 
               {% blocktrans with label_val=property_order_list_css.0.1.1.altnames %} {{label_val}} {% endblocktrans %}
             </label>
-          </div>
-          <div class="small-3 columns end mins_inp_div">
             {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.1 %}
           </div>
 
          </div>
 
+         <!-- //div for assignment radio buttons-->
         <div class="row">
           <div class="small-3 columns">
             <label for="{{property_order_list_css.0.1.1.name}}" class="right inline"> 
@@ -183,6 +181,8 @@
             {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.2 %}
           </div>
         </div>
+
+        <!-- //div for assessment radio buttons-->
 
         <div class="row">
           <div class="small-3 columns">
@@ -195,25 +195,24 @@
           </div>
         </div>
 
-        <div class="row min_marks_div hide">
-          <div class="small-3 columns">
-            <label for="{{property_order_list_css.0.1.1.name}}" class="right inline"> 
-              {% blocktrans with label_val=property_order_list_css.0.1.4.altnames %} {{label_val}} {% endblocktrans %}
-            </label>
+        <!-- //div row for min and max marks -->
+        <div class="row marks_div hide">
+          <div class="min_marks_div">
+            <div class="small-6 columns">
+              <label for="{{property_order_list_css.0.1.1.name}}"> 
+                {% blocktrans with label_val=property_order_list_css.0.1.4.altnames %} {{label_val}} {% endblocktrans %}
+              </label>
+              {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.4 %}
+            </div>
           </div>
-          <div class="small-4 columns end ">
-            {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.4 %}
-          </div>
-        </div>
 
-        <div class="row max_marks_div hide">
-          <div class="small-3 columns">
-            <label for="{{property_order_list_css.0.1.1.name}}" class="right inline"> 
-              {% blocktrans with label_val=property_order_list_css.0.1.5.altnames %} {{label_val}} {% endblocktrans %}
-            </label>
-          </div>
-          <div class="small-4 columns end ">
-            {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.5 %}
+          <div class="max_marks_div">
+            <div class="small-6 columns">
+              <label for="{{property_order_list_css.0.1.1.name}}"> 
+                {% blocktrans with label_val=property_order_list_css.0.1.5.altnames %} {{label_val}} {% endblocktrans %}
+              </label>
+              {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.5 %}
+            </div>
           </div>
         </div>
 
@@ -227,9 +226,8 @@
     <input type="hidden" id="changed_names" name="changed_names">
     <input type="hidden" id="app_set_id" name="app_set_id" value="{{app_set_id}}">
     <input type="hidden" id="app_id" name="app_id" value="{{app_id}}">
-    <input type="submit" value="submit" id="submit_course_struct" class="button right inline">  
+    <input type="submit" value="submit" id="submit_course_struct" class="button right inline" disabled="disabled">  
   </form>
-
 {% endblock %}
 
 <script>
@@ -247,8 +245,12 @@
   var css_names_list = []
   var all_mins_set = true;
   var css_renamed = {};
+  var max_marks_value;
+  var min_marks_value
   original_cs_and_css = {};
   $("#course_structure_minutes").addClass("css_mins_class")
+  $("#min_marks").addClass("min_marks_class")
+  $("#max_marks").addClass("max_marks_class")
 
 //Adding Course Section--------------------------------------------------------------------------------
   function add_course_section(){
@@ -770,6 +772,9 @@
   $(document).on('click','.reveal_prop_form',function(){
 
     $(".css_mins_class").val('');
+    $(".max_marks_class").val('')
+    $(".min_marks_class").val('')
+
     lb = $(this).closest("li").find("label").text()//csk
     lb_id = $(this).closest("li").find("label").attr("id")
     
@@ -791,13 +796,13 @@
 
                             if(course_sec_list[i][xy][newk][csk]["course_structure_assessment"]){
                                     v = course_sec_list[i][xy][newk][csk]["course_structure_assessment"]
-                                    if(v==true){v="Yes";}else{v="No";}
+                                    if(v==true){v="Yes";$(".marks_div").removeClass("hide");}else{v="No";$(".marks_div").addClass("hide");}
                                     $("input[name='course_structure_assessment'][value='"+v+"']").prop("checked","checked")
                             }
                             else{
-                                $("input[name='course_structure_assessment'][value='No']").prop("checked","checked")
+                                $("input[name='course_structure_assessment'][value='No']").prop("checked","checked");
+                                $(".marks_div").addClass("hide");
                             }
-
                             if(course_sec_list[i][xy][newk][csk]["course_structure_assignment"]){
                                     v = course_sec_list[i][xy][newk][csk]["course_structure_assignment"]
                                     if(v==true){v="Yes";}else{v="No";}
@@ -806,6 +811,21 @@
                             else{
                                 $("input[name='course_structure_assignment'][value='No']").prop("checked","checked")
                             }
+                            if(course_sec_list[i][xy][newk][csk]["min_marks"]){
+                                    v = course_sec_list[i][xy][newk][csk]["min_marks"]
+                                    $("#min_marks").val(v)
+                            }
+                            else{
+                                $("#min_marks").val("")
+                            }
+                            if(course_sec_list[i][xy][newk][csk]["max_marks"]){
+                                    v = course_sec_list[i][xy][newk][csk]["max_marks"]
+                                    $("#max_marks").val(v)
+                            }
+                            else{
+                                $("#max_marks").val("")
+                            }
+
                         }
                     }
                 } 
@@ -834,37 +854,69 @@
     
   });
 
-//Done button in reveal modal -------------------------------------------------------------------------
-  $(document).on('click','.set_prop_class',function(){
-    course_min_value = $(".css_mins_class").val()
-    $('#course_prop').foundation('reveal', 'close');
-    a = $("#hidden_css_name_id").val()
-    c_name = $("#"+a).text();
-    x = $("#"+a).parents("li.course-section-class").find("label.lbl_of_cs").text()
-    // $("#"+a).attr("course_mins",course_min_value)
-    var assessment_chk =  $("input[name='course_structure_assessment']:checked").val()
-    var assignment_chk  = $("input[name='course_structure_assignment']:checked").val()
+// Onchecking any radio button in prop reveal modal
+  $(document).on("change click", "input:radio[name=course_structure_assessment]", function(){
+      var assessment_val = $(this).val();
+      if(assessment_val=="Yes"){
+        $(".marks_div").removeClass("hide");
+      }
+      else{
+        $(".marks_div").addClass("hide");
+      }
+  });
 
-    if(assignment_chk=="Yes"){ assignment_chk=true;}else{ assignment_chk=false;}
+//Done button in reveal modal -------------------------------------------------------------------------
+  $(document).on('click','.set_prop_class',function(event){
+
+    var length_val = false;
+    var assessment_chk =  $("input[name='course_structure_assessment']:checked").val()
     if(assessment_chk=="Yes"){ assessment_chk=true;}else{ assessment_chk=false;}
 
-    for(var i in course_sec_list){
-        for(var i2 in course_sec_list[i]){
-            if(x==i2){
-              for( var newk in course_sec_list[i][i2]){
-                  for (var csk in course_sec_list[i][i2][newk]){
-                      if(c_name==csk){
-                          course_sec_list[i][i2][newk][csk] = {}
-                          course_sec_list[i][i2][newk][csk]["course_structure_minutes"] = course_min_value;
-                          course_sec_list[i][i2][newk][csk]["course_structure_assessment"] = assessment_chk;
-                          course_sec_list[i][i2][newk][csk]["course_structure_assignment"] = assignment_chk;
-                      }
-                  }
-              } 
-            }
-        }
+    course_min_value = $(".css_mins_class").val();
+    if (!assessment_chk){
+      if(course_min_value>10){ length_val = true; }
     }
-    all_mins_set=true;
+    else{
+      min_marks_value = $(".min_marks_class").val(); 
+      max_marks_value = $(".max_marks_class").val();
+      if (max_marks_value>10 && min_marks_value>10 && course_min_value>10){ length_val = true;}
+    }
+
+    if(length_val == true) {
+      a = $("#hidden_css_name_id").val();
+      c_name = $("#"+a).text();
+      x = $("#"+a).parents("li.course-section-class").find("label.lbl_of_cs").text()
+      // $("#"+a).attr("course_mins",course_min_value)
+      var assignment_chk  = $("input[name='course_structure_assignment']:checked").val()
+      if(assignment_chk=="Yes"){ assignment_chk=true;}else{ assignment_chk=false;}
+
+      for(var i in course_sec_list){
+          for(var i2 in course_sec_list[i]){
+              if(x==i2){
+                for( var newk in course_sec_list[i][i2]){
+                    for (var csk in course_sec_list[i][i2][newk]){
+                        if(c_name==csk){
+                            course_sec_list[i][i2][newk][csk] = {}
+                            course_sec_list[i][i2][newk][csk]["course_structure_minutes"] = course_min_value;
+                            course_sec_list[i][i2][newk][csk]["course_structure_assessment"] = assessment_chk;
+                            course_sec_list[i][i2][newk][csk]["course_structure_assignment"] = assignment_chk;
+                            if (assessment_chk){
+                              course_sec_list[i][i2][newk][csk]["max_marks"] = max_marks_value;
+                              course_sec_list[i][i2][newk][csk]["min_marks"] = min_marks_value;
+                            }
+                        }
+                    }
+                } 
+              }
+          }
+      }
+      all_mins_set=true;
+      $('#course_prop').foundation('reveal', 'close');
+      $("#submit_course_struct").removeAttr("disabled")
+    }
+    else{
+      event.preventDefault();
+    }
   });
 
 //Submit course structure -----------------------------------------------------------------------------
@@ -900,7 +952,6 @@
 
 {% block document_ready %}
   {{block.super}}
-
   var view_dict = {{course_collection_list|safe|escape}}
   $.each(view_dict, function(cs,csv){
 

@@ -45,7 +45,6 @@ table, th, td {
   {% if user.is_authenticated %}
   <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
   {% endif %}
-
   <header class="row event">
     <section class="medium-12 columns" >
       <h2>
@@ -172,7 +171,7 @@ table, th, td {
                                 <label>Min marks:</label>
                               </div>
                               <div class="small-3 end columns">
-                                <label>{{course.attribute_set.6.min_marks}}</label>
+                                <label>{{session_min_marks}}</label>
 
                               </div>
                                 
@@ -180,7 +179,7 @@ table, th, td {
                                 <label>Max Marks:</label>
                               </div>
                               <div class="small-2 end columns">
-                                  <label>{{course.attribute_set.7.max_marks}}</label>  
+                                  <label>{{session_max_marks}}</label>  
                               </div>
                          </div>
                           {% endif %}
@@ -324,10 +323,8 @@ table, th, td {
 {% endblock %}
 
 {% block script %}
-
-
- eventreschedule=""
-
+eventreschedule=""
+pass = ""
 
 session_time  = 0
 session_time  = get_time_diff("{{node.start_time|date:'c'}}","{{node.end_time|date:'c'}}")
@@ -356,11 +353,7 @@ if ('{{Eventtype}}' == 'Eventtype')
   {
      $('#Edit').show()
      $('#Edit_start_time').hide()
-  
   }
-
-
-
 
 if ('{{Eventtype}}' == 'CollegeEvents')
  {
@@ -375,19 +368,13 @@ if ('{{Eventtype}}' == 'CollegeEvents')
             add_reschedule()
             $('#Edit_start_time').hide()
       }
-
-
  }  
-
-
 
 function remove_reschedule(){
 
     $('#reschedule').hide()
     $('#Edit_start_time').show() 
 }
-
-
 
 function add_reschedule(){
 
@@ -413,7 +400,6 @@ function add_reschedule(){
  
 function closeEvent()
 {
-
     $.ajax({
 
                url:"{% url 'close_event' groupid node %}",
@@ -430,8 +416,6 @@ function closeEvent()
 
 function checkDate()
 {
-   
-
    $.ajax({
 
              url:"{% url 'check_date' groupid node %}",
@@ -481,8 +465,6 @@ function controler()
                       }
               
                 });
-
-
 }
 
 function EditAttendance(columns)
@@ -533,18 +515,18 @@ function saveTime()
          {
             alert("session time should be exactly same as previouse alloted time")
          }     
-    
-
 }
 function disableAttendance()
 {
     $(':checkbox.chkbx').each(function () 
     { this.disabled = true})
-     
+    $('#selall').attr('disabled','true')
+    $('#attendancediv').hide()
 }
 
 function drawTable(attended,columns)
 {
+
 if ( (columns == 'Edit') == false ){
       pass=columns
 }
@@ -593,9 +575,6 @@ column4="<th> Assessment Marks </th>"
        column4_data= "<td class='Assesstxtbx'> "  + val.Assessment_marks + "</td > " 
        column3data="<td><input type='number' onblur='validate_txtbx(this)'  class='Assigntxtbx' id="+val.id+"Assignment" + " value= "+ val.Assignment_marks + " </td>"
        column4data="<td> <input type='number' onblur='validate_txtbx(this)'  class='Assesstxtbx' id="+val.id+"Assessment" +" value= "+ val.Assessment_marks + " </td>"  
-      
-      
-
      if(pass[1] == 1)
       {
         column3data = " " 
@@ -618,8 +597,6 @@ column4="<th> Assessment Marks </th>"
        column4data=""
       }     
 if ( pass[0] == 'Edit'){
-
-          
                      if(val.presence == 'Absent')
                               {
                     $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' onClick='enablemarks(this)' class='chkbx'  value=" + val.id + " ></td>  " 
@@ -644,15 +621,9 @@ if ( pass[0] == 'Edit'){
                                         $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' onClick='enablemarks(this)' class='chkbx'  value=" + val.id + " checked></td >  " 
             + column3data  + column4data + "</tr>")
                               }
-                                 
-
 }
 else{
-
-       
-       
        $('#forattendance').append("<tr>"+ column1_data + column2_data + column3_data + column4_data   + "</tr>")         
-
     }
   });
   
@@ -662,27 +633,34 @@ if ( pass[0] == 'Edit'){
         $('#attendance').append("<div class='row'>" 
          + "<div class='small-8 columns'> "
          + " <fieldset>   "
-         + " <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done"
+         + "<div id='assessmentdiv'> <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done </div>"
+         + "<div id='attendancediv'> <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done </div>"
          + " <br> <span style='color:red;'> Note:- Edit option will be closed after asessment is done. </span> "
+         + " </fieldset> </div></div>")
+      }
+      else
+      {
+
+        $('#attendance').append("<div class='row'>" 
+         + "<div class='small-8 columns'> "
+         + " <fieldset>   "
+         + " <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done"
+         + " <br> <span style='color:red;'> Note:- Edit option will be closed after Attendance is done. </span> "
          + " </fieldset> </div></div>")
       }
         $('#attendance').append("<br>")
         $('#attendance').append("<input class='tiny button' onclick='saveattendees("+pass[1]+")' value='Save' >")
         $('#attendance').append("<input class='tiny button' onclick='TakePrint()' value='Print'>")
-                   
-
 }
 else
 {     
         
       $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")
-      if(reschedule == true || marks_enter  == true){
-            if(marks_enter != false)
-            {
+      if(reschedule == true || marks_enter  == true)
+           {
               $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
-            }
-      }
-      if(reschedule == false || marks_enter == false)
+           }
+      if(reschedule == false)
       {
         if ('{{Add}}' == 'Allow'){
           $('#attendance').append("<input class='tiny button'  onclick=reschedule_time('attendance_reschedule') value='Re-Schedule'>" )
@@ -701,11 +679,7 @@ else
 
           }          
       }
-          
-      
 }
-
-
 }
 
 function reschedule_time(type)
@@ -715,18 +689,23 @@ function reschedule_time(type)
     $('#reschedule_save').empty()
     $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
     $('#reschedulemodal').foundation('reveal', 'open');
-    
-
 }
 
 function reschedule_event(type)
 {
    var start_time =  $("#start_time_1").val()
+   var session =""  
+     if (pass)
+     {
+        session = pass[1]
+     
+     }
      $.ajax({
              url:"{% url 'reschedule_task' groupid node.pk  %}",
              type:"POST",
              data:{
-                 path:'{{request.path}}',
+                 path:"{{request.path}}",
+                 session:session,
                  reschedule_type:type,
                  reschedule_date:start_time,
                  csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -758,8 +737,7 @@ function reschedule_event(type)
                                     }
                  
              }
-         }); 
-  
+         });   
 }
 
 function enablemarks(value)
@@ -875,8 +853,8 @@ var student_marks=[]
 var student_id=[]
 var eventid=[]
 var Event_attended_by=[]
-var assessmentdone=""
-var attendancedone=""
+var assessmentdone = ""
+var attendancedone = ""
 eventid='{{node.pk}}'
 title='{{app_set_id}}'
 
@@ -902,11 +880,15 @@ if (!(Status_attended))
     }); 
     
     if ($('#assessmentchkbx').is(':checked')) 
-    {
-    assessmentdone='True'
-    }
-       
-   
+      {
+          assessmentdone = 'True'
+      }
+
+    if($('#attendancechkbx').is(':checked'))
+      {
+          attendancedone = 'True'
+      }
+    
      if(Event_attended_by !="")
      {
               $.ajax({
@@ -915,6 +897,8 @@ if (!(Status_attended))
                       data:{
                       marks:'{{marks_enter}}',
                       assessmentdone:assessmentdone,
+                      attendancedone:attendancedone,               
+                      attendancesession:pass[1],
                       Event_attended_by:Event_attended_by,
                       Event:eventid,
                       csrfmiddlewaretoken: '{{ csrf_token }}'},
@@ -928,18 +912,13 @@ if (!(Status_attended))
      {
      alert("No Attendance Taken.")
      }
-    
-    
-    
- }
-    
+     }
    
 function validate_txtbx(input)
 { 
-    
-  if ( Number(input.value) >= Number('{{course.attribute_set.6.min_marks}}') && Number(input.value) <= Number('{{course.attribute_set.7.max_marks}}') )
+  if ( Number(input.value) >= Number('{{ session_min_marks }}') && Number(input.value) <= Number('{{session_max_marks}}') )
   {
-    
+
   }
   else
   {
