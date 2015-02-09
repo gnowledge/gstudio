@@ -1078,7 +1078,7 @@ def tag_info(request, group_id, tagname = None):
         if len(search_result) == 0:
             total_length = len(search_result)
 
-    else: #UNauthenticated user can see all public files.
+    else: #Unauthenticated user can see all public files.
         if tagname:
             cur = collection.Node.find( { 'tags':{'$in':[tagname]},
                                            'access_policy':u'PUBLIC',
@@ -1092,7 +1092,7 @@ def tag_info(request, group_id, tagname = None):
         total = locale.format("%d", total, grouping=True)
         if len(search_result) == 0:
             total_length = len(search_result)
-            
+    
     return render_to_response(
         "ndf/tag_browser.html",
         {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},

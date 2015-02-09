@@ -38,7 +38,8 @@
 {%endcomment%}
     h1{ font-size: 300%;}
     h2{ font-size: 160%;}
-    p { font-size: 100%; }  
+    p { font-size: 125%;}
+    p1{ font-size: 125%;}  
     i { font-size: 110%;}
     b { font-size: 120%;}
 {% endblock %}
@@ -48,11 +49,11 @@
     			<div class="pos_left">asdddfff</div>
     			<div class="block">jjjj</div>--> 
 <form id ="search_result" action="{% url 'tag_info' group_id %}" method="GET" onsubmit="return checkforBlank()">
-        <p class="Focus"> 
+        <p1 class="Focus"> 
             <b>Jump To:</b>
             <input type = "text" name = "search" id="value" style ="width:300px;" maxlength = "20" placeholder = "search other files by tagname">
             <input type = "submit" value ='GO'>
-        </p>
+        </p1>
 </form>
 <script type = "text/javascript">
     function checkforBlank(){
