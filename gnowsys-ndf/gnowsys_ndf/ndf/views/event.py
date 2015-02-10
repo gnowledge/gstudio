@@ -107,7 +107,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
         group_id = str(auth._id)
   else :
     pass
-  
+  session_node = ""
   app = None
   '''if app_id is None:
     app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
