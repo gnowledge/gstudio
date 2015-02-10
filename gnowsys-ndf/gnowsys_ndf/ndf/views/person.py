@@ -278,6 +278,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   college_node = None
   college_id = None
   student_enrollment_code = u""
+  create_student_enrollment_code = False
 
   property_order_list = []
 
@@ -291,7 +292,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
-        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
@@ -316,12 +317,13 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   if request.method == "POST":
     if person_gst.name == "Student" and "_id" not in person_gs:
-        # Create enrollment code for student node only while registering a new node
-        for rel in college_node.relation_set:
-            if rel and "group_of" in rel:
-                college_id = rel["group_of"][0]
+            # Create enrollment code for student node only while registering a new node
+            for rel in college_node.relation_set:
+                if rel and "group_of" in rel:
+                    college_id = rel["group_of"][0]
 
-        student_enrollment_code = get_student_enrollment_code(college_id, ObjectId(group_id))
+            student_enrollment_code = get_student_enrollment_code(college_id, ObjectId(group_id))
+            create_student_enrollment_code = True
 
     # [A] Save person-node's base-field(s)
     is_changed = get_node_common_fields(request, person_gs, group_id, person_gst)
@@ -371,7 +373,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                 else:
                   field_value = ""
-                
+
                 # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
                 if field_value != '' and field_value != u'':
                   file_name = person_gs.name + " -- " + field_instance["altnames"]
@@ -413,8 +415,8 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
               person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value_list)
 
-    # Setting enrollment code for student node
-    if person_gst.name == "Student":
+    # Setting enrollment code for student node only while creating it
+    if create_student_enrollment_code:
         enrollment_code_at = collection.Node.one({
             "_type": "AttributeType", "name": "enrollment_code"
         })
