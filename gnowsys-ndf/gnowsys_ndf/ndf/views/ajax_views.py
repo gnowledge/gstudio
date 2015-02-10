@@ -3976,31 +3976,42 @@ def get_students_for_approval(request, group_id):
           for each_id in enrolled_students_list:
             if (each_id not in approved_students_list) and (each_id not in rejected_students_list):
               updated_enrolled_students_list.append(each_id)
-          
-          enrollment_columns = ["Name", "Reg#", "Degree", "Year"]
-          for each_id in updated_enrolled_students_list:
-            n = collection.Node.one({'_id': ObjectId(each_id)}, {'name': 1, 'member_of': 1})
-            n.get_neighbourhood(n.member_of)
-            nn = {}
-            nn["_id"] = n._id
-            nn["Name"] = n.name
-            nn["Reg#"] = n.registration_date
-            nn["Degree"] = n.degree_name
-            nn["Year"] = n.degree_year
-            approval_nodes.append(nn)
+          res = collection.aggregate([
+              {
+                  '$match': {
+                      '_id':{"$in":updated_enrolled_students_list}
+                  }
+              }, {
+                  '$project': {
+                      '_id': 1,
+                      'name': '$name',
+                      'degree_name': '$attribute_set.degree_name',
+                      'degree_year':'$attribute_set.degree_year',
+                      # 'registration_year':{"$date": "$attribute_set.registration_date"}
+                      'registration_year':"$attribute_set.registration_date"
+                  }
+              },
+              {
+                  '$sort': {'name': 1}
+              }
+          ])
 
-          half_count = len(approval_nodes) / 2
+          # To convert full registration date
+          for each in res["result"]:
+            reg_year = each["registration_year"][0]
+            each["registration_year"] = datetime.datetime.strftime(reg_year,"%Y")
 
-          approval_list = render_to_string('ndf/approval_data_review.html', 
-            {
-              'groupid': group_id, 'group_id': group_id,
-              'enrollment_details': data, 'enrollment_columns': enrollment_columns, 'approval_nodes': approval_nodes, 'half_count': half_count
-            },
-            context_instance=RequestContext(request)
-          )
-
+          enrollment_columns = [
+              ("name", "Name"),
+              ("degree_name", "Degree"),
+              ("degree_year", "Year of Study"),
+              ("registration_year", "Registration Year")
+          ]
           response_dict["success"] = True
-          response_dict["approval_data_review"] = approval_list
+          response_dict["enrollment_details"] = data
+
+          response_dict["column_headers"] = enrollment_columns
+          response_dict["student_approval_data"] = res["result"]
 
           return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
@@ -4019,10 +4030,8 @@ def approve_students(request, group_id):
         if request.is_ajax() and request.method == "POST":
             approval_state = request.POST.get("approval_state", "")
             enrollment_id = request.POST.get("enrollment_id", "")
-
             course_ids = request.POST.get("course_id", "")
             course_ids = [(ObjectId(each.strip()), each.strip()) for each in course_ids.split(",")]
-
             students_selected = request.POST.getlist("students_selected[]", "")
 
             sce_gs = collection.aggregate([{
