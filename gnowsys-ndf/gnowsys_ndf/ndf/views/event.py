@@ -122,7 +122,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   app_collection_set = []
   title = ""
   marks_enter= ""
-   
+  session_node = "" 
   event_gst = None
   event_gs = None
   reschedule = True
