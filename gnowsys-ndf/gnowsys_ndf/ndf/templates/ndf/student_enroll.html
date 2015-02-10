@@ -474,10 +474,10 @@
     $(document).on("click", ".sbtn", function(event) {
       $("#enrollState").val($(this).val());
       if ( !is_inprogress_confirm && !is_complete_confirm) {
-        if(!is_inprogress_confirm){
+        if($("#enrollState").val() == "In Progress"){
           $("#alertModalLabel").text("You can come back to enroll more students to this course again. This will not complete your enrollment task. Do you want to continue?");
         }
-        else if(!is_complete_confirm){
+        else if($("#enrollState").val() == "Complete"){
           $("#alertModalLabel").text("This will not allow further enrollments. Do you want to continue?");
         }
         $("#alertModal")
