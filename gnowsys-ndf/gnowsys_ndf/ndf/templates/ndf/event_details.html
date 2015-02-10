@@ -38,6 +38,17 @@ table, th, td {
      font-weight: bold;
      font-size: 1rem;
    }
+   #myModal
+    {
+		min-height: 10vh;
+    		
+    }
+
+    #reschedulemodal
+    {
+		min-height: 10vh;
+			
+    }
 </style>
 
 <div id="view_event">
@@ -45,6 +56,7 @@ table, th, td {
   {% if user.is_authenticated %}
   <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
   {% endif %}
+
   <header class="row event">
     <section class="medium-12 columns" >
       <h2>
@@ -84,17 +96,23 @@ table, th, td {
                               <div class="small-3 columns">
                                 <label>Start time:</label> 
                               </div>
+                              
                               <div class="small-5 end columns">
                                 <label>{{node.start_time}}</label> 
                               </div>
+                              <div id = 'Edit_start_time'> 
+	                                  <a  onclick="checkDate()" class="tiny button">  Edit 
+	                                  </a>
+	                          </div>
                               
-                              <div id='Edit_start_time'> 
-                                  <a  onclick="checkDate()" class="tiny button">  Edit 
-                                  </a>
+                              <div id='reschedule' class = "row">
                               </div>
-                              <div id='reschedule'>
+                              <div id='br-div'>
+                               <br>
                               </div>
-                          </div>
+
+                          </div>    
+                              
                           <div class="row">
                               <div class="small-3 columns">
                                 <label>End time:</label>
@@ -103,7 +121,7 @@ table, th, td {
                                 <label>{{node.end_time}}</label>
                               </div>
                           </div>
-                        <br>
+                        
                           {% if  Eventtype == 'Eventtype' %}
                             {%  if node.event_organised_by %}
                                 <br>
@@ -125,9 +143,10 @@ table, th, td {
                                 
                           {% endif %}
                           {% endif %}
-                         <br> 
+                          
                          
                          {% if node.event_coordinator %} 
+                          <br>
                           <div class="row">
                             <div class="small-3 columns">
                               <label>Event Co-ordinator:</label>
@@ -143,9 +162,10 @@ table, th, td {
                             </div>
                           </div>
                           {% endif %}
-                           <br>
+                           
 
                           {% if Eventtype == 'CollegeEvents' %}  
+                            <br>
                             <div class="row">
                               <div class="small-3 columns">
                                 <label>Batch:</label>
@@ -164,14 +184,14 @@ table, th, td {
                                 <label>{{course.name}}</label>
                               </div>
                           </div>
-                            <br>
-                          
+                            
+                          <br>
                           <div class="row">
                               <div class="small-3 columns">
                                 <label>Min marks:</label>
                               </div>
                               <div class="small-3 end columns">
-                                <label>{{session_min_marks}}</label>
+                                <label>{{course.attribute_set.6.min_marks}}</label>
 
                               </div>
                                 
@@ -179,7 +199,7 @@ table, th, td {
                                 <label>Max Marks:</label>
                               </div>
                               <div class="small-2 end columns">
-                                  <label>{{session_max_marks}}</label>  
+                                  <label>{{course.attribute_set.7.max_marks}}</label>  
                               </div>
                          </div>
                           {% endif %}
@@ -243,7 +263,7 @@ table, th, td {
  
                  </div> <!-- End of class="content active" -->
 
-                 <div id="myModal" class="small reveal-modal" animation="None" data-reveal>
+                 <div id="myModal" class="small reveal-modal" animation="None" data-reveal style = "">
                    <fieldset> 
                           <div class = "row">
                             <div class="small-6 columns">
@@ -256,17 +276,17 @@ table, th, td {
                           </div>
                           <br>
                           <div class = "row"> 
-                             <div class = "small-2 columns">
-                               <label> Start_time </label>
+                             <div class = "large-2  medium-4  columns">
+                               <label> Start time </label>
                              </div>  
-                             <div class = "small-4 columns"> 
+                             <div class = "large-4   columns"> 
                                <input id="start_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time">
                              </div>  
-                             <div class = "small-2 columns">
-                               <label> End_time </label>
+                             <div class = "large-2   columns">
+                               <label> End time </label>
                              </div>
-                             
-                             <div class = "small-4 columns">  
+                             	
+                             <div class = "large-4  columns">  
                                <input id="end_time" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="end_time">
                              </div>  
                           </div>     
@@ -286,13 +306,13 @@ table, th, td {
                           <div class = "row">
                             
                           <div class = "row">
-                               <div class = "small-5 columns">
+                               <div class = "small-4  medium -4 large-4 columns">
                               	 <label><b>Reschedule Session till : </b></label>
                                </div>  
-                              <div class = "small-2 columns">  
-                               <input id="start_time_1" class="date_month_day_year" type="text" style="float:left; width:10rem" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time_1">
+                              <div class = "small-4  medium -4 large-5 columns">  
+                               <input id="start_time_1" class="date_month_day_year" type="text" style="float:left;" required="" readonly="" placeholder="DD/MM/YYYY HH:MM" value="" name="start_time_1">
                               </div>
-                              <div class = "small-2 columns" id = 'reschedule_save' aling="left">  
+                              <div class = "small-4  medium -4 large-3 columns" id = 'reschedule_save' aling="left">  
                                  
                               </div>
                           </div>
@@ -304,7 +324,7 @@ table, th, td {
 
                        <div class="content" id="view-Attendance" >    
                         
-                        <div  id  = "attendance_reschedule">
+                        <div  id  = "attendance_message">
                         </div>
                       
                         <div id="attendance">
@@ -323,7 +343,9 @@ table, th, td {
 {% endblock %}
 
 {% block script %}
-eventreschedule=""
+
+
+ eventreschedule=""
 pass = ""
 
 session_time  = 0
@@ -353,45 +375,63 @@ if ('{{Eventtype}}' == 'Eventtype')
   {
      $('#Edit').show()
      $('#Edit_start_time').hide()
+  
   }
+
+
+
 
 if ('{{Eventtype}}' == 'CollegeEvents')
  {
-    $('#Edit_start_time').show()
+
+    //$('#Edit_start_time').show()
     if ('{{reschedule}}' == 'True')
       {
           
+          $('#br-div br:first').remove()
           $('#Edit_start_time').show()
       }
     if ('{{reschedule}}' == 'False')
-      {
+      {     $('#br-div br:first').remove()
             add_reschedule()
             $('#Edit_start_time').hide()
       }
+
+
  }  
+
+
 
 function remove_reschedule(){
 
     $('#reschedule').hide()
+    $('#br-div br:first').remove()
     $('#Edit_start_time').show() 
 }
+
+
 
 function add_reschedule(){
 
          if ('{{Add}}' == 'Allow'){
-                  
-                  $('#reschedule').append("<input class='tiny button' onclick=reschedule_time('event_reschedule') value='Reschedule'>")
-                  
+                  $('#reschedule').append("<div class='small-2 columns'>"
+                  + "<input class='tiny button' onclick=reschedule_time('event_reschedule') value='Reschedule'>"
+                  +"</div>")
                   }
          if ('{{task_date}}' != 'False')
              { 
       
                 if('{{Add}}' == 'Stop')
-                  {
-                  		$('#reschedule').append("<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>")	
+                  {     
+                        $('#br-div br:first').remove()
+                        $('#reschedule').append("<div class='small-2 columns'>"
+                  		+ "<input class='tiny button' onclick=reschedule_event('event_reschedule') value='Reschedule'>"	
+                  		+"</div>")
                   }
+                  
                 $('#Edit_start_time').hide()
             }
+            
  if ('{{task_date}}' == 'False' && '{{Add}}' == 'Stop'){  
       $('#message').empty()
       $('#message').append("<label id = 'lbl_displ' > Your request to reschedule the event has been sent to Admin </label>")
@@ -400,14 +440,14 @@ function add_reschedule(){
  
 function closeEvent()
 {
+
     $.ajax({
 
                url:"{% url 'close_event' groupid node %}",
                type: "POST",
                data:{
-               
-               csrfmiddlewaretoken: '{{ csrf_token }}'},
-               success: function(data){
+                   csrfmiddlewaretoken: '{{ csrf_token }}'},
+	               success: function(data){
                }
 
           });
@@ -416,6 +456,8 @@ function closeEvent()
 
 function checkDate()
 {
+   
+
    $.ajax({
 
              url:"{% url 'check_date' groupid node %}",
@@ -451,20 +493,29 @@ function controler()
                       },
                       complete:function()
                       {
-                      reschedule = attended[2]
-                      marks_enter = attended[3]
-                      if (attended[0] == 'True')
-                      {
-                          EditAttendance(attended)             
-                      }
-                      else
-                      {
-                          EditAttendance(attended)        
-                      }
-                      
-                      }
-              
+	                      if (attended != "" )
+	                      {
+		                      reschedule = attended[2]
+		                      marks_enter = attended[3]
+		                      if (attended[0] == 'True')
+		                      {
+		                          EditAttendance(attended)             
+		                      }
+		                      else
+		                      {
+		                          EditAttendance(attended)        
+		                      }
+		                      
+		                  }
+	                     else
+	                      {
+	                         $('#attendance_message').empty()
+	                         $('#attendance_message').append("<label id = 'lbl_displ' > Attendance would be available after start time of event </label>")
+	                      } 
+                     }   
                 });
+
+
 }
 
 function EditAttendance(columns)
@@ -515,6 +566,8 @@ function saveTime()
          {
             alert("session time should be exactly same as previouse alloted time")
          }     
+    
+
 }
 function disableAttendance()
 {
@@ -575,6 +628,9 @@ column4="<th> Assessment Marks </th>"
        column4_data= "<td class='Assesstxtbx'> "  + val.Assessment_marks + "</td > " 
        column3data="<td><input type='number' onblur='validate_txtbx(this)'  class='Assigntxtbx' id="+val.id+"Assignment" + " value= "+ val.Assignment_marks + " </td>"
        column4data="<td> <input type='number' onblur='validate_txtbx(this)'  class='Assesstxtbx' id="+val.id+"Assessment" +" value= "+ val.Assessment_marks + " </td>"  
+      
+      
+
      if(pass[1] == 1)
       {
         column3data = " " 
@@ -597,6 +653,8 @@ column4="<th> Assessment Marks </th>"
        column4data=""
       }     
 if ( pass[0] == 'Edit'){
+
+          
                      if(val.presence == 'Absent')
                               {
                     $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' onClick='enablemarks(this)' class='chkbx'  value=" + val.id + " ></td>  " 
@@ -621,13 +679,22 @@ if ( pass[0] == 'Edit'){
                                         $('#forattendance').append("<tr><td>" + val.name +"</td>  <td> <input type='checkbox' onClick='enablemarks(this)' class='chkbx'  value=" + val.id + " checked></td >  " 
             + column3data  + column4data + "</tr>")
                               }
+                                 
+
 }
 else{
+
+       
+       
        $('#forattendance').append("<tr>"+ column1_data + column2_data + column3_data + column4_data   + "</tr>")         
+
     }
   });
   
 if ( pass[0] == 'Edit'){
+      
+         
+
       if (pass[1] == '2' || pass[1] == '4' || pass[1] == '3')
       {
         $('#attendance').append("<div class='row'>" 
@@ -647,10 +714,14 @@ if ( pass[0] == 'Edit'){
          + " <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done"
          + " <br> <span style='color:red;'> Note:- Edit option will be closed after Attendance is done. </span> "
          + " </fieldset> </div></div>")
+
       }
+
         $('#attendance').append("<br>")
         $('#attendance').append("<input class='tiny button' onclick='saveattendees("+pass[1]+")' value='Save' >")
         $('#attendance').append("<input class='tiny button' onclick='TakePrint()' value='Print'>")
+                   
+
 }
 else
 {     
@@ -674,12 +745,16 @@ else
              }  
         if ('{{task_attendance}}' == 'False')
           {
-              $('#attendance_reschedule').empty()
-              $('#attendance_reschedule').append("<label id = 'lbl_displ'   >  Your request to reschedule the event has been sent to Admin  </label>")
+              $('#attendance_message').empty()
+              $('#attendance_message').append("<label id = 'lbl_displ'   >  Your request to reschedule the event has been sent to Admin  </label>")
 
           }          
       }
+          
+      
 }
+
+
 }
 
 function reschedule_time(type)
@@ -689,6 +764,8 @@ function reschedule_time(type)
     $('#reschedule_save').empty()
     $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
     $('#reschedulemodal').foundation('reveal', 'open');
+    
+
 }
 
 function reschedule_event(type)
@@ -737,7 +814,8 @@ function reschedule_event(type)
                                     }
                  
              }
-         });   
+         }); 
+  
 }
 
 function enablemarks(value)
@@ -913,12 +991,18 @@ if (!(Status_attended))
      alert("No Attendance Taken.")
      }
      }
+    
+    
+    
+ 
+    
    
 function validate_txtbx(input)
 { 
-  if ( Number(input.value) >= Number('{{ session_min_marks }}') && Number(input.value) <= Number('{{session_max_marks}}') )
+    
+  if ( Number(input.value) >= Number('{{course.attribute_set.6.min_marks}}') && Number(input.value) <= Number('{{course.attribute_set.7.max_marks}}') )
   {
-
+    
   }
   else
   {

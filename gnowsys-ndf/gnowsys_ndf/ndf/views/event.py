@@ -109,6 +109,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     pass
   
   app = None
+  session_node = ""
   '''if app_id is None:
     app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
     if app:
