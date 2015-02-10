@@ -621,7 +621,7 @@ def get_gapps_iconbar(request, group_id):
 
 
 @register.assignment_tag
-def get_nroer_menu(request, group_name):
+def get_nroer_menu_old(request, group_name):
 
 	url_str = request.META["PATH_INFO"]
 	url_split = url_str.split("/")
@@ -722,6 +722,62 @@ def get_nroer_menu(request, group_name):
 
 	return nroer_menu_dict
 # ---------- END of get_nroer_menu -----------
+
+
+@register.assignment_tag
+def get_nroer_menu(request, group_name):
+
+	gapps = GSTUDIO_NROER_GAPPS
+
+	url_str = request.META["PATH_INFO"]
+	url_split = url_str.split("/")
+
+	# removing "" in the url_split
+	url_split = filter(lambda x: x != "", url_split)
+	# print "url_split : ", url_split
+
+	nroer_menu_dict = {}
+	top_menu_selected = ""
+
+	if (len(url_split) > 1) and (url_split[1] != "dashboard"):
+		selected_gapp = url_split[1]  # expecting e-library etc. type of extract
+
+		# handling conditions of "e-library" = "file" and vice-versa.
+		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
+
+		# for deciding selected gapp
+		for each_gapp in gapps:
+			temp_val = each_gapp.values()[0]
+			if temp_val == selected_gapp:
+				nroer_menu_dict["selected_gapp"] = temp_val
+
+	mapping = {
+			"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
+			"Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
+			}
+
+	# deciding top level menu selection
+	if (group_name == "home") and nroer_menu_dict.has_key("selected_gapp"):
+		top_menu_selected = "Repository"
+		
+	elif group_name in mapping.values():
+		sub_menu_selected = mapping.keys()[mapping.values().index(group_name)]  # get key of/from mapping
+		nroer_menu_dict["sub_menu_selected"] = sub_menu_selected
+
+		# with help of sub_menu_selected get it's parent from GSTUDIO_NROER_MENU
+		top_menu_selected = [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:] if sub_menu_selected in i.values()[0]][0]
+		
+		# for Partners, "Curated Zone" should not appear
+		gapps = gapps[1:] if top_menu_selected == "Partners" else gapps
+	# elif - put this for sub groups. Needs to fire queries etc.
+
+	nroer_menu_dict["gapps"] = gapps
+	nroer_menu_dict["top_menu_selected"] = top_menu_selected
+	nroer_menu_dict["mapping"] = mapping
+	nroer_menu_dict["top_menus"] = GSTUDIO_NROER_MENU[1:]
+
+	# print "nroer_menu_dict : ", nroer_menu_dict
+	return nroer_menu_dict
 
 
 @register.assignment_tag

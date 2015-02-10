@@ -546,7 +546,9 @@ GSTUDIO_RESOURCES_READING_LEVEL = [  ]
 
 GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
 
-GSTUDIO_NROER_MENU = [{"Home":[]}, {"Repository":["Curated Zone", "eLibrary", "eBooks", "eCourses", "Events"]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
+GSTUDIO_NROER_MENU = [{"Repository":[]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
+
+GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eLibrary": "e-library"}, {"eBooks": ""}, {"eCourses": ""}, {"Events": ""} ]
 
 try:
     from local_settings import *
