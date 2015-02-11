@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU
+from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
 from gnowsys_ndf.ndf.models import Group
@@ -693,11 +693,21 @@ def create_sub_group(request,group_id):
       print "Exception in create subgroup "+str(e)
 
 
-def nroer_groups(request, group_id):
+def nroer_groups(request, group_id, groups_category):
 
     group_name, group_id = get_group_name_id(group_id)
 
-    groups_names_list = GSTUDIO_NROER_MENU[-1:][0].get("Groups", [])
+    mapping = GSTUDIO_NROER_MENU_MAPPINGS
+
+    # loop over nroer menu except "Repository" 
+    for each_item in GSTUDIO_NROER_MENU[1:]:
+        temp_key_name = each_item.keys()[0]
+        if temp_key_name == groups_category:
+            groups_names_list = each_item.get(groups_category, [])
+
+            # mapping for the text names in list
+            groups_names_list = [mapping.get(i) for i in groups_names_list]
+            break
 
     group_nodes = collection.Node.find({ '_type': "Group", 
                                         '_id': {'$nin': [ObjectId(group_id)]},
@@ -705,7 +715,7 @@ def nroer_groups(request, group_id):
                                         'group_type': "PUBLIC"
                                      })#.sort('last_update', -1)
 
-    group_nodes_count = group_nodes.count()
+    group_nodes_count = group_nodes.count() if group_nodes else 0
 
     return render_to_response("ndf/group.html", 
                           {'group_nodes': group_nodes,
