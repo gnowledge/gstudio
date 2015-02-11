@@ -646,6 +646,7 @@ def get_nroer_menu(request, group_name):
 			temp_val = each_gapp.values()[0]
 			if temp_val == selected_gapp:
 				nroer_menu_dict["selected_gapp"] = temp_val
+				break
 
 		# print "selected_gapp : ", selected_gapp
 
@@ -664,11 +665,9 @@ def get_nroer_menu(request, group_name):
 		
 		# for Partners, "Curated Zone" should not appear
 		gapps = gapps[1:] if top_menu_selected == "Partners" else gapps
-	elif (len(url_split) >= 3) and ("agency_type" in url_split):
-		top_menu_selected = "Partners" if (url_split[3] == "Partner") else ""
-		gapps = ""
-	elif (len(url_split) >= 2) and ("nroer_groups" in url_split):
-		top_menu_selected = "Groups" if (url_split[2] == "nroer_groups") else ""
+		
+	elif (len(url_split) >= 3) and ("nroer_groups" in url_split) and (url_split[2] in [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:]]):
+		top_menu_selected = url_split[2]
 		gapps = ""
 	# elif - put this for sub groups. Needs to fire queries etc. for future perspective.
 
