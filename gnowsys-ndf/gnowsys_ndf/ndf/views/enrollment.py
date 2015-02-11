@@ -1,7 +1,10 @@
 ''' -- imports from python libraries -- '''
 # from datetime import datetime
 import datetime
+import time
 import json
+import math
+import multiprocessing
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect  #, HttpResponse uncomment when to use
@@ -200,7 +203,6 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     ann_course_node.get_neighbourhood(ann_course_node.member_of)
 
-
                     start_time_ac = ann_course_node.start_time.strftime("%Y")
                     end_time_ac = ann_course_node.end_time.strftime("%Y")
 
@@ -265,6 +267,9 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                         ac_cname_cl_uv_ids.append([ann_course_ids, ann_course_name, course_name, college_id, university_id])
 
+        enrollment_gst = collection.Node.one({
+            '_type': "GSystemType", 'name': "StudentCourseEnrollment"
+        })
         if nussd_course_type == "Foundation Course":
             for each_fc_set in ac_cname_cl_uv_ids:
                 fc_set = each_fc_set[0]
@@ -300,9 +305,6 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                             task_group_set.append(college_group_id)
 
                 at_rt_dict["for_university"] = ObjectId(university_id)
-                enrollment_gst = collection.Node.one({
-                    '_type': "GSystemType", 'name': "StudentCourseEnrollment"
-                })
                 if enrollment_gs and "_id" in enrollment_gs :
                     enrollment_gs_name = enrollment_gs.name
                 else:
@@ -458,7 +460,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                                 elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
                                     at_rt_node = create_grelation(enrollment_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
-
+                enrollment_gs = None
         else:
             for each_set in ac_cname_cl_uv_ids:
                 acourse_id = ObjectId(each_set[0][0])
@@ -490,17 +492,18 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                             task_group_set.append(college_group_id)
 
                 at_rt_dict["for_university"] = ObjectId(each_set[4])
-                enrollment_gst = collection.Node.one({
-                    '_type': "GSystemType", 'name': "StudentCourseEnrollment"
-                })
 
-                enrollment_gs_name = "StudentCourseEnrollment" \
-                    + "_" + ann_course_name
-                enrollment_gs = collection.Node.one({
-                    'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
-                    "group_set": [mis_admin._id, college_group_id],
-                    'status': u"PUBLISHED"
-                })
+                if enrollment_gs and "_id" in enrollment_gs :
+                    enrollment_gs_name = enrollment_gs.name
+                else:
+                    enrollment_gs_name = "StudentCourseEnrollment" \
+                        + "_" + ann_course_name
+
+                    enrollment_gs = collection.Node.one({
+                        'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
+                        "group_set": [mis_admin._id, college_group_id],
+                        'status': u"PUBLISHED"
+                    })
 
                 # If not found, create it
                 if not enrollment_gs:
@@ -645,7 +648,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                                 elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
                                     at_rt_node = create_grelation(enrollment_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
-
+                enrollment_gs = None
         if reopen_task_id:
             # Update the Re-open enrollment task as "Closed"
             task_dict["_id"] = reopen_task_id
@@ -896,16 +899,13 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     if app_set_instance_id:
         if ObjectId.is_valid(app_set_instance_id):
             sce_gs = collection.Node.one({
-                   '_id': ObjectId(app_set_instance_id)
-                },
-                {   'member_of':1,
-                    'name':1,
-                    'last_update':1,
-                    'attribute_set.start_enroll':1,
-                    'attribute_set.end_enroll':1,
-                    'attribute_set.has_enrollment_task':1
-                }
-            )
+                '_id': ObjectId(app_set_instance_id)
+            }, {
+                'member_of': 1, 'name': 1,
+                'last_update': 1, 'attribute_set.start_enroll': 1,
+                'attribute_set.end_enroll': 1,
+                'attribute_set.has_enrollment_task': 1
+            })
 
             for attr in sce_gs.attribute_set:
                 if attr and "start_enroll" in attr:
@@ -1214,10 +1214,6 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
             #    in "course_enrollment_status" (AttributeType) as "Enrolled"
 
             # Fetch students which are not enrolled to given announced course(s)
-            # student_cur = collection.Node.find({
-            #     "_id": {"$in": total_student_enroll_list},
-            #     "relation_set.selected_course": {"$nin": ann_course_ids}
-            # })
             student_cur = collection.aggregate([{
                 "$match": {
                     "_id": {"$in": total_student_enroll_list},
@@ -1230,9 +1226,6 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                     "course_enrollment_status": "$attribute_set.course_enrollment_status",
                 }
             }])
-            # }, {
-            #     "relation_set.selected_course": 1, "name": 1, "attribute_set.course_enrollment_status": 1
-            # })
 
             selected_course_rt = collection.Node.one({
                 "_type": "RelationType", "name": "selected_course"
@@ -1241,12 +1234,16 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 "_type": "AttributeType", "name": "course_enrollment_status"
             })
 
+            # Performing multiprocessing to fasten out the below processing of
+            # for loop; that is, enrolling students into given course(s)
+            mp_enroll_students(
+                student_cur["result"], ann_course_ids,
+                selected_course_rt, course_enrollment_status_at,
+                num_of_processes=multiprocessing.cpu_count()
+            )
+
+            """
             for each_student in student_cur["result"]:
-                # for rel in each_student.relation_set:
-                #     selected_course_ids = []
-                #     if rel and "selected_course" in rel:
-                #         selected_course_ids = rel["selected_course"]
-                #         break
                 prev_selected_course_ids = []
                 selected_course_ids = []
                 if each_student["selected_course"]:
@@ -1279,6 +1276,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                         continue
                 except Exception as e:
                     continue
+            """
 
         # Save/Update GAttribute(s) and/or GRelation(s)
         for at_rt_name in at_rt_list:
@@ -1305,7 +1303,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
             )
 
         # Very important
-        sce_gs.reload()
+        #sce_gs.reload()
 
         return HttpResponseRedirect(reverse(app_name.lower() + ":" + template_prefix + '_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
 
@@ -1355,3 +1353,51 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
         })
 
         return render_to_response(template, variable)
+def mp_enroll_students(student_cur, ann_course_ids, selected_course_rt, course_enrollment_status_at, num_of_processes=4):
+    def worker(student_cur, ann_course_ids, selected_course_rt, course_enrollment_status_at):
+        for each_student in student_cur:
+            prev_selected_course_ids = []
+            selected_course_ids = []
+            if each_student["selected_course"]:
+                prev_selected_course_ids = each_student["selected_course"][0]
+            else:
+                prev_selected_course_ids = each_student["selected_course"]
+
+            selected_course_ids = ann_course_ids + prev_selected_course_ids
+            try:
+                gr_node = create_grelation(each_student["_id"], selected_course_rt, selected_course_ids)
+                # try block is used to avoid "Multiple results found" error
+                try:
+                    course_enrollment_status = {}
+                    if each_student["course_enrollment_status"]:
+                        course_enrollment_status = each_student["course_enrollment_status"][0]
+
+                    for each_course_id in selected_course_ids:
+                        str_course_id = str(each_course_id)
+                        if str_course_id not in course_enrollment_status:
+                            course_enrollment_status.update({str_course_id: u"Enrolled"})
+                    at_node = create_gattribute(each_student["_id"], course_enrollment_status_at, course_enrollment_status)
+                except Exception as e:
+                    gr_node = create_grelation(each_student["_id"], selected_course_rt, prev_selected_course_ids)
+                    # continue
+            except Exception as e:
+                print "\n " + str(e)
+
+    # Each process will get 'chunksize' student_cur and a queue to put his out
+    # dict into
+    chunksize = int(math.ceil(len(student_cur) / float(num_of_processes)))
+    procs = []
+
+    for i in range(num_of_processes):
+        p = multiprocessing.Process(
+            target=worker,
+            args=(student_cur[chunksize * i:chunksize * (i + 1)], ann_course_ids, selected_course_rt, course_enrollment_status_at)
+        )
+        procs.append(p)
+        p.start()
+
+    # Wait for all worker processes to finish
+    for p in procs:
+        p.join()
+
+

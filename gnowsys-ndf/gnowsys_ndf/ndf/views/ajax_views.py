@@ -5,6 +5,8 @@ import csv
 import time
 import ast
 import json
+import math
+import multiprocessing
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -3202,9 +3204,9 @@ def get_announced_courses_with_ctype(request, group_id):
                                             newrec[u"university_id"] = u._id
                                 else:
                                     newrec["college"] = college[colg_id]["name"]
-                                    newrec["college_id"] = college[colg_id]
-                                    newrec.update({"university": college[colg_id]["university"]})
-                                    newrec.update({"university_": college[colg_id]["university_id"]})
+                                    newrec["college_id"] = ObjectId(colg_id)
+                                    newrec["university_id"] = college[colg_id]["university_id"]
+                                    newrec["university"] = college[colg_id]["university"]
 
                             newrec[u"course"] = "Foundation Course"
                             newrec[u"ac_id"] = each["fc_ann_ids"]
@@ -4030,13 +4032,18 @@ def approve_students(request, group_id):
         if request.is_ajax() and request.method == "POST":
             approval_state = request.POST.get("approval_state", "")
             enrollment_id = request.POST.get("enrollment_id", "")
+
+            enrollment_id = ObjectId(enrollment_id)
+
             course_ids = request.POST.get("course_id", "")
             course_ids = [(ObjectId(each.strip()), each.strip()) for each in course_ids.split(",")]
+
             students_selected = request.POST.getlist("students_selected[]", "")
+            students_selected = [ObjectId(each_str_id) for each_str_id in students_selected]
 
             sce_gs = collection.aggregate([{
                 "$match": {
-                    "_id": ObjectId(enrollment_id), "group_set": ObjectId(group_id),
+                    "_id": enrollment_id, "group_set": ObjectId(group_id),
                     "relation_set.has_current_approval_task": {"$exists": True},
                     "status": u"PUBLISHED"
                 }
@@ -4088,6 +4095,33 @@ def approve_students(request, group_id):
             # For that update value as "Enrollment Approved" against corresponding course (Course ObjectId)
             # in "course_enrollment_status" attribute of respective student
             # This should be done only for Course(s) which exists in "selected_course" relation for that student
+
+            stud_cur = collection.aggregate([{
+                "$match": {
+                    "_id": {"$in": students_selected}
+                }
+            }, {
+                "$project": {
+                    "_id": 1,
+                    "selected_course": "$relation_set.selected_course",
+                    "course_enrollment_status": "$attribute_set.course_enrollment_status"
+                }
+            }])
+
+
+            # Performing multiprocessing to fasten out the below processing of
+            # for loop; that is, performing approval of students to respective course(s)
+            prev_approved_or_rejected_list = []
+            new_list = []
+            prev_approved_or_rejected_list.extend(approved_or_rejected_list)
+            new_list = mp_approve_students(
+                stud_cur["result"], course_ids,
+                course_enrollment_status_text,
+                course_enrollment_status_at,
+                prev_approved_or_rejected_list,
+                num_of_processes=multiprocessing.cpu_count()
+            )
+            """
             for each in students_selected:
                 # Fetch student node along with selected_course and course_enrollment_status
                 student_id = ObjectId(each)
@@ -4130,13 +4164,16 @@ def approve_students(request, group_id):
                         except Exception as e:
                             error_id_list.append(student_id)
                             continue
+            """
+
+            approved_or_rejected_list.extend(new_list)
 
             has_approved_or_rejected_at = collection.Node.one({
                 '_type': "AttributeType", 'name': at_name
             })
             try:
                 attr_node = create_gattribute(
-                    ObjectId(enrollment_id),
+                    enrollment_id,
                     has_approved_or_rejected_at,
                     approved_or_rejected_list
                 )
@@ -4192,6 +4229,71 @@ def approve_students(request, group_id):
         error_message = "ApproveStudentsError: " + str(e) + "!!!"
         response_dict["message"] = error_message
         return HttpResponse(json.dumps(response_dict))
+
+
+def mp_approve_students(student_cur, course_ids, course_enrollment_status_text, course_enrollment_status_at, approved_or_rejected_list, num_of_processes=4):
+    def worker(student_cur, course_ids, course_enrollment_status_text, course_enrollment_status_at, approved_or_rejected_list, out_q):
+        updated_approved_or_rejected_list = []
+        for each_stud in student_cur:
+            # Fetch student node along with selected_course and course_enrollment_status
+            student_id = each_stud["_id"]
+
+            selected_course = each_stud["selected_course"]
+            if selected_course:
+                selected_course = selected_course[0]
+
+            # Fetch course_enrollment_status -- Holding Course(s) along with it's enrollment status
+            course_enrollment_status = each_stud["course_enrollment_status"]
+            if course_enrollment_status:
+                course_enrollment_status = course_enrollment_status[0]
+            else:
+                course_enrollment_status = {}
+
+            for each_course_id, str_course_id in course_ids:
+                # If ObjectId exists in selected_course and ObjectId(in string format)
+                # exists as key in course_enrollment_status
+                # Then only update status as "Enrollment Approved"/"Enrollment Rejected"
+                if each_course_id in selected_course and str_course_id in course_enrollment_status:
+                    # course_enrollment_status.update({str_course_id: course_enrollment_status_text})
+                    course_enrollment_status[str_course_id] = course_enrollment_status_text
+                    try:
+                        at_node = create_gattribute(student_id, course_enrollment_status_at, course_enrollment_status)
+                        if at_node:
+                            # If status updated, then only update approved_or_rejected_list
+                            # by appending given student's ObjectId into it
+                            if student_id not in approved_or_rejected_list and student_id not in updated_approved_or_rejected_list:
+                                # approved_or_rejected_list.appendingpend(student_id)
+                                updated_approved_or_rejected_list.append(student_id)
+                    except Exception as e:
+                        error_id_list.append(student_id)
+                        continue
+        out_q.put(updated_approved_or_rejected_list)
+
+    # Each process will get 'chunksize' student_cur and a queue to put his out
+    # dict into
+    out_q = multiprocessing.Queue()
+    chunksize = int(math.ceil(len(student_cur) / float(num_of_processes)))
+    procs = []
+
+    for i in range(num_of_processes):
+        p = multiprocessing.Process(
+            target=worker,
+            args=(student_cur[chunksize * i:chunksize * (i + 1)], course_ids, course_enrollment_status_text, course_enrollment_status_at, approved_or_rejected_list, out_q)
+        )
+        procs.append(p)
+        p.start()
+
+    # Collect all results into a single result list. We know how many lists
+    # with results to expect.
+    resultlist = []
+    for i in range(num_of_processes):
+        resultlist.extend(out_q.get())
+
+    # Wait for all worker processes to finish
+    for p in procs:
+        p.join()
+
+    return resultlist
 
 
 def get_students_for_batches(request, group_id):
