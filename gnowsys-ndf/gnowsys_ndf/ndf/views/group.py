@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES
+from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
 from gnowsys_ndf.ndf.models import Group
@@ -61,7 +61,7 @@ def group(request, group_id, app_id=None, agency_type=None):
 
   if (app_id == "agency_type") and (agency_type in GROUP_AGENCY_TYPES):
     query_dict["agency_type"] = agency_type
-    # print "=========", app_id, agency_type
+  # print "=========", app_id, agency_type
 
   group_nodes = []
   group_count = 0
@@ -691,3 +691,25 @@ def create_sub_group(request,group_id):
       return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
   except Exception as e:
       print "Exception in create subgroup "+str(e)
+
+
+def nroer_groups(request, group_id):
+
+    group_name, group_id = get_group_name_id(group_id)
+
+    groups_names_list = GSTUDIO_NROER_MENU[-1:][0].get("Groups", [])
+
+    group_nodes = collection.Node.find({ '_type': "Group", 
+                                        '_id': {'$nin': [ObjectId(group_id)]},
+                                        'name': {'$nin': ["home"], '$in': groups_names_list},
+                                        'group_type': "PUBLIC"
+                                     })#.sort('last_update', -1)
+
+    group_nodes_count = group_nodes.count()
+
+    return render_to_response("ndf/group.html", 
+                          {'group_nodes': group_nodes,
+                           'group_nodes_count': group_nodes_count,
+                           'groupid': group_id, 'group_id': group_id
+                          }, context_instance=RequestContext(request))
+

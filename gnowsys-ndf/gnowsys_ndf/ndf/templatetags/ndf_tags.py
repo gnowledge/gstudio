@@ -670,6 +670,9 @@ def get_nroer_menu(request, group_name):
 	elif (len(url_split) >= 3) and ("agency_type" in url_split):
 		top_menu_selected = "Partners" if (url_split[3] == "Partner") else ""
 		gapps = ""
+	elif (len(url_split) >= 2) and ("nroer_groups" in url_split):
+		top_menu_selected = "Groups" if (url_split[2] == "nroer_groups") else ""
+		gapps = ""
 	# elif - put this for sub groups. Needs to fire queries etc. for future perspective.
 
 	nroer_menu_dict["gapps"] = gapps

@@ -10,6 +10,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.group',
                         url(r'^/switch_group/(?P<node_id>[\w-]+)$', 'switch_group', name='switch_group'),
                         url(r'^/app_selection/', 'app_selection', name='app_selection'),
                         url(r'^/create_sub_group/', 'create_sub_group', name='create_sub_group'),
+                        url(r'^/nroer_groups/$', 'nroer_groups', name='nroer_groups'),
                     )
 
 urlpatterns += patterns('gnowsys_ndf.ndf.views.ajax_views',

@@ -109,6 +109,8 @@
               <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
               {% if menuk == "Partners"%}
                 href="{% url 'groups_by_agency_type' 'home' 'agency_type' 'Partner' %}" 
+              {% elif menuk == "Groups"%}
+                href="{% url 'nroer_groups' 'home' %}" 
               {% endif %}
               > {{menuk}} </a>
               <ul class="dropdown">
