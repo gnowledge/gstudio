@@ -23,7 +23,7 @@ from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
-
+from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
 
 ####################################################################################################################
 
@@ -67,13 +67,13 @@ college_gst = collection.Node.one({
 college_dict = {}
 attr_type_dict = {}
 rel_type_dict = {}
+create_student_enrollment_code = False
 
 class Command(BaseCommand):
     help = "Based on "
 
     def handle(self, *args, **options):
         try:
-
             for file_name in args:
                 file_path = os.path.join(SCHEMA_ROOT, file_name)
 
@@ -90,7 +90,11 @@ class Command(BaseCommand):
                     gsystem_type_name = os.path.splitext(gsystem_type_name)[0]
                     gsystem_type_name = gsystem_type_name.replace("_", " ")
 
-                    gsystem_type_node = collection.Node.one({'_type': "GSystemType", 
+                    if gsystem_type_name == u"Student":
+                        global create_student_enrollment_code
+                        create_student_enrollment_code = True
+
+                    gsystem_type_node = collection.Node.one({'_type': "GSystemType",
                                                              '$or': [{'name': {'$regex': "^"+gsystem_type_name+"$", '$options': 'i'}}, 
                                                                      {'altnames': {'$regex': "^"+gsystem_type_name+"$", '$options': 'i'}}]
                                                          })
@@ -220,12 +224,14 @@ def parse_data_create_gsystem(json_file_path):
     for i, json_document in enumerate(json_documents_list):
         try:
             n_name = ""
-            if json_document.has_key("first name"):
+            if "first name" in json_document:
                 n_name = json_document["first name"] + " "
                 if json_document["middle name"]:
-                    n_name += json_document["middle name"] + " "
+                    n_name += json_document["middle name"]
+                    if json_document["last name"]:
+                        n_name += " "
                 n_name += json_document["last name"]
-                json_document["name"] = n_name
+                json_document["name"] = n_name.title()
 
             info_message = "\n ============ #"+ str(i+1) +" : Start of "+gsystem_type_name+"'s GSystem ("+json_document['name']+") creation/updation ============\n"
             log_list.append(info_message)
@@ -271,85 +277,89 @@ def parse_data_create_gsystem(json_file_path):
                             is_relation = False
 
                             if json_document[key]:
-                                if attr_value['data_type'] == basestring:
-                                    if u"\u2013" in json_document[key]:
-                                        json_document[key] = json_document[key].replace(u"\u2013", "-")
-            
-                                info_message = "\n For GAttribute parsing content | key: " + attr_key + " -- " + json_document[key]
-                                log_list.append(info_message)
+                                try:
+                                    if attr_value['data_type'] == basestring:
+                                        if u"\u2013" in json_document[key]:
+                                            json_document[key] = json_document[key].replace(u"\u2013", "-")
 
+                                    info_message = "\n For GAttribute parsing content | key: " + attr_key + " -- " + json_document[key]
+                                    log_list.append(info_message)
 
-                                if attr_value['data_type'] == unicode:
-                                    json_document[key] = unicode(json_document[key])
+                                    if attr_value['data_type'] == unicode:
+                                        json_document[key] = unicode(json_document[key])
 
-                                elif attr_value['data_type'] == bool: 
-                                    if json_document[key].lower() == "yes":
-                                        json_document[key] = True
-                                    elif json_document[key].lower() == "no":
-                                        json_document[key] = False
-                                    else:
-                                        json_document[key] = None
-                                    
-                                elif attr_value['data_type'] == datetime.datetime:
-
-                                    # Use small-case altnames
-                                    if key in ["dob", "date of birth", "date of registration"]:
-                                        json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
-                                    else:
-                                        json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")
-
-                                elif attr_value['data_type'] in [int, float, long]:
-                                    if not json_document[key]:
-                                        json_document[key] = 0
-                                    else:
-                                        if attr_value['data_type'] == int:
-                                            json_document[key] = int(json_document[key])
-                                        elif attr_value['data_type'] == float:
-                                            json_document[key] = float(json_document[key])
+                                    elif attr_value['data_type'] == bool: 
+                                        if json_document[key].lower() == "yes":
+                                            json_document[key] = True
+                                        elif json_document[key].lower() == "no":
+                                            json_document[key] = False
                                         else:
-                                            json_document[key] = long(json_document[key])
+                                            json_document[key] = None
 
-                                elif type(attr_value['data_type']) == IS:
-                                    for op in attr_value['data_type']._operands:
-                                        if op.lower() == json_document[key].lower():
-                                            json_document[key] = op
+                                    elif attr_value['data_type'] == datetime.datetime:
 
-                                elif (attr_value['data_type'] in [list, dict]) or (type(attr_value['data_type']) in [list, dict]):
-                                    if "," not in json_document[key]:
-                                        # Necessary to inform perform_eval_type() that handle this value as list
-                                        json_document[key] = "\"" + json_document[key] + "\", "
+                                        # Use small-case altnames
+                                        if key in ["dob", "date of birth", "date of registration"]:
+                                            json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
+                                        else:
+                                            json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")
 
+                                    elif attr_value['data_type'] in [int, float, long]:
+                                        if not json_document[key]:
+                                            json_document[key] = 0
+                                        else:
+                                            if attr_value['data_type'] == int:
+                                                json_document[key] = int(json_document[key])
+                                            elif attr_value['data_type'] == float:
+                                                json_document[key] = float(json_document[key])
+                                            else:
+                                                json_document[key] = long(json_document[key])
+
+                                    elif type(attr_value['data_type']) == IS:
+                                        for op in attr_value['data_type']._operands:
+                                            if op.lower() == json_document[key].lower():
+                                                json_document[key] = op
+
+                                    elif (attr_value['data_type'] in [list, dict]) or (type(attr_value['data_type']) in [list, dict]):
+                                        if "," not in json_document[key]:
+                                            # Necessary to inform perform_eval_type() that handle this value as list
+                                            json_document[key] = "\"" + json_document[key] + "\", "
+
+                                        else:
+                                            formatted_value = ""
+                                            for v in json_document[key].split(","):
+                                                formatted_value += "\""+v.strip(" ")+"\", "
+                                            json_document[key] = formatted_value
+
+                                        perform_eval_type(key, json_document, "GSystem")
+
+                                    subject_id = node._id
+
+                                    attribute_type_node = None
+                                    if attr_key in attr_type_dict:
+                                        attribute_type_node = attr_type_dict[attr_key]
                                     else:
-                                        formatted_value = ""
-                                        for v in json_document[key].split(","):
-                                            formatted_value += "\""+v.strip(" ")+"\", "
-                                        json_document[key] = formatted_value
+                                        attribute_type_node = collection.Node.one({
+                                            '_type': "AttributeType",
+                                            '$or': [{
+                                                'name': {'$regex': "^" + attr_key + "$", '$options': 'i'}
+                                            }, {
+                                                'altnames': {'$regex': "^" + attr_key + "$", '$options': 'i'}
+                                            }]
+                                        })
+                                        attr_type_dict[attr_key] = attribute_type_node
 
-                                    perform_eval_type(key, json_document, "GSystem")
+                                    object_value = json_document[key]
 
-                                subject_id = node._id
+                                    ga_node = None
 
-                                attribute_type_node = None
-                                if attr_key in attr_type_dict:
-                                    attribute_type_node = attr_type_dict[attr_key]
-                                else:
-                                    attribute_type_node = collection.Node.one({
-                                        '_type': "AttributeType",
-                                        '$or': [{
-                                            'name': {'$regex': "^" + attr_key + "$", '$options': 'i'}
-                                        }, {
-                                            'altnames': {'$regex': "^" + attr_key + "$", '$options': 'i'}
-                                        }]
-                                    })
-                                    attr_type_dict[attr_key] = attribute_type_node
-
-                                object_value = json_document[key]
-
-                                ga_node = None
-
-                                info_message = "\n Creating GAttribute (" + node.name + " -- " + attribute_type_node.name + " -- " + str(json_document[key]) + ") ...\n"
-                                log_list.append(info_message)
-                                ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
+                                    info_message = "\n Creating GAttribute (" + node.name + " -- " + attribute_type_node.name + " -- " + str(json_document[key]) + ") ...\n"
+                                    log_list.append(info_message)
+                                    ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
+                                except Exception as e:
+                                    error_message = "\n While creating GAttribute (" + attr_key + ") for "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e) + "\n"
+                                    log_list.append(error_message)
+                                    print error_message # Keep it!
 
                                 # To break outer for loop as key found
                                 break
@@ -380,53 +390,57 @@ def parse_data_create_gsystem(json_file_path):
                                 if json_document[key]:
                                     # Here semi-colon(';') is used instead of comma(',')
                                     # Beacuse one of the value may contain comma(',') which causes problem in finding required value in database
-                                    if ";" not in json_document[key]:
-                                        # Necessary to inform perform_eval_type() that handle this value as list
-                                        json_document[key] = "\""+json_document[key]+"\", "
+                                    try:
+                                        if ";" not in json_document[key]:
+                                            # Necessary to inform perform_eval_type() that handle this value as list
+                                            json_document[key] = "\""+json_document[key]+"\", "
 
-                                    else:
-                                        formatted_value = ""
-                                        for v in json_document[key].split(";"):
-                                            formatted_value += "\""+v.strip(" ")+"\", "
-                                        json_document[key] = formatted_value
+                                        else:
+                                            formatted_value = ""
+                                            for v in json_document[key].split(";"):
+                                                formatted_value += "\""+v.strip(" ")+"\", "
+                                            json_document[key] = formatted_value
 
-                                    info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
-                                    log_list.append(info_message)
+                                        info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
+                                        log_list.append(info_message)
 
-                                    perform_eval_type(key, json_document, "GSystem", "GSystem")
+                                        perform_eval_type(key, json_document, "GSystem", "GSystem")
 
-                                    # for right_subject_id in json_document[key]:
-                                    subject_id = node._id
+                                        # for right_subject_id in json_document[key]:
+                                        subject_id = node._id
 
-                                    # Here we are appending list of ObjectIds of GSystemType's type_of field 
-                                    # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
-                                    # This is because some of the RelationType's are holding Base class's ObjectId
-                                    # and not that of the Derived one's
-                                    # Delibrately keeping GSystemType's ObjectId first in the list
-                                    # And hence, used $in operator in the query!
-                                    rel_subject_type = []
-                                    rel_subject_type.append(gsystem_type_id)
-                                    if gsystem_type_node.type_of:
-                                        rel_subject_type.extend(gsystem_type_node.type_of)
+                                        # Here we are appending list of ObjectIds of GSystemType's type_of field 
+                                        # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
+                                        # This is because some of the RelationType's are holding Base class's ObjectId
+                                        # and not that of the Derived one's
+                                        # Delibrately keeping GSystemType's ObjectId first in the list
+                                        # And hence, used $in operator in the query!
+                                        rel_subject_type = []
+                                        rel_subject_type.append(gsystem_type_id)
+                                        if gsystem_type_node.type_of:
+                                            rel_subject_type.extend(gsystem_type_node.type_of)
 
-                                    relation_type_node = None
-                                    if rel_key in rel_type_dict:
-                                        relation_type_node = rel_type_dict[rel_key]
-                                    else:
-                                        relation_type_node = collection.Node.one({
-                                            '_type': "RelationType",
-                                            '$or': [{
-                                                'name': {'$regex': "^" + rel_key + "$", '$options': 'i'}
-                                            }, {
-                                                'altnames': {'$regex': "^" + rel_key + "$", '$options': 'i'}
-                                            }],
-                                            'subject_type': {'$in': rel_subject_type}
-                                        })
-                                        rel_type_dict[rel_key] = relation_type_node
+                                        relation_type_node = None
+                                        if rel_key in rel_type_dict:
+                                            relation_type_node = rel_type_dict[rel_key]
+                                        else:
+                                            relation_type_node = collection.Node.one({
+                                                '_type': "RelationType",
+                                                '$or': [{
+                                                    'name': {'$regex': "^" + rel_key + "$", '$options': 'i'}
+                                                }, {
+                                                    'altnames': {'$regex': "^" + rel_key + "$", '$options': 'i'}
+                                                }],
+                                                'subject_type': {'$in': rel_subject_type}
+                                            })
+                                            rel_type_dict[rel_key] = relation_type_node
 
-                                    info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(json_document[key])+") ...\n"
-                                    log_list.append(info_message)
-                                    gr_node = create_grelation(subject_id, relation_type_node, json_document[key])
+                                        info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(json_document[key])+") ...\n"
+                                        log_list.append(info_message)
+                                        gr_node = create_grelation(subject_id, relation_type_node, json_document[key])
+                                    except Exception as e:
+                                        error_message = "\n While creating GRelation (" + rel_key + ") for "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n" + str(e) + "\n"
+                                        log_list.append(error_message)
 
                                     if college_gst._id in relation_type_node.object_type:
                                         # Fetch college node's group id
@@ -485,6 +499,31 @@ def parse_data_create_gsystem(json_file_path):
 
                                     break
 
+                # Create enrollment code (Only for Student)
+                if create_student_enrollment_code:
+                    enrollment_code_at = collection.Node.one({
+                        "_type": "AttributeType", "name": "enrollment_code"
+                    })
+
+                    node_exist = collection.Node.one({"_id": node._id, "attribute_set.enrollment_code": {"$exists": True}})
+                    if not node_exist:
+                        # It means enrollment_code is not set for given student node
+                        # Then set it
+                        try:
+                            college_id = None
+                            group_id = None
+                            for k, v in college_dict.items():
+                                college_id = ObjectId(k)
+                                group_id = ObjectId(v)
+
+                            student_enrollment_code = get_student_enrollment_code(college_id, node._id, json_document["date of registration"], group_id)
+
+                            info_message = "\n Creating GAttribute (" + node.name + " -- " + enrollment_code_at.name + " -- " + str(student_enrollment_code) + ") ...\n"
+                            log_list.append(info_message)
+                            ga_node = create_gattribute(node._id, enrollment_code_at, student_enrollment_code)
+                        except Exception as e:
+                            error_message = "\n StudentEnrollmentCreateError: " + str(e) + "!!!"
+                            log_list.append(error_message)
 
         except Exception as e:
             error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
@@ -498,11 +537,17 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
     """
     node = None
 
-    node = collection.Node.one({'_type': "GSystem", 
-                                '$or': [{'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}, 
-                                        {'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}],
-                                'member_of': gsystem_type_id
-                            })
+    query = {'_type': "GSystem",
+                '$or': [{'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}},
+                        {'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}],
+                'member_of': gsystem_type_id
+    }
+
+    if "date of birth" in json_document:
+        dob = json_document["date of birth"]
+        query.update({"attribute_set.dob": datetime.datetime.strptime(dob, "%d/%m/%Y")})
+
+    node = collection.Node.one(query)
 
     if node is None:
         try:
@@ -606,7 +651,7 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                     ["Education", education_details],
                     ["Work Experience", work_experience],
                     ["TOT Details", tot_details],
-                    
+
                 ]
             if gsystem_type_name in ["Student"]:
                 personal_details.insert(6, ("student_of_caste_category", "Caste Category"))
@@ -646,10 +691,13 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
             error_message = "\n "+gsystem_type_name+"Error: Failed to create ("+json_document['name']+") as " + str(e) + "\n"
             log_list.append(error_message)
             raise Exception(error_message)
-    
+
     else:
         # Code for updation
         is_node_changed = False
+
+        global create_student_enrollment_code
+        create_student_enrollment_code = False
 
         try:
             for key in json_document.iterkeys():
@@ -675,7 +723,7 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                     node.contributors.append(user_id)
 
                 node.status = u"PUBLISHED"
-                
+
                 node.save()
                 info_message = "\n "+gsystem_type_name+" ("+node.name+") updated successfully.\n"
                 log_list.append(info_message)

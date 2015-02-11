@@ -279,6 +279,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   college_id = None
   student_enrollment_code = u""
   create_student_enrollment_code = False
+  registration_date = None
 
   property_order_list = []
 
@@ -317,13 +318,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   if request.method == "POST":
     if person_gst.name == "Student" and "_id" not in person_gs:
-            # Create enrollment code for student node only while registering a new node
-            for rel in college_node.relation_set:
-                if rel and "group_of" in rel:
-                    college_id = rel["group_of"][0]
-
-            student_enrollment_code = get_student_enrollment_code(college_id, ObjectId(group_id))
-            create_student_enrollment_code = True
+      create_student_enrollment_code = True
 
     # [A] Save person-node's base-field(s)
     is_changed = get_node_common_fields(request, person_gs, group_id, person_gst)
@@ -391,6 +386,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
               elif fi_name in ["dob", "registration_date"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y")
+                registration_date = field_value
               else:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
 
@@ -417,6 +413,13 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
     # Setting enrollment code for student node only while creating it
     if create_student_enrollment_code:
+        # Create enrollment code for student node only while registering a new node
+        for rel in college_node.relation_set:
+          if rel and "group_of" in rel:
+            college_id = rel["group_of"][0]
+
+        student_enrollment_code = get_student_enrollment_code(college_id, person_gs._id, registration_date, ObjectId(group_id))
+
         enrollment_code_at = collection.Node.one({
             "_type": "AttributeType", "name": "enrollment_code"
         })

@@ -2345,7 +2345,7 @@ def create_task(task_dict, task_type_creation="single"):
     return task_node
 
 
-def get_student_enrollment_code(college_id, college_group_id=None):
+def get_student_enrollment_code(college_id, node_id_to_ignore, registration_date, college_group_id=None):
     """Returns new student's enrollment code
 
     Enrollment Code is combination of following values:
@@ -2357,6 +2357,8 @@ def get_student_enrollment_code(college_id, college_group_id=None):
 
     Arguments:
     college_id: ObjectId of college's node
+    node_id_to_ignore: ObjectId of the student node for which this function generates enrollment_code
+    registration_date: Date of registration of student node for which this function generates enrollment_code
     college_group_id [Optional]: ObjectId of college's group node
 
     Returns:
@@ -2415,7 +2417,8 @@ def get_student_enrollment_code(college_id, college_group_id=None):
             raise Exception("Either name or enrollment code is not set for given college's ObjectId(" + str(college_id) + ") !!!")
 
         # Set Last two digits of current year
-        current_year = str(datetime.today().year)
+        # current_year = str(datetime.today().year)
+        current_year = str(registration_date.year)
         two_digit_year_code = current_year[-2:]
 
         # Fetch total no. of students registered for current year
@@ -2428,6 +2431,7 @@ def get_student_enrollment_code(college_id, college_group_id=None):
         })
         res = collection.aggregate([{
             "$match": {
+                "_id": {"$nin": [ObjectId(node_id_to_ignore)]},
                 "member_of": student_gst._id,
                 "group_set": college_group_id,
                 "relation_set.student_belongs_to_college": college_id,
@@ -2454,6 +2458,7 @@ def get_student_enrollment_code(college_id, college_group_id=None):
         }])
 
         student_data_result = res["result"]
+
         if student_data_result:
             student_count = student_data_result[0]["count"]
             last_enrollment_code = student_data_result[0]["last_enrollment_code"]
@@ -2473,7 +2478,7 @@ def get_student_enrollment_code(college_id, college_group_id=None):
                 else:
                     raise Exception("Inconsistent Data Found (Student count & last enrollment code's number doesn't match) !!!")
             else:
-                raise Exception("Invalid Data Found (Student count & last enrollment code) !!!")
+                raise Exception("Invalid Data Found (Student count & no last enrollment code) !!!")
         else:
             # Registering very first student node
             # Create enrollment code, hence fetch state node's state-code
