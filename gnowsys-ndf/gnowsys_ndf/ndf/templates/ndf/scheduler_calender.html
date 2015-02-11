@@ -10,12 +10,19 @@
     .MaxHght {
         height:16px;
     }
+   .fc-title
+      {
 
+      	font-size: 1.1rem;
+      }
     .viewMore {
         float: right;
         color: rgb(219, 104, 28);
         cursor: pointer;
     }
+
+    
+
 
     #view-scheduler-calendar table {
         border: none;
@@ -50,7 +57,7 @@
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'month,agendaWeek,agendaDay'
+                right: 'month,agendaWeek,basicDay'
             },
 
             // first day of week e.g: Monday
@@ -68,20 +75,21 @@
             },
             eventLimitClick: function(cellInfo, jsEvent) {
                     
-                    $('#calendar').fullCalendar('changeView', 'agendaDay'/* or 'basicDay' */);
+                    $('#calendar').fullCalendar('changeView', 'basicDay'/* or 'basicDay' */);
                     var moment = $('#calendar').fullCalendar('getDate');
                     $('#calendar').fullCalendar('gotoDate', cellInfo.date);
                      
             },
                                 
             viewRender: function(view) {
-                var groupid='{{groupid}}';
-                 $('#calendar').fullCalendar( 'removeEvents');
-                for (i=1;i<=3;i++)
-                {
-                    ajaxcalls(i)
-                }
-                
+                if (view.name == 'month'){	
+	                var groupid='{{groupid}}';
+	                 $('#calendar').fullCalendar( 'removeEvents');
+	                for (i=1;i<=3;i++)
+	                {
+	                    ajaxcalls(i)
+	                }
+                  }
             }
         });
     });
