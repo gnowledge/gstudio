@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
 from gnowsys_ndf.ndf.models import Group
@@ -51,28 +51,24 @@ app=collection.Node.one({'name':u'Group','_type':'GSystemType'})
 #######################################################################################################################################
 
 
-def group(request, group_id, app_id=None):
+def group(request, group_id, app_id=None, agency_type=None):
   """Renders a list of all 'Group-type-GSystems' available within the database.
   """
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    if group_ins:
-      group_id = str(group_ins._id)
-    else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-        group_id = str(auth._id)	
-  else :
-  	pass
+
+  group_name, group_id = get_group_name_id(group_id)
+
+  query_dict = {}
+
+  if (app_id == "agency_type") and (agency_type in GROUP_AGENCY_TYPES):
+    query_dict["agency_type"] = agency_type
+    # print "=========", app_id, agency_type
 
   group_nodes = []
   group_count = 0
   auth = collection.Node.one({'_type': u"Author", 'name': unicode(request.user.username)})
 
   if request.method == "POST":
-    #Page search view
+    # Page search view
     title = gst_group.name
     
     search_field = request.POST['search_field']
@@ -81,6 +77,7 @@ def group(request, group_id, app_id=None):
       # Logged-In View
       cur_groups_user = collection.Node.find({'_type': "Group", 
                                        '_id': {'$nin': [ObjectId(group_id), auth._id]},
+                                       '$and': [query_dict],
                                        '$or': [
                                           {'$and': [
                                             {'name': {'$regex': search_field, '$options': 'i'}},
@@ -118,6 +115,7 @@ def group(request, group_id, app_id=None):
       # Without Log-In View
       cur_public = collection.Node.find({'_type': "Group", 
                                        '_id': {'$nin': [ObjectId(group_id)]},
+                                       '$and': [query_dict],
                                        '$or': [
                                           {'name': {'$regex': search_field, '$options': 'i'}}, 
                                           {'tags': {'$regex':search_field, '$options': 'i'}}
@@ -142,34 +140,45 @@ def group(request, group_id, app_id=None):
                               context_instance=RequestContext(request)
     )
 
-  else:
+  else: # for GET request
+
     if auth:
       # Logged-In View
       cur_groups_user = collection.Node.find({'_type': "Group", 
+                                              '$and': [query_dict],
                                               '_id': {'$nin': [ObjectId(group_id), auth._id]},
                                               'name': {'$nin': ["home"]},
-                                              '$or': [{'created_by': request.user.id}, {'author_set': request.user.id}, {'group_admin': request.user.id}, {'group_type': 'PUBLIC'}]
-                                          }).sort('last_update', -1)
-      if cur_groups_user.count():
-        for group in cur_groups_user:
-          group_nodes.append(group)
+                                              '$or': [
+                                                      {'created_by': request.user.id},
+                                                      {'author_set': request.user.id},
+                                                      {'group_admin': request.user.id},
+                                                      {'group_type': 'PUBLIC'}
+                                                    ]
+                                            }).sort('last_update', -1)
+      # if cur_groups_user.count():
+      #   for group in cur_groups_user:
+      #     group_nodes.append(group)
 
-      group_count = cur_groups_user.count()
+      if cur_groups_user.count():
+        group_nodes = cur_groups_user
+        group_count = cur_groups_user.count()
         
     else:
       # Without Log-In View
       cur_public = collection.Node.find({'_type': "Group", 
                                          '_id': {'$nin': [ObjectId(group_id)]},
+                                         '$and': [query_dict],
                                          'name': {'$nin': ["home"]},
                                          'group_type': "PUBLIC"
                                      }).sort('last_update', -1)
   
+      # if cur_public.count():
+      #   for group in cur_public:
+      #     group_nodes.append(group)
+  
       if cur_public.count():
-        for group in cur_public:
-          group_nodes.append(group)
-      
-      group_count = cur_public.count()
-
+        group_nodes = cur_public
+        group_count = cur_public.count()
     
     return render_to_response("ndf/group.html", 
                               {'group_nodes': group_nodes,

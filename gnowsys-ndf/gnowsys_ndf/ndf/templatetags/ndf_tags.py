@@ -621,110 +621,6 @@ def get_gapps_iconbar(request, group_id):
 
 
 @register.assignment_tag
-def get_nroer_menu_old(request, group_name):
-
-	url_str = request.META["PATH_INFO"]
-	url_split = url_str.split("/")
-
-	# removing "" in the url_split
-	url_split = filter(lambda x: x != "", url_split)
-	# print "url_split : ", url_split
-
-	# initializing of variables
-	selected_gapp = menu_level_one_selected = selected_gapp_formated = ""
-	menu_level_one_list = selected_gapp_list = []
-	mapping = {"eLibrary": "e-library", "Curated Zone": "topics",
-				"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
-				"Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
-				}
-
-	# the dict that will be returned
-	nroer_menu_dict = {
-						'menu_level_one_list': menu_level_one_list,
-						'menu_level_one_selected': menu_level_one_selected,
-						'selected_gapp': selected_gapp,
-						'selected_gapp_list': selected_gapp_list,
-						'mapping': mapping
-					}
-
-	if (len(url_split) > 1) and (url_split[1] != "dashboard"):
-		selected_gapp = url_split[1]  # expecting e-library etc. type of extract
-
-		# handling conditions of "e-library" = "file" and vice-versa.
-		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
-
-		if selected_gapp.lower() in [i.lower() for i in mapping.values()]:
-			for k, v in mapping.iteritems():
-				if selected_gapp.lower() == v.lower():
-					selected_gapp = k.lower()
-
-		selected_gapp_formated = selected_gapp.replace("-", "")
-
-	elif group_name == "home":  # only for "home" group
-		menu_level_one_selected = group_name
-
-	else:  # for group's other than home
-
-		# getting all the values of all keys from GSTUDIO_NROER_MENU
-		# all_sub_menu_values = []
-		# for each_d in GSTUDIO_NROER_MENU:
-		# 	for i in each_d.values():
-		# 		all_sub_menu_values += i
-
-		if group_name.lower() in [i.lower() for i in mapping.keys()]:
-			# if group_name directly appear to be in all the values in GSTUDIO_NROER_MENU
-			# e.g: Teachers, Interest Group's
-			selected_gapp = group_name
-			selected_gapp_formated = group_name.lower()
-		elif group_name.lower() in [i.lower() for i in mapping.values()]:
-			# if group_name appears in mapping's value then get it's key.
-			# e.g: States, Individuals
-			for k, v in mapping.iteritems():
-				if group_name.lower() == v.lower():
-					selected_gapp = k.lower()
-					selected_gapp_formated = k.lower()
-
-	# [i.keys()[0].lower() for i in GSTUDIO_NROER_MENU]
-	# print "selected_gapp : ", selected_gapp
-	# print "selected_gapp_formated : ", selected_gapp_formated
-	# print "menu_level_one_selected : ", menu_level_one_selected
-
-	menu_level_one_list = []
-
-	for menu_level_one in GSTUDIO_NROER_MENU:
-
-		temp_menu_level_one_key = menu_level_one.keys()[0]
-		temp_selected_gapp_list = menu_level_one[temp_menu_level_one_key]
-		# print temp_selected_gapp_list
-		
-		menu_level_one_list.append(temp_menu_level_one_key)
-
-		if menu_level_one_selected and (menu_level_one_selected.lower() == temp_menu_level_one_key.lower()):
-			nroer_menu_dict["selected_gapp_list"] = temp_selected_gapp_list
-			nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
-
-		if selected_gapp_formated:
-			for k, each_menu_dict in menu_level_one.iteritems():
-				if each_menu_dict and (selected_gapp_formated in [i.lower() for i in each_menu_dict]):
-					nroer_menu_dict["selected_gapp"] = selected_gapp_formated
-					nroer_menu_dict["menu_level_one_selected"] = temp_menu_level_one_key.capitalize()
-					nroer_menu_dict["selected_gapp_list"] = each_menu_dict
-
-	nroer_menu_dict["menu_level_one_list"] = menu_level_one_list
-
-	# sending details about which are groups and which are gapps
-	mapping["groups"] = ["States", "Institutions", "Individuals", "Teachers", "Interest Groups", "Schools"]
-	mapping["gapps"] = ["Curated Zone", "eLibrary", "eBooks", "eCourses", "Events"]
-	# print mapping
-
-	nroer_menu_dict["mapping"] = mapping
-	# print "nroer_menu_dict ::::\n", nroer_menu_dict
-
-	return nroer_menu_dict
-# ---------- END of get_nroer_menu -----------
-
-
-@register.assignment_tag
 def get_nroer_menu(request, group_name):
 
 	gapps = GSTUDIO_NROER_GAPPS
@@ -745,18 +641,20 @@ def get_nroer_menu(request, group_name):
 		# handling conditions of "e-library" = "file" and vice-versa.
 		selected_gapp = "e-library" if (selected_gapp == "file") else selected_gapp
 
-		# for deciding selected gapp
+		# for deciding/confirming selected gapp
 		for each_gapp in gapps:
 			temp_val = each_gapp.values()[0]
 			if temp_val == selected_gapp:
 				nroer_menu_dict["selected_gapp"] = temp_val
+
+		# print "selected_gapp : ", selected_gapp
 
 	mapping = {
 			"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
 			"Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
 			}
 
-	# deciding top level menu selection
+	# deciding "top level menu selection"
 	if (group_name == "home") and nroer_menu_dict.has_key("selected_gapp"):
 		top_menu_selected = "Repository"
 		
@@ -769,7 +667,10 @@ def get_nroer_menu(request, group_name):
 		
 		# for Partners, "Curated Zone" should not appear
 		gapps = gapps[1:] if top_menu_selected == "Partners" else gapps
-	# elif - put this for sub groups. Needs to fire queries etc.
+	elif (len(url_split) >= 3) and ("agency_type" in url_split):
+		top_menu_selected = "Partners" if (url_split[3] == "Partner") else ""
+		gapps = ""
+	# elif - put this for sub groups. Needs to fire queries etc. for future perspective.
 
 	nroer_menu_dict["gapps"] = gapps
 	nroer_menu_dict["top_menu_selected"] = top_menu_selected
@@ -778,6 +679,7 @@ def get_nroer_menu(request, group_name):
 
 	# print "nroer_menu_dict : ", nroer_menu_dict
 	return nroer_menu_dict
+# ---------- END of get_nroer_menu -----------
 
 
 @register.assignment_tag
