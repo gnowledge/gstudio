@@ -73,7 +73,6 @@
       <ul class="title-area ">
         
         <li class="name">
-          {% get_site_variables as site %}
             <h1>
               <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
             </h1>
@@ -96,26 +95,46 @@
         {% get_nroer_menu request group_name_tag as nroer_menu %}
 
         <ul class="left">
+
           <li>
-            <a href="/home/" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}> 
-              Home
-            </a>
-          </li>
-          <li>          
-            <a href="{% url 'GAPPS' group_name_tag|default:'home' 'topics' %}" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
+            <a href="{% url 'GAPPS' 'home' 'topics' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
-          <li>
-            <a href="{% url 'groupchange' 'State Partners' %}" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
-              Partners
-            </a>
-          </li>
-          <li>
-            <a href="{% url 'groupchange' 'Teachers' %}" {% if nroer_menu.menu_level_one_selected == "Groups" %}class="active"{% endif %}>
-              Groups
-            </a>
-          </li>
+
+          {% for each_menu in nroer_menu.top_menus %}
+            {% for menuk, menuv in each_menu.items %}
+
+            <li class="has-dropdown">
+              <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
+              {% if menuk == "Partners"%}
+                href="{% url 'groups_by_agency_type' 'home' 'agency_type' 'Partner' %}" 
+              {% elif menuk == "Groups"%}
+                href="{% url 'nroer_groups' 'home' %}" 
+              {% endif %}
+              > {{menuk}} </a>
+              <ul class="dropdown">
+                {% for each_sub_menu in menuv %}
+                <li>
+                  <a 
+                  {% for mapk, mapv in nroer_menu.mapping.items %}
+                    {% if each_sub_menu == mapk %}
+                      href="{% url 'groupchange' mapv %}"
+                      {% if nroer_menu.sub_menu_selected == mapk %}
+                        class="active" 
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  >{{each_sub_menu}}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+
+            {% endfor %}
+          {% endfor %}
+
         </ul>
         <!-- -END of NROER level one menu -->
       {% else %}
@@ -335,28 +354,19 @@
               {% if site_name == "nroer" %} 
               
               <!-- NROER level-two menu -->
-
                 <ul class="button-group nroer-menu">
-                  {% for each_menu in nroer_menu.selected_gapp_list %}
-                    <li {% if each_menu|lower == nroer_menu.selected_gapp|cut:"-" %}class="active"{% endif %}>
-                      <a class="button"
-                      {% if each_menu in nroer_menu.mapping.groups %}
-                        {% for k, v in nroer_menu.mapping.items %}
-                          {% if k == each_menu %} href="{% url 'groupchange' v %}"{% endif %}
-                        {% endfor %}
-                      {% elif each_menu in nroer_menu.mapping.gapps %}
-                        {% for k, v in nroer_menu.mapping.items %}
-                          {% if k == each_menu %}
-                            href="{% url 'GAPPS' group_name_tag v %}"
-                          {% endif %}
-                        {% endfor %}
-                      {% endif %}
-                      >{{each_menu}}</a>
-                    </li>
+                  {% for each_gapp in nroer_menu.gapps %}
+                    {% for k, v in each_gapp.items %}
+                      <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
+                        <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
+                          {{k}}
+                        </a>
+                      </li>
+                    {% endfor %}
                   {% endfor %}
                 </ul>
-
               <!-- END of NROER level two menu -->
+
               {% else %}
                 {% get_gapps_iconbar request groupid %}
               {% endif %}
@@ -468,13 +478,11 @@
       <div class="medium-12 columns">
         <ul class="inline-list">
           <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
-          {% if user.is_authenticated %}
           <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
           <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
           <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
           <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
           <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
-          {% endif %}
           <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
         </ul>   
       </div>
@@ -604,15 +612,23 @@
 
     // start of document.ready()
       $(document).ready(function(){
-        $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
-              
-        {% block document_ready %} {% endblock %}
+  
+        try{
 
-        // function defined in app.js to check the font and load it asynchronously.
-        checkOpenSansFont();
+          $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
+                
+          {% block document_ready %} {% endblock %}
+
+        }
+        finally{
+          // function defined in app.js to check the font and load it asynchronously.
+          checkOpenSansFont();
+        }
+
       });
 
     {% block script %} {% endblock %} 
+
   </script>
 </body>
 
