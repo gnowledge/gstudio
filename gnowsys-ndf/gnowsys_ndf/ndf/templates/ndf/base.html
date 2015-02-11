@@ -95,21 +95,42 @@
         {% get_nroer_menu request group_name_tag as nroer_menu %}
 
         <ul class="left">
-          <li>          
-            <a href="{% url 'GAPPS' 'home' 'topics' %}" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
+
+          <li>
+            <a href="{% url 'GAPPS' 'home' 'topics' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
-          <li>
-            <a href="{% url 'groupchange' 'State Partners' %}" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
-              Partners
-            </a>
-          </li>
-          <li>
-            <a href="{% url 'groupchange' 'Teachers' %}" {% if nroer_menu.menu_level_one_selected == "Groups" %}class="active"{% endif %}>
-              Groups
-            </a>
-          </li>
+
+          {% for each_menu in nroer_menu.top_menus %}
+            {% for menuk, menuv in each_menu.items %}
+
+            <li class="has-dropdown">
+              <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
+                href="{% url 'nroer_groups' 'home' menuk %}" 
+              > {{menuk}} </a>
+              <ul class="dropdown">
+                {% for each_sub_menu in menuv %}
+                <li>
+                  <a 
+                  {% for mapk, mapv in nroer_menu.mapping.items %}
+                    {% if each_sub_menu == mapk %}
+                      href="{% url 'groupchange' mapv %}"
+                      {% if nroer_menu.sub_menu_selected == mapk %}
+                        class="active" 
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  >{{each_sub_menu}}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+
+            {% endfor %}
+          {% endfor %}
+
         </ul>
         <!-- -END of NROER level one menu -->
       {% else %}
@@ -329,28 +350,19 @@
               {% if site_name == "nroer" %} 
               
               <!-- NROER level-two menu -->
-
                 <ul class="button-group nroer-menu">
-                  {% for each_menu in nroer_menu.selected_gapp_list %}
-                    <li {% if each_menu|lower == nroer_menu.selected_gapp|cut:"-" %}class="active"{% endif %}>
-                      <a class="button"
-                      {% if each_menu in nroer_menu.mapping.groups %}
-                        {% for k, v in nroer_menu.mapping.items %}
-                          {% if k == each_menu %} href="{% url 'groupchange' v %}"{% endif %}
-                        {% endfor %}
-                      {% elif each_menu in nroer_menu.mapping.gapps %}
-                        {% for k, v in nroer_menu.mapping.items %}
-                          {% if k == each_menu %}
-                            href="{% url 'GAPPS' group_name_tag v %}"
-                          {% endif %}
-                        {% endfor %}
-                      {% endif %}
-                      >{{each_menu}}</a>
-                    </li>
+                  {% for each_gapp in nroer_menu.gapps %}
+                    {% for k, v in each_gapp.items %}
+                      <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
+                        <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
+                          {{k}}
+                        </a>
+                      </li>
+                    {% endfor %}
                   {% endfor %}
                 </ul>
-
               <!-- END of NROER level two menu -->
+
               {% else %}
                 {% get_gapps_iconbar request groupid %}
               {% endif %}
@@ -605,15 +617,14 @@
 
         }
         finally{
-  
           // function defined in app.js to check the font and load it asynchronously.
           checkOpenSansFont();
-  
         }
-  
+
       });
 
     {% block script %} {% endblock %} 
+
   </script>
 </body>
 
