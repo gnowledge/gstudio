@@ -550,6 +550,11 @@ GSTUDIO_NROER_MENU = [{"Repository":[]}, {"Partners":["States", "Institutions", 
 
 GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eLibrary": "e-library"}, {"eBooks": ""}, {"eCourses": ""}, {"Events": ""} ]
 
+GSTUDIO_NROER_MENU_MAPPINGS = {
+            "States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
+            "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
+            }
+
 try:
     from local_settings import *
     #print "Local settings applied"

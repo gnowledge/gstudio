@@ -649,10 +649,7 @@ def get_nroer_menu(request, group_name):
 
 		# print "selected_gapp : ", selected_gapp
 
-	mapping = {
-			"States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
-			"Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
-			}
+	mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
 	# deciding "top level menu selection"
 	if (group_name == "home") and nroer_menu_dict.has_key("selected_gapp"):

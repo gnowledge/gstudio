@@ -107,11 +107,7 @@
 
             <li class="has-dropdown">
               <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
-              {% if menuk == "Partners"%}
-                href="{% url 'groups_by_agency_type' 'home' 'agency_type' 'Partner' %}" 
-              {% elif menuk == "Groups"%}
-                href="{% url 'nroer_groups' 'home' %}" 
-              {% endif %}
+                href="{% url 'nroer_groups' 'home' menuk %}" 
               > {{menuk}} </a>
               <ul class="dropdown">
                 {% for each_sub_menu in menuv %}
