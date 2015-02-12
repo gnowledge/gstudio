@@ -4,7 +4,7 @@ import datetime
 import json
 
 ''' -- imports from installed packages -- '''
-from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
+from django.http import HttpResponseRedirect, HttpResponse # uncomment when to use
 from django.http import Http404
 from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
@@ -27,9 +27,11 @@ from mongokit import IS
 from gnowsys_ndf.settings import GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
+# from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
 
 collection = get_database()[Node.collection_name]
 
@@ -75,7 +77,8 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   property_order_list = []
   widget_for = []
   is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
-
+  univ_list = []
+  colg_list = []
   template_prefix = "mis"
   context_variables = {}
 
@@ -96,18 +99,19 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       person_gs = collection.GSystem()
       person_gs.member_of.append(person_gst._id)
       person_gs.get_neighbourhood(person_gs.member_of)
-      rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id': 1})
-      rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
+      university_gst = collection.Node.one({'_type': "GSystemType", 'name': "University"})
+      mis_admin = collection.Node.one({"_type": "Group","name": "MIS_admin"}, {"_id": 1})
+
+      univ_cur = collection.Node.find({"member_of":university_gst._id,'group_set':mis_admin._id},{'name':1,"_id":1})
       attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id': 1})
 
       widget_for = ["name", 
-                    rel_univ._id,
-                    rel_colg._id,
                     attr_deg_yr._id
                   ]
-                  #   'status'
-                  # ]
       widget_for = get_widget_built_up_data(widget_for, person_gs)
+
+      for each in univ_cur:
+        univ_list.append(each)
   
     else:
       query = {}
@@ -222,6 +226,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         'title':title,
                         'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
                         'property_order_list': property_order_list, 'lstFilters': widget_for,
+                        'univ_list':json.dumps(univ_list, cls=NodeJSONEncoder),
                         'is_link_needed': is_link_needed
                       }
 
@@ -274,6 +279,11 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   person_gst = None
   person_gs = None
+  college_node = None
+  college_id = None
+  student_enrollment_code = u""
+  create_student_enrollment_code = False
+  registration_date = None
 
   property_order_list = []
 
@@ -287,10 +297,16 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
-        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   # for eachset in app.collection_set:
   #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  college_node = collection.Node.one({
+      "_id": ObjectId(group_id),
+      "relation_set.group_of": {"$exists": True}
+  }, {
+      "relation_set.group_of": 1
+  })
 
   if app_set_id:
     person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
@@ -305,6 +321,9 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   property_order_list = get_property_order_with_value(person_gs)#.property_order
 
   if request.method == "POST":
+    if person_gst.name == "Student" and "_id" not in person_gs:
+      create_student_enrollment_code = True
+
     # [A] Save person-node's base-field(s)
     is_changed = get_node_common_fields(request, person_gs, group_id, person_gst)
 
@@ -313,13 +332,31 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       person_gs.status = u"PUBLISHED"
 
     person_gs.save(is_changed=is_changed)
-  
+
+    if college_node:
+        mis_admin = collection.Node.one({
+            "_type": "Group",
+            "name": "MIS_admin"
+        }, {
+            "_id": 1
+        }
+        )
+
+        collection.update({
+            "_id": person_gs._id
+        }, {
+            "$addToSet": {"group_set": mis_admin._id}
+        },
+        upsert=False, multi=False
+        )
+
     # [B] Store AT and/or RT field(s) of given person-node (i.e., person_gs)
     for tab_details in property_order_list:
       for field_set in tab_details[1]:
         # Fetch only Attribute field(s) / Relation field(s)
-        if field_set.has_key('_id'):
+        if '_id' in field_set:
           field_instance = collection.Node.one({'_id': field_set['_id']})
+          fi_name = field_instance["name"]
           field_instance_type = type(field_instance)
 
           if field_instance_type in [AttributeType, RelationType]:
@@ -330,12 +367,12 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
                 user_id = request.user.id
-                if field_instance["name"] in request.FILES:
-                  field_value = request.FILES[field_instance["name"]]
+                if fi_name in request.FILES:
+                  field_value = request.FILES[fi_name]
 
                 else:
                   field_value = ""
-                
+
                 # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
                 if field_value != '' and field_value != u'':
                   file_name = person_gs.name + " -- " + field_instance["altnames"]
@@ -344,14 +381,16 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                   field_value = save_file(field_value, file_name, user_id, group_id, content_org, tags, oid=True)[0]
 
               else:
-                # Other AttributeTypes 
-                field_value = request.POST[field_instance["name"]]
+                # Other AttributeTypes
+                if fi_name in request.POST:
+                    field_value = request.POST[fi_name]
 
               # field_instance_type = "GAttribute"
-              if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
+              if fi_name in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
-              elif field_instance["name"] in ["dob", "registration_date"]:
+              elif fi_name in ["dob", "registration_date"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y")
+                registration_date = field_value
               else:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
 
@@ -360,14 +399,14 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
             else:
               if field_instance["object_cardinality"] > 1:
-                field_value_list = request.POST.get(field_instance["name"], "")
+                field_value_list = request.POST.get(fi_name, "")
                 if "[" in field_value_list and "]" in field_value_list:
                   field_value_list = json.loads(field_value_list)
                 else:
-                  field_value_list = request.POST.getlist(field_instance["name"])
+                  field_value_list = request.POST.getlist(fi_name)
 
               else:
-                field_value_list = request.POST.getlist(field_instance["name"])
+                field_value_list = request.POST.getlist(fi_name)
 
               # field_instance_type = "GRelation"
               for i, field_value in enumerate(field_value_list):
@@ -375,6 +414,24 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 field_value_list[i] = field_value
 
               person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value_list)
+
+    # Setting enrollment code for student node only while creating it
+    if create_student_enrollment_code:
+        # Create enrollment code for student node only while registering a new node
+        for rel in college_node.relation_set:
+          if rel and "group_of" in rel:
+            college_id = rel["group_of"][0]
+
+        student_enrollment_code = get_student_enrollment_code(college_id, person_gs._id, registration_date, ObjectId(group_id))
+
+        enrollment_code_at = collection.Node.one({
+            "_type": "AttributeType", "name": "enrollment_code"
+        })
+
+        try:
+            ga_node = create_gattribute(person_gs._id, enrollment_code_at, student_enrollment_code)
+        except Exception as e:
+            print "\n StudentEnrollmentCreateError: " + str(e) + "!!!"
 
     # [C] Code to link GSystem Node and Author node via "has_login" relationship;
     #     and Subscribe the Author node to College group if user "Program Officer"
