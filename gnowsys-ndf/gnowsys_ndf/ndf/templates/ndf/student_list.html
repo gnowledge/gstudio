@@ -1,10 +1,22 @@
 {% extends "ndf/mis_base_create_edit.html" %}
+{% load staticfiles %}
+
 {% load ndf_tags %}
 {% load i18n %}
 
   
 {% block title %}
   {% trans "Students List View" %}
+{% endblock %}
+
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block style %}
@@ -61,6 +73,10 @@
   
   .padding-left-2p2 {
     padding-left: 2.2rem;
+  }
+
+  .text-size-15 {
+    font-size: 15px;
   }
 {% endblock %}
 
@@ -215,8 +231,6 @@
 {% endblock %}
 
 {% block script %}
-
-
   // Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
     $(document).on('focus click blur', '.date_year' ,function(){
       $(".ui-datepicker-calendar").hide();
@@ -481,7 +495,6 @@
         ajax_request_data['app_set_id'] = "{{app_set_id}}"
         ajax_request_data['reg_year'] = $("#datepicker_year").val() 
 
-
         // Iterate rows with class set as 'filter' and class not set as 'hide'
         $(".filter").not(".hide").each(function() {
           // Iterate all input elements whose type is not 'button'
@@ -496,7 +509,7 @@
         var success_state = false;
         // Ajax call that fetches all students data depending on selection criteria
         $.ajax({
-          url:"{% url 'get_students' groupid %}",
+          url: "{% url 'get_students' groupid %}",
 
           data: ajax_request_data,
 
@@ -509,11 +522,65 @@
             $("#alertModalLabel").text(data["message"]);
 
             if (success_state) {
-              // $("#alertModal").removeClass("alert");
-              // $("#alertModal").addClass("success");
-              // $("#alertModal").foundation('reveal', 'open');
+              // $("#students-data-review").html(data["students_data_review"]);
+        
+              groupid_val = data["groupid"];
+              app_id_val = data["app_id"];
+              app_set_id_val = data["app_set_id"];
 
-              $("#students-data-review").html(data["students_data_review"]);
+              filename = data["filename"];
+              university = data["university"];
+              college = data["college"];
+              students_count = data["students_count"];
+              column_headers = data["column_headers"];
+              students_data_set = data["students_data_set"];
+              dataTable_columns_set = [];
+              download_link = "{% static 'filename' %}".replace('filename', filename);
+
+              if (parseInt(students_count) <= 0) {
+                c = '<div class="row">' +
+                  '<div class="large-4 large-centered columns">' +
+                    '<p class="alert-box alert radius text-center text-size-15">No records match the given criteria !!!</p>' +
+                  '</div>' +
+                '</div>'
+                $("#students-data-review").html(c);
+              }
+
+              else {
+                // Define table
+                student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
+                  '<caption>' +
+                    '<h3>' + college + '</h3>' +
+                    '<h4>' + university + '</h4>' +
+                    '<h6>Total No. of Students Registered: <b>' + students_count + '</b></h6>' +
+                    '<a href="' + download_link + '" download="">' +
+                      '<span class="fi-download large">&nbsp;&nbsp;&nbsp;Download Students\' data (CSV)</span>' +
+                    '</a>' + 
+                  '</caption>' +
+                '</table>';
+                $("#students-data-review").html(student_data_table);
+                
+                // Prepare title & data headers used in dataTable
+                $.each(column_headers, function(index, v) {
+                  d = {};
+                  d["data"] = v[0];
+                  d["title"] = v[1];
+                  dataTable_columns_set.push(d);
+                });
+
+                // Set defintion dataTable
+                sce_dt_var = $("#student_data_table").dataTable({
+                  "data": students_data_set,
+                  "columns": dataTable_columns_set,
+                  "createdRow": function ( row, data, index ) {
+                    // Attaching Student's ObjectId to each row (i.e., assigning to it's id attribute)
+                    s_id = data["stud_id"];
+                    $(row).attr("id", s_id);
+                    edit_url = "{% url 'mis:mis_app_instance_edit' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", s_id);
+                    $(row).find("td:nth-child(2)").html("<a href='" + edit_url + "' title='Edit " + data['Name'] + "' target='_blank'><i class='fi-pencil medium'></i></a>");
+                  }
+                });
+              }
             }
 
             else {
@@ -524,9 +591,6 @@
           },
 
           complete: function() {
-            if (success_state) {
-              var abc = 22;
-            }
           },
         });
       }

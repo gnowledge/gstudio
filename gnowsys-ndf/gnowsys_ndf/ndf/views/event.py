@@ -107,7 +107,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
         group_id = str(auth._id)
   else :
     pass
-  
+  session_node = ""
   app = None
   '''if app_id is None:
     app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
@@ -187,6 +187,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   marks_list=[]
   Assesslist=[]
   batch=[]
+  session_node = ""
   if app_set_instance_id :
     template = "ndf/event_details.html"
 
@@ -224,7 +225,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                       if unicode('announced_for') in i.keys():
                             course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
             batch=batch.name
-       elif unicode('session_of') in i.keys():
+       if unicode('session_of') in i.keys():
             event_has_session = collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})
             session_node = collection.Node.one({'_id':ObjectId(event_has_session._id)},{'attribute_set':1})
 
@@ -366,6 +367,8 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   iteration=request.POST.get("iteration","")
   if iteration == "":
         iteration=1
+  
+        
   for i in range(int(iteration)):
    if app_set_id:
      event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
@@ -390,10 +393,14 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
       # Remove this when publish button is setup on interface
       event_gs.status = u"PUBLISHED"
     if (request.POST.get("name","")) == "":
-        if event_gst.name == "Exam":
-           name=slugify(request.POST.get("course_type",""))+ "--"+ slugify(request.POST.get("course_name",""))+ "--"+slugify           (request.POST.get("batch_name",""))
+        if i>0:
+            field_value=request.POST.get('start_time'+"_"+str(i),'')  
         else:
-           name=slugify(request.POST.get("course_type",""))+ "--"+ slugify(request.POST.get("course_name",""))+ "--"+slugify           (request.POST.get("Module_name",""))+ "--"+slugify(request.POST.get("Session",""))
+            field_value = request.POST.get('start_time','')
+        if event_gst.name == "Exam":
+           name = "Exam" + "--" + slugify(request.POST.get("batch_name","")) + "--" + field_value 
+        else:
+           name= "Class" + "--"+ slugify(request.POST.get("course_name","")) + "--" + field_value
         event_gs.name=name 
     
     event_gs.save(is_changed=is_changed)
