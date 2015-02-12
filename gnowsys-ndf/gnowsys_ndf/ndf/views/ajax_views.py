@@ -4497,7 +4497,7 @@ def reschedule_task(request,group_id,node):
     b.append(task_groupset._id)
     glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
     task_type = []
-    task_type = collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id
+    task_type.append(collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id)
     task_dict.update({"has_type" :task_type})
     task_dict.update({'name':unicode('Reschedule Task')})
     task_dict.update({'group_set':b})
