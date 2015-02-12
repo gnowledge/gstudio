@@ -913,6 +913,7 @@ if (!(Status_attended))
     
      if(Event_attended_by !="")
      {
+              var success_data = ""
               $.ajax({
                       url: url,
                       type: "POST",
@@ -925,8 +926,12 @@ if (!(Status_attended))
                       Event:eventid,
                       csrfmiddlewaretoken: '{{ csrf_token }}'},
                       success: function(data){
-                      alert(data)
-                      controler()
+                        success_data = data;
+                      },
+                      complete:function()
+                      {
+                          alert(success_data);
+                          controler();
                       }
                     });
      }
