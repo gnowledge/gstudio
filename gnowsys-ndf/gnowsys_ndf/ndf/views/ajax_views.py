@@ -2191,13 +2191,13 @@ def get_students(request, group_id):
             if field_name == "student_belongs_to_university":
               university_id = query_data
             else:
-              query.update({"relation_set."+field_name: query_data})
+              query.update({"relation_set." + field_name: query_data})
 
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
       query["member_of"] = student._id
 
-      date_lte = datetime.datetime.strptime("31/12/"+stud_reg_year, "%d/%m/%Y")
-      date_gte = datetime.datetime.strptime("1/1/"+stud_reg_year, "%d/%m/%Y")
+      date_lte = datetime.datetime.strptime("31/12/" + stud_reg_year, "%d/%m/%Y")
+      date_gte = datetime.datetime.strptime("1/1/" + stud_reg_year, "%d/%m/%Y")
       query["attribute_set.registration_date"] = {'$gte': date_gte, '$lte': date_lte} 
 
       mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
@@ -2233,6 +2233,7 @@ def get_students(request, group_id):
       rec = collection.aggregate([{'$match': query},
                                   {'$project': {'_id': 0,
                                                 'stud_id': '$_id', 
+                                                'Enrollment Code': '$attribute_set.enrollment_code',
                                                 'Name': '$name',
                                                 # 'First Name': '$attribute_set.first_name',
                                                 # 'Middle Name': '$attribute_set.middle_name',
@@ -2337,7 +2338,7 @@ def get_students(request, group_id):
           json_data.append(new_dict)
 
         # Start: CSV file processing -------------------------------------------
-        column_header = [u'Name', u'Reg# Date', u'Gender', u'Birth Date', u'Religion', u'Email ID', u'Languages Known', u'Caste', u'Contact Number (Mobile)', u'Alternate Number / Landline', u'House / Street', u'Village', u'Taluka', u'Town / City', u'District', u'State', u'Pin Code', u'Year of Passing 12th Standard', u'Degree Name / Highest Degree', u'Year of Study', u'Stream / Degree Specialization', u'College Enrolment Number / Roll No', u'College ( Graduation )', u'Are you registered for NSS?']
+        column_header = [u"Enrollment Code", u'Name', u'Reg# Date', u'Gender', u'Birth Date', u'Religion', u'Email ID', u'Languages Known', u'Caste', u'Contact Number (Mobile)', u'Alternate Number / Landline', u'House / Street', u'Village', u'Taluka', u'Town / City', u'District', u'State', u'Pin Code', u'Year of Passing 12th Standard', u'Degree Name / Highest Degree', u'Year of Study', u'Stream / Degree Specialization', u'College Enrolment Number / Roll No', u'College ( Graduation )', u'Are you registered for NSS?']
 
         t = time.strftime("%c").replace(":", "_").replace(" ", "_")
         filename = "csv/" + "student_registration_data_" + t + ".csv"
@@ -2354,43 +2355,49 @@ def get_students(request, group_id):
             fw.writerow(row)
             row.update(v)
         # End: CSV file processing ----------------------------------------------
-        
-        column_header = ['Name', "Reg# Date", "Gender", "Birth Date", "Email ID", 'stud_id']
 
-        for i, each in enumerate(json_data):
-          data = []
-          for ch in column_header:
-            data.append(each[ch])
-          json_data[i] = data
+      # Column headers to be displayed on html
+      column_headers = [
+          ("Enrollment Code", "Enrollment Code"), 
+          ("stud_id", "Edit"), 
+          ("Name", "Name"), 
+          ("Reg# Date", "Reg# Date"), 
+          ("Gender", "Gender"), 
+          ("Birth Date", "Birth Date"), 
+          ("Email ID", "Email ID"), 
+      ]
 
       university = collection.Node.one({'_id': ObjectId(university_id)}, {'name': 1})
-      college = collection.Node.one({'_id': ObjectId(query["relation_set.student_belongs_to_college"])})
+      college = collection.Node.one({'_id': ObjectId(query["relation_set.student_belongs_to_college"])}, {"name": 1})
       students_count = len(json_data)
 
       response_dict["success"] = True
-      student_list = render_to_string('ndf/student_data_review.html', 
-                                        {'groupid': groupid, 'app_id': app_id, 'app_set_id': app_set_id, 
-                                         'university': university, 'college': college, 'students_count': students_count, 'half_count': students_count/2,
-                                         'column_header': column_header, 'students_list': json_data, 'filename': filename
-                                        },
-                                        context_instance = RequestContext(request)
-                                    )
-      response_dict["students_data_review"] = student_list
-      return HttpResponse(json.dumps(response_dict))
+
+      response_dict["groupid"] = groupid
+      response_dict["app_id"] = app_id
+      response_dict["app_set_id"] = app_set_id
+      response_dict["filename"] = filename
+      response_dict["university"] = university.name
+      response_dict["college"] = college.name
+      response_dict["students_count"] = students_count
+      response_dict["column_headers"] = column_headers
+      response_dict["students_data_set"] = json_data
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+    
     else:
       error_message = "StudentFindError: Either not an ajax call or not a POST request!!!"
       response_dict["message"] = error_message
-      return HttpResponse(json.dumps(response_dict))
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
   except OSError as oe:
     error_message = "StudentFindError: " + str(oe) + "!!!"
     response_dict["message"] = error_message
-    return HttpResponse(json.dumps(response_dict))
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
   except Exception as e:
     error_message = "StudentFindError: " + str(e) + "!!!"
     response_dict["message"] = error_message
-    return HttpResponse(json.dumps(response_dict))
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
 
 def get_statewise_data(request, group_id):
@@ -2552,8 +2559,10 @@ def get_college_wise_students_data(request, group_id):
       college_gst = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
 
-      date_lte = datetime.datetime.strptime("31/12/2014", "%d/%m/%Y")
-      date_gte = datetime.datetime.strptime("1/1/2014", "%d/%m/%Y")
+      current_year = str(datetime.datetime.today().year)
+
+      date_gte = datetime.datetime.strptime("1/1/" + current_year, "%d/%m/%Y")
+      date_lte = datetime.datetime.strptime("31/12/" + current_year, "%d/%m/%Y")
 
       college_cur = collection.Node.find({'member_of': college_gst._id, 'group_set': mis_admin._id}, 
                                          {'_id': 1, 'name': 1, 'relation_set': 1}).sort('name', 1)
@@ -2583,11 +2592,11 @@ def get_college_wise_students_data(request, group_id):
         data["College"] = each.name
         for res in rec["result"]:
           data[res["_id"]["Degree Year"][0]] = res["No of students"]
-        if not data.has_key("I"):
+        if "I" not in data:
           data["I"] = 0
-        if not data.has_key("II"):
+        if "II" not in data:
           data["II"] = 0
-        if not data.has_key("III"):
+        if "III" not in data:
           data["III"] = 0
 
         data["Total"] = data["I"] + data["II"] + data["III"]
