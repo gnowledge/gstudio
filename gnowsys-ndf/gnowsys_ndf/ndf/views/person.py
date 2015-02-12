@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
-# from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
+from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
 
 collection = get_database()[Node.collection_name]
 

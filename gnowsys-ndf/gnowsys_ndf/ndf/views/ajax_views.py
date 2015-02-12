@@ -2383,7 +2383,7 @@ def get_students(request, group_id):
       ]
 
       university = collection.Node.one({'_id': ObjectId(university_id)}, {'name': 1})
-      college = collection.Node.one({'_id': ObjectId(college_id)})
+      college = collection.Node.one({'_id': ObjectId(college_id)}, {"name": 1})
       students_count = len(json_data)
 
       response_dict["success"] = True
@@ -2574,8 +2574,10 @@ def get_college_wise_students_data(request, group_id):
       college_gst = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
       student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
 
-      date_lte = datetime.datetime.strptime("31/12/2014", "%d/%m/%Y")
-      date_gte = datetime.datetime.strptime("1/1/2014", "%d/%m/%Y")
+      current_year = str(datetime.datetime.today().year)
+
+      date_gte = datetime.datetime.strptime("1/1/" + current_year, "%d/%m/%Y")
+      date_lte = datetime.datetime.strptime("31/12/" + current_year, "%d/%m/%Y")
 
       college_cur = collection.Node.find({'member_of': college_gst._id, 'group_set': mis_admin._id}, 
                                          {'_id': 1, 'name': 1, 'relation_set': 1}).sort('name', 1)
@@ -2605,11 +2607,11 @@ def get_college_wise_students_data(request, group_id):
         data["College"] = each.name
         for res in rec["result"]:
           data[res["_id"]["Degree Year"][0]] = res["No of students"]
-        if not data.has_key("I"):
+        if "I" not in data:
           data["I"] = 0
-        if not data.has_key("II"):
+        if "II" not in data:
           data["II"] = 0
-        if not data.has_key("III"):
+        if "III" not in data:
           data["III"] = 0
 
         data["Total"] = data["I"] + data["II"] + data["III"]
@@ -4576,9 +4578,14 @@ def reschedule_task(request,group_id,node):
 	    	   	  reschedule_dates = i['event_edit_reschedule']['reschedule_dates']
          if unicode("event_date_task") in i.keys():
               task_id = i["event_date_task"]
+         print "the task ", task_id
+         
          if task_id:
-            task_node = collection.Node.find({"_id":ObjectId(task_id['Task'])})
-            task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+            for i in task_id:
+              if unicode('Task')  ==  i:
+                 tid = i
+                 task_node = collection.Node.find({"_id":ObjectId(task_id["Task"])})
+                 task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
             create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
          task_id['Reschedule_Task'] = True
@@ -4596,8 +4603,11 @@ def reschedule_task(request,group_id,node):
             if unicode("event_attendance_task") in i.keys():
               task_id = i["event_attendance_task"]
         if task_id:
-            task_node = collection.Node.find({"_id":ObjectId(task_id['Task'])})
-            task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+            for i in task_id:
+              if unicode('Task') in i.keys():
+                 tid = i['Task']
+                 task_node = collection.Node.find({"_id":ObjectId(tid)})
+                 task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
             create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))
 
         reschedule_dates.append(b)
