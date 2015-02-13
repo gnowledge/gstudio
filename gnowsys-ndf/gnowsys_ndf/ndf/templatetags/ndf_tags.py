@@ -664,7 +664,7 @@ def get_nroer_menu(request, group_name):
 		top_menu_selected = [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:] if sub_menu_selected in i.values()[0]][0]
 		
 		# for Partners, "Curated Zone" should not appear
-		gapps = gapps[1:] if top_menu_selected == "Partners" else gapps
+		gapps = gapps[1:] if (top_menu_selected in ["Partners", "Groups"]) else gapps
 		
 	elif (len(url_split) >= 3) and ("nroer_groups" in url_split) and (url_split[2] in [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:]]):
 		top_menu_selected = url_split[2]

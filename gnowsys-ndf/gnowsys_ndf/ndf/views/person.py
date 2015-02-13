@@ -27,6 +27,7 @@ from mongokit import IS
 from gnowsys_ndf.settings import GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
@@ -76,7 +77,8 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   property_order_list = []
   widget_for = []
   is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
-
+  univ_list = []
+  colg_list = []
   template_prefix = "mis"
   context_variables = {}
 
@@ -97,18 +99,19 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       person_gs = collection.GSystem()
       person_gs.member_of.append(person_gst._id)
       person_gs.get_neighbourhood(person_gs.member_of)
-      rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id': 1})
-      rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
+      university_gst = collection.Node.one({'_type': "GSystemType", 'name': "University"})
+      mis_admin = collection.Node.one({"_type": "Group","name": "MIS_admin"}, {"_id": 1})
+
+      univ_cur = collection.Node.find({"member_of":university_gst._id,'group_set':mis_admin._id},{'name':1,"_id":1})
       attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id': 1})
 
       widget_for = ["name", 
-                    rel_univ._id,
-                    rel_colg._id,
                     attr_deg_yr._id
                   ]
-                  #   'status'
-                  # ]
       widget_for = get_widget_built_up_data(widget_for, person_gs)
+
+      for each in univ_cur:
+        univ_list.append(each)
   
     else:
       query = {}
@@ -223,6 +226,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         'title':title,
                         'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
                         'property_order_list': property_order_list, 'lstFilters': widget_for,
+                        'univ_list':json.dumps(univ_list, cls=NodeJSONEncoder),
                         'is_link_needed': is_link_needed
                       }
 

@@ -221,6 +221,7 @@ def parse_data_create_gsystem(json_file_path):
         log_list.append(error_message)
         raise error_message
 
+
     for i, json_document in enumerate(json_documents_list):
         try:
             n_name = ""
@@ -300,9 +301,11 @@ def parse_data_create_gsystem(json_file_path):
 
                                         # Use small-case altnames
                                         if key in ["dob", "date of birth", "date of registration"]:
-                                            json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
+                                            if json_document[key]:
+                                                json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
                                         else:
-                                            json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")
+                                            if json_document[key]:
+                                                json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")
 
                                     elif attr_value['data_type'] in [int, float, long]:
                                         if not json_document[key]:
@@ -545,7 +548,8 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
 
     if "date of birth" in json_document:
         dob = json_document["date of birth"]
-        query.update({"attribute_set.dob": datetime.datetime.strptime(dob, "%d/%m/%Y")})
+        if dob:
+            query.update({"attribute_set.dob": datetime.datetime.strptime(dob, "%d/%m/%Y")})
 
     node = collection.Node.one(query)
 
