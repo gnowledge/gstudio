@@ -2234,13 +2234,16 @@ def get_students(request, group_id):
 
       groupid = ObjectId(groupid)
       group_set_to_check = []
-      if groupid == college_groupid or groupid == mis_admin._id:
+
+      if groupid == mis_admin._id:
         # It means group is either a college group or MIS_admin group
         # In either case append MIS_admin group's ObjectId
         # and if college_groupid exists, append it's ObjectId too!
         if college_groupid:
           group_set_to_check.append(college_groupid)
-        group_set_to_check.append(mis_admin._id)
+        else:
+          group_set_to_check.append(mis_admin._id)
+
       else:
         # Otherwise, append given group's ObjectId
         group_set_to_check.append(groupid)
@@ -2254,6 +2257,7 @@ def get_students(request, group_id):
 
       query.update({'group_set': {'$in': group_set_to_check}})
       query.update({'status': u"PUBLISHED"})
+
       rec = collection.aggregate([{'$match': query},
                                   {'$project': {'_id': 0,
                                                 'stud_id': '$_id', 
