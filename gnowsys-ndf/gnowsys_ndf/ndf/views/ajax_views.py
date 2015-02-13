@@ -2153,7 +2153,6 @@ def get_students(request, group_id):
 
       person_gst = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'name': 1, 'type_of': 1})
 
-
       widget_for = []
       query = {}
       person_gs = collection.GSystem()
@@ -2217,13 +2216,13 @@ def get_students(request, group_id):
       date_lte = datetime.datetime.strptime("31/12/" + stud_reg_year, "%d/%m/%Y")
       date_gte = datetime.datetime.strptime("1/1/" + stud_reg_year, "%d/%m/%Y")
       query["attribute_set.registration_date"] = {'$gte': date_gte, '$lte': date_lte} 
-
-      # mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
-      # print "\n1\n",query["relation_set.student_belongs_to_college"]
-      # Get selected college's groupid, where given college should belongs to MIS_admin group
-      college_groupid = collection.Node.one({'_id': ObjectId(college_id), 'group_set': mis_admin._id, 'relation_set.has_group': {'$exists': True}}, 
-                                            {'relation_set.has_group': 1}
-      )
+      college_groupid = None
+      if college_id:
+        # Get selected college's groupid, where given college should belongs to MIS_admin group
+        college_groupid = collection.Node.one({'_id': ObjectId(college_id), 'group_set': mis_admin._id, 'relation_set.has_group': {'$exists': True}}, 
+                                              {'relation_set.has_group': 1, 'name': 1}
+        )
+        response_dict["college"] = college_groupid.name
 
       if college_groupid:
         for each in college_groupid.relation_set:
@@ -2245,6 +2244,13 @@ def get_students(request, group_id):
       else:
         # Otherwise, append given group's ObjectId
         group_set_to_check.append(groupid)
+
+      if university_id:
+        university_id = ObjectId(university_id)
+        university = collection.Node.one({'_id': university_id}, {'name': 1})
+        if university:
+          response_dict["university"] = university.name
+          query.update({'relation_set.student_belongs_to_university': university_id})
 
       query.update({'group_set': {'$in': group_set_to_check}})
       query.update({'status': u"PUBLISHED"})
@@ -2385,18 +2391,14 @@ def get_students(request, group_id):
           ("Email ID", "Email ID"), 
       ]
 
-      university = collection.Node.one({'_id': ObjectId(university_id)}, {'name': 1})
-      college = collection.Node.one({'_id': ObjectId(college_id)}, {"name": 1})
+      
+      # college = collection.Node.one({'_id': ObjectId(college_id)}, {"name": 1})
       students_count = len(json_data)
-
       response_dict["success"] = True
-
       response_dict["groupid"] = groupid
       response_dict["app_id"] = app_id
       response_dict["app_set_id"] = app_set_id
       response_dict["filename"] = filename
-      response_dict["university"] = university.name
-      response_dict["college"] = college.name
       response_dict["students_count"] = students_count
       response_dict["column_headers"] = column_headers
       response_dict["students_data_set"] = json_data

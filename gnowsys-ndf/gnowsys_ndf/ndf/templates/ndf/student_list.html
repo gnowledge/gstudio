@@ -529,10 +529,17 @@
               groupid_val = data["groupid"];
               app_id_val = data["app_id"];
               app_set_id_val = data["app_set_id"];
-
+              var caption_college = ""
+              var caption_university = ""
               filename = data["filename"];
-              university = data["university"];
-              college = data["college"];
+              if (data.hasOwnProperty("university")){
+                university = data["university"];
+                caption_university = '<h4>' + university + '</h4>';
+              }
+              if (data.hasOwnProperty("college")){
+                college = data["college"];
+                caption_college = '<h3>' + college + '</h3>';
+              }
               students_count = data["students_count"];
               column_headers = data["column_headers"];
               students_data_set = data["students_data_set"];
@@ -552,8 +559,8 @@
                 // Define table
                 student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
                   '<caption>' +
-                    '<h3>' + college + '</h3>' +
-                    '<h4>' + university + '</h4>' +
+                    caption_college +
+                    caption_university +
                     '<h6>Total No. of Students Registered: <b>' + students_count + '</b></h6>' +
                     '<a href="' + download_link + '" download="">' +
                       '<span class="fi-download large">&nbsp;&nbsp;&nbsp;Download Students\' data (CSV)</span>' +
@@ -635,7 +642,7 @@
       $("select#student_belongs_to_university").append(
         $("<option></option>")
           .attr("value", "")
-          .text("{% trans ' - - - Select course - - - ' %}")
+          .text("{% trans ' - - - Select University - - - ' %}")
       );
       
     //Update the Univ and college dropdown list
