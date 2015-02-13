@@ -746,11 +746,3 @@ def create_enrollment_code(stud_id, attribute_type_node, new_enroll_code):
     error_message = " GAttributeCreateError ("+str(stud_id)+") - "+str(e)+" !!!"
     raise Exception(error_message)
 
-
-
-
-
-
-
-
-

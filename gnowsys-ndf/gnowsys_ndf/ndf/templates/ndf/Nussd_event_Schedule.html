@@ -553,7 +553,6 @@ function date_validation(name)
 	           if (total_session_time > 0)
 	            {
 	                GenerateSplits()
-	                $("#iteration").attr('value',last_start_time)
 	                datetime()
 	                
 	            } 
@@ -580,6 +579,7 @@ function date_validation(name)
         }
  append_time()       
  enable_submit()
+ $("#iteration").attr('value',Number(last_start_time) + 1)
 }  
 function set_date(name)
  {
