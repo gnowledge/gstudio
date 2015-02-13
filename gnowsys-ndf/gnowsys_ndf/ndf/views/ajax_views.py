@@ -4462,9 +4462,12 @@ def reschedule_task(request,group_id,node):
                  if unicode("start_time") in i.keys():
                       event_start_time = i["start_time"]  
          if task_id:
-                 task_node = collection.Node.find({"_id":ObjectId(task_id["Task"])})
-                 task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
-                 create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
+     	     for i in task_id:
+          	   if unicode('Task') == i:
+             	     tid = task_id['Task']
+             	     task_node = collection.Node.find({"_id":ObjectId(tid)})
+             	     task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+             	     create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
          task_id['Reschedule_Task'] = True
          create_gattribute(ObjectId(node),reschedule_event,task_id)
@@ -4488,8 +4491,8 @@ def reschedule_task(request,group_id,node):
         
         if task_id:
             for i in task_id:
-              if unicode('Task') == i:
-                 tid = i['Task']
+            	if unicode('Task') == i:
+                 tid = task_id['Task']
                  task_node = collection.Node.find({"_id":ObjectId(tid)})
                  task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
                  create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))

@@ -741,7 +741,7 @@ function reschedule_time(type)
     var event_type = ""
     var event_reschedule_check = '{{event_reschedule_check}}'
     event_type  = String(type)
-    if (event_reschedule_check == 'False')
+    if (event_reschedule_check == 'False' && event_type == 'attendance_reschedule')
     {
         $('#rescheduleoption').foundation('reveal', 'open');
         $('#reschedule_check').empty()
