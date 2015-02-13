@@ -4432,14 +4432,15 @@ def reschedule_task(request,group_id,node):
  values=[]
  if request.user.id in listing:
     
-    reschedule_attendance=collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
-    marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
+    reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+    marks_entry_completed = collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
+    reshedule_choice = request.POST.get('reshedule_choice','')
     session = request.POST.get('session','')
-    end_time=collection.Node.one({"name":"end_time"})
+    end_time = collection.Node.one({"name":"end_time"})
     from datetime import date,time,timedelta
-    date1=datetime.date.today() + timedelta(2)
-    ti=datetime.time(0,0)
+    date1 = datetime.date.today() + timedelta(2)
+    ti = datetime.time(0,0)
     event_start_time = ""
     start_time = request.POST.get('reschedule_date','')
     b = parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
@@ -4495,9 +4496,8 @@ def reschedule_task(request,group_id,node):
                  break
 
         reschedule_dates.append(datetime.datetime.today())
-        
-        if event_details != False: 
-            create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
+        if event_details != False or reshedule_choice == "Attendance" :         
+        	create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
         if session != str(1):
           create_gattribute(ObjectId(node),marks_entry_completed[0],True)
         task_id['Reschedule_Task'] = True
@@ -4602,7 +4602,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  
  reschedule_dates={}
  
- if attendancedone == 'True':
+ if attendancedone == 'True' or assessmentdone == 'True':
     for j in event_node.attribute_set:
        if unicode('reschedule_attendance') in j.keys():
           reschedule_dates = j['reschedule_attendance']
