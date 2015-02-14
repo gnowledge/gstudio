@@ -129,18 +129,18 @@
     <div class="row filter">
       <!-- University -->
       <div class="small-5 large-5 columns">
-        <label for="{{lstFilters.1.name}}">
-          {{lstFilters.1.altnames}}
+        <label>
+          University
         </label>
-        {% html_widget groupid node.pk lstFilters.1 %}
+        <select id="student_belongs_to_university"></select>
       </div>
 
       <!-- College -->
       <div class="small-5 large-5 columns">
-        <label for="{{lstFilters.2.name}}">
-          {{lstFilters.2.altnames}}
+        <label>
+          College
         </label>
-        {% html_widget groupid node.pk lstFilters.2 %}
+        <select id="student_belongs_to_college"></select>
       </div>
 
       <div class="small-2 large-2 columns end">
@@ -166,12 +166,12 @@
     </div>
 
     <!-- Degree Year -->
-    <div class="row filter{% if not lstFilters.3.value %} hide{% endif %}">
+    <div class="row filter{% if not lstFilters.1.value %} hide{% endif %}">
       <div class="small-12 large-10 columns">
-        <label for="{{lstFilters.3.name}}">
-          {{lstFilters.3.altnames}}
+        <label for="{{lstFilters.1.name}}">
+          {{lstFilters.1.altnames}}
         </label>
-        {% html_widget groupid node.pk lstFilters.3 %}
+        {% html_widget groupid node.pk lstFilters.1 %}
       </div>
       <div class="small-5 large-2 columns end button-margin-top">
         <input type="button" value="Delete" class="button small expand deleteFilter"/>
@@ -493,6 +493,8 @@
         ajax_request_data['groupid'] = "{{groupid}}"
         ajax_request_data['app_id'] = "{{app_id}}"
         ajax_request_data['app_set_id'] = "{{app_set_id}}"
+        ajax_request_data['student_belongs_to_university'] = $("select#student_belongs_to_university").val()
+        ajax_request_data['student_belongs_to_college'] = $("select#student_belongs_to_college").val()
         ajax_request_data['reg_year'] = $("#datepicker_year").val() 
 
         // Iterate rows with class set as 'filter' and class not set as 'hide'
@@ -527,10 +529,17 @@
               groupid_val = data["groupid"];
               app_id_val = data["app_id"];
               app_set_id_val = data["app_set_id"];
-
+              var caption_college = ""
+              var caption_university = ""
               filename = data["filename"];
-              university = data["university"];
-              college = data["college"];
+              if (data.hasOwnProperty("university")){
+                university = data["university"];
+                caption_university = '<h4>' + university + '</h4>';
+              }
+              if (data.hasOwnProperty("college")){
+                college = data["college"];
+                caption_college = '<h3>' + college + '</h3>';
+              }
               students_count = data["students_count"];
               column_headers = data["column_headers"];
               students_data_set = data["students_data_set"];
@@ -550,8 +559,8 @@
                 // Define table
                 student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
                   '<caption>' +
-                    '<h3>' + college + '</h3>' +
-                    '<h4>' + university + '</h4>' +
+                    caption_college +
+                    caption_university +
                     '<h6>Total No. of Students Registered: <b>' + students_count + '</b></h6>' +
                     '<a href="' + download_link + '" download="">' +
                       '<span class="fi-download large">&nbsp;&nbsp;&nbsp;Download Students\' data (CSV)</span>' +
@@ -599,6 +608,7 @@
 
 {% block document_ready %}
   {{block.super}}
+
     var currentYear = (new Date()).getFullYear()
     lowerYearLimit = currentYear - 5;
 
@@ -628,42 +638,55 @@
         }
       });
 
-  // If university selected, then trigger 'change' event for respective university-widget
-    university_widget = $("select#student_belongs_to_university");
-    is_selected = university_widget.find(":selected").index();
-
-    if (is_selected) {
-      university_widget.trigger("change");
-    }
-    else {
-      // Disable College field, later on will be enabled after a university is selected
-      $("select#student_belongs_to_college").attr('disabled', 'disabled')
-    }
-
-  // Select and then Disable College & University when visiting respective college group
-    var college_name_str = "{{group_name_tag|safe}}";
-    var university_name_str = ""
-    
-    $("#student_belongs_to_college option").each(function(){
-      // If college-name matches with that of college-name, 
-      // then select that college from drop-down and disable it
-      if (college_name_str.trim() == $(this).text().trim()) {
-        $(this).attr("selected", true);
-        $(this).parent().attr("disabled", "disabled");
+    $("select#student_belongs_to_university").empty();
+      $("select#student_belongs_to_university").append(
+        $("<option></option>")
+          .attr("value", "")
+          .text("{% trans ' - - - Select University - - - ' %}")
+      );
+      
+    //Update the Univ and college dropdown list
+    var univ_data = {{ univ_list|safe }}
+    $.each(univ_data, function(i,v){
+      $("select#student_belongs_to_university").append(
+        $("<option></option>")
+          .attr("value", v['_id'])
+          .text(v['name'])
+      );
+    });
+    {% if group_name_tag != "MIS_admin" %}
+      // Select and then Disable College & University when visiting respective college group
         
+        var college_name_str = "{{group_name_tag|safe}}";
+        var university_name_str = ""
+        //check if univ exists
         {% get_university group_name_tag as university_name %}
         university_name_str = "{{university_name|safe}}"
         
-        // Retrieve university-name & match with list of university-names from dropdown -
-        $("#student_belongs_to_university option").each(function(){
-          // If university-name matches with that of university-name, 
-          // then select that university from drop-down and disable it
+        $("select#student_belongs_to_university option").each(function(){
           if (university_name_str.trim() == $(this).text().trim()) {
             $(this).attr("selected", true);
             $(this).parent().attr("disabled", "disabled");
           }
         });
-      }
-    });
+        
+      // If university selected, then trigger 'change' event for respective university-widget
+        university_widget = $("select#student_belongs_to_university");
+        is_selected = university_widget.find(":selected").index();
+
+        if (is_selected) {
+          university_widget.trigger("change");
+        }
+        else {
+          // Disable College field, later on will be enabled after a university is selected
+          $("select#student_belongs_to_college").attr('disabled', 'disabled')
+        }
+        $("select#student_belongs_to_college option").each(function(){
+          if (college_name_str.trim() == $(this).text().trim()) {
+            $(this).attr("selected", true);
+            //$(this).parent().attr("disabled", "disabled");
+          }
+        });
+      {% endif %}    
 {% endblock %}
 
