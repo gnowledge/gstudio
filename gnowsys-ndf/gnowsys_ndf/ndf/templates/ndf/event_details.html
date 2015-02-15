@@ -263,11 +263,9 @@ table, th, td {
  
                  </div> <!-- End of class="content active" -->
 
-<<<<<<< HEAD
-                 <div id="myModal" class="small reveal-modal" animation="None" data-reveal style = "">
-=======
+
                  <div id="myModal" class="small reveal-modal" animation="None" data-reveal >
->>>>>>> 2381a08d9d8c9db3e0c5e197cbfa25c1e6cf6955
+
                    <fieldset> 
                           <div class = "row">
                             <div class="small-6 columns">
@@ -806,25 +804,27 @@ function reschedule_time(type)
     }
     else
     {
-          reschedule_till_overlay(type);       
-    }
+           $('#reschedule_save').empty()
+           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+           $('#reschedulemodal').foundation('reveal', 'open');
+     }
 }
 
 function reschedule_till_overlay(type)
  {
-      if ( $('.sessiontype:checked').val() == 'Attendance'   ||  '{{event_reschedule_check}}' != 'False' )
+      if ( $('.sessiontype:checked').val() == 'Attendance')
       {
-         $('#rescheduleoption').foundation('reveal', 'close');
-         var event_type = ""
-         event_type  = String(type) 
-         $('#reschedule_save').empty()
-          $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
-          $('#reschedulemodal').foundation('reveal', 'open');
+           $('#rescheduleoption').foundation('reveal', 'close');
+           var event_type = ""
+           event_type  = String(type) 
+           $('#reschedule_save').empty()
+           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+           $('#reschedulemodal').foundation('reveal', 'open');
       }
-      else
+      if ( $('.sessiontype:checked').val() == 'Assessment' )
        {
-          reschedule_event(type)
-       }    
+           reschedule_event(type)
+       }   
 }
 
 function reschedule_event(type)
