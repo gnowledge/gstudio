@@ -263,11 +263,9 @@ table, th, td {
  
                  </div> <!-- End of class="content active" -->
 
-<<<<<<< HEAD
-                 <div id="myModal" class="small reveal-modal" animation="None" data-reveal style = "">
-=======
+
                  <div id="myModal" class="small reveal-modal" animation="None" data-reveal >
->>>>>>> 2381a08d9d8c9db3e0c5e197cbfa25c1e6cf6955
+
                    <fieldset> 
                           <div class = "row">
                             <div class="small-6 columns">
@@ -324,6 +322,38 @@ table, th, td {
                       <a class="close-reveal-modal">&#215;</a>      
                     </fieldset> 
                  </div>                
+                 <div id = "rescheduleoption" class="small reveal-modal" animation="None" data-reveal>
+                   <fieldset> 
+                          
+                          
+                          <div class = "row" aling="center">
+                                <label> <h5> Please select what you want to reschedule <h5> </label>
+                                <br>
+
+                                <form>
+                                    <div class = "small-5 columns ">  
+                                      Attendance:
+                                      <input type="radio" class = "sessiontype" name = "sessiontype" id="a1" value = "Attendance">
+                                    </div>
+                                    <div class = "small-5 columns ">  
+                                      Assessment:
+                                      <input type="radio" class = "sessiontype" name = "sessiontype" id="a2" value = "Assessment">
+                                    </div>  
+                                </form>    
+                              
+
+                         </div>
+                         <div class = "row">       
+                              <div class = "small-12 columns" id = 'reschedule_check' align= "center">  
+                                 
+                              </div>
+                         </div> 
+                                                     
+
+                      <a class="close-reveal-modal">&#215;</a>      
+                    </fieldset> 
+                 </div>                
+
 
 
                        <div class="content" id="view-Attendance" >    
@@ -764,12 +794,37 @@ else
 function reschedule_time(type)
 {
     var event_type = ""
+    var event_reschedule_check = '{{event_reschedule_check}}'
     event_type  = String(type)
-    $('#reschedule_save').empty()
-    $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
-    $('#reschedulemodal').foundation('reveal', 'open');
-    
+    if (event_reschedule_check == 'False' && event_type == 'attendance_reschedule')
+    {
+        $('#rescheduleoption').foundation('reveal', 'open');
+        $('#reschedule_check').empty()
+        $('#reschedule_check').append( "<input type='button' class='tiny button' onclick = reschedule_till_overlay('" + event_type + "') value='ok'>")
+    }
+    else
+    {
+           $('#reschedule_save').empty()
+           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+           $('#reschedulemodal').foundation('reveal', 'open');
+     }
+}
 
+function reschedule_till_overlay(type)
+ {
+      if ( $('.sessiontype:checked').val() == 'Attendance')
+      {
+           $('#rescheduleoption').foundation('reveal', 'close');
+           var event_type = ""
+           event_type  = String(type) 
+           $('#reschedule_save').empty()
+           $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+           $('#reschedulemodal').foundation('reveal', 'open');
+      }
+      if ( $('.sessiontype:checked').val() == 'Assessment' )
+       {
+           reschedule_event(type)
+       }   
 }
 
 function reschedule_event(type)
@@ -781,6 +836,7 @@ function reschedule_event(type)
         session = pass[1]
      
      }
+     
      $.ajax({
              url:"{% url 'reschedule_task' groupid node.pk  %}",
              type:"POST",
@@ -789,6 +845,7 @@ function reschedule_event(type)
                  session:session,
                  reschedule_type:type,
                  reschedule_date:start_time,
+                 reshedule_choice:$('.sessiontype:checked').val(),
                  csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
              success:function(data)
@@ -802,10 +859,15 @@ function reschedule_event(type)
                     remove_reschedule()
                     location.reload();
                  }
+              else
+                 {
+                      location.reload();
+                 }   
              
-              if ( type != 'event_reschedule') 
+              /*if ( type != 'event_reschedule') 
                   {
-                   controler()
+                   //controler()
+                   location.reload();
                   }
               if (type == 'attendance_reschedule')
               {
@@ -815,7 +877,8 @@ function reschedule_event(type)
                if ( type == 'event_reschedule') 
                   {
                    location.reload();
-                                    }
+                                    } */
+
                  
              }
          }); 
@@ -991,7 +1054,8 @@ if (!(Status_attended))
                       complete:function()
                       {
                           alert(success_data);
-                          controler();
+                          //controler();
+                          location.reload();
                       }
                     });
      }
