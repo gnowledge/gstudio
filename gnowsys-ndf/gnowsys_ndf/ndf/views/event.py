@@ -12,7 +12,10 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
-
+from django.template.loader import render_to_string
+from gnowsys_ndf.notification import models as notification
+from django.contrib.sites.models import Site
+          
 from django_mongokit import get_database
 
 try:
@@ -485,8 +488,54 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
               #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     '''return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))'''
-    if i==( (int(iteration))-1):
-     return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
+    if event_gst.name == u'Classroom Session' or event_gst.name == u'Exam':
+       if i==( (int(iteration))-1):
+          #code to send mail to every one
+          return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
+  
+    else:
+          to_user_list = []
+          event_organizer_str = ""
+          event_coordinator_str = ""
+          for i in event_gs.relation_set:
+             print "the key",i
+             if unicode('event_organised_by') in i.keys():
+                event_organized_by = i['event_organised_by']
+             if unicode('has_attendees') in i.keys():
+                event_attendees = i['has_attendees']
+             if unicode('event_coordinator') in i.keys():
+                event_coordinator = i['event_coordinator'] 
+          event_url = "/"+str(group_id)+"/event/"+str(app_set_id) +"/"+str(event_gs._id)
+          site = Site.objects.get(pk=1)
+          site = site.name.__str__()
+          event_link = "http://" + site + event_url
+          event_organized_by_cur = collection.Node.find({"_id":{'$in':event_organized_by}})
+          event_coordinator_cur = collection.Node.find({"_id":{'$in':event_coordinator}})
+          for i in event_coordinator_cur:
+              event_coordinator_str = event_coordinator_str + i.name + ","
+          for i in event_organized_by_cur:
+              event_organizer_str = event_coordinator_str + i.name + ","     
+          for j in event_attendees:
+                      auth = collection.Node.one({"_id":ObjectId(j)})
+                      user_obj = User.objects.get(id=auth.created_by)
+                      if user_obj not in to_user_list:
+                              to_user_list.append(user_obj)
+                      render_label = render_to_string(
+                            "notification/label.html",
+                            {
+                                "sender": "metaStudio",
+                                "activity": "Event Created",
+                                "conjunction": "-"
+                            })
+          notification.create_notice_type(render_label,"Invitation for Event"+ " " + str(event_gs.name) + "\n Event is organized by "
+                       + str ( event_organizer_str ) + "\n Event will be co-ordinated by " +str (event_coordinator_str) 
+                        + "\n- Please click [[" + event_link + "][here]] to view the details of the event" , "notification")
+          notification.send(to_user_list, render_label, {"from_user":"metaStudio"})
+
+          return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
+  event_attendees = request.POST.getlist('has_attendees','')
+
+  
   event_gs.get_neighbourhood(event_gs.member_of)
   course=[]
   val=False
