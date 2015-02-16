@@ -4562,14 +4562,15 @@ def reschedule_task(request,group_id,node):
  values=[]
  if request.user.id in listing:
     
-    reschedule_attendance=collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
-    marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
+    reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+    marks_entry_completed = collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
+    reshedule_choice = request.POST.get('reshedule_choice','')
     session = request.POST.get('session','')
-    end_time=collection.Node.one({"name":"end_time"})
+    end_time = collection.Node.one({"name":"end_time"})
     from datetime import date,time,timedelta
-    date1=datetime.date.today() + timedelta(2)
-    ti=datetime.time(0,0)
+    date1 = datetime.date.today() + timedelta(2)
+    ti = datetime.time(0,0)
     event_start_time = ""
     start_time = request.POST.get('reschedule_date','')
     b = parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
@@ -4591,9 +4592,12 @@ def reschedule_task(request,group_id,node):
                  if unicode("start_time") in i.keys():
                       event_start_time = i["start_time"]  
          if task_id:
-                 task_node = collection.Node.find({"_id":ObjectId(task_id["Task"])})
-                 task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
-                 create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
+     	     for i in task_id:
+          	   if unicode('Task') == i:
+             	     tid = task_id['Task']
+             	     task_node = collection.Node.find({"_id":ObjectId(tid)})
+             	     task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+             	     create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
          task_id['Reschedule_Task'] = True
          create_gattribute(ObjectId(node),reschedule_event,task_id)
@@ -4603,21 +4607,30 @@ def reschedule_task(request,group_id,node):
          return_message = "Event Dates Re-Schedule Opened" 
 
     else:
+        event_details = ""
         for i in event_node.attribute_set:
             if unicode('reschedule_attendance') in i.keys():
                 if unicode ('reschedule_dates') in i['reschedule_attendance']:
                     reschedule_dates = i['reschedule_attendance']['reschedule_dates']
+            if unicode('marks_entry_completed') in i.keys():
+                    event_details = i['marks_entry_completed']
             if unicode("event_attendance_task") in i.keys():
               task_id = i["event_attendance_task"]
-            if unicode("start_time") in i.keys():
-                      event_start_time = i["start_time"]  
-        if task_id:
-                task_node = collection.Node.find({"_id":ObjectId(task_id['Task'])})
-                task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
-                create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))
+              
 
-        reschedule_dates.append(event_start_time)
-        create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
+        
+        if task_id:
+            for i in task_id:
+            	if unicode('Task') == i:
+                 tid = task_id['Task']
+                 task_node = collection.Node.find({"_id":ObjectId(tid)})
+                 task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+                 create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))
+                 break
+
+        reschedule_dates.append(datetime.datetime.today())
+        if event_details != False or reshedule_choice == "Attendance" :         
+        	create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
         if session != str(1):
           create_gattribute(ObjectId(node),marks_entry_completed[0],True)
         task_id['Reschedule_Task'] = True
@@ -4713,14 +4726,16 @@ def event_assginee(request, group_id, app_set_instance_id=None):
       if(a['Presence'] == 'True'):
           attendedlist.append(a['Name'])
 
+ if attendancesession != str(1):
+   create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],True)
  if assessmentdone == 'True':
      event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
      create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
-     if attendancesession != str(1):
-	 create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
+     create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
+ 
  reschedule_dates={}
  
- if attendancedone == 'True':
+ if attendancedone == 'True' or assessmentdone == 'True':
     for j in event_node.attribute_set:
        if unicode('reschedule_attendance') in j.keys():
           reschedule_dates = j['reschedule_attendance']
