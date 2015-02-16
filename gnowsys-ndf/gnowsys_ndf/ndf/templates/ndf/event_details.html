@@ -516,6 +516,9 @@ function saveTime()
             alert("session time should be exactly same as previouse alloted time")
          }     
 }
+
+
+
 function disableAttendance()
 {
     $(':checkbox.chkbx').each(function () 
@@ -573,8 +576,9 @@ column4="<th> Assessment Marks </th>"
        column2_data="<td> " + val.presence + "</td >"
        column3_data="<td class='Assigntxtbx'> " + val.Assignment_marks + "</td >"
        column4_data= "<td class='Assesstxtbx'> "  + val.Assessment_marks + "</td > " 
-       column3data="<td><input type='number' onblur='validate_txtbx(this)'  class='Assigntxtbx' id="+val.id+"Assignment" + " value= "+ val.Assignment_marks + " </td>"
-       column4data="<td> <input type='number' onblur='validate_txtbx(this)'  class='Assesstxtbx' id="+val.id+"Assessment" +" value= "+ val.Assessment_marks + " </td>"  
+       column3data="<td><input type='number'   class='Assigntxtbx input_text_only' id="+val.id+"Assignment" + " value= "+ val.Assignment_marks + " </td>"
+       column4data="<td> <input type='number'  onblur='validate_txtbx(this)'  class='Assesstxtbx input_text_only' id="+val.id+"Assessment" +" value= "+ val.Assessment_marks + " </td>"
+       execute();  
      if(pass[1] == 1)
       {
         column3data = " " 
@@ -590,12 +594,15 @@ column4="<th> Assessment Marks </th>"
       {
        column3_data=""
        column3data=""
+       
       }
       if (pass[1] == 3 )
       {
        column4_data=""
        column4data=""
-      }     
+       
+      }   
+
 if ( pass[0] == 'Edit'){
                      if(val.presence == 'Absent')
                               {
@@ -989,7 +996,20 @@ $(".date_month_day_year").datetimepicker({
         $(this).datetimepicker('option', 'defaultDate', new Date(year, (month-1), day));
         $(this).datetimepicker('setDate', new Date(year, (month-1), day));
       }
-    });  
-
-
+    });
+function execute(){
+$(".input_text_only").keydown(function (e) {
+            // Allow ctrl+A
+        if ((e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right, down, up and //Allow delete, backspace, tab
+                (e.keyCode >= 35 && e.keyCode <= 40) || e.keyCode==46 || e.keyCode==8 || e.keyCode==9) {
+                     // let it happen, don't do anything
+                     return;
+            }
+       // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }        
+      });
+}
 {% endblock %}	
