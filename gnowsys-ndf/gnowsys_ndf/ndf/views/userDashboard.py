@@ -124,7 +124,8 @@ def uDashboard(request, group_id):
                 # submitDoc(request, group_id)
                 #save_file(each,title,userid,group_object._id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                 field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
-                profile_pic_image = collection.Node.one({'_type': "File", '_id': ObjectId(field_value)})
+                if field_value:
+                    profile_pic_image = collection.Node.one({'_type': "File", '_id': ObjectId(field_value)})
                 # Create new grelation and append it to that along with given user
                 if profile_pic_image:
                     gr_node = create_grelation(auth._id, has_profile_pic, profile_pic_image._id)
