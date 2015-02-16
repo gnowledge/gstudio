@@ -68,6 +68,7 @@ college_dict = {}
 attr_type_dict = {}
 rel_type_dict = {}
 create_student_enrollment_code = False
+node_repeated = False
 
 class Command(BaseCommand):
     help = "Based on "
@@ -224,6 +225,8 @@ def parse_data_create_gsystem(json_file_path):
 
     for i, json_document in enumerate(json_documents_list):
         try:
+            global node_repeated
+            node_repeated = False
             n_name = ""
             if "first name" in json_document:
                 n_name = json_document["first name"] + " "
@@ -503,12 +506,13 @@ def parse_data_create_gsystem(json_file_path):
                                     break
 
                 # Create enrollment code (Only for Student)
-                if create_student_enrollment_code:
+                if create_student_enrollment_code and not node_repeated:
                     enrollment_code_at = collection.Node.one({
                         "_type": "AttributeType", "name": "enrollment_code"
                     })
 
                     node_exist = collection.Node.one({"_id": node._id, "attribute_set.enrollment_code": {"$exists": True}})
+
                     if not node_exist:
                         # It means enrollment_code is not set for given student node
                         # Then set it
@@ -550,6 +554,23 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
         dob = json_document["date of birth"]
         if dob:
             query.update({"attribute_set.dob": datetime.datetime.strptime(dob, "%d/%m/%Y")})
+
+    if "contact number (mobile)" in json_document:
+        mobile_number = json_document["contact number (mobile)"]
+        if mobile_number:
+            query.update({"attribute_set.mobile_number": long(mobile_number)})
+
+    if "degree name / highest degree" in json_document:
+        degree_name = json_document["degree name / highest degree"]
+        if degree_name:
+            query.update({"attribute_set.degree_name": degree_name})
+
+    if "year of study" in json_document:
+        degree_year = json_document["year of study"]
+        if degree_year:
+            query.update({"attribute_set.degree_year": degree_year})
+
+    print "\n query: ", query, "\n"
 
     node = collection.Node.one(query)
 
@@ -700,12 +721,12 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
         # Code for updation
         is_node_changed = False
 
-        global create_student_enrollment_code
-        create_student_enrollment_code = False
+        global node_repeated
+        node_repeated = True
 
         try:
             for key in json_document.iterkeys():
-                if node.has_key(key):
+                if key in node:
                     if type(node[key]) == list:
                         if set(node[key]) != set(json_document[key]):
                             node[key] = json_document[key]
