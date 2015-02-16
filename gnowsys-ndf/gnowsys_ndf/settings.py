@@ -546,7 +546,14 @@ GSTUDIO_RESOURCES_READING_LEVEL = [  ]
 
 GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
 
-GSTUDIO_NROER_MENU = [{"Home":[]}, {"Repository":["Curated Zone", "eLibrary", "eBooks", "eCourses", "Events"]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
+GSTUDIO_NROER_MENU = [{"Repository":[]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
+
+GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eLibrary": "e-library"}, {"eBooks": ""}, {"eCourses": ""}, {"Events": ""} ]
+
+GSTUDIO_NROER_MENU_MAPPINGS = {
+            "States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
+            "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
+            }
 
 try:
     from local_settings import *

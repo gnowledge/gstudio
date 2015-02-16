@@ -23,8 +23,11 @@
       <a class="close-reveal-modal"> &#215;</a>
     </div>
 
+
     {% if gstaff_access %}
-      <input class="button deleteObjects" type="button" value="Delete">
+      {% comment %}
+      <!-- <input class="button deleteObjects" type="button" value="Delete"> -->
+      {% endcomment %}
     {% endif %}
     
     <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
@@ -36,38 +39,51 @@
 
     </form>
   {% endif %}
-
+  <br><br><br>
   {% if nodes.count %}
   <table >
     <thead>
       <tr>
           <th width="20"> <input class="checkedAll" type="checkbox" ></th>
           <th>Title</th>
+          <th>Status</th>
+          <th></th>
 
-          {% if gstaff_access %}
-          <th>Edit</th>
-          {% endif %}
       </tr>
     </thead>
     
     <tbody>
       {% for each in nodes %}
         <tr>
-      
-          <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox" class="chkbx"> </td>
+         
+         <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox" class="chkbx"> </td>
           <td style="font-size:14px;">
             <a href="{% url 'event_app_instance_detail' groupid  app_set_id each.pk %}">{{each.name|title}}</a>
           </td>
-          
-          {% if gstaff_access %}
-          <!-- Show below Edit buttons only to GStaff members -->
-           <td>
-              <a href="{% url 'event_app_instance_edit' groupid app_set_id each.pk %}" style="font-size:14px;" class="button tiny">{% trans "Edit" %}</a>
+          <td style="font-size:14px;">
+            {%  if each.attribute_set.3.event_status  == 'Completed' %}
+             <svg height="20" width="25">
+                   <rect width="15" height="15" stroke="black" stroke-width="0" fill="#006600" />
+             </svg>
+            {% endif %}
+            {%  if each.attribute_set.3.event_status  == 'Scheduled' %}
+             <svg height="20" width="25">
+                   <rect width = "15" height = "15" stroke="black" stroke-width="0" fill="#00CED1" />
+             </svg>
+             
+            {% endif %}
+            {%  if each.attribute_set.3.event_status  == 'Rescheduled' %}
+             <svg height="20" width="25">
+                   <rect width = "15" height = "15" stroke="black" stroke-width="0" fill="#ffff66" />
+             </svg>
+            {% endif %}
+            {%  if each.attribute_set.3.event_status  == 'Incomplete' %}
+             <svg height="20" width="25">
+                   <rect width = "15" height = "15" stroke="black" stroke-width="0" fill="#ff3232" />
+             </svg>
+            {% endif %}
+              
           </td>
-          
-          
-          <!-- endif of GStaff members -->
-          {% endif %}
         </tr>
 
       {% endfor %}

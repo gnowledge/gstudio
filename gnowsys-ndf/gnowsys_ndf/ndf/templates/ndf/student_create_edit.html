@@ -9,7 +9,7 @@
     <header class="row" style="margin: 1rem 0 0 0 ;">
       <h2 class="small-12 columns">
         {% if node %}
-        {% trans "Editing" %} {{title}}: {{node.name}}
+        {% trans "Editing" %} {{title}}: {{node.name}} ({{node.enrollment_code}})
         {% else %}
         {% trans "Register a " %} {{title}}
         {% endif %}

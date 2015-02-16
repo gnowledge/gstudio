@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
 from gnowsys_ndf.ndf.models import Group
@@ -51,28 +51,24 @@ app=collection.Node.one({'name':u'Group','_type':'GSystemType'})
 #######################################################################################################################################
 
 
-def group(request, group_id, app_id=None):
+def group(request, group_id, app_id=None, agency_type=None):
   """Renders a list of all 'Group-type-GSystems' available within the database.
   """
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    if group_ins:
-      group_id = str(group_ins._id)
-    else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-        group_id = str(auth._id)	
-  else :
-  	pass
+
+  group_name, group_id = get_group_name_id(group_id)
+
+  query_dict = {}
+
+  if (app_id == "agency_type") and (agency_type in GROUP_AGENCY_TYPES):
+    query_dict["agency_type"] = agency_type
+  # print "=========", app_id, agency_type
 
   group_nodes = []
   group_count = 0
   auth = collection.Node.one({'_type': u"Author", 'name': unicode(request.user.username)})
 
   if request.method == "POST":
-    #Page search view
+    # Page search view
     title = gst_group.name
     
     search_field = request.POST['search_field']
@@ -81,6 +77,7 @@ def group(request, group_id, app_id=None):
       # Logged-In View
       cur_groups_user = collection.Node.find({'_type': "Group", 
                                        '_id': {'$nin': [ObjectId(group_id), auth._id]},
+                                       '$and': [query_dict],
                                        '$or': [
                                           {'$and': [
                                             {'name': {'$regex': search_field, '$options': 'i'}},
@@ -118,6 +115,7 @@ def group(request, group_id, app_id=None):
       # Without Log-In View
       cur_public = collection.Node.find({'_type': "Group", 
                                        '_id': {'$nin': [ObjectId(group_id)]},
+                                       '$and': [query_dict],
                                        '$or': [
                                           {'name': {'$regex': search_field, '$options': 'i'}}, 
                                           {'tags': {'$regex':search_field, '$options': 'i'}}
@@ -142,34 +140,45 @@ def group(request, group_id, app_id=None):
                               context_instance=RequestContext(request)
     )
 
-  else:
+  else: # for GET request
+
     if auth:
       # Logged-In View
       cur_groups_user = collection.Node.find({'_type': "Group", 
+                                              '$and': [query_dict],
                                               '_id': {'$nin': [ObjectId(group_id), auth._id]},
                                               'name': {'$nin': ["home"]},
-                                              '$or': [{'created_by': request.user.id}, {'author_set': request.user.id}, {'group_admin': request.user.id}, {'group_type': 'PUBLIC'}]
-                                          }).sort('last_update', -1)
-      if cur_groups_user.count():
-        for group in cur_groups_user:
-          group_nodes.append(group)
+                                              '$or': [
+                                                      {'created_by': request.user.id},
+                                                      {'author_set': request.user.id},
+                                                      {'group_admin': request.user.id},
+                                                      {'group_type': 'PUBLIC'}
+                                                    ]
+                                            }).sort('last_update', -1)
+      # if cur_groups_user.count():
+      #   for group in cur_groups_user:
+      #     group_nodes.append(group)
 
-      group_count = cur_groups_user.count()
+      if cur_groups_user.count():
+        group_nodes = cur_groups_user
+        group_count = cur_groups_user.count()
         
     else:
       # Without Log-In View
       cur_public = collection.Node.find({'_type': "Group", 
                                          '_id': {'$nin': [ObjectId(group_id)]},
+                                         '$and': [query_dict],
                                          'name': {'$nin': ["home"]},
                                          'group_type': "PUBLIC"
                                      }).sort('last_update', -1)
   
+      # if cur_public.count():
+      #   for group in cur_public:
+      #     group_nodes.append(group)
+  
       if cur_public.count():
-        for group in cur_public:
-          group_nodes.append(group)
-      
-      group_count = cur_public.count()
-
+        group_nodes = cur_public
+        group_count = cur_public.count()
     
     return render_to_response("ndf/group.html", 
                               {'group_nodes': group_nodes,
@@ -682,3 +691,35 @@ def create_sub_group(request,group_id):
       return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
   except Exception as e:
       print "Exception in create subgroup "+str(e)
+
+
+def nroer_groups(request, group_id, groups_category):
+
+    group_name, group_id = get_group_name_id(group_id)
+
+    mapping = GSTUDIO_NROER_MENU_MAPPINGS
+
+    # loop over nroer menu except "Repository" 
+    for each_item in GSTUDIO_NROER_MENU[1:]:
+        temp_key_name = each_item.keys()[0]
+        if temp_key_name == groups_category:
+            groups_names_list = each_item.get(groups_category, [])
+
+            # mapping for the text names in list
+            groups_names_list = [mapping.get(i) for i in groups_names_list]
+            break
+
+    group_nodes = collection.Node.find({ '_type': "Group", 
+                                        '_id': {'$nin': [ObjectId(group_id)]},
+                                        'name': {'$nin': ["home"], '$in': groups_names_list},
+                                        'group_type': "PUBLIC"
+                                     })#.sort('last_update', -1)
+
+    group_nodes_count = group_nodes.count() if group_nodes else 0
+
+    return render_to_response("ndf/group.html", 
+                          {'group_nodes': group_nodes,
+                           'group_nodes_count': group_nodes_count,
+                           'groupid': group_id, 'group_id': group_id
+                          }, context_instance=RequestContext(request))
+
