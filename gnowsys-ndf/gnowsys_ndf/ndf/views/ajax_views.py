@@ -4370,7 +4370,14 @@ def save_time(request,group_id,node):
                if unicode('event_edit_reschedule') in i.keys():
                  a = i['event_edit_reschedule']
   a['reschedule_till'] = start_time               
-  create_gattribute(ObjectId(node),reschedule_event,a)    
+  create_gattribute(ObjectId(node),reschedule_event,a)
+  #change the name of the event based on new time
+  if event_node:
+     name = event_node.name
+     name_arr = name.split("--")
+     new_name = unicode(str(name_arr[0]) + "--" + str(name_arr[1]) + "--" + str(start_time))
+     event_node.name = new_name
+     event_node.save() 
   return HttpResponse("Session rescheduled") 
 
 def check_date(request,group_id,node):
@@ -4453,7 +4460,7 @@ def reschedule_task(request,group_id,node):
                  tid = i
                  task_node = collection.Node.find({"_id":ObjectId(task_id["Task"])})
                  task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
-            create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
+                 create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
          reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
          task_id['Reschedule_Task'] = True
          create_gattribute(ObjectId(node),reschedule_event,task_id)
