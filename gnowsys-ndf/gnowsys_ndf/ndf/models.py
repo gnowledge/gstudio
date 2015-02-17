@@ -762,25 +762,6 @@ class Node(DjangoDocument):
 
 
 @connection.register
-class MetaType(Node):
-    """MetaType class: Its members are any of GSystemType, AttributeType,
-    RelationType, ProcessType.  
-
-    It is used to express the NodeTypes that are part of an
-    Application developed using GNOWSYS-Studio. E.g, a GSystemType
-    'Page' or 'File' become applications by expressing them as members
-    of a MetaType, 'GAPP'.
-
-    """
-
-    structure = {
-        'description': basestring,		# Description (name)
-        'parent': ObjectId                      # Foreign key to self 
-    }
-    use_dot_notation = True
-
-
-@connection.register
 class AttributeType(Node):
     '''To define reusable properties that can be set as possible
     attributes to a GSystemType. A set of possible properties defines
@@ -1059,6 +1040,27 @@ class RelationType(Node):
 
         rel_dict[rel_name]["_id"] = rel_type_node._id
         return rel_dict
+
+
+@connection.register
+class MetaType(Node):
+    """MetaType class: Its members are any of GSystemType, AttributeType,
+    RelationType, ProcessType.  
+
+    It is used to express the NodeTypes that are part of an
+    Application developed using GNOWSYS-Studio. E.g, a GSystemType
+    'Page' or 'File' become applications by expressing them as members
+    of a MetaType, 'GAPP'.
+
+    """
+
+    structure = {
+        'description': basestring,    # Description (name)
+        'attribute_type_set': [AttributeType],  # Embed list of Attribute Type Class as Documents
+        'relation_type_set': [RelationType],    # Holds list of Relation Types
+        'parent': ObjectId                      # Foreign key to self 
+    }
+    use_dot_notation = True
 
 
 class ProcessType(Node):
