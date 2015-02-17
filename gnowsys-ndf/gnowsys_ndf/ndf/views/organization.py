@@ -29,6 +29,7 @@ from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
+from gnowsys_ndf.ndf.views.methods import create_college_group_and_setup_data
 
 collection = get_database()[Node.collection_name]
 
@@ -315,96 +316,3 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
   except Exception as e:
     error_message = "\n OrganizationCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
-
-
-def create_college_group_and_setup_data(college_node):
-    """
-    Creates private group for given college; establishes relationship
-    between them via "has_group" RelationType.
-
-    Also populating data into it needed for registrations.
-
-    Arguments:
-    college_node -- College node (or document)
-
-    Returns:
-    College group node
-    GRelation node
-    """
-
-    gfc = None
-    gr_gfc = None
-
-    # [A] Creating group
-    group_gst = collection.Node.one(
-        {'_type': "GSystemType", 'name': "Group"},
-        {'_id': 1}
-    )
-    creator_and_modifier = college_node.created_by
-
-    gfc = collection.Node.one(
-        {'_type': "Group", 'name': college_node.name},
-        {'_id': 1, 'name': 1, 'group_type': 1}
-    )
-
-    if not gfc:
-        gfc = collection.Group()
-        gfc._type = u"Group"
-        gfc.name = college_node.name
-        gfc.altnames = college_node.name
-        gfc.member_of = [group_gst._id]
-        gfc.group_type = u"PRIVATE"
-        gfc.created_by = creator_and_modifier
-        gfc.modified_by = creator_and_modifier
-        gfc.contributors = [creator_and_modifier]
-        gfc.status = u"PUBLISHED"
-        gfc.save()
-
-    if "_id" in gfc:
-        has_group_rt = collection.Node.one(
-            {'_type': "RelationType", 'name': "has_group"}
-        )
-        gr_gfc = create_grelation(college_node._id, has_group_rt, gfc._id)
-
-        # [B] Setting up data into college group
-        if gr_gfc:
-            # List of Types (names) whose data needs to be populated
-            # in college group
-            gst_list = [
-                "Country", "State", "District", "University",
-                "College", "Caste", "NUSSD Course"
-            ]
-
-            gst_cur = collection.Node.find(
-                {'_type': "GSystemType", 'name': {'$in': gst_list}}
-            )
-
-            # List of Types (ObjectIds)
-            gst_list = []
-            for each in gst_cur:
-                gst_list.append(each._id)
-
-            mis_admin = collection.Node.one(
-                {
-                    '_type': "Group",
-                    '$or': [
-                        {'name': {'$regex': u"MIS_admin", '$options': 'i'}},
-                        {'altnames': {'$regex': u"MIS_admin", '$options': 'i'}}
-                    ],
-                    'group_type': "PRIVATE"
-                },
-                {'_id': 1}
-            )
-
-            # Update GSystem node(s) of GSystemType(s) specified in gst_list
-            # Append newly created college group's ObjectId in group_set field
-            collection.update(
-                {
-                    '_type': "GSystem", 'member_of': {'$in': gst_list},
-                    'group_set': mis_admin._id
-                },
-                {'$addToSet': {'group_set': gfc._id}},
-                upsert=False, multi=True
-            )
-
-    return gfc, gr_gfc
