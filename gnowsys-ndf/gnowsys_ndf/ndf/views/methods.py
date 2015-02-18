@@ -1678,6 +1678,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         else:
           # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
           # So change their status from PUBLISHED to DELETED
+          right_subject_id_or_list.remove(n.right_subject)
           n.status = u"DELETED"
           n.save()
           info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
