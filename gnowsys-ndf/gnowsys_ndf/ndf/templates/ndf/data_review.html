@@ -1,13 +1,16 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-{% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
 
 {% block style %}
 
-	.right-border{
-		border-right: 1px solid #dddddd
+	#data-review-table td, th {
+		border-right: solid thin #eee;
+	}
+
+	#data-review-table .right-border{
+		border-right: 1px solid lightgray;
 	}
 
 	.bottom-border > th {
@@ -97,10 +100,10 @@
 	}
 
 	#kbd-tips > i{
-		font-size: 1.5em;
+		font-size: 2em;
 	    position: absolute;
-	    left: -25px;
-	    top: 0.1em;
+	    left: -35px;
+	    top: -10px;
 	}
 
 	#kbd-tips-alert {
@@ -243,7 +246,8 @@
 
 	// setting the height of data review table
 	// $("#data-rev-table-container-div").height(window.innerHeight - ($("nav.top-bar").height()*4) + "px");
-
+	$("select[multiple]:visible").focus(function(){ $(this).css("height", "6em"); });
+	$("select[multiple]:visible").blur(function(){ $(this).css("height", ""); });
 
 	function updateContent()
 	{
@@ -357,13 +361,16 @@
 
 		setCurrNoneToEditRow(oid);
 
-		$("div[data-id='edit-btn-" + oid +"']").fadeOut(0);
+		$("div[data-id='edit-btn-" + oid +"']").fadeOut();
 
 		// processing each element of row
 		for (var i = 0; i < resEditRowArr.length; i++)
 		{
 			resEditRowArr[i].classList.remove("hide-el");
 		};
+
+		// setting focus to first input text box
+		resEditRowArr[1].children[0].focus()
 
 		// setting orgitdown_data_reveal_editor content to content_org of current row object.
 		content_org = $("input[data-content-org-row-id="+oid+"]").attr("data-content-org");
@@ -378,12 +385,12 @@
 		populateTeachesPriorNode(oid, "teaches");
 		populateTeachesPriorNode(oid, "prior_node");
 
+		selectMultiAdjHt();
 	}
 
 
 	function getEditSummary(oid, msg, action)
 	{
-
 		// fetching resource object VIEW row
 		var $resViewRow = $("tr#view-row-" + oid),
 			resViewRowArr = $resViewRow.children();
@@ -393,7 +400,8 @@
 			resEditRowArr = $resEditRow.children();
 
 		// to show details on confirm popup
-		var tempEditedFields = "";
+		var tempEditedFields = "",
+			fieldEditCntr = 0;
 
 		var nodeObj = new Object()
 
@@ -403,6 +411,7 @@
 			// checking if the values in textboxes are changed
 			if(resEditRowArr[i].firstElementChild)
 			{
+				// console.log(resEditRowArr[i].firstElementChild.type)
 				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
 				{
 					var tempEditFieldVal = resEditRowArr[i].firstElementChild.value.trim(),
@@ -410,7 +419,9 @@
 
 					if(tempViewFieldVal != tempEditFieldVal)
 					{
-						tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n(" 
+						++fieldEditCntr;
+
+						tempEditedFields += "\n-------| FIELD "+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n(" 
 						+ tempViewFieldVal + ")\nChanged to:\n(" 
 						+ tempEditFieldVal + ")\n\n";
 					}
@@ -424,7 +435,39 @@
 						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = ""; 
 					}
 				}
-				else if((resEditRowArr[i].firstElementChild.type == "button"))
+				else if( resEditRowArr[i].firstElementChild.type == "select-multiple" )
+				{
+					var tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
+						tempViewFieldValArr = (tempViewFieldVal.length > 0) ? tempViewFieldVal.split(",") : [];
+
+					// trimming the values in the array
+					tempViewFieldValArr.forEach(function(elm, index){ tempViewFieldValArr[index] = elm.trim() })
+
+					// returns array of selected sub items.
+					var tempMultiSelElem = resEditRowArr[i].firstElementChild.selectedOptions,
+						tempMultiSelVals = [];
+
+					for(var v = 0; v < tempMultiSelElem.length; v++)
+					{
+						if(tempMultiSelElem[v].index != 0)
+						{
+							tempMultiSelVals.push( tempMultiSelElem[v].value.trim() );
+						}
+					}
+					// console.log(tempViewFieldValArr);
+					// console.log(tempMultiSelVals)
+
+					// checking if any of the element is not matching with any of the element from other array.
+					if ( !(($(tempViewFieldValArr).not(tempMultiSelVals).length === 0) && ($(tempMultiSelVals).not(tempViewFieldValArr).length === 0)) )
+					{
+						++fieldEditCntr;
+						// console.log("tempEditedFields");
+						tempEditedFields += "\n-------| FIELD "+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n("+ tempViewFieldValArr.toString() + ")\nChanged to:\n("+ tempMultiSelVals.toString() + ")\n\n";
+					}
+
+					nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempMultiSelVals.toString();
+				}
+				else if( resEditRowArr[i].firstElementChild.type == "button" )
 				{
 					// 'content-org' field
 					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
@@ -433,7 +476,9 @@
 
 						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
 						{
-							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
+							++fieldEditCntr;
+
+							tempEditedFields += "\n-------| FIELD"+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
 						}
 
 						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempContentOrg;
@@ -449,7 +494,9 @@
 
 						if(tempPrevDrawerFields != tempCurrDrawerFields)
 						{
-							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n Element's in right drawer are changed.\n\n";
+							++fieldEditCntr;
+
+							tempEditedFields += "\n-------| FIELD "+String(fieldEditCntr)+": " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n Element's in right drawer are changed.\n\n";
 						}
 
 						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempCurrDrawerFields;
@@ -460,25 +507,25 @@
 			}
 		};
 
-		isFieldEdited = (tempEditedFields.length > 0) ? true: false;
+		isFieldEdited = (fieldEditCntr > 0) ? true: false;
 
 		if(isFieldEdited)
 		{
 			var saveCancelConfirm = "false"
 			
-			saveCancelConfirm = window.confirm("Please Note that following fields are changed:\n\n" + tempEditedFields + msg);
+			saveCancelConfirm = window.confirm("Please Note that following [ " + String(fieldEditCntr) + " ] fields are changed:\n\n" + tempEditedFields + msg);
 			
 			if(saveCancelConfirm)
 			{
 				if(action == "save")
 				{
-					return [true, nodeObj];
+					return [true, nodeObj, fieldEditCntr];
 				}
 				changeSaveCancelToEdit(oid, resEditRowArr);
 			}	
 			else
 			{
-				return [false, nodeObj];
+				return [false, nodeObj, fieldEditCntr];
 			}
 		}
 		else
@@ -527,6 +574,27 @@
 						resViewRowArr[4+i].textContent = status;
 						resEditRowArr[i].firstElementChild.value = status;								
 					}
+				}
+				else if( resEditRowArr[i].firstElementChild.type == "select-multiple" )
+				{
+					// returns array of selected sub items.
+					var tempViewFieldVal = resViewRowArr[4+i].textContent.trim(),
+						tempMultiSelElem = resEditRowArr[i].firstElementChild.selectedOptions,
+						tempMultiSelVals = [];
+
+					for(var v = 0; v < tempMultiSelElem.length; v++)
+					{
+						if(tempMultiSelElem[v].index != 0)
+						{
+							tempMultiSelVals.push( tempMultiSelElem[v].value.trim() );
+						}
+					}
+
+					if(tempViewFieldVal != tempMultiSelVals.toString())
+					{
+						resViewRowArr[4+i].textContent = tempMultiSelVals.toString();
+					}
+
 				}
 				else if((resEditRowArr[i].firstElementChild.type == "button"))
 				{
@@ -696,6 +764,14 @@
 		if (button.is(":visible")) {
 			button[0].click();
 		}
+	}
+
+
+	function selectMultiAdjHt() {
+
+		$("select[multiple]:visible").focus(function(){ $(this).css("height", "6em"); });
+		$("select[multiple]:visible").blur(function(){ $(this).css("height", ""); });
+
 	}
 
 	var $drContainer = $('#data-rev-table-container-div');
