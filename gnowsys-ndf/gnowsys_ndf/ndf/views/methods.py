@@ -1090,10 +1090,62 @@ def update_mobwrite_content_org(node_system):
   return textobj
 
 
+def cast_to_data_type(value, data_type):
+    '''
+    This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
+    '''
+    # print "\n\t\tin method: ", value, " == ", data_type
+
+    value = value.strip()
+    casted_value = value
+
+    if data_type == "unicode":
+        casted_value = unicode(value)
+
+    elif data_type == "basestring":
+        casted_value = str(value)
+
+    elif (data_type == "int") and str(value):
+        casted_value = int(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type == "float") and str(value):
+        casted_value = float(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type == "long") and str(value):
+        casted_value = long(value) if (str.isdigit(str(value))) else value
+
+    elif data_type == "bool" and str(value): # converting unicode to int and then to bool
+        if (str.isdigit(str(value))):
+            casted_value = bool(int(value))
+        elif unicode(value) in [u"True", u"False"]:
+            if (unicode(value) == u"True"):
+                casted_value = True
+            elif (unicode(value) == u"False"):
+                casted_value = False
+
+    elif (data_type == "list") and (not isinstance(value, list)):
+        value = value.replace("\n", "").split(",")
+        
+        # check for complex list type like: [int] or [unicode]
+        if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
+            casted_value = [data_type[0](i.strip()) for i in value if i]
+
+        else:  # otherwise normal list
+            casted_value = [i.strip() for i in value if i]
+
+    elif data_type == "datetime.datetime":
+        # "value" should be in following example format
+        # In [10]: datetime.datetime.strptime( "11/12/2014", "%d/%m/%Y")
+        # Out[10]: datetime.datetime(2014, 12, 11, 0, 0)
+        casted_value = datetime.datetime.strptime(value, "%d/%m/%Y")
+        
+    return casted_value
+
+
 def get_node_metadata(request, node, **kwargs):
     '''
     Getting list of updated GSystems with kwargs arguments.
-    Pass is_changed=True as last/fourth argument while calling this/get_node_metadata method.
+    Pass is_changed=True as last/third argument while calling this/get_node_metadata method.
     Example: 
       updated_ga_nodes = get_node_metadata(request, node_obj, GST_FILE_OBJ, is_changed=True)
 
@@ -1112,10 +1164,12 @@ def get_node_metadata(request, node, **kwargs):
 
         for atname in attribute_type_list:
 
-            field_value = unicode(request.POST.get(atname, ""))
-            at = collection.Node.one({"_type": "AttributeType", "name": atname})	
+            field_value = request.POST.get(atname, "")
+            at = collection.Node.one({"_type": "AttributeType", "name": atname})  
 
-            if at and field_value:
+            if at:
+
+                field_value = cast_to_data_type(field_value, at["data_type"])
 
                 if kwargs.has_key("is_changed"):
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
