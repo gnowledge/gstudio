@@ -422,6 +422,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
         # print " ", field_set["name"]
 
         # * Fetch only Attribute field(s) / Relation field(s)
+        print "getting some thing****"
         if field_set.has_key('_id'):
           field_instance = collection.Node.one({'_id': field_set['_id']})
           field_instance_type = type(field_instance)
@@ -501,23 +502,26 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
           to_user_list = []
           event_organizer_str = ""
           event_coordinator_str = ""
-          for i in event_gs.relation_set:
+          event_organized_by = []
+          event_coordinator = []
+          event_node = collection.Node.one({'_id':ObjectId(event_gs._id)})
+          for i in event_node.relation_set:
              if unicode('event_organised_by') in i.keys():
                 event_organized_by = i['event_organised_by']
              if unicode('has_attendees') in i.keys():
                 event_attendees = i['has_attendees']
              if unicode('event_coordinator') in i.keys():
                 event_coordinator = i['event_coordinator'] 
-          event_url = "/"+str(group_id)+"/event/"+str(app_set_id) +"/"+str(event_gs._id)
+          event_url = "/"+str(group_id)+"/event/"+str(app_set_id) +"/"+str(event_node._id)
           site = Site.objects.get(pk=1)
           site = site.name.__str__()
           event_link = "http://" + site + event_url
           event_organized_by_cur = collection.Node.find({"_id":{'$in':event_organized_by}})
           event_coordinator_cur = collection.Node.find({"_id":{'$in':event_coordinator}})
           for i in event_coordinator_cur:
-              event_coordinator_str = event_coordinator_str + i.name + ","
+              event_coordinator_str = event_coordinator_str + i.name + "  "
           for i in event_organized_by_cur:
-              event_organizer_str = event_coordinator_str + i.name + ","     
+              event_organizer_str = event_coordinator_str + i.name + "  "     
           for j in event_attendees:
                       auth = collection.Node.one({"_id":ObjectId(j)})
                       user_obj = User.objects.get(id=auth.created_by)
@@ -530,12 +534,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                                 "activity": "Event Created",
                                 "conjunction": "-"
                             })
-          notification.create_notice_type(render_label,"Invitation for Event"+ " " + str(event_gs.name) + "\n Event is organized by "
-                       + str ( event_organizer_str ) + "\n Event will be co-ordinated by " +str (event_coordinator_str) 
+          if event_organized_by:
+             msg_string = "\n Event is organized by " + str ( event_organizer_str ) 
+          else:
+             msg_string = "" 
+          notification.create_notice_type(render_label,"Invitation for Event"+ " " + str(event_node.name) + msg_string   + "\n Event will be co-ordinated by " +str (event_coordinator_str) 
                         + "\n- Please click [[" + event_link + "][here]] to view the details of the event" , "notification")
           notification.send(to_user_list, render_label, {"from_user":"metaStudio"})
 
-          return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_gs._id}))
+          return HttpResponseRedirect(reverse('event_app_instance_detail', kwargs={'group_id': group_id,"app_set_id":app_set_id,"app_set_instance_id":event_node._id}))
   event_attendees = request.POST.getlist('has_attendees','')
 
   
