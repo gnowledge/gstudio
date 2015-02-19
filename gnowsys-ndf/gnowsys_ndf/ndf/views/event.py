@@ -126,7 +126,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   app_collection_set = []
   title = ""
   marks_enter= ""
-   
+  session_node = "" 
   event_gst = None
   event_gs = None
   reschedule = True
@@ -188,6 +188,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       nodes = collection.Node.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
       
   node = None
+  event_reschedule_check = False
   marks_list=[]
   Assesslist=[]
   batch=[]
@@ -217,6 +218,8 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
             
        if(unicode('event_date_task')) in i.keys():
            event_task_date_reschedule = i['event_date_task']['Reschedule_Task']     
+       if(unicode('marks_entry_completed')) in i.keys():    
+           event_reschedule_check = i['marks_entry_completed'] 
                 
     for i in node.relation_set:
        if unicode('event_has_batch') in i.keys():
@@ -259,6 +262,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         'reschedule'    : reschedule, 
                         'task_date' : event_task_date_reschedule,
                         'task_attendance' : event_task_Attendance_reschedule,
+                        'event_reschedule_check' :event_reschedule_check,
                         'Eventtype':Eventtype, 
                          # 'property_order_list': property_order_list
                       }

@@ -22,7 +22,7 @@ from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_college_group_and_setup_data
 from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
 
 ####################################################################################################################
@@ -68,6 +68,9 @@ college_dict = {}
 attr_type_dict = {}
 rel_type_dict = {}
 create_student_enrollment_code = False
+create_private_college_group = False
+node_repeated = False
+
 
 class Command(BaseCommand):
     help = "Based on "
@@ -93,11 +96,18 @@ class Command(BaseCommand):
                     if gsystem_type_name == u"Student":
                         global create_student_enrollment_code
                         create_student_enrollment_code = True
+                    elif gsystem_type_name == u"College":
+                        global create_private_college_group
+                        create_private_college_group = True
 
-                    gsystem_type_node = collection.Node.one({'_type': "GSystemType",
-                                                             '$or': [{'name': {'$regex': "^"+gsystem_type_name+"$", '$options': 'i'}}, 
-                                                                     {'altnames': {'$regex': "^"+gsystem_type_name+"$", '$options': 'i'}}]
-                                                         })
+                    gsystem_type_node = collection.Node.one({
+                        "_type": "GSystemType",
+                        "$or": [{
+                            "name": {"$regex": "^"+gsystem_type_name+"$", '$options': 'i'}
+                        }, {
+                            "altnames": {"$regex": "^"+gsystem_type_name+"$", '$options': 'i'}
+                        }]
+                    })
 
                     if gsystem_type_node:
                         gsystem_type_id = gsystem_type_node._id
@@ -224,6 +234,8 @@ def parse_data_create_gsystem(json_file_path):
 
     for i, json_document in enumerate(json_documents_list):
         try:
+            global node_repeated
+            node_repeated = False
             n_name = ""
             if "first name" in json_document:
                 n_name = json_document["first name"] + " "
@@ -503,7 +515,7 @@ def parse_data_create_gsystem(json_file_path):
                                     break
 
                 # Create enrollment code (Only for Student)
-                if create_student_enrollment_code:
+                if create_student_enrollment_code and not node_repeated:
                     enrollment_code_at = collection.Node.one({
                         "_type": "AttributeType", "name": "enrollment_code"
                     })
@@ -528,6 +540,18 @@ def parse_data_create_gsystem(json_file_path):
                             error_message = "\n StudentEnrollmentCreateError: " + str(e) + "!!!"
                             log_list.append(error_message)
 
+                elif create_private_college_group:
+                    # Create a private group for respective college node
+                    node_exist = collection.Node.one({"_id": node._id, "relation_set.has_group": {"$exists": True}})
+                    if not node_exist:
+                        try:
+                            info_message = "\n Creating private group for given college (" + node.name + ") via RelationType (has_group)...\n"
+                            log_list.append(info_message)
+                            college_group, college_group_gr = create_college_group_and_setup_data(node)
+                        except Exception as e:
+                            error_message = "\n CollegeGroupCreateError: " + str(e) + "!!!"
+                            log_list.append(error_message)
+
         except Exception as e:
             error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
             log_list.append(error_message)
@@ -540,16 +564,35 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
     """
     node = None
 
-    query = {'_type': "GSystem",
-                '$or': [{'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}},
-                        {'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}],
-                'member_of': gsystem_type_id
+    query = {
+        "_type": "GSystem",
+        '$or': [{
+            'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}
+        }, {
+            'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}
+        }],
+        'member_of': gsystem_type_id
     }
 
     if "date of birth" in json_document:
         dob = json_document["date of birth"]
         if dob:
             query.update({"attribute_set.dob": datetime.datetime.strptime(dob, "%d/%m/%Y")})
+
+    if "contact number (mobile)" in json_document:
+        mobile_number = json_document["contact number (mobile)"]
+        if mobile_number:
+            query.update({"attribute_set.mobile_number": long(mobile_number)})
+
+    if "degree name / highest degree" in json_document:
+        degree_name = json_document["degree name / highest degree"]
+        if degree_name:
+            query.update({"attribute_set.degree_name": degree_name})
+
+    if "year of study" in json_document:
+        degree_year = json_document["year of study"]
+        if degree_year:
+            query.update({"attribute_set.degree_year": degree_year})
 
     node = collection.Node.one(query)
 
@@ -700,12 +743,12 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
         # Code for updation
         is_node_changed = False
 
-        global create_student_enrollment_code
-        create_student_enrollment_code = False
+        global node_repeated
+        node_repeated = True
 
         try:
             for key in json_document.iterkeys():
-                if node.has_key(key):
+                if key in node:
                     if type(node[key]) == list:
                         if set(node[key]) != set(json_document[key]):
                             node[key] = json_document[key]
