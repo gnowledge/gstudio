@@ -502,7 +502,6 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
           event_organizer_str = ""
           event_coordinator_str = ""
           for i in event_gs.relation_set:
-             print "the key",i
              if unicode('event_organised_by') in i.keys():
                 event_organized_by = i['event_organised_by']
              if unicode('has_attendees') in i.keys():
