@@ -425,6 +425,8 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 			
 			result_paginated_cur = files
 			result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+
+		filter_result = "True" if (files.count() > 0) else "False"
 				
 		# if filetype == "all":
 		#     if files:
@@ -531,7 +533,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		#     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
 		
-		return render_to_response ("ndf/file_list_tab.html", {
+		return render_to_response ("ndf/file_list_tab.html", { "filter_result": filter_result,
 				"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
 				'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
 				"resource_type": result_paginated_cur, "detail_urlname": "file_detail", 
