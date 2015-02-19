@@ -349,18 +349,22 @@
               <!-- add GSTUDIO_SITE_NAME = "nroer" in the local_settings.py file, to check locally -->
               {% if site_name == "nroer" %} 
               
-              <!-- NROER level-two menu -->
-                <ul class="button-group nroer-menu">
-                  {% for each_gapp in nroer_menu.gapps %}
-                    {% for k, v in each_gapp.items %}
-                      <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
-                        <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
-                          {{k}}
-                        </a>
-                      </li>
+                {% if group_name_tag == "home" %}
+                <!-- NROER level-two menu -->
+                  <ul class="button-group nroer-menu">
+                    {% for each_gapp in nroer_menu.gapps %}
+                      {% for k, v in each_gapp.items %}
+                        <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
+                          <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
+                            {{k}}
+                          </a>
+                        </li>
+                      {% endfor %}
                     {% endfor %}
-                  {% endfor %}
-                </ul>
+                  </ul>
+                {% else %}
+                  {% get_gapps_iconbar request groupid %}
+                {% endif %}
               <!-- END of NROER level two menu -->
 
               {% else %}
