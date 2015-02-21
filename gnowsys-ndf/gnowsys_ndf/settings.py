@@ -3,8 +3,8 @@ from django.conf import global_settings
 #from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
-DEBUG = True
-# ALLOWED_HOSTS = ["127.0.0.1"]
+DEBUG = False
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
