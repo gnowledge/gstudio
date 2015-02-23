@@ -1927,7 +1927,7 @@ def str_to_dict(str1):
 	                              if user:
 	                                dict_format[k] = user.get_username()
               else: 
-                      if v != []:
+                      if v:
                       		  if User.objects.filter(id = userid).exists():
 	                              user = User.objects.get(id = v)
 	                              if user:
