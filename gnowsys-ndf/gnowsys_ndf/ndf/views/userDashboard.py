@@ -464,7 +464,7 @@ def group_dashboard(request, group_id):
 
         if sce_cur.count():
             approval = True
-            enrollment_columns = ["College", "Course", "Completed On", "Status", "Enrolled", "Remaining", "Approved", "Rejected"]
+            enrollment_columns = ["College", "Course", "Status", "Enrolled", "Remaining", "Approved", "Rejected"]
             for sce_gs in sce_cur:
                 sce_gs.get_neighbourhood(sce_gs.member_of)
                 data = {}
