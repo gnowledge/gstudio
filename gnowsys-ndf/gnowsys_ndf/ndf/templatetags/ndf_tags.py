@@ -1172,7 +1172,8 @@ def get_contents(node_id, selected, choice):
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
 				
 				if selected:
-					if left_obj.attribute_set[4][selected] == choice:
+					if choice in left_obj.attribute_set[4][selected]:
+
 						name = str(left_obj.name)
 						ob_id = str(left_obj._id)
 
