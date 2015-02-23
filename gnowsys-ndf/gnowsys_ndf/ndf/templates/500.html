@@ -1,0 +1,21 @@
+{% extends "error_base.html" %}
+
+{% block error_title %} Internal Server Error {% endblock %}
+
+{% block error_body_text %}
+	<br/>
+	<h2>Sorry, Internal Server Error!</h2>
+
+	<div style="color: gray;">
+	<h4>
+		<br/>
+		<small>
+			Sorry, but the requested page is unavailable due to a server error.
+		<br/>
+			Our developers team have been notified, so check back later.
+		<br/><br/>
+			If you want, head to the &nbsp; <a href="/home/"> <i class="fi-home"> </i> homepage</a>.
+		</small>
+	</h4>
+	</div>
+{% endblock %}

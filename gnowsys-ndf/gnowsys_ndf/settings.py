@@ -355,7 +355,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     #'django.core.context_processors.csrf',
 )
 
-INSTALLED_APPS = (	
+INSTALLED_APPS = (  
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -369,14 +369,14 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
-    # 'gnowsys_ndf.mobwrite',	#textb
-#    'south',			#textb
-    # 'django_extensions',	#textb
-    # 'reversion',		#textb
-    # 'django.contrib.flatpages',	#textb
+    # 'gnowsys_ndf.mobwrite',   #textb
+#    'south',           #textb
+    # 'django_extensions',  #textb
+    # 'reversion',      #textb
+    # 'django.contrib.flatpages',   #textb
     # 'online_status',                       #for online_users     
 #    'endless_pagination',
-	'jsonrpc',
+    'jsonrpc',
     'registration_email',
 )
 
