@@ -679,6 +679,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   nodes = None
   node = None
   property_order_list = []
+  property_order_list_ac = []
   is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
 
   template_prefix = "mis"
@@ -727,32 +728,33 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
     node.get_neighbourhood(node.member_of)
-
+    if title == u"Announced Course":
+        property_order_list_ac = node.attribute_set
 
     #Course structure as list of dicts
-    
     for eachcs in node.collection_set:
       cs_dict = {}
       coll_node_cs = collection.Node.one({'_id':ObjectId(eachcs),'member_of':cs_gst._id},{'name':1,'collection_set':1})
-      cs_dict[coll_node_cs.name]=[]
-      course_collection_list.append(cs_dict)
-      for eachcss in coll_node_cs.collection_set:
-        css_dict = {}
-        coll_node_css = collection.Node.one({'_id':ObjectId(eachcss), 'member_of':css_gst._id},{'name':1,'collection_set':1,'attribute_set':1})
-        css_dict[coll_node_css.name]={}
-        for eachattr in coll_node_css.attribute_set:
-          for eachk,eachv in eachattr.items():
-            if (eachk=="course_structure_minutes"):
-              css_dict[coll_node_css.name]["Minutes"] = eachv
-            elif (eachk=="course_structure_assignment"):
-              css_dict[coll_node_css.name]["Assignment"] = eachv
-            elif (eachk=="course_structure_assessment"):
-              css_dict[coll_node_css.name]["Assessment"] = eachv
-            elif (eachk=="min_marks"):
-              css_dict[coll_node_css.name]["Minimum-marks"] = eachv
-            elif (eachk=="max_marks"):
-              css_dict[coll_node_css.name]["Maximum-marks"] = eachv
-        cs_dict[coll_node_cs.name].append(css_dict)
+      if coll_node_cs:
+          cs_dict[coll_node_cs.name]=[]
+          course_collection_list.append(cs_dict)
+          for eachcss in coll_node_cs.collection_set:
+            css_dict = {}
+            coll_node_css = collection.Node.one({'_id':ObjectId(eachcss), 'member_of':css_gst._id},{'name':1,'collection_set':1,'attribute_set':1})
+            css_dict[coll_node_css.name]={}
+            for eachattr in coll_node_css.attribute_set:
+              for eachk,eachv in eachattr.items():
+                if (eachk=="course_structure_minutes"):
+                  css_dict[coll_node_css.name]["Minutes"] = eachv
+                elif (eachk=="course_structure_assignment"):
+                  css_dict[coll_node_css.name]["Assignment"] = eachv
+                elif (eachk=="course_structure_assessment"):
+                  css_dict[coll_node_css.name]["Assessment"] = eachv
+                elif (eachk=="min_marks"):
+                  css_dict[coll_node_css.name]["Minimum-marks"] = eachv
+                elif (eachk=="max_marks"):
+                  css_dict[coll_node_css.name]["Maximum-marks"] = eachv
+            cs_dict[coll_node_cs.name].append(css_dict)
 
     if course_collection_list:
       course_collection_dict_exists = True
@@ -767,6 +769,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         'course_collection_dict_exists':course_collection_dict_exists,
                         'nodes': nodes, 'node': node,
                         'property_order_list': property_order_list,
+                        'property_order_list_ac':property_order_list_ac,
                         'is_link_needed': is_link_needed
                       }
 
