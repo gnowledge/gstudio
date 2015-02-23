@@ -22,7 +22,7 @@ from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_college_group_and_setup_data
 from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
 
 ####################################################################################################################
@@ -68,6 +68,9 @@ college_dict = {}
 attr_type_dict = {}
 rel_type_dict = {}
 create_student_enrollment_code = False
+create_private_college_group = False
+node_repeated = False
+
 
 class Command(BaseCommand):
     help = "Based on "
@@ -93,11 +96,18 @@ class Command(BaseCommand):
                     if gsystem_type_name == u"Student":
                         global create_student_enrollment_code
                         create_student_enrollment_code = True
+                    elif gsystem_type_name == u"College":
+                        global create_private_college_group
+                        create_private_college_group = True
 
-                    gsystem_type_node = collection.Node.one({'_type': "GSystemType",
-                                                             '$or': [{'name': {'$regex': "^"+gsystem_type_name+"$", '$options': 'i'}}, 
-                                                                     {'altnames': {'$regex': "^"+gsystem_type_name+"$", '$options': 'i'}}]
-                                                         })
+                    gsystem_type_node = collection.Node.one({
+                        "_type": "GSystemType",
+                        "$or": [{
+                            "name": {"$regex": "^"+gsystem_type_name+"$", '$options': 'i'}
+                        }, {
+                            "altnames": {"$regex": "^"+gsystem_type_name+"$", '$options': 'i'}
+                        }]
+                    })
 
                     if gsystem_type_node:
                         gsystem_type_id = gsystem_type_node._id
@@ -110,6 +120,8 @@ class Command(BaseCommand):
 
                     if "csv" in file_extension:
                         # Process csv file and convert it to json format at first
+
+                        total_rows = 0
                         info_message = "\n CSVType: Following file (" + file_path + ") found!!!"
                         log_list.append(info_message)
 
@@ -123,7 +135,12 @@ class Command(BaseCommand):
                                 csv_file_content = csv.DictReader(csv_file, delimiter=",")
                                 json_file_content = []
                                 for row in csv_file_content:
+                                    total_rows += 1
                                     json_file_content.append(row)
+
+                                info_message = "\n- File '" + file_name + "' contains : " + str(total_rows) + " entries/rows (excluding top-header/column-names)."
+                                print info_message
+                                log_list.append(str(info_message))
 
                             with open(json_file_path, 'w') as json_file:
                                 json.dump(json_file_content,
@@ -155,15 +172,20 @@ class Command(BaseCommand):
                         info_message = "\n Task initiated: Processing json-file...\n"
                         log_list.append(info_message)
 
+                        t0 = time.time()
                         parse_data_create_gsystem(file_path)
+                        t1 = time.time()
+                        time_diff = t1 - t0
+                        # print time_diff
+                        total_time_minute = round( (time_diff/60), 2) if time_diff else 0
+                        total_time_hour = round( (time_diff/(60*60)), 2) if time_diff else 0
+                        # End of processing json file
+                        info_message = "\n------- Task finised: Successfully processed json-file -------\n"
+                        info_message += "- Total time taken for the processing: \n\n\t" + str(total_time_minute) + " MINUTES\n\t=== OR ===\n\t" + str(total_time_hour) + " HOURS\n"
+                        print info_message
+                        log_list.append(str(info_message))
 
                         # End of processing json file
-
-                        info_message = "\n Task finised: Successfully processed json-file.\n"
-                        log_list.append(info_message)
-
-                        # End of creation of respective GSystems, GAttributes and GRelations for Enrollment
-
                 else:
                     error_message = "\n FileNotFound: Following path (" + file_path + ") doesn't exists!!!\n"
                     log_list.append(error_message)
@@ -224,6 +246,8 @@ def parse_data_create_gsystem(json_file_path):
 
     for i, json_document in enumerate(json_documents_list):
         try:
+            global node_repeated
+            node_repeated = False
             n_name = ""
             if "first name" in json_document:
                 n_name = json_document["first name"] + " "
@@ -444,6 +468,7 @@ def parse_data_create_gsystem(json_file_path):
                                     except Exception as e:
                                         error_message = "\n While creating GRelation (" + rel_key + ") for "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n" + str(e) + "\n"
                                         log_list.append(error_message)
+                                        pass
 
                                     if college_gst._id in relation_type_node.object_type:
                                         # Fetch college node's group id
@@ -503,7 +528,7 @@ def parse_data_create_gsystem(json_file_path):
                                     break
 
                 # Create enrollment code (Only for Student)
-                if create_student_enrollment_code:
+                if create_student_enrollment_code and not node_repeated:
                     enrollment_code_at = collection.Node.one({
                         "_type": "AttributeType", "name": "enrollment_code"
                     })
@@ -528,6 +553,18 @@ def parse_data_create_gsystem(json_file_path):
                             error_message = "\n StudentEnrollmentCreateError: " + str(e) + "!!!"
                             log_list.append(error_message)
 
+                elif create_private_college_group:
+                    # Create a private group for respective college node
+                    node_exist = collection.Node.one({"_id": node._id, "relation_set.has_group": {"$exists": True}})
+                    if not node_exist:
+                        try:
+                            info_message = "\n Creating private group for given college (" + node.name + ") via RelationType (has_group)...\n"
+                            log_list.append(info_message)
+                            college_group, college_group_gr = create_college_group_and_setup_data(node)
+                        except Exception as e:
+                            error_message = "\n CollegeGroupCreateError: " + str(e) + "!!!"
+                            log_list.append(error_message)
+
         except Exception as e:
             error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
             log_list.append(error_message)
@@ -540,16 +577,43 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
     """
     node = None
 
-    query = {'_type': "GSystem",
-                '$or': [{'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}},
-                        {'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}],
-                'member_of': gsystem_type_id
-    }
+    if "(" in json_document['name'] or ")" in json_document['name']:
+        query = {
+            "_type": "GSystem",
+            'name': json_document['name'],
+            'member_of': gsystem_type_id
+        }
+
+    else:
+        query = {
+            "_type": "GSystem",
+            '$or': [{
+                'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}
+            }, {
+                'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}
+            }],
+            'member_of': gsystem_type_id
+        }
 
     if "date of birth" in json_document:
         dob = json_document["date of birth"]
         if dob:
             query.update({"attribute_set.dob": datetime.datetime.strptime(dob, "%d/%m/%Y")})
+
+    if "contact number (mobile)" in json_document:
+        mobile_number = json_document["contact number (mobile)"]
+        if mobile_number:
+            query.update({"attribute_set.mobile_number": long(mobile_number)})
+
+    if "degree name / highest degree" in json_document:
+        degree_name = json_document["degree name / highest degree"]
+        if degree_name:
+            query.update({"attribute_set.degree_name": degree_name})
+
+    if "year of study" in json_document:
+        degree_year = json_document["year of study"]
+        if degree_year:
+            query.update({"attribute_set.degree_year": degree_year})
 
     node = collection.Node.one(query)
 
@@ -700,12 +764,12 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
         # Code for updation
         is_node_changed = False
 
-        global create_student_enrollment_code
-        create_student_enrollment_code = False
+        global node_repeated
+        node_repeated = True
 
         try:
             for key in json_document.iterkeys():
-                if node.has_key(key):
+                if key in node:
                     if type(node[key]) == list:
                         if set(node[key]) != set(json_document[key]):
                             node[key] = json_document[key]
@@ -778,13 +842,22 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
             type_list.append(data)
 
         else:
-            node = collection.Node.one({'_type': type_convert_objectid, 
-                                        '$or': [{'name': {'$regex': "^"+data+"$", '$options': 'i'}}, 
-                                                {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}],
-                                        'group_set': group_id
-                                       }, 
-                                       {'_id': 1}
-                                   )
+            if "(" in data or ")" in data:
+                node = collection.Node.one({'_type': type_convert_objectid, 
+                                            'name': data, 
+                                            'group_set': group_id
+                                           }, 
+                                           {'_id': 1}
+                                       )
+
+            else:
+                node = collection.Node.one({'_type': type_convert_objectid, 
+                                            '$or': [{'name': {'$regex': "^"+data+"$", '$options': 'i'}}, 
+                                                    {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}],
+                                            'group_set': group_id
+                                           }, 
+                                           {'_id': 1}
+                                       )
         
             if node:
                 type_list.append(node._id)

@@ -23,6 +23,15 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Appending attribute_type_set and relation_type_set fields to existing MetaType nodes
+    res = collection.update(
+        {'_type': "MetaType"},
+        {'$set': {'attribute_type_set': [], 'relation_type_set': []}},
+        upsert=False, multi=True
+    )
+    if res['updatedExisting'] and res['nModified']:
+        print "\n Appending attribute_type_set and relation_type_set fields to existing MetaType nodes."
+
     # Renames RelaionType names -- "has_corresponding_task" to "has_current_approval_task"
     res = collection.update(
         {'_type': "RelationType", 'name': u"has_corresponding_task"}, 

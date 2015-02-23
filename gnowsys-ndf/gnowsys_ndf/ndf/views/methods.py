@@ -1090,10 +1090,62 @@ def update_mobwrite_content_org(node_system):
   return textobj
 
 
+def cast_to_data_type(value, data_type):
+    '''
+    This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
+    '''
+    # print "\n\t\tin method: ", value, " == ", data_type
+
+    value = value.strip()
+    casted_value = value
+
+    if data_type == "unicode":
+        casted_value = unicode(value)
+
+    elif data_type == "basestring":
+        casted_value = str(value)
+
+    elif (data_type == "int") and str(value):
+        casted_value = int(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type == "float") and str(value):
+        casted_value = float(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type == "long") and str(value):
+        casted_value = long(value) if (str.isdigit(str(value))) else value
+
+    elif data_type == "bool" and str(value): # converting unicode to int and then to bool
+        if (str.isdigit(str(value))):
+            casted_value = bool(int(value))
+        elif unicode(value) in [u"True", u"False"]:
+            if (unicode(value) == u"True"):
+                casted_value = True
+            elif (unicode(value) == u"False"):
+                casted_value = False
+
+    elif (data_type == "list") and (not isinstance(value, list)):
+        value = value.replace("\n", "").split(",")
+        
+        # check for complex list type like: [int] or [unicode]
+        if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
+            casted_value = [data_type[0](i.strip()) for i in value if i]
+
+        else:  # otherwise normal list
+            casted_value = [i.strip() for i in value if i]
+
+    elif data_type == "datetime.datetime":
+        # "value" should be in following example format
+        # In [10]: datetime.datetime.strptime( "11/12/2014", "%d/%m/%Y")
+        # Out[10]: datetime.datetime(2014, 12, 11, 0, 0)
+        casted_value = datetime.datetime.strptime(value, "%d/%m/%Y")
+        
+    return casted_value
+
+
 def get_node_metadata(request, node, **kwargs):
     '''
     Getting list of updated GSystems with kwargs arguments.
-    Pass is_changed=True as last/fourth argument while calling this/get_node_metadata method.
+    Pass is_changed=True as last/third argument while calling this/get_node_metadata method.
     Example: 
       updated_ga_nodes = get_node_metadata(request, node_obj, GST_FILE_OBJ, is_changed=True)
 
@@ -1112,10 +1164,12 @@ def get_node_metadata(request, node, **kwargs):
 
         for atname in attribute_type_list:
 
-            field_value = unicode(request.POST.get(atname, ""))
-            at = collection.Node.one({"_type": "AttributeType", "name": atname})	
+            field_value = request.POST.get(atname, "")
+            at = collection.Node.one({"_type": "AttributeType", "name": atname})  
 
-            if at and field_value:
+            if at:
+
+                field_value = cast_to_data_type(field_value, at["data_type"])
 
                 if kwargs.has_key("is_changed"):
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)
@@ -1678,6 +1732,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         else:
           # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
           # So change their status from PUBLISHED to DELETED
+          right_subject_id_or_list.remove(n.right_subject)
           n.status = u"DELETED"
           n.save()
           info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
@@ -2519,3 +2574,96 @@ def get_student_enrollment_code(college_id, node_id_to_ignore, registration_date
         return new_student_enrollment_code
     else:
         raise Exception("No college node exists with given college's ObjectId(" + str(college_id) + ") !!!")
+
+
+def create_college_group_and_setup_data(college_node):
+    """
+    Creates private group for given college; establishes relationship
+    between them via "has_group" RelationType.
+
+    Also populating data into it needed for registrations.
+
+    Arguments:
+    college_node -- College node (or document)
+
+    Returns:
+    College group node
+    GRelation node
+    """
+
+    gfc = None
+    gr_gfc = None
+
+    # [A] Creating group
+    group_gst = collection.Node.one(
+        {'_type': "GSystemType", 'name': "Group"},
+        {'_id': 1}
+    )
+    creator_and_modifier = college_node.created_by
+
+    gfc = collection.Node.one(
+        {'_type': "Group", 'name': college_node.name},
+        {'_id': 1, 'name': 1, 'group_type': 1}
+    )
+
+    if not gfc:
+        gfc = collection.Group()
+        gfc._type = u"Group"
+        gfc.name = college_node.name
+        gfc.altnames = college_node.name
+        gfc.member_of = [group_gst._id]
+        gfc.group_type = u"PRIVATE"
+        gfc.created_by = creator_and_modifier
+        gfc.modified_by = creator_and_modifier
+        gfc.contributors = [creator_and_modifier]
+        gfc.status = u"PUBLISHED"
+        gfc.save()
+
+    if "_id" in gfc:
+        has_group_rt = collection.Node.one(
+            {'_type': "RelationType", 'name': "has_group"}
+        )
+        gr_gfc = create_grelation(college_node._id, has_group_rt, gfc._id)
+
+        # [B] Setting up data into college group
+        if gr_gfc:
+            # List of Types (names) whose data needs to be populated
+            # in college group
+            gst_list = [
+                "Country", "State", "District", "University",
+                "College", "Caste", "NUSSD Course"
+            ]
+
+            gst_cur = collection.Node.find(
+                {'_type': "GSystemType", 'name': {'$in': gst_list}}
+            )
+
+            # List of Types (ObjectIds)
+            gst_list = []
+            for each in gst_cur:
+                gst_list.append(each._id)
+
+            mis_admin = collection.Node.one(
+                {
+                    '_type': "Group",
+                    '$or': [
+                        {'name': {'$regex': u"MIS_admin", '$options': 'i'}},
+                        {'altnames': {'$regex': u"MIS_admin", '$options': 'i'}}
+                    ],
+                    'group_type': "PRIVATE"
+                },
+                {'_id': 1}
+            )
+
+            # Update GSystem node(s) of GSystemType(s) specified in gst_list
+            # Append newly created college group's ObjectId in group_set field
+            collection.update(
+                {
+                    '_type': "GSystem", 'member_of': {'$in': gst_list},
+                    'group_set': mis_admin._id
+                },
+                {'$addToSet': {'group_set': gfc._id}},
+                upsert=False, multi=True
+            )
+
+    return gfc, gr_gfc

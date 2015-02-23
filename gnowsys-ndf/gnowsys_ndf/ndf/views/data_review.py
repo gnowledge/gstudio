@@ -194,26 +194,15 @@ def data_review_save(request, group_id):
     '''
 
     userid = request.user.pk
+
     group_name, group_id = get_group_name_id(group_id)
-
-    # # getting group obj from name
-    # group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
-
-    # # checking if passed group_id is group name or group Id
-    # if group_obj and (group_id == group_obj.name):
-    #     group_id = group_obj._id
-  
-    # else:  # passes group_id is _id and not name
-    #     ins_objectid = ObjectId()
-    #     if ins_objectid.is_valid(group_id):
-    #         # retrieve Obj by _id
-    #         group_obj = collection.Node.one({"_id": ObjectId(group_id)})
-    #         if group_obj:
-    #             group_id = group_id       # for clarity
+    group_obj = collection.Node.one({"_id": ObjectId(group_id)})
 
     node_oid = request.POST.get("node_oid", "")
     node_details = request.POST.get("node_details", "")
     node_details = json.loads(node_details)
+
+    # print "node_details : ", node_details
 
     # updating some key names of dictionary as per get_node_common_fields.
     node_details["lan"] = node_details.pop("language")
