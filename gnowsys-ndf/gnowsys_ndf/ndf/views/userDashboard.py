@@ -87,20 +87,21 @@ def uDashboard(request, group_id):
         has_profile_pic_str = "has_profile_pic"
         gridfs = get_database()['fs.files']
         pp = None
-        
+
         if has_profile_pic_str in request.FILES:
             pp = request.FILES[has_profile_pic_str]
             has_profile_pic = collection.Node.one({'_type': "RelationType", 'name': has_profile_pic_str})
-    
+
             # Find md5
             pp_md5 = hashlib.md5(pp.read()).hexdigest()
+            pp.seek(0)
 
             # Check whether this md5 exists in file collection
             gridfs_node = gridfs.one({'md5': pp_md5})
             if gridfs_node:
                 # md5 exists
                 right_subject = gridfs_node["docid"]
-                
+
                 # Check whether already selected
                 is_already_selected = collection.Triple.one(
                     {'subject': auth._id, 'right_subject': right_subject, 'status': u"PUBLISHED"}
@@ -110,14 +111,14 @@ def uDashboard(request, group_id):
                     # Already selected found
                     # Signify already selected
                     is_already_selected = gridfs_node["filename"]
-                
+
                 else:
                     # Already uploaded found
                     # Reset already uploaded as to be selected
                     profile_pic_image = create_grelation(auth._id, has_profile_pic, right_subject)
 
                 profile_pic_image = collection.Node.one({'_type': "File", '_id': right_subject})
-            
+
             else:
                 # Otherwise (md5 doesn't exists)
                 # Upload image

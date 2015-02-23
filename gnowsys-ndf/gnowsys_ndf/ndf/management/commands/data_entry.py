@@ -120,6 +120,8 @@ class Command(BaseCommand):
 
                     if "csv" in file_extension:
                         # Process csv file and convert it to json format at first
+
+                        total_rows = 0
                         info_message = "\n CSVType: Following file (" + file_path + ") found!!!"
                         log_list.append(info_message)
 
@@ -133,7 +135,12 @@ class Command(BaseCommand):
                                 csv_file_content = csv.DictReader(csv_file, delimiter=",")
                                 json_file_content = []
                                 for row in csv_file_content:
+                                    total_rows += 1
                                     json_file_content.append(row)
+
+                                info_message = "\n- File '" + file_name + "' contains : " + str(total_rows) + " entries/rows (excluding top-header/column-names)."
+                                print info_message
+                                log_list.append(str(info_message))
 
                             with open(json_file_path, 'w') as json_file:
                                 json.dump(json_file_content,
@@ -165,15 +172,20 @@ class Command(BaseCommand):
                         info_message = "\n Task initiated: Processing json-file...\n"
                         log_list.append(info_message)
 
+                        t0 = time.time()
                         parse_data_create_gsystem(file_path)
+                        t1 = time.time()
+                        time_diff = t1 - t0
+                        # print time_diff
+                        total_time_minute = round( (time_diff/60), 2) if time_diff else 0
+                        total_time_hour = round( (time_diff/(60*60)), 2) if time_diff else 0
+                        # End of processing json file
+                        info_message = "\n------- Task finised: Successfully processed json-file -------\n"
+                        info_message += "- Total time taken for the processing: \n\n\t" + str(total_time_minute) + " MINUTES\n\t=== OR ===\n\t" + str(total_time_hour) + " HOURS\n"
+                        print info_message
+                        log_list.append(str(info_message))
 
                         # End of processing json file
-
-                        info_message = "\n Task finised: Successfully processed json-file.\n"
-                        log_list.append(info_message)
-
-                        # End of creation of respective GSystems, GAttributes and GRelations for Enrollment
-
                 else:
                     error_message = "\n FileNotFound: Following path (" + file_path + ") doesn't exists!!!\n"
                     log_list.append(error_message)
@@ -456,6 +468,7 @@ def parse_data_create_gsystem(json_file_path):
                                     except Exception as e:
                                         error_message = "\n While creating GRelation (" + rel_key + ") for "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n" + str(e) + "\n"
                                         log_list.append(error_message)
+                                        pass
 
                                     if college_gst._id in relation_type_node.object_type:
                                         # Fetch college node's group id
@@ -564,15 +577,23 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
     """
     node = None
 
-    query = {
-        "_type": "GSystem",
-        '$or': [{
-            'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}
-        }, {
-            'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}
-        }],
-        'member_of': gsystem_type_id
-    }
+    if "(" in json_document['name'] or ")" in json_document['name']:
+        query = {
+            "_type": "GSystem",
+            'name': json_document['name'],
+            'member_of': gsystem_type_id
+        }
+
+    else:
+        query = {
+            "_type": "GSystem",
+            '$or': [{
+                'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}
+            }, {
+                'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}
+            }],
+            'member_of': gsystem_type_id
+        }
 
     if "date of birth" in json_document:
         dob = json_document["date of birth"]
@@ -821,13 +842,22 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
             type_list.append(data)
 
         else:
-            node = collection.Node.one({'_type': type_convert_objectid, 
-                                        '$or': [{'name': {'$regex': "^"+data+"$", '$options': 'i'}}, 
-                                                {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}],
-                                        'group_set': group_id
-                                       }, 
-                                       {'_id': 1}
-                                   )
+            if "(" in data or ")" in data:
+                node = collection.Node.one({'_type': type_convert_objectid, 
+                                            'name': data, 
+                                            'group_set': group_id
+                                           }, 
+                                           {'_id': 1}
+                                       )
+
+            else:
+                node = collection.Node.one({'_type': type_convert_objectid, 
+                                            '$or': [{'name': {'$regex': "^"+data+"$", '$options': 'i'}}, 
+                                                    {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}],
+                                            'group_set': group_id
+                                           }, 
+                                           {'_id': 1}
+                                       )
         
             if node:
                 type_list.append(node._id)
