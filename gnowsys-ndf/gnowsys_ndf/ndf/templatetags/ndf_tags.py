@@ -95,9 +95,9 @@ def get_node(node):
 
 @register.assignment_tag
 def get_schema(node):
-   obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
+   obj=collection.Node.find_one({"_id": ObjectId(node.member_of[0])},{"name":1})
    nam=node.member_of_names_list[0]
-   if(nam=='Page'):
+   if(nam == 'Page'):
         return [1,schema_dict[nam]]
    elif(nam=='File'):
 	if( 'image' in node.mime_type):
@@ -357,10 +357,10 @@ def get_all_replies(parent):
 @register.assignment_tag
 def get_metadata_values():
 
-	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
-				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE, "curricular": GSTUDIO_RESOURCES_CURRICULAR,
+				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, "language": GSTUDIO_RESOURCES_LANGUAGES,
 				"timerequired": GSTUDIO_RESOURCES_TIME_REQUIRED, "audience": GSTUDIO_RESOURCES_AUDIENCE , "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY,
-				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL}
+				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL, "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT}
 
 
 	return metadata
@@ -1171,9 +1171,15 @@ def get_contents(node_id, selected, choice):
 			for attr in list_gattr:
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
 				
-				if selected:
-					if choice in left_obj.attribute_set[4][selected]:
+				if selected and left_obj:
+					if selected == "curricular":
+						attr_dict = {unicode(selected): unicode(choice)}
+					else:
+						attr_dict = {unicode(selected): unicode(choice)}
 
+					# if attr_dict in left_obj.attribute_set or choice == left_obj.language:
+					if attr_dict in left_obj.attribute_set or choice == left_obj.language:
+						
 						name = str(left_obj.name)
 						ob_id = str(left_obj._id)
 
