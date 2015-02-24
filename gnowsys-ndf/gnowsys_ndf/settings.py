@@ -546,16 +546,16 @@ GSTUDIO_RESOURCES_READING_LEVEL = [  ]
 
 GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
 
-<<<<<<< HEAD
+
 GSTUDIO_NROER_MENU = [{"Home":[]}, {"Repository":["Curated Zone", "eLibrary", "eBooks", "eCourses", "Events"]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
-=======
+
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
 
 GSTUDIO_RESOURCES_REPLY_RATING = 2
 
->>>>>>> 0590999a7eb11e68dddbfed20e8fad97de460f98
+
 
 try:
     from local_settings import *
