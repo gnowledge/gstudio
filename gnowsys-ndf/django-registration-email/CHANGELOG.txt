@@ -1,0 +1,84 @@
+=== ongoing ===
+
+=== 0.7.2 ===
+
+- Prepared for Python 3 and fixed email validator import
+
+=== 0.7.1 ===
+
+- Added title block to all templates
+
+=== 0.7 ===
+
+- Added login_remember_me view function
+- Added remember_me field to EmailLoginForm
+
+=== 0.6 ===
+
+- Changed URL settings due to misuse of get_success_url function in
+  django-registration app
+- updated to support django-registration's new class based views
+
+=== 0.5.4 ===
+
+- updated Manifest.in to include missing style sheet
+
+=== 0.5.3 ===
+
+- stripping whitespace from email string in registration form
+
+=== 0.5.2 ===
+
+- Changed deprecated import
+
+=== 0.5.1 ===
+
+- using hashlib instead of deprecated md5 module
+
+=== 0.5 ===
+
+- Added dutch translation
+
+=== 0.4.1 ===
+
+- Fixed a bad <p> tag
+
+=== 0.4 ===
+
+- Added registration_base.html template.
+
+=== 0.3 ===
+
+- making sure to save emails as lower case all the time
+
+=== 0.2.4 ===
+
+- BUGFIX!! Fixed typo in urls.py. Thanks to `DmitryGit` for reporting this!
+
+=== 0.2.3 ===
+
+- Replaced usage of `direct_to_template` with `TemplateView` because the former
+  doesn't exist in Django 1.5 any more.
+
+=== 0.2.2 ===
+
+- made username generation more robust to avoid name clashes
+
+=== 0.2.1 ===
+
+- Added method `generate_username` in `forms.py` so you can re-use it in your
+  own apps.
+
+=== 0.2.0 ===
+
+- Added new settings: REGISTRATION_EMAIL_REGISTER_SUCCESS_URL and
+  REGISTRATION_EMAIL_ACTIVATE_SUCCESS_URL. This allows to override the standard
+  redirect without overriding the urls.py.
+
+=== 0.1.0 ===
+
+- Added URLs for the simple backend of django-registration.
+
+=== 0.0.1 ===
+
+- Initial commit

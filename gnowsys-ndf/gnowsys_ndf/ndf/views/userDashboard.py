@@ -24,8 +24,14 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
+<<<<<<< HEAD
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.settings import META_TYPE,GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
+=======
+from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.views.forum import *
+from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
+>>>>>>> 0590999a7eb11e68dddbfed20e8fad97de460f98
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 #######################################################################################################################################
@@ -42,6 +48,27 @@ ins_objectid  = ObjectId()
 #######################################################################################################################################
 #                                                                     V I E W S   D E F I N E D   F O R   U S E R   D A S H B O A R D
 #######################################################################################################################################
+# getting Forum GSystem's ObjectId
+collection = get_database()[Node.collection_name]
+#a = collection.Node.find({"_type":"GSystem"})
+#a.count()
+
+#forum_count.count()
+#existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(None)]},'status':{'$nin':['HIDDEN']}
+#}).sort('last_update', -1)
+
+#THREAD COUNT
+
+    
+#getting Quiz GSyatem's ObjectId
+#collection = get_database()[Node.collection_name]
+#a = collection.Node.find({"_type":"GSystem"})
+#a.count()
+
+#quiz_count.count()
+    # Forum list view
+   # existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(node_id)]},'status':{'$nin':['HIDDEN']}
+#}).sort('last_update', -1)
 
 
 def userpref(request,group_id):
@@ -138,8 +165,16 @@ def uDashboard(request, group_id):
     dashboard_count.update({'group':group_cur.count()})  
 
     GST_PAGE = collection.Node.one({'_type': "GSystemType", 'name': 'Page'})
-    page_cur = collection.GSystem.find({'member_of': {'$all': [GST_PAGE._id]}, 'created_by':int(ID)})
-    file_cur = collection.Node.find({'_type':  u"File", 'created_by': int(ID) })
+    page_cur = collection.GSystem.find({'member_of': {'$all': [GST_PAGE._id]}, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
+    file_cur = collection.Node.find({'_type':  u"File", 'created_by': int(ID), "status":{"$nin":["HIDDEN"]}})
+    forum_gst = collection.Node.one({"name":"Forum"})
+    forum_count = collection.Node.find({"_type":"GSystem","member_of":forum_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
+    quiz_gst = collection.Node.one({"name":"Quiz"})
+    quiz_count = collection.Node.find({"_type":"GSystem","member_of":quiz_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
+    thread_gst = collection.Node.one({"name":"Twist"})
+    thread_count = collection.Node.find({"_type":"GSystem","member_of":thread_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
+    reply_gst = collection.Node.one({"name":"Reply"})
+    reply_count = collection.Node.find({"_type":"GSystem","member_of":reply_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
 
     for i in group_cur:
         group_list.append(i)
@@ -235,13 +270,19 @@ def uDashboard(request, group_id):
             'usr': current_user, 'username': usrname, 'user_id': ID, 'DOJ': date_of_join, 'author':auth,
             'group_id':group_id, 'groupid':group_id, 'group_name':group_name,
             'already_set': is_already_selected, 'prof_pic_obj': profile_pic_image,
-            'group_count':group_cur.count(), 'page_count':page_cur.count(), 'file_count':file_cur.count(),
+            'group_count':group_cur.count(),'page_count':page_cur.count(),'file_count':file_cur.count(),
             'user_groups':group_list, 'user_task': user_assigned, 'user_activity':user_activity,
-            'user_notification':notification_list,
-            'dashboard_count':dashboard_count
-        },
+            'user_notification':notification_list,'forum_count':forum_count.count(), 'quiz_count':quiz_count.count(), 'thread_count':thread_count.count(),
+            'dashboard_count':dashboard_count,'quiz_create_rate': quiz_count.count() * GSTUDIO_RESOURCES_CREATION_RATING, 
+            'reply_count':reply_count.count(), 'reply_create_rate': reply_count.count() * GSTUDIO_RESOURCES_REPLY_RATING,
+            'forum_create_rate': forum_count.count() * GSTUDIO_RESOURCES_CREATION_RATING, 'page_create_rate': page_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING,
+            'file_create_rate': file_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING, 'thread_create_rate':thread_count.count() * GSTUDIO_RESOURCES_CREATION_RATING,
+            'total_activity_rating': GSTUDIO_RESOURCES_REGISTRATION_RATING + (page_cur.count()  + file_cur.count()  + forum_count.count()  + quiz_count.count()) * GSTUDIO_RESOURCES_CREATION_RATING + (thread_count.count()  + reply_count.count()) * GSTUDIO_RESOURCES_REPLY_RATING
+         },
         context_instance=RequestContext(request)
     )
+       
+   
 
 def user_preferences(request,group_id,auth_id):
     try:
