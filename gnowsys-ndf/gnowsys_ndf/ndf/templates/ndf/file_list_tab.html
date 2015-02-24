@@ -85,10 +85,12 @@
     {% empty %}
       {% if not searching %}
         <div class="row">
-          <div class="small-12 columns">
+          <div class="small-11 small-offset-1 columns">
       
             {% if res_type_name == "collection" %}
               <h5> {% trans "This group doesn't have any collections." %}</h5>
+            {% elif filter_result == "False" %}
+              <h5> {% trans "Sorry, No resources found with selected filters :(" %}</h5>
             {% else %}
               <h5> 
                 {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %}
@@ -103,18 +105,16 @@
   
 </ul>
 
-{% comment %}
-{% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
-{% endcomment %}
-
-
 {% if title == "E-Library" %}
   
   {% include 'ndf/pagination.html' with urlname="elib_paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
 
+  <div class="hide" data-educationaluse-stats='{{ educationaluse_stats }}'></div>
+  
 {% else %}
 
   {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
 
 {% endif %}
+
 

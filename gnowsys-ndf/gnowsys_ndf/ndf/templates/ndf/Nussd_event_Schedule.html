@@ -98,29 +98,29 @@
 
   <fieldset>
     <div class="row" style="margin-top: 0.5rem;">
-       <div class="small-1 columns">
+       <div class="small-2 large-1 columns">
           <label for="{{property_order_list.0.1.9.name}}" class="right inline"> 
                 {{property_order_list.0.1.9.altnames}}
           </label>
        </div>
-       <div class="small-5 columns">
+       <div class="small-4 columns">
                      {% html_widget groupid node.pk property_order_list.0.1.9 %}
        </div>
             
-       <div class="small-2 columns">
+       <div class="small-2   columns">
                  <label  class="right inline">
                     Course Name
                 </label>
         </div>
-        <div class="small-4 columns" align="left">
-                 <select id="nussd_course_name" name="nussd_course_name" required>
+        <div class="small-4 large-5 columns" align="left">
+                 <select id="nussd_course_name" name="nussd_course_name" required  style="float:left; width:80%">
                  </select>
          </div>
     </div>
         <!-- tab for batches -->
         
         <div class= "row">
-            <div class="small-1 columns">
+            <div class="small-2 large-1 columns">
                  <label  class="right inline">
                     Batches</label>
             </div>
@@ -189,25 +189,25 @@
   <div id="Module-session-section">
     <fieldset >
       <div class="row">
-        <div class="small-1 columns">
+        <div class="small-2 large-1 columns">
           <label class="right inline">
             {% trans "Module:" %}
           </lable>
         </div>
     
-        <div class="small-4 columns">
+        <div class="small-4 large-4 columns">
           <select id="Module_of" name="Module_of" style="float:left; width:95%">
           </select>
           <i style="color:red; float:left display:inline">*</i>
         </div>
 
-        <div class="small-1 columns">
+        <div class="small-2  large-2 columns">
           <label class="right inline">
             {% trans "Sessions:" %}
           </label>
         </div>
    
-        <div class="small-4 columns end"> 
+        <div class="small-4 large-4 columns end"> 
           <select id="session_of" name="session_of" style="float:left; width:95%">
           </select>
           <i style="color:red; float:left display:inline">*</i>
@@ -220,16 +220,16 @@
             {{property_order_list.0.1.1.altnames}}
           </label>
         </div>
-        <div class="small-2 columns">
+        <div class="small-2 large-2 columns">
           {% html_widget groupid node.pk property_order_list.0.1.1 %}
         </div>
           
-        <div class="small-1 columns">
+        <div class="small-1 large-1 columns">
           <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
             {{property_order_list.0.1.2.altnames}}
           </label>
         </div>
-        <div class="small-2 columns">
+        <div class="small-2 large-2 columns">
           {% html_widget groupid node.pk property_order_list.0.1.2 %}
         </div>
           
@@ -257,8 +257,8 @@
         </div>
       <div class="session_time">
       </div>
-      <div class="row" style="margin-top: 1em;">
-        <div class="small-2 columns">
+      <div class="row" >
+        <div class="small-2 medium-1 large-1 columns">
           <label class="right inline"> 
             {% trans "Voluntary Teacher" %}
           </label>
@@ -269,7 +269,7 @@
           <i style="color:red; float:left display:inline">*</i>
         </div>
  
-        <div class="small-4 columns end">
+        <div class="small-5 columns end">
           <!-- keept for spacing from left hand side -->        
         </div>
       </div>
@@ -296,6 +296,8 @@
 
 {% block script %}
 $(document).ready(function(){
+$('#start_time').attr('style','float:left; width:95%;')
+$('#end_time').attr('style','float:left; width:95%;')
 datetime()
 document.getElementById('form-edit-node').reset()
 if (!('{{edit_details}}'))
@@ -472,8 +474,8 @@ function  GenerateSplits ()
 
      $("#split" + "_" + last_start_time + ""  ).append("<b>Split no." + last_start_time +"</b>")
      //$("#split" + "_" + last_start_time + ""  ).append("<hr>")
-     $("#split" + "_" + last_start_time + ""  ).append("<div class='small-1 columns' id=" + "split_start_time_label" + "_" + last_start_time+"> </div>")
-     $("#split_start_time_label" + "_" + last_start_time + ""  ).append("Start_time")
+     $("#split" + "_" + last_start_time + ""  ).append("<div class='small-1 columns'  id=" + "split_start_time_label" + "_" + last_start_time+"> </div>")
+     $("#split_start_time_label" + "_" + last_start_time + ""  ).append("<label class='right inline' > Start Time </label>")
      <!-- date time widget append -->
      $("#split" + "_" + last_start_time + ""  ).append("<div class='small-2 columns' id=" + "split_start_time" + "_" + last_start_time+"> </div>")
      
@@ -481,7 +483,7 @@ function  GenerateSplits ()
      
      <!-- split secssion end_time -->
      $("#split" + "_" + last_start_time + ""  ).append("<div class='small-1 columns' id=" + "split_end_time_label" + "_" + last_start_time+"> </div>")
-     $("#split_end_time_label" + "_" + last_start_time + ""  ).append("End_time")
+     $("#split_end_time_label" + "_" + last_start_time + ""  ).append("<label class='right inline' > End Time </label>")
 
      $("#split" + "_" + last_start_time + ""  ).append("<div class='small-2 columns' id=" + "split_end_time" + "_" + last_start_time+"> </div>")
 
@@ -551,7 +553,6 @@ function date_validation(name)
 	           if (total_session_time > 0)
 	            {
 	                GenerateSplits()
-	                $("#iteration").attr('value',last_start_time)
 	                datetime()
 	                
 	            } 
@@ -578,6 +579,7 @@ function date_validation(name)
         }
  append_time()       
  enable_submit()
+ $("#iteration").attr('value',Number(last_start_time) + 1)
 }  
 function set_date(name)
  {
@@ -927,7 +929,7 @@ $("#view").click(function(){
       changeMonth: true,
       dateFormat: 'dd/mm/yy',
       
-      minDate: '0',
+      
       maxDate: '+2m',
       defaultDate: '0',
       hourGrid: 6,

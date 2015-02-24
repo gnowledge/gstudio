@@ -24,7 +24,11 @@
 
 {% if approval_nodes %}
 <table align="center" id="table_data" class="display" cellspacing="0" width="100%">
-    <caption><h4><b>{{enrollment_details.College}}</b></h4><h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5><h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6></caption>
+    <caption>
+      <h4><b>{{enrollment_details.College}}</b></h4>
+      <h5>{% trans "Course Code: " %}<b>{{enrollment_details.Course}}</b></h5>
+      <h6>{% trans "Enrollment Completed On: " %}<b>{{enrollment_details.CompletedOn|date:"d-M-Y"}}</b></h6>
+    </caption>
     <input type="button" class="button tiny select_all_rows" value="Select All" >
     &nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >
     <label id="lbl_displ"></label>

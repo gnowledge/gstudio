@@ -73,7 +73,6 @@
       <ul class="title-area ">
         
         <li class="name">
-          {% get_site_variables as site %}
             <h1>
               <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
             </h1>
@@ -96,26 +95,42 @@
         {% get_nroer_menu request group_name_tag as nroer_menu %}
 
         <ul class="left">
+
           <li>
-            <a href="/home/" {% if nroer_menu.menu_level_one_selected == "Home" %}class="active"{% endif %}> 
-              Home
-            </a>
-          </li>
-          <li>          
-            <a href="{% url 'GAPPS' group_name_tag|default:'home' 'topics' %}" {% if nroer_menu.menu_level_one_selected == "Repository" %}class="active"{% endif %}>
+            <a href="{% url 'GAPPS' 'home' 'topics' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
-          <li>
-            <a href="{% url 'groupchange' 'State Partners' %}" {% if nroer_menu.menu_level_one_selected == "Partners" %}class="active"{% endif %}>
-              Partners
-            </a>
-          </li>
-          <li>
-            <a href="{% url 'groupchange' 'Teachers' %}" {% if nroer_menu.menu_level_one_selected == "Groups" %}class="active"{% endif %}>
-              Groups
-            </a>
-          </li>
+
+          {% for each_menu in nroer_menu.top_menus %}
+            {% for menuk, menuv in each_menu.items %}
+
+            <li class="has-dropdown">
+              <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
+                href="{% url 'nroer_groups' 'home' menuk %}" 
+              > {{menuk}} </a>
+              <ul class="dropdown">
+                {% for each_sub_menu in menuv %}
+                <li>
+                  <a 
+                  {% for mapk, mapv in nroer_menu.mapping.items %}
+                    {% if each_sub_menu == mapk %}
+                      href="{% url 'groupchange' mapv %}"
+                      {% if nroer_menu.sub_menu_selected == mapk %}
+                        class="active" 
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  >{{each_sub_menu}}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+
+            {% endfor %}
+          {% endfor %}
+
         </ul>
         <!-- -END of NROER level one menu -->
       {% else %}
@@ -334,29 +349,24 @@
               <!-- add GSTUDIO_SITE_NAME = "nroer" in the local_settings.py file, to check locally -->
               {% if site_name == "nroer" %} 
               
-              <!-- NROER level-two menu -->
-
-                <ul class="button-group nroer-menu">
-                  {% for each_menu in nroer_menu.selected_gapp_list %}
-                    <li {% if each_menu|lower == nroer_menu.selected_gapp|cut:"-" %}class="active"{% endif %}>
-                      <a class="button"
-                      {% if each_menu in nroer_menu.mapping.groups %}
-                        {% for k, v in nroer_menu.mapping.items %}
-                          {% if k == each_menu %} href="{% url 'groupchange' v %}"{% endif %}
-                        {% endfor %}
-                      {% elif each_menu in nroer_menu.mapping.gapps %}
-                        {% for k, v in nroer_menu.mapping.items %}
-                          {% if k == each_menu %}
-                            href="{% url 'GAPPS' group_name_tag v %}"
-                          {% endif %}
-                        {% endfor %}
-                      {% endif %}
-                      >{{each_menu}}</a>
-                    </li>
-                  {% endfor %}
-                </ul>
-
+                {% if group_name_tag == "home" %}
+                <!-- NROER level-two menu -->
+                  <ul class="button-group nroer-menu">
+                    {% for each_gapp in nroer_menu.gapps %}
+                      {% for k, v in each_gapp.items %}
+                        <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
+                          <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
+                            {{k}}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  {% get_gapps_iconbar request groupid %}
+                {% endif %}
               <!-- END of NROER level two menu -->
+
               {% else %}
                 {% get_gapps_iconbar request groupid %}
               {% endif %}
@@ -463,45 +473,7 @@
   </div>
 </div>
 
-  <footer>
-    <section class="row">
-      <div class="medium-12 columns">
-        <ul class="inline-list">
-          <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
-          {% if user.is_authenticated %}
-          <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
-          <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
-          <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
-          <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
-          <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
-          {% endif %}
-          <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
-        </ul>   
-      </div>
-    </section>
-
-    <div class="medium-2 columns">
-      <p>
-        <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a>
-        <br>
-
-        <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/">
-          <img src="/static/ndf/images/cc-by-sa.png" alt="Creative Commons License" style="border-width:0" src="/static/ndf/images/cc-by-sa.png"/>
-          <small>
-            <span>
-              {% trans "All material is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License unless mentioned otherwise." %}
-            </span>
-          </small>
-        </a>
-      </p>
-    </div>
-
-    <div class="medium-10 columns">
-      <strong>{% trans "Powered by" %} <a href="https://github.com/gnowledge/gstudio" target="_blank">{% trans "Gnowsys-Studio" %}</a> {% trans "at the" %} <a href="http://www.hbcse.tifr.res.in/" target="_blank">{% trans "Homi Bhabha Centre for Science Education" %}</a>, <a href="http://www.tifr.res.in/" target="_blank">{% trans "TIFR" %}</a>.</strong>
-
-      <!--{{site.ORG_NAME |safe }}-->
-    </div>
-  </footer>
+  {% include "ndf/footer.html" with site=site %}
 
   <!-- JS -->
   <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> 
@@ -604,15 +576,23 @@
 
     // start of document.ready()
       $(document).ready(function(){
-        $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
-              
-        {% block document_ready %} {% endblock %}
+  
+        try{
 
-        // function defined in app.js to check the font and load it asynchronously.
-        checkOpenSansFont();
+          $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);
+                
+          {% block document_ready %} {% endblock %}
+
+        }
+        finally{
+          // function defined in app.js to check the font and load it asynchronously.
+          checkOpenSansFont();
+        }
+
       });
 
     {% block script %} {% endblock %} 
+
   </script>
 </body>
 

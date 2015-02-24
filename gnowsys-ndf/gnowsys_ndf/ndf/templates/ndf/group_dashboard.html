@@ -5,10 +5,11 @@
 
 {% block head %}
   {{block.super}}
-
   {% if approval %}
+    <!-- DataTables -->
     <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
     <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+    <!-- DataTables CSS -->
     <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
   {% endif %}
 {% endblock %}
@@ -62,6 +63,23 @@
   .tiny.button {
     font-size: 1em !important;
   }
+
+  div.reveal-modal > label {
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .selected{
+    background-color: #D5D3D3 !important;
+  }
+
+  #lbl_displ {
+    color: #0b8a91;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
 {% endblock %}
 
 {% block meta_content %}
@@ -112,142 +130,163 @@
 {% endblock %}
 
 {% block body_content %}
-<div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
-  <label id="alertModalLabel"></label>
-  <a class="close-reveal-modal">&#215;</a>
-</div>
-
-<!-- Banner Div -->
-
-<!-- as per nroer specs, it doesn't want banner picture. So checking -->
-{% get_site_name_from_settings as site_name %}
-{% if site_name != "nroer" %}
-
-<form id ="frmBanner" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
-  {% csrf_token %}
-  <div id="group_dashboard_Banner" style="height:300px; width:1150px; background-color: #b0e1df;">
-    
-    {% if banner_pic %}
-      {% get_grid_fs_object banner_pic as grid_fs_obj %}
-      <img alt="Profile picture for this group." src="{% url 'read_file' group_id banner_pic.pk grid_fs_obj.filename %}"
-      style="height:300px; width:1150px; position:absolute; z-index:auto;">
-      {% else %}
-        <img src="/static/ndf/images/metastudio-site-banner.png" alt="Banner picture for this group." width="100%" style="background-color:white; border:solid 1px darkgray;">
-    {% endif %}   
-
-    <div class="row">
-      <div class="row" style="margin-top:80px; margin-left:20px; background: transparent;position:absolute z-index:1"  align="Left">
-        <input type="file" name="has_Banner_pic" id="docFile" accept="image/*" class="hide"/>
-        <input type="hidden" name="type" value="banner_pic">           
-        <input type="hidden" name="user" value="{{usr}}">         
-        <p id="message" style="display:none">
-          {% trans "Please wait for uploading profile picture" %}
-        </p>
-      </div> 
-    </div>
-  </div>
-  <div class="height-div" style="height:5px">
-    <!-- this div is used for spaceing between the button Add phot button and profile picture area -->
-  </div>
-    
-  {% comment %}
-  {% if request.user.is_authenticated %}
-    <div style="position:relative;">
-      <div style="float:left;">
-        <a style="border-style:solid; border-width:1.5px; padding:3px 5px; border-radius:4px" id="btnUploadBannerPic" >  
-        Add a Banner Photo 
-        </a>
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <label id="alertModalLabel"></label>
+    <div class="row approval_modal hide">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
       </div>
-      <div>
-        <input type="submit" id="submitpostid" value="Save" style="font-size:15px;"  />
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
       </div>
     </div>
-    {% endif %}
-  {% endcomment %}
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
 
-</form>  
+  <!-- Banner Div -->
 
-{% endif %}
-<!-- end of checking for banner in nroer menu -->
+  <!-- as per nroer specs, it doesn't want banner picture. So checking -->
+  {% get_site_name_from_settings as site_name %}
+  {% if site_name != "nroer" %}
 
-<nav class="row" style="margin-top: 2em;">
-  <dl class="tabs small-12 columns" data-tab data-options="deep_linking:false">
-    {% if approval %}
-    <dd class="active" title="Enrollment Approval Details">
-      <a href="#panel_enrollment_approval_details">
-        {% trans "Approval" %}
-      </a>
-    </dd>
-    {% endif %}
-    
-    <dd class="{% if not approval %}active{% endif %}" >
-      <a onclick="loaddata()" href="#status" name="Status">Activity</a>
-    </dd>
-    
-    <dd>
-      <a href="#view-scheduler-calendar" name="Calendar">Calendar</a>
-    </dd>
-  </dl>
-</nav>
-
-<div id="group_dashboard_details" class="tabs-content" style="padding: 0px 5px; width:1150px;">
-  {% if approval %}
-  <!-- Tab: Enrollment Approval Details -->
-  <div class="active content row" id="panel_enrollment_approval_details">
-    <dl class="accordion" data-accordion>
-      <!-- Enrollment Details -->
-      <dd class="accordion-navigation">
-        <a href="#enrollment_accordion">{% trans "Enrollment Details" %}</a>
-        <div id="enrollment_accordion" class="content active">
-          {% if enrollment_details %}
-          <table>
-            <thead>
-              <th class="width_s_no counter">{% trans "S. #" %}</th>
-              {% for each_column in enrollment_columns %}
-              <th class="width_{{each_column}}">{{each_column}}</th>
-              {% endfor %}
-            </thead>
-
-            <tbody>
-              {% for each in enrollment_details %}
-              <tr id="{{each|get_dict_item:'_id'}}">
-                <td class="counter">{{forloop.counter}}.</td>
-                {% for each_key in enrollment_columns %}
-                <td class="width_{{each_key}}">
-                  <a href="#" class="detail-view {{each_key}}">
-                    {{each|get_dict_item:each_key}}
-                  </a>
-                </td>
-                {% endfor %}
-              </tr>
-              {% endfor %}
-            </tbody>  
-          </table>
+    <form id ="frmBanner" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
+      {% csrf_token %}
+      <div id="group_dashboard_Banner" style="height:300px; width:1150px; background-color: #b0e1df;">
+        
+        {% if banner_pic %}
+          {% get_grid_fs_object banner_pic as grid_fs_obj %}
+          <img alt="Profile picture for this group." src="{% url 'read_file' group_id banner_pic.pk grid_fs_obj.filename %}"
+          style="height:300px; width:1150px; position:absolute; z-index:auto;">
           {% else %}
-          <h4>Nothing there to be approved!!</h4>
-          {% endif %}
-        </div>
-      </dd>
+            <img src="/static/ndf/images/metastudio-site-banner.png" alt="Banner picture for this group." width="100%" style="background-color:white; border:solid 1px darkgray;">
+        {% endif %}   
 
-      {% if enrollment_details %}
-      <!-- Approval Details -->
-      <dd class="accordion-navigation">
-        <a href="#approval_accordion">{% trans "Approval Details" %}</a>
-        <div id="approval_accordion" class="content">
+        <div class="row">
+          <div class="row" style="margin-top:80px; margin-left:20px; background: transparent;position:absolute z-index:1"  align="Left">
+            <input type="file" name="has_Banner_pic" id="docFile" accept="image/*" class="hide"/>
+            <input type="hidden" name="type" value="banner_pic">           
+            <input type="hidden" name="user" value="{{usr}}">         
+            <p id="message" style="display:none">
+              {% trans "Please wait for uploading profile picture" %}
+            </p>
+          </div> 
         </div>
+      </div>
+      <div class="height-div" style="height:5px">
+        <!-- this div is used for spaceing between the button Add phot button and profile picture area -->
+      </div>
+        
+      {% comment %}
+      {% if request.user.is_authenticated %}
+        <div style="position:relative;">
+          <div style="float:left;">
+            <a style="border-style:solid; border-width:1.5px; padding:3px 5px; border-radius:4px" id="btnUploadBannerPic" >  
+            Add a Banner Photo 
+            </a>
+          </div>
+          <div>
+            <input type="submit" id="submitpostid" value="Save" style="font-size:15px;"  />
+          </div>
+        </div>
+        {% endif %}
+      {% endcomment %}
+    </form>  
+
+  {% endif %}
+  <!-- end of checking for banner in nroer menu -->
+
+  <nav class="row" style="margin-top: 2em;">
+    <dl class="tabs small-12 columns" data-tab data-options="deep_linking:false">
+      <input type="hidden" id="enrollment_id">
+      <input type="hidden" id="course_id" >
+
+      {% if approval %}
+
+      <dd class="active" title="Enrollment Approval Details">
+        <a href="#panel_enrollment_approval_details">
+          {% trans "Approval" %}
+        </a>
       </dd>
       {% endif %}
+      
+      <dd class="{% if not approval %}active{% endif %}" >
+        <a onclick="loaddata()" href="#status" name="Status">Activity</a>
+      </dd>
+      
+      <dd>
+        <a href="#view-scheduler-calendar" name="Calendar">Calendar</a>
+      </dd>
     </dl>
-  </div>
-  {% endif %}
+  </nav>
 
-  <div class="content row {% if not approval %}active {% endif %}" id="status" align="center">
-  </div>
+  <div id="group_dashboard_details" class="tabs-content" style="padding: 0px 5px; width:1150px;">
+    {% if approval %}
+    <!-- Tab: Enrollment Approval Details -->
+    <div class="active content row" id="panel_enrollment_approval_details">
+      <dl class="accordion" data-accordion>
+        <!-- Enrollment Details -->
+        <dd class="accordion-navigation">
+          <a href="#enrollment_accordion">{% trans "Enrollment Details" %}</a>
+          <div id="enrollment_accordion" class="content active">
+            {% if enrollment_details %}
+            <table>
+              <thead>
+                <th class="width_s_no counter">{% trans "S. #" %}</th>
+                {% for each_column in enrollment_columns %}
+                <th class="width_{{each_column}}">{{each_column}}</th>
+                {% endfor %}
+              </thead>
 
-  <div class="content row" id="view-scheduler-calendar">
-    {% include "ndf/scheduler_calender.html"  %}
+              <tbody>
+                {% for each in enrollment_details %}
+                <tr id="{{each|get_dict_item:'_id'}}">
+                  <td class="counter">{{forloop.counter}}.</td>
+                  {% for each_key in enrollment_columns %}
+                  <td class="width_{{each_key}}">
+                    <a href="#" class="detail-view {{each_key}}">
+                      {{each|get_dict_item:each_key}}
+                    </a>
+                  </td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>  
+            </table>
+            {% else %}
+            <h4>Nothing there to be approved!!</h4>
+            {% endif %}
+          </div>
+        </dd>
+
+        {% if enrollment_details %}
+        <!-- Approval Details -->
+        <dd class="accordion-navigation">
+          <a href="#approval_accordion">{% trans "Approval Details" %}</a>
+          <div id="approval_accordion" class="content">
+          <div id="approval_table">
+            
+          </div>
+            <div class="row hide" id="approval_buttons">
+                <div class="medium-2 columns">
+                    <input type="button" class="button small radius expand btnApproval" id="btnApp_id" value="Approve" disabled="disabled">
+                </div>
+                <div class="medium-2 columns end">
+                    <input type="button" class="button small radius expand btnApproval"  id="btnRej_id" value="Reject" disabled="disabled">
+                </div>
+            </div>
+          </div>
+        </dd>
+        {% endif %}
+      </dl>
+    </div>
+    {% endif %}
+
+    <div class="content row {% if not approval %}active {% endif %}" id="status" align="center">
+    </div>
+    <div class="content row" id="view-scheduler-calendar">
+      {% include "ndf/scheduler_calender.html"  %}
+    </div>
   </div>
-</div>
 {% endblock %}
 
 {% block script %}
@@ -291,7 +330,6 @@
       
         success:function(data){
           if(String(data)) {
-            // alert(data)
             $("#status").append(data);
             counter = counter+1;
           }
@@ -400,51 +438,230 @@
     }
   });
 
-// ================================================================
+  // Detail view
+    $(".detail-view").click(function(event) {
+      event.preventDefault();
+      enrollment_id = $(this).closest("tr").attr("id");
 
-$(".detail-view").click(function(event) {
-  event.preventDefault();
+      approval_data_review = "";
+      nesc=""
+      success_state = false;
+      $.ajax({
+        url: "{% url 'get_students_for_approval' groupid %}",
 
-  enrollment_id = $(this).closest("tr").attr("id");
+        data: {
+          'enrollment_id': enrollment_id,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
 
-  approval_data_review = "";
-  success_state = false;
-  $.ajax({
-    url: "{% url 'get_students_for_approval' groupid %}",
+        type: "POST",
 
-    data: {
-      'enrollment_id': enrollment_id,
-      'csrfmiddlewaretoken': "{{csrf_token}}"
-    },
+        dataType: "json",
 
-    type: "POST",
+        success: function(data) {
+          success_state = data["success"];
+          approval_data_review = data["student_approval_data"];
+          if (success_state) {
+            $("#enrollment_id").val(data["enrollment_details"]["pk"])
+            $("#course_id").val(data["enrollment_details"]["CourseId"])
 
-    dataType: "json",
+            if(approval_data_review.length >0){
 
-    success: function(data) {
-      success_state = data["success"];
+              column_headers = data["column_headers"];
+              dataTable_columns_set = [];
 
-      if (success_state) {
-        approval_data_review = data["approval_data_review"];
-      }
+              // Define table
+              student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_app_data_table">' +
+              '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
+              '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
+              '<label id="lbl_displ"></label>' +
+              '</table>';
+              $("#approval_table").html(student_data_table); 
+              $("#approval_buttons").removeClass("hide")
+              // Prepare title & data headers used in dataTable
+              $.each(column_headers, function(index, v) {
+                d = {};
+                d["data"] = v[0];
+                d["title"] = v[1];
+                dataTable_columns_set.push(d);
+              });
 
-      else {
-        $("#alertModalLabel").text(data["message"]);
-        $("#alertModal").removeClass("success").removeClass("warning");
-        $("#alertModal").addClass("alert");
+              // Set defintion dataTable
+              sce_dt_var = $("#student_app_data_table").dataTable({
+                "data": approval_data_review,
+                "columns": dataTable_columns_set,
+                "createdRow": function ( row, data, index ) {
+                  $(row).attr("id", data["_id"]);
+                }
+              });
+            }
+            else {
+              nesc = "<p class='text-center'><b>  Students have been approved" + "</b></p>"
+              $("#approval_table").html(nesc); 
+              $("#approval_buttons").addClass("hide")
+            }
+          }
+
+          else {
+            $("#alertModalLabel").text(data["message"]);
+            $("#alertModal").removeClass("success").removeClass("warning");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+          }
+        },
+
+        complete: function() {
+          if (success_state) {
+            $("#enrollment_accordion").removeClass("active");
+            $("#approval_accordion").addClass("active");
+          }
+        },
+      });
+    })
+
+  // approval table tr click functions
+    $(document).on( 'click', '#student_app_data_table tbody tr', function () {
+      $(this).toggleClass('selected');
+      $("#lbl_displ").text("")
+      $(".btnApproval").removeAttr("disabled")
+    } );
+
+  //On click of select All, highlight all rows
+    $(document).on('click','.select_all_rows',function(){
+      $(sce_dt_var.fnGetNodes()).addClass('selected');
+      $("#lbl_displ").text("All " + $(sce_dt_var.fnGetNodes()).length + " rows are selected")
+      $(".btnApproval").removeAttr("disabled")
+    });
+
+  //On click of De-Select All, remove highlight from all rows
+    $(document).on('click','.deselect_all_rows',function(){
+      $("#lbl_displ").text("All rows are de-selected")
+      $(sce_dt_var.fnGetNodes()).removeClass("selected");
+      $(".btnApproval").attr("disabled",true)
+    });
+
+  // On click of Approve/Reject
+    var is_approve_confirm = false;
+    var is_reject_confirm = false;
+    var approval_state;
+
+    $(document).on("click", ".btnApproval", function() {
+      approval_state = $(this).val();
+      if ( !is_approve_confirm && !is_reject_confirm) {
+        if(approval_state == "Approve"){
+          $("#alertModalLabel").text("Do you want to continue approving the selected students?");
+        }
+        else if(approval_state == "Reject"){
+          $("#alertModalLabel").text("Do you want to continue rejecting the selected stuffdents?");
+        }
+        $("#alertModal")
+          .removeClass("medium").addClass("small")
+          .addClass("alert")
+          .find("div.approval_modal").removeClass("hide")
         $("#alertModal").foundation('reveal', 'open');
+        return false;
       }
-    },
+      students_selected = []
+      sce_dt_var.$("tr.selected").each(function() {
+        students_selected.push($(this).attr("id"));
+      });
+      if (students_selected.length > 0) {
+        enrollment_id = $("#enrollment_id").val();
+        course_id = $("#course_id").val();
 
-    complete: function() {
-      if (success_state) {
-        $("#approval_accordion").empty().html(approval_data_review);
-        $("#enrollment_accordion").removeClass("active");
-        $("#approval_accordion").addClass("active");
+        success_state = false
+        approved = ""
+        rejected = ""
+        remaining = ""
+        task_status = ""
+        $.ajax({
+          url: "{% url 'approve_students' groupid %}",
+
+          data: {
+            'approval_state': approval_state,
+            'enrollment_id': enrollment_id,
+            'course_id': course_id,
+            'students_selected': students_selected,
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data) {
+            success_state = data["success"];
+            if (success_state) {
+              approved = data["approved"];
+              rejected = data["rejected"];
+              remaining = data["remaining"];
+              task_status = data["task_status"];
+            }
+
+            else {
+              $("#alertModalLabel").text(data["message"]);
+              $("#alertModal").removeClass("success").removeClass("warning");
+              $("#alertModal").addClass("alert");
+              $("#alertModal").foundation('reveal', 'open');
+            }
+          },
+
+          complete: function() {
+            if (success_state) {
+              $("#"+enrollment_id).find(".Approved").text(approved);
+              $("#"+enrollment_id).find(".Rejected").text(rejected);
+              $("#"+enrollment_id).find(".Remaining").text(remaining);
+              $("#"+enrollment_id).find(".Status").text(task_status);
+
+              $("#approval_table").html("");
+              $("#approval_buttons").addClass("hide")
+              $("#approval_accordion").removeClass("active");
+              $("#enrollment_accordion").addClass("active");
+              is_reject_confirm = false;
+              is_approve_confirm = false;
+            }
+          },
+        });
       }
-    },
-  });
-})
+    });
+
+    //Approval/Rejection confirmation
+    $(document).on("click", "#btnConfirmYes", function() {
+      if(approval_state == "Approve"){
+        is_approve_confirm = true;
+        is_reject_confirm = false;
+        $("#alertModal").foundation('reveal', 'close');
+        $("#btnApp_id").trigger("click");
+      }
+      else if(approval_state == "Reject"){
+        is_reject_confirm = true;
+        is_approve_confirm = false;
+        $("#alertModal").foundation('reveal', 'close');
+        $("#btnRej_id").trigger("click");
+      }
+    });
+
+    $(document).on("click", "#btnConfirmNo", function() {
+      if(approval_state == "Approve"){
+        is_approve_confirm = false;
+        is_reject_confirm = false;
+      }
+      else if(approval_state == "Reject"){
+        is_reject_confirm = false;
+        is_approve_confirm = false;
+      }
+      $("#alertModal").foundation('reveal', 'close');
+    });
+
+
+  // Reset reveal-modal content & it's setting
+    $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+      $("#alertModalLabel").text("");
+      $("#alertModal")
+        .removeClass("success").removeClass("warning").removeClass("alert").removeClass("small")
+        .addClass("medium")
+        .find("div.approval_modal").addClass("hide")
+    });
 
 {% endblock %}
 
@@ -452,4 +669,5 @@ $(".detail-view").click(function(event) {
   {{block.super}}
 
   loaddata();
+
 {% endblock %}

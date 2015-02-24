@@ -60,9 +60,10 @@ def getvideoThumbnail(request, group_id, _id):
     else :
         pass
     videoobj = collection.File.one({"_id": ObjectId(_id)})
-    if (videoobj.fs.files.exists(videoobj.fs_file_ids[1])):
-        f = videoobj.fs.files.get(ObjectId(videoobj.fs_file_ids[1]))
-        return HttpResponse(f.read())
+    if videoobj:
+        if (videoobj.fs.files.exists(videoobj.fs_file_ids[0])):
+            f = videoobj.fs.files.get(ObjectId(videoobj.fs_file_ids[0]))
+            return HttpResponse(f.read())
         
     
 def getFullvideo(request, group_id, _id):

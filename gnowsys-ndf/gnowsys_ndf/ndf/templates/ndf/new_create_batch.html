@@ -388,7 +388,6 @@
       
         //Fetch the value of "#drawer_head" which will be key for above dict
         batch_name= $("#drawer_head").val()
-        batch_user_list_list[batch_name] = []
 
         arr = [] //Value for above key
         arr1 = []
@@ -401,10 +400,8 @@
             $("#alertModal").find("div.row").removeClass("hide");
             lbl = "Batch once created CANNOT be deleted. Confirm to proceed. Do you want to continue?"
             $("#alertModalLabel").text(lbl);
-
-
           }
-          if(create_batch_flag){
+          else{
             create_batch_flag = false;
             $("#save_batch").removeAttr("disabled")
             $("#stud_count").css("font-size", "53px");
