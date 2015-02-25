@@ -555,6 +555,14 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
 
+GSTUDIO_RESOURCES_CREATION_RATING = 5
+
+GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
+
+GSTUDIO_RESOURCES_REPLY_RATING = 2
+
+
+
 try:
     from local_settings import *
     #print "Local settings applied"

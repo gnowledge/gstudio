@@ -6,7 +6,21 @@
 {% block meta_content %}
   <h3>{% trans "About" %}</h3>
 
-  {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}
+  {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}<br><br>
+  <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}<b><br> 
+  
+   <a href="#" data-reveal-id="library-statistics" class="tiny round button">
+      {% trans "Activity Statistics" %}
+    </a>
+    
+
+    <div class="medium reveal-modal" id="library-statistics" data-reveal>
+      {% include "ndf/activity_statistics.html" %}
+      <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+   
+    </div>
 {% endblock %}
 
 {% block style %}
@@ -111,6 +125,14 @@
         {% trans "Pages created" %}: &nbsp;{{page_count}}<br>
         <!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
         {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
+        {% trans "Quiz" %}: {{quiz_count}}<br> 
+        {% trans "Forum" %}: {{forum_count}}<br>
+
+        <!--    FOR AWARDS  -->  
+
+       <!-- {% if page_count > 1 %}  
+        <img src="/static/ndf/images/close.png">
+        {% endif %}     -->      
         </h5>
   		</div>
   	</div>
@@ -130,8 +152,11 @@
     <dd class="active"><a href="#group" id="p1">Groups </a></dd>
     
     {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
-    <dd><a href="#Activity" id="p3">My Activities </a></dd>			
+    <dd ><a href="#Activity" id="p3">My Activities </a></dd>			
     <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
+       
+    
+    
   </dl>
 
   <!-- Tab views -->
@@ -254,6 +279,8 @@
         {% endif %}
       </ul>
     </div>
+
+
 
     <div class="content" id="Activity">
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
