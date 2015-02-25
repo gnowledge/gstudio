@@ -1017,6 +1017,9 @@ def tag_info(request, group_id, tagname = None):
     '''
     Function to get all the resources related to tag
     '''
+
+    group_name, group_id = get_group_name_id(group_id)
+
     cur = None
     total = None
     total_length = None  
@@ -1037,9 +1040,9 @@ def tag_info(request, group_id, tagname = None):
     if request.user.is_superuser:  #Superuser can see private an public files 
         if tagname:
             cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                          '$or':[   {'access_policy':u'PUBLIC'},
-                                                    {'access_policy':u'PRIVATE'}
-                                                ],   
+                                          # '$or':[   {'access_policy':u'PUBLIC'},
+                                          #           {'access_policy':u'PRIVATE'}
+                                          #       ],   
                                          'status':u'PUBLISHED'
                                     }
                                  )
@@ -1057,16 +1060,15 @@ def tag_info(request, group_id, tagname = None):
                                                  {'group_admin':userid},
                                                  {'author_set':userid},
                                                  {'group_type':u'PUBLIC'},
-                                                 {'group_type':u'PRIVATE'}
                                                ]
                                     }      
                                 )
         for each in group_cur:
             group_cur_list.append(each._id)
 
-        if tagname:
+        if tagname and (group_id in group_cur_list):
             cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                         'group_set':{'$in':group_cur_list},
+                                         'group_set':{'$in': [group_id]},
                                          'status':u'PUBLISHED'
                                     }
                              )
