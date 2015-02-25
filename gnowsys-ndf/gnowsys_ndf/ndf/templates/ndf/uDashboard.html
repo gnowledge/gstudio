@@ -175,7 +175,7 @@
               <header>
                 <div class="label-list">
                   {% for tag in node.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                    <span class="label"> <mark> {{tag}} </mark> </span>
                   {% endfor %}
                 </div>
         
@@ -238,7 +238,7 @@
               <header>
                 <div class="label-list">
                 {% for tag in node.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                   <span class="label"><mark>{{tag}}</mark></span>
                 {% endfor %}
                 </div>
                 
@@ -303,7 +303,7 @@
               <header>
                 <div class="label-list">
                   {% for tag in node.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                       <span class="label"> <mark> {{tag}} </mark> </span>
                   {% endfor %}
                 </div>
         
