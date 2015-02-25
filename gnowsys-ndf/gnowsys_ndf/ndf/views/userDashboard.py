@@ -232,7 +232,9 @@ def uDashboard(request, group_id):
             collab_drawer.append({'usrname':name, 'Id': val,'resource': each.name})   
 
     shelves = []
+    datavisual = []
     shelf_list = {}
+    show_only_pie = True
 
     if not profile_pic_image:
         if auth:
@@ -250,8 +252,17 @@ def uDashboard(request, group_id):
     quiz_create_rate  = quiz_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
     reply_create_rate = reply_count.count() * GSTUDIO_RESOURCES_REPLY_RATING
     thread_create_rate = thread_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
-    total_activity_rating = GSTUDIO_RESOURCES_REGISTRATION_RATING + (page_cur.count()  + file_cur.count()  + forum_count.count()  + quiz_count.count()) * GSTUDIO_RESOURCES_CREATION_RATING + (thread_count.count()  + reply_count.count()) * GSTUDIO_RESOURCES_REPLY_RATING
+    
+    datavisual.append({"name":"Forum", "count":forum_create_rate})
+    datavisual.append({"name":"File", "count":file_create_rate})
+    datavisual.append({"name":"Page", "count":page_create_rate})
+    datavisual.append({"name":"Quiz", "count":quiz_create_rate})
+    datavisual.append({"name":"Reply", "count":reply_create_rate})
+    datavisual.append({"name":"Thread", "count":thread_create_rate})
+    datavisual.append({"name":"Registration", "count":GSTUDIO_RESOURCES_REGISTRATION_RATING})
 
+    total_activity_rating = GSTUDIO_RESOURCES_REGISTRATION_RATING + (page_cur.count()  + file_cur.count()  + forum_count.count()  + quiz_count.count()) * GSTUDIO_RESOURCES_CREATION_RATING + (thread_count.count()  + reply_count.count()) * GSTUDIO_RESOURCES_REPLY_RATING
+    
     return render_to_response(
         "ndf/uDashboard.html",
         {
@@ -260,11 +271,8 @@ def uDashboard(request, group_id):
             'already_set': is_already_selected, 'prof_pic_obj': profile_pic_image,
             'group_count':group_cur.count(),'page_count':page_cur.count(),'file_count':file_cur.count(),
             'user_groups':group_list, 'user_task': user_assigned, 'user_activity':user_activity,
-            'user_notification':notification_list,'forum_count':forum_count.count(), 'quiz_count':quiz_count.count(), 'thread_count':thread_count.count(),
-            'dashboard_count':dashboard_count,'quiz_create_rate': quiz_create_rate, 
-            'reply_count':reply_count.count(), 'reply_create_rate': reply_create_rate,
-            'forum_create_rate': forum_create_rate, 'page_create_rate': page_create_rate,
-            'file_create_rate': file_create_rate, 'thread_create_rate': thread_create_rate,
+            'user_notification':notification_list,'dashboard_count':dashboard_count,
+            'datavisual': json.dumps(datavisual),'show_only_pie':show_only_pie,
             'total_activity_rating': total_activity_rating
          },
         context_instance=RequestContext(request)

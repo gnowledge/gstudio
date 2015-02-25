@@ -9,18 +9,16 @@
   {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}<br><br>
   <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}<b><br> 
   
-   <a href="#" data-reveal-id="library-statistics" class="tiny round button">
-      {% trans "Activity Statistics" %}
+   <a href="#" data-reveal-id="activity-statistics" class="tiny round button">
+      {% trans "Activity Ratings" %}
     </a>
-    
 
-    <div class="medium reveal-modal" id="library-statistics" data-reveal>
-      {% include "ndf/activity_statistics.html" %}
+    <div class="medium reveal-modal" id="activity-statistics" data-reveal>
+      {% include "ndf/file_statistics.html" %}
       <a class="close-reveal-modal">&#215;</a>
     </div>
 
    
-    </div>
 {% endblock %}
 
 {% block style %}
