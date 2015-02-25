@@ -1173,13 +1173,13 @@ def get_contents(node_id, selected, choice):
 				
 				if selected and left_obj:
 					if selected == "curricular":
-						attr_dict = {unicode(selected): unicode(choice)}
+						if choice == "False":
+							choice = False
+						attr_dict = {unicode(selected): bool(choice)}
 					else:
 						attr_dict = {unicode(selected): unicode(choice)}
 
-					# if attr_dict in left_obj.attribute_set or choice == left_obj.language:
 					if attr_dict in left_obj.attribute_set or choice == left_obj.language:
-						
 						name = str(left_obj.name)
 						ob_id = str(left_obj._id)
 
