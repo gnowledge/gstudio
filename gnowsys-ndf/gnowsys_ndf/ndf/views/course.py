@@ -613,14 +613,16 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     if app_set_instance_id:
         course_gs.get_neighbourhood(course_gs.member_of)
         context_variables['node'] = course_gs
-        for attr in course_gs.attribute_set:
-            for eachk, eachv in attr.items():
-                context_variables[eachk] = eachv
+        # for attr in course_gs.attribute_set:
+        #     if attr:
+        #         for eachk, eachv in attr.items():
+        #             context_variables[eachk] = eachv
 
-        for rel in course_gs.relation_set:
-            for eachk, eachv in rel.items():
-                get_node_name = collection.Node.one({'_id': eachv[0]})
-                context_variables[eachk] = get_node_name.name
+        # for rel in course_gs.relation_set:
+        #     if rel:
+        #         for eachk, eachv in rel.items():
+        #             get_node_name = collection.Node.one({'_id': eachv[0]})
+        #             context_variables[eachk] = get_node_name.name
 
     try:
         return render_to_response(
