@@ -372,11 +372,11 @@ def get_attribute_value(node_id, attr):
 	node_attr = None
 	if node_id:
 		node = collection.Node.one({'_id': ObjectId(node_id) })
+		gattr = collection.Node.one({'_type': 'AttributeType', 'name': unicode(attr) })
 		# print "node: ",node.name,"\n"
 		# print "attr: ",attr,"\n"
 
-		if node:
-			gattr = collection.Node.one({'_type': 'AttributeType', 'name': unicode(attr) })
+		if node and gattr:
 			node_attr = collection.Node.one({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": node._id })	
 
 	if node_attr:
