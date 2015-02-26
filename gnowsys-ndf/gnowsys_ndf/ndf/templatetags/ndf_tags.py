@@ -24,7 +24,7 @@ except ImportError:
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -1171,15 +1171,30 @@ def get_contents(node_id, selected, choice):
 			for attr in list_gattr:
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
 				
-				if selected and left_obj:
-					if selected == "curricular":
-						if choice == "False":
-							choice = False
-						attr_dict = {unicode(selected): bool(choice)}
-					else:
-						attr_dict = {unicode(selected): unicode(choice)}
+				if selected and left_obj and selected != "language":
+					AT = collection.Node.one({'_type':'AttributeType', 'name': unicode(selected) })
+					att = cast_to_data_type(choice, AT.data_type)
+					attr_dict = {unicode(selected): att}
 
-					if attr_dict in left_obj.attribute_set or choice == left_obj.language:
+					for m in left_obj.attribute_set:
+						if attr_dict == m:
+
+							name = str(left_obj.name)
+							ob_id = str(left_obj._id)
+
+							if attr.object_value == "Images":
+								image_contents.append((name, ob_id))
+							elif attr.object_value == "Videos":
+								video_contents.append((name, ob_id))
+							elif attr.object_value == "Audios":
+								audio_contents.append((name, ob_id))
+							elif attr.object_value == "Interactives":
+								interactive_contents.append((name, ob_id))
+							elif attr.object_value == "Documents":
+								document_contents.append((name, ob_id))
+
+				else:
+					if not selected or choice == left_obj.language:
 						name = str(left_obj.name)
 						ob_id = str(left_obj._id)
 
@@ -1193,21 +1208,6 @@ def get_contents(node_id, selected, choice):
 							interactive_contents.append((name, ob_id))
 						elif attr.object_value == "Documents":
 							document_contents.append((name, ob_id))
-
-				else:
-					name = str(left_obj.name)
-					ob_id = str(left_obj._id)
-
-					if attr.object_value == "Images":
-						image_contents.append((name, ob_id))
-					elif attr.object_value == "Videos":
-						video_contents.append((name, ob_id))
-					elif attr.object_value == "Audios":
-						audio_contents.append((name, ob_id))
-					elif attr.object_value == "Interactives":
-						interactive_contents.append((name, ob_id))
-					elif attr.object_value == "Documents":
-						document_contents.append((name, ob_id))
 
 							
 	if image_contents:
