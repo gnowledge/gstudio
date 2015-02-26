@@ -197,6 +197,10 @@ ul#navigation ul {
 ul#navigation ul li ul {
     top: 0;
     left: 181px;
+    height:150px; 
+    width: 200px;
+    overflow:hidden; 
+    overflow-y:auto;
 }
 
 ul#navigation ul li {
@@ -217,6 +221,7 @@ ul#navigation ul li a {
   float:left;
   clear:both;
   width:100%;
+
 }
 
 ul#navigation li a.first {
@@ -302,8 +307,69 @@ ul#navigation li a.last {
                         {% endfor %}
                       </ul>
                     </li> 
-                  <!-- {#% elif k == "educationalsubject" %#}
-                    <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li>  -->
+                  {% elif k == "educationalsubject" %}
+                    <li>
+                      <a> {% trans "Educational Subject" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "textcomplexity" %}
+                    <li>
+                      <a> {% trans "Text Complexity" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "educationalalignment" %}
+                    <li>
+                      <a> {% trans "Educational Alignment" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "language" %}
+                    <li>
+                      <a> {% trans "Language" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "interactivitytype" %}
+                    <li>
+                      <a> {% trans "Interactivity Type" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "audience" %}
+                    <li>
+                      <a> {% trans "Audience" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "curricular" %}
+                    <li>
+                      <a> {% trans "Curricular" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
                   {% endif %}
 
                 {% endfor %}
@@ -1212,7 +1278,7 @@ ul#navigation li a.last {
         if (data != "{}"){
           var k = Object.keys(data_obj); // To get the keys from incomming data
           if (selected){
-            fs = "<b><i><u>"+ choice +" level resources: </u></i></b><br/>"  // Fieldset for one element
+            fs = "<b><i><u>Resources with "+ selected + ": " + choice +"  </u></i></b><br/>"  // Fieldset for one element
           }
           else{
             fs = ""  // Fieldset for one element
@@ -1259,7 +1325,7 @@ ul#navigation li a.last {
         }
         else{
           // If no resource found for topic it will show bellow statement
-          var cont = "<h3>No resources available for '"+choice+"' level in this topic</h3>"
+          var cont = "<h3>No resources available with '"+ selected + ": " + choice +"' in this topic</h3>"
           $(".topic_content").html(cont);
         }
 
