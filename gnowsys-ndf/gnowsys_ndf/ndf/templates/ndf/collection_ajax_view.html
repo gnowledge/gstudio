@@ -19,7 +19,10 @@
           function(event) {
               // The clicked node is 'event.node'
               var node = event.node;
-              // var node_type = node.node_type;
+              var node_type = node.node_type;
+              var breadcrumbs_list = "{{breadcrumbs_list}}";  
+              var url = location.href;
+              var lastSegment = url.split('/').pop();
 
               $.ajax({
                   type: "POST",
@@ -27,18 +30,20 @@
                   datatype: "html",
                   data:{
                     node_id: node.id,
+                    breadcrumbs_list: breadcrumbs_list,
+                    // location: lastSegment,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                   },
                   success: function(data) {
 
-                    // if (node_type == "Page"){
-                    //  window.history.pushState("", "", "/{{group_name_tag}}/page/"+node.id+"");
-                    // }
-                    // else if(node_type == "File"){
-                    //   window.history.pushState("", "", "/{{group_name_tag}}/file/"+node.id+"");  
-                    // }
+                    if (node_type == "Page"){
+                     window.history.pushState("", "", "/{{group_name_tag}}/page/"+node.id+"seleted:"+lastSegment+"");
+                    }
+                    else if(node_type == "File"){
+                      window.history.pushState("", "", "/{{group_name_tag}}/file/"+node.id+"?seleted="+lastSegment+"");  
+                    }
                     // else if (node_type == "Term"){
-                    //   window.history.pushState("", "", "/{{group_name_tag}}/term/"+node.id+"");
+                      // window.history.pushState("", "", "/{{group_name_tag}}/term/"+node.id+"");
                     // }
                     // else if (node_type == "Topic"){
                     //   window.history.pushState("", "", "/{{group_name_tag}}/topic_details/"+node.id+"");
@@ -51,20 +56,20 @@
                   }
               });
 
-              $.ajax({
-                  type: "POST",
-                  url: "{% url 'collection_view' group_id %}",
-                  datatype: "html",
-                  data:{
-                    node_id: node.id,
-                    breadcrumbs_list: "{{breadcrumbs_list}}",
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                  },
-                  success: function(data) {
+              // $.ajax({
+              //     type: "POST",
+              //     url: "{#% url 'collection_view' group_id %#}",
+              //     datatype: "html",
+              //     data:{
+              //       node_id: node.id,
+              //       breadcrumbs_list: "{{breadcrumbs_list}}",
+              //       csrfmiddlewaretoken: '{{ csrf_token }}'
+              //     },
+              //     success: function(data) {
 
-                    $("#view_collection").html(data);
-                  }
-              });
+              //       $("#view_collection").html(data);
+              //     }
+              // });
             
           }
         );
@@ -86,21 +91,7 @@
   
 </style>  
 
-{% endblock %}
-  
-  <ul class="breadcrumbs"> 
-    {% for e in breadcrumbs_list %}
-        {% if topic %}
-          {% get_prior_node e.0 as prior %}
-            {% if prior %}              
-              <li><b><a style="color:black;">{{prior.0.1}}</a></b></li>
-              <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
-            {% endif %}
-        {% else %}
-          <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
-        {% endif %}
-    {% endfor %}
-  </ul>
+{% endblock %}  
 
   <div>
     <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
@@ -110,21 +101,21 @@
 
   $(".current").click(function() {
     
-    $.ajax({
-        type: "POST",
-        url: "{% url 'collection_view' group_id %}",
-        datatype: "html",
-        data:{
-          node_id: this.id,
-          breadcrumbs_list: "{{breadcrumbs_list}}",
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function(data) {
+    // $.ajax({
+    //     type: "POST",
+    //     url: "{#% url 'collection_view' group_id %#}",
+    //     datatype: "html",
+    //     data:{
+    //       node_id: this.id,
+    //       breadcrumbs_list: "{{breadcrumbs_list}}",
+    //       csrfmiddlewaretoken: '{{ csrf_token }}'
+    //     },
+    //     success: function(data) {
 
-          $("#view_collection").html(data);
+    //       $("#view_collection").html(data);
 
-        }
-    }); 
+    //     }
+    // }); 
 
     $.ajax({
         type: "POST",
@@ -132,6 +123,7 @@
         datatype: "html",
         data:{
           node_id: this.id,
+          breadcrumbs_list: "{{breadcrumbs_list}}",
           csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function(data) {
