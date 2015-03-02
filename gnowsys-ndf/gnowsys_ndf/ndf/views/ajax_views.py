@@ -110,10 +110,49 @@ def collection_nav(request, group_id):
 
     topic = ""
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
+    # location = request.POST.get("location", '')
+    # print "location: ",location,"\n"
+
     topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
     if topic_GST._id in node_obj.member_of:
       topic = "topic"
 
+    # Breadcrumbs code
+    if breadcrumbs_list:
+      breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
+      breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
+
+      b_list = []
+      for each in breadcrumbs_list:
+        b_list.append(each[0])
+      
+
+      selecetd = node_obj
+      original_node = collection.Node.one({'_id': ObjectId(b_list[0]) })
+
+      def rec(original_node, selected):
+        
+        if selecetd.prior_node:
+          
+
+
+
+
+
+      if str(node_obj._id) not in b_list:
+        # Add the tuple if clicked node is not there in breadcrumbs list
+        breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
+      else:
+        # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+        for e in reversed(breadcrumbs_list):
+          if node_id in e:
+            break
+          else:
+            breadcrumbs_list.remove(e)
+
+    else:
+      breadcrumbs_list = []
 
     # node_obj.get_neighbourhood(node_obj.member_of)
 
@@ -121,6 +160,7 @@ def collection_nav(request, group_id):
                                 { 'node': node_obj,
                                   'group_id': group_id,
                                   'groupid':group_id,
+                                  'breadcrumbs_list':breadcrumbs_list,
                                   'app_id': node_id, 'topic':topic
                                 },
                                 context_instance = RequestContext(request)
@@ -133,26 +173,26 @@ def collection_view(request, group_id):
   '''
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
-    breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
+    # breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
 
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-    breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
-    breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
+    # breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
+    # breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
 
-    b_list = []
-    for each in breadcrumbs_list:
-      b_list.append(each[0])
+    # b_list = []
+    # for each in breadcrumbs_list:
+    #   b_list.append(each[0])
     
-    if str(node_obj._id) not in b_list:
-      # Add the tuple if clicked node is not there in breadcrumbs list
-      breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
-    else:
-      # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
-      for e in reversed(breadcrumbs_list):
-        if node_id in e:
-          break
-        else:
-          breadcrumbs_list.remove(e)
+    # if str(node_obj._id) not in b_list:
+    #   # Add the tuple if clicked node is not there in breadcrumbs list
+    #   breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
+    # else:
+    #   # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+    #   for e in reversed(breadcrumbs_list):
+    #     if node_id in e:
+    #       break
+    #     else:
+    #       breadcrumbs_list.remove(e)
         
 
   # print "\nbreadcrumbs_list: ",breadcrumbs_list,"\n"
@@ -161,7 +201,7 @@ def collection_view(request, group_id):
                                   { 'node': node_obj,
                                     'group_id': group_id,
                                     'groupid':group_id,
-                                    'breadcrumbs_list':breadcrumbs_list
+                                    # 'breadcrumbs_list':breadcrumbs_list
                                   },
                                  context_instance = RequestContext(request)
     )
