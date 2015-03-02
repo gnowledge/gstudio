@@ -338,7 +338,12 @@
                         <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
                       -->
                     {% endcomment %}
-                    <i class="fi-results"></i> Updates 
+
+                    {% if site_name == "nroer" and "home" in request.path and request.path|length <= 6 %}
+                    {% else %}
+                      <i class="fi-results"></i> Updates
+                    {% endif %}
+
                   </a>
                 {% endif %}
                 <!-- </li> -->
@@ -351,17 +356,19 @@
               
                 {% if group_name_tag == "home" %}
                 <!-- NROER level-two menu -->
-                  <ul class="button-group nroer-menu">
-                    {% for each_gapp in nroer_menu.gapps %}
-                      {% for k, v in each_gapp.items %}
-                        <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
-                          <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
-                            {{k}}
-                          </a>
-                        </li>
+                  {% if request.path|length > 6 %}
+                    <ul class="button-group nroer-menu">
+                      {% for each_gapp in nroer_menu.gapps %}
+                        {% for k, v in each_gapp.items %}
+                          <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
+                            <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
+                              {{k}}
+                            </a>
+                          </li>
+                        {% endfor %}
                       {% endfor %}
-                    {% endfor %}
-                  </ul>
+                    </ul>
+                  {% endif %}
                 {% else %}
                   {% get_gapps_iconbar request groupid %}
                 {% endif %}
