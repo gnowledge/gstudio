@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from mongokit import paginator
 import mongokit 
+import time
 
 
 ''' -- imports from application folders/files -- '''
@@ -17,7 +18,7 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
-from gnowsys_ndf.ndf.models import HistoryManager
+from gnowsys_ndf.ndf.models import HistoryManager,Benchmark
 from gnowsys_ndf.notification import models as notification
 
 ''' -- imports from python libraries -- '''
@@ -2750,3 +2751,19 @@ def create_college_group_and_setup_data(college_node):
             )
 
     return gfc, gr_gfc
+
+def timing(f):
+    def wrap(*args,**kwargs):
+        time1 = time.time()
+        ret = f(*args,**kwargs)
+        time2 = time.time()
+        a =  Benchmark()
+        print "Benchmark",a
+        a.time_take = '5:56:00'
+        a.name = f.func_name
+        a.save()
+        #collection = get_database()['Benchmark']
+        print '%s function took %0.3f ms' % (f.func_name,(time2-time1))
+        return ret
+    return wrap    
+    

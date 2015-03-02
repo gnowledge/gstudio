@@ -24,7 +24,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation
-from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
+from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,timing
 
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.forum import *
@@ -61,12 +61,11 @@ def userpref(request,group_id):
         auth.modified_by=request.user.id
         auth.save()
     return HttpResponse("Success")
-    
-
 @login_required
+@timing
 def uDashboard(request, group_id):
     usrid = group_id
-
+    print "get the timing"
     ID = int(usrid)
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
     auth = collection.Node.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1})

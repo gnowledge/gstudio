@@ -1115,6 +1115,7 @@ class GSystem(Node):
     
     use_dot_notation = True
 
+
         
 
 
@@ -1542,10 +1543,28 @@ class NodeJSONEncoder(json.JSONEncoder):
     return json.JSONEncoder.default(self, o)
 
 
+# Benchmarking Class Defination
+@connection.register
+class Benchmark(DjangoDocument):
+
+  objects = models.Manager()
+
+  collection_name = 'Benchmark'
+  structure = {
+    'name': unicode,
+    'time_take':unicode
+  }
+  required_fields = ['name']
+  use_dot_notation = True
+  
+  def __unicode__(self):
+    return self._id
+  
+  def identity(self):
+    return self.__unicode__()
+
 
 #  TRIPLE CLASS DEFINITIONS
-
-
 @connection.register
 class Triple(DjangoDocument):
 
