@@ -1,22 +1,23 @@
+import re
+
 ''' -- imports from installed packages -- ''' 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.core.urlresolvers import reverse
+# from django.core.urlresolvers import reverse
 from django_mongokit import get_database
-from gnowsys_ndf.ndf.org2any import org2html
+from mongokit import paginator
 
-import re
 
 try:
 	from bson import ObjectId
 except ImportError:  # old pymongo
 	from pymongo.objectid import ObjectId
-from mongokit import paginator
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type
+# from gnowsys_ndf.ndf.org2any import org2html
 
 #######################################################################################################################################
 
@@ -34,48 +35,52 @@ app = collection.GSystemType.one({'_type':'GSystemType', 'name': 'E-Library'})
 
 def resource_list(request, group_id, app_id=None, page_no=1):
 
-	ins_objectid  = ObjectId()
 	is_video = request.GET.get('is_video', "")
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else :
-			auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-			if auth :
-				group_id = str(auth._id)
-	else :
-		pass
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False :
+	# 	group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+	# 	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else :
+	# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 		if auth :
+	# 			group_id = str(auth._id)
+	# else :
+	# 	pass
+
+	group_name, group_id = get_group_name_id(group_id)
+
 	if app_id is None:
-		app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'E-Library'})
-		if app_ins:
-			app_id = str(app_ins._id)
+		# app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'E-Library'})
+		# if app_ins:
+		# 	app_id = str(app_ins._id)
+		app_id = str(app._id)
 
-	# Code for displaying user shelf 
-	shelves = []
-	shelf_list = {}
-	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	# # Code for displaying user shelf 
+	# shelves = []
+	# shelf_list = {}
+	# auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
-	if auth:
-	  has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-	  dbref_has_shelf = has_shelf_RT.get_dbref()
-	  shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-	  shelf_list = {}
+	# if auth:
+	#   has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+	#   dbref_has_shelf = has_shelf_RT.get_dbref()
+	#   shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+	#   shelf_list = {}
 
-	  if shelf:
-		for each in shelf:
-			shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
-			shelves.append(shelf_name)
+	#   if shelf:
+	# 	for each in shelf:
+	# 		shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+	# 		shelves.append(shelf_name)
 
-			shelf_list[shelf_name.name] = []         
-			for ID in shelf_name.collection_set:
-			  shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-			  shelf_list[shelf_name.name].append(shelf_item.name)
+	# 		shelf_list[shelf_name.name] = []         
+	# 		for ID in shelf_name.collection_set:
+	# 		  shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+	# 		  shelf_list[shelf_name.name].append(shelf_item.name)
 
-	  else:
-		shelves = []
-	# End of user shelf
+	#   else:
+	# 	shelves = []
+	# # End of user shelf
 
 	pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id, 'group_set': ObjectId(group_id) })
 
@@ -128,7 +133,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 												'group_set': ObjectId(group_id) 
 											}
 										],
-										'status': u"PUBLISHED"
+										# 'status': u"PUBLISHED"
 									}).sort("last_update", -1)
 
 	# print "files.count : ", files.count()
@@ -340,12 +345,18 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 				temp_list = []
 				for each_filter in filter_grp:
 					temp_dict = {}
+					each_filter["selFieldText"] = cast_to_data_type(each_filter["selFieldText"], each_filter["selFieldPrimaryType"])
+
+					if each_filter["selFieldPrimaryType"] == unicode("list"):
+						each_filter["selFieldText"] = {"$in": each_filter["selFieldText"]}
+
 					if each_filter["selFieldGstudioType"] == "attribute":
-						if each_filter["selFieldPrimaryType"] == unicode("bool"):
-							if (each_filter["selFieldText"] == "True"):
-								each_filter["selFieldText"] = True
-							elif (each_filter["selFieldText"] == "False"):
-								each_filter["selFieldText"] = False
+						# if each_filter["selFieldPrimaryType"] == unicode("bool"):
+						# 	if (each_filter["selFieldText"] == "True"):
+						# 		each_filter["selFieldText"] = True
+						# 	elif (each_filter["selFieldText"] == "False"):
+						# 		each_filter["selFieldText"] = False
+
 						temp_dict["attribute_set." + each_filter["selFieldValue"]] = each_filter["selFieldText"]
 						temp_list.append(temp_dict)
 						# print "temp_list : ", temp_list
@@ -380,7 +391,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 													'group_set': ObjectId(group_id) 
 												}
 											],
-											'status': u"PUBLISHED"
+											# 'status': u"PUBLISHED"
 										}).sort("last_update", -1)
 
 		# print "files.count : ", files.count()
@@ -414,6 +425,8 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 			
 			result_paginated_cur = files
 			result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
+
+		filter_result = "True" if (files.count() > 0) else "False"
 				
 		# if filetype == "all":
 		#     if files:
@@ -520,7 +533,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 		#     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
 		
-		return render_to_response ("ndf/file_list_tab.html", {
+		return render_to_response ("ndf/file_list_tab.html", { "filter_result": filter_result,
 				"group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
 				'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
 				"resource_type": result_paginated_cur, "detail_urlname": "file_detail", 

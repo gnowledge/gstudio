@@ -27,7 +27,10 @@ import re
 import ast
 import string
 import json
-from datetime import datetime
+import locale
+from datetime import datetime,timedelta,date
+import csv
+from collections import Counter
 
 
 db = get_database()
@@ -1010,13 +1013,93 @@ def check_page_first_creation(request,node):
 	return(count)     
       
 
-def tag_info(request, group_id, tagname):
-  '''
-  Function to get all the resources related to tag
-  '''
+def tag_info(request, group_id, tagname = None):
+    '''
+    Function to get all the resources related to tag
+    '''
 
+    group_name, group_id = get_group_name_id(group_id)
 
-  return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
+    cur = None
+    total = None
+    total_length = None  
+    yesterdays_result = []
+    week_ago_result = []
+    search_result = []
+    group_cur_list = [] #for AutheticatedUser
+    today = date.today()
+    yesterdays_search = {date.today()-timedelta(days=1)}
+    week_ago_search = {date.today()-timedelta(days=7)}
+    locale.setlocale(locale.LC_ALL, '')
+    userid = request.user.id
+    collection = get_database()[Node.collection_name]
+
+    if not tagname:
+        tagname = request.GET["search"].lower()
+
+    if request.user.is_superuser:  #Superuser can see private an public files 
+        if tagname:
+            cur = collection.Node.find( {'tags':{'$in':[tagname]},
+                                          # '$or':[   {'access_policy':u'PUBLIC'},
+                                          #           {'access_policy':u'PRIVATE'}
+                                          #       ],   
+                                         'status':u'PUBLISHED'
+                                    }
+                                 )
+            for every in cur:
+                search_result.append(every)
+
+        total = len(search_result)
+        total = locale.format("%d", total, grouping=True)
+        if len(search_result) == 0:
+            total_length = len(search_result)    
+
+    elif request.user.is_authenticated():   #Autheticate user can see all public files  
+        group_cur = collection.Node.find({'_type':'Group',
+                                           '$or':[ {'created_by':userid},
+                                                 {'group_admin':userid},
+                                                 {'author_set':userid},
+                                                 {'group_type':u'PUBLIC'},
+                                               ]
+                                    }      
+                                )
+        for each in group_cur:
+            group_cur_list.append(each._id)
+
+        if tagname and (group_id in group_cur_list):
+            cur = collection.Node.find( {'tags':{'$in':[tagname]},
+                                         'group_set':{'$in': [group_id]},
+                                         'status':u'PUBLISHED'
+                                    }
+                             )
+            for every in cur: 
+                search_result.append(every)
+
+        total = len(search_result)
+        total = locale.format("%d", total, grouping=True)
+        if len(search_result) == 0:
+            total_length = len(search_result)
+
+    else: #Unauthenticated user can see all public files.
+        if tagname:
+            cur = collection.Node.find( { 'tags':{'$in':[tagname]},
+                                           'access_policy':u'PUBLIC',
+                                           'status':u'PUBLISHED'
+                                        }
+                                 )
+            for every in cur:
+                search_result.append(every)
+
+        total = len(search_result)
+        total = locale.format("%d", total, grouping=True)
+        if len(search_result) == 0:
+            total_length = len(search_result)
+    
+    return render_to_response(
+        "ndf/tag_browser.html",
+        {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},
+        context_instance=RequestContext(request)
+    )
 
 
 #code for merging two text Documents
@@ -1090,10 +1173,62 @@ def update_mobwrite_content_org(node_system):
   return textobj
 
 
+def cast_to_data_type(value, data_type):
+    '''
+    This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
+    '''
+    # print "\n\t\tin method: ", value, " == ", data_type
+
+    value = value.strip()
+    casted_value = value
+
+    if data_type == "unicode":
+        casted_value = unicode(value)
+
+    elif data_type == "basestring":
+        casted_value = str(value)
+
+    elif (data_type == "int") and str(value):
+        casted_value = int(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type == "float") and str(value):
+        casted_value = float(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type == "long") and str(value):
+        casted_value = long(value) if (str.isdigit(str(value))) else value
+
+    elif data_type == "bool" and str(value): # converting unicode to int and then to bool
+        if (str.isdigit(str(value))):
+            casted_value = bool(int(value))
+        elif unicode(value) in [u"True", u"False"]:
+            if (unicode(value) == u"True"):
+                casted_value = True
+            elif (unicode(value) == u"False"):
+                casted_value = False
+
+    elif (data_type == "list") and (not isinstance(value, list)):
+        value = value.replace("\n", "").split(",")
+        
+        # check for complex list type like: [int] or [unicode]
+        if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
+            casted_value = [data_type[0](i.strip()) for i in value if i]
+
+        else:  # otherwise normal list
+            casted_value = [i.strip() for i in value if i]
+
+    elif data_type == "datetime.datetime":
+        # "value" should be in following example format
+        # In [10]: datetime.datetime.strptime( "11/12/2014", "%d/%m/%Y")
+        # Out[10]: datetime.datetime(2014, 12, 11, 0, 0)
+        casted_value = datetime.datetime.strptime(value, "%d/%m/%Y")
+        
+    return casted_value
+
+
 def get_node_metadata(request, node, **kwargs):
     '''
     Getting list of updated GSystems with kwargs arguments.
-    Pass is_changed=True as last/fourth argument while calling this/get_node_metadata method.
+    Pass is_changed=True as last/third argument while calling this/get_node_metadata method.
     Example: 
       updated_ga_nodes = get_node_metadata(request, node_obj, GST_FILE_OBJ, is_changed=True)
 
@@ -1112,10 +1247,12 @@ def get_node_metadata(request, node, **kwargs):
 
         for atname in attribute_type_list:
 
-            field_value = unicode(request.POST.get(atname, ""))
-            at = collection.Node.one({"_type": "AttributeType", "name": atname})	
+            field_value = request.POST.get(atname, "")
+            at = collection.Node.one({"_type": "AttributeType", "name": atname})  
 
-            if at and field_value:
+            if at:
+
+                field_value = cast_to_data_type(field_value, at["data_type"])
 
                 if kwargs.has_key("is_changed"):
                     temp_res = create_gattribute(node._id, at, field_value, is_changed=True)

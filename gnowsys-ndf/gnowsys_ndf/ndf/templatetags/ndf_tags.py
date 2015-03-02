@@ -24,7 +24,7 @@ except ImportError:
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
@@ -95,9 +95,9 @@ def get_node(node):
 
 @register.assignment_tag
 def get_schema(node):
-   obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
+   obj=collection.Node.find_one({"_id": ObjectId(node.member_of[0])},{"name":1})
    nam=node.member_of_names_list[0]
-   if(nam=='Page'):
+   if(nam == 'Page'):
         return [1,schema_dict[nam]]
    elif(nam=='File'):
 	if( 'image' in node.mime_type):
@@ -357,10 +357,10 @@ def get_all_replies(parent):
 @register.assignment_tag
 def get_metadata_values():
 
-	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
-				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE, "curricular": GSTUDIO_RESOURCES_CURRICULAR,
+				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, "language": GSTUDIO_RESOURCES_LANGUAGES,
 				"timerequired": GSTUDIO_RESOURCES_TIME_REQUIRED, "audience": GSTUDIO_RESOURCES_AUDIENCE , "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY,
-				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL}
+				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL, "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT}
 
 
 	return metadata
@@ -372,11 +372,11 @@ def get_attribute_value(node_id, attr):
 	node_attr = None
 	if node_id:
 		node = collection.Node.one({'_id': ObjectId(node_id) })
+		gattr = collection.Node.one({'_type': 'AttributeType', 'name': unicode(attr) })
 		# print "node: ",node.name,"\n"
 		# print "attr: ",attr,"\n"
 
-		if node:
-			gattr = collection.Node.one({'_type': 'AttributeType', 'name': unicode(attr) })
+		if node and gattr:
 			node_attr = collection.Node.one({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": node._id })	
 
 	if node_attr:
@@ -1171,8 +1171,30 @@ def get_contents(node_id, selected, choice):
 			for attr in list_gattr:
 				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
 				
-				if selected:
-					if left_obj.attribute_set[4][selected] == choice:
+				if selected and left_obj and selected != "language":
+					AT = collection.Node.one({'_type':'AttributeType', 'name': unicode(selected) })
+					att = cast_to_data_type(choice, AT.data_type)
+					attr_dict = {unicode(selected): att}
+
+					for m in left_obj.attribute_set:
+						if attr_dict == m:
+
+							name = str(left_obj.name)
+							ob_id = str(left_obj._id)
+
+							if attr.object_value == "Images":
+								image_contents.append((name, ob_id))
+							elif attr.object_value == "Videos":
+								video_contents.append((name, ob_id))
+							elif attr.object_value == "Audios":
+								audio_contents.append((name, ob_id))
+							elif attr.object_value == "Interactives":
+								interactive_contents.append((name, ob_id))
+							elif attr.object_value == "Documents":
+								document_contents.append((name, ob_id))
+
+				else:
+					if not selected or choice == left_obj.language:
 						name = str(left_obj.name)
 						ob_id = str(left_obj._id)
 
@@ -1186,21 +1208,6 @@ def get_contents(node_id, selected, choice):
 							interactive_contents.append((name, ob_id))
 						elif attr.object_value == "Documents":
 							document_contents.append((name, ob_id))
-
-				else:
-					name = str(left_obj.name)
-					ob_id = str(left_obj._id)
-
-					if attr.object_value == "Images":
-						image_contents.append((name, ob_id))
-					elif attr.object_value == "Videos":
-						video_contents.append((name, ob_id))
-					elif attr.object_value == "Audios":
-						audio_contents.append((name, ob_id))
-					elif attr.object_value == "Interactives":
-						interactive_contents.append((name, ob_id))
-					elif attr.object_value == "Documents":
-						document_contents.append((name, ob_id))
 
 							
 	if image_contents:
@@ -1926,7 +1933,7 @@ def str_to_dict(str1):
 	                              if user:
 	                                dict_format[k] = user.get_username()
               else: 
-                      if v != []:
+                      if v != [] and v != "None":
                       		  if User.objects.filter(id = userid).exists():
 	                              user = User.objects.get(id = v)
 	                              if user:

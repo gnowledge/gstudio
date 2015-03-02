@@ -2,26 +2,28 @@
 import os
 import csv
 import json
-# import ast
 import datetime
 import zipfile
 import urllib2
 import hashlib
-import magic
-import subprocess
-# import mimetypes
-from PIL import Image
-from StringIO import StringIO
 import io
 import time
 
+# import subprocess
+# import magic
+# import ast
+# import mimetypes
+# from PIL import Image
+# from StringIO import StringIO
+
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand
-# from django.core.management.base import CommandError
 from django.contrib.auth.models import User
-# from django.http import Http404
-from django.template.defaultfilters import slugify
 from django.contrib.sites.models import Site
+
+# from django.core.management.base import CommandError
+# from django.http import Http404
+# from django.template.defaultfilters import slugify
 
 from django_mongokit import get_database
 from mongokit import IS
@@ -30,16 +32,17 @@ try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
-''' imports from application folders/files '''
 
-from gnowsys_ndf.settings import GAPPS
-# from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
+''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
-from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
+
+# from gnowsys_ndf.settings import GAPPS
+# from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
+# from gnowsys_ndf.ndf.org2any import org2html
 
 ##############################################################################
 
@@ -65,7 +68,7 @@ theme_gst = collection.GSystemType.one({"name": "Theme"})
 theme_item_gst = collection.GSystemType.one({"name": "theme_item"})
 topic_gst = collection.GSystemType.one({"name": "Topic"})
 GST_IMAGE = collection.GSystemType.one({'name': 'Image', '_type': 'GSystemType'})
-nroer_id = User.objects.get(username="nroer_team").id
+nroer_team_id = 1
 
 class Command(BaseCommand):
     help = "\n\tFor saving E-Book data in gstudio DB from NROER E-Book schema files. This will create 'File' type GSystem instances."
@@ -82,7 +85,9 @@ class Command(BaseCommand):
 
                     file_extension = os.path.splitext(file_name)[1]
 
-                    if "csv" in file_extension:                        
+                    if "csv" in file_extension:
+
+                        total_rows = 0                     
 
                         # Process csv file and convert it to json format at first
                         info_message = "\n- CSV File (" + file_path + ") found!!!"
@@ -100,7 +105,12 @@ class Command(BaseCommand):
                                 json_file_content = []
 
                                 for row in csv_file_content:
+                                    total_rows += 1
                                     json_file_content.append(row)
+
+                                info_message = "\n- File '" + file_name + "' contains : " + str(total_rows) + " entries/rows (excluding top-header/column-names)." 
+                                print info_message
+                                log_list.append(str(info_message))
 
                             with open(json_file_path, 'w') as json_file:
                                 json.dump(json_file_content, json_file, indent=4, sort_keys=False)
@@ -128,16 +138,27 @@ class Command(BaseCommand):
                         raise Exception(error_mesage)
 
                     if is_json_file_exists:
+
+                        create_user_nroer_team()
+
                         # Process json file and create required GSystems, GRelations, and GAttributes
-                        info_message = "\n------- Task initiated: Processing json-file -------\n"
+                        info_message = "\n------- Initiating task of processing json-file -------\n"
                         print info_message
                         log_list.append(str(info_message))
 
+                        t0 = time.time()
                         parse_data_create_gsystem(file_path)
+                        t1 = time.time()
+
+                        time_diff = t1 - t0
+                        # print time_diff
+                        total_time_minute = round( (time_diff/60), 2) if time_diff else 0
+                        total_time_hour = round( (time_diff/(60*60)), 2) if time_diff else 0
                         
                         # End of processing json file
 
                         info_message = "\n------- Task finised: Successfully processed json-file -------\n"
+                        info_message += "- Total time taken for the processing: \n\n\t" + str(total_time_minute) + " MINUTES\n\t=== OR ===\n\t" + str(total_time_hour) + " HOURS\n"
                         print info_message
                         log_list.append(str(info_message))
                         # End of creation of respective GSystems, GAttributes and GRelations for Enrollment
@@ -168,7 +189,34 @@ class Command(BaseCommand):
   # --- End of handle() ---
 
 
+def create_user_nroer_team():
+    '''
+    Check for the user: "nroer_team". If it doesn't exists, create one.
+    '''
+    global nroer_team_id
+
+    if User.objects.filter(username="nroer_team"):
+        nroer_team_id = get_user_id("nroer_team")
+    
+    else:
+        info_message = "\n- Creating super user: 'nroer_team': "
+        user = User.objects.create_superuser(username='nroer_team', password='nroer_team', email='nroer_team@example.com')
+    
+        nroer_team_id = user.id
+    
+        info_message += "\n- Created super user with following creadentials: "
+        info_message += "\n\n\tusername = 'nroer_team', \n\tpassword = 'nroer_team', \n\temail = 'nroer_team@example.com', \n\tid = '" + str(nroer_team_id) + "'"
+        print info_message
+        log_list.append(info_message)
+        
+
 def get_user_id(user_name):
+    '''
+    Takes the "user name" as an argument and returns:
+    - django "use id" as a response. 
+    else
+    - returns False.
+    '''
     try:
         user_obj = User.objects.get(username=user_name)
         return int(user_obj.id)
@@ -177,6 +225,51 @@ def get_user_id(user_name):
         print error_message
         log_list.append(str(error_message))
         return False
+
+
+def cast_to_data_type(value, data_type):
+    '''
+    This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
+    '''
+
+    value = value.strip()
+    casted_value = value
+
+    if data_type == unicode:
+        casted_value = unicode(value)
+
+    elif data_type == basestring:
+        casted_value = str(value)
+
+    elif (data_type == int) and str(value):
+        casted_value = int(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type == float) and str(value):
+        casted_value = float(value) if (str.isdigit(str(value))) else value
+
+    elif (data_type == long) and str(value):
+        casted_value = long(value) if (str.isdigit(str(value))) else value
+
+    elif data_type == bool and str(value): # converting unicode to int and then to bool
+        casted_value = bool(int(value)) if (str.isdigit(str(value))) else bool(value)
+
+    elif (data_type == list) or isinstance(data_type, list):
+        value = value.replace("\n", "").replace(" and ", ",").split(",")
+        
+        # check for complex list type like: [int] or [unicode]
+        if isinstance(data_type, list) and len(data_type) and isinstance(data_type[0], type):
+            casted_value = [data_type[0](i.strip()) for i in value if i]
+
+        else:  # otherwise normal list
+            casted_value = [i.strip() for i in value if i]
+
+    elif data_type == datetime.datetime:
+        # "value" should be in following example format
+        # In [10]: datetime.datetime.strptime( "11/12/2014", "%d/%m/%Y")
+        # Out[10]: datetime.datetime(2014, 12, 11, 0, 0)
+        casted_value = datetime.datetime.strptime(value, "%d/%m/%Y")
+        
+    return casted_value
 
 
 def parse_data_create_gsystem(json_file_path):
@@ -236,7 +329,6 @@ def parse_data_create_gsystem(json_file_path):
                 
                 if parsed_key in node_keys:
                     # print parsed_key
-
                     # adding the default field values like: created_by, member_of, ...
 
                     # created_by:
@@ -245,9 +337,11 @@ def parse_data_create_gsystem(json_file_path):
                             temp_user_id = get_user_id(json_document[key].strip())
                             if temp_user_id:
                                 parsed_json_document[parsed_key] = temp_user_id
+                            else:
+                                parsed_json_document[parsed_key] = nroer_team_id                            
                         else:
                             # parsed_json_document[parsed_key] = get_user_id("nroer_team")
-                            parsed_json_document[parsed_key] = nroer_id
+                            parsed_json_document[parsed_key] = nroer_team_id
                        # print "---", parsed_json_document[parsed_key]
                       
                     # contributors:
@@ -260,19 +354,23 @@ def parse_data_create_gsystem(json_file_path):
                                 user_id = get_user_id(each_user.strip())
                                 if user_id:
                                     temp_contributors.append(user_id)
+
                             parsed_json_document[parsed_key] = temp_contributors
                         else:
-                            parsed_json_document[parsed_key] = []
+                            parsed_json_document[parsed_key] = [nroer_team_id]
                             # print "===", parsed_json_document[parsed_key]
                       
                     # tags:
-                    if (parsed_key == "tags") and json_document[key]:
-                        tag_list = json_document[key].replace("\n", "").split(",")
-                        temp_tag_list = []
-                        for each_tag in tag_list:
-                          if each_tag:
-                            temp_tag_list.append(each_tag.strip())
-                        parsed_json_document[parsed_key] = temp_tag_list
+                    elif (parsed_key == "tags") and json_document[key]:
+                        
+                        parsed_json_document[parsed_key] = cast_to_data_type(json_document[key], node_structure.get(parsed_key))
+
+                        # tag_list = json_document[key].replace("\n", "").split(",")
+                        # temp_tag_list = []
+                        # for each_tag in tag_list:
+                        #   if each_tag:
+                        #     temp_tag_list.append(each_tag.strip())
+                        # parsed_json_document[parsed_key] = temp_tag_list
                         # print parsed_json_document[parsed_key]
                       
                     # member_of:
@@ -283,20 +381,22 @@ def parse_data_create_gsystem(json_file_path):
                       # --- END of adding the default field values
 
                     # processing for remaining fields
-                    elif node_structure[parsed_key] == unicode:
-                        parsed_json_document[parsed_key] = unicode(json_document[key])
-                    elif node_structure[parsed_key] == basestring:
-                        parsed_json_document[parsed_key] = str(json_document[key])
-                    elif (node_structure[parsed_key] == int) and (type(json_document[key]) == int):
-                        parsed_json_document[parsed_key] = int(json_document[key])
-                    elif node_structure[parsed_key] == bool: # converting unicode to int and then to bool
-                        parsed_json_document[parsed_key] = bool(int(json_document[key]))
-                      # elif node_structure[parsed_key] == list:
-                        # parsed_json_document[parsed_key] = list(json_document[key])
-                    elif node_structure[parsed_key] == datetime.datetime:
-                       parsed_json_document[parsed_key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
+                    # elif node_structure[parsed_key] == unicode:
+                    #     parsed_json_document[parsed_key] = unicode(json_document[key])
+                    # elif node_structure[parsed_key] == basestring:
+                    #     parsed_json_document[parsed_key] = str(json_document[key])
+                    # elif (node_structure[parsed_key] == int) and (type(json_document[key]) == int):
+                    #     parsed_json_document[parsed_key] = int(json_document[key])
+                    # elif node_structure[parsed_key] == bool: # converting unicode to int and then to bool
+                    #     parsed_json_document[parsed_key] = bool(int(json_document[key]))
+                    #   # elif node_structure[parsed_key] == list:
+                    #     # parsed_json_document[parsed_key] = list(json_document[key])
+                    # elif node_structure[parsed_key] == datetime.datetime:
+                    #    parsed_json_document[parsed_key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
                     else:
-                        parsed_json_document[parsed_key] = json_document[key]
+                        # parsed_json_document[parsed_key] = json_document[key]
+                        parsed_json_document[parsed_key] = cast_to_data_type(json_document[key], node_structure.get(parsed_key))
+
 
                     # --- END of processing for remaining fields
 
@@ -307,10 +407,11 @@ def parse_data_create_gsystem(json_file_path):
             # calling method to create File GSystems
             nodeid = create_resource_gsystem(parsed_json_document)
             # print type(nodeid), "nodeid ------- : ", nodeid, "\n"
-            node = collection.Node.one({ "_id": ObjectId(nodeid) })
 
             # starting processing for the attributes and relations saving
-            if node and attribute_relation_list:
+            if isinstance(nodeid, ObjectId) and attribute_relation_list:
+
+                node = collection.Node.one({ "_id": ObjectId(nodeid) })
 
                 gst_possible_attributes_dict = node.get_possible_attributes(file_gst._id)
                 # print gst_possible_attributes_dict
@@ -332,56 +433,73 @@ def parse_data_create_gsystem(json_file_path):
                             is_relation = False
 
                             # setting value to "0" for int, float, long (to avoid casting error)
-                            if (attr_value['data_type'] in [int, float, long]) and (not json_document[key]):
-                                json_document[key] = 0
+                            # if (attr_value['data_type'] in [int, float, long]) and (not json_document[key]):
+                            #     json_document[key] = 0
 
                             if json_document[key]:
 
-                                if attr_value['data_type'] == basestring:
+                                info_message = "\n- For GAttribute parsing content | key: '" + attr_key + "' having value: '" + json_document[key]  + "'"
+                                print info_message
+                                log_list.append(str(info_message))
 
-                                    info_message = "\n- For GAttribute parsing content | key: " + attr_key + " -- value: " + json_document[key]
-                                    print info_message
-                                    log_list.append(str(info_message))
+                                cast_to_data_type(json_document[key], attr_value['data_type'])
 
-                                elif attr_value['data_type'] == unicode:
-                                    json_document[key] = unicode(json_document[key])
-
-                                elif attr_value['data_type'] == bool: 
+                                if attr_value['data_type'] == "curricular":
                                     # setting int values for CR/XCR
                                     if json_document[key] == "CR":
-                                      json_document[key] = 1
+                                        json_document[key] = 1
                                     elif json_document[key] == "XCR":
-                                      json_document[key] = 0
+                                        json_document[key] = 0
+                                    else:  # needs to be confirm
+                                        json_document[key] = 0
+
+                                json_document[key] = cast_to_data_type(json_document[key], attr_value['data_type'])
+
+                                # if attr_value['data_type'] == basestring:
+
+                                #     info_message = "\n- For GAttribute parsing content | key: " + attr_key + " -- value: " + json_document[key]
+                                #     print info_message
+                                #     log_list.append(str(info_message))
+
+                                # elif attr_value['data_type'] == unicode:
+                                #     json_document[key] = unicode(json_document[key])
+
+                                # elif attr_value['data_type'] == bool: 
+                                #     # setting int values for CR/XCR
+                                #     if json_document[key] == "CR":
+                                #       json_document[key] = 1
+                                #     elif json_document[key] == "XCR":
+                                #       json_document[key] = 0
                                     
-                                    json_document[key] = bool(int(json_document[key]))
+                                #     json_document[key] = bool(int(json_document[key]))
                                     
-                                elif attr_value['data_type'] == datetime.datetime:
-                                    json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
+                                # elif attr_value['data_type'] == datetime.datetime:
+                                #     json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
 
-                                elif attr_value['data_type'] == int:
-                                    json_document[key] = int(json_document[key])
-                                elif attr_value['data_type'] == float:
-                                    json_document[key] = float(json_document[key])
-                                elif attr_value['data_type'] == long:
-                                    json_document[key] = long(json_document[key])
+                                # elif attr_value['data_type'] == int:
+                                #     json_document[key] = int(json_document[key])
+                                # elif attr_value['data_type'] == float:
+                                #     json_document[key] = float(json_document[key])
+                                # elif attr_value['data_type'] == long:
+                                #     json_document[key] = long(json_document[key])
 
-                                elif type(attr_value['data_type']) == IS:
-                                    for op in attr_value['data_type']._operands:
-                                        if op.lower() == json_document[key].lower():
-                                            json_document[key] = op
+                                # elif type(attr_value['data_type']) == IS:
+                                #     for op in attr_value['data_type']._operands:
+                                #         if op.lower() == json_document[key].lower():
+                                #             json_document[key] = op
 
-                                elif (attr_value['data_type'] in [list, dict]) or (type(attr_value['data_type']) in [list, dict]):
-                                    if "," not in json_document[key]:
-                                        # Necessary to inform perform_eval_type() that handle this value as list
-                                        json_document[key] = "\"" + json_document[key] + "\", "
+                                # elif (attr_value['data_type'] in [list, dict]) or (type(attr_value['data_type']) in [list, dict]):
+                                #     if "," not in json_document[key]:
+                                #         # Necessary to inform perform_eval_type() that handle this value as list
+                                #         json_document[key] = "\"" + json_document[key] + "\", "
 
-                                    else:
-                                        formatted_value = ""
-                                        for v in json_document[key].split(","):
-                                            formatted_value += "\""+v.strip(" ")+"\", "
-                                            json_document[key] = formatted_value
+                                #     else:
+                                #         formatted_value = ""
+                                #         for v in json_document[key].split(","):
+                                #             formatted_value += "\""+v.strip(" ")+"\", "
+                                #             json_document[key] = formatted_value
 
-                                    perform_eval_type(key, json_document, "GSystem")
+                                #     perform_eval_type(key, json_document, "GSystem")
 
                                 subject_id = node._id
                                 # print "\n-----\nsubject_id: ", subject_id
@@ -412,6 +530,8 @@ def parse_data_create_gsystem(json_file_path):
                                 print error_message
                                 log_list.append(str(error_message))
 
+                        # ---END of if (key == attr_key)
+
                     if is_relation:
                         relation_list.append(key)
 
@@ -428,7 +548,6 @@ def parse_data_create_gsystem(json_file_path):
                 # processing each entry in relation_list
                 for key in relation_list:
                   is_relation = True
-
 
                   for rel_key, rel_value in gst_possible_relations_dict.iteritems():
                     if key == rel_key: # commented because teaches is only relation being used for time being
@@ -649,7 +768,7 @@ def check_folder_exists(resource_link, base_folder_name):
                         img_type = None
                         language = ""
 
-                        cover_page_oid, video = save_file(files, cover_page_name, nroer_id, home_group._id, content_org, tags, img_type, language, "nroer_team", u"PUBLIC", count=0, first_object="")
+                        cover_page_oid, video = save_file(files, cover_page_name, nroer_team_id, home_group._id, content_org, tags, img_type, language, "nroer_team", u"PUBLIC", count=0, first_object="")
 
                         cover_page_url = update_url_field(cover_page_oid, cover_page_name)
                         # cover_page_in_content_org = "[[http://" + current_site.domain + "/" + os.getlogin() + "/file/readDoc/" + cover_page_oid.__str__() + "/" + cover_page_name + "]]"
@@ -701,7 +820,7 @@ def check_folder_exists(resource_link, base_folder_name):
             files.seek(0)
             language = ""
 
-            fileobj_oid, video = save_file(files, name, nroer_id, home_group._id, content_org, [], None, language, "nroer_team", u"PUBLIC", count=0, first_object="")
+            fileobj_oid, video = save_file(files, name, nroer_team_id, home_group._id, content_org, [], None, language, "nroer_team", u"PUBLIC", count=0, first_object="")
 
             # creating grelation "has_cover_page"
             if fileobj_oid and cover_page_oid:
@@ -770,19 +889,10 @@ def create_resource_gsystem(resource_data):
     name = unicode(resource_data["name"])  # name to be given to gsystem
     files.name = filename # as per requirements in save_file()
 
-    userid = nroer_id
+    userid = nroer_team_id
     content_org = resource_data["content_org"]
 
-    # processing tags
-    if not type(resource_data["tags"]) is list:
-        tag_list = resource_data["tags"].replace("\n", "").split(",")
-        temp_tag_list = []
-        for each_tag in tag_list:
-            if each_tag:
-                temp_tag_list.append(each_tag.strip())
-        tags = temp_tag_list
-    else:
-        tags = resource_data["tags"]
+    tags = resource_data["tags"]
 
     img_type = None
     language = resource_data["language"]

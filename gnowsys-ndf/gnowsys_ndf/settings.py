@@ -355,7 +355,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     #'django.core.context_processors.csrf',
 )
 
-INSTALLED_APPS = (	
+INSTALLED_APPS = (  
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -369,14 +369,14 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
-    # 'gnowsys_ndf.mobwrite',	#textb
-#    'south',			#textb
-    # 'django_extensions',	#textb
-    # 'reversion',		#textb
-    # 'django.contrib.flatpages',	#textb
+    # 'gnowsys_ndf.mobwrite',   #textb
+#    'south',           #textb
+    # 'django_extensions',  #textb
+    # 'reversion',      #textb
+    # 'django.contrib.flatpages',   #textb
     # 'online_status',                       #for online_users     
 #    'endless_pagination',
-	'jsonrpc',
+    'jsonrpc',
     'registration_email',
 )
 
@@ -524,13 +524,13 @@ GSTUDIO_RESOURCES_INTERACTIVITY_TYPE = [ "Active", "Expositive", "Mixed" ]
 
 GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = [ "NCF", "State", "All" ]
 
-GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = [ "Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary", "Primary and Upper Primary", "Primary, Upper Primary and Secondary", "Primary, Upper Primary, Secondary and Senior Secondary", "Secondary and Senior Secondary", "Upper Primary, Secondary and Senior Secondary", "Upper Primary and Secondary", "Upper Primary and Senior Secondary" ]
+GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = [ "Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary" ]
 
 GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = [ "Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy" ]
 
 GSTUDIO_RESOURCES_CURRICULAR = [ "True", "False" ]
 
-GSTUDIO_RESOURCES_AUDIENCE = [ "Teachers", "Students", "Teacher educators", "Teachers and Students", "Teachers, Students and Teacher educators" ]
+GSTUDIO_RESOURCES_AUDIENCE = [ "Teachers", "Students", "Teacher educators" ]
 
 GSTUDIO_RESOURCES_TEXT_COMPLEXITY = [ "Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard" ]
 
@@ -554,6 +554,14 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
             "States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
+
+GSTUDIO_RESOURCES_CREATION_RATING = 5
+
+GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
+
+GSTUDIO_RESOURCES_REPLY_RATING = 2
+
+
 
 try:
     from local_settings import *
