@@ -107,53 +107,37 @@ def collection_nav(request, group_id):
   '''
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
+    curr_node_id = request.POST.get("curr_node", '')
 
     topic = ""
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-    breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
-    # location = request.POST.get("location", '')
-    # print "location: ",location,"\n"
+    nav_list = request.POST.getlist("nav[]", '')
 
-    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-    if topic_GST._id in node_obj.member_of:
-      topic = "topic"
+    breadcrumbs_list = []
 
-    # Breadcrumbs code
-    if breadcrumbs_list:
-      breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
-      breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
+    curr_node_obj = collection.Node.one({'_id': ObjectId(curr_node_id) })
+    breadcrumbs_list.append( (str(curr_node_obj._id), curr_node_obj.name) )
+
+    if nav_list:
+      for each in nav_list:
+        obj = collection.Node.one({'_id': ObjectId(each) })
+        breadcrumbs_list.append( (str(obj._id), obj.name) )
 
       b_list = []
       for each in breadcrumbs_list:
         b_list.append(each[0])
-      
 
-      selected = node_obj
-      original_node = collection.Node.one({'_id': ObjectId(b_list[0]) })
+      if str(node_obj._id) not in b_list:
+        # Add the tuple if clicked node is not there in breadcrumbs list
+        breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
+      else:
+        # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+        for e in reversed(breadcrumbs_list):
+          if node_id in e:
+            break
+          else:
+            breadcrumbs_list.remove(e)
 
-      # coll_list = get_collection(request, group_id, original_node._id, True)
-
-      breadcrumbs_list = []
-
-
-      breadcrumbs_list = rec(original_node, selected)
-
-      
-      # if str(node_obj._id) not in b_list:
-      #   # Add the tuple if clicked node is not there in breadcrumbs list
-      #   breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
-      # else:
-      #   # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
-      #   for e in reversed(breadcrumbs_list):
-      #     if node_id in e:
-      #       break
-      #     else:
-      #       breadcrumbs_list.remove(e)
-
-    else:
-      breadcrumbs_list = []
-
-    # node_obj.get_neighbourhood(node_obj.member_of)
 
     return render_to_response('ndf/node_ajax_view.html', 
                                 { 'node': node_obj,
@@ -164,22 +148,6 @@ def collection_nav(request, group_id):
                                 },
                                 context_instance = RequestContext(request)
     )
-
-
-def rec(original_node, selected):
-        
-  if original_node._id != selected._id:
-    if original_node.collection_set:
-      for each in original_node.collection_set:
-        obj = collection.Node.one({'_id': each})
-        if original_node._id in obj.prior_node:
-          breadcrumbs_list.append( (str(original_node._id), original_node.name) )
-
-          rec(obj, selecetd)
-  else:
-    breadcrumbs_list.append( (str(selecetd._id), selected.name) )
-
-  return breadcrumbs_list
 
 
 # This view handles the collection list of resource and its breadcrumbs
