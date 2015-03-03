@@ -1,18 +1,12 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
-from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.settings import LANGUAGES
-from gnowsys_ndf.notification import models as notification
-from django_mongokit import get_database
 from gnowsys_ndf.ndf.views.file import save_file
 
 try:
@@ -22,21 +16,21 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation
-from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
-from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.settings import META_TYPE,GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
+# from gnowsys_ndf.ndf.views.methods import get_user_task, get_user_notification, get_user_activity
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 #######################################################################################################################################
 
-db = get_database()
-collection = db[Node.collection_name]
-collection_tr = db[Triple.collection_name]
-gapp_mt = collection.Node.one({'_type': "MetaType", 'name': META_TYPE[0]})
-GST_IMAGE = collection.Node.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
-at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
+gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
+GST_IMAGE = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
+at_user_pref = node_collection.one({'_type': 'AttributeType', 'name': 'user_preference_off'})
 ins_objectid  = ObjectId()
 
 
@@ -46,7 +40,7 @@ ins_objectid  = ObjectId()
 
 
 def userpref(request,group_id):
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     lan_dict={}
     pref=request.POST["pref"]
     fall_back=request.POST["fallback"]
@@ -66,7 +60,7 @@ def uDashboard(request, group_id):
 
     ID = int(usrid)
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
-    auth = collection.Node.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1})
+    auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1})
     group_id = auth._id
 
     group_name = auth.name
@@ -85,26 +79,25 @@ def uDashboard(request, group_id):
         using its md5 
         """
         has_profile_pic_str = "has_profile_pic"
-        gridfs = get_database()['fs.files']
         pp = None
 
         if has_profile_pic_str in request.FILES:
             pp = request.FILES[has_profile_pic_str]
-            has_profile_pic = collection.Node.one({'_type': "RelationType", 'name': has_profile_pic_str})
+            has_profile_pic = node_collection.one({'_type': "RelationType", 'name': has_profile_pic_str})
 
             # Find md5
             pp_md5 = hashlib.md5(pp.read()).hexdigest()
             pp.seek(0)
 
             # Check whether this md5 exists in file collection
-            gridfs_node = gridfs.one({'md5': pp_md5})
+            gridfs_node = gridfs_collection.one({'md5': pp_md5})
             if gridfs_node:
                 # md5 exists
                 right_subject = gridfs_node["docid"]
 
                 # Check whether already selected
-                is_already_selected = collection.Triple.one(
-                    {'subject': auth._id, 'right_subject': right_subject, 'status': u"PUBLISHED"}
+                is_already_selected = triple_collection.one(
+                    {'subject': auth._id, 'status': u"PUBLISHED", 'right_subject': right_subject}
                 )
 
                 if is_already_selected:
@@ -117,7 +110,7 @@ def uDashboard(request, group_id):
                     # Reset already uploaded as to be selected
                     profile_pic_image = create_grelation(auth._id, has_profile_pic, right_subject)
 
-                profile_pic_image = collection.Node.one({'_type': "File", '_id': right_subject})
+                profile_pic_image = node_collection.one({'_type': "File", '_id': right_subject})
 
             else:
                 # Otherwise (md5 doesn't exists)
@@ -126,7 +119,7 @@ def uDashboard(request, group_id):
                 #save_file(each,title,userid,group_object._id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                 field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
                 if field_value:
-                    profile_pic_image = collection.Node.one({'_type': "File", '_id': ObjectId(field_value)})
+                    profile_pic_image = node_collection.one({'_type': "File", '_id': ObjectId(field_value)})
                 # Create new grelation and append it to that along with given user
                 if profile_pic_image:
                     gr_node = create_grelation(auth._id, has_profile_pic, profile_pic_image._id)
@@ -134,16 +127,16 @@ def uDashboard(request, group_id):
     dashboard_count={}  
     group_list=[]
     user_activity=[]
-    group_cur = collection.Node.find(
+    group_cur = node_collection.find(
         {'_type': "Group", 'name': {'$nin': ["home", request.user.username]}, 
         '$or': [{'group_admin': request.user.id}, {'author_set': request.user.id}],
     }).sort('last_update', -1).limit(10)
 
     dashboard_count.update({'group':group_cur.count()})  
 
-    GST_PAGE = collection.Node.one({'_type': "GSystemType", 'name': 'Page'})
-    page_cur = collection.GSystem.find({'member_of': {'$all': [GST_PAGE._id]}, 'created_by':int(ID)})
-    file_cur = collection.Node.find({'_type':  u"File", 'created_by': int(ID) })
+    GST_PAGE = node_collection.one({'_type': "GSystemType", 'name': 'Page'})
+    page_cur = node_collection.find({'member_of': {'$all': [GST_PAGE._id]}, 'created_by':int(ID)})
+    file_cur = node_collection.find({'_type':  u"File", 'created_by': int(ID) })
 
     for i in group_cur:
         group_list.append(i)
@@ -152,7 +145,7 @@ def uDashboard(request, group_id):
     #user_notification = get_user_notification(userObject)
     #user_activity = get_user_activity(userObject)
     activity = ""
-    activity_user = collection.Node.find(
+    activity_user = node_collection.find(
         {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
         {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
     }).sort('last_update', -1).limit(10)
@@ -176,7 +169,7 @@ def uDashboard(request, group_id):
         if each._type == 'Group':
             user_activity.append(each)
         else:
-            member_of = collection.Node.find_one({"_id":each.member_of[0]})
+            member_of = node_collection.find_one({"_id": each.member_of[0]})
             user_activity.append(each)
     
     notification_list=[]    
@@ -189,20 +182,20 @@ def uDashboard(request, group_id):
 
     # Retrieving Tasks Assigned for User (Only "New" and "In Progress")
     user_assigned = []
-    # attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    # attr_assignee = collection.Node.find(
+    # attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    # attr_assignee = triple_collection.find(
     #     {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": request.user.id}
     # ).sort('last_update', -1).limit(10)
     
     # dashboard_count.update({'Task':attr_assignee.count()})
     # for attr in attr_assignee :
-    #     task_node = collection.Node.one({'_id':attr.subject})
+    #     task_node = node_collection.one({'_id':attr.subject})
     #     if task_node:   
     #         user_assigned.append(task_node) 
-    task_gst = collection.Node.one(
+    task_gst = node_collection.one(
         {'_type': "GSystemType", 'name': "Task"}
     )
-    task_cur = collection.Node.find(
+    task_cur = node_collection.find(
         {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee': request.user.id}
     ).sort('last_update', -1).limit(10)
 
@@ -211,7 +204,7 @@ def uDashboard(request, group_id):
     for task_node in task_cur:
         user_assigned.append(task_node)
 
-    obj = collection.Node.find(
+    obj = node_collection.find(
         {'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}}
     )
     collab_drawer = []  
@@ -227,7 +220,7 @@ def uDashboard(request, group_id):
         if auth:
             for each in auth.relation_set:
                 if "has_profile_pic" in each:
-                    profile_pic_image = collection.Node.one(
+                    profile_pic_image = node_collection.one(
                         {'_type': "File", '_id': each["has_profile_pic"][0]}
                     )
 
@@ -249,7 +242,7 @@ def uDashboard(request, group_id):
 
 def user_preferences(request,group_id,auth_id):
     try:
-        grp=collection.Node.one({'_id':ObjectId(auth_id)})
+        grp = node_collection.one({'_id': ObjectId(auth_id)})
         if request.method == "POST":
             lst = []
             pref_to_set = request.POST['pref_to_set']
@@ -257,17 +250,19 @@ def user_preferences(request,group_id,auth_id):
             if pref_list:
                 for each in pref_list:
                     if each:
-                        obj=collection.Node.one({'_id':ObjectId(each)})
+                        obj = node_collection.one({'_id':ObjectId(each)})
                         lst.append(obj);
-                gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_user_pref._id},{'subject':grp._id}]})
-                if gattribute:
-                    gattribute.delete()
                 if lst:
-                    create_attribute=collection.GAttribute()
-                    create_attribute.attribute_type=at_user_pref
-                    create_attribute.subject=grp._id
-                    create_attribute.object_value=lst
-                    create_attribute.save()            
+                    ga_node = create_gattribute(grp._id, at_user_pref, lst)
+                # gattribute = triple_collection.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_user_pref._id},{'subject':grp._id}]})
+                # if gattribute:
+                #     gattribute.delete()
+                # if lst:
+                #     create_attribute=collection.GAttribute()
+                #     create_attribute.attribute_type=at_user_pref
+                #     create_attribute.subject=grp._id
+                #     create_attribute.object_value=lst
+                #     create_attribute.save()            
             return HttpResponse("Success")
 
 
@@ -282,7 +277,7 @@ def user_preferences(request,group_id,auth_id):
             all_user_groups=[]
             for each in get_all_user_groups():
                 all_user_groups.append(each.name)
-            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
+            st = node_collection.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
             data_list=set_drawer_widget(st,list_at_pref)
             return HttpResponse(json.dumps(data_list))
     except Exception as e:
@@ -292,15 +287,15 @@ def user_preferences(request,group_id,auth_id):
 def user_template_view(request,group_id):
     auth_group = None
     group_list=[]
-    group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}}).limit(4)
+    group_cur = node_collection.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}}).limit(4)
     for i in group_cur:
         group_list.append(i)
 
     blank_list = []
-    attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username})
+    attributetype_assignee = node_collection.find_one({"_type": 'AttributeType', 'name':'Assignee'})
+    attr_assignee = triple_collection.find({"_type": "GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username})
     for attr in attr_assignee :
-     task_node = collection.Node.find_one({'_id':attr.subject})
+     task_node = node_collection.find_one({'_id': attr.subject})
      blank_list.append(task_node) 
        
     notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)
@@ -313,7 +308,7 @@ def user_template_view(request,group_id):
      
     blank_list = []
     activity = ""
-    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'Group'},{'_type':'File'}]}, 
+    activity_user = node_collection.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'Group'},{'_type':'File'}]}, 
                                                  {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] }).sort('last_update', -1).limit(4)
     for each in activity_user:
       if each.created_by == each.modified_by :
@@ -326,7 +321,7 @@ def user_template_view(request,group_id):
       if each._type == 'Group':
         blank_list.append(each)
       else :
-        member_of = collection.Node.find_one({"_id":each.member_of[0]})
+        member_of = node_collection.find_one({"_id": each.member_of[0]})
         blank_list.append(each)
     
     
@@ -337,7 +332,7 @@ def user_template_view(request,group_id):
 
 @login_required
 def user_activity(request, group_id):
-    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
+    activity_user = node_collection.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
                                                  
                                                  {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
 
@@ -354,7 +349,7 @@ def user_activity(request, group_id):
       if each._type == 'Group':
         blank_list.append(each)
       else :
-        member_of = collection.Node.find_one({"_id":each.member_of[0]})
+        member_of = node_collection.find_one({"_id":each.member_of[0]})
         blank_list.append(each)
     template = "ndf/User_Activity.html"
     #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
@@ -365,21 +360,20 @@ def group_dashboard(request, group_id):
     """
     This view returns data required for group's dashboard.
     """
-    gridfs = get_database()['fs.files']
     profile_pic_image = None
     has_profile_pic_str = ""
     
     if ObjectId.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else :
-        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+        group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
         if group_ins:
             group_id = group_ins._id
     
@@ -393,22 +387,21 @@ def group_dashboard(request, group_id):
         if (request.POST.get('type','')=='profile_pic'):
           has_profile_pic_str="has_profile_pic"  
         
-        gridfs = get_database()['fs.files']
         pp = None
         profile_pic_image=""
         if has_profile_pic_str in request.FILES:
             pp = request.FILES[has_profile_pic_str]
-            has_profile_pic = collection.Node.one({'_type': "RelationType", 'name': has_profile_pic_str})
+            has_profile_pic = node_collection.one({'_type': "RelationType", 'name': has_profile_pic_str})
             # Find md5
             pp_md5 = hashlib.md5(pp.read()).hexdigest()
             # Check whether this md5 exists in file collection
-            gridfs_node = gridfs.one({'md5': pp_md5})
+            gridfs_node = gridfs_collection.one({'md5': pp_md5})
             if gridfs_node:
                 # md5 exists
                 right_subject = gridfs_node["docid"]
                 
                 # Check whether already selected
-                is_already_selected = collection.Triple.one(
+                is_already_selected = triple_collection.one(
                     {'subject': group_id, 'right_subject': right_subject, 'status': u"PUBLISHED"}
                 )
 
@@ -422,28 +415,28 @@ def group_dashboard(request, group_id):
                     # Reset already uploaded as to be selected
                     profile_pic_image = create_grelation(ObjectId(group_id), has_profile_pic, right_subject)
 
-                profile_pic_image = collection.Node.one({'_type': "File", '_id': right_subject})
+                profile_pic_image = node_collection.one({'_type': "File", '_id': right_subject})
             else:
                 # Otherwise (md5 doesn't exists)
                 # Upload image
                 # submitDoc(request, group_id)
                 field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
-                profile_pic_image = collection.Node.one({'_type': "File", 'name': unicode(pp)})
+                profile_pic_image = node_collection.one({'_type': "File", 'name': unicode(pp)})
                 # Create new grelation and append it to that along with given user
                 if profile_pic_image:
                     gr_node = create_grelation(group_id, has_profile_pic, profile_pic_image._id)
 
     banner_pic=""
-    group=collection.Node.one({"_id":ObjectId(group_id)})
+    group = node_collection.one({"_id": ObjectId(group_id)})
     for each in group.relation_set:
                 if "has_profile_pic" in each:
                     if each["has_profile_pic"]:
-                        profile_pic_image = collection.Node.one(
+                        profile_pic_image = node_collection.one(
                             {'_type': "File", '_id': each["has_profile_pic"][0]}
                         )
                 if "has_Banner_pic" in each:
                     if each["has_Banner_pic"]:
-                        banner_pic = collection.Node.one(
+                        banner_pic = node_collection.one(
                             {'_type': "File", '_id': each["has_Banner_pic"][0]}
                         )
 
@@ -452,10 +445,10 @@ def group_dashboard(request, group_id):
     enrollment_details = []
     enrollment_columns = []
 
-    sce_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
+    sce_gst = node_collection.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
     if sce_gst:
         # Get StudentCourseEnrollment nodes which are there for approval
-        sce_cur = collection.Node.find({
+        sce_cur = node_collection.find({
             'member_of': sce_gst._id, 'group_set': ObjectId(group_id),
             "attribute_set.enrollment_status": {"$nin": [u"OPEN"]},
             'status': u"PUBLISHED"

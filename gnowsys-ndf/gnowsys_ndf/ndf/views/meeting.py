@@ -1,70 +1,60 @@
 ''' -- imports from installed packages -- '''
-import json
+# import json
+# import datetime
+import unicodedata
 
-from django.shortcuts import render_to_response, render
-from django.template import RequestContext
-from django.template import Context
-from django.template.defaultfilters import slugify
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
-from django.http import HttpResponse
-from django.template.loader import get_template
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-
-######################
-
-from django.contrib.auth.models import User
-from django.core.cache import cache
-from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response  # , render
+from django.template import RequestContext
+# from django.template import Context
+# from django.template.defaultfilters import slugify
+# from django.template.loader import get_template
 from django.template.context import RequestContext
+# from django.core.urlresolvers import reverse
+# from django.http import HttpResponseRedirect
+from django.http import HttpResponse
+from django.core.cache import cache
 from django.utils import simplejson
-from online_status.status import CACHE_USERS
-from online_status.utils import encode_json
-from gnowsys_ndf.ndf.models import Group
 
-
-
-
-from django_mongokit import get_database
-from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
-from gnowsys_ndf.settings import GAPPS
-
-from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
-from gnowsys_ndf.ndf.views.notify import set_notif_val
-import datetime
-from gnowsys_ndf.ndf.org2any import org2html
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
-import unicodedata
 
-db = get_database()
-col_Group = db[Group.collection_name]
-sitename=Site.objects.all()[0]
+######################
+
+# from gnowsys_ndf.settings import GAPPS
+# from gnowsys_ndf.ndf.org2any import org2html
+# from gnowsys_ndf.ndf.models import Node, GSystemType, GSystem, Group
+from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.views.notify import set_notif_val
+# from gnowsys_ndf.ndf.views.methods import get_forum_repl_type, forum_notification_status
+
+from online_status.status import CACHE_USERS
+from online_status.utils import encode_json
 
 ##################
-collection = get_database()[Node.collection_name]
-app=collection.Node.one({'name':u'Meeting','_type':'GSystemType'})
+sitename = Site.objects.all()[0]
 
+app = node_collection.one({'_type': 'GSystemType', 'name': u'Meeting'})
 ##################
 
-def output(request, group_id, meetingid):                                                               #ramkarnani
+
+def output(request, group_id, meetingid):
 	newmeetingid = meetingid
 	ins_objectid  = ObjectId()
         if ins_objectid.is_valid(group_id) is False:
-            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if group_ins:
                 group_id = str(group_ins._id)
             else :
-                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
                 if auth :
                     group_id = str(auth._id)
         else:
-            group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+            group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
             pass
             #template = "https://chatb/#"+meetingid
 	
@@ -77,16 +67,16 @@ def dashb(request, group_id):                                                   
     """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False:
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else:
-        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+        group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})
         pass
     online_users = cache.get(CACHE_USERS)
     online_users = simplejson.dumps(online_users, default=encode_json)	
@@ -110,7 +100,7 @@ def get_online_users(request, group_id):                                        
 def invite_meeting(request, group_id, meetingid):                                                                  #ramkarnani
 	try:
             # print "here in view"
-            colg=col_Group.Group.one({'_id':ObjectId(group_id)})
+            colg = node_collection.one({'_id': ObjectId(group_id)})
             groupname=colg.name
             # print "\n\nPOST : ", request
             recipient = request.GET.get("usr","")

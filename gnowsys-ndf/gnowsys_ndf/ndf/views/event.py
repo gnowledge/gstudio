@@ -13,8 +13,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
 
-from django_mongokit import get_database
-
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -22,31 +20,32 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
+from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
-collection = get_database()[Node.collection_name]
+
 def event(request, group_id):
  
  if ObjectId.is_valid(group_id) is False :
-    group_ins = collection.Node.one({'_type': "Group","name": group_id})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.one({'_type': "Group","name": group_id})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
  else :
     pass
  #view written just to show the landing page of the events
  group_inverse_rel_id = [] 
- Group_type=collection.Node.one({'_id':ObjectId(group_id)})
+ Group_type=node_collection.one({'_id':ObjectId(group_id)})
  for i in Group_type.relation_set:
      if unicode("group_of") in i.keys():
         group_inverse_rel_id = i['group_of']
- Group_name = collection.Node.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
+ Group_name = node_collection.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
  Eventtype='Eventtype'
  if Group_name:
 
@@ -55,11 +54,11 @@ def event(request, group_id):
     else:
          Eventtype='Eventtype'
       
- Glisttype=collection.Node.find({"name":"GList"})
+ Glisttype=node_collection.find({"_type": "GSystemType", "name":"GList"})
  #bug
- #Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
+ #Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":"Eventtype"},{'collection_set': 1})
  #buggy
- Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":unicode(Eventtype)},{'collection_set': 1})
+ Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":unicode(Eventtype)},{'collection_set': 1})
  
  app_collection_set=[]
  Mis_admin_list=[]
@@ -67,7 +66,7 @@ def event(request, group_id):
  #check for exam session to be created only by the Mis_Admin
 
  Add=""
- Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+ Mis_admin=node_collection.one({"_type":"Group","name":"MIS_admin"})
  if  Mis_admin:
     Mis_admin_list=Mis_admin.group_admin
     Mis_admin_list.append(Mis_admin.created_by)
@@ -80,7 +79,7 @@ def event(request, group_id):
 
  if Event_Types:
     for eachset in Event_Types.collection_set:
-          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
  return render_to_response('ndf/event.html',{'app_collection_set':app_collection_set,
                                              'groupid':group_id,
                                              'group_id':group_id,
@@ -97,12 +96,12 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   """
   auth = None
   if ObjectId.is_valid(group_id) is False :
-    group_ins = collection.Node.one({'_type': "Group","name": group_id})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.one({'_type': "Group","name": group_id})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
   else :
@@ -111,11 +110,11 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   app = None
   session_node = ""
   '''if app_id is None:
-    app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+    app = node_collection.one({'_type': "GSystemType", 'name': app_name})
     if app:
       app_id = str(app._id)
   else:'''
-  app = collection.Node.one({'_id': ObjectId(app_id)})
+  app = node_collection.one({'_id': ObjectId(app_id)})
   
   #app_name = app.name 
 
@@ -137,22 +136,22 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
   if request.user:
     if auth is None:
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
   '''  agency_type = auth.agency_type
-    Event_Types = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    Event_Types = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if Event_Types:
       for eachset in Event_Types.collection_set:
-        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
   # for eachset in app.collection_set:
-  #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   group_inverse_rel_id = []
-  Group_type=collection.Node.one({'_id':ObjectId(group_id)})
+  Group_type=node_collection.one({'_id':ObjectId(group_id)})
   for i in Group_type.relation_set:
        if unicode("group_of") in i.keys():
           group_inverse_rel_id = i['group_of']
   
-  Group_name = collection.Node.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
+  Group_name = node_collection.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
   Eventtype='Eventtype'
   if Group_name:
 
@@ -161,17 +160,17 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       else:
            Eventtype='Eventtype'
 
-  Glisttype=collection.Node.find({"name":"GList"})
-  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
+  Glisttype=node_collection.find({"name":"GList"})
+  Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
   app_collection_set=[]
   if Event_Types:
     for eachset in Event_Types.collection_set:
-          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   
   nodes = None
   if app_set_id:
-    event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+    event_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = event_gst.name
   
     template = "ndf/event_list.html"
@@ -179,10 +178,10 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     if request.method=="POST":
       search = request.POST.get("search","")
       classtype = request.POST.get("class","")
-      # nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [event_gst._id]}}))
-      nodes = collection.Node.find({'member_of': event_gst._id, 'name': {'$regex': search, '$options': 'i'}})
+      # nodes = list(node_collection.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [event_gst._id]}}))
+      nodes = node_collection.find({'member_of': event_gst._id, 'name': {'$regex': search, '$options': 'i'}})
     else:
-      nodes = collection.Node.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
+      nodes = node_collection.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
       
   node = None
   event_reschedule_check = False
@@ -193,7 +192,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   if app_set_instance_id :
     template = "ndf/event_details.html"
 
-    node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
+    node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     # property_order_list = get_property_order_with_value(node)
     # print "\n property_order_list: ", property_order_list, "\n"
     
@@ -220,23 +219,23 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                 
     for i in node.relation_set:
        if unicode('event_has_batch') in i.keys():
-            batch=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
-            batch_relation=collection.Node.one({'_type':"GSystem",'_id':ObjectId(batch._id)},{'relation_set':1})
+            batch=node_collection.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
+            batch_relation=node_collection.one({'_type':"GSystem",'_id':ObjectId(batch._id)},{'relation_set':1})
             for i in batch_relation['relation_set']:
                if  unicode('has_course') in i.keys(): 
-                   announced_course =collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['has_course'][0])})
+                   announced_course =node_collection.one({"_type":"GSystem",'_id':ObjectId(i['has_course'][0])})
                    for i in  announced_course.relation_set:
                       if unicode('announced_for') in i.keys():
-                            course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
+                            course=node_collection.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
             batch=batch.name
        if unicode('session_of') in i.keys():
-            event_has_session = collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})
-            session_node = collection.Node.one({'_id':ObjectId(event_has_session._id)},{'attribute_set':1})
+            event_has_session = node_collection.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})
+            session_node = node_collection.one({'_id':ObjectId(event_has_session._id)},{'attribute_set':1})
 
            
   #   print "\n node.keys(): ", node.keys(), "\n"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
-  Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+  Mis_admin=node_collection.one({"_type":"Group","name":"MIS_admin"})
   if  Mis_admin:
     Mis_admin_list=Mis_admin.group_admin
     Mis_admin_list.append(Mis_admin.created_by)
@@ -301,12 +300,12 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   """
   auth = None
   if ObjectId.is_valid(group_id) is False :
-    group_ins = collection.Node.one({'_type': "Group","name": group_id})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.one({'_type': "Group","name": group_id})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
   else :
@@ -314,11 +313,11 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   ''' 
   app = None
   if app_id is None:
-    app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+    app = node_collection.one({'_type': "GSystemType", 'name': app_name})
     if app:
       app_id = str(app._id)
   else:
-    app = collection.Node.one({'_id': ObjectId(app_id)})
+    app = node_collection.one({'_id': ObjectId(app_id)})
 
   app_name = app.name 
   '''
@@ -339,20 +338,20 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
   '''if request.user:
     if auth is None:
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
     agency_type = auth.agency_type
-    Event_Types = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    Event_Types = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if Event_Types:
       for eachset in Event_Types.collection_set:
-        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
   '''
 
   group_inverse_rel_id = [] 
-  Group_type=collection.Node.one({'_id':ObjectId(group_id)})
+  Group_type=node_collection.one({'_id':ObjectId(group_id)})
   for i in Group_type.relation_set:
        if unicode("group_of") in i.keys():
           group_inverse_rel_id = i['group_of']
-  Group_name = collection.Node.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
+  Group_name = node_collection.one({'_type':'GSystem','_id':{'$in':group_inverse_rel_id}})
   Eventtype='Eventtype'
   if Group_name:
 
@@ -360,15 +359,15 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
            Eventtype='CollegeEvents'     
       else:
            Eventtype='Eventtype'
-  Glisttype=collection.Node.find({"name":"GList"})
-  Event_Types = collection.Node.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
+  Glisttype=node_collection.find({"_type": "GSystemType", "name":"GList"})
+  Event_Types = node_collection.one({"member_of":ObjectId(Glisttype[0]["_id"]),"name":Eventtype},{'collection_set': 1})
   app_collection_set=[]
   if Event_Types:
     for eachset in Event_Types.collection_set:
-          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   # for eachset in app.collection_set:
-  #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
   iteration=request.POST.get("iteration","")
   if iteration == "":
         iteration=1
@@ -376,13 +375,13 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
         
   for i in range(int(iteration)):
    if app_set_id:
-     event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+     event_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
      title = event_gst.name
-     event_gs = collection.GSystem()
+     event_gs = node_collection.collection.GSystem()
      event_gs.member_of.append(event_gst._id)
 
    if app_set_instance_id:
-     event_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
+     event_gs = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
    property_order_list = get_property_order_with_value(event_gs)#.property_order
    
    if request.method == "POST":
@@ -420,7 +419,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
 
         # * Fetch only Attribute field(s) / Relation field(s)
         if field_set.has_key('_id'):
-          field_instance = collection.Node.one({'_id': field_set['_id']})
+          field_instance = node_collection.one({'_id': field_set['_id']})
           field_instance_type = type(field_instance)
 
           if field_instance_type in [AttributeType, RelationType]:
@@ -467,7 +466,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
               
               if field_value:
-                event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
+                event_gs_triple_instance = create_gattribute(event_gs._id, node_collection.collection.AttributeType(field_instance), field_value)
                 # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
             else:
@@ -478,7 +477,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                 field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%d/%m/%Y %H:%M")
                 field_value_list[i] = field_value
               if field_value_list:
-                event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value_list)
+                event_gs_triple_instance = create_grelation(event_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
               # if isinstance(event_gs_triple_instance, list):
               #   print "\n"
               #   for each in event_gs_triple_instance:
@@ -496,19 +495,19 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   val=False
   for i in event_gs.relation_set:
        if unicode('event_has_batch') in i.keys():
-            batch=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
-            batch_relation=collection.Node.one({'_type':"GSystem",'_id':ObjectId(batch._id)},{'relation_set':1})
+            batch=node_collection.one({'_type':"GSystem",'_id':ObjectId(i['event_has_batch'][0])})
+            batch_relation=node_collection.one({'_type':"GSystem",'_id':ObjectId(batch._id)},{'relation_set':1})
             for i in batch_relation['relation_set']:
                if  unicode('has_course') in i.keys(): 
-                   announced_course =collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['has_course'][0])})
+                   announced_course =node_collection.one({"_type":"GSystem",'_id':ObjectId(i['has_course'][0])})
                    for i in  announced_course.relation_set:
                       if unicode('announced_for') in i.keys():
-                            course=collection.Node.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
+                            course=node_collection.one({"_type":"GSystem",'_id':ObjectId(i['announced_for'][0])})
        if unicode('session_of') in i.keys(): 
-                session_of=collection.Node.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})                     
-                module=collection.Node.one({'_type':"GSystem",'_id':{'$in':session_of.prior_node}})
+                session_of=node_collection.one({'_type':"GSystem",'_id':ObjectId(i['session_of'][0])})                     
+                module=node_collection.one({'_type':"GSystem",'_id':{'$in':session_of.prior_node}})
   event_gs.event_coordinator
-  Mis_admin=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+  Mis_admin=node_collection.one({"_type":"Group","name":"MIS_admin"})
   if  Mis_admin:
     Mis_admin_list=Mis_admin.group_admin
     Mis_admin_list.append(Mis_admin.created_by)

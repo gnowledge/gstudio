@@ -14,8 +14,6 @@ from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
-from django_mongokit import get_database
-
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -25,6 +23,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.file import *
@@ -32,11 +31,9 @@ from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
-
 #######################################################################################################################################
 
-db = get_database()
-collection = db[Node.collection_name]
+
 def graphs(request,group_id):
 		# HttpResponseRedirect("ndf/visualize.html",
 		# 					 	{
@@ -46,12 +43,12 @@ def graphs(request,group_id):
 		# 					 )
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-	    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+	    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    if group_ins:
 	        group_id = str(group_ins._id)
 	    else :
-	        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	        if auth :
 	            group_id = str(auth._id)
 
@@ -60,12 +57,12 @@ def graphs(request,group_id):
 # def graph_display(request, group_id):
 # 	ns_objectid  = ObjectId()
 # 	if ins_objectid.is_valid(group_id) is False :
-# 	    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-# 	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+# 	    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 	    if group_ins:
 # 	        group_id = str(group_ins._id)
 # 	    else :
-# 	        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 	        if auth :
 # 	            group_id = str(auth._id)
 
