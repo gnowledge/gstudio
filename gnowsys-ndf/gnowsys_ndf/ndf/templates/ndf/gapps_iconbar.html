@@ -74,7 +74,7 @@
                 {% if app_dict.name|lower == selectedGapp|lower %} active
                 {% elif app_dict.id|safe == selectedGapp|safe %} active {% endif %}">
 
-                  <a class="{{app_dict.name|title}} app" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
+                  <a class="{{app_dict.name|title}} app" href="{% url app_dict.name|lower group_name_tag %}">
                       {{app_name}}
                   </a>
 
@@ -95,7 +95,7 @@
                     </li>
 
                     <li>
-                      <a href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">List {{app_name}}</a>
+                      <a href="{% url app_dict.name|lower group_name_tag %}">List {{app_name}}</a>
                     </li>
 
                   </ul>
@@ -106,13 +106,19 @@
 
                 <li class="{% if app_dict.name|lower == selectedGapp|lower %} active {% elif app_dict.id|safe == selectedGapp|safe %} active {% endif %}">
 
-                  <a class="{{app_dict.name|title}} app" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
-                    {% if app_name == "Term" %}
-                      Topic
+                    {% if app_name == "MIS" %}
+                      <a class="{{app_dict.name|title}} app" href="/{{group_name_tag}}/mis">
+                      {{app_name|upper}}
+                      </a>
                     {% else %}
-                      {{app_name}}
+                      <a class="{{app_dict.name|title}} app" href="{% url app_dict.name|lower group_name_tag %}">
+                      {% if app_name == "Term" %}
+                        Topic
+                      {% else %}
+                        {{app_name}}
+                      {% endif %}
+                      </a>
                     {% endif %}
-                  </a>
 
                 </li>
 

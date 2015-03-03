@@ -1,40 +1,42 @@
+import datetime
+import json
+
 from django.http import HttpResponseRedirect
-#from django.http import HttpResponse
+from django.http import StreamingHttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render_to_response #render  uncomment when to use
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from django_mongokit import get_database
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.http import HttpResponseRedirect,StreamingHttpResponse
-from django.http import HttpResponse
-from mongokit import paginator
 from django.utils import simplejson
-from online_status.utils import encode_json			
-import datetime
-import json
-from gnowsys_ndf.ndf.models import NodeJSONEncoder
+from online_status.utils import encode_json     
+
+from mongokit import paginator
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import Node, GSystemType
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import save_file
-from gnowsys_ndf.ndf.models import GSystemType, Node 
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node
-from gnowsys_ndf.ndf.views.methods import parse_template_data, create_grelation
+from gnowsys_ndf.ndf.views.methods import parse_template_data, create_gattribute, create_grelation
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-collection = get_database()[Node.collection_name]
+
 sitename=Site.objects.all()
-app = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+app = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
 
 if sitename :
 	sitename = sitename[0]
 else : 
 	sitename = ""
+
 
 def task(request, group_name, task_id=None):
     """Renders a list of all 'task' available within the database.
@@ -42,20 +44,20 @@ def task(request, group_name, task_id=None):
     """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_name) is False :
-      group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      group_ins = node_collection.find_one({'_type': "Group","name": group_name})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if group_ins:
         group_id = str(group_ins._id)
       else :
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :
           group_id = str(auth._id)
     else :
         pass
 
-    GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+    GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
     title = "Task"
-    TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     template = "ndf/task.html"
     variable = RequestContext(request, {'title': title, 'appId':app._id, 'TASK_inst': TASK_inst, 'group_id': group_id, 'groupid': group_id, 'group_name':group_name })
     return render_to_response(template, variable)
@@ -64,29 +66,29 @@ def task_details(request, group_name, task_id):
   """Renders given task's details.
   
   """
-  if ObjectId.is_valid(group_name) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  if ObjectId.is_valid(group_name) is False:
+    group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
   
-  elif ObjectId.is_valid(group_name) is True :
-    group_ins = collection.Node.find_one({'_type': "Group","_id":ObjectId(group_name)})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
+  elif ObjectId.is_valid(group_name) is True:
+    group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_name)})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })  
   
   if group_ins:
       group_id = str(group_ins._id)
   else :
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if auth :	
       group_id = str(auth._id)
 
-  task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
+  task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
   at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"]
   blank_dict = {}
   history = []
   subtask = []
   for each in at_list:
-    attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
-    attr = collection.Node.find_one({"_type":"GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
+    attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
+    attr = node_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
     if attr:
       if attributetype_key.name == "Assignee":
         u_list = []
@@ -101,13 +103,13 @@ def task_details(request, group_name, task_id):
         blank_dict[each] = attr.object_value
   
   if task_node.prior_node:
-    blank_dict['parent'] = collection.Node.one({'_id':task_node.prior_node[0]}).name 
+    blank_dict['parent'] = node_collection.one({'_id': task_node.prior_node[0]}).name 
   
   if task_node.post_node:
     for each_postnode in task_node.post_node:
-      sys_each_postnode = collection.Node.find_one({'_id':each_postnode})
+      sys_each_postnode = node_collection.find_one({'_id': each_postnode})
       sys_each_postnode_user = User.objects.get(id=sys_each_postnode.created_by)
-      member_of_name = collection.Node.find_one({'_id':sys_each_postnode.member_of[0]}).name 
+      member_of_name = node_collection.find_one({'_id': sys_each_postnode.member_of[0]}).name 
       
       if member_of_name == "Task" :
         subtask.append({
@@ -140,7 +142,7 @@ def task_details(request, group_name, task_id):
   if task_node.relation_set:
     for rel in task_node.relation_set:
       for k in rel:
-        task_type = collection.Node.one({'_id': rel[k][0]}, {'name': 1})
+        task_type = node_collection.one({'_id': rel[k][0]}, {'name': 1})
         if task_type:
           blank_dict[k] = task_type["name"]
 
@@ -166,7 +168,7 @@ def task_details(request, group_name, task_id):
 
 def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None, slug=None):
     if request.method == "POST" :
-        group_object=collection.Group.one({'name':unicode(group_name), "_type": "Group"})
+        group_object = node_collection.one({'name': unicode(group_name), "_type": "Group"})
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
 
             title = each.name
@@ -207,29 +209,29 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
   userlist = []
   
   if ObjectId.is_valid(group_name) is False:
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.find_one({'_type': "Group","name": group_name})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
   elif ObjectId.is_valid(group_name) is True:
-    group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_name)})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
+    group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(group_name)})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })  
 
   if group_ins:
     group_id = str(group_ins._id)
   else:
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if auth:
       group_id = str(auth._id)
 
   blank_dict = {}
 
   if task_id:
-    task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
+    task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
     edit_task_node = task_node
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"]
 
   else:
-    task_node = collection.GSystem()
+    task_node = node_collection.collection.GSystem()
 
   userlist=[]
   user_to_be_notified = []
@@ -244,7 +246,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
     Assignee = request.POST.get("Assignee","")
     Estimated_time = request.POST.get("Estimated_time","")
     watchers = request.POST.get("watchers", "")
-    GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+    GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
 
     tag=""
     field_value=[]
@@ -272,7 +274,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
     if parent: # prior node saving
       if not task_id:		
         task_node.prior_node = [ObjectId(parent)]
-        parent_object = collection.Node.find_one({'_id':ObjectId(parent)})
+        parent_object = node_collection.find_one({'_id': ObjectId(parent)})
         parent_object.post_node = [task_node._id]
         parent_object.save()
       
@@ -281,17 +283,17 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
           parent_task_check = "yes"
           if not task_node.prior_node:
             task_node.prior_node = [ObjectId(parent)]
-            changed_object = collection.Node.find_one({'_id':ObjectId(parent)})
+            changed_object = node_collection.find_one({'_id': ObjectId(parent)})
             changed_object.post_node.append(task_node._id)
             changed_object.save()
             change_list.append('parent set to '+changed_object.name)
 
           else:
-            parent_object = collection.Node.find_one({'_id':task_node.prior_node[0]})
+            parent_object = node_collection.find_one({'_id': task_node.prior_node[0]})
             parent_object.post_node.remove(task_node._id)
             parent_object.save()
             task_node.prior_node = [ObjectId(parent)]
-            changed_object = collection.Node.find_one({'_id':ObjectId(parent)})
+            changed_object = node_collection.find_one({'_id': ObjectId(parent)})
             changed_object.post_node.append(task_node._id)
             changed_object.save()
             change_list.append('Parent changed from '+parent_object.name+' to '+changed_object.name) # updated details
@@ -303,7 +305,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
   	
     if not task_id: # create
       for each in rt_list:
-        rel_type_node = collection.Node.one({'_type': "RelationType", 'name': each})
+        rel_type_node = node_collection.one({'_type': "RelationType", 'name': each})
         field_value_list = None
 
         if rel_type_node["object_cardinality"] > 1:
@@ -321,21 +323,24 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
           field_value = parse_template_data(rel_type_node.object_type, field_value, field_instance=rel_type_node)
           field_value_list[i] = field_value
 
-        task_gs_triple_instance = create_grelation(task_node._id, collection.RelationType(rel_type_node), field_value_list)
+        task_gs_triple_instance = create_grelation(task_node._id, node_collection.collection.RelationType(rel_type_node), field_value_list)
 
       for each in at_list:
         if request.POST.get(each,""):
-          attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
-          newattribute = collection.GAttribute()
-          newattribute.subject = task_node._id
-          newattribute.attribute_type = attributetype_key
+          attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
+          # newattribute = triple_collection.collection.GAttribute()
+          # newattribute.subject = task_node._id
+          # newattribute.attribute_type = attributetype_key
+          subject = task_node._id
+          object_value = ""
           if each == 'Assignee':
             field_value = request.POST.getlist("Assignee", "")
             
             for i, val in enumerate(field_value):
               field_value[i] = int(val)
           
-            newattribute.object_value = field_value
+            # newattribute.object_value = field_value
+            object_value = field_value
 
             # if count == 0:
             #   # newattribute.object_value = [request.user.username]
@@ -359,24 +364,27 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
               date_format_string = "%d/%m/%Y"
 
             field_value = parse_template_data(eval(attributetype_key["data_type"]), field_value, date_format_string=date_format_string)
-            newattribute.object_value = field_value
+            # newattribute.object_value = field_value
+            object_value = field_value
     
-          newattribute.save()
-    
+          # newattribute.save()
+          ga_node = create_gattribute(subject, attributetype_key, object_value)
+
       if request.FILES.getlist('UploadTask'):
-        attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
-        newattribute = collection.GAttribute()
-        newattribute.subject = task_node._id
-        newattribute.attribute_type = attributetype_key
-        newattribute.object_value = file_id
-        newattribute.save()
+        attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
+        # newattribute = triple_collection.collection.GAttribute()
+        # newattribute.subject = task_node._id
+        # newattribute.attribute_type = attributetype_key
+        # newattribute.object_value = file_id
+        # newattribute.save()
+        ga_node = create_gattribute(task_node._id, attributetype_key, file_id)
 
       if int(len(request.POST.getlist("Assignee","")))>1:
         if task is None:
-          Task = collection.Node.find_one({"_id":ObjectId(task_node._id)})
+          Task = node_collection.find_one({"_id": ObjectId(task_node._id)})
 
         else:
-          Task = collection.Node.find_one({"_id":ObjectId(task)})
+          Task = node_collection.find_one({"_id": ObjectId(task)})
           Task.collection_set.append(task_node._id)
         
         Task.save()
@@ -415,7 +423,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
     else: #update
       assignee_list = []
       for each in rt_list:
-        rel_type_node = collection.Node.one({'_type': "RelationType", 'name': each})
+        rel_type_node = node_collection.one({'_type': "RelationType", 'name': each})
         field_value_list = None
 
         if rel_type_node["object_cardinality"] > 1:
@@ -436,13 +444,13 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
         for rel in task_node.relation_set:
           for k in rel:
             if rel_type_node.name == k:
-              vals_cur = collection.Node.find({'_id': {'$in': rel[k]}}, {'name': 1})
+              vals_cur = node_collection.find({'_id': {'$in': rel[k]}}, {'name': 1})
               for v_node in vals_cur:
                 old_value.append(v_node.name)
                 break
 
         new_value = []
-        vals_cur = collection.Node.find({'_id': {'$in': field_value_list}}, {'name': 1})
+        vals_cur = node_collection.find({'_id': {'$in': field_value_list}}, {'name': 1})
         for v_node in vals_cur:
           new_value.append(v_node.name)
           break
@@ -450,13 +458,13 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
         if old_value != new_value:
           change_list.append(each.encode('utf8') + ' changed from ' + ", ".join(old_value) + ' to ' + ", ".join(new_value))  # updated  details
 
-        task_gs_triple_instance = create_grelation(task_node._id, collection.RelationType(rel_type_node), field_value_list)
+        task_gs_triple_instance = create_grelation(task_node._id, node_collection.collection.RelationType(rel_type_node), field_value_list)
         task_node.reload()
 
       for each in at_list:
         if request.POST.get(each, ""):
-          attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
-          attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+          attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
+          attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
           if each == "Assignee":
             field_value = request.POST.getlist(each, "")
             
@@ -498,31 +506,34 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
               attr.save()
           
           else:
-            # attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
-            newattribute = collection.GAttribute()
-            newattribute.subject = task_node._id
-            newattribute.attribute_type = attributetype_key
+            # attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':each})
+            # newattribute = triple_collection.collection.GAttribute()
+            # newattribute.subject = task_node._id
+            # newattribute.attribute_type = attributetype_key
             # newattribute.object_value = request.POST.get(each,"")
-            newattribute.object_value = field_value
-            newattribute.save()
+            # newattribute.object_value = field_value
+            # newattribute.save()
+            ga_node = create_gattribute(task_node._id, attributetype_key, field_value)
             # change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
             change_list.append(each.encode('utf8')+' set to '+str(field_value)) # updated details
 
         elif each == 'Upload_Task':
-          attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
-          attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+          attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': 'Upload_Task'})
+          attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
           if attr:
             value=get_file_node(attr.object_value)
             change_list.append(each.encode('utf8')+' changed from '+str(value).strip('[]')+' to '+str(file_name))
-            attr.object_value=file_id
-            attr.save()
+            # attr.object_value=file_id
+            # attr.save()
+            ga_node = create_gattribute(attr.subject, attributetype_key, file_id)
       
           else:
-            newattribute = collection.GAttribute()
-            newattribute.subject = task_node._id
-            newattribute.attribute_type = attributetype_key
-            newattribute.object_value = file_id
-            newattribute.save()
+            # newattribute = node_collection.collection.GAttribute()
+            # newattribute.subject = task_node._id
+            # newattribute.attribute_type = attributetype_key
+            # newattribute.object_value = file_id
+            # newattribute.save()
+            ga_node = create_gattribute(task_node._id, attributetype_key, file_id)
             change_list.append(each.encode('utf8')+' set to '+file_name.encode('utf8')) # updated details
       
       # userobj = User.objects.get(id=task_node.created_by)
@@ -547,8 +558,8 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
         set_notif_val(request,group_id,msg,activ,bx)
 
       if change_list or content_org:
-        GST_task_update_history = collection.Node.one({'_type': "GSystemType", 'name': 'task_update_history'})
-        update_node = collection.GSystem()
+        GST_task_update_history = node_collection.one({'_type': "GSystemType", 'name': 'task_update_history'})
+        update_node = node_collection.collection.GSystem()
         get_node_common_fields(request, update_node, group_id, GST_task_update_history)
         if change_list:
           update_node.altnames = unicode(str(change_list))
@@ -565,7 +576,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
         task_node.save()
         
         # patch
-        GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 			
+        GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
         get_node_common_fields(request, task_node, group_id, GST_TASK)
         task_node.save()
         # End Patch        
@@ -575,8 +586,8 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
   # Filling blank_dict in below if block
   if task_id:
     for each in at_list:
-      attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
-      attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+      attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
+      attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
       if attr:
         if each == "Upload_Task":
           file_list=[]
@@ -589,24 +600,24 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
           ins_objectid  = ObjectId()
           for i in new_list:
             if  ins_objectid.is_valid(i) is False:
-              filedoc=collection.Node.find({'_type':'File','name':unicode(i)})
+              filedoc = node_collection.find({'_type': 'File', 'name': unicode(i)})
           
             else:
-              filedoc=collection.Node.find({'_type':'File','_id':ObjectId(i)})			
+              filedoc = node_collection.find({'_type': 'File', '_id': ObjectId(i)})
             
             if filedoc:
               for i in filedoc:
                 file_list.append(i.name)
         
           blank_dict[each] = json.dumps(file_list)
-          blank_dict['select'] = json.dumps(new_list)                
+          blank_dict['select'] = json.dumps(new_list)
 
-        else:          
+        else:
           blank_dict[each] = attr.object_value
     
     if task_node.prior_node:
-      pri_node = collection.Node.one({'_id':task_node.prior_node[0]})
-      blank_dict['parent'] = pri_node.name 
+      pri_node = node_collection.one({'_id': task_node.prior_node[0]})
+      blank_dict['parent'] = pri_node.name
       blank_dict['parent_id'] = str(pri_node._id)
 
     # Appending TaskType to blank_dict, i.e. "has_type" relationship
@@ -626,17 +637,17 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
       blank_dict["Watchers"] = watchers_list
 
   # Fetch Task Type list values
-  glist = collection.Node.one(
+  glist = node_collection.one(
     {'_type': "GSystemType", 'name': "GList"}, 
     {'name': 1}
   )
-  task_type_node = collection.Node.one(
+  task_type_node = node_collection.one(
     {'_type': "GSystem", 'member_of': glist._id, 'name': "TaskType"},
     {'collection_set': 1}
   )
   task_type_list = []
   for task_type_id in task_type_node.collection_set:
-    task_type = collection.Node.one({'_id': task_type_id}, {'name': 1})
+    task_type = node_collection.one({'_id': task_type_id}, {'name': 1})
     if task_type:
       if task_type not in task_type_list:
         task_type_list.append(task_type)
@@ -662,26 +673,26 @@ def task_collection(request,group_name,task_id=None,each_page=1):
     
     task=[]
     if ins_objectid.is_valid(group_name) is False :
-      group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if group_ins:
         group_id = str(group_ins._id)
       else :
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :
           group_id = str(auth._id)
     else :
         pass
     collection_task=[]
-    node = collection.Node.one({'_id':ObjectId(task_id)})
+    node = node_collection.one({'_id': ObjectId(task_id)})
     attr_value = {}
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]	
     for each in node.collection_set:
         attr_value = {}
-    	new = collection.Node.one({'_id':ObjectId(each)})
+    	new = node_collection.one({'_id': ObjectId(each)})
     	for attrvalue in at_list:
-		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':attrvalue})
-		attr = collection.Node.find_one({"_type":"GAttribute", "subject":new._id, "attribute_type.$id":attributetype_key._id})
+		attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': attrvalue})
+		attr = triple_collection.find_one({"_type": "GAttribute", "subject": new._id, "attribute_type.$id": attributetype_key._id})
 		if attr:
 			attr_value.update({attrvalue:attr.object_value})
 		else:
@@ -706,33 +717,33 @@ def delete_task(request, group_name, _id):
     """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_name) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else :
         pass
     pageurl = request.GET.get("next", "")
     try:
-        node = collection.Node.one({'_id':ObjectId(_id)})
+        node = node_collection.one({'_id': ObjectId(_id)})
         if node:
-            attributes = collection.Triple.find({'_type':'GAttribute','subject':node._id})
-            relations = collection.Triple.find({'_type':'GRelation','subject':node._id})
+            attributes = triple_collection.find({'_type': 'GAttribute', 'subject': node._id})
+            relations = triple_collection.find({'_type': 'GRelation', 'subject': node._id})
             if attributes.count() > 0:
                 for each in attributes:
-                    collection.Triple.one({'_id':each['_id']}).delete()
-                    
+                    triple_collection.one({'_id': each['_id']}).delete()
+
             if relations.count() > 0:
                 for each in relations:
-                    collection.Triple.one({'_id':each['_id']}).delete()
+                    triple_collection.one({'_id': each['_id']}).delete()
 	    if len(node.post_node) > 0 :
 		for each in node.post_node : 
-		    sys_each_postnode = collection.Node.find_one({'_id':each})
-		    member_of_name = collection.Node.find_one({'_id':sys_each_postnode.member_of[0]}).name 
+		    sys_each_postnode = node_collection.find_one({'_id': each})
+		    member_of_name = node_collection.find_one({'_id': sys_each_postnode.member_of[0]}).name 
 		    if member_of_name == "Task" :
 			sys_each_postnode.prior_node.remove(node._id)
 			sys_each_postnode.save()
@@ -753,25 +764,25 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     ins_objectid  = ObjectId()
     task=[]
     if ins_objectid.is_valid(group_name) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group","name": group_name})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else :
         pass
     
     #section to get the Tasks 
-    group=collection.Node.find_one({'_id':ObjectId(group_id)})
-    GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
-    attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    group = node_collection.find_one({'_id': ObjectId(group_id)})
+    GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
+    attributetype_key1 = node_collection.find_one({"_type": 'AttributeType', 'name': 'Assignee'})
 
     Completed_Status_List=['Resolved','Closed']
     title = "Task"
-    TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    TASK_inst = node_collection.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     task_list=[]
     message="" 	
     send="This group doesn't have any files"
@@ -788,9 +799,9 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
         attr_value={}
 
         for attrvalue in at_list:
-            attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':attrvalue})
-            attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
-            attr1 = collection.Node.find_one({"_type":"GAttribute","subject":each._id, "attribute_type.$id":attributetype_key1._id,"object_value":request.user.username})
+            attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':attrvalue})
+            attr = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key._id})
+            attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key1._id, "object_value": request.user.username})
             if attr:
                 if attrvalue == "Assignee":
                     uname_list = []
@@ -828,14 +839,14 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
                 
                 if int(choice) == int(3):
                     message="No Task Created"
-                    auth1 = collection.Node.one({'_type': 'Author', 'created_by': each.created_by })   
+                    auth1 = node_collection.one({'_type': 'Author', 'created_by': each.created_by })   
                     if auth:    		
                         if auth.name == auth1.name:
                             task_list.append(dict(attr_value))
                 
                 if int(choice) == int(4):
                     message="Nothing Assigned"
-                    attr1 = collection.Node.find_one({"_type":"GAttribute","subject":each._id, "attribute_type.$id":attributetype_key1._id,"object_value":request.user.username})
+                    attr1 = triple_collection.find_one({"_type": "GAttribute", "subject": each._id, "attribute_type.$id": attributetype_key1._id, "object_value": request.user.username})
                     if attr1:
                         task_list.append(dict(attr_value))
                 
