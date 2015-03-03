@@ -97,7 +97,8 @@
         <ul class="left">
 
           <li>
-            <a href="{% url 'GAPPS' 'home' 'topics' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
+            <!-- <a href="{#% url 'GAPPS' 'home' 'topics' %#}" {#% if nroer_menu.top_menu_selected == "Repository" %#}class="active"{#% endif %#}> -->
+            <a href="{% url 'topics' 'home' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
@@ -355,7 +356,8 @@
                     {% for each_gapp in nroer_menu.gapps %}
                       {% for k, v in each_gapp.items %}
                         <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
-                          <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
+                          <!-- <a class="button" {#% if v %#} href="{#% url 'GAPPS' group_name_tag v %#}" {#% endif %#}> -->
+                          <a class="button" {% if v %} href="{% url v group_name_tag %}" {% endif %}>
                             {{k}}
                           </a>
                         </li>
