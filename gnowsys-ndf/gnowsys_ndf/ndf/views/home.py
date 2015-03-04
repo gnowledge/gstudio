@@ -4,6 +4,8 @@
 
 ''' -- imports from installed packages -- '''
 from django.shortcuts import render_to_response, render
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.views.generic import RedirectView
 
@@ -16,18 +18,59 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_LANDING_PAGE
-from gnowsys_ndf.ndf.models import GSystemType,Node
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE
+from gnowsys_ndf.ndf.models import GSystemType, Node
 
 #######################################################################################################################################
 #                                                                                           V I E W S   D E F I N E D   F O R   H O M E
 #######################################################################################################################################
 
 
-def homepage(request):	
+def homepage(request, group_id):
+    
+    if request.user.is_authenticated():
+        collection = get_database()[Node.collection_name]
+        auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
+        if auth_obj:
+            auth_type = auth_obj._id
+        auth = ""
+        auth = collection.Group.one({'_type': u"Author", 'name': unicode(request.user)})            
+        # This will create user document in Author collection to behave user as a group.
+        
+        if auth is None:
+            auth = collection.Author()
+            
+            auth.name = unicode(request.user)
+            auth.email = unicode(request.user.email)
+            auth.password = u""
+            auth.member_of.append(auth_type)
+            auth.group_type = u"PUBLIC"
+            auth.edit_policy = u"NON_EDITABLE"
+            auth.subscription_policy = u"OPEN"
+            user_id = int(request.user.pk)
+            auth.created_by = user_id
+            auth.modified_by = user_id
+            if user_id not in auth.contributors:
+                auth.contributors.append(user_id)
+            # Get group_type and group_affiliation stored in node_holder for this author 
+            try:
+                temp_details=collection.Node.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
+                if temp_details:
+                    auth.agency_type=temp_details.details_to_hold['agency_type']
+                    auth.group_affiliation=temp_details.details_to_hold['group_affiliation']
+            except e as Exception:
+                print "error in getting node_holder details for an author"+str(e)
+            auth.save()
 
-    return render_to_response("ndf/base.html",context_instance=RequestContext(request))
+        return HttpResponseRedirect( reverse('dashboard', kwargs={"group_id": request.user.id}) )
 
+    else:
+        # If user is not loggedin then will redirected to home as our base group.
+        # return "/home/dashboard/group"
+        if GSTUDIO_SITE_LANDING_PAGE == "homepage":
+            return render_to_response("ndf/landing_page_beta.html", context_instance = RequestContext(request))
+        else:
+            return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": group_id}) )
 
 
 # This class overrides the django's default RedirectView class and allows us to redirect it into user group after user logsin   
