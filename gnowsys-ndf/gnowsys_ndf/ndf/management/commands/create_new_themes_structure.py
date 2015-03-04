@@ -1,19 +1,16 @@
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
 
-from django_mongokit import get_database
-
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import node_collection
 ###################################################################################################################################################################################
-collection = get_database()[Node.collection_name]
-theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})  
-theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item' })
+theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})  
+theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item' })
 
 
 class Command(BaseCommand):
@@ -23,8 +20,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         
 
-        grp = collection.Node.one({'_type': 'Group', '_id': ObjectId('5315b7497d9d331e53c12bda')})
-        # grp = collection.Node.one({'_type': 'Group', 'name': 'home'})
+        grp = node_collection.one({'_type': 'Group', '_id': ObjectId('5315b7497d9d331e53c12bda')})
+        # grp = node_collection.one({'_type': 'Group', 'name': 'home'})
 
         lisp = []
         themes_list = []
@@ -32,7 +29,7 @@ class Command(BaseCommand):
 
 
         if grp:
-            nodes = collection.Node.find({'_type': 'GSystem', 'group_set': ObjectId(grp._id), 'member_of': {'$in': [theme_GST._id]} })
+            nodes = node_collection.find({'_type': 'GSystem', 'group_set': ObjectId(grp._id), 'member_of': {'$in': [theme_GST._id]} })
 
             for each in nodes:
                 if each.collection_set:
