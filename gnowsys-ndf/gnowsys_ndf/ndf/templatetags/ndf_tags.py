@@ -383,7 +383,7 @@ def get_attribute_value(node_id, attr):
         # print "node: ",node.name,"\n"
         # print "attr: ",attr,"\n"
 
-        if node and gattr:
+		if node and gattr:
 			node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id})	
 
 	if node_attr:
@@ -562,11 +562,11 @@ def shelf_allowed(node):
 	topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 	allowed_list = [page_GST._id,file_GST._id,course_GST._id,quiz_GST._id,topic_GST._id]
-
-	for each in node.member_of:
-		if each in allowed_list :
-			allowed = "True"
-			return allowed
+	if node:
+		for each in node.member_of:
+			if each in allowed_list :
+				allowed = "True"
+				return allowed
 
 
 # This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
@@ -1767,7 +1767,7 @@ def app_translations(request, app_dict):
 @register.assignment_tag
 def get_preferred_lang(request, group_id, nodes, node_type):
    group = node_collection({'_id':(ObjectId(group_id))})
-   get_translation_rt = node_collection({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
    uname=node_collection.one({'name':str(request.user.username), '_type': {'$in': ["Group", "Author"]}})
    preferred_list=[]
    primary_list=[]

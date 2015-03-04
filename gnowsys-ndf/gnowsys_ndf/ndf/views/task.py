@@ -397,16 +397,18 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
         assignee_list = []
         assignee_list_id = request.POST.getlist("Assignee", "")
         
-        for eachuser in assignee_list_id:
-          bx = User.objects.get(id=int(eachuser))
-        
-          if bx:
-            if bx.username not in assignee_list:
-              assignee_list.append(bx.username)
+        if assignee_list_id:
+          for eachuser in assignee_list_id:
+            if eachuser:
+              bx = User.objects.get(id=int(eachuser))
+            
+              if bx:
+                if bx.username not in assignee_list:
+                  assignee_list.append(bx.username)
 
-            # Adding to list which holds user's to be notified about the task
-            if bx not in user_to_be_notified:
-              user_to_be_notified.append(bx)
+                # Adding to list which holds user's to be notified about the task
+                if bx not in user_to_be_notified:
+                  user_to_be_notified.append(bx)
 
         # Iterating & notifying 
         # list which holds user's to be notified about the task

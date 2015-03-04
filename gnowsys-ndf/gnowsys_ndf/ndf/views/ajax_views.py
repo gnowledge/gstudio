@@ -734,7 +734,7 @@ def add_theme_item(request, group_id):
         if obj.name == name:
           return HttpResponse("failure")
 
-      theme_item_node = collection.GSystem()
+      theme_item_node = node_collection.collection.GSystem()
 
       theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST))
       theme_item_node.reload()
@@ -762,7 +762,7 @@ def add_topics(request, group_id):
     if add_topic_name:
       # print "\ntopic name: ", add_topic_name
       if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
-        node = collection.GSystem()
+        node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, topic_GST)
 
         node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST))
@@ -794,7 +794,7 @@ def add_page(request, group_id):
 
       if name not in collection_list:
 
-        page_node = collection.GSystem()
+        page_node = node_collection.collection.GSystem()
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
         context_node.collection_set.append(page_node._id)
@@ -1053,7 +1053,7 @@ def make_module_set(request, group_id):
                         dict['collection'] = get_module_set_list(node)     #gives the list of collection with proper hierarchy as they are
 
                     #creating new Gsystem object and assining data of collection object
-                    gsystem_obj = collection.GSystem()
+                    gsystem_obj = node_collection.collection.GSystem()
                     gsystem_obj.name = unicode(node.name)
                     gsystem_obj.content = unicode(node.content)
                     gsystem_obj.member_of.append(GST_MODULE._id)
@@ -1402,7 +1402,7 @@ def get_data_for_user_drawer(request, group_id,):
     st_batch_id = request.GET.get('st_batch_id','')
     node_id = request.GET.get('_id','')
     if st_batch_id:
-        batch_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        batch_coll = node_collection.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         group = node_collection.one({'_id':ObjectId(group_id)})
         if batch_coll:
             for each in batch_coll:
@@ -2744,7 +2744,7 @@ def set_user_link(request, group_id):
     result = False
 
     if gr_node:
-      # collection.remove({'_id': gr_node._id})
+      # node_collection.collection.remove({'_id': gr_node._id})
       result = True
       error_message = " Link created successfully. \n\n But facing problem(s) in subscribing to respective college group(s)!!!\n Please use group's 'Subscribe members' button to do so !!!"
 
@@ -4135,7 +4135,7 @@ def approve_students(request, group_id):
             for each in students_selected:
                 # Fetch student node along with selected_course and course_enrollment_status
                 student_id = ObjectId(each)
-                stud_node = collection.aggregate([{
+                stud_node = node_collection.collection.aggregate([{
                     "$match": {
                         "_id": student_id
                     }

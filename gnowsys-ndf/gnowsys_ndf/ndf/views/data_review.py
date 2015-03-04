@@ -100,7 +100,7 @@ def data_review(request, group_id, page_no=1):
     for each_resource in paged_resources.items:
         each_resource, ver = get_page(request, each_resource) 
         each_resource.get_neighbourhood(each_resource.member_of)
-        files_list.append(collection.GSystem(each_resource))
+        files_list.append(node_collection.collection.GSystem(each_resource))
         # print "\n\n\n========", each_resource.keys()
         # for each, val in each_resource.iteritems():
           # print each, "--", val,"\n"
@@ -161,7 +161,7 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
     for each_resource in paged_resources.items:
         each_resource, ver = get_page(request, each_resource) 
         each_resource.get_neighbourhood(each_resource.member_of)
-        files_list.append(collection.GSystem(each_resource))
+        files_list.append(node_collection.collection.GSystem(each_resource))
 
     return render_to_response("ndf/data_review.html",
                 {
@@ -224,7 +224,7 @@ def data_review_save(request, group_id):
 
     license = request.POST.get('license', '')
     
-    file_node = collection.File.one({"_id": ObjectId(node_oid)})
+    file_node = node_collection.one({"_id": ObjectId(node_oid)})
 
     if request.method == "POST":
 
