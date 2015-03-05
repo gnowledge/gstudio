@@ -9576,8 +9576,8 @@ article > footer {
 }
 /* line 515, ../../../scss/_metastudio_styles.scss */
 article .breadcrumbs {
-  display: none;
-  background-color: #eee;
+  /*display: none;*/
+  /*background-color: #eee;*/
 }
 
 /* line 524, ../../../scss/_metastudio_styles.scss */

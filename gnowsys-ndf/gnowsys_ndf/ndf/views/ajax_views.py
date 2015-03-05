@@ -96,67 +96,104 @@ def terms_list(request, group_id):
             context_instance=RequestContext(request)
         )
 
-
+            
+# This ajax view renders the output as "node view" by clicking on collections
 def collection_nav(request, group_id):
-    '''
-    This ajax view renders the output as "node view" by clicking on collections.
-    This ajax function retunrs the node on main template, when clicked on collection hierarchy
-    '''
-    if request.is_ajax() and request.method == "POST":
-        node_id = request.POST.get("node_id", '')
+  '''
+  This ajax function retunrs the node on main template, when clicked on collection hierarchy
+  '''
+  if request.is_ajax() and request.method == "POST":    
+    node_id = request.POST.get("node_id", '')
+    curr_node_id = request.POST.get("curr_node", '')
 
-        topic = ""
-        node_obj = node_collection.one({'_id': ObjectId(node_id)})
-        topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-        if topic_GST._id in node_obj.member_of:
-            topic = "topic"
+    topic = ""
+    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    nav_list = request.POST.getlist("nav[]", '')
 
-        return render_to_response(
-            'ndf/node_ajax_view.html',
-            {
-                'node': node_obj, 'group_id': group_id, 'groupid': group_id,
-                'app_id': node_id, 'topic': topic
-            },
-            context_instance=RequestContext(request)
-        )
+    breadcrumbs_list = []
+
+    curr_node_obj = collection.Node.one({'_id': ObjectId(curr_node_id) })
+    breadcrumbs_list.append( (str(curr_node_obj._id), curr_node_obj.name) )
+
+    if nav_list:
+      for each in nav_list:
+        obj = collection.Node.one({'_id': ObjectId(each) })
+        breadcrumbs_list.append( (str(obj._id), obj.name) )
+
+      b_list = []
+      for each in breadcrumbs_list:
+        b_list.append(each[0])
+
+      if str(node_obj._id) not in b_list:
+        # Add the tuple if clicked node is not there in breadcrumbs list
+        breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
+      else:
+        # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+        for e in reversed(breadcrumbs_list):
+          if node_id in e:
+            break
+          else:
+            breadcrumbs_list.remove(e)
 
 
+    return render_to_response('ndf/node_ajax_view.html', 
+                                { 'node': node_obj,
+                                  'group_id': group_id,
+                                  'groupid':group_id,
+                                  'breadcrumbs_list':breadcrumbs_list,
+                                  'app_id': node_id, 'topic':topic
+                                },
+                                context_instance = RequestContext(request)
+    )
+
+
+# This view handles the collection list of resource and its breadcrumbs
 def collection_view(request, group_id):
-    '''
-    This view handles the collection list of resource and its breadcrumbs.
-    This ajax function returns breadcrumbs_list for clicked node in collection hierarchy
-    '''
-    if request.is_ajax() and request.method == "POST":
-        node_id = request.POST.get("node_id", '')
-        breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
+  '''
+  This ajax function returns breadcrumbs_list for clicked node in collection hierarchy
+  '''
+  if request.is_ajax() and request.method == "POST":    
+    node_id = request.POST.get("node_id", '')
+    # breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
 
-        node_obj = node_collection.one({'_id': ObjectId(node_id)})
-        breadcrumbs_list = breadcrumbs_list.replace("&#39;", "'")
-        breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
+    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    # breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
+    # breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
 
-        b_list = []
-        for each in breadcrumbs_list:
-            b_list.append(each[0])
+    # b_list = []
+    # for each in breadcrumbs_list:
+    #   b_list.append(each[0])
+    
+    # if str(node_obj._id) not in b_list:
+    #   # Add the tuple if clicked node is not there in breadcrumbs list
+    #   breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
+    # else:
+    #   # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+    #   for e in reversed(breadcrumbs_list):
+    #     if node_id in e:
+    #       break
+    #     else:
+    #       breadcrumbs_list.remove(e)
+        
 
-        if str(node_obj._id) not in b_list:
-            # Add the tuple if clicked node is not there in breadcrumbs list
-            breadcrumbs_list.append((str(node_obj._id), node_obj.name))
-        else:
-            # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
-            for e in reversed(breadcrumbs_list):
-                if node_id in e:
-                    break
-                else:
-                    breadcrumbs_list.remove(e)
+        # if str(node_obj._id) not in b_list:
+        #     # Add the tuple if clicked node is not there in breadcrumbs list
+        #     breadcrumbs_list.append((str(node_obj._id), node_obj.name))
+        # else:
+        #     # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+        #     for e in reversed(breadcrumbs_list):
+        #         if node_id in e:
+        #             break
+        #         else:
+        #             breadcrumbs_list.remove(e)
 
     return render_to_response(
         'ndf/collection_ajax_view.html',
         {
             'node': node_obj, 'group_id': group_id, 'groupid': group_id,
-            'breadcrumbs_list': breadcrumbs_list
+            # 'breadcrumbs_list': breadcrumbs_list
         },
         context_instance=RequestContext(request)
-    )
 
 
 @login_required
@@ -668,7 +705,6 @@ def get_inner_collection(collection_list, node):
 def get_collection(request, group_id, node_id):
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
-
   collection_list = []
 
   if node:
@@ -682,6 +718,7 @@ def get_collection(request, group_id, node_id):
 
 
   data = collection_list
+
   return HttpResponse(json.dumps(data))
 # ###End of manipulating nodes collection####
 
