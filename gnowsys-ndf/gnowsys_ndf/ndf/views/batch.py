@@ -15,13 +15,13 @@ except ImportError:  # old pymongo
 
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import GSystemType, Node
-from gnowsys_ndf.ndf.views.methods import create_grelation
+from gnowsys_ndf.ndf.views.methods import create_grelation,get_execution_time
 
 db = get_database()
 collection = db[Node.collection_name]
 GST_BATCH = collection.GSystemType.one({'name': "Batch"})
 app = collection.GSystemType.one({'name': "Batch"})
-
+@get_execution_time
 def batch(request, group_id):
     """
    * Renders a list of all 'batches' available within the database.
@@ -74,7 +74,7 @@ def batch(request, group_id):
     variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id,'nussd_course_name_var':nussd_course_type_name,'announced_course_name_var':announced_course_name, 'ATs': req_ATs,'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id})
     return render_to_response(template, variable)
 
-
+@get_execution_time
 def new_create_and_edit(request, group_id, _id = None):
     node = ""
     count = ""
@@ -140,7 +140,7 @@ def new_create_and_edit(request, group_id, _id = None):
     
     template = "ndf/new_create_batch.html"
     return render_to_response(template, variable)
-        
+@get_execution_time        
 def save_students_for_batches(request, group_id):
     '''
     This save method creates new  and update existing the batches
@@ -154,7 +154,7 @@ def save_students_for_batches(request, group_id):
         for k,v in batch_user_list.items():
             save_batch(k,v, group_id, request, ac_id)
         return HttpResponseRedirect(reverse('batch',kwargs={'group_id':group_id}))
-
+@get_execution_time
 def save_batch(batch_name, user_list, group_id, request, ac_id):
 
     rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
@@ -188,7 +188,7 @@ def save_batch(batch_name, user_list, group_id, request, ac_id):
     create_grelation(b_node._id,rt_has_course,ObjectId(ac_id))
    
     create_grelation(ObjectId(group_id),rt_group_has_batch,all_batches_in_grp)
-
+@get_execution_time
 def detail(request, group_id, _id):
     student_coll = []
     node = collection.Node.one({'_id':ObjectId(_id)})
@@ -204,6 +204,7 @@ def detail(request, group_id, _id):
 
 
 @login_required
+@get_execution_time
 def delete_batch(request,group_id,_id):
     if ObjectId.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})

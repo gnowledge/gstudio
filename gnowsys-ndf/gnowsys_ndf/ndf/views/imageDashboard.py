@@ -15,14 +15,14 @@ from gnowsys_ndf.ndf.models import File
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GAPPS, MEDIA_ROOT
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
 db = get_database()
 collection = db[File.collection_name]
 gapp_mt = collection.Node.one({'_type': "MetaType", 'name': META_TYPE[0]})
 GST_IMAGE = collection.Node.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
-
+@get_execution_time
 def imageDashboard(request, group_id, image_id=None):
     '''
     fetching image acording to group name
@@ -48,6 +48,7 @@ def imageDashboard(request, group_id, image_id=None):
     already_uploaded=request.GET.getlist('var',"")
     variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
     return render_to_response(template, variable)
+@get_execution_time
 def getImageThumbnail(request, group_id, _id):
     '''
     this funciton can be called to get thumbnail of image throw url
@@ -76,7 +77,7 @@ def getImageThumbnail(request, group_id, _id):
     else:
         return HttpResponse("")
         
-    
+@get_execution_time    
 def getFullImage(request, group_id, _id, file_name = ""):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -99,7 +100,7 @@ def getFullImage(request, group_id, _id, file_name = ""):
             return HttpResponse("")
     else:
         return HttpResponse("")
-
+@get_execution_time
 def get_mid_size_img(request, group_id, _id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -121,7 +122,7 @@ def get_mid_size_img(request, group_id, _id):
         f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[0]))
         return HttpResponse(f.read(), content_type=f.content_type)
         
-
+@get_execution_time
 def image_search(request,group_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -142,7 +143,7 @@ def image_search(request,group_id):
         template="ndf/file_search.html"
         variable=RequestContext(request,{'file_collection':img_search,'view_name':'image_search','groupid':group_id,'group_id':group_id})
         return render_to_response(template,variable)
-
+@get_execution_time
 def image_detail(request, group_id, _id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -181,7 +182,7 @@ def image_detail(request, group_id, _id):
                                   },
                                   context_instance = RequestContext(request)
         )
-
+@get_execution_time
 def image_edit(request,group_id,_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :

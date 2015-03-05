@@ -18,7 +18,7 @@ import json
 db = get_database()
 collection = db[Node.collection_name]
 GAPP = collection.Node.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
-
+@get_execution_time
 def lang_pref(request):
     url=request.GET.get('url','')
     appid=request.GET.get('appid','')

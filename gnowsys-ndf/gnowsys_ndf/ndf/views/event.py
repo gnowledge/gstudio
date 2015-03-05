@@ -23,10 +23,11 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
-from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value,get_execution_time
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 collection = get_database()[Node.collection_name]
+@get_execution_time
 def event(request, group_id):
  
  if ObjectId.is_valid(group_id) is False :
@@ -90,7 +91,7 @@ def event(request, group_id):
                               context_instance = RequestContext(request)
                           )
 
-
+@get_execution_time
 def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None):
   """
   View for handling Event and it's sub-types detail-view
@@ -295,6 +296,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   
       
 @login_required
+@get_execution_time
 def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=None):
   """
   View for handling Event and it's sub-types create-edit-view

@@ -38,7 +38,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 db = get_database()
 collection = db[Node.collection_name]
 
-
+@get_execution_time
 def all_observations(request, group_id, app_id=None):
 
 	ins_objectid  = ObjectId()
@@ -122,7 +122,7 @@ def all_observations(request, group_id, app_id=None):
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
-
+@get_execution_time
 def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
 	ins_objectid  = ObjectId()
@@ -216,7 +216,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 							 	context_instance=RequestContext(request) 
 							 )
 
-
+@get_execution_time
 def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 	user_type = request.POST["user"]
 	user_session_id = request.POST["user_session_id"]
@@ -301,7 +301,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 	return StreamingHttpResponse(response_data, {'anonymous_added_markers':cookie_added_markers})
 
 
-
+@get_execution_time
 def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
 	user_type = request.POST["user"]
@@ -349,7 +349,7 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 
 	return StreamingHttpResponse(response_data)
 
-
+@get_execution_time
 def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
     if request.method == "POST" :

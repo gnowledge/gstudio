@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.ndf.models import get_database
 from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -19,7 +20,7 @@ except ImportError:  # old pymongo
 db = get_database()
 col_Group = db[Node.collection_name]
 sitename=Site.objects.all()[0]
-
+@get_execution_time
 def ratings(request,group_id):
     rating=request.POST.get('rating', '')
     node=col_Group.Node.one({'_id':ObjectId(group_id)})

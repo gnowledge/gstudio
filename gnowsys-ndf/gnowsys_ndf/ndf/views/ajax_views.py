@@ -1,3 +1,4 @@
+
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import datetime
@@ -38,7 +39,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
 from gnowsys_ndf.ndf.views.methods import create_gattribute
@@ -54,14 +55,14 @@ topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 # This function is used to check (while creating a new group) group exists or not
 # This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
-
+@get_execution_time 
 class Encoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, ObjectId):
 			return str(obj)
 		else:
 			return obj
-
+@get_execution_time
 def checkgroup(request,group_name):
     titl=request.GET.get("gname","")
     retfl=check_existing_group(titl)
@@ -70,7 +71,7 @@ def checkgroup(request,group_name):
     else:
         return HttpResponse("failure")    
 
-
+@get_execution_time
 def terms_list(request, group_id):
   
     if request.is_ajax() and request.method == "POST":
@@ -101,6 +102,7 @@ def terms_list(request, group_id):
 
             
 # This ajax view renders the output as "node view" by clicking on collections
+@get_execution_time
 def collection_nav(request, group_id):
   '''
   This ajax function retunrs the node on main template, when clicked on collection hierarchy
@@ -127,6 +129,7 @@ def collection_nav(request, group_id):
     )
 
 # This view handles the collection list of resource and its breadcrumbs
+@get_execution_time
 def collection_view(request, group_id):
   '''
   This ajax function returns breadcrumbs_list for clicked node in collection hierarchy
@@ -168,6 +171,7 @@ def collection_view(request, group_id):
 
 
 @login_required
+@get_execution_time
 def shelf(request, group_id):
     
     if request.is_ajax() and request.method == "POST":    
@@ -258,7 +262,7 @@ def shelf(request, group_id):
                                   context_instance = RequestContext(request)
       )
 
-
+@get_execution_time
 def drawer_widget(request, group_id):
     
     drawer = None
@@ -350,7 +354,7 @@ def drawer_widget(request, group_id):
     )
 
 
-
+@get_execution_time
 def select_drawer(request, group_id):
     
     if request.is_ajax() and request.method == "POST":
@@ -460,7 +464,7 @@ def select_drawer(request, group_id):
         )
          
   
-
+@get_execution_time
 def search_drawer(request, group_id):
     
     if request.is_ajax() and request.method == "POST":
@@ -564,7 +568,7 @@ def search_drawer(request, group_id):
                                 context_instance=RequestContext(request)
       )    
       
-
+@get_execution_time
 def get_topic_contents(request, group_id):
     
   if request.is_ajax() and request.method == "POST":
@@ -579,6 +583,7 @@ def get_topic_contents(request, group_id):
       
 
 ####Bellow part is for manipulating theme topic hierarchy####
+@get_execution_time
 def get_collection_list(collection_list, node):
   inner_list = []
   error_list = []
@@ -610,7 +615,7 @@ def get_collection_list(collection_list, node):
   else:
     return collection_list
 
-
+@get_execution_time
 def get_tree_hierarchy(request, group_id, node_id):
 
     node = collection.Node.one({'_id':ObjectId(node_id)})
@@ -650,6 +655,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 ####End of manipulating theme topic hierarchy####
 
 ##### bellow part is for manipulating nodes collections#####
+@get_execution_time
 def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
@@ -680,7 +686,7 @@ def get_inner_collection(collection_list, node):
   else:
     return collection_list
 
-
+@get_execution_time
 def get_collection(request, group_id, node_id):
 
   node = collection.Node.one({'_id':ObjectId(node_id)})
@@ -702,7 +708,7 @@ def get_collection(request, group_id, node_id):
   return HttpResponse(json.dumps(data))
 
 ####End of manipulating nodes collection####
-
+@get_execution_time
 def add_sub_themes(request, group_id):
 
   if request.is_ajax() and request.method == "POST":    
@@ -735,7 +741,7 @@ def add_sub_themes(request, group_id):
 
     return HttpResponse("None")
 
-
+@get_execution_time
 def add_theme_item(request, group_id):
 
   if request.is_ajax() and request.method == "POST":    
@@ -763,7 +769,7 @@ def add_theme_item(request, group_id):
       context_theme.reload()
 
     return HttpResponse("success")
-
+@get_execution_time
 def add_topics(request, group_id):
   if request.is_ajax() and request.method == "POST":    
     # print "\n Inside add_topics ajax view\n"
@@ -796,7 +802,7 @@ def add_topics(request, group_id):
 
     return HttpResponse("None")
 
-
+@get_execution_time
 def add_page(request, group_id):
   if request.is_ajax() and request.method == "POST":    
 
@@ -826,7 +832,7 @@ def add_page(request, group_id):
 
     return HttpResponse("None")
 
-
+@get_execution_time
 def add_file(request, group_id):
   # this is context node getting from the url get request
   context_node_id=request.GET.get('context_node','')
@@ -863,7 +869,7 @@ def add_file(request, group_id):
   return HttpResponseRedirect(var1)
 
 
-
+@get_execution_time
 def node_collection(node=None, group_id=None):
 
     theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
@@ -914,7 +920,7 @@ def node_collection(node=None, group_id=None):
 
     return True
 
-
+@get_execution_time
 def theme_node_collection(node=None, group_id=None):
 
     theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -964,7 +970,7 @@ def theme_node_collection(node=None, group_id=None):
 
     return True
 
-
+@get_execution_time
 def delete_themes(request, group_id):
   '''delete themes objects'''
   send_dict = []
@@ -1014,6 +1020,7 @@ def delete_themes(request, group_id):
   
 
 @login_required
+@get_execution_time
 def change_group_settings(request,group_id):
     '''
 	changing group's object data
@@ -1041,7 +1048,7 @@ def change_group_settings(request,group_id):
         except:
             return HttpResponse("failed")
     return HttpResponse("failed") 
-
+@get_execution_time
 def get_module_set_list(node):
     '''
         Returns the list of collection inside the collections with hierarchy as they are in collection
@@ -1065,6 +1072,7 @@ hm_obj = HistoryManager()
 GST_MODULE = gs_collection.GSystemType.one({'name': GAPPS[8]})
 
 @login_required
+@get_execution_time
 def make_module_set(request, group_id):
     '''
     This methode will create module of collection and stores objectid's with version number's
@@ -1118,7 +1126,7 @@ def make_module_set(request, group_id):
         except Exception as e:
             print "Error:",e
             return HttpResponse(e)
-
+@get_execution_time
 def sotore_md5_module_set(object_id,module_set_md5):
     '''
     This method will store md5 of module_set of perticular GSystem into an Attribute
@@ -1140,6 +1148,7 @@ def sotore_md5_module_set(object_id,module_set_md5):
         return 'False'
 
 #-- under construction
+@get_execution_time
 def create_version_of_module(subject_id,node_id):
     '''
     This method will create attribute version_no of module with at type version
@@ -1171,7 +1180,7 @@ def create_version_of_module(subject_id,node_id):
         attr.object_value = 1
         attr.save()
             
-
+@get_execution_time
 def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
     if rt_has_module and subject_id and right_subject_id:
@@ -1182,7 +1191,7 @@ def create_relation_of_module(subject_id, right_subject_id):
         relation.save()
 
     
-
+@get_execution_time
 def check_module_exits(module_set_md5):
     '''
     This method will check is module already exits ?
@@ -1195,7 +1204,7 @@ def check_module_exits(module_set_md5):
         return 'False'
         
 
-
+@get_execution_time
 def walk(node):
     hm = HistoryManager()
     list = []
@@ -1210,7 +1219,7 @@ def walk(node):
              dict['children'] = walk(each['collection'])
        list.append(dict)
     return list
-
+@get_execution_time
 def get_module_json(request, group_id):
     _id = request.GET.get("_id","")
     node = collection.Node.one({'_id':ObjectId(_id)})
@@ -1220,6 +1229,7 @@ def get_module_json(request, group_id):
 
 
 # ------------- For generating graph json data ------------
+@get_execution_time
 def graph_nodes(request, group_id):
 
   collection = db[Node.collection_name]
@@ -1399,7 +1409,7 @@ def graph_nodes(request, group_id):
 # ------ End of processing for graph ------
 
 
-
+@get_execution_time
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []
     node_id = request.GET.get("object_id","")
@@ -1411,7 +1421,7 @@ def get_data_for_switch_groups(request,group_id):
     return HttpResponse(json.dumps(data_list))
 
 
-
+@get_execution_time
 def get_data_for_drawer(request, group_id):
     '''
     designer module's drawer widget function
@@ -1426,6 +1436,7 @@ def get_data_for_drawer(request, group_id):
     return HttpResponse(json.dumps(data_list))
 
 # This method is not in use
+@get_execution_time
 def get_data_for_user_drawer(request, group_id,):
     '''
     This method will return data for user widget 
@@ -1471,7 +1482,7 @@ def get_data_for_user_drawer(request, group_id,):
     else:
         return HttpResponse("GSystemType for batch required")
 
-
+@get_execution_time
 def set_drawer_widget_for_users(st,coll_obj_list):
     '''
     NOTE : this method is used only for user drwers (Django user class)
@@ -1499,7 +1510,7 @@ def set_drawer_widget_for_users(st,coll_obj_list):
     return data_list 
 
 
-
+@get_execution_time
 def get_data_for_batch_drawer(request, group_id):
     '''
     This method will return data for batch drawer widget
@@ -1541,7 +1552,7 @@ def get_data_for_batch_drawer(request, group_id):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
-        
+@get_execution_time        
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
@@ -1581,7 +1592,7 @@ def set_drawer_widget(st,coll_obj_list):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list 
-
+@get_execution_time
 def get_data_for_event_task(request,group_id):
     #date creation for task type is date month and year
     day_list=[]
@@ -1703,7 +1714,7 @@ def get_data_for_event_task(request,group_id):
     
     
     return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder)) 
-
+@get_execution_time
 def get_data_for_drawer_of_attributetype_set(request, group_id):
     '''
     this method will fetch data for designer module's drawer widget
@@ -1736,7 +1747,7 @@ def get_data_for_drawer_of_attributetype_set(request, group_id):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
-
+@get_execution_time
 def get_data_for_drawer_of_relationtype_set(request, group_id):
     '''
     this method will fetch data for designer module's drawer widget
@@ -1771,6 +1782,7 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
     return HttpResponse(json.dumps(data_list))
 
 @login_required
+@get_execution_time
 def deletion_instances(request, group_id):
   """
   Deletes the given node(s) and associated GAttribute(s) & GRelation(s) 
@@ -1883,7 +1895,7 @@ def deletion_instances(request, group_id):
       return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")
 
   return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
-
+@get_execution_time
 def get_visited_location(request, group_id):
 
   usrid = request.user.id
@@ -1903,6 +1915,7 @@ def get_visited_location(request, group_id):
   return StreamingHttpResponse(json.dumps(visited_location))
 
 @login_required
+@get_execution_time
 def get_online_editing_user(request, group_id):
     '''
     get user who is currently online and editing the node
@@ -1928,7 +1941,7 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
 
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
-    
+@get_execution_time    
 def view_articles(request, group_id):
   if request.is_ajax():
     # extracting all the bibtex entries from database
@@ -1953,7 +1966,7 @@ def view_articles(request, group_id):
       dict2[each]=list_entry
       response_dict.append(dict2)
   return StreamingHttpResponse(json.dumps(response_dict))      
-
+@get_execution_time
 def get_author_set_users(request, group_id):
     '''
     This ajax function will give all users present in node's author_set field
@@ -1985,6 +1998,7 @@ def get_author_set_users(request, group_id):
         return StreamingHttpResponse("Invalid ajax call")
 
 @login_required
+@get_execution_time
 def remove_user_from_author_set(request, group_id):
     '''
     This ajax function remove the user from athor_set
@@ -2011,7 +2025,7 @@ def remove_user_from_author_set(request, group_id):
             return StreamingHttpResponse("You are not authorised to remove user")
     else:
         return StreamingHttpResponse("Invalid Ajax call")
-    
+@get_execution_time    
 def get_filterd_user_list(request, group_id):
     '''
     This function will return (all user's) - (subscribed user for perticular group) 
@@ -2027,7 +2041,7 @@ def get_filterd_user_list(request, group_id):
 
         filtered_users = list(set(all_users_list) - set(user_list))
         return HttpResponse(json.dumps(filtered_users))
-
+@get_execution_time
 def search_tasks(request, group_id):
     '''
     This function will return (all task's) 
@@ -2047,7 +2061,7 @@ def search_tasks(request, group_id):
         return HttpResponse(json.dumps(user_list))
     else:
 	raise Http404
-
+@get_execution_time
 def get_group_member_user(request, group_id):
   """Returns member(s) of the group excluding (group-admin(s)) in form of
   dictionary that consists of key-value pair:
@@ -2066,7 +2080,7 @@ def get_group_member_user(request, group_id):
   else:
     raise Http404
 
-
+@get_execution_time
 def annotationlibInSelText(request, group_id):
   """
   This view parses the annotations field of the currently selected node_id and evaluates if entry corresponding this selectedText already exists.
@@ -2117,7 +2131,7 @@ def annotationlibInSelText(request, group_id):
   sg_obj.save()
 
   return HttpResponse(json.dumps(sg_obj.annotations))
-
+@get_execution_time
 def delComment(request, group_id):
   '''
   Delete comment from thread
@@ -2125,7 +2139,7 @@ def delComment(request, group_id):
   return HttpResponse("comment deleted")
 
 # Views related to MIS -------------------------------------------------------------
-
+@get_execution_time
 def get_students(request, group_id):
   """
   This view returns list of students along with required data based on selection criteria
@@ -2423,7 +2437,7 @@ def get_students(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
-
+@get_execution_time
 def get_statewise_data(request, group_id):
     """
     This view returns a download link of CSV created consisting of students statistical data based on degree_year for each college.
@@ -2558,7 +2572,7 @@ def get_statewise_data(request, group_id):
         response_dict["message"] = error_message
         return HttpResponse(json.dumps(response_dict))
 
-
+@get_execution_time
 def get_college_wise_students_data(request, group_id):
   """
   This view returns a download link of CSV created consisting of students statistical data based on degree_year for each college.
@@ -2702,7 +2716,7 @@ def get_college_wise_students_data(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
-
+@get_execution_time
 def set_user_link(request, group_id):
   """
   This view creates a relationship (has_login) between the given node (node_id) and the author node (username);
@@ -2779,7 +2793,7 @@ def set_user_link(request, group_id):
       error_message = " Link not created - May be invalid username entered !!!"
       
     return HttpResponse(json.dumps({'result': result, 'message': error_message}))
-
+@get_execution_time
 def set_enrollment_code(request, group_id):
   """
   """
@@ -2790,7 +2804,7 @@ def set_enrollment_code(request, group_id):
   else:
     error_message = " EnrollementCodeError: Either not an ajax call or not a POST request!!!"
     raise Exception(error_message)
-
+@get_execution_time
 def get_students_assignments(request, group_id):
   """
 
@@ -2911,7 +2925,7 @@ def get_students_assignments(request, group_id):
   except Exception as e:
     print "\n StudentDataGetError: " + str(e)
     raise Http404(e)
-
+@get_execution_time
 def get_districts(request, group_id):
   """
   This view fetches district(s) belonging to given state.
@@ -2966,7 +2980,7 @@ def get_districts(request, group_id):
   except Exception as e:
     error_message = "\n DistrictFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
-
+@get_execution_time
 def get_affiliated_colleges(request, group_id):
   """
   This view returns list of colleges affiliated to given university.
@@ -3036,7 +3050,7 @@ def get_affiliated_colleges(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
-
+@get_execution_time
 def get_courses(request, group_id):
     """
     This view returns list of NUSSD-Course(s) belonging to given course type.
@@ -3125,7 +3139,7 @@ def get_courses(request, group_id):
         response_dict["message"] = error_message
         return HttpResponse(json.dumps(response_dict))
 
-
+@get_execution_time
 def get_announced_courses_with_ctype(request, group_id):
     """
     This view returns list of announced-course(s) that match given criteria
@@ -3421,7 +3435,7 @@ def get_announced_courses_with_ctype(request, group_id):
             + "group or something went wrong!!!"
         return HttpResponse(json.dumps({'message': error_message}))
 
-
+@get_execution_time
 def get_colleges(request, group_id, app_id):
     """This view returns HttpResponse with following data:
       - List of college(s) affiliated to given university where
@@ -3594,7 +3608,7 @@ def get_colleges(request, group_id, app_id):
         error_message = "CollegeFetchError: " + str(e) + "!!!"
         response_dict["message"] = error_message
         return HttpResponse(json.dumps(response_dict))
-
+@get_execution_time
 def get_anncourses_allstudents(request, group_id):
   """
   This view returns ...
@@ -3788,7 +3802,7 @@ def get_anncourses_allstudents(request, group_id):
     error_message = "EnrollInCourseError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
-
+@get_execution_time
 def get_course_details_for_trainer(request, group_id):
   """
   This view returns a dictionary holding data required for trainer's enrollment
@@ -3918,7 +3932,7 @@ def get_course_details_for_trainer(request, group_id):
     error_message = "TrainerCourseDetailError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
-
+@get_execution_time
 def get_students_for_approval(request, group_id):
   """This returns data-review list of students that need approval for Course enrollment.
   """
@@ -4053,7 +4067,7 @@ def get_students_for_approval(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
-
+@get_execution_time
 def approve_students(request, group_id):
     """This returns approved and/or rejected students count respectively.
     """
@@ -4261,7 +4275,7 @@ def approve_students(request, group_id):
         response_dict["message"] = error_message
         return HttpResponse(json.dumps(response_dict))
 
-
+@get_execution_time
 def mp_approve_students(student_cur, course_ids, course_enrollment_status_text, course_enrollment_status_at, approved_or_rejected_list, num_of_processes=4):
     def worker(student_cur, course_ids, course_enrollment_status_text, course_enrollment_status_at, approved_or_rejected_list, out_q):
         updated_approved_or_rejected_list = []
@@ -4326,7 +4340,7 @@ def mp_approve_students(student_cur, course_ids, course_enrollment_status_text, 
 
     return resultlist
 
-
+@get_execution_time
 def get_students_for_batches(request, group_id):
   """
   This view returns ...
@@ -4429,6 +4443,7 @@ def get_students_for_batches(request, group_id):
     return HttpResponse(json.dumps(response_dict))
 
 # ====================================================================================================
+@get_execution_time
 def edit_task_title(request, group_id):
     '''
     This function will edit task's title 
@@ -4442,7 +4457,7 @@ def edit_task_title(request, group_id):
         return HttpResponse(task.name)
     else:
 	raise Http404
-
+@get_execution_time
 def edit_task_content(request, group_id):
     '''
     This function will edit task's title 
@@ -4461,7 +4476,7 @@ def edit_task_content(request, group_id):
         return HttpResponse(task.content)
     else:
 	raise Http404
-
+@get_execution_time
 def insert_picture(request, group_id):
     if request.is_ajax():
         resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'name': 1})
@@ -4481,6 +4496,7 @@ def insert_picture(request, group_id):
 
 
 # =============================================================================
+@get_execution_time
 def close_event(request,group_id,node):
 	#close_event checks if the event start date is greater than or less than current date time
 	#if current date time if greater than event time than it changes tha edit button 
@@ -4491,6 +4507,7 @@ def close_event(request,group_id,node):
     create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":datetime.datetime.today(),"reschedule_allow":False})
 
     return HttpResponse("event closed") 
+@get_execution_time
 def save_time(request,group_id,node):
   start_time = request.POST.get('start_time','')
   end_time = request.POST.get('end_time','')
@@ -4521,7 +4538,7 @@ def save_time(request,group_id,node):
      event_node.name = new_name
      event_node.save() 
   return HttpResponse("Session rescheduled") 
-
+@get_execution_time
 def check_date(request,group_id,node):
     reschedule = request.POST.get('reschedule','')
     test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$gt':datetime.datetime.today()}})
@@ -4550,7 +4567,7 @@ def check_date(request,group_id,node):
       message = "event closed"   
     return HttpResponse(message) 
 
-
+@get_execution_time
 def reschedule_task(request,group_id,node):
  task_dict={}
  #name of the programe officer who has initiated this task
@@ -4683,7 +4700,7 @@ def reschedule_task(request,group_id,node):
     return_message="Message is sent to central office soon you will get update."
  return HttpResponse(return_message)
  
-
+@get_execution_time
 def event_assginee(request, group_id, app_set_instance_id=None):
  
  Event=   request.POST.getlist("Event","")
@@ -4757,7 +4774,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  
  
  return HttpResponse("Details Entered")  
-        
+@get_execution_time        
 def fetch_course_name(request, group_id,Course_type):
   courses=collection.Node.find({"attribute_set.nussd_course_type":unicode(Course_type)})
   
@@ -4770,7 +4787,7 @@ def fetch_course_name(request, group_id,Course_type):
     course_detail={}
     
   return HttpResponse(json.dumps(course_list))
-  
+@get_execution_time  
 def fetch_course_Module(request, group_id,Course_name):
   batch = request.GET.get('batchid','')
   superdict={}
@@ -4815,7 +4832,7 @@ def fetch_course_Module(request, group_id,Course_name):
   superdict['Module']=json.dumps(module_list,cls=NodeJSONEncoder)    
   superdict['trainer'] = json.dumps(trainerlist,cls=NodeJSONEncoder) 
   return HttpResponse(json.dumps(superdict))
-
+@get_execution_time
 def fetch_batch_student(request, group_id,Course_name):
   try:
     courses=collection.Node.one({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
@@ -4831,6 +4848,7 @@ def fetch_batch_student(request, group_id,Course_name):
     return HttpResponse(json.dumps(list1))
   except:
     return HttpResponse(json.dumps(list1)) 
+@get_execution_time
 def fetch_course_session(request, group_id,Course_name):
   try:  
 	  courses=collection.Node.one({"_id":ObjectId(Course_name)})
@@ -4866,7 +4884,7 @@ def fetch_course_session(request, group_id,Course_name):
   
     
   
-
+@get_execution_time
 def fetch_course_batches(request, group_id,Course_name):
   #courses=collection.Node.one({"_id":ObjectId(Course_name)})
   #courses=collection.Node.find({"relation_set.announced_for":ObjectId(Course_name)})
@@ -4884,7 +4902,7 @@ def fetch_course_batches(request, group_id,Course_name):
     return HttpResponse(json.dumps(list1))
   except:
     return HttpResponse(json.dumps(list1))
-
+@get_execution_time
 def save_csv(request,group_id,app_set_instance_id=None):
         #column_header = [u'Name', 'Presence','Attendance_marks','Assessment_marks']
         json_data=request.POST.getlist("attendance[]","")
@@ -4904,7 +4922,7 @@ def save_csv(request,group_id,app_set_instance_id=None):
             v = {}
             fw.writerow(ast.literal_eval(row))
         return HttpResponse((STATIC_URL + filename))
-        
+@get_execution_time        
 def get_assessment(request,group_id,app_set_instance_id):
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     node.get_neighbourhood(node.member_of)
@@ -4930,6 +4948,7 @@ def get_assessment(request,group_id,app_set_instance_id):
              marks_list.append(dict1)      
    
     return HttpResponse(json.dumps(marks_list))
+@get_execution_time    
 def get_attendees(request,group_id,node):
  #get all the ObjectId of the people who would attend the event
  node=collection.Node.one({'_id':ObjectId(node)})
@@ -4966,7 +4985,7 @@ def get_attendees(request,group_id,node):
     
     
  return HttpResponse(json.dumps(a))
- 
+@get_execution_time 
 def get_attendance(request,group_id,node):
  #method is written to get the presence and absence of attendees for the event
  node=collection.Node.one({'_id':ObjectId(node)})
@@ -5063,7 +5082,7 @@ def get_attendance(request,group_id,node):
       attendance.append(temp_attendance) 
     temp_attendance={}
  return HttpResponse(json.dumps(attendance))
- 
+@get_execution_time 
 def attendees_relations(request,group_id,node):
  test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$lt':datetime.datetime.today()}})
  if test_output.count() != 0: 
@@ -5126,7 +5145,7 @@ def attendees_relations(request,group_id,node):
          column_list=[]
  return HttpResponse(json.dumps(column_list)) 
 
-        
+@get_execution_time        
 def page_scroll(request,group_id,page):
   
  Group_Activity = collection.Node.find(
@@ -5171,6 +5190,9 @@ def page_scroll(request,group_id,page):
                                   context_instance = RequestContext(request)
       )
 
+
+
+@get_execution_time 
 def get_batches_with_acourse(request, group_id):
   """
   This view returns list of batches that match given criteria

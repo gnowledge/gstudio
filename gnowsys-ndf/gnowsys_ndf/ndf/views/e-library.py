@@ -16,7 +16,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, GRelation,GSystemType,File,Triple
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type
+from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type,get_execution_time
 # from gnowsys_ndf.ndf.org2any import org2html
 
 #######################################################################################################################################
@@ -32,7 +32,7 @@ pandora_video_st = collection.GSystemType.one({'_type':'GSystemType', 'name': 'P
 app = collection.GSystemType.one({'_type':'GSystemType', 'name': 'E-Library'})
 
 #######################################################################################################################################
-
+@get_execution_time
 def resource_list(request, group_id, app_id=None, page_no=1):
 
 	is_video = request.GET.get('is_video', "")
@@ -318,7 +318,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 								}, 
 								context_instance = RequestContext(request))
 
-
+@get_execution_time
 def elib_paged_file_objs(request, group_id, filetype, page_no):
 	'''
 	Method to implement pagination in File and E-Library app.

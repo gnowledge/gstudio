@@ -6,6 +6,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
+
 import ast
 
 from gnowsys_ndf.ndf.models import *
@@ -15,7 +16,7 @@ from gnowsys_ndf.ndf.views.file import *
 
 db = get_database()
 collection = db['Nodes']
-
+@get_execution_time
 def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, app_set_instance_id=None):
     """
     custom view for custom GAPPS
@@ -164,6 +165,7 @@ def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, a
     return render_to_response(template, variable)
       
 @login_required
+@get_execution_time
 def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, app_set_instance_id=None):
     """
     create new instance of app_set of apps view for custom GAPPS

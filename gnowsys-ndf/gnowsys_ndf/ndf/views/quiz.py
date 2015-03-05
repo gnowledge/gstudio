@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls
 
@@ -46,7 +46,7 @@ app = collection.Node.one({'_type': u'GSystemType', 'name': GAPPS[6]})
 #######################################################################################################################################
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
 #######################################################################################################################################
-
+@get_execution_time
 def quiz(request, group_id, app_id=None):
     """Renders a list of all 'Quiz-type-GSystems' available within the database.
     """
@@ -114,6 +114,7 @@ def quiz(request, group_id, app_id=None):
 
 
 @login_required
+@get_execution_time
 def create_edit_quiz_item(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
@@ -248,6 +249,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
                               )
 
 @login_required
+@get_execution_time
 def create_edit_quiz(request, group_id, node_id=None):
     """Creates/Edits quiz category.
     """

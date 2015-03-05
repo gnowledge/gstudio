@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_execution_time
 
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 
@@ -52,7 +52,7 @@ app=collection.Node.one({'name':u'Page','_type':'GSystemType'})
 #######################################################################################################################################
 # VIEWS DEFINED FOR GAPP -- 'PAGE'
 #######################################################################################################################################
-
+@get_execution_time
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
@@ -280,6 +280,7 @@ def page(request, group_id, app_id=None):
 
 
 @login_required
+@get_execution_time
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
@@ -347,6 +348,7 @@ def create_edit_page(request, group_id, node_id=None):
 
 
 @login_required    
+@get_execution_time
 def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
     
@@ -370,7 +372,7 @@ def delete_page(request, group_id, node_id):
 
 
 
-
+@get_execution_time
 def version_node(request, group_id, node_id, version_no):
     """Renders either a single or compared version-view based on request.
 
@@ -462,7 +464,7 @@ def version_node(request, group_id, node_id, version_no):
                               context_instance = RequestContext(request)
     )        
 
-
+@get_execution_time
 def diff_prettyHtml(diffs):
     """Convert a diff array into a pretty HTML report.
 
@@ -492,7 +494,7 @@ def diff_prettyHtml(diffs):
         i += len(data)
     return "".join(html)
 
-
+@get_execution_time
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
     ins_objectid  = ObjectId()
@@ -570,7 +572,7 @@ def translate_node(request,group_id,node_id=None):
 #######################################################################################################################################
 #                                                                                                     H E L P E R  -  F U N C T I O N S
 #######################################################################################################################################
-
+@get_execution_time
 def get_html_diff(versionfile, fromfile="", tofile=""):
 
     if versionfile != "":
@@ -617,7 +619,7 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         print "\n Please pass a valid rcs-version-file!!!\n"
         #TODO: Throw an error indicating the above message!
         return ""
-        
+@get_execution_time        
 def publish_page(request,group_id,node):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -650,7 +652,7 @@ def publish_page(request,group_id,node):
 
     return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
 
-
+@get_execution_time
 def merge_doc(request,group_id,node_id,version_1,version_2):
      node=collection.Node.one({'_id':ObjectId(node_id)})
      doc=history_manager.get_version_document(node,version_1)
@@ -693,7 +695,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
     )        
 
   
-  
+@get_execution_time  
 def revert_doc(request,group_id,node_id,version_1):
    node=collection.Node.one({'_id':ObjectId(node_id)})
    group=collection.Node.one({'_id':ObjectId(group_id)})

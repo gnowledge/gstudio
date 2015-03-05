@@ -1549,10 +1549,16 @@ class Benchmark(DjangoDocument):
 
   objects = models.Manager()
 
-  collection_name = 'Benchmark'
+  collection_name = 'Benchmarks'
   structure = {
+    '_type':unicode,
     'name': unicode,
-    'time_take':unicode
+    'time_taken':unicode,
+    'parameters':unicode,
+    'size_of_parameters':unicode,
+    'function_output_length':unicode,
+    'calling_url':unicode,
+    'last_update': datetime.datetime
   }
   required_fields = ['name']
   use_dot_notation = True

@@ -31,7 +31,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data,get_execution_time
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
@@ -41,6 +41,7 @@ app = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 
 
 @login_required
+@get_execution_time
 def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     Creates/Modifies document of given sub-types of Course(s).
@@ -716,6 +717,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
 
 @login_required
+@get_execution_time
 def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   custom view for custom GAPPS
@@ -1353,6 +1355,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
         })
 
         return render_to_response(template, variable)
+@get_execution_time
 def mp_enroll_students(student_cur, ann_course_ids, selected_course_rt, course_enrollment_status_at, num_of_processes=4):
     def worker(student_cur, ann_course_ids, selected_course_rt, course_enrollment_status_at):
         for each_student in student_cur:

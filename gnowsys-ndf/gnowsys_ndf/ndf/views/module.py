@@ -14,11 +14,11 @@ except ImportError:  # old pymongo
 
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import GSystemType, Node 
-
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 collection = get_database()[Node.collection_name]
 GST_MODULE = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[8]})
 app = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[8]})
-
+@get_execution_time
 def module(request, group_id, module_id=None):
     """
     * Renders a list of all 'modules' available within the database.
@@ -71,7 +71,7 @@ def module(request, group_id, module_id=None):
       variable = RequestContext(request, {'title': title, 'appId':app._id, 'module_coll': module_coll, 'group_id': group_id, 'groupid': group_id})
       return render_to_response(template, variable)
 
-
+@get_execution_time
 def module_detail(request, group_id, _id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -98,7 +98,8 @@ def module_detail(request, group_id, _id):
         )
 
     
-@login_required    
+@login_required
+@get_execution_time    
 def delete_module(request, group_id, _id):
     """This method will delete module object and its Attribute and Relation
     """

@@ -25,7 +25,7 @@ from django_mongokit import get_database
 ''' -- imports from gstudio -- '''
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
-from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete
+from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete,get_execution_time
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
@@ -49,6 +49,7 @@ twist_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Twist'}
 sitename=Site.objects.all()[0].name.__str__()
 app=collection.Node.one({'name':u'Forum','_type':'GSystemType'})
 
+@get_execution_time
 def forum(request, group_id, node_id=None):
     '''
     Method to list all the available forums and to return forum-search-query result.
@@ -129,6 +130,7 @@ def forum(request, group_id, node_id=None):
       return render_to_response("ndf/forum.html",variables)
 
 @login_required
+@get_execution_time
 def create_forum(request,group_id):    
     '''
     Method to create forum and Retrieve all the forums
@@ -255,6 +257,7 @@ def create_forum(request,group_id):
     return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 @login_required
+@get_execution_time
 def edit_forum(request,group_id,forum_id):    
     '''
     Method to create forum and Retrieve all the forums
@@ -369,6 +372,7 @@ def edit_forum(request,group_id,forum_id):
 
 
 
+@get_execution_time
 def display_forum(request,group_id,forum_id):
     forum = collection.Node.one({'_id': ObjectId(forum_id)})
 
@@ -405,6 +409,7 @@ def display_forum(request,group_id,forum_id):
 
 
 
+@get_execution_time
 def display_thread(request,group_id, thread_id, forum_id=None):
     '''
     Method to display thread and it's content
@@ -466,6 +471,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
 
 
 @login_required
+@get_execution_time
 def create_thread(request, group_id, forum_id):
     ''' 
     Method to create thread
@@ -568,6 +574,7 @@ def create_thread(request, group_id, forum_id):
 
 
 @login_required
+@get_execution_time
 def add_node(request,group_id):
 
     ins_objectid  = ObjectId()
@@ -705,6 +712,7 @@ def add_node(request,group_id):
     return HttpResponse("success")
 
     
+@get_execution_time
 def get_profile_pic(username):
     
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(username) })
@@ -724,6 +732,7 @@ def get_profile_pic(username):
 
 @login_required
 @check_delete
+@get_execution_time
 def delete_forum(request,group_id,node_id,relns=None):
     """ Changing status of forum to HIDDEN
     """
@@ -762,6 +771,7 @@ def delete_forum(request,group_id,node_id,relns=None):
     return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id}))
 
 @login_required
+@get_execution_time
 def delete_thread(request,group_id,forum_id,node_id):
     """ Changing status of thread to HIDDEN
     """
@@ -822,6 +832,7 @@ def delete_thread(request,group_id,forum_id,node_id):
     return render_to_response("ndf/forumdetails.html",variables)
 
 @login_required   
+@get_execution_time
 def edit_thread(request,group_id,forum_id,thread_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -893,6 +904,7 @@ def edit_thread(request,group_id,forum_id,thread_id):
                               RequestContext(request))
 
 @login_required
+@get_execution_time
 def delete_reply(request,group_id,forum_id,thread_id,node_id):
     ins_objectid  = ObjectId()    
     if ins_objectid.is_valid(group_id) is False :

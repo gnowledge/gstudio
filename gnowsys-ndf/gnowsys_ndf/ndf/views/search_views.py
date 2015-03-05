@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 from django.template import RequestContext
 #from stemming.porter2 import stem
 import json
@@ -137,7 +138,7 @@ def search_query(request, group_id):
 # 	return render(request, 'ndf/search_home.html', {"groupid":group_id, "authors":memList}, context_instance=RequestContext(request))
 
 
-
+@get_execution_time
 def results_search(request, group_id, return_only_dict = None):
 	"""
 	This view returns the results for global search on all GSystems by name, tags and contents.

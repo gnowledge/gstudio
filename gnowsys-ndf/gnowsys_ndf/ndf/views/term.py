@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 
 from gnowsys_ndf.ndf.models import Node, Triple, HistoryManager
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_page,get_node_metadata
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_page,get_node_metadata,get_execution_time
 
 #######################################################################################################################################
 db = get_database()
@@ -33,7 +33,7 @@ topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 if term_GST:	
 	title = term_GST.altnames
-
+@get_execution_time
 def term(request, group_id, node_id=None):
 
 	ins_objectid  = ObjectId()
@@ -80,6 +80,7 @@ def term(request, group_id, node_id=None):
 
 
 @login_required
+@get_execution_time
 def create_edit_term(request, group_id, node_id=None):
 
     ins_objectid = ObjectId()
@@ -141,7 +142,8 @@ def create_edit_term(request, group_id, node_id=None):
                                   context_instance=RequestContext(request)
                               	)
 
-@login_required    
+@login_required   
+@get_execution_time 
 def delete_term(request, group_id, node_id):
     """Change the status to Hidden.
     

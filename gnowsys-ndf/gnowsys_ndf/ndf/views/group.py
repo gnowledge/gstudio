@@ -51,6 +51,7 @@ app=collection.Node.one({'name':u'Group','_type':'GSystemType'})
 #######################################################################################################################################
 
 
+@get_execution_time
 def group(request, group_id, app_id=None, agency_type=None):
   """Renders a list of all 'Group-type-GSystems' available within the database.
   """
@@ -58,7 +59,7 @@ def group(request, group_id, app_id=None, agency_type=None):
   group_name, group_id = get_group_name_id(group_id)
 
   query_dict = {}
-
+  print "aisisririririr"
   if (app_id == "agency_type") and (agency_type in GROUP_AGENCY_TYPES):
     query_dict["agency_type"] = agency_type
   # print "=========", app_id, agency_type
@@ -188,6 +189,7 @@ def group(request, group_id, app_id=None, agency_type=None):
                               }, context_instance=RequestContext(request))
 
 
+@get_execution_time
 def create_group(request,group_id):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
@@ -287,7 +289,8 @@ def create_group(request,group_id):
 
   return render_to_response("ndf/create_group.html", {'groupid':group_id,'appId':app._id,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
     
-# def home_dashboard(request):
+# @get_execution_time
+#def home_dashboard(request):
 #     try:
 #         groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 #     except Exception as e:
@@ -297,6 +300,7 @@ def create_group(request,group_id):
 #     return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'user':request.user,'curgroup':groupobj},context_instance=RequestContext(request))
 
 
+@get_execution_time
 def populate_list_of_members():
 	members = User.objects.all()
 	memList = []
@@ -304,7 +308,9 @@ def populate_list_of_members():
 		memList.append(mem.username)	
 	return memList
 
+@get_execution_time
 def populate_list_of_group_members(group_id):
+    print "populate"
     col = get_database()[Node.collection_name]
     try :
       try:
@@ -323,8 +329,9 @@ def populate_list_of_group_members(group_id):
     except:
         return []
 
+@get_execution_time
 def group_dashboard(request,group_id=None):
-
+  print "reahcing"
   if ins_objectid.is_valid(group_id) is False :
     group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -398,8 +405,9 @@ def group_dashboard(request,group_id=None):
   breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
   annotations = json.dumps(groupobj.annotations)
 
+  
   default_template = "ndf/groupdashboard.html"
-  return render_to_response([alternate_template, default_template] ,{'node': groupobj, 'groupid':grpid, 
+  return render_to_response([alternate_template,default_template] ,{'node': groupobj, 'groupid':grpid, 
                                                        'group_id':grpid, 'user':request.user, 
                                                        'shelf_list': shelf_list,
                                                        'appId':app._id,
@@ -411,6 +419,7 @@ def group_dashboard(request,group_id=None):
 
 
 @login_required
+@get_execution_time
 def edit_group(request,group_id):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
@@ -455,7 +464,9 @@ def edit_group(request,group_id):
                                     context_instance=RequestContext(request)
                                     )
 
+@get_execution_time
 def app_selection(request,group_id):
+  print "app_selection"
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
     group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
@@ -509,7 +520,9 @@ def app_selection(request,group_id):
     print "Error in app_selection "+str(e)
      
 
+@get_execution_time
 def switch_group(request,group_id,node_id):
+  print "hihihihihih swtich _group"
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
     group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
@@ -554,6 +567,7 @@ def switch_group(request,group_id,node_id):
     return HttpResponse("Failure")
 
 
+@get_execution_time
 def publish_group(request,group_id,node):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
@@ -588,6 +602,7 @@ def publish_group(request,group_id,node):
                               )
 
 
+@get_execution_time
 def create_sub_group(request,group_id):
   try:
       ins_objectid  = ObjectId()
@@ -693,8 +708,9 @@ def create_sub_group(request,group_id):
       print "Exception in create subgroup "+str(e)
 
 
+@get_execution_time
 def nroer_groups(request, group_id, groups_category):
-
+    print "asdfasfsafdsadf"
     group_name, group_id = get_group_name_id(group_id)
 
     mapping = GSTUDIO_NROER_MENU_MAPPINGS

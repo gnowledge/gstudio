@@ -9,12 +9,13 @@ from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from mongokit import paginator
-import mongokit 
+import mongokit
+import datetime 
 import time
-
+import sys
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS,BENCHMARK
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
@@ -36,7 +37,7 @@ from collections import Counter
 
 db = get_database()
 collection = db[Node.collection_name]
-
+col = db[Benchmark.collection_name]
 history_manager = HistoryManager()
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -48,7 +49,41 @@ coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
 
+def get_execution_time(f):
+   if BENCHMARK == 'ON': 
 
+  
+	    def wrap(*args,**kwargs):
+	        time1 = time.time()
+	        total_parm_size = 0
+	        for key, value in kwargs.iteritems():
+	           total_parm_size = total_parm_size + sys.getsizeof(value)
+	        total_param = len(kwargs)
+	        ret = f(*args,**kwargs)
+	        t2 = time.clock()
+	        time2 = time.time()
+	        time_diff = time2 - time1
+	        benchmark_node =  col.Benchmark()
+	        benchmark_node.time_taken = unicode(str(time_diff))
+	        benchmark_node.name = unicode(f.func_name)
+	        benchmark_node.parameters = unicode(total_param)
+	        benchmark_node.size_of_parameters = unicode(total_parm_size)
+	        benchmark_node.last_update = datetime.today()
+	        #benchmark_node.functionOplength = unicode(sys.getsizeof(ret))
+	        try:
+	        	benchmark_node.calling_url = unicode(args[0].path)
+	        except:	
+	        	pass 
+	        benchmark_node.save()
+	        print "method",f.func_name,"executed for",time_diff,"seconds"
+	        return ret
+   if BENCHMARK == 'ON': 
+    	return wrap
+   if BENCHMARK == 'OFF':
+        return f
+
+
+@get_execution_time
 def get_group_name_id(group_name_or_id):
     '''
       This method takes possible group name/id as an argument and returns group name and id.
@@ -86,8 +121,12 @@ def get_group_name_id(group_name_or_id):
     return None, None
 
     
+
+@get_execution_time
 def check_delete(main):
   try:
+
+
     def check(*args, **kwargs):
       relns=""
       node_id=kwargs['node_id']
@@ -103,18 +142,23 @@ def check_delete(main):
   except Exception as e:
     print "Error in check_delete "+str(e)
 
+
+@get_execution_time
 def get_all_resources_for_group(group_id):
   if ins_objectid.is_valid(group_id):
     obj_resources=coln.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'File'}]},{'group_set':{'$all':[ObjectId(group_id)]}},{'member_of':{'$nin':[grp_st._id]}}]})
     return obj_resources
 
 
+
+@get_execution_time
 def get_all_gapps():
   meta_type_gapp=coln.Node.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]})
   all_gapps=coln.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type_gapp._id]}}]})    
   return list(all_gapps)
 
-#checks forum notification turn off for an author object
+#checks forum notification turn off for an author objec
+@get_execution_time
 def forum_notification_status(group_id,user_id):
   try:
     grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
@@ -133,6 +177,8 @@ def forum_notification_status(group_id,user_id):
     return True
   except Exception as e:
     print "Exception in forum notification status check "+str(e)
+
+@get_execution_time
 def get_forum_repl_type(forrep_id):
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
@@ -144,6 +190,8 @@ def get_forum_repl_type(forrep_id):
   else:
     return "None"
 
+
+@get_execution_time
 def check_existing_group(group_name):
   collection = db[Node.collection_name]
   if type(group_name) == 'unicode':
@@ -174,6 +222,8 @@ def check_existing_group(group_name):
     return False
 
 
+
+@get_execution_time
 def filter_drawer_nodes(nid, group_id=None):
   page_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
   file_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
@@ -196,6 +246,8 @@ def filter_drawer_nodes(nid, group_id=None):
   nodes = collection.Node.find(query)
 
   # Remove parent nodes in which current node exists
+
+  
   def filter_nodes(parents, group_id=None):  
     length = []
     if parents:
@@ -241,6 +293,8 @@ def filter_drawer_nodes(nid, group_id=None):
 
 
 
+
+@get_execution_time
 def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs):
     """Get both drawers-list.
     """
@@ -382,12 +436,15 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
 
 
-# get type of resource
+# get type of resourc
+@get_execution_time
 def get_resource_type(request,node_id):
   get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
   get_type=get_resource_type._type
   return get_type 
                           
+
+@get_execution_time
 def get_translate_common_fields(request,get_type,node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
@@ -451,6 +508,8 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
 
 
 
+
+@get_execution_time
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   """Updates the retrieved values of common fields from request into the given node."""
 
@@ -657,8 +716,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if usrid not in node.contributors:
       node.contributors.append(usrid)
   return is_changed
+
+
 # ============= END of def get_node_common_fields() ==============
-  
+ 
+@get_execution_time
 def build_collection(node, check_collection, right_drawer_list, checked):  
   
   is_changed = False
@@ -888,6 +950,8 @@ def build_collection(node, check_collection, right_drawer_list, checked):
   else:
     return False
 
+
+@get_execution_time
 def get_versioned_page(node):
             
     rcs = RCS()
@@ -916,6 +980,8 @@ def get_versioned_page(node):
            return(node,'1.1')
         
 
+
+@get_execution_time
 def get_user_page(request,node):
     ''' function gives the last docment submited by the currently logged in user either it
 	can be drafted or published
@@ -946,6 +1012,8 @@ def get_user_page(request,node):
            proc1.kill()
            return(node,'1.1')
                    
+
+@get_execution_time
 def get_page(request,node):
   ''' 
   function to filter between the page to be displyed to user 
@@ -992,6 +1060,8 @@ def get_page(request,node):
 	#	   return (node2,ver2)
          return (node1,ver1)
 	 
+
+@get_execution_time
 def check_page_first_creation(request,node):
     ''' function to check wheather the editing is performed by the user very first time '''
     rcs = RCS()
@@ -1014,6 +1084,7 @@ def check_page_first_creation(request,node):
 	return(count)     
       
 
+@get_execution_time
 def tag_info(request, group_id, tagname = None):
     '''
     Function to get all the resources related to tag
@@ -1105,6 +1176,7 @@ def tag_info(request, group_id, tagname = None):
 
 #code for merging two text Documents
 import difflib
+@get_execution_time
 def diff_string(original,revised):
         
         # build a list of sentences for each input string
@@ -1154,6 +1226,8 @@ def _split_with_maintain(value, treat_trailing_spaces_as_sentence = True, split_
             
         return result
 
+
+@get_execution_time
 def update_mobwrite_content_org(node_system):   
   '''
 	on revert or merge of nodes,a content_org is synced to mobwrite object
@@ -1174,6 +1248,8 @@ def update_mobwrite_content_org(node_system):
   return textobj
 
 
+
+@get_execution_time
 def cast_to_data_type(value, data_type):
     '''
     This method will cast first argument: "value" to second argument: "data_type" and returns catsed value.
@@ -1226,6 +1302,8 @@ def cast_to_data_type(value, data_type):
     return casted_value
 
 
+
+@get_execution_time
 def get_node_metadata(request, node, **kwargs):
     '''
     Getting list of updated GSystems with kwargs arguments.
@@ -1267,6 +1345,8 @@ def get_node_metadata(request, node, **kwargs):
         return updated_ga_nodes
 
 
+
+@get_execution_time
 def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
 # function to create grelations for new ones and delete old ones.
 	relationtype = collection.Node.one({"_type":"RelationType","name":unicode(relation_type_name)})
@@ -1285,6 +1365,8 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
 	    gr_node.status = u"PUBLISHED"
             gr_node.save()
 		
+
+@get_execution_time
 def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set=[]):
   """
   Returns data in list of dictionary format which is required for building html widget.
@@ -1395,6 +1477,8 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   return widget_data_list
 
 
+
+@get_execution_time
 def get_property_order_with_value(node):
   new_property_order = []
   demo = None
@@ -1456,6 +1540,8 @@ def get_property_order_with_value(node):
   return node['property_order']
 
 
+
+@get_execution_time
 def parse_template_data(field_data_type, field_value, **kwargs):
   """
   Parses the value fetched from request (GET/POST) object based on the data-type of the given field.
@@ -1614,6 +1700,8 @@ def parse_template_data(field_data_type, field_value, **kwargs):
     error_message = "\n TemplateDataParsingError: "+str(e)+" !!!\n"
     raise Exception(error_message)
 
+
+@get_execution_time
 def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
   ga_node = None
   info_message = ""
@@ -1744,6 +1832,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value, **kwargs):
     return ga_node
 
 
+
+@get_execution_time
 def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):
   """Creates single or multiple GRelation documents (instances) based on given 
   RelationType's cardinality (one-to-one / one-to-many).
@@ -2085,7 +2175,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
       
 
       
-###############################################      ###############################################
+###############################################      ##############################################
+@get_execution_time
 def set_all_urls(member_of):
 	Gapp_obj = collection.Node.one({"_type":"MetaType", "name":"GAPP"})
 	factory_obj = collection.Node.one({"_type":"MetaType", "name":"factory_types"})
@@ -2114,6 +2205,7 @@ def set_all_urls(member_of):
 
 # Method to create discussion thread for File and Page.
 @login_required
+@get_execution_time
 def create_discussion(request, group_id, node_id):
   '''
   Method to create discussion thread for File and Page.
@@ -2167,7 +2259,8 @@ def create_discussion(request, group_id, node_id):
     # return HttpResponse("server-error")
 
 
-# to add discussion replies
+# to add discussion replie
+@get_execution_time
 def discussion_reply(request, group_id):
 
   try:
@@ -2224,6 +2317,8 @@ def discussion_reply(request, group_id):
     return HttpResponse(json.dumps(["Server Error"]))
 
 
+
+@get_execution_time
 def discussion_delete_reply(request, group_id):
 
     nodes_to_delete = json.loads(request.POST.get("nodes_to_delete", "[]"))
@@ -2242,6 +2337,8 @@ def discussion_delete_reply(request, group_id):
     return HttpResponse(json.dumps(deleted_replies))
 
 
+
+@get_execution_time
 def get_user_group(userObject):
   '''
   methods for getting user's belongs to group.
@@ -2270,6 +2367,8 @@ def get_user_group(userObject):
     blank_list.append({'id':str(eachgroup._id), 'name':eachgroup.name, 'access':access, 'group_type':eachgroup.group_type, 'created_at':eachgroup.created_at, 'created_by':user.username})
   return blank_list
   
+
+@get_execution_time
 def get_user_task(userObject):
   '''
   methods for getting user's assigned task.
@@ -2297,6 +2396,8 @@ def get_user_task(userObject):
       blank_list.append(blankdict)
   return blank_list
 
+
+@get_execution_time
 def get_user_notification(userObject):
   '''
   methods for getting user's notification.
@@ -2313,6 +2414,8 @@ def get_user_notification(userObject):
   blank_list.reverse()
   return blank_list
 
+
+@get_execution_time
 def get_user_activity(userObject):
   '''
   methods for getting user's activity.
@@ -2338,6 +2441,7 @@ def get_user_activity(userObject):
       blank_list.append({'id':str(each._id), 'name':each.name, 'date':each.last_update, 'activity': activity, 'type': each._type, 'group_id':str(each.group_set[0]), 'member_of':member_of.name.lower()})
   return blank_list
 
+@get_execution_time
 def get_file_node(file_name=""):
   file_list=[]
   new=[]
@@ -2357,6 +2461,7 @@ def get_file_node(file_name=""):
 		            file_list.append(i.name)	
   return file_list	
 
+@get_execution_time
 def create_task(task_dict, task_type_creation="single"):
     """Creates task with required attribute(s) and relation(s).
 
@@ -2484,6 +2589,8 @@ def create_task(task_dict, task_type_creation="single"):
     return task_node
 
 
+
+@get_execution_time
 def get_student_enrollment_code(college_id, node_id_to_ignore, registration_date, college_group_id=None):
     """Returns new student's enrollment code
 
@@ -2660,6 +2767,8 @@ def get_student_enrollment_code(college_id, node_id_to_ignore, registration_date
         raise Exception("No college node exists with given college's ObjectId(" + str(college_id) + ") !!!")
 
 
+
+@get_execution_time
 def create_college_group_and_setup_data(college_node):
     """
     Creates private group for given college; establishes relationship
@@ -2752,18 +2861,6 @@ def create_college_group_and_setup_data(college_node):
 
     return gfc, gr_gfc
 
-def timing(f):
-    def wrap(*args,**kwargs):
-        time1 = time.time()
-        ret = f(*args,**kwargs)
-        time2 = time.time()
-        a =  Benchmark()
-        print "Benchmark",a
-        a.time_take = '5:56:00'
-        a.name = f.func_name
-        a.save()
-        #collection = get_database()['Benchmark']
-        print '%s function took %0.3f ms' % (f.func_name,(time2-time1))
-        return ret
-    return wrap    
+
+  
     

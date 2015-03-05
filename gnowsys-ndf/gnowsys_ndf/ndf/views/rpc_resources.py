@@ -13,7 +13,7 @@ from mongokit import paginator
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node
 from django.contrib.auth.models import User
-
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 #######################################################################################################################################
 
 collection = get_database()[Node.collection_name]
@@ -86,7 +86,7 @@ def resources_list(request):
 	# print "\n",json.dumps(ebooks_dict),"\n"
 	return json.dumps(ebooks_dict)
 
-
+@get_execution_time
 def get_metadata(efile):
 	'''
 	This function converts "relation_set" object values in defined relation from ObjectId to unicode names

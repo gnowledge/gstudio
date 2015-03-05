@@ -29,12 +29,12 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
-from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value
+from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value,get_execution_time
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
 from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
 
 collection = get_database()[Node.collection_name]
-
+@get_execution_time
 def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   custom view for custom GAPPS
@@ -245,6 +245,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     raise Exception(error_message)
 
 @login_required
+@get_execution_time
 def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   Creates/Modifies document of given person-type.
