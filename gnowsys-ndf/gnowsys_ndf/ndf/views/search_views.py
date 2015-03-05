@@ -1,19 +1,23 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from gnowsys_ndf.ndf.models import *
 from django.template import RequestContext
 #from stemming.porter2 import stem
-import json
+
 try:
         from collections import OrderedDict
 except ImportError:
         # python 2.6 or earlier, use backport
         from ordereddict import OrderedDict
+
+import json
 import difflib
 import string
 import datetime
 import itertools
 import nltk
+
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import *
 
 my_doc_requirement = u'storing_orignal_doc'
 reduced_doc_requirement = u'storing_reduced_doc'
@@ -24,10 +28,6 @@ ADVANCED_SEARCH = u'ADVANCED_SEARCH'
 RELATION_SEARCH = u'RELATION_SEARCH'
 SEMANTIC_SEARCH = u'SEMANTIC_SEARCH'
 POSSIBLE_SEARCH_TYPES = ["GSystem", "File"]
-
-#############
-collection = get_database()[Node.collection_name]
-#############
 
 # CLASS FOR ENCODING INTO JSON - OBJECTID TO STRING CONVERSION
 class Encoder(json.JSONEncoder):
@@ -42,12 +42,12 @@ class Encoder(json.JSONEncoder):
 def search_page(request, group_id):
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 		if group_ins:
 			group_id = str(group_ins._id)
 		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    		if auth :
 				group_id = str(auth._id)
 	else:
@@ -59,8 +59,7 @@ def search_page(request, group_id):
 
 # FUNCTION THAT RETURNS A MINIMUM COMMON CONTEXT THAT ALL SEARCH RESULTS RETURN
 def getRenderableContext(group_id):
-	col = get_database()[Node.collection_name]
-	temp = col.Node.find({"_type":"GSystemType"}, {"name":1, "_id":0})
+	temp = node_collection.find({"_type":"GSystemType"}, {"name":1, "_id":0})
         ins_objectid = ObjectId()
 	allGSystems = []
         allGroups=[]
@@ -70,21 +69,21 @@ def getRenderableContext(group_id):
 	#allGroups = get_public_groups()								# LIST OF ALL PUBLIC GROUPS
   
         if ins_objectid.is_valid(group_id) is False :
-                group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+                auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
                 if group_ins:
                         group_id = str(group_ins._id)
                 else:
-                        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
                         if auth :
                                       group_id = str(auth._id)
                                       group_ins=auth
 	else:
-                group_ins = collection.Node.find_one({'_type': "Group","_id":ObjectId(group_id)})     
+                group_ins = node_collection.find_one({'_type': "Group", "_id": ObjectId(group_id)})     
                 
         if not group_ins:
                 
-                group_ins = collection.Node.find_one({'_type': "Author","_id":ObjectId(group_id)})        
+                group_ins = node_collection.find_one({'_type': "Author", "_id": ObjectId(group_id)})        
         allGroups.append(group_ins.name)
 	allUsers = populate_list_of_group_members(allGroups)		# LIST OF ALL USERS IN PUBLIC GROUPS
 	memList = populate_list_of_members()						# LIST OF ALL USERS
@@ -99,12 +98,12 @@ def search_query(request, group_id):
 	# SCRIPT FOR CONVERTING GROUP NAME RECEIVED TO OBJECTID 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 		if group_ins:
 			group_id = str(group_ins._id)
 		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    		if auth :
 				group_id = str(auth._id)
 	else:
@@ -116,17 +115,16 @@ def search_query(request, group_id):
 
 # View for returning the search results according to group search
 # def search_query_group(request, group_id):
-# 	col = get_database()[Node.collection_name]
 
 # 	# SCRIPT FOR CONVERTING GROUP NAME RECEIVED TO OBJECTID 
 # 	ins_objectid  = ObjectId()
 # 	if ins_objectid.is_valid(group_id) is False :
-# 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+# 		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 		if group_ins:
 # 			group_id = str(group_ins._id)
 # 		else:
-# 	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 	    		if auth :
 # 				group_id = str(auth._id)
 # 	else:
@@ -149,11 +147,11 @@ def results_search(request, group_id, return_only_dict = None):
 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
 		if group_ins:
 			group_id = str(group_ins._id)
 		else: 
-			auth = collection.Node.one({'_type': 'Author', 'created_by': unicode(userid) })
+			auth = node_collection.one({'_type': 'Author', 'created_by': unicode(userid) })
     		if auth :
 				group_id = str(auth._id)
 
@@ -191,7 +189,7 @@ def results_search(request, group_id, return_only_dict = None):
 			# CONVERT USERNAME TO INTEGER
 			if user_reqd_name != "all": 
 				#Query writtent o avoid the error due to User.Object 
-				auth = collection.Node.one({'_type': 'Author', 'name': user_reqd_name }) 
+				auth = node_collection.one({'_type': 'Author', 'name': user_reqd_name})
 				if auth: 
 					user_reqd = int(auth.created_by)
 	 		
@@ -199,7 +197,6 @@ def results_search(request, group_id, return_only_dict = None):
 			search_str_user = search_str_user.lower()  # CONVERT TO LOWERCASE
 			search_str_noArticles = list(removeArticles(str(search_str_user)))  # REMOVES ARTICLES
 			search_str_stemmed = list(stemWords(search_str_noArticles, search_str_user))  # STEMS THE WORDS
-                        col = get_database()[Node.collection_name]
 
 			#Check if the user is the super User
 			Access_policy=""
@@ -208,7 +205,7 @@ def results_search(request, group_id, return_only_dict = None):
 			else:
 			    Access_policy=["PUBLIC"]    
 			# GET A CURSOR ON ALL THE GSYSTEM TYPES 
-			all_GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"_id":1})
+			all_GSystemTypes = node_collection.find({"_type":"GSystemType"}, {"_id":1})
 			
 			#public_groups = get_public_groups()					# GET LIST OF PUBLIC GROUPS
 			#public_groups = group_name_to_id(public_groups)		# CONVERT GROUP NAMES TO OBJECTIDS
@@ -234,7 +231,7 @@ def results_search(request, group_id, return_only_dict = None):
 				
 				if user_reqd != -1:
 
-					exact_match = col.Node.find({'$and':[
+					exact_match = node_collection.find({'$and':[
 									   {"member_of":{'$in':all_list}},	    	
 									   {"created_by":user_reqd},
 									   {"group_set":ObjectId(group_id)},
@@ -242,7 +239,7 @@ def results_search(request, group_id, return_only_dict = None):
 									   {"name":{"$regex":search_str_user, "$options":"i"}}]},
 					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 				else:
-				  exact_match = col.Node.find({'$and':[
+				  exact_match = node_collection.find({'$and':[
 									    {"member_of":{'$in':all_list}},		
 									    {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									    {"group_set":ObjectId(group_id)},
@@ -280,7 +277,7 @@ def results_search(request, group_id, return_only_dict = None):
 						word = search_str_stemmed[c]
 						temp=""
 						if user_reqd != -1:	# user_reqd = -1  =>  search all users, else user_reqd = pk of user
-							temp = col.Node.find({'$and':[
+							temp = node_collection.find({'$and':[
 									   {"member_of":{'$in':all_list}},	    	 										   {"created_by":user_reqd},
 									   {"group_set":ObjectId(group_id)},
 									   {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},	
@@ -288,7 +285,7 @@ def results_search(request, group_id, return_only_dict = None):
 						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 						else:		
 						  			# search all users in created by
-						  temp = col.Node.find({'$and':[
+						  temp = node_collection.find({'$and':[
 									   {"member_of":{'$in':all_list}},
 									   {"group_set":ObjectId(group_id)},
 									   {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
@@ -328,7 +325,7 @@ def results_search(request, group_id, return_only_dict = None):
 				
 				# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
 				if user_reqd != -1:				
-						exact_match = col.Node.find({'$and':[
+						exact_match = node_collection.find({'$and':[
 									   {"member_of":{'$in':all_list}},	    		
 									   {"created_by":user_reqd},
 									   {"group_set":ObjectId(group_id)},
@@ -336,7 +333,7 @@ def results_search(request, group_id, return_only_dict = None):
 									   {"tags":search_str_user}]},
 					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 				else:
-						exact_match = col.Node.find({'$and':[
+						exact_match = node_collection.find({'$and':[
 										{"member_of":{'$in':all_list}},	    											{'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									   {"group_set":ObjectId(group_id)},
 									   {"tags":search_str_user}]},
@@ -363,14 +360,14 @@ def results_search(request, group_id, return_only_dict = None):
 				while c < len_stemmed:
 						word = search_str_stemmed[c]
 						if user_reqd != -1:					
-							temp = col.Node.find({'$and':[{"tags":word},
+							temp = node_collection.find({'$and':[{"tags":word},
 									     {"member_of":{'$in':all_list}},	    		 	
 									     {"created_by":user_reqd},
 									     {"group_set":ObjectId(group_id)},
 									     {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]}]}, 
 						{"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
 						else:
-							temp = col.Node.find({'$and':[{"tags":word},
+							temp = node_collection.find({'$and':[{"tags":word},
 									    {"member_of":{'$in':all_list}},	    			
 									    {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									    {"group_set":ObjectId(group_id)}]},
@@ -409,7 +406,7 @@ def results_search(request, group_id, return_only_dict = None):
 
 			if (search_by_contents == True):
 				# FETCH ALL THE GSYSTEMS THAT HAVE BEEN MAP REDUCED.
-				all_Reduced_documents = collection.Node.find({"required_for":reduced_doc_requirement}, {"content":1, "_id":0, "orignal_id":1})
+				all_Reduced_documents = node_collection.find({"required_for": reduced_doc_requirement}, {"content": 1, "_id": 0, "orignal_id": 1})
 				# ABOVE LINE DOES NOT RETURN ALL GSYSTEMS. IT RETURNS OBJECTS OF "ToReduceDocs" class. 
 
 				for singleDoc in all_Reduced_documents:
@@ -433,7 +430,7 @@ def results_search(request, group_id, return_only_dict = None):
 					sorted_content_match_pairs.insert(c, pair)	# SORTED INSERT (INCREASING ORDER)
 
 				for docId in sorted_content_match_pairs:
-					doc = col.Node.find_one({"_id":docId['doc_id'], "access_policy":Access_policy}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+					doc = node_collection.find_one({"_id":docId['doc_id'], "access_policy":Access_policy}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
                                         try:
                                                 grps = doc.group_set
 					
@@ -484,7 +481,7 @@ def results_search_group(request, group_id):
 	group_ins = {}
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})._id
+		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})._id
 		group_id = ObjectId(group_ins)
 	else:
 		pass
@@ -541,9 +538,6 @@ def results_search_group(request, group_id):
 
 			#user = str(request.GET['author'])				# GET THE VALUE OF AUTHOR FROM THE FORM
 
-			col = get_database()[Node.collection_name]			# COLLECTION NAME
-
-
 			# FORMAT OF THE RESULTS RETURNED
 			search_results_ex = {'name':[], 'tags':[], 'content':[], 'user':[]}
 			search_results_st = {'name':[], 'tags':[], 'content':[], 'user':[]}
@@ -556,7 +550,7 @@ def results_search_group(request, group_id):
 			all_ids = []
 
 			# GET A CURSOR ON ALL THE GSYSTEM TYPES 
-			all_GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"_id":1})
+			all_GSystemTypes = node_collection.find({"_type":"GSystemType"}, {"_id":1})
 			len1 = all_GSystemTypes.count()
 			
 			if (search_by_name == 1):					# IF 1, THEN SEARCH BY NAME
@@ -567,9 +561,9 @@ def results_search_group(request, group_id):
 
 					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
 					if user_reqd != -1:				
-						exact_match = col.Node.find({'$and':[{"member_of":GSType._id},{"created_by":user_reqd}, {"access_policy":Access_policy},{"group_set":group_id},{"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+						exact_match = node_collection.find({'$and':[{"member_of":GSType._id},{"created_by":user_reqd}, {"access_policy":Access_policy},{"group_set":group_id},{"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 					else:
-						exact_match = col.Node.find({'$and':[{"member_of":GSType._id},{ "access_policy":Access_policy}, {"group_set":group_id}, {"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})					
+						exact_match = node_collection.find({'$and':[{"member_of":GSType._id},{ "access_policy":Access_policy}, {"group_set":group_id}, {"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})					
 
 					# SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
 					exact_match = list(exact_match)				
@@ -591,9 +585,9 @@ def results_search_group(request, group_id):
 					while c < len_stemmed:
 						word = search_str_stemmed[c]
 						if user_reqd != -1:
-							temp = col.Node.find({'$and':[{"member_of":GSType._id},{ "group_set":group_id},{ "created_by":user_reqd},{ "access_policy":Access_policy},{ "name":{"$regex":word, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+							temp = node_collection.find({'$and':[{"member_of":GSType._id},{ "group_set":group_id},{ "created_by":user_reqd},{ "access_policy":Access_policy},{ "name":{"$regex":word, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 						else:
-							temp = col.Node.find({'$and':[{"member_of":GSType._id},{ "group_set":group_id}, {"access_policy":Access_policy}, {"name":{"$regex":word, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+							temp = node_collection.find({'$and':[{"member_of":GSType._id},{ "group_set":group_id}, {"access_policy":Access_policy}, {"name":{"$regex":word, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 						#temp_sorted = sort_names_by_similarity(temp, search_str_user)
 						split_stem_match.append(temp)#temp_sorted)
 						c += 1
@@ -619,9 +613,9 @@ def results_search_group(request, group_id):
 
 					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
 					if user_reqd != -1:				
-						exact_match = col.Node.find({"member_of":GSType._id, "group_set":group_id, "created_by":user_reqd, "access_policy":Access_policy, "tags":search_str_user}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+						exact_match = node_collection.find({"member_of":GSType._id, "group_set":group_id, "created_by":user_reqd, "access_policy":Access_policy, "tags":search_str_user}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 					else:
-						exact_match = col.Node.find({"member_of":GSType._id, "access_policy":Access_policy, "group_set":group_id,  "tags":search_str_user}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+						exact_match = node_collection.find({"member_of":GSType._id, "access_policy":Access_policy, "group_set":group_id,  "tags":search_str_user}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 					#exact_match = sort_names_by_similarity(exact_match, search_str_user)
 					
 					for j in exact_match:
@@ -640,9 +634,9 @@ def results_search_group(request, group_id):
 					while c < len_stemmed:
 						word = search_str_stemmed[c]
 						if user_reqd != -1:					
-							temp = col.Node.find({"member_of":GSType._id, "group_set":group_id, "tags":word, "created_by":user_reqd, "access_policy":Access_policy}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+							temp = node_collection.find({"member_of":GSType._id, "group_set":group_id, "tags":word, "created_by":user_reqd, "access_policy":Access_policy}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 						else:
-							temp = col.Node.find({"member_of":GSType._id, "group_set":group_id, "access_policy":Access_policy, "tags":word}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+							temp = node_collection.find({"member_of":GSType._id, "group_set":group_id, "access_policy":Access_policy, "tags":word}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 						#temp_sorted = sort_names_by_similarity(temp, search_str_user)
 						
 						split_stem_match.append(temp)#_sorted)
@@ -664,7 +658,7 @@ def results_search_group(request, group_id):
 			sorted_content_match_pairs = []
 
 			if (search_by_contents == 1):
-				all_Reduced_documents = collection.Node.find({"required_for":reduced_doc_requirement}, {"content":1, "_id":0, "orignal_id":1})
+				all_Reduced_documents = node_collection.find({"required_for": reduced_doc_requirement}, {"content": 1, "_id": 0, "orignal_id": 1})
 				##print "cursor: ", all_Reduced_documents, all_Reduced_documents.count()
 				
 				for singleDoc in all_Reduced_documents:
@@ -693,7 +687,7 @@ def results_search_group(request, group_id):
 				#print "sorted pairs: ", sorted_content_match_pairs
 
 				for docId in sorted_content_match_pairs:
-					doc = col.Node.find_one({"_id":docId['doc_id'], "group_set":group_id, "access_policy":Access_policy}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+					doc = node_collection.find_one({"_id":docId['doc_id'], "group_set":group_id, "access_policy":Access_policy}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 					if (doc != None):
 						doc = addType(doc)
 						#print "type added  ", doc['created_by'], "value: ", User.objects.get(username=doc['created_by']).pk == 1
@@ -725,20 +719,19 @@ def results_search_group(request, group_id):
 
 # 	ins_objectid  = ObjectId()
 # 	if ins_objectid.is_valid(group_id) is False :
-# 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+# 		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 		if group_ins:
 # 			group_id = str(group_ins._id)
 # 		else:
-# 	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 	    		if auth :
 # 				group_id = str(auth._id)
 # 	else:
 # 		pass
 
 # 	#print "Group id is: ", group_id
-# 	col = get_database()[Node.collection_name]
-# 	temp = col.Node.find({"_type":"GSystemType"}, {"name":1, "_id":0})
+# 	temp = node_collection.find({"_type":"GSystemType"}, {"name":1, "_id":0})
 
 # 	allGSystems = []
 # 	for gs in temp:
@@ -756,7 +749,6 @@ def results_search_group(request, group_id):
 
 
 def get_attributes(request, group_id):
-	col = get_database()[Node.collection_name]
 	attributes = []
 
 	##print request.GET['GSystem']
@@ -771,7 +763,7 @@ def get_attributes(request, group_id):
 
 	for GSystem_name in GSystem_names:
 		#print GSystem_name
-		test_obj = col.Node.find_one({"_type":"GSystemType", "name":GSystem_name})
+		test_obj = node_collection.find_one({"_type":"GSystemType", "name":GSystem_name})
 		##print test_obj.keys()
 		for sg_key in list_of_keys:
 			if sg_key in test_obj.keys():
@@ -779,7 +771,7 @@ def get_attributes(request, group_id):
 					attributes.append(sg_key)
 
 		#print "\n\nattr: ", attributes, "\n\n"
-		temp = col.Node.one({"_type":"GSystemType", "name":GSystem_name})
+		temp = node_collection.one({"_type":"GSystemType", "name":GSystem_name})
 		
 		for attr in temp.attribute_type_set:
 			attributes.append(attr.name)
@@ -803,10 +795,9 @@ def user_name_to_id(userNames):
 
 def group_name_to_id(groupNames):
 	allGroups = []
-	col = get_database()[Node.collection_name]
 
 	for gr in groupNames:
-		sg_gr = col.Node.find({"_type":"Group", "name":gr})
+		sg_gr = node_collection.find({"_type":"Group", "name":gr})
 		for each in sg_gr:
                         allGroups.append(each._id)
 
@@ -814,8 +805,6 @@ def group_name_to_id(groupNames):
 
 
 def advanced_search_results(request, group_id): 
-
-	col = get_database()[Node.collection_name]
 
 	# READ THE GET VALUES
 	search_str_user = str(request.GET['search_text']).strip()
@@ -857,14 +846,14 @@ def advanced_search_results(request, group_id):
 			#print "attr: ", at_name
 			# CASE 1 -- SEARCH IN THE STRUCTURE OF THE GSYSTEM
 			for GSystem_name in GSystem_names:
-				GSystem_obj = col.Node.one({"_type":"GSystemType", "name":GSystem_name})
+				GSystem_obj = node_collection.one({"_type":"GSystemType", "name":GSystem_name})
 				##print GSystem_obj
 
-				if GSystem_obj.has_key(at_name):
+				if at_name in GSystem_obj:
 					if all_users != 0:
-						res = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GSystem_obj._id, at_name:{"$regex":word, "$options":"i" }}, {"name":1, "created_by":1, "last_update":1, "member_of":1 , "group_set":1, "url":1})
+						res = node_collection.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GSystem_obj._id, at_name:{"$regex":word, "$options":"i" }}, {"name":1, "created_by":1, "last_update":1, "member_of":1 , "group_set":1, "url":1})
 					else:
-						res = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "created_by":{"$in":all_users}, "member_of":GSystem_obj._id, at_name:{"$regex":word, "$options":"i" }}, {"name":1, "created_by":1, "last_update":1, "member_of":1, "group_set":1, "url":1})	
+						res = node_collection.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "created_by":{"$in":all_users}, "member_of":GSystem_obj._id, at_name:{"$regex":word, "$options":"i" }}, {"name":1, "created_by":1, "last_update":1, "member_of":1, "group_set":1, "url":1})	
 					for obj in res:
 						flag = False
 						#print obj.name
@@ -882,19 +871,19 @@ def advanced_search_results(request, group_id):
 
 			# CASE 2 -- SEARCH THE GATTRIBUTES
 			try:
-				attr_id = col.Node.one({"_type":"AttributeType", "name":at_name}, {"_id":1})
-				res = col.Node.find({"_type":"GAttribute", "attribute_type.$id":ObjectId(attr_id._id), "object_value":{"$regex":word, "$options":"i"}}, {"name":1, "object_value":1, "subject":1})
+				attr_id = node_collection.one({"_type":"AttributeType", "name":at_name}, {"_id":1})
+				res = triple_collection.find({"_type":"GAttribute", "attribute_type.$id":ObjectId(attr_id._id), "object_value":{"$regex":word, "$options":"i"}}, {"name":1, "object_value":1, "subject":1})
 				#print "Sttr type: ", attr_id
 				for obj in res: 
 					if all_users == 0:
-						GSystem = col.Node.one({"_id":obj.subject}, {"name":1, "created_by":1, "last_update":1, "member_of":1 , "group_set":1, "url":1})
+						GSystem = node_collection.one({"_id":obj.subject}, {"name":1, "created_by":1, "last_update":1, "member_of":1 , "group_set":1, "url":1})
 					else:
-						GSystem = col.Node.one({"_id":obj.subject, "created_by":{"$in":all_users}}, {"name":1, "created_by":1, "last_update":1, "member_of":1, "group_set":1, "url":1})
+						GSystem = node_collection.one({"_id":obj.subject, "created_by":{"$in":all_users}}, {"name":1, "created_by":1, "last_update":1, "member_of":1, "group_set":1, "url":1})
 
 					if GSystem._id not in all_ids:
 						#print "adding: ", GSystem._id
 						# THE FOLLOWING CODE MAY BE WRONG IF THE RETURNED NODE IS A MEMBER OF MORE THAN ONE GSYSTEM_TYPE
-						#link_obj = collection.Node.one({"member_of":GSystem.member_of[0], "required_for":"Links"}, {"link":1})
+						#link_obj = node_collection.one({"member_of":GSystem.member_of[0], "required_for":"Links"}, {"link":1})
 						#print "731"
 						GSystem_groups = GSystem.group_set
 						#print "groups: ", GSystem_groups
@@ -921,8 +910,7 @@ def advanced_search_results(request, group_id):
 
 
 def get_public_groups():
-	col = get_database()[Node.collection_name]	
-	cur = col.Node.find({"_type":"Group", "group_type":"PUBLIC"}, {"name":1})
+	cur = node_collection.find({"_type": "Group", "group_type": "PUBLIC"}, {"name": 1})
 	allGroups = []
 	for obj in cur:
 		allGroups.append(obj.name)
@@ -933,10 +921,10 @@ def get_public_groups():
 def addType(obj):
 	##print "received: ", obj.member_of[0]
 	#i = ObjectId(obj.member_of[0])
-	#links = collection.Node.find({"member_of":i, "required_for":"Links"}, {"link":1})
+	#links = node_collection.find({"member_of":i, "required_for":"Links"}, {"link":1})
 	##print "links count", links.count(), "\n"
         
-        auth = collection.Node.one({'_type': 'Author', 'created_by': obj.created_by})
+        auth = node_collection.one({'_type': 'Author', 'created_by': obj.created_by})
         
 	#for ob in links:
 	obj2 = {}
@@ -1023,14 +1011,13 @@ def populate_list_of_group_members(group_ids):
 	This function returns a list of users in a given list of groups.
 	Groups should be given as a list of group ids.
 	"""
-	col = get_database()[Node.collection_name]
 	memList = []
 
 	try:
 		for gr in group_ids:
 			# THIS CODE WILL CAUSE PROBLEMS IF THERE ARE MANY GROUPS WITH THE SAME NAME
-			group_id = col.Node.find_one({"_type":"Group", "name":gr}, {"_id":1})
-			author_list = col.Node.one({"_type":"Group", "_id":group_id._id}, {"author_set":1, "_id":0})
+			group_id = node_collection.find_one({"_type":"Group", "name":gr}, {"_id":1})
+			author_list = node_collection.one({"_type":"Group", "_id":group_id._id}, {"author_set":1, "_id":0})
 
 			for author in author_list.author_set:
 				name_author = User.objects.get(pk=author).username
@@ -1060,12 +1047,12 @@ def get_node_info(request, group_id, node_name):
 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 		if group_ins:
 			group_id = str(group_ins._id)
 		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    		if auth :
 				group_id = str(auth._id)
 	else:
@@ -1073,9 +1060,7 @@ def get_node_info(request, group_id, node_name):
 
 
 	is_list = False
-	col = get_database()[Node.collection_name]
-
-	list_of_nodes = col.Node.find({"name":node_name}, {"_id":1})
+	list_of_nodes = node_collection.find({"name": node_name}, {"_id": 1})
 
 	if list_of_nodes.count() > 1:
 		list_of_nodes.rewind()
@@ -1088,7 +1073,7 @@ def get_node_info(request, group_id, node_name):
 		list_nodes = json.dumps(list_nodes, cls=Encoder)
 		return render(request, 'ndf/node_details.html', {'is_list':1, 'list_nodes':list_nodes, 'all_fields':'', 'groupid':group_id})
 	else:
-		sg_node = col.Node.one({"name":node_name})
+		sg_node = node_collection.one({"name": node_name})
 		GSTypes = sg_node.member_of
 
 		attrs = []
@@ -1098,10 +1083,10 @@ def get_node_info(request, group_id, node_name):
 		results['last_update'] = str(sg_node.last_update.date())
 
 		for GSType in GSTypes:
-			obj = col.Node.one({"_id":ObjectId(GSType)})
+			obj = node_collection.one({"_id": ObjectId(GSType)})
 
 			for attr in obj.attribute_type_set:
-				custom_attrs = col.Node.find({"_type":"GAttribute", "subject":ObjectId(sg_node._id), "attribute_type.$id":ObjectId(attr._id)}, {"name":1, "object_value":1})
+				custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type.$id": ObjectId(attr._id)}, {"name":1, "object_value":1})
 				for sg_attr in custom_attrs:
 					temp = sg_attr.name
 					i1 = temp.index('--') + 3
@@ -1122,19 +1107,18 @@ def get_node_info2(request, group_id, node_id):
 	"""
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 		if group_ins:
 			group_id = str(group_ins._id)
 		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    		if auth :
 				group_id = str(auth._id)
 	else:
 		pass
 
-	col = get_database()[Node.collection_name]
-	sg_node = col.Node.one({"_id":ObjectId(node_id)})
+	sg_node = node_collection.one({"_id": ObjectId(node_id)})
 	GSTypes = sg_node.member_of
 
 	attrs = []
@@ -1144,10 +1128,10 @@ def get_node_info2(request, group_id, node_id):
 	results['last_update'] = str(sg_node.last_update.date())
 
 	for GSType in GSTypes:
-		obj = col.Node.one({"_id":ObjectId(GSType)})
+		obj = node_collection.one({"_id": ObjectId(GSType)})
 
 		for attr in obj.attribute_type_set:
-			custom_attrs = col.Node.find({"_type":"GAttribute", "subject":ObjectId(sg_node._id), "attribute_type.$id":ObjectId(attr._id)}, {"name":1, "object_value":1})
+			custom_attrs = triple_collection.find({"_type": "GAttribute", "subject": ObjectId(sg_node._id), "attribute_type.$id": ObjectId(attr._id)}, {"name":1, "object_value":1})
 			for sg_attr in custom_attrs:
 				temp = sg_attr.name
 				i1 = temp.index('--') + 3
@@ -1171,11 +1155,11 @@ def get_relations_for_autoSuggest(request, group_id):
 	ins = []									# HOLDS LIST OF SUGGESTIONS TO RETURN
 
 	# FIND NAMES OF ALL GSYSTEMTYPES OR RELATIONTYPES THAT START WITH WHAT HAS BEEN TYPED BY THE USER
-	instances = col.Node.find({ "$or": [{ "_type": "RelationType"}, {"_type": "GSystemType"}], "name":{'$regex':"^"+x, "$options":"i"}}, {"name":1})
+	instances = node_collection.find({ "$or": [{ "_type": "RelationType"}, {"_type": "GSystemType"}], "name":{'$regex':"^"+x, "$options":"i"}}, {"name":1})
 	for inst in instances:
 		ins.append(prefix + ' ' + inst.name)
 	
-	instances = col.Node.find({"_type": "GSystem", "name":{'$regex':"^"+x, "$options":"i"}}, {"name":1})
+	instances = node_collection.find({"_type": "GSystem", "name":{'$regex':"^"+x, "$options":"i"}}, {"name":1})
 	for inst in instances:
 		ins.append(prefix + ' ' + inst.name)
 
@@ -1188,12 +1172,12 @@ def get_relations_for_autoSuggest(request, group_id):
 # 	# GET VALUE FROM TEXT BOX
 # 	ins_objectid  = ObjectId()
 # 	if ins_objectid.is_valid(group_id) is False :
-# 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+# 		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 		if group_ins:
 # 			group_id = str(group_ins._id)
 # 		else:
-# 	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 	    		if auth :
 # 				group_id = str(auth._id)
 # 	else:
@@ -1221,8 +1205,7 @@ def ra_search_results(request, group_id):
 	"""
 	
 	sq = str(request.GET['search_text']).strip()						# SEARCH QUERY
-	col = get_database()[Node.collection_name]							
-	relations = col.Node.find({ "_type": "RelationType"}, {"name":1, "inverse_name":1})	
+	relations = node_collection.find({"_type": "RelationType"}, {"name": 1, "inverse_name": 1})	
 
 	CASE_TWO_THRESHOLD = 0.6
 	GSYSTEM_MIN_THRESHOLD_CASE1 = 0.69
@@ -1275,9 +1258,9 @@ def ra_search_results(request, group_id):
 		c += 1
 
 	try:
-		relationType_obj = col.Node.one({"_type":"RelationType", "$or": [ {"name":max_match_rel}, {"inverse_name":max_match_rel} ] }, {"_id":1, "name":1})
+		relationType_obj = node_collection.one({"_type": "RelationType", "$or": [{"name": max_match_rel}, {"inverse_name": max_match_rel} ] }, {"_id": 1, "name": 1})
 
-		GRelation_objs = col.Node.find({"_type":"GRelation", "relation_type.$id":relationType_obj._id})
+		GRelation_objs = triple_collection.find({"_type": "GRelation", "relation_type.$id": relationType_obj._id})
 
 		#subjects = []
 		#right_subjects = []
@@ -1288,14 +1271,14 @@ def ra_search_results(request, group_id):
 			right_sub = name_Grel[name_Grel.rfind('--')+3:] 
 
 			if difflib.SequenceMatcher(None, GSystem_name, left_sub).ratio() > GSYSTEM_MIN_THRESHOLD_CASE1: 
-				reqd_obj = col.Node.one({"_id":gr_obj.right_subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
+				reqd_obj = node_collection.one({"_id":gr_obj.right_subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
 				#subjects.append(gr_obj.subject)
 				#right_subjects.append(gr_obj.name)
 				reqd_obj = addType(reqd_obj)
 				result_members.append(reqd_obj)
 				#print "match %: ", difflib.SequenceMatcher(None, GSystem_name, left_sub).ratio()
 			elif difflib.SequenceMatcher(None, GSystem_name, right_sub).ratio() > GSYSTEM_MIN_THRESHOLD_CASE1: 
-				reqd_obj = col.Node.one({"_id":gr_obj.subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
+				reqd_obj = node_collection.one({"_id":gr_obj.subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
 				#subjects.append(gr_obj.subject)
 				#right_subjects.append(gr_obj.name)
 				reqd_obj = addType(reqd_obj)
@@ -1309,7 +1292,7 @@ def ra_search_results(request, group_id):
 	if max_match < CASE_TWO_THRESHOLD:
 
 		# LOOK FOR GSYSTEM_TYPE IN SEARCH QUERY
-		GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"name":1})
+		GSystemTypes = node_collection.find({"_type": "GSystemType"}, {"name": 1})
 
 		sorted_gst = {}
 		max_length = 0
@@ -1352,7 +1335,7 @@ def ra_search_results(request, group_id):
 		sorted_gs = {}
 		max_length = 0
 
-		GSystems_sq = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}}, {"name":1})
+		GSystems_sq = node_collection.find({"_type": {"$in": POSSIBLE_SEARCH_TYPES}}, {"name": 1})
 
 		for gs in GSystems_sq:
 			length = len(gs.name.split())
@@ -1386,13 +1369,13 @@ def ra_search_results(request, group_id):
 			c -= 1
 		
 		try:
-			GStype = col.Node.one({"name":max_match_rel_gst}, {"_id":1})
-			GS_sq = col.Node.find_one({"name":"GSystem", "name":max_match_rel_gs}, {"_id":1})
+			GStype = node_collection.one({"name": max_match_rel_gst}, {"_id": 1})
+			GS_sq = node_collection.find_one({"name": "GSystem", "name": max_match_rel_gs}, {"_id": 1})
 
-			allMembers = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GStype._id}, {"_id":1, "name":1})
+			allMembers = node_collection.find({"_type": {"$in": POSSIBLE_SEARCH_TYPES}, "member_of": GStype._id}, {"_id": 1, "name": 1})
 			
 			# LOOK FOR GRELATIONS WITH BOTH GSYSTEMS ON EITHER SIDE
-			relations = col.Node.find({"_type":"GRelation", "right_subject":GS_sq._id}, {"subject":1})
+			relations = triple_collection.find({"_type": "GRelation", "right_subject": GS_sq._id}, {"subject": 1})
 
 			relations.rewind()
 			for rel in relations:
@@ -1403,7 +1386,7 @@ def ra_search_results(request, group_id):
 						result_members.append(member)	
 
 			allMembers.rewind()
-			relations = col.Node.find({"_type":"GRelation", "subject":GS_sq._id}, {"right_subject":1})
+			relations = triple_collection.find({"_type": "GRelation", "subject": GS_sq._id}, {"right_subject": 1})
 			for rel in relations:
 				for member in allMembers:
 					if rel.right_subject == member._id:
@@ -1418,7 +1401,7 @@ def ra_search_results(request, group_id):
 		sorted_gs = {}
 		max_length = 0
 
-		GSystems_sq = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}}, {"name":1})
+		GSystems_sq = node_collection.find({"_type": {"$in": POSSIBLE_SEARCH_TYPES}}, {"name": 1})
 
 		for gs in GSystems_sq:
 			length = len(gs.name.split())
@@ -1452,7 +1435,7 @@ def ra_search_results(request, group_id):
 			c += 1
 
 		# LOOK FOR GSYSTEM_TYPE IN SEARCH QUERY
-		GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"name":1})
+		GSystemTypes = node_collection.find({"_type": "GSystemType"}, {"name": 1})
 
 		sorted_gst = {}
 		max_length = 0
@@ -1489,13 +1472,13 @@ def ra_search_results(request, group_id):
 			c -= 1
 
 		try:
-			GStype = col.Node.one({"name":max_match_rel_gst}, {"_id":1})
-			GS_sq = col.Node.find_one({"name":"GSystem", "name":max_match_rel_gs}, {"_id":1})
+			GStype = node_collection.one({"name": max_match_rel_gst}, {"_id": 1})
+			GS_sq = node_collection.find_one({"name": "GSystem", "name": max_match_rel_gs}, {"_id": 1})
 
-			allMembers = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GStype._id}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
+			allMembers = node_collection.find({"_type": {"$in": POSSIBLE_SEARCH_TYPES}, "member_of": GStype._id}, {"_id": 1, "name": 1, "created_by": 1, "last_update": 1, "url": 1})
 			
 			# LOOK FOR GRELATIONS WITH BOTH GSYSTEMS ON EITHER SIDE
-			relations = col.Node.find({"_type":"GRelation", "right_subject":GS_sq._id}, {"subject":1})
+			relations = triple_collection.find({"_type": "GRelation", "right_subject": GS_sq._id}, {"subject": 1})
 
 			relations.rewind()
 			for rel in relations:
@@ -1505,7 +1488,7 @@ def ra_search_results(request, group_id):
 						member = addType(member)
 						result_members.append(member)	
 
-			relations = col.Node.find({"_type":"GRelation", "subject":GS_sq._id}, {"right_subject":1})
+			relations = triple_collection.find({"_type": "GRelation", "subject": GS_sq._id}, {"right_subject": 1})
 			for rel in relations:
 				allMembers.rewind()
 				for member in allMembers:
@@ -1659,18 +1642,18 @@ def map_reduce(x,mapper,reducer):
 """
 def perform_map_reduce(request,group_id):
 	#This function shall perform map reduce on all the objects which are present in the ToReduce() class Collection
-	all_instances = list(collection.ToReduce.find({'required_for':'map_reduce_to_reduce'}))
+	all_instances = list(node_collection.collection.ToReduce.find({'required_for':'map_reduce_to_reduce'}))
 	for particular_instance in all_instances:
 		#print particular_instance._id,'\n'
 		particular_instance_id  = particular_instance.id_of_document_to_reduce
 		#Now Pick up a node from the Node Collection class
-		orignal_node = collection.Node.find_one({"_id":particular_instance_id})		
-		map_reduce_node = collection.MyReduce.find_one({'required_for':'map_reduce_reduced','orignal_doc_id':particular_instance_id})
+		orignal_node = node_collection.find_one({"_id":particular_instance_id})		
+		map_reduce_node = node_collection.find_one({'required_for':'map_reduce_reduced','orignal_doc_id':particular_instance_id})
 		if map_reduce_node:
 			map_reduce_node.content_org = dict(map_reduce(orignal_node.content_org,mapper,reducer))
 			map_reduce_node.save()
 		else:
-			z = collection.MyReduce()
+			z = node_collection.collection.MyReduce()
 			z.content_org = dict(map_reduce(orignal_node.content_org,mapper,reducer))
 			z.orignal_doc_id = particular_instance_id
 			z.required_for = u'map_reduce_reduced'
@@ -1685,22 +1668,22 @@ def perform_map_reduce(request,group_id):
 	#connection.register([ReducedDocs])
 	#connection.register([ToReduceDocs])
 	
-	dltr=list(collection.ToReduceDocs.find({'required_for':to_reduce_doc_requirement}))	#document_list_to_reduce
+	dltr=list(node_collection.find({'required_for':to_reduce_doc_requirement}))	#document_list_to_reduce
 	
 	for doc in dltr:
 		doc_id = doc.doc_id
 		#print "DOC ID LN 1504::",doc_id
-		#orignal_doc = collection.MyDocs.find_one({"_id":doc_id,'required_for':my_doc_requirement})
-		orignal_doc = collection.Node.find_one({"_id":doc_id})
+		#orignal_doc = node_collection.find_one({"_id": doc_id,'required_for': my_doc_requirement})
+		orignal_doc = node_collection.find_one({"_id": doc_id})
 		content_dict = dict(map_reduce(orignal_doc.content_org,mapper,reducer))
 		
-		dord = collection.ReducedDocs.find_one({"orignal_id":doc_id,'required_for':reduced_doc_requirement}) #doc of reduced docs
+		dord = node_collection.find_one({"orignal_id": doc_id, 'required_for': reduced_doc_requirement}) #doc of reduced docs
 		if dord:
 			dord.content=content_dict
 			dord.is_indexed = False
 			dord.save()
 		else:
-			new_doc = collection.ReducedDocs()
+			new_doc = node_collection.collection.ReducedDocs()
 			new_doc.content = content_dict
 			new_doc.orignal_id = doc_id
 			new_doc.required_for = reduced_doc_requirement
@@ -1738,14 +1721,14 @@ def td_doc():
 	
 	#This is the list of documents which contains the indexed words
 	
-	lod = collection.IndexedWordList.find({'required_for':indexed_word_list_requirement})	#list_of_documents_cursor
+	lod = node_collection.find({'required_for': indexed_word_list_requirement})	#list_of_documents_cursor
 	
 	"""
 		What does indexing mean?
 		In our scenario,indexing simply means to store the number if occurances of a particular word in each and every document.
 		
 	"""
-	mrd = collection.ReducedDocs.find({'required_for':reduced_doc_requirement})	#map_reduced_documents
+	mrd = node_collection.find({'required_for': reduced_doc_requirement})	#map_reduced_documents
 	mrdl = list(mrd)
 	
 		
@@ -1777,7 +1760,7 @@ def generate_big_dict():
 	#This function will generate a big dictionary i.e. it will simply go and combine all the dictionaries together
 	#connection.register([IndexedWordList])
 	
-	lod = collection.IndexedWordList.find({'required_for':indexed_word_list_requirement})
+	lod = node_collection.find({'required_for': indexed_word_list_requirement})
 	lodl = list(lod)
 	
 	prefs = {} #prefs ==> Preferences
@@ -1907,12 +1890,12 @@ def recommend(prefs,term,similarity = sim_distance):
 # def cf_search(request, group_id):
 # 	ins_objectid  = ObjectId()
 # 	if ins_objectid.is_valid(group_id) is False :
-# 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+# 		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 		if group_ins:
 # 			group_id = str(group_ins._id)
 # 		else:
-# 	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 # 	    		if auth :
 # 				group_id = str(auth._id)
 # 	else:
@@ -1949,7 +1932,7 @@ def get_nearby_words(request,group_id):
 	
 	result_array = []
 	for (relevance,each_id) in final_ranking_list:
-		obj = collection.Node.find_one({"_id":ObjectId(each_id)},{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+		obj = node_collection.find_one({"_id": ObjectId(each_id)}, {"name": 1, "_id": 1, "member_of": 1, "created_by": 1, "last_update": 1, "group_set": 1, "url": 1})
 		obj = addType(obj)
 		obj["relevance"]=relevance
 		result_array.append(obj)

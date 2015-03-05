@@ -1,6 +1,10 @@
 ''' -- imports from python libraries -- '''
-import re, magic, collections
+import re
+# import magic
+import collections
 from time import time
+import json
+import ox
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
@@ -22,6 +26,7 @@ try:
 except ImportError:
 	pass
 
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
@@ -35,12 +40,9 @@ from django.contrib.sites.models import Site
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
 register = Library()
-db = get_database()
-collection = db[Node.collection_name]
-at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'}, {'name':'apps_list'}]})
+at_apps_list = node_collection.one({'_type': 'AttributeType', 'name': 'apps_list'})
 translation_set=[]
 check=[]
-import json,ox
 
 
 
@@ -76,7 +78,7 @@ def get_group_agency_types():
 @register.assignment_tag
 def get_node_type(node):
    if node:
-      obj=collection.Node.find_one({"_id":ObjectId(node._id)})
+      obj = node_collection.find_one({"_id": ObjectId(node._id)})
       nodetype=node.member_of_names_list[0]
       return nodetype
    else:
@@ -86,7 +88,7 @@ def get_node_type(node):
 @register.assignment_tag
 def get_node(node):
 	if node:
-		obj=collection.Node.one({"_id":ObjectId(node)})
+		obj = node_collection.one({"_id": ObjectId(node)})
 		if obj:
 			return obj
 		else:
@@ -95,7 +97,7 @@ def get_node(node):
 
 @register.assignment_tag
 def get_schema(node):
-   obj=collection.Node.find_one({"_id": ObjectId(node.member_of[0])},{"name":1})
+   obj = node_collection.find_one({"_id": ObjectId(node.member_of[0])}, {"name": 1})
    nam=node.member_of_names_list[0]
    if(nam == 'Page'):
         return [1,schema_dict[nam]]
@@ -109,25 +111,28 @@ def get_schema(node):
    else:
 	return [0,""]
 
+
 @register.filter
 def is_Page(node):
-	Page = collection.Node.one({"_type":"GSystemType","name":"Page"})
+	Page = node_collection.one({"_type": "GSystemType", "name": "Page"})
 	if(Page._id in node.member_of):
 		return 1
 	else:
 		return 0
 
+
 @register.filter
 def is_Quiz(node):
-	Quiz = collection.Node.one({"_type":"GSystemType","name":"Quiz"})
+	Quiz = node_collection.one({"_type": "GSystemType", "name": "Quiz"})
 	if(Quiz._id in node.member_of):
 		return 1
 	else:
 		return 0
-		
+
+
 @register.filter
 def is_File(node):
-	File = collection.Node.one({"_type":"GSystemType","name":"File"})
+	File = node_collection.one({"_type": "GSystemType", "name": "File"})
 	if(File._id in node.member_of):
 		return 1
 	else:
@@ -145,7 +150,7 @@ def get_languages():
 def get_node_ratings(request,node):
         try:
                 user=request.user
-                node=collection.Node.one({'_id':ObjectId(node._id)})
+                node = node_collection.one({'_id': ObjectId(node._id)})
                 sum=0
                 dic={}
                 cnt=0
@@ -205,12 +210,12 @@ def get_site_info():
 def check_gapp_menus(groupid):
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(groupid) is False :
-		group_ins = collection.Node.find_one({'_type': "Group", "name": groupid}) 
+		group_ins = node_collection.find_one({'_type': "Group", "name": groupid}) 
 		if group_ins:
 			groupid = str(group_ins._id)
 	else :
 		pass
-	grp=collection.Node.one({'_id':ObjectId(groupid)})
+	grp = node_collection.one({'_id': ObjectId(groupid)})
 	if not at_apps_list:
 		return False
 	poss_atts=grp.get_possible_attributes(grp.member_of)
@@ -223,7 +228,7 @@ def check_gapp_menus(groupid):
 def get_apps_for_groups(groupid):
 	try:
 		ret_dict={}
-		grp=collection.Node.one({'_id':ObjectId(groupid)})
+		grp = node_collection.one({'_id': ObjectId(groupid)})
 		poss_atts=grp.get_possible_attributes(at_apps_list._id)
 		if poss_atts:
 			list_apps=poss_atts['apps_list']['object_value']
@@ -236,12 +241,12 @@ def get_apps_for_groups(groupid):
 				counter+=1 
 			return ret_dict 
 		else:
-			gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+			gpid = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 			gapps = {}
 			i = 0;
-			meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-			GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
-			group_obj=collection.Group.one({'_id':ObjectId(groupid)})
+			meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+			GAPPS = node_collection.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+			group_obj = node_collection.one({'_id':ObjectId(groupid)})
 
 			# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
 			not_in_menu_bar = []
@@ -276,7 +281,7 @@ def check_is_user_group(group_id):
 	try:
 		lst_grps=[]
 		all_user_grps=get_all_user_groups()
-		grp=collection.Node.one({'_id':ObjectId(group_id)})
+		grp = node_collection.one({'_id':ObjectId(group_id)})
 		for each in all_user_grps:
 			lst_grps.append(each.name)
 		if grp.name in lst_grps:
@@ -286,43 +291,45 @@ def check_is_user_group(group_id):
 	except Exception as exptn:
 		print "Exception in check_user_group "+str(exptn)
 
+
 @register.assignment_tag
 def switch_group_conditions(user,group_id):
 	try:
 		ret_policy=False
 		req_user_id=User.objects.get(username=user).id
-		group=collection.Node.one({'_id':ObjectId(group_id)})
+		group = node_collection.one({'_id':ObjectId(group_id)})
 		if req_user_id in group.author_set and group.group_type == 'PUBLIC':
 			ret_policy=True
 		return ret_policy
 	except Exception as ex:
 		print "Exception in switch_group_conditions"+str(ex)
- 
+
+
 @register.assignment_tag
 def get_all_user_groups():
 	try:
-		all_groups = collection.Node.find({'_type':'Author'}).sort('name', 1)
+		all_groups = node_collection.find({'_type':'Author'}).sort('name', 1)
 		return list(all_groups)
 	except:
 		print "Exception in get_all_user_groups"
 
+
 @register.assignment_tag
 def get_group_object(group_id = None):
 	try:
-		colln=db[Node.collection_name]
 		if group_id == None :
-			group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+			group_object = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		else:
-			group_object=colln.Group.one({'_id':ObjectId(group_id)})
+			group_object = node_collection.one({'_id':ObjectId(group_id)})
 		return group_object
 	except invalid_id:
-		group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+		group_object = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return group_object
+
 
 @register.assignment_tag
 def get_states_object(request):
-   colln=db[Node.collection_name]
-   group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'State Partners'}]})
+   group_object = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'State Partners'}]})
    return group_object
 
 
@@ -338,18 +345,18 @@ def get_all_users_to_invite():
 		return str(inv_users)
 	except Exception as e:
 		print str(e)
- 
+
 
 @register.inclusion_tag('ndf/twist_replies.html')
 def get_reply(thread,parent,forum,token,user,group_id):
 	return {'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent,'groupid':group_id}
 
+
 @register.assignment_tag
 def get_all_replies(parent):
-	 gs_collection = db[Node.collection_name]
 	 ex_reply=""
 	 if parent:
-		 ex_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
+		 ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
 		 ex_reply.sort('created_at',-1)
 	 return ex_reply
 
@@ -371,13 +378,13 @@ def get_attribute_value(node_id, attr):
 
 	node_attr = None
 	if node_id:
-		node = collection.Node.one({'_id': ObjectId(node_id) })
-		gattr = collection.Node.one({'_type': 'AttributeType', 'name': unicode(attr) })
-		# print "node: ",node.name,"\n"
-		# print "attr: ",attr,"\n"
+		node = node_collection.one({'_id': ObjectId(node_id) })
+		gattr = node_collection.one({'_type': 'AttributeType', 'name': unicode(attr) })
+        # print "node: ",node.name,"\n"
+        # print "attr: ",attr,"\n"
 
 		if node and gattr:
-			node_attr = collection.Node.one({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": node._id })	
+			node_attr = triple_collection.one({'_type': "GAttribute", "subject": node._id, 'attribute_type.$id': gattr._id})	
 
 	if node_attr:
 		attr_val = node_attr.object_value
@@ -465,12 +472,13 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 					'is_RT': checked, 'group_id': group_id, 'groupid': group_id
 				}
 
+
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
 	drawer1 = {}
 	drawer2 = None
 	groupid = ""
-	group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+	group_obj = node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
 
 	if group_obj:
 		groupid = str(group_obj[0]._id)
@@ -502,7 +510,7 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 				drawer1['en']='en'
 				drawer1['mar']='mar'
 		else:
-			drawer = collection.Node.find({"_type":types})
+			drawer = node_collection.find({"_type":types})
 			for each in drawer:
 				drawer1[str(each._id)]=each.name
 		return {'template': template1, 'widget_for': fields_name, 'drawer1': drawer1, 'selected_value': fields_value}
@@ -519,7 +527,7 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 					fields_value_id_list.append(each._id)
 
 		if types in alltypes:
-			for each in collection.Node.find({"_type": types}):
+			for each in node_collection.find({"_type": types}):
 				if fields_value_id_list:
 					if each._id not in fields_value_id_list:
 						drawer1[each._id] = each.name
@@ -528,7 +536,7 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 
 		if types in ["all_types"]:
 			for each in alltypes:
-				for eachnode in collection.Node.find({"_type": each}):
+				for eachnode in node_collection.find({"_type": each}):
 					if fields_value_id_list:
 						if eachnode._id not in fields_value_id_list:
 							drawer1[eachnode._id] = eachnode.name
@@ -538,28 +546,27 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 		if fields_value_id_list:
 			drawer2 = []
 			for each_id in fields_value_id_list:
-				each_node = collection.Node.one({'_id': each_id})
+				each_node = node_collection.one({'_id': each_id})
 				if each_node:
 					drawer2.append(each_node)
 
 		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid, 'groupid': groupid}
 
 
-
 @register.assignment_tag
 def shelf_allowed(node):
-	page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
-	file_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
-	course_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Course'})
-	quiz_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'Quiz'})
-	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+	page_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+	file_GST = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
+	course_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Course'})
+	quiz_GST= node_collection.one({'_type': 'GSystemType', 'name': 'Quiz'})
+	topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 	allowed_list = [page_GST._id,file_GST._id,course_GST._id,quiz_GST._id,topic_GST._id]
-
-	for each in node.member_of:
-		if each in allowed_list :
-			allowed = "True"
-			return allowed
+	if node:
+		for each in node.member_of:
+			if each in allowed_list :
+				allowed = "True"
+				return allowed
 
 
 # This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
@@ -570,14 +577,13 @@ def get_gapps_iconbar(request, group_id):
 	try:
 		selectedGapp = request.META["PATH_INFO"]
 		group_name = ""
-		collection = db[Node.collection_name]
-		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+		gpid = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		gapps = {}
 		i = 0;
-		meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+		meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
 		
-		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
-		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		GAPPS = node_collection.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+		group_obj = node_collection.one({'_id':ObjectId(group_id)})
 
 		# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
 		not_in_menu_bar = []
@@ -595,7 +601,7 @@ def get_gapps_iconbar(request, group_id):
 			DEFAULT_GAPPS_LIST = setting_gapps
 
 		for node in GAPPS:
-			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+			#node = node_collection.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
 			if node:
 				if node.name not in not_in_menu_bar and node.name in DEFAULT_GAPPS_LIST:
 					i = i+1;
@@ -607,7 +613,7 @@ def get_gapps_iconbar(request, group_id):
 			selectedGapp = selectedGapp.split("/")[1]
 		if group_id == None:
 			group_id=gpid._id
-		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		group_obj=node_collection.one({'_id':ObjectId(group_id)})
 		if not group_obj:
 			group_id=gpid._id
 		else :
@@ -615,7 +621,7 @@ def get_gapps_iconbar(request, group_id):
 
 		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
 	except invalid_id:
-		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+		gpid=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		group_id=gpid._id
 		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
@@ -693,7 +699,7 @@ def thread_reply_count( oid ):
 	'''
 	Method to count total replies for the thread.
 	'''
-	thr_rep = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}],'status':{'$nin':['HIDDEN']}})
+	thr_rep = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}],'status':{'$nin':['HIDDEN']}})
 	global global_thread_rep_counter		# to acces global_thread_rep_counter as global and not as local, 
 	global global_thread_latest_reply
 
@@ -721,7 +727,7 @@ def thread_reply_count( oid ):
 # global variable to count thread's total reply
 # global_disc_rep_counter = 0	
 # global_disc_all_replies = []
-reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
 @register.assignment_tag
 def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 	'''
@@ -730,19 +736,19 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False:
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 		if group_ins:
 			group_id = str(group_ins._id)
 		else:
-			auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+			auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 			if auth :
 				group_id = str(auth._id)
 	else:
 		pass
 
-	# thr_rep = collection.GSystem.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})#.sort({'created_at': -1})
-	thr_rep = collection.Node.find({'_type':'GSystem', 'group_set':ObjectId(group_id), 'prior_node':ObjectId(oid), 'member_of':ObjectId(reply_st._id)}).sort('created_at', -1)
+	# thr_rep = node_collection.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})#.sort({'created_at': -1})
+	thr_rep = node_collection.find({'_type':'GSystem', 'group_set':ObjectId(group_id), 'prior_node':ObjectId(oid), 'member_of':ObjectId(reply_st._id)}).sort('created_at', -1)
 
 	# to acces global_disc_rep_counter as global and not as local
 	# global global_disc_rep_counter 
@@ -789,9 +795,8 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 
 @register.assignment_tag
 def get_forum_twists(forum):
-	gs_collection = db[Node.collection_name]
 	ret_replies = []
-	exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
+	exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
 	exstng_reply.sort('created_at')
 	global global_thread_rep_counter 		# to acces global global_thread_rep_counter and reset it to zero
 	global global_thread_latest_reply
@@ -808,17 +813,16 @@ def get_forum_twists(forum):
 lp=[]
 def get_rec_objs(ob_id):
 	lp.append(ob_id)
-	exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(ob_id)}]})
+	exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(ob_id)}]})
 	for each in exstng_reply:
 		get_rec_objs(each)
 	return lp
 
 @register.assignment_tag
 def get_twist_replies(twist):
-	gs_collection = db[Node.collection_name]
 	ret_replies={}
 	entries=[]
-	exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(twist._id)}]})
+	exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(twist._id)}]})
 	for each in exstng_reply:
 		lst=get_rec_objs(each)
 	return ret_replies
@@ -836,11 +840,10 @@ def check_user_join(request,group_id):
 		user_id=usern.id
 	else:
 		return "null"
-	col_Group = db[Group.collection_name]
 	if group_id == '/home/'or group_id == "":
-		colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+		colg = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 	else:
-		colg = col_Group.Group.one({'_id':ObjectId(group_id)})
+		colg = node_collection.one({'_id':ObjectId(group_id)})
 	if colg:
 		if colg.created_by == user_id:
 			return "author"
@@ -866,8 +869,7 @@ def check_group(group_id):
 @register.assignment_tag
 def get_existing_groups():
 	group = []
-	col_Group = db[Group.collection_name]
-	colg = col_Group.Group.find({'_type': u'Group'})
+	colg = node_collection.find({'_type': u'Group'})
 	colg.sort('name')
 	gr = list(colg)
 	for items in gr:
@@ -878,12 +880,11 @@ def get_existing_groups():
 @register.assignment_tag
 def get_existing_groups_excluding_username():
 	group = []
-	col_Group = db[Group.collection_name]
 	user_list=[]
 	users=User.objects.all()
 	for each in users:
 		user_list.append(each.username)
-	colg = col_Group.Group.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
+	colg = node_collection.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
 	colg.sort('name')
 	gr = list(colg)
 	for items in gr:
@@ -903,7 +904,7 @@ def get_existing_groups_excluded(grname):
   Returns:
   list of group node(s) resulted after given searching criteria
   """
-  group_cur = collection.Node.find({'_type':u"Group", 'name': {'$nin': [u"home", grname]}, 'group_type': "PUBLIC"}).sort('last_update', -1).limit(10)
+  group_cur = node_collection.find({'_type':u"Group", 'name': {'$nin': [u"home", grname]}, 'group_type': "PUBLIC"}).sort('last_update', -1).limit(10)
 
   if group_cur.count() <= 0:
     return "None"
@@ -914,8 +915,7 @@ def get_existing_groups_excluded(grname):
 def get_group_policy(group_id,user):
 	try:
 		policy = ""
-		col_Group = db[Group.collection_name]
-		colg = col_Group.Group.one({'_id':ObjectId(group_id)})
+		colg = node_collection.one({'_id':ObjectId(group_id)})
 		if colg:
 			policy = str(colg.subscription_policy)
 	except:
@@ -939,11 +939,11 @@ def get_user_group(user, selected_group_name):
   group_list = []
   auth_group = None
   
-  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 
+  group_cur = node_collection.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 
   									'$or': [{'group_admin': user.id}, {'author_set': user.id}],
   								}).sort('last_update', -1).limit(9)
 
-  auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
+  auth_group = node_collection.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
   if group_cur.count():
     for g in group_cur:
@@ -966,12 +966,12 @@ def get_profile_pic(user_pk):
     """
     profile_pic_image = None
     ID = int(user_pk)
-    auth = collection.Node.one({'_type': "Author", 'created_by': ID}, {'_id': 1, 'relation_set': 1})
+    auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'_id': 1, 'relation_set': 1})
 
     if auth:
         for each in auth.relation_set:
             if "has_profile_pic" in each:
-                profile_pic_image = collection.Node.one(
+                profile_pic_image = node_collection.one(
                     {'_type': "File", '_id': each["has_profile_pic"][0]}
                 )
 
@@ -983,14 +983,14 @@ def get_profile_pic(user_pk):
 @register.assignment_tag
 def get_theme_node(groupid, node):
 
-	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-	theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-	theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+	topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+	theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+	theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
 	# code for finding nodes collection has only topic instances or not
 	# It checks if first element in collection is theme instance or topic instance accordingly provide checks
 	if node.collection_set:
-		collection_nodes = collection.Node.one({'_id': ObjectId(node.collection_set[0]) })
+		collection_nodes = node_collection.one({'_id': ObjectId(node.collection_set[0]) })
 		if theme_GST._id in collection_nodes.member_of:
 			return "Theme_Enabled"
 		if theme_item_GST._id in collection_nodes.member_of:
@@ -1008,17 +1008,17 @@ def get_theme_node(groupid, node):
 
 # 	 for each in val.group_set: 
 
-# 		grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
+# 		grpName = node_collection.one({'_id': ObjectId(each) }).name.__str__()
 # 		GroupName.append(grpName)
 # 	 return GroupName
 
 @register.assignment_tag
 def get_edit_url(groupid):
 
-	node = collection.Node.one({'_id': ObjectId(groupid) }) 
+	node = node_collection.one({'_id': ObjectId(groupid) }) 
 	if node._type == 'GSystem':
 
-		type_name = collection.Node.one({'_id': node.member_of[0]}).name
+		type_name = node_collection.one({'_id': node.member_of[0]}).name
                 
 		if type_name == 'Quiz':
 			return 'quiz_edit'    
@@ -1046,19 +1046,22 @@ def get_edit_url(groupid):
 			return 'image_edit'
 		else:
 			return 'file_edit'
+
+
 @register.assignment_tag
 def get_event_type(node):
-    event=collection.Node.one({'_id':{'$in':node.member_of}})
+    event = node_collection.one({'_id':{'$in':node.member_of}})
     return event._id
-  
+
+
 @register.assignment_tag
 def get_url(groupid):
      
-    node = collection.Node.one({'_id': ObjectId(groupid) }) 
+    node = node_collection.one({'_id': ObjectId(groupid) }) 
     
     if node._type == 'GSystem':
 
-		type_name = collection.Node.one({'_id': node.member_of[0]})
+		type_name = node_collection.one({'_id': node.member_of[0]})
                 if type_name.name == 'Exam' or type_name.name == "Classroom Session":
                    return ('event_app_instance_detail')
                 if type_name.name == 'Quiz':
@@ -1089,10 +1092,10 @@ def get_url(groupid):
 @register.assignment_tag
 def get_create_url(groupid):
 
-  node = collection.Node.one({'_id': ObjectId(groupid) }) 
+  node = node_collection.one({'_id': ObjectId(groupid) }) 
   if node._type == 'GSystem':
 
-    type_name = collection.Node.one({'_id': node.member_of[0]}).name
+    type_name = node_collection.one({'_id': node.member_of[0]}).name
 
     if type_name == 'Quiz':
       return 'quiz_create'    
@@ -1116,14 +1119,14 @@ def get_create_url(groupid):
 @register.assignment_tag
 def get_prior_node(node_id):
 
-	obj = collection.Node.one({'_id':ObjectId(node_id) })
+	obj = node_collection.one({'_id':ObjectId(node_id) })
 	prior = []
-	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+	topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 	if topic_GST._id in obj.member_of:
 
 		if obj.prior_node:
 			for each in obj.prior_node:
-				node = collection.Node.one({'_id': ObjectId(each) })
+				node = node_collection.one({'_id': ObjectId(each) })
 				prior.append(( node._id , node.name ))
 
 		return prior
@@ -1145,31 +1148,31 @@ def get_contents(node_id, selected, choice):
 	name = ""
 	ob_id = ""
 
-	obj = collection.Node.one({'_id': ObjectId(node_id) })
+	obj = node_collection.one({'_id': ObjectId(node_id) })
 
-	RT_teaches = collection.Node.one({'_type':'RelationType', 'name': 'teaches'})
-	RT_translation_of = collection.Node.one({'_type':'RelationType','name': 'translation_of'})
+	RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
+	RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
 
 	# "right_subject" is the translated node hence to find those relations which has translated nodes with RT 'translation_of'
 	# These are populated when translated topic clicked.
-	trans_grelations = collection.Node.find({'_type':'GRelation','right_subject':obj._id,'relation_type.$id':RT_translation_of._id })               
+	trans_grelations = triple_collection.find({'_type':'GRelation','right_subject':obj._id,'relation_type.$id':RT_translation_of._id })               
 	# If translated topic then, choose its subject value since subject value is the original topic node for which resources are attached with RT teaches. 
 	if trans_grelations.count() > 0:
-		obj = collection.Node.one({'_id': ObjectId(trans_grelations[0].subject)})
+		obj = node_collection.one({'_id': ObjectId(trans_grelations[0].subject)})
 
 	# If no translated topic then, take the "obj" value mentioned above which is original topic node for which resources are attached with RT teaches
-	list_grelations = collection.Node.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type.$id': RT_teaches._id })
+	list_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type.$id': RT_teaches._id })
 
 	for rel in list_grelations:
-		rel_obj = collection.Node.one({'_id': ObjectId(rel.subject)})
+		rel_obj = node_collection.one({'_id': ObjectId(rel.subject)})
 
 		if rel_obj._type == "File":
-			gattr = collection.Node.one({'_type': 'AttributeType', 'name': u'educationaluse'})
-			# list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
-			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id })
+			gattr = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
+			# list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id, 'object_value': selected })
+			list_gattr = triple_collection.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id })
 
 			for attr in list_gattr:
-				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
+				left_obj = node_collection.one({'_id': ObjectId(attr.subject) })
 				
 				if selected and left_obj and selected != "language":
 					AT = collection.Node.one({'_type':'AttributeType', 'name': unicode(selected) })
@@ -1236,23 +1239,24 @@ def get_teaches_list(node):
 	
 	teaches_list = []
 	if node:
-		relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
-        list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+		relationtype = node_collection.one({"_type":"RelationType","name":"teaches"})
+        list_grelations = triple_collection.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
         for relation in list_grelations:
-        	obj = collection.Node.one({'_id': ObjectId(relation.right_subject) })
+        	obj = node_collection.one({'_id': ObjectId(relation.right_subject) })
           	teaches_list.append(obj)
 
 	return teaches_list
+
 
 @register.assignment_tag
 def get_assesses_list(node):
 	
 	assesses_list = []
 	if node:
-		relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
-        list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+		relationtype = node_collection.one({"_type":"RelationType","name":"assesses"})
+        list_grelations = triple_collection.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
         for relation in list_grelations:
-        	obj = collection.Node.one({'_id': ObjectId(relation.right_subject) })
+        	obj = node_collection.one({'_id': ObjectId(relation.right_subject) })
           	assesses_list.append(obj)
 
 	return assesses_list
@@ -1288,11 +1292,11 @@ def get_group_type(group_id, user):
             # Group's url found
             if ObjectId.is_valid(g_id):
                 # Group's ObjectId found
-                group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(g_id)})
+                group_node = node_collection.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(g_id)})
 
             else:
                 # Group's name found
-                group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, 'name': g_id})
+                group_node = node_collection.one({'_type': {'$in': ["Group", "Author"]}, 'name': g_id})
 
             if group_node:
                 # Check whether Group is PUBLIC or not
@@ -1362,8 +1366,7 @@ def get_grid_fs_object(f):
 	'''get the gridfs object by object id'''
 	grid_fs_obj = ""
 	try:
-		file_collection = db[File.collection_name]
-		file_obj = file_collection.File.one({'_id':ObjectId(f['_id'])})
+		file_obj = node_collection.one({'_id':ObjectId(f['_id'])})
                 if file_obj.mime_type == 'video':
                         if len(file_obj.fs_file_ids) > 2:
                                 if (file_obj.fs.files.exists(file_obj.fs_file_ids[2])):
@@ -1374,12 +1377,14 @@ def get_grid_fs_object(f):
 		print "Object does not exist", e
 	return grid_fs_obj
 
+
 @register.inclusion_tag('ndf/admin_class.html')
 def get_class_list(group_id,class_name):
 	"""Get list of class 
 	"""
 	class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "MetaType", "GRelation", "GAttribute"]
 	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data","groupid":group_id}
+
 
 @register.inclusion_tag('ndf/admin_class.html')
 def get_class_type_list(group_id,class_name):
@@ -1388,17 +1393,18 @@ def get_class_type_list(group_id,class_name):
 	class_list = ["GSystemType", "RelationType", "AttributeType"]
 	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"designer","groupid":group_id}
 
+
 @register.assignment_tag
 def get_Object_count(key):
 		try:
-				return collection.Node.find({'_type':key}).count()
+				return node_collection.find({'_type':key}).count()
 		except:
 				return 'null'
 
 @register.assignment_tag
 def get_memberof_objects_count(key,group_id):
 	try:
-		return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
+		return node_collection.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
 	except:
 		return 'null'
 
@@ -1407,10 +1413,10 @@ def get_memberof_objects_count(key,group_id):
 @register.assignment_tag
 def get_memberof_name(node_id):
 	try:
-		node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 		member_of_name = ""
 		if node_obj.member_of:
-			member_of_name = collection.Node.one({'_id': ObjectId(node_obj.member_of[0]) }).name
+			member_of_name = node_collection.one({'_id': ObjectId(node_obj.member_of[0]) }).name
 		return member_of_name
 	except:
 		return 'null'
@@ -1448,8 +1454,7 @@ def get_input_fields(fields_type,fields_name,translate=None):
 
 @register.assignment_tag
 def group_type_info(groupid,user=0):
-	col_Group =db[Group.collection_name]
-	group_gst = col_Group.Group.one({'_id':ObjectId(groupid)})
+	group_gst = node_collection.one({'_id':ObjectId(groupid)})
 	
 	if group_gst.post_node:
 		return "BaseModerated"
@@ -1487,9 +1492,9 @@ def user_access_policy(node, user):
       user_access = True
 
     else:
-      # group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+      # group_node = node_collection.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
       group_name, group_id = get_group_name_id(node)
-      group_node = collection.Node.one({"_id": ObjectId(group_id)})
+      group_node = node_collection.one({"_id": ObjectId(group_id)})
 
       if user.id == group_node.created_by:
         user_access = True
@@ -1623,7 +1628,7 @@ def check_is_gstaff(groupid, user):
   """
 
   try:
-    group_node = collection.Node.one({'_id': ObjectId(groupid)})
+    group_node = node_collection.one({'_id': ObjectId(groupid)})
 
     if group_node:
       return group_node.is_gstaff(user)
@@ -1671,14 +1676,14 @@ def check_is_gapp_for_gstaff(groupid, app_dict, user):
 
 @register.assignment_tag
 def get_publish_policy(request, groupid, res_node):
-	resnode = collection.Node.one({"_id": ObjectId(res_node._id)})
+	resnode = node_collection.one({"_id": ObjectId(res_node._id)})
 
 	if resnode.status == "DRAFT":
 	    
-	    # node = collection.Node.one({"_id": ObjectId(groupid)})
+	    # node = node_collection.one({"_id": ObjectId(groupid)})
 		
 		group_name, group_id = get_group_name_id(groupid)
-		node = collection.Node.one({"_id": ObjectId(group_id)})
+		node = node_collection.one({"_id": ObjectId(group_id)})
 
 		group_type = group_type_info(groupid)
 		group = user_access_policy(groupid,request.user)
@@ -1725,9 +1730,9 @@ def get_resource_collection(groupid, resource_type):
   Mongodb's cursor object holding nodes having collections
   """
   try:
-    gst = collection.Node.one({'_type': "GSystemType", 'name': unicode(resource_type)})
+    gst = node_collection.one({'_type': "GSystemType", 'name': unicode(resource_type)})
 
-    res_cur = collection.Node.find({'_type': {'$in': [u"GSystem", u"File"]},
+    res_cur = node_collection.find({'_type': {'$in': [u"GSystem", u"File"]},
                                     'member_of': gst._id,
                                     'group_set': ObjectId(groupid),
                                     'collection_set': {'$exists': True, '$not': {'$size': 0}}
@@ -1741,32 +1746,33 @@ def get_resource_collection(groupid, resource_type):
 @register.assignment_tag
 def app_translations(request, app_dict):
    app_id=app_dict['id']
-   get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
    if request.LANGUAGE_CODE != GSTUDIO_SITE_DEFAULT_LANGUAGE:
-      get_rel=collection.Node.one({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':ObjectId(app_id)}]})
+      get_rel = triple_collection.one({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':ObjectId(app_id)}]})
       if get_rel:
-         get_trans=collection.Node.one({'_id':get_rel.right_subject})
+         get_trans=node_collection.one({'_id':get_rel.right_subject})
          if get_trans.language == request.LANGUAGE_CODE:
             return get_trans.name
          else:
-            app_name=collection.Node.one({'_id':ObjectId(app_id)})
+            app_name=node_collection.one({'_id':ObjectId(app_id)})
             return app_name.name
       else:
-         app_name=collection.Node.one({'_id':ObjectId(app_id)})
+         app_name=node_collection.one({'_id':ObjectId(app_id)})
          return app_name.name
    else:
-      app_name=collection.Node.one({'_id':ObjectId(app_id)})
+      app_name=node_collection.one({'_id':ObjectId(app_id)})
       return app_name.name
-      
+
+
 @register.assignment_tag
 def get_preferred_lang(request, group_id, nodes, node_type):
-   group=collection.Node.one({'_id':(ObjectId(group_id))})
-   get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
-   uname=collection.Node.one({'name':str(request.user.username), '_type': {'$in': ["Group", "Author"]}})
+   group = node_collection({'_id':(ObjectId(group_id))})
+   get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   uname=node_collection.one({'name':str(request.user.username), '_type': {'$in': ["Group", "Author"]}})
    preferred_list=[]
    primary_list=[]
    default_list=[]
-   node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
+   node=node_collection.one({'_type':'GSystemType','name':node_type,})
    if uname:
       if uname.has_key("preferred_languages"):
 		pref_lan=uname.preferred_languages
@@ -1788,22 +1794,22 @@ def get_preferred_lang(request, group_id, nodes, node_type):
       pref_lan[u'default']=u"en"
    try:
       for each in nodes:
-         get_rel=collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':each._id}]})
+         get_rel = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':each._id}]})
          if get_rel.count() > 0:
             for rel in list(get_rel):
-               rel_node=collection.Node.one({'_id':rel.right_subject})
+               rel_node = node_collection.one({'_id':rel.right_subject})
                if rel_node.language == pref_lan['primary']:
-                  primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':rel_node._id}]})
+                  primary_nodes = node_collection.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':rel_node._id}]})
                   if primary_nodes:
                      preferred_list.append(primary_nodes)
                     
                else:
-                  default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
+                  default_nodes=node_collection.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
                   if default_nodes:
                      preferred_list.append(default_nodes)
               
          elif get_rel.count() == 0:
-            default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
+            default_nodes = node_collection.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
             if default_nodes:
                preferred_list.append(default_nodes)
                   
@@ -1812,6 +1818,7 @@ def get_preferred_lang(request, group_id, nodes, node_type):
       
    except Exception as e:
       return 'error'
+
 
 # getting video metadata from wetube.gnowledge.org
 @register.assignment_tag
@@ -1827,36 +1834,36 @@ def get_pandoravideo_metadata(src_id):
 @register.assignment_tag
 def get_source_id(obj_id):
   try:
-    source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
-    att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+    source_id_at = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    att_set = triple_collection.one({'_type': 'GAttribute', 'subject': ObjectId(obj_id), 'attribute_type.$id': source_id_at._id})
     return att_set.object_value
   except Exception as e:
     return 'null'
 
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
-   get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
    if obj_id not in r_list:
       r_list.append(obj_id)
-      node_sub_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
-      node_rightsub_rt = collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
+      node_sub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
+      node_rightsub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
       
       if list(node_sub_rt):
          node_sub_rt.rewind()
          for each in list(node_sub_rt):
-            right_subject=collection.Node.one({'_id':each.right_subject})
+            right_subject = node_collection.one({'_id':each.right_subject})
             if right_subject._id not in r_list:
                r_list.append(right_subject._id)
       if list(node_rightsub_rt):
          node_rightsub_rt.rewind()
          for each in list(node_rightsub_rt):
-            right_subject=collection.Node.one({'_id':each.subject})
+            right_subject = node_collection.one({'_id':each.subject})
             if right_subject._id not in r_list:
                r_list.append(right_subject._id)
       if r_list:
          r_list.remove(obj_id)
          for each in r_list:
             dic={}
-            node=collection.Node.one({'_id':each})
+            node = node_collection.one({'_id':each})
             dic[node._id]=node.language
             translation_list.append(dic)
             get_translation_relation(each,translation_list, r_list)
@@ -1869,9 +1876,9 @@ def get_object_value(node):
    att_name_value= collections.OrderedDict()
            
    for each in at_set:
-      attribute_type = collection.Node.one({'_type':"AttributeType" , 'name':each}) 
+      attribute_type = node_collection.one({'_type':"AttributeType" , 'name':each}) 
       if attribute_type:
-      	get_att=collection.Triple.one({'_type':"GAttribute" ,'subject':node._id,'attribute_type.$id': attribute_type._id})
+      	get_att = triple_collection.one({'_type':"GAttribute", 'subject':node._id, 'attribute_type.$id': attribute_type._id})
       	if get_att:
         	att_name_value[attribute_type.altnames] = get_att.object_value
          
@@ -1880,7 +1887,7 @@ def get_object_value(node):
 @register.assignment_tag
 # return json data of object
 def get_json(node):
-   node_obj = collection.Node.one({'_id':ObjectId(str(node))})
+   node_obj = node_collection.one({'_id':ObjectId(str(node))})
    return json.dumps(node_obj, cls=NodeJSONEncoder, sort_keys = True)  
    
 @register.filter("is_in")
@@ -1919,7 +1926,7 @@ def str_to_dict(str1):
         name_list = []
         if "None" not in dict_format[k]:
                 for ids in dict_format[k]:
-                        node = collection.Node.one({'_id':ObjectId(ids)})
+                        node = node_collection.one({'_id':ObjectId(ids)})
                         if node:
                                 name_list.append(str(node.name))
                                 dict_format[k] = name_list
@@ -1953,7 +1960,7 @@ def str_to_dict(str1):
                               for each in dict_format[k]:
                                       for k1, v1 in each.items():
                                               for rel in v1:
-                                                      rel =collection.Node.one({'_id':ObjectId(rel)})
+                                                      rel = node_collection.one({'_id':ObjectId(rel)})
                                                       att_dic[k1] = rel.name
                                       dict_format[k] = att_dic                          
                                 
@@ -1989,7 +1996,7 @@ def check_existence_textObj_mobwrite(node_id):
 	input nodeid 
 		'''		
 		check = ""
-		system = collection.Node.find_one({"_id":ObjectId(node_id)})
+		system = node_collection.find_one({"_id":ObjectId(node_id)})
 		filename = TextObj.safe_name(str(system._id))
 		textobj = TextObj.objects.filter(filename=filename)
 		if textobj:
@@ -2011,9 +2018,9 @@ def get_version_of_module(module_id):
 	''''
 	This method will return version number of module
 	'''
-	ver_at = collection.Node.one({'_type':'AttributeType','name':'version'})
+	ver_at = node_collection.one({'_type':'AttributeType','name':'version'})
 	if ver_at:
-		attr = collection.Triple.one({'_type':'GAttribute','attribute_type.$id':ver_at._id,'subject':ObjectId(module_id)})
+		attr = triple_collection.one({'_type':'GAttribute','attribute_type.$id':ver_at._id,'subject':ObjectId(module_id)})
 		if attr:
 			return attr.object_value
 		else:
@@ -2026,11 +2033,11 @@ def get_group_name(groupid):
 	group_name = ""
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(groupid) is True :
-		group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(groupid)})
+		group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(groupid)})
 		if group_ins:
 			group_name = group_ins.name
 		else :
-			auth = collection.Node.one({'_type': 'Author', "_id": ObjectId(groupid) })
+			auth = node_collection.one({'_type': 'Author', "_id": ObjectId(groupid) })
 			if auth :
 				group_name = auth.name
 
@@ -2084,7 +2091,7 @@ def html_widget(groupid, node_id, field):
       node_dict['_id'] = node_id
 
     # if node_member_of:
-    #   gs = collection.GSystem()
+    #   gs = node_collection.collection.GSystem()
     #   gs.get_neighbourhood(node_member_of)
 
     # field_type = gs.structure[field['name']]
@@ -2102,7 +2109,7 @@ def html_widget(groupid, node_id, field):
       field_value_choices = [True, False]
 
     if field.has_key('_id'):
-      field = collection.Node.one({'_id': field['_id']})
+      field = node_collection.one({'_id': field['_id']})
 
     field['altnames'] = field_altnames
 
@@ -2140,24 +2147,24 @@ def html_widget(groupid, node_id, field):
       is_relation_field = True
       is_required_field = True
       #patch
-      group=collection.Node.find({"_id":ObjectId(groupid)})
-      person=collection.Node.find({"_id":{'$in': field["object_type"]}},{"name":1})
+      group = node_collection.find({"_id":ObjectId(groupid)})
+      person = node_collection.find({"_id":{'$in': field["object_type"]}},{"name":1})
       
       if person[0].name == "Author":
           if field.name == "has_attendees":
-              field_value_choices.extend(list(collection.Node.find({'member_of': {'$in':field["object_type"]},
+              field_value_choices.extend(list(node_collection.find({'member_of': {'$in':field["object_type"]},
                                                                   'created_by':{'$in':group[0]["group_admin"]+group[0]["author_set"]},
                                                                   
                                                                  })
                                                                  ))
           else:       
-              field_value_choices.extend(list(collection.Node.find({'member_of': {'$in':field["object_type"]},
+              field_value_choices.extend(list(node_collection.find({'member_of': {'$in':field["object_type"]},
                                                             'created_by':{'$in':group[0]["group_admin"]},                                																														}).sort('name', 1)
                                       )
                                 )
       #End path
       else:
-        field_value_choices.extend(list(collection.Node.find({'member_of': {'$in': field["object_type"]},
+        field_value_choices.extend(list(node_collection.find({'member_of': {'$in': field["object_type"]},
                                                               'status': u"PUBLISHED",
                                                               'group_set': ObjectId(groupid)
                                                                }).sort('name', 1)
@@ -2207,9 +2214,9 @@ def check_node_linked(node_id):
   """
 
   try:
-    node = collection.Node.one({'_id': ObjectId(node_id)}, {'_id': 1})
-    relation_type_node = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
-    is_linked = collection.Node.one({'_type': "GRelation", 'subject': node._id, 'relation_type': relation_type_node.get_dbref()})
+    node = node_collection.one({'_id': ObjectId(node_id)}, {'_id': 1})
+    relation_type_node = node_collection.one({'_type': "RelationType", 'name': "has_login"})
+    is_linked = triple_collection.one({'_type': "GRelation", 'subject': node._id, 'relation_type': relation_type_node.get_dbref()})
 
     if is_linked:
       return True
@@ -2220,7 +2227,6 @@ def check_node_linked(node_id):
   except Exception as e:
     error_message = " NodeUserLinkFindError - " + str(e)
     raise Exception(error_message)
-
 
 
 @register.assignment_tag
@@ -2236,10 +2242,10 @@ def get_file_node(request, file_name=""):
 
 	for each in file_list:
 		if ObjectId.is_valid(each) is False:
-			filedoc = collection.Node.find({'_type':'File','name':unicode(each)})
+			filedoc = node_collection.find({'_type':'File','name':unicode(each)})
 
 		else:
-			filedoc = collection.Node.find({'_type':'File','_id':ObjectId(each)})			
+			filedoc = node_collection.find({'_type':'File','_id':ObjectId(each)})			
 
 		if filedoc:
 			for i in filedoc:
@@ -2263,20 +2269,20 @@ def get_university(college_name):
     Returns university name to which given college is affiliated to.
     """
     try:
-        college = collection.Node.one({
+        college = node_collection.one({
             '_type': "GSystemType", 'name': u"College"
         })
 
-        sel_college = collection.Node.one({
+        sel_college = node_collection.one({
             'member_of': college._id, 'name': unicode(college_name)
         })
 
         university_name = None
         if sel_college:
-            university = collection.Node.one({
+            university = node_collection.one({
                 '_type': "GSystemType", 'name': u"University"
             })
-            sel_university = collection.Node.one({
+            sel_university = node_collection.one({
                 'member_of': university._id,
                 'relation_set.affiliated_college': sel_college._id
             })
@@ -2308,7 +2314,7 @@ def get_features_with_special_rights(group_id_or_name, user):
     # List of feature(s) for which creation rights should not be given
     features_with_special_rights = ["StudentCourseEnrollment"]
 
-    mis_admin = collection.Node.one({
+    mis_admin = node_collection.one({
         "_type": "Group", "name": "MIS_admin"
     })
 
@@ -2349,7 +2355,7 @@ def get_filters_data(gst_name):
 
 	filter_dict = {}
 
-	gst = collection.Node.one({'_type':"GSystemType", "name": unicode(gst_name)})
+	gst = node_collection.one({'_type':"GSystemType", "name": unicode(gst_name)})
 	poss_attr = gst.get_possible_attributes(gst._id)
 
 	exception_list = ["educationaluse"]

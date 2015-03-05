@@ -9,8 +9,6 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.views.generic import RedirectView
 
-from django_mongokit import get_database
-
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -20,25 +18,24 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.ndf.models import GSystemType, Node
+from gnowsys_ndf.ndf.models import node_collection
 
 #######################################################################################################################################
 #                                                                                           V I E W S   D E F I N E D   F O R   H O M E
 #######################################################################################################################################
 
-
 def homepage(request, group_id):
     
     if request.user.is_authenticated():
-        collection = get_database()[Node.collection_name]
-        auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
+        auth_obj = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
         if auth_obj:
             auth_type = auth_obj._id
         auth = ""
-        auth = collection.Group.one({'_type': u"Author", 'name': unicode(request.user)})            
+        auth = node_collection.one({'_type': u"Author", 'name': unicode(request.user)})            
         # This will create user document in Author collection to behave user as a group.
         
         if auth is None:
-            auth = collection.Author()
+            auth = node_collection.collection.Author()
             
             auth.name = unicode(request.user)
             auth.email = unicode(request.user.email)
@@ -54,10 +51,10 @@ def homepage(request, group_id):
                 auth.contributors.append(user_id)
             # Get group_type and group_affiliation stored in node_holder for this author 
             try:
-                temp_details=collection.Node.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
+                temp_details = node_collection.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
                 if temp_details:
-                    auth.agency_type=temp_details.details_to_hold['agency_type']
-                    auth.group_affiliation=temp_details.details_to_hold['group_affiliation']
+                    auth.agency_type = temp_details.details_to_hold['agency_type']
+                    auth.group_affiliation = temp_details.details_to_hold['group_affiliation']
             except e as Exception:
                 print "error in getting node_holder details for an author"+str(e)
             auth.save()
@@ -79,17 +76,16 @@ class HomeRedirectView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
     	if self.request.user.is_authenticated():
-            collection = get_database()[Node.collection_name]
-            auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
+            auth_obj = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
             if auth_obj:
                 auth_type = auth_obj._id
             auth = ""
-            auth = collection.Group.one({'_type': u"Author", 'name': unicode(self.request.user)})            
+            auth = node_collection.one({'_type': u"Author", 'name': unicode(self.request.user)})
             # This will create user document in Author collection to behave user as a group.
-            
+
             if auth is None:
-                auth = collection.Author()
-                
+                auth = node_collection.collection.Author()
+
                 auth.name = unicode(self.request.user)
                 auth.email = unicode(self.request.user.email)
                 auth.password = u""
@@ -104,7 +100,7 @@ class HomeRedirectView(RedirectView):
                     auth.contributors.append(user_id)
                 # Get group_type and group_affiliation stored in node_holder for this author 
                 try:
-                    temp_details=collection.Node.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
+                    temp_details = node_collection.one({'_type': 'node_holder', 'details_to_hold.node_type': 'Author', 'details_to_hold.userid': user_id})
                     if temp_details:
                         auth.agency_type=temp_details.details_to_hold['agency_type']
                         auth.group_affiliation=temp_details.details_to_hold['group_affiliation']
