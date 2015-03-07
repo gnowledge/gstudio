@@ -67,13 +67,16 @@ def get_site_variables():
 
    return  site_var
 
+
 @register.assignment_tag
 def get_author_agency_types():
    return AUTHOR_AGENCY_TYPES
 
+
 @register.assignment_tag
 def get_group_agency_types():
    return GROUP_AGENCY_TYPES
+
 
 @register.assignment_tag
 def get_node_type(node):
@@ -138,13 +141,16 @@ def is_File(node):
 	else:
 		return 0
 
+
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
 
+
 @register.assignment_tag
 def get_languages():
         return LANGUAGES
+
 
 @register.assignment_tag
 def get_node_ratings(request,node):
@@ -179,6 +185,7 @@ def get_node_ratings(request,node):
         except Exception as e:
                 print "Error in get_node_ratings "+str(e)
 
+
 @register.assignment_tag
 def get_group_resources(group):
 	try:
@@ -187,12 +194,14 @@ def get_group_resources(group):
 	except Exception as e:
 		print "Error in get_group_resources "+str(e)
 	
+
 @register.assignment_tag
 def all_gapps():
 	try:
 		return get_all_gapps()
 	except Exception as expt:
 		print "Error in get_all_gapps "+str(expt)
+
 
 @register.assignment_tag
 def get_create_group_visibility():
@@ -201,10 +210,12 @@ def get_create_group_visibility():
 	else:
 		return False
 
+
 @register.assignment_tag
 def get_site_info():
-	sitename=Site.objects.all()[0].name.__str__()
+	sitename = Site.objects.all()[0].name.__str__()
 	return sitename
+
 
 @register.assignment_tag
 def check_gapp_menus(groupid):
@@ -333,19 +344,26 @@ def get_states_object(request):
    return group_object
 
 
-
-
 @register.simple_tag
 def get_all_users_to_invite():
 	try:
-		inv_users={}
-		users=User.objects.all()
+		inv_users = {}
+		users = User.objects.all()
 		for each in users:
-			inv_users[each.username.__str__()]=each.id.__str__()
+			inv_users[each.username.__str__()] = each.id.__str__()
 		return str(inv_users)
 	except Exception as e:
 		print str(e)
 
+
+@register.assignment_tag
+def get_all_users_int_count():
+	'''
+	get integer count of all the users
+	'''
+	all_users = len(User.objects.all())
+	print all_users
+	return all_users
 
 @register.inclusion_tag('ndf/twist_replies.html')
 def get_reply(thread,parent,forum,token,user,group_id):
@@ -368,8 +386,6 @@ def get_metadata_values():
 				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT, "language": GSTUDIO_RESOURCES_LANGUAGES,
 				"timerequired": GSTUDIO_RESOURCES_TIME_REQUIRED, "audience": GSTUDIO_RESOURCES_AUDIENCE , "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY,
 				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL, "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT}
-
-
 	return metadata
 
 
@@ -393,9 +409,6 @@ def get_attribute_value(node_id, attr):
 
 	# print "attr_val: ",attr_val,"\n"
 	return attr_val
-
-
-
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
@@ -811,12 +824,15 @@ def get_forum_twists(forum):
 		ret_replies.append(each)
 	return ret_replies
 lp=[]
+
+
 def get_rec_objs(ob_id):
 	lp.append(ob_id)
 	exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(ob_id)}]})
 	for each in exstng_reply:
 		get_rec_objs(each)
 	return lp
+
 
 @register.assignment_tag
 def get_twist_replies(twist):
@@ -826,7 +842,6 @@ def get_twist_replies(twist):
 	for each in exstng_reply:
 		lst=get_rec_objs(each)
 	return ret_replies
-
 
 
 @register.assignment_tag
@@ -857,6 +872,7 @@ def check_user_join(request,group_id):
 	else:
 		return "nullobj"
 	
+
 @register.assignment_tag
 def check_group(group_id):
 	if group_id:
@@ -877,6 +893,7 @@ def get_existing_groups():
 			group.append(items)
 	return group
 
+
 @register.assignment_tag
 def get_existing_groups_excluding_username():
 	group = []
@@ -891,6 +908,7 @@ def get_existing_groups_excluding_username():
 		if items.name:
 			group.append(items)
 	return group
+
 
 @register.assignment_tag
 def get_existing_groups_excluded(grname):
@@ -911,6 +929,7 @@ def get_existing_groups_excluded(grname):
 
   return group_cur
 
+
 @register.assignment_tag
 def get_group_policy(group_id,user):
 	try:
@@ -921,6 +940,7 @@ def get_group_policy(group_id,user):
 	except:
 		pass
 	return policy
+
 
 @register.assignment_tag
 def get_user_group(user, selected_group_name):
@@ -1011,6 +1031,7 @@ def get_theme_node(groupid, node):
 # 		grpName = node_collection.one({'_id': ObjectId(each) }).name.__str__()
 # 		GroupName.append(grpName)
 # 	 return GroupName
+
 
 @register.assignment_tag
 def get_edit_url(groupid):
@@ -1115,7 +1136,6 @@ def get_create_url(groupid):
     return 'uploadDoc'
 	
 
-
 @register.assignment_tag
 def get_prior_node(node_id):
 
@@ -1132,7 +1152,6 @@ def get_prior_node(node_id):
 		return prior
 
 	return prior
-
 
 
 @register.assignment_tag
@@ -1228,10 +1247,8 @@ def get_contents(node_id, selected, choice):
 	if interactive_contents:
 		contents['Interactives'] = interactive_contents
 	
-
 	# print "\n",contents,"\n"
 	return contents
-
 	
 
 @register.assignment_tag
@@ -1260,6 +1277,7 @@ def get_assesses_list(node):
           	assesses_list.append(obj)
 
 	return assesses_list
+
 
 @register.assignment_tag
 def get_group_type(group_id, user):
@@ -1330,6 +1348,7 @@ def get_group_type(group_id, user):
     except Exception as e:
         raise Http404(e)
 
+
 @register.assignment_tag
 def check_accounts_url(url_path):
 	'''
@@ -1348,6 +1367,7 @@ def check_accounts_url(url_path):
 
 	else:
 		return False
+
 
 '''this template function is used to get the user object from template''' 
 @register.assignment_tag 
@@ -1422,7 +1442,6 @@ def get_memberof_name(node_id):
 		return 'null'
 
 
-	
 @register.filter
 def get_dict_item(dictionary, key):
 	return dictionary.get(key)
@@ -1562,8 +1581,6 @@ def edit_policy(groupid,node,user):
 							return "allow"    
 						
 		
-	 
-
 @register.assignment_tag
 def get_prior_post_node(group_id):
 	col_Group = db[Group.collection_name]
@@ -1587,6 +1604,7 @@ def get_prior_post_node(group_id):
 					#return node of the base group
 					return base_colg
 	
+
 @register.assignment_tag
 def Group_Editing_policy(groupid,node,user):
 	col_Group = db[Group.collection_name]
@@ -1743,6 +1761,16 @@ def get_resource_collection(groupid, resource_type):
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+
+@register.assignment_tag
+def get_all_file_int_count():
+	'''
+	getting all the file/e-library type resource
+	'''
+	all_files = node_collection.find({ "_type": "File", "access_policy": "PUBLIC" })
+	return all_files.count()
+
+
 @register.assignment_tag
 def app_translations(request, app_dict):
    app_id=app_dict['id']
@@ -1831,6 +1859,7 @@ def get_pandoravideo_metadata(src_id):
   except Exception as e:
     return 'null'
 
+
 @register.assignment_tag
 def get_source_id(obj_id):
   try:
@@ -1839,6 +1868,7 @@ def get_source_id(obj_id):
     return att_set.object_value
   except Exception as e:
     return 'null'
+
 
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
    get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
@@ -1869,6 +1899,7 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
             get_translation_relation(each,translation_list, r_list)
    return translation_list
 
+
 # returns object value of attribute 
 @register.assignment_tag
 def get_object_value(node):
@@ -1884,12 +1915,14 @@ def get_object_value(node):
          
    return att_name_value
 
+
 @register.assignment_tag
 # return json data of object
 def get_json(node):
    node_obj = node_collection.one({'_id':ObjectId(str(node))})
    return json.dumps(node_obj, cls=NodeJSONEncoder, sort_keys = True)  
    
+
 @register.filter("is_in")
 # filter added to test if vaiable is inside of list or dict
 def is_in(var, args):
@@ -1898,12 +1931,12 @@ def is_in(var, args):
     arg_list = [arg.strip() for arg in args.split(',')]
     return var in arg_list
 
+
 @register.filter("del_underscore")
 # filter added to remove underscore from string
 def del_underscore(var):
    var = var.replace("_"," ")   
    return var 
-
 
 
 @register.assignment_tag
@@ -1971,6 +2004,7 @@ def str_to_dict(str1):
               dict_format[k] = filesize_dic               
     return dict_format
     
+
 @register.assignment_tag
 def get_possible_translations(obj_id):
         translation_list = []
@@ -1988,6 +2022,7 @@ def mongo_id(value):
 	 
 		# Return value
 		return unicode(str(value))
+
 
 @register.simple_tag
 def check_existence_textObj_mobwrite(node_id):
@@ -2013,6 +2048,7 @@ def check_existence_textObj_mobwrite(node_id):
 		return check
 #textb 
 
+
 @register.assignment_tag
 def get_version_of_module(module_id):
 	''''
@@ -2027,6 +2063,7 @@ def get_version_of_module(module_id):
 			return ""
 	else:
 		return ""
+
 
 @register.assignment_tag
 def get_group_name(groupid):
@@ -2044,6 +2081,7 @@ def get_group_name(groupid):
 	else :
 		pass
 	return group_name 
+
 
 @register.filter
 def get_field_type(node_structure, field_name):
@@ -2198,6 +2236,7 @@ def html_widget(groupid, node_id, field):
   except Exception as e:
     error_message = " HtmlWidgetTagError: " + str(e) + " !!!"
     raise Exception(error_message)
+
   
 @register.assignment_tag
 def check_node_linked(node_id):

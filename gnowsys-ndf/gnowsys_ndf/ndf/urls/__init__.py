@@ -1,10 +1,9 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from django.conf.urls import *
 from django.contrib.auth import views as auth_views
-from django.views.generic import RedirectView
 from django.views.generic import TemplateView
+# from django.views.generic import RedirectView
 
 from registration.backends.default.views import RegistrationView
 from registration.backends.default.views import ActivationView
@@ -12,8 +11,9 @@ from registration_email.forms import EmailRegistrationForm
 from jsonrpc import jsonrpc_site
 
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error
-from gnowsys_ndf.ndf.forms import *
-from gnowsys_ndf.ndf.views.home import HomeRedirectView, homepage
+# from gnowsys_ndf.ndf.forms import *
+from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
+from gnowsys_ndf.ndf.views.home import homepage
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
 from gnowsys_ndf.ndf.views import rpc_resources
@@ -36,8 +36,11 @@ urlpatterns = patterns('',
     # --end of mobwrite
 
     (r'^admin/', include(admin.site.urls)),
-    (r'^$', HomeRedirectView.as_view()),
+    # (r'^$', HomeRedirectView.as_view()),        
+    url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
+    url(r'^welcome/?', TemplateView.as_view(template_name='ndf/landing_page_beta.html'), name="welcome"),
 
+    # all main apps
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_id>[^/]+)/video', include('gnowsys_ndf.ndf.urls.video')),
@@ -48,7 +51,6 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/search', include('gnowsys_ndf.ndf.urls.search_urls')),
-    # (r'^(?P<group_id>[^/]+)/search/', include('gnowsys_ndf.ndf.urls.search_urls')),
     (r'^(?P<group_name>[^/]+)/task', include('gnowsys_ndf.ndf.urls.task')),
     (r'^(?P<group_id>[^/]+)/batch', include('gnowsys_ndf.ndf.urls.batch')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
@@ -57,6 +59,13 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
     (r'^(?P<group_id>[^/]+)/ratings', include('gnowsys_ndf.ndf.urls.ratings')),
     (r'^(?P<group_id>[^/]+)/topics', include('gnowsys_ndf.ndf.urls.topics')),
+    (r'^(?P<group_id>[^/]+)/e-library', include('gnowsys_ndf.ndf.urls.e-library')),
+    (r'^(?P<group_id>[^/]+)/term', include('gnowsys_ndf.ndf.urls.term')),
+    (r'^(?P<group_id>[^/]+)/event', include('gnowsys_ndf.ndf.urls.event')),
+    (r'^(?P<group_id>[^/]+)/data-review', include('gnowsys_ndf.ndf.urls.data_review')),
+    (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
+
+    url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 
     # -- django-json-rpc method calls --
     url(r'^json/browse/$', 'jsonrpc.views.browse', name='jsonrpc_browser'),
@@ -64,12 +73,6 @@ urlpatterns = patterns('',
     # url for directly calling RPC method from browser
     (r'^json/(?P<method>[a-zA-Z0-9.-_]+)$', jsonrpc_site.dispatch),
     # ---end of django-json-rpc
-
-    url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
-
-    (r'^(?P<group_id>[^/]+)/e-library', include('gnowsys_ndf.ndf.urls.e-library')),
-    (r'^(?P<group_id>[^/]+)/term', include('gnowsys_ndf.ndf.urls.term')),
-    (r'^(?P<group_id>[^/]+)/event', include('gnowsys_ndf.ndf.urls.event')),
 
     # -- mis --
     (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis', namespace='mis'), {'app_name': "MIS"}),
@@ -81,12 +84,11 @@ urlpatterns = patterns('',
     # url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
     # url(r'^(?P<group_id>[^/]+)/meeting/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.output', name='newmeeting'),
     # url(r'^(?P<group_id>[^/]+)/meeting','gnowsys_ndf.ndf.views.meeting.dashb', name='Meeting'),
-    url(r'^(?P<group_id>[^/]+)/meeting','gnowsys_ndf.ndf.views.meeting.dashb', name='meeting'),
     # url(r'^(?P<group_id>[^/]+)/online','gnowsys_ndf.ndf.views.meeting.get_online_users', name='get_online_users'),
+    # following url (name="meeting") kept uncommented to avoid errors
+    url(r'^(?P<group_id>[^/]+)/meeting','gnowsys_ndf.ndf.views.meeting.dashb', name='meeting'),
     # --end meeting app
 
-    (r'^(?P<group_id>[^/]+)/data-review', include('gnowsys_ndf.ndf.urls.data_review')),
-    (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
     # (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
 
     # --discussion--
@@ -160,5 +162,5 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('registration_email.backends.default.urls')),
    # --end of django-registration
 
-    url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
+    # url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )
