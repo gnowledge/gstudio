@@ -888,7 +888,6 @@ def get_versioned_page(node):
     proc1=subprocess.Popen(cmd,shell=True,
         stdout=subprocess.PIPE)
     for line in iter(proc1.stdout.readline,b''):
-       
       if line.find('revision')!=-1 and line.find('selected') == -1:
           rev_no=string.split(line,'revision')
           rev_no=rev_no[1].strip( '\t\n\r')
