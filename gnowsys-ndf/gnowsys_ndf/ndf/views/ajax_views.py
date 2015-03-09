@@ -105,19 +105,42 @@ def collection_nav(request, group_id):
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
     curr_node_id = request.POST.get("curr_node", '')
+    node_type = request.POST.get("nod_type", '')
+    
+    breadcrumbs_list = []
+    curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id) })
+
+    if node_type == "Topic":
+      theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+      for e in curr_node_obj.prior_node:
+        prior = node_collection.one({'_id': ObjectId(e) })
+        if curr_node_obj._id in prior.collection_set and theme_item_GST._id in prior.member_of:
+          breadcrumbs_list.append( (str(prior._id), prior.name) )
 
     topic = ""
-    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
     nav_list = request.POST.getlist("nav[]", '')
+    n_list = request.POST.get("nav", '')
 
-    breadcrumbs_list = []
+    if n_list:
+      n_list = n_list.replace("&#39;","'")
+      n_list = ast.literal_eval(n_list) 
 
-    curr_node_obj = collection.Node.one({'_id': ObjectId(curr_node_id) })
+      for e in reversed(n_list):
+        if e != unicode(node_obj._id):
+          n_list.remove(e)
+        else:
+          break
+
+      nav_list = n_list
+
+    # Firstly original node should go into breadcrumbs list
     breadcrumbs_list.append( (str(curr_node_obj._id), curr_node_obj.name) )
 
     if nav_list:
+      # create beadcrumbs list from navigation list sent from template.
       for each in nav_list:
-        obj = collection.Node.one({'_id': ObjectId(each) })
+        obj = node_collection.one({'_id': ObjectId(each) })
         breadcrumbs_list.append( (str(obj._id), obj.name) )
 
       b_list = []
@@ -135,13 +158,14 @@ def collection_nav(request, group_id):
           else:
             breadcrumbs_list.remove(e)
 
-
+    # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
     return render_to_response('ndf/node_ajax_view.html', 
                                 { 'node': node_obj,
+                                  'original_node':curr_node_obj,
                                   'group_id': group_id,
                                   'groupid':group_id,
                                   'breadcrumbs_list':breadcrumbs_list,
-                                  'app_id': node_id, 'topic':topic
+                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list
                                 },
                                 context_instance = RequestContext(request)
     )
@@ -156,7 +180,7 @@ def collection_view(request, group_id):
     node_id = request.POST.get("node_id", '')
     # breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
 
-    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
     # breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
     # breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
 
@@ -174,26 +198,12 @@ def collection_view(request, group_id):
     #       break
     #     else:
     #       breadcrumbs_list.remove(e)
-        
 
-        # if str(node_obj._id) not in b_list:
-        #     # Add the tuple if clicked node is not there in breadcrumbs list
-        #     breadcrumbs_list.append((str(node_obj._id), node_obj.name))
-        # else:
-        #     # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
-        #     for e in reversed(breadcrumbs_list):
-        #         if node_id in e:
-        #             break
-        #         else:
-        #             breadcrumbs_list.remove(e)
-
-    return render_to_response(
-        'ndf/collection_ajax_view.html',
-        {
-            'node': node_obj, 'group_id': group_id, 'groupid': group_id,
-            # 'breadcrumbs_list': breadcrumbs_list
-        },
-        context_instance=RequestContext(request)
+    return render_to_response('ndf/collection_ajax_view.html',
+                              {
+                                'node': node_obj, 'group_id': group_id, 'groupid': group_id
+                              },context_instance=RequestContext(request)
+    )
 
 
 @login_required
