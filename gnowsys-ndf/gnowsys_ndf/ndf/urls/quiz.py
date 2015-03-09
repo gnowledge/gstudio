@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.quiz',
-                       url(r'^$', 'quiz', name='quiz'),
+                       url(r'^[/]$', 'quiz', name='quiz'),
                        url(r'^/(?P<app_id>[\w-]+)$', 'quiz', name='quiz'),
                        url(r'^/question/create', 'create_edit_quiz_item', name='quiz_item_create'),
                        url(r'^/create/', 'create_edit_quiz', name='quiz_create'),

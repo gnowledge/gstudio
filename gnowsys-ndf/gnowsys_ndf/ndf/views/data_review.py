@@ -9,7 +9,6 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 
 from mongokit import paginator
-from django_mongokit import get_database
 
 try:
     from bson import ObjectId
@@ -20,6 +19,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node  # , GRelation, Triple
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 # from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 # from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.models import STATUS_CHOICES
@@ -42,14 +42,11 @@ from gnowsys_ndf.settings import GSTUDIO_RESOURCES_AUDIENCE
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_TEXT_COMPLEXITY
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_LANGUAGES
 
-db = get_database()
-collection = db[Node.collection_name]
-# collection_tr = db[Triple.collection_name]
-GST_FILE = collection.GSystemType.one({'name': u'File', '_type': 'GSystemType'})
-pandora_video_st = collection.Node.one({'$and': [{'name': 'Pandora_video'}, {'_type': 'GSystemType'}]})
+GST_FILE = node_collection.one({'_type': 'GSystemType', 'name': u'File'})
+pandora_video_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Pandora_video'}]})
 
-file_id = collection.Node.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
-page_id = collection.Node.find_one({'_type': "GSystemType", "name": "Page"}, {"_id": 1})
+file_id = node_collection.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
+page_id = node_collection.find_one({'_type': "GSystemType", "name": "Page"}, {"_id": 1})
 
 
 # data review in File app
@@ -60,7 +57,7 @@ def data_review(request, group_id, page_no=1):
     '''
     # getting group obj from name
 
-    # group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
+    # group_obj = node_collection.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
 
     # # checking if passed group_id is group name or group Id
     # if group_obj and (group_id == group_obj.name):
@@ -71,14 +68,14 @@ def data_review(request, group_id, page_no=1):
     #     ins_objectid = ObjectId()
     #     if ins_objectid.is_valid(group_id):
     #         # retrieve Obj by _id
-    #         group_obj = collection.Node.one({"_id": ObjectId(group_id)})
+    #         group_obj = node_collection.one({"_id": ObjectId(group_id)})
     #         if group_obj:
     #             # group_name = group_obj.name
     #             group_id = group_id       # for clarity
 
     group_name, group_id = get_group_name_id(group_id)
 
-    files_obj = collection.Node.find({'$or': [
+    files_obj = node_collection.find({'$or': [
                                     {'member_of': {'$in': [ObjectId(file_id._id), ObjectId(page_id._id)]},
                                     # '_type': 'File', 'fs_file_ids': {'$ne': []},
                                     'group_set': {'$all': [ObjectId(group_id)]},
@@ -103,7 +100,7 @@ def data_review(request, group_id, page_no=1):
     for each_resource in paged_resources.items:
         each_resource, ver = get_page(request, each_resource) 
         each_resource.get_neighbourhood(each_resource.member_of)
-        files_list.append(collection.GSystem(each_resource))
+        files_list.append(node_collection.collection.GSystem(each_resource))
         # print "\n\n\n========", each_resource.keys()
         # for each, val in each_resource.iteritems():
           # print each, "--", val,"\n"
@@ -151,7 +148,7 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
     search_reply = json.loads(results_search(request, group_id, return_only_dict = True))
     exact_search_res = search_reply["exact"]["name"]
     result_ids_list = [ ObjectId(each_dict["_id"]) for each_dict in exact_search_res ]
-    result_cur = collection.Node.find({
+    result_cur = node_collection.find({
                                     "_id": {"$in": result_ids_list},
                                     'member_of': {'$in': [ObjectId(file_id._id), ObjectId(page_id._id)]}
                                     })
@@ -164,7 +161,7 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
     for each_resource in paged_resources.items:
         each_resource, ver = get_page(request, each_resource) 
         each_resource.get_neighbourhood(each_resource.member_of)
-        files_list.append(collection.GSystem(each_resource))
+        files_list.append(node_collection.collection.GSystem(each_resource))
 
     return render_to_response("ndf/data_review.html",
                 {
@@ -196,7 +193,7 @@ def data_review_save(request, group_id):
     userid = request.user.pk
 
     group_name, group_id = get_group_name_id(group_id)
-    group_obj = collection.Node.one({"_id": ObjectId(group_id)})
+    group_obj = node_collection.one({"_id": ObjectId(group_id)})
 
     node_oid = request.POST.get("node_oid", "")
     node_details = request.POST.get("node_details", "")
@@ -227,7 +224,7 @@ def data_review_save(request, group_id):
 
     license = request.POST.get('license', '')
     
-    file_node = collection.File.one({"_id": ObjectId(node_oid)})
+    file_node = node_collection.one({"_id": ObjectId(node_oid)})
 
     if request.method == "POST":
 
@@ -270,7 +267,7 @@ def data_review_save(request, group_id):
             teaches_list = teaches_list.split(",") if teaches_list else []
             teaches_list = [ObjectId(each_oid) for each_oid in teaches_list]
 
-            relation_type_node = collection.Node.one({'_type': "RelationType", 'name':'teaches'})
+            relation_type_node = node_collection.one({'_type': "RelationType", 'name':'teaches'})
 
             gr_nodes = create_grelation(file_node._id, relation_type_node, teaches_list)
             gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes] if gr_nodes else []
@@ -281,7 +278,7 @@ def data_review_save(request, group_id):
             if len(gr_nodes_oid_list) == len(prev_teaches_list) and set(gr_nodes_oid_list) == set(prev_teaches_list):
                 pass
             else:
-                rel_nodes = collection.Triple.find({'_type': "GRelation", 
+                rel_nodes = triple_collection.find({'_type': "GRelation", 
                                       'subject': file_node._id, 
                                       'relation_type.$id': relation_type_node._id
                                     })
@@ -305,7 +302,7 @@ def data_review_save(request, group_id):
             assesses_list = assesses_list.split(",")
             assesses_list = [ObjectId(each_oid) for each_oid in assesses_list]
 
-            relation_type_node = collection.Node.one({'_type': "RelationType", 'name':'assesses'})
+            relation_type_node = node_collection.one({'_type': "RelationType", 'name':'assesses'})
 
             gr_nodes = create_grelation(file_node._id, relation_type_node, teaches_list)
             gr_nodes_oid_list = [ObjectId(each_oid["right_subject"]) for each_oid in gr_nodes]

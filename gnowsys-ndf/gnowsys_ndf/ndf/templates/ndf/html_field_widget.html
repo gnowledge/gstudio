@@ -70,6 +70,7 @@
           {% if is_required_field %}required{% endif %} 
           class="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
+          maxlength="{{field.max_digits|default_if_none:''}}"
           pattern="{% if field.validators|length > 2 %}{{field.validators.2|default_if_none:''}}{% endif %}" 
 
     />
@@ -97,6 +98,19 @@
         }      
       });
 
+      $(".course_code_check").keydown(function (e) {
+      	//Dont allow space, special characters,special char on num pad, qoutes,brackets,colons,etc
+        if (e.keyCode == 32 || (e.shiftKey || (e.keyCode < 48 && e.keyCode > 57)) || (e.keyCode >= 106 && e.keyCode <= 111) || (e.keyCode>=144 && e.keyCode<=188) || (e.keyCode>= 190 && e.keyCode <=222)){
+          return false;
+        }  
+        else {
+          return true;
+        }      
+      });
+
+      $(".course_code_check").keyup(function (e) {
+	      this.value = this.value.toLocaleUpperCase();
+	  });
     </script>
 
     {% if is_required_field or field.validators %}
@@ -177,7 +191,10 @@
     {% endif %}
 
   {% elif field_type == "ObjectId" and field.validators.0 == "File" %}
-    <!-- <h4>Coming soon</h4> -->
+    {% if field_value %}
+    <a target="_blank" href="{% url 'read_file' group_id field_value %}" id="{{field.name}}">{% trans "Click here to view " %}{{field.altnames|lower}}</a>
+
+    {% else %}
     <style type="text/css">
       .fileUpload input.upload {
         position: absolute;
@@ -208,6 +225,8 @@
         $('#uploadFile_{{field.name}}').val(this.value);
       });
     </script>
+
+    {% endif %}
 
   {% else %}
 
