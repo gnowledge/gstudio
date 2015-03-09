@@ -1,11 +1,21 @@
 <!ATTLIST lbl_name course_mins CDATA #IMPLIED>
-{% extends "ndf/mis_base_create_edit.html" %}
+{% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 {% load pagination_tags %}
 
+{% block head %}
+  {{block.super}}
+    <!-- DataTables -->
+    <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+    <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+    <!-- DataTables CSS -->
+    <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
 {% block style %}
+
   {{block.super}}
 
   /* Resetting css-properties for fieldset (also legend, input) */
@@ -26,8 +36,6 @@
     .edit_course_structure_name{
       width: 30%;
     }
-
-
 
   /* Setting css-properties for reveal-modal's label */
     div.reveal-modal > label {
@@ -64,12 +72,14 @@
       border-color:#757b80 !important; 
       margin: 10px !important;
       border: 3px solid;
+      display:block;
     }
 
     li.course-sub-section-class{
       border-color:#b0b3b6 !important; 
       margin: 10px !important;
       border: 3px solid;
+      display:block;
     }
 
     #name{
@@ -98,10 +108,40 @@
       font-weight: bold;
       font-size: 130%;
     }
+    .div_lbl > label {
+     min-width: 350px;
+     display: inline-block;
+    }
+
 
     .course-section-class:hover .cs_setting{
       display:block;
     }
+
+    .resource-drawer { 
+    border-color: #D3D3D3; border-style: solid; 
+    padding: 0 !important; 
+    overflow-y: auto;
+    }
+
+    .resource-drawer li.bullet-item:hover{
+    background-color: #ecf0f1; cursor:pointer;
+    }
+
+    .posted-by{ color: #808080; font-size: small; }
+
+    .selected-resource { background-color:lightgray !important ; }
+
+    .resource-type-image {
+    height:40px;    
+    background-repeat:no-repeat; background-size: 48px 48px;
+    width:16.667%;
+    }
+
+    .resource-type-image + div {
+    width:83.33333%%;
+    }
+
 {% endblock %}
 
 {% block body_content %} 
@@ -145,14 +185,61 @@
             </label>
           </div>
           <div class="small-4 columns end">
-          {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.0 %}
-        </div>
+            {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.0 %}
+          </div>
           <div class="small-4 columns">
                 <input type="button" value="Save" class="button small hoverstyle round save-cs save-css" >
                 <input type="button" value="Cancel" class="button small hoverstyle round cancel-cs cancel-css" >
           </div>
         </div>
+        <div class="row">
+          <div class="small-10 small-centered columns units-btn-div">
+            <input type="button" class="button round expand hoverstyle units-btn" value="Add Units">
+          </div>
+        </div>
+    {% block collection %}
+    <div class="collection_block_div">
+      <div class="choose" style="display:none;">
+          
+        <div class="row">
+            <div class="small-2 columns ">
+              <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
+              {% trans "Page" %} <i class="step fi-page-filled"></i></span>
+            </div>
+            <div class="small-2 columns">
+              <span class="fontsize-x-large subheader"><input type="radio" name="col" value="File" />
+              {% trans "File" %} <i class="step fi-book"></i></span>
+            </div>
+            <div class="small-2 columns">
+              <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Image" />
+              {% trans "Image" %} <i class="step fi-photo"></i>
+              </span>
+            </div>
+            <div class="small-2 columns">
+              <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Video" />
+              {% trans "Video" %} <i class="step fi-video"></i>
+              </span>
+            </div>
+            <div class="small-2 columns">
+              <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
+              {% trans "Pandora" %} <i class="step fi-video"></i>
+              </span>
+            </div>      
+            <div class="small-2 columns">
+              <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
+              {% trans "Quiz" %} <i class="step fi-pencil"></i>
+              </span>
+            </div>
+        </div>
+      </div>
+
+        <div class="resources_drawer_div">
+        </div>
+        <input type="button" value="Save Units" class="save_units small button round" style="display:none">
+    </div>
     </li>
+
+    {% endblock %}
 
     <ul class="ul-course-section no-bullet">
       <input type="button" class="button expand round hoverstyle course-sec-btn" value="Add Course Section" onclick="add_course_section()">
@@ -234,7 +321,7 @@
 
 {% block script %}
   {{block.super}}
-
+  
   //Global var declarations------------------------------------------------------------------------------
     var cs_cloned_id = 1;
     var css_cloned_id = 1;
@@ -252,7 +339,6 @@
     $("#course_structure_minutes").addClass("css_mins_class")
     $("#min_marks").addClass("min_marks_class")
     $("#max_marks").addClass("max_marks_class")
-
 
   // Prevent enter key
     $('html').bind('keypress', function(e)
@@ -280,6 +366,7 @@
         $(this).before($("#course-subsection").clone().attr('id',function(i,id){
             cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
             return cloned_ss_ele_id}).removeClass("hide"));
+        $("#"+cloned_ss_ele_id).find("div.resources_drawer_div").attr('id','resources_drawer_for_'+cloned_ss_ele_id)
         $("#"+cloned_ss_ele_id).find("input[id=name]").focus()
         css_cloned_id+=1
     });
@@ -323,8 +410,8 @@
                   course_sec_dict[lbl_val] = []
                   course_sec_list.push(course_sec_dict)
                   $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled");
-                  var str_btn="<div class='row'><div class='small-2 columns text-center fold-btn-div'><i class='fi-page-copy largesize'></i></div>"
-                  var str_lbl="<span data-tooltip title="+ lbl_val +"><div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"' style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>"    
+                  var str_btn="<div class='row'><div class='small-1 columns text-center fold-btn-div'><i class='fi-page-copy largesize'></i></div>"
+                  var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"' style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>"    
                   var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
                   $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
@@ -339,9 +426,9 @@
 
   //Function to save Course Subsection-------------------------------------------------------------------
     function save_course_sub_section(p_id,p_lbl,l_id,l_lbl){
-      var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-page largesize'></i></div>"
-      var str_lbl="<span data-tooltip title="+ l_lbl +"><div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ l_id+"' style='float:left;'>"+l_lbl+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>" 
-      $("#"+p_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-2 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
+      var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-page largesize'></i></div>"
+      var str_lbl="<span data-tooltip title='"+ l_lbl +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='"+ l_id+"' style='float:left;'>"+l_lbl+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>" 
+      $("#"+p_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-1 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
       $("#"+p_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
       var str_prop="<div class='small-2 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
       $("#"+p_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
@@ -929,7 +1016,7 @@
         event.preventDefault();
       }
     });
-
+  
   //Submit course structure -----------------------------------------------------------------------------
     $("#form_course_structure").submit(function(event){
       $.each(course_sec_list,function(csindex,csdict){
@@ -965,6 +1052,103 @@
           event.preventDefault();
       }
     });
+
+  var parent_li_css;
+  var corr_resource_div;
+  
+  //On click of 'Add Units' button
+  $(document).on('click','.units-btn',function(){
+    $(".choose").css("display", "block");
+    parent_li_css = $(".units-btn").parents("li.course-sub-section-class").not(".hide").attr('id')
+    corr_resource_div = $("#resources_drawer_for_"+parent_li_css)
+    $(this).addClass('hide')
+    $(".sub-section-btn").attr("disabled",true)
+
+  });
+  
+  // Ajax call for units
+  $(document).on('click',"input[type='radio'][name='col']",function(){
+
+    var resource_type_name = this.value;
+    resp_dict = {}
+    $.ajax({
+
+      type: "POST",
+    
+      url: "{% url 'get_resources' groupid %}",
+    
+      datatype: "json",
+    
+      data:{
+        resource_type: resource_type_name,
+        widget_for: "create_course_structure",
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+
+      },
+    
+      success: function (data) {
+        resp_dict = data
+        $(corr_resource_div).html(resp_dict); 
+        $(corr_resource_div).next().css("display", "block"); 
+      }
+    });
+  });
+
+
+  // Save units
+  $(document).on('click','.save_units',function(){
+    var length_val = false;
+    var total_resources = 0
+    var all_resources_ids = []
+    //check if right drawer has values
+    total_resources = $(corr_resource_div).find("#create_course_structure_drawer2").children("li")
+    
+    if(total_resources.length > 0){
+      length_val = true;
+    }
+
+    //fetch right drawer values
+    $.each(total_resources,function(i,v){
+      all_resources_ids.push(v.getAttribute('value'))
+    });
+    console.log(parent_li_css)
+
+    if(length_val == true) {
+      x = $("#"+parent_li_css).parents("li.course-section-class").find("label.lbl_of_cs").text()
+      console.log(x)
+      c_name = $("#"+parent_li_css).find("label.lbl_of_css").text()
+      console.log(c_name)
+      for(var i in course_sec_list){
+          for(var i2 in course_sec_list[i]){
+              if(i2==x){
+                for( var newk in course_sec_list[i][i2]){
+                    for (var csk in course_sec_list[i][i2][newk]){
+                        if(csk==c_name){
+                            if(course_sec_list[i][i2][newk][csk]){
+                              course_sec_list[i][i2][newk][csk]["resources"] = all_resources_ids;
+                            }
+                            else{
+                                course_sec_list[i][i2][newk][csk] = {}
+                              course_sec_list[i][i2][newk][csk]["resources"] = all_resources_ids;
+                            } 
+                        }
+                    }
+                } 
+              }
+          }
+      }
+
+    }
+    else{
+      event.preventDefault();
+    }
+    $(corr_resource_div).addClass("hide");
+    $(corr_resource_div).next().css("display", "none"); 
+    $(".choose").css("display", "none");
+    $(".units-btn").removeClass("hide")
+    $(".sub-section-btn").removeAttr("disabled")
+  });
+
 {% endblock %}
 
 {% block document_ready %}

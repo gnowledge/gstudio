@@ -23,6 +23,11 @@
         line-height: 20px;
         color: black;
     }
+
+    #tot_rating{
+        font-size: 25px;
+        font-weight: bold;
+    }
 </style>
 <script src="/static/ndf/bower_components/d3/d3.js"></script>
 <script src="/static/ndf/bower_components/d3-tip/index.js"></script>
@@ -147,7 +152,6 @@
 
                     });
 
-
                 bars.data(dataset)
                     .transition()
                     .attr("y", function (d) {
@@ -179,6 +183,7 @@
         </div>
         {% endif %}
         {% if show_only_pie %}
+        <label id="tot_rating">{{username}}'s Total Rating Score: {{total_activity_rating}}</label>
         <div class="content active" id="pie_visual">
         {% else %}
         <div class="content " id="pie_visual">

@@ -184,7 +184,6 @@ def course_detail(request, group_id, _id):
                                   context_instance = RequestContext(request)
         )
 
-
 @login_required
 def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
@@ -1107,3 +1106,9 @@ def create_course_struct(request, group_id,node_id):
                                   },
                                   context_instance = RequestContext(request)
         )
+
+@login_required
+def add_units(request,group_id):
+    return render_to_response("ndf/course_units.html",
+                              context_instance = RequestContext(request)
+    )

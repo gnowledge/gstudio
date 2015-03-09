@@ -420,7 +420,6 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 	# Special case used while dealing with RelationType widget
 	left_drawer_content = None
 	paged_resources = ""
-
 	if node:
 		if field == "collection":
 			if checked == "Quiz":
@@ -439,7 +438,7 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 			checked = "Module"
 			drawers, paged_resources = get_drawers(group_id, node._id, node.collection_set, checked)
 
-		elif field == "RelationType":
+		elif field == "RelationType" or field == "CourseUnits":
 			# Special case used while dealing with RelationType widget
 			if kwargs.has_key("left_drawer_content"):
 				widget_for = checked
@@ -462,19 +461,20 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 		elif field == "module":
 			checked = "Module"
 
-		elif field == "RelationType":
+		elif field == "RelationType" or field == "CourseUnits":
 			# Special case used while dealing with RelationType widget
 			if kwargs.has_key("left_drawer_content"):
 				widget_for = checked
 				checked = field
 				field = widget_for
 				left_drawer_content = kwargs["left_drawer_content"]
-
 		else:
 			# To make the collection work as Heterogenous one, by default
 			checked = None
 
-		if checked == "RelationType":
+		if checked == "RelationType" or checked == "CourseUnits" :
+			print "\n\nchecked----",checked
+			# checked = "RelationType"
 			drawer1 = get_drawers(group_id, checked=checked, left_drawer_content=left_drawer_content)
 
 		else:
