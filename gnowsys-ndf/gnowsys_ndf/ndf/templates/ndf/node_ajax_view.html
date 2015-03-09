@@ -1234,7 +1234,6 @@ ul#navigation li a.last {
 
   });
 
-  // $(document).on('click',".current",function(){  
   $(".current").click(function() {
 
     var nav_list = "{{nav_list}}";
@@ -1251,7 +1250,6 @@ ul#navigation li a.last {
           curr_node:"{{original_node.pk}}",
           nav:nav_list,
           nod_type: node_type,
-          // breadcrumbs_list: "{{breadcrumbs_list}}",
           csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function(data) {
@@ -1264,6 +1262,9 @@ ul#navigation li a.last {
           }
           else if (node_type == "Term"){
             window.history.pushState("", "", "/{{group_name_tag}}/term/{{original_node.pk}}"+"?selected="+clicked_node+"");
+          }
+          else if (node_type == "Group"){
+            window.history.pushState("", "", "/{{original_node.pk}}"+"?selected="+clicked_node+"");
           }
           else if (node_type == "Topic"){
             window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{original_node.pk}}"+"?selected="+clicked_node+"");

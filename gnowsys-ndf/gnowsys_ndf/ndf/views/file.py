@@ -1125,8 +1125,6 @@ def file_detail(request, group_id, _id):
     else:
          raise Http404 
 
-    breadcrumbs_list = []
-    breadcrumbs_list.append(( str(file_node._id), file_node.name ))
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     shelves = []
@@ -1158,8 +1156,7 @@ def file_detail(request, group_id, _id):
                                 'annotations' : annotations,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
-                                'breadcrumbs_list': breadcrumbs_list,
-                                'imageCollection':imageCollection,
+                                'imageCollection':imageCollection
                               },
                               context_instance = RequestContext(request)
                              )

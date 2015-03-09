@@ -376,10 +376,7 @@ def group_dashboard(request,group_id=None):
 
       property_order_list = get_property_order_with_value(groupobj['group_of'][0])
 
-  # First time breadcrumbs_list created on click of page details
-  breadcrumbs_list = []
-  # Appends the elements in breadcrumbs_list first time the resource which is clicked
-  breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
+  
   annotations = json.dumps(groupobj.annotations)
 
   default_template = "ndf/groupdashboard.html"
@@ -388,8 +385,7 @@ def group_dashboard(request,group_id=None):
                                                        'shelf_list': shelf_list,
                                                        'appId':app._id,
                                                        'annotations' : annotations,
-                                                       'shelves': shelves, 
-                                                       'breadcrumbs_list': breadcrumbs_list
+                                                       'shelves': shelves
                                                       },context_instance=RequestContext(request)
                           )
 
