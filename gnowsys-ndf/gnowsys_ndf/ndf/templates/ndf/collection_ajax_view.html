@@ -122,21 +122,6 @@
 
 
             });
-
-            // $.ajax({
-            //     type: "POST",
-            //     url: "{#% url 'collection_view' group_id %#}",
-            //     datatype: "html",
-            //     data:{
-            //       node_id: node.id,
-            //       breadcrumbs_list: "{{breadcrumbs_list}}",
-            //       csrfmiddlewaretoken: '{{ csrf_token }}'
-            //     },
-            //     success: function(data) {
-
-            //       $("#view_collection").html(data);
-            //     }
-            // });
           
         }
       );
@@ -163,43 +148,3 @@
   <div>
     <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
   </div>
-
-<script type="text/javascript">
-
-  // $(".current").click(function() {
-    
-    // $.ajax({
-    //     type: "POST",
-    //     url: "{#% url 'collection_view' group_id %#}",
-    //     datatype: "html",
-    //     data:{
-    //       node_id: this.id,
-    //       breadcrumbs_list: "{{breadcrumbs_list}}",
-    //       csrfmiddlewaretoken: '{{ csrf_token }}'
-    //     },
-    //     success: function(data) {
-
-    //       $("#view_collection").html(data);
-
-    //     }
-    // }); 
-
-    // $.ajax({
-    //     type: "POST",
-    //     url: "{% url 'collection_nav' group_id %}",
-    //     datatype: "html",
-    //     data:{
-    //       node_id: this.id,
-    //       breadcrumbs_list: "{{breadcrumbs_list}}",
-    //       csrfmiddlewaretoken: '{{ csrf_token }}'
-    //     },
-    //     success: function(data) {
-    //       $("#view_page").html(data);
-    //     }
-    // }); 
-   
-
-  // });
-
-</script>
-
