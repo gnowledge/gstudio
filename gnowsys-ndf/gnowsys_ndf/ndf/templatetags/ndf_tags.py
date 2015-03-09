@@ -90,12 +90,12 @@ def get_node_type(node):
 
 @register.assignment_tag
 def get_node(node):
-	if node:
-		obj = node_collection.one({"_id": ObjectId(node)})
-		if obj:
-			return obj
-		else:
-			return ""
+    if node:
+        obj = node_collection.one({"_id": ObjectId(node)})
+        if obj:
+            return obj
+        else:
+            return ""
 
 
 @register.assignment_tag
@@ -1378,24 +1378,28 @@ def get_user_object(user_id):
 	except Exception as e:
 		print "User Not found in User Table",e
 	return user_obj
-	
 
-'''this template function is used to get the user object from template''' 
-@register.assignment_tag 
+
+@register.assignment_tag
 def get_grid_fs_object(f):
-	'''get the gridfs object by object id'''
-	grid_fs_obj = ""
-	try:
-		file_obj = node_collection.one({'_id':ObjectId(f['_id'])})
-                if file_obj.mime_type == 'video':
-                        if len(file_obj.fs_file_ids) > 2:
-                                if (file_obj.fs.files.exists(file_obj.fs_file_ids[2])):
-                                        grid_fs_obj = file_obj.fs.files.get(ObjectId(file_obj.fs_file_ids[2]))
-                else:
-                        grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
-	except Exception as e:
-		print "Object does not exist", e
-	return grid_fs_obj
+    """
+    Get the gridfs object by object id
+    """
+    grid_fs_obj = ""
+    try:
+        file_obj = node_collection.one({
+            '_id': ObjectId(f['_id'])
+        })
+        if file_obj.mime_type == 'video':
+            if len(file_obj.fs_file_ids) > 2:
+                if (file_obj.fs.files.exists(file_obj.fs_file_ids[2])):
+                    grid_fs_obj = file_obj.fs.files.get(ObjectId(file_obj.fs_file_ids[2]))
+        else:
+            grid_fs_obj = file_obj.fs.files.get(file_obj.fs_file_ids[0])
+    except Exception as e:
+        print "Object does not exist", e
+
+    return grid_fs_obj
 
 
 @register.inclusion_tag('ndf/admin_class.html')
