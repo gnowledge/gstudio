@@ -9,7 +9,6 @@ import datetime
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
 
-from django_mongokit import get_database
 from mongokit import IS
 
 try:
@@ -19,6 +18,7 @@ except ImportError:  # old pymongo
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
@@ -37,14 +37,13 @@ SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
 log_list = [] # To hold intermediate errors
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
-collection = get_database()[Node.collection_name]
 is_json_file_exists = False
 
 gsystem_type_node = None
 gsystem_type_id = None
 gsystem_type_name = ""
 
-mis_group = collection.Node.one({
+mis_group = node_collection.one({
     '_type': "Group",
     '$or': [{
         'name': {'$regex': u"MIS_admin", '$options': 'i'}
@@ -60,9 +59,8 @@ if mis_group is not None:
     group_id = mis_group._id
     user_id = mis_group.created_by  # User who created the above private group
 
-college_gst = collection.Node.one({
-    "_type": "GSystemType",
-    "name": "College"
+college_gst = node_collection.one({
+    "_type": "GSystemType", "name": "College"
 })
 college_dict = {}
 attr_type_dict = {}
@@ -100,7 +98,7 @@ class Command(BaseCommand):
                         global create_private_college_group
                         create_private_college_group = True
 
-                    gsystem_type_node = collection.Node.one({
+                    gsystem_type_node = node_collection.one({
                         "_type": "GSystemType",
                         "$or": [{
                             "name": {"$regex": "^"+gsystem_type_name+"$", '$options': 'i'}
@@ -222,7 +220,7 @@ def parse_data_create_gsystem(json_file_path):
         json_documents_list = json.loads(json_file_content)
 
         # Process data in proper format
-        node = collection.GSystem()
+        node = node_collection.collection.GSystem()
         node_keys = node.keys()
         node_structure = node.structure
 
@@ -366,7 +364,7 @@ def parse_data_create_gsystem(json_file_path):
                                     if attr_key in attr_type_dict:
                                         attribute_type_node = attr_type_dict[attr_key]
                                     else:
-                                        attribute_type_node = collection.Node.one({
+                                        attribute_type_node = node_collection.one({
                                             '_type': "AttributeType",
                                             '$or': [{
                                                 'name': {'$regex': "^" + attr_key + "$", '$options': 'i'}
@@ -451,7 +449,7 @@ def parse_data_create_gsystem(json_file_path):
                                         if rel_key in rel_type_dict:
                                             relation_type_node = rel_type_dict[rel_key]
                                         else:
-                                            relation_type_node = collection.Node.one({
+                                            relation_type_node = node_collection.one({
                                                 '_type': "RelationType",
                                                 '$or': [{
                                                     'name': {'$regex': "^" + rel_key + "$", '$options': 'i'}
@@ -490,7 +488,7 @@ def parse_data_create_gsystem(json_file_path):
                                             else:
                                                 # If not found in college_dict
                                                 # Then find and update college_dict
-                                                college_node = collection.aggregate([{
+                                                college_node = node_collection.collection.aggregate([{
                                                     "$match": {"_id": each}
                                                 }, {
                                                     "$project": {"group_id": "$relation_set.has_group"}
@@ -509,7 +507,7 @@ def parse_data_create_gsystem(json_file_path):
                                         # Update node's group_set with updated list
                                         # if changed
                                         if is_group_set_changed:
-                                            collection.update({
+                                            node_collection.collection.update({
                                                 "_id": subject_id
                                             }, {
                                                 "$set": {"group_set": node_group_set}
@@ -529,11 +527,11 @@ def parse_data_create_gsystem(json_file_path):
 
                 # Create enrollment code (Only for Student)
                 if create_student_enrollment_code and not node_repeated:
-                    enrollment_code_at = collection.Node.one({
+                    enrollment_code_at = node_collection.one({
                         "_type": "AttributeType", "name": "enrollment_code"
                     })
 
-                    node_exist = collection.Node.one({"_id": node._id, "attribute_set.enrollment_code": {"$exists": True}})
+                    node_exist = node_collection.one({"_id": node._id, "attribute_set.enrollment_code": {"$exists": True}})
                     if not node_exist:
                         # It means enrollment_code is not set for given student node
                         # Then set it
@@ -555,7 +553,7 @@ def parse_data_create_gsystem(json_file_path):
 
                 elif create_private_college_group:
                     # Create a private group for respective college node
-                    node_exist = collection.Node.one({"_id": node._id, "relation_set.has_group": {"$exists": True}})
+                    node_exist = node_collection.one({"_id": node._id, "relation_set.has_group": {"$exists": True}})
                     if not node_exist:
                         try:
                             info_message = "\n Creating private group for given college (" + node.name + ") via RelationType (has_group)...\n"
@@ -615,11 +613,11 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
         if degree_year:
             query.update({"attribute_set.degree_year": degree_year})
 
-    node = collection.Node.one(query)
+    node = node_collection.one(query)
 
     if node is None:
         try:
-            node = collection.GSystem()
+            node = node_collection.collection.GSystem()
 
             personal_details = []
             address_details = []
@@ -843,7 +841,7 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
 
         else:
             if "(" in data or ")" in data:
-                node = collection.Node.one({'_type': type_convert_objectid, 
+                node = node_collection.one({'_type': type_convert_objectid, 
                                             'name': data, 
                                             'group_set': group_id
                                            }, 
@@ -851,7 +849,7 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
                                        )
 
             else:
-                node = collection.Node.one({'_type': type_convert_objectid, 
+                node = node_collection.one({'_type': type_convert_objectid, 
                                             '$or': [{'name': {'$regex': "^"+data+"$", '$options': 'i'}}, 
                                                     {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}],
                                             'group_set': group_id

@@ -1206,7 +1206,7 @@ def getFileThumbnail(request, group_id, _id):
     else:
         return HttpResponse("")
 
-def readDoc(request, _id, group_id, file_name = ""):
+def readDoc(request, _id, group_id, file_name=""):
     '''Return Files 
     '''
     ins_objectid  = ObjectId()
