@@ -362,7 +362,6 @@ def get_all_users_int_count():
 	get integer count of all the users
 	'''
 	all_users = len(User.objects.all())
-	print all_users
 	return all_users
 
 @register.inclusion_tag('ndf/twist_replies.html')
