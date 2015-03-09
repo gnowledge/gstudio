@@ -23,6 +23,7 @@
 
       // Condition to check whether the tree has been loaded on the page completely or not before attempting any function on tree(such as 'getNodeById')
       if (url && $(".collection").not(".jqtree-loading").length > 0){
+
         var tree_build = $(".collection").not(".jqtree-loading");
         var node = tree_build.tree('getNodeById', url);
         tree_build.tree('selectNode', node);
@@ -41,12 +42,15 @@
     function doc(){
 
       var $tree = $('.collection');
-      var arr = []
+      var arr = [];  
+      {% get_node_type node as node_type %}  
+      var node_type = "{{node_type}}";
 
       $tree.tree({
-        selectable: true
+        selectable: true,
       });
 
+      // This "tree.open" event helps to open the particular node from browser url
       $tree.bind(
         'tree.open',
         function(e) {
@@ -59,22 +63,32 @@
         }
       );
 
+      // This "tree.select" event helps to click the particular tree node and also triggers the click event on tree node
       $tree.bind(          
-        'tree.click',
+        'tree.select',
         function(event) {
             // The clicked node is 'event.node'
             var node = event.node;
-            var node_type = node.node_type;
-            // var breadcrumbs_list = "{{breadcrumbs_list}}"; 
-            if (arr.length > 0){
-              var nav_list = arr;  
+            var parent_arr = [];
+            var parent_node = node;
+            parent_arr.push(node.id);
+
+            while (parent_node) {
+                if (parent_node.name !== undefined){           
+                  $tree.tree('openNode', parent_node);
+                  parent_node = parent_node.parent;
+                  if (parent_node.name !== undefined){
+                    parent_arr.push(parent_node.id);                                          
+                  }
+                }
+                else{
+                  break;
+                }
             }
-            else{
-              arr.push(node.id);
-              var nav_list = arr;
-            }
-            
+            var nav_list = parent_arr.reverse();
+
             // alert(nav_list);
+            // alert(node_type);
 
             $.ajax({
                 type: "POST",
@@ -84,6 +98,7 @@
                   node_id: node.id,
                   curr_node:"{{node.pk}}",
                   nav: nav_list,
+                  nod_type: node_type,
                   csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function(data) {
@@ -100,9 +115,7 @@
                   else if (node_type == "Topic"){
                     window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
                   }
-
-                  
-                  // $("#content").css({"opacity":""})
+                                      
                   $("#view_page").html(data);
 
                 }
@@ -145,14 +158,15 @@
 </style>  
 
 {% endblock %}  
-
+  
+  <b class="current">{{node.name}}</b>
   <div>
     <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
   </div>
 
 <script type="text/javascript">
 
-  $(".current").click(function() {
+  // $(".current").click(function() {
     
     // $.ajax({
     //     type: "POST",
@@ -185,7 +199,7 @@
     // }); 
    
 
-  });
+  // });
 
 </script>
 
