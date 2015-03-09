@@ -333,13 +333,13 @@
                     </a>
                      -->
                   {% endcomment %}
-                  <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}"
                     {% comment %}
                       <!--
                         <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
                       -->
                     {% endcomment %}
-
+                  
+                  <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
                     {% if site_name == "nroer" and "home" in request.path and request.path|length <= 6 %}
                     {% else %}
                       <i class="fi-results"></i> Updates
