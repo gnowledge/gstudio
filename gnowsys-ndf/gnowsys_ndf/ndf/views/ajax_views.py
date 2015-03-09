@@ -122,10 +122,13 @@ def collection_nav(request, group_id):
     nav_list = request.POST.getlist("nav[]", '')
     n_list = request.POST.get("nav", '')
 
-    if n_list:
+    # This "n_list" is for manipulating breadcrumbs events and its navigation
+    if n_list:      
+      # Convert the incomming listfrom template into python list
       n_list = n_list.replace("&#39;","'")
       n_list = ast.literal_eval(n_list) 
 
+      # For removing elements from breadcrumbs list to manipulate basd on which node is clicked 
       for e in reversed(n_list):
         if e != unicode(node_obj._id):
           n_list.remove(e)
