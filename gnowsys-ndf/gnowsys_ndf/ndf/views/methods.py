@@ -35,6 +35,7 @@ from collections import Counter
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
@@ -300,17 +301,13 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         drawer = node_collection.find({'_type': u"File", '_id': {'$nin': filtering},'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}).limit(50)
 
       elif checked == "Theme":
-        theme_GST_id = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
-        topic_GST_id = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})    
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_GST._id, topic_GST._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "theme_item":
-        theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
-        topic_GST_id = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})    
-        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_item_GST._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        drawer = node_collection.find({'_type': u"GSystem", '_id': {'$nin': filtering},'member_of': {'$in':[theme_item_GST._id, topic_GST._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "Topic":
-        drawer = node_collection.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = node_collection.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST._id, theme_item_GST._id, topic_GST._id]},'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "RelationType":
         # Special case used while dealing with RelationType widget
@@ -448,8 +445,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   """Updates the retrieved values of common fields from request into the given node."""
 
   group_obj = node_collection.one({'_id': ObjectId(group_id)})
-  theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
-  topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+  # theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+  # topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
   collection = None
 
   if coll_set:
