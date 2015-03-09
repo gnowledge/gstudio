@@ -449,7 +449,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
                   file_name = event_gs.name + " -- " + field_instance["altnames"]
                   content_org = ""
                   tags = ""
-                  field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
+                  field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, access_policy="PRIVATE", count=0, first_object="", oid=True)[0]
 
               if "date_month_day_year" in field_instance["validators"]:
                      if i>0:
