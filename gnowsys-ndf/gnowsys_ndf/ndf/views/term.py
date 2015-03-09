@@ -1,16 +1,16 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
+
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 
-from django_mongokit import get_database
-from mongokit import paginator
+# from mongokit import paginator
 
 try:
     from bson import ObjectId
@@ -19,17 +19,15 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-
-from gnowsys_ndf.ndf.models import Node, Triple, HistoryManager
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_page,get_node_metadata
+from gnowsys_ndf.ndf.models import HistoryManager
+from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_page, get_node_metadata
 
 #######################################################################################################################################
-db = get_database()
-collection = db[Node.collection_name]
 history_manager = HistoryManager()
-gapp_GST = collection.Node.one({'_type':'MetaType', 'name':'GAPP' })
-term_GST = collection.Node.one({'_type': 'GSystemType', 'name':'Term', 'member_of':ObjectId(gapp_GST._id) })
-topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+gapp_GST = node_collection.one({'_type': 'MetaType', 'name': 'GAPP'})
+term_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Term', 'member_of': ObjectId(gapp_GST._id) })
+topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 if term_GST:	
 	title = term_GST.altnames
@@ -38,12 +36,12 @@ def term(request, group_id, node_id=None):
 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 		if group_ins:
 			group_id = str(group_ins._id)
 		else :
-			auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+			auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 			if auth :
 				group_id = str(auth._id)
 	else :
@@ -52,7 +50,7 @@ def term(request, group_id, node_id=None):
 
 	if not node_id:
 		# To list all term instances
-	  	terms_list = collection.Node.find({'_type':'GSystem','member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]},
+	  	terms_list = node_collection.find({'_type':'GSystem','member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]},
 	  	 								   'group_set': ObjectId(group_id) 
 	  	 								  }).sort('name', 1)
 
@@ -68,7 +66,7 @@ def term(request, group_id, node_id=None):
 
 	else:
 		topic = "Topic"
-		node_obj = collection.Node.one({'_id': ObjectId(node_id) })
+		node_obj = node_collection.one({'_id': ObjectId(node_id)})
 
 		return render_to_response('ndf/topic_details.html',
 									{ 'node': node_obj, 'title':title,
@@ -84,12 +82,12 @@ def create_edit_term(request, group_id, node_id=None):
 
     ins_objectid = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else :
@@ -102,7 +100,7 @@ def create_edit_term(request, group_id, node_id=None):
                       }
     
     # To list all term instances
-    terms_list = collection.Node.find({'_type':'GSystem','member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]},
+    terms_list = node_collection.find({'_type': 'GSystem', 'member_of': {'$all': [ObjectId(term_GST._id), ObjectId(topic_GST._id)]},
                                        'group_set': ObjectId(group_id) 
                                    }).sort('name', 1)
 
@@ -111,10 +109,9 @@ def create_edit_term(request, group_id, node_id=None):
       nodes_list.append(each.name)
 
     if node_id:
-        term_node = collection.Node.one({'_id': ObjectId(node_id)})
+        term_node = node_collection.one({'_id': ObjectId(node_id)})
     else:
-        term_node = collection.GSystem()
-        
+        term_node = node_collection.collection.GSystem()
 
     if request.method == "POST":
         
@@ -149,16 +146,16 @@ def delete_term(request, group_id, node_id):
     """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else :
         pass
 
-    op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     return HttpResponseRedirect(reverse('term', kwargs={'group_id': group_id}))

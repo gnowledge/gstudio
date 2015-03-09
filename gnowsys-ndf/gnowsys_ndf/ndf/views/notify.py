@@ -1,13 +1,14 @@
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from gnowsys_ndf.ndf.models import get_database
-from gnowsys_ndf.ndf.models import Node
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.notification import models as notification
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
+
+from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 import json
@@ -17,10 +18,9 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
+sitename = Site.objects.all()[0]
 
-db = get_database()
-col_Group = db[Node.collection_name]
-sitename=Site.objects.all()[0]
+
 def get_userobject(user_id):
     bx=User.objects.filter(id=user_id)
     if bx:
@@ -28,6 +28,7 @@ def get_userobject(user_id):
         return bx
     else:
         return 0
+
 
 def get_user(username):
     bx=User.objects.filter(username=username)
@@ -38,10 +39,10 @@ def get_user(username):
         return 0
 
 
-# A general function used to send all kinds of notifications
 def set_notif_val(request,group_id,msg,activ,bx):
+    # A general function used to send all kinds of notifications
     try:
-        group_obj=col_Group.Group.one({'_id':ObjectId(group_id)})
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
         site=sitename.name.__str__()
         objurl="http://test"
         render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':group_obj,'site':site,'link':objurl})
@@ -52,10 +53,11 @@ def set_notif_val(request,group_id,msg,activ,bx):
         print "Error in sending notification- "+str(e)
         return False
 
-# Send invitation to any user to join or unsubscribe
+
 def send_invitation(request,group_id):
+    # Send invitation to any user to join or unsubscribe
     try:
-        colg=col_Group.Group.one({'_id':ObjectId(group_id)})
+        colg = node_collection.one({'_id': ObjectId(group_id)})
         groupname=colg.name
         list_of_invities=request.POST.get("users","") 
         sender=request.user
@@ -82,8 +84,8 @@ def send_invitation(request,group_id):
 
 
 def notifyuser(request,group_id):
-#    usobj=User.objects.filter(username=usern)
-    colg=col_Group.Group.one({'_id':ObjectId(group_id)})
+    # usobj=User.objects.filter(username=usern)
+    colg = node_collection.one({'_id': ObjectId(group_id)})
     groupname=colg.name
     activ="joined in group"
     msg="You have successfully joined in the group '"+ groupname +"'"
@@ -100,7 +102,7 @@ def notifyuser(request,group_id):
 
 
 def notify_remove_user(request,group_id):
-    colg=col_Group.Group.one({'_id':ObjectId(group_id)})
+    colg = node_collection.one({'_id': ObjectId(group_id)})
     groupname=colg.name
     msg="You have been removed from the group '"+ groupname +"'"
     activ="removed from group"
@@ -114,10 +116,11 @@ def notify_remove_user(request,group_id):
     else:
         return HttpResponse("failure")
 
+
 def invite_users(request,group_id):
     try:
         sending_user=request.user
-        node=col_Group.Node.one({'_id':ObjectId(group_id)})
+        node = node_collection.one({'_id': ObjectId(group_id)})
         if request.method == "POST":
             exst_users=[]
             new_users=[]
@@ -182,10 +185,11 @@ def invite_users(request,group_id):
         print "Exception in invite_users "+str(e)
         return HttpResponse("Failure")
 
+
 def invite_admins(request,group_id):
     try:
         sending_user=request.user
-        node=col_Group.Node.one({'_id':ObjectId(group_id)})
+        node = node_collection.one({'_id': ObjectId(group_id)})
         if request.method == "POST":
             exst_users=[]
             new_users=[]
