@@ -1193,7 +1193,7 @@ def get_contents(node_id, selected, choice):
 				left_obj = node_collection.one({'_id': ObjectId(attr.subject) })
 				
 				if selected and left_obj and selected != "language":
-					AT = collection.Node.one({'_type':'AttributeType', 'name': unicode(selected) })
+					AT = node_collection.one({'_type':'AttributeType', 'name': unicode(selected) })
 					att = cast_to_data_type(choice, AT.data_type)
 					attr_dict = {unicode(selected): att}
 

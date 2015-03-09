@@ -709,11 +709,6 @@ def topic_detail_view(request, group_id, app_Id=None):
   app_id = app._id
   topic = "Topic"
 
-  ##breadcrumbs##
-  # First time breadcrumbs_list created on click of page details
-  breadcrumbs_list = []
-  # Appends the elements in breadcrumbs_list first time the resource which is clicked
-  breadcrumbs_list.append( (str(obj._id), obj.name) )
 
   ###shelf###
   shelves = []
@@ -739,7 +734,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 	    shelves = []
   
   return render_to_response('ndf/topic_details.html', 
-	                                { 'node': obj,'app_id': app_id,'breadcrumbs_list': breadcrumbs_list,
+	                                { 'node': obj,'app_id': app_id,
 	                                  'group_id': group_id,'shelves': shelves,'topic': topic,
 	                                  'groupid':group_id,'shelf_list': shelf_list
 	                                },

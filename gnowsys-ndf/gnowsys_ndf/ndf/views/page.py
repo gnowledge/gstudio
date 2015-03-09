@@ -250,12 +250,6 @@ def page(request, group_id, app_id=None):
               page_node = node
 
       
-        # First time breadcrumbs_list created on click of page details
-        breadcrumbs_list = []
-        # Appends the elements in breadcrumbs_list first time the resource which is clicked
-        breadcrumbs_list.append( (str(page_node._id), page_node.name) )
-
-        
  
         annotations = json.dumps(page_node.annotations)
         page_node.get_neighbourhood(page_node.member_of)
@@ -266,8 +260,7 @@ def page(request, group_id, app_id=None):
                                     'shelf_list': shelf_list,
                                     'annotations': annotations,
                                     'shelves': shelves,
-                                    'groupid':group_id,
-                                    'breadcrumbs_list': breadcrumbs_list
+                                    'groupid':group_id
                                   },
                                   context_instance = RequestContext(request)
         )        
