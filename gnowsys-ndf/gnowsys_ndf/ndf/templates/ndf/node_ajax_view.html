@@ -233,6 +233,9 @@ ul#navigation li a.last {
 }
 
 /*end dropdown style*/
+.accordion .accordion-navigation > a, .accordion dd > a {
+    color: #10c1cb;
+ }
 
 
 </style>
@@ -762,19 +765,25 @@ ul#navigation li a.last {
       {% endif %}
       <div id="view-info" style="display:none;">
        <br/>
-	<table style="width:100%; border-width:0px; font-weight:bold" >
+       <h3 class="text-center" color="blue"> {{node.name}}</h3>
+
+       <dl class="accordion" data-accordion>
+       <dd class="accordion-navigation">
+       <a href="#panel1a" style="font-color:blue">Overview</a>
+       <div id="panel1a" class="content">
+	 <table align ="center" style="width:80%; border-width:0px;" >
 	  <tbody>
+	   
 	    {% get_json node.pk as jsonobj %}
 	    {% str_to_dict jsonobj as obj %}
-    
 	    {% for key, value in obj.items %}
-	    <tr>
-	      <td align ="left"> {{key|del_underscore|title}}</td>
-              
-	      <td align = "right"> 
+            <tr>
+	      {% if key != "attribute_set" and key != "relation_set" and key != "collection_set" %}
+	      <td align ="left"><strong>{{key|del_underscore|title}}</strong></td>
+              <td align = "right"> 
 		{% if "None" not in value %}
 		{% if key|is_in:"attribute_set, file_size, relation_set" %}
-	     
+		
 		{% for k, v in value.items %}
 		{{k}} : {{v}}<br/>
 		{% endfor %}
@@ -790,11 +799,128 @@ ul#navigation li a.last {
 	      {{value}}</td>
              {% endif %}
 	    </tr>
+            {% endif %}
+	    {% endfor %}	    
+     </tbody>
+	  </table>
+       </div>
+       </dd>
+<dd class="accordion-navigation">
+    <a href="#panel2a">Collection Set</a>
+    <div id="panel2a" class="content">
+      <table align ="center" style="width:80%; border-width:0px;" >
+	<tbody>
+	   {% get_json node.pk as jsonobj %}
+	   {% str_to_dict jsonobj as obj %}
+	   {% for key, value in obj.items %}
+            <tr>
+	      {% if key == "collection_set" %}
+	  	{% if "None" not in value %}
+		{% for each in value %}
+
+		<td align ="center">{{each}}</td>
+		</tr>
+		{% endfor %}
+	        {% else %}
+	      No Collections associted with {{node.name}} resource.
+	    {% endif %}
+		{% endif %}
+	    {% endfor %}
+       </tdbody>
+      </table>
+
+    </div>
+    </dd>
+   <dd class="accordion-navigation">
+    <a href="#panel3a">Attribute Set</a>
+    <div id="panel3a" class="content">
+      <table align ="center" style="width:80%; border-width:0px;" >
+	<tbody>
+	   {% get_json node.pk as jsonobj %}
+	   {% str_to_dict jsonobj as obj %}
+	   {% for key, value in obj.items %}
+            <tr>
+	      {% if key == "attribute_set" %}
+	  	{% if "None" not in value %}
+		{% for k, v in value.items %}
+		<td align ="left">{{k}}</td>
+		<td align ="right">{{v}}</td>
+          </tr>
+		{% endfor %}
+	        {% else %}
+	      No Attributes associted with {{node.name}} resource.
+	    {% endif %}
+		{% endif %}
+	    {% endfor %}
+       </tdbody>
+      </table>
+    </div>
+    </dd>
+   <dd class="accordion-navigation">
+     <a href="#panel4a">Relation Set</a>
+     <div id="panel4a" class="content">
+       <table align ="center" style="width:80%; border-width:0px;" >
+ 	<tbody>
+	   {% get_json node.pk as jsonobj %}
+	   {% str_to_dict jsonobj as obj %}
+	   {% for key, value in obj.items %}
+            <tr>
+	      {% if key == "relation_set" %}
+	  	{% if "None" not in value %}
+		{% for k, v in value.items %}
+		<td align ="left">{{k}}</td>
+		<td align ="right">{{v}}</td>
+          </tr>
+		{% endfor %}
+	        {% else %}
+	       No Relations associted with {{node.name}} resource.
+	    {% endif %}
+		{% endif %}
+	    {% endfor %}
+       </tdbody>
+      </table>
+
+    </div>
+    </dd>
+ </dl>
+
+{% comment %}
+	<table align ="center" style="width:80%; border-width:1px;" >
+	  <tbody>
+	   
+	    {% get_json node.pk as jsonobj %}
+	    {% str_to_dict jsonobj as obj %}
+	   <tr>
+	     <td style="color:blue;" align="center">Overview</td>
+	   </tr>
+	    {% for key, value in obj.items %}
+            <tr>
+	      {% if key != "attribute_set" and key != "relation_set" %}
+	      <td align ="left"> {{key|del_underscore|title}}</td>
+              <td align = "right"> 
+		{% if "None" not in value %}
+		{% if key|is_in:"attribute_set, file_size, relation_set" %}
+		
+		{% for k, v in value.items %}
+		{{k}} : {{v}}<br/>
+		{% endfor %}
+		{% elif key|is_in:"group_set ,collection_set, member_of, tags, prior_node, post_node" %}
+		{% for each in value %}
+		{{each}}</br>
+	    	{% endfor %}
+		{% else %}
+		{{value}}
+		{% endif %}
+	      </td>
+	      {% else %}	     
+	      {{value}}</td>
+             {% endif %}
+	    </tr>
+            {% endif %}
 	    {% endfor %}
 	  <tbody>
 	</table>
-
-
+{% endcomment %}
      </div>
 
       <div id="view-discussion" style="display:none;">
