@@ -1089,7 +1089,7 @@ def file_detail(request, group_id, _id):
     file_node = node_collection.one({"_id": ObjectId(_id)})
     file_node.get_neighbourhood(file_node.member_of)
     if file_node._type == "GSystemType":
-	return file(request, group_id, _id)
+      return file(request, group_id, _id)
 
     file_template = ""
     if file_node.mime_type:
