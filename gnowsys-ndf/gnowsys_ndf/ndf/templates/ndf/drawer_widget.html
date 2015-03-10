@@ -360,6 +360,7 @@
   }
 
   //For left drawer selected resources and right button click
+  $(document).off('click',"#{{widget_for}}_btnRight").on('click',"#{{widget_for}}_btnRight")
   // $("#{{widget_for}}_btnRight").click(function() {
   $(document).on('click',"#{{widget_for}}_btnRight",function(){
     $("#{{widget_for}}_drawer1 li.selected-resource input.node_id").addClass("{{widget_for}}_values");
@@ -393,6 +394,8 @@
   });
 
   //For right drawer selected resources and left button click
+  $(document).off('click',"#{{widget_for}}_btnLeft").on('click',"#{{widget_for}}_btnLeft")
+
   $(document).on('click',"#{{widget_for}}_btnLeft",function(){
 
     $("#{{widget_for}}_drawer2 li.selected-resource input.node_id.{{widget_for}}_values").removeClass("{{widget_for}}_values");
