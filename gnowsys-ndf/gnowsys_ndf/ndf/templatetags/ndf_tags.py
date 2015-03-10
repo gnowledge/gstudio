@@ -473,10 +473,7 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 			checked = None
 
 		if checked == "RelationType" or checked == "CourseUnits" :
-			print "\n\nchecked----",checked
-			# checked = "RelationType"
 			drawer1 = get_drawers(group_id, checked=checked, left_drawer_content=left_drawer_content)
-
 		else:
 			drawer1, paged_resources = get_drawers(group_id, page_no=page_no, checked=checked)
 
