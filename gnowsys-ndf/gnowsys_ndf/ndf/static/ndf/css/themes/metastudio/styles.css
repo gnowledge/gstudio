@@ -7576,13 +7576,13 @@ td {
 /* Default Link Styles */
 /* line 217, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a {
-  color: #0c949c;
+  color: #08676d;
   text-decoration: none;
   line-height: inherit;
 }
 /* line 223, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a:hover, a:focus {
-  color: #0a7f86;
+  color: #043436;
 }
 /* line 230, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a img {
@@ -9576,8 +9576,8 @@ article > footer {
 }
 /* line 515, ../../../scss/_metastudio_styles.scss */
 article .breadcrumbs {
-  display: none;
-  background-color: #eee;
+  /*display: none;*/
+  /*background-color: #eee;*/
 }
 
 /* line 524, ../../../scss/_metastudio_styles.scss */
@@ -10052,4 +10052,9 @@ pre {
   /* BLACK STAR */
   color: #ff980d;
   text-shadow: 0 0 1px #333;
+}
+
+/* line 180, ../../../scss/_app_styles.scss */
+body a:visited {
+  color: #1d484a;
 }

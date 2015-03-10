@@ -9,8 +9,6 @@ import time
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
 
-from django_mongokit import get_database
-
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -18,8 +16,8 @@ except ImportError:  # old pymongo
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, GSystemType, AttributeType, RelationType
-
 
 
 ####################################################################################################################
@@ -29,9 +27,9 @@ SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
 log_list = [] # To hold intermediate errors
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
-collection = get_database()[Node.collection_name]
 is_json_file_exists = False
 user_id = 1  # Very first user (considering superuser/admin)
+
 
 class Command(BaseCommand):
   help = "Based on "
@@ -290,7 +288,7 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
       type_list.append(data)
 
     else:
-      node = collection.Node.one({'_type': type_convert_objectid, 'name': data})
+      node = node_collection.one({'_type': type_convert_objectid, 'name': data})
   
       if node:
         if eval_field == "complex_data_type":
@@ -327,10 +325,10 @@ def create_edit_type(type_name, json_document, user_id):
   """Creates factory Types' (including GSystemType, AttributeType, RelationType)
   """
 
-  node = collection.Node.one({'_type': type_name, 'name': json_document['name']})
+  node = node_collection.one({'_type': type_name, 'name': json_document['name']})
   if node is None:
     try:
-      node = eval("collection"+"."+type_name)()
+      node = eval("node_collection.collection"+"."+type_name)()
       
       for key in json_document.iterkeys():
         node[key] = json_document[key]

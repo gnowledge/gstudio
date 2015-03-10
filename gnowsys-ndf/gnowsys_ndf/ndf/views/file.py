@@ -1089,7 +1089,7 @@ def file_detail(request, group_id, _id):
     file_node = node_collection.one({"_id": ObjectId(_id)})
     file_node.get_neighbourhood(file_node.member_of)
     if file_node._type == "GSystemType":
-	return file(request, group_id, _id)
+      return file(request, group_id, _id)
 
     file_template = ""
     if file_node.mime_type:
@@ -1125,8 +1125,6 @@ def file_detail(request, group_id, _id):
     else:
          raise Http404 
 
-    breadcrumbs_list = []
-    breadcrumbs_list.append(( str(file_node._id), file_node.name ))
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     shelves = []
@@ -1158,8 +1156,7 @@ def file_detail(request, group_id, _id):
                                 'annotations' : annotations,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
-                                'breadcrumbs_list': breadcrumbs_list,
-                                'imageCollection':imageCollection,
+                                'imageCollection':imageCollection
                               },
                               context_instance = RequestContext(request)
                              )
@@ -1206,7 +1203,7 @@ def getFileThumbnail(request, group_id, _id):
     else:
         return HttpResponse("")
 
-def readDoc(request, _id, group_id, file_name = ""):
+def readDoc(request, _id, group_id, file_name=""):
     '''Return Files 
     '''
     ins_objectid  = ObjectId()
