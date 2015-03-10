@@ -862,7 +862,7 @@ ul#navigation li a.last {
 		{% endif %}
 	      </td>
 	      {% else %}	     
-	      {{value}}</td>
+	      Not set</td>
              {% endif %}
 	    </tr>
             {% endif %}
@@ -950,43 +950,6 @@ ul#navigation li a.last {
     </dd>
  </dl>
 
-{% comment %}
-	<table align ="center" style="width:80%; border-width:1px;" >
-	  <tbody>
-	   
-	    {% get_json node.pk as jsonobj %}
-	    {% str_to_dict jsonobj as obj %}
-	   <tr>
-	     <td style="color:blue;" align="center">Overview</td>
-	   </tr>
-	    {% for key, value in obj.items %}
-            <tr>
-	      {% if key != "attribute_set" and key != "relation_set" %}
-	      <td align ="left"> {{key|del_underscore|title}}</td>
-              <td align = "right"> 
-		{% if "None" not in value %}
-		{% if key|is_in:"attribute_set, file_size, relation_set" %}
-		
-		{% for k, v in value.items %}
-		{{k}} : {{v}}<br/>
-		{% endfor %}
-		{% elif key|is_in:"group_set ,collection_set, member_of, tags, prior_node, post_node" %}
-		{% for each in value %}
-		{{each}}</br>
-	    	{% endfor %}
-		{% else %}
-		{{value}}
-		{% endif %}
-	      </td>
-	      {% else %}	     
-	      {{value}}</td>
-             {% endif %}
-	    </tr>
-            {% endif %}
-	    {% endfor %}
-	  <tbody>
-	</table>
-{% endcomment %}
      </div>
 
       <div id="view-discussion" style="display:none;">
