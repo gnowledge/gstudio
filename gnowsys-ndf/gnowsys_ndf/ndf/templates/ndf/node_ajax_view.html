@@ -858,7 +858,12 @@ ul#navigation li a.last {
 		{{each}}</br>
 	    	{% endfor %}
 		{% else %}
+		{% if key == "url" %}
+		<a href ="{{value}}">{{value}}</a>
+		{% endif %}
+		{% if key != "url" %}
 		{{value}}
+		{% endif %}
 		{% endif %}
 	      </td>
 	      {% else %}	     
