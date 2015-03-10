@@ -37,7 +37,7 @@ def report(request):
          total = avg/count
          count = 0
          print "asdf",loop -1 ,int(loop) - 1
-         new_list[ loop -1 ].update({'avg':total})
+         new_list[2].update({'avg':total})
          
     avg = float (i['time_taken']) +avg
     count = count + 1
