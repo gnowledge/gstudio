@@ -855,7 +855,7 @@ ul#navigation li a.last {
 		{% endfor %}
 		{% elif key|is_in:"group_set ,collection_set, member_of, tags, prior_node, post_node" %}
 		{% for each in value %}
-		{{each}}</br>
+		{{each.name}}</br>
 	    	{% endfor %}
 		{% else %}
 		{% if key == "url" %}
@@ -889,7 +889,7 @@ ul#navigation li a.last {
 	  	{% if "None" not in value %}
 		{% for each in value %}
 
-		<td align ="center">{{each}}</td>
+		<td align ="center">{{each.name}}</td>
 		</tr>
 		{% endfor %}
 	        {% else %}

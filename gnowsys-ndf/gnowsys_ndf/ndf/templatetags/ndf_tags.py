@@ -1964,7 +1964,7 @@ def str_to_dict(str1):
                 for ids in dict_format[k]:
                         node = node_collection.one({'_id':ObjectId(ids)})
                         if node:
-                                name_list.append(str(node.name))
+                                name_list.append(node)
                                 dict_format[k] = name_list
               
       if k in keys_by_userid:
