@@ -1,0 +1,77 @@
+<html>
+
+<center>
+<div  style = "width:70%; border-style: solid; border-color: red" align="right"> 
+			<center><h1>   MetaStudio  </h1> </center>
+			<center><h2> <u>  BenchMark Report </u> </h2> </center>
+
+			<center> 
+			   <form method="POST" >
+			          {% csrf_token %}
+			          <select name = "methodlist" >
+			             <option value = 'ALL'> ALL </option>
+			             {% for i in listofmethods %}
+			               <option value = {{i}}> {{i}} </option>
+			             {% endfor %}  
+			          </select>
+			          <input type="submit"  value = "search">
+
+			  </form>        
+			</center>
+			
+			<table border="1" width="1000">
+				  	    <thead>
+                        <th>  Method Name  </th> 
+					  	<th>  Last Executed at </th>
+					  	<th>  URL Called from  </th>
+					  	<th>  paramerters     </th>
+					  	<th>  Size of patameters  </th>	  
+					  	<th>  Time Taken   </th>
+					  	<th>  Average Time Taken</th>
+					  	</thead>
+					
+			{% if search_cur %}
+				<div align="left"> 	
+				<b> Last Execution time of the methods executed today </b> </br> 
+				{% for i in search_cur %}
+				   <tbody>
+						  <tr> <td> {{i.name}}  </td>  
+						   <td> {{i.last_update}} </td>  
+						   <td> {{i.calling_url}}</td>  
+						   <td> {{i.parameters}}</td>  
+						   <td> {{i.size_of_parameters}} </td>
+						   <td> {{i.time_taken}} </td>
+						   <td> {{i.avg}} </td>
+						      </tr>
+
+						  
+			      </tbody>  
+			    {% endfor %}
+			  </table>
+			  </div>
+
+				
+			{% else %}
+			  <div align="left"> 	
+				<b> Last Execution time of the methods executed today </b> </br> 
+				{% for i in bench_cur %}
+				   <tbody>
+                         
+						  <tr> <td> {{i.name}}  </td>  
+						   <td> {{i.last_update}} </td>  
+						   <td> {{i.calling_url}}</td>  
+						   <td> {{i.parameters}}</td>  
+						   <td> {{i.size_of_parameters}} </td>
+						   <td> {{i.time_taken}} </td>
+						   <td> {{i.avg}} </td>
+						   </tr>
+
+						  
+			      </tbody>  
+			    {% endfor %}
+			  </table>
+			  </div>  
+			{% endif %}
+</div>
+</center>
+</html>
