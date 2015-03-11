@@ -11,7 +11,7 @@ db = get_database()
 col = db[Benchmark.collection_name]
  
 def report(request):
- date1=datetime.date.today() - timedelta(2)
+ date1=datetime.date.today()
  ti=time(0,0)
  listofmethods = []
  Today=datetime.datetime.combine(date1,ti)
