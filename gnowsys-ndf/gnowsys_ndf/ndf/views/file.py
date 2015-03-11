@@ -1,3 +1,4 @@
+
 ''' -- Imports from python libraries -- '''
 import json
 import hashlib
@@ -284,8 +285,10 @@ def file(request, group_id, file_id=None, page_no=1):
       no_of_objs_pp = 24  # no. of objects per page to be list
 
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
+        
 
         files_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp, "all_files")
+        
 
         file_pages = files_dict["result_pages"]
         files_pc = files_dict["result_cur"]
@@ -311,7 +314,7 @@ def file(request, group_id, file_id=None, page_no=1):
       image_pages = image_dict["result_pages"]
 
       # --- for videos ---
-      video_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
+      video_dict = get_query_cursor_filetype('$in', [ObjectId(GST_VIDEO._id),ObjectId(pandora_video_st._id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
       videoCollection = video_dict["result_cur"]
       videos_pc = video_dict["result_cur"]
@@ -410,7 +413,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
                                                 ]
                                                 },{'member_of': {'$all': [pandora_video_st._id]}, 
                                                   'group_set': {'$all': [ObjectId(group_id)]},
-                                                  '_type': "File", 'accesss_policy': u"PUBLIC"
+                                                  '_type': "File", 'access_policy': u"PUBLIC"
                                                   }
                                            ]}).sort("last_update", -1)
     else:
@@ -615,7 +618,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
             result_cur = result_dict["result_cur"]
             result_paginated_cur = result_dict["result_cur"]
             result_pages = result_dict["result_pages"]
-
+     
         return render_to_response ("ndf/file_list_tab.html", {
                 "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
                 "resource_type": result_paginated_cur, "detail_urlname": "file_detail", 

@@ -1948,7 +1948,7 @@ def del_underscore(var):
 # which convert str to dict type & returns dict which used for rendering in template 
 def str_to_dict(str1):
     dict_format = json.loads(str1, object_pairs_hook = collections.OrderedDict)
-    keys_to_remove = ('_id','access_policy','rating', 'fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required') # keys needs to hide
+    keys_to_remove = ('_id','access_policy','rating', 'fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required','status','featured','module_set','property_order','url') # keys needs to hide
     keys_by_ids = ('member_of', 'group_set', 'collection_set','prior_node') # keys holds list of ids
     keys_by_userid = ('modified_by', 'contributors', 'created_by', 'author_set') # keys holds dada from User table
     keys_by_dict = ('attribute_set', 'relation_set')
@@ -1965,7 +1965,7 @@ def str_to_dict(str1):
                 for ids in dict_format[k]:
                         node = node_collection.one({'_id':ObjectId(ids)})
                         if node:
-                                name_list.append(str(node.name))
+                                name_list.append(node)
                                 dict_format[k] = name_list
               
       if k in keys_by_userid:
@@ -1991,8 +1991,14 @@ def str_to_dict(str1):
                       
                               for att in dict_format[k]:
                                       for k1, v1 in att.items():
-                                              att_dic[k1] = v1
-                                              dict_format[k] = att_dic    
+                                        if type(v1) == list :
+                                                str1=""
+                                                for each1 in v1:
+                                                        str1 += each1+" "
+                                                        att_dic[k1] = str1
+                                        else:
+                                                att_dic[k1] = v1
+                                                dict_format[k] = att_dic    
                       if k == "relation_set":
                               for each in dict_format[k]:
                                       for k1, v1 in each.items():
@@ -2005,8 +2011,12 @@ def str_to_dict(str1):
               filesize_dic = {}
               for k1, v1 in dict_format[k].items():
                       filesize_dic[k1] = v1
-              dict_format[k] = filesize_dic               
-    return dict_format
+              dict_format[k] = filesize_dic
+    order_dict_format = collections.OrderedDict()
+    order_val=['altnames','language','plural','_type','member_of','created_by','created_at','tags','modified_by','author_set','group_set','collection_set','contributors','last_update','start_publication','location','license','attribute_set','relation_set']
+    for each in order_val:
+            order_dict_format[each]=dict_format[each]
+    return order_dict_format
     
 
 @register.assignment_tag
