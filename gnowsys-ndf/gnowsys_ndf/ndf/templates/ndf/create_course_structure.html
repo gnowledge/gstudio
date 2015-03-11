@@ -321,7 +321,7 @@
     <input type="hidden" id="changed_names" name="changed_names">
     <input type="hidden" id="app_set_id" name="app_set_id" value="{{app_set_id}}">
     <input type="hidden" id="app_id" name="app_id" value="{{app_id}}">
-    <input type="submit" value="SUBMIT" id="submit_course_struct" class="button right inline" disabled="disabled">  
+    <input type="submit" value="SUBMIT" id="submit_course_struct" class="button right inline">  
   </form>
 {% endblock %}
 <script>
@@ -1015,7 +1015,6 @@
         }
         all_mins_set=0;
         $('#course_prop').foundation('reveal', 'close');
-        $("#submit_course_struct").removeAttr("disabled")
       }
       else{
         event.preventDefault();
