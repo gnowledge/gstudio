@@ -1993,7 +1993,7 @@ def str_to_dict(str1):
                                         if type(v1) == list :
                                                 str1=""
                                                 for each1 in v1:
-                                                        str1 +=each+" "
+                                                        str1 += each1+" "
                                                         att_dic[k1] = str1
                                         else:
                                                 att_dic[k1] = v1
