@@ -1990,8 +1990,14 @@ def str_to_dict(str1):
                       
                               for att in dict_format[k]:
                                       for k1, v1 in att.items():
-                                              att_dic[k1] = v1
-                                              dict_format[k] = att_dic    
+                                        if type(v1) == list :
+                                                str1=""
+                                                for each1 in v1:
+                                                        str1 +=each+" "
+                                                        att_dic[k1] = str1
+                                        else:
+                                                att_dic[k1] = v1
+                                                dict_format[k] = att_dic    
                       if k == "relation_set":
                               for each in dict_format[k]:
                                       for k1, v1 in each.items():
