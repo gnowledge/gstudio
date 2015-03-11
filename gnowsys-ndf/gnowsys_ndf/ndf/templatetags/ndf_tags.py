@@ -64,6 +64,7 @@ def get_site_variables():
    site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
    site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
    site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
+   site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
 
    return  site_var
 
@@ -1338,7 +1339,7 @@ def get_group_type(group_id, user):
                 # If Group is not found with either given ObjectId or name in the database
                 # Then compare with a given list of names as these were used in one of the urls
                 # And still no match found, throw error
-                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
+                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome"]:
                     error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
                     raise Http404(error_message)
 
