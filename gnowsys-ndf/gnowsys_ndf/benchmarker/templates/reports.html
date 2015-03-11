@@ -63,7 +63,11 @@
 						   <td> {{i.parameters}}</td>  
 						   <td> {{i.size_of_parameters}} </td>
 						   <td> {{i.time_taken}} </td>
-						   <td> {{i.avg}} </td>
+						   {% if i.avg %}
+						   <td> <center> {{i.avg}} </center> </td>
+						   {% else %}
+						   <td> <center> ---  </center> </td>
+						   {% endif %}
 						   </tr>
 
 						  

@@ -11,7 +11,7 @@ db = get_database()
 col = db[Benchmark.collection_name]
  
 def report(request):
- date1=datetime.date.today()
+ date1=datetime.date.today() - timedelta(2)
  ti=time(0,0)
  listofmethods = []
  Today=datetime.datetime.combine(date1,ti)
@@ -36,14 +36,17 @@ def report(request):
       if last_name != i['name']:
          total = avg/count
          count = 0
-         print "asdf",loop -1 ,int(loop) - 1
-         new_list[2].update({'avg':total})
-         
+         avg = 0
+         a = new_list.pop()
+         a.update({'avg':total})
+         new_list.append(a)
     avg = float (i['time_taken']) +avg
     count = count + 1
     last_name = i['name']
     new_list.append(i)
-    
+ a = new_list.pop()   
+ a.update({'avg':(avg/count)})
+ new_list.append(a)
  bench_cur.rewind()          
  return render_to_response("reports.html",
                            {'bench_cur':new_list,
