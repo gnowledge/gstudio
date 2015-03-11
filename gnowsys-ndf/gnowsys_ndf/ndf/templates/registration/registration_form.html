@@ -142,7 +142,7 @@
 {% block document_ready %}
   {{block.super}}
 
-  $("input[id='id_email'], input[id='id_password1'], input[id='id_password2']").each(function(){
+  $("input[id='id_email'], input[id='id_password1'], input[id='id_password2'], select[id='id_agency_type']").each(function(){
     if (this.id == "id_email") {
       $(this).prop("type", "email");
     }
