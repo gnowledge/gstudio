@@ -420,8 +420,8 @@ def version_node(request, group_id, node_id, version_no):
            except:
                 node1[i]=node1[i]		       
            
-        
-    
+        print node1['content']
+        print doc['content']
         content = node1
         content_1=doc
         
@@ -477,19 +477,21 @@ def diff_prettyHtml(diffs):
     DIFF_INSERT = 1
     DIFF_EQUAL = 0
     i = 0
+    print "the diffs",diffs
     for (op, data) in diffs:
-      text = (data.replace("&", "&amp;").replace("<", "&lt;")
-                 .replace(">", "&gt;").replace("\n", "<BR>"))
+      text = (data.replace("&", "&amp;").replace("&lt;", "<")
+                 .replace("&gt;", ">").replace("\n", "<BR>"))
+      
       if op == DIFF_INSERT:
-        html.append("<INS STYLE=\"background:#b3ffb3;\" TITLE=\"i=%i\">%s</INS>"
+        html.append("<INS STYLE='background:#b3ffb3;' TITLE='i=%i'>%s</INS>"
             % (i, text))
       elif op == DIFF_DELETE:
-        html.append("<DEL STYLE=\"background:#ffb3b3;\" TITLE=\"i=%i\">%s</DEL>"
+        html.append("<DEL STYLE='background:#ffb3b3;' TITLE='i=%i'>%s</DEL>"
             % (i, text))
       elif op == DIFF_EQUAL:
-        html.append("<SPAN TITLE=\"i=%i\">%s</SPAN>" % (i, text))
+        html.append("<SPAN TITLE='i=%i'>%s</SPAN>" % (i, text))
       if op != DIFF_DELETE:
-        i += len(data)
+        i += len(data) 
     return "".join(html)
 
 
