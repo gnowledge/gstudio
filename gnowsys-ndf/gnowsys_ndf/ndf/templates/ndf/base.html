@@ -74,7 +74,7 @@
         
         <li class="name">
             <h1>
-              <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
+              <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
             </h1>
         </li>
 
@@ -306,6 +306,7 @@
 
         <main class="row">
           {% if not is_ac_url %}
+          {% if request.path != "/welcome" %}
           <!--
           This menu-bar is meant especially for group which is selected 
           from group's dropdown visible on site-bar.
@@ -375,7 +376,6 @@
                   {% get_gapps_iconbar request groupid %}
                 {% endif %}
               <!-- END of NROER level two menu -->
-
               {% else %}
                 {% get_gapps_iconbar request groupid %}
               {% endif %}
@@ -408,7 +408,8 @@
               </ul>
             </div>
           </nav>
-          {% endif %}
+          {% endif%} <!-- end of "/welcome" landing page check -->
+          {% endif %} <!-- end of "accounts" urls check -->
 
           <!-- Start of sidebar section (main aside) -->
           <aside class="medium-2 columns">

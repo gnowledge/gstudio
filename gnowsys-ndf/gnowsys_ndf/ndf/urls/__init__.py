@@ -13,7 +13,7 @@ from jsonrpc import jsonrpc_site
 from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error
 # from gnowsys_ndf.ndf.forms import *
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
-from gnowsys_ndf.ndf.views.home import homepage
+from gnowsys_ndf.ndf.views.home import homepage, landing_page
 from gnowsys_ndf.ndf.views.methods import tag_info
 from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
 from gnowsys_ndf.ndf.views import rpc_resources
@@ -38,7 +38,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     # (r'^$', HomeRedirectView.as_view()),        
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
-    url(r'^welcome/?', TemplateView.as_view(template_name='ndf/landing_page_beta.html'), name="welcome"),
+    url(r'^welcome/?', landing_page, name="welcome"),
 
     # all main apps
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),

@@ -64,6 +64,7 @@ def get_site_variables():
    site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
    site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
    site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
+   site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
 
    return  site_var
 
@@ -419,7 +420,6 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 	# Special case used while dealing with RelationType widget
 	left_drawer_content = None
 	paged_resources = ""
-
 	if node:
 		if field == "collection":
 			if checked == "Quiz":
@@ -438,7 +438,7 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 			checked = "Module"
 			drawers, paged_resources = get_drawers(group_id, node._id, node.collection_set, checked)
 
-		elif field == "RelationType":
+		elif field == "RelationType" or field == "CourseUnits":
 			# Special case used while dealing with RelationType widget
 			if kwargs.has_key("left_drawer_content"):
 				widget_for = checked
@@ -461,21 +461,19 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 		elif field == "module":
 			checked = "Module"
 
-		elif field == "RelationType":
+		elif field == "RelationType" or field == "CourseUnits":
 			# Special case used while dealing with RelationType widget
 			if kwargs.has_key("left_drawer_content"):
 				widget_for = checked
 				checked = field
 				field = widget_for
 				left_drawer_content = kwargs["left_drawer_content"]
-
 		else:
 			# To make the collection work as Heterogenous one, by default
 			checked = None
 
-		if checked == "RelationType":
+		if checked == "RelationType" or checked == "CourseUnits" :
 			drawer1 = get_drawers(group_id, checked=checked, left_drawer_content=left_drawer_content)
-
 		else:
 			drawer1, paged_resources = get_drawers(group_id, page_no=page_no, checked=checked)
 
@@ -1338,7 +1336,7 @@ def get_group_type(group_id, user):
                 # If Group is not found with either given ObjectId or name in the database
                 # Then compare with a given list of names as these were used in one of the urls
                 # And still no match found, throw error
-                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
+                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome"]:
                     error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
                     raise Http404(error_message)
 

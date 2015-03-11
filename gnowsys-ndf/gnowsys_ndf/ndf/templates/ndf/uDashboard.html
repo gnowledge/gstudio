@@ -7,15 +7,15 @@
   <h3>{% trans "About" %}</h3>
 
   {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}<br><br>
-  <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}<b><br> 
+  <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}</b><br> 
   
    <a href="#" data-reveal-id="activity-statistics" class="tiny round button">
       {% trans "Activity Ratings" %}
     </a>
 
-    <div class="medium reveal-modal" id="activity-statistics" data-reveal>
+    <div class="small reveal-modal" id="activity-statistics" data-reveal>
       {% include "ndf/file_statistics.html" %}
-      <a class="close-reveal-modal">&#215;</a>
+      <a href="#" class="close-reveal-modal">&#215;</a>
     </div>
 
    
@@ -73,7 +73,7 @@
     			{% if user.is_authenticated %}
     				{% if prof_pic_obj %}
               <div class="div-height">
-    					<img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height">
+    					<img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
               </div>
 
     				{% else %}
@@ -152,9 +152,6 @@
     {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
     <dd ><a href="#Activity" id="p3">My Activities </a></dd>			
     <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
-       
-    
-    
   </dl>
 
   <!-- Tab views -->
@@ -336,13 +333,14 @@
     		{% if dashboard_count.activity > 10 %}
         	<div class="row">
         		<div class="small-12 columns" align="right">
-         			<h6> <a href="{% url 'user_activity' group_id %}"> Show More.. <a></h6>
+         			<h6> <a href="{% url 'user_activity' group_id %}"> Show More.. </a></h6>
         		</div>
         	</div>
     		{% endif %}
       </ul>
     </div>
   </div>
+
 {% endblock %}
 
 {% block script %}
@@ -355,8 +353,8 @@
     		$li.filter(function() {    		    		
       			return $(this).text().toLowerCase().indexOf(search) >= 0;
     		}).show();
-  		});
-    });
+  	});
+  });
 
   $("#btnUploadProfilePic").click(function() {
     $("#docFile").trigger("click");

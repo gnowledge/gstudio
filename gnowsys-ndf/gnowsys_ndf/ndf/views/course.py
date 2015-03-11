@@ -184,7 +184,6 @@ def course_detail(request, group_id, _id):
                                   context_instance = RequestContext(request)
         )
 
-
 @login_required
 def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
@@ -726,7 +725,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   at_cs_min_marks = node_collection.one({'_type':'AttributeType', 'name':'min_marks'})
   at_cs_max_marks = node_collection.one({'_type':'AttributeType', 'name':'max_marks'})
 
-  if app_set_instance_id :
+  if app_set_instance_id:
     template = "ndf/course_details.html"
 
     node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
@@ -738,7 +737,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     # Course structure as list of dicts
     for eachcs in node.collection_set:
       cs_dict = {}
-
       coll_node_cs = node_collection.one({'_id': ObjectId(eachcs), 'member_of':cs_gst._id}, {'name':1, 'collection_set':1})
       if coll_node_cs:
           cs_dict[coll_node_cs.name] = []
@@ -875,6 +873,8 @@ def create_course_struct(request, group_id,node_id):
         for eachattr in coll_node_css.attribute_set:
           for eachk,eachv in eachattr.items():
             css_dict[coll_node_css.name][eachk] = eachv
+          if coll_node_css.collection_set:
+            css_dict[coll_node_css.name]["resources"] = coll_node_css.collection_set
         cs_dict[coll_node_cs.name].append(css_dict)
     
     if course_collection_list:
@@ -890,7 +890,7 @@ def create_course_struct(request, group_id,node_id):
     # else:
     #     eval_type_flag = False
 
-    if request.method=="POST":
+    if request.method == "POST":
         listdict = request.POST.get("course_sec_dict_ele","")
         changed_names = request.POST.get("changed_names","")
         listdict = json.loads(listdict)
@@ -941,6 +941,9 @@ def create_course_struct(request, group_id,node_id):
                       create_gattribute(css_new._id,at_cs_min_marks,int(propv))
                     elif(propk=="max_marks"):
                       create_gattribute(css_new._id,at_cs_max_marks,int(propv))
+                    elif(propk=="resources"):
+                      node_collection.collection.update({'_id':css_new._id},{'$set':{'collection_set':propv}},upsert=False,multi=False)
+                      css_new.reload()
               #append CSS to CS
               node_collection.collection.update({'_id':cs_new._id},{'$set':{'collection_set':css_ids}},upsert=False,multi=False)
             course_node_coll_set = course_node.collection_set
@@ -999,8 +1002,9 @@ def create_course_struct(request, group_id,node_id):
                             create_gattribute(css_node._id,at_cs_min_marks,int(propv))
                           elif(propk==u"max_marks"):
                             create_gattribute(css_node._id,at_cs_max_marks,int(propv))
-
-
+                          elif(propk=="resources"):
+                            node_collection.collection.update({'_id':css_node._id},{'$set':{'collection_set':propv}},upsert=False,multi=False)
+                            css_node.reload()
                         css_reorder_ids.append(css_node._id)
                       else:
                         #create new css in existing cs
@@ -1025,6 +1029,9 @@ def create_course_struct(request, group_id,node_id):
                             create_gattribute(css_new._id,at_cs_min_marks,int(propv))
                           elif(propk==u"max_marks"):
                             create_gattribute(css_new._id,at_cs_max_marks,int(propv))
+                          elif(propk=="resources"):
+                            node_collection.collection.update({'_id':css_new._id},{'$set':{'collection_set':propv}},upsert=False,multi=False)
+                            css_new.reload()
                         css_reorder_ids.append(css_new._id)
 
                         #add to cs collection_set
@@ -1073,7 +1080,9 @@ def create_course_struct(request, group_id,node_id):
                           create_gattribute(css_new._id,at_cs_min_marks,int(propv))
                         elif(propk==u"max_marks"):
                           create_gattribute(css_new._id,at_cs_max_marks,int(propv))
-
+                        elif(propk=="resources"):
+                          node_collection.collection.update({'_id':css_new._id},{'$set':{'collection_set':propv}},upsert=False,multi=False)
+                          css_new.reload()
                     #add to cs collection_set
                     node_collection.collection.update({'_id':cs_new._id},{'$push':{'collection_set':css_new._id}},upsert=False,multi=False)
             course_node_coll_set = course_node.collection_set
@@ -1087,7 +1096,7 @@ def create_course_struct(request, group_id,node_id):
         app_set_id = request.POST.get("app_set_id","")
 
         return HttpResponseRedirect(reverse('mis:mis_app_instance_detail',kwargs={'group_id':group_id,'app_id':app_id,'app_set_id':app_set_id,'app_set_instance_id':course_node._id}))
-    elif request.method=="GET":
+    elif request.method == "GET":
       app_id = request.GET.get("app_id","")
       app_set_id = request.GET.get("app_set_id","")
 
@@ -1107,3 +1116,9 @@ def create_course_struct(request, group_id,node_id):
                                   },
                                   context_instance = RequestContext(request)
         )
+
+@login_required
+def add_units(request,group_id):
+    return render_to_response("ndf/course_units.html",
+                              context_instance = RequestContext(request)
+    )

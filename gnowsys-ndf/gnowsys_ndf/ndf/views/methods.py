@@ -246,11 +246,12 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
     dict_drawer = {}
     dict1 = {}
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
+    filtering = []
 
     drawer = None    
-
     if checked:
-      filtering = filter_drawer_nodes(nid, group_id)
+      if nid:
+        filtering = filter_drawer_nodes(nid, group_id)
 
       if checked == "Page":
         gst_page_id = node_collection.one({'_type': "GSystemType", 'name': "Page"})._id
@@ -309,14 +310,13 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
       elif checked == "Topic":
         drawer = node_collection.find({'_type': {'$in' : [u"GSystem", u"File"]}, '_id': {'$nin': filtering},'member_of':{'$nin':[theme_GST._id, theme_item_GST._id, topic_GST._id]},'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "RelationType":
+      elif checked == "RelationType" or checked == "CourseUnits":
         # Special case used while dealing with RelationType widget
         if kwargs.has_key("left_drawer_content"):
           drawer = kwargs["left_drawer_content"]
-
     else:
       # For heterogeneous collection
-      if checked == "RelationType":
+      if checked == "RelationType" or checked == "CourseUnits":
         # Special case used while dealing with RelationType widget
         drawer = checked
 
@@ -329,11 +329,9 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
                                        '_id': {'$nin': filtering},'group_set': {'$all': [ObjectId(group_id)]}, 
                                        'member_of':{'$in':[Page._id,File._id,Quiz._id]}
                                       })
-
-    if checked != "RelationType":
-      paged_resources = paginator.Paginator(drawer, page_no, 10)
-      drawer.rewind()
-    
+    if checked != "RelationType" and checked != "CourseUnits":
+        paged_resources = paginator.Paginator(drawer, page_no, 10)
+        drawer.rewind()
 
     if (nid is None) and (not nlist):
       for each in drawer:
@@ -350,7 +348,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
-    
+
     else:
       for each in drawer:
 
@@ -361,15 +359,14 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
       for oid in nlist: 
         obj = node_collection.one({'_id': oid})
         dict2.append(obj)
-      
+
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
 
-    if checked == "RelationType":
+    if checked == "RelationType" or checked == "CourseUnits":
       return dict_drawer
 
     else:
-
       return dict_drawer, paged_resources
 
 
