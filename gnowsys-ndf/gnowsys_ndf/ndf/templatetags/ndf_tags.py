@@ -1947,7 +1947,7 @@ def del_underscore(var):
 # which convert str to dict type & returns dict which used for rendering in template 
 def str_to_dict(str1):
     dict_format = json.loads(str1, object_pairs_hook = collections.OrderedDict)
-    keys_to_remove = ('_id','access_policy','rating', 'fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required','status','featured','module_set','property_order') # keys needs to hide
+    keys_to_remove = ('_id','access_policy','rating', 'fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required','status','featured','module_set','property_order','url') # keys needs to hide
     keys_by_ids = ('member_of', 'group_set', 'collection_set','prior_node') # keys holds list of ids
     keys_by_userid = ('modified_by', 'contributors', 'created_by', 'author_set') # keys holds dada from User table
     keys_by_dict = ('attribute_set', 'relation_set')
@@ -2006,7 +2006,7 @@ def str_to_dict(str1):
                       filesize_dic[k1] = v1
               dict_format[k] = filesize_dic
     order_dict_format = collections.OrderedDict()
-    order_val=['altnames','language','plural','_type','member_of','created_by','created_at','tags','modified_by','author_set','group_set','collection_set','contributors','last_update','start_publication','location','url','license','attribute_set','relation_set']
+    order_val=['altnames','language','plural','_type','member_of','created_by','created_at','tags','modified_by','author_set','group_set','collection_set','contributors','last_update','start_publication','location','license','attribute_set','relation_set']
     for each in order_val:
             order_dict_format[each]=dict_format[each]
     return order_dict_format

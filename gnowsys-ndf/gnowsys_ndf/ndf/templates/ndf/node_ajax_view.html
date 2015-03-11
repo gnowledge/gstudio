@@ -6,7 +6,13 @@
 <script type="text/javascript">
   $(document).foundation();
 </script>
-
+<script>
+$(document).ready(function() {
+    $('#panel1a').dataTable( {
+        "scrollX": true
+    } );
+} );
+</script>
 {% block head %}
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -242,7 +248,10 @@ ul#navigation li a.last {
     color: #10c1cb;
  }
 
-
+table {
+  display: block;
+  overflow-y: scroll;
+}
 </style>
 
 
@@ -852,7 +861,7 @@ ul#navigation li a.last {
        <dd class="accordion-navigation">
        <a href="#panel1a" style="font-color:blue">Overview</a>
        <div id="panel1a" class="content active">
-	 <table align ="center" style="width:80%; border-width:0px;" >
+	 <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 230px;">
 	  <tbody>
 	   
 	    {% get_json node.pk as jsonobj %}
@@ -873,12 +882,7 @@ ul#navigation li a.last {
 		{{each.name}}</br>
 	    	{% endfor %}
 		{% else %}
-		{% if key == "url" %}
-		<a href ="{{value}}">{{value}}</a>
-		{% endif %}
-		{% if key != "url" %}
 		{{value}}
-		{% endif %}
 		{% endif %}
 	      </td>
 	      {% else %}	     
@@ -894,7 +898,7 @@ ul#navigation li a.last {
 <dd class="accordion-navigation">
     <a href="#panel2a">Collection Set</a>
     <div id="panel2a" class="content">
-      <table align ="center" style="width:80%; border-width:0px;" >
+      <table align ="center" style="width:80%; border-width:0px; height: 200px;" >
 	<tbody>
 	   {% get_json node.pk as jsonobj %}
 	   {% str_to_dict jsonobj as obj %}
@@ -908,6 +912,7 @@ ul#navigation li a.last {
 		</tr>
 		{% endfor %}
 	        {% else %}
+	    
 	      No Collections associted with {{node.name}} resource.
 	    {% endif %}
 		{% endif %}
