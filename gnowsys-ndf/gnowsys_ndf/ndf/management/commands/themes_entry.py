@@ -32,7 +32,7 @@ theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme' })
 theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item' })
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 br_topic = node_collection.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
-
+nroer_team=User.objects.get(username="nroer_team")
 #grp = collection.Node.one({'_type': 'Group', '_id': ObjectId('53747277c1704121fe54be46')})
 grp = node_collection.one({'_type': 'Group', 'name': 'home'})
 
@@ -105,11 +105,11 @@ def create_theme(obj):
 		theme_node.name = unicode(name).strip()
 		theme_node.access_policy = u"PUBLIC"
 		theme_node.contributors.append(1)
-		theme_node.created_by = 1
+		theme_node.created_by = nroer_team.id
 		theme_node.group_set.append(group_id)
 		theme_node.language = u"en"
 		theme_node.member_of.append(theme_GST._id)
-		theme_node.modified_by = 1
+		theme_node.modified_by = nroer_team.id
 		theme_node.status = u"DRAFT"
 
 		theme_node.save()
@@ -159,11 +159,11 @@ def create_theme_item(obj, prev, row):
 		theme_item_node.name = unicode(obj).strip()
 		theme_item_node.access_policy = u"PUBLIC"
 		theme_item_node.contributors.append(1)
-		theme_item_node.created_by = 1
+		theme_item_node.created_by = nroer_team.id
 		theme_item_node.group_set.append(group_id)
 		theme_item_node.language = u"en"
 		theme_item_node.member_of.append(theme_item_GST._id)
-		theme_item_node.modified_by = 1
+		theme_item_node.modified_by = nroer_team.id
 		theme_item_node.status = u"DRAFT"
 
 		theme_item_node.save()
@@ -215,11 +215,11 @@ def create_topic(obj, prev, row):
 		topic_node.name = unicode(obj).strip()
 		topic_node.access_policy = u"PUBLIC"
 		topic_node.contributors.append(1)
-		topic_node.created_by = 1
+		topic_node.created_by = nroer_team.id
 		topic_node.group_set.append(group_id)
 		topic_node.language = u"en"
 		topic_node.member_of.append(topic_GST._id)
-		topic_node.modified_by = 1
+		topic_node.modified_by = nroer_team.id
 		topic_node.status = u"DRAFT"
 
 		topic_node.save()
