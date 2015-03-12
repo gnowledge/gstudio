@@ -175,7 +175,7 @@ def group(request, group_id, app_id=None, agency_type=None):
                                'groupid': group_id, 'group_id': group_id
                               }, context_instance=RequestContext(request))
 
-
+@login_required
 def create_group(request,group_id):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
@@ -281,7 +281,7 @@ def create_group(request,group_id):
 #     print "frhome--",groupobj
 #     return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'user':request.user,'curgroup':groupobj},context_instance=RequestContext(request))
 
-
+@login_required
 def populate_list_of_members():
 	members = User.objects.all()
 	memList = []
@@ -289,6 +289,7 @@ def populate_list_of_members():
 		memList.append(mem.username)	
 	return memList
 
+@login_required
 def populate_list_of_group_members(group_id):
     try :
       try:
@@ -434,6 +435,7 @@ def edit_group(request,group_id):
                                     context_instance=RequestContext(request)
                                     )
 
+@login_required
 def app_selection(request,group_id):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
@@ -533,7 +535,7 @@ def switch_group(request,group_id,node_id):
     print "Exception in switch_group"+str(e)
     return HttpResponse("Failure")
 
-
+@login_required
 def publish_group(request,group_id,node):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
@@ -567,7 +569,7 @@ def publish_group(request,group_id,node):
                                   context_instance=RequestContext(request)
                               )
 
-
+@login_required
 def create_sub_group(request,group_id):
   try:
       ins_objectid  = ObjectId()
