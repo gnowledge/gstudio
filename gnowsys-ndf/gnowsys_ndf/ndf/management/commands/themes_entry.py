@@ -32,7 +32,7 @@ theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme' })
 theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item' })
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 br_topic = node_collection.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
-nroer_team=User.objects.get(username="nroer_team")
+nroer_team=User.objects.get(username = "nroer_team")
 #grp = collection.Node.one({'_type': 'Group', '_id': ObjectId('53747277c1704121fe54be46')})
 grp = node_collection.one({'_type': 'Group', 'name': 'home'})
 
