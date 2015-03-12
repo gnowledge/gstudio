@@ -37,6 +37,8 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
+
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 
@@ -45,7 +47,6 @@ from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 # from gnowsys_ndf.ndf.org2any import org2html
 
 ##############################################################################
-
 
 SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files/nroer_ebooks_csv")
 EBOOKS_ROOT = os.path.expanduser("~") + "/nroer_ebooks/"
@@ -58,16 +59,12 @@ log_list = []  # To hold intermediate errors
 
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
-collection = get_database()[Node.collection_name]
-file_collection = get_database()[File.collection_name]
-fs_files_collection = get_database()['fs.files']
-
-file_gst = collection.GSystemType.one({"name": "File"})
-home_group = collection.Group.one({"name": "home", "_type": "Group"})
-theme_gst = collection.GSystemType.one({"name": "Theme"})
-theme_item_gst = collection.GSystemType.one({"name": "theme_item"})
-topic_gst = collection.GSystemType.one({"name": "Topic"})
-GST_IMAGE = collection.GSystemType.one({'name': 'Image', '_type': 'GSystemType'})
+file_gst = node_collection.one({"name": "File"})
+home_group = node_collection.one({"name": "home", "_type": "Group"})
+theme_gst = node_collection.one({"name": "Theme"})
+theme_item_gst = node_collection.one({"name": "theme_item"})
+topic_gst = node_collection.one({"name": "Topic"})
+GST_IMAGE = node_collection.one({'name': 'Image', '_type': 'GSystemType'})
 nroer_team_id = 1
 
 class Command(BaseCommand):
@@ -108,7 +105,7 @@ class Command(BaseCommand):
                                     total_rows += 1
                                     json_file_content.append(row)
 
-                                info_message = "\n- File '" + file_name + "' contains : " + str(total_rows) + " entries/rows (excluding top-header/column-names)." 
+                                info_message = "\n- File '" + file_name + "' contains : [ " + str(total_rows) + " ] entries/rows (excluding top-header/column-names)." 
                                 print info_message
                                 log_list.append(str(info_message))
 
@@ -282,7 +279,7 @@ def parse_data_create_gsystem(json_file_path):
         json_documents_list = json.loads(json_file_content)
 
         # Process data in proper format
-        node = collection.File()
+        node = node_collection.collection.File()
         node_keys = node.keys()
         node_structure = node.structure
 
@@ -378,25 +375,9 @@ def parse_data_create_gsystem(json_file_path):
                         parsed_json_document[parsed_key] = [file_gst._id]
                         # print parsed_json_document[parsed_key]
                       
-                      # --- END of adding the default field values
-
-                    # processing for remaining fields
-                    # elif node_structure[parsed_key] == unicode:
-                    #     parsed_json_document[parsed_key] = unicode(json_document[key])
-                    # elif node_structure[parsed_key] == basestring:
-                    #     parsed_json_document[parsed_key] = str(json_document[key])
-                    # elif (node_structure[parsed_key] == int) and (type(json_document[key]) == int):
-                    #     parsed_json_document[parsed_key] = int(json_document[key])
-                    # elif node_structure[parsed_key] == bool: # converting unicode to int and then to bool
-                    #     parsed_json_document[parsed_key] = bool(int(json_document[key]))
-                    #   # elif node_structure[parsed_key] == list:
-                    #     # parsed_json_document[parsed_key] = list(json_document[key])
-                    # elif node_structure[parsed_key] == datetime.datetime:
-                    #    parsed_json_document[parsed_key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
                     else:
                         # parsed_json_document[parsed_key] = json_document[key]
                         parsed_json_document[parsed_key] = cast_to_data_type(json_document[key], node_structure.get(parsed_key))
-
 
                     # --- END of processing for remaining fields
 
@@ -411,7 +392,7 @@ def parse_data_create_gsystem(json_file_path):
             # starting processing for the attributes and relations saving
             if isinstance(nodeid, ObjectId) and attribute_relation_list:
 
-                node = collection.Node.one({ "_id": ObjectId(nodeid) })
+                node = node_collection.one({ "_id": ObjectId(nodeid) })
 
                 gst_possible_attributes_dict = node.get_possible_attributes(file_gst._id)
                 # print gst_possible_attributes_dict
@@ -503,7 +484,7 @@ def parse_data_create_gsystem(json_file_path):
 
                                 subject_id = node._id
                                 # print "\n-----\nsubject_id: ", subject_id
-                                attribute_type_node = collection.Node.one({'_type': "AttributeType", 
+                                attribute_type_node = node_collection.one({'_type': "AttributeType", 
                                                    '$or': [{'name': {'$regex': "^"+attr_key+"$", '$options': 'i'}}, 
                                                    {'altnames': {'$regex': "^"+attr_key+"$", '$options': 'i'}}]
                                                    })
@@ -571,14 +552,14 @@ def parse_data_create_gsystem(json_file_path):
                             try:
 
                               if oid:
-                                curr_oid = collection.GSystem.one({ "_id": oid })
+                                curr_oid = node_collection.one({ "_id": oid })
                                 # print "curr_oid._id", curr_oid._id
 
                               else:
-                                curr_oid = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
 
                               if curr_oid:
-                                next_oid = collection.GSystem.one({ 
+                                next_oid = node_collection.one({ 
                                                           "name": hier_list[1],
                                                           'group_set': {'$all': [ObjectId(home_group._id)]},
                                                           'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
@@ -655,7 +636,7 @@ def parse_data_create_gsystem(json_file_path):
                           if file_gst.type_of:
                               rel_subject_type.extend(file_gst.type_of)
 
-                          relation_type_node = collection.Node.one({'_type': "RelationType", 
+                          relation_type_node = node_collection.one({'_type': "RelationType", 
                                                                     '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
                                                                             {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
                                                                     'subject_type': {'$in': rel_subject_type}
@@ -664,7 +645,7 @@ def parse_data_create_gsystem(json_file_path):
                           right_subject_id_or_list = []
                           right_subject_id_or_list.append(ObjectId(right_subject_id))
                           
-                          nodes = collection.Triple.find({'_type': "GRelation", 
+                          nodes = triple_collection.find({'_type': "GRelation", 
                                       'subject': subject_id, 
                                       'relation_type.$id': relation_type_node._id
                                     })
@@ -755,9 +736,9 @@ def check_folder_exists(resource_link, base_folder_name):
                     files.name = cover_page_name # as per requirements in save_file()
 
                     filemd5 = hashlib.md5(files.read()).hexdigest()
-                    fileobj = file_collection.File()
+                    fileobj = node_collection.collection.File()
 
-                    if fileobj.fs.files.exists({"md5":filemd5}):
+                    if fileobj.fs.files.exists({"md5": filemd5}):
                         info_message = "\n- Cover page resource exists in DB: '" + str(cur_oid._id) + "'"
                         print info_message
                         log_list.append(str(info_message))
@@ -796,10 +777,10 @@ def check_folder_exists(resource_link, base_folder_name):
             files.name = resource_code + "dd.zip" # as per requirements in save_file()
 
             filemd5 = hashlib.md5(files.read()).hexdigest()
-            fileobj = file_collection.File()
+            fileobj = node_collection.collection.File()
 
-            if fileobj.fs.files.exists({"md5":filemd5}):
-                gridfs_obj_by_md5 = fs_files_collection.find_one({"md5":filemd5})
+            if fileobj.fs.files.exists({"md5": filemd5}):
+                gridfs_obj_by_md5 = gridfs_collection.find_one({"md5":filemd5})
                 
                 check_obj_by_name_n_fs_ids = collection.File.find_one({
                                         "_type":"File", 
@@ -826,7 +807,7 @@ def check_folder_exists(resource_link, base_folder_name):
             if fileobj_oid and cover_page_oid:
 
                 update_url_field(fileobj_oid, resource_code + "dd.zip")
-                relation_type_node = collection.Node.one({'_type': "RelationType", 'name': "has_cover_page", 'subject_type': {'$in': [file_gst._id]} })
+                relation_type_node = node_collection.one({'_type': "RelationType", 'name': "has_cover_page", 'subject_type': {'$in': [file_gst._id]} })
                 gr_node = create_grelation(fileobj_oid, relation_type_node, cover_page_oid)
 
                 if gr_node:
@@ -901,13 +882,13 @@ def create_resource_gsystem(resource_data):
 
     filemd5 = hashlib.md5(files.read()).hexdigest()
     
-    fileobj = file_collection.File()
+    fileobj = node_collection.collection.File()
 
-    if fileobj.fs.files.exists({"md5":filemd5}):
+    if fileobj.fs.files.exists({"md5":filemd5}): 
 
-        gridfs_obj_by_md5 = fs_files_collection.find_one({"md5":filemd5})
+        gridfs_obj_by_md5 = gridfs_collection.find_one({"md5":filemd5})
         
-        check_obj_by_name_n_fs_ids = collection.File.find_one({
+        check_obj_by_name_n_fs_ids = node_collection.find_one({
                                         "_type":"File", 
                                         'member_of': {'$all': [ObjectId(file_gst._id)]},
                                         'group_set': {'$all': [ObjectId(home_group._id)]},
@@ -942,7 +923,7 @@ def create_resource_gsystem(resource_data):
             resource_data["featured"] = True if (resource_data["featured"] == 1) else False
 
             # adding remaining fields
-            collection.update(
+            node_collection.collection.update(
                                 {"_id": fileobj_oid},
                                 {'$set': 
                                     {
@@ -983,7 +964,7 @@ def update_url_field(oid, name):
     url = "http://" + str(current_site.domain) + "/" + home_group.name.replace(" ","%20").encode('utf8') + "/file/readDoc/" + oid.__str__() + "/" + str(name)
 
     # adding remaining fields
-    collection.update({"_id": oid}, {'$set': {'url': unicode(url)} }, upsert=False, multi=False )
+    node_collection.collection.update({"_id": oid}, {'$set': {'url': unicode(url)} }, upsert=False, multi=False )
 
     return "[[" + url + "]]"
 

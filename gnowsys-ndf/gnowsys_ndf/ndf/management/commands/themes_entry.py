@@ -28,13 +28,13 @@ SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files")
 
 collection = get_database()[Node.collection_name]
 
-theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme' })
-theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item' })
-topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-br_topic = collection.Node.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
-
+theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme' })
+theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item' })
+topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+br_topic = node_collection.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
+nroer_team=User.objects.get(username = "nroer_team")
 #grp = collection.Node.one({'_type': 'Group', '_id': ObjectId('53747277c1704121fe54be46')})
-grp = collection.Node.one({'_type': 'Group', 'name': 'home'})
+grp = node_collection.one({'_type': 'Group', 'name': 'home'})
 
 if grp:
 	group_id = grp._id
@@ -93,7 +93,7 @@ def create_theme(obj):
 	themes_list = []
 
 	# To find the root themes to maintain the uniquness while creating new themes
-	nodes = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+	nodes = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 	for each in nodes:
 		themes_list.append(each.name)
 
@@ -101,15 +101,15 @@ def create_theme(obj):
 	if obj not in themes_list:
 		name = obj
 
-		theme_node = collection.GSystem()
+		theme_node = node_collection.collection.GSystem()
 		theme_node.name = unicode(name).strip()
 		theme_node.access_policy = u"PUBLIC"
 		theme_node.contributors.append(1)
-		theme_node.created_by = 1
+		theme_node.created_by = nroer_team.id
 		theme_node.group_set.append(group_id)
 		theme_node.language = u"en"
 		theme_node.member_of.append(theme_GST._id)
-		theme_node.modified_by = 1
+		theme_node.modified_by = nroer_team.id
 		theme_node.status = u"DRAFT"
 
 		theme_node.save()
@@ -128,13 +128,13 @@ def create_theme_item(obj, prev, row):
 
 	if prev:
 		# To find the prev item in a row as its already created 
-		prev_node_cur = collection.GSystem.find({'name': unicode(prev),'group_set': group_id, 'member_of': {'$in': [ theme_item_GST._id, theme_GST._id]}  })	
+		prev_node_cur = node_collection.find({'name': unicode(prev),'group_set': group_id, 'member_of': {'$in': [ theme_item_GST._id, theme_GST._id]}  })	
 
 		# To identify the exact prev element and its hierarchy level of theme item when we found multiple results of same theme item
 		if prev_node_cur.count() > 1:
 			for each in prev_node_cur:
 				# This will return the pre-prev node in the hierarchy level of incoming prev node
-				pre_prev_node = collection.Node.one({'collection_set': ObjectId(each._id) })
+				pre_prev_node = node_collection.one({'collection_set': ObjectId(each._id) })
 				# if prev node is the theme item of pre-prev node, then we found the exact hierarchy level.
 				if pre_prev_node.name == pre_prev_name:
 					prev_node_list.append(each)
@@ -149,21 +149,21 @@ def create_theme_item(obj, prev, row):
 		# To find the uniqueness of incoming obj in its prev node's hierarchy level 
 		if prev_node.collection_set:
 			for item in prev_node.collection_set:
-				theme_item = collection.Node.one({'_id': ObjectId(item) })
+				theme_item = node_collection.one({'_id': ObjectId(item) })
 				theme_items_list.append(theme_item.name)				
 
 
 	if obj not in theme_items_list:
 		# Save the theme item 
-		theme_item_node = collection.GSystem()
+		theme_item_node = node_collection.collection.GSystem()
 		theme_item_node.name = unicode(obj).strip()
 		theme_item_node.access_policy = u"PUBLIC"
 		theme_item_node.contributors.append(1)
-		theme_item_node.created_by = 1
+		theme_item_node.created_by = nroer_team.id
 		theme_item_node.group_set.append(group_id)
 		theme_item_node.language = u"en"
 		theme_item_node.member_of.append(theme_item_GST._id)
-		theme_item_node.modified_by = 1
+		theme_item_node.modified_by = nroer_team.id
 		theme_item_node.status = u"DRAFT"
 
 		theme_item_node.save()
@@ -185,13 +185,13 @@ def create_topic(obj, prev, row):
 
 	if prev:
 		# To find the prev item in a row as its already created 
-		prev_node_cur = collection.GSystem.find({'name': unicode(prev),'group_set': group_id, 'member_of': {'$in': [ theme_item_GST._id, theme_GST._id]}  })
+		prev_node_cur = node_collection.find({'name': unicode(prev),'group_set': group_id, 'member_of': {'$in': [ theme_item_GST._id, theme_GST._id]}  })
 		
 		# To identify the exact prev element and its hierarchy level of theme item when we found multiple results of same theme item
 		if prev_node_cur.count() > 1:
 			for each in prev_node_cur:
 				# This will return the pre-prev node in the hierarchy level of incoming prev node
-				pre_prev_node = collection.Node.one({'collection_set': ObjectId(each._id) })
+				pre_prev_node = node_collection.one({'collection_set': ObjectId(each._id) })
 				# if prev node is the theme item of pre-prev node, then we found the exact hierarchy level.
 				if pre_prev_node.name == pre_prev_name:
 					prev_node_list.append(each)
@@ -205,21 +205,21 @@ def create_topic(obj, prev, row):
 		# To find the uniqueness of incoming obj in its prev node's hierarchy level 
 		if prev_node.collection_set:
 			for item in prev_node.collection_set:
-				theme_item = collection.Node.one({'_id': ObjectId(item) })
+				theme_item = node_collection.one({'_id': ObjectId(item) })
 				theme_items_list.append(theme_item.name)
 
 
 	if obj not in theme_items_list:
 		# Save the topic 
-		topic_node = collection.GSystem()
+		topic_node = node_collection.collection.GSystem()
 		topic_node.name = unicode(obj).strip()
 		topic_node.access_policy = u"PUBLIC"
 		topic_node.contributors.append(1)
-		topic_node.created_by = 1
+		topic_node.created_by = nroer_team.id
 		topic_node.group_set.append(group_id)
 		topic_node.language = u"en"
 		topic_node.member_of.append(topic_GST._id)
-		topic_node.modified_by = 1
+		topic_node.modified_by = nroer_team.id
 		topic_node.status = u"DRAFT"
 
 		topic_node.save()
