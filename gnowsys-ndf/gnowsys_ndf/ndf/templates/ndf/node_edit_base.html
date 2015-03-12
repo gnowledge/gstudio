@@ -901,7 +901,7 @@ $(document).ready(function(){
 	    var nodes = {{nodes_list|safe}} 
 	    condition_result_var = true;
 	    {% if node %}
-	    	condition_result_var = (name != old_name)
+	    	condition_result_var = (name == old_name)
 	    {% endif %}
 
     	if (condition_result_var && name != "")
