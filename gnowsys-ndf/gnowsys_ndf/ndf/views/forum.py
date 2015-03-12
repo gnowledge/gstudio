@@ -244,7 +244,7 @@ def create_forum(request,group_id):
 
     nodes_list = []
     for each in available_nodes:
-      nodes_list.append(each.name)
+      nodes_list.append(str((each.name).strip().lower()))
 
     return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
@@ -358,7 +358,8 @@ def edit_forum(request,group_id,forum_id):
 
     nodes_list = []
     for each in available_nodes:
-      nodes_list.append(each.name)
+      nodes_list.append(str((each.name).strip().lower()))
+
     return render_to_response("ndf/edit_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list,'forum':forum},RequestContext(request))
 
 
