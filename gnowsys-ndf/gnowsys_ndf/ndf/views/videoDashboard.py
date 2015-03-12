@@ -163,16 +163,21 @@ def video_edit(request,group_id,_id):
 		assesses_list=assesses_list.split(",")
 					
 	create_grelation_list(vid_node._id,"assesses",assesses_list)
-        
+
 
         return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
+    vid_col = node_collection.find({'member_of': GST_VIDEO._id})
+    nodes_list = []
+    for each in vid_col:
+      nodes_list.append(str((each.name).strip().lower()))
         
     else:
         return render_to_response("ndf/video_edit.html",
                                   { 'node': vid_node, 'title': title,
                                     'group_id': group_id,
                                     'groupid':group_id,
-                                    'video_obj':video_obj
+                                    'video_obj':video_obj,
+                                    'nodes_list':nodes_list
                                 },
                                   context_instance=RequestContext(request)
                               )
