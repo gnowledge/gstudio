@@ -426,10 +426,17 @@ def edit_group(request,group_id):
     if page_node.status == u"DRAFT":
       page_node, ver = get_page(request, page_node)
       page_node.get_neighbourhood(page_node.member_of) 
+
+  available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+  nodes_list = []
+  for each in available_nodes:
+      nodes_list.append(str((each.name).strip().lower()))
+
   return render_to_response("ndf/edit_group.html",
                                     { 'node': page_node,'title':title,
                                       'appId':app._id,
                                       'groupid':group_id,
+                                      'nodes_list': nodes_list,
                                       'group_id':group_id
                                       },
                                     context_instance=RequestContext(request)

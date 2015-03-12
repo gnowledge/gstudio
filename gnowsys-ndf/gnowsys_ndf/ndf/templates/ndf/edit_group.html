@@ -225,18 +225,15 @@ ul#graph-hover.f-dropdown{
 
 
        </div>
-    
-
 </dd>
 </dl>
-
 
 {{ block.super }}
 {% endblock %}
 
-
 {% block script %}
 var datas= ""
+var old_group_name;
 $(document).on('click',"#app_selected",function(){
 $('#mySystemtype #collection_set_drawer1').html("");
  $('#mySystemtype #collection_set_drawer2').html("");
@@ -348,5 +345,34 @@ $("#status").html(result);
 
 {% else %}
 {% endifequal %}
+
+
+$("#form-edit-node").submit(function(event){
+  var name = $("#name_id").val().trim().toLowerCase();
+  var nodes = {{nodes_list|safe}} 
+
+  if (name != old_group_name && name != "")
+  {
+    if (nodes.indexOf(name) != -1)  
+    { 
+      $("#message").css("display", "block");
+      $("#message").text("Group '"+ name +"' already exist. Please choose another name");
+      event.preventDefault();
+    }
+  }
+  else if (name == ""){
+    $("#message").css("display", "block");
+    $("#message").text("Group name cannot be empty.");
+    event.preventDefault();
+  }
+  else
+  {
+    $("#message").css("display", "none");
+  }
+})
 {% endblock %}
 
+
+{% block document_ready %}
+  old_group_name = $("#name_id").val()
+{% endblock %}
