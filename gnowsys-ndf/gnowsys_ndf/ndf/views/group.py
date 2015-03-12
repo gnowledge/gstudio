@@ -393,6 +393,7 @@ def group_dashboard(request,group_id=None):
 @login_required
 def edit_group(request,group_id):
   ins_objectid  = ObjectId()
+  is_auth_node = False
   if ins_objectid.is_valid(group_id) is False :
     group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -402,10 +403,10 @@ def edit_group(request,group_id):
       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
+        is_auth_node = True
 
   else:
     pass
-
   page_node = node_collection.one({"_id": ObjectId(group_id)})
   title = gst_group.name
   if request.method == "POST":
@@ -437,7 +438,8 @@ def edit_group(request,group_id):
                                       'appId':app._id,
                                       'groupid':group_id,
                                       'nodes_list': nodes_list,
-                                      'group_id':group_id
+                                      'group_id':group_id,
+                                      'is_auth_node':is_auth_node
                                       },
                                     context_instance=RequestContext(request)
                                     )

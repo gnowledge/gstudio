@@ -498,6 +498,9 @@ $(document).ready(function(){
 	} 
 	{% if node %}
 		old_name = "{{node.name}}"
+		{% if is_auth_node %}
+			$("#name_id").attr("disabled",true)
+		{% endif %}
 	{% endif %}
 });
 
@@ -893,7 +896,7 @@ $(document).ready(function(){
 		$("#teaches_list").val(tch_arr);
 		$("#assesses_list").val(assess_arr);
 		{% block base_save_on_click %}{% endblock %}
-		
+
 	    var name = $("#name_id").val().trim().toLowerCase();
 	    var nodes = {{nodes_list|safe}} 
 	    condition_result_var = true;
