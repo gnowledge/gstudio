@@ -279,15 +279,15 @@
         $("#message").text("Forum '"+ name +"' already exist. Please choose another name");
         event.preventDefault();
       }
-      else
-      {
-        $("#message").css("display", "none");
-      }
     }
     else if (name == ""){
       $("#message").css("display", "block");
       $("#message").text("Forum name cannot be empty.");
       event.preventDefault();
+    }
+    else
+    {
+      $("#message").css("display", "none");
     }
   });
 
