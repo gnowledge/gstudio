@@ -266,10 +266,9 @@ def create_group(request,group_id):
 
 
   available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
-
   nodes_list = []
   for each in available_nodes:
-    nodes_list.append(each.name)
+      nodes_list.append(str((each.name).strip().lower()))
 
   return render_to_response("ndf/create_group.html", {'groupid':group_id,'appId':app._id,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
     
@@ -666,7 +665,8 @@ def create_sub_group(request,group_id):
       available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
       nodes_list = []
       for each in available_nodes:
-          nodes_list.append(each.name)
+          nodes_list.append(str((each.name).strip().lower()))
+
       return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
   except Exception as e:
       print "Exception in create subgroup "+str(e)
