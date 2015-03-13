@@ -10,9 +10,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from optparse import make_option
 
-from mongokit import IS
-
-from django_mongokit import get_database
+# from mongokit import IS
 
 try:
   from bson import ObjectId
@@ -20,9 +18,10 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Node, GSystemType, ToReduceDocs, ReducedDocs, IndexedWordList
-from gnowsys_ndf.ndf.models import Group
-from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
+from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
+# from gnowsys_ndf.ndf.models import Node, GSystemType, ToReduceDocs, ReducedDocs, IndexedWordList
+# from gnowsys_ndf.ndf.models import Group
+# from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_TASK_TYPES
@@ -30,8 +29,6 @@ from gnowsys_ndf.factory_type import factory_gsystem_types, factory_attribute_ty
 
 ###############################################################################
 # Global variables
-db = get_database()
-collection = db[Node.collection_name]
 
 filename = sys.argv[-1]
 f = filename.split("/")
@@ -72,37 +69,37 @@ class Command(BaseCommand):
         meta_type_name = META_TYPE[0]
 
         for each in META_TYPE:
-          meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':each}]})
+          meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':each}]})
           if meta_type == None:                
             create_meta_type(user_id,each)
 
           else:
             print "Meta_Type",each,"already created"
 
-        meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]}) # getting MetaType Object
+        meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]}) # getting MetaType Object
         if meta_type == None:
           meta_type = create_meta_type(user_id) #creating MetaType
         
         for each in GAPPS:
           # Temporarily made this change for renaming "Browse Topic & Browse Resource" untill all servers will be updated
           if each == "Topics":
-            br_topic = collection.Node.one({'_type':'GSystemType', 'name': 'Browse Topic'})
+            br_topic = node_collection.one({'_type':'GSystemType', 'name': 'Browse Topic'})
             if br_topic:
               br_topic.name = unicode(each)
               br_topic.status = u"PUBLISHED"
               br_topic.save()
 
           if each == "E-Library":
-            br_resource = collection.Node.one({'_type':'GSystemType', 'name': 'Browse Resource'})
+            br_resource = node_collection.one({'_type':'GSystemType', 'name': 'Browse Resource'})
             if br_resource:
               br_resource.name = unicode(each)
               br_resource.status = u"PUBLISHED"
               br_resource.save()
           # Keep above part untill all servers updated
           
-          node_doc = collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':each}]})
+          node_doc = node_collection.one({'$and':[{'_type':'GSystemType'},{'name':each}]})
           if (node_doc == None or each != node_doc['name']):
-            gst_node=collection.GSystemType()
+            gst_node=node_collection.collection.GSystemType()
             gst_node.name = unicode(each)
             gst_node.created_by = user_id
             gst_node.modified_by = user_id
@@ -120,9 +117,9 @@ class Command(BaseCommand):
             node_doc.save()
                    
         # Create default group 'home'
-        node_doc =collection.GSystemType.one({'$and':[{'_type': u'Group'},{'name': u'home'}]})
+        node_doc =node_collection.one({'$and':[{'_type': u'Group'},{'name': u'home'}]})
         if node_doc is None:
-          gs_node = collection.Group()
+          gs_node = node_collection.collection.Group()
           gs_node.name = u'home'
           gs_node.created_by = user_id
           gs_node.modified_by = user_id
@@ -130,7 +127,7 @@ class Command(BaseCommand):
           if user_id not in gs_node.contributors:
             gs_node.contributors.append(user_id)
 
-          gs_node.member_of.append(collection.Node.one({'name': "Group"})._id)
+          gs_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
           gs_node.disclosure_policy=u'DISCLOSED_TO_MEM'
           gs_node.subscription_policy=u'OPEN'
           gs_node.visibility_policy=u'ANNOUNCED'
@@ -169,40 +166,40 @@ class Command(BaseCommand):
             print 'file name should be ATs.json,STs.json or RTs.json to load Ats,STs or RTs of json'
         
         # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
-        quiz_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Quiz'})
-        quiz_item_type = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})
+        quiz_type = node_collection.one({'_type': u'GSystemType', 'name': u'Quiz'})
+        quiz_item_type = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
         
         # Append quiz_type, options & correct_answer to attribute_type_set of 'QuizItem'
         if not quiz_item_type.attribute_type_set:
-          quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'quiz_type'}))
-          quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'options'}))
-          quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'correct_answer'}))
+          quiz_item_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'quiz_type'}))
+          quiz_item_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'options'}))
+          quiz_item_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'correct_answer'}))
           quiz_item_type.save()
         
         # Append start_time & end_time to attribute_type_set of 'Quiz'
         if not quiz_type.attribute_type_set:
-          quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'start_time'}))
-          quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'}))
+          quiz_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'start_time'}))
+          quiz_type.attribute_type_set.append(node_collection.one({'_type': u'AttributeType', 'name': u'end_time'}))
           quiz_type.save()
 
         #Creation Gsystem Eventtype as a container to hold the Event types
-        glist = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
-        GlistItem=collection.Node.one({'_type': "GSystemType","name":"GListItem"})
+        glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
+        GlistItem=node_collection.one({'_type': "GSystemType","name":"GListItem"})
         #create super container list Eventlist
         #First check if EventList Exist or not
         #Eventtype and College Type Glist Creation
-        Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
+        Eventtype=node_collection.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
         if Eventtype is None:
-          glist_container = collection.GSystem()
+          glist_container = node_collection.collection.GSystem()
           glist_container.name=u"Eventtype"
           glist_container.status = u"PUBLISHED"
           glist_container.created_by=user_id
           glist_container.member_of.append(glist._id)
           glist_container.save()
           print "\n Eventtype Created."
-        collegeevent=collection.Node.one({"member_of":ObjectId(glist._id),"name":"CollegeEvents"})
+        collegeevent=node_collection.one({"member_of":ObjectId(glist._id),"name":"CollegeEvents"})
         if not collegeevent:
-            node = collection.GSystem()
+            node = node_collection.collection.GSystem()
             node.name=u"CollegeEvents"
             node.status = u"PUBLISHED"
             node.created_by=user_id
@@ -210,11 +207,11 @@ class Command(BaseCommand):
             node.save()
             print "\n CollegeEvents Created."
   
-        Event=collection.Node.find_one({'_type':"GSystemType","name":"Event"})  
+        Event=node_collection.find_one({'_type':"GSystemType","name":"Event"})  
         if Event:
-          All_Event_Types=collection.Node.find({"type_of": ObjectId(Event._id)})
-          Eventtype=collection.Node.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
-          CollegeEvents=collection.Node.one({"name":"CollegeEvents"})
+          All_Event_Types=node_collection.find({"type_of": ObjectId(Event._id)})
+          Eventtype=node_collection.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
+          CollegeEvents=node_collection.one({"_type":"GSystemType", "name":"CollegeEvents"})
           Event_type_list=[]
           College_type_list=[]
           for i in All_Event_Types:
@@ -226,9 +223,9 @@ class Command(BaseCommand):
               if i.name in ['Classroom Session','Exam']:
                  College_type_list.append(i._id)
                   
-          collection.update({'_id': ObjectId(Eventtype._id)}, {'$set': {'collection_set': Event_type_list}}, upsert=False, multi=False)
+          node_collection.collection.update({'_id': ObjectId(Eventtype._id)}, {'$set': {'collection_set': Event_type_list}}, upsert=False, multi=False)
           
-          collection.update({'_id': ObjectId(CollegeEvents._id)}, {'$set': {'collection_set': College_type_list}}, upsert=False, multi=False)
+          node_collection.collection.update({'_id': ObjectId(CollegeEvents._id)}, {'$set': {'collection_set': College_type_list}}, upsert=False, multi=False)
           
         #End of adding Event Types and CollegeEvents
         
@@ -237,15 +234,15 @@ class Command(BaseCommand):
         # 1) Creating Types as GList nodes from GSTUDIO_TASK_TYPES
         # 2) Create "TaskType" which again is going to be GList node;
         #    that will act as container i.e. hold above Types in its collection_set
-        glist = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+        glist = node_collection.one({'_type': "GSystemType", 'name': "GList"})
         task_type_ids = []
         # First: Creating Types as GList nodes from GSTUDIO_TASK_TYPES
         info_message = "\n"
         for gl_node_name in GSTUDIO_TASK_TYPES:
-          gl_node = collection.Node.one({'_type': "GSystem", 'member_of':glist._id, 'name': gl_node_name})
+          gl_node = node_collection.one({'_type': "GSystem", 'member_of':glist._id, 'name': gl_node_name})
 
           if gl_node is None:
-            gl_node = collection.GSystem()
+            gl_node = node_collection.collection.GSystem()
             gl_node.name = unicode(gl_node_name)
             gl_node.created_by = user_id
             gl_node.modified_by = user_id
@@ -268,9 +265,9 @@ class Command(BaseCommand):
 
         # Second: Create "TaskType" (GList container)
         glc_node_name = u"TaskType"
-        glc_node = collection.Node.one({'_type': "GSystem", 'member_of': glist._id, 'name': glc_node_name})
+        glc_node = node_collection.one({'_type': "GSystem", 'member_of': glist._id, 'name': glc_node_name})
         if glc_node is None:
-          glc_node = collection.GSystem()
+          glc_node = node_collection.collection.GSystem()
           glc_node.name = unicode(glc_node_name)
           glc_node.created_by = user_id
           glc_node.modified_by = user_id
@@ -349,7 +346,7 @@ def create_meta_type(user_id,meta_type):
   '''
   Creating meta_type in database
   '''
-  meta = collection.MetaType()
+  meta = node_collection.collection.MetaType()
   meta.name = meta_type
   meta.created_by = user_id # default hardcode
   meta.modified_by = user_id
@@ -363,10 +360,10 @@ def create_gsystem_type(st_name, user_id, meta_type_id = None):
   '''
   creating factory GSystemType's 
   '''
-  node = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name':st_name}]})
+  node = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name':st_name}]})
   if node is None:
     try:
-      gs_node = collection.GSystemType()
+      gs_node = node_collection.collection.GSystemType()
       gs_node.name = unicode(st_name)
       gs_node.created_by = user_id
       gs_node.modified_by = user_id
@@ -391,10 +388,10 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
   '''
   creating factory AttributeType's
   '''
-  node = collection.Node.one({'$and':[{'_type': u'AttributeType'},{'name':at_name}]})
+  node = node_collection.one({'$and':[{'_type': u'AttributeType'},{'name':at_name}]})
   if node is None:
     try:
-      at = collection.AttributeType()
+      at = node_collection.collection.AttributeType()
       at.name = unicode(at_name)
       at.created_by = user_id
       at.modified_by = user_id
@@ -437,10 +434,10 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
   '''
   creating factory RelationType's
   '''
-  rt_node = collection.RelationType.one({'_type': u'RelationType', 'name': rt_name}) 
+  rt_node = node_collection.one({'_type': u'RelationType', 'name': rt_name}) 
   if rt_node is None:
     try:
-      rt_node = collection.RelationType()
+      rt_node = node_collection.collection.RelationType()
       rt_node.name = unicode(rt_name)
       rt_node.inverse_name = unicode(inverse_name)
       rt_node.object_cardinality = object_cardinality
@@ -503,14 +500,14 @@ def create_ats(factory_attribute_types,user_id):
       at_name = key
       data_type = value['data_type']
 
-      if value.has_key("meta_type"):
+      if "meta_type" in value:
         meta_type_name = value['meta_type']
-        meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
+        meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
         if meta_type:
           meta_type_id = meta_type._id
 
       for e in value['gsystem_names_list']:
-        node = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': e}]})
+        node = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': e}]})
         if node is not None:
           gsystem_id_list.append(node._id)
         else:
@@ -528,27 +525,27 @@ def create_rts(factory_relation_types,user_id):
       at_name = key
       inverse_name = value['inverse_name']
 
-      if value.has_key("meta_type"):
+      if "meta_type" in value:
         meta_type_name = value['meta_type']
-        meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
+        meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
         if meta_type:
           meta_type_id = meta_type._id
 
       for s in value['subject_type']:
-        node_s = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
+        node_s = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
         if node_s is None:
-          node_s = collection.Node.one({'$and':[{'_type': u'MetaType'},{'name': s}]})
+          node_s = node_collection.one({'$and':[{'_type': u'MetaType'},{'name': s}]})
           
         subject_type_id_list.append(node_s._id)
        
       for rs in value['object_type']:
-        node_rs = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': rs}]})
+        node_rs = node_collection.one({'$and':[{'_type': u'GSystemType'},{'name': rs}]})
         if node_rs is None:
-          node_rs =collection.Node.one({'$and':[{'_type': u'MetaType'},{'name': rs}]})
+          node_rs =node_collection.one({'$and':[{'_type': u'MetaType'},{'name': rs}]})
   
         object_type_id_list.append(node_rs._id)
       
-      if value.has_key("object_cardinality"):
+      if "object_cardinality" in value:
         object_cardinality = value["object_cardinality"]
 
     create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id, object_cardinality)
@@ -558,15 +555,15 @@ def create_sts(factory_gsystem_types,user_id):
   for each in factory_gsystem_types:
     name = each['name']
     meta_type_name = each['meta_type']
-    meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
+    meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
     if meta_type:
       meta_type_id = meta_type._id
     create_gsystem_type(name, user_id, meta_type_id)
 
   # For creating Topics as a collection of Theme & Topic
-  theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-  topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-  topics = collection.Node.one({'_type': 'GSystemType', 'name': 'Topics'})
+  theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+  topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+  topics = node_collection.one({'_type': 'GSystemType', 'name': 'Topics'})
   if theme_GST and topic_GST and topics:
     if not topics.collection_set:
       topics.collection_set.append(theme_GST._id)
@@ -588,10 +585,10 @@ def clean_structure():
   users = User.objects.all()
   for each in users:
     try:
-      auth_node = collection.Node.one({'_type': "Author", 'created_by': each.id})
+      auth_node = node_collection.one({'_type': "Author", 'created_by': each.id})
 
       if auth_node:
-        res = collection.update(
+        res = node_collection.collection.update(
           {'_id': auth_node._id},
           {'$set': {'email': each.email}},
           upsert=False, multi=False
@@ -627,13 +624,13 @@ def clean_structure():
 
   # to fix broken documents which are having partial/outdated attributes/relations in their attribute_set/relation_set. 
   # first make their attribute_set and relation_set empty and them fill them with latest key-values. 
-  collection.update(
+  node_collection.collection.update(
     {'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 'attribute_set': {'$exists': True}, 'relation_set': {'$exists': True}},
     {'$set': {'attribute_set': [], 'relation_set': []}}, 
     upsert=False, multi=True
   )
 
-  gs = collection.Node.find({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
+  gs = node_collection.find({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
                               '$or': [{'attribute_set': []}, {'relation_set': []}] 
                             }, timeout=False)
 
@@ -652,8 +649,8 @@ def clean_structure():
     # Fetch all attributes, if created in GAttribute Triple
     # Key-value pair will be appended only for those whose entry would be found in GAttribute Triple
     # ------------------------------------------------------------------------------------
-    ga = collection.aggregate([
-      {'$match': {'subject': each_gs._id, '_type': "GAttribute", 'status': u"PUBLISHED"}}, 
+    ga = triple_collection.collection.aggregate([
+      {'$match': {'_type': "GAttribute", 'subject': each_gs._id, 'status': u"PUBLISHED"}}, 
       {'$project': {'_id': 0, 'key_val': '$attribute_type', 'value_val': '$object_value'}}
     ])
 
@@ -661,8 +658,8 @@ def clean_structure():
     # Fetch all relations, if created in GRelation Triple
     # Key-value pair will be appended only for those whose entry would be found in GRelation Triple
     # ------------------------------------------------------------------------------------
-    gr = collection.aggregate([
-      {'$match': {'subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
+    gr = triple_collection.collection.aggregate([
+      {'$match': {'_type': "GRelation", 'subject': each_gs._id, 'status': u"PUBLISHED"}},
       {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$right_subject'}}
     ])
 
@@ -670,8 +667,8 @@ def clean_structure():
     # Fetch all inverse-relations, if created in GRelation Triple
     # Key-value pair will be appended only for those whose entry would be found in GRelation Triple
     # ------------------------------------------------------------------------------------
-    inv_gr = collection.aggregate([
-      {'$match': {'right_subject': each_gs._id, '_type': "GRelation", 'status': u"PUBLISHED"}},
+    inv_gr = triple_collection.collection.aggregate([
+      {'$match': {'_type': "GRelation", 'right_subject': each_gs._id, 'status': u"PUBLISHED"}},
       {'$project': {'_id': 0, 'key_val': '$relation_type', 'value_val': '$subject'}}
     ])
 
@@ -683,7 +680,7 @@ def clean_structure():
       # print "\n"
       for each_gar in ga["result"]:
         if each_gar:
-          key_node = get_database().dereference(each_gar["key_val"])
+          key_node = db.dereference(each_gar["key_val"])
           # print "\t", key_node["name"], " -- ", each_gar["value_val"]
           # Append corresponding GAttribute as key-value pair in given attribute-list
           # key: attribute-type name
@@ -697,7 +694,7 @@ def clean_structure():
       # ------------------------------------------------------------------------------------
       for each_grr in gr["result"]:
         if each_grr:
-          key_node = get_database().dereference(each_grr["key_val"])
+          key_node = db.dereference(each_grr["key_val"])
           # Append corresponding GRelation as key-value pair in given relation-list
           # key: name field's value of relation-type's document
           # value: right_subject field's value of GRelation document
@@ -707,7 +704,7 @@ def clean_structure():
           else:
             key_found = False
             for each in rel_list:
-              if each.has_key(key_node["name"]):
+              if key_node["name"] in each:
                 each[key_node["name"]].append(each_grr["value_val"])
                 key_found = True
 
@@ -721,7 +718,7 @@ def clean_structure():
       # ------------------------------------------------------------------------------------
       for each_grr in inv_gr["result"]:
         if each_grr:
-          key_node = get_database().dereference(each_grr["key_val"])
+          key_node = db.dereference(each_grr["key_val"])
           # Append corresponding GRelation as key-value pair in given inverse-relation-list
           # key: inverse_name field's value of relation-type's document
           # value: subject field's value of GRelation document
@@ -731,7 +728,7 @@ def clean_structure():
           else:
             key_found = False
             for each in inv_rel_list:
-              if each.has_key(key_node["inverse_name"]):
+              if key_node["inverse_name"] in each:
                 each[key_node["inverse_name"]].append(each_grr["value_val"])
                 key_found = True
 
@@ -759,7 +756,7 @@ def clean_structure():
     # ------------------------------------------------------------------------------------
     # Finally set attribute_set & relation_set of current GSystem with modified attr_list & rel_list respectively
     # ------------------------------------------------------------------------------------
-    res = collection.update(
+    res = node_collection.collection.update(
       {'_id': each_gs._id}, 
       {'$set': {'attribute_set': attr_list, 'relation_set': (rel_list + inv_rel_list)}}, 
       upsert=False, multi=False
@@ -781,14 +778,14 @@ def clean_structure():
     print "\n Setting attribute_set & relation_set completed succesfully !"
 
   # Rectify start_time & end_time of task ==================
-  start_time = collection.Node.one({'_type': "AttributeType", 'name': "start_time"})
-  end_time = collection.Node.one({'_type': "AttributeType", 'name': "end_time"})
+  start_time = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
+  end_time = node_collection.one({'_type': "AttributeType", 'name': "end_time"})
 
   info_message = "\n\nRectifing start_time & end_time of following task(s)...\n"
   print info_message
   log_list.append(info_message)
   
-  invalid_dates_cur = collection.Triple.find({'attribute_type.$id': {'$in': [start_time._id, end_time._id]}, 'object_value': {'$not': {'$type': 9}}})
+  invalid_dates_cur = triple_collection.find({'attribute_type.$id': {'$in': [start_time._id, end_time._id]}, 'object_value': {'$not': {'$type': 9}}})
   for each in invalid_dates_cur:
     date_format_string = ""
     old_value = ""
@@ -808,7 +805,7 @@ def clean_structure():
       old_value = each.object_value
       info_message = "\n\n\t" + str(each._id) + " -- " + str(old_value)
 
-      res = collection.update({'_id': each._id}, 
+      res = triple_collection.collection.update({'_id': each._id}, 
               {'$set': {'object_value': datetime.strptime(each.object_value, date_format_string)}}, 
               upsert=False, multi=False
             )
@@ -821,7 +818,7 @@ def clean_structure():
         info_message += " >> " + str(new_value)
         log_list.append(info_message)
 
-        res = collection.update({'_id': each.subject, 'attribute_set.'+attribute_type_node.name: old_value}, 
+        res = node_collection.collection.update({'_id': each.subject, 'attribute_set.'+attribute_type_node.name: old_value}, 
                 {'$set': {'attribute_set.$.'+attribute_type_node.name: new_value}}, 
                 upsert=False, multi=False
               )
@@ -832,33 +829,33 @@ def clean_structure():
 
 
   # Update type_of field to list
-  type_of_cursor=collection.find({'type_of':{'$exists':True}})
+  type_of_cursor=node_collection.find({'type_of':{'$exists':True}})
   for object_cur in type_of_cursor:
     if type(object_cur['type_of']) == ObjectId or object_cur['type_of'] == None:
       if type(object_cur['type_of']) == ObjectId :
-        collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[object_cur['type_of']]}})
+        node_collection.collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[object_cur['type_of']]}})
       else :
-        collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[]}})
+        node_collection.collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[]}})
 
   # Removes n attribute if created accidently in existsing documents
-  collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False, multi=True)
+  node_collection.collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False, multi=True)
 
   # Updates wherever modified_by field is None with default value as either first contributor or the creator of the resource
-  modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation', 'node_holder', 'ToReduceDocs', 'ReducedDocs', 'IndexedWordList']}, 'modified_by': None})
+  modified_by_cur = node_collection.find({'_type': {'$nin': ['GAttribute', 'GRelation', 'node_holder', 'ToReduceDocs', 'ReducedDocs', 'IndexedWordList']}, 'modified_by': None})
   if modified_by_cur.count > 0:
     for n in modified_by_cur:
       if u'required_for' not in n.keys():
-        if n.has_key("contributors"):
+        if "contributors" in n:
           if n.contributors:
-            collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
+            node_collection.collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
           else:
             if n.created_by:
-              collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]}}, upsert=False, multi=False)
+              node_collection.collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]}}, upsert=False, multi=False)
             else:
               print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")\n"
 
   # Updating faulty modified_by and contributors values (in case of user-group and file documents)
-  cur = collection.Node.find({'_type': {'$nin': ['node_holder', 'ToReduceDocs', 'ReducedDocs', 'IndexedWordList']}, 'modified_by': {'$exists': True}})
+  cur = node_collection.find({'_type': {'$nin': ['node_holder', 'ToReduceDocs', 'ReducedDocs', 'IndexedWordList']}, 'modified_by': {'$exists': True}})
   for n in cur:
     # By faulty, it means modified_by and contributors has 1 as their values
     # 1 stands for superuser
@@ -869,36 +866,36 @@ def clean_structure():
         print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")"
       else:
         if n.created_by not in n.contributors:
-          collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]} }, upsert=False, multi=False)
+          node_collection.collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]} }, upsert=False, multi=False)
 
   # For delete the profile_pic as GST 
-  profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_pic'})
+  profile_pic_obj = node_collection.one({'_type': 'GSystemType','name': u'profile_pic'})
   if profile_pic_obj:
     profile_pic_obj.delete()
     print "\n Deleted GST document of profile_pic.\n"
 
   # For adding visited_location field (default value set as []) in User Groups.
   try:
-    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
     if author:
-      auth_cur = collection.Node.find({'_type': 'Group', 'member_of': author._id })
+      auth_cur = node_collection.find({'_type': 'Group', 'member_of': author._id })
       if auth_cur.count() > 0:
         for each in auth_cur:
-          collection.update({'_id': each._id}, {'$set': {'_type': "Author"} }, upsert=False, multi=False)    
+          node_collection.collection.update({'_id': each._id}, {'$set': {'_type': "Author"} }, upsert=False, multi=False)    
           print "\n Updated user group: ", each.name
           
-      cur = collection.Node.find({'_type': "Author", 'visited_location': {'$exists': False}})
-      author_cur = collection.Node.find({'_type': 'Author'})
+      cur = node_collection.find({'_type': "Author", 'visited_location': {'$exists': False}})
+      author_cur = node_collection.find({'_type': 'Author'})
       if author_cur.count() > 0:
         for each in author_cur:
           if each.group_type == None:
-            collection.update({'_id': each._id}, {'$set': {'group_type': u"PUBLIC", 'edit_policy': u"NON_EDITABLE", 'subscription_policy': u"OPEN"} }, upsert=False, multi=False)    
+            node_collection.collection.update({'_id': each._id}, {'$set': {'group_type': u"PUBLIC", 'edit_policy': u"NON_EDITABLE", 'subscription_policy': u"OPEN"} }, upsert=False, multi=False)    
             print "\n Updated user group policies: ", each.name
 
       if cur.count():
         print "\n"
         for each in cur:
-          collection.update({'_type': "Author", '_id': each._id}, {'$set': {'visited_location': []}}, upsert=False, multi=True)
+          node_collection.collection.update({'_type': "Author", '_id': each._id}, {'$set': {'visited_location': []}}, upsert=False, multi=True)
           print " 'visited_location' field added to Author group (" + each.name + ")\n"
 
     else:
@@ -909,12 +906,12 @@ def clean_structure():
     print str(e)
 
   # INSERTED FOR MAP_REDUCE
-  allIndexed = collection.IndexedWordList.find({"required_for" : "storing_indexed_words"})
+  allIndexed = node_collection.find({"_type": "IndexedWordList", "required_for" : "storing_indexed_words"})
   if allIndexed.count() == 0:
     print "\n Inserting indexes"
     j=1
     while j<=27:
-      obj = collection.IndexedWordList()
+      obj = node_collection.collection.IndexedWordList()
       obj.word_start_id = float(j)
       obj.words = {}
       obj.required_for = u'storing_indexed_words'
@@ -922,9 +919,9 @@ def clean_structure():
       j+=1
 
   # Adding Task GST into start_time and end_time ATs subject_type
-  start_time = collection.Node.one({'_type': u'AttributeType', 'name': u'start_time'})
-  end_time = collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'})
-  task = collection.Node.find_one({'_type':u'GSystemType', 'name':u'Task'})
+  start_time = node_collection.one({'_type': u'AttributeType', 'name': u'start_time'})
+  end_time = node_collection.one({'_type': u'AttributeType', 'name': u'end_time'})
+  task = node_collection.find_one({'_type':u'GSystemType', 'name':u'Task'})
   if task:
     if start_time:
       if not task._id in start_time.subject_type :

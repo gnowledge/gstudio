@@ -1,11 +1,12 @@
 <!ATTLIST lbl_name course_mins CDATA #IMPLIED>
-{% extends "ndf/mis_base_create_edit.html" %}
+{% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 {% load pagination_tags %}
 
 {% block style %}
+
   {{block.super}}
 
   /* Resetting css-properties for fieldset (also legend, input) */
@@ -26,8 +27,6 @@
     .edit_course_structure_name{
       width: 30%;
     }
-
-
 
   /* Setting css-properties for reveal-modal's label */
     div.reveal-modal > label {
@@ -64,12 +63,14 @@
       border-color:#757b80 !important; 
       margin: 10px !important;
       border: 3px solid;
+      display:block;
     }
 
     li.course-sub-section-class{
       border-color:#b0b3b6 !important; 
       margin: 10px !important;
       border: 3px solid;
+      display:block;
     }
 
     #name{
@@ -80,6 +81,18 @@
       font-size:22px;
       color:#0b8a91 !important;
     }
+    
+    .resource_icon{
+      color:#0b8a91 !important;
+    }
+    .pricing-table .bullet-item {
+      padding:0 !important;
+    }
+
+    ul.no-bullet li ul, ul.no-bullet li ol{
+    margin-left:0 !important;
+    }
+
     .css_setting{
       display:none;
     }
@@ -90,18 +103,52 @@
       display:block;
     }
 
-    .lbl_of_cs{
+    .lbl_of_cs, .lbl_of_css{
       white-space: nowrap;
       width: 100px;
       overflow: hidden;
       text-overflow: ellipsis;
+      font-weight: bold;
+      font-size: 100%;
     }
+    .div_lbl > label {
+     min-width: 350px;
+     display: inline-block;
+    }
+
 
     .course-section-class:hover .cs_setting{
       display:block;
     }
-{% endblock %}
 
+    .resource-drawer { 
+    border-color: #D3D3D3; border-style: solid; 
+    padding: 0 !important; 
+    overflow-y: auto;
+    }
+
+    div.resources_drawer_div div{
+      padding:7px;
+    }
+    .resource-drawer li.bullet-item:hover{
+    background-color: #ecf0f1; cursor:pointer;
+    }
+
+    .posted-by{ color: #808080; font-size: small; }
+
+    .selected-resource { background-color:lightgray !important ; }
+
+    .resource-type-image {
+    height:40px;    
+    background-repeat:no-repeat; background-size: 48px 48px;
+    width:16.667%;
+    }
+
+    .resource-type-image + div {
+    width:83.33333%%;
+    }
+
+{% endblock %}
 {% block body_content %} 
   <h3>{{cnode.name}}</h3>
   
@@ -143,14 +190,62 @@
             </label>
           </div>
           <div class="small-4 columns end">
-          {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.0 %}
-        </div>
+            {% html_widget groupid coll_node_css.pk property_order_list_css.0.1.0 %}
+          </div>
           <div class="small-4 columns">
                 <input type="button" value="Save" class="button small hoverstyle round save-cs save-css" >
                 <input type="button" value="Cancel" class="button small hoverstyle round cancel-cs cancel-css" >
           </div>
         </div>
+        <div class="row">
+          <div class="small-10 small-centered columns units-btn-div">
+            <input type="button" class="button round expand hoverstyle units-btn" value="Add Units">
+            <a class="hide close-units-btn" style="float:right;">&#215; Add Units Later</a>
+          </div>
+        </div>
+    {% block collection %}
+    <div class="collection_block_div">
+      <div class="choose" style="display:none;">
+        
+        <table width="400" align="center">
+          <tr class="row">
+              <td class="small-4 columns ">
+                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
+                  {% trans "Page" %} <i class="resource_icon fi-page-filled"></i></span>
+              </td> 
+              <td class="small-4 columns ">
+                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="File" />
+                  {% trans "File" %} <i class="resource_icon fi-book"></i></span>
+              </td>
+
+              <td class="small-4 columns ">
+                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Image" />
+                  {% trans "Image" %} <i class="resource_icon fi-photo"></i>
+              </td> 
+          </tr>
+          <tr class="row">
+              <td class="small-4 columns ">
+                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Video" />
+                  {% trans "Video" %} <i class="resource_icon fi-video"></i>
+              </td>
+              <td class="small-4 columns ">
+                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
+                  {% trans "Pandora" %} <i class="resource_icon fi-video"></i>
+              </td> 
+              <td class="small-4 columns ">
+                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
+                  {% trans "Quiz" %} <i class="resource_icon fi-pencil"></i>
+              </td>
+          </tr>
+        </table>
+        
+      </div>
+        <div class="resources_drawer_div row"></div>
+        <input type="button" value="Save Units" class="save_units small button round" style="display:none">
+    </div>
     </li>
+
+    {% endblock %}
 
     <ul class="ul-course-section no-bullet">
       <input type="button" class="button expand round hoverstyle course-sec-btn" value="Add Course Section" onclick="add_course_section()">
@@ -226,319 +321,458 @@
     <input type="hidden" id="changed_names" name="changed_names">
     <input type="hidden" id="app_set_id" name="app_set_id" value="{{app_set_id}}">
     <input type="hidden" id="app_id" name="app_id" value="{{app_id}}">
-    <input type="submit" value="submit" id="submit_course_struct" class="button right inline" disabled="disabled">  
+    <input type="submit" value="SUBMIT" id="submit_course_struct" class="button right inline">  
   </form>
 {% endblock %}
-
 <script>
 {% block script %}
   {{block.super}}
+  
+  //Global var declarations------------------------------------------------------------------------------
+    var cs_cloned_id = 1;
+    var css_cloned_id = 1;
+    var course_min_value;
+    var course_sec_list = [];
+    var changed_names ={};
+    var cs_names_list = [];
+    var css_names_dict = {};
+    var css_names_list = []
+    var all_mins_set = true;
+    var css_renamed = {};
+    var max_marks_value;
+    var min_marks_value
+    original_cs_and_css = {};
+    $("#course_structure_minutes").addClass("css_mins_class")
+    $("#min_marks").addClass("min_marks_class")
+    $("#max_marks").addClass("max_marks_class")
 
-//Global var declarations------------------------------------------------------------------------------
-  var cs_cloned_id = 1;
-  var css_cloned_id = 1;
-  var course_min_value;
-  var course_sec_list = [];
-  var changed_names ={};
-  var cs_names_list = [];
-  var css_names_dict = {};
-  var css_names_list = []
-  var all_mins_set = true;
-  var css_renamed = {};
-  var max_marks_value;
-  var min_marks_value
-  original_cs_and_css = {};
-  $("#course_structure_minutes").addClass("css_mins_class")
-  $("#min_marks").addClass("min_marks_class")
-  $("#max_marks").addClass("max_marks_class")
+  // Prevent enter key-----------------------------------------------------------------------------------
+    $('html').bind('keypress', function(e)
+    {
+       if(e.keyCode == 13)
+       {
+          return false;
+       }
+    });
 
-//Adding Course Section--------------------------------------------------------------------------------
-  function add_course_section(){
-    $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
-     cloned_ele_id = id+"_cloned"+cs_cloned_id;
-     return cloned_ele_id
-     }).removeClass("hide"));
-    $("#"+cloned_ele_id).find("input[id=name]").focus()
-    cs_cloned_id+=1
-  }  
+  //Adding Course Section--------------------------------------------------------------------------------
+    function add_course_section(){
+      $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
+       cloned_ele_id = id+"_cloned"+cs_cloned_id;
+       return cloned_ele_id
+       }).removeClass("hide"));
+      $("#"+cloned_ele_id).find("input[id=name]").focus()
+      cs_cloned_id+=1
+    }  
 
-//Adding Course Subsection-----------------------------------------------------------------------------
-  $(document).on('click','.sub-section-btn',function(){
+  //Adding Course Subsection-----------------------------------------------------------------------------
+    $(document).on('click','.sub-section-btn',function(){
+        parent_id = $(this).parents("li").attr("id")
+        $("#"+parent_id).find("input.sub-section-btn").attr("disabled",true)
+        $(this).before($("#course-subsection").clone().attr('id',function(i,id){
+            cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
+            return cloned_ss_ele_id}).removeClass("hide"));
+        $("#"+cloned_ss_ele_id).find("div.resources_drawer_div").attr('id','resources_drawer_for_'+cloned_ss_ele_id)
+        $("#"+cloned_ss_ele_id).find("input[id=name]").focus()
+        css_cloned_id+=1
+    });
+
+  //Save Course Section ---------------------------------------------------------------------------------
+    $(document).on('click','.save-cs',function(){
       parent_id = $(this).parents("li").attr("id")
-      $("#"+parent_id).find("input.sub-section-btn").attr("disabled",true)
-      $(this).before($("#course-subsection").clone().attr('id',function(i,id){
-          cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
-          return cloned_ss_ele_id}).removeClass("hide"));
-      $("#"+cloned_ss_ele_id).find("input[id=name]").focus()
-      css_cloned_id+=1
-  });
+      lbl_val = $("#"+parent_id).find("input[id='name']").val()
+      if(lbl_val==""){
+          alert("Please enter Name");
+          event.preventDefault();
+      }
 
-//Save Course Section and Course Subsection------------------------------------------------------------
-  $(document).on('click','.save-cs',function(){
-    parent_id = $(this).parents("li").attr("id")
-    lbl_val = $("#"+parent_id).find("input[id='name']").val()
-    if(lbl_val==""){
-        alert("Please enter Name");
-        event.preventDefault();
-    }
-
-    else{
-        lbl_id = "lbl_for_"+parent_id   
-        if($(this).hasClass("save-css")){
-            parent_lbl = $("#"+parent_id).parents("li.course-section-class").find("label.lbl_of_cs").text()
-              for(var cs_name_key in css_names_dict){
-                if(cs_name_key==parent_lbl){
-                  if(css_names_dict[cs_name_key].length==0){
-                    save_course_sub_section(parent_id,parent_lbl,lbl_id,lbl_val);
-                    return;
-                  }
-                  else{
-                    for (var all_css in css_names_dict[cs_name_key]){
-                      if(css_names_dict[cs_name_key][all_css]==lbl_val){
-                          alert("Duplicate Name. Please select another name");
-                          return;
-                      }
+      else{
+          lbl_id = "lbl_for_"+parent_id   
+          if($(this).hasClass("save-css")){
+              parent_lbl = $("#"+parent_id).parents("li.course-section-class").find("label.lbl_of_cs").text()
+                for(var cs_name_key in css_names_dict){
+                  if(cs_name_key==parent_lbl){
+                    if(css_names_dict[cs_name_key].length==0){
+                      save_course_sub_section(parent_id,parent_lbl,lbl_id,lbl_val);
+                      return;
                     }
-                    save_course_sub_section(parent_id,parent_lbl,lbl_id,lbl_val)
+                    else{
+                      for (var all_css in css_names_dict[cs_name_key]){
+                        if(css_names_dict[cs_name_key][all_css]==lbl_val){
+                            alert("Duplicate Name. Please select another name");
+                            return;
+                        }
+                      }
+                      save_course_sub_section(parent_id,parent_lbl,lbl_id,lbl_val)
+                    }
                   }
                 }
               }
-            }
-        else{
-            if(cs_names_list.indexOf(lbl_val)==-1){
-                cs_names_list.push(lbl_val)
-                css_names_dict[lbl_val]=[]
-                course_sec_dict = {}
-                course_sec_dict[lbl_val] = []
-                course_sec_list.push(course_sec_dict)
-                $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled");
-                var str_btn="<div class='row'><div class='small-2 columns text-center fold-btn-div'><i class='fi-page-copy largesize'></i></div>"
-                var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"' style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:right;'></i></div>"    
-                var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
+          else{
+              if(cs_names_list.indexOf(lbl_val)==-1){
+                  cs_names_list.push(lbl_val)
+                  css_names_dict[lbl_val]=[]
+                  course_sec_dict = {}
+                  course_sec_dict[lbl_val] = []
+                  course_sec_list.push(course_sec_dict)
+                  $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled");
+                  var str_btn="<div class='row'><div class='small-1 columns text-center fold-btn-div'><i class='fi-page-copy largesize'></i></div>"
+                  var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"' style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>"    
+                  var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
-                $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
-            }
-            else{
-                alert("Duplicate Name. Please select another name");
-                event.preventDefault();            
-            }
-        }
-    }
-  })
+                  $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
+              }
+              else{
+                  alert("Duplicate Name. Please select another name");
+                  event.preventDefault();            
+              }
+          }
+      }
+    })
 
-//Function to save Course Subsection-------------------------------------------------------------------
-  function save_course_sub_section(p_id,p_lbl,l_id,l_lbl){
-    var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-page largesize'></i></div>"
-    var str_lbl="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ l_id+"' style='float:left;'>"+l_lbl+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div>" 
-    $("#"+p_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-2 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
-    $("#"+p_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
-    var str_prop="<div class='small-2 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
-    $("#"+p_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
-    css_names_dict[p_lbl].push(l_lbl);
-    css_names_list.push(l_lbl)
-    for (var i in course_sec_list){
-        for(var i2 in course_sec_list[i]){
-            if(i2==p_lbl){
-                c = {}
-                c[l_lbl]=""
-                course_sec_list[i][i2].push(c)
-            }
-        }
+  //Function to save Course Subsection-------------------------------------------------------------------
+    function save_course_sub_section(p_id,p_lbl,l_id,l_lbl){
+      var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-page largesize'></i></div>"
+      var str_lbl="<span data-tooltip title='"+ l_lbl +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='"+ l_id+"' style='float:left;'>"+l_lbl+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>" 
+      $("#"+p_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-1 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
+      $("#"+p_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
+      var str_prop="<div class='small-2 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
+      $("#"+p_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
+      css_names_dict[p_lbl].push(l_lbl);
+      css_names_list.push(l_lbl)
+      for (var i in course_sec_list){
+          for(var i2 in course_sec_list[i]){
+              if(i2==p_lbl){
+                  c = {}
+                  c[l_lbl]={}
+                  course_sec_list[i][i2].push(c)
+              }
+          }
+      }
     }
-  }
 
-// Cancel Course Section and Course Subsection---------------------------------------------------------
-  $(document).on('click','.cancel-cs',function(){
-    parent_id = $(this).parents("li").attr("id")
-    if($(this).hasClass("cancel-css")){
-        $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled")   
-    }
-    else{
-        $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled")
-    }
-    $("#"+parent_id).remove()
-  });
-
-// Reordering li elements to move UP-------------------------------------------------------------------
-  $(document).on('click','.fi-arrow-up',function(){
-    var $current = $(this).closest('li');
-    class_of_lbl = $current.find('label').attr('class');
-    var $previous = $current.prev('li');
-    movenameup = $current.find("label."+class_of_lbl).text()
-    movenamedown = $previous.find('label.'+class_of_lbl).text()
-    var temp;
-
-    // Change order of course sub sections accordingly in the list of dicts
-    for(var i in course_sec_list){
-        for(var i2 in course_sec_list[i]){
-            for( var newk in course_sec_list[i][i2]){
-                newk = parseInt(newk)
-                for (var csk in course_sec_list[i][i2][newk]){
-                    if(csk==movenameup){
-                    // if(course_sec_list[i][i2][newk].hasOwnProperty(movenameup)){
-                        if(newk==0){
-                            alert("You are on the Top element")
-                            return;   
-                        }
-                        temp = course_sec_list[i][i2][newk-1]
-                        course_sec_list[i][i2][newk-1] = course_sec_list[i][i2][newk]
-                        course_sec_list[i][i2][newk] = temp
-                        movenameup=""
-                        if($previous.length !== 0){
-                            $current.insertBefore($previous);
-                        }
-                    }
-                } 
-            }
-        }
-    }
-    // Change order of course sections accordingly in the list of dicts
-    for(var i in course_sec_list){
-        for(var i2 in course_sec_list[i]){
-            i = parseInt(i);
-            // if(course_sec_list[i].hasOwnProperty(movenameup)){
-            if(i2==movenameup){
-                if(i==0){
-                    alert("You are on the Top element")
-                    return;   
-                }
-                temp = course_sec_list[i-1]
-                course_sec_list[i-1] = course_sec_list[i]
-                course_sec_list[i] = temp
-                movenameup=""
-                if($previous.length !== 0){
-                    $current.insertBefore($previous);
-                }
-            }
-        }
-    }
-  });
-
-// Reordering li elements to move DOWN-----------------------------------------------------------------
-  $(document).on('click','.fi-arrow-down',function(){
-    var $current = $(this).closest('li')
-    class_of_lbl = $current.find('label').attr('class');
-    var $next = $current.next('li');
-    movenameup = $current.find("label."+class_of_lbl).text()
-    movenamedown = $next.find('label.'+class_of_lbl).text()
-    var temp;
-
-  // Change order of course sub sections accordingly in the list of dicts
-    for(var i in course_sec_list){
-        for(var i2 in course_sec_list[i]){
-            for( var newk in course_sec_list[i][i2]){
-                newk = parseInt(newk)
-                for (var csk in course_sec_list[i][i2][newk]){
-                    if(csk==movenameup){
-                        if(newk==course_sec_list[i][i2].length-1){
-                            alert("You are on the Last element")
-                            return;   
-                        }
-                        temp = course_sec_list[i][i2][newk+1]
-                        course_sec_list[i][i2][newk+1] = course_sec_list[i][i2][newk]
-                        course_sec_list[i][i2][newk] = temp
-                        movenameup="";
-                        if($next.length !== 0){
-                          $current.insertAfter($next);
-                        }
-                    }
-                } 
-            }
-        }
-    }
-  // Change order of course sections accordingly in the list of dicts
-    for(var i in course_sec_list){
-        i = parseInt(i)
-        for(var i2 in course_sec_list[i]){
-            if(i2==movenameup){
-                if(i==course_sec_list[i][i2].length){
-                    alert("You are on the Last element")
-                    return;   
-                }
-                temp = course_sec_list[i+1]
-                course_sec_list[i+1] = course_sec_list[i]
-                course_sec_list[i] = temp
-                movenameup=""
-                if($next.length !== 0){
-                  $current.insertAfter($next);
-                }
-            }
-        }
-    }
+  // Cancel Course Section and Course Subsection---------------------------------------------------------
+    $(document).on('click','.cancel-cs',function(){
+      parent_id = $(this).parents("li").attr("id")
+      if($(this).hasClass("cancel-css")){
+          $("#"+parent_id).parents("li").find("input.sub-section-btn").removeAttr("disabled")   
+      }
+      else{
+          $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled")
+      }
+      $("#"+parent_id).remove()
     });
 
-// Rename Edit course structure name-------------------------------------------------------------------
-  var lbl_text;
-  $(document).on('click','.edit_course_structure_name',function(){
-        
-        lbl_text_id = $(this).prev().attr("id")
-        if($(this).hasClass("fi-pencil")){
-          //Only one course name can be renamed at once
-          lbl_text_id_of_opened = $(".ul-course-section").find(".fi-check").prev().attr('id')
-          if(lbl_text_id_of_opened){
-            lbl_text_class_of_opened = $("#"+lbl_text_id_of_opened).attr('class')
-            lbl_text_of_opened = $("#"+lbl_text_id_of_opened).val()
-            $("#"+lbl_text_id_of_opened).replaceWith("<label name='lbl_name' class='"+lbl_text_class_of_opened+"' id='"+lbl_text_id_of_opened+"' style='float:left;'>"+ lbl_text_of_opened+"</label>")
-            $(".ul-course-section").find(".fi-check").removeClass("fi-check").addClass("fi-pencil")
-          }
-          lbl_text = $(this).prev().text()
-          lbl_text_class = $(this).prev().attr('class')
-          $(this).removeClass("fi-pencil").addClass("fi-check");
-          $("#"+lbl_text_id).replaceWith("<input type='text' id='"+lbl_text_id+"' class='"+lbl_text_class+"' value='"+ lbl_text +"' style='float:left;'>")
-          $("#"+lbl_text_id).focus();
-        }
-        else{
-          new_name = $("#"+lbl_text_id).val();
-          if(lbl_text!=new_name && new_name!=""){
-            if(cs_names_list.indexOf(new_name)==-1) {
-              $(this).removeClass("fi-check").addClass("fi-pencil");
-              if(Object.keys(changed_names).length > 0){
-                if(lbl_text_class=="lbl_of_cs"){
-                  if(css_names_list.indexOf(new_name)==-1){
-                    
-                    var flag = false;
-                    //If Course section editing for first time time after its Course subsection is being edited
-                    if(original_cs_and_css.hasOwnProperty(lbl_text)){
-                      if(changed_names.hasOwnProperty(lbl_text)){
-                        changed_names[lbl_text].shift();
-                        changed_names[lbl_text].unshift(new_name);
-                      }
-                      else{
-                        for (var p in changed_names){
-                          //renaming same course section for more than one time
-                          if(changed_names[p][0]==lbl_text){
-                            changed_names[p].shift();
-                            changed_names[p].unshift(new_name);
-                            flag=true;
-                          }
-                        }
-                        if(!flag){
-                          changed_names[lbl_text]=[]
-                          changed_names[lbl_text].push(new_name)
-                        }
-                      }
-                    }
+  // Reordering li elements to move UP-------------------------------------------------------------------
+    $(document).on('click','.fi-arrow-up',function(){
+      var $current = $(this).closest('li');
+      class_of_lbl = $current.find('label').attr('class');
+      var $previous = $current.prev('li');
+      movenameup = $current.find("label."+class_of_lbl).text()
+      movenamedown = $previous.find('label.'+class_of_lbl).text()
+      var temp;
 
-                    else{
-                      if(changed_names.hasOwnProperty(lbl_text)){
-                        changed_names[lbl_text].shift();
-                        changed_names[lbl_text].unshift(new_name);
+      // Change order of course sub sections accordingly in the list of dicts
+      for(var i in course_sec_list){
+          for(var i2 in course_sec_list[i]){
+              for( var newk in course_sec_list[i][i2]){
+                  newk = parseInt(newk)
+                  for (var csk in course_sec_list[i][i2][newk]){
+                      if(csk==movenameup){
+                      // if(course_sec_list[i][i2][newk].hasOwnProperty(movenameup)){
+                          if(newk==0){
+                              alert("You are on the Top element")
+                              return;   
+                          }
+                          temp = course_sec_list[i][i2][newk-1]
+                          course_sec_list[i][i2][newk-1] = course_sec_list[i][i2][newk]
+                          course_sec_list[i][i2][newk] = temp
+                          movenameup=""
+                          if($previous.length !== 0){
+                              $current.insertBefore($previous);
+                          }
                       }
-                      else{
-                        for (var p in changed_names){
-                          //renaming same course section for more than one time
-                          if(changed_names[p][0]==lbl_text){
-                            changed_names[p].shift();
-                            changed_names[p].unshift(new_name);
-                            flag=true;
+                  } 
+              }
+          }
+      }
+      // Change order of course sections accordingly in the list of dicts
+      for(var i in course_sec_list){
+          for(var i2 in course_sec_list[i]){
+              i = parseInt(i);
+              // if(course_sec_list[i].hasOwnProperty(movenameup)){
+              if(i2==movenameup){
+                  if(i==0){
+                      alert("You are on the Top element")
+                      return;   
+                  }
+                  temp = course_sec_list[i-1]
+                  course_sec_list[i-1] = course_sec_list[i]
+                  course_sec_list[i] = temp
+                  movenameup=""
+                  if($previous.length !== 0){
+                      $current.insertBefore($previous);
+                  }
+              }
+          }
+      }
+    });
+
+  // Reordering li elements to move DOWN-----------------------------------------------------------------
+    $(document).on('click','.fi-arrow-down',function(){
+      var $current = $(this).closest('li')
+      class_of_lbl = $current.find('label').attr('class');
+      var $next = $current.next('li');
+      movenameup = $current.find("label."+class_of_lbl).text()
+      movenamedown = $next.find('label.'+class_of_lbl).text()
+      var temp;
+
+    // Change order of course sub sections accordingly in the list of dicts
+      for(var i in course_sec_list){
+          for(var i2 in course_sec_list[i]){
+              for( var newk in course_sec_list[i][i2]){
+                  newk = parseInt(newk)
+                  for (var csk in course_sec_list[i][i2][newk]){
+                      if(csk==movenameup){
+                          if(newk==course_sec_list[i][i2].length-1){
+                              alert("You are on the Last element")
+                              return;   
+                          }
+                          temp = course_sec_list[i][i2][newk+1]
+                          course_sec_list[i][i2][newk+1] = course_sec_list[i][i2][newk]
+                          course_sec_list[i][i2][newk] = temp
+                          movenameup="";
+                          if($next.length !== 0){
+                            $current.insertAfter($next);
+                          }
+                      }
+                  } 
+              }
+          }
+      }
+    // Change order of course sections accordingly in the list of dicts
+      for(var i in course_sec_list){
+          i = parseInt(i)
+          for(var i2 in course_sec_list[i]){
+              if(i2==movenameup){
+                  if(i==course_sec_list[i][i2].length){
+                      alert("You are on the Last element")
+                      return;   
+                  }
+                  temp = course_sec_list[i+1]
+                  course_sec_list[i+1] = course_sec_list[i]
+                  course_sec_list[i] = temp
+                  movenameup=""
+                  if($next.length !== 0){
+                    $current.insertAfter($next);
+                  }
+              }
+          }
+      }
+      });
+
+  // Rename Edit course structure name-------------------------------------------------------------------
+    var lbl_text;
+    $(document).on('click','.edit_course_structure_name',function(){
+          
+          lbl_text_id = $(this).prev().attr("id")
+          if($(this).hasClass("fi-pencil")){
+            //Only one course name can be renamed at once
+            lbl_text_id_of_opened = $(".ul-course-section").find(".fi-check").prev().attr('id')
+            if(lbl_text_id_of_opened){
+              lbl_text_class_of_opened = $("#"+lbl_text_id_of_opened).attr('class')
+              lbl_text_of_opened = $("#"+lbl_text_id_of_opened).val()
+              $("#"+lbl_text_id_of_opened).replaceWith("<label name='lbl_name' class='"+lbl_text_class_of_opened+"' id='"+lbl_text_id_of_opened+"' style='float:left;'>"+ lbl_text_of_opened+"</label>")
+              $(".ul-course-section").find(".fi-check").removeClass("fi-check").addClass("fi-pencil")
+            }
+            lbl_text = $(this).prev().text()
+            lbl_text_class = $(this).prev().attr('class')
+            $(this).removeClass("fi-pencil").addClass("fi-check");
+            $("#"+lbl_text_id).replaceWith("<input type='text' id='"+lbl_text_id+"' class='"+lbl_text_class+"' value='"+ lbl_text +"' style='float:left;'>")
+            $("#"+lbl_text_id).focus();
+          }
+          else{
+            new_name = $("#"+lbl_text_id).val();
+            if(lbl_text!=new_name && new_name!=""){
+              if(cs_names_list.indexOf(new_name)==-1) {
+                $(this).removeClass("fi-check").addClass("fi-pencil");
+                if(Object.keys(changed_names).length > 0){
+                  if(lbl_text_class=="lbl_of_cs"){
+                    if(css_names_list.indexOf(new_name)==-1){
+                      
+                      var flag = false;
+                      //If Course section editing for first time time after its Course subsection is being edited
+                      if(original_cs_and_css.hasOwnProperty(lbl_text)){
+                        if(changed_names.hasOwnProperty(lbl_text)){
+                          changed_names[lbl_text].shift();
+                          changed_names[lbl_text].unshift(new_name);
+                        }
+                        else{
+                          for (var p in changed_names){
+                            //renaming same course section for more than one time
+                            if(changed_names[p][0]==lbl_text){
+                              changed_names[p].shift();
+                              changed_names[p].unshift(new_name);
+                              flag=true;
+                            }
+                          }
+                          if(!flag){
+                            changed_names[lbl_text]=[]
+                            changed_names[lbl_text].push(new_name)
                           }
                         }
-                        if(!flag){
-                          changed_names[lbl_text]=[]
-                          changed_names[lbl_text].push(new_name)
+                      }
+
+                      else{
+                        if(changed_names.hasOwnProperty(lbl_text)){
+                          changed_names[lbl_text].shift();
+                          changed_names[lbl_text].unshift(new_name);
+                        }
+                        else{
+                          for (var p in changed_names){
+                            //renaming same course section for more than one time
+                            if(changed_names[p][0]==lbl_text){
+                              changed_names[p].shift();
+                              changed_names[p].unshift(new_name);
+                              flag=true;
+                            }
+                          }
+                          if(!flag){
+                            changed_names[lbl_text]=[]
+                            changed_names[lbl_text].push(new_name)
+                          }
                         }
                       }
+
+                      for(var cs_name_key in css_names_dict){
+                        if(cs_name_key==lbl_text){
+                          css_names_dict[new_name]=css_names_dict[cs_name_key]
+                          delete css_names_dict[cs_name_key]
+                          break;
+                        }
+                      }
+                      for(var i in course_sec_list){
+                          for(var i2 in course_sec_list[i]){
+                              if(i2==lbl_text){
+                                  course_sec_list[i][new_name]=course_sec_list[i][i2]
+                                  delete course_sec_list[i][i2]
+                                  i2 = new_name;
+                                  // return;
+                              }
+                          }
+                      }
                     }
+                  }//end of if lbl_of_cs
+                  
+                  //renaming course sub section
+                  else{
+                      //Course Sub Section renamed
+                      var flag1 = false;
+                      var fl1 = false;
+                      cs_lbl = $(this).parents("li.course-section-class").find("label.lbl_of_cs").text()
+                      
+                      for (var indval in css_names_dict[cs_lbl]){
+                        if(css_names_dict[cs_lbl][indval]==new_name){
+                          alert("Duplicate Course Subsection. Please select another name");
+                          event.preventDefault();
+                          return;
+                        }
+                      }
+                      $.each(original_cs_and_css,function(cs,cslist){
+                        if(cs == cs_lbl){
+                          $.each(cslist,function(cssind,cssn){
+                            if(cssn == lbl_text){
+                              for (var p in changed_names){
+                                if(changed_names[p][0]==cs_lbl){
+                                  //check for respective CS if true, we are editing CSS after editing CS
+                                  css_renames={}
+                                  css_renames[lbl_text]=new_name
+                                  changed_names[cs_lbl].push(css_renames)
+                                  flag1 = true;
+                                  fl1 = true;
+                                }
+                              }
+                              if(!flag1){
+                                //Editing CSS first before editing CS
+                                changed_names[cs_lbl]=[]
+                                changed_names[cs_lbl].push(cs_lbl)
+                                css_renames={}
+                                css_renames[lbl_text]=new_name
+                                changed_names[cs_lbl].push(css_renames)
+                                fl1 = true;
+                              }
+                            }
+                          })
+                        }
+                      })
+
+                      if(!fl1){
+                        var fl = false;
+                        css_changed_names_dict = {}
+                        for (var p in changed_names){
+                          //renaming same course section for more than one time
+                          if(changed_names[p][0]==cs_lbl){
+                            if(changed_names[p].length==2){
+                              //dict exists
+                              css_changed_names_dict = changed_names[p][1]
+                              $.each(css_changed_names_dict,function(k,v){
+                                if(v==lbl_text){
+                                  css_changed_names_dict[k]=new_name
+                                  fl = true;
+                                }
+                              })
+                            }
+                            else{
+                              css_renames={}
+                              css_renames[lbl_text]=new_name
+                              changed_names[p].push(css_renames)
+                            }
+                          }
+                        }
+
+                        if(!fl){
+                          css_changed_names_dict[lbl_text]=new_name
+                        }
+                      }
+                  
+                      for(var cs_name_key in css_names_dict){
+                        if(cs_name_key==cs_lbl){
+                          for (var css_n in css_names_dict[cs_name_key]){
+                            if(css_names_dict[cs_name_key][css_n]==lbl_text){
+                              css_names_dict[cs_name_key][css_n]=new_name
+                              break;
+                            }
+                          }
+                        }
+                      }
+                      for(var i in course_sec_list){
+                          for(var i2 in course_sec_list[i]){
+                              if(i2==cs_lbl){
+                                  for( var newk in course_sec_list[i][i2]){
+                                      for (var csk in course_sec_list[i][i2][newk]){
+                                          if(csk==lbl_text){
+                                              course_sec_list[i][i2][newk][new_name]=course_sec_list[i][i2][newk][csk]
+                                              delete course_sec_list[i][i2][newk][csk]
+                                              csk=new_name;
+                                              // return;
+                                          }
+                                      }
+                                  } 
+                              }
+                          }
+                      }
+
+                  }
+                }
+                else{
+                  //If a Course section is renamed initially
+                  if(lbl_text_class=="lbl_of_cs"){
+                    $.each(original_cs_and_css,function(csname,css_list){
+                      if(csname==lbl_text){
+                        changed_names[lbl_text]=[]
+                        changed_names[lbl_text].push(new_name)
+                      }
+                    })
 
                     for(var cs_name_key in css_names_dict){
                       if(cs_name_key==lbl_text){
@@ -547,6 +781,7 @@
                         break;
                       }
                     }
+
                     for(var i in course_sec_list){
                         for(var i2 in course_sec_list[i]){
                             if(i2==lbl_text){
@@ -557,82 +792,34 @@
                             }
                         }
                     }
-                  }
-                }//end of if lbl_of_cs
-                
-                //renaming course sub section
-                else{
-                    //Course Sub Section renamed
-                    var flag1 = false;
-                    var fl1 = false;
-                    cs_lbl = $(this).parents("li.course-section-class").find("label.lbl_of_cs").text()
                     
-                    for (var indval in css_names_dict[cs_lbl]){
-                      if(css_names_dict[cs_lbl][indval]==new_name){
+                  }
+                  //If a Course sub section is renamed initially
+                  else{
+                    cs_l = $(this).parents("li.course-section-class").find("label.lbl_of_cs").text() 
+
+                    for (var indval in css_names_dict[cs_l]){
+                      if(css_names_dict[cs_l][indval]==new_name){
                         alert("Duplicate Course Subsection. Please select another name");
                         event.preventDefault();
                         return;
                       }
                     }
-                    $.each(original_cs_and_css,function(cs,cslist){
-                      if(cs == cs_lbl){
-                        $.each(cslist,function(cssind,cssn){
-                          if(cssn == lbl_text){
-                            for (var p in changed_names){
-                              if(changed_names[p][0]==cs_lbl){
-                                //check for respective CS if true, we are editing CSS after editing CS
-                                css_renames={}
-                                css_renames[lbl_text]=new_name
-                                changed_names[cs_lbl].push(css_renames)
-                                flag1 = true;
-                                fl1 = true;
-                              }
-                            }
-                            if(!flag1){
-                              //Editing CSS first before editing CS
-                              changed_names[cs_lbl]=[]
-                              changed_names[cs_lbl].push(cs_lbl)
-                              css_renames={}
-                              css_renames[lbl_text]=new_name
-                              changed_names[cs_lbl].push(css_renames)
-                              fl1 = true;
-                            }
-                          }
-                        })
-                      }
+
+                    $.each(original_cs_and_css,function(csname,css_list){
+                      $.each(css_list,function(cssnameindex,cssname){
+                        if(cssname==lbl_text){
+                          changed_names[cs_l]=[]
+                          changed_names[cs_l].push(cs_l)
+                          css_renames={}
+                          css_renames[lbl_text]=new_name
+                          changed_names[cs_l].push(css_renames)
+                        }
+                      })
                     })
 
-                    if(!fl1){
-                      var fl = false;
-                      css_changed_names_dict = {}
-                      for (var p in changed_names){
-                        //renaming same course section for more than one time
-                        if(changed_names[p][0]==cs_lbl){
-                          if(changed_names[p].length==2){
-                            //dict exists
-                            css_changed_names_dict = changed_names[p][1]
-                            $.each(css_changed_names_dict,function(k,v){
-                              if(v==lbl_text){
-                                css_changed_names_dict[k]=new_name
-                                fl = true;
-                              }
-                            })
-                          }
-                          else{
-                            css_renames={}
-                            css_renames[lbl_text]=new_name
-                            changed_names[p].push(css_renames)
-                          }
-                        }
-                      }
-
-                      if(!fl){
-                        css_changed_names_dict[lbl_text]=new_name
-                      }
-                    }
-                
                     for(var cs_name_key in css_names_dict){
-                      if(cs_name_key==cs_lbl){
+                      if(cs_name_key==cs_l){
                         for (var css_n in css_names_dict[cs_name_key]){
                           if(css_names_dict[cs_name_key][css_n]==lbl_text){
                             css_names_dict[cs_name_key][css_n]=new_name
@@ -643,7 +830,7 @@
                     }
                     for(var i in course_sec_list){
                         for(var i2 in course_sec_list[i]){
-                            if(i2==cs_lbl){
+                            if(i2==cs_l){
                                 for( var newk in course_sec_list[i][i2]){
                                     for (var csk in course_sec_list[i][i2][newk]){
                                         if(csk==lbl_text){
@@ -657,299 +844,411 @@
                             }
                         }
                     }
-
+                  }
                 }
+                $("#"+lbl_text_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+lbl_text_id+"' style='float:left;'>"+ new_name+"</label>")
+
+                $.each(cs_names_list, function(i,v){
+                  if(cs_names_list[i]==lbl_text){
+                    cs_names_list[i]=new_name;
+                  }
+                });
+
+                $.each(css_names_list, function(i2,v2){
+                  if(css_names_list[i2]==lbl_text){
+                    css_names_list[i2]=new_name;
+                  }
+                });
               }
               else{
-                //If a Course section is renamed initially
-                if(lbl_text_class=="lbl_of_cs"){
-                  $.each(original_cs_and_css,function(csname,css_list){
-                    if(csname==lbl_text){
-                      changed_names[lbl_text]=[]
-                      changed_names[lbl_text].push(new_name)
-                    }
-                  })
-
-                  for(var cs_name_key in css_names_dict){
-                    if(cs_name_key==lbl_text){
-                      css_names_dict[new_name]=css_names_dict[cs_name_key]
-                      delete css_names_dict[cs_name_key]
-                      break;
-                    }
-                  }
-
-                  for(var i in course_sec_list){
-                      for(var i2 in course_sec_list[i]){
-                          if(i2==lbl_text){
-                              course_sec_list[i][new_name]=course_sec_list[i][i2]
-                              delete course_sec_list[i][i2]
-                              i2 = new_name;
-                              // return;
-                          }
-                      }
-                  }
-                  
-                }
-                //If a Course sub section is renamed initially
-                else{
-                  cs_l = $(this).parents("li.course-section-class").find("label.lbl_of_cs").text() 
-
-                  for (var indval in css_names_dict[cs_l]){
-                    if(css_names_dict[cs_l][indval]==new_name){
-                      alert("Duplicate Course Subsection. Please select another name");
-                      event.preventDefault();
-                      return;
-                    }
-                  }
-
-                  $.each(original_cs_and_css,function(csname,css_list){
-                    $.each(css_list,function(cssnameindex,cssname){
-                      if(cssname==lbl_text){
-                        changed_names[cs_l]=[]
-                        changed_names[cs_l].push(cs_l)
-                        css_renames={}
-                        css_renames[lbl_text]=new_name
-                        changed_names[cs_l].push(css_renames)
-                      }
-                    })
-                  })
-
-                  for(var cs_name_key in css_names_dict){
-                    if(cs_name_key==cs_l){
-                      for (var css_n in css_names_dict[cs_name_key]){
-                        if(css_names_dict[cs_name_key][css_n]==lbl_text){
-                          css_names_dict[cs_name_key][css_n]=new_name
-                          break;
-                        }
-                      }
-                    }
-                  }
-                  for(var i in course_sec_list){
-                      for(var i2 in course_sec_list[i]){
-                          if(i2==cs_l){
-                              for( var newk in course_sec_list[i][i2]){
-                                  for (var csk in course_sec_list[i][i2][newk]){
-                                      if(csk==lbl_text){
-                                          course_sec_list[i][i2][newk][new_name]=course_sec_list[i][i2][newk][csk]
-                                          delete course_sec_list[i][i2][newk][csk]
-                                          csk=new_name;
-                                          // return;
-                                      }
-                                  }
-                              } 
-                          }
-                      }
-                  }
-                }
+                alert("Duplicate Name. Please select another name");
+                event.preventDefault();
               }
-              $("#"+lbl_text_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+lbl_text_id+"' style='float:left;'>"+ new_name+"</label>")
-
-              $.each(cs_names_list, function(i,v){
-                if(cs_names_list[i]==lbl_text){
-                  cs_names_list[i]=new_name;
-                }
-              });
-
-              $.each(css_names_list, function(i2,v2){
-                if(css_names_list[i2]==lbl_text){
-                  css_names_list[i2]=new_name;
-                }
-              });
             }
             else{
-              alert("Duplicate Name. Please select another name");
-              event.preventDefault();
+              $("#"+lbl_text_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+lbl_text_id+"' style='float:left;'>"+ lbl_text+"</label>")
+              $(this).removeClass("fi-check").addClass("fi-pencil");
             }
           }
-          else{
-            $("#"+lbl_text_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+lbl_text_id+"' style='float:left;'>"+ lbl_text+"</label>")
-            $(this).removeClass("fi-check").addClass("fi-pencil");
-          }
-        }
-    });
+      });
 
-// Set label name and mins in reveal modal with respective course name---------------------------------
-  $(document).on('click','.reveal_prop_form',function(){
+  // Set label name and mins in reveal modal with respective course name---------------------------------
+    $(document).on('click','.reveal_prop_form',function(){
 
-    $(".css_mins_class").val('');
-    $(".max_marks_class").val('')
-    $(".min_marks_class").val('')
+      $(".css_mins_class").val('');
+      $(".max_marks_class").val('')
+      $(".min_marks_class").val('')
 
-    lb = $(this).closest("li").find("label").text()//csk
-    lb_id = $(this).closest("li").find("label").attr("id")
-    
-    xy = $("#"+lb_id).parents("li.course-section-class").find("label.lbl_of_cs").text()//i2
-
-    for(var i in course_sec_list){
-        for(var i2 in course_sec_list[i]){
-            if(i2==xy){
-                for( var newk in course_sec_list[i][xy]){
-                    for (var csk in course_sec_list[i][xy][newk]){
-                        if(csk==lb){
-                            if(course_sec_list[i][xy][newk][csk]["course_structure_minutes"]){
-                                    v = course_sec_list[i][xy][newk][csk]["course_structure_minutes"]
-                                    $("#course_structure_minutes").val(v)
-                            }
-                            else{
-                                $("#course_structure_minutes").val("")
-                            }
-
-                            if(course_sec_list[i][xy][newk][csk]["course_structure_assessment"]){
-                                    v = course_sec_list[i][xy][newk][csk]["course_structure_assessment"]
-                                    if(v==true){v="Yes";$(".marks_div").removeClass("hide");}else{v="No";$(".marks_div").addClass("hide");}
-                                    $("input[name='course_structure_assessment'][value='"+v+"']").prop("checked","checked")
-                            }
-                            else{
-                                $("input[name='course_structure_assessment'][value='No']").prop("checked","checked");
-                                $(".marks_div").addClass("hide");
-                            }
-                            if(course_sec_list[i][xy][newk][csk]["course_structure_assignment"]){
-                                    v = course_sec_list[i][xy][newk][csk]["course_structure_assignment"]
-                                    if(v==true){v="Yes";}else{v="No";}
-                                    $("input[name='course_structure_assignment'][value='"+v+"']").prop("checked","checked")
-                            }
-                            else{
-                                $("input[name='course_structure_assignment'][value='No']").prop("checked","checked")
-                            }
-                            if(course_sec_list[i][xy][newk][csk]["min_marks"]){
-                                    v = course_sec_list[i][xy][newk][csk]["min_marks"]
-                                    $("#min_marks").val(v)
-                            }
-                            else{
-                                $("#min_marks").val("")
-                            }
-                            if(course_sec_list[i][xy][newk][csk]["max_marks"]){
-                                    v = course_sec_list[i][xy][newk][csk]["max_marks"]
-                                    $("#max_marks").val(v)
-                            }
-                            else{
-                                $("#max_marks").val("")
-                            }
-
-                        }
-                    }
-                } 
-            }
-        }
-    }
-    $("#hidden_css_name_id").val(lb_id)
-    $("#css_name").text("Properties for '"+ lb+"'")
-    $("#css_name").css("font-size", "30px");
-    $('#course_prop').foundation('reveal', 'open');
-  });
-
-//Fold unfold Actions----------------------------------------------------------------------------------
-  $(document).on('click','.fold-btn',function(){
-    parent_id = $(this).parents("li").attr("id");
-    if($("#"+parent_id).hasClass("hidden_children")){
-        $(this).removeClass("fi-plus").addClass("fi-minus");
-        $("#"+parent_id).find("li").removeClass("hide");
-        $("#"+parent_id).removeClass("hidden_children");
-    }
-    else{
-        $(this).removeClass("fi-minus").addClass("fi-plus")
-        $("#"+parent_id).find("li").addClass("hide");
-        $("#"+parent_id).addClass("hidden_children");
-    }
-    
-  });
-
-// Onchecking any radio button in prop reveal modal
-  $(document).on("change click", "input:radio[name=course_structure_assessment]", function(){
-      var assessment_val = $(this).val();
-      if(assessment_val=="Yes"){
-        $(".marks_div").removeClass("hide");
-      }
-      else{
-        $(".marks_div").addClass("hide");
-      }
-  });
-
-//Done button in reveal modal -------------------------------------------------------------------------
-  $(document).on('click','.set_prop_class',function(event){
-
-    var length_val = false;
-    var assessment_chk =  $("input[name='course_structure_assessment']:checked").val()
-    if(assessment_chk=="Yes"){ assessment_chk=true;}else{ assessment_chk=false;}
-
-    course_min_value = $(".css_mins_class").val();
-    if (!assessment_chk){
-      if(course_min_value>10){ length_val = true; }
-    }
-    else{
-      min_marks_value = $(".min_marks_class").val(); 
-      max_marks_value = $(".max_marks_class").val();
-      if (max_marks_value>10 && min_marks_value>10 && course_min_value>10){ length_val = true;}
-    }
-
-    if(length_val == true) {
-      a = $("#hidden_css_name_id").val();
-      c_name = $("#"+a).text();
-      x = $("#"+a).parents("li.course-section-class").find("label.lbl_of_cs").text()
-      // $("#"+a).attr("course_mins",course_min_value)
-      var assignment_chk  = $("input[name='course_structure_assignment']:checked").val()
-      if(assignment_chk=="Yes"){ assignment_chk=true;}else{ assignment_chk=false;}
+      lb = $(this).closest("li").find("label").text()//csk
+      lb_id = $(this).closest("li").find("label").attr("id")
+      
+      xy = $("#"+lb_id).parents("li.course-section-class").find("label.lbl_of_cs").text()//i2
 
       for(var i in course_sec_list){
           for(var i2 in course_sec_list[i]){
-              if(x==i2){
-                for( var newk in course_sec_list[i][i2]){
-                    for (var csk in course_sec_list[i][i2][newk]){
-                        if(c_name==csk){
-                            course_sec_list[i][i2][newk][csk] = {}
-                            course_sec_list[i][i2][newk][csk]["course_structure_minutes"] = course_min_value;
-                            course_sec_list[i][i2][newk][csk]["course_structure_assessment"] = assessment_chk;
-                            course_sec_list[i][i2][newk][csk]["course_structure_assignment"] = assignment_chk;
-                            if (assessment_chk){
-                              course_sec_list[i][i2][newk][csk]["max_marks"] = max_marks_value;
-                              course_sec_list[i][i2][newk][csk]["min_marks"] = min_marks_value;
-                            }
-                        }
-                    }
-                } 
+              if(i2==xy){
+                  for( var newk in course_sec_list[i][xy]){
+                      for (var csk in course_sec_list[i][xy][newk]){
+                          if(csk==lb){
+                              if(course_sec_list[i][xy][newk][csk]["course_structure_minutes"]){
+                                      v = course_sec_list[i][xy][newk][csk]["course_structure_minutes"]
+                                      $("#course_structure_minutes").val(v)
+                              }
+                              else{
+                                  $("#course_structure_minutes").val("")
+                              }
+
+                              if(course_sec_list[i][xy][newk][csk]["course_structure_assessment"]){
+                                      v = course_sec_list[i][xy][newk][csk]["course_structure_assessment"]
+                                      if(v==true){v="Yes";$(".marks_div").removeClass("hide");}else{v="No";$(".marks_div").addClass("hide");}
+                                      $("input[name='course_structure_assessment'][value='"+v+"']").prop("checked","checked")
+                              }
+                              else{
+                                  $("input[name='course_structure_assessment'][value='No']").prop("checked","checked");
+                                  $(".marks_div").addClass("hide");
+                              }
+                              if(course_sec_list[i][xy][newk][csk]["course_structure_assignment"]){
+                                      v = course_sec_list[i][xy][newk][csk]["course_structure_assignment"]
+                                      if(v==true){v="Yes";}else{v="No";}
+                                      $("input[name='course_structure_assignment'][value='"+v+"']").prop("checked","checked")
+                              }
+                              else{
+                                  $("input[name='course_structure_assignment'][value='No']").prop("checked","checked")
+                              }
+                              if(course_sec_list[i][xy][newk][csk]["min_marks"]){
+                                      v = course_sec_list[i][xy][newk][csk]["min_marks"]
+                                      $("#min_marks").val(v)
+                              }
+                              else{
+                                  $("#min_marks").val("")
+                              }
+                              if(course_sec_list[i][xy][newk][csk]["max_marks"]){
+                                      v = course_sec_list[i][xy][newk][csk]["max_marks"]
+                                      $("#max_marks").val(v)
+                              }
+                              else{
+                                  $("#max_marks").val("")
+                              }
+
+                          }
+                      }
+                  } 
               }
           }
       }
-      all_mins_set=true;
-      $('#course_prop').foundation('reveal', 'close');
-      $("#submit_course_struct").removeAttr("disabled")
-    }
-    else{
-      event.preventDefault();
-    }
-  });
+      $("#hidden_css_name_id").val(lb_id)
+      $("#css_name").text("Properties for '"+ lb+"'")
+      $("#css_name").css("font-size", "30px");
+      $('#course_prop').foundation('reveal', 'open');
+    });
 
-//Submit course structure -----------------------------------------------------------------------------
-  $("#form_course_structure").submit(function(event){
-    $.each(course_sec_list,function(csindex,csdict){
-        $.each(csdict,function(cskey,csslist){
-            $.each(csslist,function(cssindex,cssdict){
-                $.each(cssdict,function(csskey,propdict){
-                    if(!propdict.hasOwnProperty("course_structure_minutes")){
-                        all_mins_set = false;
-                    }
-                    else{
-                        if(propdict["course_structure_minutes"]==""){
-                            all_mins_set = false;
-                        }
-                    }
-                })
-            })
-        })
-    })
+  //Fold unfold Actions----------------------------------------------------------------------------------
+    $(document).on('click','.fold-btn',function(){
+      parent_id = $(this).parents("li").attr("id");
+      if($("#"+parent_id).hasClass("hidden_children")){
+          $(this).removeClass("fi-plus").addClass("fi-minus");
+          $("#"+parent_id).find("li").removeClass("hide");
+          $("#"+parent_id).removeClass("hidden_children");
+      }
+      else{
+          $(this).removeClass("fi-minus").addClass("fi-plus")
+          $("#"+parent_id).find("li").addClass("hide");
+          $("#"+parent_id).addClass("hidden_children");
+      }
+      
+    });
 
-    if(all_mins_set) {
-        $("#course_sec_dict_ele").val(JSON.stringify(course_sec_list))
-        $("#changed_names").val(JSON.stringify(changed_names))
-    }
-    else{
-        alert("Please fill the minutes of all Course Subsections");
+  // Onchecking any radio button in prop reveal modal----------------------------------------------------
+    $(document).on("change click", "input:radio[name=course_structure_assessment]", function(){
+        var assessment_val = $(this).val();
+        if(assessment_val=="Yes"){
+          $(".marks_div").removeClass("hide");
+        }
+        else{
+          $(".marks_div").addClass("hide");
+        }
+    });
+
+  //Done button in reveal modal -------------------------------------------------------------------------
+    $(document).on('click','.set_prop_class',function(event){
+
+      var length_val = false;
+      var assessment_chk =  $("input[name='course_structure_assessment']:checked").val()
+      if(assessment_chk=="Yes"){ assessment_chk=true;}else{ assessment_chk=false;}
+
+      course_min_value = $(".css_mins_class").val();
+      if (!assessment_chk){
+        if(course_min_value>10){ length_val = true; }
+      }
+      else{
+        min_marks_value = $(".min_marks_class").val(); 
+        max_marks_value = $(".max_marks_class").val();
+        if (max_marks_value>10 && min_marks_value>10 && course_min_value>10){ length_val = true;}
+      }
+
+      if(length_val == true) {
+        a = $("#hidden_css_name_id").val();
+        c_name = $("#"+a).text();
+        x = $("#"+a).parents("li.course-section-class").find("label.lbl_of_cs").text()
+        // $("#"+a).attr("course_mins",course_min_value)
+        var assignment_chk  = $("input[name='course_structure_assignment']:checked").val()
+        if(assignment_chk=="Yes"){ assignment_chk=true;}else{ assignment_chk=false;}
+
+        for(var i in course_sec_list){
+            for(var i2 in course_sec_list[i]){
+                if(x==i2){
+                  for( var newk in course_sec_list[i][i2]){
+                      for (var csk in course_sec_list[i][i2][newk]){
+                          if(c_name==csk){
+                              course_sec_list[i][i2][newk][csk]["course_structure_minutes"] = course_min_value;
+                              course_sec_list[i][i2][newk][csk]["course_structure_assessment"] = assessment_chk;
+                              course_sec_list[i][i2][newk][csk]["course_structure_assignment"] = assignment_chk;
+                              if (assessment_chk){
+                                course_sec_list[i][i2][newk][csk]["max_marks"] = max_marks_value;
+                                course_sec_list[i][i2][newk][csk]["min_marks"] = min_marks_value;
+                              }
+                          }
+                      }
+                  } 
+                }
+            }
+        }
+        all_mins_set=0;
+        $('#course_prop').foundation('reveal', 'close');
+      }
+      else{
         event.preventDefault();
-    }
-  });
+      }
+    });
+  
+  //Submit course structure -----------------------------------------------------------------------------
+    $("#form_course_structure").submit(function(event){
+      $.each(course_sec_list,function(csindex,csdict){
+          $.each(csdict,function(cskey,csslist){
+              if(csslist.length == 0){
+                all_mins_set = 1;
+              }
+              $.each(csslist,function(cssindex,cssdict){
+                  $.each(cssdict,function(csskey,propdict){
+                      if(!propdict.hasOwnProperty("course_structure_minutes")){
+                          all_mins_set = 2;
+                      }
+                      else{
+                          if(propdict["course_structure_minutes"]==""){
+                              all_mins_set = 2;
+                          }
+                      }
+                  })
+              })
+          })
+      })
+
+      if(all_mins_set == 0) {
+          $("#course_sec_dict_ele").val(JSON.stringify(course_sec_list))
+          $("#changed_names").val(JSON.stringify(changed_names))
+      }
+      else if(all_mins_set == 1){
+          alert("A Course-Section must have atleast one Course-Subsection");
+          event.preventDefault();
+      }
+      else if(all_mins_set == 2){
+          alert("Please fill the minutes of all Course Subsections");
+          event.preventDefault();
+      }
+    });
+
+  var parent_li_css;
+  var corr_resource_div;
+  
+  //On click of 'Add Units' button-----------------------------------------------------------------------
+
+    $(document).on('click','.units-btn',function(){
+      // $(".choose").css("display", "block");
+
+      parent_li_css = $(this).parents("li.course-sub-section-class").not(".hide").attr('id')
+      corr_resource_div = "resources_drawer_for_"+parent_li_css
+      $("#"+corr_resource_div).prev().css("display", "block"); 
+      $(this).addClass('hide')
+      $(".sub-section-btn").attr("disabled",true)
+      $(".units-btn").attr("disabled",true)
+      $(".course-sec-btn").attr("disabled",true)
+      $("input[type='radio'][name='col']:checked").removeAttr("checked");
+      $(this).next(".close-units-btn").removeClass("hide")
+      //add a close button here to skip adding resources
+    });
+  
+  // Close units div. This is same as skipping adding units now in other words
+  //units will be added later
+
+    $(document).on('click',".close-units-btn",function(){
+      // $(this).prev().removeClass("hide")// this is for close btns prev btn 'Add Units' btn
+      $("#"+corr_resource_div).html("")
+      $("#"+corr_resource_div).next().css("display", "none"); 
+      $("#"+corr_resource_div).prev().css("display", "none"); //for choose div
+      $(".course-sec-btn").removeAttr("disabled")
+      $(".units-btn").removeAttr("disabled")
+      $(".units-btn").removeClass("hide")
+      $(".sub-section-btn").removeAttr("disabled")
+      $(this).addClass("hide")
+
+    })
+  // Ajax call for units
+    $(document).on('click',"input[type='radio'][name='col']",function(){
+
+      var resource_type_name = this.value;
+      var existing_resources;
+      resp_dict = {}
+      $.ajax({
+
+        type: "POST",
+      
+        url: "{% url 'get_resources' groupid %}",
+      
+        datatype: "json",
+      
+        data:{
+          resource_type: resource_type_name,
+          widget_for: "create_course_structure",
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+      
+        success: function (data) {
+          resp_dict = data
+          $("#"+corr_resource_div).removeClass("hide");
+          $("#"+corr_resource_div).html(resp_dict); 
+          $("#"+corr_resource_div).next().css("display", "block"); 
+          $("#"+corr_resource_div).prev().css("display", "none"); //for choose div
+        },
+        complete: function (data){
+          css_name = $("#"+parent_li_css).find("label.lbl_of_css").text()
+          cs_name = $("#"+parent_li_css).parents("li.course-section-class").find("label.lbl_of_cs").text()
+          for(var i in course_sec_list){
+              for(var i2 in course_sec_list[i]){
+                  if(cs_name==i2){
+                    for( var newk in course_sec_list[i][i2]){
+                        for (var csk in course_sec_list[i][i2][newk]){
+                            if(css_name==csk){
+                                if (course_sec_list[i][i2][newk][csk]["resources"]){
+                                  existing_resources = course_sec_list[i][i2][newk][csk]["resources"];
+                                }
+                                else{
+                                  existing_resources =[];
+                                }
+                            }
+                        }
+                    } 
+                  }
+              }
+          }
+          // Check if the existing resources are in left drawer. If yes, move them to right drawer
+          $.each($("#create_course_structure_drawer1").children("li"),function(ind,li_ele){
+            if($.inArray(li_ele.getAttribute('value'),existing_resources)>=0){
+              $("#create_course_structure_drawer2").append(li_ele)
+              }
+          })        
+
+        }
+      });
+    });
+
+  // Save units
+    $(document).on('click','.save_units',function(){
+      var length_val = false;
+      var total_resources = 0
+      var all_resources_ids_LHS = []
+      var all_resources_ids_RHS = []
+      //check if right drawer has values
+      total_resources_in_RHS = $("#"+corr_resource_div).find("#create_course_structure_drawer2").children("li")
+      total_resources_in_LHS = $("#"+corr_resource_div).find("#create_course_structure_drawer1").children("li")
+      
+      if(total_resources_in_RHS.length > 0){
+        length_val = true;
+      }
+
+      existing_list_res = []
+      if(length_val == true) {
+        //fetch right drawer values
+        $.each(total_resources_in_RHS,function(i,v){
+          all_resources_ids_RHS.push(v.getAttribute('value'))
+        });
+        $.each(total_resources_in_LHS,function(i,v){
+          all_resources_ids_LHS.push(v.getAttribute('value'))
+        });
+        x = $("#"+parent_li_css).parents("li.course-section-class").find("label.lbl_of_cs").text()
+        c_name = $("#"+parent_li_css).find("label.lbl_of_css").text()
+
+        for(var i in course_sec_list){
+            for(var i2 in course_sec_list[i]){
+                if(i2==x){
+                  for( var newk in course_sec_list[i][i2]){
+                      for (var csk in course_sec_list[i][i2][newk]){
+                          if(csk==c_name){
+                                if(course_sec_list[i][i2][newk][csk]["resources"]){
+                                  existing_list_res = course_sec_list[i][i2][newk][csk]["resources"]
+                                }
+                                else{
+                                  existing_list_res = []
+                                }
+                          }
+                      }
+                  } 
+                }
+            }
+        }
+
+        //Now we have all_resources_ids_RHS fetched from the right drawer.
+        //We directly cannot set this as value to course_sec_list[i][i2][newk][csk]["resources"].
+        //Because, the Course Subsection may hold resources from other GSType drawer too.
+        //Hence, check if any of the all_resources_ids_RHS doesn't exist in existing_list_res, then only add to existing_list_res.
+
+        $.each(all_resources_ids_RHS,function(ind,resource_id){
+          if($.inArray(resource_id,existing_list_res)<0){
+            existing_list_res.push(resource_id)
+            }
+        })        
+
+        //Find if any of the existing_list_res exists in  all_resources_ids_LHS, if found, remove them from existing_list_res
+        //This is basically removing of a resource from Units
+        $.each(existing_list_res,function(ind,resource_id){
+          if($.inArray(resource_id,all_resources_ids_LHS)>=0){
+            index_of_resource = existing_list_res.indexOf(resource_id)
+            if(index_of_resource != -1){
+              existing_list_res.splice(index_of_resource,1)
+            }
+          }
+        })        
+
+        for(var i in course_sec_list){
+            for(var i2 in course_sec_list[i]){
+                if(i2==x){
+                  for( var newk in course_sec_list[i][i2]){
+                      for (var csk in course_sec_list[i][i2][newk]){
+                          if(csk==c_name){
+                                course_sec_list[i][i2][newk][csk]["resources"] = existing_list_res;
+                          }
+                      }
+                  } 
+                }
+            }
+        }
+
+        $("#"+corr_resource_div).html("")
+        $("#"+corr_resource_div).next().css("display", "none"); 
+        $(".choose").css("display", "none");
+        $(".units-btn").removeClass("hide")
+        $(".course-sec-btn").removeAttr("disabled")
+        $(".units-btn").removeAttr("disabled")
+        $(".sub-section-btn").removeAttr("disabled")
+        $(".close-units-btn").addClass("hide")
+      }
+      else{
+        alert("Please select any resource")
+        event.preventDefault();
+      }
+    });
 
 {% endblock %}
-
+</script>
 {% block document_ready %}
   {{block.super}}
   var view_dict = {{course_collection_list|safe|escape}}
@@ -963,8 +1262,8 @@
 
         lbl_id = "lbl_for_"+cloned_ele_id   
         
-        var str_btn="<div class='row'><div class='small-2 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
-        var str_lbl="<div class='small-8 end columns left inline'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"' style='float:left;'>"+csvv+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:right;' ></i></div>"    
+        var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
+        var str_lbl="<span data-tooltip title='"+ csvv +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id='"+ lbl_id+"' style='float:left;'>"+csvv+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>"    
         var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
         $("#"+cloned_ele_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
@@ -980,12 +1279,15 @@
                 $("#"+cloned_ele_id).find(".sub-section-btn").before($("#course-subsection").clone().attr('id',function(i,id){
                     cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
                     return cloned_ss_ele_id}).removeClass("hide"));
+                $("#"+cloned_ss_ele_id).find("div.resources_drawer_div").attr('id','resources_drawer_for_'+cloned_ss_ele_id)
                 $("#"+cloned_ele_id).find("input.sub-section-btn").attr("disabled",true)
                 lbl_id = "lbl_for_"+cloned_ss_ele_id   
 
-                var str_btn1="<div class='row'><div class='small-2 columns text-center'><i class='fi-page largesize'></i></div>"
-                var str_lbl1="<div class='small-8 columns left inline'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"' style='float:left;'>"+css1+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div>"    
-                var str_prop1="<div class='small-2 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
+                var str_btn1="<div class='row'><div class='small-1 columns text-center'><i class='fi-page largesize'></i></div>"
+                var str_lbl1="<span data-tooltip title='"+ css1 +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='"+ lbl_id+"' style='float:left;'>"+css1+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>" 
+                
+                
+                var str_prop1="<div class='small-1 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
                 css_cloned_id+=1
                 $("#"+cloned_ele_id).find("input.sub-section-btn").removeAttr("disabled");
@@ -1024,4 +1326,3 @@
   $("#form_course_structure").find(":input[required]").removeAttr("required")
   $("#form_course_structure").find(":input[data-invalid]").removeAttr("data-invalid")
 {% endblock %}
-</script>

@@ -7576,13 +7576,13 @@ td {
 /* Default Link Styles */
 /* line 217, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a {
-  color: #0c949c;
+  color: #08676d;
   text-decoration: none;
   line-height: inherit;
 }
 /* line 223, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a:hover, a:focus {
-  color: #0a7f86;
+  color: #043436;
 }
 /* line 230, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a img {
@@ -9574,11 +9574,6 @@ article > header {
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 515, ../../../scss/_metastudio_styles.scss */
-article .breadcrumbs {
-  display: none;
-  background-color: #eee;
-}
 
 /* line 524, ../../../scss/_metastudio_styles.scss */
 textarea {
@@ -9777,36 +9772,42 @@ section.promo {
   background-color: rgba(0, 0, 0, 0.9);
   border-bottom: 4px solid #00CEFD;
 }
-/* line 705, ../../../scss/_metastudio_styles.scss */
+/* line 704, ../../../scss/_metastudio_styles.scss */
+section.promo .meta {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+/* line 707, ../../../scss/_metastudio_styles.scss */
 section.promo .meta h4 {
   color: white;
 }
 
-/* line 712, ../../../scss/_metastudio_styles.scss */
+/* line 714, ../../../scss/_metastudio_styles.scss */
 ul.partner img {
   max-height: 150px;
 }
 
-/* line 717, ../../../scss/_metastudio_styles.scss */
+/* line 719, ../../../scss/_metastudio_styles.scss */
 div.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
   border: 2px solid #12d9e4;
   border-width: 2px 0;
 }
-/* line 722, ../../../scss/_metastudio_styles.scss */
+/* line 724, ../../../scss/_metastudio_styles.scss */
 div.banner > * {
   background-color: #0eacb5;
   color: #eee;
   margin: 0;
 }
-/* line 724, ../../../scss/_metastudio_styles.scss */
+/* line 726, ../../../scss/_metastudio_styles.scss */
 div.banner > * .slide {
   padding: 1rem;
+  margin: 0;
   background-color: #0c969d;
   height: 250px !important;
 }
-/* line 728, ../../../scss/_metastudio_styles.scss */
+/* line 731, ../../../scss/_metastudio_styles.scss */
 div.banner > * .slide > i {
   position: absolute;
   font-size: 15rem;
@@ -9815,45 +9816,45 @@ div.banner > * .slide > i {
   opacity: 0.1;
   right: 5%;
 }
-/* line 739, ../../../scss/_metastudio_styles.scss */
+/* line 742, ../../../scss/_metastudio_styles.scss */
 div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 742, ../../../scss/_metastudio_styles.scss */
+/* line 745, ../../../scss/_metastudio_styles.scss */
 div.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 746, ../../../scss/_metastudio_styles.scss */
+/* line 749, ../../../scss/_metastudio_styles.scss */
 div.banner > * p:first-child {
   color: white;
   font-size: 120%;
 }
 
-/* line 759, ../../../scss/_metastudio_styles.scss */
+/* line 762, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 762, ../../../scss/_metastudio_styles.scss */
+/* line 765, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
 }
 
-/* line 769, ../../../scss/_metastudio_styles.scss */
+/* line 772, ../../../scss/_metastudio_styles.scss */
 .align-center {
   margin: 0 auto;
   display: block;
 }
 
-/* line 776, ../../../scss/_metastudio_styles.scss */
+/* line 779, ../../../scss/_metastudio_styles.scss */
 #profile-img {
   height: 40px;
   margin-right: 5px;
   width: 40px;
 }
 
-/* line 785, ../../../scss/_metastudio_styles.scss */
+/* line 788, ../../../scss/_metastudio_styles.scss */
 #replies-area .disc-replies {
   padding: 10px;
   background-color: #dffbfd;
@@ -9862,11 +9863,11 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-left: 48px;
   margin-top: 10px;
 }
-/* line 794, ../../../scss/_metastudio_styles.scss */
+/* line 797, ../../../scss/_metastudio_styles.scss */
 #replies-area .disc-replies .reply-btn {
   cursor: pointer;
 }
-/* line 798, ../../../scss/_metastudio_styles.scss */
+/* line 801, ../../../scss/_metastudio_styles.scss */
 #replies-area .disc-replies .reply-btn:hover {
   font-weight: bold;
 }
@@ -10052,4 +10053,9 @@ pre {
   /* BLACK STAR */
   color: #ff980d;
   text-shadow: 0 0 1px #333;
+}
+
+/* line 180, ../../../scss/_app_styles.scss */
+body a:visited {
+  color: #1d484a;
 }

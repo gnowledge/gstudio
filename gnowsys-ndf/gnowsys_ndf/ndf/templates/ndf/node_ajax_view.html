@@ -6,7 +6,6 @@
 <script type="text/javascript">
   $(document).foundation();
 </script>
-
 {% block head %}
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -197,6 +196,10 @@ ul#navigation ul {
 ul#navigation ul li ul {
     top: 0;
     left: 181px;
+    height:150px; 
+    width: 200px;
+    overflow:hidden; 
+    overflow-y:auto;
 }
 
 ul#navigation ul li {
@@ -217,6 +220,7 @@ ul#navigation ul li a {
   float:left;
   clear:both;
   width:100%;
+
 }
 
 ul#navigation li a.first {
@@ -233,8 +237,14 @@ ul#navigation li a.last {
 }
 
 /*end dropdown style*/
+.accordion .accordion-navigation > a, .accordion dd > a {
+    color: #10c1cb;
+ }
 
-
+table {
+  display: block;
+  overflow-y: scroll;
+}
 </style>
 
 
@@ -266,9 +276,24 @@ ul#navigation li a.last {
 {% check_user_join request groupid as user_is_joined %}
 
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
-    
-    <section class="medium-9 columns" >
       
+    <section class="medium-9 columns" >
+    {% if breadcrumbs_list %}
+      <ul class="breadcrumbs"> 
+        {% for e in breadcrumbs_list %}
+            {% if topic %}
+              {% get_prior_node e.0 as prior %}
+                {% if prior %}              
+                  <li><b><a style="color:black;">{{prior.0.1}}</a></b></li>
+                  <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+                {% endif %}
+            {% else %}
+              <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+            {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+ 
       <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
 
       {% if node %}
@@ -281,7 +306,7 @@ ul#navigation li a.last {
       </h1>
 
       <h1 class="subheader">
-      <dl class="tabs" data-tab data-options="deep_linking:true"> 
+      <dl class="tabs" data-tab> 
 
       {% if topic %}
         <dd class="active page-view view_list"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
@@ -302,8 +327,69 @@ ul#navigation li a.last {
                         {% endfor %}
                       </ul>
                     </li> 
-                  <!-- {#% elif k == "educationalsubject" %#}
-                    <li class="view_list" id="{{k}}"><a> {% trans "Educational Subject" %} </a></li>  -->
+                  {% elif k == "educationalsubject" %}
+                    <li>
+                      <a> {% trans "Educational Subject" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "textcomplexity" %}
+                    <li>
+                      <a> {% trans "Text Complexity" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "educationalalignment" %}
+                    <li>
+                      <a> {% trans "Educational Alignment" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "language" %}
+                    <li>
+                      <a> {% trans "Language" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "interactivitytype" %}
+                    <li>
+                      <a> {% trans "Interactivity Type" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "audience" %}
+                    <li>
+                      <a> {% trans "Audience" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% elif k == "curricular" %}
+                    <li>
+                      <a> {% trans "Curricular" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
                   {% endif %}
 
                 {% endfor %}
@@ -332,7 +418,7 @@ ul#navigation li a.last {
       <dd class="info-view"><a class="view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       {% if "Group" not in node.member_of_names_list %}
 
-        {% if node|is_File %}         
+        {% if node|is_File or node|is_Page %}         
           <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
             
               {% if all_replies %}
@@ -762,38 +848,136 @@ ul#navigation li a.last {
       {% endif %}
       <div id="view-info" style="display:none;">
        <br/>
-	<table style="width:100%; border-width:0px; font-weight:bold" >
+       <h3 class="text-center" color="blue"> {{node.name}}</h3>
+
+       <dl class="accordion" data-accordion>
+       <dd class="accordion-navigation">
+       <a href="#panel1a" style="font-color:blue">Overview</a>
+       <div id="panel1a" class="content active">
+	 <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 200px;">
 	  <tbody>
+	   
 	    {% get_json node.pk as jsonobj %}
 	    {% str_to_dict jsonobj as obj %}
-    
 	    {% for key, value in obj.items %}
-	    <tr>
-	      <td align ="left"> {{key|del_underscore|title}}</td>
-              
-	      <td align = "right"> 
+            <tr>
+	      {% if key != "attribute_set" and key != "relation_set" and key != "collection_set" %}
+	      <td align ="left"><strong>{{key|del_underscore|title}}</strong></td>
+              <td align = "right"> 
 		{% if "None" not in value %}
 		{% if key|is_in:"attribute_set, file_size, relation_set" %}
-	     
+		
 		{% for k, v in value.items %}
 		{{k}} : {{v}}<br/>
 		{% endfor %}
 		{% elif key|is_in:"group_set ,collection_set, member_of, tags, prior_node, post_node" %}
 		{% for each in value %}
-		{{each}}</br>
+		{{each.name}}</br>
 	    	{% endfor %}
 		{% else %}
 		{{value}}
 		{% endif %}
 	      </td>
 	      {% else %}	     
-	      {{value}}</td>
+	      Not set</td>
              {% endif %}
 	    </tr>
-	    {% endfor %}
-	  <tbody>
-	</table>
+            {% endif %}
+	    {% endfor %}	    
+     </tbody>
+	  </table>
+       </div>
+       </dd>
+<dd class="accordion-navigation">
+    <a href="#panel2a">Collection Set</a>
+    <div id="panel2a" class="content">
+      	   {% get_json node.pk as jsonobj %}
+	   {% str_to_dict jsonobj as obj %}
+	   {% for key, value in obj.items %}
+            
+	      {% if key == "collection_set" %}
+	      {% if "None" not in value %}
+	      <table align ="center" style="width:80%; border-width:0px; height: 200px;" >
+	      <tbody>
+	      <tr>
+		{% for each in value %}
+	   	<td align ="center">{{each.name}}</td>
+		</tr>
+		{% endfor %}
+	      {% endif %}
+	      </tdbody>
+              </table>
+             {% endif %}
+	   {% endfor %}
+           {% for key, value in obj.items %}
+            {% if key == "collection_set" and "None" in value %}
+	      No Collections associted with {{node.name}} resource.
+             {% endif %}
+             {% endfor %}
+	    
+    </div>
+    </dd>
+   <dd class="accordion-navigation">
+    <a href="#panel3a">Attribute Set</a>
+    <div id="panel3a" class="content">
+      	   {% get_json node.pk as jsonobj %}
+	   {% str_to_dict jsonobj as obj %}
+	   {% for key, value in obj.items %}
+              {% if key == "attribute_set" %}
+	  	{% if "None" not in value %}
+              <table align ="center" style="width:80%; border-width:0px; height: 200px;" >
+	      <tbody>
+	       <tr>
+	     {% for k, v in value.items %}
+		<td align ="left"><strong>{{k}}</strong></td>
+		<td align ="right">{{v}}</td>
+             </tr>
+		{% endfor %}
+             </tdbody>
+             </table>
+	    {% endif %}
+		{% endif %}
+	    {% endfor %}    
+            {% for key, value in obj.items %}
+             {% if key == "attribute_set" and "None" in value %}
+             No Attributes associted with {{node.name}} resource.
+	     {% endif %}
+             {% endfor %}
+	   	   
 
+  	   
+          </div>
+    </dd>
+   <dd class="accordion-navigation">
+     <a href="#panel4a">Relation Set</a>
+     <div id="panel4a" class="content">
+       	   {% get_json node.pk as jsonobj %}
+	   {% str_to_dict jsonobj as obj %}
+	   {% for key, value in obj.items %}
+	      {% if key == "relation_set" %}
+	  	{% if "None" not in value %}
+               <table align ="center" style="width:80%; border-width:0px; height:200px;" >
+ 	      <tbody><tr>
+		{% for k, v in value.items %}
+		<td align ="left"><strong>{{k}}</strong></td>
+		<td align ="right">{{v}}</td>
+          </tr>
+		{% endfor %}
+           </tdbody>
+          </table>
+	   {% endif %}
+	   {% endif %}
+	   {% endfor %}
+	     {% for key, value in obj.items %}
+             {% if key == "relation_set" and "None" in value %}
+             No Relations associted with {{node.name}} resource.
+	     {% endif %}
+             {% endfor %}
+	       
+      
+    </div>
+    </dd>
+ </dl>
 
      </div>
 
@@ -1153,6 +1337,48 @@ ul#navigation li a.last {
 
   });
 
+  $(".current").click(function() {
+
+    var nav_list = "{{nav_list}}";
+    {% get_node_type original_node as node_type %}  
+    var node_type = "{{node_type}}";
+    var clicked_node = this.id;
+
+    $.ajax({
+        type: "POST",
+        url: "{% url 'collection_nav' group_id %}",
+        datatype: "html",
+        data:{
+          node_id: clicked_node,
+          curr_node:"{{original_node.pk}}",
+          nav:nav_list,
+          nod_type: node_type,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
+
+          if (node_type == "Page"){
+           window.history.pushState("", "", "/{{group_name_tag}}/page/{{original_node.pk}}"+"?selected="+clicked_node+"");
+          }
+          else if(node_type == "File"){
+            window.history.pushState("", "", "/{{group_name_tag}}/file/{{original_node.pk}}"+"?selected="+clicked_node+"");  
+          }
+          else if (node_type == "Term"){
+            window.history.pushState("", "", "/{{group_name_tag}}/term/{{original_node.pk}}"+"?selected="+clicked_node+"");
+          }
+          else if (node_type == "Group"){
+            window.history.pushState("", "", "/{{original_node.pk}}"+"?selected="+clicked_node+"");
+          }
+          else if (node_type == "Topic"){
+            window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{original_node.pk}}"+"?selected="+clicked_node+"");
+          }
+
+          $("#view_page").html(data);
+
+        }
+    });  
+  });
+
   $(document).on('click',"#save_switch_group",function(){
     var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
     saveflag = 1;
@@ -1212,7 +1438,7 @@ ul#navigation li a.last {
         if (data != "{}"){
           var k = Object.keys(data_obj); // To get the keys from incomming data
           if (selected){
-            fs = "<b><i><u>"+ choice +" level resources: </u></i></b><br/>"  // Fieldset for one element
+            fs = "<b><i><u>Resources with "+ selected + ": " + choice +"  </u></i></b><br/>"  // Fieldset for one element
           }
           else{
             fs = ""  // Fieldset for one element
@@ -1259,7 +1485,7 @@ ul#navigation li a.last {
         }
         else{
           // If no resource found for topic it will show bellow statement
-          var cont = "<h3>No resources available for '"+choice+"' level in this topic</h3>"
+          var cont = "<h3>No resources available with '"+ selected + ": " + choice +"' in this topic</h3>"
           $(".topic_content").html(cont);
         }
 

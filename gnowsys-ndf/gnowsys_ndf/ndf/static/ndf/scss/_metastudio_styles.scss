@@ -513,8 +513,8 @@ article{
 	border-top: 1px dotted #ddd;
 }
     .breadcrumbs{
-	display: none;
-	background-color: #eee;
+	// display: none;
+	// background-color: #eee;
 }
 }
 
@@ -702,6 +702,8 @@ section.promo{
     background-color: rgba(0,0,0,0.9);
     border-bottom: 4px solid #00CEFD;
     .meta{
+        padding-left: 2rem;
+        padding-right: 2rem;
         h4{
             color:white;
         }
@@ -723,6 +725,7 @@ div.banner{
     background-color: $primary-color;
         .slide{
             padding: 1rem;
+            margin: 0;
             background-color: darken($primary-color,5%);
             height:250px!important;
             &>i{

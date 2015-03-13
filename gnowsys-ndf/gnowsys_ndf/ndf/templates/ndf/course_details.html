@@ -66,19 +66,47 @@
     <legend>
   		{% trans "Course Registration Details "%}
     </legend>
-	{% for tab_name, tab_fields_list in property_order_list %}
-		<div class=" {% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
-			{% for field in tab_fields_list %}
-				<div class="small-6 columns"> 
-					{{field.altnames}}
-				</div>
-				<div class="small-3 columns">
-					{{field.value|title}}
-				</div>
-				<br>
-			{% endfor %}
-		</div>
-	{% endfor %}
+    {% if course_gst_name == "NUSSD Course" %}
+    	{% for tab_name, tab_fields_list in property_order_list %}
+    		<div class=" {% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+    			{% for field in tab_fields_list %}
+    				<div class="small-6 columns"> 
+    					{{field.altnames}}
+    				</div>
+    				<div class="small-3 columns {{field.altnames}}">
+              {% if field.altnames == "Master Trainer: Minimum qualifications requirement" or field.altnames == "Voluntary Teacher: Minimum qualifications requirement" %}
+                {% for k in field.value %}
+                  {% for k1,v1 in k.items %}
+                      {% if k1 == "text" %}
+                        {{v1|title}}
+                      {% endif %}
+                  {% endfor %}
+                {% endfor %}
+              {% elif field.altnames == "Tags" %}
+                {% for k in field.value %}
+    	   				  {{k}}
+                {% endfor %}
+              {% else %}
+                {{field.value|title}}
+              {% endif %}
+    				</div>
+    				<br>
+    			{% endfor %}
+    		</div>
+    	{% endfor %}
+    {% elif course_gst_name == "Announced Course" %}
+      {% for each in property_order_list_ac %}
+        <div>
+        {% for fieldk,fieldv in each.items %}
+            <div class="small-6 columns"> 
+              {{fieldk|title}}
+            </div>
+            <div class="small-3 columns end">
+              {{fieldv|title}}
+            </div>
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
   </fieldset>
 
   {% if course_gst_name == "NUSSD Course" %}

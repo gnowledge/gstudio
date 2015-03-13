@@ -1,7 +1,112 @@
 {% extends "ndf/base.html" %}
+{% load ndf_tags %}
 {% load i18n %}
 {% block title %} Tag Browser {% endblock %}
 
+{% block meta_content %}
+    <h2 class="subheader">{% trans "What are Tags?" %}</h2><hr/>
+    <p class="subheader">{% blocktrans %}<b>Tag</b> is like a keyword or category label. <br/>Tags helps you to find photos, videos, files and pages which have something in common.</p>{% endblocktrans%}
+{% endblock %}
+
+{% block style %}
+{%comment%}
+   	.block{ border: 2px solid #a1a1a1;
+    		padding: 10px 40px; 
+    		background: #dddddd; 
+    		width: 400px;
+   			border-radius: 25px;
+   			height:300px;
+    		position:relative;
+    		top:200px;
+    	}
+    .pos_left{border: 2px solid #a1a1a1;
+    				padding: 10px 40px; 
+    				background: #dddddd; 
+    				width: 400px;
+   					border-radius: 25px;
+   					height: 100px;
+   					float:left;
+    			}
+   	.pos_right{border: 2px solid #a1a1a1;
+    				padding: 10px 40px; 
+    				background: #dddddd; 
+    				width: 400px;
+   					border-radius: 25px;
+   					height: 100px;
+   					float:right;
+    			}
+{%endcomment%}
+    h1{ font-size: 300%;}
+    h2{ font-size: 160%;}
+    p { font-size: 125%;}
+    p1{ font-size: 125%;}  
+    i { font-size: 110%;}
+    b { font-size: 120%;}
+{% endblock %}
+
 {% block body_content %} 
-	<h1>{% trans "Will appear very soon .... " %} </h1>
-{% endblock %}	
+
+  <form id ="search_result" action="{% url 'tag_info' group_id %}" method="GET" onsubmit="return checkforBlank()">
+    <div class="row">
+      <div class="small-3 columns">
+        <input type = "text" name = "search" id="value"  maxlength = "20" placeholder="Enter the tag">
+      </div>
+      <div class="small-2 small-pull-7 columns">
+        <input class="button tiny" type="submit" value='Find a tag'>
+      </div>
+    </div>
+  </form>
+
+  <script type = "text/javascript">
+      function checkforBlank(){
+          if(document.getElementById("value").value == ""){
+              alert('Please Enter');
+              return false;
+          }
+      }
+  </script>
+
+  <hr></hr>
+  {% if tagname %}
+    {% if search_result %}
+        <h4><small>{{total}} result found with tag <strong>"{{tagname}}"</strong></small></h4>
+    {% elif not search_result %}
+        <h4><small>{{total_length}} result found with tag <strong>"{{tagname}}"</strong></h4>
+    {% endif %}
+  {% endif %}
+  <br/>
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+{%  for each in search_result %}
+
+  <li class="card">
+    <div class ="published_page">
+      <a href="{% url 'page_details' group_id each.pk %}">
+      <header>
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+          <h3>{{ each.name|truncatechars:10 }}</h3>
+          <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+        <div>
+          <small class="subheader">
+            {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
+            <br/>
+            {% get_user_object each.created_by as user %}
+            by <span href="#" class="user" data-gnow="">{{ user }}</span> 
+          </small>
+        </div>
+      </header>
+     </a>
+        <div class="label-list">
+          {% for tag in each.tags %}
+             <a href="{% url 'tag_info' groupid tag %}"><span class="label"><mark>{{tag}}</mark></span></a>
+          {% endfor %}
+        </div>
+</div> 
+  </li>
+
+  {% endfor %}
+
+</ul>
+
+{% endblock %}

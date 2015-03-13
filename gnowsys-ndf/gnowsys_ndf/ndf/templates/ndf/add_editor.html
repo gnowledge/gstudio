@@ -167,10 +167,10 @@ function internalImg(){
                  success: function(data) {
                            data1 = JSON.parse(data);
                            temp1=''
-                           temp1 +='<h3>Add External Image:</h3><div><label>Image Description</label><input type="text" id="image_des_int" placeholder="Some description ..."><label>Width</label><input type="text" id="image_width_int" placeholder="Enter width in pixel eg.600..."></div>';
+                           temp1 +='<h3>Add Internal Image:</h3><div><label>Image Description</label><input type="text" id="image_des_int" placeholder="Some description ..."><label>Width</label><input type="text" id="image_width_int" placeholder="Enter width in pixel eg.600..."></div>';
                            temp1 +='<label>URL</label><select id="img-select">'
                            for(i=0; i<data1.length; i++)
-                           {temp1 += '<option value="'+data1[i].fname+'" id="'+data1[i]._id+'" name="checkedpic">'+data1[i].name+'</option>'
+                           {temp1 += '<option value="'+data1[i].fname+'" id="'+data1[i]._id+'" name="checkedpic">'+data1[i].name+''+'<img src="'+data1[i].name+'">'+'</option>'
  }
                            temp1 +='</select>'                     
                            temp1 +='<input type="button" onclick="getfullImg()" class="button" value="Add Image">'

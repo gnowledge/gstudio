@@ -460,8 +460,9 @@ GSTUDIO_SITE_GROUPS=""
 GSTUDIO_ORG_LOGO=""
 GSTUDIO_SITE_ORG=""
 GSTUDIO_SITE_CONTRIBUTE=""
-GSTUDIO_SITE_VIDEO="pandora"  #possible values are 'local','pandora' and 'pandora_and_local'
+GSTUDIO_SITE_VIDEO="pandora_and_local"  #possible values are 'local','pandora' and 'pandora_and_local'
 GSTUDIO_SITE_LANDING_PAGE="udashboard"  #possible values are 'home' and 'udashboard'
+GSTUDIO_SITE_HOME_PAGE = None
 #GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
@@ -554,6 +555,14 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
             "States": "State Partners", "Institutions": "Institution Partners", "Individuals": "Individual Partners",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
+
+GSTUDIO_RESOURCES_CREATION_RATING = 5
+
+GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
+
+GSTUDIO_RESOURCES_REPLY_RATING = 2
+
+
 
 try:
     from local_settings import *

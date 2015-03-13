@@ -1,21 +1,20 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, render
-from gnowsys_ndf.ndf.models import *
-from django_mongokit import get_database
 from django.template import RequestContext
 
-database = get_database()
-collection = database[Node.collection_name]
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import *
+
 
 def index(request, group_id):
 	ins_objectid  = ObjectId()
     	if ins_objectid.is_valid(group_id) is False :
-        	group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       	if group_ins:
        		group_id = str(group_ins._id)
       	else :
-        	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :
          	group_id = str(auth._id)
     	else :
@@ -23,10 +22,10 @@ def index(request, group_id):
 	
 	tag_coll = []
 	selected_topic = None
-	topic_coll = collection.Node.find({"_type": u"GSystem"})
+	topic_coll = node_collection.find({"_type": u"GSystem"})
 	topic_count =topic_coll.count()
 	#print "here: " + str(topic_coll)	
-	topics = collection.Node.find({"_type": u"GSystem"})
+	topics = node_collection.find({"_type": u"GSystem"})
 	#Tag collection
 	tag_count = 0
 	for topic1 in topics:
@@ -48,19 +47,19 @@ def details(request, group_id, topic_id):
 	ins_objectid  = ObjectId()
 	group_ins = None
     	if ins_objectid.is_valid(group_id) is False :
-        	group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       	if group_ins:
        		group_id = str(group_ins._id)
       	else :
-        	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :
          	group_id = str(auth._id)
     	else :
         	pass
 
-	selected_topic = collection.Node.one({"_type":u"GSystem", "_id":ObjectId(topic_id)})
-	topic_coll = collection.Node.find({"_type": u"GSystem"})
+	selected_topic = node_collection.one({"_type":u"GSystem", "_id":ObjectId(topic_id)})
+	topic_coll = node_collection.find({"_type": u"GSystem"})
 	topic_count = topic_coll.count()
 	#print "here: " + str(topic_coll)	
 	context = RequestContext(request, {'title': "WikiData Topics", 'topic_coll': topic_coll})
@@ -68,8 +67,8 @@ def details(request, group_id, topic_id):
      	variable = RequestContext(request,{'title': "WikiData Topics"})
 	context_variables = {'title': "WikiData Topics"}
 	context_instance = RequestContext(request, {'title': "WikiData Topics", 'groupid':group_id, 'group_id':group_id})
-	attribute_set = collection.Node.find({"_type":u"GAttribute", "subject":ObjectId(topic_id)})
-	#relation_set = collection.Node.find({"_type":u"GRelation", "subject":ObjectId(topic_id)})
+	attribute_set = triple_collection.find({"_type":u"GAttribute", "subject":ObjectId(topic_id)})
+	#relation_set = triple_collection.find({"_type":u"GRelation", "subject":ObjectId(topic_id)})
 	relation_set = selected_topic.get_possible_relations(selected_topic.member_of)
 	#print relation_set
 	relation_set_dict = {}
@@ -91,18 +90,18 @@ def tag_view_list(request, group_id, topic_id, tag):
 	ins_objectid  = ObjectId()
 	group_ins = None
     	if ins_objectid.is_valid(group_id) is False :
-        	group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       	if group_ins:
        		group_id = str(group_ins._id)
       	else :
-        	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :
          	group_id = str(auth._id)
     	else :
         	pass
 
-	all_topic = collection.Node.find({"_type": u"GSystem"})
+	all_topic = node_collection.find({"_type": u"GSystem"})
 	topic_coll=['None']	
 	for topic in all_topic:
 		if tag in topic.tags:
@@ -116,8 +115,8 @@ def tag_view_list(request, group_id, topic_id, tag):
      	variable = RequestContext(request,{'title': "WikiData Topics"})
 	context_variables = {'title': "WikiData Topics"}
 	context_instance = RequestContext(request, {'title': "WikiData Topics", 'groupid':group_id, 'group_id':group_id})
-	#attribute_set = collection.Node.find({"_type":u"GAttribute", "subject":ObjectId(topic_id)})
-	#relation_set = collection.Node.find({"_type":u"GRelation", "subject":ObjectId(topic_id)})	
+	#attribute_set = triple_collection.find({"_type":u"GAttribute", "subject":ObjectId(topic_id)})
+	#relation_set = triple_collection.find({"_type":u"GRelation", "subject":ObjectId(topic_id)})	
 	#print attribute_set
 	flag =1==1 #passing a true flag value
 	selected_topic=None

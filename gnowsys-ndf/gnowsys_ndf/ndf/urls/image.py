@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.imageDashboard',
-			url(r'^$', 'imageDashboard', name='image'),
+			url(r'^[/]$', 'imageDashboard', name='image'),
 #                        url(r'^/(?P<image_id>[\w-]+)$', 'imageDashboard', name='image'),
                         #url(r'^images/', 'imageDashboard', name='imageDashboard'),                                                 
                         url(r'^/thumbnail/(?P<_id>[\w-]+)$', 'getImageThumbnail', name='getImageThumbnail'),
