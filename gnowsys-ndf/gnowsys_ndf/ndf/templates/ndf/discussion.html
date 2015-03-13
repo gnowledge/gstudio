@@ -172,14 +172,15 @@
   function updateDiscussionTabText()
   {
     var totalReplies = $("#replies-area div.disc-replies:visible").length;
-
     if(totalReplies == 0)
     {
-      $("a[href='#view-discussion'] span").fadeOut().fadeIn().text("Begin Discussion");
+      $(".view-discussion span").fadeOut().fadeIn().html("Begin Discussion");
       $("#create-discussion").text("Initiate discussion on " + $("h1 span.node[itemprop]").text().trim());
     }
-
-    $(".view-discussion span").fadeOut().fadeIn().html("Join Discussion ("+totalReplies+")");
+    else
+    {
+      $(".view-discussion span").fadeOut().fadeIn().html("Join Discussion ("+totalReplies+")");
+    }
   }
 
 
