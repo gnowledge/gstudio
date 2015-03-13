@@ -2747,7 +2747,7 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
 
     Keyword arguments:
     subject_id -- (Optional argument)
-        - Specify this argument if you need to delete/purge Gattribute(s)
+        - Specify this argument if you need to delete/purge GAttribute(s)
         related to given node belonging to Nodes collection
         - ObjectId of the node whose GAttribute node(s) need(s) to be deleted,
         accepted in either format String or ObjectId
@@ -2763,11 +2763,12 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         query variable
 
     deletion_type -- (Optional argument)
-        - To signify two types of deletion:
-        0: Normal delete (zero)
+        - Specify this to signify which type of deletion you need to perform
+        - Accepts only either of the following values:
+        (a) 0 (zero, i.e.  Normal delete)
             - Process in which node exists in database; only status field's
             value is set to "DELETED"
-        1: Purge (one)
+        (b) 1 (one, i.e. Purge)
             - Process in which node is deleted from the database
         - Default value is set to 0 (zero)
 
@@ -2780,25 +2781,27 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
     Otherwise, (False, "Error message !")
 
     Examples:
-    del_status, del_status_msg = delete_gattribute(subject_id=ObjectId("..."))
-    del_status, del_status_msg = delete_gattribute(subject_id=ObjectId("..."), deletion_type=0)
-    del_status, del_status_msg = delete_gattribute(subject_id=ObjectId("..."), deletion_type=1)
+    del_status, del_status_msg = delete_attribute(
+        subject_id=ObjectId("...")
+        [, deletion_type=0[/1]]
+    )
 
-    del_status, del_status_msg = delete_gattribute(node_id=ObjectId("..."))
-    del_status, del_status_msg = delete_gattribute(node_id=ObjectId("..."), deletion_type=0)
-    del_status, del_status_msg = delete_gattribute(node_id=ObjectId("..."), deletion_type=1)
+    del_status, del_status_msg = delete_attribute(
+        node_id=ObjectId("...")
+        [, deletion_type=0[/1]]
+    )
     """
     node_id = None
     str_node_id = ""
     str_subject_id = ""
-    str_deletion_type = "deleted"  # As default value of deleion_type is 0
+    str_deletion_type = "deleted"  # As default value of deletion_type is 0
 
     # Below variable holds list of ObjectId (string format)
-    # of GAttribute node(s) which is/are deleted
+    # of GAttribute node(s) which is/are going to be deleted
     gattribute_deleted_id = []
 
     # Below variable holds list of ObjectId (string format)
-    # of GAttribute node(s) whose object_value field is updated
+    # of GAttribute node(s) whose object_value field is/are going to be updated
     gattribute_updated_id = []
 
     query = OrderedDict()
@@ -2807,7 +2810,7 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         # print "\n 1 >> Begin..."
         if deletion_type not in [0, 1]:
             delete_status_message = "Must pass \"deletion_type\" agrument's " \
-                + "value as either 0 (Normal delete) or 1 (Purge) !!!"
+                + "value as either 0 (Normal delete) or 1 (Purge)"
             raise Exception(delete_status_message)
 
         # print "\n 2 >> looking for node_id..."
@@ -2815,32 +2818,26 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
             # Typecast node_id from string into ObjectId,
             # if found in string format
             node_id = kwargs["node_id"]
-            # print "\t 2 >> found node_id..."
-            if not node_id:
-                node_id = None
-                delete_status_message = "No value found for node_id" \
-                    + "... [Expected value in ObjectId " \
-                    + "format] !!!"
-                raise Exception(delete_status_message)
 
             # print "\t 2a >> convert node_id..."
-            if type(node_id) == ObjectId:
-                str_node_id = str(node_id)
-                # print "\t 2b >> node_id -- O to s: ", type(str_subject_id), " -- ", str_subject_id
-            else:
-                str_node_id = node_id
-                if ObjectId.is_valid(node_id):
-                    node_id = ObjectId(node_id)
-                    # print "\t 2c >> node_id -- s to O: ", type(str_subject_id), " -- ", str_subject_id
+            if node_id:
+                if type(node_id) == ObjectId:
+                    str_node_id = str(node_id)
+                    # print "\t 2b >> node_id -- O to s: ", type(str_subject_id), " -- ", str_subject_id
                 else:
-                    delete_status_message = "Invalid value found for node_id " \
-                        + "(%(str_node_id)s)... [Expected value in ObjectId " \
-                        + "format] !!!" % locals()
-                    raise Exception(delete_status_message)
+                    str_node_id = node_id
+                    if ObjectId.is_valid(node_id):
+                        node_id = ObjectId(node_id)
+                        # print "\t 2c >> node_id -- s to O: ", type(str_subject_id), " -- ", str_subject_id
+                    else:
+                        delete_status_message = "Invalid value found for node_id " \
+                            + "(%(str_node_id)s)... [Expected value in" % locals() \
+                            + " ObjectId format] !!!"
+                        raise Exception(delete_status_message)
 
-            # Forming query to delete a specific GAtribute node
-            query = {"_id": node_id}
-            # print "\t 2d >> query... ", query
+                # Forming query to delete a specific GAtribute node
+                query = {"_id": node_id}
+                # print "\t 2d >> query... ", query
 
         # print "\n 3 >> looking for subject_id..."
         if not node_id:
@@ -2848,8 +2845,7 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
             # print "\t 3 >> found subject_id..."
             if not subject_id:
                 delete_status_message = "Either specify subject_id " \
-                    + "or node_id [Expected value in ObjectId " \
-                    + "format]!!!"
+                    + "or node_id [Expected value in ObjectId format] !!!"
                 raise Exception(delete_status_message)
 
             # print "\t 3a >> convert subject_id..."
@@ -2867,8 +2863,8 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
                     else:
                         if not node_id:
                             delete_status_message = "Invalid value found for subject_id " \
-                                + "(%(str_subject_id)s)... [Expected value in ObjectId " \
-                                + "format] !!!" % locals()
+                                + "(%(str_subject_id)s)... [Expected value in" % locals() \
+                                + " ObjectId format] !!!"
                             raise Exception(delete_status_message)
 
                 # Check first whether request is
@@ -2889,8 +2885,6 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
 
         # Perform normal delete operation (i.e. deletion_type == 0)
         for each_ga in gattributes:
-            # each_ga.status = u"DELETED"
-            # each_ga.save()
             gattribute_deleted_id.append(each_ga._id.__str__())
 
             if each_ga.status != u"DELETED":
@@ -2926,7 +2920,7 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
             })
             # print "\n 8 >> gattributes.count()... ", gattributes.count()
             for each_ga in gattributes:
-                # (a) Update gattribute node's object_value field
+                # (a) Update GAttribute node's object_value field
                 # Remove subject_id from object_value
                 # (b) Update subject node's attribute_set field
                 # Remove subject_id from the value corresponding to
@@ -2967,32 +2961,40 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         # Return output of the function
         # print "\n 9 >> ", delete_status_message
         return (True, delete_status_message)
-
     except Exception as e:
         delete_status_message = "DeleteGAttributeError: " + str(e)
         return (False, delete_status_message)
 
 
-def delete_node(node_id, deletion_type=0, **kwargs):
-    """This function deletes node of Nodes collection only. But along with
-    that it also implicitly deletes GAttribute and GRelation node(s) related to
-    given deleting-node.
+def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
+    """This function deletes GRelation node(s) of Triples collection.
 
-    You can't use this function for explcitly deleting node of Triple
-    collection.
+    Keyword arguments:
+    subject_id -- (Optional argument)
+        - Specify this argument if you need to delete/purge GRelation(s)
+        related to given node belonging to Nodes collection
+        - ObjectId of the node whose GRelation node(s) need(s) to be deleted,
+        accepted in either format String or ObjectId
+        - Default value is set to None
 
-    Arguments:
-    str_node_id (Mandatory argument)
-        - ObjectId of the node to be deleted in either format
-        String or ObjectId
-    deletion_type (Optional argument)
-        - To signify two types of deletion:
-        0: Normal delete
+    kwargs["node_id"] -- (Optional argument)
+        - Specify this argument if you need to delete/purge only a given
+        GRelation node
+        - ObjectId of the GRelation node to be deleted/purged, accepted in
+        either format String or ObjectId
+        - If this argument is specified, subject_id will work as an optional
+        argument and even query variable would be overridden by node_id's
+        query variable
+
+    deletion_type -- (Optional argument)
+        - Specify this to signify which type of deletion you need to perform
+        - Accepts only either of the following values:
+        (a) 0 (zero, i.e.  Normal delete)
             - Process in which node exists in database; only status field's
             value is set to "DELETED"
-        1: Purge
-            - Process in which node is deleted along with all it's references
-            - Including GRelation(s) and GAttribute(s)
+        (b) 1 (one, i.e. Purge)
+            - Process in which node is deleted from the database
+        - Default value is set to 0 (zero)
 
     Returns:
     A tuple with following values:
@@ -3001,210 +3003,603 @@ def delete_node(node_id, deletion_type=0, **kwargs):
 
     If deletion is successful, then (True, "Success message.")
     Otherwise, (False, "Error message !")
+
+    Examples:
+    del_status, del_status_msg = delete_grelation(
+        subject_id=ObjectId("...")
+        [, deletion_type=0[/1]]
+    )
+
+    del_status, del_status_msg = delete_grelation(
+        node_id=ObjectId("...")
+        [, deletion_type=0[/1]]
+    )
     """
+    node_id = None
+    str_node_id = ""
+    str_subject_id = ""
+    str_deletion_type = "deleted"  # As default value of deletion_type is 0
 
-    """ UNDER CONSTRUCTION
+    # Below variable holds list of ObjectId (string format)
+    # of GRelation node(s) which is/are going to be deleted
+    grelation_deleted_id = []
+
+    # Below variable holds list of ObjectId (string format)
+    # of GRelation node(s) [inverse-relation] which is/are going to be deleted
+    inverse_grelation_deleted_id = []
+
+    query_by_id = {}  # Search by _id field
+    query_for_relation = OrderedDict()  # Search by subject field
+    query_for_inverse_relation = OrderedDict()  # Search by right_subject field
+
+    def _perform_delete_updates_on_node(gr_node):
+        rel_name = gr_node.relation_type.name
+        inv_rel_name = gr_node.relation_type.inverse_name
+        subj = gr_node.subject
+        right_subj = gr_node.right_subject
+
+        # Remove right-subject-node's ObjectId from the value
+        # corresponding to subject-node's "relation-name" key
+        # referenced in relation_set field
+        res = node_collection.collection.update({
+            '_id': subj,
+            'relation_set.' + rel_name: {'$exists': True}
+        }, {
+            '$pull': {'relation_set.$.' + rel_name: right_subj}
+        },
+            upsert=False, multi=False
+        )
+        # print "\n 5 -- subject node's (", subj, ") relation-name key (", rel_name, ") referenced in relation_set field updated -- \n", res
+
+        # Remove subject-node's ObjectId from the value corresponding
+        # to right-subject-node's "inverse-relation-name" key
+        # referenced in relation_set field
+        res = node_collection.collection.update({
+            '_id': right_subj,
+            'relation_set.' + inv_rel_name: {'$exists': True}
+        }, {
+            '$pull': {'relation_set.$.' + inv_rel_name: subj}
+        },
+            upsert=False, multi=False
+        )
+        # print " 5 -- right_subject node's (", right_subj, ") inverse-relation-name key (", inv_rel_name, ") referenced in relation_set field updated -- \n", res
+
+        gr_node.status = u"DELETED"
+        gr_node.save()
+
     try:
-        print "\n 1 -- Eneterd in delete node function..."
-
+        # print "\n 1 >> Begin..."
         if deletion_type not in [0, 1]:
-            delete_status_message = "Must pass \"deletion_type\" agrument's value as either 0 (Normal delete) or 1 (Purge) !!!"
-            print "\n 2 -- ", delete_status_message
-            return (False, delete_status_message)
+            delete_status_message = "Must pass \"deletion_type\" agrument's " \
+                + "value as either 0 (Normal delete) or 1 (Purge) !!!"
+            raise Exception(delete_status_message)
 
-        node_to_be_deleted = None
-        str_node_id = ""
+        # print "\n 2 >> looking for node_id..."
+        if "node_id" in kwargs:
+            # Typecast node_id from string into ObjectId,
+            # if found in string format
+            node_id = kwargs["node_id"]
 
-        # Typecast node_id from string into ObjectId, if found in string format
-        if type(node_id) == ObjectId:
-            str_node_id = str(node_id)
-            print "\n 3 -- ObjectId to string..."
+            # print "\t 2a >> convert node_id..."
+            if node_id:
+                if type(node_id) == ObjectId:
+                    str_node_id = str(node_id)
+                    # print "\t 2b >> node_id -- O to s: ", type(str_subject_id), " -- ", str_subject_id
+                else:
+                    str_node_id = node_id
+                    if ObjectId.is_valid(node_id):
+                        node_id = ObjectId(node_id)
+                        # print "\t 2c >> node_id -- s to O: ", type(str_subject_id), " -- ", str_subject_id
+                    else:
+                        delete_status_message = "Invalid value found for node_id " \
+                            + "(%(str_node_id)s)... [Expected value in" % locals() \
+                            + " ObjectId format] !!!"
+                        raise Exception(delete_status_message)
+
+                # Forming query to delete a specific GRelation node
+                query_by_id = {"_id": node_id}
+                # print "\t 2d >> query... ", query_by_id
+
+        # print "\n 3 >> looking for subject_id..."
+        if not node_id:
+            # Perform check for subject_id
+            # print "\t 3 >> found subject_id..."
+            if not subject_id:
+                delete_status_message = "Either specify subject_id " \
+                    + "or node_id [Expected value in ObjectId format] !!!"
+                raise Exception(delete_status_message)
+
+            # print "\t 3a >> convert subject_id..."
+            if subject_id:
+                # Typecast subject_id from string into ObjectId,
+                # if found in string format
+                if type(subject_id) == ObjectId:
+                    str_subject_id = str(subject_id)
+                    # print "\t 3b >> subject_id -- O to s: ", type(str_subject_id), " -- ", str_subject_id
+                else:
+                    str_subject_id = subject_id
+                    if ObjectId.is_valid(subject_id):
+                        subject_id = ObjectId(subject_id)
+                        # print "\t 3c >> subject_id -- s to O: ", type(str_subject_id), " -- ", str_subject_id
+                    else:
+                        if not node_id:
+                            delete_status_message = "Invalid value found for subject_id " \
+                                + "(%(str_subject_id)s)... [Expected value in" % locals() \
+                                + " ObjectId format] !!!"
+                            raise Exception(delete_status_message)
+
+                # Check first whether request is
+                # for single GRelation node delete or not
+                # print "\t 3d >> Override query... ???"
+                if not node_id:
+                    # Form this query only when you need to
+                    # delete/purge GRelation(s) related to a given node
+                    query_for_relation = {"_type": "GRelation", "subject": subject_id}
+                    query_for_inverse_relation = {"_type": "GRelation", "right_subject": subject_id}
+                    # print "\t 3e >> query (YES)... \n\t", query_for_relation, "\n\t", query_for_inverse_relation
+
+        # Based on what you need to perform
+        # Delete single GRelation node (query_by_id), or
+        # Delete GRelation node(s) related to a given node (subject_id)
+        # (i.e, query_for_relation and query_for_inverse_relation)
+        # Find the required GRelation node(s) & perform required operation(s)
+        if query_by_id:
+            # print "\n delete single GRelation node"
+            grelations = triple_collection.find(query_by_id)
+            for each_rel in grelations:
+                if each_rel.status != u"DELETED":
+                    _perform_delete_updates_on_node(each_rel)
+                grelation_deleted_id.append(each_rel._id.__str__())
+
+            # print "\n 5 >> grelation_deleted_id... " + ", ".join(grelation_deleted_id)
+
+            # Perform purge operation
+            if deletion_type == 1:
+                # Remove from database
+                str_deletion_type = "purged"
+                triple_collection.collection.remove(query_by_id)
+                # print "\n 6 >> purged (relation) also... " + ", ".join(grelation_deleted_id)
         else:
-            str_node_id = node_id
-            if ObjectId.is_valid(node_id):
-                node_id = ObjectId(node_id)
-                print "\n 4 -- string to ObjectId..."
-            else:
-                delete_status_message = "Invalid value found for node_id (%(str_node_id)s)... [Expected value in ObjectId format] !!!" % locals()
-                print "\n 5 -- ", delete_status_message
-                return (False, delete_status_message)
+            # print "\n handle query_for_relation, query_for_inverse_relation"
+            grelations = None
+            inv_grelations = None
 
-        # Fetch the deleting-node from given node_id
-        node_to_be_deleted = node_collection.find_one({"_id": node_id})
-        # print "\n ", node_to_be_deleted
-        # raise Exception("ITesting...")
+            # (1) Find relation(s) of given node (subject_id)
+            # i.e, GRelation node where given node's ObjectId resides
+            # in subject field
+            grelations = triple_collection.find(query_for_relation)
+            for each_rel in grelations:
+                if each_rel.status != u"DELETED":
+                    _perform_delete_updates_on_node(each_rel)
+                grelation_deleted_id.append(each_rel._id.__str__())
 
-        if not node_to_be_deleted:
-            delete_status_message = "Node with given ObjectId (%(str_node_id)s) doesn't exists !!!" % locals()
-            print "\n 6 -- ", delete_status_message
-            return (False, delete_status_message)
+            # (2) Find inverse-relation(s) of given node (subject_id)
+            # i.e, GRelation node where given node's ObjectId resides
+            # in right_subject field
+            inv_grelations = triple_collection.find(query_for_inverse_relation)
+            for each_inv_rel in inv_grelations:
+                if each_inv_rel.status != u"DELETED":
+                    _perform_delete_updates_on_node(each_inv_rel)
+                inverse_grelation_deleted_id.append(each_inv_rel._id.__str__())
 
-        node_name = node_to_be_deleted.name
+            # print "\n 5 >> grelation_deleted_id... " + ", ".join(grelation_deleted_id)
+            # print "\n 5 >> inverse_grelation_deleted_id... " + ", ".join(inverse_grelation_deleted_id)
 
-        if node_to_be_deleted.status == u"DELETED":
-            delete_status_message = "%(node_name)s (%(str_node_id)s) has already been deleted (using normal delete)." % locals()
-            print "\n 6 -- ", delete_status_message
-            return (True, delete_status_message)
+            # Perform purge operation
+            if deletion_type == 1:
+                # Remove from database
+                str_deletion_type = "purged"
+                triple_collection.collection.remove(query_for_relation)
+                triple_collection.collection.remove(query_for_inverse_relation)
+                # print "\n 6 >> purged (relation) also... " + ", ".join(grelation_deleted_id)
+                # print "\n 6 >> purged (inverse-relation) also... " + ", ".join(inverse_grelation_deleted_id)
 
-        print "\n 7 -- node to be deleted fetched successfully... ", node_to_be_deleted.name, " |||"
-        if not deletion_type:
-            # Perform normal delete on given node
-            # Only changes the status of given node to DELETED
-            node_to_be_deleted.status = u"DELETED"
-            node_to_be_deleted.save()
-
-            delete_status_message = "%(node_name)s (%(str_node_id)s) deleted successfully." % locals()
-            print "\n 8 -- ", delete_status_message
+        # Formulate delete-status-message
+        if grelation_deleted_id:
+            delete_status_message = "\tFollowing are the list of ObjectId(s) of " \
+                + "%(str_deletion_type)s GRelation [Normal relation] node(s):- \n\t" % locals() \
+                + ", ".join(grelation_deleted_id)
         else:
-            # Purge the deleting-node
+            delete_status_message = "\tNo GRelation [Normal relation] nodes have been " \
+                + "%(str_deletion_type)s !!!" % locals()
 
-            # Find it's left relation(s)
-            # i.e, GRelation node where deleting-node's ObjectId resides in subject field
-            left_relations = triple_collection.find({"_type": "GRelation", "subject": node_to_be_deleted._id})
-            print "\n 9 -- left_relations: ", left_relations.count()
-            for each_left_gr in left_relations:
-                print "\n 9 -- left_relations: ", each_left_gr._id
-                if each_left_gr.relation_type.name == "has_login":
-                    # Special case: if "has_login" relation found
-                    # Fetch that auth_node
-                    # Remove this auth_node's created_by value from
-                    # every Group's group_admin and/or author_set fields
-                    # wherein it exists
-                    print "\n 10 -- has_login"
-                    auth_node = node_collection.one(
-                        {'_id': each_left_gr.right_subject},
-                        {'created_by': 1}
-                    )
+        if inverse_grelation_deleted_id:
+            delete_status_message += "\n\n\tFollowing are the list of ObjectId(s) of " \
+                + "%(str_deletion_type)s GRelation [Inverse relation] node(s):- \n\t" % locals() \
+                + ", ".join(inverse_grelation_deleted_id)
+        else:
+            delete_status_message += "\n\n\tNo GRelation [Inverse relation] nodes have been " \
+                + "%(str_deletion_type)s !!!" % locals()
 
-                    if auth_node:
-                        res = node_collection.collection.update(
-                            {'_type': "Group", '$or': [{'group_admin': auth_node.created_by}, {'author_set': auth_node.created_by}]},
-                            {'$pull': {'group_admin': auth_node.created_by, 'author_set': auth_node.created_by}},
-                            upsert=False, multi=True
-                        )
-                        print "\n 10 -- group/author -- \n", res
-
-                # Remove deleting-node's ObjectId from the value corresponding to
-                # right_subject node's "inverse-relation-name" key
-                # referenced in relation_set field
-                res = node_collection.collection.update(
-                    {'_id': each_left_gr.right_subject, 'relation_set.'+each_left_gr.relation_type.inverse_name: {'$exists': True}},
-                    {'$pull': {'relation_set.$.'+each_left_gr.relation_type.inverse_name: node_to_be_deleted._id}},
-                    upsert=False, multi=False
-                )
-                print "\n 11 -- right_subject node's inverse-relation-name key referenced in relation_set field updated -- \n", res
-
-                # Delete left-grelation node
-                each_left_gr.delete()
-
-            # Find it's right relation(s)
-            # i.e, GRelation node where deleting-node's ObjectId resides in right_subject field
-            right_relations = triple_collection.find({"_type": "GRelation", "right_subject": node_to_be_deleted._id})
-            print "\n 12 -- right_relations: ", right_relations.count()
-            for each_right_gr in right_relations:
-                # Remove deleting-node's ObjectId from the value corresponding to
-                # right_subject node's "relation-name" key
-                # referenced in relation_set field
-                print "\n 12 -- right_relations: ", each_right_gr._id
-                res = node_collection.collection.update(
-                    {'_id': each_right_gr.subject, 'relation_set.'+each_right_gr.relation_type.name: {'$exists': True}},
-                    {'$pull': {'relation_set.$.'+each_right_gr.relation_type.name: node_to_be_deleted._id}},
-                    upsert=False, multi=False
-                )
-                print "\n 13 -- right_subject node's relation-name key referenced in relation_set field updated -- \n", res
-
-                # Delete right-grelation node
-                each_right_gr.delete()
-
-            # Find it's attribute(s)
-            # i.e. GAttribute node where deleting-node's ObjectId resides in subject field
-            attributes = triple_collection.find({"_type": "GAttribute", "subject": node_to_be_deleted._id})
-            print "\n 14 -- attributes: ", attributes.count()
-            for each_ga in attributes:
-                print "\n 14 -- attributes: ", each_ga._id
-                # Delete attribute node
-                each_ga.delete()
-
-            # Find attribute(s)
-            # i.e. GAttribute where in deleting-node's ObjectId exists in their object_value field
-            attributes = None
-            attributes = triple_collection.find({"_type": "GAttribute", "object_value": node_to_be_deleted._id})
-            print "\n 15 -- attributes (object_value): ", attributes.count()
-            for each_ga in attributes:
-                # (a) Update attribute node's object_value field
-                # Remove deleting-node's ObjectId from object_value
-                # (b) Update subject node's attribute_set field
-                # Remove deleting-node's ObjectId from the value corresponding to
-                # subject node's "attribute-name" key referenced in attribute_set field
-                print "\n 15 -- attributes (object_value): ", each_ga._id
-
-                # Expecting object_value as list of ObjectIds
-                obj_val = []
-                if type(each_ga.object_value) == list:
-                    print "\tobject_value as list found..."
-                    obj_val = each_ga.object_value
-
-                    # Avoid assignment without declaration
-                    prev_obj_val = []
-                    prev_obj_val.extend(obj_val)
-
-                    if node_to_be_deleted._id in obj_val:
-                        obj_val.remove(node_to_be_deleted._id)
-
-                    print "\tobject_value: ", each_ga._id, " -- ", obj_val
-                    print "\tprev_object_value: ", each_ga._id, " -- ", prev_obj_val
-
-                    if prev_obj_val != obj_val:
-                        # Update only when there is any change found
-                        # Below call will perform (a) & (b) collectively
-                        create_gattribute(each_ga.subject, each_ga.attribute_type, obj_val)
-                        print "\t", each_ga._id, " -- object_value UPDATED"
-
-            # Search deleting-node's ObjectId in collection_set field and remove from it, if found any
-            res = node_collection.collection.update(
-                {"_type": "GSystem", "collection_set": node_to_be_deleted._id},
-                {"$pull": {"collection_set": node_to_be_deleted._id}},
-                upsert=False,
-                multi=True
-            )
-            print "\n 16 -- collection_set : ", res
-
-            # Search deleting-node's ObjectId in prior_node field and remove from it, if found any
-            res = node_collection.collection.update(
-                {"_type": "GSystem", "prior_node": node_to_be_deleted._id},
-                {"$pull": {"prior_node": node_to_be_deleted._id}},
-                upsert=False,
-                multi=True
-            )
-            print "\n 17 -- prior_node : ", res
-
-            # Search deleting-node's ObjectId in post_node field and remove from it, if found any
-            res = node_collection.collection.update(
-                {"_type": "GSystem", "post_node": node_to_be_deleted._id},
-                {"$pull": {"post_node": node_to_be_deleted._id}},
-                upsert=False,
-                multi=True
-            )
-            print "\n 18 -- post_node : ", res
-
-            # If given node is of member-of File GApp
-            # Then remove it's references from GridFS as well
-            # Consider File GApp's ObjectId is there in member_of field
-            if node_to_be_deleted.member_of_names_list == "File":
-                print "\n 19 -- node found as File; nodes in GridFS : ", len(node_to_be_deleted.fs_file_ids)
-                if node_to_be_deleted.fs_file_ids:
-                    for each in node_to_be_deleted.fs_file_ids:
-                        print "\tdeleting node in GridFS : ", each
-                        node_to_be_deleted.fs.files.delete(each)
-
-            # Finally delete the node
-            node_to_be_deleted.delete()
-
-            delete_status_message = "%(node_name)s (%(str_node_id)s) purged successfully." % locals()
-            print "\n 20 -- ", delete_status_message
-
+        # Return output of the function
+        # print "\n 9 >> ", delete_status_message
         return (True, delete_status_message)
     except Exception as e:
-        delete_status_message = "Error (from delete_node): " + str(e) + " !!!"
+        delete_status_message = "DeleteGRelationError: " + str(e)
         return (False, delete_status_message)
+
+
+def delete_node(
+        node_id=None, collection_name=node_collection.collection_name,
+        deletion_type=0, **kwargs):
+    """This function deletes node belonging to either Nodes collection or
+    Triples collection.
+
+    Keyword Arguments:
+    node_id -- (Optional argument)
+        - Specify this argument if you need to delete/purge only a given
+        node from Nodes/Triples collection
+        - ObjectId of the node to be deleted/purged, accepted in
+        either format String or ObjectId
+        - If this argument is specified, then subject_id parameter will be
+        ignored (if specified) in case of deleting node from Triples collection
+        - If this argument is ignored, then you must specify subject_id as a
+        parameter (mandatory in case of deleting node from Triples collection).
+        - Default value is set to None
+
+    collection_name -- (Optional argument)
+        - Specify this to signify from which collection you need to delete node
+        i.e. helpful in setting-up the collection-variable
+        - Name of the collection you need to refer for performing deletion
+        - Accepts only either of the following values:
+        (a) node_collection.collection_name/"Nodes"
+        (b) triple_collection.collection_name/"Triples"
+        - Default set to node_collection.collection_name (i.e. "Nodes")
+
+    deletion_type -- (Optional argument)
+        - Specify this to signify which type of deletion you need to perform
+        - Accepts only either of the following values:
+        (a) 0 (zero, i.e.  Normal delete)
+            - Process in which node exists in database; only status field's
+            value is set to "DELETED"
+        (b) 1 (one, i.e. Purge)
+            - Process in which node is deleted from the database
+        - Default value is set to 0 (zero)
+
+    kwargs["subject_id"] -- (Optional argument)
+        - Specify this argument if you need to delete/purge GRelation(s) and/or
+        GAttribute(s) related to given node belonging to Nodes collection
+        - ObjectId of the node whose GAttribute(s) and/or GRelation node(s)
+        need(s) to be deleted, accepted in either format String or ObjectId
+        - Default value is set to None
+
+    kwargs["_type"] -- (Optional argument)
+        - Specify this argument if you need to delete/purge specifically either
+        only GAttribute node(s) or GRelation node(s)
+        - If ignored, then by default node(s) belonging to both types
+        (GAttribute and GRelation) will be considered for deleting/purging
+        - Can also be specified in case of delete/purge Nodes collection node
+
+    Returns:
+    A tuple with following values:
+        First-element: Boolean value
+        Second-element: Message
+
+    If deletion is successful, then (True, "Success message.")
+    Otherwise, (False, "Error message !")
+
+    If you need to delete node of Nodes collection, then you only need to
+    specify node_id, collection_name, and deletion_type as parameters.
+        Examples:
+        del_status, del_status_msg = delete_node(
+            node_id=ObjectId("...")
+            [, collection_name=node_collection.collection_name]
+            [, deletion_type=0[/1]]
+        )
+
+    If you need to delete node(s) of Triples collection, then you need to
+    specify node_id/subject_id [depending on whether you need to delete single
+    node or multiple nodes which are related to given node of Nodes collection]
+    , collection_name, _type, and deletion_type as parameters.
+        Examples:
+        del_status, del_status_msg = delete_node(
+            subject_id=ObjectId("..."),
+            collection_name=triple_collection.collection_name
+            [, _type="GAttribute"[/"GRelation"]]
+            [, deletion_type=0[/1]]
+        )
+        del_status, del_status_msg = delete_node(
+            node_id=ObjectId("..."),
+            collection_name=triple_collection.collection_name
+            [, _type="GAttribute"[/"GRelation"]]
+            [, deletion_type=0[/1]]
+        )
     """
+
+    try:
+        # print "\n 1 >> Entered in delete_node() function..."
+        # Convert into string format if value of some other data-type is passed
+        collection_name = collection_name.__str__()
+
+        # Check from which collection you need to delete node from
+        if collection_name == node_collection.collection_name:
+            # Perform deletion operation on Nodes collection
+            str_node_id = ""
+            query = {}
+            node_to_be_deleted = None
+            node_name = ""
+            # As default value of deletion_type is 0
+            str_deletion_type = "deleted"
+            delete_status_message = ""
+
+            # print "\n 2 >> Nodes collection..."
+            if deletion_type not in [0, 1]:
+                delete_status_message = "Must pass \"deletion_type\" agrument's " \
+                    + "value as either 0 (Normal delete) or 1 (Purge) !!!"
+                raise Exception(delete_status_message)
+
+            # print "\t 3 >> found node_id..."
+            if not node_id:
+                delete_status_message = "No value found for node_id" \
+                    + "... [Expected value in ObjectId format] !!!"
+                raise Exception(delete_status_message)
+
+            # print "\t 3a >> convert node_id..."
+            # Typecast node_id from string into ObjectId,
+            # if found in string format
+            if type(node_id) == ObjectId:
+                str_node_id = str(node_id)
+                # print "\t 3b >> node_id -- O to s: ", type(str_node_id), " -- ", str_node_id
+            else:
+                str_node_id = node_id
+                if ObjectId.is_valid(node_id):
+                    node_id = ObjectId(node_id)
+                    # print "\t 3c >> node_id -- s to O: ", type(str_node_id), " -- ", str_node_id
+                else:
+                    delete_status_message = "Invalid value found for node_id " \
+                        + "(%(str_node_id)s)... [Expected value in" % locals() \
+                        + " ObjectId format] !!!"
+                    raise Exception(delete_status_message)
+
+            # Forming query to delete a specific node from Nodes collection
+            query = {"_id": node_id}
+            # print "\t 3d >> query... ", query
+
+            # Fetch the deleting-node from given node_id
+            node_to_be_deleted = node_collection.find_one(query)
+
+            if not node_to_be_deleted:
+                delete_status_message = "Node with given ObjectId " \
+                    + "(%(str_node_id)s) doesn't exists " % locals() \
+                    + "in Nodes collection !!!"
+                raise Exception(delete_status_message)
+
+            node_name = node_to_be_deleted.name
+
+            if node_to_be_deleted.status == u"DELETED" and deletion_type == 0:
+                delete_status_message = "%(node_name)s (%(str_node_id)s) has " % locals() \
+                    + "already been deleted (using normal delete)." \
+                    + "\n\nIf required, you can still purge this node !"
+                return (True, delete_status_message)
+
+            # print "\n 4 >> node to be deleted fetched successfully... ", node_to_be_deleted.name
+            if ((node_to_be_deleted.status == u"DELETED" and
+                deletion_type == 1) or
+                    (node_to_be_deleted.status != u"DELETED")):
+                # Perform delete/purge operation for
+                # deleting-node's GAttribute(s)
+                # print "\n\n 5 >> node's (", node_to_be_deleted.name,") GAttribute... "
+                del_status, del_status_msg = delete_gattribute(
+                    subject_id=node_to_be_deleted._id,
+                    deletion_type=deletion_type
+                )
+                if not del_status:
+                    raise Exception(del_status_msg)
+                delete_status_message = del_status_msg
+                # print "\n 5* >> delete_status_message... \n", delete_status_message
+
+                # Required as below this node is getting saved and
+                # in above delete_gattribute() function, it's getting updated
+                node_to_be_deleted.reload()
+
+                # Perform delete/purge operation
+                # for deleting-node's GRelation(s)
+                # print "\n\n 6 >> node's (", node_to_be_deleted.name,") GRelation... "
+                del_status, del_status_msg = delete_grelation(
+                    subject_id=node_to_be_deleted._id,
+                    deletion_type=deletion_type
+                )
+                if not del_status:
+                    raise Exception(del_status_msg)
+                delete_status_message += "\n\n" + del_status_msg
+                # print "\n 6* >> delete_status_message... \n", delete_status_message
+
+                # Required as below this node is getting saved and
+                # in above delete_gattribute() function, it's getting updated
+                node_to_be_deleted.reload()
+
+                # Search deleting-node's ObjectId in collection_set field and
+                # remove from it, if found any
+                res = node_collection.collection.update({
+                    "_type": "GSystem",
+                    "collection_set": node_to_be_deleted._id
+                }, {
+                    "$pull": {"collection_set": node_to_be_deleted._id}
+                },
+                    upsert=False, multi=True
+                )
+                # print "\n 7 >> collection_set : \n", res
+
+                # Search deleting-node's ObjectId in prior_node field and
+                # remove from it, if found any
+                res = node_collection.collection.update({
+                    "_type": "GSystem", "prior_node": node_to_be_deleted._id
+                }, {
+                    "$pull": {"prior_node": node_to_be_deleted._id}
+                },
+                    upsert=False, multi=True
+                )
+                # print "\n 8 >> prior_node : \n", res
+
+                # Search deleting-node's ObjectId in post_node field and
+                # remove from it, if found any
+                res = node_collection.collection.update({
+                    "_type": "GSystem", "post_node": node_to_be_deleted._id
+                }, {
+                    "$pull": {"post_node": node_to_be_deleted._id}
+                },
+                    upsert=False, multi=True
+                )
+                # print "\n 9 >> post_node : \n", res
+
+                # Perform normal delete on deleting-node
+                # Only changes the status of given node to DELETED
+                node_to_be_deleted.status = u"DELETED"
+                node_to_be_deleted.save()
+
+            # Perform Purge operation on deleting-node
+            if deletion_type == 1:
+                # Remove from database
+                str_deletion_type = "purged"
+
+                # If given node is of member-of File GApp
+                # Then remove it's references from GridFS as well
+                # Consider File GApp's ObjectId is there in member_of field
+                # print "\n node_to_be_deleted.member_of_names_list: ", node_to_be_deleted.member_of_names_list
+                if "File" in node_to_be_deleted.member_of_names_list:
+                    # print "\n 10 >> node found as File; nodes in GridFS : ", len(node_to_be_deleted.fs_file_ids)
+                    if node_to_be_deleted.fs_file_ids:
+                        for each in node_to_be_deleted.fs_file_ids:
+                            if node_to_be_deleted.fs.files.exists(each):
+                                # print "\tdeleting node in GridFS : ", each
+                                node_to_be_deleted.fs.files.delete(each)
+
+                # Finally delete the node
+                node_to_be_deleted.delete()
+
+            delete_status_message += "\n\n %(node_name)s (%(str_node_id)s) " % locals() \
+                + "%(str_deletion_type)s successfully." % locals()
+            # print delete_status_message
+            return (True, delete_status_message)
+
+        elif collection_name == triple_collection.collection_name:
+            # Perform deletion operation on Triples collection
+            subject_id = None
+            underscore_type = ""
+            str_node_id = ""
+            query = {}
+            delete_status_message = ""
+
+            # print "\n 3 >> Triples collection..."
+            if deletion_type not in [0, 1]:
+                delete_status_message = "Must pass \"deletion_type\" agrument's " \
+                    + "value as either 0 (Normal delete) or 1 (Purge) !!!"
+                raise Exception(delete_status_message)
+
+            # print "\n 4 >> look out for subject_id..."
+            if "subject_id" in kwargs:
+                subject_id = kwargs["subject_id"]
+                # print "\t4a >> found subject_id...", subject_id
+
+            if (not node_id) and (not subject_id):
+                delete_status_message = "Value not found for neither node_id nor " \
+                    + "subject_id... [Expected value(s) in ObjectId format]"
+                raise Exception(delete_status_message)
+
+            # print "\n 5 >> look out for _type..."
+            if "_type" in kwargs:
+                underscore_type = kwargs["_type"].__str__()
+                # print "\t5a >> found _type...", underscore_type
+                if underscore_type not in ["GAttribute", "GRelation"]:
+                    delete_status_message = "Invalid value found for _type parameter " \
+                        + "%(underscore_type)s... " % locals() \
+                        + "Please pass either GAttribute or GRelation"
+                    raise Exception(delete_status_message)
+
+            # print "\n 5b >> convert node_id..."
+            if node_id:
+                if type(node_id) == ObjectId:
+                    str_node_id = str(node_id)
+                    # print "\t 5ba >> node_id -- O to s: ", type(str_node_id), " -- ", str_node_id
+                else:
+                    str_node_id = node_id
+                    if ObjectId.is_valid(node_id):
+                        node_id = ObjectId(node_id)
+                        # print "\t 5bb >> node_id -- s to O: ", type(str_node_id), " -- ", str_node_id
+                    else:
+                        delete_status_message = "Invalid value found for node_id " \
+                            + "(%(str_node_id)s)... [Expected value in" % locals() \
+                            + " ObjectId format] !!!"
+                        raise Exception(delete_status_message)
+
+                # Forming query to delete a specific node from Triples collection
+                query = {"_id": node_id}
+                # print "\t 5bc >> query... ", query
+
+                # Fetch the deleting-node from given node_id
+                node_to_be_deleted = triple_collection.find_one(query)
+
+                if not node_to_be_deleted:
+                    delete_status_message = "Node with given ObjectId " \
+                        + "(%(str_node_id)s) doesn't exists in Triples collection" % locals()
+                    raise Exception(delete_status_message)
+                # print "\t 5bd >> node_to_be_deleted... ", node_to_be_deleted.name, " -- ", node_to_be_deleted._type
+
+                # Resetting underscore_type
+                # To rectify, if by mistake wrong value is set
+                # That is, consider _type is set as "GAttribute" (by mistake)
+                # but node (with node_id) represents "GRelation"
+                # To avoid this kind of case(s), resetting underscore_type
+                underscore_type = node_to_be_deleted._type
+                # print "\t 5be >> underscore_type set to node_to_be_deleted's _type... ", underscore_type
+
+            if underscore_type == "GAttribute":
+                # Delete/Purge only GAttribute node(s)
+
+                # print "\n 6 >> Delete/Purge only GAttribute node(s)..."
+                del_status, del_status_msg = delete_gattribute(
+                    node_id=node_id, subject_id=subject_id,
+                    deletion_type=deletion_type
+                )
+                if not del_status:
+                    raise Exception(del_status_msg)
+                delete_status_message = del_status_msg
+                # print "\n 6* >> delete_status_message... \n", delete_status_message
+            elif underscore_type == "GRelation":
+                # Delete/Purge only GRelation node(s)
+
+                # print "\n 7 >> Delete/Purge only GRelation node(s)..."
+                del_status, del_status_msg = delete_grelation(
+                    node_id=node_id, subject_id=subject_id,
+                    deletion_type=deletion_type
+                )
+                if not del_status:
+                    raise Exception(del_status_msg)
+                delete_status_message = del_status_msg
+                # print "\n 7* >> delete_status_message... \n", delete_status_message
+            else:
+                # Delete/Purge both GAttribute & GRelation node(s)
+
+                # print "\n 8 >> Delete/Purge both GAttribute & GRelation node(s)..."
+                # Delete/Purge GAttribute node(s)
+                del_status, del_status_msg = delete_gattribute(
+                    node_id=node_id, subject_id=subject_id,
+                    deletion_type=deletion_type
+                )
+                if not del_status:
+                    raise Exception(del_status_msg)
+                delete_status_message = del_status_msg
+                # print "\n 8* >> delete_status_message... \n", delete_status_message
+
+                # Delete/Purge GRelation node(s)
+                del_status, del_status_msg = delete_grelation(
+                    node_id=node_id, subject_id=subject_id,
+                    deletion_type=deletion_type
+                )
+                if not del_status:
+                    raise Exception(del_status_msg)
+                delete_status_message += "\n\n" + del_status_msg
+                # print "\n 8* >> delete_status_message... \n", delete_status_message
+
+            # Return output of the function
+            # print delete_status_message
+            return (True, delete_status_message)
+
+        else:
+            delete_status_message = " Invalid value (%(collection_name)s) " % locals() \
+                + "found for collection_name field. Please refer function " \
+                + "details for correct value !!!"
+            raise Exception(delete_status_message)
+    except Exception as e:
+        delete_status_message = "Error (from delete_node) :-\n" + str(e)
+        return (False, delete_status_message)
