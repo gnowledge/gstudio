@@ -83,7 +83,6 @@ def get_group_name_id(group_name_or_id):
 
     
 def check_delete(main):
-  print "hsfsadfs",main
   try:
     def check(*args, **kwargs):
       relns=""
@@ -96,7 +95,6 @@ def check_delete(main):
         return main(*args, **kwargs)
       else:
         print "Not a valid id"
-    print "hasfsadf",check
     return check 
   except Exception as e:
     print "Error in check_delete "+str(e)
@@ -2689,4 +2687,39 @@ def get_published_version_dict(request,document_object):
             if line.find('PUBLISHED')!=-1:
                    published_node_version.append(rev_no)      
         return published_node_version
+def parse_data(doc):
+  '''Section to parse node '''
+  user_idlist = ['modified_by','created_by','author_set','contributors']
+  date_typelist = ['last_update','created_at']
+  objecttypelist = ['member_of']
+  languagelist = ['language']
         
+  for i in doc:
+          
+          if i in user_idlist:
+             if type(doc[i]) == list :
+                      temp =   ""
+                      for userid in doc[i]:
+                      		  if User.objects.filter(id = userid).exists():
+	                              user = User.objects.get(id = userid)
+	                              if user:
+	                                user_name = user.get_username
+	                                if temp:
+	                                        temp =temp  + "," + (user.get_username() ) 
+	                                else:
+	                                        temp = str(user.get_username())        
+	              doc[i] = temp            
+             else: 
+                      
+                      		  if User.objects.filter(id = doc[i]).exists():
+	                              user = User.objects.get(id = doc[i])
+	                              if user:
+	                                doc[i] = user.get_username()
+          elif i in date_typelist:
+              doc[i] = datetime.strftime(doc[i],"%d %B %Y %H:%M")
+          elif i in objecttypelist:
+               for j in doc[i]:
+                   node = collection.Node.one({"_id":ObjectId(j)})
+                   
+                   doc[i] = node.name
+          
