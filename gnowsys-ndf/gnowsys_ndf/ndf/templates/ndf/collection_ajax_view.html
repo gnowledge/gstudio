@@ -73,6 +73,7 @@
             var parent_node = node;
             parent_arr.push(node.id);
 
+            // Bellow code manipulates the parent hierarchy of clicked node in a tree
             while (parent_node) {
                 if (parent_node.name !== undefined){           
                   $tree.tree('openNode', parent_node);
@@ -146,6 +147,22 @@
 </style>  
 
 {% endblock %}  
+
+
+  <fieldset>
+    <legend>Related Topics</legend>
+      {% if prior_obj %}        
+
+        {% for each in prior_obj.collection_set %}
+          {% get_node each as obj %}
+          <a href="#">{{obj.name}}</a>
+          {% if not forloop.last %}, {% endif %}
+
+        {% endfor %}
+
+      {% endif %}
+      
+  </fieldset>
   
   <b class="current">{{node.name}}</b>
   <div>
