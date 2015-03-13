@@ -278,7 +278,17 @@ table {
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
       
     <section class="medium-9 columns" >
+
     {% if breadcrumbs_list %}
+      <ul class="breadcrumbs"> 
+        {% for e in breadcrumbs_list %}
+              <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% comment %}
+    <!-- {% if breadcrumbs_list %}
       <ul class="breadcrumbs"> 
         {% for e in breadcrumbs_list %}
             {% if topic %}
@@ -292,7 +302,8 @@ table {
             {% endif %}
         {% endfor %}
       </ul>
-    {% endif %}
+    {% endif %} -->
+    {% endcomment %}
  
       <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
 
@@ -1344,39 +1355,48 @@ table {
     var node_type = "{{node_type}}";
     var clicked_node = this.id;
 
-    $.ajax({
-        type: "POST",
-        url: "{% url 'collection_nav' group_id %}",
-        datatype: "html",
-        data:{
-          node_id: clicked_node,
-          curr_node:"{{original_node.pk}}",
-          nav:nav_list,
-          nod_type: node_type,
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function(data) {
+    {% if topic %}
+    
+      location.href = "{% url 'theme_page' group_name_tag theme_id %}?selected="+clicked_node+"";
 
-          if (node_type == "Page"){
-           window.history.pushState("", "", "/{{group_name_tag}}/page/{{original_node.pk}}"+"?selected="+clicked_node+"");
-          }
-          else if(node_type == "File"){
-            window.history.pushState("", "", "/{{group_name_tag}}/file/{{original_node.pk}}"+"?selected="+clicked_node+"");  
-          }
-          else if (node_type == "Term"){
-            window.history.pushState("", "", "/{{group_name_tag}}/term/{{original_node.pk}}"+"?selected="+clicked_node+"");
-          }
-          else if (node_type == "Group"){
-            window.history.pushState("", "", "/{{original_node.pk}}"+"?selected="+clicked_node+"");
-          }
-          else if (node_type == "Topic"){
-            window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{original_node.pk}}"+"?selected="+clicked_node+"");
-          }
+    {% else %}
 
-          $("#view_page").html(data);
+      $.ajax({
+          type: "POST",
+          url: "{% url 'collection_nav' group_id %}",
+          datatype: "html",
+          data:{
+            node_id: clicked_node,
+            curr_node:"{{original_node.pk}}",
+            nav:nav_list,
+            nod_type: node_type,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function(data) {
 
-        }
-    });  
+            if (node_type == "Page"){
+             window.history.pushState("", "", "/{{group_name_tag}}/page/{{original_node.pk}}"+"?selected="+clicked_node+"");
+            }
+            else if(node_type == "File"){
+              window.history.pushState("", "", "/{{group_name_tag}}/file/{{original_node.pk}}"+"?selected="+clicked_node+"");  
+            }
+            else if (node_type == "Term"){
+              window.history.pushState("", "", "/{{group_name_tag}}/term/{{original_node.pk}}"+"?selected="+clicked_node+"");
+            }
+            else if (node_type == "Group"){
+              window.history.pushState("", "", "/{{original_node.pk}}"+"?selected="+clicked_node+"");
+            }
+            else if (node_type == "Topic"){
+              window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{original_node.pk}}"+"?selected="+clicked_node+"");
+            }
+
+            $("#view_page").html(data);
+
+          }
+      });
+
+    {% endif %}
+
   });
 
   $(document).on('click',"#save_switch_group",function(){
