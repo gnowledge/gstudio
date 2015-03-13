@@ -418,7 +418,7 @@ table {
       <dd class="info-view"><a class="view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       {% if "Group" not in node.member_of_names_list %}
 
-        {% if node|is_File %}         
+        {% if node|is_File or node|is_Page %}         
           <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
             
               {% if all_replies %}
