@@ -1150,6 +1150,28 @@ def get_prior_node(node_id):
 
 	return prior
 
+@register.assignment_tag
+# method returns resources associated with node
+def get_resources(node_id):
+        resources={}
+        resource_list=['Images','Documents','Audios','Videos','Interactives']
+        for res in resource_list:
+                resources[res] = []
+	node = node_collection.one({'_id': ObjectId(node_id) })
+        RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
+	RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
+	trans_grelations = triple_collection.find({'_type':'GRelation','right_subject':node._id,'relation_type.$id':RT_translation_of._id })               
+	teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type.$id': RT_teaches._id })
+        AT_educationaluse = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
+        for each in teaches_grelations:
+             obj=node_collection.one({'_id':ObjectId(each.subject)}) 
+             mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type.$id': AT_educationaluse._id, "subject":each.subject})       
+             for res in resource_list:
+                     if mime_type.object_value == res:
+                             resources.setdefault(res,[]).append(obj)
+        print resources
+        
+        return resources
 
 @register.assignment_tag
 def get_contents(node_id, selected, choice):
