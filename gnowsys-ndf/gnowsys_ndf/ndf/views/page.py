@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_published_version_dict
 
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 
@@ -400,7 +400,8 @@ def version_node(request, group_id, node_id, version_no):
     node = collection.Node.one({"_id": ObjectId(node_id)})
     node1 = collection.Node.one({"_id": ObjectId(node_id)})
     fp = history_manager.get_file_path(node)
-
+    listform = ['modified_by','created_by','last_update','name','content','content_org','contributors','rating','location','access_policy',
+                'type_of','status','tags','language','member_of','url','created_at','author_set']
     if request.method == "POST":
         view = "compare"
 
@@ -410,7 +411,7 @@ def version_node(request, group_id, node_id, version_no):
 	selected_versions = {"1": version_1, "2": version_2}
    	doc=history_manager.get_version_document(node,version_1)
 	doc1=history_manager.get_version_document(node,version_2)     
-        
+        versions= get_published_version_dict(request,doc)
         for i in node1:
 	   try:
     
@@ -420,12 +421,17 @@ def version_node(request, group_id, node_id, version_no):
            except:
                 node1[i]=node1[i]		       
            
-        print node1['content']
-        print doc['content']
         content = node1
         content_1=doc
-        
-        
+        new_content = []
+        for i in listform:
+           new_content.append({i:content[i]})
+        content =  new_content
+        new_content = []
+        for i in listform:
+           new_content.append({i:str(content_1[i])})
+        content_1 =  new_content
+        print "content_1",content_1,content
 	
     else:
         view = "single"
@@ -457,6 +463,7 @@ def version_node(request, group_id, node_id, version_no):
                                'selected_versions': selected_versions,
                                'content': content,
                                'content1':content_1,
+                               'publishedversions':versions
                                
                               },
                               context_instance = RequestContext(request)
@@ -477,11 +484,11 @@ def diff_prettyHtml(diffs):
     DIFF_INSERT = 1
     DIFF_EQUAL = 0
     i = 0
-    print "the diffs",diffs
     for (op, data) in diffs:
       text = (data.replace("&", "&amp;").replace("&lt;", "<")
                  .replace("&gt;", ">").replace("\n", "<BR>"))
       
+      print "hello",op,data
       if op == DIFF_INSERT:
         html.append("<INS STYLE='background:#b3ffb3;' TITLE='i=%i'>%s</INS>"
             % (i, text))

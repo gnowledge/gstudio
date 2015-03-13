@@ -83,6 +83,7 @@ def get_group_name_id(group_name_or_id):
 
     
 def check_delete(main):
+  print "hsfsadfs",main
   try:
     def check(*args, **kwargs):
       relns=""
@@ -95,6 +96,7 @@ def check_delete(main):
         return main(*args, **kwargs)
       else:
         print "Not a valid id"
+    print "hasfsadf",check
     return check 
   except Exception as e:
     print "Error in check_delete "+str(e)
@@ -2667,3 +2669,24 @@ def create_college_group_and_setup_data(college_node):
             )
 
     return gfc, gr_gfc
+
+def get_published_version_dict(request,document_object):
+        """Returns the dictionary containing the list of revision numbers of published nodes.
+        """
+        published_node_version = []
+        rcs = RCS()
+        fp = history_manager.get_file_path(document_object)
+        cmd= 'rlog  %s' % \
+	      (fp)
+        rev_no =""
+        proc1=subprocess.Popen(cmd,shell=True,
+				stdout=subprocess.PIPE)
+        for line in iter(proc1.stdout.readline,b''):
+            if line.find('revision')!=-1 and line.find('selected') == -1:
+                  rev_no=string.split(line,'revision')
+                  rev_no=rev_no[1].strip( '\t\n\r')
+                  rev_no=rev_no.strip(' ')
+            if line.find('PUBLISHED')!=-1:
+                   published_node_version.append(rev_no)      
+        return published_node_version
+        

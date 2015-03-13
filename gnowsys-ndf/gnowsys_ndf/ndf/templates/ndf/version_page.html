@@ -31,7 +31,7 @@
         <td><font size="3">{% trans "Compare" %}</font></td>
         <td valign="bottom">
       	  <select class="" id="version_1" name="version_1">
-      	    {% for version_no in node.version_dict.values %}
+      	    {% for version_no in publishedversions reversed %}
       	      {% ifequal version_no selected_versions.1 %}
       	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
       	      {% else %}
@@ -43,7 +43,7 @@
         <td><font size="3">{% trans "with" %}</font></td>
       	<td valign="bottom">
       	  <select id="version_2" name="version_2">
-      	    {% for version_no in node.version_dict.values reversed %}
+      	    {% for version_no in publishedversions  %}
       	      {% ifequal version_no selected_versions.2 %}
       	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
       	      {% else %}
@@ -70,7 +70,7 @@
 
   </form>
   </div>
-
+  {{trail|safe}}
   {% if  view == "single" %}
     <div id="single-view" style="padding-bottom: 20px">
       <table cellpadding="8">
@@ -93,47 +93,39 @@
         document.location.href = '/{{group_id}}/page/{{node}}/version/{{ver}}'</script>
 
   {% else %}
+  
  <div class="row">  
  <div class="medium-5 columns"> 
     <div id="compare-view" style="padding-bottom: 20px">
-       <table>
-       	    {% trans "Version" %} #{{selected_versions.1}}
-	    {% for k,v in content1.items %}
-		<tr>
-                  
-	          <td align="right" valign="top">{{k}}</td>
-	          <td>{{v|safe}}</td>
-		</tr>
-	   
-		{% endfor %}
-	      
-	    </table>
-    
-     </div>
     </div>
-
- <div class="medium-6 columns">  
-         <table>
-       	    {% trans "Version" %} #{{selected_versions.2}}
-	    {% for k,v in content.items %}
-		<tr>
-	          <td align="right" valign="top">{{k}}</td>
-	          <td>{{v|safe}}</td>
-		</tr>
-	   
-		{% endfor %}
-	      
-	    </table>
-    </div>
+ </div>
  </div>
 	
 
   {% endif %}
-
 {% endblock %}
 
 {% block script %}
 
+a={{content|safe}}
+
+$('#compare-view').append("<table id='new' style='width:100%'  </table>")
+a1 = {{content1|safe}}
+h= 0
+a.reverse()
+$.each(a1,function(k,g)
+{   h = h + 1
+    $.each(g,function(c,v){
+        $('#new').append("<tr id = " +  "rows" + k  + " >  <td style='vertical-align: top;'> " + c.toUpperCase().replace('_',' ')   + "</td> <td style='vertical-align: top;'>" + v + "</td> ")
+        
+    
+    });
+        t = a.pop(k)
+        $.each(t,function(c,v){
+        $('#rows' + k).append("<td style='vertical-align: top;'> " + c.toUpperCase().replace('_',' ')   + "</td> <td style='vertical-align: top;'>" + v + "</td> </tr>")
+         });
+   
+});
 $("#compare_versions").click(function() {
     if ($("#version_1").val() === $("#version_2").val()) {
 	alert ("Please select different versions!!!")
