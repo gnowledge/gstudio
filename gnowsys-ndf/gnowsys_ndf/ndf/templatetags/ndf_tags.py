@@ -1989,10 +1989,8 @@ def str_to_dict(str1):
                               for att in dict_format[k]:
                                       for k1, v1 in att.items():
                                         if type(v1) == list :
-                                                str1=""
-                                                for each1 in v1:
-                                                        str1 += each1+" "
-                                                        att_dic[k1] = str1
+                                                str1=",".join(v1)
+                                                att_dic[k1] = str1
                                         else:
                                                 att_dic[k1] = v1
                                                 dict_format[k] = att_dic    
