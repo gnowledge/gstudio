@@ -306,7 +306,7 @@ table {
       </h1>
 
       <h1 class="subheader">
-      <dl class="tabs" data-tab data-options="deep_linking:true"> 
+      <dl class="tabs" data-tab> 
 
       {% if topic %}
         <dd class="active page-view view_list"><a class="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
@@ -418,7 +418,7 @@ table {
       <dd class="info-view"><a class="view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       {% if "Group" not in node.member_of_names_list %}
 
-        {% if node|is_File %}         
+        {% if node|is_File or node|is_Page %}         
           <dd class="discussion-view"><a class="view-discussion"><i class="fi-comment"></i>
             
               {% if all_replies %}
