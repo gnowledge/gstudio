@@ -104,7 +104,7 @@ def create_theme(obj):
 		theme_node = node_collection.collection.GSystem()
 		theme_node.name = unicode(name).strip()
 		theme_node.access_policy = u"PUBLIC"
-		theme_node.contributors.append(1)
+		theme_node.contributors.append(nroer_team.id)
 		theme_node.created_by = nroer_team.id
 		theme_node.group_set.append(group_id)
 		theme_node.language = u"en"
@@ -158,7 +158,7 @@ def create_theme_item(obj, prev, row):
 		theme_item_node = node_collection.collection.GSystem()
 		theme_item_node.name = unicode(obj).strip()
 		theme_item_node.access_policy = u"PUBLIC"
-		theme_item_node.contributors.append(1)
+		theme_item_node.contributors.append(nroer_team.id)
 		theme_item_node.created_by = nroer_team.id
 		theme_item_node.group_set.append(group_id)
 		theme_item_node.language = u"en"
@@ -214,7 +214,7 @@ def create_topic(obj, prev, row):
 		topic_node = node_collection.collection.GSystem()
 		topic_node.name = unicode(obj).strip()
 		topic_node.access_policy = u"PUBLIC"
-		topic_node.contributors.append(1)
+		topic_node.contributors.append(nroer_team.id)
 		topic_node.created_by = nroer_team.id
 		topic_node.group_set.append(group_id)
 		topic_node.language = u"en"
