@@ -1,22 +1,20 @@
-
 ''' -- imports from installed packages -- ''' 
-from django_mongokit import get_database
 import json
 from jsonrpc import jsonrpc_method
+from django.contrib.auth.models import User
+
+from mongokit import paginator
 
 try:
 	from bson import ObjectId
 except ImportError:  # old pymongo
 	from pymongo.objectid import ObjectId
-from mongokit import paginator
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.ndf.models import Node
-from django.contrib.auth.models import User
+from gnowsys_ndf.ndf.models import node_collection
 
 #######################################################################################################################################
 
-collection = get_database()[Node.collection_name]
 
 @jsonrpc_method('resources', safe=True) 
 def resources_list(request):
@@ -27,16 +25,16 @@ def resources_list(request):
 	                     s.resources()
 	'''
 
-	grp = collection.Node.one({'_type':'Group','name':'home'})
-	File_GST = collection.Node.one({'_type':'GSystemType','name':'File'})
-	Pandora_GST = collection.Node.one({'_type':'GSystemType','name':'Pandora_video'})
+	grp = node_collection.one({'_type': 'Group', 'name': 'home'})
+	File_GST = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
+	Pandora_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Pandora_video'})
 	nodes = []
 
 	if File_GST and Pandora_GST and grp:
 		if User.objects.filter(username='nroer_team').exists():
 			auth_id = User.objects.get(username='nroer_team').pk
 			# Filter only ebooks based on "mime_type:zip"
-			nodes = collection.Node.find(
+			nodes = node_collection.find(
 				{'member_of': {'$nin':[Pandora_GST._id],'$in':[File_GST._id]}, 'access_policy':'PUBLIC','group_set':ObjectId(grp._id), 'mime_type': 'application/zip', 'created_by': auth_id },
 				{'_id':0, 'name':1, 'attribute_set':1, 'created_by':1, 'relation_set':1, 'collection_set':1, 'content_org':1, 'language':1, 'mime_type':1, 'start_publication':1, 'url':1}
 			)
@@ -66,7 +64,7 @@ def resources_list(request):
 				ebook_res_list = []
 				for res in ebook_collection_set:
 					# Selected particular fields only of resource object as bellow
-					res_obj = collection.Node.one({'_id': ObjectId(res) },
+					res_obj = node_collection.one({'_id': ObjectId(res) },
 												  {'_id':0, 'name':1, 'attribute_set':1, 'created_by':1, 'relation_set':1, 'collection_set':1, 'content_org':1, 'language':1, 'mime_type':1, 'start_publication':1, 'url':1})
 					
 					efile = res_obj
@@ -101,7 +99,7 @@ def get_metadata(efile):
 	if efile.relation_set:
 		for e in efile.relation_set:
 			for k in e[e.keys()[0]]:
-				obj = collection.Node.one({'_id': ObjectId(k) })
+				obj = node_collection.one({'_id': ObjectId(k) })
 				t_list.append(obj.name)
 			relation_set.update({ e.keys()[0] : t_list })
 
@@ -110,7 +108,7 @@ def get_metadata(efile):
 	# To fetch collection elements of resource
 	if efile.collection_set:
 		for m in efile.collection_set:
-			coll_obj = collection.Node.one({'_id': ObjectId(m) })
+			coll_obj = node_collection.one({'_id': ObjectId(m) })
 			coll_list.append(coll_obj.name)
 
 	efile['collection_set'] = coll_list

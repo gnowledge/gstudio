@@ -4,16 +4,13 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
-from django_mongokit import get_database
 
 from gnowsys_ndf.settings import LANGUAGES
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import *
 
 import json
 import datetime
-
-db = get_database()
-collection = db[File.collection_name]
 
 @user_passes_test(lambda u: u.is_superuser)
 def adminDesignerDashboardClass(request, class_name='GSystemType'):
@@ -23,9 +20,9 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = collection.Node.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
+        nodes = node_collection.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
     else :
-        nodes = collection.Node.find({'_type':class_name}).sort('last_update', -1)
+        nodes = node_collection.find({'_type':class_name}).sort('last_update', -1)
 
     objects_details = []
     for each in nodes:
@@ -35,13 +32,13 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         attribute_type_set = []
         relation_type_set = [] 
         for e in each.member_of:
-            member_of_list.append(collection.Node.one({'_id':e}).name+" - "+str(e))
+            member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
         
         for members in each.member_of:
-            member.append(collection.Node.one({ '_id': members}).name+" - "+str(members))
+            member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
         
         for coll in each.collection_set:
-            collection_list.append(collection.Node.one({ '_id': coll}).name+" - "+str(coll))
+            collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
         
         if class_name in ("GSystemType"):
             for at_set in each.attribute_type_set:
@@ -52,23 +49,23 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         else :
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list)})
     groups = []
-    group = collection.Node.find({'_type':"Group"})
+    group = node_collection.find({'_type':"Group"})
     for each in group:
         groups.append({'id':each._id,"title":each.name})
     
     systemtypes = []
-    systemtype = collection.Node.find({'_type':"GSystemType"})
+    systemtype = node_collection.find({'_type':"GSystemType"})
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
 
 
     meta_types = []
-    meta_type = collection.Node.find({'_type':"MetaType"})
+    meta_type = node_collection.find({'_type':"MetaType"})
     for each in meta_type:
         meta_types.append({'id':each._id,"title":each.name})
 
     groupid = ""
-    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
 	groupid = str(group_obj[0]._id)
 
@@ -114,7 +111,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     required_fields = eval(class_name).required_fields
     newdict = {}
     if node_id:
-        new_instance_type = collection.Node.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
+        new_instance_type = node_collection.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
 
     else:
         new_instance_type = eval("collection"+"."+class_name)()
@@ -163,7 +160,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                     elif key in ["meta_type_set","attribute_type_set","relation_type_set"]:
                         listoflist = []
                         for each in request.POST.get(key,"").split(","):
-                            listoflist.append(collection.Node.one({"_id":ObjectId(each)}))
+                            listoflist.append(node_collection.one({"_id":ObjectId(each)}))
                         new_instance_type[key] = listoflist
                     else :
                         listoflist = []
@@ -202,7 +199,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
         new_instance_type.save()
         if translate:        
-            relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
+            relation_type=node_collection.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
             grelation=collection.GRelation()
             grelation.relation_type=relation_type
             grelation.subject=new_instance_type['_id']
@@ -248,7 +245,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
     class_structure = newdict
     groupid = ""
-    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
 	groupid = str(group_obj[0]._id)
 

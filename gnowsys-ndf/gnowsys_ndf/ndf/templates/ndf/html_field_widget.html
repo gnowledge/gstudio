@@ -191,7 +191,10 @@
     {% endif %}
 
   {% elif field_type == "ObjectId" and field.validators.0 == "File" %}
-    <!-- <h4>Coming soon</h4> -->
+    {% if field_value %}
+    <a target="_blank" href="{% url 'read_file' group_id field_value %}" id="{{field.name}}">{% trans "Click here to view " %}{{field.altnames|lower}}</a>
+
+    {% else %}
     <style type="text/css">
       .fileUpload input.upload {
         position: absolute;
@@ -222,6 +225,8 @@
         $('#uploadFile_{{field.name}}').val(this.value);
       });
     </script>
+
+    {% endif %}
 
   {% else %}
 

@@ -5,14 +5,13 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
-from django_mongokit import get_database
+
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import *
 
 import json
 
-db = get_database()
-collection = db[Node.collection_name]
-GAPP = collection.Node.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
+GAPP = node_collection.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
 
 @user_passes_test(lambda u: u.is_superuser)
 def adminDashboard(request):
@@ -20,8 +19,8 @@ def adminDashboard(request):
     methods for class view 
     '''
     objects_details = []
-    nodes = collection.Node.find({'_type':"GSystem"})
-    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    nodes = node_collection.find({'_type':"GSystem"})
+    group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     groupid = ""
     if group_obj:
 	groupid = str(group_obj[0]._id)
@@ -41,14 +40,14 @@ def adminDashboardClass(request, class_name="GSystem"):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = collection.Node.find({'name':{'$regex':search, '$options': 'i' },'_type':classtype})
+        nodes = node_collection.find({'name':{'$regex':search, '$options': 'i' },'_type':classtype})
     else :
-        nodes = collection.Node.find({'_type':class_name})
+        nodes = node_collection.find({'_type':class_name})
     objects_details = []
     for each in nodes:
         member = []
         # for members in each.member_of:
-        #     obj = collection.Node.one({ '_id': members})
+        #     obj = node_collection.one({ '_id': members})
         #     if obj:
         #         member.append(obj.name+" - "+str(members))
 
@@ -59,13 +58,13 @@ def adminDashboardClass(request, class_name="GSystem"):
         relation_type_set = []
         if class_name == "GSystemType":
             for e in each.member_of:
-                member_of_list.append(collection.Node.one({'_id':e}).name+" - "+str(e))
+                member_of_list.append(node_collection.one({'_id':e}).name+" - "+str(e))
                 
             for members in each.member_of:
-                member.append(collection.Node.one({ '_id': members}).name+" - "+str(members))
+                member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
 
             for coll in each.collection_set:
-                collection_list.append(collection.Node.one({ '_id': coll}).name+" - "+str(coll))
+                collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
 
             for at_set in each.attribute_type_set:
                 attribute_type_set.append(at_set.name+" - "+str(at_set._id))
@@ -73,22 +72,22 @@ def adminDashboardClass(request, class_name="GSystem"):
                 relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
 
 	if class_name in ("GSystem","File"):
-      		group_set = [collection.Node.find_one({"_id":eachgroup}).name for eachgroup in each.group_set ]
+      		group_set = [node_collection.find_one({"_id":eachgroup}).name for eachgroup in each.group_set ]
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(group_set),"Creation":each.created_at})
         elif class_name in ("GAttribute","GRelation"):
             objects_details.append({"Id":each._id,"Title":each.name,"Type":"","Author":"","Creation":""})
 	else :
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list), "attribute_type_set":",".join(attribute_type_set), "relation_type_set":",".join(relation_type_set)})
     groups = []
-    group = collection.Node.find({'_type':"Group"})
+    group = node_collection.find({'_type':"Group"})
     for each in group:
         groups.append({'id':each._id,"title":each.name})
     systemtypes = []
-    systemtype = collection.Node.find({'_type':"GSystemType"})
+    systemtype = node_collection.find({'_type':"GSystemType"})
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
     groupid = ""
-    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    group_obj= node_collection.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
 	groupid = str(group_obj[0]._id)
     template = "ndf/adminDashboard.html"
@@ -104,7 +103,7 @@ def adminDashboardEdit(request):
     try:
         if request.is_ajax() and request.method =="POST":
             objectjson = json.loads(request.POST['objectjson'])
-        node = collection.Node.one({ '_id': ObjectId(objectjson['id'])})
+        node = node_collection.one({ '_id': ObjectId(objectjson['id'])})
         node.name =  objectjson['fields']['title']
         for key,value in objectjson['fields'].items():
             if key == "group":
@@ -134,13 +133,13 @@ def adminDashboardEdit(request):
                 typelist = []
 	        for eachvalue in  value.split(","):
 		    if eachvalue:
-                    	typelist.append(collection.Node.find_one(ObjectId(eachvalue.split(" ")[-1])))
+                    	typelist.append(node_collection.find_one(ObjectId(eachvalue.split(" ")[-1])))
                 node['attribute_type_set'] = typelist
             if key == "relation_type_set":
                 typelist = []
 	        for eachvalue in  value.split(","):
 		    if eachvalue:
-                    	typelist.append(collection.Node.find_one(ObjectId(eachvalue.split(" ")[-1])))
+                    	typelist.append(node_collection.find_one(ObjectId(eachvalue.split(" ")[-1])))
                 node['relation_type_set'] = typelist
 
 
@@ -160,7 +159,7 @@ def adminDashboardDelete(request):
     if request.is_ajax() and request.method =="POST":
        deleteobjects = request.POST['deleteobjects']
     for each in  deleteobjects.split(","):
-        node = collection.Node.one({ '_id': ObjectId(each)})
+        node = node_collection.one({ '_id': ObjectId(each)})
         node.delete()
 
     return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")

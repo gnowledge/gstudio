@@ -6,5 +6,4 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.adminDashboard',
         url(r'^edit', 'adminDashboardEdit', name='adminDashboardEdit'),
         url(r'^delete', 'adminDashboardDelete', name='adminDashboardDelete'),
 	url(r'^(?P<class_name>[^/]+)', 'adminDashboardClass', name='adminDashboardClass'),
-
 )

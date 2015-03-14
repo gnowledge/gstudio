@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.data_review',
 						# simple data-review with/withou page no.
-						url(r'^/$', 'data_review', name='data_review'),
+						url(r'^[/]$', 'data_review', name='data_review'),
 						url(r'^/page-no=(?P<page_no>\d+)/$', 'data_review', name='data_review_page'),
 
 						# to save edited data-review row

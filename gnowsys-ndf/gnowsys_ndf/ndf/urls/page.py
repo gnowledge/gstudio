@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.page',
-                       url(r'^$', 'page', name='page'),
+                       url(r'^[/]$', 'page', name='page'),
                        url(r'^/details/(?P<app_id>[\w-]+)$', 'page', name='page_details'),
                        url(r'^/(?P<app_id>[\w-]+)$', 'page', name='page_details'),
                        url(r'^/create/', 'create_edit_page', name='page_create_edit'),

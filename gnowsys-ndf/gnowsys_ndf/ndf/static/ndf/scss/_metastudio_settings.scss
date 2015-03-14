@@ -207,8 +207,8 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 
 // We use these to style anchors
 // $anchor-text-decoration: none;
- $anchor-font-color: darken($active-color,10%);
- $anchor-font-color-hover: scale-color( $anchor-font-color, $lightness: -14%);
+ $anchor-font-color: darken($active-color, 20%);
+ $anchor-font-color-hover: scale-color( $anchor-font-color, $lightness: -50%);
 
 // We use these to style the <hr> element
 // $hr-border-width: 1px;

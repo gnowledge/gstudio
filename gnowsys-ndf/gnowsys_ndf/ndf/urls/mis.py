@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.mis',
-  url(r'^$', 'mis_detail', name='mis_list'),
+  url(r'^[/]$', 'mis_detail', name='mis'),
   url(r'^/(?P<app_id>[\w-]+)$', 'mis_detail', name='mis_list'),  # MIS app landing
   url(r'^/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', 'mis_detail', name='mis_app_detail'),  # mis_app_detail
   url(r'^/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/enroll/(?P<app_set_instance_id>[\w-]+)$', 'mis_enroll', name='mis_enroll'),  # Person enrollment in Courses link

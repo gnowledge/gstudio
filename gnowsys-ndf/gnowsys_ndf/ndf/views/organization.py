@@ -1,37 +1,30 @@
 ''' -- imports from python libraries -- '''
 # from datetime import datetime
-import datetime
 import json
 
 ''' -- imports from installed packages -- '''
-from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
+from django.http import HttpResponseRedirect  #, HttpResponse uncomment when to use
 from django.http import Http404
-from django.shortcuts import render_to_response #, render  uncomment when to use
+from django.shortcuts import render_to_response  #, render  uncomment when to use
 from django.template import RequestContext
 from django.template import TemplateDoesNotExist
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.models import Site
-
-from django_mongokit import get_database
 
 try:
   from bson import ObjectId
 except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
-from mongokit import IS
-
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
+from gnowsys_ndf.ndf.models import AttributeType, RelationType
+from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
-from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, get_property_order_with_value
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
 from gnowsys_ndf.ndf.views.methods import create_college_group_and_setup_data
 
-collection = get_database()[Node.collection_name]
 
 def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
@@ -40,12 +33,12 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
 
   auth = None
   if ObjectId.is_valid(group_id) is False :
-    group_ins = collection.Node.one({'_type': "Group","name": group_id})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.one({'_type': "Group", "name": group_id})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
   else :
@@ -53,11 +46,11 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
 
   app = None
   if app_id is None:
-    app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+    app = node_collection.one({'_type': "GSystemType", 'name': app_name})
     if app:
       app_id = str(app._id)
   else:
-    app = collection.Node.one({'_id': ObjectId(app_id)})
+    app = node_collection.one({'_id': ObjectId(app_id)})
 
   app_name = app.name 
 
@@ -81,15 +74,15 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
 
   if request.user:
     if auth is None:
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
     agency_type = auth.agency_type
-    agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
-        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   if app_set_id:
-    organization_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
+    organization_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
     title = organization_gst.name
 
     query = {}
@@ -100,7 +93,7 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
     else:
       query = {'member_of': organization_gst._id, 'group_set': ObjectId(group_id)}
 
-    nodes = list(collection.Node.find(query).sort('name', 1))
+    nodes = list(node_collection.find(query).sort('name', 1))
 
     nodes_keys = [('name', "Name")]
 
@@ -111,7 +104,7 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
     template = "ndf/" + organization_gst.name.strip().lower().replace(' ', '_') + "_details.html"
     default_template = "ndf/mis_details.html"
 
-    node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
+    node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
     node.get_neighbourhood(node.member_of)
 
@@ -145,12 +138,12 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
   """
   auth = None
   if ObjectId.is_valid(group_id) is False :
-    group_ins = collection.Node.one({'_type': "Group","name": group_id})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.one({'_type': "Group","name": group_id})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
   else :
@@ -158,11 +151,11 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
 
   app = None
   if app_id is None:
-    app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+    app = node_collection.one({'_type': "GSystemType", 'name': app_name})
     if app:
       app_id = str(app._id)
   else:
-    app = collection.Node.one({'_id': ObjectId(app_id)})
+    app = node_collection.one({'_id': ObjectId(app_id)})
 
   app_name = app.name 
 
@@ -181,25 +174,25 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
 
   if request.user:
     if auth is None:
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
     agency_type = auth.agency_type
-    agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
-        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   # for eachset in app.collection_set:
-  #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   if app_set_id:
-    organization_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+    organization_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     template = "ndf/" + organization_gst.name.strip().lower().replace(' ', '_') + "_create_edit.html"
     title = organization_gst.name
-    organization_gs = collection.GSystem()
+    organization_gs = node_collection.collection.GSystem()
     organization_gs.member_of.append(organization_gst._id)
 
   if app_set_instance_id:
-    organization_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
+    organization_gs = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
   property_order_list = get_property_order_with_value(organization_gs)#.property_order
 
@@ -217,8 +210,8 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
     for tab_details in property_order_list:
       for field_set in tab_details[1]:
         # Fetch only Attribute field(s) / Relation field(s)
-        if field_set.has_key('_id'):
-          field_instance = collection.Node.one({'_id': field_set['_id']})
+        if '_id' in field_set:
+          field_instance = node_collection.one({'_id': field_set['_id']})
           field_instance_type = type(field_instance)
 
           if field_instance_type in [AttributeType, RelationType]:
@@ -243,7 +236,7 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
                   file_name = organization_gs.name + " -- " + field_instance["altnames"]
                   content_org = ""
                   tags = ""
-                  field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
+                  field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, access_policy="PRIVATE", count=0, first_object="", oid=True)[0]
 
               else:
                 # Other AttributeTypes 
@@ -258,7 +251,7 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%d/%m/%Y %H:%M")
 
               if field_value:
-                organization_gs_triple_instance = create_gattribute(organization_gs._id, collection.AttributeType(field_instance), field_value)
+                organization_gs_triple_instance = create_gattribute(organization_gs._id, node_collection.collection.AttributeType(field_instance), field_value)
 
             else:
               if field_instance["object_cardinality"] > 1:
@@ -276,7 +269,7 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
                 field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
                 field_value_list[i] = field_value
 
-              organization_gs_triple_instance = create_grelation(organization_gs._id, collection.RelationType(field_instance), field_value_list)
+              organization_gs_triple_instance = create_grelation(organization_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
 
     # [C] Create private group only for College GSystems
     if "College" in organization_gs.member_of_names_list:

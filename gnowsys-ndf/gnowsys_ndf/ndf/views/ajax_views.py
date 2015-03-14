@@ -13,7 +13,6 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.http import Http404
-from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -21,7 +20,6 @@ from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django_mongokit import get_database
 from mongokit import paginator
 from django.contrib.sites.models import Site
 
@@ -34,70 +32,69 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.settings import STATIC_ROOT, STATIC_URL
-from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data
+from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
-from gnowsys_ndf.ndf.views.methods import create_gattribute
-#from datetime import date,time,timedelta
 from gnowsys_ndf.mobwrite.models import ViewObj
 
- 
-db = get_database()
-gs_collection = db[GSystem.collection_name]
-collection = db[Node.collection_name]
-theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 # This function is used to check (while creating a new group) group exists or not
 # This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 
-class Encoder(json.JSONEncoder):
-	def default(self, obj):
-		if isinstance(obj, ObjectId):
-			return str(obj)
-		else:
-			return obj
 
-def checkgroup(request,group_name):
-    titl=request.GET.get("gname","")
-    retfl=check_existing_group(titl)
+class Encoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        else:
+            return obj
+
+
+def checkgroup(request, group_name):
+    titl = request.GET.get("gname", "")
+    retfl = check_existing_group(titl)
     if retfl:
         return HttpResponse("success")
     else:
-        return HttpResponse("failure")    
+        return HttpResponse("failure")
 
 
 def terms_list(request, group_id):
-  
     if request.is_ajax() and request.method == "POST":
-      # page number which have clicked on pagination
-      page_no = request.POST.get("page_no", '')
-      terms = []
-      gapp_GST = collection.Node.one({'_type':'MetaType', 'name':'GAPP' })
-      term_GST = collection.Node.one({'_type': 'GSystemType', 'name':'Term', 'member_of':ObjectId(gapp_GST._id) })
+        # page number which have clicked on pagination
+        page_no = request.POST.get("page_no", '')
+        terms = []
+        gapp_GST = node_collection.one({'_type': 'MetaType', 'name': 'GAPP'})
+        term_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Term', 'member_of':ObjectId(gapp_GST._id) })
 
-      # To list all term instances
-      terms_list = collection.Node.find({'_type':'GSystem','member_of': ObjectId(term_GST._id),
-                                         'group_set': ObjectId(group_id) 
-                                        }).sort('name', 1)
+        # To list all term instances
+        terms_list = node_collection.find({
+            '_type': 'GSystem', 'member_of': ObjectId(term_GST._id),
+            'group_set': ObjectId(group_id)
+        }).sort('name', 1)
 
-      paged_terms = paginator.Paginator(terms_list, page_no, 25) 
-      
-      # Since "paged_terms" returns dict ,we append the dict items in a list to forwarded into template
-      for each in paged_terms.items:
-        terms.append(each)
+        paged_terms = paginator.Paginator(terms_list, page_no, 25)
 
-         
-      return render_to_response('ndf/terms_list.html', 
-                            {'group_id': group_id,'groupid': group_id,"paged_terms": terms, 
-                             'page_info': paged_terms
-                            },context_instance = RequestContext(request)
-      )
+        # Since "paged_terms" returns dict ,we append the dict items in a list to forwarded into template
+        for each in paged_terms.items:
+            terms.append(each)
 
+        return render_to_response(
+            'ndf/terms_list.html',
+            {
+                'group_id': group_id, 'groupid': group_id, "paged_terms": terms,
+                'page_info': paged_terms
+            },
+            context_instance=RequestContext(request)
+        )
 
             
 # This ajax view renders the output as "node view" by clicking on collections
@@ -107,24 +104,75 @@ def collection_nav(request, group_id):
   '''
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
+    curr_node_id = request.POST.get("curr_node", '')
+    node_type = request.POST.get("nod_type", '')
+    
+    breadcrumbs_list = []
+    curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id) })
+
+    if node_type == "Topic":
+      theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+      for e in curr_node_obj.prior_node:
+        prior = node_collection.one({'_id': ObjectId(e) })
+        if curr_node_obj._id in prior.collection_set and theme_item_GST._id in prior.member_of:
+          breadcrumbs_list.append( (str(prior._id), prior.name) )
 
     topic = ""
-    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-    if topic_GST._id in node_obj.member_of:
-      topic = "topic"
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    nav_list = request.POST.getlist("nav[]", '')
+    n_list = request.POST.get("nav", '')
 
+    # This "n_list" is for manipulating breadcrumbs events and its navigation
+    if n_list:      
+      # Convert the incomming listfrom template into python list
+      n_list = n_list.replace("&#39;","'")
+      n_list = ast.literal_eval(n_list) 
 
-    # node_obj.get_neighbourhood(node_obj.member_of)
+      # For removing elements from breadcrumbs list to manipulate basd on which node is clicked 
+      for e in reversed(n_list):
+        if e != unicode(node_obj._id):
+          n_list.remove(e)
+        else:
+          break
 
+      nav_list = n_list
+
+    # Firstly original node should go into breadcrumbs list
+    breadcrumbs_list.append( (str(curr_node_obj._id), curr_node_obj.name) )
+
+    if nav_list:
+      # create beadcrumbs list from navigation list sent from template.
+      for each in nav_list:
+        obj = node_collection.one({'_id': ObjectId(each) })
+        breadcrumbs_list.append( (str(obj._id), obj.name) )
+
+      b_list = []
+      for each in breadcrumbs_list:
+        b_list.append(each[0])
+
+      if str(node_obj._id) not in b_list:
+        # Add the tuple if clicked node is not there in breadcrumbs list
+        breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
+      else:
+        # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+        for e in reversed(breadcrumbs_list):
+          if node_id in e:
+            break
+          else:
+            breadcrumbs_list.remove(e)
+
+    # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
     return render_to_response('ndf/node_ajax_view.html', 
                                 { 'node': node_obj,
+                                  'original_node':curr_node_obj,
                                   'group_id': group_id,
                                   'groupid':group_id,
-                                  'app_id': node_id, 'topic':topic
+                                  'breadcrumbs_list':breadcrumbs_list,
+                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list
                                 },
                                 context_instance = RequestContext(request)
     )
+
 
 # This view handles the collection list of resource and its breadcrumbs
 def collection_view(request, group_id):
@@ -133,44 +181,37 @@ def collection_view(request, group_id):
   '''
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
-    breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
+    # breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
 
-    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-    breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
-    breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    # breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
+    # breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
 
-    b_list = []
-    for each in breadcrumbs_list:
-      b_list.append(each[0])
+    # b_list = []
+    # for each in breadcrumbs_list:
+    #   b_list.append(each[0])
     
-    if str(node_obj._id) not in b_list:
-      # Add the tuple if clicked node is not there in breadcrumbs list
-      breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
-    else:
-      # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
-      for e in reversed(breadcrumbs_list):
-        if node_id in e:
-          break
-        else:
-          breadcrumbs_list.remove(e)
-        
+    # if str(node_obj._id) not in b_list:
+    #   # Add the tuple if clicked node is not there in breadcrumbs list
+    #   breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
+    # else:
+    #   # To remove breadcrumbs untill clicked node have not reached(Removal starts in reverse order)
+    #   for e in reversed(breadcrumbs_list):
+    #     if node_id in e:
+    #       break
+    #     else:
+    #       breadcrumbs_list.remove(e)
 
-  # print "\nbreadcrumbs_list: ",breadcrumbs_list,"\n"
-
-  return render_to_response('ndf/collection_ajax_view.html', 
-                                  { 'node': node_obj,
-                                    'group_id': group_id,
-                                    'groupid':group_id,
-                                    'breadcrumbs_list':breadcrumbs_list
-                                  },
-                                 context_instance = RequestContext(request)
+    return render_to_response('ndf/collection_ajax_view.html',
+                              {
+                                'node': node_obj, 'group_id': group_id, 'groupid': group_id
+                              },context_instance=RequestContext(request)
     )
 
 
 @login_required
 def shelf(request, group_id):
-    
-    if request.is_ajax() and request.method == "POST":    
+    if request.is_ajax() and request.method == "POST":
       shelf = request.POST.get("shelf_name", '')
       shelf_add = request.POST.get("shelf_add", '')
       shelf_remove = request.POST.get("shelf_remove", '')
@@ -178,53 +219,50 @@ def shelf(request, group_id):
 
       shelf_available = ""
       shelf_item_available = ""
-      collection= db[Node.collection_name]
-      collection_tr = db[Triple.collection_name]
 
-      shelf_gst = collection.Node.one({'_type': u'GSystemType', 'name': u'Shelf'})
+      shelf_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Shelf'})
 
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      has_shelf_RT = collection.Node.one({'_type': u'RelationType', 'name': u'has_shelf'}) 
-      dbref_has_shelf = has_shelf_RT.get_dbref()
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      has_shelf_RT = node_collection.one({'_type': u'RelationType', 'name': u'has_shelf'}) 
 
       if shelf:
-        shelf_gs = collection.Node.one({'name': unicode(shelf), 'member_of': [ObjectId(shelf_gst._id)] })
+        shelf_gs = node_collection.one({'name': unicode(shelf), 'member_of': [ObjectId(shelf_gst._id)] })
         if shelf_gs is None:
-          shelf_gs = collection.GSystem()
+          shelf_gs = node_collection.collection.GSystem()
           shelf_gs.name = unicode(shelf)
           shelf_gs.created_by = int(request.user.id)
           shelf_gs.member_of.append(shelf_gst._id)
           shelf_gs.save()
 
-          shelf_R = collection_tr.GRelation()        
+          shelf_R = triple_collection.collection.GRelation()
           shelf_R.subject = ObjectId(auth._id)
           shelf_R.relation_type = has_shelf_RT
           shelf_R.right_subject = ObjectId(shelf_gs._id)
           shelf_R.save()
         else:
           if shelf_add:
-            shelf_item = ObjectId(shelf_add)  
+            shelf_item = ObjectId(shelf_add)
 
             if shelf_item in shelf_gs.collection_set:
-              shelf_Item = collection.Node.one({'_id': ObjectId(shelf_item)}).name       
+              shelf_Item = node_collection.one({'_id': ObjectId(shelf_item)}).name
               shelf_item_available = shelf_Item
               return HttpResponse("failure")
 
             else:
-              collection.update({'_id': shelf_gs._id}, {'$push': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)
+              node_collection.collection.update({'_id': shelf_gs._id}, {'$push': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)
               shelf_gs.reload()
 
           elif shelf_item_remove:
-            shelf_item = collection.Node.one({'name': unicode(shelf_item_remove)})._id
-            collection.update({'_id': shelf_gs._id}, {'$pull': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)      
+            shelf_item = node_collection.one({'name': unicode(shelf_item_remove)})._id
+            node_collection.collection.update({'_id': shelf_gs._id}, {'$pull': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)      
             shelf_gs.reload()
-          
+
           else:
             shelf_available = shelf
 
       elif shelf_remove:
-        shelf_gs = collection.Node.one({'name': unicode(shelf_remove), 'member_of': [ObjectId(shelf_gst._id)] })
-        shelf_rel = collection.Node.one({'_type': 'GRelation', 'subject': ObjectId(auth._id),'right_subject': ObjectId(shelf_gs._id) })
+        shelf_gs = node_collection.one({'name': unicode(shelf_remove), 'member_of': [ObjectId(shelf_gst._id)] })
+        shelf_rel = triple_collection.one({'_type': 'GRelation', 'subject': ObjectId(auth._id),'right_subject': ObjectId(shelf_gs._id) })
 
         shelf_rel.delete()
         shelf_gs.delete()
@@ -236,22 +274,22 @@ def shelf(request, group_id):
       shelf_list = {}
 
       if auth:
-        shelf = collection_tr.Triple.find({'_type': 'GRelation','subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-        
+        shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id})
+
         if shelf:
           for each in shelf:
-            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})  
+            shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
             shelves.append(shelf_name)
 
-            shelf_list[shelf_name.name] = []         
+            shelf_list[shelf_name.name] = []
             for ID in shelf_name.collection_set:
-              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_item = node_collection.one({'_id': ObjectId(ID)})
               shelf_list[shelf_name.name].append(shelf_item.name)
-            
+
         else:
           shelves = []
 
-      return render_to_response('ndf/shelf.html', 
+      return render_to_response('ndf/shelf.html',
                                   { 'shelf_obj': shelf_gs,'shelf_list': shelf_list,'shelves': shelves,
                                     'groupid':group_id
                                   },
@@ -260,7 +298,6 @@ def shelf(request, group_id):
 
 
 def drawer_widget(request, group_id):
-    
     drawer = None
     drawers = None
     drawer1 = None
@@ -268,25 +305,25 @@ def drawer_widget(request, group_id):
     dict_drawer = {}
     dict1 = {}
     dict2 = []
-    nlist=[]
+    nlist = []
     node = None
-    
+
     node_id = request.POST.get("node_id", '')
     field = request.POST.get("field", '')
     app = request.POST.get("app", '')
     page_no = request.POST.get("page_no", '')
 
     if node_id:
-      node = collection.Node.one({'_id': ObjectId(node_id) })
+      node = node_collection.one({'_id': ObjectId(node_id)})
       if field == "prior_node":
         app = None
-        nlist = node.prior_node	       
+        nlist = node.prior_node
         drawer, paged_resources = get_drawers(group_id, node._id, nlist, page_no, app)
 
       elif field == "teaches":
         app = None
-        relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
-        list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+        relationtype = node_collection.one({"_type": "RelationType", "name": "teaches"})
+        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
         for relation in list_grelations:
           nlist.append(ObjectId(relation.right_subject))
 
@@ -294,8 +331,8 @@ def drawer_widget(request, group_id):
 
       elif field == "assesses":
         app = field
-        relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
-        list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+        relationtype = node_collection.one({"_type": "RelationType", "name": "assesses"})
+        list_grelations = triple_collection.find({"_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id})
         for relation in list_grelations:
           nlist.append(ObjectId(relation.right_subject))
 
@@ -317,7 +354,6 @@ def drawer_widget(request, group_id):
 
         nlist = node.collection_set
         drawer, paged_resources = get_drawers(group_id, node._id, nlist, page_no, app)
-        
 
     else:
       if field == "collection" and app == "Quiz":
@@ -342,7 +378,7 @@ def drawer_widget(request, group_id):
       drawer1 = drawers['1']
       drawer2 = drawers['2']
 
-    return render_to_response('ndf/drawer_widget.html', 
+    return render_to_response('ndf/drawer_widget.html',
                               { 'widget_for': field,'drawer1': drawer1, 'drawer2': drawer2,'node_id': node_id,
                                 'group_id': group_id,'groupid': group_id,"page_info": paged_resources
                               },
@@ -350,15 +386,13 @@ def drawer_widget(request, group_id):
     )
 
 
-
 def select_drawer(request, group_id):
-    
     if request.is_ajax() and request.method == "POST":
-
         drawer = None
         drawers = None
         drawer1 = None
         drawer2 = None
+        selection_flag = True
         node = None
         dict_drawer = {}
         dict1 = {}
@@ -366,46 +400,51 @@ def select_drawer(request, group_id):
         nlist=[]
         check = ""
         checked = ""
-        relationtype = "" 
+        relationtype = ""
 
         node_id = request.POST.get("node_id", '')
         page_no = request.POST.get("page_no", '')
         field = request.POST.get("field", '')
         checked = request.POST.get("homo_collection", '')
         node_type = request.POST.get("node_type", '')
-          
+
         if node_id:
           node_id = ObjectId(node_id)
-          node = collection.Node.one({'_id': ObjectId(node_id) })  
+          node = node_collection.one({'_id': ObjectId(node_id)})
           if node_type:
             if len(node.member_of) > 1:
-              n_type = collection.Node.one({'_id': ObjectId(node.member_of[1]) })
+              n_type = node_collection.one({'_id': ObjectId(node.member_of[1])})
             else:
-              n_type = collection.Node.one({'_id': ObjectId(node.member_of[0]) })
+              n_type = node_collection.one({'_id': ObjectId(node.member_of[0])})
             checked = n_type.name
 
         if checked:
           if checked == "QuizObj" :
-            quiz = collection.Node.one({'_type': 'GSystemType', 'name': "Quiz" })
-            quizitem = collection.Node.one({'_type': 'GSystemType', 'name': "QuizItem" })
+            quiz = node_collection.one({'_type': 'GSystemType', 'name': "Quiz" })
+            quizitem = node_collection.one({'_type': 'GSystemType', 'name': "QuizItem"})
 
           elif checked == "Pandora Video":
-            check = collection.Node.one({'_type': 'GSystemType', 'name': 'Pandora_video' })
+            check = node_collection.one({'_type': 'GSystemType', 'name': 'Pandora_video'})
 
           else:
-            check = collection.Node.one({'_type': 'GSystemType', 'name': unicode(checked) })
+            check = node_collection.one({'_type': 'GSystemType', 'name': unicode(checked)})
 
         if node_id:
-
             if field:
               if field == "teaches":
-                relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
-                list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+                relationtype = node_collection.one({"_type": "RelationType", "name":"teaches"})
+                list_grelations = triple_collection.find({
+                    "_type": "GRelation", "subject": node._id,
+                    "relation_type": relationtype._id
+                })
                 for relation in list_grelations:
                   nlist.append(ObjectId(relation.right_subject))
               elif field == "assesses":
-                relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
-                list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+                relationtype = node_collection.one({"_type": "RelationType", "name":"assesses"})
+                list_grelations = triple_collection.find({
+                    "_type": "GRelation", "subject": node._id,
+                    "relation_type": relationtype._id
+                })
                 for relation in list_grelations:
                   nlist.append(ObjectId(relation.right_subject))
               elif field == "prior_node":
@@ -418,11 +457,10 @@ def select_drawer(request, group_id):
 
 
         if node_id:
-
           if node.collection_set:
-            if checked:              
+            if checked:
               for k in node.collection_set:
-                obj = collection.Node.one({'_id': ObjectId(k) })
+                obj = node_collection.one({'_id': ObjectId(k)})
                 if check:
                   if check._id in obj.member_of:
                     nlist.append(k)
@@ -439,6 +477,11 @@ def select_drawer(request, group_id):
         drawer, paged_resources = get_drawers(group_id, node_id, nlist, page_no, checked)#get_drawers(group_id, node_id, nlist, checked)
 
 
+        if field == "course_units":
+            nlist.append("course_units")
+            selection_flag = False
+            drawers = get_drawers(group_id, node_id, nlist, checked)
+
         drawers = drawer
         if not node_id:
           drawer1 = drawers
@@ -452,17 +495,15 @@ def select_drawer(request, group_id):
 
         return render_to_response("ndf/drawer_widget.html", 
                                   {"widget_for": field, "page_info": paged_resources,
-                                   "drawer1": drawer1, 'selection': True, 'node_id':node_id,
+                                   "drawer1": drawer1, 'selection': selection_flag, 'node_id':node_id,
                                    "drawer2": drawer2, "checked": checked,
                                    "groupid": group_id
                                   },
                                   context_instance=RequestContext(request)
         )
-         
-  
+
 
 def search_drawer(request, group_id):
-    
     if request.is_ajax() and request.method == "POST":
 
       search_name = request.POST.get("search_name", '')
@@ -481,24 +522,28 @@ def search_drawer(request, group_id):
       node = None
       page_no = 1
 
-      Page = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
-      File = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
-      Quiz = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})
+      Page = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+      File = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
+      Quiz = node_collection.one({'_type': "GSystemType", 'name': "Quiz"})
 
       if node_id:
-        node = collection.Node.one({'_id': ObjectId(node_id) })
-        node_type = collection.Node.one({'_id': ObjectId(node.member_of[0]) })
+        node = node_collection.one({'_id': ObjectId(node_id)})
+        node_type = node_collection.one({'_id': ObjectId(node.member_of[0])})
 
-        if field: 
+        if field:
           if field == "teaches":
-            relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
-            list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+            relationtype = node_collection.one({"_type": "RelationType", "name": "teaches"})
+            list_grelations = triple_collection.find({
+                "_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id
+            })
             for relation in list_grelations:
               nlist.append(ObjectId(relation.right_subject))
 
           elif field == "assesses":
-            relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
-            list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+            relationtype = node_collection.one({"_type": "RelationType", "name": "assesses"})
+            list_grelations = triple_collection.find({
+                "_type": "GRelation", "subject": node._id, "relation_type.$id": relationtype._id
+            })
             for relation in list_grelations:
               nlist.append(ObjectId(relation.right_subject))
 
@@ -510,7 +555,7 @@ def search_drawer(request, group_id):
 
           node.reload()
 
-        search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]},
+        search_drawer = node_collection.find({'_type': {'$in' : [u"GSystem", u"File"]},
                                         'member_of':{'$in':[Page._id,File._id,Quiz._id]}, 
                                         '$and': [
                                           {'name': {'$regex': str(search_name), '$options': "i"}},
@@ -520,7 +565,7 @@ def search_drawer(request, group_id):
         
 
       else:
-          search_drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
+          search_drawer = node_collection.find({'_type': {'$in' : [u"GSystem", u"File"]}, 
                                           'member_of':{'$in':[Page._id,File._id,Quiz._id]}, 
                                           '$and': [
                                             {'name': {'$regex': str(search_name), '$options': "i"}},
@@ -536,7 +581,7 @@ def search_drawer(request, group_id):
               dict1[each._id] = each
 
         for oid in nlist:
-          obj = collection.Node.one({'_id': oid })
+          obj = node_collection.one({'_id': oid })
           dict2.append(obj)
 
         dict_drawer['1'] = dict1
@@ -562,21 +607,20 @@ def search_drawer(request, group_id):
                                  "groupid": group_id, 'node_id': node_id
                                 },
                                 context_instance=RequestContext(request)
-      )    
-      
+      )
+
 
 def get_topic_contents(request, group_id):
-    
   if request.is_ajax() and request.method == "POST":
     node_id = request.POST.get("node_id", '')
     selected = request.POST.get("selected", '')
     choice = request.POST.get("choice", '')
-    # node = collection.Node.one({'_id': ObjectId(node_id) })
+    # node = node_collection.one({'_id': ObjectId(node_id) })
 
     contents = get_contents(node_id, selected, choice)
 
     return HttpResponse(json.dumps(contents))
-      
+
 
 ####Bellow part is for manipulating theme topic hierarchy####
 def get_collection_list(collection_list, node):
@@ -585,12 +629,12 @@ def get_collection_list(collection_list, node):
   
   if node.collection_set:
     for each in node.collection_set:
-      col_obj = collection.Node.one({'_id': ObjectId(each)})
+      col_obj = node_collection.one({'_id': ObjectId(each)})
       if col_obj:
         if theme_item_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
           for cl in collection_list:
             if cl['id'] == node.pk:
-              node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
+              node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
               inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk , 'node_type': node_type}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_collection_list(inner_sub_list, col_obj)
@@ -612,33 +656,30 @@ def get_collection_list(collection_list, node):
 
 
 def get_tree_hierarchy(request, group_id, node_id):
-
-    node = collection.Node.one({'_id':ObjectId(node_id)})
+    node = node_collection.one({'_id':ObjectId(node_id)})
     Collapsible = request.GET.get("collapsible", "");
 
     data = ""
     collection_list = []
     themes_list = []
 
-    theme_node = collection.Node.one({'_id': ObjectId(node._id) })
+    theme_node = node_collection.one({'_id': ObjectId(node._id) })
     # print "\ntheme_node: ",theme_node.name,"\n"
     if theme_node.collection_set:
 
       for e in theme_node.collection_set:
-        objs = collection.Node.one({'_id': ObjectId(e) })
+        objs = node_collection.one({'_id': ObjectId(e) })
         for l in objs.collection_set:
           themes_list.append(l)
 
 
       for each in theme_node.collection_set:
-        obj = collection.Node.one({'_id': ObjectId(each) })
+        obj = node_collection.one({'_id': ObjectId(each) })
         if obj._id not in themes_list:
           if theme_item_GST._id in obj.member_of or topic_GST._id in obj.member_of:
-
-            node_type = collection.Node.one({'_id': ObjectId(obj.member_of[0])}).name
+            node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
             collection_list.append({'name': obj.name, 'id': obj.pk, 'node_type': node_type})
             collection_list = get_collection_list(collection_list, obj)
-
 
     if Collapsible:
       data = { "name": theme_node.name, "children": collection_list }
@@ -646,21 +687,20 @@ def get_tree_hierarchy(request, group_id, node_id):
       data = collection_list
 
     return HttpResponse(json.dumps(data))
+# ###End of manipulating theme topic hierarchy####
 
-####End of manipulating theme topic hierarchy####
-
-##### bellow part is for manipulating nodes collections#####
+# #### bellow part is for manipulating nodes collections#####
 def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
 
   if node.collection_set:
     for each in node.collection_set:
-      col_obj = collection.Node.one({'_id': ObjectId(each)})
+      col_obj = node_collection.one({'_id': ObjectId(each)})
       if col_obj:
         for cl in collection_list:
           if cl['id'] == node.pk:
-            node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
+            node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
             inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type}
             inner_sub_list = [inner_sub_dict]
             inner_sub_list = get_inner_collection(inner_sub_list, col_obj)
@@ -682,30 +722,28 @@ def get_inner_collection(collection_list, node):
 
 
 def get_collection(request, group_id, node_id):
-
-  node = collection.Node.one({'_id':ObjectId(node_id)})
+  node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
-
   collection_list = []
 
   if node:
     if node.collection_set:
       for each in node.collection_set:
-        obj = collection.Node.one({'_id': ObjectId(each) })
+        obj = node_collection.one({'_id': ObjectId(each) })
         if obj:
-          node_type = collection.Node.one({'_id': ObjectId(obj.member_of[0])}).name
+          node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
           collection_list.append({'name': obj.name, 'id': obj.pk,'node_type': node_type})
           collection_list = get_inner_collection(collection_list, obj)
 
 
   data = collection_list
-  return HttpResponse(json.dumps(data))
 
-####End of manipulating nodes collection####
+  return HttpResponse(json.dumps(data))
+# ###End of manipulating nodes collection####
+
 
 def add_sub_themes(request, group_id):
-
-  if request.is_ajax() and request.method == "POST":    
+  if request.is_ajax() and request.method == "POST":
 
     context_node_id = request.POST.get("context_node", '')
     sub_theme_name = request.POST.get("sub_theme_name", '')
@@ -713,20 +751,20 @@ def add_sub_themes(request, group_id):
     themes_list = themes_list.replace("&quot;","'")
     themes_list = ast.literal_eval(themes_list)
 
-    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
-    context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
-    
-    # Save the sub-theme first  
+    theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+    context_node = node_collection.one({'_id': ObjectId(context_node_id) })
+
+    # Save the sub-theme first
     if sub_theme_name:
       if not sub_theme_name.upper() in (theme_name.upper() for theme_name in themes_list):
 
-        node = collection.GSystem()
+        node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, theme_GST)
-      
+
         node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST))
         node.reload()
         # Add this sub-theme into context nodes collection_set
-        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        node_collection.collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
         context_node.reload()
 
         return HttpResponse("success")
@@ -737,35 +775,35 @@ def add_sub_themes(request, group_id):
 
 
 def add_theme_item(request, group_id):
-
-  if request.is_ajax() and request.method == "POST":    
+  if request.is_ajax() and request.method == "POST":
 
     context_theme_id = request.POST.get("context_theme", '')
     name =request.POST.get('name','')
 
-    context_theme = collection.Node.one({'_id': ObjectId(context_theme_id) })
+    context_theme = node_collection.one({'_id': ObjectId(context_theme_id) })
 
     list_theme_items = []
     if name and context_theme:
 
       for each in context_theme.collection_set:
-        obj = collection.Node.one({'_id': ObjectId(each) })
+        obj = node_collection.one({'_id': ObjectId(each) })
         if obj.name == name:
           return HttpResponse("failure")
 
-      theme_item_node = collection.GSystem()
+      theme_item_node = node_collection.collection.GSystem()
 
       theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST))
       theme_item_node.reload()
 
       # Add this theme item into context theme's collection_set
-      collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      node_collection.collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
       context_theme.reload()
 
     return HttpResponse("success")
 
+
 def add_topics(request, group_id):
-  if request.is_ajax() and request.method == "POST":    
+  if request.is_ajax() and request.method == "POST":
     # print "\n Inside add_topics ajax view\n"
     context_node_id = request.POST.get("context_node", '')
     add_topic_name = request.POST.get("add_topic_name", '')
@@ -773,21 +811,20 @@ def add_topics(request, group_id):
     topics_list = topics_list.replace("&quot;","'")
     topics_list = ast.literal_eval(topics_list)
 
-    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-    context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
+    topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+    context_node = node_collection.one({'_id': ObjectId(context_node_id) })
 
-
-    # Save the topic first  
+    # Save the topic first
     if add_topic_name:
       # print "\ntopic name: ", add_topic_name
       if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
-        node = collection.GSystem()
+        node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, topic_GST)
-      
+
         node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST))
-        node.reload()        
+        node.reload()
         # Add this topic into context nodes collection_set
-        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        node_collection.collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
         context_node.reload()
 
         return HttpResponse("success")
@@ -798,22 +835,22 @@ def add_topics(request, group_id):
 
 
 def add_page(request, group_id):
-  if request.is_ajax() and request.method == "POST":    
+  if request.is_ajax() and request.method == "POST":
 
     context_node_id = request.POST.get("context_node", '')
-    gst_page = collection.Node.one({'_type': "GSystemType", 'name': "Page"})
-    context_node = collection.Node.one({'_id': ObjectId(context_node_id)})
+    gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    context_node = node_collection.one({'_id': ObjectId(context_node_id)})
     name =request.POST.get('name','')
 
     collection_list = []
     if context_node:
       for each in context_node.collection_set:
-        obj = collection.Node.one({'_id': ObjectId(each), 'group_set': ObjectId(group_id)})
+        obj = node_collection.one({'_id': ObjectId(each), 'group_set': ObjectId(group_id)})
         collection_list.append(obj.name)
 
       if name not in collection_list:
 
-        page_node = collection.GSystem()
+        page_node = node_collection.collection.GSystem()
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
         context_node.collection_set.append(page_node._id)
@@ -831,15 +868,14 @@ def add_file(request, group_id):
   # this is context node getting from the url get request
   context_node_id=request.GET.get('context_node','')
 
-  if request.method == "POST":   
+  if request.method == "POST":
 
     new_list = []
     # For checking the node is already available in gridfs or not
     for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-      fcol = get_database()[File.collection_name]
-      fileobj = fcol.File()
+      fileobj = node_collection.collection.File()
       filemd5 = hashlib.md5(each.read()).hexdigest()
-      if not fileobj.fs.files.exists({"md5":filemd5}):
+      if not fileobj.fs.files.exists({"md5": filemd5}):
         # If not available append to the list for making the collection for topic bellow
         new_list.append(each)
       else:
@@ -851,9 +887,9 @@ def add_file(request, group_id):
     submitDoc(request, group_id)
 
   # After file gets saved , that file's id should be saved in collection_set of context topic node
-  context_node = collection.Node.one({'_id': ObjectId(context_node_id)})
+  context_node = node_collection.one({'_id': ObjectId(context_node_id)})
   for k in new_list:
-    file_obj = collection.Node.one({'_type': 'File', 'name': unicode(k) })
+    file_obj = node_collection.one({'_type': 'File', 'name': unicode(k) })
 
     context_node.collection_set.append(file_obj._id)
     context_node.save()
@@ -863,26 +899,21 @@ def add_file(request, group_id):
   return HttpResponseRedirect(var1)
 
 
-
-def node_collection(node=None, group_id=None):
-
-    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+def collection_of_node(node=None, group_id=None):
+    theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
     if node.collection_set:
       for each in node.collection_set:
-        
-        each_node = collection.Node.one({'_id': ObjectId(each)})
-        
+        each_node = node_collection.one({'_id': ObjectId(each)})
         if each_node.collection_set:
-          
-          node_collection(each_node, group_id)
+          collection_of_node(each_node, group_id)
         else:
           # After deleting theme instance it's should also remove from collection_set
-          cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+          cur = node_collection.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
           for e in cur:
             if each_node._id in e.collection_set:
-              collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
+              node_collection.collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
 
 
           # print "\n node ", each_node.name ,"has been deleted \n"
@@ -890,11 +921,11 @@ def node_collection(node=None, group_id=None):
 
 
       # After deleting theme instance it's should also remove from collection_set
-      cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+      cur = node_collection.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
       for e in cur:
         if node._id in e.collection_set:
-          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+          node_collection.collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
 
       # print "\n node ", node.name ,"has been deleted \n"
       node.delete()
@@ -902,11 +933,11 @@ def node_collection(node=None, group_id=None):
     else:
 
       # After deleting theme instance it's should also remove from collection_set
-      cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+      cur = node_collection.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
       for e in cur:
         if node._id in e.collection_set:
-          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+          node_collection.collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
 
 
       # print "\n node ", node.name ,"has been deleted \n"
@@ -916,36 +947,35 @@ def node_collection(node=None, group_id=None):
 
 
 def theme_node_collection(node=None, group_id=None):
-
-    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+    theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+    theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
     if node.collection_set:
       for each in node.collection_set:
         
-        each_node = collection.Node.one({'_id': ObjectId(each)})
+        each_node = node_collection.one({'_id': ObjectId(each)})
         
         if each_node.collection_set:
           
-          node_collection(each_node, group_id)
+          collection_of_node(each_node, group_id)
         else:
           # After deleting theme instance it's should also remove from collection_set
-          cur = collection.Node.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+          cur = node_collection.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
           for e in cur:
             if each_node._id in e.collection_set:
-              collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
+              node_collection.collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
 
 
           # print "\n node ", each_node.name ,"has been deleted \n"
           each_node.delete()
 
       # After deleting theme instance it's should also remove from collection_set
-      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+      cur = node_collection.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
       for e in cur:
         if node._id in e.collection_set:
-          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+          node_collection.collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
 
       # print "\n node ", node.name ,"has been deleted \n"
       node.delete()
@@ -953,11 +983,11 @@ def theme_node_collection(node=None, group_id=None):
     else:
 
       # After deleting theme instance it's should also remove from collection_set
-      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+      cur = node_collection.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
       for e in cur:
         if node._id in e.collection_set:
-          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+          node_collection.collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
 
       # print "\n node ", node.name ,"has been deleted \n"
       node.delete()
@@ -973,35 +1003,32 @@ def delete_themes(request, group_id):
   if request.is_ajax() and request.method =="POST":
     context_node_id=request.POST.get('context_theme','') 
     if context_node_id:
-      context_theme_node = collection.Node.one({'_id': ObjectId(context_node_id)}) 
+      context_theme_node = node_collection.one({'_id': ObjectId(context_node_id)}) 
 
-     
     confirm = request.POST.get("confirm","")
     deleteobj = request.POST.get('deleteobj',"")
-    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+    theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
+    theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
     if deleteobj:
-      obj = collection.Node.one({'_id': ObjectId(deleteobj) })
-      obj.delete()          
-      node = collection.Node.one({'member_of': {'$in':[theme_GST._id, theme_item_GST._id]}, 'collection_set': ObjectId(deleteobj) })
-      collection.update({'_id': node._id}, {'$pull': {'collection_set': ObjectId(deleteobj) }}, upsert=False, multi=False)      
+      obj = node_collection.one({'_id': ObjectId(deleteobj) })
+      obj.delete()
+      node = node_collection.one({'member_of': {'$in':[theme_GST._id, theme_item_GST._id]}, 'collection_set': ObjectId(deleteobj) })
+      node_collection.collection.update({'_id': node._id}, {'$pull': {'collection_set': ObjectId(deleteobj) }}, upsert=False, multi=False)      
 
     else:
       deleteobjects = request.POST['deleteobjects']
 
     if deleteobjects:
-      for each in  deleteobjects.split(","):
-          node = collection.Node.one({ '_id': ObjectId(each)})
+      for each in deleteobjects.split(","):
+          node = node_collection.one({ '_id': ObjectId(each)})
           # print "\n confirmed objects: ", node.name
 
           if confirm:
-            
             if context_node_id:
-              node_collection(node, group_id)
+              collection_of_node(node, group_id)
               if node._id in context_theme_node.collection_set:
-                collection.update({'_id': context_theme_node._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
-
+                node_collection.collection.update({'_id': context_theme_node._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
 
             else:
               theme_node_collection(node, group_id)
@@ -1011,14 +1038,13 @@ def delete_themes(request, group_id):
 
   return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
 
-  
 
 @login_required
-def change_group_settings(request,group_id):
+def change_group_settings(request, group_id):
     '''
-	changing group's object data
+    changing group's object data
     '''
-    if request.is_ajax() and request.method =="POST":
+    if request.is_ajax() and request.method == "POST":
         try:
             edit_policy = request.POST['edit_policy']
             group_type = request.POST['group_type']
@@ -1026,9 +1052,9 @@ def change_group_settings(request,group_id):
             visibility_policy = request.POST['visibility_policy']
             disclosure_policy = request.POST['disclosure_policy']
             encryption_policy = request.POST['encryption_policy']
-           # group_id = request.POST['group_id']
-            group_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
-            if group_node :
+            # group_id = request.POST['group_id']
+            group_node = node_collection.one({"_id": ObjectId(group_id)})
+            if group_node:
                 group_node.edit_policy = edit_policy
                 group_node.group_type = group_type
                 group_node.subscription_policy = subscription_policy
@@ -1040,29 +1066,28 @@ def change_group_settings(request,group_id):
                 return HttpResponse("changed successfully")
         except:
             return HttpResponse("failed")
-    return HttpResponse("failed") 
+    return HttpResponse("failed")
 
+
+list_of_collection = []
+hm_obj = HistoryManager()
 def get_module_set_list(node):
     '''
         Returns the list of collection inside the collections with hierarchy as they are in collection
     '''
     list = []
     for each in node.collection_set:
-        each = collection.Node.one({'_id':each})
+        each = node_collection.one({'_id': each})
         dict = {}
         dict['id'] = unicode(each._id)
         dict['version_no'] = hm_obj.get_current_version(each)
         if each._id not in list_of_collection:
             list_of_collection.append(each._id)
-            if each.collection_set :                                   #checking that same collection can'not be called again
+            if each.collection_set:                                   #checking that same collection can'not be called again
                 dict['collection'] = get_module_set_list(each)         #calling same function recursivaly
         list.append(dict)
     return list
 
-
-list_of_collection = []
-hm_obj = HistoryManager()
-GST_MODULE = gs_collection.GSystemType.one({'name': GAPPS[8]})
 
 @login_required
 def make_module_set(request, group_id):
@@ -1071,9 +1096,10 @@ def make_module_set(request, group_id):
     '''
     if request.is_ajax():
         try:
+            GST_MODULE = node_collection.one({"_type": "GSystemType", 'name': GAPPS[8]})
             _id = request.GET.get("_id","")
             if _id:
-                node = collection.Node.one({'_id':ObjectId(_id)})
+                node = node_collection.one({'_id':ObjectId(_id)})
                 if node:
                     list_of_collection.append(node._id)
                     dict = {}
@@ -1083,12 +1109,12 @@ def make_module_set(request, group_id):
                         dict['collection'] = get_module_set_list(node)     #gives the list of collection with proper hierarchy as they are
 
                     #creating new Gsystem object and assining data of collection object
-                    gsystem_obj = collection.GSystem()
+                    gsystem_obj = node_collection.collection.GSystem()
                     gsystem_obj.name = unicode(node.name)
                     gsystem_obj.content = unicode(node.content)
                     gsystem_obj.member_of.append(GST_MODULE._id)
                     gsystem_obj.group_set.append(ObjectId(group_id))
-                    # if usrname not in gsystem_obj.group_set:        
+                    # if usrname not in gsystem_obj.group_set:
                     #     gsystem_obj.group_set.append(int(usrname))
                     user_id = int(request.user.id)
                     gsystem_obj.created_by = user_id
@@ -1119,14 +1145,15 @@ def make_module_set(request, group_id):
             print "Error:",e
             return HttpResponse(e)
 
-def sotore_md5_module_set(object_id,module_set_md5):
+
+def sotore_md5_module_set(object_id, module_set_md5):
     '''
     This method will store md5 of module_set of perticular GSystem into an Attribute
     '''
-    node_at = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]}) #retrving attribute type
+    node_at = node_collection.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]}) #retrving attribute type
     if node_at is not None:
         try:
-            attr_obj =  collection.GAttribute()                #created instance of attribute class
+            attr_obj = triple_collection.collection.GAttribute()                #created instance of attribute class
             attr_obj.attribute_type = node_at
             attr_obj.subject = object_id
             attr_obj.object_value = unicode(module_set_md5)
@@ -1139,61 +1166,63 @@ def sotore_md5_module_set(object_id,module_set_md5):
         print "Run 'python manage.py filldb' commanad to create AttributeType 'module_set_md5' "
         return 'False'
 
-#-- under construction
-def create_version_of_module(subject_id,node_id):
+
+# under construction
+def create_version_of_module(subject_id, node_id):
     '''
     This method will create attribute version_no of module with at type version
     '''
-    rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
-    relation = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_module._id,'subject':node_id})
-    at_version = collection.Node.one({'_type':'AttributeType', 'name':'version'})
+    rt_has_module = node_collection.one({'_type':'RelationType', 'name':'has_module'})
+    relation = triple_collection.find({'_type': 'GRelation', 'subject': node_id, 'relation_type.$id':rt_has_module._id})
+    at_version = node_collection.one({'_type':'AttributeType', 'name':'version'})
     attr_versions = []
     if relation.count() > 0:
         for each in relation:
-            module_id = collection.Triple.one({'_id':each['_id']})
+            module_id = triple_collection.one({'_id': each['_id']})
             if module_id:
-                attr = collection.Triple.one({'_type':'GAttribute','attribute_type.$id':at_version._id,'subject':ObjectId(module_id.right_subject)})
+                attr = triple_collection.one({
+                    '_type': 'GAttribute', 'subject': ObjectId(module_id.right_subject),
+                    'attribute_type.$id': at_version._id
+                })
             if attr:
                 attr_versions.append(attr.object_value)
 
     if attr_versions:
         attr_versions.sort()
         attr_ver = float(attr_versions[-1])
-        attr = collection.GAttribute()
+        attr = triple_collection.collection.GAttribute()
         attr.attribute_type = at_version
         attr.subject = subject_id
         attr.object_value = round((attr_ver+0.1),1)
         attr.save()
     else:
-        attr = collection.GAttribute()
+        attr = triple_collection.collection.GAttribute()
         attr.attribute_type = at_version
         attr.subject = ObjectId(subject_id)
         attr.object_value = 1
         attr.save()
-            
+
 
 def create_relation_of_module(subject_id, right_subject_id):
-    rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
+    rt_has_module = node_collection.one({'_type': 'RelationType', 'name': 'has_module'})
     if rt_has_module and subject_id and right_subject_id:
-        relation = collection.GRelation()                         #instance of GRelation class
+        relation = triple_collection.collection.GRelation()                         #instance of GRelation class
         relation.relation_type = rt_has_module
         relation.right_subject = right_subject_id
         relation.subject = subject_id
         relation.save()
 
-    
 
 def check_module_exits(module_set_md5):
     '''
     This method will check is module already exits ?
     '''
-    node_at = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
-    attribute = collection.Triple.one({'_type':'GAttribute', 'attribute_type.$id':node_at._id, 'object_value':module_set_md5}) 
+    node_at = node_collection.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
+    attribute = triple_collection.one({'_type':'GAttribute', 'attribute_type.$id': node_at._id, 'object_value': module_set_md5}) 
     if attribute is not None:
         return 'True'
     else:
         return 'False'
-        
 
 
 def walk(node):
@@ -1201,7 +1230,7 @@ def walk(node):
     list = []
     for each in node:
        dict = {}
-       node = collection.Node.one({'_id':ObjectId(each['id'])})
+       node = node_collection.one({'_id':ObjectId(each['id'])})
        n = hm.get_version_document(node,each['version_no'])
        dict['label'] = n.name
        dict['id'] = each['id']
@@ -1211,27 +1240,25 @@ def walk(node):
        list.append(dict)
     return list
 
+
 def get_module_json(request, group_id):
-    _id = request.GET.get("_id","")
-    node = collection.Node.one({'_id':ObjectId(_id)})
+    _id = request.GET.get("_id", "")
+    node = node_collection.one({'_id': ObjectId(_id)})
     data = walk(node.module_set)
     return HttpResponse(json.dumps(data))
 
 
-
 # ------------- For generating graph json data ------------
 def graph_nodes(request, group_id):
-
-  collection = db[Node.collection_name]
-  page_node = collection.Node.one({'_id':ObjectId(request.GET.get("id"))})
+  page_node = node_collection.one({'_id': ObjectId(request.GET.get("id"))})
   page_node.get_neighbourhood(page_node.member_of)
   # print page_node.keys()
-  coll_relation = { 'relation_name':'has_collection', 'inverse_name':'member_of_collection' }
+  coll_relation = {'relation_name': 'has_collection', 'inverse_name': 'member_of_collection'}
 
-  prior_relation = { 'relation_name':'prerequisite', 'inverse_name':'is_required_for' }
+  prior_relation = {'relation_name': 'prerequisite', 'inverse_name': 'is_required_for'}
 
   def _get_node_info(node_id):
-    node = collection.Node.one( {'_id':node_id}  )
+    node = node_collection.one( {'_id':node_id}  )
     # mime_type = "true"  if node.structure.has_key('mime_type') else 'false'
 
     return node.name
@@ -1242,7 +1269,7 @@ def graph_nodes(request, group_id):
   # def _get_node_url(node_id):
 
   #   node_url = '/' + str(group_id)
-  #   node = collection.Node.one({'_id':node_id})
+  #   node = node_collection.one({'_id':node_id})
 
   #   if len(node.member_of) > 1:
   #     if node.mime_type == 'image/jpeg':
@@ -1251,7 +1278,7 @@ def graph_nodes(request, group_id):
   #       node_url += '/video/video_detail/' + str(node_id)
 
   #   elif len(node.member_of) == 1:
-  #     gapp_name = (collection.Node.one({'_id':node.member_of[0]}).name).lower()
+  #     gapp_name = (node_collection.one({'_id':node.member_of[0]}).name).lower()
 
   #     if gapp_name == 'forum':
   #       node_url += '/forum/show/' + str(node_id)
@@ -1264,9 +1291,7 @@ def graph_nodes(request, group_id):
 
   #     elif gapp_name == 'quiz' or 'quizitem':
   #       node_url += '/quiz/details/' + str(node_id)
-      
   #   return node_url
-
 
   # page_node_id = str(id(page_node._id))
   node_metadata ='{"screen_name":"' + page_node.name + '",  "title":"' + page_node.name + '",  "_id":"'+ str(page_node._id) +'", "refType":"GSystem"}, '
@@ -1284,8 +1309,7 @@ def graph_nodes(request, group_id):
 
   i = 1
   for key, value in page_node.items():
-    
-    if (key in exception_items) or (not value):      
+    if (key in exception_items) or (not value):
       pass
 
     elif isinstance(value, list):
@@ -1298,7 +1322,7 @@ def graph_nodes(request, group_id):
         # key_id = str(i)
         key_id = str(abs(hash(key+str(page_node._id))))
         # i += 1
-        
+
         # if key in ("modified_by", "author_set"):
         #   for each in value:
         #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
@@ -1313,9 +1337,9 @@ def graph_nodes(request, group_id):
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)
             if key == "collection_set":
-              inverse = coll_relation['inverse_name'] 
+              inverse = coll_relation['inverse_name']
             elif key == "prior_node":
-              inverse = prior_relation['inverse_name'] 
+              inverse = prior_relation['inverse_name']
             else:
               inverse = ""
 
@@ -1325,8 +1349,7 @@ def graph_nodes(request, group_id):
             i += 1
 
           # if "each" is Object of GSystem
-          elif isinstance(each, GSystem):           
-            
+          elif isinstance(each, GSystem):
             node_metadata += '{"screen_name":"' + each.name + '", "title":"' + page_node.name + '", "_id":"'+ str(each._id) + '", "refType":"Relation"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each._id) +'"},'            
 
@@ -1335,13 +1358,13 @@ def graph_nodes(request, group_id):
             node_metadata += '{"screen_name":"' + unicode(each) + '", "_id":"'+ unicode(each) +'_n"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ unicode(each) +'_n"},'
             i += 1
-    
+
     else:
       # possibly gives GAttribute
       node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
       node_relations += '{"type":"'+ key +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
 
-      # key_id = str(i)     
+      # key_id = str(i)
       key_id = str(abs(hash(key+str(page_node._id))))
 
       if isinstance( value, list):
@@ -1367,7 +1390,6 @@ def graph_nodes(request, group_id):
   #   if vall['subject_or_right_subject_list']:
 
   #     for eachnode in vall['subject_or_right_subject_list']:
-    
     # if keyy == "event_organised_by":
     #   pass
     #   # node_metadata +='{"screen_name":"' + keyy + '", "_id":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
@@ -1375,12 +1397,10 @@ def graph_nodes(request, group_id):
 
     #   # node_metadata += '{"screen_name":"' + str(vall) + '", "_id":"'+ str(i) +'_n"},'
     #   # node_relations += '{"type":"'+ keyy +'", "from":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
-    
     # else:
 
     #   node_metadata +='{"screen_name":"' + keyy + '", "_id":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
     #   node_relations += '{"type":"'+ keyy +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
-      
     #   vall = vall.altnames if ( len(vall['altnames'])) else _get_node_info(vall['subject_or_right_subject_list'][0])
     #   node_metadata += '{"screen_name":"' + str(vall) + '", "_id":"'+ str(i) +'_n"},'
     #   node_relations += '{"type":"'+ keyy +'", "f**rom":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
@@ -1395,21 +1415,18 @@ def graph_nodes(request, group_id):
   # print node_graph_data
 
   return StreamingHttpResponse(node_graph_data)
-
 # ------ End of processing for graph ------
 
 
-
-def get_data_for_switch_groups(request,group_id):
+def get_data_for_switch_groups(request, group_id):
     coll_obj_list = []
-    node_id = request.GET.get("object_id","")
-    st = collection.Node.find({"_type":"Group"})
-    node = collection.Node.one({"_id":ObjectId(node_id)})
+    node_id = request.GET.get("object_id", "")
+    st = node_collection.find({"_type": "Group"})
+    node = node_collection.one({"_id": ObjectId(node_id)})
     for each in node.group_set:
-        coll_obj_list.append(collection.Node.one({'_id':each}))
-    data_list=set_drawer_widget(st,coll_obj_list)
+        coll_obj_list.append(node_collection.one({'_id': each}))
+    data_list = set_drawer_widget(st, coll_obj_list)
     return HttpResponse(json.dumps(data_list))
-
 
 
 def get_data_for_drawer(request, group_id):
@@ -1418,18 +1435,17 @@ def get_data_for_drawer(request, group_id):
     '''
     coll_obj_list = []
     node_id = request.GET.get("id","")
-    st = collection.Node.find({"_type":"GSystemType"})
-    node = collection.Node.one({"_id":ObjectId(node_id)})
+    st = node_collection.find({"_type":"GSystemType"})
+    node = node_collection.one({"_id":ObjectId(node_id)})
     for each in node.collection_set:
-        coll_obj_list.append(collection.Node.one({'_id':each}))
+        coll_obj_list.append(node_collection.one({'_id':each}))
     data_list=set_drawer_widget(st,coll_obj_list)
     return HttpResponse(json.dumps(data_list))
 
+
 # This method is not in use
 def get_data_for_user_drawer(request, group_id,):
-    '''
-    This method will return data for user widget 
-    '''
+    # This method will return data for user widget
     d1 = []
     d2 = []
     draw1 = {}
@@ -1442,8 +1458,8 @@ def get_data_for_user_drawer(request, group_id,):
     st_batch_id = request.GET.get('st_batch_id','')
     node_id = request.GET.get('_id','')
     if st_batch_id:
-        batch_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-        group = collection.Node.one({'_id':ObjectId(group_id)})
+        batch_coll = node_collection.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        group = node_collection.one({'_id':ObjectId(group_id)})
         if batch_coll:
             for each in batch_coll:
                 users = users+each.author_set
@@ -1459,7 +1475,7 @@ def get_data_for_user_drawer(request, group_id,):
         draw1['drawer1'] = d1
         data_list.append(draw1)
         if node_id:
-            for each in collection.Node.one({'_id':ObjectId(node_id)}).author_set:
+            for each in node_collection.one({'_id':ObjectId(node_id)}).author_set:
                 user= User.objects.get(id=each)
                 dic = {}
                 dic['id'] = user.id   
@@ -1472,7 +1488,7 @@ def get_data_for_user_drawer(request, group_id,):
         return HttpResponse("GSystemType for batch required")
 
 
-def set_drawer_widget_for_users(st,coll_obj_list):
+def set_drawer_widget_for_users(st, coll_obj_list):
     '''
     NOTE : this method is used only for user drwers (Django user class)
     '''
@@ -1488,7 +1504,7 @@ def set_drawer_widget_for_users(st,coll_obj_list):
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
-    
+
     for each in coll_obj_list:
        dic = {}
        dic['id'] = str(each.id)
@@ -1496,8 +1512,7 @@ def set_drawer_widget_for_users(st,coll_obj_list):
        d2.append(dic)
     draw2['drawer2'] = d2
     data_list.append(draw2)
-    return data_list 
-
+    return data_list
 
 
 def get_data_for_batch_drawer(request, group_id):
@@ -1511,15 +1526,15 @@ def get_data_for_batch_drawer(request, group_id):
     drawer1 = []
     drawer2 = []
     data_list = []
-    st = collection.Node.one({'_type':'GSystemType','name':'Student'})
+    st = node_collection.one({'_type':'GSystemType','name':'Student'})
     node_id = request.GET.get('_id','')
-    batch_coll = collection.GSystem.find({'member_of':st._id, 'group_set': {'$all': [ObjectId(group_id)]}})
+    batch_coll = node_collection.find({"_type": "GSystem", 'member_of':st._id, 'group_set': {'$all': [ObjectId(group_id)]}})
     if node_id:
-        rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
-        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'right_subject':ObjectId(node_id)})
+        rt_has_batch_member = node_collection.one({'_type':'RelationType','name':'has_batch_member'})
+        relation_coll = triple_collection.find({'_type':'GRelation', 'right_subject':ObjectId(node_id), 'relation_type.$id':rt_has_batch_member._id})
         for each in relation_coll:
             dic = {}
-            n = collection.Node.one({'_id':ObjectId(each.subject)})
+            n = triple_collection.one({'_id':ObjectId(each.subject)})
             drawer2.append(n)
     for each in batch_coll:
         drawer1.append(each)
@@ -1541,8 +1556,9 @@ def get_data_for_batch_drawer(request, group_id):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
-        
-def set_drawer_widget(st,coll_obj_list):
+
+
+def set_drawer_widget(st, coll_obj_list):
     '''
     this method will set data for drawer widget
     '''
@@ -1562,7 +1578,7 @@ def set_drawer_widget(st,coll_obj_list):
     drawer1_set = set(stobjs) - set(coll_objs)
     lstset=[]
     for each in drawer1_set:
-        obj=collection.Node.one({'_id':each})
+        obj=node_collection.one({'_id':each})
         lstset.append(obj)
     drawer1=lstset
     drawer2 = coll_obj_list
@@ -1582,7 +1598,8 @@ def set_drawer_widget(st,coll_obj_list):
     data_list.append(draw2)
     return data_list 
 
-def get_data_for_event_task(request,group_id):
+
+def get_data_for_event_task(request, group_id):
     #date creation for task type is date month and year
     day_list=[]
     append = day_list.append
@@ -1607,18 +1624,18 @@ def get_data_for_event_task(request,group_id):
      task_end=str(int(month))+"/"+"30"+"/"+str(int(year))
     else:
      end=datetime.datetime(int(currentYear),int(month), 28)
-     task_end=str(int(month))+"/"+"28"+"/"+str(int(year)) 
+     task_end=str(int(month))+"/"+"28"+"/"+str(int(year))
     #day_list of events  
-    
+
     if no == '1' or no == '2':
        #condition to search events only in case of above condition so that it
        #doesnt gets executed when we are looking for other data
-       event = collection.Node.one({'_type': "GSystemType", 'name': "Event"})
-       obj = collection.Node.find({'type_of': event._id},{'_id':1})
-       all_list = [ each_gst._id for each_gst in obj ] 
-    
-    if no == '1':    
-        nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':all_list},'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
+       event = node_collection.one({'_type': "GSystemType", 'name': "Event"})
+       obj = node_collection.find({'type_of': event._id},{'_id':1})
+       all_list = [ each_gst._id for each_gst in obj ]
+
+    if no == '1':
+        nodes = node_collection.find({'_type':'GSystem','member_of':{'$in':all_list},'attribute_set.start_time':{'$gte':start,'$lt': end},'group_set':ObjectId(group_id)})
         for i in nodes:
           attr_value={}
           update = attr_value.update
@@ -1630,22 +1647,22 @@ def get_data_for_event_task(request,group_id):
           formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
           update({'start':formated_date})
           for j in i.attribute_set:
-                if unicode('event_status') in j.keys():  
-                  if j['event_status'] == 'Scheduled':  
+                if unicode('event_status') in j.keys():
+                  if j['event_status'] == 'Scheduled':
                         #Default Color Blue would be applied
                         pass
                   if j['event_status'] == 'Rescheduled':
                         update({'backgroundColor':'#ffd700'})
                   if j['event_status'] == 'Completed':
                         update({'backgroundColor':'green'})
-                  if j['event_status'] == 'Incomplete':      
+                  if j['event_status'] == 'Incomplete':
                         update({'backgroundColor':'red'})
           append(dict(attr_value))
-    if no == '2':    
-        #All the Rescheduled ones 
-        nodes = collection.Node.find({'_type':'GSystem','member_of':{'$in':list(all_list)},'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}},'group_set':ObjectId(group_id)},{'attribute_set.event_edit_reschedule.reschedule_dates':1,"name":1})
+    if no == '2':
+        #All the Rescheduled ones
+        nodes = node_collection.find({'_type':'GSystem','member_of':{'$in':list(all_list)},'attribute_set.event_edit_reschedule.reschedule_dates':{ '$elemMatch':{'$gt':start}},'group_set':ObjectId(group_id)},{'attribute_set.event_edit_reschedule.reschedule_dates':1,"name":1})
         for k in nodes:
-          for a in k.attribute_set: 
+          for a in k.attribute_set:
              if  unicode('event_edit_reschedule') in a:
                 for v in a['event_edit_reschedule']['reschedule_dates']:
                       attr_value={}
@@ -1654,37 +1671,38 @@ def get_data_for_event_task(request,group_id):
                       update({'url':event_url})
                       update({'id':k._id})
                       update({'title':k.name})
-                      date = v 
+                      date = v
                       try:
                               formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
                               update({'start':formated_date})
                               update({'backgroundColor':'#7e7e7e'})
                               append(dict(attr_value))
                       except:
-                              pass  
+                              pass
     date=""
     user_assigned=[]
     user_append = user_assigned.append
     #day_list of task
     if no == '3': 
-          groupname=collection.Node.find_one({"_id":ObjectId(group_id)})
-          attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-          attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'start_time'})
+          groupname=node_collection.find_one({"_id":ObjectId(group_id)})
+          attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
+          attributetype_key1 = node_collection.find_one({"_type":'AttributeType', 'name':'start_time'})
           #check wheather the group is author group or the common group
           if groupname._type == "Group":
-                GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
-                task_nodes = collection.GSystem.find({'member_of':GST_TASK._id, 'group_set': ObjectId(group_id)})
+                GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
+                task_nodes = node_collection.find({"_type": "GSystem", 'member_of':GST_TASK._id, 'group_set': ObjectId(group_id)})
           if groupname._type == "Author":
-                task_nodes = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id,                                "object_value":request.user.id}).sort('last_update',-1)
+                task_nodes = triple_collection.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.id}).sort('last_update',-1)
           for attr in task_nodes:
-           if groupname._type == "Group": 
-               task_node = collection.Node.one({'_id':attr._id})
+           if groupname._type == "Group":
+               task_node = node_collection.one({'_id':attr._id})
            if groupname._type == "Author":
-               task_node = collection.Node.one({'_id':attr.subject})
+               task_node = node_collection.one({'_id':attr.subject})
            if task_node:
-                        attr1=collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id
-                        ,'object_value':{'$gte':task_start,'$lte':task_end}
-                         })	
+                        attr1=triple_collection.find_one({
+                            "_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key1._id,
+                            'object_value':{'$gte':task_start,'$lte':task_end}
+                         })
                         attr_value={}
                         update = attr_value.update
                         task_url="/" + groupname.name +"/" + "task"+"/" + str(task_node._id)
@@ -1697,12 +1715,12 @@ def get_data_for_event_task(request,group_id):
                         else: 
                               date=task_node.created_at
                               formated_date=date.strftime("%Y-%m-%dT%H:%M:%S")
-                              attr_value.update({'start':formated_date})     
+                              attr_value.update({'start':formated_date})
                         update({'url':task_url})
                         append(attr_value) 
-    
-    
+
     return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder)) 
+
 
 def get_data_for_drawer_of_attributetype_set(request, group_id):
     '''
@@ -1715,8 +1733,8 @@ def get_data_for_drawer_of_attributetype_set(request, group_id):
     draw2 = {}
     node_id = request.GET.get("id","")
     coll_obj_list = []
-    st = collection.Node.find({"_type":"AttributeType"})
-    node = collection.Node.one({"_id":ObjectId(node_id)})
+    st = node_collection.find({"_type":"AttributeType"})
+    node = node_collection.one({"_id":ObjectId(node_id)})
     for each in node.attribute_type_set:
         coll_obj_list.append(each)
     drawer1 = list(set(st) - set(coll_obj_list))
@@ -1737,6 +1755,7 @@ def get_data_for_drawer_of_attributetype_set(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
 
+
 def get_data_for_drawer_of_relationtype_set(request, group_id):
     '''
     this method will fetch data for designer module's drawer widget
@@ -1748,8 +1767,8 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
     draw2 = {}
     node_id = request.GET.get("id","")
     coll_obj_list = []
-    st = collection.Node.find({"_type":"RelationType"})
-    node = collection.Node.one({"_id":ObjectId(node_id)})
+    st = node_collection.find({"_type":"RelationType"})
+    node = node_collection.one({"_id":ObjectId(node_id)})
     for each in node.relation_type_set:
         coll_obj_list.append(each)
     drawer1 = list(set(st) - set(coll_obj_list))
@@ -1770,6 +1789,7 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
 
+
 @login_required
 def deletion_instances(request, group_id):
   """
@@ -1782,12 +1802,12 @@ def deletion_instances(request, group_id):
     deleteobjects = request.POST['deleteobjects']
     confirm = request.POST.get("confirm", "")
 
-    for each in  deleteobjects.split(","):
+    for each in deleteobjects.split(","):
       delete_list = []
-      node = collection.Node.one({'_id': ObjectId(each)})
-      left_relations = collection.Node.find({"_type":"GRelation", "subject":node._id})
-      right_relations = collection.Node.find({"_type":"GRelation", "right_subject":node._id})
-      attributes = collection.Node.find({"_type":"GAttribute", "subject":node._id})
+      node = node_collection.one({'_id': ObjectId(each)})
+      left_relations = triple_collection.find({"_type": "GRelation", "subject": node._id})
+      right_relations = triple_collection.find({"_type": "GRelation", "right_subject": node._id})
+      attributes = triple_collection.find({"_type": "GAttribute", "subject": node._id})
 
       # When confirm holds "yes" value, all given node(s) is/are deleted.
       # Otherwise, required information is provided for confirmation before deletion.
@@ -1796,13 +1816,13 @@ def deletion_instances(request, group_id):
         for each_left_gr in left_relations:
           # Special case
           if each_left_gr.relation_type.name == "has_login":
-            auth_node = collection.Node.one(
+            auth_node = node_collection.one(
               {'_id': each_left_gr.right_subject},
               {'created_by': 1}
             )
 
             if auth_node:
-              collection.update(
+              node_collection.collection.update(
                 {'_type': "Group", '$or': [{'group_admin': auth_node.created_by}, {'author_set': auth_node.created_by}]},
                 {'$pull': {'group_admin': auth_node.created_by, 'author_set': auth_node.created_by}},
                 upsert=False, multi=True
@@ -1811,7 +1831,7 @@ def deletion_instances(request, group_id):
           # If given node is used in relationship with any other node (as subject)
           # Then given node's ObjectId must be removed from "relation_set" field 
           # of other node, referred under key as inverse-name of the RelationType
-          collection.update(
+          node_collection.collection.update(
             {'_id': each_left_gr.right_subject, 'relation_set.'+each_left_gr.relation_type.inverse_name: {'$exists': True}}, 
             {'$pull': {'relation_set.$.'+each_left_gr.relation_type.inverse_name: node._id}}, 
             upsert=False, multi=False
@@ -1823,7 +1843,7 @@ def deletion_instances(request, group_id):
           # If given node is used in relationship with any other node (as subject)
           # Then given node's ObjectId must be removed from "relation_set" field 
           # of other node, referred under key as name of the RelationType
-          collection.update({'_id': each_right_gr.subject, 'relation_set.'+each_right_gr.relation_type.name: {'$exists': True}}, 
+          node_collection.collection.update({'_id': each_right_gr.subject, 'relation_set.'+each_right_gr.relation_type.name: {'$exists': True}}, 
             {'$pull': {'relation_set.$.'+each_right_gr.relation_type.name: node._id}}, 
             upsert=False, multi=False
           )
@@ -1832,15 +1852,15 @@ def deletion_instances(request, group_id):
         # Deleting GAttribute(s)
         for each_ga in attributes:
           each_ga.delete()
-        
+
         # Finally deleting given node
         node.delete()
-      
+
       else:
         if left_relations :
           list_rel = []
           for each in left_relations:
-            rname = collection.Node.find_one({"_id":each.right_subject})
+            rname = node_collection.find_one({"_id":each.right_subject})
             if not rname:
               continue
             rname = rname.name
@@ -1855,7 +1875,7 @@ def deletion_instances(request, group_id):
         if right_relations :
           list_rel = []
           for each in right_relations:
-            lname = collection.Node.find_one({"_id":each.subject})
+            lname = node_collection.find_one({"_id":each.subject})
             if not lname:
               continue
             lname = lname.name
@@ -1867,7 +1887,7 @@ def deletion_instances(request, group_id):
 
           delete_list.append({'right_relations': list_rel})
         
-        if attributes :
+        if attributes:
           list_att = []
           for each in attributes:
             alt_names = each.attribute_type.name
@@ -1884,8 +1904,8 @@ def deletion_instances(request, group_id):
 
   return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
 
-def get_visited_location(request, group_id):
 
+def get_visited_location(request, group_id):
   usrid = request.user.id
   visited_location = ""
 
@@ -1894,21 +1914,22 @@ def get_visited_location(request, group_id):
     usrid = int(request.user.id)
     usrname = unicode(request.user.username)
         
-    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-    user_group_location = collection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = node_collection.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
     
     if user_group_location:
       visited_location = user_group_location.visited_location
   
   return StreamingHttpResponse(json.dumps(visited_location))
 
+
 @login_required
 def get_online_editing_user(request, group_id):
     '''
     get user who is currently online and editing the node
     '''
-    if request.is_ajax() and request.method =="POST":
-        editorid = request.POST.get('editorid',"")
+    if request.is_ajax() and request.method == "POST":
+        editorid = request.POST.get('editorid', "")
     viewobj = ViewObj.objects.filter(filename=editorid)
     userslist = []
     if viewobj:
@@ -1928,31 +1949,33 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
 
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
-    
+
+
 def view_articles(request, group_id):
   if request.is_ajax():
     # extracting all the bibtex entries from database
-    GST_one=collection.Node.one({'_type':'AttributeType','name':'Citation'})
+    GST_one=node_collection.one({'_type':'AttributeType','name':'Citation'})
     list_item=['article','book','booklet','conference','inbook','incollection','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry']
     response_dict=[]
 
     for each in list_item:
       dict2={}
-      ref=collection.Node.one({'_type':'GSystemType','name':each})
+      ref=node_collection.one({'_type':'GSystemType','name':each})
   
-      ref_entry=collection.GSystem.find({'member_of':{'$all':[ref._id]},'group_set':{'$all':[ObjectId(group_id)]},'status':u'PUBLISHED'})
+      ref_entry=node_collection.find({"_type": "GSystem", 'member_of':{'$all':[ref._id]},'group_set':{'$all':[ObjectId(group_id)]},'status':u'PUBLISHED'})
       
       list_entry=[]
       for every in ref_entry:
         
         id=every._id
-        gst_attribute=collection.Node.one({'subject':ObjectId(every._id),'attribute_type.$id':ObjectId(GST_one._id)})
+        gst_attribute=triple_collection.one({"_type": "GAttribute", 'subject': ObjectId(every._id), 'attribute_type.$id':ObjectId(GST_one._id)})
         cite=gst_attribute.object_value
-        dict1 = {'name': every.name,'cite':cite}
+        dict1 = {'name': every.name, 'cite': cite}
         list_entry.append(dict1)
       dict2[each]=list_entry
       response_dict.append(dict2)
-  return StreamingHttpResponse(json.dumps(response_dict))      
+  return StreamingHttpResponse(json.dumps(response_dict))
+
 
 def get_author_set_users(request, group_id):
     '''
@@ -1963,19 +1986,19 @@ def get_author_set_users(request, group_id):
 
     if request.is_ajax():
         _id = request.GET.get('_id',"")
-        node = collection.Node.one({'_id':ObjectId(_id)})
+        node = node_collection.one({'_id':ObjectId(_id)})
         course_name = ""
-        rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
+        rt_has_course = node_collection.one({'_type':'RelationType', 'name':'has_course'})
         if rt_has_course and node._id:
-            course = collection.Triple.one({'relation_type.$id':rt_has_course._id,'right_subject':node._id})
+            course = triple_collection.one({"_type": "GRelation", 'right_subject':node._id, 'relation_type.$id':rt_has_course._id})
             if course:
-                course_name = collection.Node.one({'_id':ObjectId(course.subject)}).name
+                course_name = node_collection.one({'_id':ObjectId(course.subject)}).name
         if node.created_by == request.user.id:
             can_remove = True
         if node.author_set:
             for each in node.author_set:
                 user_list.append(User.objects.get(id = each))
-            return render_to_response("ndf/refresh_subscribed_users.html", 
+            return render_to_response("ndf/refresh_subscribed_users.html",
                                        {"user_list":user_list,'can_remove':can_remove,'node_id':node._id,'course_name':course_name}, 
                                        context_instance=RequestContext(request)
             )
@@ -1983,6 +2006,7 @@ def get_author_set_users(request, group_id):
             return StreamingHttpResponse("Empty")
     else:
         return StreamingHttpResponse("Invalid ajax call")
+
 
 @login_required
 def remove_user_from_author_set(request, group_id):
@@ -1994,7 +2018,7 @@ def remove_user_from_author_set(request, group_id):
     if request.is_ajax():
         _id = request.GET.get('_id',"")
         user_id = int(request.GET.get('user_id',""))
-        node = collection.Node.one({'_id':ObjectId(_id)})
+        node = node_collection.one({'_id':ObjectId(_id)})
         if node.created_by == request.user.id:
             node.author_set.remove(user_id)
             can_remove = True
@@ -2011,7 +2035,8 @@ def remove_user_from_author_set(request, group_id):
             return StreamingHttpResponse("You are not authorised to remove user")
     else:
         return StreamingHttpResponse("Invalid Ajax call")
-    
+
+
 def get_filterd_user_list(request, group_id):
     '''
     This function will return (all user's) - (subscribed user for perticular group) 
@@ -2019,7 +2044,7 @@ def get_filterd_user_list(request, group_id):
     user_list = []
     if request.is_ajax():
         _id = request.GET.get('_id',"")
-        node = collection.Node.one({'_id':ObjectId(_id)})
+        node = node_collection.one({'_id':ObjectId(_id)})
         all_users_list =  [each.username for each in User.objects.all()]
         if node._type == 'Group':
             for each in node.author_set:
@@ -2028,25 +2053,27 @@ def get_filterd_user_list(request, group_id):
         filtered_users = list(set(all_users_list) - set(user_list))
         return HttpResponse(json.dumps(filtered_users))
 
+
 def search_tasks(request, group_id):
     '''
     This function will return (all task's) 
     '''
     user_list = []
-    app_id = collection.Node.find_one({'_type':"GSystemType", "name":"Task"})
+    app_id = node_collection.find_one({'_type':"GSystemType", "name":"Task"})
     if request.is_ajax():
         term = request.GET.get('term',"")
-        task_nodes = collection.Node.find({
+        task_nodes = node_collection.find({
                                           'member_of': {'$all': [app_id._id]},
 					  'name': {'$regex': term, '$options': 'i'}, 
                                           'group_set': {'$all': [ObjectId(group_id)]},
                                           'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
 	for each in task_nodes :
-		user_list.append({"label":each.name,"value":each.name,"id":str(each._id)})	
+		user_list.append({"label":each.name,"value":each.name,"id":str(each._id)})
         return HttpResponse(json.dumps(user_list))
     else:
 	raise Http404
+
 
 def get_group_member_user(request, group_id):
   """Returns member(s) of the group excluding (group-admin(s)) in form of
@@ -2056,7 +2083,7 @@ def get_group_member_user(request, group_id):
   value: User-name of that User record
   """
   user_list = {}
-  group = collection.Node.find_one({'_id':ObjectId(group_id)})
+  group = node_collection.find_one({'_id': ObjectId(group_id)})
   if request.is_ajax():
     if group.author_set:
       for each in group.author_set:
@@ -2070,7 +2097,7 @@ def get_group_member_user(request, group_id):
 def annotationlibInSelText(request, group_id):
   """
   This view parses the annotations field of the currently selected node_id and evaluates if entry corresponding this selectedText already exists.
-  If it does, it appends the comment to this entry else creates a new one.   
+  If it does, it appends the comment to this entry else creates a new one.
 
   Arguments:
   group_id - ObjectId of the currently selected group
@@ -2081,11 +2108,10 @@ def annotationlibInSelText(request, group_id):
  Returns:
   The updated annoatations field
   """
-  
+
   obj_id = str(request.POST["node_id"])
-  col = get_database()[Node.collection_name]
-  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
-  
+  sg_obj = node_collection.one({"_id":ObjectId(obj_id)})
+
   comment = request.POST ["comment"]
   comment = json.loads(comment)
   comment_modified = {
@@ -2118,13 +2144,14 @@ def annotationlibInSelText(request, group_id):
 
   return HttpResponse(json.dumps(sg_obj.annotations))
 
+
 def delComment(request, group_id):
   '''
   Delete comment from thread
   '''
   return HttpResponse("comment deleted")
-
 # Views related to MIS -------------------------------------------------------------
+
 
 def get_students(request, group_id):
   """
@@ -2151,21 +2178,21 @@ def get_students(request, group_id):
       university_id = request.POST.get("student_belongs_to_university",None)
       college_id = request.POST.get("student_belongs_to_college",None)
 
-      person_gst = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'name': 1, 'type_of': 1})
+      person_gst = node_collection.one({'_type': "GSystemType", 'name': "Student"}, {'name': 1, 'type_of': 1})
 
       widget_for = []
       query = {}
-      person_gs = collection.GSystem()
+      person_gs = node_collection.collection.GSystem()
       person_gs.member_of.append(person_gst._id)
       person_gs.get_neighbourhood(person_gs.member_of)
-      # university_gst = collection.Node.one({'_type': "GSystemType", 'name': "University"})
-      mis_admin = collection.Node.one({"_type": "Group","name": "MIS_admin"}, {"_id": 1})
+      # university_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+      mis_admin = node_collection.one({"_type": "Group", "name": "MIS_admin"}, {"_id": 1})
 
-      # univ_cur = collection.Node.find({"member_of":university_gst._id,'group_set':mis_admin._id},{'name':1,"_id":1})
+      # univ_cur = node_collection.find({"member_of":university_gst._id,'group_set':mis_admin._id},{'name':1,"_id":1})
 
-      # rel_univ = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id': 1})
-      # rel_colg = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
-      attr_deg_yr = collection.Node.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id': 1})
+      # rel_univ = node_collection.one({'_type': "RelationType", 'name': "student_belongs_to_university"}, {'_id': 1})
+      # rel_colg = node_collection.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
+      attr_deg_yr = node_collection.one({'_type': "AttributeType", 'name': "degree_year"}, {'_id': 1})
 
       widget_for = ["name", 
                     # rel_univ._id, 
@@ -2182,9 +2209,9 @@ def get_students(request, group_id):
 
       for each in widget_for:
         field_name = each["name"]
-  
+
         if each["_type"] == "BaseField":
-          if request.POST.has_key(field_name):
+          if field_name in request.POST:
             query_data = request.POST.get(field_name, "")
             query_data = parse_template_data(each["data_type"], query_data)
             if field_name == "name":
@@ -2193,7 +2220,7 @@ def get_students(request, group_id):
               query.update({field_name: query_data})
 
         elif each["_type"] == "AttributeType":
-          if request.POST.has_key(field_name):
+          if field_name in request.POST:
             query_data = request.POST.get(field_name, "")
             query_data = parse_template_data(each["data_type"], query_data)
             query.update({"attribute_set."+field_name: query_data})
@@ -2210,7 +2237,7 @@ def get_students(request, group_id):
         #     else:
         #       query.update({"relation_set."+field_name: query_data})
 
-      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
+      student = node_collection.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
       query["member_of"] = student._id
 
       date_lte = datetime.datetime.strptime("31/12/" + stud_reg_year, "%d/%m/%Y")
@@ -2219,7 +2246,7 @@ def get_students(request, group_id):
       college_groupid = None
       if college_id:
         # Get selected college's groupid, where given college should belongs to MIS_admin group
-        college_groupid = collection.Node.one({'_id': ObjectId(college_id), 'group_set': mis_admin._id, 'relation_set.has_group': {'$exists': True}}, 
+        college_groupid = node_collection.one({'_id': ObjectId(college_id), 'group_set': mis_admin._id, 'relation_set.has_group': {'$exists': True}}, 
                                               {'relation_set.has_group': 1, 'name': 1}
         )
         response_dict["college"] = college_groupid.name
@@ -2250,7 +2277,7 @@ def get_students(request, group_id):
 
       if university_id:
         university_id = ObjectId(university_id)
-        university = collection.Node.one({'_id': university_id}, {'name': 1})
+        university = node_collection.one({'_id': university_id}, {'name': 1})
         if university:
           response_dict["university"] = university.name
           query.update({'relation_set.student_belongs_to_university': university_id})
@@ -2258,7 +2285,7 @@ def get_students(request, group_id):
       query.update({'group_set': {'$in': group_set_to_check}})
       query.update({'status': u"PUBLISHED"})
 
-      rec = collection.aggregate([{'$match': query},
+      rec = node_collection.collection.aggregate([{'$match': query},
                                   {'$project': {'_id': 0,
                                                 'stud_id': '$_id', 
                                                 'Enrollment Code': '$attribute_set.enrollment_code',
@@ -2317,7 +2344,7 @@ def get_students(request, group_id):
                     # new_dict[each_key] = str(data)
                     d_list = []
                     for oid in data:
-                      d = collection.Node.one({'_id': oid}, {'name': 1})
+                      d = node_collection.one({'_id': oid}, {'name': 1})
                       d_list.append(str(d.name))
                     new_dict[each_key] = ', '.join(str(n) for n in d_list)
                 
@@ -2396,7 +2423,7 @@ def get_students(request, group_id):
       ]
 
       
-      # college = collection.Node.one({'_id': ObjectId(college_id)}, {"name": 1})
+      # college = node_collection.one({'_id': ObjectId(college_id)}, {"name": 1})
       students_count = len(json_data)
       response_dict["success"] = True
       response_dict["groupid"] = groupid
@@ -2444,16 +2471,16 @@ def get_statewise_data(request, group_id):
             # Fetching selected state's name
             state_val = request.GET.get("state_val", None)
 
-            mis_admin = collection.Node.one(
+            mis_admin = node_collection.one(
                 {'_type': "Group", 'name': "MIS_admin"},
                 {'_id': 1}
             )
 
             # Fetching selected state's node
-            state_gst = collection.Node.one(
+            state_gst = node_collection.one(
                 {'_type': "GSystemType", 'name': "State"}
             )
-            state_gs = collection.Node.one(
+            state_gs = node_collection.one(
                 {
                     'member_of': state_gst._id,
                     'name': {'$regex': state_val, '$options': "i"},
@@ -2462,10 +2489,10 @@ def get_statewise_data(request, group_id):
             )
 
             # Fetching universities belonging to that state
-            university_gst = collection.Node.one(
+            university_gst = node_collection.one(
                 {'_type': "GSystemType", 'name': "University"}
             )
-            university_cur = collection.Node.find(
+            university_cur = node_collection.find(
                 {
                     'member_of': university_gst._id,
                     'group_set': mis_admin._id,
@@ -2477,7 +2504,7 @@ def get_statewise_data(request, group_id):
                 }
             ).sort('name', 1)
 
-            student_gst = collection.Node.one(
+            student_gst = node_collection.one(
                 {'_type': "GSystemType", 'name': "Student"}
             )
 
@@ -2494,13 +2521,13 @@ def get_statewise_data(request, group_id):
                         break
 
                 # Fetching college-wise data
-                college_cur = collection.Node.find(
+                college_cur = node_collection.find(
                     {'_id': {'$in': colleges_id_list}}
                 ).sort('name', 1)
 
                 for each_college in college_cur:
                     university_wise_data[each_univ.name][each_college.name] = {}
-                    rec = collection.aggregate([
+                    rec = node_collection.collection.aggregate([
                         {
                             '$match': {
                                 'member_of': student_gst._id,
@@ -2579,16 +2606,16 @@ def get_college_wise_students_data(request, group_id):
     if request.is_ajax() and request.method == "GET":
       groupid = request.GET.get("groupid", None)
 
-      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
-      college_gst = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
-      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      mis_admin = node_collection.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
+      college_gst = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+      student = node_collection.one({'_type': "GSystemType", 'name': "Student"})
 
       current_year = str(datetime.datetime.today().year)
 
       date_gte = datetime.datetime.strptime("1/1/" + current_year, "%d/%m/%Y")
       date_lte = datetime.datetime.strptime("31/12/" + current_year, "%d/%m/%Y")
 
-      college_cur = collection.Node.find({'member_of': college_gst._id, 'group_set': mis_admin._id}, 
+      college_cur = node_collection.find({'member_of': college_gst._id, 'group_set': mis_admin._id}, 
                                          {'_id': 1, 'name': 1, 'relation_set': 1}).sort('name', 1)
 
       json_data = []
@@ -2601,7 +2628,7 @@ def get_college_wise_students_data(request, group_id):
             college_group_id = each_dict["has_group"]
             break
 
-        rec = collection.aggregate([{'$match': {'member_of': student._id,
+        rec = node_collection.collection.aggregate([{'$match': {'member_of': student._id,
                                                 'group_set': {'$in': [college_group_id, mis_admin._id]},
                                                 'relation_set.student_belongs_to_college': each._id,
                                                 'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
@@ -2726,8 +2753,8 @@ def set_user_link(request, group_id):
       username = request.POST.get("username", "")
 
       # Creating link between user-node and it's login credentials
-      author = collection.Node.one({'_type': "Author", 'name': unicode(username)}, {'created_by': 1})
-      rt_has_login = collection.Node.one({'_type': "RelationType", 'name': u"has_login"})
+      author = node_collection.one({'_type': "Author", 'name': unicode(username)}, {'created_by': 1})
+      rt_has_login = node_collection.one({'_type': "RelationType", 'name': u"has_login"})
 
       gr_node = create_grelation(node_id, rt_has_login, author._id)
 
@@ -2735,28 +2762,31 @@ def set_user_link(request, group_id):
         # Assigning the userid to respective private college groups's author_set,
         # i.e. making user, member of college group to which he/she belongs
         # Only after the given user's link (i.e., has_login relation) gets created
-        node = collection.Node.one({'_id': ObjectId(node_id)}, {'member_of': 1})
+        node = node_collection.one({'_id': ObjectId(node_id)}, {'member_of': 1})
         node_type = node.member_of_names_list
 
-        has_group = collection.Node.one({'_type': "RelationType", 'name': "has_group"}, {'_id': 1})
+        has_group = node_collection.one({'_type': "RelationType", 'name': "has_group"}, {'_id': 1})
 
         if "Student" in node_type:
-          student_belonds_to_college = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
+          student_belonds_to_college = node_collection.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
 
-          colleges = collection.Node.find({'_type': "GRelation", 'subject': node._id, 'relation_type.$id': student_belonds_to_college._id})
+          colleges = triple_collection.find({
+              '_type': "GRelation", 'subject': node._id,
+              'relation_type.$id': student_belonds_to_college._id
+          })
 
           for each in colleges:
-            g = collection.Node.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
-            collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
+            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
+            node_collection.collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
 
         elif "Voluntary Teacher" in node_type:
-          trainer_of_college = collection.Node.one({'_type': "RelationType", 'name': "trainer_of_college"}, {'_id': 1})
+          trainer_of_college = node_collection.one({'_type': "RelationType", 'name': "trainer_of_college"}, {'_id': 1})
 
-          colleges = collection.Node.find({'_type': "GRelation", 'subject': node._id, 'relation_type.$id': trainer_of_college._id})
+          colleges = triple_collection.find({'_type': "GRelation", 'subject': node._id, 'relation_type.$id': trainer_of_college._id})
 
           for each in colleges:
-            g = collection.Node.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
-            collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
+            g = triple_collection.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
+            node_collection.collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
 
 
       return HttpResponse(json.dumps({'result': True, 'message': " Link successfully created. \n\n Also subscribed to respective college group(s)."}))
@@ -2770,7 +2800,7 @@ def set_user_link(request, group_id):
     result = False
 
     if gr_node:
-      # collection.remove({'_id': gr_node._id})
+      # node_collection.collection.remove({'_id': gr_node._id})
       result = True
       error_message = " Link created successfully. \n\n But facing problem(s) in subscribing to respective college group(s)!!!\n Please use group's 'Subscribe members' button to do so !!!"
 
@@ -2780,20 +2810,20 @@ def set_user_link(request, group_id):
       
     return HttpResponse(json.dumps({'result': result, 'message': error_message}))
 
+
 def set_enrollment_code(request, group_id):
   """
   """
   if request.is_ajax() and request.method == "POST":
-
     return HttpResponse("Five digit code")
 
   else:
     error_message = " EnrollementCodeError: Either not an ajax call or not a POST request!!!"
     raise Exception(error_message)
 
+
 def get_students_assignments(request, group_id):
   """
-
   Arguments:
   group_id - ObjectId of the currently selected group
 
@@ -2805,15 +2835,15 @@ def get_students_assignments(request, group_id):
     if request.is_ajax() and request.method =="GET":
       user_id = 0
 
-      if request.GET.has_key("user_id"):
+      if "user_id" in request.GET:
         user_id = int(request.GET.get("user_id", ""))
 
       # Fetching college group
-      college_group = collection.Node.one({'_id': ObjectId(group_id)}, {'name': 1, 'tags': 1, 'author_set': 1, 'created_by': 1})
-      page_res = collection.Node.one({'_type': "GSystemType", 'name': "Page"}, {'_id': 1})
-      file_res = collection.Node.one({'_type': "GSystemType", 'name': "File"}, {'_id': 1})
-      image_res = collection.Node.one({'_type': "GSystemType", 'name': "Image"}, {'_id': 1})
-      video_res = collection.Node.one({'_type': "GSystemType", 'name': "Video"}, {'_id': 1})
+      college_group = node_collection.one({'_id': ObjectId(group_id)}, {'name': 1, 'tags': 1, 'author_set': 1, 'created_by': 1})
+      page_res = node_collection.one({'_type': "GSystemType", 'name': "Page"}, {'_id': 1})
+      file_res = node_collection.one({'_type': "GSystemType", 'name': "File"}, {'_id': 1})
+      image_res = node_collection.one({'_type': "GSystemType", 'name': "Image"}, {'_id': 1})
+      video_res = node_collection.one({'_type': "GSystemType", 'name': "Video"}, {'_id': 1})
 
       student_list = []
 
@@ -2826,11 +2856,11 @@ def get_students_assignments(request, group_id):
         num_files = []
 
         # Fetch student's user-group
-        user_group = collection.Node.one({'_type': "Author", 'created_by': user_id})
+        user_group = node_collection.one({'_type': "Author", 'created_by': user_id})
         student_dict["username"] = user_group.name
 
         # Fetch all resources from student's user-group
-        resources = collection.Node.find({'group_set': user_group._id}, {'name': 1, 'member_of': 1, 'created_at': 1})
+        resources = node_collection.find({'group_set': user_group._id}, {'name': 1, 'member_of': 1, 'created_at': 1})
 
         for res in resources:
           if page_res._id in res.member_of:
@@ -2865,16 +2895,16 @@ def get_students_assignments(request, group_id):
           num_files = 0
 
           # Fetch student's user-group
-          user_group = collection.Node.one({'_type': "Author", 'created_by': user_id})
+          user_group = node_collection.one({'_type': "Author", 'created_by': user_id})
 
           # Fetch student's node from his/her has_login relationship
-          student_has_login_rel = collection.Node.one({'_type': "GRelation", 'right_subject': user_group._id})
-          student_node = collection.Node.one({'_id': student_has_login_rel.subject}, {'name': 1})
+          student_has_login_rel = triple_collection.one({'_type': "GRelation", 'right_subject': user_group._id})
+          student_node = node_collection.one({'_id': student_has_login_rel.subject}, {'name': 1})
           student_dict["Name"] = student_node.name
           student_dict["user_id"] = user_id
 
           # Fetch all resources from student's user-group
-          resources = collection.Node.find({'group_set': user_group._id}, {'member_of': 1})
+          resources = node_collection.find({'group_set': user_group._id}, {'member_of': 1})
 
           for res in resources:
             if page_res._id in res.member_of:
@@ -2912,6 +2942,7 @@ def get_students_assignments(request, group_id):
     print "\n StudentDataGetError: " + str(e)
     raise Http404(e)
 
+
 def get_districts(request, group_id):
   """
   This view fetches district(s) belonging to given state.
@@ -2936,14 +2967,14 @@ def get_districts(request, group_id):
       districts = []
 
       # Fetching RelationType: District - district_of (name) | has_district (inverse_name) - State
-      rt_district_of = collection.Node.one({'_type': "RelationType", 'name': "district_of"})
+      rt_district_of = node_collection.one({'_type': "RelationType", 'name': "district_of"})
 
       # Fetching all districts belonging to given state in sorted order by name
       if rt_district_of:
-        cur_districts = collection.Triple.find({'_type': "GRelation", 
-                                                'relation_type.$id': rt_district_of._id, 
-                                                'right_subject': ObjectId(state_id)
-                                              }).sort('name', 1)
+        cur_districts = triple_collection.find({
+            '_type': "GRelation", 'right_subject': ObjectId(state_id),
+            'relation_type.$id': rt_district_of._id
+        }).sort('name', 1)
 
         if cur_districts.count():
           for d in cur_districts:
@@ -2966,6 +2997,7 @@ def get_districts(request, group_id):
   except Exception as e:
     error_message = "\n DistrictFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
+
 
 def get_affiliated_colleges(request, group_id):
   """
@@ -3003,7 +3035,7 @@ def get_affiliated_colleges(request, group_id):
       university_id = ObjectId(university_id)
 
       # Fetch required university
-      req_university = collection.Node.one({'_id': university_id})
+      req_university = node_collection.one({'_id': university_id})
 
       if not req_university:
         error_message = "AffiliatedCollegeFindError: No university exists with given ObjectId("+university_id+")!!!"
@@ -3011,7 +3043,7 @@ def get_affiliated_colleges(request, group_id):
 
       for each in req_university["relation_set"]:
         if u"affiliated_college" in each.keys():
-          req_affiliated_colleges = collection.Node.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
+          req_affiliated_colleges = node_collection.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
       
       req_affiliated_colleges_list = []
       for each in req_affiliated_colleges:
@@ -3065,7 +3097,7 @@ def get_courses(request, group_id):
                 raise Exception(error_message)
 
             # Fetch "Announced Course" GSystemType
-            mis_admin = collection.Node.one(
+            mis_admin = node_collection.one(
                 {'_type': "Group", 'name': "MIS_admin"},
                 {'name': 1}
             )
@@ -3076,7 +3108,7 @@ def get_courses(request, group_id):
                 raise Exception(error_message)
 
             # Fetch "Announced Course" GSystemType
-            nussd_course_gt = collection.Node.one(
+            nussd_course_gt = node_collection.one(
                 {'_type': "GSystemType", 'name': "NUSSD Course"}
             )
             if not nussd_course_gt:
@@ -3089,7 +3121,7 @@ def get_courses(request, group_id):
             nussd_course_type = unicode(nussd_course_type)
 
             # Fetch registered NUSSD-Courses of given type
-            nc_cur = collection.Node.find(
+            nc_cur = node_collection.find(
                 {
                     'member_of': nussd_course_gt._id,
                     'group_set': mis_admin._id,
@@ -3154,7 +3186,7 @@ def get_announced_courses_with_ctype(request, group_id):
             # curr_date = datetime.datetime.now()
 
             # Fetch "Announced Course" GSystemType
-            announced_course_gt = collection.Node.one(
+            announced_course_gt = node_collection.one(
                 {'_type': "GSystemType", 'name': "Announced Course"}
             )
             if not announced_course_gt:
@@ -3163,7 +3195,7 @@ def get_announced_courses_with_ctype(request, group_id):
                     + "exists... Please create it first!"
                 raise Exception(error_message)
 
-            mis_admin = collection.Node.one(
+            mis_admin = node_collection.one(
                 {'_type': "Group", 'name': "MIS_admin"}
             )
 
@@ -3188,7 +3220,7 @@ def get_announced_courses_with_ctype(request, group_id):
                 records_list = []
 
                 if nussd_course_type == "Foundation Course":
-                    rec = collection.aggregate([{
+                    rec = node_collection.collection.aggregate([{
                         "$match": {
                             "member_of": announced_course_gt._id,
                             "group_set": ObjectId(mis_admin._id),
@@ -3218,7 +3250,7 @@ def get_announced_courses_with_ctype(request, group_id):
                             if each['_id']["college"]:
                                 colg_id = each['_id']["college"][0][0]
                                 if colg_id not in college:
-                                    c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1,"attribute_set.enrollment_code":1})
+                                    c = node_collection.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1,"attribute_set.enrollment_code":1})
                                     newrec[u"college"] = c.name
                                     newrec[u"college_id"] = c._id
                                     newrec[u"created_at"] = each["foundation_course"][0]["created_at"]
@@ -3227,7 +3259,7 @@ def get_announced_courses_with_ctype(request, group_id):
                                     for rel in c.relation_set:
                                         if rel and "college_affiliated_to" in rel:
                                             univ_id = rel["college_affiliated_to"][0]
-                                            u = collection.Node.one({"_id": univ_id}, {"name": 1})
+                                            u = node_collection.one({"_id": univ_id}, {"name": 1})
                                             each.update({"university": u.name})
                                             college[colg_id]["university"] = each["university"]
                                             college[colg_id]["university_id"] = u._id
@@ -3245,7 +3277,7 @@ def get_announced_courses_with_ctype(request, group_id):
                             ac_data_set.append(newrec)
 
                 else:
-                    rec = collection.aggregate([
+                    rec = node_collection.collection.aggregate([
                         {
                             '$match': query
                         }, {
@@ -3269,7 +3301,7 @@ def get_announced_courses_with_ctype(request, group_id):
                             if each["college"]:
                                 colg_id = each["college"][0][0]
                                 if colg_id not in college:
-                                    c = collection.Node.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1})
+                                    c = node_collection.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1})
                                     each["college"] = c.name
                                     each["college_id"] = c._id
                                     college[colg_id] = {}
@@ -3277,7 +3309,7 @@ def get_announced_courses_with_ctype(request, group_id):
                                     for rel in c.relation_set:
                                         if rel and "college_affiliated_to" in rel:
                                             univ_id = rel["college_affiliated_to"][0]
-                                            u = collection.Node.one({"_id": univ_id}, {"name": 1})
+                                            u = node_collection.one({"_id": univ_id}, {"name": 1})
                                             each.update({"university": u.name})
                                             college[colg_id]["university"] = each["university"]
                                             college[colg_id]["university_id"] = u._id
@@ -3291,7 +3323,7 @@ def get_announced_courses_with_ctype(request, group_id):
                             if each["course"]:
                                 course_id = each["course"][0][0]
                                 if course_id not in course:
-                                    each["course"] = collection.Node.one({"_id": course_id}).name
+                                    each["course"] = node_collection.one({"_id": course_id}).name
                                     course[course_id] = each["course"]
                                 else:
                                     each["course"] = course[course_id]
@@ -3318,7 +3350,7 @@ def get_announced_courses_with_ctype(request, group_id):
                 return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
             if(ObjectId(group_id) == mis_admin._id):
-                ac_cur = collection.Node.find({
+                ac_cur = node_collection.find({
                     'member_of': announced_course_gt._id,
                     'group_set': ObjectId(group_id),
                     'attribute_set.nussd_course_type': nussd_course_type
@@ -3327,14 +3359,14 @@ def get_announced_courses_with_ctype(request, group_id):
                 })
 
             else:
-                colg_gst = collection.Node.one(
+                colg_gst = node_collection.one(
                     {'_type': "GSystemType", 'name': 'College'}
                 )
 
                 # Fetch Courses announced for given college (or college group)
                 # Get college node & courses announced for it from
                 # college group's ObjectId
-                req_colg_id = collection.Node.one({
+                req_colg_id = node_collection.one({
                     'member_of': colg_gst._id,
                     'relation_set.has_group': ObjectId(group_id)
                 }, {
@@ -3347,7 +3379,7 @@ def get_announced_courses_with_ctype(request, group_id):
 
                 # Keeping only those announced courses which are active
                 # (i.e. PUBLISHED)
-                ac_cur = collection.Node.find({
+                ac_cur = node_collection.find({
                     '_id': {'$in': ac_of_colg},
                     'member_of': announced_course_gt._id,
                     'attribute_set.nussd_course_type': nussd_course_type,
@@ -3376,7 +3408,7 @@ def get_announced_courses_with_ctype(request, group_id):
                                         enrolled_stud_count = sce_gs_dict[str_sce_gs_id]
                                         break
 
-                                    sce_gs_node = collection.Node.one({
+                                    sce_gs_node = node_collection.one({
                                         "_id": ObjectId(sce_gs_id)
                                     }, {
                                         "attribute_set.has_approved": 1
@@ -3456,7 +3488,7 @@ def get_colleges(request, group_id, app_id):
             # Fetch field(s) from GET object
             nussd_course_type = request.GET.get("nussd_course_type", "")
 
-            mis_admin = collection.Node.one(
+            mis_admin = node_collection.one(
                 {'_type': "Group", 'name': "MIS_admin"}, {'name': 1}
             )
             if not mis_admin:
@@ -3478,7 +3510,7 @@ def get_colleges(request, group_id, app_id):
                 raise Exception(error_message)
 
             # Fetch all college groups
-            college = collection.Node.one(
+            college = node_collection.one(
                 {'_type': "GSystemType", 'name': "College"}, {'name': 1}
             )
             if not college:
@@ -3494,14 +3526,14 @@ def get_colleges(request, group_id, app_id):
             dc_courses_id_list = [ObjectId(dc) for dc in dc_courses_id_list]
 
             # Fetch the node of selected university
-            # university_node = collection.Node.one(
+            # university_node = node_collection.one(
             #     {'_id': univ_id},
             #     {'relation_set': 1, 'name': 1}
             # )
 
             # Fetch the list of colleges that are affiliated to
             # the selected university (univ_id)
-            colg_under_univ_id = collection.Node.find(
+            colg_under_univ_id = node_collection.find(
                 {
                     'member_of': college._id,
                     'relation_set.college_affiliated_to': univ_id
@@ -3528,7 +3560,7 @@ def get_colleges(request, group_id, app_id):
                         if rel and "college_has_acourse" in rel:
                             if rel["college_has_acourse"]:
                                 if dc_courses_id_list:
-                                    acourse_exists = collection.Node.find_one({
+                                    acourse_exists = node_collection.find_one({
                                         '_id': {'$in': rel["college_has_acourse"]},
                                         'relation_set.announced_for': {'$in': dc_courses_id_list},
                                         'attribute_set.start_time': start_time,
@@ -3595,6 +3627,7 @@ def get_colleges(request, group_id, app_id):
         response_dict["message"] = error_message
         return HttpResponse(json.dumps(response_dict))
 
+
 def get_anncourses_allstudents(request, group_id):
   """
   This view returns ...
@@ -3635,13 +3668,13 @@ def get_anncourses_allstudents(request, group_id):
         # registration_year = datetime.datetime.now().year.__str__()
         all_students = u"false"
         # error_message = "Invalid data: No data found in any of the field(s)!!!"
-      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      student = node_collection.one({'_type': "GSystemType", 'name': "Student"})
 
-      sce_gs = collection.Node.one({'_id':ObjectId(sce_gs_id)},
+      sce_gs = node_collection.one({'_id':ObjectId(sce_gs_id)},
         {'member_of': 1, 'attribute_set.has_enrolled': 1, 'relation_set.for_college':1}
       )
       # From Announced Course node fetch College's ObjectId
-      # acourse_node = collection.Node.find_one(
+      # acourse_node = node_collection.find_one(
       #   {'_id': {'$in': acourse_val}, 'relation_set.acourse_for_college': {'$exists': True}}, 
       #   {'attribute_set': 1, 'relation_set.acourse_for_college': 1}
       # )
@@ -3663,7 +3696,7 @@ def get_anncourses_allstudents(request, group_id):
 
       # If College's ObjectId exists, fetch respective College's group
       if colg_of_acourse_id:
-        colg_of_acourse = collection.Node.one(
+        colg_of_acourse = node_collection.one(
           {'_id': colg_of_acourse_id, 'relation_set.has_group': {'$exists': True}},
           {'relation_set.has_group': 1}
         )
@@ -3714,7 +3747,7 @@ def get_anncourses_allstudents(request, group_id):
 
       if all_students == u"true":
         all_students_text = "All students (including enrolled ones)"
-        res = collection.aggregate([
+        res = node_collection.collection.aggregate([
             {
                 '$match': query
             }, {
@@ -3742,7 +3775,7 @@ def get_anncourses_allstudents(request, group_id):
         # query.update({'relation_set.selected_course': {'$ne': acourse_node._id}})
         query.update({'relation_set.selected_course': {'$nin': acourse_val}})
 
-        res = collection.aggregate([
+        res = node_collection.collection.aggregate([
             {
                 '$match': query
             }, {
@@ -3789,6 +3822,7 @@ def get_anncourses_allstudents(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
+
 def get_course_details_for_trainer(request, group_id):
   """
   This view returns a dictionary holding data required for trainer's enrollment
@@ -3822,16 +3856,16 @@ def get_course_details_for_trainer(request, group_id):
         raise Exception(error_message)
 
       # Fetch required GSystemTypes (NUSSD Course, Announced Course, University, College)
-      course_gst = collection.Node.one({'_type': "GSystemType", 'name': "NUSSD Course"}, {'_id': 1})
-      ann_course_gst = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"}, {'_id': 1})
-      college_gst = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
-      university_gst = collection.Node.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
-      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
+      course_gst = node_collection.one({'_type': "GSystemType", 'name': "NUSSD Course"}, {'_id': 1})
+      ann_course_gst = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"}, {'_id': 1})
+      college_gst = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+      university_gst = node_collection.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
+      mis_admin = node_collection.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
 
       # Query that fetches Announced Course GSystems
       # Group by Course
       # Populate a list of Announced Course & College ObjectIds
-      op = collection.aggregate([
+      op = node_collection.collection.aggregate([
         {'$match': {
           'member_of': ann_course_gst._id, 
           'group_set': mis_admin._id,
@@ -3854,14 +3888,14 @@ def get_course_details_for_trainer(request, group_id):
         for each in op["result"]:
           course = None
           if trainer_type == "Voluntary Teacher":
-            course = collection.Node.one({'member_of': course_gst._id, '_id': {'$in': each["_id"]["course_id"][0]}}, {'_id': 1, 'name': 1, 'attribute_set.voln_tr_qualifications': 1})
+            course = node_collection.one({'member_of': course_gst._id, '_id': {'$in': each["_id"]["course_id"][0]}}, {'_id': 1, 'name': 1, 'attribute_set.voln_tr_qualifications': 1})
 
             for requirement in course.attribute_set:
               if requirement:
                 course_requirements[course.name] = requirement["voln_tr_qualifications"]
           
           elif trainer_type == "Master Trainer":
-            course = collection.Node.one({'member_of': course_gst._id, '_id': {'$in': each["_id"]["course_id"][0]}}, {'_id': 1, 'name': 1, 'attribute_set.mast_tr_qualifications': 1})
+            course = node_collection.one({'member_of': course_gst._id, '_id': {'$in': each["_id"]["course_id"][0]}}, {'_id': 1, 'name': 1, 'attribute_set.mast_tr_qualifications': 1})
 
             for requirement in course.attribute_set:
               if requirement:
@@ -3877,7 +3911,7 @@ def get_course_details_for_trainer(request, group_id):
               college_gs = None
               college_id = each_data["college_id"][0][0]
               if college_id not in college_dict:
-                college_gs = collection.Node.one({'member_of': college_gst._id, '_id': college_id}, {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1})
+                college_gs = node_collection.one({'member_of': college_gst._id, '_id': college_id}, {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1})
                 college_dict[college_id] = college_gs
               else:
                 college_gs = college_dict[college_id]
@@ -3885,7 +3919,7 @@ def get_course_details_for_trainer(request, group_id):
               
               university_gs = None
               if college_id not in university_dict:
-                university_gs = collection.Node.one({'member_of': university_gst._id, 'relation_set.affiliated_college': college_gs._id}, {'_id': 1, 'name': 1})
+                university_gs = node_collection.one({'member_of': university_gst._id, 'relation_set.affiliated_college': college_gs._id}, {'_id': 1, 'name': 1})
                 university_dict[college_id] = university_gs
               else:
                 university_gs = university_dict[college_id]
@@ -3919,6 +3953,7 @@ def get_course_details_for_trainer(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
+
 def get_students_for_approval(request, group_id):
   """This returns data-review list of students that need approval for Course enrollment.
   """
@@ -3928,9 +3963,9 @@ def get_students_for_approval(request, group_id):
     if request.is_ajax() and request.method == "POST":
       enrollment_id = request.POST.get("enrollment_id", "")
 
-      sce_gst = collection.Node.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
+      sce_gst = node_collection.one({'_type': "GSystemType", 'name': "StudentCourseEnrollment"})
       if sce_gst:
-        sce_gs = collection.Node.one(
+        sce_gs = node_collection.one(
             {'_id': ObjectId(enrollment_id), 'member_of': sce_gst._id, 'group_set': ObjectId(group_id), 'status': u"PUBLISHED"},
             {'member_of': 1}
         )
@@ -4009,7 +4044,7 @@ def get_students_for_approval(request, group_id):
           for each_id in enrolled_students_list:
             if (each_id not in approved_students_list) and (each_id not in rejected_students_list):
               updated_enrolled_students_list.append(each_id)
-          res = collection.aggregate([
+          res = node_collection.collection.aggregate([
               {
                   '$match': {
                       '_id':{"$in":updated_enrolled_students_list}
@@ -4072,7 +4107,7 @@ def approve_students(request, group_id):
             students_selected = request.POST.getlist("students_selected[]", "")
             students_selected = [ObjectId(each_str_id) for each_str_id in students_selected]
 
-            sce_gs = collection.aggregate([{
+            sce_gs = node_collection.collection.aggregate([{
                 "$match": {
                     "_id": enrollment_id, "group_set": ObjectId(group_id),
                     "relation_set.has_current_approval_task": {"$exists": True},
@@ -4119,7 +4154,7 @@ def approve_students(request, group_id):
                 course_enrollment_status_text = u"Enrollment Rejected"
                 approved_or_rejected_list = rejected_list
 
-            course_enrollment_status_at = collection.Node.one({
+            course_enrollment_status_at = node_collection.one({
                 '_type': "AttributeType", 'name': "course_enrollment_status"
             })
             # For each student, approve enrollment into given course(Domain)/courses(Foundation Course)
@@ -4127,7 +4162,7 @@ def approve_students(request, group_id):
             # in "course_enrollment_status" attribute of respective student
             # This should be done only for Course(s) which exists in "selected_course" relation for that student
 
-            stud_cur = collection.aggregate([{
+            stud_cur = node_collection.collection.aggregate([{
                 "$match": {
                     "_id": {"$in": students_selected}
                 }
@@ -4156,7 +4191,7 @@ def approve_students(request, group_id):
             for each in students_selected:
                 # Fetch student node along with selected_course and course_enrollment_status
                 student_id = ObjectId(each)
-                stud_node = collection.aggregate([{
+                stud_node = node_collection.collection.aggregate([{
                     "$match": {
                         "_id": student_id
                     }
@@ -4199,7 +4234,7 @@ def approve_students(request, group_id):
 
             approved_or_rejected_list.extend(new_list)
 
-            has_approved_or_rejected_at = collection.Node.one({
+            has_approved_or_rejected_at = node_collection.one({
                 '_type': "AttributeType", 'name': at_name
             })
             try:
@@ -4231,7 +4266,7 @@ def approve_students(request, group_id):
             if has_current_approval_task_id:
                 has_current_approval_task_id = has_current_approval_task_id[0]
 
-            task_status_at = collection.Node.one({
+            task_status_at = node_collection.one({
                 '_type': "AttributeType", 'name': "Status"
             })
 
@@ -4352,15 +4387,15 @@ def get_students_for_batches(request, group_id):
       batch_mem_dict = {}
       batch_member_list = []
       
-      batch_gst = collection.Node.one({'_type':"GSystemType", 'name':"Batch"})
+      batch_gst = node_collection.one({'_type':"GSystemType", 'name':"Batch"})
 
-      batch_for_group = collection.Node.find({'member_of': batch_gst._id, 'relation_set.has_course': ObjectId(ac_id)})
+      batch_for_group = node_collection.find({'member_of': batch_gst._id, 'relation_set.has_course': ObjectId(ac_id)})
       
       for each1 in batch_for_group:
-        existing_batch = collection.Node.one({'_id': ObjectId(each1._id)})
+        existing_batch = node_collection.one({'_id': ObjectId(each1._id)})
         batch_name_index += 1
         for each2 in each1.relation_set:
-          if each2.has_key("has_batch_member"):
+          if "has_batch_member" in each2:
             batch_member_list.extend(each2['has_batch_member'])
             break
         each1.get_neighbourhood(each1.member_of)
@@ -4370,14 +4405,14 @@ def get_students_for_batches(request, group_id):
       # using group's ObjectId
       # A use-case where records created via csv file appends MIS_admin group's 
       # ObjectId in group_set field & not college-group's ObjectId
-      ann_course = collection.Node.one({'_id': ObjectId(ac_id)}, {'relation_set.acourse_for_college': 1,"relation_set.course_has_enrollment":1})
+      ann_course = node_collection.one({'_id': ObjectId(ac_id)}, {'relation_set.acourse_for_college': 1,"relation_set.course_has_enrollment":1})
       sce_id = None
       for rel in ann_course.relation_set:
         if rel and "course_has_enrollment" in rel:
           sce_id = rel["course_has_enrollment"][0]
           break
 
-      sce_node = collection.Node.one({"_id":ObjectId(sce_id)},{"attribute_set.has_approved":1})
+      sce_node = node_collection.one({"_id":ObjectId(sce_id)},{"attribute_set.has_approved":1})
 
       approved_students_list = []
       for attr in sce_node.attribute_set:
@@ -4387,9 +4422,9 @@ def get_students_for_batches(request, group_id):
 
       approve_not_in_batch_studs = [stud_id for stud_id in approved_students_list if stud_id not in batch_member_list]
 
-      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      student = node_collection.one({'_type': "GSystemType", 'name': "Student"})
 
-      res = collection.Node.find(
+      res = node_collection.find(
         {
           '_id': {"$in": approve_not_in_batch_studs},
           'member_of': student._id
@@ -4428,7 +4463,70 @@ def get_students_for_batches(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
+
+def get_resources(request, group_id):
+    """
+    This view is for adding units to MIS Course Structure
+    Arguments:
+    group_id - ObjectId of the currently selected group
+    resource_type - name of GSystemType
+
+    Returns:
+    Drawer with resources
+    """
+    response_dict = {'success': False, 'message': ""}
+    try:
+        if request.is_ajax() and request.method == "POST":
+            resource_type = request.POST.get('resource_type', "")
+            widget_for = request.POST.get('widget_for', "")
+            list_resources = []
+            if resource_type:
+
+                if resource_type == "Pandora Video":
+                    resource_type = "Pandora_video"
+
+                resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
+                res = node_collection.find(
+                    {
+                        'member_of': resource_gst._id,
+                        'group_set': ObjectId(group_id),
+                        'status': u"PUBLISHED"
+                    }
+                )
+
+                for each in res:
+                    list_resources.append(each)
+
+                drawer_template_context = edit_drawer_widget("CourseUnits", group_id, None, None, None, left_drawer_content=list_resources)
+                drawer_template_context["widget_for"] = widget_for
+                drawer_widget = render_to_string(
+                    'ndf/drawer_widget.html',
+                    drawer_template_context,
+                    context_instance = RequestContext(request)
+                )
+                # response_dict["drawer_widget"] = drawer_widget
+                # response_dict["success"] = True
+                # response_dict["reso"] = json.dumps(res['result'],cls=NodeJSONEncoder)
+                # print "\nresponse_dict---",response_dict["reso"]
+                # enrollment_columns = [
+                #   ("name", "Name"),
+                # ]
+                # response_dict["column_headers"] = enrollment_columns
+
+            return HttpResponse(drawer_widget)
+        else:
+            error_message = "Resource Drawer: Either not an ajax call or not a POST request!!!"
+            response_dict["message"] = error_message
+            return HttpResponse(json.dumps(response_dict))
+
+    except Exception as e:
+        error_message = "Resource Drawer: " + str(e) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
+
 # ====================================================================================================
+
+
 def edit_task_title(request, group_id):
     '''
     This function will edit task's title 
@@ -4436,12 +4534,13 @@ def edit_task_title(request, group_id):
     if request.is_ajax() and request.method =="POST":
         taskid = request.POST.get('taskid',"")
         title = request.POST.get('title',"")
-	task = collection.Node.find_one({'_id':ObjectId(taskid)})
+	task = node_collection.find_one({'_id':ObjectId(taskid)})
         task.name = title
 	task.save()
         return HttpResponse(task.name)
     else:
 	raise Http404
+
 
 def edit_task_content(request, group_id):
     '''
@@ -4450,7 +4549,7 @@ def edit_task_content(request, group_id):
     if request.is_ajax() and request.method =="POST":
         taskid = request.POST.get('taskid',"")
         content_org = request.POST.get('content_org',"")
-	task = collection.Node.find_one({'_id':ObjectId(taskid)})
+	task = node_collection.find_one({'_id':ObjectId(taskid)})
         task.content_org = unicode(content_org)
     
   	# Required to link temporary files with the current user who is modifying this document
@@ -4462,56 +4561,57 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
+
 def insert_picture(request, group_id):
     if request.is_ajax():
-        resource_list=collection.Node.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'name': 1})
+        resource_list=node_collection.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'name': 1})
         resources=list(resource_list)
         n=[]
         for each in resources:
             each['_id'] =str(each['_id'])
-            file_collection = db[File.collection_name]
-            file_obj = file_collection.File.one({'_id':ObjectId(str(each['_id']))})
+            file_obj = node_collection.one({'_id':ObjectId(str(each['_id']))})
             if file_obj.fs_file_ids:
                 grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
                 each['fname']=grid_fs_obj.filename
                 each['name'] = each['name']
             n.append(each)
         return StreamingHttpResponse(json.dumps(n))
-    
-
-
 # =============================================================================
-def close_event(request,group_id,node):
+
+
+def close_event(request, group_id, node):
 	#close_event checks if the event start date is greater than or less than current date time
 	#if current date time if greater than event time than it changes tha edit button 
 	#on the Gui to reschedule and in database puts the current date and time for reference check
 	#till when the event is allowed to reschedule
 
-    reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+    reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_edit_reschedule"})
     create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":datetime.datetime.today(),"reschedule_allow":False})
 
-    return HttpResponse("event closed") 
-def save_time(request,group_id,node):
+    return HttpResponse("event closed")
+
+
+def save_time(request, group_id, node):
   start_time = request.POST.get('start_time','')
   end_time = request.POST.get('end_time','')
   
-  reschedule_event_start = collection.Node.one({"_type":"AttributeType","name":"start_time"})
-  reschedule_event_end = collection.Node.one({"_type":"AttributeType","name":"end_time"})
-  reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+  reschedule_event_start = node_collection.one({"_type":"AttributeType","name":"start_time"})
+  reschedule_event_end = node_collection.one({"_type":"AttributeType","name":"end_time"})
+  reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_edit_reschedule"})
   start_time= parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
   end_time= parse_template_data(datetime.datetime,end_time, date_format_string="%d/%m/%Y %H:%M")
-  create_gattribute(ObjectId(node),reschedule_event_start,start_time) 
-  create_gattribute(ObjectId(node),reschedule_event_end,end_time) 
-  reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
-  event_node = collection.Node.one({"_id":ObjectId(node)})  
-  # below code gets the old value from the database 
-  # if value exists it append new value to it 
-  # else a new time is assigned to it 
+  create_gattribute(ObjectId(node),reschedule_event_start,start_time)
+  create_gattribute(ObjectId(node),reschedule_event_end,end_time)
+  reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+  event_node = node_collection.one({"_id":ObjectId(node)})
+  # below code gets the old value from the database
+  # if value exists it append new value to it
+  # else a new time is assigned to it
   a = {}
   for i in event_node.attribute_set:
                if unicode('event_edit_reschedule') in i.keys():
                  a = i['event_edit_reschedule']
-  a['reschedule_till'] = start_time               
+  a['reschedule_till'] = start_time
   create_gattribute(ObjectId(node),reschedule_event,a)
   #change the name of the event based on new time
   if event_node:
@@ -4519,20 +4619,21 @@ def save_time(request,group_id,node):
      name_arr = name.split("--")
      new_name = unicode(str(name_arr[0]) + "--" + str(name_arr[1]) + "--" + str(start_time))
      event_node.name = new_name
-     event_node.save() 
-  return HttpResponse("Session rescheduled") 
+     event_node.save()
+  return HttpResponse("Session rescheduled")
 
-def check_date(request,group_id,node):
+
+def check_date(request, group_id, node):
     reschedule = request.POST.get('reschedule','')
-    test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$gt':datetime.datetime.today()}})
+    test_output = node_collection.find({"_id":ObjectId(node),"attribute_set.start_time":{'$gt':datetime.datetime.today()}})
     a = {}
     if test_output.count()  == 0 and reschedule == 'True':
-       test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.event_edit_reschedule.reschedule_till":{'$gt':datetime.datetime.today()}})
+       test_output = node_collection.find({"_id":ObjectId(node),"attribute_set.event_edit_reschedule.reschedule_till":{'$gt':datetime.datetime.today()}})
     if test_output.count() != 0:
-       message = "event Open" 
+       message = "event Open"
     if test_output.count() == 0:
-      reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
-      event_node = collection.Node.one({"_id":ObjectId(node)})  
+      reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+      event_node = node_collection.one({"_id":ObjectId(node)})
       a=""
       for i in event_node.attribute_set:
                if unicode('event_edit_reschedule') in i.keys():
@@ -4541,24 +4642,23 @@ def check_date(request,group_id,node):
           for i in a:
               if unicode('reschedule_allow') in i:
                   a['reschedule_allow'] = False
-          create_gattribute(ObjectId(node),reschedule_event,a)        
+          create_gattribute(ObjectId(node),reschedule_event,a)
       else:
           create_gattribute(ObjectId(node),reschedule_event,{'reschedule_allow':False})
-                         
-      
-      event_node = collection.Node.one({"_id":ObjectId(node)})
-      message = "event closed"   
-    return HttpResponse(message) 
+
+      event_node = node_collection.one({"_id":ObjectId(node)})
+      message = "event closed"
+    return HttpResponse(message)
 
 
-def reschedule_task(request,group_id,node):
+def reschedule_task(request, group_id, node):
  task_dict={}
  #name of the programe officer who has initiated this task
  '''Required keys: _id[optional], name, group_set, created_by, modified_by, contributors, content_org,
         created_by_name, Status, Priority, start_time, end_time, Assignee, has_type
  '''
  
- task_groupset=collection.Node.one({"_type":"Group","name":"MIS_admin"})
+ task_groupset=node_collection.one({"_type":"Group","name":"MIS_admin"})
  
  a=[]
  b=[]
@@ -4569,12 +4669,12 @@ def reschedule_task(request,group_id,node):
  values=[]
  if request.user.id in listing:
     
-    reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
-    marks_entry_completed = collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
+    reschedule_attendance = node_collection.one({"_type":"AttributeType","name":"reschedule_attendance"})
+    marks_entry_completed = node_collection.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
     reshedule_choice = request.POST.get('reshedule_choice','')
     session = request.POST.get('session','')
-    end_time = collection.Node.one({"name":"end_time"})
+    end_time = node_collection.one({"name":"end_time"})
     from datetime import date,time,timedelta
     date1 = datetime.date.today() + timedelta(2)
     ti = datetime.time(0,0)
@@ -4582,11 +4682,11 @@ def reschedule_task(request,group_id,node):
     start_time = request.POST.get('reschedule_date','')
     b = parse_template_data(datetime.datetime,start_time, date_format_string="%d/%m/%Y %H:%M")
     #fetch event
-    event_node = collection.Node.one({"_id":ObjectId(node)})
+    event_node = node_collection.one({"_id":ObjectId(node)})
     reschedule_dates = []
     #for any type change the event status to re-schdueled if the request comes 
     #for generating a task for reschdueling a event
-    event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+    event_status = node_collection.one({"_type":"AttributeType","name":"event_status"})
     create_gattribute(ObjectId(node),event_status,unicode('Rescheduled'))
     task_id= {}
     if  reschedule_type == 'event_reschedule' :
@@ -4603,14 +4703,14 @@ def reschedule_task(request,group_id,node):
             for i in task_id:
               if unicode('Task')  ==  i:
                  tid = i
-                 task_node = collection.Node.find({"_id":ObjectId(task_id["Task"])})
-                 task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+                 task_node = node_collection.find({"_id":ObjectId(task_id["Task"])})
+                 task_attribute = node_collection.one({"_type":"AttributeType","name":"Status"})
                  create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))  
-         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+         reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_date_task"})
          task_id['Reschedule_Task'] = True
          create_gattribute(ObjectId(node),reschedule_event,task_id)
          reschedule_dates.append(event_start_time)  
-         reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_edit_reschedule"})
+         reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_edit_reschedule"})
          create_gattribute(ObjectId(node),reschedule_event,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})  
          return_message = "Event Dates Re-Schedule Opened" 
 
@@ -4624,30 +4724,28 @@ def reschedule_task(request,group_id,node):
                     event_details = i['marks_entry_completed']
             if unicode("event_attendance_task") in i.keys():
               task_id = i["event_attendance_task"]
-              
 
-        
         if task_id:
             for i in task_id:
             	if unicode('Task') == i:
                  tid = task_id['Task']
-                 task_node = collection.Node.find({"_id":ObjectId(tid)})
-                 task_attribute = collection.Node.one({"_type":"AttributeType","name":"Status"})
+                 task_node = node_collection.find({"_id":ObjectId(tid)})
+                 task_attribute = node_collection.one({"_type":"AttributeType","name":"Status"})
                  create_gattribute(ObjectId(task_node[0]._id),task_attribute,unicode("Closed"))
                  break
 
         reschedule_dates.append(datetime.datetime.today())
-        if event_details != False or reshedule_choice == "Attendance" :         
+        if event_details != False or reshedule_choice == "Attendance" :
         	create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
         if session != str(1):
           create_gattribute(ObjectId(node),marks_entry_completed[0],True)
         task_id['Reschedule_Task'] = True
-        reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
+        reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_attendance_task"})
 	create_gattribute(ObjectId(node),reschedule_event,task_id)
         return_message="Event Re-scheduled"
  else:
     reschedule_type = request.POST.get('reschedule_type','')
-    Mis_admin=collection.Node.find({"name":"MIS_admin"})
+    Mis_admin=node_collection.find({"name":"MIS_admin"})
     Mis_admin_list=Mis_admin[0].group_admin
     Mis_admin_list.append(Mis_admin[0].created_by)
     path=request.POST.get('path','')
@@ -4655,9 +4753,9 @@ def reschedule_task(request,group_id,node):
     site = site.name.__str__()
     event_reschedule_link = "http://" + site + path
     b.append(task_groupset._id)
-    glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+    glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
     task_type = []
-    task_type.append(collection.Node.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id)
+    task_type.append(node_collection.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id)
     task_dict.update({"has_type" :task_type})
     task_dict.update({'name':unicode('Reschedule Task')})
     task_dict.update({'group_set':b})
@@ -4673,16 +4771,16 @@ def reschedule_task(request,group_id,node):
     task_dict.update({'start_time':Today})
     task_dict.update({'Assignee':Mis_admin_list})
     task = create_task(task_dict)
-    
+
     if  reschedule_type == 'event_reschedule' :
-      reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_date_task"})
+      reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_date_task"})
       create_gattribute(ObjectId(node),reschedule_event,{'Task':ObjectId(task._id),'Reschedule_Task':False})
     else:
-      reschedule_event=collection.Node.one({"_type":"AttributeType","name":"event_attendance_task"})
+      reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_attendance_task"})
       create_gattribute(ObjectId(node),reschedule_event,{'Task':ObjectId(task._id),'Reschedule_Task':False})
     return_message="Message is sent to central office soon you will get update."
  return HttpResponse(return_message)
- 
+
 
 def event_assginee(request, group_id, app_set_instance_id=None):
  
@@ -4698,21 +4796,21 @@ def event_assginee(request, group_id, app_set_instance_id=None):
 
  attendancesession = request.POST.get("attendancesession","")
  
- oid=collection.Node.find_one({"_type" : "RelationType","name":"has_attended"})
+ oid=node_collection.find_one({"_type" : "RelationType","name":"has_attended"})
  
- Assignment_rel=collection.Node.find({"_type":"AttributeType","name":"Assignment_marks_record"})
+ Assignment_rel=node_collection.find({"_type":"AttributeType","name":"Assignment_marks_record"})
  
- Assessmentmarks_rel=collection.Node.find({"_type":"AttributeType","name":"Assessment_marks_record"})
+ Assessmentmarks_rel=node_collection.find({"_type":"AttributeType","name":"Assessment_marks_record"})
  
- performance_record=collection.Node.find({"_type":"AttributeType","name":"performance_record"})
+ performance_record=node_collection.find({"_type":"AttributeType","name":"performance_record"})
  
- student_details=collection.Node.find({"_type":"AttributeType","name":"attendance_record"})
+ student_details=node_collection.find({"_type":"AttributeType","name":"attendance_record"})
  
- marks_entry_completed=collection.Node.find({"_type":"AttributeType","name":"marks_entry_completed"})
+ marks_entry_completed=node_collection.find({"_type":"AttributeType","name":"marks_entry_completed"})
  
- reschedule_attendance = collection.Node.one({"_type":"AttributeType","name":"reschedule_attendance"})
+ reschedule_attendance = node_collection.one({"_type":"AttributeType","name":"reschedule_attendance"})
 
- event_node = collection.Node.one({"_id":ObjectId(app_set_instance_id)})
+ event_node = node_collection.one({"_id":ObjectId(app_set_instance_id)})
 
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
@@ -4737,7 +4835,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  if attendancesession != str(1):
    create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],True)
  if assessmentdone == 'True':
-     event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+     event_status = node_collection.one({"_type":"AttributeType","name":"event_status"})
      create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
      create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
  
@@ -4750,16 +4848,17 @@ def event_assginee(request, group_id, app_set_instance_id=None):
     reschedule_dates["reschedule_allow"] = False
     create_gattribute(ObjectId(app_set_instance_id),reschedule_attendance,reschedule_dates)
     if attendancesession == str(1):
-    	event_status = collection.Node.one({"_type":"AttributeType","name":"event_status"})
+    	event_status = node_collection.one({"_type":"AttributeType","name":"event_status"})
         create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
 
  create_grelation(ObjectId(app_set_instance_id), oid,attendedlist)
  
  
  return HttpResponse("Details Entered")  
-        
+
+
 def fetch_course_name(request, group_id,Course_type):
-  courses=collection.Node.find({"attribute_set.nussd_course_type":unicode(Course_type)})
+  courses=node_collection.find({"attribute_set.nussd_course_type":unicode(Course_type)})
   
   course_detail={}
   course_list=[]
@@ -4768,31 +4867,31 @@ def fetch_course_name(request, group_id,Course_type):
     course_detail.update({"id":str(i._id)})
     course_list.append(course_detail)
     course_detail={}
-    
   return HttpResponse(json.dumps(course_list))
-  
+
+
 def fetch_course_Module(request, group_id,Course_name):
   batch = request.GET.get('batchid','')
   superdict={}
   module_Detail={}
   module_list=[]
   event_type_ids=[]
-  courses = collection.Node.one({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
-  eventtypes = collection.Node.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
+  courses = node_collection.one({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
+  eventtypes = node_collection.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
   for i in eventtypes:
   	  event_type_ids.append(i._id)
   for i in courses.relation_set:
     if unicode('announced_for') in i.keys():
       	announced_for = i['announced_for']  
-  courses=collection.Node.find({"_id":{'$in':announced_for}})
-  trainers=collection.Node.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
-  course_modules=collection.Node.find({"_id":{'$in':courses[0].collection_set}})
+  courses=node_collection.find({"_id":{'$in':announced_for}})
+  trainers=node_collection.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
+  course_modules=node_collection.find({"_id":{'$in':courses[0].collection_set}})
   #condition for all the modules to be listed is session in it should not be part of the event
   checklist=[]
   for i in course_modules:
     checklist = i.collection_set
     #check if this collection_set exists in any
-    event = collection.Node.find({"member_of":{'$in':event_type_ids},"relation_set.session_of":{'$elemMatch':{'$in':i.collection_set}}
+    event = node_collection.find({"member_of":{'$in':event_type_ids},"relation_set.session_of":{'$elemMatch':{'$in':i.collection_set}}
     	                  ,'relation_set.event_has_batch':ObjectId(batch)})
     for k in event:
     	 for j in k.relation_set:
@@ -4816,9 +4915,10 @@ def fetch_course_Module(request, group_id,Course_name):
   superdict['trainer'] = json.dumps(trainerlist,cls=NodeJSONEncoder) 
   return HttpResponse(json.dumps(superdict))
 
+
 def fetch_batch_student(request, group_id,Course_name):
   try:
-    courses=collection.Node.one({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
+    courses=node_collection.one({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
     dict1={}
     list1=[]
     for i in courses.relation_set:
@@ -4831,27 +4931,29 @@ def fetch_batch_student(request, group_id,Course_name):
     return HttpResponse(json.dumps(list1))
   except:
     return HttpResponse(json.dumps(list1)) 
+
+
 def fetch_course_session(request, group_id,Course_name):
   try:  
-	  courses=collection.Node.one({"_id":ObjectId(Course_name)})
+	  courses=node_collection.one({"_id":ObjectId(Course_name)})
 	  batch = request.GET.get('batchid','')
 	  dict1={}
 	  list1=[]
 	  checklist = []
 	  event_type_ids = []
 	  checklist =  courses.collection_set
-	  eventtypes = collection.Node.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
+	  eventtypes = node_collection.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
 	  for i in eventtypes:
 	  	  event_type_ids.append(i._id)
           
-	  module_node  = collection.Node.find({"member_of":{'$in':event_type_ids},"relation_set.session_of":{'$elemMatch':{'$in':checklist}}
+	  module_node  = node_collection.find({"member_of":{'$in':event_type_ids},"relation_set.session_of":{'$elemMatch':{'$in':checklist}}
 	    	                  ,'relation_set.event_has_batch':ObjectId(batch)})
 	  for i in module_node:
 	     for k in i.relation_set:
 		if unicode('session_of') in k.keys():
 		   if k['session_of'][0] in checklist:  
 		       checklist.remove(k['session_of'][0])
-	  course_modules=collection.Node.find({"_id":{'$in':checklist}})    
+	  course_modules=node_collection.find({"_id":{'$in':checklist}})    
 	  for i in course_modules:
 	      dict1.update({"name":i.name})
 	      dict1.update({"id":str(i._id)})
@@ -4862,19 +4964,17 @@ def fetch_course_session(request, group_id,Course_name):
 	      dict1={}
 	  return HttpResponse(json.dumps(list1))
   except:
-    return HttpResponse(json.dumps(list1)) 	      
-  
-    
-  
+    return HttpResponse(json.dumps(list1))
+
 
 def fetch_course_batches(request, group_id,Course_name):
-  #courses=collection.Node.one({"_id":ObjectId(Course_name)})
-  #courses=collection.Node.find({"relation_set.announced_for":ObjectId(Course_name)})
+  #courses=node_collection.one({"_id":ObjectId(Course_name)})
+  #courses=node_collection.find({"relation_set.announced_for":ObjectId(Course_name)})
   try:
     dict1={}
     list1=[]
-    batch=collection.Node.find({"_type":"GSystemType","name":"Batch"})
-    batches=collection.Node.find({"member_of":batch[0]._id,"relation_set.has_course":ObjectId(Course_name)})
+    batch=node_collection.find({"_type":"GSystemType","name":"Batch"})
+    batches=node_collection.find({"member_of":batch[0]._id,"relation_set.has_course":ObjectId(Course_name)})
     for i in batches:
         dict1.update({"name":i.name})
         dict1.update({"id":str(i._id)})
@@ -4885,28 +4985,30 @@ def fetch_course_batches(request, group_id,Course_name):
   except:
     return HttpResponse(json.dumps(list1))
 
-def save_csv(request,group_id,app_set_instance_id=None):
-        #column_header = [u'Name', 'Presence','Attendance_marks','Assessment_marks']
-        json_data=request.POST.getlist("attendance[]","")
-        column_header=request.POST.getlist("column[]","")
-        t = time.strftime("%c").replace(":", "_").replace(" ", "_")
-        filename = "csv/" + "Attendance_data_" + t + ".csv"
-        filepath = os.path.join(STATIC_ROOT, filename)
-        filedir = os.path.dirname(filepath)
-        if not os.path.exists(filedir):
-          os.makedirs(filedir)
-        data={}
-        with open(filepath, 'wb') as csv_file:
-          fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
-          fw.writerow(dict((col,col) for col in column_header))
-          
-          for row in list(json_data):
-            v = {}
-            fw.writerow(ast.literal_eval(row))
-        return HttpResponse((STATIC_URL + filename))
-        
+
+def save_csv(request, group_id, app_set_instance_id=None):
+    #column_header = [u'Name', 'Presence','Attendance_marks','Assessment_marks']
+    json_data=request.POST.getlist("attendance[]","")
+    column_header=request.POST.getlist("column[]","")
+    t = time.strftime("%c").replace(":", "_").replace(" ", "_")
+    filename = "csv/" + "Attendance_data_" + t + ".csv"
+    filepath = os.path.join(STATIC_ROOT, filename)
+    filedir = os.path.dirname(filepath)
+    if not os.path.exists(filedir):
+      os.makedirs(filedir)
+    data={}
+    with open(filepath, 'wb') as csv_file:
+      fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
+      fw.writerow(dict((col,col) for col in column_header))
+
+      for row in list(json_data):
+        v = {}
+        fw.writerow(ast.literal_eval(row))
+    return HttpResponse((STATIC_URL + filename))
+
+
 def get_assessment(request,group_id,app_set_instance_id):
-    node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
+    node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     node.get_neighbourhood(node.member_of)
     marks_list=[]
     Assesslist=[]
@@ -4921,35 +5023,36 @@ def get_assessment(request,group_id,app_set_instance_id):
                   dict1.update({'marks':j['performance_record']['marks']})
                else:
                   dict1.update({'marks':""})
-                   
+
        dict1.update({'id':str(i._id)})
        if val is True:
              marks_list.append(dict1)
        else:
              dict1.update({'marks':"0"})
-             marks_list.append(dict1)      
-   
+             marks_list.append(dict1)
     return HttpResponse(json.dumps(marks_list))
+
+
 def get_attendees(request,group_id,node):
  #get all the ObjectId of the people who would attend the event
- node=collection.Node.one({'_id':ObjectId(node)})
+ node=node_collection.one({'_id':ObjectId(node)})
  attendieslist=[]
  #below code would give the the Object Id of Possible attendies
  for i in node.relation_set:
      if ('has_attendees' in i): 
         for j in  i['has_attendees']:
                 attendieslist.append(j)
-                
+
  attendee_name=[]
  #below code is meant for if a batch or member of group id  is found, fetch the attendees list-
  #from the members of the batches if members are selected from the interface their names would be returned
- #attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}},{"group_admin":1})
- attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}})
+ #attendees_id=node_collection.find({ '_id':{'$in': attendieslist}},{"group_admin":1})
+ attendees_id=node_collection.find({ '_id':{'$in': attendieslist}})
  for i in attendees_id:
     #if i["group_admin"]:
     #  User_info=(collectigeton.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
     #else:
-    User_info=(collection.Node.find({'_id':ObjectId(i._id)}))
+    User_info=(node_collection.find({'_id':ObjectId(i._id)}))
     for i in User_info:
        attendee_name.append(i)
  attendee_name_list=[]
@@ -4963,27 +5066,27 @@ def get_attendees(request,group_id,node):
     d.update({'name':i.name})
     d.update({'id':str(i._id)})
     a.append(d)
-    
-    
+
  return HttpResponse(json.dumps(a))
- 
+
+
 def get_attendance(request,group_id,node):
  #method is written to get the presence and absence of attendees for the event
- node=collection.Node.one({'_id':ObjectId(node)})
+ node=node_collection.one({'_id':ObjectId(node)})
  attendieslist=[]
  #below code would give the the Object Id of Possible attendies
  for i in node.relation_set:
      if ('has_attendees' in i): 
         for j in  i['has_attendees']:
                 attendieslist.append(j)
-                
+
  attendee_name=[]
- attendees_id=collection.Node.find({ '_id':{'$in': attendieslist}})
+ attendees_id=node_collection.find({ '_id':{'$in': attendieslist}})
  for i in attendees_id:
     #if i["group_admin"]:
-    #  User_info=(collection.Node.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
+    #  User_info=(node_collection.find({'_type':"Author",'created_by':{'$in':i["group_admin"]}}))
     #else:
-    User_info=(collection.Node.find({'_id':ObjectId(i._id)}))
+    User_info=(node_collection.find({'_id':ObjectId(i._id)}))
     for i in User_info:
        attendee_name.append(i)
  attendee_name_list=[]
@@ -4993,7 +5096,7 @@ def get_attendance(request,group_id,node):
  a=[]
  d={}
  
- has_attended_event=collection.Node.find({'_id':ObjectId(node.pk)},{'relation_set':1})
+ has_attended_event=node_collection.find({'_id':ObjectId(node.pk)},{'relation_set':1})
  #get all the objectid
  attendieslist=[]
  for i in has_attended_event[0].relation_set:
@@ -5006,7 +5109,7 @@ def get_attendance(request,group_id,node):
  temp_attendance={}
  #the below code would compare between the supposed attendees and has_attended the event
  #and accordingly mark their presence or absence for the event
-  
+
  node.get_neighbourhood(node.member_of)
  Assess_marks_list=[]
  Assign_marks_list=[]
@@ -5015,10 +5118,10 @@ def get_attendance(request,group_id,node):
  val=False
  assign=False
  asses=False
- member_of=collection.Node.one({"_id":{'$in':node.member_of}})
+ member_of=node_collection.one({"_id":{'$in':node.member_of}})
  for i in attendee_name_list:
     if (i._id in attendieslist):
-      attendees=collection.Node.one({"_id":ObjectId(i._id)})
+      attendees=node_collection.one({"_id":ObjectId(i._id)})
       dict1={}
       dict2={}
       for j in  attendees.attribute_set:
@@ -5045,7 +5148,7 @@ def get_attendance(request,group_id,node):
                   asses=True
                   dict2.update({'marks':j['performance_record']['marks']}) 
                else:
-                  dict2.update({'marks':"0"})               
+                  dict2.update({'marks':"0"})
       temp_attendance.update({'id':str(i._id)})
       temp_attendance.update({'name':i.name})
       temp_attendance.update({'presence':'Present'})
@@ -5063,11 +5166,12 @@ def get_attendance(request,group_id,node):
       attendance.append(temp_attendance) 
     temp_attendance={}
  return HttpResponse(json.dumps(attendance))
- 
+
+
 def attendees_relations(request,group_id,node):
- test_output = collection.Node.find({"_id":ObjectId(node),"attribute_set.start_time":{'$lt':datetime.datetime.today()}})
+ test_output = node_collection.find({"_id":ObjectId(node),"attribute_set.start_time":{'$lt':datetime.datetime.today()}})
  if test_output.count() != 0: 
-         event_has_attended=collection.Node.find({'_id':ObjectId(node)})
+         event_has_attended=node_collection.find({'_id':ObjectId(node)})
          column_list=[]
          column_count=0
          course_assignment=False
@@ -5075,7 +5179,7 @@ def attendees_relations(request,group_id,node):
          reschedule = True
          marks = False
            
-         member_of=collection.Node.one({"_id":{'$in':event_has_attended[0].member_of}})
+         member_of=node_collection.one({"_id":{'$in':event_has_attended[0].member_of}})
          if member_of.name != "Exam":
            for i in event_has_attended[0].relation_set:
               #True if (has_attended relation is their means attendance is already taken) 
@@ -5085,7 +5189,7 @@ def attendees_relations(request,group_id,node):
               else:
                 a = "False"   
               if ('session_of' in i):
-                 session=collection.Node.one({"_id":{'$in':i['session_of']}})
+                 session=node_collection.one({"_id":{'$in':i['session_of']}})
                  for i in session.attribute_set:
                       if unicode('course_structure_assignment') in i:   
                        if i['course_structure_assignment'] == True:
@@ -5113,7 +5217,7 @@ def attendees_relations(request,group_id,node):
            column_count=5
            column_list.append('True')
            column_list.append(column_count) 
-         node = collection.Node.one({"_id":ObjectId(node)}) 
+         node = node_collection.one({"_id":ObjectId(node)}) 
          for i in node.attribute_set:
             if unicode("reschedule_attendance") in i.keys():
               if unicode('reschedule_allow') in i['reschedule_attendance']: 
@@ -5126,10 +5230,10 @@ def attendees_relations(request,group_id,node):
          column_list=[]
  return HttpResponse(json.dumps(column_list)) 
 
-        
+
 def page_scroll(request,group_id,page):
   
- Group_Activity = collection.Node.find(
+ Group_Activity = node_collection.find(
         {'group_set':ObjectId(group_id)}).sort('last_update', -1)
  
  if Group_Activity.count() >=10:
@@ -5171,6 +5275,7 @@ def page_scroll(request,group_id,page):
                                   context_instance = RequestContext(request)
       )
 
+
 def get_batches_with_acourse(request, group_id):
   """
   This view returns list of batches that match given criteria
@@ -5182,26 +5287,25 @@ def get_batches_with_acourse(request, group_id):
   """
   response_dict = {'success': False, 'message': ""}
   batches_list = []
-  batch_gst = collection.Node.one({'_type':'GSystemType','name':'Batch'})
+  batch_gst = node_collection.one({'_type':'GSystemType','name':'Batch'})
   try:
     if request.is_ajax() and request.method == "GET":
       # Fetch field(s) from GET object
       announced_course_id = request.GET.get("ac_id", "")
-      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"})
+      mis_admin = node_collection.one({'_type': "Group", 'name': "MIS_admin"})
       if(ObjectId(group_id) == mis_admin._id):
         pass
       else:
-        colg_gst = collection.Node.one({'_type': "GSystemType", 'name': 'College'})
-        req_colg_id = collection.Node.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
-        b = collection.Node.find({'member_of':batch_gst._id,'relation_set.has_course':ObjectId(announced_course_id)})
+        colg_gst = node_collection.one({'_type': "GSystemType", 'name': 'College'})
+        req_colg_id = node_collection.one({'member_of':colg_gst._id,'relation_set.has_group':ObjectId(group_id)})
+        b = node_collection.find({'member_of':batch_gst._id,'relation_set.has_course':ObjectId(announced_course_id)})
         for each in b:
           batches_list.append(each)
 
-        response_dict["success"] = True      
+        response_dict["success"] = True
         info_message = "Batch for this course is available"
       response_dict["message"] = info_message
 
-      
       response_dict["batches_list"] = json.dumps(batches_list, cls=NodeJSONEncoder)
 
       return HttpResponse(json.dumps(response_dict))

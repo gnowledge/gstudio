@@ -1,54 +1,42 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-
+import json
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-from django.template.defaultfilters import slugify
+# from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-from django_mongokit import get_database
 from django.contrib.auth.models import User
-import json
 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
 
-from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
-from gnowsys_ndf.ndf.models import Group
+# from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups,get_all_user_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups, get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import *
 
+# ######################################################################################################################################
 
-#######################################################################################################################################
-
-from django.contrib.auth.models import User
-db = get_database()
-gst_collection = db[GSystemType.collection_name]
-collection_tr = db[Triple.collection_name]
-gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
-gs_collection = db[GSystem.collection_name]
-collection = db[Node.collection_name]
+gst_group = node_collection.one({"_type": "GSystemType", 'name': GAPPS[2]})
 get_all_usergroups=get_all_user_groups()
-at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+at_apps_list=node_collection.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
 ins_objectid  = ObjectId()
-app=collection.Node.one({'name':u'Group','_type':'GSystemType'})
+app=gst_group
 
-
-
-#######################################################################################################################################
+# ######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
-#######################################################################################################################################
+# ######################################################################################################################################
 
 
 def group(request, group_id, app_id=None, agency_type=None):
@@ -65,7 +53,7 @@ def group(request, group_id, app_id=None, agency_type=None):
 
   group_nodes = []
   group_count = 0
-  auth = collection.Node.one({'_type': u"Author", 'name': unicode(request.user.username)})
+  auth = node_collection.one({'_type': u"Author", 'name': unicode(request.user.username)})
 
   if request.method == "POST":
     # Page search view
@@ -75,7 +63,7 @@ def group(request, group_id, app_id=None, agency_type=None):
 
     if auth:
       # Logged-In View
-      cur_groups_user = collection.Node.find({'_type': "Group", 
+      cur_groups_user = node_collection.find({'_type': "Group", 
                                        '_id': {'$nin': [ObjectId(group_id), auth._id]},
                                        '$and': [query_dict],
                                        '$or': [
@@ -113,7 +101,7 @@ def group(request, group_id, app_id=None, agency_type=None):
         
     else:
       # Without Log-In View
-      cur_public = collection.Node.find({'_type': "Group", 
+      cur_public = node_collection.find({'_type': "Group", 
                                        '_id': {'$nin': [ObjectId(group_id)]},
                                        '$and': [query_dict],
                                        '$or': [
@@ -144,7 +132,7 @@ def group(request, group_id, app_id=None, agency_type=None):
 
     if auth:
       # Logged-In View
-      cur_groups_user = collection.Node.find({'_type': "Group", 
+      cur_groups_user = node_collection.find({'_type': "Group", 
                                               '$and': [query_dict],
                                               '_id': {'$nin': [ObjectId(group_id), auth._id]},
                                               'name': {'$nin': ["home"]},
@@ -165,7 +153,7 @@ def group(request, group_id, app_id=None, agency_type=None):
         
     else:
       # Without Log-In View
-      cur_public = collection.Node.find({'_type': "Group", 
+      cur_public = node_collection.find({'_type': "Group", 
                                          '_id': {'$nin': [ObjectId(group_id)]},
                                          '$and': [query_dict],
                                          'name': {'$nin': ["home"]},
@@ -191,21 +179,20 @@ def group(request, group_id, app_id=None, agency_type=None):
 def create_group(request,group_id):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)	
   else :
   	pass
 
   if request.method == "POST":
-    col_Group = db[Group.collection_name]
-    colg = col_Group.Group()
-    Mod_colg=col_Group.Group()
+    colg = node_collection.collection.Group()
+    Mod_colg = node_collection.collection.Group()
 
     cname=request.POST.get('groupname', "")
     colg.altnames=cname
@@ -249,25 +236,24 @@ def create_group(request,group_id):
       colg.post_node.append(Mod_colg._id)
       colg.save()
 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
-    has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-    dbref_has_shelf = has_shelf_RT.get_dbref()
+    has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
 
     shelves = []
     shelf_list = {}
     
     if auth:
-      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
 
       if shelf:
         for each in shelf:
-          shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+          shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
           shelves.append(shelf_name)
 
           shelf_list[shelf_name.name] = []         
           for ID in shelf_name.collection_set:
-            shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+            shelf_item = node_collection.one({'_id': ObjectId(ID) })
             shelf_list[shelf_name.name].append(shelf_item.name)
                   
       else:
@@ -279,7 +265,7 @@ def create_group(request,group_id):
                                                         },context_instance=RequestContext(request))
 
 
-  available_nodes = collection.Node.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+  available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
 
   nodes_list = []
   for each in available_nodes:
@@ -289,7 +275,7 @@ def create_group(request,group_id):
     
 # def home_dashboard(request):
 #     try:
-#         groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+#         groupobj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 #     except Exception as e:
 #         groupobj=""
 #         pass
@@ -305,12 +291,11 @@ def populate_list_of_members():
 	return memList
 
 def populate_list_of_group_members(group_id):
-    col = get_database()[Node.collection_name]
     try :
       try:
-        author_list = col.Node.one({"_type":"Group", "_id":ObjectId(group_id)}, {"author_set":1, "_id":0})
+        author_list = node_collection.one({"_type":"Group", "_id":ObjectId(group_id)}, {"author_set":1, "_id":0})
       except:
-        author_list = col.Node.find_one({"_type":"Group", "name":group_id}, {"author_set":1, "_id":0})
+        author_list = node_collection.find_one({"_type":"Group", "name":group_id}, {"author_set":1, "_id":0})
       
       memList = []
 
@@ -326,12 +311,12 @@ def populate_list_of_group_members(group_id):
 def group_dashboard(request,group_id=None):
 
   if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
 	    group_id = str(group_ins._id)
     else :
-	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    if auth :
 	    	group_id = str(auth._id)	
   else :
@@ -345,36 +330,35 @@ def group_dashboard(request,group_id=None):
     alternate_template = ""
 
     if group_id == None:
-      groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+      groupobj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
       grpid=groupobj['_id']
     else:
-      groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
+      groupobj=node_collection.one({'_id':ObjectId(group_id)})
       grpid=groupobj['_id']
 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
     if auth:
-      has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-      dbref_has_shelf = has_shelf_RT.get_dbref()
+      has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
 
-      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
       shelf_list = {}
 
       if shelf:
         for each in shelf:
-          shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+          shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
           shelves.append(shelf_name)
 
-          shelf_list[shelf_name.name] = []         
+          shelf_list[shelf_name.name] = []
           for ID in shelf_name.collection_set:
-            shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+            shelf_item = node_collection.one({'_id': ObjectId(ID) })
             shelf_list[shelf_name.name].append(shelf_item.name)
               
       else:
           shelves = []
 
   except Exception as e:
-    groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    groupobj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     grpid=groupobj['_id']
     pass
 
@@ -382,9 +366,9 @@ def group_dashboard(request,group_id=None):
   groupobj.get_neighbourhood(groupobj.member_of)
 
   property_order_list = []
-  if groupobj.has_key("group_of"):
+  if "group_of" in groupobj:
     if groupobj['group_of']:
-      college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+      college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
 
       if college:
         if college._id in groupobj['group_of'][0]['member_of']:
@@ -392,10 +376,7 @@ def group_dashboard(request,group_id=None):
 
       property_order_list = get_property_order_with_value(groupobj['group_of'][0])
 
-  # First time breadcrumbs_list created on click of page details
-  breadcrumbs_list = []
-  # Appends the elements in breadcrumbs_list first time the resource which is clicked
-  breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
+  
   annotations = json.dumps(groupobj.annotations)
 
   default_template = "ndf/groupdashboard.html"
@@ -404,8 +385,7 @@ def group_dashboard(request,group_id=None):
                                                        'shelf_list': shelf_list,
                                                        'appId':app._id,
                                                        'annotations' : annotations,
-                                                       'shelves': shelves, 
-                                                       'breadcrumbs_list': breadcrumbs_list
+                                                       'shelves': shelves
                                                       },context_instance=RequestContext(request)
                           )
 
@@ -414,19 +394,19 @@ def group_dashboard(request,group_id=None):
 def edit_group(request,group_id):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
       group_id = str(group_ins._id)
     else:
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
 
   else:
     pass
 
-  page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+  page_node = node_collection.one({"_id": ObjectId(group_id)})
   title = gst_group.name
   if request.method == "POST":
     is_node_changed=get_node_common_fields(request, page_node, group_id, gst_group)
@@ -458,19 +438,19 @@ def edit_group(request,group_id):
 def app_selection(request,group_id):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
       	group_id = str(auth._id)	
   else :
   	pass
 
   try:
-    grp=collection.Node.one({"_id":ObjectId(group_id)})
+    grp=node_collection.one({"_id":ObjectId(group_id)})
     if request.method == "POST":
       lst=[]
       apps_to_set = request.POST['apps_to_set']
@@ -478,17 +458,18 @@ def app_selection(request,group_id):
       if apps_list:
         for each in apps_list:
           if each:
-            obj=collection.Node.one({'_id':ObjectId(each)})
-            lst.append(obj);
-        gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_apps_list._id},{'subject':grp._id}]})
+            obj=node_collection.one({'_id':ObjectId(each)})
+            lst.append(obj)
+        gattribute = triple_collection.one({'_type': 'GAttribute', 'subject': grp._id, 'attribute_type.$id': at_apps_list._id})
         if gattribute:
           gattribute.delete()
         if lst:
-          create_attribute=collection.GAttribute()
-          create_attribute.attribute_type=at_apps_list
-          create_attribute.subject=grp._id
-          create_attribute.object_value=lst
-          create_attribute.save()            
+          ga_node = create_gattribute(grp._id, at_apps_list, lst)
+          # create_attribute=triple_collection.collection.GAttribute()
+          # create_attribute.attribute_type=at_apps_list
+          # create_attribute.subject=grp._id
+          # create_attribute.object_value=lst
+          # create_attribute.save()
       return HttpResponse("Success")
 
     else:
@@ -512,19 +493,19 @@ def app_selection(request,group_id):
 def switch_group(request,group_id,node_id):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
       	group_id = str(auth._id)	
   else :
   	pass
 
   try:
-    node=collection.Node.one({"_id":ObjectId(node_id)})
+    node=node_collection.one({"_id":ObjectId(node_id)})
     exstng_grps=node.group_set
     if request.method == "POST":     
       node.group_set=[] # Remove all existing groups and add new ones 
@@ -543,9 +524,9 @@ def switch_group(request,group_id,node_id):
       all_user_groups=[]
       for each in get_all_user_groups():
         all_user_groups.append(each.name)
-      st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
+      st = node_collection.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
       for each in node.group_set:
-        coll_obj_list.append(collection.Node.one({'_id':each}))
+        coll_obj_list.append(node_collection.one({'_id':each}))
       data_list=set_drawer_widget(st,coll_obj_list)
       return HttpResponse(json.dumps(data_list))
    
@@ -557,18 +538,18 @@ def switch_group(request,group_id,node_id):
 def publish_group(request,group_id,node):
   ins_objectid  = ObjectId()
   if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
 	    group_id = str(group_ins._id)
     else:
-	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    if auth :
 	    	group_id = str(auth._id)	
   else :
   	pass
 
-  node=collection.Node.one({'_id':ObjectId(node)})
+  node=node_collection.one({'_id':ObjectId(node)})
    
   page_node,v=get_page(request,node)
   
@@ -593,31 +574,30 @@ def create_sub_group(request,group_id):
       ins_objectid  = ObjectId()
       grpname=""
       if ins_objectid.is_valid(group_id) is False :
-          group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-          auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+          group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+          auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
           if group_ins:
               grpname=group_ins.name 
               group_id = str(group_ins._id)
           else :
-              auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+              auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
               if auth :
                   group_id = str(auth._id)
                   grpname=auth.name	
       else :
-          group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+          group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(group_id)})
           if group_ins:
               grpname=group_ins.name
               pass
           else:
-              group_ins = collection.Node.find_one({'_type': "Author","_id": ObjectId(group_id)})
+              group_ins = node_collection.find_one({'_type': "Author","_id": ObjectId(group_id)})
               if group_ins:
                   grpname=group_ins.name
                   pass
 
       if request.method == "POST":
-          col_Group = db[Group.collection_name]
-          colg = col_Group.Group()
-          Mod_colg=col_Group.Group()
+          colg = node_collection.collection.Group()
+          Mod_colg=node_collection.collection.Group()
           cname=request.POST.get('groupname', "")
           colg.altnames=cname
           colg.name = unicode(cname)
@@ -629,7 +609,7 @@ def create_sub_group(request,group_id):
           colg.modified_by = usrid
           if usrid not in colg.contributors:
               colg.contributors.append(usrid)
-          colg.group_type = request.POST.get('group_type', "")        
+          colg.group_type = request.POST.get('group_type', "")
           colg.edit_policy = request.POST.get('edit_policy', "")
           colg.subscription_policy = request.POST.get('subscription', "")
           colg.visibility_policy = request.POST.get('existance', "ANNOUNCED")
@@ -659,22 +639,21 @@ def create_sub_group(request,group_id):
 
               colg.post_node.append(Mod_colg._id)
               colg.save()
-          auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-          has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-          dbref_has_shelf = has_shelf_RT.get_dbref()
+          auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+          has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
           shelves = []
           shelf_list = {}
     
           if auth:
-              shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+              shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
 
               if shelf:
                   for each in shelf:
-                      shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                      shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
                       shelves.append(shelf_name)
-                      shelf_list[shelf_name.name] = []         
+                      shelf_list[shelf_name.name] = []
                       for ID in shelf_name.collection_set:
-                          shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                          shelf_item = node_collection.one({'_id': ObjectId(ID) })
                           shelf_list[shelf_name.name].append(shelf_item.name)
                   
               else:
@@ -684,7 +663,7 @@ def create_sub_group(request,group_id):
                                                          'groupid':group_id,'group_id':group_id,
                                                          'shelf_list': shelf_list,'shelves': shelves
                                                         },context_instance=RequestContext(request))
-      available_nodes = collection.Node.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+      available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
       nodes_list = []
       for each in available_nodes:
           nodes_list.append(each.name)
@@ -709,7 +688,7 @@ def nroer_groups(request, group_id, groups_category):
             groups_names_list = [mapping.get(i) for i in groups_names_list]
             break
 
-    group_nodes = collection.Node.find({ '_type': "Group", 
+    group_nodes = node_collection.find({ '_type': "Group", 
                                         '_id': {'$nin': [ObjectId(group_id)]},
                                         'name': {'$nin': ["home"], '$in': groups_names_list},
                                         'group_type': "PUBLIC"
