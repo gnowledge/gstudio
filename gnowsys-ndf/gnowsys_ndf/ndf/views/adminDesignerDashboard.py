@@ -16,7 +16,7 @@ db = get_database()
 collection = db[File.collection_name]
 
 @user_passes_test(lambda u: u.is_superuser)
-def adminDesignerDashboardClass(request, class_name):
+def adminDesignerDashboardClass(request, class_name='GSystemType'):
     '''
     fetching class's objects
     '''
@@ -78,7 +78,7 @@ def adminDesignerDashboardClass(request, class_name):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
+def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id=None):
     '''
     delete class's objects
     '''
