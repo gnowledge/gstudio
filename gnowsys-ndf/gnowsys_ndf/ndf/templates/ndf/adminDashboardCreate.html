@@ -173,8 +173,12 @@
 
 {% block script %}
 {% autoescape off %}
-
-  var required_fields = {{ required_fields }}
+  var required_fields = [];
+  required_fields = {{ required_fields }}
+  var index = required_fields.indexOf('_type');
+  if(index>-1){
+     required_fields.splice(index, 1);
+  }
   var flag = 0;
   
   {% endautoescape %}
@@ -184,14 +188,11 @@
     for(each in type_list){
       eval(type_list[each] + "()");
     }
-    alert(required_fields);
     for(reqfields in required_fields){
-  
       if($("#definitionlist [name = "+required_fields[reqfields]+" ]").val()){
         $("#"+required_fields[reqfields]+"_required").hide();
       }
       else{
-  
         flag = 1;
         $("#"+required_fields[reqfields]+"_required").show();
       }
