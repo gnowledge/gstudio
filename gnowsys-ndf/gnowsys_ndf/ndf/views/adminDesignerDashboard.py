@@ -114,11 +114,11 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         new_instance_type = node_collection.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
 
     else:
-        new_instance_type = eval("collection"+"."+class_name)()
+        new_instance_type = eval("node_collection.collection"+"."+class_name)()
 
     if request.method=="POST":
         if translate:
-            new_instance_type = eval("collection"+"."+class_name)()
+            new_instance_type = eval("node_collection.collection"+"."+class_name)()
             
         for key,value in class_structure.items():
             if value == bool:
