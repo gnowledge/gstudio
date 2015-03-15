@@ -79,8 +79,9 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
     '''
     delete class's objects
     '''
+    global LANGUAGES
     new_instance_type = None
-    LANGUAGES = ""
+    LANGUAGES = '' if not LANGUAGES else LANGUAGES
     definitionlist = []
     contentlist = []
     dependencylist = []
@@ -200,7 +201,7 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         new_instance_type.save()
         if translate:        
             relation_type=node_collection.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
-            grelation=collection.GRelation()
+            grelation=node_collection.collection.GRelation()
             grelation.relation_type=relation_type
             grelation.subject=new_instance_type['_id']
             grelation.right_subject=ObjectId(node_id)
