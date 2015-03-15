@@ -54,8 +54,6 @@
 }
 table {
     table-layout: auto;
-    display: block;
-    overflow: auto;
 }
 {% endblock %}
 
@@ -119,6 +117,7 @@ table {
 <input type="submit" value="search" style="width:100px;">
 </form>
 {% autopaginate nodes 25 %}
+<div style="display: block; width: 101%; overflow: auto;">
 <table>
   <thead>
     <tr>
@@ -201,6 +200,7 @@ table {
  	{% endfor %}
   </tbody>
 </table>
+</div>
 {% paginate %}
 {% endblock %}
 
