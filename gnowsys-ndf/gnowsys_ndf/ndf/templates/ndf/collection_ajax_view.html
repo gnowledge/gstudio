@@ -7,7 +7,7 @@
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
     
   <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function() {      
 
       // Funtion for loading tree for showing collection list left side panel
       doc();
@@ -131,6 +131,15 @@
       );
       
     }
+
+    // This function takes id of clicked "related" node and redirect to its page with its proper breadcrumbs
+    // nav_li manipulates the navigation path of that topic in theme map
+    function topic_redirect (obj_id) {
+
+      var nav_list = window.location.search.replace("?nav_li=", ""); // This takes "nav_li" from browser url
+      var nav_li = nav_list.replace('{{node.pk}}', obj_id); // This replaces the last node id with clicked "related" node id
+      location.href = "/{{group_name_tag}}/topic_details/"+obj_id+"?nav_li="+nav_li+"";
+    }
     
   </script>
 
@@ -155,7 +164,7 @@
 
         {% for each in prior_obj.collection_set %}
           {% get_node each as obj %}
-          <a href="#">{{obj.name}}</a>
+          <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a>
           {% if not forloop.last %}, {% endif %}
 
         {% endfor %}
