@@ -2791,7 +2791,7 @@ def parse_data(doc):
               doc[i] = datetime.strftime(doc[i],"%d %B %Y %H:%M")
           elif i in objecttypelist:
                for j in doc[i]:
-                   node = collection.Node.one({"_id":ObjectId(j)})
+                   node = node_collection.one({"_id":ObjectId(j)})
                    
                    doc[i] = node.name
           

@@ -427,22 +427,27 @@ def version_node(request, group_id, node_id, version_no):
         view = "single"
 
         # Retrieve rcs-file for a given version-number
-        rcs.checkout((fp, version_no))
+        #rcs.checkout((fp, version_no))
 
         # Copy content from rcs-version-file
         data = None
-        with open(fp, 'r') as sf:
-            data = sf.read()
-
+        #with open(fp, 'r') as sf:
+        #    data = sf.read()
+        
         # Used json.loads(x) -- to covert string to dictionary object
         # If want to use key from this converted dictionay, use array notation because dot notation doesn't works!
-        data = json.loads(data)
-
+        #data = json.loads(data)
         # Remove retrieved rcs-file belonging to the given version-number
-        rcs.checkin(fp)
-
+        #rcs.checkin(fp)
+        data = history_manager.get_version_document(node,version_no)
+        parse_data(data)
+        new_content = []
         selected_versions = {"1": version_no, "2": ""}
-        content = data
+        for i in listform:
+           new_content.append({i:data[i]})
+        content =  new_content
+        
+        #content = data
         content_1='none'
     return render_to_response("ndf/version_page.html",
                               {'view': view,

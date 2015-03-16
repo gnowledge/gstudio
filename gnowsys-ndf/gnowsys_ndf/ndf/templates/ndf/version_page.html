@@ -78,13 +78,14 @@
 	<th align="right">{% trans "Fields" %}</th>
           <th align="left">{% trans "Version" %} #{{selected_versions.1}}</th>
 	</tr>
-        {% for k, v in content.items %}
-	<tr>
-          
-          <td align="right" valign="top">{{k}}</td>
-          <td>{{v}}</td>
-	</tr>
-	{% endfor %}
+        {% for i in content %}
+	        {% for k,v in i.items %}
+	          <tr>
+              <td align="right" valign="top">{{k|title}}</td>
+              <td>{{v}}</td>
+	          </tr>
+		      {% endfor %}
+	     {% endfor %}
       </table>
    
  </div>
