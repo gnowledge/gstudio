@@ -710,15 +710,15 @@ def topic_detail_view(request, group_id, app_Id=None):
   app = node_collection.one({'_id': ObjectId(obj.member_of[0])})
   app_id = app._id
   topic = "Topic"
+  theme_id = None
 
   # First get the navigation list till topic from theme map
   nav_l=request.GET.get('nav_li','')
-  nav_l = str(nav_l).split(",")
-
-  print "nav_l: ",nav_l,"\n"
-
   breadcrumbs_list = []
+
   if nav_l:
+    nav_l = str(nav_l).split(",")
+
     # create beadcrumbs list from navigation list sent from template.
     for each in nav_l:
         each_obj = node_collection.one({'_id': ObjectId(each) })
