@@ -170,8 +170,7 @@
               
               <!-- Clicked topic should not be included in related nodes list -->
               {% if node.pk != obj.pk %}
-                <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a>
-                {% if not forloop.last %}, {% endif %}
+                <i class="fi-arrow-right"></i> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a><br/>
               {% endif %} 
 
           {% endfor %}
