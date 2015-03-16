@@ -157,22 +157,25 @@
 
 {% endblock %}  
 
-
   <fieldset>
     <legend>Related Topics</legend>
       {% if prior_obj %}        
 
         {% for each in prior_obj.collection_set %}
-          {% get_node each as obj %}
-          <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a>
-          {% if not forloop.last %}, {% endif %}
+
+            {% get_node each as obj %}
+            
+            {% if node.pk != obj.pk %}
+              <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a>
+              {% if not forloop.last %}, {% endif %}
+            {% endif %} 
 
         {% endfor %}
 
       {% endif %}
       
   </fieldset>
-  
+
   <b class="current">{{node.name}}</b>
   <div>
     <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
