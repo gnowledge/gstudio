@@ -36,7 +36,8 @@ background:#b3ffb3;
       {% else %}
       {% trans "Compare" %}
       {% endifequal %}
-      {% trans "History" %}
+      {% trans "History" %} :
+      {{content1.3.name|title}}
     </h2>
   </div>
 
@@ -114,10 +115,9 @@ background:#b3ffb3;
         document.location.href = '/{{group_id}}/page/{{node}}/version/{{ver}}'</script>
 
   {% else %}
-  
- <div class="row">  
+ <div class="row" style = "overflow: auto; min-height: auto;max-height: 75vh;">  
  <div class="medium-5 columns"> 
-    <div id="compare-view" style="padding-bottom: 20px; overflow-x:scroll; width:250%;">
+    <div id="compare-view" style="padding-bottom: 20px;  width:250%;">
     </div>
  </div>
  </div>
@@ -131,6 +131,9 @@ background:#b3ffb3;
 a={{content|safe}}
 
 $('#compare-view').append("<table id='new' width='700'  </table>")
+$('#new').append("<thead> <th> Feild </th> <th> Value </th> <th> Feild </th> <th> Value </th>  </thead>")
+
+
 a1 = {{content1|safe}}
 h= 0
 a.reverse()
