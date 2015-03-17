@@ -289,7 +289,7 @@ def create_edit_page(request, group_id, node_id=None):
                           'groupid': group_id
                       }
     
-    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id) })
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
     for each in available_nodes:

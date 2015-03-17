@@ -899,6 +899,7 @@ $(document).ready(function(){
 
 	    var name = $("#name_id").val().trim().toLowerCase();
 	    var nodes = {{nodes_list|safe}} 
+	    old_name = old_name.val().toLowerCase();
 	    condition_result_var = true;
 	    {% if node %}
 	    	if(name == old_name){

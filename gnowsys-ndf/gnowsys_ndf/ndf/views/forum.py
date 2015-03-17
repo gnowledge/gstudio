@@ -240,7 +240,7 @@ def create_forum(request,group_id):
         # return render_to_response("ndf/forumdetails.html",variables)
 
     # getting all the GSystem of forum to provide autocomplete/intellisence of forum names
-    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
     for each in available_nodes:
@@ -354,7 +354,7 @@ def edit_forum(request,group_id,forum_id):
         # return render_to_response("ndf/forumdetails.html",variables)
 
     # getting all the GSystem of forum to provide autocomplete/intellisence of forum names
-    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
     for each in available_nodes:

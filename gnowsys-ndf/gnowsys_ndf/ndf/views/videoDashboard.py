@@ -166,7 +166,7 @@ def video_edit(request,group_id,_id):
 
 
         return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
-    vid_col = node_collection.find({'member_of': GST_VIDEO._id})
+    vid_col = node_collection.find({'member_of': GST_VIDEO._id,'group_set': ObjectId(group_id)})
     nodes_list = []
     for each in vid_col:
       nodes_list.append(str((each.name).strip().lower()))
