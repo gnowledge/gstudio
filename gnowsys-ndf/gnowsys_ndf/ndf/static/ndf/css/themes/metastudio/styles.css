@@ -9312,7 +9312,7 @@ main > aside > div footer label {
 }
 /* line 238, ../../../scss/_metastudio_styles.scss */
 main > aside > div a, main > aside > div p {
-  color: white;
+  /*color: white;*/
 }
 /* line 240, ../../../scss/_metastudio_styles.scss */
 main > aside > div a:hover, main > aside > div p:hover {
