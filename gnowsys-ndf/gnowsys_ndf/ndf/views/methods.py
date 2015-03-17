@@ -2803,13 +2803,28 @@ def parse_data(doc):
 	                              user = User.objects.get(id = userid)
 	                              if user:
 	                                 new_str = new_str + "User" +":" + str(user.get_username()) + "  " + "Score" + str (score) + "\n"
-	                                 
 	     if not doc[i]:
-	        doc[i] = "-"
+	              doc[i] = ""
 	     else:
-	        doc[i] = new_str                     
+	              doc[i] = new_str                     
+          elif i == "location":
+              coordinates = []
+              parsed_string = ""
+              for j in doc[i]:
+                 coordinates = j['geometry']['coordinates']
+              if  coordinates:
+                   for j in coordinates:
+                      if parsed_string:
+                        parsed_string =   str(parsed_string)  + "," + str(j)
+                      else:
+                        parsed_string =   str(j)  
+              if not doc[i]:
+                   doc[i] = ""
+              else:
+                   doc[i] = parsed_string
+                 
           elif not doc[i]:
-             doc[i] = "-"
+             doc[i] = ""
          
 
           

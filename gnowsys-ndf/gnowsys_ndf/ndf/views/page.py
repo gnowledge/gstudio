@@ -404,6 +404,7 @@ def version_node(request, group_id, node_id, version_no):
        
         for i in node1:
            try:
+           
                s=d.diff_compute(str(doc[i]),str(doc1[i]),True)
                l=diff_prettyHtml(s)
                node1[i]=l
