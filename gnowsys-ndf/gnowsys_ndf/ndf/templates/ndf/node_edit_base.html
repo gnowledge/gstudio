@@ -862,7 +862,7 @@ $(document).ready(function(){
 	});
 
 
-	$("#save-node").click(function() {
+	$("#save-node").click(function(event) {
                       
       	pn_arr = []
 		cn_arr = []
@@ -870,7 +870,7 @@ $(document).ready(function(){
 		tch_arr=[]  // for teaches
 		assess_arr=[] // for assesses		
 
- 		$(".node_id").each(function (event){
+ 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());
 			}
@@ -899,7 +899,7 @@ $(document).ready(function(){
 
 	    var name = $("#name_id").val().trim().toLowerCase();
 	    var nodes = {{nodes_list|safe}} 
-	    old_name = old_name.val().toLowerCase();
+	    old_name = old_name.toLowerCase();
 	    condition_result_var = true;
 	    {% if node %}
 	    	if(name == old_name){
