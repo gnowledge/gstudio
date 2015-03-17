@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.org2any import org2html
 
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_published_version_dict,parse_data
 
-from gnowsys_ndf.ndf.views.html_diff import *
+from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 

@@ -2766,9 +2766,9 @@ def parse_data(doc):
   date_typelist = ['last_update','created_at']
   objecttypelist = ['member_of']
   languagelist = ['language']
-        
   for i in doc:
-          
+           
+           
           if i in user_idlist:
              if type(doc[i]) == list :
                       temp =   ""
@@ -2793,8 +2793,26 @@ def parse_data(doc):
           elif i in objecttypelist:
                for j in doc[i]:
                    node = node_collection.one({"_id":ObjectId(j)})
-                   
                    doc[i] = node.name
+          elif i == "rating":
+             
+             for k in doc[i]:
+                new_str = ""
+                userid = k['user_id']
+                score = k['score']
+                if User.objects.filter(id = userid).exists():
+	                              user = User.objects.get(id = userid)
+	                              if user:
+	                                 new_str = "User" +":" + str(user.get_username()) + "  " + "Score" + str (score)
+	                                 rating_list = new_str 
+	     if not doc[i]:
+	        doc[i] = "-"
+	     else:
+	        doc[i] = rating_list                     
+          elif not doc[i]:
+             doc[i] = "-"
+         
+
           
 
 def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
@@ -3659,3 +3677,5 @@ def delete_node(
         delete_status_message = "Error (from delete_node) :-\n" + str(e)
         return (False, delete_status_message)
 
+
+          
