@@ -929,17 +929,32 @@ def convert_pdf_thumbnail(files,_id):
 
 def convert_mid_size_image(files):
     """
-    convert image into mid size image image 500*300
+    convert image into mid size image w.r.t. max width of 500
     """
     files.seek(0)
     mid_size_img = StringIO()
-    size = (500, 300)
+    size = (500, 300)  # (width, height)
     img = Image.open(StringIO(files.read()))
-    img = img.resize(size, Image.ANTIALIAS)
-    img.save(mid_size_img, "JPEG")
-    mid_size_img.seek(0)
-    return mid_size_img
-    
+    # img = img.resize(size, Image.ANTIALIAS)
+    # img.save(mid_size_img, "JPEG")
+    # mid_size_img.seek(0)
+
+    if (img.size > size) or (img.size[0] >= size[0]):
+      # both width and height are more than width:500 and height:300
+      # or
+      # width is more than width:500
+      factor = img.size[0]/500.00
+      img = img.resize((500, int(img.size[1] / factor)), Image.ANTIALIAS)
+      img.save(mid_size_img, "JPEG")
+      mid_size_img.seek(0)
+      return mid_size_img
+
+    elif (img.size <= size) or (img.size[0] <= size[0]): 
+      # both width and height are less than width:500 and height:300
+      # or
+      # width is lesser than width:500
+      return files.seek(0)
+
     
 def convertVideo(files, userid, fileobj, filename):
     """
