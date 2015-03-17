@@ -29,8 +29,9 @@ from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields, get_page
-from gnowsys_ndf.ndf.views.methods import get_resource_type, diff_string, get_node_metadata, create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_published_version_dict,parse_data
+
+from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
@@ -385,7 +386,9 @@ def version_node(request, group_id, node_id, version_no):
     node = node_collection.one({"_id": ObjectId(node_id)})
     node1 = node_collection.one({"_id": ObjectId(node_id)})
     fp = history_manager.get_file_path(node)
-
+    listform = ['modified_by','created_by','last_update','name','content','contributors','rating','location','access_policy',
+                'type_of','status','tags','language','member_of','url','created_at','author_set']
+    versions= get_published_version_dict(request,node)
     if request.method == "POST":
         view = "compare"
 
@@ -395,7 +398,10 @@ def version_node(request, group_id, node_id, version_no):
 	selected_versions = {"1": version_1, "2": version_2}
    	doc=history_manager.get_version_document(node,version_1)
 	doc1=history_manager.get_version_document(node,version_2)     
-        
+        parse_data(doc)
+        parse_data(doc1)
+        difference = htmldiff(doc['content'],doc1['content'])
+       
         for i in node1:
 	   try:
     
@@ -404,34 +410,45 @@ def version_node(request, group_id, node_id, version_no):
 	       node1[i]=l
            except:
                 node1[i]=node1[i]		       
-           
-        
-    
         content = node1
+        new_content = difference.replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
+        new_content = new_content.replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        content['content'] = new_content
         content_1=doc
-        
+        new_content = []
+        new_content1= []
+        for i in listform:
+           new_content.append({i:content[i]})
+           new_content1.append({i:str(content_1[i])})
+        content =  new_content
+        content_1 =  new_content1
         
 	
     else:
         view = "single"
 
         # Retrieve rcs-file for a given version-number
-        rcs.checkout((fp, version_no))
+        #rcs.checkout((fp, version_no))
 
         # Copy content from rcs-version-file
         data = None
-        with open(fp, 'r') as sf:
-            data = sf.read()
-
+        #with open(fp, 'r') as sf:
+        #    data = sf.read()
+        
         # Used json.loads(x) -- to covert string to dictionary object
         # If want to use key from this converted dictionay, use array notation because dot notation doesn't works!
-        data = json.loads(data)
-
+        #data = json.loads(data)
         # Remove retrieved rcs-file belonging to the given version-number
-        rcs.checkin(fp)
-
+        #rcs.checkin(fp)
+        data = history_manager.get_version_document(node,version_no)
+        parse_data(data)
+        new_content = []
         selected_versions = {"1": version_no, "2": ""}
-        content = data
+        for i in listform:
+           new_content.append({i:data[i]})
+        content =  new_content
+        
+        #content = data
         content_1='none'
     return render_to_response("ndf/version_page.html",
                               {'view': view,
@@ -442,6 +459,7 @@ def version_node(request, group_id, node_id, version_no):
                                'selected_versions': selected_versions,
                                'content': content,
                                'content1':content_1,
+                               'publishedversions':versions
                                
                               },
                               context_instance = RequestContext(request)
@@ -457,26 +475,34 @@ def diff_prettyHtml(diffs):
     Returns:
       HTML representation.
     """
+    openingtags = ['<a>','li','<div>','<ol>']
+    closingtags = ['</a>','</li>','</div>','</ol>']
     html = []
     DIFF_DELETE = -1
     DIFF_INSERT = 1
     DIFF_EQUAL = 0
     i = 0
+      
     for (op, data) in diffs:
-      text = (data.replace("&", "&amp;").replace("<", "&lt;")
-                 .replace(">", "&gt;").replace("\n", "<BR>"))
+      text = (data.replace("&", "&amp;").replace("&lt;", "<")
+                 .replace("&gt;", ">").replace("\n", "<br>"))
+      
+      
       if op == DIFF_INSERT:
-        html.append("<INS STYLE=\"background:#b3ffb3;\" TITLE=\"i=%i\">%s</INS>"
-            % (i, text))
+        html.append("<INS STYLE=background:#b3ffb3;> %s</INS>"
+            % ( text))
       elif op == DIFF_DELETE:
-        html.append("<DEL STYLE=\"background:#ffb3b3;\" TITLE=\"i=%i\">%s</DEL>"
-            % (i, text))
+        html.append("<DEL STYLE=background:#ffb3b3; >%s</DEL>"
+            % ( text))
       elif op == DIFF_EQUAL:
-        html.append("<SPAN TITLE=\"i=%i\">%s</SPAN>" % (i, text))
+        html.append("<SPAN >%s</SPAN>" % ( text))
       if op != DIFF_DELETE:
         i += len(data)
     return "".join(html)
-
+def text_holder(string):
+  comp_string.append(string)
+  
+  return "".join(comp_string)    
 
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
@@ -684,8 +710,6 @@ def revert_doc(request,group_id,node_id,version_1):
    node = node_collection.one({'_id': ObjectId(node_id)})
    group = node_collection.one({'_id': ObjectId(group_id)})
    doc=history_manager.get_version_document(node,version_1)
-   
-   print node
    
    for attr in node:
       if attr != '_type':

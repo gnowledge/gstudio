@@ -700,6 +700,7 @@ def get_nroer_menu(request, group_name):
 @register.assignment_tag
 def get_site_name_from_settings():
 	# print "GSTUDIO_SITE_NAME : ", GSTUDIO_SITE_NAME
+	print "site name",GSTUDIO_SITE_NAME
 	return GSTUDIO_SITE_NAME
 
 
