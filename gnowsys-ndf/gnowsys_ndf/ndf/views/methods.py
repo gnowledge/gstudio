@@ -2741,6 +2741,79 @@ def create_college_group_and_setup_data(college_node):
 
     return gfc, gr_gfc
 
+def get_published_version_dict(request,document_object):
+        """Returns the dictionary containing the list of revision numbers of published nodes.
+        """
+        published_node_version = []
+        rcs = RCS()
+        fp = history_manager.get_file_path(document_object)
+        cmd= 'rlog  %s' % \
+	      (fp)
+        rev_no =""
+        proc1=subprocess.Popen(cmd,shell=True,
+				stdout=subprocess.PIPE)
+        for line in iter(proc1.stdout.readline,b''):
+            if line.find('revision')!=-1 and line.find('selected') == -1:
+                  rev_no=string.split(line,'revision')
+                  rev_no=rev_no[1].strip( '\t\n\r')
+                  rev_no=rev_no.strip(' ')
+            if line.find('PUBLISHED')!=-1:
+                   published_node_version.append(rev_no)      
+        return published_node_version
+def parse_data(doc):
+  '''Section to parse node '''
+  user_idlist = ['modified_by','created_by','author_set','contributors']
+  date_typelist = ['last_update','created_at']
+  objecttypelist = ['member_of']
+  languagelist = ['language']
+  for i in doc:
+           
+           
+          if i in user_idlist:
+             if type(doc[i]) == list :
+                      temp =   ""
+                      for userid in doc[i]:
+                      		  if User.objects.filter(id = userid).exists():
+	                              user = User.objects.get(id = userid)
+	                              if user:
+	                                user_name = user.get_username
+	                                if temp:
+	                                        temp =temp  + "," + (user.get_username() ) 
+	                                else:
+	                                        temp = str(user.get_username())        
+	              doc[i] = temp            
+             else: 
+                      
+                      		  if User.objects.filter(id = doc[i]).exists():
+	                              user = User.objects.get(id = doc[i])
+	                              if user:
+	                                doc[i] = user.get_username()
+          elif i in date_typelist:
+              doc[i] = datetime.strftime(doc[i],"%d %B %Y %H:%M")
+          elif i in objecttypelist:
+               for j in doc[i]:
+                   node = node_collection.one({"_id":ObjectId(j)})
+                   doc[i] = node.name
+          elif i == "rating":
+             
+             for k in doc[i]:
+                new_str = ""
+                userid = k['user_id']
+                score = k['score']
+                if User.objects.filter(id = userid).exists():
+	                              user = User.objects.get(id = userid)
+	                              if user:
+	                                 new_str = "User" +":" + str(user.get_username()) + "  " + "Score" + str (score)
+	                                 rating_list = new_str 
+	     if not doc[i]:
+	        doc[i] = "-"
+	     else:
+	        doc[i] = rating_list                     
+          elif not doc[i]:
+             doc[i] = "-"
+         
+
+          
 
 def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
     """This function deletes GAttribute node(s) of Triples collection.
@@ -3603,3 +3676,6 @@ def delete_node(
     except Exception as e:
         delete_status_message = "Error (from delete_node) :-\n" + str(e)
         return (False, delete_status_message)
+
+
+          
