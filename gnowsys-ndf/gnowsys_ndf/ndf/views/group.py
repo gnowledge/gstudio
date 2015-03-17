@@ -260,7 +260,7 @@ def create_group(request,group_id):
         shelves = []
 
     return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'appId':app._id,'node':colg,'user':request.user,
-                                                         'groupid':group_id,'group_id':group_id,
+                                                         'groupid':colg._id,'group_id':colg._id,
                                                          'shelf_list': shelf_list,'shelves': shelves
                                                         },context_instance=RequestContext(request))
 
@@ -670,7 +670,7 @@ def create_sub_group(request,group_id):
                   shelves = []
 
           return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'appId':app._id,'node':colg,'user':request.user,
-                                                         'groupid':group_id,'group_id':group_id,
+                                                         'groupid':colg._id,'group_id':colg._id,
                                                          'shelf_list': shelf_list,'shelves': shelves
                                                         },context_instance=RequestContext(request))
       available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
