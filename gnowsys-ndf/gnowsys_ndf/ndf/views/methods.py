@@ -2795,20 +2795,19 @@ def parse_data(doc):
                    node = node_collection.one({"_id":ObjectId(j)})
                    doc[i] = node.name
           elif i == "rating":
-             
+             new_str = ""
              for k in doc[i]:
-                new_str = ""
                 userid = k['user_id']
                 score = k['score']
                 if User.objects.filter(id = userid).exists():
 	                              user = User.objects.get(id = userid)
 	                              if user:
-	                                 new_str = "User" +":" + str(user.get_username()) + "  " + "Score" + str (score)
-	                                 rating_list = new_str 
+	                                 new_str = new_str + "User" +":" + str(user.get_username()) + "  " + "Score" + str (score) + "\n"
+	                                 
 	     if not doc[i]:
 	        doc[i] = "-"
 	     else:
-	        doc[i] = rating_list                     
+	        doc[i] = new_str                     
           elif not doc[i]:
              doc[i] = "-"
          

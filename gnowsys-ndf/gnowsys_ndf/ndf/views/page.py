@@ -394,24 +394,23 @@ def version_node(request, group_id, node_id, version_no):
 
         version_1 = request.POST["version_1"]
         version_2 = request.POST["version_2"]
-        diff = get_html_diff(fp, version_1, version_2)
-	selected_versions = {"1": version_1, "2": version_2}
-   	doc=history_manager.get_version_document(node,version_1)
-	doc1=history_manager.get_version_document(node,version_2)     
+        #diff = get_html_diff(fp, version_1, version_2)
+        selected_versions = {"1": version_1, "2": version_2}
+        doc=history_manager.get_version_document(node,version_1)
+        doc1=history_manager.get_version_document(node,version_2)     
         parse_data(doc)
         parse_data(doc1)
-        difference = htmldiff(doc['content'],doc1['content'])
+        content_difference = htmldiff(doc['content'],doc1['content'])
        
         for i in node1:
-	   try:
-    
-    	       s=d.diff_compute(str(doc[i]),str(doc1[i]),True)
+           try:
+               s=d.diff_compute(str(doc[i]),str(doc1[i]),True)
                l=diff_prettyHtml(s)
-	       node1[i]=l
+               node1[i]=l
            except:
                 node1[i]=node1[i]		       
         content = node1
-        new_content = difference.replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
+        new_content = content_difference.replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
         new_content = new_content.replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
         content['content'] = new_content
         content_1=doc
@@ -422,24 +421,9 @@ def version_node(request, group_id, node_id, version_no):
            new_content1.append({i:str(content_1[i])})
         content =  new_content
         content_1 =  new_content1
-        
-	
     else:
         view = "single"
-
-        # Retrieve rcs-file for a given version-number
-        #rcs.checkout((fp, version_no))
-
-        # Copy content from rcs-version-file
         data = None
-        #with open(fp, 'r') as sf:
-        #    data = sf.read()
-        
-        # Used json.loads(x) -- to covert string to dictionary object
-        # If want to use key from this converted dictionay, use array notation because dot notation doesn't works!
-        #data = json.loads(data)
-        # Remove retrieved rcs-file belonging to the given version-number
-        #rcs.checkin(fp)
         data = history_manager.get_version_document(node,version_no)
         parse_data(data)
         new_content = []
@@ -475,8 +459,6 @@ def diff_prettyHtml(diffs):
     Returns:
       HTML representation.
     """
-    openingtags = ['<a>','li','<div>','<ol>']
-    closingtags = ['</a>','</li>','</div>','</ol>']
     html = []
     DIFF_DELETE = -1
     DIFF_INSERT = 1
