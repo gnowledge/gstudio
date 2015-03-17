@@ -31,8 +31,7 @@ from gnowsys_ndf.ndf.org2any import org2html
 
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_published_version_dict,parse_data
 
-from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
-
+from gnowsys_ndf.ndf.views.html_diff import *
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
@@ -401,7 +400,8 @@ def version_node(request, group_id, node_id, version_no):
 	doc1=history_manager.get_version_document(node,version_2)     
         parse_data(doc)
         parse_data(doc1)
-        
+        difference = htmldiff(doc['content'],doc1['content'])
+       
         for i in node1:
 	   try:
     
@@ -410,18 +410,19 @@ def version_node(request, group_id, node_id, version_no):
 	       node1[i]=l
            except:
                 node1[i]=node1[i]		       
-           
         content = node1
+        new_content = difference.replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
+        new_content = new_content.replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        content['content'] = new_content
         content_1=doc
         new_content = []
+        new_content1= []
         for i in listform:
            new_content.append({i:content[i]})
+           new_content1.append({i:str(content_1[i])})
         content =  new_content
-        new_content = []
-        for i in listform:
-           new_content.append({i:str(content_1[i])})
-        content_1 =  new_content
-
+        content_1 =  new_content1
+        
 	
     else:
         view = "single"
@@ -474,26 +475,34 @@ def diff_prettyHtml(diffs):
     Returns:
       HTML representation.
     """
+    openingtags = ['<a>','li','<div>','<ol>']
+    closingtags = ['</a>','</li>','</div>','</ol>']
     html = []
     DIFF_DELETE = -1
     DIFF_INSERT = 1
     DIFF_EQUAL = 0
     i = 0
+      
     for (op, data) in diffs:
       text = (data.replace("&", "&amp;").replace("&lt;", "<")
-                 .replace("&gt;", ">").replace("\n", "<BR>"))
+                 .replace("&gt;", ">").replace("\n", "<br>"))
+      
+      
       if op == DIFF_INSERT:
-        html.append("<INS STYLE='background:#b3ffb3;' TITLE='i=%i'>%s</INS>"
-            % (i, text))
+        html.append("<INS STYLE=background:#b3ffb3;> %s</INS>"
+            % ( text))
       elif op == DIFF_DELETE:
-        html.append("<DEL STYLE='background:#ffb3b3;' TITLE='i=%i'>%s</DEL>"
-            % (i, text))
+        html.append("<DEL STYLE=background:#ffb3b3; >%s</DEL>"
+            % ( text))
       elif op == DIFF_EQUAL:
-        html.append("<SPAN TITLE='i=%i'>%s</SPAN>" % (i, text))
+        html.append("<SPAN >%s</SPAN>" % ( text))
       if op != DIFF_DELETE:
-        i += len(data) 
+        i += len(data)
     return "".join(html)
-
+def text_holder(string):
+  comp_string.append(string)
+  
+  return "".join(comp_string)    
 
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
