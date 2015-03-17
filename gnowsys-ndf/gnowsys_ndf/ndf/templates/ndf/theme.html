@@ -22,117 +22,168 @@
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
   
   <script type="text/javascript">
-    $(document).ready(function() {
-    	$(function() {
-    		
-    		var $tree = $('.themes');
-    		var user = "{{user.is_authenticated}}";
-    		var unfold = "{{unfold}}";
 
-    		if(unfold == "true"){
-    			unfold = true
-    		}
-    		else{
-    			unfold = false
-    		}
+  	$(document).ready(function() {
 
-			$tree.tree({
-    			autoOpen: unfold,
 
-        		onCreateLi: function(node, $li) {
-						
-					if (node.node_type == "Topic"){
-						$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
-					}
-					else{
-						$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:orange"></span> &nbsp;');				        		
-					}
+      // Funtion for loading tree for showing collection list left side panel
+      doc();
 
-        			if (user == "True")
-        			{   
-        				if (node.node_type == "Topic"){
-        					$li.find('.jqtree-element').append(
-	        					{% user_access_policy groupid request.user as user_access %}
-	        					{% if user_access == "allow" %}
+      // Function for manipulating tree when user visits to page directly via browser url
+      {% if selected %}
+      	TreeTillNode();
+      {% endif %}
 
-	                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
-
-	                			{% endif %}
-	            			);	            			
-
-        				}
-        				else{
-        					
-        					$li.find('.jqtree-element').append(
-	        					{% user_access_policy groupid request.user as user_access %}
-	        					{% if user_access == "allow" %}
-
-	                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
-	                			
-	                			{% endif %}
-            				);
-
-        				}
-        					
-        			}           		
-
-        		}
-
-    		});
-			
-    		// bind 'tree.click' event
-			$tree.bind(
-			    'tree.click',
-			    function(event) {
-			        // The clicked node is 'event.node'
-			        var node = event.node;
-			        
-			        // If its topic node i.e no children of this node then show the detail view for topic
-			  		if( node.children[0] == null ){
-
-			  			if (node.node_type == "Topic"){
-			  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";
-
-			  			}
-				        
-			  		}
-			  		
-			    }
-			);
-
-			$tree.bind(
-			    'tree.contextmenu',
-			    function(event) {
-			        // The clicked node is 'event.node'
-			        var node = event.node;
-			        {% user_access_policy groupid request.user as user_access %}
-	        		{% if user_access == "allow" %}
-				        var msg = confirm("Do you want to delete this topic ?");
-				        if (msg == true) {
-
-				        	$.ajax({
-				            	url: "{% url 'delete_themes' groupid %}",
-				             	type: 'POST',
-				             	data:{
-				             		deleteobj: node.id,
-				             		csrfmiddlewaretoken: '{{ csrf_token }}'
-				             	},
-				             	success: function(result){
-				             		alert("Topic "+node.name+" deleted successfully");
-				             		location.reload(true);
-				             	},
-				             	
-				            });
-
-						}
-					{% endif %} 
-
-			    }
-			);
-                     
-
-    	});
     });
+
+
+  	function TreeTillNode () {
+      // This gives the last hierarchy node id from browser url.
+      var url = "{{selected}}";
+
+	  var tree_build = $(".themes").not(".jqtree-loading");
+  	  var node = tree_build.tree('getNodeById', url);
+  	  tree_build.tree('selectNode', node);
+      
+      // Javascript function to be used for checking objects in specific time of interval
+      setTimeout(function(){
+        // console.log($(".themes"))
+        if( ($(".themes").length > 0) ) { TreeTillNode() }
+      }, 100 );
+    
+    }
+
+
+	function doc() {
+		
+		var $tree = $('.themes');
+		var user = "{{user.is_authenticated}}";
+		var unfold = "{{unfold}}";
+
+		if(unfold == "true"){
+			unfold = true
+		}
+		else{
+			unfold = false
+		}
+
+		$tree.tree({
+			autoOpen: unfold,
+
+    		onCreateLi: function(node, $li) {
+					
+				if (node.node_type == "Topic"){
+					$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
+				}
+				else{
+					$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:orange"></span> &nbsp;');				        		
+				}
+
+    			if (user == "True")
+    			{   
+    				if (node.node_type == "Topic"){        					
+
+    					$li.find('.jqtree-element').append(
+        					{% user_access_policy groupid request.user as user_access %}
+        					{% if user_access == "allow" %}
+
+                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
+
+                			{% endif %}
+            			);	            			
+
+    				}
+    				else{
+    					
+    					$li.find('.jqtree-element').append(
+        					{% user_access_policy groupid request.user as user_access %}
+        					{% if user_access == "allow" %}
+
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+                			
+                			{% endif %}
+        				);
+
+    				}
+    					
+    			}           		
+
+    		}
+
+		});
+		
+		// bind 'tree.click' event
+		$tree.bind(
+		    'tree.click',
+		    function(event) {
+		        // The clicked node is 'event.node'
+		        var node = event.node;
+
+		        var parent_arr = [];
+	            var parent_node = node;
+	            parent_arr.push(node.id);
+
+	            // Bellow code manipulates the parent hierarchy of clicked node in a tree
+	            while (parent_node) {
+	                if (parent_node.name !== undefined){           
+	                  $tree.tree('openNode', parent_node);
+	                  parent_node = parent_node.parent;
+	                  if (parent_node.name !== undefined){
+	                    parent_arr.push(parent_node.id);                                          
+	                  }
+	                }
+	                else{
+	                  break;
+	                }
+	            }
+	            var nav_list = parent_arr.reverse();
+		        // alert(nav_list);
+
+		        // If its topic node i.e no children of this node then show the detail view for topic
+		  		if( node.children[0] == null ){
+
+		  			if (node.node_type == "Topic"){
+		  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"?nav_li="+nav_list+"";
+
+		  			}
+			        
+		  		}
+		  		
+		    }
+		);
+
+		$tree.bind(
+		    'tree.contextmenu',
+		    function(event) {
+		        // The clicked node is 'event.node'
+		        var node = event.node;
+		        {% user_access_policy groupid request.user as user_access %}
+        		{% if user_access == "allow" %}
+			        var msg = confirm("Do you want to delete this topic ?");
+			        if (msg == true) {
+
+			        	$.ajax({
+			            	url: "{% url 'delete_themes' groupid %}",
+			             	type: 'POST',
+			             	data:{
+			             		deleteobj: node.id,
+			             		csrfmiddlewaretoken: '{{ csrf_token }}'
+			             	},
+			             	success: function(result){
+			             		alert("Topic "+node.name+" deleted successfully");
+			             		location.reload(true);
+			             	},
+			             	
+			            });
+
+					}
+				{% endif %} 
+
+		    }
+		);
+                 
+
+	};
 
   </script>
 
