@@ -131,7 +131,7 @@ background:#b3ffb3;
 a={{content|safe}}
 
 $('#compare-view').append("<table id='new' width='700'  </table>")
-$('#new').append("<thead> <th> Feild </th> <th> Value </th> <th> Feild </th> <th> Value </th>  </thead>")
+$('#new').append("<thead> <th> Feild </th> <th> Value </th>  <th> Compared  </th>  </thead>")
 
 
 a1 = {{content1|safe}}
@@ -147,7 +147,7 @@ $.each(a1,function(k,g)
     });
         t = a.pop(k)
         $.each(t,function(c,v){
-        $('#rows' + k).append("<td style='vertical-align: top;'> " + c.toUpperCase().replace('_',' ')   + "</td> <td style='vertical-align: top;'> " + v + "</td> </tr>")
+        $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
          });
    
 });
