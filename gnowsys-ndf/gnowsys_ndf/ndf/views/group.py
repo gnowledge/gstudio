@@ -194,7 +194,7 @@ def create_group(request,group_id):
     colg = node_collection.collection.Group()
     Mod_colg = node_collection.collection.Group()
 
-    cname=request.POST.get('groupname', "")
+    cname=request.POST.get('groupname', "").strip()
     colg.altnames=cname
     colg.name = unicode(cname)
     colg.member_of.append(gst_group._id)

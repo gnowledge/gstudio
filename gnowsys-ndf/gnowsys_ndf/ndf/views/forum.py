@@ -149,7 +149,7 @@ def create_forum(request,group_id):
 
         colf = node_collection.collection.GSystem() # creating new/empty GSystem object
 
-        name = unicode(request.POST.get('forum_name',"")) # forum name
+        name = unicode(request.POST.get('forum_name',"")).strip() # forum name
         colf.name = name
         
         content_org = request.POST.get('content_org',"") # forum content
@@ -276,7 +276,7 @@ def edit_forum(request,group_id,forum_id):
 
         colf = node_collection.one({'_id':ObjectId(forum_id)}) # creating new/empty GSystem object
 
-        name = unicode(request.POST.get('forum_name',"")) # forum name
+        name = unicode(request.POST.get('forum_name',"")).strip() # forum name
         colf.name = name
         
         content_org = request.POST.get('content_org',"") # forum content

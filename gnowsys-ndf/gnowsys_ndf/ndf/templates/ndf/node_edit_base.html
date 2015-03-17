@@ -498,6 +498,7 @@ $(document).ready(function(){
 	} 
 	{% if node %}
 		old_name = "{{node.name}}"
+	    old_name = old_name.toLowerCase();
 		{% if is_auth_node %}
 			$("#name_id").attr("disabled",true)
 		{% endif %}
@@ -899,7 +900,6 @@ $(document).ready(function(){
 
 	    var name = $("#name_id").val().trim().toLowerCase();
 	    var nodes = {{nodes_list|safe}} 
-	    old_name = old_name.toLowerCase();
 	    condition_result_var = true;
 	    {% if node %}
 	    	if(name == old_name){
@@ -909,7 +909,6 @@ $(document).ready(function(){
 	    		condition_result_var = true;
 	    	}
 	    {% endif %}
-
     	if (condition_result_var && name != "")
 	    {
 	      if (nodes.indexOf(name) != -1)  
