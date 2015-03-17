@@ -870,7 +870,7 @@ $(document).ready(function(){
 		tch_arr=[]  // for teaches
 		assess_arr=[] // for assesses		
 
- 		$(".node_id").each(function (){
+ 		$(".node_id").each(function (event){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());
 			}
