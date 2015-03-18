@@ -1,31 +1,27 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-import json
-from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-
-from django_mongokit import get_database
 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
-from gnowsys_ndf.ndf.models import Node, GSystemType, GSystem
+from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import HistoryManager
+from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
@@ -35,13 +31,10 @@ from gnowsys_ndf.ndf.views.methods import get_node_metadata, set_all_urls
 
 #######################################################################################################################################
 
-db = get_database()
-
-collection = db[Node.collection_name]
-gst_quiz = collection.Node.one({'_type': u'GSystemType', 'name': GAPPS[6]})
+gst_quiz = node_collection.one({'_type': u'GSystemType', 'name': GAPPS[6]})
 history_manager = HistoryManager()
 rcs = RCS()
-app = collection.Node.one({'_type': u'GSystemType', 'name': GAPPS[6]})
+app = gst_quiz
 
 #######################################################################################################################################
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
@@ -52,27 +45,27 @@ def quiz(request, group_id, app_id=None):
     """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else :
         pass
     if app_id is None:
-        app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Quiz"})
+        app_ins = node_collection.find_one({'_type':"GSystemType", "name":"Quiz"})
         if app_ins:
             app_id = str(app_ins._id)
     if gst_quiz._id == ObjectId(app_id):
         title = gst_quiz.name
-        quiz_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        quiz_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         quiz_nodes.sort('last_update', -1)
         quiz_nodes_count = quiz_nodes.count()
-        gst_quiz_item_id = collection.Node.one({'_type': 'GSystemType', 'name': u'QuizItem'})._id
-        quiz_item_nodes = collection.Node.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        gst_quiz_item_id = node_collection.one({'_type': 'GSystemType', 'name': u'QuizItem'})._id
+        quiz_item_nodes = node_collection.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         quiz_item_nodes.sort('last_update', -1)
         quiz_item_nodes_count = quiz_item_nodes.count()
 	#quiz_node.get_neighbourhood(quiz_node.member_of)
@@ -88,7 +81,7 @@ def quiz(request, group_id, app_id=None):
         )
 
     else:
-        node = collection.Node.one({"_id": ObjectId(app_id)})
+        node = node_collection.one({"_id": ObjectId(app_id)})
 
         title = gst_quiz.name
 
@@ -120,17 +113,17 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else :
         pass
-    gst_quiz_item = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})
+    gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
 
     context_variables = { 'title': gst_quiz_item.name,
                           'quiz_type_choices': QUIZ_TYPE_CHOICES,
@@ -143,19 +136,19 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     quiz_item_node = None
 
     if node_id:
-        node = collection.Node.one({'_id': ObjectId(node_id)})
+        node = node_collection.one({'_id': ObjectId(node_id)})
 
         if gst_quiz._id in node.member_of:
             # Add question from a given Quiz category's context
             quiz_node = node
-            quiz_item_node = collection.GSystem()
+            quiz_item_node = node_collection.collection.GSystem()
 
         else:
             # Edit a question
             quiz_item_node = node
     else:
         # Add miscellaneous question
-        quiz_item_node = collection.GSystem()
+        quiz_item_node = node_collection.collection.GSystem()
 
 
     if request.method == "POST":
@@ -173,10 +166,10 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         if usrid not in quiz_item_node.contributors:
             quiz_item_node.contributors.append(usrid)
 
-        group_object=collection.Group.one({'_id':ObjectId(group_id)})
+        group_object = node_collection.one({'_id': ObjectId(group_id)})
         if group_object._id not in quiz_item_node.group_set:
             quiz_item_node.group_set.append(group_object._id)
-        user_group_object=collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+        user_group_object = node_collection.one({'_type': u'Group', 'name': usrname})
         if user_group_object:
             if user_group_object._id not in quiz_item_node.group_set:
                 quiz_item_node.group_set.append(user_group_object._id)
@@ -255,12 +248,12 @@ def create_edit_quiz(request, group_id, node_id=None):
     """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
     else :
@@ -271,9 +264,9 @@ def create_edit_quiz(request, group_id, node_id=None):
                       }
 
     if node_id:
-        quiz_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
+        quiz_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
-        quiz_node = collection.GSystem()
+        quiz_node = node_collection.collection.GSystem()
 
     if request.method == "POST":
 

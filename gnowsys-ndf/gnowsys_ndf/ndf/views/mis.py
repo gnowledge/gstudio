@@ -22,12 +22,14 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.organization import *
 from gnowsys_ndf.ndf.views.course import *
 from gnowsys_ndf.ndf.views.person import *
 from gnowsys_ndf.ndf.views.enrollment import *
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 collection = get_database()[Node.collection_name]
+
 @get_execution_time
 def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
@@ -36,12 +38,12 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
     auth = None
     if ObjectId.is_valid(group_id) is False :
-      group_ins = collection.Node.one({'_type': "Group","name": group_id})
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      group_ins = node_collection.one({'_type': "Group","name": group_id})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if group_ins:
         group_id = str(group_ins._id)
       else :
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :
           group_id = str(auth._id)
     else :
@@ -49,11 +51,11 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
     app = None
     if app_id is None:
-      app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+      app = node_collection.one({'_type': "GSystemType", 'name': app_name})
       if app:
         app_id = str(app._id)
     else:
-      app = collection.Node.one({'_id': ObjectId(app_id)})
+      app = node_collection.one({'_id': ObjectId(app_id)})
 
     app_name = app.name 
 
@@ -87,28 +89,28 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
     if request.user.id:
       if auth is None:
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
 
       agency_type = auth.agency_type
-      agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+      agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
       if agency_type_node:
         for eachset in agency_type_node.collection_set:
-          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
     # for eachset in app.collection_set:
-    #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
-      # app_set = collection.Node.find_one({"_id":eachset})
+    #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+      # app_set = node_collection.find_one({"_id":eachset})
       # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
-      app_set = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+      app_set = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
       
       view_file_extension = ".py"
       app_set_view_file_name = ""
       app_set_view_file_path = ""
 
       if app_set.type_of:
-        app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
+        app_set_type_of = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
 
         app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
         # print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
@@ -130,16 +132,16 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       app_set_template = "yes"
       template = "ndf/"+template_prefix+"_list.html"
 
-      systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+      systemtype = node_collection.find_one({"_id":ObjectId(app_set_id)})
       systemtype_name = systemtype.name
       title = systemtype_name
 
       if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}, {'name': 1}).sort('name', 1))
+        nodes = list(node_collection.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}, {'name': 1}).sort('name', 1))
       else :
-        nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}, {'name': 1}).sort('name', 1))
+        nodes = list(node_collection.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}, {'name': 1}).sort('name', 1))
 
       nodes_keys = [('name', "Name")]
       # nodes_dict = []
@@ -151,15 +153,15 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       template = "ndf/"+template_prefix+"_list.html"
       title = app_name
 
-      university_gst = collection.Node.one({'_type': "GSystemType", 'name': "University"})
-      student_gst = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+      university_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+      student_gst = node_collection.one({'_type': "GSystemType", 'name': "Student"})
 
-      mis_admin = collection.Node.one(
+      mis_admin = node_collection.one(
           {'_type': "Group", 'name': "MIS_admin"},
           {'_id': 1}
       )
 
-      university_cur = collection.Node.find(
+      university_cur = node_collection.find(
         {'member_of': university_gst._id, 'group_set': mis_admin._id},
         {'name': 1, 'relation_set.affiliated_college': 1}
       ).sort('name', 1)
@@ -171,7 +173,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
             affiliated_college_ids_list = rel["affiliated_college"]
             break
 
-        students_cur = collection.Node.find(
+        students_cur = node_collection.find(
           {
             'member_of': student_gst._id,
             'relation_set.student_belongs_to_college': {'$in': affiliated_college_ids_list}
@@ -188,19 +190,19 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         app_set_template = ""
         systemtype_attributetype_set = []
         systemtype_relationtype_set = []
-        system = collection.Node.find_one({"_id":ObjectId(app_set_instance_id)})
-        systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+        system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})
+        systemtype = node_collection.find_one({"_id":ObjectId(app_set_id)})
         for each in systemtype.attribute_type_set:
             systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type})
         for each in systemtype.relation_type_set:
             systemtype_relationtype_set.append({"rt_name":each.name,"type_id":str(each._id)})
 
         for eachatset in systemtype_attributetype_set :
-            for eachattribute in collection.Node.find({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])}):
+            for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])}):
                 atlist.append({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
         for eachrtset in systemtype_relationtype_set :
-            for eachrelation in collection.Node.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
-                right_subject = collection.Node.find_one({"_id":ObjectId(eachrelation.right_subject)})
+            for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
+                right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
                 rtlist.append({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
 
         # To support consistent view
@@ -332,12 +334,12 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     """
     auth = None
     if ObjectId.is_valid(group_id) is False :
-      group_ins = collection.Node.one({'_type': "Group","name": group_id})
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      group_ins = node_collection.one({'_type': "Group","name": group_id})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if group_ins:
         group_id = str(group_ins._id)
       else :
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :
           group_id = str(auth._id)
     else :
@@ -345,17 +347,17 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
     app = None
     if app_id is None:
-      app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+      app = node_collection.one({'_type': "GSystemType", 'name': app_name})
       if app:
         app_id = str(app._id)
     else:
-      app = collection.Node.one({'_id': ObjectId(app_id)})
+      app = node_collection.one({'_id': ObjectId(app_id)})
 
     app_name = app.name 
 
     # app_name = "mis"
     app_collection_set = [] 
-    # app = collection.Node.find_one({"_id":ObjectId(app_id)})
+    # app = node_collection.find_one({"_id":ObjectId(app_id)})
     app_set = ""
     app_set_instance_name = ""
     nodes = ""
@@ -383,27 +385,27 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
     if request.user.id:
       if auth is None:
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
       agency_type = auth.agency_type
-      agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+      agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
       if agency_type_node:
         for eachset in agency_type_node.collection_set:
-          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
     # for eachset in app.collection_set:
-    #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
-      # app_set = collection.Node.find_one({"_id":eachset})
+    #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+      # app_set = node_collection.find_one({"_id":eachset})
       # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
-        app_set = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+        app_set = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
 
         view_file_extension = ".py"
         app_set_view_file_name = ""
         app_set_view_file_path = ""
 
         if app_set.type_of:
-            app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
+            app_set_type_of = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
 
             app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
             # print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
@@ -422,15 +424,15 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
         # print "\n Perform fallback code...\n"
 
-        systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+        systemtype = node_collection.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
         title = systemtype_name + " - new"
         for each in systemtype.attribute_type_set:
             systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type, 'sub_values': each.complex_data_type, 'altnames': each.altnames})
 
         for eachrt in systemtype.relation_type_set:
-            # object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in collection.Node.find({'member_of': {'$all': [ collection.Node.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
-            object_type_cur = collection.Node.find({'member_of': {'$in': eachrt.object_type}})
+            # object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in node_collection.find({'member_of': {'$all': [ node_collection.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
+            object_type_cur = node_collection.find({'member_of': {'$in': eachrt.object_type}})
             object_type = []
             for each in object_type_cur:
               object_type.append({"name":each.name, "id":str(each._id)})
@@ -441,16 +443,16 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
     files_sts = ['File','Image','Video']
     if app_set_id:
-        app = collection.Node.one({'_id':ObjectId(app_set_id)})
+        app = node_collection.one({'_id':ObjectId(app_set_id)})
         for each in files_sts:
-            node_id = collection.Node.one({'name':each,'_type':'GSystemType'})._id
+            node_id = node_collection.one({'name':each,'_type':'GSystemType'})._id
             if node_id in app.type_of:
                 File = 'True'
 
     if app_set_instance_id : # at and rt set editing instance
-        system = collection.Node.find_one({"_id":ObjectId(app_set_instance_id)})
+        system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})
         for eachatset in systemtype_attributetype_set :
-            eachattribute = collection.Node.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
+            eachattribute = triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
             if eachattribute :
                 eachatset['database_value'] = eachattribute.object_value
                 eachatset['database_id'] = str(eachattribute._id)
@@ -458,9 +460,9 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                 eachatset['database_value'] = ""
                 eachatset['database_id'] = ""
         for eachrtset in systemtype_relationtype_set :
-            eachrelation = collection.Node.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})       
+            eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})       
             if eachrelation:
-                right_subject = collection.Node.find_one({"_id":ObjectId(eachrelation.right_subject)})
+                right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
                 eachrtset['database_id'] = str(eachrelation._id)
                 eachrtset["database_value"] = right_subject.name
                 eachrtset["database_value_id"] = str(right_subject._id)
@@ -499,17 +501,17 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             if file1:
                 f = save_file(file1, name, request.user.id, group_id, content_org, tags)
                 if obj_id_ins.is_valid(f):
-                    newgsystem = collection.Node.one({'_id':f})
+                    newgsystem = node_collection.one({'_id':f})
                 else:
                     template = "ndf/mis_list.html"
                     variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
                     return render_to_response(template, variable)
             else:
-                newgsystem = collection.File()
+                newgsystem = node_collection.collection.File()
         else:
-            newgsystem = collection.GSystem()
+            newgsystem = node_collection.collection.GSystem()
         if app_set_instance_id :
-            newgsystem = collection.Node.find_one({"_id":ObjectId(app_set_instance_id)})
+            newgsystem = node_collection.find_one({"_id": ObjectId(app_set_instance_id)})
 
         newgsystem.name = name
         newgsystem.member_of=[ObjectId(app_set_id)]
@@ -547,8 +549,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     
             user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
-            author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-            user_group_location = collection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': user_id, 'name': user_name})
+            author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
+            user_group_location = node_collection.one({'_type': "Author", 'member_of': author._id, 'created_by': user_id, 'name': user_name})
 
             if user_group_location:
                 user_group_location['visited_location'] = user_last_visited_location
@@ -558,52 +560,59 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
         if not app_set_instance_id :
             for key,value in request_at_dict.items():
-                attributetype_key = collection.Node.find_one({"_id":ObjectId(key)})
-                newattribute = collection.GAttribute()
-                newattribute.subject = newgsystem._id
-                newattribute.attribute_type = attributetype_key
-                newattribute.object_value = value
-                newattribute.save()
+                attributetype_key = node_collection.find_one({"_id":ObjectId(key)})
+                ga_node = create_gattribute(newgsystem._id, attributetype_key, value)
+                # newattribute = triple_collection.collection.GAttribute()
+                # newattribute.subject = newgsystem._id
+                # newattribute.attribute_type = attributetype_key
+                # newattribute.object_value = value
+                # newattribute.save()
             for key,value in request_rt_dict.items():
                 if key:
-                    relationtype_key = collection.Node.find_one({"_id":ObjectId(key)})
+                    relationtype_key = node_collection.find_one({"_id": ObjectId(key)})
                 if value:
-                    right_subject = collection.Node.find_one({"_id":ObjectId(value)})
-                    newrelation = collection.GRelation()
-                    newrelation.subject = newgsystem._id
-                    newrelation.relation_type = relationtype_key
-                    newrelation.right_subject = right_subject._id
-                    newrelation.save()
+                    right_subject = node_collection.find_one({"_id": ObjectId(value)})
+                    gr_node = create_grelation(newgsystem._id, relationtype_key, right_subject._id)
+                    # newrelation = triple_collection.collection.GRelation()
+                    # newrelation.subject = newgsystem._id
+                    # newrelation.relation_type = relationtype_key
+                    # newrelation.right_subject = right_subject._id
+                    # newrelation.save()
 
-        if app_set_instance_id : # editing instance
+        if app_set_instance_id:
+            # editing instance
             for each in systemtype_attributetype_set:
                 if each["database_id"]:
-                    attribute_instance = collection.Node.find_one({"_id":ObjectId(each['database_id'])})
+                    attribute_instance = triple_collection.find_one({"_id": ObjectId(each['database_id'])})
                     attribute_instance.object_value = request.POST.get(each["database_id"],"")
-                    attribute_instance.save()
+                    # attribute_instance.save()
+                    ga_node = create_gattribute(attribute_instance.subject, attribute_instance.attribute_type, attribute_instance.object_value)
                 else :
                     if request.POST.get(each["type_id"],""):
-                        attributetype_key = collection.Node.find_one({"_id":ObjectId(each["type_id"])})
-                        newattribute = collection.GAttribute()
-                        newattribute.subject = newgsystem._id
-                        newattribute.attribute_type = attributetype_key
-                        newattribute.object_value = request.POST.get(each["type_id"],"")
-                        newattribute.save()
+                        attributetype_key = node_collection.find_one({"_id":ObjectId(each["type_id"])})
+                        # newattribute = triple_collection.collection.GAttribute()
+                        # newattribute.subject = newgsystem._id
+                        # newattribute.attribute_type = attributetype_key
+                        # newattribute.object_value = request.POST.get(each["type_id"],"")
+                        # newattribute.save()
+                        ga_node = create_gattribute(newgsystem._id, attributetype_key, request.POST.get(each["type_id"],""))
 
             for eachrt in systemtype_relationtype_set:
                 if eachrt["database_id"]:
-                    relation_instance = collection.Node.find_one({"_id":ObjectId(eachrt['database_id'])})
+                    relation_instance = triple_collection.find_one({"_id":ObjectId(eachrt['database_id'])})
                     relation_instance.right_subject = ObjectId(request.POST.get(eachrt["database_id"],""))
-                    relation_instance.save()
+                    # relation_instance.save()
+                    gr_node = create_grelation(relation_instance.subject, relation_instance.relation_type, relation_instance.right_subject)
                 else :
                     if request.POST.get(eachrt["type_id"],""):
-                        relationtype_key = collection.Node.find_one({"_id":ObjectId(eachrt["type_id"])})
-                        right_subject = collection.Node.find_one({"_id":ObjectId(request.POST.get(eachrt["type_id"],""))})
-                        newrelation = collection.GRelation()
-                        newrelation.subject = newgsystem._id
-                        newrelation.relation_type = relationtype_key
-                        newrelation.right_subject = right_subject._id
-                        newrelation.save()
+                        relationtype_key = node_collection.find_one({"_id":ObjectId(eachrt["type_id"])})
+                        right_subject = node_collection.find_one({"_id":ObjectId(request.POST.get(eachrt["type_id"],""))})
+                        gr_node = create_grelation(newgsystem._id, relationtype_key, right_subject._id)
+                        # newrelation = triple_collection.collection.GRelation()
+                        # newrelation.subject = newgsystem._id
+                        # newrelation.relation_type = relationtype_key
+                        # newrelation.right_subject = right_subject._id
+                        # newrelation.save()
 
         return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
     
@@ -618,14 +627,14 @@ def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
     Redirects to student_enroll function of person-view.
     """
     if app_set_id:
-        app_set = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+        app_set = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
 
         view_file_extension = ".py"
         app_set_view_file_name = ""
         app_set_view_file_path = ""
 
         if app_set.type_of:
-            app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
+            app_set_type_of = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
             app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
 
         else:

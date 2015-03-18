@@ -40,6 +40,7 @@
       <ul class="{{widget_for}} pricing-table drawer1" id="{{widget_for}}_drawer1">        
 
         <!-- Searchbox as first li in the  Resources drawer -->
+
         {% if drawer1 != "None" %}
         <li class="price">
             <input type="text" class="margin-0 search_items" id="{{widget_for}}_search" placeholder="Type atleast 3 characters to search in the resources"/>            
@@ -85,7 +86,7 @@
               <div class="row">
 
                <div class="small-12 columns text-left" style="padding-top:5px;">
-		            {{ value.html_content|safe|striptags|truncatechars:50 }}
+                {{ value.html_content|safe|striptags|truncatechars:50 }}
                </div>  
               </div>
             </div>
@@ -204,24 +205,24 @@
 
       {% if not selection %}
         <br/><br/><br/><br/>
-      	<span id="{{widget_for}}_btnUp" class="fontsize-x-large">
-       		<i class="button fi-arrow-up coll-arrows"></i>
-      	</span>
-      	<br/>
+        <span id="{{widget_for}}_btnUp" class="fontsize-x-large">
+          <i class="button fi-arrow-up coll-arrows"></i>
+        </span>
+        <br/>
 
-  	    <span id="{{widget_for}}_btnRight" class="fontsize-x-large right1">
-       		<i class="button fi-arrow-right coll-arrows"></i>
-       	</span>
-       	<br/>      
+        <span id="{{widget_for}}_btnRight" class="fontsize-x-large right1">
+          <i class="button fi-arrow-right coll-arrows"></i>
+        </span>
+        <br/>      
       
-  	    <span id="{{widget_for}}_btnLeft" class="fontsize-x-large">
-       		<i class="button fi-arrow-left coll-arrows"></i>
-       	</span>        
-       	<br/>	
+        <span id="{{widget_for}}_btnLeft" class="fontsize-x-large">
+          <i class="button fi-arrow-left coll-arrows"></i>
+        </span>        
+        <br/> 
 
-  	    <span id="{{widget_for}}_btnDown" class="fontsize-x-large">
-       		<i class="button fi-arrow-down coll-arrows"></i>
-       	</span>
+        <span id="{{widget_for}}_btnDown" class="fontsize-x-large">
+          <i class="button fi-arrow-down coll-arrows"></i>
+        </span>
 
       {% else %}
 
@@ -234,7 +235,7 @@
           <i class="button fi-arrow-left coll-arrows"></i>
         </span>
 
-      {% endif %}	     
+      {% endif %}      
    </div>
 
    <!-- For collection created on RHS -->
@@ -279,7 +280,7 @@
 
               <div class="row">
                 <div class="small-12 columns text-left" style="padding-top:5px;">
-  		{{ value.html_content|safe|striptags|truncatechars:50 }}
+      {{ value.html_content|safe|striptags|truncatechars:50 }}
                 </div>
              </div>
             </div>
@@ -359,7 +360,8 @@
   }
 
   //For left drawer selected resources and right button click
-  $("#{{widget_for}}_btnRight").click(function() {
+  // $("#{{widget_for}}_btnRight").click(function() {
+  $(document).off('click',"#{{widget_for}}_btnRight").on('click',"#{{widget_for}}_btnRight",function(){
     $("#{{widget_for}}_drawer1 li.selected-resource input.node_id").addClass("{{widget_for}}_values");
 
     var selectedOpts = $("#{{widget_for}}_drawer1 li.selected-resource");
@@ -369,6 +371,7 @@
       alert("Nothing to move.");
     }
 
+    // $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
     $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
 
     $(selectedOpts).remove();
@@ -390,7 +393,9 @@
   });
 
   //For right drawer selected resources and left button click
-  $("#{{widget_for}}_btnLeft").click(function() {
+
+  $(document).off('click',"#{{widget_for}}_btnLeft").on('click',"#{{widget_for}}_btnLeft",function(){
+
     $("#{{widget_for}}_drawer2 li.selected-resource input.node_id.{{widget_for}}_values").removeClass("{{widget_for}}_values");
     var selectedOpts = $("#{{widget_for}}_drawer2 li.selected-resource");
     $("#{{widget_for}}_drawer2 li.selected-resource").removeClass("selected-resource");
@@ -423,8 +428,7 @@
   }
 
   //For UP Button pressed :
-  $("#{{widget_for}}_btnUp").click(function() {
-
+  $(document).on('click',"#{{widget_for}}_btnUp",function(){
     collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
 
     if( collSelected ){
@@ -449,7 +453,7 @@
   });
 
   //For DOWN Button pressed :
-  $("#{{widget_for}}_btnDown").click(function() {
+  $(document).on('click',"#{{widget_for}}_btnDown",function(){
 
     collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
 

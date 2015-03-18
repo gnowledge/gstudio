@@ -74,7 +74,7 @@
         
         <li class="name">
             <h1>
-              <a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
+              <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
             </h1>
         </li>
 
@@ -97,7 +97,8 @@
         <ul class="left">
 
           <li>
-            <a href="{% url 'GAPPS' 'home' 'topics' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
+            <!-- <a href="{#% url 'GAPPS' 'home' 'topics' %#}" {#% if nroer_menu.top_menu_selected == "Repository" %#}class="active"{#% endif %#}> -->
+            <a href="{% url 'topics' 'home' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
@@ -305,6 +306,7 @@
 
         <main class="row">
           {% if not is_ac_url %}
+          {% if request.path != "/welcome" %}
           <!--
           This menu-bar is meant especially for group which is selected 
           from group's dropdown visible on site-bar.
@@ -332,13 +334,18 @@
                     </a>
                      -->
                   {% endcomment %}
-                  <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}"
                     {% comment %}
                       <!--
                         <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
                       -->
                     {% endcomment %}
-                    <i class="fi-results"></i> Updates 
+                  
+                  <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
+                    {% if site_name == "nroer" and "home" in request.path and request.path|length <= 6 %}
+                    {% else %}
+                      <i class="fi-results"></i> Updates
+                    {% endif %}
+
                   </a>
                 {% endif %}
                 <!-- </li> -->
@@ -351,22 +358,24 @@
               
                 {% if group_name_tag == "home" %}
                 <!-- NROER level-two menu -->
-                  <ul class="button-group nroer-menu">
+                  {% if request.path|length > 6 %}
+                    <ul class="button-group nroer-menu">
                     {% for each_gapp in nroer_menu.gapps %}
                       {% for k, v in each_gapp.items %}
                         <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
-                          <a class="button" {% if v %} href="{% url 'GAPPS' group_name_tag v %}" {% endif %}>
+                          <!-- <a class="button" {#% if v %#} href="{#% url 'GAPPS' group_name_tag v %#}" {#% endif %#}> -->
+                          <a class="button" {% if v %} href="{% url v group_name_tag %}" {% endif %}>
                             {{k}}
                           </a>
                         </li>
                       {% endfor %}
                     {% endfor %}
-                  </ul>
+                    </ul>
+                  {% endif %}
                 {% else %}
                   {% get_gapps_iconbar request groupid %}
                 {% endif %}
               <!-- END of NROER level two menu -->
-
               {% else %}
                 {% get_gapps_iconbar request groupid %}
               {% endif %}
@@ -399,7 +408,8 @@
               </ul>
             </div>
           </nav>
-          {% endif %}
+          {% endif%} <!-- end of "/welcome" landing page check -->
+          {% endif %} <!-- end of "accounts" urls check -->
 
           <!-- Start of sidebar section (main aside) -->
           <aside class="medium-2 columns">

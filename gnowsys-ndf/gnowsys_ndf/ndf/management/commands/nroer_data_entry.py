@@ -34,6 +34,9 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
+from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
+
+from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 # from gnowsys_ndf.settings import GAPPS
@@ -48,14 +51,13 @@ SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
 log_list = []  # To hold intermediate errors
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
-collection = get_database()[Node.collection_name]
-file_gst = collection.GSystemType.one({"name": "File"})
-home_group = collection.Group.one({"name": "home", "_type": "Group"})
-theme_gst = collection.GSystemType.one({"name": "Theme"})
-theme_item_gst = collection.GSystemType.one({"name": "theme_item"})
-topic_gst = collection.GSystemType.one({"name": "Topic"})
+file_gst = node_collection.one({"name": "File"})
+home_group = node_collection.one({"name": "home", "_type": "Group"})
+theme_gst = node_collection.one({"name": "Theme"})
+theme_item_gst = node_collection.one({"name": "theme_item"})
+topic_gst = node_collection.one({"name": "Topic"})
 nroer_team_id = 1
-# GST_IMAGE = collection.GSystemType.one({'name': u"Image", '_type': 'GSystemType'})
+# GST_IMAGE = node_collection.one({'name': u"Image", '_type': 'GSystemType'})
 
 
 class Command(BaseCommand):
@@ -272,7 +274,7 @@ def parse_data_create_gsystem(json_file_path):
         json_documents_list = json.loads(json_file_content)
 
         # Initiating empty node obj and other related data variables
-        node = collection.File()
+        node = node_collection.collection.File()
         node_keys = node.keys()
         node_structure = node.structure
         # print "\n\n---------------", node_keys
@@ -386,7 +388,7 @@ def parse_data_create_gsystem(json_file_path):
             # starting processing for the attributes and relations saving
             if isinstance(nodeid, ObjectId) and attribute_relation_list:
 
-                node = collection.Node.one({ "_id": ObjectId(nodeid) })
+                node = node_collection.one({ "_id": ObjectId(nodeid) })
 
                 gst_possible_attributes_dict = node.get_possible_attributes(file_gst._id)
                 # print gst_possible_attributes_dict
@@ -437,7 +439,7 @@ def parse_data_create_gsystem(json_file_path):
 
                                 subject_id = node._id
                                 # print "\n-----\nsubject_id: ", subject_id
-                                attribute_type_node = collection.Node.one({
+                                attribute_type_node = node_collection.one({
                                                                 '_type': "AttributeType", 
                                                                 '$or': [
                                                                         {'name':
@@ -510,18 +512,18 @@ def parse_data_create_gsystem(json_file_path):
                             # print hier_list, "len(hier_list) : ", len(hier_list)
                             try:
                               if oid:
-                                curr_oid = collection.GSystem.one({ "_id": oid })
+                                curr_oid = node_collection.one({ "_id": oid })
                                 # print "curr_oid._id", curr_oid._id
                               else:
                                 row_list = []
                                 for e in hier_list:
                                     row_list.append(e)
 
-                                curr_oid = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
 
                               if curr_oid:
                                 object_exist = True
-                                next_oid = collection.GSystem.one({ 
+                                next_oid = node_collection.one({ 
                                                           "name": hier_list[1],
                                                           'group_set': {'$all': [ObjectId(home_group._id)]},
                                                           'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
@@ -551,14 +553,14 @@ def parse_data_create_gsystem(json_file_path):
                                 return oid
                               else:
                                 # print "else - hier_list : ", hier_list
-                                temp_obj = collection.GSystem.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                # temp_obj = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
                                 # print temp_obj
                                 if temp_obj.count() > 0:
                                     for e in temp_obj:
                                         if e.prior_node:
                                             for k in e.prior_node:
-                                                obj = collection.Node.one({'_id':ObjectId(k) })
+                                                obj = node_collection.one({'_id':ObjectId(k) })
                                                 # print "\nitem: ",row_list[len(row_list)-2],"\n"
                                                 if obj.name == row_list[len(row_list)-2]:
                                                     # print e._id
@@ -574,7 +576,7 @@ def parse_data_create_gsystem(json_file_path):
 
                             # if any one of the item of hierarchy does not exist in database then:
                             elif not object_exist:
-                              temp_obj = collection.GSystem.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                              temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
                               if temp_obj:
                                 return temp_obj._id
                               else:
@@ -636,7 +638,7 @@ def parse_data_create_gsystem(json_file_path):
                           if file_gst.type_of:
                               rel_subject_type.extend(file_gst.type_of)
 
-                          relation_type_node = collection.Node.one({'_type': "RelationType", 
+                          relation_type_node = node_collection.one({'_type': "RelationType", 
                                                                     '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
                                                                             {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
                                                                     'subject_type': {'$in': rel_subject_type}
@@ -645,7 +647,7 @@ def parse_data_create_gsystem(json_file_path):
                           right_subject_id_or_list = []
                           right_subject_id_or_list.append(ObjectId(right_subject_id))
                           
-                          nodes = collection.Triple.find({'_type': "GRelation", 
+                          nodes = triple_collection.find({'_type': "GRelation", 
                                       'subject': subject_id, 
                                       'relation_type.$id': relation_type_node._id
                                     })
@@ -717,21 +719,23 @@ def create_resource_gsystem(resource_data):
     # size, unit = getFileSize(files)
     # size = {'size':round(size, 2), 'unit':unicode(unit)}
     
-    fcol = get_database()[File.collection_name]
-    fileobj = fcol.File()
+    # fcol = get_database()[File.collection_name]
+    # fileobj = fcol.File()
 
-    check_obj_by_name = collection.File.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
+    fileobj = node_collection.collection.File()
+
+    check_obj_by_name = node_collection.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
     # print "\n====", check_obj_by_name, "==== ", fileobj.fs.files.exists({"md5":filemd5})
 
     # even though file resource exists as a GSystem or in gridfs return None
-    if fileobj.fs.files.exists({"md5":filemd5}) or check_obj_by_name:
+    if fileobj.fs.files.exists({"md5": filemd5}) or check_obj_by_name:
         
-        coll_oid = get_database()['fs.files']
-        cur_oid = coll_oid.find_one({"md5":filemd5})
+        # coll_oid = get_database()['fs.files']
+        cur_oid = gridfs_collection.find_one({"md5": filemd5})
         
         # printing appropriate error message
         if check_obj_by_name:
-            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the home group. Ref _id: "+ str(check_obj_by_name._id)
+            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the home group. (Ref _id: '"+ str(check_obj_by_name._id) + "' )"
             print info_message
             log_list.append(str(info_message))
 

@@ -12,7 +12,7 @@ var r = h/2;
 var color = d3.scale.category10();
 
 var data = [{"label":"Pages Created", "value":"{{page_create_rate}}"}, 
-            {"label":"Files Uploaded", "value":"{{file_create_rate}}"},
+            {"label":"", "value":"{{file_create_rate}}"},
             {"label":"Quiz Created", "value":"{{quiz_create_rate}}"},
             {"label":"Forums Created", "value":"{{forum_create_rate}}"},
             {"label":"Threads Created", "value":"{{thread_create_rate}}"},
@@ -34,7 +34,6 @@ arcs.append("svg:path")
     })
     .attr("d", function (d) {
         // log the result of the arc generator to show how cool it is :)
-        console.log(arc(d));
         return arc(d);
     });
 
@@ -47,5 +46,5 @@ arcs.append("svg:text").attr("transform", function(d){
         );
 
 
-</script>
 
+</script>

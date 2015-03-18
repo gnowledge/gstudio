@@ -1,7 +1,9 @@
+from PIL import Image
+from StringIO import StringIO
+import magic
+
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
-
-from django_mongokit import get_database
 
 try:
     from bson import ObjectId
@@ -9,12 +11,11 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Node
-from PIL import Image
-from StringIO import StringIO
-import magic
+from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.views.file import convert_mid_size_image
+
 ########################################################################
-collection = get_database()[Node.collection_name]  
+
 
 class Command(BaseCommand):
 
@@ -22,10 +23,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-		img_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Image'})
-		img_objs = collection.Node.find({'member_of': ObjectId(img_GST._id) })
+		img_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Image'})
+		img_objs = node_collection.find({'member_of': ObjectId(img_GST._id) })
 		for each in img_objs:
-			img = collection.Node.one({'_id':ObjectId(each._id)})
+			img = node_collection.one({'_id':ObjectId(each._id)})
 			if img:
 
 				f = img.fs.files.get(ObjectId(img.fs_file_ids[0]))
@@ -37,30 +38,20 @@ class Command(BaseCommand):
 					if e in filetype:
 						ext = e
 				if not ext:
-					ext = "JPEG"				
+					ext = "JPEG"			
 
 				if len(img.fs_file_ids) > 2:
 
 					img.fs.files.delete(img.fs_file_ids[2])
 					rm_id = img.fs_file_ids[2]
-					collection.update({'_id':img._id},{'$pull':{'fs_file_ids': rm_id}})
+					node_collection.collection.update({'_id':img._id},{'$pull':{'fs_file_ids': rm_id}})
 
 					f.seek(0)
-					mid_size_img = StringIO()
-					obj = Image.open(StringIO(f.read()))   
-					img_size = obj.size 
-					if img_size > (500, 300):
-						size = (500, 300)
-					else: 
-						size = img_size
-
-					obj = obj.resize(size, Image.ANTIALIAS)
-					obj.save(mid_size_img, ext)
-					mid_size_img.seek(0)
+					mid_size_img = convert_mid_size_image(f)
 
 					if mid_size_img:
 						mid_img_id = img.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-						collection.update({'_id':img._id},{'$push':{'fs_file_ids':mid_img_id}})
+						node_collection.collection.update({'_id':img._id},{'$push':{'fs_file_ids':mid_img_id}})
 
 						print "\n mid size image created for image: ",img.name,"\n"
 
@@ -68,7 +59,7 @@ class Command(BaseCommand):
 
 					f.seek(0)
 					img_thumb = StringIO()
-					img_size = obj.size 
+					# img_size = obj.size 
 					size = 128, 128
 					obj = Image.open(StringIO(f.read()))
 					obj.thumbnail(size, Image.ANTIALIAS)
@@ -77,26 +68,32 @@ class Command(BaseCommand):
 
 					if img_thumb:
 						img_thumb_id = img.fs.files.put(img_thumb, filename=filename+"-thumbnail", content_type=filetype)
-						collection.update({'_id':img._id},{'$push':{'fs_file_ids':img_thumb_id}})
+						node_collection.collection.update({'_id':img._id},{'$push':{'fs_file_ids':img_thumb_id}})
 
 						print "\n thumbnail image created for image: ",img.name,"\n"
 
-
 					f.seek(0)
-					mid_size_img = StringIO()
-					obj = Image.open(StringIO(f.read()))  
-					img_size = obj.size 
-					if img_size > (500, 300):
-						size = (500, 300)
-					else: 
-						size = img_size  
-
-					obj = obj.resize(size, Image.ANTIALIAS)
-					obj.save(mid_size_img, ext)
-					mid_size_img.seek(0)
+					mid_size_img = convert_mid_size_image(f)
 
 					if mid_size_img:
 						mid_img_id = img.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-						collection.update({'_id':img._id},{'$push':{'fs_file_ids':mid_img_id}})
+						node_collection.collection.update({'_id':img._id},{'$push':{'fs_file_ids':mid_img_id}})
 
 						print "\n mid size image created for image: ",img.name,"\n"
+
+				
+				# to update existing images
+				if len(img.fs_file_ids) >= 2:
+
+					img.fs.files.delete(img.fs_file_ids[1])
+					rm_id = img.fs_file_ids[1]
+					node_collection.collection.update({'_id':img._id},{'$pull':{'fs_file_ids': rm_id}})
+
+					f.seek(0)
+					mid_size_img = convert_mid_size_image(f)
+
+					if mid_size_img:
+						mid_img_id = img.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
+						node_collection.collection.update({'_id':img._id},{'$push':{'fs_file_ids':mid_img_id}})
+
+						# print "\n mid size image created for image: ",img.name,"\n"

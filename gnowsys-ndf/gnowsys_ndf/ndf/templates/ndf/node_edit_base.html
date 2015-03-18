@@ -47,13 +47,15 @@ background-repeat:no-repeat; background-size: 48px 48px
  		
 		<h3><span class="subheader">		
 		{% if node %}
-			{% trans "Editing " %} {{title}} : 
+			{% trans "Editing " %} {{title}} : {{node.name}}
 		{% else %}
 			{% trans "Create New " %} {{title}} :
 		{% endif %} 
 		</span></h3>		
 
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
+  		<label id="message" style="display:none; color:red"></label>
+
 	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 	  
     </div>     
@@ -104,7 +106,6 @@ background-repeat:no-repeat; background-size: 48px 48px
   	</div>
   
   	<div id="node-details-edit-div" class="tabs-content" > 
-  		<div id="message" style="display:none; color:red"></div>
 
     	<div class="active content row contents" id="panel-name-description">
       		<div class="medium-8 columns">
@@ -399,8 +400,8 @@ background-repeat:no-repeat; background-size: 48px 48px
       <!-- #{#%# endif %} -->
     </div>
 
-    <input type="hidden" id="nodes_list" value="{{nodes_list}}">
-    <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
+    <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}"> -->
+    <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button" />
 
 </form>
 
@@ -412,6 +413,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 <script type="text/javascript">
 var data_list = ""
 var saveflag = 0
+var old_name;
 function setdrawer(){
       $('#switchgrp').foundation('reveal', 'open');
        $('.close-reveal-modal.st').click(function(){
@@ -493,27 +495,16 @@ $(document).ready(function(){
 	else if(nt == "Quiz" || nt == "QuizItem")
 	{
 		$(".assesses_tab").show();
-
 	} 
-	
-	$("#name_id").change(function(){
-
-		var name = $("#name_id").val();
-		var nodes = $("#nodes_list").val();
-
-		if (nodes.indexOf(name) > 0)  
-		{
-			$("#message").css("display", "block");
-			$("#message").html("Name '"+ name +"' already exist .. Please choose another name");
-			$("#name_id").val("");
-		}
-		else
-		{
-			$("#message").css("display", "none");
-		}
-
-	});
+	{% if node %}
+		old_name = "{{node.name}}"
+	    old_name = old_name.toLowerCase();
+		{% if is_auth_node %}
+			$("#name_id").attr("disabled",true)
+		{% endif %}
+	{% endif %}
 });
+
 
 
 	$("input[type='radio'][name='col']").click(function() {
@@ -872,7 +863,7 @@ $(document).ready(function(){
 	});
 
 
-	$("#save-node").click(function() {
+	$("#save-node").click(function(event) {
                       
       	pn_arr = []
 		cn_arr = []
@@ -906,6 +897,36 @@ $(document).ready(function(){
 		$("#teaches_list").val(tch_arr);
 		$("#assesses_list").val(assess_arr);
 		{% block base_save_on_click %}{% endblock %}
+
+	    var name = $("#name_id").val().trim().toLowerCase();
+	    var nodes = {{nodes_list|safe}} 
+	    condition_result_var = true;
+	    {% if node %}
+	    	if(name == old_name){
+	    		condition_result_var = false;
+	    	}
+	    	else{
+	    		condition_result_var = true;
+	    	}
+	    {% endif %}
+    	if (condition_result_var && name != "")
+	    {
+	      if (nodes.indexOf(name) != -1)  
+	      { 
+	        $("#message").css("display", "block");
+	        $("#message").text("{{title}} '" + name +"' already exist. Please choose another name");
+	        event.preventDefault();
+	      }
+	    }
+	    else if (name == ""){
+	      $("#message").css("display", "block");
+	      $("#message").text("Name cannot be empty.");
+	      event.preventDefault();
+	    }
+	    else
+    	{
+          $("#message").css("display", "none");
+	    }
 	});
 
 
