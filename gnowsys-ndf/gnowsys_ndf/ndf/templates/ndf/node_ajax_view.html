@@ -293,7 +293,7 @@ table {
       {% if node %}
         {% get_publish_policy request groupid node as group_policy %}
         {% if group_policy == "allow" %}
-          &nbsp;&nbsp;&nbsp;<span style='position:fixed; color: gray;'>Draft</span>
+          &nbsp;&nbsp;&nbsp;<span style='position:relative; color: gray;'>Draft</span>
         {% endif %}
       {% endif %}
 
@@ -1299,6 +1299,7 @@ table {
   // publishing resource in other groups
   var data_list = ""
   var saveflag = 0
+
   function get_new_groups(){
     $.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
            data_list=data_list+String(item.id)+",";
