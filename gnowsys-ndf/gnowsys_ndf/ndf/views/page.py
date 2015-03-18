@@ -290,11 +290,11 @@ def create_edit_page(request, group_id, node_id=None):
                           'groupid': group_id
                       }
     
-    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id) })
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
     for each in available_nodes:
-      nodes_list.append(each.name)
+      nodes_list.append(str((each.name).strip().lower()))
 
     if node_id:
         page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
@@ -325,9 +325,7 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
-            context_variables['nodes_list'] = json.dumps(nodes_list)
-        else:
-            context_variables['nodes_list'] = json.dumps(nodes_list)
+        context_variables['nodes_list'] = json.dumps(nodes_list)
 
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,

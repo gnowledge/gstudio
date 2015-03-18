@@ -460,7 +460,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       tags = request.POST.get('tags'+ str(coll_set._id),"")
      
   else:    
-    name =request.POST.get('name','')
+    name =request.POST.get('name','').strip()
     content_org = request.POST.get('content_org')
     tags = request.POST.get('tags')
 

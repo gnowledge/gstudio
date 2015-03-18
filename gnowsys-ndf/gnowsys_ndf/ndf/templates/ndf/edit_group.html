@@ -225,18 +225,15 @@ ul#graph-hover.f-dropdown{
 
 
        </div>
-    
-
 </dd>
 </dl>
-
 
 {{ block.super }}
 {% endblock %}
 
-
 {% block script %}
 var datas= ""
+var old_group_name;
 $(document).on('click',"#app_selected",function(){
 $('#mySystemtype #collection_set_drawer1').html("");
  $('#mySystemtype #collection_set_drawer2').html("");
@@ -348,5 +345,5 @@ $("#status").html(result);
 
 {% else %}
 {% endifequal %}
-{% endblock %}
 
+{% endblock %}
