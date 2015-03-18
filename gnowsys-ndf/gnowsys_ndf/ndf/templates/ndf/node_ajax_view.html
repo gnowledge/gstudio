@@ -293,7 +293,7 @@ table {
       {% if node %}
         {% get_publish_policy request groupid node as group_policy %}
         {% if group_policy == "allow" %}
-          &nbsp;&nbsp;&nbsp;<span style='position:relative; color: gray;'>Draft</span>
+          &nbsp;&nbsp;&nbsp;<span data-tooltip title= "Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see." ><span style='position:relative; color: gray;'>Draft</span></span>
         {% endif %}
       {% endif %}
 
