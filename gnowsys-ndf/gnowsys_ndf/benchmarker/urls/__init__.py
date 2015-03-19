@@ -6,6 +6,6 @@ urlpatterns = patterns('gnowsys_ndf.benchmarker.benchmarkreport',
                        url(r'^report/', 'report', name='report'),
                        )
                        
-urlpatterns = patterns('',
-                      url(r'^run/', views.run, name='run'),
-                       )                                              
+#urlpatterns = patterns('',
+#                      url(r'^run/', views.run, name='run'),
+#                       )                                              
