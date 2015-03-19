@@ -801,8 +801,47 @@ table {
                   
                
               </fieldset>
+	      {% endfor %} 
+              
+	      {% get_possible_translations node as tran %}
+              {% for each in tran %}
+              {% for key,val in each.items %}
+	      {% get_resources key as contents %}
+              <fieldset id ="{{key}}">
+	      <legend>In other Languages</legend>
 
-            {% endfor %}          
+              {% for k,v in contents.items %}    
+
+              <fieldset id="{{k}}">
+                <legend>{{k}}</legend>
+
+                  {% if k == "Images" %}
+		{% for each1 in v %}
+                      <a href ="{% url 'image_detail' group_name_tag each1 %}" style="display: inline-block">
+                        <img src="{% url 'getFileThumbnail' group_name_tag each1 %}" />  
+                        <br/><div>{{each1.name}}</div>
+                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+		 {% endfor %}
+                  {% elif k == "Videos" %}
+		      {% for each1 in v %}
+                
+		      <a href ="{% url 'video_detail' group_name_tag each1 %}" style="display: inline-block">
+                        <img src="{% url 'getFileThumbnail' group_name_tag each1 %}">
+                        <br/><div>{{each1.name}}</div>
+                      </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endfor %}
+                  {% else %}
+		      {% for each1 in v %}
+                      <a href ="{% url 'file_detail' group_name_tag each1 %}"> {{each1.name}} </a>&nbsp;&nbsp;&nbsp;
+		      {% endfor %}
+                  {% endif %}
+                </fieldset>
+            {% endfor %} 
+</fieldset>
+	      {% endfor %}
+	      {% endfor %}
+            
+        
           </div>
 
         {% endif %}
