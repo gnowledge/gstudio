@@ -44,8 +44,7 @@ register = Library()
 at_apps_list = node_collection.one({'_type': 'AttributeType', 'name': 'apps_list'})
 translation_set=[]
 check=[]
-
-
+       
 @register.assignment_tag
 def get_site_variables():
    site_var={}
@@ -1151,30 +1150,52 @@ def get_prior_node(node_id):
 	return prior
 
 @register.assignment_tag
+# method returns object ids od translation_of relation
+def get_translations_obj(node_id):
+        obj_set=[]
+        result_set=[]
+        node=node_collection.one({'_id':ObjectId(node_id)})
+        result_set=get_possible_translations(node)
+        if node._id not in obj_set:
+                obj_set.append(node._id)
+                for item in result_set:
+                        obj_set.extend(item.keys())
+        resources={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        for each in obj_set:
+                n=node_collection.one({'_id':ObjectId(each)})
+                test=get_resources(each,resources)
+        return test
+
+@register.assignment_tag
 # method returns resources associated with node
-def get_resources(node_id):
-        resources={}
-        resource_list=['Images','Documents','Audios','Videos','Interactives']
-        other_languages=[]       
+def get_resources(node_id,resources):
+        #test={}
+        #resources={}
+        #resource_list=['Images','Documents','Audios','Videos','Interactives']
+        #other_languages=[]       
 
         #resources
         #global resource_list
         #global other_languages
-        for res in resource_list:
-                resources[res] = []
-	node = node_collection.one({'_id': ObjectId(node_id) })
-        #other_languages.append(node._id)
+        #for res in resource_list:
+         #       resources[res] = []
+
+	node = node_collection.one({'_id': ObjectId(node_id)})
+        
+        #print other_languages ,"___________+++++++++++"
+        #if node._id not in other_languages:
+         #       other_languages.append(node._id)
         RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
-	RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
-	trans_grelations = triple_collection.find({'_type':'GRelation','subject':node._id,'relation_type.$id':RT_translation_of._id })
-    	teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type.$id': RT_teaches._id })
+        RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
+        trans_grelations = triple_collection.find({'_type':'GRelation','subject':node._id,'relation_type.$id':RT_translation_of._id })
+        teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type.$id': RT_teaches._id })
         AT_educationaluse = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
         for each in teaches_grelations:
-             obj=node_collection.one({'_id':ObjectId(each.subject)}) 
-             mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type.$id': AT_educationaluse._id, "subject":each.subject})       
-             for res in resource_list:
-                     if mime_type.object_value == res:
-                             resources.setdefault(res,[]).append(obj)
+                obj=node_collection.one({'_id':ObjectId(each.subject)}) 
+                mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type.$id': AT_educationaluse._id, "subject":each.subject})       
+                for k,v in resources.items():
+                        if mime_type.object_value == k:
+                                resources.setdefault(k,[]).append(obj.name)
         # if trans_grelations.count() > 0:
         #         print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
 	# 	obj = node_collection.one({'_id': ObjectId(trans_grelations[0].right_subject)})
@@ -1187,8 +1208,8 @@ def get_resources(node_id):
         #                get_resources(obj._id,resources,other_languages=,resource_list)
         #                print "after_$$$$$$$$"
         #resources['In other Languages']= other_languages        
-        print resources
-        print other_languages
+        #print resources
+        #print other_languages
         
         return resources
 
