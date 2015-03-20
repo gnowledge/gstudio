@@ -951,7 +951,6 @@ def convert_mid_size_image(files, **kwargs):
 
     if "extension" in kwargs:
       if kwargs["extension"]:
-        print "kwargs : ", kwargs["extension"]
         img.save(mid_size_img, kwargs["extension"])
 
     else:    
