@@ -48,7 +48,7 @@
           </div>
           <div class="small-4 column">
             {% if "image" in each_res.mime_type %}
-              <img src="{% url 'getImageThumbnail' group_id each_res.pk %}"/>
+              <img src="{% url 'getFileThumbnail' group_id each_res.pk %}"/>
             {% elif "audio" in each_res.mime_type %}
               <span class="fi-music" style="font-size:40px"></span>
             {% elif "Pandora_video" in each_res.member_of_names_list and "video" in each_res.mime_type %}
