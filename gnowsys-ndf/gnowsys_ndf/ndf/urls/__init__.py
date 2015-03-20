@@ -38,7 +38,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     # (r'^$', HomeRedirectView.as_view()),        
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
-    url(r'^welcome/?', landing_page, name="welcome"),
+    url(r'^welcome/?', landing_page, name="landing_page"),
 
     # all main apps
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
