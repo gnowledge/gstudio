@@ -94,11 +94,11 @@
           <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox"> </td>
           {% if app_name == "MIS" %}
           <td style="font-size:14px;">
-            <a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name|title}}</a>
+            <a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name}}</a>
           </td>
           {% else %}
           <td style="font-size:14px;">
-            <a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name|title}}</a>
+            <a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name}}</a>
           </td>
           {% endif %}
 

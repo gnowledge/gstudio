@@ -175,3 +175,9 @@ pre{
   }
   }
 }
+
+body a{
+  &:visited{
+    color: #1d484a;
+  }
+}

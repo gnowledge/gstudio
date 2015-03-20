@@ -11,27 +11,22 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-
-from django_mongokit import get_database
 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-
 ''' -- imports from application folders/files -- '''
-
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
-
 
 #######################################################################################################################################
 
@@ -43,24 +38,24 @@ def all_observations(request, group_id, app_id=None):
 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-	    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+	    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    if group_ins:
 	        group_id = str(group_ins._id)
 	    else :
-	        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	        if auth :
 	            group_id = str(auth._id)
 	else :
 	    pass
 	if app_id is None:
-	    app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Observation"})
+	    app_ins = node_collection.find_one({'_type':"GSystemType", "name":"Observation"})
 	    if app_ins:
 	        app_id = str(app_ins._id)
 
 
 	# app is GSystemType Observation
-	app = collection.Node.find_one({"_id":ObjectId(app_id)})
+	app = node_collection.find_one({"_id":ObjectId(app_id)})
 
 	app_name = app.name
 	app_collection_set = []
@@ -69,7 +64,7 @@ def all_observations(request, group_id, app_id=None):
 	# retriving each GSystemType in Observation e.g.Plant Obs.., Rain Fall etc.
 	for each in app.collection_set: 
 
-		app_set_element = collection.Node.find_one({'_id':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
+		app_set_element = node_collection.find_one({'_id': ObjectId(each), 'group_set': {'$all': [ObjectId(group_id)]}})
 		
 		# Individual observations e.g. Rain Fall
 		if app_set_element:
@@ -89,7 +84,7 @@ def all_observations(request, group_id, app_id=None):
 						# for preventing duplicate dict forming
 						if not file_id in [d['id'] for d in file_metadata]:
 
-							file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+							file_obj = node_collection.one({'_type': 'File', "_id": ObjectId(file_id)})
 							# print file_id, "===", type(file_id)
 							
 							temp_dict = {}
@@ -99,7 +94,7 @@ def all_observations(request, group_id, app_id=None):
 
 							file_metadata.append(temp_dict)
 
-			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
+			# app_element_content_objects = node_collection.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 			# obj_count = app_element_content_objects.count()
 				
 			app_collection_set.append({ 
@@ -127,18 +122,18 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
-	    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+	    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	    if group_ins:
 	        group_id = str(group_ins._id)
 	    else :
-	        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 	        if auth :
 	            group_id = str(auth._id)
 	else :
 	    pass
 	if app_id is None:
-	    app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Page"})
+	    app_ins = node_collection.find_one({'_type':"GSystemType", "name":"Page"})
 	    if app_ins:
 	        app_id = str(app_ins._id)
 
@@ -151,16 +146,16 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	user_name = unicode(request.user.username) if request.user.username  else "" # getting django user name
 	
 
-	app = collection.Node.find_one({"_id":ObjectId(app_id)})
+	app = node_collection.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
 	app_collection_set = []
 	file_metadata = []
 
 	for each in app.collection_set:
 
-		app_set_element = collection.Node.find_one({'_id':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
+		app_set_element = node_collection.find_one({'_id':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 		
-		# app_element = collection.Node.find_one({"_id":each})
+		# app_element = node_collection.find_one({"_id":each})
 		if app_set_element:
 
 			locs = len(app_set_element.location)
@@ -185,7 +180,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 							# for preventing duplicate dict forming
 							if not file_id in [d['id'] for d in file_metadata]:
 
-								file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+								file_obj = node_collection.one({'_type': 'File', "_id": ObjectId(file_id)})
 								# print file_id, "===", type(file_id)
 								
 								temp_dict = {}
@@ -228,7 +223,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 	unique_token = str(ObjectId())
         cookie_added_markers = ""
 
-	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
+	app_set_element = node_collection.find_one({'_id': ObjectId(app_set_id), 'group_set': {'$all': [ObjectId(group_id)]}})
 	
 	# to update existing location
 	if "ref" in marker_geojson['properties']:
@@ -314,7 +309,7 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 	is_cookie_supported = request.session.test_cookie_worked()
 	operation_performed = ""
 
-	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
+	app_set_element = node_collection.find_one({'_id': ObjectId(app_set_id), 'group_set': {'$all': [ObjectId(group_id)]}})
 
 	# for anonymous user
 	anonymous_flag = False

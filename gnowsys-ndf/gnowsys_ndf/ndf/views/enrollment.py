@@ -20,8 +20,6 @@ from django.contrib.sites.models import Site
 
 from mongokit import IS
 
-from django_mongokit import get_database
-
 try:
   from bson import ObjectId
 except ImportError:  # old pymongo
@@ -30,14 +28,14 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
+from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data,get_execution_time
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
 
-collection = get_database()[Node.collection_name]
-app = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
+app = node_collection.one({'_type': "GSystemType", 'name': GAPPS[7]})
 
 
 @login_required
@@ -49,14 +47,14 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
     auth = None
     if ObjectId.is_valid(group_id) is False:
-        group_ins = collection.Node.one({'_type': "Group", "name": group_id})
-        auth = collection.Node.one(
+        group_ins = node_collection.one({'_type': "Group", "name": group_id})
+        auth = node_collection.one(
             {'_type': 'Author', 'name': unicode(request.user.username)}
         )
         if group_ins:
             group_id = str(group_ins._id)
         else:
-            auth = collection.Node.one(
+            auth = node_collection.one(
                 {'_type': 'Author', 'name': unicode(request.user.username)}
             )
             if auth:
@@ -64,11 +62,11 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
     app = None
     if app_id is None:
-        app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+        app = node_collection.one({'_type': "GSystemType", 'name': app_name})
         if app:
             app_id = str(app._id)
     else:
-        app = collection.Node.one({'_id': ObjectId(app_id)})
+        app = node_collection.one({'_id': ObjectId(app_id)})
 
     app_name = app.name
 
@@ -92,23 +90,23 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
     if request.user:
         if auth is None:
-            auth = collection.Node.one(
+            auth = node_collection.one(
                 {'_type': 'Author', 'name': unicode(request.user.username)}
             )
         agency_type = auth.agency_type
-        agency_type_node = collection.Node.one(
+        agency_type_node = node_collection.one(
             {'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1}
         )
         if agency_type_node:
             for eachset in agency_type_node.collection_set:
                 app_collection_set.append(
-                    collection.Node.one(
+                    node_collection.one(
                         {"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}
                     )
                 )
 
     if app_set_id:
-        enrollment_gst = collection.Node.one(
+        enrollment_gst = node_collection.one(
             {'_type': "GSystemType", '_id': ObjectId(app_set_id)},
             {'name': 1, 'type_of': 1}
         )
@@ -117,11 +115,11 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
             + "_create_edit.html"
 
         title = enrollment_gst.name
-        enrollment_gs = collection.GSystem()
+        enrollment_gs = node_collection.collection.GSystem()
         enrollment_gs.member_of.append(enrollment_gst._id)
 
     if app_set_instance_id:
-        enrollment_gs = collection.Node.one({
+        enrollment_gs = node_collection.one({
             '_type': "GSystem", '_id': ObjectId(app_set_instance_id)
         })
 
@@ -179,7 +177,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
         university_id = None
 
         college_po = {}
-        mis_admin = collection.Node.one(
+        mis_admin = node_collection.one(
             {'_type': "Group", 'name': "MIS_admin"}, {'name': 1}
         )
 
@@ -198,7 +196,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     # Foundation
                     ann_course_ids = ann_course_ids_set
 
-                    ann_course_node = collection.Node.one({
+                    ann_course_node = node_collection.one({
                         "_id": ObjectId(ann_course_ids[0])
                     })
 
@@ -240,7 +238,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     for each_ac in ann_course_ids_set:
                         ann_course_ids = [each_ac]
 
-                        ann_course_node = collection.Node.one({
+                        ann_course_node = node_collection.one({
                             "_id": ObjectId(each_ac)
                         })
 
@@ -268,7 +266,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                         ac_cname_cl_uv_ids.append([ann_course_ids, ann_course_name, course_name, college_id, university_id])
 
-        enrollment_gst = collection.Node.one({
+        enrollment_gst = node_collection.one({
             '_type': "GSystemType", 'name': "StudentCourseEnrollment"
         })
         if nussd_course_type == "Foundation Course":
@@ -290,7 +288,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                 task_group_set = []
                 if college_id not in college_po:
-                    college_node = collection.Node.one({
+                    college_node = node_collection.one({
                         "_id": ObjectId(college_id)
                     }, {
                         "name": 1,
@@ -312,7 +310,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     enrollment_gs_name = "StudentCourseEnrollment" \
                         + "_" + ann_course_name
 
-                    enrollment_gs = collection.Node.one({
+                    enrollment_gs = node_collection.one({
                         'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
                         "group_set": [mis_admin._id, college_group_id],
                         'status': u"PUBLISHED"
@@ -320,7 +318,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                 # If not found, create it
                 if not enrollment_gs:
-                    enrollment_gs = collection.GSystem()
+                    enrollment_gs = node_collection.collection.GSystem()
                     enrollment_gs.name = enrollment_gs_name
                     if enrollment_gst._id not in enrollment_gs.member_of:
                         enrollment_gs.member_of.append(enrollment_gst._id)
@@ -358,12 +356,12 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     task_dict["start_time"] = start_enroll
                     task_dict["end_time"] = end_enroll
 
-                    glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+                    glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
                     task_type_node = None
                     # Here, GSTUDIO_TASK_TYPES[3] := 'Student-Course Enrollment'
                     task_dict["has_type"] = []
                     if glist_gst:
-                        task_type_node = collection.Node.one(
+                        task_type_node = node_collection.one(
                             {'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[3]},
                             {'_id': 1}
                         )
@@ -381,7 +379,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     # From Program Officer node(s) assigned to college using college_po[college_id]
                     # From each node's 'has_login' relation fetch corresponding Author node
-                    po_cur = collection.Node.find({
+                    po_cur = node_collection.find({
                         '_id': {'$in': college_po[college_id]},
                         'attribute_set.email_id': {'$exists': True},
                         'relation_set.has_login': {'$exists': True}
@@ -393,7 +391,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                         po_auth = None
                         for rel in PO.relation_set:
                             if rel and "has_login" in rel:
-                                po_auth = collection.Node.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
+                                po_auth = node_collection.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
                                 if po_auth:
                                     if po_auth.created_by not in task_dict["Assignee"]:
                                         task_dict["Assignee"].append(po_auth.created_by)
@@ -405,11 +403,11 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     task_node = create_task(task_dict)
 
-                    MIS_GAPP = collection.Node.one({
+                    MIS_GAPP = node_collection.one({
                         "_type": "GSystemType", "name": "MIS"
                     })
 
-                    Student = collection.Node.one({
+                    Student = node_collection.one({
                         "_type": "GSystemType", "name": "Student"
                     })
 
@@ -448,7 +446,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     # Save/Update GAttribute(s) and/or GRelation(s)
                     for at_rt_name in at_rt_list:
                         if at_rt_name in at_rt_dict:
-                            at_rt_type_node = collection.Node.one({
+                            at_rt_type_node = node_collection.one({
                                 '_type': {'$in': ["AttributeType", "RelationType"]},
                                 'name': at_rt_name
                             })
@@ -477,7 +475,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                 task_group_set = []
                 if college_id not in college_po:
-                    college_node = collection.Node.one({
+                    college_node = node_collection.one({
                         "_id": college_id
                     }, {
                         "name": 1,
@@ -500,7 +498,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     enrollment_gs_name = "StudentCourseEnrollment" \
                         + "_" + ann_course_name
 
-                    enrollment_gs = collection.Node.one({
+                    enrollment_gs = node_collection.one({
                         'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
                         "group_set": [mis_admin._id, college_group_id],
                         'status': u"PUBLISHED"
@@ -508,7 +506,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                 # If not found, create it
                 if not enrollment_gs:
-                    enrollment_gs = collection.GSystem()
+                    enrollment_gs = node_collection.collection.GSystem()
                     enrollment_gs.name = enrollment_gs_name
                     if enrollment_gst._id not in enrollment_gs.member_of:
                         enrollment_gs.member_of.append(enrollment_gst._id)
@@ -546,12 +544,12 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     task_dict["start_time"] = start_enroll
                     task_dict["end_time"] = end_enroll
 
-                    glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+                    glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
                     task_type_node = None
                     # Here, GSTUDIO_TASK_TYPES[3] := 'Student-Course Enrollment'
                     task_dict["has_type"] = []
                     if glist_gst:
-                        task_type_node = collection.Node.one(
+                        task_type_node = node_collection.one(
                             {'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[3]},
                             {'_id': 1}
                         )
@@ -569,7 +567,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     # From Program Officer node(s) assigned to college using college_po[college_id]
                     # From each node's 'has_login' relation fetch corresponding Author node
-                    po_cur = collection.Node.find({
+                    po_cur = node_collection.find({
                         '_id': {'$in': college_po[college_id]},
                         'attribute_set.email_id': {'$exists': True},
                         'relation_set.has_login': {'$exists': True}
@@ -581,7 +579,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                         po_auth = None
                         for rel in PO.relation_set:
                             if rel and "has_login" in rel:
-                                po_auth = collection.Node.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
+                                po_auth = node_collection.one({'_type': "Author", '_id': ObjectId(rel["has_login"][0])})
                                 if po_auth:
                                     if po_auth.created_by not in task_dict["Assignee"]:
                                         task_dict["Assignee"].append(po_auth.created_by)
@@ -593,11 +591,11 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     task_node = create_task(task_dict)
 
-                    MIS_GAPP = collection.Node.one({
+                    MIS_GAPP = node_collection.one({
                         "_type": "GSystemType", "name": "MIS"
                     })
 
-                    Student = collection.Node.one({
+                    Student = node_collection.one({
                         "_type": "GSystemType", "name": "Student"
                     })
 
@@ -636,7 +634,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     # Save/Update GAttribute(s) and/or GRelation(s)
                     for at_rt_name in at_rt_list:
                         if at_rt_name in at_rt_dict:
-                            at_rt_type_node = collection.Node.one({
+                            at_rt_type_node = node_collection.one({
                                 '_type': {'$in': ["AttributeType", "RelationType"]},
                                 'name': at_rt_name
                             })
@@ -692,10 +690,10 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                 l_labels = []
                 if eachk == "for_acourse":
                     for every_ac in eachv:
-                        get_node_name = collection.Node.one({'_id': every_ac})
+                        get_node_name = node_collection.one({'_id': every_ac})
                         l_labels.append(get_node_name.name)
                 else:
-                    get_node_name = collection.Node.one({'_id': eachv[0]})
+                    get_node_name = node_collection.one({'_id': eachv[0]})
                     l_labels.append(get_node_name.name)
                 context_variables[eachk] = l_labels
 
@@ -725,12 +723,12 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
 
   auth = None
   if ObjectId.is_valid(group_id) is False :
-    group_ins = collection.Node.one({'_type': "Group","name": group_id})
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    group_ins = node_collection.one({'_type': "Group","name": group_id})
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
   else :
@@ -738,11 +736,11 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
 
   app = None
   if app_id is None:
-    app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+    app = node_collection.one({'_type': "GSystemType", 'name': app_name})
     if app:
       app_id = str(app._id)
   else:
-    app = collection.Node.one({'_id': ObjectId(app_id)})
+    app = node_collection.one({'_id': ObjectId(app_id)})
 
   app_name = app.name 
 
@@ -766,15 +764,15 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
 
   if request.user:
     if auth is None:
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
     agency_type = auth.agency_type
-    agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
-        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
   if app_set_id:
-    sce_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
+    sce_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
     title = sce_gst.name
 
     query = {}
@@ -785,7 +783,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
     else:
       query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id)}
 
-    nodes = list(collection.Node.find(query).sort('name', 1))
+    nodes = list(node_collection.find(query).sort('name', 1))
 
     nodes_keys = [('name', "Name")]
     template = ""
@@ -796,7 +794,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
     template = "ndf/" + sce_gst.name.strip().lower().replace(' ', '_') + "_details.html"
     default_template = "ndf/mis_details.html"
 
-    node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
+    node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
     node.get_neighbourhood(node.member_of)
 
@@ -830,22 +828,22 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     """
     auth = None
     if ObjectId.is_valid(group_id) is False:
-        group_ins = collection.Node.one({'_type': "Group", "name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = node_collection.one({'_type': "Group", "name": group_id})
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else:
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth:
                 group_id = str(auth._id)
 
     app = None
     if app_id is None:
-        app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+        app = node_collection.one({'_type': "GSystemType", 'name': app_name})
         if app:
             app_id = str(app._id)
     else:
-        app = collection.Node.one({'_id': ObjectId(app_id)})
+        app = node_collection.one({'_id': ObjectId(app_id)})
 
     app_name = app.name
 
@@ -859,19 +857,19 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
 
     if user_id:
         if auth is None:
-            auth = collection.Node.one({
+            auth = node_collection.one({
                 '_type': 'Author', 'name': unicode(request.user.username)
             })
 
         agency_type = auth.agency_type
-        agency_type_node = collection.Node.one({
+        agency_type_node = node_collection.one({
             '_type': "GSystemType", 'name': agency_type
         }, {
             'collection_set': 1
         })
         if agency_type_node:
             for eachset in agency_type_node.collection_set:
-                app_collection_set.append(collection.Node.one({
+                app_collection_set.append(node_collection.one({
                     "_id": eachset
                 }, {
                     '_id': 1, 'name': 1, 'type_of': 1
@@ -900,7 +898,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
 
     if app_set_instance_id:
         if ObjectId.is_valid(app_set_instance_id):
-            sce_gs = collection.Node.one({
+            sce_gs = node_collection.one({
                 '_id': ObjectId(app_set_instance_id)
             }, {
                 'member_of': 1, 'name': 1,
@@ -927,7 +925,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 current_date = datetime.datetime.now().date()
                 if end_enroll < current_date:
                     #close sce_gs
-                    at_type_node = collection.Node.one({
+                    at_type_node = node_collection.one({
                         '_type': "AttributeType",
                         'name': u"enrollment_status"
                     })
@@ -936,7 +934,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                         at_node = create_gattribute(sce_gs._id, at_type_node,u"CLOSED")
                         if at_node:
                             #Change status of Task to Closed
-                            task_at_type_node = collection.Node.one({
+                            task_at_type_node = node_collection.one({
                                 '_type': "AttributeType",
                                 'name': u"Status"
                             })
@@ -975,7 +973,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
         enroll_state = request.POST.get("enrollState", "")
         at_rt_list = ["start_enroll", "end_enroll", "for_acourse", "for_college", "for_university", "enrollment_status", "has_enrolled", "has_enrollment_task", "has_approval_task", "has_current_approval_task"]
 
-        mis_admin = collection.Node.one({
+        mis_admin = node_collection.one({
             '_type': "Group", 'name': "MIS_admin"
         })
 
@@ -998,25 +996,25 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
             task_dict["modified_by"] = mis_admin.group_admin[0]
             task_dict["contributors"] = [mis_admin.group_admin[0]]
 
-            MIS_GAPP = collection.Node.one({
+            MIS_GAPP = node_collection.one({
                 '_type': "GSystemType", 'name': "MIS"
             }, {
                 '_id': 1
             })
 
-            sce_gst = collection.Node.one({
+            sce_gst = node_collection.one({
                 "_type": "GSystemType", "name": "StudentCourseEnrollment"
             })
 
             task_dict["start_time"] = datetime.datetime.now()
             task_dict["end_time"] = None
 
-            glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+            glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
             task_type_node = None
             # Here, GSTUDIO_TASK_TYPES[7] := 'Re-open Student-Course Enrollment'
             task_dict["has_type"] = []
             if glist_gst:
-                task_type_node = collection.Node.one({
+                task_type_node = node_collection.one({
                     'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[7]
                 }, {
                     '_id': 1
@@ -1062,7 +1060,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
 
             for at_rt_name in at_rt_list:
                 if at_rt_name in at_rt_dict:
-                    at_rt_type_node = collection.Node.one({
+                    at_rt_type_node = node_collection.one({
                         '_type': {'$in': ["AttributeType", "RelationType"]},
                         'name': at_rt_name
                     })
@@ -1121,7 +1119,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 task_dict["modified_by"] = mis_admin.group_admin[0]
                 task_dict["contributors"] = [mis_admin.group_admin[0]]
 
-                MIS_GAPP = collection.Node.one({
+                MIS_GAPP = node_collection.one({
                     '_type': "GSystemType", 'name': "MIS"
                 }, {
                     '_id': 1
@@ -1138,12 +1136,12 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 task_dict["start_time"] = completed_on
                 task_dict["end_time"] = None
 
-                glist_gst = collection.Node.one({'_type': "GSystemType", 'name': "GList"})
+                glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
                 task_type_node = None
                 # Here, GSTUDIO_TASK_TYPES[4] := 'Student-Course Enrollment Approval'
                 task_dict["has_type"] = []
                 if glist_gst:
-                    task_type_node = collection.Node.one({
+                    task_type_node = node_collection.one({
                         'member_of': glist_gst._id, 'name': GSTUDIO_TASK_TYPES[4]
                     }, {
                         '_id': 1
@@ -1216,7 +1214,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
             #    in "course_enrollment_status" (AttributeType) as "Enrolled"
 
             # Fetch students which are not enrolled to given announced course(s)
-            student_cur = collection.aggregate([{
+            student_cur = node_collection.collection.aggregate([{
                 "$match": {
                     "_id": {"$in": total_student_enroll_list},
                     "relation_set.selected_course": {"$nin": ann_course_ids}
@@ -1229,10 +1227,10 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 }
             }])
 
-            selected_course_rt = collection.Node.one({
+            selected_course_rt = node_collection.one({
                 "_type": "RelationType", "name": "selected_course"
             })
-            course_enrollment_status_at = collection.Node.one({
+            course_enrollment_status_at = node_collection.one({
                 "_type": "AttributeType", "name": "course_enrollment_status"
             })
 
@@ -1283,7 +1281,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
         # Save/Update GAttribute(s) and/or GRelation(s)
         for at_rt_name in at_rt_list:
             if at_rt_name in at_rt_dict:
-                at_rt_type_node = collection.Node.one({
+                at_rt_type_node = node_collection.one({
                     '_type': {'$in': ["AttributeType", "RelationType"]},
                     'name': at_rt_name
                 })
@@ -1298,7 +1296,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                         at_rt_node = create_grelation(sce_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
 
         if sce_last_update < sce_gs.last_update:
-            collection.update(
+            node_collection.collection.update(
                 {"_id": sce_gs._id},
                 {"$set": {"last_update": sce_gs.last_update}},
                 upsert=False, multi=False
@@ -1316,7 +1314,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
             fetch_ats = ["nussd_course_type", "degree_year","degree_name"]
 
             for each in fetch_ats:
-                each = collection.Node.one({
+                each = node_collection.one({
                     '_type': "AttributeType", 'name': each
                 }, {
                     '_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1

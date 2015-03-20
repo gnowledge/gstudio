@@ -8,8 +8,8 @@ from gnowsys_ndf.ndf.forms import *
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
     (r'^$', include('gnowsys_ndf.ndf.urls')),
     (r'^ndf/', include('gnowsys_ndf.ndf.urls')),
-    (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
