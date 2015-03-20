@@ -28,7 +28,7 @@
     <div style='display:table-row;'>
       <div style='display:table-cell;'>
 	{% if "image" in  file.mime_type %}
-	<img src="{% url 'getImageThumbnail' group_name_tag file %}" vertical-align="top"></img>
+	<img src="{% url 'getFileThumbnail' group_name_tag file %}" vertical-align="top"></img>
 	{% endif %}
 	<!-- {% if "pdf" in  file.mime_type %} -->
 	<!-- <img src="/home/file/readDoc/52aacbfd1606ea57ec7c40f6" vertical-align="top"></img> -->
