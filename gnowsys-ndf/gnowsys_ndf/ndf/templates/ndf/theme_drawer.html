@@ -16,7 +16,7 @@
       <li class="bullet-item" value={{value.pk}} > 
         <input type="hidden" class="node_id" value={{value.pk}} />
         <div class="row">
-          <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' groupid value.pk %}), url(/static/ndf/images/doc.png); ">
+          <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getFileThumbnail' groupid value.pk %}), url(/static/ndf/images/doc.png); ">
           </div>
 
           <div class="small-11 columns">
