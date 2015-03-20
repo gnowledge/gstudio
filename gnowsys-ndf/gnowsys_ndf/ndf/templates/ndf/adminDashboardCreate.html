@@ -52,98 +52,79 @@
 <div style="display:table; border:1px;   border-spacing:15px;" class="small-12 columns">
 
 {% endif %}
+
 <dl class="accordion" data-accordion>
-  <dd>
+  <dd class="accordion-navigation">
     <a href="#definitionlist">Definition</a>
-  <div id="definitionlist" class="content active">
-    
-    {% for list in definitionlist %}
-    {% if translate and list != "language" %}
-	
-    <div style="display:table-row;">
-      <div style="display:table-cell;"> 
-	<font size="3"> {{list}}</font> 
-      </div>
-      {% get_input_fields class_structure|get_dict_item:list list %}
-      {% if list in  required_fields %}
-      <div style="display:table-cell;">
-	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
-      </div>
-      {% endif %}
-
-    </div>
-{% endif %}
-
-    {% if not translate %}
-	
-    <div style="display:table-row;">
-      <div style="display:table-cell;"> 
-	<font size="3"> {{list}}</font> 
-      </div>
-      {% get_input_fields class_structure|get_dict_item:list list %}
-      {% if list in  required_fields %}
-      <div style="display:table-cell;">
-	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
+    <div id="definitionlist" class="content active">
+      {% for list in definitionlist %}
+      {% if translate and list != "language" %}
+      <div style="display:table-row;">
+	<div style="display:table-cell;"> 
+	  <font size="3"> {{list}}</font> 
+	</div>
+	{% get_input_fields class_structure|get_dict_item:list list %}
+	{% if list in  required_fields %}
+	<div style="display:table-cell;">
+          <font size="3" color="red"> * </font>
+          <font id="{{list}}_required" style="display:none" color="red">This field required</font>
+        </div>
+        {% endif %}
       </div>
       {% endif %}
-
+      
+      {% if not translate %}
+      <div style="display:table-row;">
+        <div style="display:table-cell;"> 
+	  <font size="3"> {{list}}</font> 
+        </div>
+        {% get_input_fields class_structure|get_dict_item:list list %}
+        {% if list in  required_fields %}
+        <div style="display:table-cell;">
+          <font size="3" color="red"> * </font>
+          <font id="{{list}}_required" style="display:none" color="red">This field required</font>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% endfor %}
     </div>
-{% endif %}
-
-
-
-    {% endfor %}
-    
-  </div>
   </dd>
-</dl>
-<dl class="accordion" data-accordion>
-  <dd>
+  <dd class="accordion-navigation">
     <a href="#contentlist">Content</a>
     <div id="contentlist" class="content">
-
       {% for list in contentlist %}
       <div class="medium-12 columns">
-	     {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
       </div>
       {% endfor %}
-<script type="text/javascript">
-
-$(".orgitdown .orgitdownButton1 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/bold.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-$(".orgitdown .orgitdownButton2 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/italic.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-$(".orgitdown .orgitdownButton3 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/stroke.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-$(".orgitdown .orgitdownButton4 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/list-bullet.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-$(".orgitdown .orgitdownButton5 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/list-numeric.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-$(".orgitdown .orgitdownButton6 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/picture.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-$(".orgitdown .orgitdownButton7 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/link.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-$(".orgitdown .orgitdownButton8 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/html.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-$(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/close.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
-
-$(document).ready(function(){
-
-$("#lan option[value={{node.language}}]").remove();
-{% if node %}
-{% get_possible_translations node as translations %}
-
-{% for each in translations %}
-{% for k,v in each.items %}
-$("#lan option[value={{v}}]").remove();
-
-{% endfor %}
-{% endfor %}
-{% endif %}
-});
-
-</script>
-
+      <script type="text/javascript">
+	$(".orgitdown .orgitdownButton1 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/bold.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton2 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/italic.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton3 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/stroke.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton4 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/list-bullet.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton5 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/list-numeric.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton6 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/picture.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton7 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/link.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton8 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/html.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/close.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+	$(document).ready(function(){
+	$("#lan option[value={{node.language}}]").remove();
+	{% if node %}
+	{% get_possible_translations node as translations %}
+	{% for each in translations %}
+	{% for k,v in each.items %}
+	$("#lan option[value={{v}}]").remove();
+	{% endfor %}
+	{% endfor %}
+	{% endif %}
+	});
+      </script>
     </div>
   </dd>
-</dl>
-<dl class="accordion" data-accordion>
-  <dd>
+  <dd class="accordion-navigation">
     <a href="#dependencylist">Dependency</a>
     <div id="dependencylist" class="content">
-
       {% for list in dependencylist %}
       <div style="display:table-row;">
 	<div style="display:table-cell;"> 
@@ -151,27 +132,25 @@ $("#lan option[value={{v}}]").remove();
 	</div>
 	{% get_input_fields class_structure|get_dict_item:list list %}
       </div>
-{% endfor %}
+      {% endfor %}
     </div>
   </dd>
-</dl>
-<dl class="accordion" data-accordion>
-  <dd>
+  <dd class="accordion-navigation">
     <a href="#options">Options</a>
     <div id="options" class="content">
-  {% for list in options %}
-  <div style="display:table-row;">
-    <div style="display:table-cell;"> 
-      <font size="3"> {{list}}</font> 
-    </div>
-    {% get_input_fields class_structure|get_dict_item:list list %}
-  </div>
-  {% endfor %}
-  
+      {% for list in options %}
+      <div style="display:table-row;">
+        <div style="display:table-cell;"> 
+          <font size="3"> {{list}}</font> 
+        </div>
+        {% get_input_fields class_structure|get_dict_item:list list %}
+      </div>
+      {% endfor %}
     </div>
   </dd>
 </dl>
 </div>
+
 <input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
 </form>
 {% if translate %}   
@@ -194,8 +173,12 @@ $("#lan option[value={{v}}]").remove();
 
 {% block script %}
 {% autoescape off %}
-
-  var required_fields = {{ required_fields }}
+  var required_fields = [];
+  required_fields = {{ required_fields }}
+  var index = required_fields.indexOf('_type');
+  if(index>-1){
+     required_fields.splice(index, 1);
+  }
   var flag = 0;
   
   {% endautoescape %}
@@ -205,14 +188,11 @@ $("#lan option[value={{v}}]").remove();
     for(each in type_list){
       eval(type_list[each] + "()");
     }
-    alert(required_fields);
     for(reqfields in required_fields){
-  
       if($("#definitionlist [name = "+required_fields[reqfields]+" ]").val()){
         $("#"+required_fields[reqfields]+"_required").hide();
       }
       else{
-  
         flag = 1;
         $("#"+required_fields[reqfields]+"_required").show();
       }

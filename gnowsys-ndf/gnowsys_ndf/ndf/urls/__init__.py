@@ -23,8 +23,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
-    (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
-    (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
+    (r'^admin/data[\/]?', include('gnowsys_ndf.ndf.urls.adminDashboard')),
+    (r'^admin/designer[\/]?', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
 
     # --mobwrite-- commented for time being
     # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
