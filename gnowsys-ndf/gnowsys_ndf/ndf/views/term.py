@@ -106,7 +106,7 @@ def create_edit_term(request, group_id, node_id=None):
 
     nodes_list = []
     for each in terms_list:
-      nodes_list.append(each.name)
+      nodes_list.append(str((each.name).strip().lower()))
 
     if node_id:
         term_node = node_collection.one({'_id': ObjectId(node_id)})
