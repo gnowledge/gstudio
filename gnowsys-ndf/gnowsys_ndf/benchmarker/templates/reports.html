@@ -27,12 +27,16 @@
 					  	<th>  paramerters     </th>
 					  	<th>  Size of patameters  </th>	  
 					  	<th>  Time Taken   </th>
-					  	<th>  Average Time Taken</th>
+					  	{% if search_cur %}
+					  	  <!-- no Average row creation -->
+					  	{% else %}
+					  	 <th>  Average Time Taken</th> 
+					  	{% endif %}   
 					  	</thead>
 					
 			{% if search_cur %}
 				<div align="left"> 	
-				<b> Last Execution time of the methods executed today </b> </br> 
+				<b> Last All the  Execution time of the method </b> </br> 
 				{% for i in search_cur %}
 				   <tbody>
 						  <tr> <td> {{i.name}}  </td>  
@@ -41,8 +45,7 @@
 						   <td> {{i.parameters}}</td>  
 						   <td> {{i.size_of_parameters}} </td>
 						   <td> {{i.time_taken}} </td>
-						   <td> {{i.avg}} </td>
-						      </tr>
+						  </tr>
 
 						  
 			      </tbody>  
