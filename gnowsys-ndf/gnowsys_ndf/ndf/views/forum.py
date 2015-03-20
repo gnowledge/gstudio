@@ -149,7 +149,7 @@ def create_forum(request,group_id):
 
         colf = node_collection.collection.GSystem() # creating new/empty GSystem object
 
-        name = unicode(request.POST.get('forum_name',"")) # forum name
+        name = unicode(request.POST.get('forum_name',"")).strip() # forum name
         colf.name = name
         
         content_org = request.POST.get('content_org',"") # forum content
@@ -240,11 +240,11 @@ def create_forum(request,group_id):
         # return render_to_response("ndf/forumdetails.html",variables)
 
     # getting all the GSystem of forum to provide autocomplete/intellisence of forum names
-    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
     for each in available_nodes:
-      nodes_list.append(each.name)
+      nodes_list.append(str((each.name).strip().lower()))
 
     return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
@@ -276,7 +276,7 @@ def edit_forum(request,group_id,forum_id):
 
         colf = node_collection.one({'_id':ObjectId(forum_id)}) # creating new/empty GSystem object
 
-        name = unicode(request.POST.get('forum_name',"")) # forum name
+        name = unicode(request.POST.get('forum_name',"")).strip() # forum name
         colf.name = name
         
         content_org = request.POST.get('content_org',"") # forum content
@@ -354,11 +354,12 @@ def edit_forum(request,group_id,forum_id):
         # return render_to_response("ndf/forumdetails.html",variables)
 
     # getting all the GSystem of forum to provide autocomplete/intellisence of forum names
-    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
     for each in available_nodes:
-      nodes_list.append(each.name)
+      nodes_list.append(str((each.name).strip().lower()))
+
     return render_to_response("ndf/edit_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list,'forum':forum},RequestContext(request))
 
 

@@ -36,7 +36,8 @@ background:#b3ffb3;
       {% else %}
       {% trans "Compare" %}
       {% endifequal %}
-      {% trans "History" %}
+      {% trans "History" %} :
+      {{content1.3.name|title}}
     </h2>
   </div>
 
@@ -114,10 +115,9 @@ background:#b3ffb3;
         document.location.href = '/{{group_id}}/page/{{node}}/version/{{ver}}'</script>
 
   {% else %}
-  
- <div class="row">  
+ <div class="row" style = "overflow: auto; min-height: auto;max-height: 75vh;">  
  <div class="medium-5 columns"> 
-    <div id="compare-view" style="padding-bottom: 20px; overflow-x:scroll; width:250%;">
+    <div id="compare-view" style="padding-bottom: 20px;  width:250%;">
     </div>
  </div>
  </div>
@@ -131,19 +131,23 @@ background:#b3ffb3;
 a={{content|safe}}
 
 $('#compare-view').append("<table id='new' width='700'  </table>")
+$('#new').append("<thead> <th> Feild </th> <th> Value </th>  <th> Compared  </th>  </thead>")
+
+
 a1 = {{content1|safe}}
 h= 0
 a.reverse()
 $.each(a1,function(k,g)
 {   h = h + 1
     $.each(g,function(c,v){
+        
         $('#new').append("<tr id = " +  "rows" + k  + " >  <td style='vertical-align: top;'> " + c.toUpperCase().replace('_',' ')   + "</td> <td style='vertical-align: top;'>" + v + "</td> ")
         
     
     });
         t = a.pop(k)
         $.each(t,function(c,v){
-        $('#rows' + k).append("<td style='vertical-align: top;'> " + c.toUpperCase().replace('_',' ')   + "</td> <td style='vertical-align: top;'> " + v + "</td> </tr>")
+        $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
          });
    
 });

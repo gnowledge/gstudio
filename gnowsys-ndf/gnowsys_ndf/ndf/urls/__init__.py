@@ -64,6 +64,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/event', include('gnowsys_ndf.ndf.urls.event')),
     (r'^(?P<group_id>[^/]+)/data-review', include('gnowsys_ndf.ndf.urls.data_review')),
     (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
+    (r'^(?P<group_id>[^/]+)/compare', include('gnowsys_ndf.ndf.urls.version')),
 
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 
