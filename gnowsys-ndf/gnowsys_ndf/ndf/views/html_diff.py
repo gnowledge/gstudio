@@ -97,7 +97,7 @@ class HTMLMatcher(SequenceMatcher):
                 if inSpan:
                     out.write(self.endInsertText())
                     inSpan = False
-                out.write(self.formatInsertTag(item))
+                #out.write(self.formatInsertTag(item))
                 out.write(item)
                 out.write(' ')
             else:
