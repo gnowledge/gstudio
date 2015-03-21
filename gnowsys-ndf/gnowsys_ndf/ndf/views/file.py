@@ -1208,16 +1208,12 @@ def getFileThumbnail(request, group_id, _id):
           file_fs = file_node.fs_file_ids[2]
          
           if (file_node.fs.files.exists(file_fs)):
-            # f = file_node.fs.files.get(ObjectId(file_fs))
-            ## This is to display the thumbnail properly, depending upon the size of file.
-            #f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]))
-            if len(file_node.fs_file_ids) > 1:
-              print "file_node.name : ", file_node.name
-              f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[2]))
+
+            if len(file_node.fs_file_ids) > 0:
+              f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
             else:
               f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
-            # if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
-            #     f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
+
             return HttpResponse(f.read(), content_type=f.content_type)
 
           else:
