@@ -937,7 +937,7 @@ def convert_pdf_thumbnail(files,_id):
     return thumb_pdf
     
 @get_execution_time
-def convert_mid_size_image(files):
+def convert_mid_size_image(files, **kwargs):
     """
     convert image into mid size image w.r.t. max width of 500
     """
@@ -955,15 +955,20 @@ def convert_mid_size_image(files):
       # width is more than width:500
       factor = img.size[0]/500.00
       img = img.resize((500, int(img.size[1] / factor)), Image.ANTIALIAS)
-      img.save(mid_size_img, "JPEG")
-      mid_size_img.seek(0)
-      return mid_size_img
 
     elif (img.size <= size) or (img.size[0] <= size[0]): 
-      # both width and height are less than width:500 and height:300
-      # or
-      # width is lesser than width:500
-      return files.seek(0)
+      img = img.resize(img.size, Image.ANTIALIAS)
+
+    if "extension" in kwargs:
+      if kwargs["extension"]:
+        img.save(mid_size_img, kwargs["extension"])
+
+    else:    
+      img.save(mid_size_img, "JPEG")
+
+    mid_size_img.seek(0)
+
+    return mid_size_img
 
     
 
@@ -1214,18 +1219,15 @@ def getFileThumbnail(request, group_id, _id):
     if file_node is not None:
         if file_node.fs_file_ids:
           # getting latest uploaded pic's _id
-          file_fs = file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]
+          file_fs = file_node.fs_file_ids[2]
          
           if (file_node.fs.files.exists(file_fs)):
-            # f = file_node.fs.files.get(ObjectId(file_fs))
-            ## This is to display the thumbnail properly, depending upon the size of file.
-            #f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]))
-            if len(file_node.fs_file_ids) > 1:
+
+            if len(file_node.fs_file_ids) > 0:
               f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
             else:
               f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
-            # if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
-            #     f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
+
             return HttpResponse(f.read(), content_type=f.content_type)
 
           else:

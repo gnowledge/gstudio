@@ -69,7 +69,7 @@ def getImageThumbnail(request, group_id, _id):
 
     if img_obj is not None:
         # getting latest uploaded pic's _id
-        img_fs = img_obj.fs_file_ids[ len(img_obj.fs_file_ids) - 1 ]
+        img_fs = img_obj.fs_file_ids[2]
 
         if (img_obj.fs.files.exists(img_fs)):
             f = img_obj.fs.files.get(ObjectId(img_fs))

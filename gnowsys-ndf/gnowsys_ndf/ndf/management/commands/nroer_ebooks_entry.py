@@ -236,7 +236,9 @@ def cast_to_data_type(value, data_type):
         casted_value = unicode(value)
 
     elif data_type == basestring:
-        casted_value = str(value)
+        casted_value = unicode(value)
+        # the casting is made to unicode despite of str;
+        # to prevent "authorized type" check error in mongoDB
 
     elif (data_type == int) and str(value):
         casted_value = int(value) if (str.isdigit(str(value))) else value
