@@ -10,14 +10,14 @@ from django.http import HttpResponseRedirect
 
 # from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.models import node_collection
-# from gnowsys_ndf.ndf.views.methods import *
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 
 # import os.path
 # import json
 
 GAPP = node_collection.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
 
-
+@get_execution_time
 def lang_pref(request):
     url=request.GET.get('url','')
     appid=request.GET.get('appid','')

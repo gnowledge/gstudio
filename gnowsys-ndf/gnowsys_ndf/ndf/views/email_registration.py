@@ -7,8 +7,9 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.template.response import TemplateResponse
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 
-
+@get_execution_time
 def password_reset_email(request, *args, **kwargs):
     if request.method == "POST":
         eml=request.POST.get('email',None)
@@ -18,7 +19,7 @@ def password_reset_email(request, *args, **kwargs):
                 return HttpResponseRedirect(reverse('password_reset_error'))
     return password_reset(request,*args,**kwargs)
 
-
+@get_execution_time
 def password_reset_error(request,*args,**kwargs):
     if request.method == "POST":
         eml=request.POST.get('email',None)

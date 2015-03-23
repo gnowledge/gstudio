@@ -28,9 +28,8 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_published_version_dict,parse_data
-
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list,get_execution_time,get_published_version_dict,parse_data
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
@@ -50,7 +49,7 @@ app = gst_page
 #######################################################################################################################################
 # VIEWS DEFINED FOR GAPP -- 'PAGE'
 #######################################################################################################################################
-
+@get_execution_time
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
@@ -269,6 +268,7 @@ def page(request, group_id, app_id=None):
 
 
 @login_required
+@get_execution_time
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
@@ -334,6 +334,7 @@ def create_edit_page(request, group_id, node_id=None):
 
 
 @login_required    
+@get_execution_time
 def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
     
@@ -356,7 +357,7 @@ def delete_page(request, group_id, node_id):
 
 
 
-
+@get_execution_time
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
     ins_objectid  = ObjectId()
@@ -432,7 +433,7 @@ def translate_node(request,group_id,node_id=None):
     )        
 
 
-        
+@get_execution_time        
 def publish_page(request,group_id,node):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -466,79 +467,3 @@ def publish_page(request,group_id,node):
     return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
 
 
-def merge_doc(request,group_id,node_id,version_1,version_2):
-     node = node_collection.one({'_id': ObjectId(node_id)})
-     doc=history_manager.get_version_document(node,version_1)
-     doc2=history_manager.get_version_document(node,version_2)
-     a=doc.content_org
-     b=doc2.content_org
-     c=doc.content
-     d=doc2.content   
-     con2=diff_string(a,b)
-     con3=diff_string(c,d)
-     doc2.update(doc)
-     for attr in node:
-       if attr != '_type':
-        try:
-		node[attr] = doc2[attr];
-        except:
-		node[attr]=node[attr]
-     doc2.content_org=con2
-     doc2.content=con3
-     node.content_org=doc2.content_org
-     node.content=doc2.content
-     node.modified_by=request.user.id
-     node.save()
-     update_mobwrite = update_mobwrite_content_org(node)
-     ver=history_manager.get_current_version(node)
-     view='merge'
-     
-     return render_to_response("ndf/version_page.html",
-                               {'view': view,
-                                'appId':app._id,
-                                'version_no':version_1,
-                                'node':node,
-                                'groupid':group_id,
-                                'group_id':group_id,
-                                'content':node,
-                                'ver':ver
-                               },
-                             
-                              context_instance = RequestContext(request)
-    )        
-
-  
-  
-def revert_doc(request,group_id,node_id,version_1):
-   node = node_collection.one({'_id': ObjectId(node_id)})
-   group = node_collection.one({'_id': ObjectId(group_id)})
-   doc=history_manager.get_version_document(node,version_1)
-   
-   for attr in node:
-      if attr != '_type':
-            try:
-	    	node[attr] = doc[attr];
-            except:
-		node[attr] =node[attr]
-   node.modified_by=request.user.id
-   node.save()
-   update_mobwrite = update_mobwrite_content_org(node)
-   view ='revert'
-   ver=history_manager.get_current_version(node)
-   selected_versions=selected_versions = {"1": version_1, "2": ""}
-   
-   return render_to_response("ndf/version_page.html",
-                               {'view': view,
-                                'appId':app._id,
-                                'selected_versions': selected_versions, 
-                                'node':node,
-                                'groupid':group_id,
-                                'group_id':group_id,
-                                'content':node,
-                                'ver':ver    
-                           
-                               },
-                             
-                              context_instance = RequestContext(request)
-    )
-			  

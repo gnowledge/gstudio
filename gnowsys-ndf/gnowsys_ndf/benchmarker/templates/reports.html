@@ -1,0 +1,84 @@
+<html>
+
+<center>
+<div  style = "width:70%;" align="right"> 
+			<center><h1>   MetaStudio  </h1> </center>
+			<center><h2> <u>  BenchMark Report </u> </h2> </center>
+
+			<center> 
+			   <form method="POST" >
+			          {% csrf_token %}
+			          <select name = "methodlist" >
+			             <option value = 'ALL'> ALL </option>
+			             {% for i in listofmethods %}
+			               <option value = {{i}}> {{i}} </option>
+			             {% endfor %}  
+			          </select>
+			          <input type="submit"  value = "search">
+
+			  </form>        
+			</center>
+			
+			<table border="1" width="100%">
+				  	    <thead>
+                        <th>  Method Name  </th> 
+					  	<th>  Last Executed at </th>
+					  	<th>  URL Called from  </th>
+					  	<th>  paramerters     </th>
+					  	<th>  Size of patameters  </th>	  
+					  	<th>  Time Taken   </th>
+					  	{% if search_cur %}
+					  	  <!-- no Average row creation -->
+					  	{% else %}
+					  	 <th>  Average Time Taken</th> 
+					  	{% endif %}   
+					  	</thead>
+					
+			{% if search_cur %}
+				<div align="left"> 	
+				<b> Last All the  Execution time of the method </b> </br> 
+				{% for i in search_cur %}
+				   <tbody>
+						  <tr> <td> {{i.name}}  </td>  
+						   <td> {{i.last_update}} </td>  
+						   <td> {{i.calling_url}}</td>  
+						   <td> {{i.parameters}}</td>  
+						   <td> {{i.size_of_parameters}} </td>
+						   <td> {{i.time_taken}} </td>
+						  </tr>
+
+						  
+			      </tbody>  
+			    {% endfor %}
+			  </table>
+			  </div>
+
+				
+			{% else %}
+			  <div align="left"> 	
+				<b> Last Execution time of the methods executed today </b> </br> 
+				{% for i in bench_cur %}
+				   <tbody>
+                         
+						  <tr> <td> {{i.name}}  </td>  
+						   <td> {{i.last_update}} </td>  
+						   <td> {{i.calling_url}}</td>  
+						   <td> {{i.parameters}}</td>  
+						   <td> {{i.size_of_parameters}} </td>
+						   <td> {{i.time_taken}} </td>
+						   {% if i.avg %}
+						   <td> <center> {{i.avg}} </center> </td>
+						   {% else %}
+						   <td> <center> ---  </center> </td>
+						   {% endif %}
+						   </tr>
+
+						  
+			      </tbody>  
+			    {% endfor %}
+			  </table>
+			  </div>  
+			{% endif %}
+</div>
+</center>
+</html>

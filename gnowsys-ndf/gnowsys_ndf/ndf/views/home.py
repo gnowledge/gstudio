@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.views.generic import RedirectView
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 
 try:
     from bson import ObjectId
@@ -21,7 +22,7 @@ from gnowsys_ndf.ndf.models import node_collection
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
 ###################################################
-
+@get_execution_time
 def homepage(request, group_id):
     
     if request.user.is_authenticated():
@@ -70,7 +71,7 @@ def homepage(request, group_id):
         else:
             return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": group_id}) )
 
-
+@get_execution_time
 def landing_page(request):
     '''
     Method to render landing page after checking variables in local_settings/settings file.

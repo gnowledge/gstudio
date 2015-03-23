@@ -23,7 +23,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 # from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 # from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.models import STATUS_CHOICES
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields  # , create_grelation_list ,set_all_urls
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,get_execution_time  # , create_grelation_list ,set_all_urls
 from gnowsys_ndf.ndf.views.methods import create_grelation
 # from gnowsys_ndf.ndf.views.methods import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_group_name_id
@@ -51,6 +51,7 @@ page_id = node_collection.find_one({'_type': "GSystemType", "name": "Page"}, {"_
 
 # data review in File app
 @login_required
+@get_execution_time
 def data_review(request, group_id, page_no=1):
     '''
     To get all the information related to every resource object in the group.
@@ -128,7 +129,7 @@ def data_review(request, group_id, page_no=1):
     )
 # ---END of data review in File app
 
-
+@get_execution_time
 def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
 
     group_name, group_id = get_group_name_id(group_id)
@@ -185,6 +186,7 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
 
 # saving resource object of data review
 @login_required
+@get_execution_time
 def data_review_save(request, group_id):
     '''
     Method to save each and every data-row edit of data review app
