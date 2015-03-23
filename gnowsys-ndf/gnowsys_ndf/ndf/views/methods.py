@@ -76,7 +76,6 @@ def get_execution_time(f):
 	        except:	
 	        	pass 
 	        benchmark_node.save()
-	        print "method",f.func_name,"executed for",time_diff,"seconds"
 	        return ret
    if BENCHMARK == 'ON': 
     	return wrap
