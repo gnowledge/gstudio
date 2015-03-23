@@ -150,7 +150,18 @@ def uDashboard(request, group_id):
     reply_gst = node_collection.one({"_type": "GSystemType", "name":"Reply"})
     reply_count = node_collection.find({"_type":"GSystem","member_of":reply_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
 
+    task_gst = node_collection.one(
+        {'_type': "GSystemType", 'name': "Task"}
+    )
     
+    task_cur = ""
+    if int(current_user) != int(ID): 
+               task_cur = node_collection.find(
+        {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee': int(ID)}
+    ).sort('last_update', -1).limit(10)
+
+               dashboard_count.update({'Task': task_cur.count()})
+  
     
     group_cur = node_collection.find(
         {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
@@ -213,15 +224,7 @@ def uDashboard(request, group_id):
     #         user_assigned.append(task_node) 
     
     # task_cur gives the task asigned to users
-    task_gst = node_collection.one(
-        {'_type': "GSystemType", 'name': "Task"}
-    )
-    task_cur = node_collection.find(
-        {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee': int(ID),"access_policy":{"$in":Access_policy}}
-    ).sort('last_update', -1).limit(10)
-
-    dashboard_count.update({'Task': task_cur.count()})
-
+    
     
     obj = node_collection.find(
         {'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}}
