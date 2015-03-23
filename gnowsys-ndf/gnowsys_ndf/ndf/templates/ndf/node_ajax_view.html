@@ -770,15 +770,44 @@ table {
         {% if topic %}
           <!-- <div class="content" id="view-graph">  </div> -->
 
-          
-          <div class="topic_content" id="contents"> 
-            {% get_translations_obj node.pk as contents %}
+      <div class="topic_content" id="contents"> 
+            {% get_all_resources node.pk as contents %}
             {% for k,v in contents.items %}    
-                {{k}} : {{v}}
-              {% endfor %}
-            
-        
-          </div>
+               <fieldset id="{{k}}">
+	      <legend>{{k}}</legend>
+	      {% for e in v %}
+	      {% if k == "Images" %}
+	      {% if e.language == LANGUAGE_CODE %}
+	      <a href ="{% url 'image_detail' group_name_tag e.pk %}" style="display: inline-block">
+		<img src="{% url 'getFileThumbnail' group_name_tag e.pk %}" />
+		<br/><div>{{e.name}}</div>
+	      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+	      {% endif %}
+	      {% endif %}
+	      {% endfor %}
+	       
+
+	      <fieldset id= "Other {{k}}">
+		<legend>{% trans "In Other Languages" %}</legend>
+	     	{% for e in v %}  
+	      	{% if k == "Images" %}
+	        {% if e.language != LANGUAGE_CODE %}
+	        <a href ="{% url 'image_detail' group_name_tag e.pk %}" style="display: inline-block">
+		<img src="{% url 'getFileThumbnail' group_name_tag e.pk %}" />
+		<br/><div>{{e.name}}</div>
+	      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+	     {% endif %}
+		{% endif %}
+		{% endfor %}
+	       </fieldset>
+	    </fieldset>
+              
+
+
+
+
+{% endfor %}
+            </div>
 
         {% endif %}
         <!-- End of displaying topic page contents -->
