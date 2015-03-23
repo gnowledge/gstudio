@@ -520,7 +520,9 @@ def switch_group(request,group_id,node_id):
     if request.method == "POST":
       new_grps_list = request.POST.getlist("new_groups_list[]", "")
       resource_exists = False
+      resource_exists_in_grps = []
       response_dict = {'success': False, 'message': ""}
+
       new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
       if new_grps_list_distinct:
         for each_new_grp in new_grps_list_distinct:
@@ -528,7 +530,9 @@ def switch_group(request,group_id,node_id):
             grp = node_collection.find({'name': node.name, "group_set": ObjectId(each_new_grp), "member_of":ObjectId(node.member_of[0])})
             if grp.count() > 0:
               resource_exists = True
-              break
+              resource_exists_in_grps.append(unicode(each_new_grp))
+
+        response_dict["resource_exists_in_grps"] = resource_exists_in_grps
 
       if not resource_exists:
         new_grps_list_all = [ObjectId(item) for item in new_grps_list]
@@ -538,8 +542,13 @@ def switch_group(request,group_id,node_id):
         response_dict["message"] = "Published to selected groups"
       else:
         response_dict["success"] = False
-        response_dict["message"] = "Cannot Publish to selected groups"
-
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists. Hence Cannot Publish to selected groups."
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists in selected group(s). " + \
+                "Hence cannot be cross published now." + \
+                " For publishing, you can rename this " + node.member_of_names_list[0] + " and try again."
+      print response_dict
       return HttpResponse(json.dumps(response_dict))
 
     else:
