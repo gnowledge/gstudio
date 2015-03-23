@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.views.course import *
 from gnowsys_ndf.ndf.views.person import *
 from gnowsys_ndf.ndf.views.enrollment import *
 from gnowsys_ndf.ndf.views.methods import get_execution_time
-collection = get_database()[Node.collection_name]
+
 
 @get_execution_time
 def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):

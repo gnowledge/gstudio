@@ -30,8 +30,6 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
 #######################################################################################################################################
 
-db = get_database()
-collection = db[Node.collection_name]
 
 @get_execution_time
 def all_observations(request, group_id, app_id=None):
