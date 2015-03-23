@@ -1297,14 +1297,17 @@ table {
 <script type="text/javascript">
 
   // publishing resource in other groups
-  var data_list = ""
   var saveflag = 0
+  var data_list = []
 
   function get_new_groups(){
-    $.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
-           data_list=data_list+String(item.id)+",";
-    });
+    data_list = []
+    $("#switchgrp #collection_set_drawer2").children("li").each(
+      function(c,v){
+        data_list.push($(v).attr("id"))
+      });
   }
+
 
   $(document).on('click',"#switch_group",function(){
     $('#switchgrp #collection_set_drawer1').html("");
@@ -1383,21 +1386,31 @@ table {
 
   });
 
-  $(document).on('click',"#save_switch_group",function(){
+  $(document).on('click',"#save_switch_group",function(event){
     var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
     saveflag = 1;
     get_new_groups();
-    new_groups=data_list;
+    new_groups = data_list
+    success_state = false
     $.ajax({
-           url: turl,
-           type: 'POST',
-           data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            url: turl,
+            type: 'POST',
+            datatype:"json",
+            data: { new_groups_list : new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
             success: function(data){
-                           alert("Successfully switched groups");
-                
-               },
+                      data = JSON.parse(data)
+                      success_state = data["success"]
+                      alert(data["message"]);
+            },
+            complete: function(){
+                      if(!success_state){
+                        event.preventDefault();
+                      }
+                      else{
+                        $("#publish_resource").foundation('reveal', 'close');
+                      }
+            },
     }); //end of ajax
-
   }); //end of document click
 
   // Taken value of svg data of that node globally
