@@ -1152,7 +1152,7 @@ def get_prior_node(node_id):
 @register.assignment_tag
 # method fist get all possible translations associated with current node &
 # return the set of resources by using get_resources method
-def get_all_resources(node_id):
+def get_all_resources(request,node_id):
         obj_set=[]
         result_set=[]
         node=node_collection.one({'_id':ObjectId(node_id)})
@@ -1165,7 +1165,16 @@ def get_all_resources(node_id):
         for each in obj_set:
                 n=node_collection.one({'_id':ObjectId(each)})
                 resources_dict=get_resources(each,resources)
-        return resources_dict
+        res_dict={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        for k,v in res_dict.items():
+                res_dict[k]={'fallback_lang':[],'other_languages':[]}
+        for key,val in resources_dict.items():
+                for res in val:
+                        if res.language == request.LANGUAGE_CODE:
+                                        res_dict[key]['fallback_lang'].append(res)
+                        else:
+                                        res_dict[key]['other_languages'].append(res)
+        return res_dict
 
 @register.assignment_tag
 # method returns resources associated with node
