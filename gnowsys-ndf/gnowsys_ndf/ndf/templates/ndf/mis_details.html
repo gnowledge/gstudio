@@ -151,12 +151,12 @@
             <div class="row">
               {% if "image" in mime_type %}
               <a class="small-12 columns" href="{% url 'file_detail' groupid system_id %}">
-                <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+                <img src="{% url 'getFileThumbnail' groupid system_id %}" />
               </a>
 
               {% elif "video" in mime_type %}
               <a class="small-12 columns" href="{% url 'file_detail' groupid system_id %}">
-                <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+                <img src="{% url 'getFileThumbnail' groupid system_id %}" />
               </a>
 
               {% else %}

@@ -15,6 +15,12 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,get_execution_time
+
+from gnowsys_ndf.ndf.views.file import * 
+from gnowsys_ndf.ndf.views.forum import *
 from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
@@ -39,7 +45,7 @@ ins_objectid  = ObjectId()
 #######################################################################################################################################
 #                                                                     V I E W S   D E F I N E D   F O R   U S E R   D A S H B O A R D
 #######################################################################################################################################
-
+@get_execution_time
 def userpref(request,group_id):
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     lan_dict={}
@@ -53,12 +59,11 @@ def userpref(request,group_id):
         auth.modified_by=request.user.id
         auth.save()
     return HttpResponse("Success")
-    
-
 @login_required
+@get_execution_time
 def uDashboard(request, group_id):
     usrid = group_id
-
+    print "get the timing"
     ID = int(usrid)
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
     auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1})
@@ -270,7 +275,7 @@ def uDashboard(request, group_id):
     )
        
    
-
+@get_execution_time
 def user_preferences(request,group_id,auth_id):
     try:
         grp = node_collection.one({'_id': ObjectId(auth_id)})
@@ -314,7 +319,7 @@ def user_preferences(request,group_id,auth_id):
     except Exception as e:
         print "Exception in userpreference view "+str(e)
         return HttpResponse("Failure")
-
+@get_execution_time
 def user_template_view(request,group_id):
     auth_group = None
     group_list=[]
@@ -362,6 +367,7 @@ def user_template_view(request,group_id):
     return render_to_response(template, variable)
 
 @login_required
+@get_execution_time
 def user_activity(request, group_id):
     activity_user = node_collection.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
                                                  
@@ -386,7 +392,7 @@ def user_activity(request, group_id):
     #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
     variable = RequestContext(request, {'user_activity':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
     return render_to_response(template, variable)
-
+@get_execution_time
 def group_dashboard(request, group_id):
     """
     This view returns data required for group's dashboard.

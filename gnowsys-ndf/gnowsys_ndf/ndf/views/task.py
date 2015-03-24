@@ -25,7 +25,8 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, GSystemType
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import save_file
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node
+from gnowsys_ndf.ndf.models import GSystemType, Node 
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node,get_execution_time
 from gnowsys_ndf.ndf.views.methods import parse_template_data, create_gattribute, create_grelation
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 
@@ -37,7 +38,7 @@ if sitename :
 else : 
 	sitename = ""
 
-
+@get_execution_time
 def task(request, group_name, task_id=None):
     """Renders a list of all 'task' available within the database.
     
@@ -61,7 +62,7 @@ def task(request, group_name, task_id=None):
     template = "ndf/task.html"
     variable = RequestContext(request, {'title': title, 'appId':app._id, 'TASK_inst': TASK_inst, 'group_id': group_id, 'groupid': group_id, 'group_name':group_name })
     return render_to_response(template, variable)
-
+@get_execution_time
 def task_details(request, group_name, task_id):
   """Renders given task's details.
   
@@ -165,7 +166,7 @@ def task_details(request, group_name, task_id):
   variables = RequestContext(request, var)
   template = "ndf/task_details.html"
   return render_to_response(template, variables)
-
+@get_execution_time
 def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None, slug=None):
     if request.method == "POST" :
         group_object = node_collection.one({'name': unicode(group_name), "_type": "Group"})
@@ -199,6 +200,7 @@ def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None,
             	return StreamingHttpResponse("UploadError")	
 
 @login_required
+@get_execution_time
 def create_edit_task(request, group_name, task_id=None, task=None, count=0):
   """Creates/Modifies details about the given Task.
   
@@ -669,6 +671,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
         )
 
 @login_required    
+@get_execution_time
 def task_collection(request,group_name,task_id=None,each_page=1):
     ins_objectid  = ObjectId()
     choice=0
@@ -713,7 +716,7 @@ def task_collection(request,group_name,task_id=None,each_page=1):
     variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name,"page_info":paged_resources,'page_no':each_page, 
                                         'group_id': group_id, 'groupid': group_id,'choice':choice,'status':'None','task':task_id})
     return render_to_response(template, variable)                                     	
-
+@get_execution_time
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
@@ -756,7 +759,7 @@ def delete_task(request, group_name, _id):
         print "Exception:", e
 
     return HttpResponseRedirect(reverse('task', kwargs={'group_name': group_name }))
-
+@get_execution_time
 def check_filter(request,group_name,choice=1,status='New',each_page=1):
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}

@@ -19,8 +19,6 @@ import time
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 # from django.core.management.base import CommandError
-# from django.http import Http404
-# from django.template.defaultfilters import slugify
 
 from django_mongokit import get_database
 from mongokit import IS
@@ -39,10 +37,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
-# from gnowsys_ndf.settings import GAPPS
-# from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.management.commands.data_entry import perform_eval_type
-# from gnowsys_ndf.ndf.org2any import org2html
 
 ##############################################################################
 
@@ -57,7 +52,6 @@ theme_gst = node_collection.one({"name": "Theme"})
 theme_item_gst = node_collection.one({"name": "theme_item"})
 topic_gst = node_collection.one({"name": "Topic"})
 nroer_team_id = 1
-# GST_IMAGE = node_collection.one({'name': u"Image", '_type': 'GSystemType'})
 
 
 class Command(BaseCommand):
@@ -98,7 +92,7 @@ class Command(BaseCommand):
                                     total_rows += 1
                                     json_file_content.append(row)
 
-                                info_message = "\n- File '" + file_name + "' contains : " + str(total_rows) + " entries/rows (excluding top-header/column-names)." 
+                                info_message = "\n- File '" + file_name + "' contains : [ " + str(total_rows) + " ] entries/rows (excluding top-header/column-names)." 
                                 print info_message
                                 log_list.append(str(info_message))
 
@@ -129,7 +123,6 @@ class Command(BaseCommand):
 
                     if is_json_file_exists:
 
-                        # print nroer_team_id
                         create_user_nroer_team()
                         # print nroer_team_id
 
@@ -143,7 +136,6 @@ class Command(BaseCommand):
                         t1 = time.time()
 
                         time_diff = t1 - t0
-                        # print time_diff
                         total_time_minute = round( (time_diff/60), 2) if time_diff else 0
                         total_time_hour = round( (time_diff/(60*60)), 2) if time_diff else 0
                         
@@ -172,6 +164,7 @@ class Command(BaseCommand):
                     ======================= End of Iteration ============\
                     ================================================\n")
                 # print log_list
+
                 log_file_name = args[0].rstrip("csv") + "log"
                 log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
                 # print log_file_path
@@ -231,7 +224,9 @@ def cast_to_data_type(value, data_type):
         casted_value = unicode(value)
 
     elif data_type == basestring:
-        casted_value = str(value)
+        casted_value = unicode(value)
+        # the casting is made to unicode despite of str;
+        # to prevent "authorized type" check error in mongoDB
 
     elif (data_type == int) and str(value):
         casted_value = int(value) if (str.isdigit(str(value))) else value
@@ -354,19 +349,6 @@ def parse_data_create_gsystem(json_file_path):
                       
                       # --- END of adding the default field values
 
-                    # processing for remaining fields
-                    # elif node_structure[parsed_key] == unicode:
-                    #     parsed_json_document[parsed_key] = unicode(json_document[key])
-                    # elif node_structure[parsed_key] == basestring:
-                    #     parsed_json_document[parsed_key] = str(json_document[key])
-                    # elif (node_structure[parsed_key] == int) and (type(json_document[key]) == int):
-                    #     parsed_json_document[parsed_key] = int(json_document[key])
-                    # elif node_structure[parsed_key] == bool: # converting unicode to int and then to bool
-                    #     parsed_json_document[parsed_key] = bool(int(json_document[key]))
-                    #   # elif node_structure[parsed_key] == list:
-                    #     # parsed_json_document[parsed_key] = list(json_document[key])
-                    # elif node_structure[parsed_key] == datetime.datetime:
-                    #    parsed_json_document[parsed_key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
                     else:
                         # parsed_json_document[parsed_key] = json_document[key]
                         parsed_json_document[parsed_key] = cast_to_data_type(json_document[key], node_structure.get(parsed_key))
@@ -495,186 +477,204 @@ def parse_data_create_gsystem(json_file_path):
                   for rel_key, rel_value in gst_possible_relations_dict.iteritems():
                     if key == rel_key:
                     # if key == "teaches":
-                      is_relation = False
+                        is_relation = False
 
-                      if json_document[key]:
+                        if json_document[key]:
 
-                        # -----------------------------
-                        def _get_id_from_hierarchy(hier_list, oid=None):
-                          '''
-                          Returns the last hierarchical element's ObjectId.
-                          Arguments to be passes is list of unicode names.
-                          e.g.
-                          hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
-                          '''
-                          # print oid
-                          if len(hier_list) >= 2:
-                            # print hier_list, "len(hier_list) : ", len(hier_list)
-                            try:
-                              if oid:
-                                curr_oid = node_collection.one({ "_id": oid })
-                                # print "curr_oid._id", curr_oid._id
-                              else:
-                                row_list = []
-                                for e in hier_list:
-                                    row_list.append(e)
+                            # -----------------------------
+                            hierarchy_output = None
+                            def _get_id_from_hierarchy(hier_list, oid=None):
+                                '''
+                                Returns the last hierarchical element's ObjectId.
+                                Arguments to be passes is list of unicode names.
+                                e.g.
+                                hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
+                                '''
+                                # print oid
+                                if len(hier_list) >= 2:
+                                    # print hier_list, "len(hier_list) : ", len(hier_list)
+                                    # object_exist = ""
+                                    try:
+                                        if oid:
+                                            curr_oid = node_collection.one({ "_id": oid })
+                                            # print "curr_oid._id", curr_oid._id
 
-                                curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                        else:
+                                            row_list = []
 
-                              if curr_oid:
-                                object_exist = True
-                                next_oid = node_collection.one({ 
-                                                          "name": hier_list[1],
-                                                          'group_set': {'$all': [ObjectId(home_group._id)]},
-                                                          'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
-                                                          '_id': {'$in': curr_oid.collection_set }
-                                                          })
+                                            for e in hier_list:
+                                                row_list.append(e)
 
-                                # print "||||||", next_oid.name
-                                hier_list.remove(hier_list[0])
-                                # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
+                                            curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
 
-                                if (len(hier_list) == 1) and next_oid:
-                                    # print "retun successfully"
-                                    return next_oid._id
-                                _get_id_from_hierarchy(hier_list, next_oid._id)
-                              else:
-                                object_exists = False
-                                # print "retun NOT successfully"
+                                        if curr_oid:
+                                            # object_exist = True
+                                            next_oid = node_collection.one({ 
+                                                                      "name": hier_list[1],
+                                                                      'group_set': {'$all': [ObjectId(home_group._id)]},
+                                                                      'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
+                                                                      '_id': {'$in': curr_oid.collection_set }
+                                                                      })
 
-                            except Exception as e:
-                              error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
-                              # print error_message
-                              log_list.append(error_message)
-                            
-                            if len(hier_list) == 1:
-                              if oid:
-                                # print "oid: ", oid
-                                return oid
-                              else:
-                                # print "else - hier_list : ", hier_list
-                                temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                # print temp_obj
-                                if temp_obj.count() > 0:
-                                    for e in temp_obj:
-                                        if e.prior_node:
-                                            for k in e.prior_node:
-                                                obj = node_collection.one({'_id':ObjectId(k) })
-                                                # print "\nitem: ",row_list[len(row_list)-2],"\n"
-                                                if obj.name == row_list[len(row_list)-2]:
-                                                    # print e._id
-                                                    return e._id
+                                        
+                                            # print "||||||", next_oid.name
+                                            hier_list.remove(hier_list[0])
+                                            # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
 
-                                    return None
+                                            _get_id_from_hierarchy(hier_list, next_oid._id)
+      
+                                        else:
+                                            error_message = "!! ObjectId of curr_oid does not found."
+                                            print error_message
+                                            log_list.append(error_message)
+
+                                    except Exception as e:
+                                        error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
+                                        # print error_message
+                                        log_list.append(error_message)
+
                                 else:
-                                    return None
-                                # if temp_obj:
-                                #   return temp_obj._id
-                                # else:
-                                #   return None
+                                    global hierarchy_output
+                                    hierarchy_output = oid
+                                    # print "return oid: ", oid
 
-                            # if any one of the item of hierarchy does not exist in database then:
-                            elif not object_exist:
-                              temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                              if temp_obj:
-                                return temp_obj._id
-                              else:
-                                return None
+                                return hierarchy_output
 
-                          # -----------------------------                  
+                                # -----------------------------                  
+                          
+                                # if len(hier_list) == 1:
+                                #     if oid:
+                                #       print "oid: ", oid
+                                #       return oid
+                                #     else:
+                                #       # print "else - hier_list : ", hier_list
+                                #       temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                #       # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                #       # print temp_obj
+                                #       if temp_obj.count() > 0:
+                                #           for e in temp_obj:
+                                #               if e.prior_node:
+                                #                   for k in e.prior_node:
+                                #                       obj = node_collection.one({'_id':ObjectId(k) })
+                                #                       # print "\nitem: ",row_list[len(row_list)-2],"\n"
+                                #                       if obj.name == row_list[len(row_list)-2]:
+                                #                           # print e._id
+                                #                           return e._id
 
-                        # most often the data is hierarchy sep by ":"
-                        if ":" in json_document[key]:
-                          formatted_list = []
-                          temp_teaches_list = json_document[key].replace("\n", "").split(":")
-                          # print "\n temp_teaches", temp_teaches
-                          for v in temp_teaches_list:
-                            formatted_list.append(v.strip())
+                                #           return None
+                                #       else:
+                                #           return None
+                                #       # if temp_obj:
+                                #       #   return temp_obj._id
+                                #       # else:
+                                #       #   return None
 
-                          right_subject_id = []
-                          rsub_id = _get_id_from_hierarchy(formatted_list)
+                                #   # if any one of the item of hierarchy does not exist in database then:
+                                # elif not object_exist:
+                                #     temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                                #     if temp_obj:
+                                #       return temp_obj._id
+                                #     else:
+                                #       return None
 
-                          # checking every item in hierarchy exist and leaf node's _id found
-                          if rsub_id:
-                            right_subject_id.append(rsub_id)
-                            json_document[key] = right_subject_id
-                            # print json_document[key]
-                          else:
-                            error_message = "\n!! While creating teaches rel: Any one of the item in hierarchy"+ str(json_document[key]) +"does not exist in Db. \n!! So relation: " + str(key) + "cannot be created.\n"
-                            log_list.append(error_message)
+                              # -------------- END of _get_id_from_hierarchy() ---------------                  
+
+                            # most often the data is hierarchy sep by ":"
+                            if ":" in json_document[key]:
+                                formatted_list = []
+                                temp_teaches_list = json_document[key].replace("\n", "").split(":")
+                                # print "\n temp_teaches", temp_teaches
+
+                                for v in temp_teaches_list:
+                                    formatted_list.append(v.strip())
+
+                                right_subject_id = []
+                                rsub_id = _get_id_from_hierarchy(formatted_list)
+                                hierarchy_output = None
+
+                                # checking every item in hierarchy exist and leaf node's _id found
+                                if rsub_id:
+                                    right_subject_id.append(rsub_id)
+                                    json_document[key] = right_subject_id
+                                    # print json_document[key]
+
+                                else:
+                                    error_message = "\n!! While creating teaches rel: Any one of the item in hierarchy"+ str(json_document[key]) +"does not exist in Db. \n!! So relation: " + str(key) + " cannot be created.\n"
+                                    print error_message
+                                    log_list.append(error_message)
+                                    break
+                              
+                            # sometimes direct leaf-node may be present without hierarchy and ":"
+                            else:
+                                formatted_list = list(json_document[key].strip())
+                                right_subject_id = []
+                                right_subject_id.append(_get_id_from_hierarchy(formatted_list))
+                                json_document[key] = right_subject_id
+
+                            # print "\n----------", json_document[key]
+                            info_message = "\n- For GRelation parsing content | key: " + str(rel_key) + " -- " + str(json_document[key])
+                            print info_message
+                            log_list.append(str(info_message))
+                            # print list(json_document[key])
+
+                            # perform_eval_type(key, json_document, "GSystem", "GSystem")
+
+                            for right_subject_id in json_document[key]:
+                                # print "\njson_document[key]: ", json_document[key]
+
+                                subject_id = node._id
+                                # print "subject_id : ", subject_id
+                                # print "node.name: ", node.name
+                                # Here we are appending list of ObjectIds of GSystemType's type_of field 
+                                # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
+                                # This is because some of the RelationType's are holding Base class's ObjectId
+                                # and not that of the Derived one's
+                                # Delibrately keeping GSystemType's ObjectId first in the list
+                                # And hence, used $in operator in the query!
+                                rel_subject_type = []
+                                rel_subject_type.append(file_gst._id)
+                                
+                                if file_gst.type_of:
+                                    rel_subject_type.extend(file_gst.type_of)
+
+                                relation_type_node = node_collection.one({'_type': "RelationType", 
+                                                                          '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
+                                                                                  {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
+                                                                          'subject_type': {'$in': rel_subject_type}
+                                                                  })
+
+                                right_subject_id_or_list = []
+                                right_subject_id_or_list.append(ObjectId(right_subject_id))
+                                
+                                nodes = triple_collection.find({'_type': "GRelation", 
+                                            'subject': subject_id, 
+                                            'relation_type.$id': relation_type_node._id
+                                          })
+
+                                # sending list of all the possible right subject to relation
+                                for n in nodes:
+                                    if not n.right_subject in right_subject_id_or_list:
+                                        right_subject_id_or_list.append(n.right_subject)
+
+                                info_message = "\n- Creating GRelation ("+ str(node.name)+ " -- "+ str(rel_key)+ " -- "+ str(right_subject_id_or_list)+") ..."
+                                print info_message
+                                log_list.append(str(info_message))
+                                
+                                gr_node = create_grelation(subject_id, relation_type_node, right_subject_id_or_list)
+                                                          
+                                info_message = "\n- Grelation processing done.\n"
+                                print info_message
+                                log_list.append(str(info_message))
+
+                            # To break outer for loop if key found
                             break
-                        
-                        # sometimes direct leaf-node may be present without hierarchy and ":"
+
                         else:
-                          formatted_list = list(json_document[key].strip())
-                          right_subject_id = []
-                          right_subject_id.append(_get_id_from_hierarchy(formatted_list))
-                          json_document[key] = right_subject_id
+                            error_message = "\n!! DataNotFound: No data found for relation ("+ str(rel_key)+ ") while creating GSystem (" + str(file_gst.name) + " -- " + str(node.name) + ")\n"
+                            print error_message
+                            log_list.append(str(error_message))
 
-                        # print "\n----------", json_document[key]
-                        info_message = "\n- For GRelation parsing content | key: " + str(rel_key) + " -- " + str(json_document[key])
-                        print info_message
-                        log_list.append(str(info_message))
-                        # print list(json_document[key])
-
-                        # perform_eval_type(key, json_document, "GSystem", "GSystem")
-
-                        for right_subject_id in json_document[key]:
-                          # print "\njson_document[key]: ", json_document[key]
-
-                          subject_id = node._id
-                          # print "subject_id : ", subject_id
-                          # print "node.name: ", node.name
-                          # Here we are appending list of ObjectIds of GSystemType's type_of field 
-                          # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
-                          # This is because some of the RelationType's are holding Base class's ObjectId
-                          # and not that of the Derived one's
-                          # Delibrately keeping GSystemType's ObjectId first in the list
-                          # And hence, used $in operator in the query!
-                          rel_subject_type = []
-                          rel_subject_type.append(file_gst._id)
-                          
-                          if file_gst.type_of:
-                              rel_subject_type.extend(file_gst.type_of)
-
-                          relation_type_node = node_collection.one({'_type': "RelationType", 
-                                                                    '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
-                                                                            {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
-                                                                    'subject_type': {'$in': rel_subject_type}
-                                                            })
-
-                          right_subject_id_or_list = []
-                          right_subject_id_or_list.append(ObjectId(right_subject_id))
-                          
-                          nodes = triple_collection.find({'_type': "GRelation", 
-                                      'subject': subject_id, 
-                                      'relation_type.$id': relation_type_node._id
-                                    })
-
-                          # sending list of all the possible right subject to relation
-                          for n in nodes:
-                            if not n.right_subject in right_subject_id_or_list:
-                              right_subject_id_or_list.append(n.right_subject)
-
-                          info_message = "\n- Creating GRelation ("+ str(node.name)+ " -- "+ str(rel_key)+ " -- "+ str(right_subject_id_or_list)+") ..."
-                          print info_message
-                          log_list.append(str(info_message))
-                          gr_node = create_grelation(subject_id, relation_type_node, right_subject_id_or_list)
-                                                    
-                          info_message = "\n- Grelation processing done.\n"
-                          print info_message
-                          log_list.append(str(info_message))
-
-                        # To break outer for loop if key found
-                        break
-
-                      else:
-                        error_message = "\n!! DataNotFound: No data found for relation ("+ str(rel_key)+ ") while creating GSystem (" + str(file_gst.name) + " -- " + str(node.name) + ")\n"
-                        print error_message
-                        log_list.append(str(error_message))
-
-                        break
+                            break
 
               # print relation_list
             else:
@@ -738,18 +738,24 @@ def create_resource_gsystem(resource_data):
             info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the home group. (Ref _id: '"+ str(check_obj_by_name._id) + "' )"
             print info_message
             log_list.append(str(info_message))
+            return check_obj_by_name._id
 
-        else:      
-            info_message = "\n- Resource file exists in gridfs having id: '" + str(cur_oid._id) + "'"
+        elif cur_oid:
+            info_message = "\n- Resource file exists in gridfs having id: '" + str(cur_oid["_id"]) + "'"
             print info_message
             log_list.append(str(info_message))
+            return None
 
-        return check_obj_by_name._id
+        else:
+            info_message = "\n- Resource file does not exists in database"
+            print info_message
+            log_list.append(str(info_message))
+            return None
 
     else:  # creating new resource
 
         files.seek(0)
-        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC")
+        fileobj_oid, video = save_file(files, name, userid, home_group._id, content_org, tags, img_type, language, usrname, access_policy=u"PUBLIC", count=0, first_object="")
         # print "\n------------ fileobj_oid : ", fileobj_oid, "--- ", video
         
         info_message = "\n- Creating resource: " + str(resource_data["name"])

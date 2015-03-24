@@ -10,7 +10,7 @@ from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
-
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 import json
 
 try:
@@ -21,6 +21,7 @@ except ImportError:  # old pymongo
 sitename = Site.objects.all()[0]
 
 
+@get_execution_time
 def get_userobject(user_id):
     bx=User.objects.filter(id=user_id)
     if bx:
@@ -29,7 +30,7 @@ def get_userobject(user_id):
     else:
         return 0
 
-
+@get_execution_time
 def get_user(username):
     bx=User.objects.filter(username=username)
     if bx:
@@ -39,6 +40,8 @@ def get_user(username):
         return 0
 
 
+# A general function used to send all kinds of notifications
+@get_execution_time
 def set_notif_val(request,group_id,msg,activ,bx):
     # A general function used to send all kinds of notifications
     try:
@@ -53,7 +56,8 @@ def set_notif_val(request,group_id,msg,activ,bx):
         print "Error in sending notification- "+str(e)
         return False
 
-
+# Send invitation to any user to join or unsubscribe
+@get_execution_time
 def send_invitation(request,group_id):
     # Send invitation to any user to join or unsubscribe
     try:
@@ -82,7 +86,7 @@ def send_invitation(request,group_id):
         print str(e)
         return HttpResponse(str(e))
 
-
+@get_execution_time
 def notifyuser(request,group_id):
     # usobj=User.objects.filter(username=usern)
     colg = node_collection.one({'_id': ObjectId(group_id)})
@@ -100,7 +104,7 @@ def notifyuser(request,group_id):
     else:
         return HttpResponse("failure")
 
-
+@get_execution_time
 def notify_remove_user(request,group_id):
     colg = node_collection.one({'_id': ObjectId(group_id)})
     groupname=colg.name
@@ -116,7 +120,7 @@ def notify_remove_user(request,group_id):
     else:
         return HttpResponse("failure")
 
-
+@get_execution_time
 def invite_users(request,group_id):
     try:
         sending_user=request.user
@@ -185,7 +189,7 @@ def invite_users(request,group_id):
         print "Exception in invite_users "+str(e)
         return HttpResponse("Failure")
 
-
+@get_execution_time
 def invite_admins(request,group_id):
     try:
         sending_user=request.user

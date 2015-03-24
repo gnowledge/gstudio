@@ -3,6 +3,10 @@ from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from gnowsys_ndf.ndf.models import get_database
+from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.views.methods import get_execution_time
+from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
@@ -18,7 +22,7 @@ from gnowsys_ndf.ndf.models import node_collection
 
 sitename=Site.objects.all()[0]
 
-
+@get_execution_time
 def ratings(request, group_id):
     rating=request.POST.get('rating', '')
     node = node_collection.one({'_id': ObjectId(group_id)})
