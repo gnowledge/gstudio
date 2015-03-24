@@ -25,7 +25,7 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import save_file
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data,get_execution_time
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
@@ -35,6 +35,7 @@ app = GST_COURSE
 
 
 @login_required
+@get_execution_time
 def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
@@ -117,6 +118,7 @@ def course(request, group_id, course_id=None):
 
 
 @login_required
+@get_execution_time
 def create_edit(request, group_id, node_id = None):
     """Creates/Modifies details about the given quiz-item.
     """
@@ -158,7 +160,7 @@ def create_edit(request, group_id, node_id = None):
                                   context_instance=RequestContext(request)
                               )
 
-
+@get_execution_time
 def course_detail(request, group_id, _id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -185,6 +187,7 @@ def course_detail(request, group_id, _id):
         )
 
 @login_required
+@get_execution_time
 def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     Creates/Modifies document of given sub-types of Course(s).
@@ -642,6 +645,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
 
 @login_required
+@get_execution_time
 def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   custom view for custom GAPPS
@@ -797,6 +801,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
 
 @login_required
+@get_execution_time
 def create_course_struct(request, group_id,node_id):
     """
     This view is to create the structure of the Course.

@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
 
 #######################################################################################################################################
@@ -34,7 +34,7 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 global list_trans_coll
 list_trans_coll = []
 coll_set_dict={}
-
+@get_execution_time
 def themes(request, group_id, app_id=None, app_set_id=None):
     
     ins_objectid  = ObjectId()
@@ -87,7 +87,9 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     node = ""
     nodes = ""
     unfold_tree = request.GET.get('unfold','')
+    selected = request.GET.get('selected','')
     unfold = "false"
+
 
     topics_GST = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
     
@@ -126,7 +128,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'themes_cards': themes_cards,
                                'group_id': group_id,'groupid': group_id,'node': node,'shelf_list': shelf_list,'shelves': shelves,
-                               'nodes':nodes_dict,'app_id': app_id,'app_name': appName,
+                               'nodes':nodes_dict,'app_id': app_id,'app_name': appName,"selected": selected,
                                'title': title,'themes_list_items': themes_list_items,
                                'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
                                 'appId':app._id,
@@ -135,7 +137,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                               context_instance = RequestContext(request)
     )       
 
-
+@get_execution_time
 def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     #####################
@@ -667,7 +669,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
     )
-
+@get_execution_time
 def get_coll_set(node):
   obj = node_collection.one({'_id': ObjectId(node)})
   #print obj.member_of_names_list
@@ -686,7 +688,7 @@ def get_coll_set(node):
   
                               get_coll_set(n._id)
   return list_trans_coll
-
+@get_execution_time
 def topic_detail_view(request, group_id, app_Id=None):
 
   #####################
@@ -708,6 +710,34 @@ def topic_detail_view(request, group_id, app_Id=None):
   app = node_collection.one({'_id': ObjectId(obj.member_of[0])})
   app_id = app._id
   topic = "Topic"
+  theme_id = None
+
+  # First get the navigation list till topic from theme map
+  nav_l=request.GET.get('nav_li','')
+  breadcrumbs_list = []
+
+  if nav_l:
+    nav_l = str(nav_l).split(",")
+
+    # create beadcrumbs list from navigation list sent from template.
+    for each in nav_l:
+        each_obj = node_collection.one({'_id': ObjectId(each) })
+        # Theme object needs to be added in breadcrumbs for full navigation path from theme to topic
+        # "nav_l" doesnt includes theme object since its not in tree hierarchy level, 
+        # hence Match the first element and get its prior node which is theme object, to include it in breadcrumbs list
+        if each == nav_l[0]:
+            if each_obj.prior_node:
+                theme_obj = node_collection.one({'_id': ObjectId(each_obj.prior_node[0] ) })
+                theme_id = theme_obj._id
+                breadcrumbs_list.append( (str(theme_obj._id), theme_obj.name) )
+
+        breadcrumbs_list.append( (str(each_obj._id), each_obj.name) )
+
+
+
+  if obj:
+    if obj.prior_node:
+        prior_obj = node_collection.one({'_id': ObjectId(obj.prior_node[0]) })
 
 
   ###shelf###
@@ -734,9 +764,9 @@ def topic_detail_view(request, group_id, app_Id=None):
 	    shelves = []
   
   return render_to_response('ndf/topic_details.html', 
-	                                { 'node': obj,'app_id': app_id,
+	                                { 'node': obj,'app_id': app_id,"theme_id": theme_id, "prior_obj": prior_obj,
 	                                  'group_id': group_id,'shelves': shelves,'topic': topic,
-	                                  'groupid':group_id,'shelf_list': shelf_list
+	                                  'groupid':group_id,'shelf_list': shelf_list,'breadcrumbs_list': breadcrumbs_list 
 	                                },
 	                                context_instance = RequestContext(request)
   )
