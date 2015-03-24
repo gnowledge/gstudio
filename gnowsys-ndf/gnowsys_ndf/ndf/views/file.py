@@ -22,6 +22,11 @@ from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
 
 from mongokit import paginator
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
+from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_node_common_fields, set_all_urls,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_group_name_id
+from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
 
 try:
     from bson import ObjectId
@@ -45,8 +50,9 @@ app=GST_FILE
 
 
 lock=threading.Lock()
-count = 0
+count = 0    
 
+@get_execution_time
 def file(request, group_id, file_id=None, page_no=1):
     """
    * Renders a list of all 'Files' available within the database.
@@ -378,7 +384,7 @@ def file(request, group_id, file_id=None, page_no=1):
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
 
-
+@get_execution_time
 def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_no, no_of_objs_pp, tab_type=None):
     '''
     This method used to fire mongoDB query and send its result along with pagination details. This method is specially for "_type": "File" objects only.
@@ -438,7 +444,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
 
     return result_dict
 
-
+@get_execution_time
 def paged_file_objs(request, group_id, filetype, page_no):
     '''
     Method to implement pagination in File and E-Library app.
@@ -628,6 +634,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
         
 @login_required    
+@get_execution_time
 def uploadDoc(request, group_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -654,6 +661,7 @@ def uploadDoc(request, group_id):
     
 
 @login_required
+@get_execution_time
 def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
@@ -740,6 +748,7 @@ def submitDoc(request, group_id):
 
     
 first_object = ''
+@get_execution_time
 def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, **kwargs):
     """
       this will create file object and save files in gridfs collection
@@ -884,6 +893,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
 
+@get_execution_time
 def getFileSize(File):
     """
     obtain file size if provided file object
@@ -898,7 +908,7 @@ def getFileSize(File):
     except Exception as e:
         print "Unabe to calucalate size",e
         return 0,'bytes'
-                     
+@get_execution_time                     
 def convert_image_thumbnail(files):
     """
     convert image file into thumbnail
@@ -911,7 +921,7 @@ def convert_image_thumbnail(files):
     img.save(thumb_io, "JPEG")
     thumb_io.seek(0)
     return thumb_io
-
+@get_execution_time
 def convert_pdf_thumbnail(files,_id):
     '''
     convert pdf file's thumnail
@@ -926,7 +936,7 @@ def convert_pdf_thumbnail(files,_id):
     thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
     return thumb_pdf
     
-
+@get_execution_time
 def convert_mid_size_image(files, **kwargs):
     """
     convert image into mid size image w.r.t. max width of 500
@@ -951,7 +961,6 @@ def convert_mid_size_image(files, **kwargs):
 
     if "extension" in kwargs:
       if kwargs["extension"]:
-        print "kwargs : ", kwargs["extension"]
         img.save(mid_size_img, kwargs["extension"])
 
     else:    
@@ -962,6 +971,7 @@ def convert_mid_size_image(files, **kwargs):
     return mid_size_img
 
     
+
 def convertVideo(files, userid, fileobj, filename):
     """
     converting video into webm format, if video already in webm format ,then pass to create thumbnails
@@ -1018,8 +1028,10 @@ def convertVideo(files, userid, fileobj, filename):
     if filename.endswith('.webm') == False:
         tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
         # saving webm video id into file object
+	
         node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 	
+@get_execution_time
 def GetDoc(request, group_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -1039,7 +1051,7 @@ def GetDoc(request, group_id):
     variable = RequestContext(request, {'filecollection':files,'groupid':group_id,'group_id':group_id})
     return render_to_response(template, variable)
 
-
+@get_execution_time
 def file_search(request, group_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -1061,6 +1073,7 @@ def file_search(request, group_id):
         return render_to_response(template, variable)
 
 @login_required    
+@get_execution_time
 def delete_file(request, group_id, _id):
   """Delete file and its data
   """
@@ -1091,7 +1104,7 @@ def delete_file(request, group_id, _id):
     print "Exception:", e
   return HttpResponseRedirect(pageurl) 
 
-
+@get_execution_time
 def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
@@ -1184,7 +1197,7 @@ def file_detail(request, group_id, _id):
                               },
                               context_instance = RequestContext(request)
                              )
-
+@get_execution_time
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
     """
@@ -1224,6 +1237,7 @@ def getFileThumbnail(request, group_id, _id):
     else:
         return HttpResponse("")
 
+@get_execution_time
 def readDoc(request, _id, group_id, file_name=""):
     '''Return Files 
     '''
@@ -1257,7 +1271,7 @@ def readDoc(request, _id, group_id, file_name=""):
             return HttpResponse("")
     else:
         return HttpResponse("")
-
+@get_execution_time
 def file_edit(request,group_id,_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :

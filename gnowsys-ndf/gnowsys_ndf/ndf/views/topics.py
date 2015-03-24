@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
 
 #######################################################################################################################################
@@ -34,7 +34,7 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 global list_trans_coll
 list_trans_coll = []
 coll_set_dict={}
-
+@get_execution_time
 def themes(request, group_id, app_id=None, app_set_id=None):
     
     ins_objectid  = ObjectId()
@@ -137,7 +137,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                               context_instance = RequestContext(request)
     )       
 
-
+@get_execution_time
 def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     #####################
@@ -669,7 +669,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
     )
-
+@get_execution_time
 def get_coll_set(node):
   obj = node_collection.one({'_id': ObjectId(node)})
   #print obj.member_of_names_list
@@ -688,7 +688,7 @@ def get_coll_set(node):
   
                               get_coll_set(n._id)
   return list_trans_coll
-
+@get_execution_time
 def topic_detail_view(request, group_id, app_Id=None):
 
   #####################

@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.views.generic import RedirectView
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 
 try:
     from bson import ObjectId
@@ -21,7 +22,7 @@ from gnowsys_ndf.ndf.models import node_collection
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
 ###################################################
-
+@get_execution_time
 def homepage(request, group_id):
     
     if request.user.is_authenticated():
@@ -57,24 +58,26 @@ def homepage(request, group_id):
                 print "error in getting node_holder details for an author"+str(e)
             auth.save()
 
-        return HttpResponseRedirect( reverse('dashboard', kwargs={"group_id": request.user.id}) )
+        if GSTUDIO_SITE_LANDING_PAGE == "home":
+            return HttpResponseRedirect( reverse('landing_page') )
+
+        else:
+            return HttpResponseRedirect( reverse('dashboard', kwargs={"group_id": request.user.id}) )
 
     else:
-        # If user is not loggedin then will redirected to home as our base group.
-        # return "/home/dashboard/group"
-        if GSTUDIO_SITE_LANDING_PAGE == "homepage":
-            # return render_to_response("ndf/landing_page_beta.html", context_instance = RequestContext(request))
-            return HttpResponseRedirect( reverse('welcome') )
+        if GSTUDIO_SITE_LANDING_PAGE == "home":
+            return HttpResponseRedirect( reverse('landing_page') )
+
         else:
             return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": group_id}) )
 
-
+@get_execution_time
 def landing_page(request):
     '''
     Method to render landing page after checking variables in local_settings/settings file.
     '''
 
-    if (GSTUDIO_SITE_LANDING_PAGE == "homepage") and (GSTUDIO_SITE_NAME == "nroer"):
+    if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "nroer"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
                                 {"group_id": "home", 'groupid':"home"},
