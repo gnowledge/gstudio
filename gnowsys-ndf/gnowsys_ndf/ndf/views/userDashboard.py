@@ -155,14 +155,13 @@ def uDashboard(request, group_id):
     )
     
     task_cur = ""
-    if int(current_user) != int(ID): 
+    if int(current_user) == int(ID):
                task_cur = node_collection.find(
-        {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee': int(ID)}
+        {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':ID}
     ).sort('last_update', -1).limit(10)
-
                dashboard_count.update({'Task': task_cur.count()})
   
-    
+   
     group_cur = node_collection.find(
         {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
         '$or': [{'group_admin': int(ID)}, {'author_set': int(ID)}]}).sort('last_update', -1).limit(10)
@@ -438,6 +437,7 @@ def group_dashboard(request, group_id):
             has_profile_pic = node_collection.one({'_type': "RelationType", 'name': has_profile_pic_str})
             # Find md5
             pp_md5 = hashlib.md5(pp.read()).hexdigest()
+            pp.seek(0)
             # Check whether this md5 exists in file collection
             gridfs_node = gridfs_collection.one({'md5': pp_md5})
             if gridfs_node:
@@ -464,6 +464,7 @@ def group_dashboard(request, group_id):
                 # Otherwise (md5 doesn't exists)
                 # Upload image
                 # submitDoc(request, group_id)
+                
                 field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
                 profile_pic_image = node_collection.one({'_type': "File", 'name': unicode(pp)})
                 # Create new grelation and append it to that along with given user
