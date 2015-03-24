@@ -1,0 +1,166 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+{% get_group_name groupid as group_name_tag %}
+{% if user.is_authenticated %}	
+
+	<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name_tag %}">{% csrf_token %}
+
+		
+		<fieldset style="background:#ccc;">
+			<legend style="background:#10c1cb">{% trans "Upload File" %}</legend>
+			<div class ="row">
+				<div class="large-2 columns">				
+					<label>{% trans "Choose File" %}</label>
+					<input type="file" name="doc[]"  id="docFile" multiple/>
+				</div>
+				<div class="large-10 columns">				
+					<label>{% trans "Title of File" %}</label>
+					<input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File">
+				</div>
+			</div>
+		</fieldset>
+		<fieldset style="background:#ccc;">
+			<legend style="background:#10c1cb">{% trans "Enter Details" %}</legend>
+
+			<div class ="row">
+				<div class="large-6 columns">
+					<b>Add Description</b>
+					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
+				</div>
+
+				<div class="large-6 columns">
+					<div class ="row">
+						<div class="large-4 columns">
+							<b>Set Language</b>
+							<select name="lan">
+								{% get_language_info_list for LANGUAGES as languages %}
+								{% for language in languages %}
+								<option value="{{ language.code }}">{{ language.name }} 
+								</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="large-4 columns">
+							<b>Add Tag</b>
+							<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" />
+						</div>
+						<div class="large-4 columns">
+							<b>Set Privacy</b><br/>
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
+						</div>
+					</div>
+					<div class ="row">
+						<div class="large-4 columns">
+							<b>Location</b>
+							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand" disabled> <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+							</a>
+						</div>
+						<div class="large-4 columns">
+							<b>License</b>
+							<input id="license_id" name="License" type="text" placeholder="Enter valid license name"/>
+						</div>
+						<div class="large-4 columns">
+							<b>Source</b>
+							<input id="source_id" name="Source" type="text" placeholder="Enter source name"/>
+						</div>
+					</div>
+					<div class ="row">
+						<div class="large-4 columns">
+							<b>Target Audience</b>
+							{% get_metadata_values as metadata %}
+	  						{% for k,v in metadata.items %}
+	  						{% if k == "audience" %}
+							<select name="audience">
+			         			<option>---Select from list---</option>
+			        			{% for opts in v %}		        														
+									<option>{% trans opts %}</option>
+								{% endfor %}
+							</select>
+							{% endif %}
+							{% endfor %}
+						</div>
+						<div class="large-4 columns">
+							<b>File Type</b>
+							{% get_metadata_values as metadata %}
+	  						{% for k,v in metadata.items %}
+	  						{% if k == "educationaluse" %}
+							<select name="FileType">
+			         			<option>---Select from list---</option>
+			        			{% for opts in v %}		        					
+									<option>{% trans opts %}</option>
+								{% endfor %}
+							</select>
+							{% endif %}
+							{% endfor %}
+						</div>
+						<div class="large-4 columns">
+						</div>
+					</div>
+
+				</div>
+			</div>	
+			
+
+		</fieldset>
+		
+		<input type="hidden" name="user" value="{{user.id}}">
+		<input type="hidden" name="page_url" value="{{page_url}}">
+		<input type="submit" id="submitpostid" value="Submit" class="button round medium">
+		<p id="message" style="display:none"> 
+			{% trans "Depending on the size of file/s and your Internet speed, upload process may take time. Please do not close this window." %} <br/>
+			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} 
+		</p>
+
+		
+	</form>
+
+
+
+{% else %}
+	<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
+{% endif %}
+
+
+<script type="text/javascript">
+
+	$("#docFile").change(function() {
+        var max_size =100000
+        var fsize=this.files[0].size
+        fsize=fsize/1024
+        {% check_is_gstaff groupid request.user as gstaff_access %}
+        if(fsize> max_size){
+          {% if gstaff_access%}
+          	$('#docFile').val(this.value);
+          {% else %}
+          	alert("Sorry. Max File Size Limit Exceeded");
+          	$(this).val("")
+          	$('#docFile').val(this.value);
+          {% endif %}
+          }
+        else{
+		$('#docFile').val(this.value);}        
+      	});
+		
+		$(document).on('submit',"form",function(){
+		if($("#docFile").val() != "")
+		{	
+
+		$("#message").show();
+		$("#submitpostid").hide();
+		$("#submitpostid").submit();
+
+		}
+		else
+		{
+		alert("select a file");
+		return false;
+		}
+
+
+	});
+
+</script>
