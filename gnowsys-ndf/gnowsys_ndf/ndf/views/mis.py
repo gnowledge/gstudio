@@ -27,8 +27,10 @@ from gnowsys_ndf.ndf.views.organization import *
 from gnowsys_ndf.ndf.views.course import *
 from gnowsys_ndf.ndf.views.person import *
 from gnowsys_ndf.ndf.views.enrollment import *
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 
 
+@get_execution_time
 def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     custom view for custom GAPPS
@@ -325,6 +327,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       
       
 @login_required
+@get_execution_time
 def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     create new instance of app_set of apps view for custom GAPPS
@@ -618,6 +621,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     return render_to_response(template, variable)
       
 @login_required
+@get_execution_time
 def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     Redirects to student_enroll function of person-view.

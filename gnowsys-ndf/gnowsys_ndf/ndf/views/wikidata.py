@@ -1,11 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
-
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 
-
+@get_execution_time
 def index(request, group_id):
 	ins_objectid  = ObjectId()
     	if ins_objectid.is_valid(group_id) is False :
@@ -42,7 +42,7 @@ def index(request, group_id):
 	attribute_set = None
       	return render(request, template, {'title': "WikiData Topics", 'topic_coll': topic_coll, 'tag_count': tag_count, 'tag_coll': tag_coll, 'selected_topic': selected_topic, 'attribute_set' : attribute_set, 'groupid':group_id, 'group_id':group_id,'topic_count':topic_count})
 
-
+@get_execution_time
 def details(request, group_id, topic_id):
 	ins_objectid  = ObjectId()
 	group_ins = None
@@ -85,7 +85,7 @@ def details(request, group_id, topic_id):
 
 
 
-
+@get_execution_time
 def tag_view_list(request, group_id, topic_id, tag):
 	ins_objectid  = ObjectId()
 	group_ins = None
