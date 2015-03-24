@@ -1151,45 +1151,48 @@ def get_prior_node(node_id):
 	return prior
 
 @register.assignment_tag
-# method returns resources associated with node
-def get_resources(node_id):
-        resources={}
-        resource_list=['Images','Documents','Audios','Videos','Interactives']
-        other_languages=[]       
+# method fist get all possible translations associated with current node &
+# return the set of resources by using get_resources method
+def get_all_resources(request,node_id):
+        obj_set=[]
+        result_set=[]
+        node=node_collection.one({'_id':ObjectId(node_id)})
+        result_set=get_possible_translations(node)
+        if node._id not in obj_set:
+                obj_set.append(node._id)
+                for item in result_set:
+                        obj_set.extend(item.keys())
+        resources={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        for each in obj_set:
+                n=node_collection.one({'_id':ObjectId(each)})
+                resources_dict=get_resources(each,resources)
+        res_dict={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        for k,v in res_dict.items():
+                res_dict[k]={'fallback_lang':[],'other_languages':[]}
+        for key,val in resources_dict.items():
+                for res in val:
+                        if res.language == request.LANGUAGE_CODE:
+                                        res_dict[key]['fallback_lang'].append(res)
+                        else:
+                                        res_dict[key]['other_languages'].append(res)
+        return res_dict
 
-        #resources
-        #global resource_list
-        #global other_languages
-        for res in resource_list:
-                resources[res] = []
-	node = node_collection.one({'_id': ObjectId(node_id) })
-        #other_languages.append(node._id)
+@register.assignment_tag
+# method returns resources associated with node
+def get_resources(node_id,resources):
+        node = node_collection.one({'_id': ObjectId(node_id)})
         RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
-	RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
-	trans_grelations = triple_collection.find({'_type':'GRelation','subject':node._id,'relation_type.$id':RT_translation_of._id })
-    	teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type.$id': RT_teaches._id })
+        RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
+        teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type.$id': RT_teaches._id })
         AT_educationaluse = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
         for each in teaches_grelations:
-             obj=node_collection.one({'_id':ObjectId(each.subject)}) 
-             mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type.$id': AT_educationaluse._id, "subject":each.subject})       
-             for res in resource_list:
-                     if mime_type.object_value == res:
-                             resources.setdefault(res,[]).append(obj)
-        # if trans_grelations.count() > 0:
-        #         print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-	# 	obj = node_collection.one({'_id': ObjectId(trans_grelations[0].right_subject)})
-        #         print obj._id, other_languages,"!!!!!!!!!!!!!!!!!!1"
-        #         if obj._id not in other_languages:
-        #                print "^^^^^^^^^^^^^^^^^^" 
-        #                other_languages.append(obj._id)
-        #                #print obj.name        
-        #                print "bfore@@@@@@@@@"
-        #                get_resources(obj._id,resources,other_languages=,resource_list)
-        #                print "after_$$$$$$$$"
-        #resources['In other Languages']= other_languages        
-        print resources
-        print other_languages
-        
+                obj=node_collection.one({'_id':ObjectId(each.subject)}) 
+                mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type.$id': AT_educationaluse._id, "subject":each.subject})       
+                for k,v in resources.items():
+                        if mime_type.object_value == k:
+                                if obj.name not in resources[k]:
+                                        resources.setdefault(k,[]).append(obj)
+    
         return resources
 
 @register.assignment_tag
