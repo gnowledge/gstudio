@@ -60,11 +60,11 @@ def userpref(request,group_id):
         auth.modified_by=request.user.id
         auth.save()
     return HttpResponse("Success")
-@login_required
+
 @get_execution_time
 def uDashboard(request, group_id):
     usrid = group_id
-    print "get the timing"
+    
     ID = int(usrid)
     auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1,'created_at':1 })
     group_id = auth._id
@@ -80,12 +80,21 @@ def uDashboard(request, group_id):
     profile_pic_image = None
     is_already_selected = None
     
-    if int(current_user) == int(ID):
-      Access_policy=["PUBLIC","PRIVATE"]
-    if int(current_user) != int(ID):
-      Access_policy=["PUBLIC"] 
-        
-		
+    task_gst = node_collection.one(
+        {'_type': "GSystemType", 'name': "Task"}
+    )
+    
+    if current_user:
+        exclued_from_public = ""  
+        if int(current_user) == int(ID):
+          Access_policy=["PUBLIC","PRIVATE"]
+        if int(current_user) != int(ID):
+          Access_policy=["PUBLIC"]
+    else:
+          Access_policy=["PUBLIC"]  
+          exclued_from_public =  ObjectId(task_gst._id)  
+	    
+    
      
     if request.method == "POST" :
         """
@@ -155,16 +164,14 @@ def uDashboard(request, group_id):
     reply_gst = node_collection.one({"_type": "GSystemType", "name":"Reply"})
     reply_count = node_collection.find({"_type":"GSystem","member_of":reply_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
 
-    task_gst = node_collection.one(
-        {'_type': "GSystemType", 'name': "Task"}
-    )
     
     task_cur = ""
-    if int(current_user) == int(ID):
-               task_cur = node_collection.find(
-        {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':ID}
-    ).sort('last_update', -1).limit(10)
-               dashboard_count.update({'Task': task_cur.count()})
+    if current_user:
+        if int(current_user) == int(ID):
+                   task_cur = node_collection.find(
+            {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':ID}
+        ).sort('last_update', -1).limit(10)
+                   dashboard_count.update({'Task': task_cur.count()})
   
    
     group_cur = node_collection.find(
@@ -174,10 +181,11 @@ def uDashboard(request, group_id):
     dashboard_count.update({'group':group_cur.count()})
     
     #user activity gives all the activities of the users
+    
     activity = ""
     activity_user = node_collection.find(
         {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
-        {"access_policy":{"$in":Access_policy}},
+        {"access_policy":{"$in":Access_policy}},{'member_of':{'$nin': [exclued_from_public]}},
         {'$or':[{'created_by':int(ID)}, {'modified_by':int(ID)}]}] 
     }).sort('last_update', -1).limit(10)
 
@@ -188,8 +196,8 @@ def uDashboard(request, group_id):
     
     for i in activity_user:
         if i._type != 'Batch' or i._type != 'Course' or i._type !='Module':
-            a_user.append(i)
-    
+              a_user.append(i)
+               
     for each in a_user:
         if each.created_by == each.modified_by :
             if each.last_update == each.created_at:
