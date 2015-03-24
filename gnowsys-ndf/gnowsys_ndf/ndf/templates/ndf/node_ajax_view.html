@@ -764,20 +764,19 @@ table {
         {% if topic %}
           <!-- <div class="content" id="view-graph">  </div> -->
 
-          
-          <div class="topic_content" id="contents"> 
-	    {% get_all_resources request node.pk as resources %}
+      <div class="topic_content" id="contents"> 
+            {% get_all_resources request node.pk as resources %}
 	    {% for key, val in resources.items %}
-	    <fieldset id="{{key}}">
-              <legend>{{key}}</legend>
-	      {% if  key == "Images" %}
-	      {% for k,v in val.items %}
+	   <fieldset id="{{key}}">
+	     <legend>{{key}}</legend>
+	     {% if  key == "Images" %}
+	     {% for k,v in val.items %}
 	      {% if k == "fallback_lang" %}
-	      {% for each in v %}
+	       {% for each in v %}
 	      <a href ="{% url 'image_detail' group_name_tag each.pk %}" style="display: inline-block">
-		<img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-		<br/><div>{{each.name}}</div>
-	      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+	       <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+	       <br/><div>{{each.name}}</div>
+	     </a>&nbsp;&nbsp;&nbsp;&nbsp;
 	      {% endfor %}
 	      {% elif k == "other_languages" %}
 	      {% if v %}
@@ -796,11 +795,11 @@ table {
 	      {% elif  key == "Videos" %}
 	      {% for k,v in val.items %}
 	      {% if k == "fallback_lang" %}
-	      {% for each in v %}
+	       {% for each in v %}
 	      <a href ="{% url 'video_detail' group_name_tag each.pk %}" style="display: inline-block">
-		<img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-		<br/><div>{{each.name}}</div>
-	      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+	       <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+	       <br/><div>{{each.name}}</div>
+	     </a>&nbsp;&nbsp;&nbsp;&nbsp;
 	      {% endfor %}
 	      {% elif k == "other_languages" %}
 	      {% if v %}
@@ -812,7 +811,7 @@ table {
 		  <br/><div>{{each.name}}</div>
 		</a>&nbsp;&nbsp;&nbsp;&nbsp;
 		{% endfor %}
-	      </fieldset>
+		</fieldset>
 	      {% endif %}
 	      {% endif %}
 	      {% endfor %}
@@ -827,18 +826,16 @@ table {
 	      <fieldset id="{{k}}">
 		<legend>{% trans "In other languages" %}</legend>
 		{% for each in v %}
-		<a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
+	   	<a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
 		{% endfor %}
 		{% endif %}
 		{% endif %}
-		{% endfor %}
-	      </fieldset>      
+	      	{% endfor %}
+	      </fieldset>	      
 	      {% endif %}
 	    </fieldset>
 	    {% endfor %}
-
-          </div>
-
+            </div>
         {% endif %}
         <!-- End of displaying topic page contents -->
       </div>

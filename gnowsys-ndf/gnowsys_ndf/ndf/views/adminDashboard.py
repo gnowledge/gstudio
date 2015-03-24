@@ -32,7 +32,7 @@ def adminDashboard(request):
     return render_to_response(template, variable)
 
 @user_passes_test(lambda u: u.is_superuser)
-def adminDashboardClass(request, class_name):
+def adminDashboardClass(request, class_name="GSystem"):
     '''
     fetching class's objects
     '''

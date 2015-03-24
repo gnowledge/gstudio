@@ -44,8 +44,7 @@ register = Library()
 at_apps_list = node_collection.one({'_type': 'AttributeType', 'name': 'apps_list'})
 translation_set=[]
 check=[]
-
-
+       
 @register.assignment_tag
 def get_site_variables():
    site_var={}
@@ -522,7 +521,7 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 		else:
 			drawer = node_collection.find({"_type":types})
 			for each in drawer:
-				drawer1[str(each._id)]=each.name
+				drawer1[str(each._id)]=each
 		return {'template': template1, 'widget_for': fields_name, 'drawer1': drawer1, 'selected_value': fields_value}
 
 	
@@ -540,18 +539,18 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 			for each in node_collection.find({"_type": types}):
 				if fields_value_id_list:
 					if each._id not in fields_value_id_list:
-						drawer1[each._id] = each.name
+						drawer1[each._id] = each
 				else:
-					drawer1[each._id] = each.name
+					drawer1[each._id] = each
 
 		if types in ["all_types"]:
 			for each in alltypes:
 				for eachnode in node_collection.find({"_type": each}):
 					if fields_value_id_list:
 						if eachnode._id not in fields_value_id_list:
-							drawer1[eachnode._id] = eachnode.name
+							drawer1[eachnode._id] = eachnode
 					else:
-						drawer1[eachnode._id] = eachnode.name
+						drawer1[eachnode._id] = eachnode
 
 		if fields_value_id_list:
 			drawer2 = []
@@ -1181,7 +1180,7 @@ def get_all_resources(request,node_id):
 @register.assignment_tag
 # method returns resources associated with node
 def get_resources(node_id,resources):
-        node = node_collection.one({'_id': ObjectId(node_id)})
+    	node = node_collection.one({'_id': ObjectId(node_id)})
         RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
         RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
         teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type.$id': RT_teaches._id })

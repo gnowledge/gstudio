@@ -2,7 +2,9 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load pagination_tags %}
+
 {% block title %} Admin {% endblock %}
+
 {% block meta_content %}
      {% ifequal url 'data' %}
 	{% get_class_list groupid class_name %}
@@ -10,34 +12,49 @@
         {% get_class_type_list groupid class_name %}
      {% endifequal %}
 {% endblock %}
+
 {% block style %}
-
-.divider-line { font-size: xx-large; color:lightgray; }
-.line-height-2 { line-height:2; }
-.line-height-2pt5 { line-height:2.5; }
-.fontsize-x-large { font-size: x-large; }
-
-.margin-0 { margin: 0 !important ;}
-
+.divider-line { 
+    font-size: xx-large; 
+    color: lightgray; 
+}
+.line-height-2 { 
+    line-height: 2; 
+}
+.line-height-2pt5 { 
+    line-height: 2.5; 
+}
+.fontsize-x-large { 
+    font-size: x-large; 
+}
+.margin-0 {
+ margin: 0 !important; 
+}
 .resource-drawer {
-border-color: #D3D3D3; border-style: solid;
-padding: 0 !important;
-overflow-y: auto;
+    border-color: #D3D3D3; 
+    border-style: solid;
+    padding: 0 !important;
+    overflow-y: auto;
 }
-
-.resource-drawer li.bullet-item:hover{
-background-color: #ecf0f1; cursor:pointer;
+.resource-drawer li.bullet-item:hover {
+    background-color: #ecf0f1; 
+    cursor:pointer;
 }
-
-.posted-by{ color: #808080; font-size: small; }
-
-.selected-resource { background-color:lightgray !important ; }
-
+.posted-by { 
+    color: #808080; 
+    font-size: small; 
+}
+.selected-resource { 
+    background-color:lightgray !important; 
+}
 .resource-type-image {
-height:40px;
-background-repeat:no-repeat; background-size: 48px 48px
+    height:40px;
+    background-repeat:no-repeat; 
+    background-size: 48px 48px;
 }
-
+table {
+    table-layout: auto;
+}
 {% endblock %}
 
 
@@ -79,7 +96,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <a class="close-reveal-modal rt">&#215;</a>
 </div>
 
-<div id="my_meta_type" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
+<div id="my_meta_type" class="reveal-modal" data-reveal style="width:30%; overflow: auto; text-overflow: ellipsis;">
      <p>Hold down "Control", to select more than one.</p>
      <h2>Select MetaType</h2>
      <select id="id_meta_type" name="meta_types" multiple="multiple" style="max-width:500px;height:180px;">
@@ -100,7 +117,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 <input type="submit" value="search" style="width:100px;">
 </form>
 {% autopaginate nodes 25 %}
-<table >
+<div style="display: block; width: 101%; overflow: auto;">
+<table>
   <thead>
     <tr>
       <th width="20"> <input class="checkedAll" type="checkbox"></th>
@@ -117,67 +135,72 @@ background-repeat:no-repeat; background-size: 48px 48px
       <th width="140">{% trans "Collection" %}</th>
       <th width="140">{% trans "AttributeType_set" %}</th>
       <th width="140">{% trans "RelationType_set" %}</th>
-      <th width="140"></th>
       {% endif %}
-      	
+      <th></th> <!-- Table head for Edit button -->
+      {% if class_name == "GSystemType" or class_name = "AttributeType" or class_name = "RelationType" %}
+      <th></th> <!-- Table head for Edit+ button -->
+      <th></th> <!-- Table head for Translate button -->
+      {% endif %}
     </tr>
   </thead>
   <tbody>
 	{% for each in nodes %}
-    <tr>	
-            <td  id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-	    <td  style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
-	    <td class="title" style="font-size:95%"><font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}"></td>
-	{% if class_name == "File" or class_name ==  "GSystem"  %}
-	    <td class="group" style="font-size:11px;">
-	      <font class="viewinput{{each.Id}}">{{each.Group}}</font>
-	      <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}">
-	    </td>
-	{% endif %}
-	    <td style="display:none" class="type" style="font-size:11px;">
-	      <font class="viewinput{{each.Id}}">{{each.Type}}</font>
-	      <input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" >
-	    </td>
-	    <td style="display:none" class="author" style="font-size:11px;">{{each.Author}}</td>
-	    <td style="display:none" class="creation" style="font-size:11px;">{{each.Creation}}</td>
-	    {% if class_name == "GSystemType"  %}
-	    <td class="member_of" style="font-size:11px;">
-	      <font class="viewinput{{each.Id}}">{{each.member_of}}</font>
-	      <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.member_of}}">
-	    </td> 
-	    <td class="collection_set" style="font-size:11px;">
-	      <font class="viewinput{{each.Id}}">{{each.collection_list}}</font>
-	      <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.collection_list}}" >
-	    </td>
-	    <td class="attribute_type_set" style="font-size:11px;">
-              <font class="viewinput{{each.Id}}">{{each.attribute_type_set}}</font>
-              <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.attribute_type_set}}" >
-            </td>
-	    <td class="relation_type_set" style="font-size:11px;">
-              <font class="viewinput{{each.Id}}">{{each.relation_type_set}}</font>
-              <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.relation_type_set}}" >
-            </td>
-	    {% endif %}
-	    <td style="font-size:11px;"> 
-	      <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 
-	      <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none">
-	    </td>
-	    <td> 
-	      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}">
-		Edit&nbsp;&nbsp;<i class="fi-plus"></i>
-	      </a>
-	   </td>
-
-	    <td>
-	      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}?translate=True">
-                {% trans "Translate" %}
-
-	    </td>
-    </tr>
- 
-	{% endfor %}
+	<tr>	
+          <td id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+	  <td style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
+	  <td class="title" style="font-size:95%"><font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}"></td>
+	  {% if class_name == "File" or class_name ==  "GSystem"  %}
+	  <td class="group" style="font-size:11px;">
+	    <font class="viewinput{{each.Id}}">{{each.Group}}</font>
+	    <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}">
+	  </td>
+	  {% endif %}
+	  <td style="display:none" class="type" style="font-size:11px;">
+	    <font class="viewinput{{each.Id}}">{{each.Type}}</font>
+	    <input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" >
+	  </td>
+	  <td style="display:none" class="author" style="font-size:11px;">{{each.Author}}</td>
+	  <td style="display:none" class="creation" style="font-size:11px;">{{each.Creation}}</td>
+	  {% if class_name == "GSystemType"  %}
+	  <td class="member_of" style="font-size:11px;">
+	    <font class="viewinput{{each.Id}}">{{each.member_of}}</font>
+	    <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.member_of}}">
+	  </td> 
+	  <td class="collection_set" style="font-size:11px;">
+	    <font class="viewinput{{each.Id}}">{{each.collection_list}}</font>
+	    <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.collection_list}}" >
+	  </td>
+	  <td class="attribute_type_set" style="font-size:11px;">
+            <font class="viewinput{{each.Id}}">{{each.attribute_type_set}}</font>
+            <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.attribute_type_set}}" >
+          </td>
+	  <td class="relation_type_set" style="font-size:11px;">
+            <font class="viewinput{{each.Id}}">{{each.relation_type_set}}</font>
+            <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.relation_type_set}}" >
+          </td>
+	  {% endif %}
+	  <td style="font-size:11px;"> 
+	    <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 
+	    <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none">
+	  </td>
+	  {% if class_name == "GSystemType" or class_name = "AttributeType" or class_name = "RelationType" %}
+	  <td> 
+	    <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}" style="width:115px;">
+	      Edit&nbsp;&nbsp;
+	      <i class="fi-plus"></i>
+	    </a>
+	  </td>
+	  <td>
+	    <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}?translate=True">
+              {% trans "Translate" %}
+	    </a>
+	  </td>
+	  {% endif %}
+	</tr>
+ 	{% endfor %}
   </tbody>
 </table>
+</div>
 {% paginate %}
 {% endblock %}
 
