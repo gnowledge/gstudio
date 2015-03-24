@@ -38,7 +38,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 # from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
-from gnowsys_ndf.ndf.views.methods import get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_group_name_id, create_gattribute
 
 ############################################
 
@@ -651,7 +651,8 @@ def uploadDoc(request, group_id):
 
     if request.method == "GET":
         page_url = request.GET.get("next", "")
-        template = "ndf/UploadDoc.html"
+        # template = "ndf/UploadDoc.html"
+        template = "ndf/Uploader_Form.html"
     if  page_url:
         variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id})
     else:
@@ -698,6 +699,18 @@ def submitDoc(request, group_id):
         content_org = request.POST.get('content_org', '')
         access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
         tags = request.POST.get('tags', "")
+        license = request.POST.get("License", "")
+        source = request.POST.get("Source", "")
+        Audience = request.POST.get("audience", "")
+        fileType = request.POST.get("FileType", "")
+        map_geojson_data = request.POST.get('map-geojson-data')
+
+        if map_geojson_data:
+          map_geojson_data = map_geojson_data + ","
+          map_geojson_data = list(ast.literal_eval(map_geojson_data))
+        else:
+          map_geojson_data = []
+
 
         i = 1
 
@@ -705,14 +718,14 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, map_geojson_data, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, map_geojson_data, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, map_geojson_data, oid=True)
             if not obj_id_instance.is_valid(f):
               alreadyUploadedFiles.append(f)
               title = mtitle
@@ -749,7 +762,7 @@ def submitDoc(request, group_id):
     
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -834,7 +847,32 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 fileobj.tags = tags
             
+
+            # new fields added
+            fileobj.license = unicode(license)
+
+            fileobj.location = map_geojson_data
+
+
             fileobj.save()
+
+            if source:
+              # create gattribute for file with source value
+              source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
+              src = create_gattribute(fileobj._id, source_AT, source)
+
+            if Audience:
+              # create gattribute for file with Audience value
+              audience_AT = node_collection.one({'_type':'AttributeType','name':'audience'})
+              aud = create_gattribute(fileobj._id, audience_AT, Audience)                
+
+            if fileType:
+              # create gattribute for file with Audience value
+              educationaluse_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationaluse'})
+              FType = create_gattribute(fileobj._id, educationaluse_AT, fileType)                
+
+
+
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
             node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
