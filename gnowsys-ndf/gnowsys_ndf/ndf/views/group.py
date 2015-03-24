@@ -351,8 +351,6 @@ def group_dashboard(request,group_id=None):
               profile_pic_image = node_collection.one(
                   {'_type': "File", '_id': each["has_profile_pic"][0]}
               )
-              print profile_pic_image
-
               break
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
