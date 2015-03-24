@@ -316,36 +316,49 @@ def populate_list_of_group_members(group_id):
 
 @get_execution_time
 def group_dashboard(request,group_id=None):
-  print "reahcing"
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-	    group_id = str(group_ins._id)
-    else :
-	    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    if auth :
-	    	group_id = str(auth._id)	
-  else :
-  	pass
+  # # print "reahcing"
+  # if ins_objectid.is_valid(group_id) is False :
+  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+	 #    group_id = str(group_ins._id)
+  #   else :
+	 #    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	 #    if auth :
+	 #    	group_id = str(auth._id)	
+  # else :
+  # 	pass
 
   try:
-    groupobj="" 
-    grpid=""
+    group_obj = "" 
     shelf_list = {}
     shelves = []
     alternate_template = ""
+    profile_pic_image = None
 
-    if group_id == None:
-      groupobj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-      grpid=groupobj['_id']
+    group_obj = get_group_name_id(group_id, get_obj=True)
+
+    if not group_obj:
+      group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+      group_id=group_obj['_id']
     else:
-      groupobj=node_collection.one({'_id':ObjectId(group_id)})
-      grpid=groupobj['_id']
+      # group_obj=node_collection.one({'_id':ObjectId(group_id)})
+      group_id = group_obj._id
+
+      # getting the profile pic File object
+      for each in group_obj.relation_set:
+          if "has_profile_pic" in each:
+              profile_pic_image = node_collection.one(
+                  {'_type': "File", '_id': each["has_profile_pic"][0]}
+              )
+              print profile_pic_image
+
+              break
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
     if auth:
+
       has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
 
       shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
@@ -365,35 +378,33 @@ def group_dashboard(request,group_id=None):
           shelves = []
 
   except Exception as e:
-    groupobj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-    grpid=groupobj['_id']
+    group_obj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    group_id=group_obj['_id']
     pass
 
   # Call to get_neighbourhood() is required for setting-up property_order_list
-  groupobj.get_neighbourhood(groupobj.member_of)
+  group_obj.get_neighbourhood(group_obj.member_of)
 
   property_order_list = []
-  if "group_of" in groupobj:
-    if groupobj['group_of']:
+  if "group_of" in group_obj:
+    if group_obj['group_of']:
       college = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
 
       if college:
-        if college._id in groupobj['group_of'][0]['member_of']:
+        if college._id in group_obj['group_of'][0]['member_of']:
           alternate_template = "ndf/college_group_details.html"
 
-      property_order_list = get_property_order_with_value(groupobj['group_of'][0])
+      property_order_list = get_property_order_with_value(group_obj['group_of'][0])
 
-  
-  annotations = json.dumps(groupobj.annotations)
-
+  annotations = json.dumps(group_obj.annotations)
   
   default_template = "ndf/groupdashboard.html"
-  return render_to_response([alternate_template,default_template] ,{'node': groupobj, 'groupid':grpid, 
-                                                       'group_id':grpid, 'user':request.user, 
+  return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
+                                                       'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,
                                                        'appId':app._id,
-                                                       'annotations' : annotations,
-                                                       'shelves': shelves
+                                                       'annotations' : annotations, 'shelves': shelves,
+                                                       'prof_pic_obj': profile_pic_image
                                                       },context_instance=RequestContext(request)
                           )
 
@@ -560,34 +571,47 @@ def switch_group(request,group_id,node_id):
 @login_required
 @get_execution_time
 def publish_group(request,group_id,node):
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-	    group_id = str(group_ins._id)
-    else:
-	    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    if auth :
-	    	group_id = str(auth._id)	
-  else :
-  	pass
+  # ins_objectid  = ObjectId()
+  # if ins_objectid.is_valid(group_id) is False :
+  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+	 #    group_id = str(group_ins._id)
+  #   else:
+	 #    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	 #    if auth :
+	 #    	group_id = str(auth._id)	
+  # else :
+  # 	pass
 
-  node=node_collection.one({'_id':ObjectId(node)})
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    profile_pic_image = None
+
+    if group_obj:
+      # group_obj=node_collection.one({'_id':ObjectId(group_id)})
+      group_id = group_obj._id
+
+      # getting the profile pic File object
+      for each in group_obj.relation_set:
+
+          if "has_profile_pic" in each:
+              profile_pic_image = node_collection.one( {'_type': "File", '_id': each["has_profile_pic"][0]} )
+              break
+
+    node=node_collection.one({'_id':ObjectId(node)})
+     
+    page_node,v=get_page(request,node)
+    
+    node.content = page_node.content
+    node.content_org=page_node.content_org
+    node.status=unicode("PUBLISHED")
+    node.modified_by = int(request.user.id)
+    node.save() 
    
-  page_node,v=get_page(request,node)
-  
-  node.content = page_node.content
-  node.content_org=page_node.content_org
-  node.status=unicode("PUBLISHED")
-  node.modified_by = int(request.user.id)
-  node.save() 
- 
-  return render_to_response("ndf/groupdashboard.html",
-                                 { 'group_id':group_id,
-                                   'node':node,
-                                   'appId':app._id,
-                                   'groupid':group_id
+    return render_to_response("ndf/groupdashboard.html",
+                                   { 'group_id':group_id, 'groupid':group_id,
+                                   'node':node, 'appId':app._id,                                   
+                                   'prof_pic_obj': profile_pic_image
                                  },
                                   context_instance=RequestContext(request)
                               )
