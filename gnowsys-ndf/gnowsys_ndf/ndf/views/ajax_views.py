@@ -163,7 +163,6 @@ def collection_nav(request, group_id):
             break
           else:
             breadcrumbs_list.remove(e)
-
     # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
     return render_to_response('ndf/node_ajax_view.html', 
                                 { 'node': node_obj,
@@ -171,7 +170,8 @@ def collection_nav(request, group_id):
                                   'group_id': group_id,
                                   'groupid':group_id,
                                   'breadcrumbs_list':breadcrumbs_list,
-                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list
+                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list,
+                                  'LANGUAGE_CODE':LANGUAGE_CODE
                                 },
                                 context_instance = RequestContext(request)
     )

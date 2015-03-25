@@ -25,6 +25,7 @@ from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.models import *
+from django.contrib.auth.models import User
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_all_gapps
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 # from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
@@ -59,26 +60,42 @@ def userpref(request,group_id):
         auth.modified_by=request.user.id
         auth.save()
     return HttpResponse("Success")
-@login_required
+
 @get_execution_time
 def uDashboard(request, group_id):
     usrid = group_id
-    print "get the timing"
+    
     ID = int(usrid)
-    # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
-    auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1})
+    auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1,'created_at':1 })
     group_id = auth._id
-
+    # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
+    
+ 
     group_name = auth.name
     usrname = auth.name
-
-    date_of_join = request.user.date_joined
+    date_of_join = auth['created_at']
     current_user = request.user.pk
-
+    
     has_profile_pic = None
     profile_pic_image = None
     is_already_selected = None
-
+    
+    task_gst = node_collection.one(
+        {'_type': "GSystemType", 'name': "Task"}
+    )
+    
+    if current_user:
+        exclued_from_public = ""  
+        if int(current_user) == int(ID):
+          Access_policy=["PUBLIC","PRIVATE"]
+        if int(current_user) != int(ID):
+          Access_policy=["PUBLIC"]
+    else:
+          Access_policy=["PUBLIC"]  
+          exclued_from_public =  ObjectId(task_gst._id)  
+	    
+    
+     
     if request.method == "POST" :
         """
         This will take the image uploaded by user and it searches if its already availale in gridfs 
@@ -133,12 +150,7 @@ def uDashboard(request, group_id):
     dashboard_count={}  
     group_list=[]
     user_activity=[]
-    group_cur = node_collection.find(
-        {'_type': "Group", 'name': {'$nin': ["home", request.user.username]}, 
-        '$or': [{'group_admin': request.user.id}, {'author_set': request.user.id}],
-    }).sort('last_update', -1).limit(10)
-
-    dashboard_count.update({'group':group_cur.count()})  
+    
 
     GST_PAGE = node_collection.one({'_type': "GSystemType", 'name': 'Page'})
     page_cur = node_collection.find({'member_of': {'$all': [GST_PAGE._id]}, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
@@ -152,25 +164,40 @@ def uDashboard(request, group_id):
     reply_gst = node_collection.one({"_type": "GSystemType", "name":"Reply"})
     reply_count = node_collection.find({"_type":"GSystem","member_of":reply_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
 
-    for i in group_cur:
-        group_list.append(i)
+    
+    task_cur = ""
+    if current_user:
+        if int(current_user) == int(ID):
+                   task_cur = node_collection.find(
+            {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':ID}
+        ).sort('last_update', -1).limit(10)
+                   dashboard_count.update({'Task': task_cur.count()})
+  
+   
+    group_cur = node_collection.find(
+        {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
+        '$or': [{'group_admin': int(ID)}, {'author_set': int(ID)}]}).sort('last_update', -1).limit(10)
 
-    # user_task = get_user_task(userObject)
-    #user_notification = get_user_notification(userObject)
-    #user_activity = get_user_activity(userObject)
+    dashboard_count.update({'group':group_cur.count()})
+    
+    #user activity gives all the activities of the users
+    
     activity = ""
     activity_user = node_collection.find(
         {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
-        {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
+        {"access_policy":{"$in":Access_policy}},{'member_of':{'$nin': [exclued_from_public]}},
+        {'$or':[{'created_by':int(ID)}, {'modified_by':int(ID)}]}] 
     }).sort('last_update', -1).limit(10)
 
     a_user = []
     dashboard_count.update({'activity':activity_user.count()})
     
+      
+    
     for i in activity_user:
         if i._type != 'Batch' or i._type != 'Course' or i._type !='Module':
-            a_user.append(i)
-    
+              a_user.append(i)
+               
     for each in a_user:
         if each.created_by == each.modified_by :
             if each.last_update == each.created_at:
@@ -186,14 +213,15 @@ def uDashboard(request, group_id):
             member_of = node_collection.find_one({"_id": each.member_of[0]})
             user_activity.append(each)
     
+    '''
     notification_list=[]    
-    notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)
+    notification_object = notification.NoticeSetting.objects.filter(user_id=int(ID))
     for each in notification_object:
         ntid = each.notice_type_id
         ntype = notification.NoticeType.objects.get(id=ntid)
         label = ntype.label.split("-")[0]
         notification_list.append(label)
-
+    ''' 
     # Retrieving Tasks Assigned for User (Only "New" and "In Progress")
     user_assigned = []
     # attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
@@ -206,18 +234,10 @@ def uDashboard(request, group_id):
     #     task_node = node_collection.one({'_id':attr.subject})
     #     if task_node:   
     #         user_assigned.append(task_node) 
-    task_gst = node_collection.one(
-        {'_type': "GSystemType", 'name': "Task"}
-    )
-    task_cur = node_collection.find(
-        {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee': request.user.id}
-    ).sort('last_update', -1).limit(10)
-
-    dashboard_count.update({'Task': task_cur.count()})
-
-    for task_node in task_cur:
-        user_assigned.append(task_node)
-
+    
+    # task_cur gives the task asigned to users
+    
+    
     obj = node_collection.find(
         {'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}}
     )
@@ -266,8 +286,8 @@ def uDashboard(request, group_id):
             'group_id':group_id, 'groupid':group_id, 'group_name':group_name,
             'already_set': is_already_selected, 'prof_pic_obj': profile_pic_image,
             'group_count':group_cur.count(),'page_count':page_cur.count(),'file_count':file_cur.count(),
-            'user_groups':group_list, 'user_task': user_assigned, 'user_activity':user_activity,
-            'user_notification':notification_list,'dashboard_count':dashboard_count,
+            'user_groups':group_cur, 'user_task': task_cur, 'user_activity':user_activity,
+            'dashboard_count':dashboard_count,
             'datavisual': json.dumps(datavisual),'show_only_pie':show_only_pie,
             'total_activity_rating': total_activity_rating
          },
@@ -431,6 +451,7 @@ def group_dashboard(request, group_id):
             has_profile_pic = node_collection.one({'_type': "RelationType", 'name': has_profile_pic_str})
             # Find md5
             pp_md5 = hashlib.md5(pp.read()).hexdigest()
+            pp.seek(0)
             # Check whether this md5 exists in file collection
             gridfs_node = gridfs_collection.one({'md5': pp_md5})
             if gridfs_node:
@@ -457,6 +478,7 @@ def group_dashboard(request, group_id):
                 # Otherwise (md5 doesn't exists)
                 # Upload image
                 # submitDoc(request, group_id)
+                
                 field_value = save_file(pp, pp, request.user.id, group_id, "", "", oid=True)[0]
                 profile_pic_image = node_collection.one({'_type': "File", 'name': unicode(pp)})
                 # Create new grelation and append it to that along with given user
