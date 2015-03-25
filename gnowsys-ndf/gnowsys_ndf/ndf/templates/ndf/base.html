@@ -340,13 +340,19 @@
                       -->
                     {% endcomment %}
                   
-                  <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
-                    {% if site_name == "nroer" and "home" in request.path and request.path|length <= 6 %}
-                    {% else %}
-                      <i class="fi-results"></i> Updates
+                    {% if not "/nroer_groups" in request.path %}
+                    <!-- while listing the partners and/or groups cards dont show any text -->
+                      {% if "/dashboard/group" in request.path %}
+                        <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
+                          <i class="fi-record"></i> About
+                        </a>
+                      {% else %}
+                        <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
+                          <i class="fi-results"></i> Updates
+                        </a>
+                      {% endif %}
                     {% endif %}
 
-                  </a>
                 {% endif %}
                 <!-- </li> -->
               </div>

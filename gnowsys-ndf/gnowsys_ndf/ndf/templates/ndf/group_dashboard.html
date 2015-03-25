@@ -81,7 +81,7 @@
   }
 
   #group_picture{
-    background-color: lightgray;
+    background-color: inherit;
   }
 
   .group-images{
@@ -94,19 +94,21 @@
 
 <!-- LHS Block -->
 {% block meta_content %}
-  <h3>{% trans "About" %}</h3>
+  <!-- <h3>{% trans "About" %}</h3> -->
 
-  {% blocktrans %}<b>Group Dashboard</b> Shows the tasks and activities in the site.{% endblocktrans %}
+  {% blocktrans %}
+    <b> Group Dashboard </b> Shows the tasks and activities in the site.
+  {% endblocktrans %}
   <br><br>
 
   <!-- form for group/profile picture on LHS -->
   <form id="frmProfilePic" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
     {% csrf_token %}       
 
-    <div id="group_picture" class="th"> 
+    <div id="group_picture"> 
             
       {% if prof_pic_obj %}
-        <img alt="profile picture for this group." src="{% url 'get_mid_size_img' group_id prof_pic_obj.pk %}" id="group-image" class="group-images">
+        <img alt="profile picture for this group." src="{% url 'get_mid_size_img' group_id prof_pic_obj.pk %}" id="group-image" class="group-images th">
 
       {% else %}
         <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." id="group-image" class="group-images">

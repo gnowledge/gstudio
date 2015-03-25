@@ -84,14 +84,20 @@ def get_execution_time(f):
 
 
 @get_execution_time
-def get_group_name_id(group_name_or_id):
+def get_group_name_id(group_name_or_id, get_obj=False):
     '''
-      This method takes possible group name/id as an argument and returns group name and id.
-      As method name suggests, returned result is "group_name" first and "group_id" second.
+      - This method takes possible group name/id as an argument and returns (group-name and id) or group object.
+      
+      - If no second argument is passed, as method name suggests, returned result is "group_name" first and "group_id" second.
 
-      Example: res_group_name, res_group_id = get_group_name_id(group_name_or_id)
+      - When we need the entire group object, just pass second argument as (boolian) True. In the case group object will be returned.  
+
+      Example 1: res_group_name, res_group_id = get_group_name_id(group_name_or_id)
       - "res_group_name" will contain name of the group.
       - "res_group_id" will contain _id/ObjectId of the group.
+
+      Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
+      - "res_group_obj" will contain entire object.
     '''
 
     # case-1: argument - "group_name_or_id" is ObjectId
@@ -104,7 +110,10 @@ def get_group_name_id(group_name_or_id):
             group_id = group_name_or_id
             group_name = group_obj.name
 
-            return group_name, group_id
+            if get_obj:
+                return group_obj
+            else:
+                return group_name, group_id
 
     # case-2: argument - "group_name_or_id" is group name
     else:
@@ -116,9 +125,16 @@ def get_group_name_id(group_name_or_id):
             group_name = group_name_or_id
             group_id = group_obj._id
 
-            return group_name, group_id
+            if get_obj:
+                return group_obj
+            else:
+                return group_name, group_id
 
-    return None, None
+    if get_obj:
+        return None
+    else:
+        return None, None
+
 
 @get_execution_time
 def check_delete(main):
