@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block style %}
-	.resource-drawer { 
+  .resource-drawer { 
     max-height: 202px;
     overflow-y: auto;
   }
@@ -64,76 +64,76 @@
 
   {% get_group_name groupid as group_name_tag %}
   <div class="row" id="new" style="margin-top: 0.5rem">
-  	<!-- Users General Information -->
-  	<div class="row">
-  		<div class="small-2 columns">
-  		    <div class="text-center">
-    			{% if user.is_authenticated %}
-    				{% if prof_pic_obj %}
-			              <div class="div-height">
-			    			  <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
-			              </div>
+    <!-- Users General Information -->
+    <div class="row">
+      <div class="small-2 columns">
+          <div class="text-center">
+          {% if user.is_authenticated %}
+            {% if prof_pic_obj %}
+                    <div class="div-height">
+                  <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
+                    </div>
                     {% else %}
-			              <div class="div-height">
-			              <i class="fi-torso style2 text-center"></i>
-			              </div>
-					{% endif %}   
+                    <div class="div-height">
+                    <i class="fi-torso style2 text-center"></i>
+                    </div>
+          {% endif %}   
 
-		            {% if user_id == usr %}
-			              <div class="row">
-			                <div class="small-12 columns">
-			                  <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px;" value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
-			                </div>
-			              </div>
-		  			{% endif %}
+                {% if user_id == usr %}
+                    <div class="row">
+                      <div class="small-12 columns">
+                        <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px;" value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+                      </div>
+                    </div>
+            {% endif %}
 
-	      			<div id="pic_div" class="hide" class="row">
-	      				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
-	      				{% csrf_token %}
-	      				<input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
-						<input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
-	      				<input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
-	                	<input type="hidden" name="type" value="profile_pic">           
-	                	<input type="hidden" name="user" value="{{usr}}">         
-	                    <p id="message" style="display:none">
-	      					{% trans "Please wait for uploading profile picture" %}
-	      				</p>
-	      						
-	      				</form>
-		      		</div>
-    			
-         		{% else %}
-    				<p><em>{% trans "You are Not Authorised user please login to upload profile picture" %} </em></p>
+              <div id="pic_div" class="hide" class="row">
+                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
+                {% csrf_token %}
+                <input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
+            <input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
+                <input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
+                    <input type="hidden" name="type" value="profile_pic">           
+                    <input type="hidden" name="user" value="{{usr}}">         
+                      <p id="message" style="display:none">
+                  {% trans "Please wait for uploading profile picture" %}
+                </p>
+                    
+                </form>
+              </div>
+          
+            {% else %}
+            <p><em>{% trans "You are Not Authorised user please login to upload profile picture" %} </em></p>
                 {% endif %}
             </div>  
         </div>
 
-  		<div class="small-10 columns">
-	        <h2 class="style-text">{{username}}</h2>
-	        <h5>
-	  			{% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
-	        	{% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
-	        	{% trans "Pages created" %}: &nbsp;{{page_count}}<br>
-	        	<!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
-	        	{% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
-	        	{% trans "Quiz" %}: {{quiz_count}}<br> 
-	        	{% trans "Forum" %}: {{forum_count}}<br>
-				<!--    FOR AWARDS  -->  
-				<!-- {% if page_count > 1 %}  
-	        	<img src="/static/ndf/images/close.png">
-	        	{% endif %}     -->      
-	        </h5>
-  		</div>
-  	</div>
-  	
+      <div class="small-10 columns">
+          <h2 class="style-text">{{username}}</h2>
+          <h5>
+          {% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
+            {% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
+            {% trans "Pages created" %}: &nbsp;{{page_count}}<br>
+            <!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
+            {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
+            {% trans "Quiz" %}: {{quiz_count}}<br> 
+            {% trans "Forum" %}: {{forum_count}}<br>
+        <!--    FOR AWARDS  -->  
+        <!-- {% if page_count > 1 %}  
+            <img src="/static/ndf/images/close.png">
+            {% endif %}     -->      
+          </h5>
+      </div>
+    </div>
+    
     <br/>
-  	
+    
     <div class="row">
-  		<div class="small-12 columns" style="padding-top:10px;">
-  			<b><a>{{username}}'s {% trans "Dashboard" %}</a></b>
-  			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
-  		</div>
-  	</div>
+      <div class="small-12 columns" style="padding-top:10px;">
+        <b><a>{{username}}'s {% trans "Dashboard" %}</a></b>
+        <hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
+      </div>
+    </div>
   </div>
 
   <!-- Task names -->
@@ -141,7 +141,7 @@
     <dd class="active"><a href="#group" id="p1">Groups </a></dd>
     
     {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
-    <dd ><a href="#Activity" id="p3">My Activities </a></dd>			
+    <dd ><a href="#Activity" id="p3">My Activities </a></dd>      
     <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
   </dl>
 
@@ -159,18 +159,18 @@
             
             <div id="group">
               <header>
-	                <a href="/{{node.pk}}">
-	                <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-						<h4>{{ node.name|truncatechars:20 }}</h4>
-					<div>
-		                <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-		                	<br/>
-		                	by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-		                </small>
-	                </div>
+                  <a href="/{{node.pk}}">
+                  <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+            <h4>{{ node.name|truncatechars:20 }}</h4>
+          <div>
+                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                      <br/>
+                      by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                    </small>
+                  </div>
               </header>
-			
-			  <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+      
+        <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
               </a>
               
               <div class="label-list">
@@ -180,24 +180,24 @@
               </div>  
             </div>
           </li>
-   	
+    
         {% empty %}
           {% if not searching %}
-	          <div class="row">
-		            <div class="small-12 columns" align="left">
-		             	<h5> {% blocktrans %}No Groups </b>{% endblocktrans %} </h5>
-		            </div>
-	          </div>
+            <div class="row">
+                <div class="small-12 columns" align="left">
+                  <h5> {% blocktrans %}No Groups </b>{% endblocktrans %} </h5>
+                </div>
+            </div>
           {% endif %}
 
         {% endfor %}
 
         {% if dashboard_count.group > 10 %}
-	      	<div class="row">
-	      		<div class="small-12 columns" align="right">
-	       			<h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
-	      		</div>
-	        </div>
+          <div class="row">
+            <div class="small-12 columns" align="right">
+              <h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
+            </div>
+          </div>
         {% endif %}
       </ul>
     </div>
@@ -214,54 +214,54 @@
 
     <!-- Assigned Tasks -->
     <div class="content" id="AssignedTasks" >
-     	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-	        {% for node in user_task %}
-	          {% get_version_of_module node.pk as version %}
-	          <li class="card">
-	            
-	            <div id="assignedTask">
-	              <header>
-	                <a href="{% url 'task_details' group_id node.pk %}">
-	                <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+          {% for node in user_task %}
+            {% get_version_of_module node.pk as version %}
+            <li class="card">
+              
+              <div id="assignedTask">
+                <header>
+                  <a href="{% url 'task_details' group_id node.pk %}">
+                  <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
 
-	                <h4>{{ node.name|truncatechars:20 }}</h4>
+                  <h4>{{ node.name|truncatechars:20 }}</h4>
 
-	                <div>
-	                  <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-		                  <br/>
-		                  by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-	                  </small>
-	                </div>
-	              </header>
-				  <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-	              </a>
-	              <div class="label-list">
-	                  {% for tag in node.tags|slice:":3" %}
-	                       <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
-	                  {% endfor %}
-	              </div>
-	            </div>
-	             
-	          </li>  
+                  <div>
+                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                      <br/>
+                      by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                    </small>
+                  </div>
+                </header>
+          <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                </a>
+                <div class="label-list">
+                    {% for tag in node.tags|slice:":3" %}
+                         <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                    {% endfor %}
+                </div>
+              </div>
+               
+            </li>  
 
-	        {% empty %}
-	          {% if not searching %}
-		          <div class="row">
-		            <div class="small-2 columns" align="right">
-		              <h5> {% trans "No Assinged Task" %} </h5>
-		            </div>
-		          </div>
-	          {% endif %}
+          {% empty %}
+            {% if not searching %}
+              <div class="row">
+                <div class="small-2 columns" align="right">
+                  <h5> {% trans "No Assinged Task" %} </h5>
+                </div>
+              </div>
+            {% endif %}
 
-	        {% endfor %}
+          {% endfor %}
 
-	        {% if dashboard_count.Task > 10 %}
-	        <div class="row">
-	          <div class="small-12 columns" align="right">
-	            <h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
-	          </div>
-	        </div>
-	        {% endif %}
+          {% if dashboard_count.Task > 10 %}
+          <div class="row">
+            <div class="small-12 columns" align="right">
+              <h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
+            </div>
+          </div>
+          {% endif %}
       </ul>
     </div>
 
@@ -273,60 +273,60 @@
           {% get_version_of_module node.pk as version %}
           {% get_url node.pk as res_type %}
             {% if res_type != "None" %}
-	          <li class="card">
-	               
-		            <div id="activity">
-			              <header>
-			               <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-			                  {% if res_type == 'group' %}
-			                    <a href="/{{node.pk}}">
-			                  {% elif res_type %}
-			          	        {% if res_type != "event_app_instance_detail" %}
-			          	              <a href="{% url res_type groupid node.pk   %}">{{i.url}} 
-			                    {% else %}
-			                        {% get_event_type node as app_set_id %}
-			                        <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}          
-			                    {% endif %}
-			                  {% endif %}
-			                <h4>{{ node.name|truncatechars:20 }}</h4>
+            <li class="card">
+                 
+                <div id="activity">
+                    <header>
+                     <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+                        {% if res_type == 'group' %}
+                          <a href="/{{node.pk}}">
+                        {% elif res_type %}
+                          {% if res_type != "event_app_instance_detail" %}
+                                <a href="{% url res_type groupid node.pk   %}">{{i.url}} 
+                          {% else %}
+                              {% get_event_type node as app_set_id %}
+                              <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}          
+                          {% endif %}
+                        {% endif %}
+                      <h4>{{ node.name|truncatechars:20 }}</h4>
 
-			                <div>
-			                  <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-			                  <br/>
-			                  by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-			                  </small>
-			                </div>
-			                
-			              </header>
+                      <div>
+                        <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                        <br/>
+                        by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                        </small>
+                      </div>
+                      
+                    </header>
 
-		              	  <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-		              	  </a>
-			              <div class="label-list">
-			                  {% for tag in node.tags|slice:":3" %}
-			                       <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
-			                  {% endfor %}
-			              </div>
-		            </div>
-	                    
-	          </li>  
+                      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                      </a>
+                    <div class="label-list">
+                        {% for tag in node.tags|slice:":3" %}
+                             <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                      
+            </li>  
             {% endif %}
         {% empty %}
           {% if not searching %}
-	          <div class="row">
-	            <div class="small-12 columns" align="left">
-	              <h5> {% trans "No Recent Activities" %}</h5>
-	            </div>
-	          </div>
+            <div class="row">
+              <div class="small-12 columns" align="left">
+                <h5> {% trans "No Recent Activities" %}</h5>
+              </div>
+            </div>
           {% endif %}
             
         {% endfor %}
-    	  {% if dashboard_count.activity > 10 %}
-	        	<div class="row">
-	        		<div class="small-12 columns" align="right">
-	         			<h6> <a href="{% url 'user_activity' group_id %}"> Show More.. </a></h6>
-	        		</div>
-	        	</div>
-    	  {% endif %}
+        {% if dashboard_count.activity > 10 %}
+            <div class="row">
+              <div class="small-12 columns" align="right">
+                <h6> <a href="{% url 'user_activity' group_id %}"> Show More.. </a></h6>
+              </div>
+            </div>
+        {% endif %}
       </ul>
     </div>
   </div>
@@ -334,16 +334,16 @@
 {% endblock %}
 
 {% block script %}
-	$("input:not('#docFile')").each(function() {
-		$(this).bind('keydown keypress keyup change', function() {
-			var search = (this.value).toLowerCase();    	
-    		var resource = (this.name); 
-    		var $li = $("#"+resource+"_drawer li.bullet-item").hide();  
+  $("input:not('#docFile')").each(function() {
+    $(this).bind('keydown keypress keyup change', function() {
+      var search = (this.value).toLowerCase();      
+        var resource = (this.name); 
+        var $li = $("#"+resource+"_drawer li.bullet-item").hide();  
 
-    		$li.filter(function() {    		    		
-      			return $(this).text().toLowerCase().indexOf(search) >= 0;
-    		}).show();
-  	});
+        $li.filter(function() {               
+            return $(this).text().toLowerCase().indexOf(search) >= 0;
+        }).show();
+    });
   });
 
   $("#btnUploadProfilePic").click(function() {
@@ -369,13 +369,13 @@
     $('#txtSelectedFiles').val(this.value);
   });
 
-	$("#submitpostid").click(function() {
-		if($("#docFile").val() != "") {	
-			$("#message").show();
-			$("#submitpostid").hide();
-		}
+  $("#submitpostid").click(function() {
+    if($("#docFile").val() != "") { 
+      $("#message").show();
+      $("#submitpostid").hide();
+    }
 
-		else {
+    else {
       var message = "{% trans 'Please select an image to set it as a profile picture !' %}"
       $("#alertModalLabel").text(message);
       $("#alertModal").addClass("warning");
@@ -383,9 +383,9 @@
 
       $("#pic_div").addClass("hide");
 
-			return false;
-		}
-	});
+      return false;
+    }
+  });
 
   // On close event of reveal-modal (alertModal) -------------------------------------------------------------
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
