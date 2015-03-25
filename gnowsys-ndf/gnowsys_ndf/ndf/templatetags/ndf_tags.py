@@ -45,6 +45,33 @@ translation_set=[]
 check=[]
 
 
+@register.assignment_tag
+def get_site_registration_variable_visibility(registration_variable=None):
+    """Returns dictionary variable holding variables defined in settings file
+    for Author's class regarding their visibility in registration template
+
+    If looking for value of single variable, then pass that variable name as
+    string which will return it's corresponding value. For example,
+        bool_val = get_site_registration_variable_visibility(
+            registration_variable="GSTUDIO_REGISTRATION_AUTHOR_AGENCY_TYPE"
+        )
+
+    Otherwise, if no parameter is passed, then returns a dictionary variable.
+    For example,
+        site_dict = get_site_registration_variable_visibility()
+    In order to fetch given variable's value from above dictionay use following:
+        site_registration_dict["AUTHOR_AGENCY_TYPE"]
+        site_registration_dict["AFFILIATION"]
+    """
+    if registration_variable:
+        return eval(registration_variable)
+
+    else:
+        site_registration_variable_visibility = {}
+        site_registration_variable_visibility["AUTHOR_AGENCY_TYPE"] = GSTUDIO_REGISTRATION_AUTHOR_AGENCY_TYPE
+        site_registration_variable_visibility["AFFILIATION"] = GSTUDIO_REGISTRATION_AFFILIATION
+    return site_registration_variable_visibility
+
 
 @register.assignment_tag
 def get_site_variables():

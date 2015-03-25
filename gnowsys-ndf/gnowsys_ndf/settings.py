@@ -423,15 +423,26 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
+META_TYPE = [u"GAPP", u"factory_types", u"Mapping_relations"]
 
-GROUP_AGENCY_TYPES=["Other", "Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
+GROUP_AGENCY_TYPES = [
+    "Other", "Partner", "GovernmentAgency", "NGO", "College", "University",
+    "School", "Institution", "Project", "SpecialInterestGroup"
+]
+
+# Varible to toggle the visibility of author_agency_type field of Author
+# class in User-registration template (shown as Occupation)
+GSTUDIO_REGISTRATION_AUTHOR_AGENCY_TYPE = True
 
 AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
 ]
 
-# Built-in GAPPS list 
+# Varible to toggle the visibility of group_affiliation field of Author
+# class in User-registration template (shown as Affiliation)
+GSTUDIO_REGISTRATION_AFFILIATION = True
+
+# Built-in GAPPS list
 # DON'T EDIT THIS LIST - for listing purpose on gapps-menubar/gapps-iconbar, instead make use of below one in local_setting file
 # ONLY TO BE EDITED - in case of adding new built-in GAPPS
 GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics", u"E-Library", u"Meeting",u"Bib_App", u"Observation",u"Event"]
