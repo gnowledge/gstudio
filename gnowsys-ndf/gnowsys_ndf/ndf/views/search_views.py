@@ -238,15 +238,15 @@ def results_search(request, group_id, return_only_dict = None):
 									   {"created_by":user_reqd},
 									   {"group_set":ObjectId(group_id)},
 									   {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
-									   {"name":{"$regex":search_str_user, "$options":"i"}}]},
-					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+									   {"name":search_str_user}]},
+					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
 				else:
 				  exact_match = node_collection.find({'$and':[
 									    {"member_of":{'$in':all_list}},		
 									    {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									    {"group_set":ObjectId(group_id)},
 									    {"name":{"$regex":search_str_user,"$options":"i"}}]},
-					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
                                                 
                                 # SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
                                 #exact_match.rewind()
@@ -269,7 +269,7 @@ def results_search(request, group_id, return_only_dict = None):
                                         	all_ids.append(j['_id'])
                                                         
 				# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY
-				search_results_ex['name'] = sort_names_by_similarity(search_results_ex['name'], search_str_user)
+				#search_results_ex['name'] = sort_names_by_similarity(search_results_ex['name'], search_str_user)
 				# split stemmed match
 				split_stem_match = []					# will hold all the split stem match results
 				len_stemmed = len(search_str_stemmed)	
@@ -284,7 +284,7 @@ def results_search(request, group_id, return_only_dict = None):
 									   {"group_set":ObjectId(group_id)},
 									   {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},	
 									   {"name":{"$regex":word, "$options":"i"}}]},
-						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
 						else:		
 						  			# search all users in created by
 						  temp = node_collection.find({'$and':[
@@ -292,7 +292,7 @@ def results_search(request, group_id, return_only_dict = None):
 									   {"group_set":ObjectId(group_id)},
 									   {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									    {"name":{"$regex":str(word), "$options":"i"}}] },
-						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
                                                 split_stem_match.append(temp)
 						c += 1
 					
@@ -318,7 +318,7 @@ def results_search(request, group_id, return_only_dict = None):
                                                                 c += 1
                                 # SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY	
 
-                                search_results_st['name'] = sort_names_by_similarity(search_results_st['name'], search_str_user)
+                                #search_results_st['name'] = sort_names_by_similarity(search_results_st['name'], search_str_user)
 				
 
 			if (search_by_tags == True):						# IF True, THEN SEARCH BY TAGS
@@ -333,13 +333,13 @@ def results_search(request, group_id, return_only_dict = None):
 									   {"group_set":ObjectId(group_id)},
 									   {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									   {"tags":search_str_user}]},
-					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+					        {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
 				else:
 						exact_match = node_collection.find({'$and':[
 										{"member_of":{'$in':all_list}},	    											{'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									   {"group_set":ObjectId(group_id)},
 									   {"tags":search_str_user}]},
-						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
 				for j in exact_match:
 						j.name=(j.name).replace('"',"'")
 						if j._id not in all_ids:
@@ -352,7 +352,7 @@ def results_search(request, group_id, return_only_dict = None):
                                                         all_ids.append(j['_id'])
                                                         
 
-				search_results_ex['tags'] = sort_names_by_similarity(search_results_ex['tags'], search_str_user)
+				#search_results_ex['tags'] = sort_names_by_similarity(search_results_ex['tags'], search_str_user)
 
 				# split stemmed match
 				split_stem_match = []
@@ -367,17 +367,17 @@ def results_search(request, group_id, return_only_dict = None):
 									     {"created_by":user_reqd},
 									     {"group_set":ObjectId(group_id)},
 									     {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]}]}, 
-						{"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1}).sort('last_update',-1)
 						else:
 							temp = node_collection.find({'$and':[{"tags":word},
 									    {"member_of":{'$in':all_list}},	    			
 									    {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									    {"group_set":ObjectId(group_id)}]},
-						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
 						
 						split_stem_match.append(temp)
 						c += 1
-				search_results_st['tags'] = sort_names_by_similarity(search_results_st['tags'], search_str_user)
+				#search_results_st['tags'] = sort_names_by_similarity(search_results_st['tags'], search_str_user)
 					
 				"""
 				For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
