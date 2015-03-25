@@ -1155,6 +1155,7 @@ def get_prior_node(node_id):
 # return the set of resources by using get_resources method
 def get_all_resources(request,node_id):
         obj_set=[]
+        keys=[] # set of keys used for creating the fieldset in template
         result_set=[]
         node=node_collection.one({'_id':ObjectId(node_id)})
         result_set=get_possible_translations(node)
@@ -1167,14 +1168,21 @@ def get_all_resources(request,node_id):
                 n=node_collection.one({'_id':ObjectId(each)})
                 resources_dict=get_resources(each,resources)
         res_dict={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        
         for k,v in res_dict.items():
                 res_dict[k]={'fallback_lang':[],'other_languages':[]}
         for key,val in resources_dict.items():
-                for res in val:
-                        if res.language == request.LANGUAGE_CODE:
+                if val:
+                        keys.append(key)
+                        for res in val:
+                                if res.language == request.LANGUAGE_CODE:
                                         res_dict[key]['fallback_lang'].append(res)
-                        else:
+                                else:
                                         res_dict[key]['other_languages'].append(res)
+                                        
+        for k1,v1 in res_dict.items():
+                if k1 not in keys :
+                        del res_dict[k1]
         return res_dict
 
 @register.assignment_tag
