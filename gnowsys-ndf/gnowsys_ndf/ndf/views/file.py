@@ -19,7 +19,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 
 from mongokit import paginator
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
@@ -822,8 +822,30 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 fileobj.access_policy = unicode(access_policy) # For giving privacy to file objects   
             
             fileobj.file_size = size
+
+            if usrname:
+              user_obj = User.objects.get(username=usrname)
+
             group_object = node_collection.one({'_id':ObjectId(group_id)})
+            mod_group = node_collection.one({'_type': "Group", 'name': "Clearing House Of "+group_object.name, 'group_type': "PRIVATE" })
             
+            if group_object.edit_policy == "EDITABLE_MODERATED" or group_object.name == "home":
+              if mod_group:
+                if user_obj.pk != group_object.created_by or user_obj.pk not in group_object.group_admin or not user_obj.is_superuser :
+                  # Contributors area to save resources in moderated i.e clearing house group
+                  fileobj.group_set.append(mod_group._id)
+
+                else:
+                  # Group admins i.e curators area to save resources
+                  if mod_group._id in fileobj.group_set :
+                    fileobj.group_set.remove(mod_group._id)
+                  if group_object._id not in fileobj.group_set:
+                    fileobj.group_set.append(group_object._id)
+
+                  # After publishing resource to original group notification will receive to all subscribe users of the group
+
+
+
             if group_object._id not in fileobj.group_set:
                 fileobj.group_set.append(group_object._id)        #group id stored in group_set field
             if usrname:
