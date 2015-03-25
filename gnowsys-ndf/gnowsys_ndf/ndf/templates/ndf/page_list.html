@@ -167,9 +167,9 @@
                 </b>
             </div>
           </div>
-          
+          {% if node.status == "PUBLISHED" or node.created_by == request.user.id %}
           <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
-
+          {% endif %}
           <footer>
             <div class="age">
               {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 

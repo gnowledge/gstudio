@@ -29,10 +29,10 @@ from gnowsys_ndf.ndf.views.methods import *
 # ######################################################################################################################################
 
 gst_group = node_collection.one({"_type": "GSystemType", 'name': GAPPS[2]})
-get_all_usergroups=get_all_user_groups()
-at_apps_list=node_collection.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
-ins_objectid  = ObjectId()
-app=gst_group
+get_all_usergroups = get_all_user_groups()
+at_apps_list = node_collection.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+ins_objectid = ObjectId()
+app = gst_group
 
 # ######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
@@ -186,9 +186,9 @@ def create_group(request,group_id):
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     if group_ins:
       group_id = str(group_ins._id)
-    else :
+    else:
       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
+      if auth:
         group_id = str(auth._id)	
   else :
   	pass
@@ -197,8 +197,8 @@ def create_group(request,group_id):
     colg = node_collection.collection.Group()
     Mod_colg = node_collection.collection.Group()
 
-    cname=request.POST.get('groupname', "").strip()
-    colg.altnames=cname
+    cname = request.POST.get('groupname', "").strip()
+    colg.altnames = cname
     colg.name = unicode(cname)
     colg.member_of.append(gst_group._id)
     usrid = int(request.user.id)
@@ -217,9 +217,9 @@ def create_group(request,group_id):
     colg.visibility_policy = request.POST.get('existance', 'ANNOUNCED')
     colg.disclosure_policy = request.POST.get('member', 'DISCLOSED_TO_MEM')
     colg.encryption_policy = request.POST.get('encryption', 'NOT_ENCRYPTED')
-    colg.agency_type=request.POST.get('agency_type',"")
+    colg.agency_type=request.POST.get('agency_type', "")
     colg.save()
-    
+
     if colg.edit_policy == "EDITABLE_MODERATED":
       Mod_colg.altnames = cname + "Mod" 
       Mod_colg.name = cname + "Mod"     
@@ -234,7 +234,7 @@ def create_group(request,group_id):
         Mod_colg.contributors.append(usrid)
 
       Mod_colg.prior_node.append(colg._id)
-      Mod_colg.save() 
+      Mod_colg.save()
 
       colg.post_node.append(Mod_colg._id)
       colg.save()
@@ -262,8 +262,8 @@ def create_group(request,group_id):
       else:
         shelves = []
 
-    return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'appId':app._id,'node':colg,'user':request.user,
-                                                         'groupid':colg._id,'group_id':colg._id,
+    return render_to_response("ndf/groupdashboard.html", {'groupobj': colg, 'appId': app._id, 'node': colg, 'user': request.user,
+                                                         'groupid': colg._id, 'group_id': colg._id,
                                                          'shelf_list': shelf_list,'shelves': shelves
                                                         },context_instance=RequestContext(request))
 
@@ -273,7 +273,7 @@ def create_group(request,group_id):
   for each in available_nodes:
       nodes_list.append(str((each.name).strip().lower()))
 
-  return render_to_response("ndf/create_group.html", {'groupid':group_id,'appId':app._id,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
+  return render_to_response("ndf/create_group.html", {'groupid': group_id, 'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
     
 # @get_execution_time
 #def home_dashboard(request):
@@ -524,44 +524,67 @@ def app_selection(request,group_id):
 
 @get_execution_time
 def switch_group(request,group_id,node_id):
-  print "hihihihihih swtich _group"
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
+  ins_objectid = ObjectId()
+  if ins_objectid.is_valid(group_id) is False:
     group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     if group_ins:
       group_id = str(group_ins._id)
-    else :
+    else:
       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-      	group_id = str(auth._id)	
+      if auth:
+      	group_id = str(auth._id)
   else :
   	pass
 
   try:
-    node=node_collection.one({"_id":ObjectId(node_id)})
-    exstng_grps=node.group_set
-    if request.method == "POST":     
-      node.group_set=[] # Remove all existing groups and add new ones 
-      new_grps = request.POST['new_grps']
-      new_grps_list=new_grps.split(",")
-      if new_grps_list:
-        for each in new_grps_list:
-          if each:
-            node.group_set.append(ObjectId(each));
-        node.save()
-      return HttpResponse("Success")
+    node = node_collection.one({"_id": ObjectId(node_id)})
+    existing_grps = node.group_set
+    if request.method == "POST":
+      new_grps_list = request.POST.getlist("new_groups_list[]", "")
+      resource_exists = False
+      resource_exists_in_grps = []
+      response_dict = {'success': False, 'message': ""}
+
+      new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
+      if new_grps_list_distinct:
+        for each_new_grp in new_grps_list_distinct:
+          if each_new_grp:
+            grp = node_collection.find({'name': node.name, "group_set": ObjectId(each_new_grp), "member_of":ObjectId(node.member_of[0])})
+            if grp.count() > 0:
+              resource_exists = True
+              resource_exists_in_grps.append(unicode(each_new_grp))
+
+        response_dict["resource_exists_in_grps"] = resource_exists_in_grps
+
+      if not resource_exists:
+        new_grps_list_all = [ObjectId(item) for item in new_grps_list]
+        node_collection.collection.update({'_id': node._id}, {'$set': {'group_set': new_grps_list_all}}, upsert=False, multi=False)
+        node.reload()
+        response_dict["success"] = True
+        response_dict["message"] = "Published to selected groups"
+      else:
+        response_dict["success"] = False
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists. Hence Cannot Publish to selected groups."
+        response_dict["message"] = node.member_of_names_list[0] + " with name " + node.name + \
+                " already exists in selected group(s). " + \
+                "Hence cannot be cross published now." + \
+                " For publishing, you can rename this " + node.member_of_names_list[0] + " and try again."
+      print response_dict
+      return HttpResponse(json.dumps(response_dict))
+
     else:
       coll_obj_list = []
-      data_list=[]
-      user_id=request.user.id
-      all_user_groups=[]
+      data_list = []
+      user_id = request.user.id
+      all_user_groups = []
       for each in get_all_user_groups():
         all_user_groups.append(each.name)
-      st = node_collection.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
+      st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
       for each in node.group_set:
-        coll_obj_list.append(node_collection.one({'_id':each}))
-      data_list=set_drawer_widget(st,coll_obj_list)
+        coll_obj_list.append(node_collection.one({'_id': each}))
+      data_list = set_drawer_widget(st, coll_obj_list)
       return HttpResponse(json.dumps(data_list))
    
   except Exception as e:

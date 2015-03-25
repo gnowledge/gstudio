@@ -13,7 +13,7 @@ import json
 import datetime
 
 @user_passes_test(lambda u: u.is_superuser)
-def adminDesignerDashboardClass(request, class_name):
+def adminDesignerDashboardClass(request, class_name='GSystemType'):
     '''
     fetching class's objects
     '''
@@ -75,12 +75,13 @@ def adminDesignerDashboardClass(request, class_name):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
+def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id=None):
     '''
     delete class's objects
     '''
+    global LANGUAGES
     new_instance_type = None
-    LANGUAGES = ""
+    LANGUAGES = '' if not LANGUAGES else LANGUAGES
     definitionlist = []
     contentlist = []
     dependencylist = []
@@ -114,11 +115,11 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
         new_instance_type = node_collection.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
 
     else:
-        new_instance_type = eval("collection"+"."+class_name)()
+        new_instance_type = eval("node_collection.collection"+"."+class_name)()
 
     if request.method=="POST":
         if translate:
-            new_instance_type = eval("collection"+"."+class_name)()
+            new_instance_type = eval("node_collection.collection"+"."+class_name)()
             
         for key,value in class_structure.items():
             if value == bool:
@@ -200,7 +201,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
         new_instance_type.save()
         if translate:        
             relation_type=node_collection.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
-            grelation=collection.GRelation()
+            grelation=node_collection.collection.GRelation()
             grelation.relation_type=relation_type
             grelation.subject=new_instance_type['_id']
             grelation.right_subject=ObjectId(node_id)
