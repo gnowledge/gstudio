@@ -79,9 +79,11 @@ background:#b3ffb3;
           {% if user.is_authenticated %}
           {% if user.is_superuser or node.created_by == user.id %}
           {% if selected_versions.1 and selected_versions.2 %}
+          {% comment %}
           <a class="button tiny" href="{% url 'merge_doc' group_id node  selected_versions.1 selected_versions.2 %}" > Merge </a>	
           <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.1 %}" > Revert to {{selected_versions.1}} </a>
           <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.2 %}" > Revert to {{selected_versions.2}} </a>
+          {% endcomment %}
           {% endif %}   
           {% endif %}   
           {% endif %}
@@ -112,7 +114,7 @@ background:#b3ffb3;
  </div>
 {% elif view == "merge" or view == "revert" %}
   <script>
-        document.location.href = '/{{group_id}}/page/{{node}}/version/{{ver}}'</script>
+        document.location.href = '/{{group_id}}/compare/{{node}}/version/{{ver}}'</script>
 
   {% else %}
  <div class="row" style = "overflow: auto; min-height: auto;max-height: 75vh;">  

@@ -2862,8 +2862,8 @@ def create_college_group_and_setup_data(college_node):
     return gfc, gr_gfc
 
 
-def get_published_version_dict(request,document_object):
-        """Returns the dictionary containing the list of revision numbers of published nodes.
+def get_published_version_list(request,document_object):
+        """Returns the list of revision numbers of published nodes.
         """
         published_node_version = []
         rcs = RCS()
@@ -2917,13 +2917,14 @@ def parse_data(doc):
                    doc[i] = node.name
           elif i == "rating":
              new_str = ""
-             for k in doc[i]:
-                userid = k['user_id']
-                score = k['score']
-                if User.objects.filter(id = userid).exists():
-	                              user = User.objects.get(id = userid)
-	                              if user:
-	                                 new_str = new_str + "User" +":" + str(user.get_username()) + "  " + "Score" + str (score) + "\n"
+             if doc[i]:
+               for k in doc[i]:
+                  userid = k['user_id']
+                  score = k['score']
+                  if User.objects.filter(id = userid).exists():
+	                                user = User.objects.get(id = userid)
+	                                if user:
+	                                   new_str = new_str + "User" +":" + str(user.get_username()) + "  " + "Score" + str (score) + "\n"
 	     if not doc[i]:
 	              doc[i] = ""
 	     else:

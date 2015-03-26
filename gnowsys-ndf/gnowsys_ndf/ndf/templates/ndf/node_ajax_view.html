@@ -249,7 +249,16 @@ table {
   display: block;
   overflow-y: scroll;
 }
+
+.history
+ {
+   background-color:#10c1cb;
+   border-width: 1px;
+   box-shadow: 1px 1px 3px #888888;
+ }
+
 </style>
+
 
 
 {% if user.is_authenticated %}
@@ -293,7 +302,6 @@ table {
 
  
       <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
-
       {% if node %}
         {% get_publish_policy request groupid node as group_policy %}
         {% if group_policy == "allow" %}
@@ -302,7 +310,8 @@ table {
       {% endif %}
 
       </h1>
-
+      
+      <a href = "{% url 'node_version' groupid node.pk  %}" >  <label class = 'history ' style = 'width:8%;'> <h5>   History   </h5> </label>  </a>   
       <h1 class="subheader">
       <dl class="tabs" data-tab> 
 
