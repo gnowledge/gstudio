@@ -22,6 +22,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import save_file
@@ -864,24 +865,25 @@ def create_course_struct(request, group_id,node_id):
 
 
     #Course structure as list of dicts
-    for eachcs in course_node.collection_set:
-      cs_dict = {}
-      coll_node_cs = node_collection.one({'_id':ObjectId(eachcs),'member_of':cs_gst._id},{'name':1,'collection_set':1})
-      cs_names.append(coll_node_cs.name)
-      cs_dict[coll_node_cs.name]=[]
-      course_collection_list.append(cs_dict)
-      for eachcss in coll_node_cs.collection_set:
-        css_dict = {}
-        coll_node_css = node_collection.one({'_id':ObjectId(eachcss), 'member_of':css_gst._id},{'name':1,'collection_set':1,'attribute_set':1})
-        css_names.append(coll_node_css.name)
-        css_dict[coll_node_css.name]={}
-        for eachattr in coll_node_css.attribute_set:
-          for eachk,eachv in eachattr.items():
-            css_dict[coll_node_css.name][eachk] = eachv
-          if coll_node_css.collection_set:
-            css_dict[coll_node_css.name]["resources"] = coll_node_css.collection_set
-        cs_dict[coll_node_cs.name].append(css_dict)
-    
+    # for eachcs in course_node.collection_set:
+    #   cs_dict = {}
+    #   coll_node_cs = node_collection.one({'_id':ObjectId(eachcs),'member_of':cs_gst._id},{'name':1,'collection_set':1})
+    #   cs_names.append(coll_node_cs.name)
+    #   cs_dict[coll_node_cs.name]=[]
+    #   course_collection_list.append(cs_dict)
+    #   for eachcss in coll_node_cs.collection_set:
+    #     css_dict = {}
+    #     coll_node_css = node_collection.one({'_id':ObjectId(eachcss), 'member_of':css_gst._id},{'name':1,'collection_set':1,'attribute_set':1})
+    #     css_names.append(coll_node_css.name)
+    #     css_dict[coll_node_css.name]={}
+    #     for eachattr in coll_node_css.attribute_set:
+    #       for eachk,eachv in eachattr.items():
+    #         css_dict[coll_node_css.name][eachk] = eachv
+    #       if coll_node_css.collection_set:
+    #         css_dict[coll_node_css.name]["resources"] = coll_node_css.collection_set
+    #     cs_dict[coll_node_cs.name].append(css_dict)
+
+    course_collection_list = course_node.collection_set
     if course_collection_list:
       course_collection_dict_exists = True
 
@@ -1114,7 +1116,7 @@ def create_course_struct(request, group_id,node_id):
                                     'app_id':app_id, 'app_set_id':app_set_id,
                                     'coll_node_cs':coll_node_cs,
                                     'coll_node_css':coll_node_css,
-                                    'course_collection_list':json.dumps(course_collection_list),
+                                    'course_collection_list':json.dumps(course_collection_list,cls=NodeJSONEncoder),
                                     'property_order_list':property_order_list_cs,
                                     'property_order_list_css':property_order_list_css
                                     #'eval_type_flag': eval_type_flag
@@ -1127,3 +1129,94 @@ def add_units(request,group_id):
     return render_to_response("ndf/course_units.html",
                               context_instance = RequestContext(request)
     )
+
+
+
+@login_required
+def save_course_section(request,group_id):
+    '''
+    This ajax function retunrs the node on main template, when clicked on collection hierarchy
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        cs_node_name = request.POST.get("cs_name", '')
+        course_node_id = request.POST.get("course_node_id", '')
+        cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
+        cs_new = node_collection.collection.GSystem()
+        cs_new.member_of.append(cs_gst._id)
+        cs_new.name = cs_node_name
+        cs_new.modified_by = int(request.user.id)
+        cs_new.created_by = int(request.user.id)
+        cs_new.contributors.append(int(request.user.id))
+        course_node = node_collection.one({"_id": ObjectId(course_node_id)})
+        cs_new.prior_node.append(ObjectId(course_node._id))
+        cs_new.save()
+        node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
+        response_dict["success"] = True
+        response_dict["cs_new_id"] = str(cs_new._id)
+        return HttpResponse(json.dumps(response_dict))
+
+
+
+def save_course_sub_section(request,group_id):
+    '''
+    This ajax function retunrs the node on main template, when clicked on collection hierarchy
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        css_node_name = request.POST.get("css_name", '')
+        cs_node_id = request.POST.get("cs_node_id", '')
+        css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSection"})
+        css_new = node_collection.collection.GSystem()
+        css_new.member_of.append(css_gst._id)
+        # set name
+        css_new.name = css_node_name
+        css_new.modified_by = int(request.user.id)
+        css_new.created_by = int(request.user.id)
+        css_new.contributors.append(int(request.user.id))
+
+        cs_node = node_collection.one({"_id": ObjectId(cs_node_id)})
+        css_new.prior_node.append(cs_node._id)
+        css_new.save()
+        node_collection.collection.update({'_id': cs_node._id}, {'$push': {'collection_set': css_new._id }}, upsert=False, multi=False)
+        response_dict["success"] = True
+        response_dict["css_new_id"] = str(css_new._id)
+        return HttpResponse(json.dumps(response_dict))
+
+
+def change_node_name(request,group_id):
+    '''
+    This ajax function retunrs the node on main template, when clicked on collection hierarchy
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        node_id = request.POST.get("node_id", '')
+        new_name = request.POST.get("new_name", '')
+        node = node_collection.one({"_id": ObjectId(node_id)})
+        node.name = new_name.strip()
+        node.save()
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
+
+
+def change_order(request,group_id):
+    '''
+    This ajax function retunrs the node on main template, when clicked on collection hierarchy
+    '''
+    print "\n\n coming here"
+    response_dict = {"success": False}
+    collection_set_list = []
+    if request.is_ajax() and request.method == "POST":
+        node_id_up = request.POST.get("node_id_up", '')
+        node_id_down = request.POST.get("node_id_down", '')
+        parent_node_id = request.POST.get("parent_node", '')
+
+        parent_node = node_collection.one({"_id": ObjectId(parent_node_id)})
+        collection_set_list = parent_node.collection_set
+        a, b = collection_set_list.index(ObjectId(node_id_up)), collection_set_list.index(ObjectId(node_id_down))
+        collection_set_list[b], collection_set_list[a] = collection_set_list[a], collection_set_list[b]
+        node_collection.collection.update({'_id': parent_node._id}, {'$set': {'collection_set': collection_set_list }}, upsert=False, multi=False)
+        parent_node.reload()
+
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
