@@ -65,6 +65,10 @@
   overflow-y: auto;
   }
 
+  .resource_exists{
+  background-color: red !important;
+  }
+
   .resource-drawer li.bullet-item:hover{
   background-color: #ecf0f1; cursor:pointer;
   }
@@ -293,7 +297,7 @@ table {
       {% if node %}
         {% get_publish_policy request groupid node as group_policy %}
         {% if group_policy == "allow" %}
-          &nbsp;&nbsp;&nbsp;<span style='position:fixed; color: gray;'>Draft</span>
+          &nbsp;&nbsp;&nbsp;<span data-tooltip title= "Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see." ><span style='position:relative; color: gray;'>Draft</span></span>
         {% endif %}
       {% endif %}
 
@@ -764,37 +768,78 @@ table {
         {% if topic %}
           <!-- <div class="content" id="view-graph">  </div> -->
 
-          
-          <div class="topic_content" id="contents"> 
-            {% get_contents node.pk None None as contents %}
-            {% for k,v in contents.items %}    
-
-              <fieldset id="{{k}}">
-                <legend>{{k}}</legend>
-
-                {% for e in v %}
-                  {% if k == "Images" %}
-                      <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
-                        <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
-                        <br/><div>{{e.0}}</div>
-                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
-
-                  {% elif k == "Videos" %}
-                      <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
-                        <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
-                        <br/><div>{{e.0}}</div>
-                      </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-                  {% else %}
-                      <a href ="{% url 'file_detail' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
-                  {% endif %}
-                  
-                {% endfor %}
-              </fieldset>
-
-            {% endfor %}          
-          </div>
-
+      <div class="topic_content" id="contents"> 
+            {% get_all_resources request node.pk as resources %}
+	    {% for key, val in resources.items %}
+	   <fieldset id="{{key}}">
+	     <legend>{{key}}</legend>
+	     {% if  key == "Images" %}
+	     {% for k,v in val.items %}
+	      {% if k == "fallback_lang" %}
+	       {% for each in v %}
+	      <a href ="{% url 'image_detail' group_name_tag each.pk %}" style="display: inline-block">
+	       <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+	       <br/><div>{{each.name}}</div>
+	     </a>&nbsp;&nbsp;&nbsp;&nbsp;
+	      {% endfor %}
+	      {% elif k == "other_languages" %}
+	      {% if v %}
+	      <fieldset id="{{k}}">
+		<legend>{% trans "In other languages" %}</legend>
+		{% for each in v %}
+		<a href ="{% url 'image_detail' group_name_tag each.pk %}" style="display: inline-block">
+		  <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+		  <br/><div>{{each.name}}</div>
+		</a>&nbsp;&nbsp;&nbsp;&nbsp;
+		{% endfor %}
+	      </fieldset>
+	      {% endif %}
+	      {% endif %}
+	      {% endfor %}
+	      {% elif  key == "Videos" %}
+	      {% for k,v in val.items %}
+	      {% if k == "fallback_lang" %}
+	       {% for each in v %}
+	      <a href ="{% url 'video_detail' group_name_tag each.pk %}" style="display: inline-block">
+	       <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+	       <br/><div>{{each.name}}</div>
+	     </a>&nbsp;&nbsp;&nbsp;&nbsp;
+	      {% endfor %}
+	      {% elif k == "other_languages" %}
+	      {% if v %}
+	      <fieldset id="{{k}}">
+		<legend>{% trans "In other languages" %}</legend>
+		{% for each in v %}
+		<a href ="{% url 'video_detail' group_name_tag each.pk %}" style="display: inline-block">
+		  <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+		  <br/><div>{{each.name}}</div>
+		</a>&nbsp;&nbsp;&nbsp;&nbsp;
+		{% endfor %}
+		</fieldset>
+	      {% endif %}
+	      {% endif %}
+	      {% endfor %}
+	      {% else %}
+	      {% for k,v in val.items %}
+	      {% if k == "fallback_lang" %}
+	      {% for each in v %}
+	      <a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
+	      {% endfor %}
+	      {% elif k == "other_languages" %}
+	      {% if v %}
+	      <fieldset id="{{k}}">
+		<legend>{% trans "In other languages" %}</legend>
+		{% for each in v %}
+	   	<a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
+		{% endfor %}
+		{% endif %}
+		{% endif %}
+	      	{% endfor %}
+	      </fieldset>	      
+	      {% endif %}
+	    </fieldset>
+	    {% endfor %}
+            </div>
         {% endif %}
         <!-- End of displaying topic page contents -->
       </div>
@@ -1262,7 +1307,7 @@ table {
           <a id="switch_group" class="tiny button" data-reveal-id="publish_resource"> 
               <span>{% trans "Publish this resource in other group/s" %} </span> 
             </a>
-            <div id="publish_resource" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+            <div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 
               <div id="switchgrp" class="content">
                 <h4>{% trans "Select Groups" %}</h4>
@@ -1297,13 +1342,17 @@ table {
 <script type="text/javascript">
 
   // publishing resource in other groups
-  var data_list = ""
-  var saveflag = 0
+  var data_list = []
+
   function get_new_groups(){
-    $.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
-           data_list=data_list+String(item.id)+",";
-    });
+    data_list = []
+    $("#switchgrp #collection_set_drawer2").children("li").each(
+      function(c,v){
+        data_list.push($(v).attr("id"))
+      });
+    return data_list;
   }
+
 
   $(document).on('click',"#switch_group",function(){
     $('#switchgrp #collection_set_drawer1').html("");
@@ -1382,22 +1431,57 @@ table {
 
   });
 
-  $(document).on('click',"#save_switch_group",function(){
+  $(document).on('click',"#save_switch_group",function(event){
     var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
-    saveflag = 1;
-    get_new_groups();
-    new_groups=data_list;
+    new_groups = get_new_groups();
+    var error_grp = []
+    var msg = ""
+    success_state = false
     $.ajax({
-           url: turl,
-           type: 'POST',
-           data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            url: turl,
+            type: 'POST',
+            datatype:"json",
+            data: { new_groups_list : new_groups, csrfmiddlewaretoken: '{{ csrf_token }}'},
             success: function(data){
-                           alert("Successfully switched groups");
-                
-               },
+                      data = JSON.parse(data)
+                      success_state = data["success"]
+                      error_grp = data["resource_exists_in_grps"]
+                      msg = data["message"];
+            },
+            complete: function(){
+                      if(!success_state){
+                        $.each(error_grp,function(index,li_ele){
+                          apply_color_to_li(li_ele);
+                        })
+                        event.preventDefault();
+                      }
+                      else{
+                        $("#publish_resource").foundation('reveal', 'close');
+                      }
+                      alert(msg);
+            },
     }); //end of ajax
-
   }); //end of document click
+
+
+
+  function apply_color_to_li(element_id){
+    $("#switchgrp #collection_set_drawer2").children("li").each(
+      function(c,v){
+        if (element_id == $(v).attr("id")){
+          $(v).addClass("resource_exists");
+        }
+      });
+  }
+
+  //Overriding from drawer_widget.html
+  // To select the single as well as multiple items from list
+  $(document).on('click','#switchgrp #collection_set_drawer2 li.bullet-item',function(e){
+    if($(this).hasClass("resource_exists")){
+      $(this).removeClass("resource_exists")
+    }
+  });
+
 
   // Taken value of svg data of that node globally
   var svgdata;

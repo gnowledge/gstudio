@@ -125,12 +125,39 @@ $(document).ready(function()
 
 </script>
 {% endblock %}
+<!-- end of head block -->
+
+{% block style %}
+
+  .group-images{
+    max-height: 200px;
+    display: block;
+    margin: 0px auto;
+  }
+
+{% endblock %}
 
 <!-- overide meta_content block from base.html -->
 {% block meta_content %}
 
-<h4><i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}</h4>
+  <h4>
+  <i class="fi-torsos"></i> {{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}
+  </h4>
+
+  <div id="group_picture">
+  
+    {% if prof_pic_obj %}
+      <img alt="profile picture for this group." src="{% url 'get_mid_size_img' group_id prof_pic_obj.pk %}" id="group-image" class="group-images th">
+
+    {% else %}
+      <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." id="group-image" class="group-images th">
+
+    {% endif %}   
+
+  </div>
+
 {% endblock %}
+<!-- end of meta_content block -->
 
 {% block app_action_list %}
 

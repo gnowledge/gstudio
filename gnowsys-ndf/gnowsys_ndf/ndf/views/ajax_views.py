@@ -163,7 +163,6 @@ def collection_nav(request, group_id):
             break
           else:
             breadcrumbs_list.remove(e)
-
     # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
     return render_to_response('ndf/node_ajax_view.html', 
                                 { 'node': node_obj,

@@ -1,3 +1,4 @@
+
 ''' -- imports from python libraries -- '''
 import re
 # import magic
@@ -525,7 +526,7 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 		else:
 			drawer = node_collection.find({"_type":types})
 			for each in drawer:
-				drawer1[str(each._id)]=each.name
+				drawer1[str(each._id)]=each
 		return {'template': template1, 'widget_for': fields_name, 'drawer1': drawer1, 'selected_value': fields_value}
 
 	
@@ -543,18 +544,18 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 			for each in node_collection.find({"_type": types}):
 				if fields_value_id_list:
 					if each._id not in fields_value_id_list:
-						drawer1[each._id] = each.name
+						drawer1[each._id] = each
 				else:
-					drawer1[each._id] = each.name
+					drawer1[each._id] = each
 
 		if types in ["all_types"]:
 			for each in alltypes:
 				for eachnode in node_collection.find({"_type": each}):
 					if fields_value_id_list:
 						if eachnode._id not in fields_value_id_list:
-							drawer1[eachnode._id] = eachnode.name
+							drawer1[eachnode._id] = eachnode
 					else:
-						drawer1[eachnode._id] = eachnode.name
+						drawer1[eachnode._id] = eachnode
 
 		if fields_value_id_list:
 			drawer2 = []
@@ -1156,6 +1157,61 @@ def get_prior_node(node_id):
 		return prior
 
 	return prior
+
+
+# method fist get all possible translations associated with current node &
+# return the set of resources by using get_resources method
+@get_execution_time
+@register.assignment_tag
+def get_all_resources(request,node_id):
+        obj_set=[]
+        keys=[] # set of keys used for creating the fieldset in template
+        result_set=[]
+        node=node_collection.one({'_id':ObjectId(node_id)})
+        result_set=get_possible_translations(node)
+        if node._id not in obj_set:
+                obj_set.append(node._id)
+                for item in result_set:
+                        obj_set.extend(item.keys())
+        resources={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        for each in obj_set:
+                n=node_collection.one({'_id':ObjectId(each)})
+                resources_dict=get_resources(each,resources)
+        res_dict={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        
+        for k,v in res_dict.items():
+                res_dict[k]={'fallback_lang':[],'other_languages':[]}
+        for key,val in resources_dict.items():
+                if val:
+                        keys.append(key)
+                        for res in val:
+                                if res.language == request.LANGUAGE_CODE:
+                                        res_dict[key]['fallback_lang'].append(res)
+                                else:
+                                        res_dict[key]['other_languages'].append(res)
+                                        
+        for k1,v1 in res_dict.items():
+                if k1 not in keys :
+                        del res_dict[k1]
+        return res_dict
+# method returns resources associated with node
+@get_execution_time
+@register.assignment_tag
+def get_resources(node_id,resources):
+    	node = node_collection.one({'_id': ObjectId(node_id)})
+        RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
+        RT_translation_of = node_collection.one({'_type':'RelationType','name': 'translation_of'})
+        teaches_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': node._id, 'relation_type.$id': RT_teaches._id })
+        AT_educationaluse = node_collection.one({'_type': 'AttributeType', 'name': u'educationaluse'})
+        for each in teaches_grelations:
+                obj=node_collection.one({'_id':ObjectId(each.subject)}) 
+                mime_type=triple_collection.one({'_type': "GAttribute", 'attribute_type.$id': AT_educationaluse._id, "subject":each.subject})       
+                for k,v in resources.items():
+                        if mime_type.object_value == k:
+                                if obj.name not in resources[k]:
+                                        resources.setdefault(k,[]).append(obj)
+    
+        return resources
 
 @get_execution_time
 @register.assignment_tag
