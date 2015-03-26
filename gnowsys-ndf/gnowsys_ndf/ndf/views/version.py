@@ -219,7 +219,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      node.content=doc2.content
      node.modified_by=request.user.id
      node.save()
-     update_mobwrite = update_mobwrite_content_org(node)
+     #update_mobwrite = update_mobwrite_content_org(node)
      ver=history_manager.get_current_version(node)
      view='merge'
      
@@ -252,14 +252,11 @@ def revert_doc(request,group_id,node_id,version_1):
 		node[attr] =node[attr]
    node.modified_by=request.user.id
    node.save()
-   update_mobwrite = update_mobwrite_content_org(node)
    view ='revert'
    ver=history_manager.get_current_version(node)
    selected_versions=selected_versions = {"1": version_1, "2": ""}
-   
    return render_to_response("ndf/version_page.html",
                                {'view': view,
-                                'appId':app._id,
                                 'selected_versions': selected_versions, 
                                 'node':node,
                                 'groupid':group_id,

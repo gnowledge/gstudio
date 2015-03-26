@@ -81,9 +81,10 @@ background:#b3ffb3;
           {% if selected_versions.1 and selected_versions.2 %}
           {% comment %}
           <a class="button tiny" href="{% url 'merge_doc' group_id node  selected_versions.1 selected_versions.2 %}" > Merge </a>	
+          {% endcomment %}
           <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.1 %}" > Revert to {{selected_versions.1}} </a>
           <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.2 %}" > Revert to {{selected_versions.2}} </a>
-          {% endcomment %}
+          
           {% endif %}   
           {% endif %}   
           {% endif %}
