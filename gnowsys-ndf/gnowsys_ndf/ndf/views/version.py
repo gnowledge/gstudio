@@ -67,8 +67,6 @@ def version_node(request, group_id, node_id, version_no = None):
         doc1=history_manager.get_version_document(node,version_2)     
         parse_data(doc)
         parse_data(doc1)
-        content_difference = htmldiff(doc['content'],doc1['content'])
-       
         for i in node1:
            try:
            
@@ -77,10 +75,12 @@ def version_node(request, group_id, node_id, version_no = None):
            except:
                 node1[i]=node1[i]		       
         content = node1
-        new_content = content_difference.replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
-        new_content = new_content.replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
-        content['content'] = new_content
-        content_1=doc
+        content['content'] = content['content'].replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
+        content['content'] = content['content'].replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        
+        content_1 = doc
+        content_1['content'] = doc['content'].replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        
         new_content = []
         new_content1= []
         for i in listform:
