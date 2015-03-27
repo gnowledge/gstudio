@@ -47,7 +47,7 @@ def group(request, group_id, app_id=None, agency_type=None):
   group_name, group_id = get_group_name_id(group_id)
 
   query_dict = {}
-  print "aisisririririr"
+  # print "aisisririririr"
   if (app_id == "agency_type") and (agency_type in GROUP_AGENCY_TYPES):
     query_dict["agency_type"] = agency_type
   # print "=========", app_id, agency_type
@@ -309,7 +309,7 @@ def populate_list_of_group_members(group_id):
           name_author = User.objects.get(pk=author)
           memList.append(name_author)
       
-      print "members in group: ", memList
+      # print "members in group: ", memList
       return memList
     except:
         return []
@@ -351,8 +351,6 @@ def group_dashboard(request,group_id=None):
               profile_pic_image = node_collection.one(
                   {'_type': "File", '_id': each["has_profile_pic"][0]}
               )
-              print profile_pic_image
-
               break
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
@@ -571,7 +569,7 @@ def switch_group(request,group_id,node_id):
                 " already exists in selected group(s). " + \
                 "Hence cannot be cross published now." + \
                 " For publishing, you can rename this " + node.member_of_names_list[0] + " and try again."
-      print response_dict
+      # print response_dict
       return HttpResponse(json.dumps(response_dict))
 
     else:
@@ -748,7 +746,7 @@ def create_sub_group(request,group_id):
 
 @get_execution_time
 def nroer_groups(request, group_id, groups_category):
-    print "asdfasfsafdsadf"
+    # print "asdfasfsafdsadf"
     group_name, group_id = get_group_name_id(group_id)
 
     mapping = GSTUDIO_NROER_MENU_MAPPINGS

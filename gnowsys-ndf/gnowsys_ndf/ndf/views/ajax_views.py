@@ -170,8 +170,7 @@ def collection_nav(request, group_id):
                                   'group_id': group_id,
                                   'groupid':group_id,
                                   'breadcrumbs_list':breadcrumbs_list,
-                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list,
-                                  'LANGUAGE_CODE':LANGUAGE_CODE
+                                  'app_id': node_id, 'topic':topic, 'nav_list':nav_list
                                 },
                                 context_instance = RequestContext(request)
     )
