@@ -11,14 +11,12 @@
   
    <a href="#" data-reveal-id="activity-statistics" class="tiny round button">
       {% trans "Activity Ratings" %}
-    </a>
+   </a>
 
-    <div class="small reveal-modal" id="activity-statistics" data-reveal>
+   <div class="small reveal-modal" id="activity-statistics" data-reveal>
       {% include "ndf/file_statistics.html" %}
       <a href="#" class="close-reveal-modal">&#215;</a>
-    </div>
-
-   
+   </div>
 {% endblock %}
 
 {% block style %}
@@ -69,69 +67,62 @@
   	<!-- Users General Information -->
   	<div class="row">
   		<div class="small-2 columns">
-  		  <div class="text-center">
+  		    <div class="text-center">
     			{% if user.is_authenticated %}
     				{% if prof_pic_obj %}
-              <div class="div-height">
-    					<img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
-              </div>
+			              <div class="div-height">
+			    			  <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
+			              </div>
+                    {% else %}
+			              <div class="div-height">
+			              <i class="fi-torso style2 text-center"></i>
+			              </div>
+					{% endif %}   
 
-    				{% else %}
-              <div class="div-height">
-              <i class="fi-torso style2 text-center"></i>
-              </div>
+		            {% if user_id == usr %}
+			              <div class="row">
+			                <div class="small-12 columns">
+			                  <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px;" value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+			                </div>
+			              </div>
+		  			{% endif %}
 
-            {% endif %}   
-
-            {% if user_id == usr %}
-              <div class="row">
-                <div class="small-12 columns">
-                  <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px;" value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
-                </div>
-              </div>
-  					{% endif %}
-
-      			<div id="pic_div" class="hide" class="row">
-      				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
-      					{% csrf_token %}
-      					<input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
-
-                <input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
-      					<input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
-                <input type="hidden" name="type" value="profile_pic">           
-                <input type="hidden" name="user" value="{{usr}}">         
-
-      					<p id="message" style="display:none">
-      						{% trans "Please wait for uploading profile picture" %}
-      					</p>
-      						
-      				</form>
-      			</div>
+	      			<div id="pic_div" class="hide" class="row">
+	      				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
+	      				{% csrf_token %}
+	      				<input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
+						<input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
+	      				<input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
+	                	<input type="hidden" name="type" value="profile_pic">           
+	                	<input type="hidden" name="user" value="{{usr}}">         
+	                    <p id="message" style="display:none">
+	      					{% trans "Please wait for uploading profile picture" %}
+	      				</p>
+	      						
+	      				</form>
+		      		</div>
     			
-          {% else %}
+         		{% else %}
     				<p><em>{% trans "You are Not Authorised user please login to upload profile picture" %} </em></p>
-
-    			{% endif %}
-        </div>  
-      </div>
+                {% endif %}
+            </div>  
+        </div>
 
   		<div class="small-10 columns">
-        <h2 class="style-text">{{username}}</h2>
-        <h5>
-  			{% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
-        {% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
-        {% trans "Pages created" %}: &nbsp;{{page_count}}<br>
-        <!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
-        {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
-        {% trans "Quiz" %}: {{quiz_count}}<br> 
-        {% trans "Forum" %}: {{forum_count}}<br>
-
-        <!--    FOR AWARDS  -->  
-
-       <!-- {% if page_count > 1 %}  
-        <img src="/static/ndf/images/close.png">
-        {% endif %}     -->      
-        </h5>
+	        <h2 class="style-text">{{username}}</h2>
+	        <h5>
+	  			{% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
+	        	{% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
+	        	{% trans "Pages created" %}: &nbsp;{{page_count}}<br>
+	        	<!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
+	        	{% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
+	        	{% trans "Quiz" %}: {{quiz_count}}<br> 
+	        	{% trans "Forum" %}: {{forum_count}}<br>
+				<!--    FOR AWARDS  -->  
+				<!-- {% if page_count > 1 %}  
+	        	<img src="/static/ndf/images/close.png">
+	        	{% endif %}     -->      
+	        </h5>
   		</div>
   	</div>
   	
@@ -165,49 +156,48 @@
         {% for node in user_groups %}
           {% get_version_of_module node.pk as version %}
           <li class="card">
-            <a href="/{{node.pk}}">
+            
             <div id="group">
               <header>
-                <div class="label-list">
-                  {% for tag in node.tags|slice:":3" %}
-                    <span class="label"> <mark> {{tag}} </mark> </span>
-                  {% endfor %}
-                </div>
-        
-                <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
-                <h4>{{ node.name|truncatechars:20 }}</h4>
-
-                <div>
-                  <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-                  <br/>
-                  by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-                  </small>
-                </div>
+	                <a href="/{{node.pk}}">
+	                <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+						<h4>{{ node.name|truncatechars:20 }}</h4>
+					<div>
+		                <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+		                	<br/>
+		                	by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+		                </small>
+	                </div>
               </header>
-
-              <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+			
+			  <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+              </a>
+              
+              <div class="label-list">
+                  {% for tag in node.tags|slice:":3" %}
+                       <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                  {% endfor %}
+              </div>  
             </div>
-            </a> 
           </li>
    	
         {% empty %}
           {% if not searching %}
-          <div class="row">
-            <div class="small-12 columns" align="left">
-             <h5> {% blocktrans %}No Groups </b>{% endblocktrans %} </h5>
-            </div>
-          </div>
+	          <div class="row">
+		            <div class="small-12 columns" align="left">
+		             	<h5> {% blocktrans %}No Groups </b>{% endblocktrans %} </h5>
+		            </div>
+	          </div>
           {% endif %}
 
         {% endfor %}
 
         {% if dashboard_count.group > 10 %}
-      	<div class="row">
-      		<div class="small-12 columns" align="right">
-       			<h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
-      		</div>
-        </div>
+	      	<div class="row">
+	      		<div class="small-12 columns" align="right">
+	       			<h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
+	      		</div>
+	        </div>
         {% endif %}
       </ul>
     </div>
@@ -225,53 +215,53 @@
     <!-- Assigned Tasks -->
     <div class="content" id="AssignedTasks" >
      	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-        {% for node in user_task %}
-          {% get_version_of_module node.pk as version %}
-          <li class="card">
-            <a href="{% url 'task_details' group_id node.pk %}">
-            <div id="assignedTask">
-              <header>
-                <div class="label-list">
-                {% for tag in node.tags|slice:":3" %}
-                   <span class="label"><mark>{{tag}}</mark></span>
-                {% endfor %}
-                </div>
-                
-                <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+	        {% for node in user_task %}
+	          {% get_version_of_module node.pk as version %}
+	          <li class="card">
+	            
+	            <div id="assignedTask">
+	              <header>
+	                <a href="{% url 'task_details' group_id node.pk %}">
+	                <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
 
-                <h4>{{ node.name|truncatechars:20 }}</h4>
+	                <h4>{{ node.name|truncatechars:20 }}</h4>
 
-                <div>
-                  <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-                  <br/>
-                  by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-                  </small>
-                </div>
-              </header>
+	                <div>
+	                  <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+		                  <br/>
+		                  by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+	                  </small>
+	                </div>
+	              </header>
+				  <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+	              </a>
+	              <div class="label-list">
+	                  {% for tag in node.tags|slice:":3" %}
+	                       <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+	                  {% endfor %}
+	              </div>
+	            </div>
+	             
+	          </li>  
 
-              <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-            </div>
-            </a> 
-          </li>  
+	        {% empty %}
+	          {% if not searching %}
+		          <div class="row">
+		            <div class="small-2 columns" align="right">
+		              <h5> {% trans "No Assinged Task" %} </h5>
+		            </div>
+		          </div>
+	          {% endif %}
 
-        {% empty %}
-          {% if not searching %}
-          <div class="row">
-            <div class="small-2 columns" align="right">
-              <h5> {% trans "No Assinged Task" %} </h5>
-            </div>
-          </div>
-          {% endif %}
+	        {% endfor %}
 
-        {% endfor %}
-
-        {% if dashboard_count.Task > 10 %}
-        <div class="row">
-          <div class="small-12 columns" align="right">
-            <h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
-          </div>
-        </div>
-        {% endif %}
+	        {% if dashboard_count.Task > 10 %}
+	        <div class="row">
+	          <div class="small-12 columns" align="right">
+	            <h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
+	          </div>
+	        </div>
+	        {% endif %}
       </ul>
     </div>
 
@@ -282,61 +272,61 @@
         {% for node in user_activity %}
           {% get_version_of_module node.pk as version %}
           {% get_url node.pk as res_type %}
-          {% if res_type != "None" %}
-          <li class="card">
-            {% if res_type == 'group' %}
-            <a href="/{{node.pk}}">
-            {% elif res_type %}
-          	     {% if res_type != "event_app_instance_detail" %}
-          	        <a href="{% url res_type groupid node.pk   %}">{{i.url}} </a>
-                 {% else %}
-                    {% get_event_type node as app_set_id %}
-                    <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}} </a>         
-                 {% endif %}
-            {% endif %}   
-            <div id="activity">
-              <header>
-                <div class="label-list">
-                  {% for tag in node.tags|slice:":3" %}
-                       <span class="label"> <mark> {{tag}} </mark> </span>
-                  {% endfor %}
-                </div>
-        
-                <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+            {% if res_type != "None" %}
+	          <li class="card">
+	               
+		            <div id="activity">
+			              <header>
+			               <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+			                  {% if res_type == 'group' %}
+			                    <a href="/{{node.pk}}">
+			                  {% elif res_type %}
+			          	        {% if res_type != "event_app_instance_detail" %}
+			          	              <a href="{% url res_type groupid node.pk   %}">{{i.url}} 
+			                    {% else %}
+			                        {% get_event_type node as app_set_id %}
+			                        <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}          
+			                    {% endif %}
+			                  {% endif %}
+			                <h4>{{ node.name|truncatechars:20 }}</h4>
 
-                <h4>{{ node.name|truncatechars:20 }}</h4>
+			                <div>
+			                  <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+			                  <br/>
+			                  by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+			                  </small>
+			                </div>
+			                
+			              </header>
 
-                <div>
-                  <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-                  <br/>
-                  by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-                  </small>
-                </div>
-              </header>
-
-              <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-            </div>
-            </a>      
-          </li>  
-           {% endif %}
+		              	  <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+		              	  </a>
+			              <div class="label-list">
+			                  {% for tag in node.tags|slice:":3" %}
+			                       <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+			                  {% endfor %}
+			              </div>
+		            </div>
+	                    
+	          </li>  
+            {% endif %}
         {% empty %}
           {% if not searching %}
-          <div class="row">
-            <div class="small-12 columns" align="left">
-              <h5> {% trans "No Recent Activities" %}</h5>
-            </div>
-          </div>
+	          <div class="row">
+	            <div class="small-12 columns" align="left">
+	              <h5> {% trans "No Recent Activities" %}</h5>
+	            </div>
+	          </div>
           {% endif %}
             
         {% endfor %}
-    
-    		{% if dashboard_count.activity > 10 %}
-        	<div class="row">
-        		<div class="small-12 columns" align="right">
-         			<h6> <a href="{% url 'user_activity' group_id %}"> Show More.. </a></h6>
-        		</div>
-        	</div>
-    		{% endif %}
+    	  {% if dashboard_count.activity > 10 %}
+	        	<div class="row">
+	        		<div class="small-12 columns" align="right">
+	         			<h6> <a href="{% url 'user_activity' group_id %}"> Show More.. </a></h6>
+	        		</div>
+	        	</div>
+    	  {% endif %}
       </ul>
     </div>
   </div>
