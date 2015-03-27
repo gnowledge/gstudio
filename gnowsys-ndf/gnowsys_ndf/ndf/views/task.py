@@ -172,9 +172,7 @@ def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None,
         #task template
         ins_objectid  = ObjectId()
         if ins_objectid.is_valid(group_name) is False :
-            group_object = node_collection.one({'name': unicode(group_name),'_type':'Group'})
-            if not group_object:
-                group_object = node_collection.one({'name': unicode(group_name),'_type':'Author'})
+            group_object = node_collection.one({'_type':{'$in':['Group','Author']}, 'name': unicode(group_name)})
             group_object = group_object._id    
         else:
             group_object = group_name
