@@ -245,10 +245,6 @@ ul#navigation li a.last {
     color: #10c1cb;
  }
 
-table {
-  display: block;
-  overflow-y: scroll;
-}
 </style>
 
 
@@ -736,12 +732,9 @@ table {
         </div>
         <br/>
 	<div>
-         {% if node.prior_node|length > 0 %}
-   
-         {% for index_key, each_node in node.prior_node_dict.items %}
          {% get_grid_fs_object each_node as grid_fs_obj %}
-         {% if "Group" in node.member_of_names_list %}
-         {% get_object_value node as objvalue %}
+	 {% if "Group" in node.member_of_names_list %}
+	 {% get_object_value node as objvalue %}
 	    <table style="width:60%; border-width:0px;" >
 	      <tbody>
 		{% for key, value in objvalue.items %}
@@ -758,8 +751,6 @@ table {
 	      <tbody>
 	    </table>
               {% endif%}
-	    {% endfor %}
-            {% endif %}
 
 	</div>
         <!-- </div> -->
@@ -893,7 +884,7 @@ table {
        <dd class="accordion-navigation">
        <a href="#panel1a" style="font-color:blue">Overview</a>
        <div id="panel1a" class="content active">
-	 <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 200px;">
+	 <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 200px; display: block;overflow-y: scroll;">
 	  <tbody>
 	   
 	    {% get_json node.pk as jsonobj %}
@@ -936,7 +927,7 @@ table {
             
 	      {% if key == "collection_set" %}
 	      {% if "None" not in value %}
-	      <table align ="center" style="width:80%; border-width:0px; height: 200px;" >
+	      <table align ="center" style="width:80%; border-width:0px; height: 200px; display: block;overflow-y: scroll;" >
 	      <tbody>
 	      <tr>
 		{% for each in value %}
@@ -964,7 +955,7 @@ table {
 	   {% for key, value in obj.items %}
               {% if key == "attribute_set" %}
 	  	{% if "None" not in value %}
-              <table align ="center" style="width:80%; border-width:0px; height: 200px;" >
+              <table align ="center" style="width:80%; border-width:0px; height: 200px;display: block;overflow-y: scroll;" >
 	      <tbody>
 	       <tr>
 	     {% for k, v in value.items %}
@@ -982,9 +973,6 @@ table {
              No Attributes associted with {{node.name}} resource.
 	     {% endif %}
              {% endfor %}
-	   	   
-
-  	   
           </div>
     </dd>
    <dd class="accordion-navigation">
