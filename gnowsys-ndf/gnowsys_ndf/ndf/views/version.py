@@ -47,6 +47,7 @@ def version_node(request, group_id, node_id, version_no = None):
     listform = ['modified_by','created_by','last_update','name','content','contributors','rating','location','access_policy',
                 'type_of','status','tags','language','member_of','url','created_at','author_set']
     versions= get_published_version_list(request,node)
+    
     if not version_no:
        if versions:
         version_no = versions.pop()
@@ -71,9 +72,8 @@ def version_node(request, group_id, node_id, version_no = None):
         for i in node1:
            try:
            
-               s=d.diff_compute(str(doc[i]),str(doc1[i]),True)
-               l=diff_prettyHtml(s)
-               node1[i]=l
+               s=htmldiff(str(doc[i]),str(doc1[i]),True)
+               node1[i]=s
            except:
                 node1[i]=node1[i]		       
         content = node1
