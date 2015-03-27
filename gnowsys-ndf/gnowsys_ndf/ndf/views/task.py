@@ -89,7 +89,7 @@ def task_details(request, group_name, task_id):
   subtask = []
   for each in at_list:
     attributetype_key = node_collection.find_one({"_type": 'AttributeType', 'name': each})
-    attr = node_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
+    attr = triple_collection.find_one({"_type": "GAttribute", "subject": task_node._id, "attribute_type.$id": attributetype_key._id})
     if attr:
       if attributetype_key.name == "Assignee":
         u_list = []
@@ -102,7 +102,6 @@ def task_details(request, group_name, task_id):
 
       else:
         blank_dict[each] = attr.object_value
-  
   if task_node.prior_node:
     blank_dict['parent'] = node_collection.one({'_id': task_node.prior_node[0]}).name 
   
@@ -169,7 +168,16 @@ def task_details(request, group_name, task_id):
 @get_execution_time
 def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None, slug=None):
     if request.method == "POST" :
-        group_object = node_collection.one({'name': unicode(group_name), "_type": "Group"})
+        #here group_name contains the object id of the group insted of name sent from 
+        #task template
+        ins_objectid  = ObjectId()
+        if ins_objectid.is_valid(group_name) is False :
+            group_object = node_collection.one({'name': unicode(group_name),'_type':'Group'})
+            if not group_object:
+                group_object = node_collection.one({'name': unicode(group_name),'_type':'Author'})
+            group_object = group_object._id    
+        else:
+            group_object = group_name
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
 
             title = each.name
@@ -187,11 +195,10 @@ def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None,
             # location = []
             # location.append(json.loads(request.POST.get("location", "{}")))
             # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True, location=location)
-            obs_image = save_file(each,title,userid,group_object._id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+            obs_image = save_file(each,title,userid,group_object, content_org, tags, img_type, language, usrname, access_policy, oid=True)
             # Sample output of (type tuple) obs_image: (ObjectId('5357634675daa23a7a5c2900'), 'True') 
 
             # if image sucessfully get uploaded then it's valid ObjectId
-            
             if obs_image[0] and ObjectId.is_valid(obs_image[0]):
               return StreamingHttpResponse(str(obs_image[0]))
             
@@ -371,7 +378,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
     
           # newattribute.save()
           ga_node = create_gattribute(subject, attributetype_key, object_value)
-
+      
       if request.FILES.getlist('UploadTask'):
         attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
         # newattribute = triple_collection.collection.GAttribute()
@@ -379,6 +386,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
         # newattribute.attribute_type = attributetype_key
         # newattribute.object_value = file_id
         # newattribute.save()
+        
         ga_node = create_gattribute(task_node._id, attributetype_key, file_id)
 
       if int(len(request.POST.getlist("Assignee","")))>1:
