@@ -15,7 +15,7 @@ from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.group import create_group
 import csv
 from collections import defaultdict
-
+from gnowsys_ndf.ndf.management.commands.nroer_data_entry import get_user_id, create_user_nroer_team
 ####################################################################################################################
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import Node
@@ -49,10 +49,6 @@ def main():
     file_content=[]
     for row in reader:
       file_content.append(row)
-    check_home_group = node_collection.one({'name': "home", '_type' : 'Group'})
-    if not check_home_group:
-      group_create("home")
-      
     for each in file_content:
       check_group = node_collection.one({'name': str(each['category']), '_type' : 'Group'})
       check_sub_group = node_collection.one({'name': str(each['name']), '_type' : 'Group'})
@@ -88,15 +84,17 @@ def main():
       print ("\n Partners details added!\n\n")
 
 def group_create(group_name):
+          create_user_nroer_team()
+
           group_id=group_name 
           ins_objectid  = ObjectId()
           if ins_objectid.is_valid(group_id) is False :
             group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
-            auth = node_collection.one({'_type': 'Author', 'name': u'sawants' }) 
+            auth = node_collection.one({'_type': 'Author', 'name': u'nroer_team' }) 
             if group_ins:
               group_id = str(group_ins._id)
             else :
-              auth = node_collection.one({'_type': 'Author', 'name': u'sawants'})
+              auth = node_collection.one({'_type': 'Author', 'name': u'nroer_team'})
               if auth :
                 group_id = str(auth._id)	
           else :
@@ -109,7 +107,8 @@ def group_create(group_name):
           colg.altnames=unicode(cname)
           colg.name = unicode(cname)
           colg.member_of.append(gst_group._id)
-          usrid = 3
+          usrid = get_user_id("nroer_team")
+          
           colg.created_by = usrid
           if usrid not in colg.author_set:
             colg.author_set.append(usrid)
