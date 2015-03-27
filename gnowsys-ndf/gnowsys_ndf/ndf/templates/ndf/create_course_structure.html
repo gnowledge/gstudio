@@ -251,6 +251,7 @@
     </ul>
 
     <div id="course_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
+        <input type="hidden" id="css_reveal_id">
         <div class="row">
             <h3><label id="css_name"></label></h3>
         </div>
@@ -327,6 +328,10 @@
   //Global var declarations------------------------------------------------------------------------------
     var cs_cloned_id = 1;
     var css_cloned_id = 1;
+    $("#course_structure_minutes").addClass("css_mins_class")
+    $("#min_marks").addClass("min_marks_class")
+    $("#max_marks").addClass("max_marks_class")
+    
 
   // Adding Course Section--------------------------------------------------------------------------------
   
@@ -620,10 +625,61 @@
   // Set label name and mins in reveal modal with respective course name---------------------------------
     $(document).on('click','.reveal_prop_form',function(){
       css_node_id = $(this).closest("li").find("label").attr("id")
-      console.log(css_node_id)
-      {% get_node css_node_id as css_node %}
-      console.log({{css_node.pk}})
+      css_node_lbl = $(this).closest("li").find("label").text()
+      $("#css_reveal_id").attr("value",css_node_id)
+      $.ajax({
+        url: "{% url 'course_sub_section_prop' group_id %}",
 
+        data: {
+          css_node_id: css_node_id
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data){
+          success_state = data["success"]
+          console.log(data)
+          console.log(success_state)
+          if(success_state){
+            $.each(data, function(key,value){
+              if (key == "course_structure_minutes"){
+                $(".css_mins_class").attr("value",value);
+              }
+              else if(key == "course_structure_assignment"){
+                if(value==true){value="Yes";}else{value="No";}
+                $("input[name='course_structure_assignment'][value='"+value+"']").prop("checked","checked")
+
+              }
+              else if(key == "course_structure_assessment"){
+                if(value==true){value="Yes";$(".marks_div").removeClass("hide");}else{value="No";$(".marks_div").addClass("hide");}
+                $("input[name='course_structure_assessment'][value='"+value+"']").prop("checked","checked")
+              }
+
+              if(key == "max_marks"){
+                $(".max_marks_class").attr("value",value);
+              }
+              else if(key=="min_marks"){
+                $(".min_marks_class").attr("value",value);
+              }
+            })
+          } 
+          else{
+            $("#course_structure_minutes").val("")
+            $("#max_marks").val("");
+            $("#min_marks").val("");
+            $("input[name='course_structure_assignment'][value='No']").prop("checked","checked");
+            $("input[name='course_structure_assessment'][value='No']").prop("checked","checked");
+            $(".marks_div").addClass("hide");
+          }
+
+          $("#css_name").text("Properties for '"+ css_node_lbl+"'")
+          $("#css_name").css("font-size", "30px");
+          $('#course_prop').foundation('reveal', 'open');
+
+        },
+      });//end of ajax
     });
 
   // Onchecking any radio button in prop reveal modal----------------------------------------------------
@@ -639,7 +695,65 @@
 
   //Done button in reveal modal -------------------------------------------------------------------------
     $(document).on('click','.set_prop_class',function(event){
-      console.log("B")
+      var length_val = false;
+      var assessment_chk;
+      var assignment_chk;
+      css_node_id = $("#css_reveal_id").val()
+      console.log(css_node_id)
+
+      prop_dict = {}
+      course_min_value = $(".css_mins_class").val();
+      prop_dict["course_structure_minutes"] = course_min_value 
+      assessment_chk =  $("input[name='course_structure_assessment']:checked").val()
+
+      if(assessment_chk=="Yes"){ assessment_chk=true;}else{ assessment_chk=false;}
+      prop_dict["course_structure_assessment"] = assessment_chk
+
+      if (!assessment_chk){
+        if(course_min_value>10){ length_val = true; }
+      }
+      else{
+        min_marks_value = $(".min_marks_class").val(); 
+        max_marks_value = $(".max_marks_class").val();
+        if (max_marks_value > 10 && min_marks_value > 10 && course_min_value > 10){
+          length_val = true;
+          prop_dict["min_marks"] = min_marks_value; 
+          prop_dict["max_marks"] = max_marks_value;
+
+        }
+      }
+      assignment_chk  = $("input[name='course_structure_assignment']:checked").val()
+      if(assignment_chk=="Yes"){ assignment_chk=true;}else{ assignment_chk=false;}
+      prop_dict["course_structure_assignment"] = assignment_chk
+
+      if(length_val == true) {
+        prop_dict = JSON.stringify(prop_dict)
+        $.ajax({
+          url: "{% url 'course_sub_section_prop' group_id %}",
+
+          data: {
+            css_node_id: css_node_id,
+            prop_dict: prop_dict,
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data){
+            success_state = data["success"]
+            console.log(success_state)
+          },
+          complete: function(){
+            $('#course_prop').foundation('reveal', 'close');
+          }
+        });//end of ajax
+      }
+      else{
+        alert("Please enter valid values");
+        event.preventDefault();
+      }
     });
   
   //On click of 'Add Units' button-----------------------------------------------------------------------

@@ -1130,12 +1130,11 @@ def add_units(request,group_id):
                               context_instance = RequestContext(request)
     )
 
-
-
 @login_required
 def save_course_section(request,group_id):
     '''
-    This ajax function retunrs the node on main template, when clicked on collection hierarchy
+    This ajax function takes the nussd course node id and to be created_by
+    course section name.
     '''
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
@@ -1160,7 +1159,8 @@ def save_course_section(request,group_id):
 
 def save_course_sub_section(request,group_id):
     '''
-    This ajax function retunrs the node on main template, when clicked on collection hierarchy
+    This ajax function takes the course section node id and to be created_by
+    course sub section name.
     '''
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
@@ -1186,7 +1186,8 @@ def save_course_sub_section(request,group_id):
 
 def change_node_name(request,group_id):
     '''
-    This ajax function retunrs the node on main template, when clicked on collection hierarchy
+    This ajax function renames a node.
+    A node here can be either a course section or a course sub section.
     '''
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
@@ -1201,9 +1202,10 @@ def change_node_name(request,group_id):
 
 def change_order(request,group_id):
     '''
-    This ajax function retunrs the node on main template, when clicked on collection hierarchy
+    This ajax function changes order of nodes in collection_set.
+    Basically it swaps the two node ids this function gets.
+    A node here can be either a course section or a course sub section.
     '''
-    print "\n\n coming here"
     response_dict = {"success": False}
     collection_set_list = []
     if request.is_ajax() and request.method == "POST":
@@ -1217,6 +1219,68 @@ def change_order(request,group_id):
         collection_set_list[b], collection_set_list[a] = collection_set_list[a], collection_set_list[b]
         node_collection.collection.update({'_id': parent_node._id}, {'$set': {'collection_set': collection_set_list }}, upsert=False, multi=False)
         parent_node.reload()
-
         response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
+
+
+
+def course_sub_section_prop(request,group_id):
+    '''
+    This ajax function creates gattributes and grealations
+    for a course subsection
+    '''
+
+    response_dict = {"success": False}
+    if request.is_ajax():
+        if request.method == "POST":
+            css_node_id = request.POST.get("css_node_id", '')
+            prop_dict = request.POST.get("prop_dict", '')
+            prop_dict = json.loads(prop_dict)
+            assessment_flag = False
+            print "\n\n css_node_id", css_node_id
+            print "\n\n\nprop_dict",prop_dict
+            css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+
+            at_cs_hours = node_collection.one({'_type': 'AttributeType', 'name': 'course_structure_minutes'})
+            at_cs_assessment = node_collection.one({'_type': 'AttributeType', 'name': 'course_structure_assessment'})
+            at_cs_assignment = node_collection.one({'_type': 'AttributeType', 'name': 'course_structure_assignment'})
+            at_cs_min_marks = node_collection.one({'_type': 'AttributeType', 'name': 'min_marks'})
+            at_cs_max_marks = node_collection.one({'_type': 'AttributeType', 'name': 'max_marks'})
+
+            for propk, propv in prop_dict.items():
+                print "\n\n propk", propk
+                # add attributes to css gs
+                if(propk == "course_structure_minutes"):
+                    create_gattribute(css_node._id, at_cs_hours, int(propv))
+                elif(propk == "course_structure_assignment"):
+                    create_gattribute(css_node._id, at_cs_assignment, propv)
+                elif(propk == "course_structure_assessment"):
+                    create_gattribute(css_node._id, at_cs_assessment, propv)
+                    if propv == True:
+                        assessment_flag = True
+                print "\n\n assessment_flag--", assessment_flag
+                if assessment_flag:
+                    if(propk == "min_marks"):
+                        print "\n\n min marks"
+                        create_gattribute(css_node._id, at_cs_min_marks, int(propv))
+                    elif(propk == "max_marks"):
+                        print "\n\n max marks"
+                        create_gattribute(css_node._id, at_cs_max_marks, int(propv))
+            css_node.reload()
+            response_dict["success"] = True
+
+        else:
+            css_node_id = request.GET.get("css_node_id", '')
+            css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+
+            if css_node.attribute_set:
+                for each in css_node.attribute_set:
+                    for k, v in each.items():
+                        response_dict[k] = v
+                print "\n\n response_dict--", response_dict
+                response_dict["success"] = True
+            else:
+                response_dict["success"] = False
+
+
         return HttpResponse(json.dumps(response_dict))
