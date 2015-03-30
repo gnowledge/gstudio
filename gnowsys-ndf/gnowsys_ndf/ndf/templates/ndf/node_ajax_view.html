@@ -236,7 +236,7 @@ ul#navigation li a.last {
 }
 
 .edu-sub-li {
-  background-color:#f8f8f8;
+  background-color:
   width: 30em !important;
 }
 
@@ -252,7 +252,7 @@ table {
 
 .history
  {
-   background-color:#0ad7b8;
+   
    border-width: 1px;
    box-shadow: 1px 1px 3px #888888;
  }
@@ -311,7 +311,7 @@ table {
 
       </h1>
       
-      <a href = "{% url 'node_version' groupid node.pk  %}" >  <label class = 'history ' style = 'width:8%;'> <h5>   History   </h5> </label>  </a>   
+        
       <h1 class="subheader">
       <dl class="tabs" data-tab> 
 
@@ -1120,6 +1120,7 @@ table {
             {% endif %}
           {% endif %}
         </div>
+        
         <div class="medium-7 columns">
           {% get_create_url node.pk as create_url %}
           {% if is_group %}
@@ -1163,9 +1164,15 @@ table {
               {% endif %}
             {% endif %}
           {% endif %}
-
         </div>
-
+        
+        <div class ="rows">
+           {% if user.is_authenticated %} 
+            <div class= "medium-12 columns" >
+                <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
+            </div>
+           {% endif %}
+        </div>     
         
 
         {% if node %}

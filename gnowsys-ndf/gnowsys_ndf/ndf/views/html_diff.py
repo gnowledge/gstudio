@@ -131,9 +131,9 @@ class HTMLMatcher(SequenceMatcher):
     def endInsertText(self):
         return '</span> '
     def startDeleteText(self):
-        return '<del class="delete">'
+        return '<span class="delete">'
     def endDeleteText(self):
-        return '</del> '
+        return '</span> '
     def formatInsertTag(self, tag):
         return ('<span class="tagInsert">insert: <tt>%s</tt></span> '
                 % htmlEncode(tag))

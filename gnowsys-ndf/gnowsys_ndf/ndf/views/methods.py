@@ -2887,9 +2887,11 @@ def parse_data(doc):
   date_typelist = ['last_update','created_at']
   objecttypelist = ['member_of']
   languagelist = ['language']
+  content = ['content']
   for i in doc:
            
-           
+          if i in content:
+             doc[i] = str(doc[i]) 
           if i in user_idlist:
              if type(doc[i]) == list :
                       temp =   ""
@@ -2897,9 +2899,8 @@ def parse_data(doc):
                       		  if User.objects.filter(id = userid).exists():
 	                              user = User.objects.get(id = userid)
 	                              if user:
-	                                user_name = user.get_username
 	                                if temp:
-	                                        temp =temp  + "," + (user.get_username() ) 
+	                                        temp =temp  + "," + (str(user.get_username()) ) 
 	                                else:
 	                                        temp = str(user.get_username())        
 	              doc[i] = temp            
@@ -2908,7 +2909,7 @@ def parse_data(doc):
                       		  if User.objects.filter(id = doc[i]).exists():
 	                              user = User.objects.get(id = doc[i])
 	                              if user:
-	                                doc[i] = user.get_username()
+	                                doc[i] = str(user.get_username())
           elif i in date_typelist:
               doc[i] = datetime.strftime(doc[i],"%d %B %Y %H:%M")
           elif i in objecttypelist:

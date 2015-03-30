@@ -74,34 +74,34 @@ def version_node(request, group_id, node_id, version_no = None):
                node1[i]=s
            except:
                 node1[i]=node1[i]		       
-        content = node1
-        content['content'] = content['content'].replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
-        content['content'] = content['content'].replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        content = doc 
+        content_1 = node1
         
-        content_1 = doc
-        content_1['content'] = doc['content'].replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        content['content'] = doc['content'].replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        content_1['content'] = content_1['content'].replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
+        content_1['content'] = content_1['content'].replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
         
         new_content = []
         new_content1= []
+        
         for i in listform:
-           new_content.append({i:content[i]})
-           new_content1.append({i:str(content_1[i])})
+           new_content.append({i:str(content[i])})
+           new_content1.append({i:content_1[i]})
         content =  new_content
         content_1 =  new_content1
     else:
         view = "single"
         data = None
-        print "the version no",version_no
         data = history_manager.get_version_document(node,version_no)
         parse_data(data)
         new_content = []
         selected_versions = {"1": version_no, "2": ""}
         for i in listform:
-           new_content.append({i:data[i]})
+           new_content.append({i:str(data[i])})
         content =  new_content
         
         #content = data
-        content_1='none'
+        content_1="none"
     return render_to_response("ndf/version_page.html",
                               {'view': view,
                                'node': node,

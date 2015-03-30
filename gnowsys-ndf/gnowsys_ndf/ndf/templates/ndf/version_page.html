@@ -37,7 +37,7 @@ background:#b3ffb3;
       {% trans "Compare" %}
       {% endifequal %}
       {% trans "History" %} :
-      {{content1.3.name|title}}
+      {{content.3.name|title}}
     </h2>
   </div>
 
@@ -131,16 +131,18 @@ background:#b3ffb3;
 
 {% block script %}
 
-a={{content|safe}}
+left_panel = {{content|safe}}
+if ( '{{content1}}' != 'none' )
+    { 
+      right_panel = {{content1|safe}}
+      right_panel.reverse()
+    }
 
 $('#compare-view').append("<table id='new' width='700'  </table>")
 $('#new').append("<thead> <th> Feild </th> <th> Value </th>  <th> Compared  </th>  </thead>")
 
-
-a1 = {{content1|safe}}
 h= 0
-a.reverse()
-$.each(a1,function(k,g)
+$.each(left_panel,function(k,g)
 {   h = h + 1
     $.each(g,function(c,v){
         
@@ -148,11 +150,13 @@ $.each(a1,function(k,g)
         
     
     });
-        t = a.pop(k)
-        $.each(t,function(c,v){
-        $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
-         });
-   
+        if ( '{{content1}}' != 'none' )
+        {
+          t = right_panel.pop(k)
+          $.each(t,function(c,v){
+          $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
+           });
+        }
 });
 $("#compare_versions").click(function() {
     if ($("#version_1").val() === $("#version_2").val()) {
