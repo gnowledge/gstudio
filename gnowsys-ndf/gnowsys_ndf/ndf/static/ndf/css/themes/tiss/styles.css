@@ -9498,14 +9498,6 @@ main > aside > div footer {
 main > aside > div footer label {
   font-size: 0.7rem;
 }
-/* line 415, ../../../scss/_app_styles.scss */
-main > aside > div a, main > aside > div p {
-  color: white;
-}
-/* line 417, ../../../scss/_app_styles.scss */
-main > aside > div a:hover, main > aside > div p:hover {
-  color: white;
-}
 /* line 421, ../../../scss/_app_styles.scss */
 main > aside > div .side-nav.collection {
   background-color: #444;
