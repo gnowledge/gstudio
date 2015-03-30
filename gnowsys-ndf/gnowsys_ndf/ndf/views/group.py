@@ -496,14 +496,14 @@ def app_selection(request, group_id):
                 ObjectId(app_id) for app_id in apps_to_set if app_id
             ]
 
-            apps_list = node_collection.find({
-                "_id": {"$in": apps_to_set}
-            })
-
-            if apps_list.count() > 0:
-                apps_list = list(apps_list)
-            else:
-                apps_list = []
+            apps_list = []
+            apps_list_append = apps_list.append
+            for each in apps_to_set:
+                apps_list_append(
+                    node_collection.find_one({
+                        "_id": each
+                    })
+                )
 
             at_apps_list = node_collection.one({
                 '_type': 'AttributeType', 'name': 'apps_list'
