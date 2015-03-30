@@ -1,0 +1,103 @@
+/*
+*  NROER Platform Stylesheet
+*/
+
+
+/* For landing page */
+ #landing>header{
+        background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
+        position: relative;
+        z-index: 50;
+        background-color: #0A253A;
+        padding:1rem 0 1rem 0;
+        @extend .drop-shadow;
+        border-bottom: 2px solid #00CEFD;
+        .logo{
+            color:#555;
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(0,0,0,0.8);
+            img{
+                max-width: 75%;
+                margin-bottom: 0.5rem;
+            }
+            
+            h1{
+        font-size: 1.2rem;
+            line-height: 1;
+        font-weight: bold;
+        text-transform: uppercase;
+                color:white;
+
+    }
+        }
+        
+    
+    }
+
+.landing{
+    position: relative;
+    
+   h2{
+       margin-top: 2rem;
+   }
+    
+}
+section.promo{
+    background-color: rgba(0,0,0,0.9);
+    border-bottom: 4px solid #00CEFD;
+    .meta{
+        padding-left: 2rem;
+        padding-right: 2rem;
+        h4{
+            color:white;
+        }
+    }
+}
+
+ul.partner{
+    img{
+        max-height: 150px;
+    }
+}
+
+div.banner{
+    padding:0 2rem;
+    margin-bottom: 2rem;
+    border:2px solid lighten($primary-color,10%);
+    border-width: 2px 0;
+    &>*{
+    background-color: $primary-color;
+        .slide{
+            padding: 1rem;
+            margin: 0;
+            background-color: darken($primary-color,5%);
+            height:50vh !important;
+            &>i{
+                position: absolute;
+                font-size: 17rem;
+                pointer-events: none;
+                color: white;
+                opacity:0.1;
+                right:5%;
+            }
+        }
+    color:#eee;
+    margin:0;
+    h3,h4,h5,h6,blockquote{
+        color:white;
+    }
+        blockquote{
+            font-size: 140%;
+            font-style:italic;
+        }
+    p:first-child{
+        color:white;
+        font-size:120%;
+        }
+    
+    }
+    // Slick Carousel
+    .slick-dots .button{
+    }
+}
