@@ -1881,7 +1881,13 @@ def get_preferred_lang(request, group_id, nodes, node_type):
    if uname:
       if uname.has_key("preferred_languages"):
 		pref_lan=uname.preferred_languages
-		if not pref_lan.keys():
+		
+		if pref_lan.keys():
+			if pref_lan['primary'] != request.LANGUAGE_CODE:
+				uname.preferred_languages['primary'] = request.LANGUAGE_CODE
+				uname.save()
+
+		else:
 			pref_lan={}
 			pref_lan['primary']=request.LANGUAGE_CODE
 			pref_lan['default']=u"en"
