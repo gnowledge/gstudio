@@ -65,6 +65,7 @@ def get_site_variables():
    site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
    site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
    site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
+   site_var['SITE_NAME']=GSTUDIO_SITE_NAME
 
    return  site_var
 
@@ -1819,7 +1820,13 @@ def get_preferred_lang(request, group_id, nodes, node_type):
    if uname:
       if uname.has_key("preferred_languages"):
 		pref_lan=uname.preferred_languages
-		if not pref_lan.keys():
+		
+		if pref_lan.keys():
+			if pref_lan['primary'] != request.LANGUAGE_CODE:
+				uname.preferred_languages['primary'] = request.LANGUAGE_CODE
+				uname.save()
+
+		else:
 			pref_lan={}
 			pref_lan['primary']=request.LANGUAGE_CODE
 			pref_lan['default']=u"en"
