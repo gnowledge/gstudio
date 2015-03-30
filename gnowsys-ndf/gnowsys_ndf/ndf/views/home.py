@@ -77,7 +77,7 @@ def landing_page(request):
     Method to render landing page after checking variables in local_settings/settings file.
     '''
 
-    if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "nroer"):
+    if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
                                 {"group_id": "home", 'groupid':"home"},
