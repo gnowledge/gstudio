@@ -210,140 +210,197 @@ ul#graph-hover.f-dropdown{
 </dl>
 
 <br/>
+
 <dl class="accordion" data-accordion>
 
   <dd>
 
     <a id="app_selected" href="#mySystemtype">{% blocktrans with node.name as name %} Click here to select apps for {{name}} {% endblocktrans %}</a>
 
-      <div id="mySystemtype" class="content">
+    <div id="mySystemtype" class="content">
 
-  <div id="app_drawer" >
+      <div id="app_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-       </div>
-<input type="button" id="save_gapps" class="button small-10 small-push-1 column" value="Save">
+      </div>
 
+      <input type="button" id="save_gapps" class="button small-10 small-push-1 column" value="Save">
 
-       </div>
-</dd>
+    </div>
+
+  </dd>
+
 </dl>
 
 {{ block.super }}
 {% endblock %}
 
 {% block script %}
-var datas= ""
-var old_group_name;
-$(document).on('click',"#app_selected",function(){
-$('#mySystemtype #collection_set_drawer1').html("");
- $('#mySystemtype #collection_set_drawer2').html("");
- $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
-var url='/{{groupid}}/group/app_selection/'+'{{node}}';
 
- $.getJSON( url, function( data ) {
-  $.each(data ,function(index , drawer_elements){
-   if(index == 0)
-    {
-     $.each(drawer_elements.drawer1, function(index, element) {
-        $('#mySystemtype #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+  $("#app_selected").click( function() {
+    var url="{% url 'app_selection' groupid %}";
+
+    $.getJSON( url, function( data ) {
+      $.each(data ,function(index, drawer_elements) {
+        if(index == 0) {
+          $.each(drawer_elements.drawer1, function(index, element) {
+            $('#mySystemtype #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+          });
+        }
+
+        if(index == 1) {
+          $.each(drawer_elements.drawer2, function(index, element) {
+            $('#mySystemtype #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+          });
+        }
       });
-   }
-   if(index == 1)
-    {
-    $.each(drawer_elements.drawer2, function(index, element) {
-        $('#mySystemtype #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
+    });
+  });
+
+  function fetch_selected_apps() {
+    var selected_apps_list = [];
+    $.each($('#mySystemtype #collection_set_drawer2 li'), function(index,item) {
+      selected_apps_list.push(item.id);
+    });
+    return selected_apps_list;
+  }
+
+  $("#save_gapps").click( function() {
+    selected_apps_list = fetch_selected_apps();
+    apps_to_set = JSON.stringify(selected_apps_list);
+
+    $.ajax({
+      url:"{% url 'app_selection' groupid %}",
+
+      type: 'POST',
+
+      data: {
+        apps_to_set: apps_to_set,
+        csrfmiddlewaretoken: '{{csrf_token}}'
+      },
+
+      beforeSend: function(){
+        $("#ajax_load_image").show();
+        $("#body").css({"opacity":"0.1"})
+      },
+
+      success: function(data){
+        alert("Apps set for this group successfully.");
+        location.reload();
+      },
+
+      complete: function(){
+        $("#ajax_load_image").hide();
+        $("#body").css({"opacity":""});
+      }
+    }); //end of ajax
+  }); //end_of_click_save_gapps
+
+  // Search-Box for LHS drawer of resources
+  $('#collection_set_search').bind('keydown change', function(e) {
+    var search_text = (this.value).toLowerCase();
+    var search_text_len = (search_text.length + 1);
+
+    if (e.keyCode == 8) {
+      // If backspace pressed, then show all
+      search_text_len = 0;
     }
 
- });
-   });
-});
+    var $li = $( ".collection_set.pricing-table.drawer1 li.bullet-item" );
 
+    if (search_text_len < 3) {
+      $li.filter(function() {
+        if ($(this).css("display") == "none") {
+          return true;
+        }
 
-function get_all_data(){
- $.each($('#mySystemtype #collection_set_drawer2 li'),function(index,item){
-         datas=datas+String(item.id)+",";
-         });
-}
+        else {
+          return false;
+        }
+      }).show();
+    }
 
+    else if (search_text_len > 2) {
+      $(".searching").css("display", "block");
+      $li.each(function() {
+        if ($(this).text().toLowerCase().indexOf(search_text) >= 0) {
+          $(this).css("display", "block");
+        }
 
-$(document).on('click',"#save_gapps",function(){
-get_all_data();
-apps_to_set=datas;
-$.ajax({
-url:'/{{groupid}}/group/app_selection/{{node}}',
-type: 'POST',
-data: {apps_to_set:apps_to_set,csrfmiddlewaretoken: '{{csrf_token}}'},
-       beforeSend: function(){
-              $("#ajax_load_image").show();
-              $("#body").css({"opacity":"0.1",})
-                              },
-        success: function(data){
-                       alert("Successfully set apps for this group");
-           },
-       complete: function(){
-                    $("#ajax_load_image").hide();
-                $("#body").css({"opacity":"",})
+        else{
+          $(this).css("display", "none");
+        }
+      });
+      $(".searching").css("display", "none");
+    }
+  });
 
-          }
+  {% get_user_object node.created_by as user_obj %}
+  {% ifequal user_obj.username user.username %}
+    var edit_policy  = document.getElementById("edit_policy")
+    var group_type  = document.getElementById("group_type")
+    var subscription_policy  = document.getElementById("subscription_policy")
+    var visibility_policy  = document.getElementById("visibility_policy")
+    var disclosure_policy  = document.getElementById("disclosure_policy")
+    var encryption_policy  = document.getElementById("encryption_policy")
+    var agency_type = document.getElementById("agency_type")
 
-}); //end of ajax
-}); //end_of_click_save_gapps
+    {% if node.edit_policy %}
+    $("select#edit_policy option[value='{{node.edit_policy}}']").prop("selected", true);
+    {% endif %}
 
-{% get_user_object node.created_by as user_obj %}
-{% ifequal  user_obj.username  user.username  %}
-var edit_policy  = document.getElementById("edit_policy")
-var group_type  = document.getElementById("group_type")
-var subscription_policy  = document.getElementById("subscription_policy")
-var visibility_policy  = document.getElementById("visibility_policy")
-var disclosure_policy  = document.getElementById("disclosure_policy")
-var encryption_policy  = document.getElementById("encryption_policy")
-var agency_type = document.getElementById("agency_type")
+    {% if node.group_type %}
+    $("select#group_type option[value='{{node.group_type}}']").prop("selected", true);
+    {% endif %}
 
-{% if node.edit_policy %}
-$("select#edit_policy option[value='{{node.edit_policy}}']").prop("selected", true);
-{% endif %}
+    {% if node.subscription_policy %}
+    $("select#subscription_policy option[value='{{node.subscription_policy}}']").prop("selected", true);
+    {% endif %}
 
-{% if node.group_type %}
-$("select#group_type option[value='{{node.group_type}}']").prop("selected", true);
-{% endif %}
+    {% if node.visibility_policy %}
+    $("select#visibility_policy option[value='{{node.visibility_policy}}']").prop("selected", true);
+    {% endif %}
 
-{% if node.subscription_policy %}
-$("select#subscription_policy option[value='{{node.subscription_policy}}']").prop("selected", true);
-{% endif %}
+    {% if node.disclosure_policy %}
+    $("select#disclosure_policy option[value='{{node.disclosure_policy}}']").prop("selected", true);
+    {% endif %}
 
-{% if node.visibility_policy %}
-$("select#visibility_policy option[value='{{node.visibility_policy}}']").prop("selected", true);
-{% endif %}
+    {% if node.encryption_policy %}
+    $("select#encryption_policy option[value='{{node.encryption_policy}}']").prop("selected", true);
+    {% endif %}
 
-{% if node.disclosure_policy %}
-$("select#disclosure_policy option[value='{{node.disclosure_policy}}']").prop("selected", true);
-{% endif %}
+    {% if node.agency_type %}
+    $("select#agency_type option[value='{{node.agency_type}}']").prop("selected", true);
+    {% endif %}
 
-{% if node.encryption_policy %}
-$("select#encryption_policy option[value='{{node.encryption_policy}}']").prop("selected", true);
-{% endif %}
+    $(document).on('click', "#changeButton", function() {
+      $.ajax({
+        url: '/{{node}}/ajax/change_group_settings/',
 
-{% if node.agency_type %}
-$("select#agency_type option[value='{{node.agency_type}}']").prop("selected", true);
-{% endif %}
+        type: 'POST',
 
-$(document).on('click',"#changeButton",function(){
-$.ajax({
-url:'/{{node}}/ajax/change_group_settings/',
-type: 'POST',
-data: {edit_policy:edit_policy.value, group_type:group_type.value, subscription_policy:subscription_policy.value, visibility_policy:visibility_policy.value, disclosure_policy:disclosure_policy.value, encryption_policy:encryption_policy.value, agency_type:agency_type, csrfmiddlewaretoken: '{{ csrf_token }}', group_id:"{{node}}"},
-beforeSend: function() {
-$("#ajax_search").show();
-},
-success: function(result){
-$("#ajax_search").hide();
-$("#status").html(result);
-}
-});
-});
+        data: {
+          edit_policy: edit_policy.value,
+          group_type: group_type.value,
+          subscription_policy: subscription_policy.value,
+          visibility_policy: visibility_policy.value,
+          disclosure_policy: disclosure_policy.value,
+          encryption_policy: encryption_policy.value,
+          agency_type: agency_type,
+          csrfmiddlewaretoken: '{{ csrf_token }}',
+          group_id:"{{node}}"
+        },
 
-{% else %}
-{% endifequal %}
+        beforeSend: function() {
+          $("#ajax_search").show();
+        },
+
+        success: function(result){
+          $("#ajax_search").hide();
+          $("#status").html(result);
+        }
+      });
+    });
+
+  {% endifequal %}
 
 {% endblock %}

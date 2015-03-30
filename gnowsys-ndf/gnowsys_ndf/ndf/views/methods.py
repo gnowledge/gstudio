@@ -5,40 +5,39 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render_to_response  # , render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from mongokit import paginator
 import mongokit
-import datetime 
-import time
-import sys
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS,BENCHMARK
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.settings import DEFAULT_GAPPS_LIST, WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
-from gnowsys_ndf.ndf.models import HistoryManager,Benchmark
+from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
+import datetime
+import time
+import sys
 import subprocess
 import re
 import ast
 import string
 import json
 import locale
-from datetime import datetime,timedelta,date
-import csv
-from collections import Counter
-
-db = get_database()
-collection = db[Node.collection_name]
-col = db[Benchmark.collection_name]
+from datetime import datetime, timedelta, date
+# import csv
+# from collections import Counter
 from collections import OrderedDict
+
+col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -163,14 +162,62 @@ def get_all_resources_for_group(group_id):
     return obj_resources
 
 
-
 @get_execution_time
-def get_all_gapps():
-  meta_type_gapp = node_collection.one({'$and': [{'_type': 'MetaType'}, {'name': 'GAPP'}]})
-  all_gapps = node_collection.find({'$and': [{'_type': 'GSystemType'}, {'member_of': {'$all': [meta_type_gapp._id]}}]})    
-  return list(all_gapps)
+def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
+    """Returns list of GApps.
 
-#checks forum notification turn off for an author objec
+    Arguments:
+    default_gapp_listing -- (Optional argument)
+        - This is to decide which list should be considered for listing GAPPs;
+        that is, in menu-bar and GAPPs selection menu for a given group
+        - True: DEFAULT_GAPPS (menu-bar)
+            - At present used in listing GAPPS whenever a new group is created
+        - False: WORKING_GAPPS (selection-menu)
+            - At present used in listing GAPPS for setting-up GAPPS for a group
+
+    already_selected_gapps -- (Optional argument)
+        - List of GApps already set for a given group in form of
+        dictionary variable
+        - If specified, then these listed GApps are excluded from
+        the list of GApps returned by this function
+
+    Returns:
+        - List of GApps where each GApp is in form of node/dictionary
+    """
+    gapps_list = []
+
+    global DEFAULT_GAPPS_LIST
+    gapps_list = DEFAULT_GAPPS_LIST
+
+    if not gapps_list or not default_gapp_listing:
+        # If DEFAULT_GAPPS_LIST not set (i.e. empty)
+        # Or we need to setup list for selection purpose of GAPPS
+        # for a group
+        gapps_list = WORKING_GAPPS
+
+        # If already_selected_gapps is non-empty,
+        # Then append their names in list of GApps to be excluded
+        if already_selected_gapps:
+            gapps_list_remove = gapps_list.remove
+            for each_gapp in already_selected_gapps:
+                gapp_name = each_gapp["name"]
+
+                if gapp_name in gapps_list:
+                    gapps_list_remove(gapp_name)
+
+    # Find all GAPPs
+    meta_type = node_collection.one({
+        "_type": "MetaType", "name": META_TYPE[0]
+    })
+    gapps_cur = None
+    gapps_cur = node_collection.find({
+        "_type": "GSystemType", "member_of": meta_type._id,
+        "name": {"$in": gapps_list}
+    }).sort("created_at")
+
+    return list(gapps_cur)
+
+
 @get_execution_time
 def forum_notification_status(group_id,user_id):
   """Checks forum notification turn off for an author object
@@ -192,6 +239,7 @@ def forum_notification_status(group_id,user_id):
     return True
   except Exception as e:
     print "Exception in forum notification status check "+str(e)
+
 
 @get_execution_time
 def get_forum_repl_type(forrep_id):
@@ -3811,7 +3859,3 @@ def delete_node(
     except Exception as e:
         delete_status_message = "Error (from delete_node) :-\n" + str(e)
         return (False, delete_status_message)
-
-
-          
-
