@@ -746,7 +746,6 @@ def create_sub_group(request,group_id):
 
 @get_execution_time
 def nroer_groups(request, group_id, groups_category):
-    # print "asdfasfsafdsadf"
     group_name, group_id = get_group_name_id(group_id)
 
     mapping = GSTUDIO_NROER_MENU_MAPPINGS
