@@ -5,6 +5,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
+{% get_site_variables as site %}
      
 <head>
 
@@ -13,7 +14,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
 
-  <title>metaStudio - {% block title %} {% endblock %} </title> 
+  <title>{{ site.SITE_NAME }} - {% block title %} {% endblock %} </title> 
 
   <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> 
 
@@ -30,15 +31,11 @@
   <!-- jQuery -->
   <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> 
   <script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script> 
-  <!--<script src="/static/ndf/bower_components/jquery-legacy/jquery.min.js"> </script>-->
-
-  <!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
-  <!-- <script src="/static/ndf/bower_components/jquery-legacy/jquery-migrate.js"> </script>-->
-
-  <!-- External library stylesheets-->
 
   <!-- Enable HTML5 on old browsers -->
   <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- External library stylesheets-->
 
   {% block head %}{% endblock %}
 
@@ -55,6 +52,7 @@
     ul.nroer-menu > li.active { box-shadow: 0 4px 0 0 #0eacb5; }
 
     {% block style %}{% endblock %}
+
   </style>
 
 </head>
@@ -62,11 +60,7 @@
 <body itemscope itemtype="http://schema.org/Webpage">
     
     {% get_group_object groupid as group_object %}
-    {% get_site_variables as site %}
     {% check_accounts_url request.path as is_ac_url %}
-
-    <!-- "get_site_name_from_settings" gives site name specified in local_settings.py -->
-    {% get_site_name_from_settings as site_name %}
 
     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
@@ -88,8 +82,8 @@
 
       <!-- Left Nav Section -->
 
-      <!-- add GSTUDIO_SITE_NAME = "nroer" in the local_settings.py file, to check locally -->
-      {% if site_name == "nroer" %} 
+      <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
+      {% if site.SITE_NAME == "NROER" %} 
       
         <!-- NROER level one menu -->
         {% get_nroer_menu request group_name_tag as nroer_menu %}
@@ -190,15 +184,6 @@
 
        <!-- Right Nav Section -->
       <ul class="right">
-
-        <!-- Old Contextual Search-->
-        {% comment %} 
-          <!-- 
-          <li class="has-form search hide">
-            {% include "ndf/node_search_base.html" %}
-          </li>
-          -->
-        {% endcomment %}
 
       <!-- Language selector--> 
       <li class="has-form"> 
@@ -332,19 +317,6 @@
 
                 <!-- <li> -->
                 {% if group_name_tag %}
-                  {% comment %}
-                    <!--               
-                    <a data-tooltip aria-haspopup="true" class="has-tip" title="{{group_name_tag|defadivt:' -- '}}" href="{% url 'groupchange' group_object.name %}" class="home button">
-                    <i class="fi-home"></i>
-                      {{group_name_tag|truncatechars:20|default:" -- "}}
-                    </a>
-                     -->
-                  {% endcomment %}
-                    {% comment %}
-                      <!--
-                        <i class="fi-home"></i> {{group_name_tag|truncatechars:20|default:" -- "}}
-                      -->
-                    {% endcomment %}
                   
                     {% if not "/nroer_groups" in request.path %}
                     <!-- while listing the partners and/or groups cards dont show any text -->
@@ -365,8 +337,8 @@
 
               <!-- group level gapps which appears at LHS of search bar -->
 
-              <!-- add GSTUDIO_SITE_NAME = "nroer" in the local_settings.py file, to check locally -->
-              {% if site_name == "nroer" %} 
+              <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
+              {% if site.SITE_NAME == "NROER" %} 
               
                 {% if group_name_tag == "home" %}
                 <!-- NROER level-two menu -->

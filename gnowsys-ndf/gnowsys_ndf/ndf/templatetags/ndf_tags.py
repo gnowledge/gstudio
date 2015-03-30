@@ -66,6 +66,7 @@ def get_site_variables():
    site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
    site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
    site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
+   site_var['SITE_NAME']=GSTUDIO_SITE_NAME
 
    return  site_var
 

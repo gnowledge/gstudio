@@ -445,7 +445,6 @@ DEFAULT_GAPPS_LIST = []
 GSTUDIO_ORG_NAME='''<p>
 A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR), India</a>.
 </p>'''
-
 GSTUDIO_SITE_LOGO="/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_COPYRIGHT=""
 GSTUDIO_GIT_REPO="https://github.com/gnowledge/gstudio"
@@ -463,7 +462,9 @@ GSTUDIO_SITE_CONTRIBUTE=""
 GSTUDIO_SITE_VIDEO="pandora_and_local"  #possible values are 'local','pandora' and 'pandora_and_local'
 GSTUDIO_SITE_LANDING_PAGE="udashboard"  #possible values are 'home' and 'udashboard'
 GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome". Default is: "/home"
-#GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
+GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
+# GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
+
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
 
@@ -511,13 +512,11 @@ VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes',
 # (history-files corresponding to every json-file created for each document)
 RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
 
-
 # Indicates the "hash-level-number", i.e the number of sub-directories that 
 # will be created for the corresponding document under it's 
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
 
-GSTUDIO_SITE_NAME = ""  # holds the name of site. e.g: "nroer", "tiss" etc.
 
 GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "Maps", "Events", "Publications"]
 
