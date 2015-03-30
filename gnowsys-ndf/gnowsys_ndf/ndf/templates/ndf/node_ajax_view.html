@@ -282,7 +282,15 @@ ul#navigation li a.last {
     {% if breadcrumbs_list %}
       <ul class="breadcrumbs"> 
         {% for e in breadcrumbs_list %}
-              <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+
+              <li><b>
+              {% if node.pk != e.0 %}
+                <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
+              {% else %} 
+                {{e.1}} 
+              {% endif %}
+              </b></li>
+              
         {% endfor %}
       </ul>
     {% endif %}
@@ -1233,6 +1241,7 @@ ul#navigation li a.last {
       <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
       {% endif %}               
     </ul>
+
   {% endif %}
 
     <!-- 
@@ -1255,21 +1264,27 @@ ul#navigation li a.last {
         <span class="label">{% trans "No tags defined" %}</span>
       {% endif %}
 
-    </div><hr/>
+    </div>
 
-    <div>
-    {% include "ndf/rating.html" %} 
-    </div><br/>
+    {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+      <div>
+      {% include "ndf/rating.html" %} 
+      </div><br/>
+    {% endif %}
 
     <div>
       <ul class="side-nav">
-        <li><b>{% trans "In other languages" %}</b></li>
+        <!-- Bellow part is commented because we are already listing other language resources in topic page -->
+        <!-- For time being commented this part to avoid confusion -->
+        {% comment %}        
+        <!-- <li><b>{% trans "In other languages" %}</b></li>
         {% get_possible_translations node as tran %}
         {% for each in tran %}
           {% for k,v in each.items %}
           <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
           {% endfor %}
-        {% endfor %}
+        {% endfor %} -->
+        {% endcomment %}
           
         <!-- This button translates given resource -->
         {% if user.is_authenticated %}
