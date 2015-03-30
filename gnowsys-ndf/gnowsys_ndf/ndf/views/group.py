@@ -23,15 +23,12 @@ from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, 
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups, get_all_user_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 
 # ######################################################################################################################################
 
 gst_group = node_collection.one({"_type": "GSystemType", 'name': GAPPS[2]})
-get_all_usergroups = get_all_user_groups()
-at_apps_list = node_collection.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
-ins_objectid = ObjectId()
 app = gst_group
 
 # ######################################################################################################################################
@@ -47,7 +44,6 @@ def group(request, group_id, app_id=None, agency_type=None):
   group_name, group_id = get_group_name_id(group_id)
 
   query_dict = {}
-  # print "aisisririririr"
   if (app_id == "agency_type") and (agency_type in GROUP_AGENCY_TYPES):
     query_dict["agency_type"] = agency_type
   # print "=========", app_id, agency_type
@@ -274,7 +270,8 @@ def create_group(request,group_id):
       nodes_list.append(str((each.name).strip().lower()))
 
   return render_to_response("ndf/create_group.html", {'groupid': group_id, 'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
-    
+
+
 # @get_execution_time
 #def home_dashboard(request):
 #     try:
@@ -285,6 +282,7 @@ def create_group(request,group_id):
 #     print "frhome--",groupobj
 #     return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'user':request.user,'curgroup':groupobj},context_instance=RequestContext(request))
 
+
 @login_required
 @get_execution_time
 def populate_list_of_members():
@@ -293,6 +291,7 @@ def populate_list_of_members():
 	for mem in members:
 		memList.append(mem.username)	
 	return memList
+
 
 @login_required
 @get_execution_time
@@ -308,17 +307,16 @@ def populate_list_of_group_members(group_id):
       for author in author_list.author_set:
           name_author = User.objects.get(pk=author)
           memList.append(name_author)
-      
-      # print "members in group: ", memList
       return memList
     except:
         return []
 
+
 @get_execution_time
-def group_dashboard(request,group_id=None):
+def group_dashboard(request, group_id=None):
   # # print "reahcing"
   # if ins_objectid.is_valid(group_id) is False :
-  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
   #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
   #   if group_ins:
 	 #    group_id = str(group_ins._id)
@@ -409,7 +407,7 @@ def group_dashboard(request,group_id=None):
 
 @login_required
 @get_execution_time
-def edit_group(request,group_id):
+def edit_group(request, group_id):
   ins_objectid  = ObjectId()
   is_auth_node = False
   if ins_objectid.is_valid(group_id) is False :
@@ -465,60 +463,70 @@ def edit_group(request,group_id):
 
 @login_required
 @get_execution_time
-def app_selection(request,group_id):
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    if group_ins:
-      group_id = str(group_ins._id)
-    else :
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-      	group_id = str(auth._id)	
-  else :
-  	pass
-
-  try:
-    grp=node_collection.one({"_id":ObjectId(group_id)})
-    if request.method == "POST":
-      lst=[]
-      apps_to_set = request.POST['apps_to_set']
-      apps_list=apps_to_set.split(",")
-      if apps_list:
-        for each in apps_list:
-          if each:
-            obj=node_collection.one({'_id':ObjectId(each)})
-            lst.append(obj)
-        gattribute = triple_collection.one({'_type': 'GAttribute', 'subject': grp._id, 'attribute_type.$id': at_apps_list._id})
-        if gattribute:
-          gattribute.delete()
-        if lst:
-          ga_node = create_gattribute(grp._id, at_apps_list, lst)
-          # create_attribute=triple_collection.collection.GAttribute()
-          # create_attribute.attribute_type=at_apps_list
-          # create_attribute.subject=grp._id
-          # create_attribute.object_value=lst
-          # create_attribute.save()
-      return HttpResponse("Success")
-
+def app_selection(request, group_id):
+    if ObjectId.is_valid(group_id) is False:
+        group_ins = node_collection.find_one({
+            '_type': "Group", "name": group_id
+        })
+        auth = node_collection.one({
+            '_type': 'Author', 'name': unicode(request.user.username)
+        })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else:
+            auth = collection.Node.one({
+                '_type': 'Author', 'name': unicode(request.user.username)
+            })
+            if auth:
+                group_id = str(auth._id)
     else:
-      list_apps=[]
+        pass
 
-      if not at_apps_list:
-        return HttpResponse("Failure")
-      poss_atts=grp.get_possible_attributes(at_apps_list._id)
+    try:
+        grp = node_collection.one({
+            "_id": ObjectId(group_id)
+        }, {
+            "name": 1, "attribute_set.apps_list": 1
+        })
+        if request.method == "POST":
+            apps_to_set = request.POST['apps_to_set']
+            apps_to_set = json.loads(apps_to_set)
 
-      if poss_atts:
-        list_apps=poss_atts['apps_list']['object_value']
-      st = get_all_gapps()
-      # print "inapp_list view",st,list_apps
-      data_list=set_drawer_widget(st,list_apps)
-      return HttpResponse(json.dumps(data_list))
+            apps_to_set = [
+                ObjectId(app_id) for app_id in apps_to_set if app_id
+            ]
 
-  except Exception as e:
-    print "Error in app_selection "+str(e)
-     
+            apps_list = []
+            apps_list_append = apps_list.append
+            for each in apps_to_set:
+                apps_list_append(
+                    node_collection.find_one({
+                        "_id": each
+                    })
+                )
+
+            at_apps_list = node_collection.one({
+                '_type': 'AttributeType', 'name': 'apps_list'
+            })
+            ga_node = create_gattribute(grp._id, at_apps_list, apps_list)
+            return HttpResponse("Apps list updated successfully.")
+
+        else:
+            list_apps = []
+
+            for attr in grp.attribute_set:
+                if attr and "apps_list" in attr:
+                    list_apps = attr["apps_list"]
+                    break
+
+            st = get_gapps(already_selected_gapps=list_apps)
+
+            data_list = set_drawer_widget(st, list_apps)
+            return HttpResponse(json.dumps(data_list))
+
+    except Exception as e:
+        print "Error in app_selection " + str(e)
+
 
 @get_execution_time
 def switch_group(request,group_id,node_id):
@@ -588,6 +596,7 @@ def switch_group(request,group_id,node_id):
   except Exception as e:
     print "Exception in switch_group"+str(e)
     return HttpResponse("Failure")
+
 
 @login_required
 @get_execution_time
@@ -773,4 +782,3 @@ def nroer_groups(request, group_id, groups_category):
                            'group_nodes_count': group_nodes_count,
                            'groupid': group_id, 'group_id': group_id
                           }, context_instance=RequestContext(request))
-

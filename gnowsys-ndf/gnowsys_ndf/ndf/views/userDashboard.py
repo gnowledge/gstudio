@@ -15,23 +15,21 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps,create_grelation,get_execution_time
-from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,get_execution_time
-
-from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.ndf.views.forum import *
 from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
+
+from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
-from gnowsys_ndf.ndf.views.methods import get_drawers, get_all_gapps
+
+from gnowsys_ndf.ndf.views.methods import get_drawers, get_execution_time
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
-# from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
-from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
+from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity,get_execution_time
+
 from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.forum import *
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 

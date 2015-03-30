@@ -431,12 +431,25 @@ AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
 ]
 
-# Built-in GAPPS list 
-# DON'T EDIT THIS LIST - for listing purpose on gapps-menubar/gapps-iconbar, instead make use of below one in local_setting file
+# Built-in GAPPS list
 # ONLY TO BE EDITED - in case of adding new built-in GAPPS
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics", u"E-Library", u"Meeting",u"Bib_App", u"Observation",u"Event"]
+GAPPS = [
+    u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz",
+    u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics",
+    u"E-Library", u"Meeting", u"Bib_App", u"Observation", u"Event"
+]
+
+# This holds the list of stable GAPPS
+# ONLY TO BE EDITED in local_settings file
+# In order to edit (redorderig purpose or adding new ones) this list,
+# please make use of local_settings file
+WORKING_GAPPS = [
+    u"Page", u"File", u"E-Library", u"Forum", u"Quiz", u"Task", u"Topics",
+    u"Course", u"Module", u"Observation", "Batch", u"Event"
+]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
+# if not set by specific group
 # DON'T EDIT this variable here.
 # ONLY TO BE EDITED in local_settings file
 DEFAULT_GAPPS_LIST = []
