@@ -35,10 +35,11 @@
       font-size: 1rem;
     }
 
-    form .row .row .columns {
+    li .row .row .columns {
         padding:0 !important;
         padding-left:0 !important;
     }
+
 
     i:hover{
         cursor:pointer;
@@ -156,8 +157,6 @@
     <a class="close-reveal-modal">&#215;</a>
   </div>
 
-  <form  data-abide id="form_course_structure" method="POST" action="">
-    {% csrf_token %}
     <li class="hide course-section-class" id="course-section">
         <div class="row input-cs-row">
           <div class="small-2 columns">
@@ -197,54 +196,11 @@
           </div>
         </div>
         <div class="row">
-          <div class="small-10 small-centered columns units-btn-div">
-            <input type="button" class="button round expand hoverstyle units-btn" value="Add Units">
-            <a class="hide close-units-btn" style="float:right;">&#215; Add Units Later</a>
+          <div class="small-10 small-centered columns units-btn-div"> 
+          <a class="button round expand hoverstyle units-btn"> Add Units</a>
           </div>
         </div>
-    {% block collection %}
-    <div class="collection_block_div">
-      <div class="choose" style="display:none;">
-        
-        <table width="400" align="center">
-          <tr class="row">
-              <td class="small-4 columns ">
-                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Page"/>
-                  {% trans "Page" %} <i class="resource_icon fi-page-filled"></i></span>
-              </td> 
-              <td class="small-4 columns ">
-                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="File" />
-                  {% trans "File" %} <i class="resource_icon fi-book"></i></span>
-              </td>
-
-              <td class="small-4 columns ">
-                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Image" />
-                  {% trans "Image" %} <i class="resource_icon fi-photo"></i>
-              </td> 
-          </tr>
-          <tr class="row">
-              <td class="small-4 columns ">
-                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Video" />
-                  {% trans "Video" %} <i class="resource_icon fi-video"></i>
-              </td>
-              <td class="small-4 columns ">
-                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="Pandora Video" />
-                  {% trans "Pandora" %} <i class="resource_icon fi-video"></i>
-              </td> 
-              <td class="small-4 columns ">
-                  <span class="fontsize-x-large subheader"><input type="radio" name="col" value="QuizObj" />
-                  {% trans "Quiz" %} <i class="resource_icon fi-pencil"></i>
-              </td>
-          </tr>
-        </table>
-        
-      </div>
-        <div class="resources_drawer_div row"></div>
-        <input type="button" value="Save Units" class="save_units small button round" style="display:none">
-    </div>
     </li>
-
-    {% endblock %}
 
     <ul class="ul-course-section no-bullet">
       <input type="button" class="button expand round hoverstyle course-sec-btn" value="Add Course Section">
@@ -319,7 +275,6 @@
     <input type="hidden" id="course_node" name="course_node" value="{{cnode.pk}}">
     <input type="hidden" id="app_set_id" name="app_set_id" value="{{app_set_id}}">
     <input type="hidden" id="app_id" name="app_id" value="{{app_id}}">
-  </form>
 {% endblock %}
 <script>
 {% block script %}
@@ -332,9 +287,7 @@
     $("#min_marks").addClass("min_marks_class")
     $("#max_marks").addClass("max_marks_class")
     
-
   // Adding Course Section--------------------------------------------------------------------------------
-  
     $(document).on('click','.course-sec-btn',function(){
       $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
        cloned_ele_id = id+"_cloned"+cs_cloned_id;
@@ -349,7 +302,6 @@
         $(this).before($("#course-subsection").clone().attr('id',function(i,id){
             cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
             return cloned_ss_ele_id}).removeClass("hide"));
-        $("#"+cloned_ss_ele_id).find("div.resources_drawer_div").attr('id','resources_drawer_for_'+cloned_ss_ele_id)
         $("#"+cloned_ss_ele_id).find("input[id=name]").focus()
         css_cloned_id+=1
     });
@@ -458,6 +410,7 @@
             $("#"+curr_css_li_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
             $("#"+curr_css_li_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
             $("#"+curr_css_li_id).attr("value",css_new_id);
+            $("#"+curr_css_li_id).find(".units-btn").attr("data-css-id",css_new_id)
           },
         });//end of ajax
 
@@ -555,7 +508,6 @@
     var lbl_text;
     $(document).on('click','.edit_course_structure_name',function(){
       node_id = $(this).prev().attr("id");
-      console.log(node_id)
       if($(this).hasClass("fi-pencil")){
         //Only one course name can be renamed at once
         node_for_edit = $(".ul-course-section").find(".fi-check").prev().attr('id')
@@ -619,7 +571,6 @@
           $("#"+parent_id).find("li").addClass("hide");
           $("#"+parent_id).addClass("hidden_children");
       }
-      
     });
 
   // Set label name and mins in reveal modal with respective course name---------------------------------
@@ -640,8 +591,6 @@
 
         success: function(data){
           success_state = data["success"]
-          console.log(data)
-          console.log(success_state)
           if(success_state){
             $.each(data, function(key,value){
               if (key == "course_structure_minutes"){
@@ -666,9 +615,9 @@
             })
           } 
           else{
-            $("#course_structure_minutes").val("")
-            $("#max_marks").val("");
-            $("#min_marks").val("");
+            $(".css_mins_class").val("");
+            $(".max_marks_class").val("");
+            $(".min_marks_class").val("");
             $("input[name='course_structure_assignment'][value='No']").prop("checked","checked");
             $("input[name='course_structure_assessment'][value='No']").prop("checked","checked");
             $(".marks_div").addClass("hide");
@@ -699,7 +648,6 @@
       var assessment_chk;
       var assignment_chk;
       css_node_id = $("#css_reveal_id").val()
-      console.log(css_node_id)
 
       prop_dict = {}
       course_min_value = $(".css_mins_class").val();
@@ -734,6 +682,7 @@
           data: {
             css_node_id: css_node_id,
             prop_dict: prop_dict,
+            assessment_chk: assessment_chk,
             'csrfmiddlewaretoken': "{{csrf_token}}"
           },
 
@@ -743,10 +692,10 @@
 
           success: function(data){
             success_state = data["success"]
-            console.log(success_state)
           },
           complete: function(){
             $('#course_prop').foundation('reveal', 'close');
+            location.reload(true);
           }
         });//end of ajax
       }
@@ -758,43 +707,9 @@
   
   //On click of 'Add Units' button-----------------------------------------------------------------------
     $(document).on('click','.units-btn',function(){
-      // $(".choose").css("display", "block");
-      parent_li_css = $(this).parents("li.course-sub-section-class").not(".hide").attr('id')
-      corr_resource_div = "resources_drawer_for_"+parent_li_css
-      $("#"+corr_resource_div).prev().css("display", "block"); 
-      $(this).addClass('hide')
-      $(".sub-section-btn").attr("disabled",true)
-      $(".units-btn").attr("disabled",true)
-      $(".course-sec-btn").attr("disabled",true)
-      $("input[type='radio'][name='col']:checked").removeAttr("checked");
-      $(this).next(".close-units-btn").removeClass("hide")
-      //add a close button here to skip adding resources
-    });
-  
-  // Close units div. This is same as skipping adding units now in other words
-  //units will be added later
-
-    $(document).on('click',".close-units-btn",function(){
-      // $(this).prev().removeClass("hide")// this is for close btns prev btn 'Add Units' btn
-      $("#"+corr_resource_div).html("")
-      $("#"+corr_resource_div).next().css("display", "none"); 
-      $("#"+corr_resource_div).prev().css("display", "none"); //for choose div
-      $(".course-sec-btn").removeAttr("disabled")
-      $(".units-btn").removeAttr("disabled")
-      $(".units-btn").removeClass("hide")
-      $(".sub-section-btn").removeAttr("disabled")
-      $(this).addClass("hide")
-
-    })
-  
-  // Ajax call for units
-    $(document).on('click',"input[type='radio'][name='col']",function(){
-      console.log("B")
-    });
-
-  // Save units
-    $(document).on('click','.save_units',function(){
-      console.log("B")
+      css_node = $(this).data("cssId");
+      turl = "{% url 'add_units' groupid %}?node_id="+ css_node+"&app_id={{app_id}}&app_set_id={{app_set_id}}&course_node={{cnode.pk}}"
+      $(this).attr("href",turl)
     });
 
 {% endblock %}
@@ -822,8 +737,7 @@
             $("#"+cloned_ele_id).find(".sub-section-btn").before($("#course-subsection").clone().attr('id',function(i,id){
                 cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
                 return cloned_ss_ele_id}).removeClass("hide").attr("value","{{css_node.pk}}"));
-
-            $("#"+cloned_ss_ele_id).find("div.resources_drawer_div").attr('id','resources_drawer_for_'+cloned_ss_ele_id);
+            $("#"+cloned_ss_ele_id).find(".units-btn").attr("data-css-id","{{css_node.pk}}")
 
             var str_btn1="<div class='row'><div class='small-1 columns text-center'><i class='fi-page largesize'></i></div>"
             var str_lbl1="<span data-tooltip title='{{css_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='{{css_node.pk}}' style='float:left;'>{{css_node.name}}</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>" 

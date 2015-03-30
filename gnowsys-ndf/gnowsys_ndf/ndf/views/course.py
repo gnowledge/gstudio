@@ -10,6 +10,7 @@ from django.http import Http404
 from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
 from django.template import TemplateDoesNotExist
+from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -26,6 +27,7 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import save_file
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data,get_execution_time
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
@@ -1125,12 +1127,6 @@ def create_course_struct(request, group_id,node_id):
         )
 
 @login_required
-def add_units(request,group_id):
-    return render_to_response("ndf/course_units.html",
-                              context_instance = RequestContext(request)
-    )
-
-@login_required
 def save_course_section(request,group_id):
     '''
     This ajax function takes the nussd course node id and to be created_by
@@ -1235,10 +1231,12 @@ def course_sub_section_prop(request,group_id):
         if request.method == "POST":
             css_node_id = request.POST.get("css_node_id", '')
             prop_dict = request.POST.get("prop_dict", '')
+
             prop_dict = json.loads(prop_dict)
+
+            assessment_chk = json.loads(request.POST.get("assessment_chk", ''))
             assessment_flag = False
-            print "\n\n css_node_id", css_node_id
-            print "\n\n\nprop_dict",prop_dict
+
             css_node = node_collection.one({"_id": ObjectId(css_node_id)})
 
             at_cs_hours = node_collection.one({'_type': 'AttributeType', 'name': 'course_structure_minutes'})
@@ -1247,24 +1245,20 @@ def course_sub_section_prop(request,group_id):
             at_cs_min_marks = node_collection.one({'_type': 'AttributeType', 'name': 'min_marks'})
             at_cs_max_marks = node_collection.one({'_type': 'AttributeType', 'name': 'max_marks'})
 
+            if(assessment_chk == True):
+                create_gattribute(css_node._id, at_cs_assessment, True)
+                assessment_flag = True
+
             for propk, propv in prop_dict.items():
-                print "\n\n propk", propk
                 # add attributes to css gs
                 if(propk == "course_structure_minutes"):
                     create_gattribute(css_node._id, at_cs_hours, int(propv))
                 elif(propk == "course_structure_assignment"):
                     create_gattribute(css_node._id, at_cs_assignment, propv)
-                elif(propk == "course_structure_assessment"):
-                    create_gattribute(css_node._id, at_cs_assessment, propv)
-                    if propv == True:
-                        assessment_flag = True
-                print "\n\n assessment_flag--", assessment_flag
                 if assessment_flag:
                     if(propk == "min_marks"):
-                        print "\n\n min marks"
                         create_gattribute(css_node._id, at_cs_min_marks, int(propv))
-                    elif(propk == "max_marks"):
-                        print "\n\n max marks"
+                    if(propk == "max_marks"):
                         create_gattribute(css_node._id, at_cs_max_marks, int(propv))
             css_node.reload()
             response_dict["success"] = True
@@ -1277,10 +1271,107 @@ def course_sub_section_prop(request,group_id):
                 for each in css_node.attribute_set:
                     for k, v in each.items():
                         response_dict[k] = v
-                print "\n\n response_dict--", response_dict
                 response_dict["success"] = True
             else:
                 response_dict["success"] = False
 
 
+        return HttpResponse(json.dumps(response_dict))
+
+def add_units(request,group_id):
+
+    print "\n\n\n coming in add_units"
+    variable = None
+    css_node_hidden = request.GET.get('node_id', '')
+    course_node_id = request.GET.get('course_node', '')
+    print "\n\n\ncss_node_hidden", css_node_hidden
+    css_node = node_collection.one({"_id": ObjectId(css_node_hidden)})
+    course_node = node_collection.one({"_id": ObjectId(course_node_id)})
+    variable = RequestContext(request, {
+        'group_id': group_id, 'groupid': group_id,
+        'css_node': css_node,
+        'course_node':course_node
+    })
+
+    template = "ndf/course_units.html"
+    return render_to_response(template, variable)
+
+
+
+def get_resources(request, group_id):
+    """
+    This view is for adding units to MIS Course Structure
+    Arguments:
+    group_id - ObjectId of the currently selected group
+    resource_type - name of GSystemType
+
+    Returns:
+    Drawer with resources
+    """
+    response_dict = {'success': False, 'message': ""}
+    try:
+        if request.is_ajax() and request.method == "POST":
+            resource_type = request.POST.get('resource_type', "")
+            css_node_id = request.POST.get('css_node_id', "")
+            resource_type = resource_type.strip()
+            print "\n\n\n resource_type", css_node_id
+            widget_for = request.POST.get('widget_for', "")
+            list_resources = []
+            css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+            if resource_type:
+
+                if resource_type == "Pandora":
+                    resource_type = "Pandora_video"
+
+                resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
+                res = node_collection.find(
+                    {
+                        'member_of': resource_gst._id,
+                        'group_set': ObjectId(group_id),
+                        'status': u"PUBLISHED"
+                    }
+
+                )
+
+                print "\n\n res----", res.count()
+                for each in res:
+                    list_resources.append(each)
+
+                drawer_template_context = edit_drawer_widget("CourseUnits", group_id, css_node, None, checked="collection_set", left_drawer_content=list_resources)
+                drawer_template_context["widget_for"] = widget_for
+                drawer_widget = render_to_string(
+                    'ndf/drawer_widget.html',
+                    drawer_template_context,
+                    context_instance = RequestContext(request)
+                )
+
+            return HttpResponse(drawer_widget)
+        else:
+            error_message = "Resource Drawer: Either not an ajax call or not a POST request!!!"
+            response_dict["message"] = error_message
+            return HttpResponse(json.dumps(response_dict))
+
+    except Exception as e:
+        error_message = "Resource Drawer: " + str(e) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
+
+
+
+def save_resources(request,group_id):
+    '''
+    This ajax function changes order of nodes in collection_set.
+    Basically it swaps the two node ids this function gets.
+    A node here can be either a course section or a course sub section.
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        list_of_res = json.loads(request.POST.get('list_of_res', ""))
+        css_node_id = request.POST.get('css_node', "")
+        css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+
+        list_of_res_objIds = [ObjectId(each_res) for each_res in list_of_res]
+        node_collection.collection.update({'_id': css_node._id}, {'$set': {'collection_set':list_of_res_objIds}},upsert=False,multi=False)
+        css_node.reload()
+        response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))

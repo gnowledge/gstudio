@@ -1,0 +1,195 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+{% load pagination_tags %}
+{% block style %}
+
+  {{block.super}}
+
+  	.td_cell{
+  		background-color:#0b8a91 !important;
+  		font-size:19px;
+  		text-align:center; 
+    	vertical-align:middle;
+  		color: white !important;
+  	}
+
+    .td_cell:hover{
+    	cursor:pointer;
+    }
+
+    table, th, td {
+    border: 1px solid white;
+	}
+
+    .resource-drawer { 
+    border-color: #D3D3D3; border-style: solid; 
+    padding: 0 !important; 
+    overflow-y: auto;
+    }
+
+    div.resources_drawer_div div{
+      padding:1px;
+    }
+    .resource-drawer li.bullet-item:hover{
+    background-color: #ecf0f1; cursor:pointer;
+    }
+
+    .posted-by{ color: #808080; font-size: small; }
+
+    .selected-resource { background-color:lightgray !important ; }
+
+    .resource-type-image {
+    height:40px;    
+    background-repeat:no-repeat; background-size: 48px 48px;
+    width:16.667%;
+    }
+
+    .resource-type-image + div {
+    width:83.33333%%;
+    }
+
+    
+    .resource_icon{
+      color:#0b8a91 !important;
+    }
+    .pricing-table .bullet-item {
+      padding:0 !important;
+    }
+
+    ul.no-bullet li ul, ul.no-bullet li ol{
+    margin-left:0 !important;
+    }
+
+{% endblock %}
+
+{% block body_content %} 
+    {% block collection %}
+    <div class="collection_block_div">
+      <div class="choose">
+        <table width="400" align="center">
+          <tr class="row">
+              <td class="small-4 columns td_cell fi-page-filled">
+                  {% trans "Page" %} 
+              </td> 
+              <td class="small-4 columns td_cell fi-book">
+                  {% trans "File" %}
+              </td>
+
+              <td class="small-4 columns td_cell fi-photo">
+                  {% trans "Image" %} 
+              </td> 
+          </tr>
+          <tr class="row">
+              <td class="small-4 columns td_cell fi-video">
+                  {% trans "Video" %}
+              </td>
+              <td class="small-4 columns td_cell fi-video">
+                  {% trans "Pandora" %}
+              </td> 
+              <td class="small-4 columns td_cell fi-pencil">
+                  {% trans "Quiz" %}
+              </td>
+          </tr>
+        </table>
+        
+      </div>
+        <div class="resources_drawer_div row"></div>
+        <input type="button" value="Save Units" class="save_units small button round hide">
+        <a href="{% url 'create_course_struct' group_id course_node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" class="done_units small button round hide">Done with Units</a>
+    </div>
+
+    {% endblock %}
+{% endblock %}
+
+<script>
+{% block script %}
+  {{block.super}}
+
+    $('td').click(function (event){
+    	var resource_type_name = $(this).html()
+    	var existing_resources;
+    	resp_dict = {}
+    	$.ajax({
+
+      	type: "POST",
+
+      	url: "{% url 'get_resources' groupid %}",
+
+      	datatype: "json",
+
+      	data:{
+      	  resource_type: resource_type_name,
+          css_node_id : "{{css_node.pk}}",
+      	  widget_for: "create_course_structure",
+      	  csrfmiddlewaretoken: '{{ csrf_token }}'
+      	},
+
+      	success: function (data) {
+      	  resp_dict = data
+      	  $(".resources_drawer_div").html(""); 
+          $(".save_units").removeClass("hide")
+      	  $(".done_units").removeClass("hide")
+      	  $(".resources_drawer_div").html(resp_dict); 
+      	},
+    	});
+
+    });
+
+  // Save units
+    $(document).on('click','.save_units',function(){
+      var resources_in_RHS = []
+      total_resources_in_RHS = $(".resources_drawer_div").find("#create_course_structure_drawer2").children("li")
+
+      //check if right drawer has values
+      if(total_resources_in_RHS.length > 0){
+        //fetch right drawer values
+        $.each(total_resources_in_RHS,function(i,v){
+          resources_in_RHS.push(v.getAttribute('value'))
+        });
+
+      existing_list = JSON.stringify(resources_in_RHS)
+  		$.ajax({
+
+    		type: "POST",
+
+    		url: "{% url 'save_resources' groupid %}",
+
+    		datatype: "json",
+
+    		data:{
+          list_of_res: existing_list,
+          css_node: "{{css_node.pk}}",
+    		  csrfmiddlewaretoken: '{{ csrf_token }}'
+    		},
+
+    		success: function (data) {
+    		  resp_dict = data
+    		  $(".resources_drawer_div").html(""); 
+          $(".save_units").removeClass("hide")
+    		  $(".done_units").removeClass("hide")
+    		},
+  		});
+
+        // $("#"+corr_resource_div).html("")
+        // $("#"+corr_resource_div).next().css("display", "none"); 
+        // $(".choose").css("display", "none");
+        // $(".units-btn").removeClass("hide")
+        // $(".course-sec-btn").removeAttr("disabled")
+        // $(".units-btn").removeAttr("disabled")
+        // $(".sub-section-btn").removeAttr("disabled")
+        // $(".close-units-btn").addClass("hide")
+      }
+      else{
+        alert("Please select any resource")
+        event.preventDefault();
+      }
+    });
+
+
+    $(document).on('click','.done_units',function(){
+
+    })
+{% endblock %}
+</script
