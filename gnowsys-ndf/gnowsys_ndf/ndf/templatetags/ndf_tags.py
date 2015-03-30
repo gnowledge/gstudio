@@ -550,7 +550,7 @@ def get_gapps_iconbar(request, group_id):
 
         if not gapps_list:
             # If gapps not found for group, then make use of default apps list
-            gapps_list = get_gapps()
+            gapps_list = get_gapps(default_gapp_listing=True)
 
         i = 0
         gapps = {}

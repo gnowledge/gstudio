@@ -519,7 +519,7 @@ def app_selection(request, group_id):
                     list_apps = attr["apps_list"]
                     break
 
-            st = get_gapps(list_apps)
+            st = get_gapps(already_selected_gapps=list_apps)
 
             data_list = set_drawer_widget(st, list_apps)
             return HttpResponse(json.dumps(data_list))

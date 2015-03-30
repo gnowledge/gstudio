@@ -13,7 +13,7 @@ import mongokit
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE
-from gnowsys_ndf.settings import DEFAULT_GAPPS_LIST, GAPPS, BENCHMARK
+from gnowsys_ndf.settings import DEFAULT_GAPPS_LIST, WORKING_GAPPS, BENCHMARK
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -163,10 +163,18 @@ def get_all_resources_for_group(group_id):
 
 
 @get_execution_time
-def get_gapps(already_selected_gapps=[]):
+def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
     """Returns list of GApps.
 
     Arguments:
+    default_gapp_listing -- (Optional argument)
+        - This is to decide which list should be considered for listing GAPPs;
+        that is, in menu-bar and GAPPs selection menu for a given group
+        - True: DEFAULT_GAPPS (menu-bar)
+            - At present used in listing GAPPS whenever a new group is created
+        - False: WORKING_GAPPS (selection-menu)
+            - At present used in listing GAPPS for setting-up GAPPS for a group
+
     already_selected_gapps -- (Optional argument)
         - List of GApps already set for a given group in form of
         dictionary variable
@@ -181,20 +189,21 @@ def get_gapps(already_selected_gapps=[]):
     global DEFAULT_GAPPS_LIST
     gapps_list = DEFAULT_GAPPS_LIST
 
-    if not DEFAULT_GAPPS_LIST:
-        # If DEFAULT_GAPPS_LIST not set (i.e. empty), set bulit-in GAPPS list
-        # from settings file
-        gapps_list = GAPPS
+    if not gapps_list or not default_gapp_listing:
+        # If DEFAULT_GAPPS_LIST not set (i.e. empty)
+        # Or we need to setup list for selection purpose of GAPPS
+        # for a group
+        gapps_list = WORKING_GAPPS
 
-    # Forcefully setting GAPPS (Image, Video & Group) to be hidden
-    exclude_gapps = ["Image", "Video", "Group"]
+        # If already_selected_gapps is non-empty,
+        # Then append their names in list of GApps to be excluded
+        if already_selected_gapps:
+            gapps_list_remove = gapps_list.remove
+            for each_gapp in already_selected_gapps:
+                gapp_name = each_gapp["name"]
 
-    # If already_selected_gapps is non-empty,
-    # Then append their names in list of GApps to be excluded
-    if already_selected_gapps:
-        exclude_gapps_append = exclude_gapps.append
-        for each_gapp in already_selected_gapps:
-            exclude_gapps_append(each_gapp["name"])
+                if gapp_name in gapps_list:
+                    gapps_list_remove(gapp_name)
 
     # Find all GAPPs
     meta_type = node_collection.one({
@@ -203,7 +212,7 @@ def get_gapps(already_selected_gapps=[]):
     gapps_cur = None
     gapps_cur = node_collection.find({
         "_type": "GSystemType", "member_of": meta_type._id,
-        "name": {"$in": gapps_list, "$nin": exclude_gapps}
+        "name": {"$in": gapps_list}
     }).sort("created_at")
 
     return list(gapps_cur)
