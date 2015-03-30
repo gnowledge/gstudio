@@ -7,11 +7,10 @@ from django.views.generic import TemplateView
 
 from registration.backends.default.views import RegistrationView
 from registration.backends.default.views import ActivationView
-from registration_email.forms import EmailRegistrationForm
 from jsonrpc import jsonrpc_site
 
-from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error
 # from gnowsys_ndf.ndf.forms import *
+from gnowsys_ndf.ndf.views.email_registration import password_reset_email, password_reset_error, GstudioEmailRegistrationForm
 from gnowsys_ndf.ndf.forms import UserChangeform, UserResetform
 from gnowsys_ndf.ndf.views.home import homepage, landing_page
 from gnowsys_ndf.ndf.views.methods import tag_info
@@ -151,9 +150,10 @@ urlpatterns = patterns('',
                 lambda request, user: '/accounts/activate/complete/'),
         ),
         name='registration_activate'),
+    
     url(r'^accounts/register/$',
         RegistrationView.as_view(
-            form_class=EmailRegistrationForm,
+            form_class=GstudioEmailRegistrationForm,
             get_success_url=getattr(
                 settings, 'REGISTRATION_EMAIL_REGISTER_SUCCESS_URL',
                 lambda request, user: '/accounts/register/complete/'),
