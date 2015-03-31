@@ -20,7 +20,7 @@
     {% get_site_variables as site %}
     {% get_all_users_int_count as all_users %}
     {% get_all_file_int_count as all_files %}
-
+<!-- 
     <div>
         <div class="row">
             <div class="medium-6 columns">
@@ -34,13 +34,14 @@
             </div>
         </div>
     </div>
-
+ -->
     <article class="landing row">
         <section class="promo">
             <div class="banner">
                 <div id="group-banner">
 
                     <div class="slide row" style="background-color:#10a05d">
+                        <br/>
                         <i class="fi-torsos"></i>
                         <h3 class="medium-12 columns">
                             <blockquote>Connecting Knowledge, Connecting People..</blockquote>
@@ -51,30 +52,38 @@
                         </div>
 
                         <div class="medium-4 columns">
-                            <a href="../accounts/register/" class="main large ui button">Join NROER</a>
+                            <a href="../accounts/register/" class="main large ui button">Let's Join NROER</a>
                         </div>
+
+                        <h4 class="medium-12 columns">
+                            {{all_files}} open resources &nbsp; | &nbsp; <span>{{all_users}} Members</span>
+                        </h4>
                     </div>
 
                     <div class="slide row" style="background-color:#3710a0">
-
+                    <br/>
                         <i class="fi-web"></i>
                         <div class="medium-12 columns">
                             <div class="row">
                                 <div class="medium-3 columns">
-                                    <h4>Collaborative</h4>
-                                    <p>Built by the people, and for the people, we believe in making education a truly social process</p>
+                                    <h3>Collaborative</h3>
+                                    <br/>
+                                    <h5>Built by the people, and for the people, we believe in making education a truly social process</h5>
                                 </div>
                                 <div class="medium-3 columns">
-                                    <h4>Open</h4>
-                                    <p>The project is built on the philosophies of keeping knowledge free and open to everyone</p>
+                                    <h3>Open</h3>
+                                    <br/>
+                                    <h5>The project is built on the philosophies of keeping knowledge free and open to everyone</h5>
                                 </div>
                                 <div class="medium-3 columns">
-                                    <h4>Accessible</h4>
-                                    <p>With official partnerships with national educational organisations and institutes, NROER offers unparalleled reach to humanity</p>
+                                    <h3>Accessible</h3>
+                                    <br/>
+                                    <h5>With official partnerships with national educational organisations and institutes, NROER offers unparalleled reach to humanity</h5>
                                 </div>
                                 <div class="medium-3 columns">
-                                    <h4>Semantic</h4>
-                                    <p>Developed using the latest in open semantic standards, educational resources can finally become machine readable</p>
+                                    <h3>Semantic</h3>
+                                    <br/>
+                                    <h5>Developed using the latest in open semantic standards, educational resources can finally become machine readable</h5>
                                 </div>
                             </div>
                         </div>
@@ -84,7 +93,7 @@
                 </div>
             </div>
             <!-- end of banner -->
-   
+<!--    
             <div class="meta row">
                 <div class="medium-4 columns">
                     <a href="{{ site.PARTNERS }}" class="main large ui button">
@@ -110,13 +119,13 @@
                     </a>
                 </div>
             </div>
+-->
         </section>
-        
+<!--         
         <section class="content small-12 columns">
             <div class="row">
                 <div class="medium-12 columns">
                     <h2>Development Partners</h2>
-                    <!-- <ul class="partner small-block-grid-6"> -->
                     <ul class="partner small-block-grid-6">
                         <li>
                             <a>
@@ -251,7 +260,8 @@
                     </ul>
                 </div>
             </div>
-        </section>
+        </section> 
+-->
     </article>
     
     <script>
@@ -266,6 +276,14 @@
         // for (i = 0; i < 0; i++) {
         //     $("#partner-list li").clone().appendTo("#partner-list");
         // }
+
+        // redundantly kept to improve the speed of forming slideshow.
+        // Along with that to ensure this script found it's elements. Hence forth kept in .ready() too.
+        $("#group-banner").slick({
+            dots: true,
+            autoplaySpeed: 7000,
+            autoplay: true
+        });
 
         $(document).ready(function(){
   
