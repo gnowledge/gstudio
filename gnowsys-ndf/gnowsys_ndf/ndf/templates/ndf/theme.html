@@ -43,7 +43,7 @@
 
 	  var tree_build = $(".themes").not(".jqtree-loading");
   	  var node = tree_build.tree('getNodeById', url);
-  	  tree_build.tree('selectNode', node);
+  	  tree_build.tree('openNode', node);
       
       // Javascript function to be used for checking objects in specific time of interval
       setTimeout(function(){
@@ -272,10 +272,10 @@
 {% endblock %}
 
 {% block related_content %}
-<div class="panel" style="background-color:#ddd;">
 	{% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
 
+	<div class="panel" style="background-color:#ddd;">
 	<ul class="no-bullet" id="app-set-item"> 
 
 	    {% get_memberof_objects_count theme_GST_id groupid as count %}
@@ -296,9 +296,9 @@
 	      </li>
 	  
 	</ul>
-	
+	</div>
+
 	{% endif %}
-</div>
 {% endblock %}
 
 
