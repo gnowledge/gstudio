@@ -1,8 +1,7 @@
-
 ''' -- imports from python libraries -- '''
 import re
 # import magic
-import collections
+from collections import OrderedDict
 from time import time
 import json
 import ox
@@ -29,7 +28,7 @@ except ImportError:
 
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group,get_execution_time
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
@@ -66,6 +65,7 @@ def get_site_variables():
    site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
    site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
    site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
+   site_var['SITE_NAME']=GSTUDIO_SITE_NAME
 
    return  site_var
 
@@ -200,9 +200,9 @@ def get_group_resources(group):
 @register.assignment_tag
 def all_gapps():
 	try:
-		return get_all_gapps()
+		return get_gapps()
 	except Exception as expt:
-		print "Error in get_all_gapps "+str(expt)
+		print "Error in get_gapps "+str(expt)
 
 @get_execution_time
 @register.assignment_tag
@@ -218,75 +218,6 @@ def get_site_info():
 	sitename = Site.objects.all()[0].name.__str__()
 	return sitename
 
-@get_execution_time
-@register.assignment_tag
-def check_gapp_menus(groupid):
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(groupid) is False :
-		group_ins = node_collection.find_one({'_type': "Group", "name": groupid}) 
-		if group_ins:
-			groupid = str(group_ins._id)
-	else :
-		pass
-	grp = node_collection.one({'_id': ObjectId(groupid)})
-	if not at_apps_list:
-		return False
-	poss_atts=grp.get_possible_attributes(grp.member_of)
-	if not poss_atts:
-		return False
-	return True
-	
-@get_execution_time 
-@register.assignment_tag
-def get_apps_for_groups(groupid):
-	try:
-		ret_dict={}
-		grp = node_collection.one({'_id': ObjectId(groupid)})
-		poss_atts=grp.get_possible_attributes(at_apps_list._id)
-		if poss_atts:
-			list_apps=poss_atts['apps_list']['object_value']
-			counter=1
-			for each in list_apps:
-				obdict={}
-				obdict['id']=each['_id']
-				obdict['name']=each['name'].lower()
-				ret_dict[counter]=obdict
-				counter+=1 
-			return ret_dict 
-		else:
-			gpid = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-			gapps = {}
-			i = 0;
-			meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-			GAPPS = node_collection.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
-			group_obj = node_collection.one({'_id':ObjectId(groupid)})
-
-			# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
-			not_in_menu_bar = []
-			if group_obj.name == "home":
-				# From "home" group hide following GAPPS: Image, Video
-				not_in_menu_bar = ["Image", "Video"]
-			else :
-				# From other remaining groups hide following GAPPS: Group, Image, Video
-				not_in_menu_bar = ["Image", "Video", "Group"]
-
-			# Defalut GAPPS to be listed on gapps-meubar/gapps-iconbar
-			global DEFAULT_GAPPS_LIST
-			if not DEFAULT_GAPPS_LIST:
-				# If DEFAULT_GAPPS_LIST is empty, set bulit-in GAPPS (setting_gapps) list from settings file
-				DEFAULT_GAPPS_LIST = setting_gapps
-
-			for node in GAPPS:
-				if node:
-					if node.name not in not_in_menu_bar and node.name in DEFAULT_GAPPS_LIST:
-						i = i+1;
-						if node.name in setting_gapps:
-							gapps[i] = {'id': node._id, 'name': node.name.lower()}
-						else:
-							gapps[i] = {'id': node._id, 'name': node.name}
-			return gapps
-	except Exception as exptn:
-		print "Exception in get_apps_for_groups "+str(exptn)
 
 @get_execution_time
 @register.assignment_tag
@@ -587,58 +518,67 @@ def shelf_allowed(node):
 @get_execution_time
 @register.inclusion_tag('ndf/gapps_iconbar.html')
 def get_gapps_iconbar(request, group_id):
-	"""Get Gapps menu-bar
-	"""
-	try:
-		selectedGapp = request.META["PATH_INFO"]
-		group_name = ""
-		gpid = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-		gapps = {}
-		i = 0;
-		meta_type = node_collection.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-		
-		GAPPS = node_collection.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
-		group_obj = node_collection.one({'_id':ObjectId(group_id)})
+    """Get GApps menu-bar
+    """
+    try:
+        selected_gapp = request.META["PATH_INFO"]
+        if len(selected_gapp.split("/")) > 2:
+            selected_gapp = selected_gapp.split("/")[2]
+        else:
+            selected_gapp = selected_gapp.split("/")[1]
 
-		# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
-		not_in_menu_bar = []
-		if group_obj.name == "home":
-			# From "home" group hide following GAPPS: Image, Video
-			not_in_menu_bar = ["Image", "Video"]
-		else :
-			# From other remaining groups hide following GAPPS: Group, Image, Video
-			not_in_menu_bar = ["Image", "Video", "Group"]
+        # If apps_list are set for given group
+        # then list them
+        # Otherwise fetch default apps list
+        gapps_list = []
 
-		# Defalut GAPPS to be listed on gapps-meubar/gapps-iconbar
-		global DEFAULT_GAPPS_LIST
-		if not DEFAULT_GAPPS_LIST:
-			# If DEFAULT_GAPPS_LIST is empty, set bulit-in GAPPS (setting_gapps) list from settings file
-			DEFAULT_GAPPS_LIST = setting_gapps
+        group_name = ""
+        group_id = ObjectId(group_id)
+        # Fetch group
+        group_obj = node_collection.one({
+            "_id": group_id
+        }, {
+            "name": 1, "attribute_set.apps_list": 1
+        })
+        if group_obj:
+            group_name = group_obj.name
 
-		for node in GAPPS:
-			#node = node_collection.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
-			if node:
-				if node.name not in not_in_menu_bar and node.name in DEFAULT_GAPPS_LIST:
-					i = i+1;
-					gapps[i] = {'id': node._id, 'name': node.name.lower()}
+            # Look for list of gapps already set for group
+            for attr in group_obj.attribute_set:
+                if attr and "apps_list" in attr:
+                    gapps_list = attr["apps_list"]
+                    break
 
-		if len(selectedGapp.split("/")) > 2 :
-			selectedGapp = selectedGapp.split("/")[2]
-		else :
-			selectedGapp = selectedGapp.split("/")[1]
-		if group_id == None:
-			group_id=gpid._id
-		group_obj=node_collection.one({'_id':ObjectId(group_id)})
-		if not group_obj:
-			group_id=gpid._id
-		else :
-			group_name = group_obj.name
+        if not gapps_list:
+            # If gapps not found for group, then make use of default apps list
+            gapps_list = get_gapps(default_gapp_listing=True)
 
-		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
-	except invalid_id:
-		gpid=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-		group_id=gpid._id
-		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+        i = 0
+        gapps = {}
+        for node in gapps_list:
+            if node:
+                i += 1
+                gapps[i] = {"id": node["_id"], "name": node["name"].lower()}
+
+        return {
+            "template": "ndf/gapps_iconbar.html",
+            "request": request,
+            "groupid": group_id, "group_name_tag": group_name,
+            "gapps": gapps, "selectedGapp": selected_gapp
+        }
+
+    except invalid_id:
+        gpid = node_collection.one({
+            "_type": u"Group"
+        }, {
+            "name": u"home"
+        })
+        group_id = gpid._id
+        return {
+            'template': 'ndf/gapps_iconbar.html',
+            'request': request, 'gapps': gapps, 'selectedGapp': selected_gapp,
+            'groupid': group_id
+        }
 
 @get_execution_time
 @register.assignment_tag
@@ -1880,7 +1820,13 @@ def get_preferred_lang(request, group_id, nodes, node_type):
    if uname:
       if uname.has_key("preferred_languages"):
 		pref_lan=uname.preferred_languages
-		if not pref_lan.keys():
+		
+		if pref_lan.keys():
+			if pref_lan['primary'] != request.LANGUAGE_CODE:
+				uname.preferred_languages['primary'] = request.LANGUAGE_CODE
+				uname.save()
+
+		else:
 			pref_lan={}
 			pref_lan['primary']=request.LANGUAGE_CODE
 			pref_lan['default']=u"en"
@@ -1982,7 +1928,7 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
 @register.assignment_tag
 def get_object_value(node):
    at_set = ['contact_point','house_street','town_city','state','pin_code','email_id','telephone','website']
-   att_name_value= collections.OrderedDict()
+   att_name_value= OrderedDict()
            
    for each in at_set:
       attribute_type = node_collection.one({'_type':"AttributeType" , 'name':each}) 
@@ -2023,7 +1969,7 @@ def del_underscore(var):
 # this function used for info-box implementation 
 # which convert str to dict type & returns dict which used for rendering in template 
 def str_to_dict(str1):
-    dict_format = json.loads(str1, object_pairs_hook = collections.OrderedDict)
+    dict_format = json.loads(str1, object_pairs_hook = OrderedDict)
     keys_to_remove = ('_id','access_policy','rating', 'fs_file_ids', 'content_org', 'content', 'comment_enabled', 'annotations', 'login_required','status','featured','module_set','property_order','url') # keys needs to hide
     keys_by_ids = ('member_of', 'group_set', 'collection_set','prior_node') # keys holds list of ids
     keys_by_userid = ('modified_by', 'contributors', 'created_by', 'author_set') # keys holds dada from User table
@@ -2062,31 +2008,35 @@ def str_to_dict(str1):
       if k in keys_by_dict:
               att_dic = {}
               if "None" not in dict_format[k]:
-
                       if type(dict_format[k]) != str and k == "attribute_set":
-                      
                               for att in dict_format[k]:
                                       for k1, v1 in att.items():
-                                        if type(v1) == list :
-                                                str1=",".join(v1)
+                                        if type(v1) == list:
+                                                str1 = ""
+                                                if type(v1[0]) in [OrderedDict, dict]:
+                                                    for each in v1:
+                                                        str1 += each["name"] + ", "
+                                                else:
+                                                    str1 = ",".join(v1)
                                                 att_dic[k1] = str1
+                                                dict_format[k] = att_dic
                                         else:
                                                 att_dic[k1] = v1
-                                                dict_format[k] = att_dic    
+                                                dict_format[k] = att_dic
                       if k == "relation_set":
                               for each in dict_format[k]:
                                       for k1, v1 in each.items():
                                               for rel in v1:
                                                       rel = node_collection.one({'_id':ObjectId(rel)})
                                                       att_dic[k1] = rel.name
-                                      dict_format[k] = att_dic                          
+                                      dict_format[k] = att_dic
                                 
       if k in keys_by_filesize:
               filesize_dic = {}
               for k1, v1 in dict_format[k].items():
                       filesize_dic[k1] = v1
               dict_format[k] = filesize_dic
-    order_dict_format = collections.OrderedDict()
+    order_dict_format = OrderedDict()
     order_val=['altnames','language','plural','_type','member_of','created_by','created_at','tags','modified_by','author_set','group_set','collection_set','contributors','last_update','start_publication','location','license','attribute_set','relation_set']
     for each in order_val:
             order_dict_format[each]=dict_format[each]

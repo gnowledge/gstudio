@@ -41,8 +41,9 @@
     {% if form.errors %}
     <div class="row">
       <div class="small-7 large-7 small-offset-2 large-offset-2 columns end">
-        <small class="error all-error text-center">
-          {% trans "Either both passwords doesn't match or doesn't satisfy the criteria!!!" %}
+        <small class="error all-error">
+          <!-- {% trans "Either both passwords doesn't match or doesn't satisfy the criteria!!!" %} -->
+          {{form.errors}}
         </small>
       </div>
     </div>
@@ -64,6 +65,18 @@
           </div>
           <div class="small-6 large-6 columns end">
             {{form.email}}
+          </div>
+        </div>
+
+        <!-- Username -->
+        <div class="row">
+          <div class="small-3 large-3 columns">
+            <label class="right inline">
+              {{form.username.label_tag}}
+            </label>
+          </div>
+          <div class="small-6 large-6 columns end">
+            {{form.username}}
           </div>
         </div>
 
@@ -142,7 +155,7 @@
 {% block document_ready %}
   {{block.super}}
 
-  $("input[id='id_email'], input[id='id_password1'], input[id='id_password2'], select[id='id_agency_type']").each(function(){
+  $("input[id='id_email'], input[id='id_username'], input[id='id_password1'], input[id='id_password2'], select[id='id_agency_type']").each(function(){
     if (this.id == "id_email") {
       $(this).prop("type", "email");
     }
