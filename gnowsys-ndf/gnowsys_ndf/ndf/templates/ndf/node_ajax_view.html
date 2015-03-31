@@ -518,7 +518,7 @@ ul#navigation li a.last {
               {% if each_node.mime_type %}
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
               {% else %}
-              <a href="{% url 'topic_details' group_name_tag each_node.pk %}?nav_li={{nav_list}}">{{ each_node.name }}</a>
+              <a href="{% url 'topic_details' group_name_tag each_node.pk %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>
               {% if not forloop.last %},&nbsp; {% endif %}
               {% endif %}
               {% endfor %}
