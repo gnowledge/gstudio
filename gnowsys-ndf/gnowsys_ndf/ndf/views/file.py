@@ -1167,6 +1167,13 @@ def file_detail(request, group_id, _id):
     shelves = []
     shelf_list = {}
 
+    # First get the navigation list till topic from theme map
+    nav_l=request.GET.get('nav_li','')
+    breadcrumbs_list = []
+
+    if nav_l:
+      nav_li = nav_l
+
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
         shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
@@ -1192,7 +1199,7 @@ def file_detail(request, group_id, _id):
                                 'groupid':group_id,
                                 'annotations' : annotations,
                                 'shelf_list': shelf_list,
-                                'shelves': shelves, 
+                                'shelves': shelves, 'nav_list':nav_li,
                                 'imageCollection':imageCollection
                               },
                               context_instance = RequestContext(request)
