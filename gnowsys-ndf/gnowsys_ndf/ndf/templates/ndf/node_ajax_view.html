@@ -518,7 +518,7 @@ ul#navigation li a.last {
               {% if each_node.mime_type %}
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
               {% else %}
-              <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>
+              <a href="{% url 'topic_details' group_name_tag each_node.pk %}?nav_li={{nav_list}}">{{ each_node.name }}</a>
               {% if not forloop.last %},&nbsp; {% endif %}
               {% endif %}
               {% endfor %}
@@ -822,14 +822,14 @@ ul#navigation li a.last {
 	      {% for k,v in val.items %}
 	      {% if k == "fallback_lang" %}
 	      {% for each in v %}
-	      <a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
+	      <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
 	      {% endfor %}
 	      {% elif k == "other_languages" %}
 	      {% if v %}
 	      <fieldset id="{{k}}">
 		<legend>{% trans "In other languages" %}</legend>
 		{% for each in v %}
-	   	<a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
+	   	<a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
 		{% endfor %}
 		{% endif %}
 		{% endif %}
