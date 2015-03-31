@@ -197,7 +197,7 @@ class Command(BaseCommand):
           glist_container.member_of.append(glist._id)
           glist_container.save()
           print "\n Eventtype Created."
-        collegeevent=node_collection.one({"member_of":ObjectId(glist._id),"name":"CollegeEvents"})
+        collegeevent=node_collection.one({'_type': "GSystemType","name":"CollegeEvents"})
         if not collegeevent:
             node = node_collection.collection.GSystem()
             node.name=u"CollegeEvents"
@@ -624,13 +624,15 @@ def clean_structure():
 
   # to fix broken documents which are having partial/outdated attributes/relations in their attribute_set/relation_set. 
   # first make their attribute_set and relation_set empty and them fill them with latest key-values. 
+  # gsystem_list = ["GSystem", "File", "Group", "Author"]
+  gsystem_list = ["Group", "Author"]
   node_collection.collection.update(
-    {'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 'attribute_set': {'$exists': True}, 'relation_set': {'$exists': True}},
+    {'_type': {'$in': gsystem_list}, 'attribute_set': {'$exists': True}, 'relation_set': {'$exists': True}},
     {'$set': {'attribute_set': [], 'relation_set': []}}, 
     upsert=False, multi=True
   )
 
-  gs = node_collection.find({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
+  gs = node_collection.find({'_type': {'$in': gsystem_list}, 
                               '$or': [{'attribute_set': []}, {'relation_set': []}] 
                             }, timeout=False)
 

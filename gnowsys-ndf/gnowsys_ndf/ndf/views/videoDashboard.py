@@ -2,7 +2,7 @@
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 
 try:
@@ -10,15 +10,17 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 from gnowsys_ndf.ndf.models import File
+
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
-from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, create_gattribute, create_grelation
-from gnowsys_ndf.ndf.models import node_collection, triple_collection
+from gnowsys_ndf.settings import META_TYPE, GAPPS  # , MEDIA_ROOT
+from gnowsys_ndf.ndf.models import node_collection  # , triple_collection
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metadata
+# from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import get_execution_time
 
+gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
+GST_VIDEO = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[4]})
 
-GST_VIDEO = node_collection.one({"_type": "GSystemType", 'name': GAPPS[4]})
 
 @get_execution_time
 def videoDashboard(request, group_id, video_id):

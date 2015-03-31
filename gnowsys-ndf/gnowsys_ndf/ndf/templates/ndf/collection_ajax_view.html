@@ -161,8 +161,8 @@
     <!-- For displaying related nodes in topic page -->
     <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->
     <fieldset>
-      <legend>Related Topics</legend>
-        {% if prior_obj %}        
+      {% if prior_obj %}        
+      <legend>Topics of {{prior_obj.name}}</legend>
 
           {% for each in prior_obj.collection_set %}
               <!-- To get the node object -->
@@ -175,7 +175,7 @@
 
           {% endfor %}
 
-        {% endif %}
+      {% endif %}
         
     </fieldset>
 

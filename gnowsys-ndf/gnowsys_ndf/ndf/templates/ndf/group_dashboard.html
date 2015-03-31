@@ -1,7 +1,7 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
-{% block title %} {{username}}'s - Dashboard  {% endblock %}
+{% block title %} {{username}} Dashboard Updates  {% endblock %}
 
 {% block head %}
   {{block.super}}
@@ -172,8 +172,7 @@
   <!-- Banner Div -->
 
   <!-- as per nroer specs, it doesn't want banner picture. So checking -->
-  {% get_site_name_from_settings as site_name %}
-  {% if site_name != "nroer" %}
+  {% if site.SITE_NAME != "NROER" %}
 
     <form id ="frmBanner" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
       {% csrf_token %}

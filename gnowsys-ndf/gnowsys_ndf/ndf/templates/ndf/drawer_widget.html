@@ -483,11 +483,28 @@
   $('#{{widget_for}}_search').bind('keydown change', function(e) {
     if (is_RT == "RelationType") {
       var search_text = (this.value).toLowerCase();
-      var search_text_len = search_text.length
+      var search_text_len = (search_text.length + 1);
+
+      if (e.keyCode == 8) {
+        // If backspace pressed, then show all
+        search_text_len = 0;
+      }
 
       var $li = $( ".{{widget_for}}.pricing-table.drawer1 li.bullet-item" );
 
-      if (search_text_len > 2) {
+      if (search_text_len < 3) {
+        $li.filter(function() {
+          if ($(this).css("display") == "none") {
+            return true;
+          }
+
+          else {
+            return false;
+          }
+        }).show();
+      }
+
+      else if (search_text_len > 2) {
         $(".searching").css("display", "block");
         $li.each(function() {
           if ($(this).text().toLowerCase().indexOf(search_text) >= 0) {
@@ -499,18 +516,6 @@
           }
         });
         $(".searching").css("display", "none");
-      }
-
-      else if (search_text_len == 2) {
-        $li.filter(function() {
-          if ($(this).css("display") == "none") {
-            return true;
-          }
-
-          else {
-            return false;
-          }
-        }).show();
       }
     }
 
