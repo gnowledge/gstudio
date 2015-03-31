@@ -338,7 +338,18 @@ ul#navigation li a.last {
                         {% endfor %}
                       </ul>
                     </li>
-                  {% elif k == "textcomplexity" %}
+                  {% elif k == "educationaluse" %}
+                    <li>
+                      <a> {% trans "Educational Use" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                    <!-- Commented bellow filters for time being will be using this filter at different place "So dont remove this code" -->
+                    {% comment %}                    
+                  <!-- {% elif k == "textcomplexity" %}
                     <li>
                       <a> {% trans "Text Complexity" %} &raquo;</a>
                       <ul>
@@ -346,7 +357,7 @@ ul#navigation li a.last {
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
                         {% endfor %}
                       </ul>
-                    </li>
+                    </li> 
                   {% elif k == "educationalalignment" %}
                     <li>
                       <a> {% trans "Educational Alignment" %} &raquo;</a>
@@ -355,7 +366,8 @@ ul#navigation li a.last {
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
                         {% endfor %}
                       </ul>
-                    </li>
+                    </li> -->
+                    {% endcomment %}                    
                   {% elif k == "language" %}
                     <li>
                       <a> {% trans "Language" %} &raquo;</a>
@@ -377,15 +389,6 @@ ul#navigation li a.last {
                   {% elif k == "audience" %}
                     <li>
                       <a> {% trans "Audience" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "curricular" %}
-                    <li>
-                      <a> {% trans "Curricular" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
