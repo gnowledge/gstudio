@@ -715,6 +715,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   # First get the navigation list till topic from theme map
   nav_l=request.GET.get('nav_li','')
   breadcrumbs_list = []
+  nav_li = ""
 
   if nav_l:
     nav_li = nav_l
