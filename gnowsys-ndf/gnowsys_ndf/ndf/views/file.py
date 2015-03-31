@@ -1170,6 +1170,7 @@ def file_detail(request, group_id, _id):
     # First get the navigation list till topic from theme map
     nav_l=request.GET.get('nav_li','')
     breadcrumbs_list = []
+    nav_li = ""
 
     if nav_l:
       nav_li = nav_l
