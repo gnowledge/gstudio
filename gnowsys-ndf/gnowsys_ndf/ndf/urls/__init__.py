@@ -125,6 +125,8 @@ urlpatterns = patterns('',
 
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
 
+    url(r'^(?P<group_id>[^/]+)/repository/?$', 'gnowsys_ndf.ndf.views.methods.repository', name='repository'),
+
     # django-registration
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
     url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
