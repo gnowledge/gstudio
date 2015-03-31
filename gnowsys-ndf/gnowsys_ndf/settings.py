@@ -561,7 +561,7 @@ GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
 
 GSTUDIO_NROER_MENU = [{"Repository":[]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eLibrary": "e-library"}, {"eBooks": ""}, {"eCourses": "course"}, {"Events": "event"} ]
+GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eBooks": ""}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"} ]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
             "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
