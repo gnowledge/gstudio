@@ -521,6 +521,7 @@ def get_gapps_iconbar(request, group_id):
     """Get GApps menu-bar
     """
     try:
+    	group_name, group_id = get_group_name_id(group_id)
         selected_gapp = request.META["PATH_INFO"]
         if len(selected_gapp.split("/")) > 2:
             selected_gapp = selected_gapp.split("/")[2]
@@ -595,6 +596,7 @@ def get_nroer_menu(request, group_name):
 
 	nroer_menu_dict = {}
 	top_menu_selected = ""
+	selected_gapp = ""
 
 	if (len(url_split) > 1) and (url_split[1] != "dashboard"):
 		selected_gapp = url_split[1]  # expecting e-library etc. type of extract
@@ -614,8 +616,9 @@ def get_nroer_menu(request, group_name):
 	mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
 	# deciding "top level menu selection"
-	if (group_name == "home") and nroer_menu_dict.has_key("selected_gapp"):
+	if ((group_name == "home") and nroer_menu_dict.has_key("selected_gapp")) or (selected_gapp == "repository"):
 		top_menu_selected = "Repository"
+		# print top_menu_selected
 		
 	elif group_name in mapping.values():
 		sub_menu_selected = mapping.keys()[mapping.values().index(group_name)]  # get key of/from mapping
@@ -2106,19 +2109,22 @@ def get_version_of_module(module_id):
 @get_execution_time
 @register.assignment_tag
 def get_group_name(groupid):
-	group_name = ""
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(groupid) is True :
-		group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(groupid)})
-		if group_ins:
-			group_name = group_ins.name
-		else :
-			auth = node_collection.one({'_type': 'Author', "_id": ObjectId(groupid) })
-			if auth :
-				group_name = auth.name
+	# group_name = ""
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(groupid) is True :
+	# 	group_ins = node_collection.find_one({'_type': "Group","_id": ObjectId(groupid)})
+	# 	if group_ins:
+	# 		group_name = group_ins.name
+	# 	else :
+	# 		auth = node_collection.one({'_type': 'Author', "_id": ObjectId(groupid) })
+	# 		if auth :
+	# 			group_name = auth.name
 
-	else :
-		pass
+	# else :
+	# 	pass
+	
+	group_name, group_id = get_group_name_id(groupid)
+
 	return group_name 
 
 @get_execution_time

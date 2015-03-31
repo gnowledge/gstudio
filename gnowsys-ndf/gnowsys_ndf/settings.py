@@ -436,7 +436,7 @@ AUTHOR_AGENCY_TYPES = [
 GAPPS = [
     u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz",
     u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics",
-    u"E-Library", u"Meeting", u"Bib_App", u"Observation", u"Event"
+    u"E-Library", u"Meeting", u"Bib_App", u"Observation", u"Event", u"E-Book"
 ]
 
 # This holds the list of stable GAPPS
@@ -561,7 +561,7 @@ GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
 
 GSTUDIO_NROER_MENU = [{"Repository":[]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eLibrary": "e-library"}, {"eBooks": ""}, {"eCourses": ""}, {"Events": ""} ]
+GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eBooks": ""}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"} ]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
             "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",

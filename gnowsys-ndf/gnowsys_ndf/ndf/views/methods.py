@@ -12,7 +12,7 @@ from mongokit import paginator
 import mongokit
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import DEFAULT_GAPPS_LIST, WORKING_GAPPS, BENCHMARK
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
@@ -3859,3 +3859,18 @@ def delete_node(
     except Exception as e:
         delete_status_message = "Error (from delete_node) :-\n" + str(e)
         return (False, delete_status_message)
+
+
+def repository(request, group_id):
+    '''
+    It's an NROER repository. Which will hold the list of apps.
+    '''
+
+    # [i.values()[0] for i in GSTUDIO_NROER_GAPPS]
+
+    return render_to_response("ndf/repository.html",
+                              { "gapps_dict" : GSTUDIO_NROER_GAPPS,
+                                'group_id': group_id, 'groupid': group_id
+                              },
+                              context_instance=RequestContext(request)
+                            )
