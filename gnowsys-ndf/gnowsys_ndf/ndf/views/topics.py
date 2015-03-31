@@ -717,6 +717,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   breadcrumbs_list = []
 
   if nav_l:
+    nav_li = nav_l
     nav_l = str(nav_l).split(",")
 
     # create beadcrumbs list from navigation list sent from template.
@@ -765,7 +766,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   
   return render_to_response('ndf/topic_details.html', 
 	                                { 'node': obj,'app_id': app_id,"theme_id": theme_id, "prior_obj": prior_obj,
-	                                  'group_id': group_id,'shelves': shelves,'topic': topic,
+	                                  'group_id': group_id,'shelves': shelves,'topic': topic, 'nav_list':nav_li,
 	                                  'groupid':group_id,'shelf_list': shelf_list,'breadcrumbs_list': breadcrumbs_list 
 	                                },
 	                                context_instance = RequestContext(request)
