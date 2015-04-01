@@ -28,7 +28,7 @@
 		font-size: 7em;
 		z-index: 0;
 		opacity: 0.2;
-		top: 40%;
+		padding-top: 5rem;
 	}
 
 {% endblock %}
@@ -56,9 +56,9 @@
 		{% for each_gapp in gapps_obj_list %}
 			<li>
 				<a class="app-card text-center" href="{% url each_gapp.name|lower group_id %}">
-					<i class="icons {{ each_gapp.url }}"></i>
 					<h4><small>{{ each_gapp.altnames }}</small></h4>
 					<hr/>
+					<i class="icons {{ each_gapp.url }}"></i>
 					<p>{{ each_gapp.content|safe }}</p>
 				</a>
 			</li>
