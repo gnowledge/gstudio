@@ -48,7 +48,7 @@
     .hoverstyle{
         background-color:white !important;
         border-color:#0b8a91;
-        border-width:2px;
+        border-width:1px;
         color:#0b8a91 !important;
         height:33px;
         margin-top: 4px;
@@ -60,19 +60,13 @@
       color:white !important;
     }
 
-    li.course-section-class{
+    .course-section-class, .course-sub-section-class{
       border-color:#757b80 !important; 
       margin: 10px !important;
-      border: 3px solid;
+      border: 1px solid;
       display:block;
     }
 
-    li.course-sub-section-class{
-      border-color:#b0b3b6 !important; 
-      margin: 10px !important;
-      border: 3px solid;
-      display:block;
-    }
 
     #name{
       margin: 5px !important;
@@ -175,7 +169,7 @@
 
         <div class="row">
           <div class="small-10 small-centered columns sub-section-btn-div">
-            <input type="button" value="Add Course Sub Section" class="button round expand hoverstyle sub-section-btn">
+            <input type="button" value="+ New Subsection" class="button round expand hoverstyle sub-section-btn">
           </div>
         </div> 
     </li>
@@ -197,13 +191,13 @@
         </div>
         <div class="row">
           <div class="small-10 small-centered columns units-btn-div"> 
-          <a class="button round expand hoverstyle units-btn"> Add Units</a>
+          <a class="button round expand hoverstyle units-btn"> + New Units</a>
           </div>
         </div>
     </li>
 
     <ul class="ul-course-section no-bullet">
-      <input type="button" class="button expand round hoverstyle course-sec-btn" value="Add Course Section">
+      <input type="button" class="button expand round hoverstyle course-sec-btn" value="+ New Section">
     </ul>
 
     <div id="course_prop" class="reveal-modal medium" data-reveal style="height:500px;"> 
@@ -283,6 +277,7 @@
   //Global var declarations------------------------------------------------------------------------------
     var cs_cloned_id = 1;
     var css_cloned_id = 1;
+    var lbl_text;
     $("#course_structure_minutes").addClass("css_mins_class")
     $("#min_marks").addClass("min_marks_class")
     $("#max_marks").addClass("max_marks_class")
@@ -503,12 +498,13 @@
       }    
 
       });
-
+var var_this;
   // Rename Edit course structure name-------------------------------------------------------------------
-    var lbl_text;
     $(document).on('click','.edit_course_structure_name',function(){
-      node_id = $(this).prev().attr("id");
-      if($(this).hasClass("fi-pencil")){
+      
+      var_this = $(this)
+      node_id = $(var_this).prev().attr("id");
+      if($(var_this).hasClass("fi-pencil")){
         //Only one course name can be renamed at once
         node_for_edit = $(".ul-course-section").find(".fi-check").prev().attr('id')
         if(node_for_edit){
@@ -517,15 +513,14 @@
           $("#"+node_for_edit).replaceWith("<label name='lbl_name' class='"+node_for_edit_class+"' id='"+node_for_edit+"' style='float:left;'>"+ node_for_edit_text+"</label>")
           $(".ul-course-section").find(".fi-check").removeClass("fi-check").addClass("fi-pencil")
         }
-        lbl_text = $(this).prev().text()
-        lbl_text_class = $(this).prev().attr('class')
-        $(this).removeClass("fi-pencil").addClass("fi-check");
+        lbl_text = $(var_this).prev().text()
+        lbl_text_class = $(var_this).prev().attr('class')
+        $(var_this).removeClass("fi-pencil").addClass("fi-check");
         $("#"+node_id).replaceWith("<input type='text' id='"+node_id+"' class='"+lbl_text_class+"' value='"+ lbl_text +"' style='float:left;'>")
         $("#"+node_id).focus();
       }
       else{
         new_name = $("#"+node_id).val();
-
         if(lbl_text!=new_name && new_name!=""){
           //  ajax call to rename the node.
 
@@ -545,7 +540,7 @@
             success: function(data){
               success_state = data["success"]
               if(success_state){
-                $(this).removeClass("fi-check").addClass("fi-pencil");
+                $(var_this).removeClass("fi-check").addClass("fi-pencil");
                 $("#"+node_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+node_id+"' style='float:left;'>"+ new_name+"</label>")
               }
             },
@@ -553,7 +548,7 @@
         }
         else{
           $("#"+node_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+node_id+"' style='float:left;'>"+ lbl_text+"</label>")
-          $(this).removeClass("fi-check").addClass("fi-pencil");
+          $(var_this).removeClass("fi-check").addClass("fi-pencil");
         }
       }
     });
@@ -563,12 +558,12 @@
       parent_id = $(this).parents("li").attr("id");
       if($("#"+parent_id).hasClass("hidden_children")){
           $(this).removeClass("fi-plus").addClass("fi-minus");
-          $("#"+parent_id).find("li").removeClass("hide");
+          $("#"+parent_id).find("li,input").removeClass("hide");
           $("#"+parent_id).removeClass("hidden_children");
       }
       else{
           $(this).removeClass("fi-minus").addClass("fi-plus")
-          $("#"+parent_id).find("li").addClass("hide");
+          $("#"+parent_id).find("li,input").addClass("hide");
           $("#"+parent_id).addClass("hidden_children");
       }
     });
@@ -722,8 +717,12 @@
     $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
     cloned_ele_id = id+"_cloned"+cs_cloned_id;
     return cloned_ele_id}).removeClass("hide").attr("value","{{cs_node.pk}}"))
-      
-    var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
+    {% if cs_node.collection_set %}
+      img = "fi-minus"
+    {% else %}
+      img = "fi-page-copy"
+    {% endif %}
+    var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='"+ img +" largesize fold-btn'></i></div>"
     var str_lbl="<span data-tooltip title='{{cs_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id='{{cs_node.pk}}' style='float:left;'>{{cs_node.name}}</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>"    
     var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
