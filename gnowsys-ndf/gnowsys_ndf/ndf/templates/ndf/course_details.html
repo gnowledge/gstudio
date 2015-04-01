@@ -115,7 +115,7 @@
     		{% trans "Course Structure Details "%}
       </legend>
       <div id="cs-div"></div>
-  	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+  	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
     </fieldset>
   {% endif %}
 </div>
@@ -124,27 +124,28 @@
 
 {% block document_ready %}
   {{block.super}}
-  var course_sec_list = {{ course_collection_dict|safe|escape }}
-  console.log(course_sec_list)
-  for(var i in course_sec_list){
-    for(var i2 in course_sec_list[i]){
-    	cs_str = "<h6><b>"+i2+"</b></h6>"
-  		$("#cs-div").append(cs_str)
-        for( var newk in course_sec_list[i][i2]){
-            for (var csk in course_sec_list[i][i2][newk]){
-				css_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7><b>"+csk+"</b></h7><br>&nbsp;&nbsp;&nbsp;&nbsp;"
-				$("#cs-div").append(css_str)
-            	for( var prop in course_sec_list[i][i2][newk][csk]){
-            	prop_str = "&nbsp;&nbsp;"+prop+" - "+course_sec_list[i][i2][newk][csk][prop]+"<br>&nbsp;&nbsp;&nbsp;&nbsp;"
-            	$("#cs-div").append(prop_str)
-            	}
-            $("#cs-div").append("<br>")
-            }
-        }
-        $("#cs-div").append("<br>")
-    } 
-  }
 
+  {% for each_cs in node.collection_set %}
+    {% get_node each_cs as cs_node %}
+        cs_str = "<h6><b>"+{{forloop.counter}}+". {{cs_node.name}}</b></h6>"
+        $("#cs-div").append(cs_str)
+      {% if cs_node.collection_set %}
+        {% for each_css in cs_node.collection_set %}
+          {% get_node each_css as css_node %}
+            css_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7><b>"+ {{forloop.counter}}+". {{css_node.name}}</b></h7><br>"
+            $("#cs-div").append(css_str)
+            {% if css_node.collection_set %}
+              {% for each_unit in css_node.collection_set %}
+
+                {% get_node each_unit as unit_node %}
+                  units_str = "&nbsp;&nbsp;&nbsp;&nbsp;-- {{unit_node.name}}<br>"
+                  $("#cs-div").append(units_str)
+              {% endfor %}
+            {% endif %}
+        {% endfor %}
+      {% endif %}
+  {% endfor %}
 
 {% endblock %}
+
 
