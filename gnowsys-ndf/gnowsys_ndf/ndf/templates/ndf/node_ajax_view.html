@@ -338,7 +338,18 @@ ul#navigation li a.last {
                         {% endfor %}
                       </ul>
                     </li>
-                  {% elif k == "textcomplexity" %}
+                  {% elif k == "educationaluse" %}
+                    <li>
+                      <a> {% trans "Educational Use" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                    <!-- Commented bellow filters for time being will be using this filter at different place "So dont remove this code" -->
+                    {% comment %}                    
+                  <!-- {% elif k == "textcomplexity" %}
                     <li>
                       <a> {% trans "Text Complexity" %} &raquo;</a>
                       <ul>
@@ -346,7 +357,7 @@ ul#navigation li a.last {
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
                         {% endfor %}
                       </ul>
-                    </li>
+                    </li> 
                   {% elif k == "educationalalignment" %}
                     <li>
                       <a> {% trans "Educational Alignment" %} &raquo;</a>
@@ -355,7 +366,8 @@ ul#navigation li a.last {
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
                         {% endfor %}
                       </ul>
-                    </li>
+                    </li> -->
+                    {% endcomment %}                    
                   {% elif k == "language" %}
                     <li>
                       <a> {% trans "Language" %} &raquo;</a>
@@ -377,15 +389,6 @@ ul#navigation li a.last {
                   {% elif k == "audience" %}
                     <li>
                       <a> {% trans "Audience" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "curricular" %}
-                    <li>
-                      <a> {% trans "Curricular" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
@@ -518,7 +521,7 @@ ul#navigation li a.last {
               {% if each_node.mime_type %}
               <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
               {% else %}
-              <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>
+              <a href="{% url 'topic_details' group_name_tag each_node.pk %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>
               {% if not forloop.last %},&nbsp; {% endif %}
               {% endif %}
               {% endfor %}
@@ -822,14 +825,14 @@ ul#navigation li a.last {
 	      {% for k,v in val.items %}
 	      {% if k == "fallback_lang" %}
 	      {% for each in v %}
-	      <a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
+	      <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
 	      {% endfor %}
 	      {% elif k == "other_languages" %}
 	      {% if v %}
 	      <fieldset id="{{k}}">
 		<legend>{% trans "In other languages" %}</legend>
 		{% for each in v %}
-	   	<a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
+	   	<a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
 		{% endfor %}
 		{% endif %}
 		{% endif %}
