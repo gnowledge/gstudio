@@ -417,24 +417,39 @@ LOGGING = {
 
 LOGIN_REDIRECT_URL = "/"
 
-# Absolute filesystem path to the project's base directory, 
+# Absolute filesystem path to the project's base directory,
 # i.e. having settings.py file
 # Example: "/.../project-name/app-name/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
+# Binary - Only meant for RelationType's document to represent
+# Binary relationship, especially defined to differentiate
+# from other relationship(s), i.e. Triadic, etc.
+# Example (Binary): A >> son-of >> [B]
+# Example (Triadic): A >> teaches-course-in-college >> [Course, College]
+META_TYPE = [
+    u"GAPP", u"factory_types", u"Mapping_relations", u"Binary", u"Triadic"
+]
 
-GROUP_AGENCY_TYPES=["Other", "Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
+GROUP_AGENCY_TYPES = [
+    "Other", "Partner", "GovernmentAgency", "NGO", "College", "University",
+    "School", "Institution", "Project", "SpecialInterestGroup"
+]
 
 AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
 ]
 
-# Built-in GAPPS list 
-# DON'T EDIT THIS LIST - for listing purpose on gapps-menubar/gapps-iconbar, instead make use of below one in local_setting file
-# ONLY TO BE EDITED - in case of adding new built-in GAPPS
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics", u"E-Library", u"Meeting",u"Bib_App", u"Observation",u"Event"]
+# Built-in GAPPS list
+# DON'T EDIT THIS LIST for listing purpose on gapps-menubar/gapps-iconbar,
+# instead make use of below one in local_setting file
+# ONLY TO BE EDITED in case of adding new built-in GAPPS
+GAPPS = [
+    u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz",
+    u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics",
+    u"E-Library", u"Meeting",u"Bib_App", u"Observation",u"Event"
+]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # DON'T EDIT this variable here.
