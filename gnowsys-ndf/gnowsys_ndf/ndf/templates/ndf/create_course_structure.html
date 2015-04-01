@@ -106,6 +106,15 @@
       font-weight: bold;
       font-size: 100%;
     }
+
+    .unit_name{
+      white-space: nowrap;
+      width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 80%;
+    }
+
     .div_lbl > label {
      min-width: 350px;
      display: inline-block;
@@ -191,6 +200,7 @@
         </div>
         <div class="row">
           <div class="small-10 small-centered columns units-btn-div"> 
+          <div class="units-list"></div>
           <a class="button round expand hoverstyle units-btn"> + New Units</a>
           </div>
         </div>
@@ -717,12 +727,7 @@ var var_this;
     $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
     cloned_ele_id = id+"_cloned"+cs_cloned_id;
     return cloned_ele_id}).removeClass("hide").attr("value","{{cs_node.pk}}"))
-    {% if cs_node.collection_set %}
-      img = "fi-minus"
-    {% else %}
-      img = "fi-page-copy"
-    {% endif %}
-    var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='"+ img +" largesize fold-btn'></i></div>"
+    var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
     var str_lbl="<span data-tooltip title='{{cs_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id='{{cs_node.pk}}' style='float:left;'>{{cs_node.name}}</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>"    
     var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
@@ -746,6 +751,22 @@ var var_this;
 
             css_cloned_id+=1
             $("#"+cloned_ss_ele_id).find("div.input-cs-row").replaceWith(str_btn1+str_lbl1+str_prop1)
+
+            //list of units
+            {% if css_node.collection_set %}
+              {% for each_unit in css_node.collection_set %}
+                {% get_node each_unit as unit_node %}
+                  {% if unit_node.member_of_names_list.0|lower == "page" or unit_node.member_of_names_list.0|lower == "quiz" %}
+                    k = "{% url unit_node.member_of_names_list.0|lower|concat:"_details" groupid unit_node.pk %}"
+                  {% else %}
+                    k = "{% url unit_node.member_of_names_list.0|lower|concat:"_detail" groupid unit_node.pk %}"
+                  {% endif %}
+                  var str_unit = "<a href='"+k+"' target='_blank' class='unit_name'>{{unit_node.name}}</a><br>"
+                $("#"+cloned_ss_ele_id).find("div.units-list").append(str_unit)
+              {% endfor %}
+            {% endif %}
+
+
 
       {% endfor %}
     {% endif %}
