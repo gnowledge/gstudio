@@ -586,9 +586,3 @@ def group_dashboard(request, group_id):
         },
         context_instance=RequestContext(request)
     )
-
-
-
-
-def remove_prof_pic(request, group_id):
-    print "\n\n new view"
