@@ -67,8 +67,8 @@
 {% block body_content %} 
     {% block collection %}
     <div class="collection_block_div">
-      <div class="choose">
-        <table width="400" align="center">
+      <div class="choose"
+    >    <table width="400" align="center">
           <tr class="row">
               <td class="small-4 columns td_cell fi-page-filled">
                   {% trans "Page" %} 
@@ -97,7 +97,7 @@
       </div>
         <div class="resources_drawer_div row"></div>
         <input type="button" value="Save Units" class="save_units small button round hide">
-        <a href="{% url 'create_course_struct' group_id course_node.pk %}" class="done_units small button round hide">Done with Units</a>
+        <span data-tooltip title="You will be redirected to Course Authoring page"><a href="{% url 'create_course_struct' group_id course_node.pk %}" class="done_units small button round hide">Add more units later..</a></span>
     </div>
 
     {% endblock %}
@@ -167,7 +167,7 @@
     		success: function (data) {
     		  resp_dict = data
     		  $(".resources_drawer_div").html(""); 
-          $(".save_units").removeClass("hide")
+          $(".save_units").addClass("hide")
     		  $(".done_units").removeClass("hide")
     		},
   		});
