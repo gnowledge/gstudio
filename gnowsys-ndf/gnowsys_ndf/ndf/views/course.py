@@ -146,6 +146,12 @@ def create_edit(request, group_id, node_id=None):
     else:
         course_node = node_collection.collection.GSystem()
 
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),'group_set': ObjectId(group_id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(str((each.name).strip().lower()))
+
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE))
@@ -157,6 +163,7 @@ def create_edit(request, group_id, node_id=None):
             context_variables['groupid'] = group_id
             context_variables['group_id'] = group_id
             context_variables['appId'] = app._id
+        context_variables['nodes_list'] = json.dumps(nodes_list)
         return render_to_response("ndf/course_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
