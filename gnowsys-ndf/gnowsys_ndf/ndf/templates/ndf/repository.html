@@ -7,9 +7,9 @@
 {% block style %}
 
 	.app-card{
-		min-width: 10rem;
+		width: 12rem;
 		min-height: 20rem;
-		margin-left: 5vh;
+		margin: 20px 1vh;
 		background-color: #efefef;
 		border: thin solid lightgray;
 		float: left;
@@ -17,9 +17,10 @@
 	}
 
 	.app-card:hover{
-		box-shadow: 0px 0px 20px gray;
+		box-shadow: 0px 0px 15px gray;
 		border: thin solid lightgray;
-		transition: ease 0.5s;
+		border-radius: 5px;
+		transition: ease 0.6s;
 	}
 
 	.icons{
@@ -27,17 +28,16 @@
 		font-size: 7em;
 		z-index: 0;
 		opacity: 0.2;
-		top: 30%;
+		top: 40%;
 	}
-<!-- 
-	.elibrary{
-		background: url("watermark.png") no-repeat 0 70%;
-	}
- -->
+
 {% endblock %}
 
 {% block body_content %}
-	<ul class="inline-list">
+	
+	{% comment %}
+	<!--
+ 	<ul class="inline-list">
 		{% for each_gapp in gapps_dict %}
 			<li>
 				<a class="app-card text-center" 
@@ -47,6 +47,21 @@
 					<hr/>
 				</a>
 			</li>	
+		{% endfor %}
+	</ul>
+	-->
+	{% endcomment %}
+	
+	<ul class="inline-list">
+		{% for each_gapp in gapps_obj_list %}
+			<li>
+				<a class="app-card text-center" href="{% url each_gapp.name|lower group_id %}">
+					<i class="icons {{ each_gapp.url }}"></i>
+					<h4><small>{{ each_gapp.altnames }}</small></h4>
+					<hr/>
+					<p>{{ each_gapp.content|safe }}</p>
+				</a>
+			</li>
 		{% endfor %}
 	</ul>
 {% endblock %}
