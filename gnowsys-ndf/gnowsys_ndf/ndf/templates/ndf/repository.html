@@ -1,0 +1,52 @@
+{% extends "ndf/base.html" %}
+
+{% load ndf_tags %}
+
+{% block title %} Repository {% endblock %}
+
+{% block style %}
+
+	.app-card{
+		min-width: 10rem;
+		min-height: 20rem;
+		margin-left: 5vh;
+		background-color: #efefef;
+		border: thin solid lightgray;
+		float: left;
+		padding: 1em;
+	}
+
+	.app-card:hover{
+		box-shadow: 0px 0px 20px gray;
+		border: thin solid lightgray;
+		transition: ease 0.5s;
+	}
+
+	.icons{
+		position: absolute;
+		font-size: 7em;
+		z-index: 0;
+		opacity: 0.2;
+		top: 30%;
+	}
+<!-- 
+	.elibrary{
+		background: url("watermark.png") no-repeat 0 70%;
+	}
+ -->
+{% endblock %}
+
+{% block body_content %}
+	<ul class="inline-list">
+		{% for each_gapp in gapps_dict %}
+			<li>
+				<a class="app-card text-center" 
+				{% if each_gapp.values.0 %} href="{% url each_gapp.values.0 group_id %}" {% endif %} >
+					<i class="icons fi-asterisk"></i>
+					<h4><small>{{ each_gapp.keys.0 }}</small></h4>
+					<hr/>
+				</a>
+			</li>	
+		{% endfor %}
+	</ul>
+{% endblock %}
