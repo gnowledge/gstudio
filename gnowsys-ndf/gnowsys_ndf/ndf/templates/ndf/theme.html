@@ -87,7 +87,7 @@
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
+                				'&nbsp;&nbsp;<a id='+node.id+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
 
                 			{% endif %}
             			);	            			
@@ -184,6 +184,18 @@
                  
 
 	};
+
+	// method to handle hover on topics
+	function showTopicStats(){
+      // Javascript function to be used for checking objects in specific time of interval
+      setTimeout(function(){
+		$(".jqtree-title.jqtree_common").hover( function(){alert(this.textContent)});
+        // console.log($(".jqtree-element.jqtree_common"))
+        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { showTopicStats() }
+      }, 1000 );
+	}
+
+    // showTopicStats();
 
   </script>
 
