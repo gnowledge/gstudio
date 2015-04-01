@@ -97,7 +97,7 @@
       </div>
         <div class="resources_drawer_div row"></div>
         <input type="button" value="Save Units" class="save_units small button round hide">
-        <a href="{% url 'create_course_struct' group_id course_node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" class="done_units small button round hide">Done with Units</a>
+        <a href="{% url 'create_course_struct' group_id course_node.pk %}" class="done_units small button round hide">Done with Units</a>
     </div>
 
     {% endblock %}
