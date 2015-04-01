@@ -57,7 +57,7 @@ def get_execution_time(f):
 	        time1 = time.time()
 	        total_parm_size = 0
 	        for key, value in kwargs.iteritems():
-	           total_parm_size = total_parm_size + sys.getsizeof(value)
+	           total_parm_size = total_parm_size + getsizeof(value)
 	        total_param = len(kwargs)
 	        ret = f(*args,**kwargs)
 	        t2 = time.clock()
@@ -69,7 +69,7 @@ def get_execution_time(f):
 	        benchmark_node.parameters = unicode(total_param)
 	        benchmark_node.size_of_parameters = unicode(total_parm_size)
 	        benchmark_node.last_update = datetime.today()
-	        #benchmark_node.functionOplength = unicode(sys.getsizeof(ret))
+	        #benchmark_node.functionOplength = unicode(getsizeof(ret))
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
 	        except:	
@@ -2226,7 +2226,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             return gr_node
 
     except Exception as e:
-        error_message = "\n GRelationError (line #" + str(sys.exc_info()[-1].tb_lineno) + "): " + str(e) + "\n"
+        error_message = "\n GRelationError (line #" + str(exc_info()[-1].tb_lineno) + "): " + str(e) + "\n"
         raise Exception(error_message)
 
 
