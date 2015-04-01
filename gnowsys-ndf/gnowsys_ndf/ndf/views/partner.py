@@ -135,6 +135,20 @@ def create_partner(request,group_id):
   return render_to_response("ndf/create_partner.html", {'groupid': group_id, 'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
     
 
+def partner_list(request,group_id):
+    group_name, group_id = get_group_name_id(group_id)
+
+    get_grp=node_collection.one({'_id':ObjectId(group_id)})
+    collection_set=[]
+    for each in get_grp.collection_set:
+        node=node_collection.one({'_id':each})
+        collection_set.append(node)
+    return render_to_response("ndf/partner_sub_list.html", 
+                          {'group_nodes': collection_set,
+                           'groupid': group_id, 'group_id': group_id
+                          }, context_instance=RequestContext(request))
+
+
 @get_execution_time
 def nroer_groups(request, group_id, groups_category):
     group_name, group_id = get_group_name_id(group_id)
@@ -158,10 +172,8 @@ def nroer_groups(request, group_id, groups_category):
                                      })#.sort('last_update', -1)
     
     group_nodes_count = group_nodes.count() if group_nodes else 0
-    is_partner = True
     return render_to_response("ndf/partner.html", 
                           {'group_nodes': group_nodes,
-                           'is_partner':is_partner,
                            'group_nodes_count': group_nodes_count,
                            'groupid': group_id, 'group_id': group_id
                           }, context_instance=RequestContext(request))
