@@ -4494,67 +4494,6 @@ def get_students_for_batches(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
-
-def get_resources(request, group_id):
-    """
-    This view is for adding units to MIS Course Structure
-    Arguments:
-    group_id - ObjectId of the currently selected group
-    resource_type - name of GSystemType
-
-    Returns:
-    Drawer with resources
-    """
-    response_dict = {'success': False, 'message': ""}
-    try:
-        if request.is_ajax() and request.method == "POST":
-            resource_type = request.POST.get('resource_type', "")
-            widget_for = request.POST.get('widget_for', "")
-            list_resources = []
-            if resource_type:
-
-                if resource_type == "Pandora Video":
-                    resource_type = "Pandora_video"
-
-                resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
-                res = node_collection.find(
-                    {
-                        'member_of': resource_gst._id,
-                        'group_set': ObjectId(group_id),
-                        'status': u"PUBLISHED"
-                    }
-                )
-
-                for each in res:
-                    list_resources.append(each)
-
-                drawer_template_context = edit_drawer_widget("CourseUnits", group_id, None, None, None, left_drawer_content=list_resources)
-                drawer_template_context["widget_for"] = widget_for
-                drawer_widget = render_to_string(
-                    'ndf/drawer_widget.html',
-                    drawer_template_context,
-                    context_instance = RequestContext(request)
-                )
-                # response_dict["drawer_widget"] = drawer_widget
-                # response_dict["success"] = True
-                # response_dict["reso"] = json.dumps(res['result'],cls=NodeJSONEncoder)
-                # print "\nresponse_dict---",response_dict["reso"]
-                # enrollment_columns = [
-                #   ("name", "Name"),
-                # ]
-                # response_dict["column_headers"] = enrollment_columns
-
-            return HttpResponse(drawer_widget)
-        else:
-            error_message = "Resource Drawer: Either not an ajax call or not a POST request!!!"
-            response_dict["message"] = error_message
-            return HttpResponse(json.dumps(response_dict))
-
-    except Exception as e:
-        error_message = "Resource Drawer: " + str(e) + "!!!"
-        response_dict["message"] = error_message
-        return HttpResponse(json.dumps(response_dict))
-
 # ====================================================================================================
 
 @get_execution_time
