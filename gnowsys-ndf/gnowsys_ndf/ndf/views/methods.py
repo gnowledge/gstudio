@@ -3866,10 +3866,23 @@ def repository(request, group_id):
     It's an NROER repository. Which will hold the list of apps.
     '''
 
-    # [i.values()[0] for i in GSTUDIO_NROER_GAPPS]
+    gapp_metatype = node_collection.one({"_type": "MetaType", "name": "GAPP"})
+
+    gapps_list = [i.values()[0] for i in GSTUDIO_NROER_GAPPS]
+    # print gapps_list
+
+    gapps_obj_list = []
+
+    for each_gapp in gapps_list:
+        gapp_obj = node_collection.one({ '_type':'GSystemType',
+                                          'name': {"$regex": each_gapp, "$options": "i"},
+                                          "member_of": {"$in": [gapp_metatype._id]}
+                                        })
+        gapps_obj_list.append(gapp_obj)
 
     return render_to_response("ndf/repository.html",
-                              { "gapps_dict" : GSTUDIO_NROER_GAPPS,
+                              { "gapps_obj_list": gapps_obj_list,
+                                "gapps_dict" : GSTUDIO_NROER_GAPPS,
                                 'group_id': group_id, 'groupid': group_id
                               },
                               context_instance=RequestContext(request)
