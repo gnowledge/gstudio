@@ -143,7 +143,7 @@ def partner_list(request,group_id):
     for each in get_grp.collection_set:
         node=node_collection.one({'_id':each})
         collection_set.append(node)
-    return render_to_response("ndf/partner_sub_list.html", 
+    return render_to_response("ndf/partner_list.html", 
                           {'group_nodes': collection_set,
                            'groupid': group_id, 'group_id': group_id
                           }, context_instance=RequestContext(request))
