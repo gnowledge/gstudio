@@ -186,7 +186,18 @@
 
 	};
 
-	
+
+	// method to handle hover on topics
+	function showTopicStats(){
+      // Javascript function to be used for checking objects in specific time of interval
+      setTimeout(function(){
+		$(".jqtree-title.jqtree_common").hover( function(){alert(this.textContent)});
+        // console.log($(".jqtree-element.jqtree_common"))
+        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { showTopicStats() }
+      }, 1000 );
+	}
+
+    // showTopicStats();
 
   </script>
 
