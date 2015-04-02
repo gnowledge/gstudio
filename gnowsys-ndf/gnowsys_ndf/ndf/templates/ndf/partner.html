@@ -7,7 +7,7 @@
 {% block title %} Partner {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader">{% trans "Partners" %}</h2>
+<h2 class="subheader">{% trans groups_category %}</h2>
 {% endblock %}
 
 
@@ -43,7 +43,7 @@
 {% get_group_name groupid as group_name_tag %}
 <header class="row">
   <dl class="tabs" data-tab data-options="deep_linking:true">
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Partners {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All {{ groups_category }} {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
     <!--<dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>-->
   </dl>
 </header>
