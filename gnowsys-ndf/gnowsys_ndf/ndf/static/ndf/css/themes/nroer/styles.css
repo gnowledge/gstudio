@@ -9083,7 +9083,7 @@ th.hide-for-touch {
 */
 /* line 6, ../../../scss/_nroer_styles.scss */
 .workspace {
-  background: url("watermark.png") no-repeat 0 70%;
+  background: url("watermark.png") no-repeat 1% 65%;
   min-height: 100%;
   margin-bottom: -130px !important;
   -webkit-box-sizing: border-box;
