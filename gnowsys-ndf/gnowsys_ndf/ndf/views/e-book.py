@@ -29,7 +29,9 @@ app = node_collection.one({'_type':'GSystemType', 'name': 'E-Library'})
 @get_execution_time
 def ebook_listing(request, group_id, page_no=1):
 
-	# all_ebook = node_collection.find({"_type": "File", "attribute_set.educationaluse": "Ebook"})
+	group_name, group_id = get_group_name_id(group_id)
+
+	all_ebooks = node_collection.find({"_type": "File", "attribute_set.educationaluse": "eBooks"})
 	# all_ebook = node_collection.find({"_type": "File", "member_of": {"$in":[gst_ebook._id]} })
 
 
@@ -43,5 +45,5 @@ def ebook_listing(request, group_id, page_no=1):
  #                                context_instance=RequestContext(request) )
 
 	return render_to_response("ndf/ebook.html",
-								{"group_id": group_id, "groupid": group_id},
+								{"all_ebooks": all_ebooks, "group_id": group_id, "groupid": group_id},
 								context_instance = RequestContext(request))
