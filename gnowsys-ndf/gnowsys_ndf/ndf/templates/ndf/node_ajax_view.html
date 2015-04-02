@@ -515,7 +515,7 @@ ul#navigation li a.last {
             {% get_teaches_list node as teaches_list %}
             {% if teaches_list %}
             <div class="panel">
-              <h6>This resource teaches you: </h6>
+              <h6>Resource for: </h6>
               {% for  each_node in teaches_list %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
