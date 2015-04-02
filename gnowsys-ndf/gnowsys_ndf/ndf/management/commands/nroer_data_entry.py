@@ -52,7 +52,7 @@ theme_gst = node_collection.one({"name": "Theme"})
 theme_item_gst = node_collection.one({"name": "theme_item"})
 topic_gst = node_collection.one({"name": "Topic"})
 nroer_team_id = 1
-
+resource_link_common = "http://125.23.112.5/sites/default/files/nroer_resources/"
 
 class Command(BaseCommand):
     help = "\n\tFor saving data in gstudio DB from NROER schema files. This will create 'File' type GSystem instances.\n\tCSV file condition: The first row should contain DB names.\n"
@@ -694,6 +694,11 @@ def create_resource_gsystem(resource_data):
   
     # fetching resource from url
     resource_link = resource_data.get("resource_link")  # actual download file link
+
+    if not resource_link:
+        resource_link = resource_link_common + resource_data.get("file_name")
+        # print "---------------",resource_link
+
     filename = resource_link.split("/")[-1]  # actual download file name with extension. e.g: neuron.jpg 
 
     info_message = "\n- Fetching resource from : '" + resource_link + "'"
