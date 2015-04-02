@@ -18,12 +18,12 @@
       <li class="card">
         {% if grouptype == "Moderated" %}
           {% if node.status == "DRAFT" %}
-            <div class="draft page">
+            <div class="draft ebook">
           {% elif node.status == "PUBLISHED" %}
-            <div class="published page">
+            <div class="published ebook">
           {% endif %}
         {% else %}
-          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} page'>
+          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} ebook'>
         {% endif %} 
 
           <a href="{% url 'page_details' group_name_tag node %}">
