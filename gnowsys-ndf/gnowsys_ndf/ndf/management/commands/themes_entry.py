@@ -31,7 +31,6 @@ collection = get_database()[Node.collection_name]
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme' })
 theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item' })
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-br_topic = node_collection.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
 nroer_team=User.objects.get(username = "nroer_team")
 #grp = collection.Node.one({'_type': 'Group', '_id': ObjectId('53747277c1704121fe54be46')})
 grp = node_collection.one({'_type': 'Group', 'name': 'home'})
@@ -50,7 +49,17 @@ class Command(BaseCommand):
                 try:
                     i = 1
                     for ind, row in enumerate(reader):
+
+                    	descrp = row[0]
+                    	row = row[1:]
+
+                    	r = []
+                    	for each in row:
+                    		r.append(each.strip())
+
+                    	row = r
                         # print "\n row: ", row
+                        # print "\n descrp: ",descrp,"\n"
 
                         for index, obj in enumerate(row):
                             if obj:
@@ -72,7 +81,7 @@ class Command(BaseCommand):
                                 	create_theme_item(obj, prev, row)
                                 	
                                 elif prev and not nex:
-                                	create_topic(obj, prev, row)
+                                	create_topic(obj, prev, row, descrp)
 
                             else:
                                 break
@@ -82,7 +91,7 @@ class Command(BaseCommand):
                         print "\n", i ," rows successfully compiled"
                         print " ======================================================="
 
-                        # if (i == 294):
+                        # if (i == 3):
                             # break
                 except csv.Error as e:
                     sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e)) 
@@ -91,18 +100,17 @@ class Command(BaseCommand):
 def create_theme(obj):
 	# print "\n Its a theme -- ", obj
 	themes_list = []
+	# obj = obj.strip()
 
 	# To find the root themes to maintain the uniquness while creating new themes
-	nodes = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+	nodes = node_collection.find({'group_set': group_id, 'member_of': theme_GST._id })
 	for each in nodes:
 		themes_list.append(each.name)
 
-
 	if obj not in themes_list:
-		name = obj
 
 		theme_node = node_collection.collection.GSystem()
-		theme_node.name = unicode(name).strip()
+		theme_node.name = unicode(obj)
 		theme_node.access_policy = u"PUBLIC"
 		theme_node.contributors.append(nroer_team.id)
 		theme_node.created_by = nroer_team.id
@@ -121,14 +129,17 @@ def create_theme(obj):
 
 def create_theme_item(obj, prev, row):
 	# print "\n Its a theme item -- ", obj
+	# print "\n row :",row,"\n"
+
 	theme_items_list = []	
 	prev_node_list = []
 	# Taking pre-prev item in a row to identify uniqueness and hierarchy level of theme item
 	pre_prev_name = row[row.index(prev) - 1]
 
+
 	if prev:
 		# To find the prev item in a row as its already created 
-		prev_node_cur = node_collection.find({'name': unicode(prev),'group_set': group_id, 'member_of': {'$in': [ theme_item_GST._id, theme_GST._id]}  })	
+		prev_node_cur = node_collection.find({'name': unicode(prev),'group_set': group_id, 'member_of': {'$in': [theme_item_GST._id, theme_GST._id]}  })	
 
 		# To identify the exact prev element and its hierarchy level of theme item when we found multiple results of same theme item
 		if prev_node_cur.count() > 1:
@@ -139,8 +150,7 @@ def create_theme_item(obj, prev, row):
 				if pre_prev_node.name == pre_prev_name:
 					prev_node_list.append(each)
 
-			prev_node = prev_node_list[0]
-					
+			prev_node = prev_node_list[0]					
 
 		else:
 			prev_node = prev_node_cur[0]
@@ -150,13 +160,13 @@ def create_theme_item(obj, prev, row):
 		if prev_node.collection_set:
 			for item in prev_node.collection_set:
 				theme_item = node_collection.one({'_id': ObjectId(item) })
-				theme_items_list.append(theme_item.name)				
+				theme_items_list.append(theme_item.name)	
 
 
 	if obj not in theme_items_list:
 		# Save the theme item 
 		theme_item_node = node_collection.collection.GSystem()
-		theme_item_node.name = unicode(obj).strip()
+		theme_item_node.name = unicode(obj)
 		theme_item_node.access_policy = u"PUBLIC"
 		theme_item_node.contributors.append(nroer_team.id)
 		theme_item_node.created_by = nroer_team.id
@@ -164,6 +174,7 @@ def create_theme_item(obj, prev, row):
 		theme_item_node.language = u"en"
 		theme_item_node.member_of.append(theme_item_GST._id)
 		theme_item_node.modified_by = nroer_team.id
+		theme_item_node.prior_node.append(prev_node._id)
 		theme_item_node.status = u"DRAFT"
 
 		theme_item_node.save()
@@ -176,8 +187,10 @@ def create_theme_item(obj, prev, row):
 		print "\n Theme Item ", obj," already available"
 		
 
-def create_topic(obj, prev, row):
-	# print "\n Its a topic -- ", obj
+def create_topic(obj, prev, row, descrp):
+
+# 	print "\n Its a topic -- ", obj
+	
 	theme_items_list = []
 	prev_node_list = []
 	# Taking pre-prev item in a row to identify uniqueness and hierarchy level of topic
@@ -212,14 +225,16 @@ def create_topic(obj, prev, row):
 	if obj not in theme_items_list:
 		# Save the topic 
 		topic_node = node_collection.collection.GSystem()
-		topic_node.name = unicode(obj).strip()
+		topic_node.name = unicode(obj)
 		topic_node.access_policy = u"PUBLIC"
 		topic_node.contributors.append(nroer_team.id)
 		topic_node.created_by = nroer_team.id
 		topic_node.group_set.append(group_id)
+		topic_node.content_org = unicode(descrp)
 		topic_node.language = u"en"
 		topic_node.member_of.append(topic_GST._id)
 		topic_node.modified_by = nroer_team.id
+		topic_node.prior_node.append(prev_node._id)
 		topic_node.status = u"DRAFT"
 
 		topic_node.save()
