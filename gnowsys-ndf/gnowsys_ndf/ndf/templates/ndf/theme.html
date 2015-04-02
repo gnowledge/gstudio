@@ -34,6 +34,7 @@
       	TreeTillNode();
       {% endif %}
 
+
     });
 
 
@@ -185,6 +186,7 @@
 
 	};
 
+
 	// method to handle hover on topics
 	function showTopicStats(){
       // Javascript function to be used for checking objects in specific time of interval
@@ -280,7 +282,7 @@
 {% endblock %}
 
 {% block meta_content %}
-	<a href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view"><h2 class="subheader">{% trans "Themes" %}</h2></a>
+	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view"><h2 class="subheader">{% trans "Themes" %}</h2></a>
 {% endblock %}
 
 {% block related_content %}
@@ -567,9 +569,15 @@
 	<script type="text/javascript">
 
 // ------ jqtree tree ------
+    	$("document").on("hover", ".jqtree-title.jqtree_common", function(){
+    		setTimeout(function(){
+		      }, 1000);
+
+			alert($(this).siblings("a").attr("id"));
+		});
 
 		$("#add_theme_item").click(function() {
-		      $.ajax({
+			      $.ajax({
 		        type: "POST",
 		        url: "{% url 'add_theme_item' groupid %}",
 		        datatype: "html",
