@@ -612,6 +612,8 @@ def get_nroer_menu(request, group_name):
 				break
 
 		# print "selected_gapp : ", selected_gapp
+	if (selected_gapp == "partner") and (len(url_split) > 2) and (url_split[2] in ["Partners", "Groups"]):
+		top_menu_selected = url_split[2]
 
 	mapping = GSTUDIO_NROER_MENU_MAPPINGS
 
@@ -620,17 +622,17 @@ def get_nroer_menu(request, group_name):
 		top_menu_selected = "Repository"
 		# print top_menu_selected
 		
-	elif group_name in mapping.values():
+	elif (group_name in mapping.values()):
 		sub_menu_selected = mapping.keys()[mapping.values().index(group_name)]  # get key of/from mapping
 		nroer_menu_dict["sub_menu_selected"] = sub_menu_selected
 
 		# with help of sub_menu_selected get it's parent from GSTUDIO_NROER_MENU
 		top_menu_selected = [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:] if sub_menu_selected in i.values()[0]][0]
-		
 		# for Partners, "Curated Zone" should not appear
 		gapps = gapps[1:] if (top_menu_selected in ["Partners", "Groups"]) else gapps
 		
 	elif (len(url_split) >= 3) and ("nroer_groups" in url_split) and (url_split[2] in [i.keys()[0] for i in GSTUDIO_NROER_MENU[1:]]):
+		# print "top_menu_selected ", top_menu_selected
 		top_menu_selected = url_split[2]
 		gapps = ""
 	# elif - put this for sub groups. Needs to fire queries etc. for future perspective.
