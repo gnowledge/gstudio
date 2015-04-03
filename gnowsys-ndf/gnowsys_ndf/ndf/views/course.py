@@ -1063,17 +1063,27 @@ def add_units(request,group_id):
     Actions:
      * Redirects to course_units.html
     '''
-
     variable = None
-    css_node_id = request.GET.get('node_id', '')
+    unit_node = None
+    css_node_id = request.GET.get('css_node_id', '')
+    unit_node_id = request.GET.get('unit_node_id', '')
     course_node_id = request.GET.get('course_node', '')
-
+    app_id = request.GET.get('app_id', '')
+    app_set_id = request.GET.get('app_set_id', '')
     css_node = node_collection.one({"_id": ObjectId(css_node_id)})
     course_node = node_collection.one({"_id": ObjectId(course_node_id)})
-
+    title = "Course Units"
+    try:
+        unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
+    except:
+        unit_node = None
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id,
         'css_node': css_node,
+        'title': title,
+        'app_set_id':app_set_id,
+        'app_id':app_id,
+        'unit_node': unit_node,
         'course_node': course_node
     })
 
@@ -1099,13 +1109,17 @@ def get_resources(request, group_id):
     try:
         if request.is_ajax() and request.method == "POST":
             css_node_id = request.POST.get('css_node_id', "")
+            unit_node_id = request.POST.get('unit_node_id', "")
             widget_for = request.POST.get('widget_for', "")
             resource_type = request.POST.get('resource_type', "")
             resource_type = resource_type.strip()
 
             list_resources = []
             css_node = node_collection.one({"_id": ObjectId(css_node_id)})
-
+            try:
+                unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
+            except:
+                unit_node = None
             if resource_type:
                 if resource_type == "Pandora":
                     resource_type = "Pandora_video"
@@ -1122,7 +1136,7 @@ def get_resources(request, group_id):
                 for each in res:
                     list_resources.append(each)
 
-                drawer_template_context = edit_drawer_widget("CourseUnits", group_id, css_node, None, checked="collection_set", left_drawer_content=list_resources)
+                drawer_template_context = edit_drawer_widget("CourseUnits", group_id, unit_node, None, checked="collection_set", left_drawer_content=list_resources)
                 drawer_template_context["widget_for"] = widget_for
                 drawer_widget = render_to_string(
                     'ndf/drawer_widget.html',
@@ -1156,10 +1170,37 @@ def save_resources(request, group_id):
     if request.is_ajax() and request.method == "POST":
         list_of_res = json.loads(request.POST.get('list_of_res', ""))
         css_node_id = request.POST.get('css_node', "")
-        css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+        unit_name = request.POST.get('unit_name', "")
+        unit_name = unit_name.strip()
+        unit_node_id = request.POST.get('unit_node_id', "")
 
+        css_node = node_collection.one({"_id": ObjectId(css_node_id)})
         list_of_res_ids = [ObjectId(each_res) for each_res in list_of_res]
-        node_collection.collection.update({'_id': css_node._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
-        css_node.reload()
+
+        try:
+            cu_new = node_collection.one({'_id': ObjectId(unit_node_id)})
+        except:
+            cu_new = None
+        if not cu_new:
+            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+            cu_new = node_collection.collection.GSystem()
+            cu_new.member_of.append(cu_gst._id)
+            # set name
+            cu_new.name = unit_name.strip()
+            cu_new.modified_by = int(request.user.id)
+            cu_new.created_by = int(request.user.id)
+            cu_new.contributors.append(int(request.user.id))
+
+            cu_new.prior_node.append(css_node._id)
+            cu_new.save()
+        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
+
+        if cu_new._id not in css_node.collection_set:
+            node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
+
+
+        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
+        cu_new.reload()
         response_dict["success"] = True
+        response_dict["cu_new_id"] = str(cu_new._id)
         return HttpResponse(json.dumps(response_dict))

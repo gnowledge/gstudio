@@ -4,6 +4,9 @@
 {% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 {% load pagination_tags %}
+{% block meta_content %}
+  <h3>{{cnode.name}}</h3>
+{% endblock %}
 
 {% block style %}
 
@@ -27,7 +30,6 @@
     .edit_course_structure_name{
       width: 30%;
     }
-
   /* Setting css-properties for reveal-modal's label */
     div.reveal-modal > label {
       color: white;
@@ -66,7 +68,9 @@
       border: 1px solid;
       display:block;
     }
-
+    .div_lbl{
+      margin-top: -5px;
+    }
 
     #name{
       margin: 5px !important;
@@ -100,11 +104,10 @@
 
     .lbl_of_cs, .lbl_of_css{
       white-space: nowrap;
-      width: 100px;
       overflow: hidden;
+      color:#0b8a91 !important;
       text-overflow: ellipsis;
-      font-weight: bold;
-      font-size: 100%;
+      font-size: 150%;
     }
 
     .unit_name{
@@ -116,7 +119,6 @@
     }
 
     .div_lbl > label {
-     min-width: 350px;
      display: inline-block;
     }
 
@@ -153,7 +155,7 @@
     }
 {% endblock %}
 {% block body_content %} 
-  <h3>{{cnode.name}}</h3>
+  
   
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert action=>
     <label id="alertModalLabel"></label>
@@ -201,10 +203,11 @@
         <div class="row">
           <div class="small-10 small-centered columns units-btn-div"> 
           <div class="units-list"></div>
-          <a class="button round expand hoverstyle units-btn"> + New Units</a>
+          <a class="button round expand hoverstyle units-btn new-units-btn"> + New Units</a>
           </div>
         </div>
     </li>
+
 
     <ul class="ul-course-section no-bullet">
       <input type="button" class="button expand round hoverstyle course-sec-btn" value="+ New Section">
@@ -287,6 +290,8 @@
   //Global var declarations------------------------------------------------------------------------------
     var cs_cloned_id = 1;
     var css_cloned_id = 1;
+    var cu_cloned_id = 1;
+
     var lbl_text;
     $("#course_structure_minutes").addClass("css_mins_class")
     $("#min_marks").addClass("min_marks_class")
@@ -713,7 +718,11 @@ var var_this;
   //On click of 'Add Units' button-----------------------------------------------------------------------
     $(document).on('click','.units-btn',function(){
       css_node = $(this).data("cssId");
-      turl = "{% url 'add_units' groupid %}?node_id="+ css_node+"&app_id={{app_id}}&app_set_id={{app_set_id}}&course_node={{cnode.pk}}"
+      var unit_node;
+      if($(this).data("unitId")){
+        unit_node = $(this).data("unitId");
+      }
+      turl = "{% url 'add_units' groupid %}?css_node_id="+ css_node+"&unit_node_id="+ unit_node+"&app_id={{app_id}}&app_set_id={{app_set_id}}&course_node={{cnode.pk}}"
       $(this).attr("href",turl)
     });
 
@@ -756,18 +765,11 @@ var var_this;
             {% if css_node.collection_set %}
               {% for each_unit in css_node.collection_set %}
                 {% get_node each_unit as unit_node %}
-                  {% if unit_node.member_of_names_list.0|lower == "page" or unit_node.member_of_names_list.0|lower == "quiz" %}
-                    k = "{% url unit_node.member_of_names_list.0|lower|concat:"_details" groupid unit_node.pk %}"
-                  {% else %}
-                    k = "{% url unit_node.member_of_names_list.0|lower|concat:"_detail" groupid unit_node.pk %}"
-                  {% endif %}
-                  var str_unit = "<a href='"+k+"' target='_blank' class='unit_name'>{{unit_node.name}}</a><br>"
-                $("#"+cloned_ss_ele_id).find("div.units-list").append(str_unit)
+                    str_unit = "<div class='row'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='button expnad hoverstyle units-btn' data-unit-id='{{unit_node.pk}}' style='width:90%;' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a></div>"
+                    $(".units-btn").before($("#course-unit-li-id").clone().attr('id',"{{unit_node.pk}}").removeClass("hide"))
+                    $("#"+cloned_ss_ele_id).find(".new-units-btn").before(str_unit)
               {% endfor %}
             {% endif %}
-
-
-
       {% endfor %}
     {% endif %}
   {% endfor %}

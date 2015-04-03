@@ -65,6 +65,15 @@
 {% endblock %}
 
 {% block body_content %} 
+
+    <div class="row">
+      <div class="small-6 columns end">
+      <label>Enter Unit Name</label>
+      </div>
+      <div class="small-6 columns">
+      <input type="text" id="unit_name" value="{% if unit_node %} {{unit_node.name}}{% endif %}">
+      </div>
+    </div>
     {% block collection %}
     <div class="collection_block_div">
       <div class="choose">
@@ -94,10 +103,11 @@
           </tr>
         </table>
       </div>
-        <span data-tooltip title="You will be redirected to Course Authoring page" style="float:right;"><a href="{% url 'create_course_struct' group_id course_node.pk %}" class="done_units small button round" style="float:right;">Add more units later..</a></span>
+        <span data-tooltip title="You will be redirected to Course Authoring page" style="float:right;"><a href="{% url 'create_course_struct' group_id course_node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" class="done_units small button round" style="float:right;">Add more units later..</a></span>
 
         <div class="resources_drawer_div row"></div>
         <input type="button" value="Save Units" class="save_units small button round hide">
+        <input type="hidden" name="hidden_unit_node_id" id="hidden_unit_node_id">
     </div>
 
     {% endblock %}
@@ -110,6 +120,12 @@
     $('td').click(function (event){
     	var resource_type_name = $(this).html()
     	var existing_resources;
+      if(!$("#hidden_unit_node_id").val()==""){
+        unit_node_id = $("#hidden_unit_node_id").val();
+      }
+      else{
+        unit_node_id = "{{unit_node.pk}}"
+      }
     	resp_dict = {}
     	$.ajax({
 
@@ -122,6 +138,7 @@
       	data:{
       	  resource_type: resource_type_name,
           css_node_id : "{{css_node.pk}}",
+          unit_node_id : unit_node_id,
       	  widget_for: "create_course_structure",
       	  csrfmiddlewaretoken: '{{ csrf_token }}'
       	},
@@ -140,49 +157,71 @@
   // Save units
     $(document).on('click','.save_units',function(){
       var resources_in_RHS = []
+      unit_name_val = $("#unit_name").val()
       total_resources_in_RHS = $(".resources_drawer_div").find("#create_course_structure_drawer2").children("li")
+      if(!$("#hidden_unit_node_id").val()==""){
 
-      //check if right drawer has values
-      if(total_resources_in_RHS.length > 0){
-        //fetch right drawer values
-        $.each(total_resources_in_RHS,function(i,v){
-          resources_in_RHS.push(v.getAttribute('value'))
-        });
-
-      existing_list = JSON.stringify(resources_in_RHS)
-  		$.ajax({
-
-    		type: "POST",
-
-    		url: "{% url 'save_resources' groupid %}",
-
-    		datatype: "json",
-
-    		data:{
-          list_of_res: existing_list,
-          css_node: "{{css_node.pk}}",
-    		  csrfmiddlewaretoken: '{{ csrf_token }}'
-    		},
-
-    		success: function (data) {
-    		  resp_dict = data
-    		  $(".resources_drawer_div").html(""); 
-          $(".save_units").addClass("hide")
-    		  $(".done_units").removeClass("hide")
-    		},
-  		});
-
-        // $("#"+corr_resource_div).html("")
-        // $("#"+corr_resource_div).next().css("display", "none"); 
-        // $(".choose").css("display", "none");
-        // $(".units-btn").removeClass("hide")
-        // $(".course-sec-btn").removeAttr("disabled")
-        // $(".units-btn").removeAttr("disabled")
-        // $(".sub-section-btn").removeAttr("disabled")
-        // $(".close-units-btn").addClass("hide")
+        unit_node_id = $("#hidden_unit_node_id").val();
       }
       else{
-        alert("Please select any resource")
+        unit_node_id = "{{unit_node.pk}}"
+      }
+
+      if(unit_name_val){
+        //check if right drawer has values
+        if(total_resources_in_RHS.length > 0){
+          //fetch right drawer values
+          $.each(total_resources_in_RHS,function(i,v){
+            resources_in_RHS.push(v.getAttribute('value'))
+          });
+
+        existing_list = JSON.stringify(resources_in_RHS)
+    		$.ajax({
+
+      		type: "POST",
+
+      		url: "{% url 'save_resources' groupid %}",
+
+      		datatype: "json",
+
+      		data:{
+            list_of_res: existing_list,
+            css_node: "{{css_node.pk}}",
+            unit_name: unit_name_val,
+            unit_node_id: unit_node_id,
+      		  csrfmiddlewaretoken: '{{ csrf_token }}'
+      		},
+
+      		success: function (data) {
+      		  resp_dict = JSON.parse(data)
+            console.log(data)
+      		  $(".resources_drawer_div").html(""); 
+            $(".save_units").addClass("hide")
+      		  $(".done_units").removeClass("hide")
+            if($("#hidden_unit_node_id").val()==""){
+              console.log("com"+resp_dict['cu_new_id'])
+              // $("#hidden_unit_node_id").attr('value',resp_dict['cu_new_id'])
+              $("#hidden_unit_node_id").val(resp_dict['cu_new_id'])
+            }
+      		},
+    		});
+
+          // $("#"+corr_resource_div).html("")
+          // $("#"+corr_resource_div).next().css("display", "none"); 
+          // $(".choose").css("display", "none");
+          // $(".units-btn").removeClass("hide")
+          // $(".course-sec-btn").removeAttr("disabled")
+          // $(".units-btn").removeAttr("disabled")
+          // $(".sub-section-btn").removeAttr("disabled")
+          // $(".close-units-btn").addClass("hide")
+        }
+        else{
+          alert("Please select any resource");
+          event.preventDefault();
+        }
+      }
+      else{
+        alert("Please enter name for unit");
         event.preventDefault();
       }
     });

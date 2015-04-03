@@ -104,23 +104,32 @@
 
   {% for each_cs in node.collection_set %}
     {% get_node each_cs as cs_node %}
-        cs_str = "<h6><b>"+{{forloop.counter}}+". {{cs_node.name}}</b></h6>"
+        cs_str = "<h6>"+{{forloop.counter}}+". {{cs_node.name}}</h6>"
         $("#cs-div").append(cs_str)
       {% if cs_node.collection_set %}
         {% for each_css in cs_node.collection_set %}
           {% get_node each_css as css_node %}
-            css_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7><b>"+ {{forloop.counter}}+". {{css_node.name}}</b></h7><br>"
+            css_str = "&nbsp;&nbsp;<h7>"+ {{forloop.counter}}+". {{css_node.name}}</h7><br>"
             $("#cs-div").append(css_str)
             {% if css_node.collection_set %}
               {% for each_unit in css_node.collection_set %}
                 {% get_node each_unit as unit_node %}
-                  {% if unit_node.member_of_names_list.0|lower == "page" or unit_node.member_of_names_list.0|lower == "quiz" %}
-                    k = "{% url unit_node.member_of_names_list.0|lower|concat:"_details" groupid unit_node.pk %}"
-                  {% else %}
-                    k = "{% url unit_node.member_of_names_list.0|lower|concat:"_detail" groupid unit_node.pk %}"
+                  cu_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7>"+ {{forloop.counter}}+". {{unit_node.name}}</h7><br>"
+                  $("#cs-div").append(cu_str)
+                  {% if unit_node.collection_set %}
+                    {% for each_res in unit_node.collection_set %}
+                      {% get_node each_res as res_node %}
+                        {% if res_node %}
+                          {% if res_node.member_of_names_list.0|lower == "page" or res_node.member_of_names_list.0|lower == "quiz" %}
+                            k = "{% url res_node.member_of_names_list.0|lower|concat:"_details" groupid res_node.pk %}"
+                          {% else %}
+                            k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
+                          {% endif %}
+                          var str_unit = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ {{forloop.counter}}+". <a href='"+k+"' target='_blank' class='unit_name'>{{res_node.name}}</a><br>"
+                          $("#cs-div").append(str_unit)
+                      {% endif %}
+                    {% endfor %}
                   {% endif %}
-                  units_str = "&nbsp;&nbsp;&nbsp;&nbsp;-- <a href='"+k+"' target='_blank'>{{unit_node.name}}</a><br>"
-                  $("#cs-div").append(units_str)
               {% endfor %}
             {% endif %}
         {% endfor %}
