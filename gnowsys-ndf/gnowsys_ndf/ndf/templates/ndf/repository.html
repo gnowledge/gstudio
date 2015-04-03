@@ -6,10 +6,14 @@
 
 {% block style %}
 
+	.card-holder{
+		padding-left: 5%;
+	}
+
 	.app-card{
 		width: 12rem;
 		min-height: 20rem;
-		margin: 20px 1vh;
+		margin: 20px 1rem;
 		background-color: #efefef;
 		border: thin solid lightgray;
 		float: left;
@@ -27,8 +31,8 @@
 		position: absolute;
 		font-size: 7em;
 		z-index: 0;
-		opacity: 0.2;
-		top: 40%;
+		opacity: 0.1;
+		padding-top: 5rem;
 	}
 
 {% endblock %}
@@ -52,16 +56,26 @@
 	-->
 	{% endcomment %}
 	
-	<ul class="inline-list">
+	<ul class="inline-list card-holder">
 		{% for each_gapp in gapps_obj_list %}
 			<li>
 				<a class="app-card text-center" href="{% url each_gapp.name|lower group_id %}">
-					<i class="icons {{ each_gapp.url }}"></i>
 					<h4><small>{{ each_gapp.altnames }}</small></h4>
 					<hr/>
+					<i class="icons {{ each_gapp.url }}"></i>
 					<p>{{ each_gapp.content|safe }}</p>
 				</a>
 			</li>
 		{% endfor %}
 	</ul>
+
+	<script type="text/javascript">
+        // removing left panel:
+        $("main.row > aside.columns").detach();
+
+        // making body_content block to take 12-large columns
+        $article = $("main.row > article.columns");
+        $article.removeClass("medium-10").addClass("large-12");
+	</script>	
+
 {% endblock %}

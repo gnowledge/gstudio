@@ -173,7 +173,7 @@ def nroer_groups(request, group_id, groups_category):
     
     group_nodes_count = group_nodes.count() if group_nodes else 0
     return render_to_response("ndf/partner.html", 
-                          {'group_nodes': group_nodes,
+                          {'group_nodes': group_nodes, "groups_category": groups_category,
                            'group_nodes_count': group_nodes_count,
                            'groupid': group_id, 'group_id': group_id
                           }, context_instance=RequestContext(request))

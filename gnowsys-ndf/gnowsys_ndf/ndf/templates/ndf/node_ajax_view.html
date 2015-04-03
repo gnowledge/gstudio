@@ -515,11 +515,11 @@ ul#navigation li a.last {
             {% get_teaches_list node as teaches_list %}
             {% if teaches_list %}
             <div class="panel">
-              <h6>This resource teaches you: </h6>
+              <h6>Resource for: </h6>
               {% for  each_node in teaches_list %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
-              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>,&nbsp;
               {% else %}
               <a href="{% url 'topic_details' group_name_tag each_node.pk %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>
               {% if not forloop.last %},&nbsp; {% endif %}
@@ -771,80 +771,89 @@ ul#navigation li a.last {
           <!-- <div class="content" id="view-graph">  </div> -->
 
       <div class="topic_content" id="contents"> 
-            {% get_all_resources request node.pk as resources %}
-	    {% for key, val in resources.items %}
-	   <fieldset id="{{key}}">
-	     <legend>{{key}}</legend>
-	     {% if  key == "Images" %}
-	     {% for k,v in val.items %}
-	      {% if k == "fallback_lang" %}
-	       {% for each in v %}
-	      <a href ="{% url 'image_detail' group_name_tag each.pk %}" style="display: inline-block">
-	       <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-	       <br/><div>{{each.name}}</div>
-	     </a>&nbsp;&nbsp;&nbsp;&nbsp;
-	      {% endfor %}
-	      {% elif k == "other_languages" %}
-	      {% if v %}
-	      <fieldset id="{{k}}">
-		<legend>{% trans "In other languages" %}</legend>
-		{% for each in v %}
-		<a href ="{% url 'image_detail' group_name_tag each.pk %}" style="display: inline-block">
-		  <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-		  <br/><div>{{each.name}}</div>
-		</a>&nbsp;&nbsp;&nbsp;&nbsp;
-		{% endfor %}
-	      </fieldset>
-	      {% endif %}
-	      {% endif %}
-	      {% endfor %}
-	      {% elif  key == "Videos" %}
-	      {% for k,v in val.items %}
-	      {% if k == "fallback_lang" %}
-	       {% for each in v %}
-	      <a href ="{% url 'video_detail' group_name_tag each.pk %}" style="display: inline-block">
-	       <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-	       <br/><div>{{each.name}}</div>
-	     </a>&nbsp;&nbsp;&nbsp;&nbsp;
-	      {% endfor %}
-	      {% elif k == "other_languages" %}
-	      {% if v %}
-	      <fieldset id="{{k}}">
-		<legend>{% trans "In other languages" %}</legend>
-		{% for each in v %}
-		<a href ="{% url 'video_detail' group_name_tag each.pk %}" style="display: inline-block">
-		  <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-		  <br/><div>{{each.name}}</div>
-		</a>&nbsp;&nbsp;&nbsp;&nbsp;
-		{% endfor %}
-		</fieldset>
-	      {% endif %}
-	      {% endif %}
-	      {% endfor %}
-	      {% else %}
-	      {% for k,v in val.items %}
-	      {% if k == "fallback_lang" %}
-	      {% for each in v %}
-	      <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
-	      {% endfor %}
-	      {% elif k == "other_languages" %}
-	      {% if v %}
-	      <fieldset id="{{k}}">
-		<legend>{% trans "In other languages" %}</legend>
-		{% for each in v %}
-	   	<a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
-		{% endfor %}
-		{% endif %}
-		{% endif %}
-	      	{% endfor %}
-	      </fieldset>	      
-	      {% endif %}
-	    </fieldset>
-	    {% endfor %}
-            </div>
-        {% endif %}
-        <!-- End of displaying topic page contents -->
+        {{node.content_org}}
+
+        {% get_all_resources request node.pk as resources %}
+          {% for key, val in resources.items %}
+          <fieldset id="{{key}}">
+            <legend>{{key}}</legend>
+            {% if  key == "Images" %}
+              {% for k,v in val.items %}
+                {% if k == "fallback_lang" %}
+                  {% for each in v %}
+          
+                    <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                    <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                    <br/><div>{{each.name}}</div>
+                    </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                  {% endfor %}
+                {% elif k == "other_languages" %}
+                  {% if v %}
+                  <fieldset id="{{k}}">
+                    <legend>{% trans "In other languages" %}</legend>
+                    {% for each in v %}
+                      <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                      <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                      <br/><div>{{each.name}}</div>
+                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endfor %}
+                  </fieldset>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+            {% elif  key == "Videos" %}
+              {% for k,v in val.items %}
+                {% if k == "fallback_lang" %}
+                  {% for each in v %}
+                    <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                    <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                    <br/><div>{{each.name}}</div>
+                    </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                  {% endfor %}
+                {% elif k == "other_languages" %}
+                  {% if v %}
+                  <fieldset id="{{k}}">
+                    <legend>{% trans "In other languages" %}</legend>
+                    {% for each in v %}
+                      <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                      <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                      <br/><div>{{each.name}}</div>
+                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endfor %}
+                  </fieldset>
+                  {% endif %}          
+                {% endif %}                
+              {% endfor %}
+            
+            {% else %}
+              {% for k,v in val.items %}
+                {% if k == "fallback_lang" %}
+                  {% for each in v %}
+                    <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
+                    &nbsp;&nbsp;
+                  {% endfor %}
+                {% elif k == "other_languages" %}
+                  {% if v %}
+                    <fieldset id="{{k}}">
+                      <legend>{% trans "In other languages" %}</legend>
+                      {% for each in v %}
+                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
+                        &nbsp;&nbsp;
+                      {% endfor %}
+                    </fieldset>	      
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+          
+            {% endif %}
+
+          </fieldset>
+          {% endfor %}
       </div>
+      <!-- End of displaying topic page contents -->
+      {% endif %}
+
 
       {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
         <!-- Below code/widgets will only be shown for all resource instances/documents
@@ -1531,6 +1540,7 @@ ul#navigation li a.last {
         if (data != "{}"){
           var k = Object.keys(data_obj); // To get the keys from incomming data
           if (selected){
+
             fs = "<b><i><u>Resources with "+ selected + ": " + choice +"  </u></i></b><br/>"  // Fieldset for one element
           }
           else{
@@ -1547,13 +1557,13 @@ ul#navigation li a.last {
             for (var i = 0; i < len; i++) { 
               var res_id = data_obj[key][i][1]
               if (key == "Images"){
-                cont_list += "<a data-id="+res_id+" href='{% url 'image_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                cont_list += "<a data-id="+res_id+" href='{% url 'image_detail' group_name_tag 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
               }
               else if(key == "Videos"){
-                cont_list += "<a data-id="+res_id+" href='{% url 'video_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                cont_list += "<a data-id="+res_id+" href='{% url 'video_detail' group_name_tag 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
               }
               else{
-                cont_list += "<a data-id="+res_id+" href='{% url 'file_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'>"+data_obj[key][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                cont_list += "<a data-id="+res_id+" href='{% url 'file_detail' group_name_tag 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'>"+data_obj[key][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
               }
             } 
 
