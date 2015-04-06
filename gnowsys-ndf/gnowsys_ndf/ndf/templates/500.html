@@ -1,6 +1,6 @@
 {% extends "error_base.html" %}
 
-{% block error_title %} Internal Server Error {% endblock %}
+{% block error_title %} 500 - Internal Server Error {% endblock %}
 
 {% block error_body_text %}
 	<br/>
@@ -15,7 +15,7 @@
 			Our developers have been informed of this error.
 		<br/><br/>
 			{% if site.SITE_NAME == "NROER" %}
-				Please Navigate back to:
+				Please navigate back to:
 				<blockquote>
 					<a href="{% url 'repository' 'home' %}"> Repository </a> | 
 					<a href="{% url 'nroer_groups' 'home' 'Partners' %}"> Partners </a> | 
