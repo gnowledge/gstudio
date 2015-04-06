@@ -197,7 +197,7 @@ class Command(BaseCommand):
           glist_container.member_of.append(glist._id)
           glist_container.save()
           print "\n Eventtype Created."
-        collegeevent=node_collection.one({'_type': "GSystemType","name":"CollegeEvents"})
+        collegeevent=node_collection.one({'member_of':ObjectId(glist._id),"name":"CollegeEvents"})
         if not collegeevent:
             node = node_collection.collection.GSystem()
             node.name=u"CollegeEvents"
@@ -211,7 +211,7 @@ class Command(BaseCommand):
         if Event:
           All_Event_Types=node_collection.find({"type_of": ObjectId(Event._id)})
           Eventtype=node_collection.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
-          CollegeEvents=node_collection.one({"_type":"GSystemType", "name":"CollegeEvents"})
+          CollegeEvents=node_collection.one({'member_of':ObjectId(glist._id), "name":"CollegeEvents"})
           Event_type_list=[]
           College_type_list=[]
           for i in All_Event_Types:
