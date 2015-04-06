@@ -28,7 +28,7 @@
   .style2 {
     color: #10c1cb; 
     font-size: 10em;
-    text-shadow: 0 1px 0 #0092b3, 0 2px 0 #0087a6, 0 3px 0 #008099, 0 4px 0 #00758c, 0 5px 0 #555, 0 6px 0 #006a80, 0 0 0 #006073, 0 8px 7px #005566;
+    text-shadow: 0 1px 0 #0092b3, 0 2px 0 #0087a6;
   }
 
   .style-text {
@@ -64,47 +64,50 @@
 
   {% get_group_name groupid as group_name_tag %}
   <div class="row" id="new" style="margin-top: 0.5rem">
-    <!-- Users General Information -->
-    <div class="row">
-      <div class="small-2 columns">
-          <div class="text-center">
-          {% if user.is_authenticated %}
-            {% if prof_pic_obj %}
-                    <div class="div-height">
-                  <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
-                    </div>
-                    {% else %}
-                    <div class="div-height">
-                    <i class="fi-torso style2 text-center"></i>
-                    </div>
-          {% endif %}   
+  	<!-- Users General Information -->
+  	<div class="row">
+  		<div class="small-2 columns">
+  		    <div class="text-center">
+          			{% if prof_pic_obj %}
+			                    <div class="div-height">
+			          			      <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
+			                    </div>
+                {% else %}
+			                    <div class="div-height">
+			                    <i class="fi-torso style2 text-center"></i>
+			                    </div>
+					      
+					      {% endif %}   
+                {% if user.is_authenticated %}
+            				    {% if user_id == usr %}
+			                      <div style="height:10px;">
+			                        <!-- div to seprate height -->
+			                      </div>
+			                      
+			                      <div class="row" >
+			                        <div class="small-12 columns" >
+			                          <br>
+			                          <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+			                        </div>
+			                      </div>
+		          			    {% endif %}
 
-                {% if user_id == usr %}
-                    <div class="row">
-                      <div class="small-12 columns">
-                        <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px;" value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
-                      </div>
-                    </div>
-            {% endif %}
-
-              <div id="pic_div" class="hide" class="row">
-                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
-                {% csrf_token %}
-                <input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
-            <input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
-                <input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
-                    <input type="hidden" name="type" value="profile_pic">           
-                    <input type="hidden" name="user" value="{{usr}}">         
-                      <p id="message" style="display:none">
-                  {% trans "Please wait for uploading profile picture" %}
-                </p>
-                    
-                </form>
-              </div>
-          
-            {% else %}
-            <p><em>{% trans "You are Not Authorised user please login to upload profile picture" %} </em></p>
-                {% endif %}
+	              			<div id="pic_div" class="hide" class="row">
+	              				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
+	              				{% csrf_token %}
+	              				<input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
+						        <input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
+	              				<input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
+	                        	<input type="hidden" name="type" value="profile_pic">           
+	                        	<input type="hidden" name="user" value="{{usr}}">         
+	                            <p id="message" style="display:none">
+	              					{% trans "Please wait for uploading profile picture" %}
+	              				</p>
+	              						
+	              				</form>
+		              		</div>
+            			
+                 {% endif %}
             </div>  
         </div>
 

@@ -26,6 +26,8 @@
 {% endblock %}
 
 {% block body_content %}
+  {% get_site_registration_variable_visibility as site_registration_variable_visibility %}
+
   <!-- Heading -->
   <div class="row" style="margin: 1.2rem 0;">
     <div class="small-10 large-10 small-centered large-centered columns">
@@ -110,6 +112,7 @@
           </div>
         </div>
 
+        {% if site_registration_variable_visibility.AUTHOR_AGENCY_TYPE %}
         <!-- Occupation -->
         <div class="row">
           <div class="small-3 large-3 columns">
@@ -121,25 +124,28 @@
             {% get_author_agency_types as agency_types %}
 
             <select id="id_agency_type" name="agency_type">
-              <option value="">{% trans "- - - Select Group Agency Type - - -" %}</option>
+              <option value="">{% trans "- - - Select Occupation - - -" %}</option>
               {% for each in agency_types %}
               <option id="{{each}}" name="group_agency_type">{{each}}</option>
               {% endfor %}
             </select>
           </div>
         </div>
+        {% endif %}
 
-        <!-- Affiliation -->
+        {% if site_registration_variable_visibility.AFFILIATION %}
+        <!-- Organization -->
         <div class="row">
           <div class="small-3 large-3 columns">
             <label for="id_affiliation" class="right inline">
-              {% trans "Affiliation" %}
+              {% trans "Organization" %}
             </label>
           </div>
           <div class="small-6 large-6 columns end">
             <input type="text" id="id_affiliation" name="group_affiliation">
           </div>
         </div>
+        {% endif %}
 
         <!-- Send Activation button -->
         <div class="row">
