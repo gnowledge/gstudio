@@ -194,37 +194,43 @@
 
 		$(".jqtree-title.jqtree_common").hover( function(){
 			var topic_id = $(this).siblings("a").attr("id");
+  			if ($(".jqtree-title.jqtree_common").attr("data-info") != topic_id ){
 			
-			$(".topic_stats").css("display", "none");
+				$(".topic_stats").css("display", "none");
 
-			$.ajax({
-            	url: "{% url 'get_topic_contents' groupid %}",
-             	type: 'POST',
-             	data:{
-             		node_id: topic_id,
-             		csrfmiddlewaretoken: '{{ csrf_token }}'
-             	},
-             	success: function(data){
-             		data_obj = JSON.parse(data);
-             		count = ""
+				$.ajax({
+	            	url: "{% url 'get_topic_contents' groupid %}",
+	             	type: 'POST',
+	             	data:{
+	             		node_id: topic_id,
+	             		csrfmiddlewaretoken: '{{ csrf_token }}'
+	             	},
+	             	success: function(data){
+	             		data_obj = JSON.parse(data);
+	             		count = ""
 
-             		if (data != "{}"){
-             			var k = Object.keys(data_obj); // To get the keys from incomming data
+	             		if (data != "{}"){
+	             			var k = Object.keys(data_obj); // To get the keys from incomming data
 
-             			for (var m = 0; m < k.length; m++) { 
-             				var key = k[m];  
-             				var len = data_obj[key].length;  // length of list as a value of key
-             				// alert(key+": "+len);
-             				count += key+": "+len+"<br/>";
-             			}
+	             			for (var m = 0; m < k.length; m++) { 
+	             				var key = k[m];  
+	             				var len = data_obj[key].length;  // length of list as a value of key
+	             				// alert(key+": "+len);
+	             				count += key+": "+len+"<br/>";
+	             			}
 
-             			$(".topic_stats").html(count);
-             			$(".topic_stats").css("display", "block");
-             		}
+	             			$(".topic_stats").html(count);
+	             			$(".topic_stats").css("display", "block");
+	             			
+	             		}
 
-             	},
-             	
-            });
+	             	},
+	             	
+	            });
+
+	            $(".jqtree-title.jqtree_common").attr("data-info", topic_id);
+
+			}
 
 
 		});
