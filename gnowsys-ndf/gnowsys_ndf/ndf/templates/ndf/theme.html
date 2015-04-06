@@ -191,13 +191,53 @@
 	function showTopicStats(){
       // Javascript function to be used for checking objects in specific time of interval
       setTimeout(function(){
-		$(".jqtree-title.jqtree_common").hover( function(){alert(this.textContent)});
+
+		$(".jqtree-title.jqtree_common").hover( function(){
+			var topic_id = $(this).siblings("a").attr("id");
+			
+			$(".topic_stats").css("display", "none");
+
+			$.ajax({
+            	url: "{% url 'get_topic_contents' groupid %}",
+             	type: 'POST',
+             	data:{
+             		node_id: topic_id,
+             		csrfmiddlewaretoken: '{{ csrf_token }}'
+             	},
+             	success: function(data){
+             		data_obj = JSON.parse(data);
+             		count = ""
+
+             		if (data != "{}"){
+             			var k = Object.keys(data_obj); // To get the keys from incomming data
+
+             			for (var m = 0; m < k.length; m++) { 
+             				var key = k[m];  
+             				var len = data_obj[key].length;  // length of list as a value of key
+             				// alert(key+": "+len);
+             				count += key+": "+len+"<br/>";
+             			}
+
+             			$(".topic_stats").html(count);
+             			$(".topic_stats").css("display", "block");
+             		}
+
+             	},
+             	
+            });
+
+
+		});
+		
         // console.log($(".jqtree-element.jqtree_common"))
-        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { showTopicStats() }
+        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { 
+        	showTopicStats() 
+        }
+
       }, 1000 );
 	}
 
-    // showTopicStats();
+	showTopicStats();
 
   </script>
 
@@ -313,6 +353,11 @@
 	</div>
 
 	{% endif %}
+
+	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;">
+		Images:  <br/>
+		Videos:  
+	</div>
 {% endblock %}
 
 
