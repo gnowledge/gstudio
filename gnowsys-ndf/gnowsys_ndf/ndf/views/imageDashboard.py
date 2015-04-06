@@ -160,6 +160,15 @@ def image_detail(request, group_id, _id):
     else :
         pass
     img_node = node_collection.one({"_id": ObjectId(_id)})
+
+    # First get the navigation list till topic from theme map
+    nav_l=request.GET.get('nav_li','')
+    breadcrumbs_list = []
+    nav_li = ""
+
+    if nav_l:
+      nav_li = nav_l
+
     if img_node._type == "GSystemType":
 	return imageDashboard(request, group_id, _id)
     img_node.get_neighbourhood(img_node.member_of)
@@ -179,7 +188,7 @@ def image_detail(request, group_id, _id):
 
     return render_to_response("ndf/image_detail.html",
                                   { 'node': img_node,
-                                    'group_id': group_id,
+                                    'group_id': group_id, 'nav_list':nav_li,
                                     'groupid':group_id, 'imageCollection': imageCollection
                                   },
                                   context_instance = RequestContext(request)

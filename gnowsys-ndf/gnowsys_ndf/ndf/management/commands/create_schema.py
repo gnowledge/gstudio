@@ -1,9 +1,11 @@
 ''' -- imports from python libraries -- '''
 import os
+from sys import exc_info
 import csv
 import json
 import ast
 import time
+from itertools import chain
 # import mimetypes
 
 ''' imports from installed packages '''
@@ -18,7 +20,6 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node, GSystemType, AttributeType, RelationType
-
 
 ####################################################################################################################
 
@@ -242,8 +243,10 @@ def parse_data_create_gtype(json_file_path):
         perform_eval_type("subject_type", json_document, type_name, "GSystemType")
         perform_eval_type("object_type", json_document, type_name, "GSystemType")
 
+        perform_eval_type("member_of", json_document, type_name, "MetaType")
+
       except Exception as e:
-        error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
+        error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error at line #" + str(exc_info()[-1].tb_lineno) + "...\n " + str(e)
         log_list.append(error_message)
         print error_message # Keep it!
         # continue
@@ -254,7 +257,7 @@ def parse_data_create_gtype(json_file_path):
         create_edit_type(type_name, json_document, user_id)
 
       except Exception as e:
-        error_message = "\n While creating "+type_name+" ("+json_document['name']+") got following error...\n " + str(e)
+        error_message = "\n While creating "+type_name+" ("+json_document['name']+") got following error at line #" + str(exc_info()[-1].tb_lineno) + "...\n " + str(e)
         print error_message # Keep it!
 
 def perform_eval_type(eval_field, json_document, type_to_create, type_convert_objectid):
@@ -268,7 +271,7 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
   except Exception as e:
     if u"\u201c" in json_document[eval_field]:
       json_document[eval_field] = json_document[eval_field].replace(u"\u201c", "\"")
-        
+
     if u"\u201d" in json_document[eval_field]:
       json_document[eval_field] = json_document[eval_field].replace(u"\u201d", "\"")
 
@@ -288,30 +291,37 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
       type_list.append(data)
 
     else:
-      node = node_collection.one({'_type': type_convert_objectid, 'name': data})
-  
-      if node:
-        if eval_field == "complex_data_type":
-          type_list.append(unicode(node._id))
-        elif eval_field in ["attribute_type_set", "relation_type_set"]:
-          type_list.append(node)
+      def _append_to_type_list(eval_field, json_document, type_to_create, type_convert_objectid, data, inner_type_list):
+        node = node_collection.one({'_type': type_convert_objectid, 'name': data})
+
+        if node:
+          if eval_field == "complex_data_type":
+            inner_type_list.append(unicode(node._id))
+          elif eval_field in ["attribute_type_set", "relation_type_set"]:
+            inner_type_list.append(node)
+          else:
+            inner_type_list.append(node._id)
+
         else:
-          type_list.append(node._id)
+          if eval_field == "complex_data_type":
+            type_convert_objectid = "Sub-" + type_convert_objectid
 
-      else:
-        if eval_field == "complex_data_type":
-          type_convert_objectid = "Sub-" + type_convert_objectid
+          elif eval_field in ["attribute_type_set", "relation_type_set"]:
+            json_document[eval_field] = inner_type_list
+            error_message = "\n "+type_convert_objectid+"Error ("+eval_field+"): This "+type_convert_objectid+" (" + data + ") doesn't exists for creating "+type_to_create+" (" + json_document['name'] + ") !!!\n"
+            log_list.append(error_message)
 
-        elif eval_field in ["attribute_type_set", "relation_type_set"]:
-          json_document[eval_field] = type_list
           error_message = "\n "+type_convert_objectid+"Error ("+eval_field+"): This "+type_convert_objectid+" (" + data + ") doesn't exists for creating "+type_to_create+" (" + json_document['name'] + ") !!!\n"
           log_list.append(error_message)
-          continue
+          raise Exception(error_message)
 
-        error_message = "\n "+type_convert_objectid+"Error ("+eval_field+"): This "+type_convert_objectid+" (" + data + ") doesn't exists for creating "+type_to_create+" (" + json_document['name'] + ") !!!\n"
-        log_list.append(error_message)
-        raise Exception(error_message)
-
+      if type_to_create == "RelationType" and type(data) == list:
+        inner_type_list = []
+        for each in data:
+          _append_to_type_list(eval_field, json_document, type_to_create, type_convert_objectid, each, inner_type_list)
+        type_list.append(inner_type_list)
+      else:
+        _append_to_type_list(eval_field, json_document, type_to_create, type_convert_objectid, data, type_list)
   # Sets python-type converted list
   json_document[eval_field] = type_list
 
@@ -354,11 +364,18 @@ def create_edit_type(type_name, json_document, user_id):
 
     try:
       for key in json_document.iterkeys():
-        if type(node[key]) == list:
-          if set(node[key]) != set(json_document[key]):
+        old_data = node[key]
+        new_data = json_document[key]
+        if type(old_data) == list:
+          if len(old_data) and len(new_data):
+              if type(old_data[0]) == list:
+                  old_data = list(chain.from_iterable(old_data))
+                  new_data = list(chain.from_iterable(new_data))
+
+          if set(old_data) != set(new_data):
             # node[key].extend(json_document[key])
             # Avoiding extend's use
-            # Because despite of whether that value exists or not in the list, 
+            # Because despite of whether that value exists or not in the list,
             # it adds value to the list
 
             if key == "subject_type" and node['name'] in [u"start_time", u"end_time"]:
@@ -369,7 +386,7 @@ def create_edit_type(type_name, json_document, user_id):
               # and this is causing problem
               # Instead making empty and refilling new entries as per ATs.csv file,
               # Keep existing values and append those of ATS.csv file!
-              pass 
+              pass
             else:
               node[key] = []
 

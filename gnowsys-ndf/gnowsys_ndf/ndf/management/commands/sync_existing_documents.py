@@ -15,10 +15,57 @@ from gnowsys_ndf.ndf.models import Node
 
 class Command(BaseCommand):
 
-  help = " This script will add new field(s) into already existing documents (only if they doesn't exists) in your database."
+  help = " This script will add new field(s) into already existing documents " \
+      + "(only if they doesn't exists) in your database."
 
   def handle(self, *args, **options):
     # Keep latest fields to be added at top
+
+    # From existing RelationType instance(s), finding Binary relationships
+    # and Setting their "member_of" field's value as "Binary" (MetaType)
+    mt_binary = node_collection.one({
+        '_type': "MetaType", 'name': "Binary"
+    })
+    if mt_binary:
+        res = node_collection.collection.update({
+            "_type": "RelationType", "object_type.0": {"$not": {"$type": 4}}
+        }, {
+            "$set": {"member_of": [mt_binary._id]}
+        },
+            upsert=False, multi=True
+        )
+        if res["updatedExisting"] and res["nModified"]:
+            print "\n 'member_of' field updated in following RelationType " \
+                + "instance(s) representing 'Binary Relationships':", res["n"]
+
+    # Replacing object_type of "trainer_of_course" & "master_trainer_of_course"
+    # relationship from "Announced Course" to "NUSSD Course"
+    nussd_course = node_collection.one({
+        '_type': "GSystemType", 'name': "NUSSD Course"
+    })
+    if nussd_course:
+        nussd_course_id = nussd_course._id
+        res = node_collection.collection.update({
+            '_type': "RelationType", 'name': "trainer_of_course", "object_value": {"$nin": [nussd_course_id]}
+        }, {
+            '$set': {'object_type': [nussd_course_id]}
+        },
+            upsert=False, multi=False
+        )
+        if res['updatedExisting'] and res['nModified']:
+            print "\n Replaced object_type of 'trainer_of_course' relationship" \
+                + " from 'Announced Course' to 'NUSSD Course'."
+
+        res = node_collection.collection.update({
+            '_type': "RelationType", 'name': "master_trainer_of_course", "object_value": {"$nin": [nussd_course_id]}
+        }, {
+            '$set': {'object_type': [nussd_course_id]}
+        },
+            upsert=False, multi=False
+        )
+        if res['updatedExisting'] and res['nModified']:
+            print "\n Replaced object_type of 'master_trainer_of_course' relationship" \
+                + " from 'Announced Course' to 'NUSSD Course'."
 
     # Appending attribute_type_set and relation_type_set fields to existing MetaType nodes
     res = node_collection.collection.update(
@@ -258,7 +305,7 @@ class Command(BaseCommand):
             print "\n Replaced object_type of 'has_course' relationship from 'NUSSD Course' to 'Announced Course'."
 
     # Adds "relation_set" field (with default value as []) to all documents belonging to GSystems.
-    res = node_collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'relation_set': {'$exists': False}}, 
+    res = node_collection.collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'relation_set': {'$exists': False}}, 
                             {'$set': {'relation_set': []}}, 
                             upsert=False, multi=True
     )
@@ -273,9 +320,9 @@ class Command(BaseCommand):
     if res['updatedExisting'] and res['nModified']:
         print "\n 'attribute_set' field added to following no. of documents: ", res['n']
 
-    # Adds "license" field (with default value as "") to all documents belonging to GSystems (except Author).
-    res = node_collection.collection.update({'_type': {'$nin': ["MetaType", "Author", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'license': {'$exists': False}}, 
-                            {'$set': {'license': ""}}, 
+    # Adds "license" field (with default value as "") to all documents belonging to GSystems.
+    res = node_collection.collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'license': {'$exists': False}}, 
+                            {'$set': {'license': None}}, 
                             upsert=False, multi=True
     )
     if res['updatedExisting'] and res['nModified']:

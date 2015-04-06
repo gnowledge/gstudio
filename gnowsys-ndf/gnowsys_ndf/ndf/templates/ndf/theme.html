@@ -34,6 +34,7 @@
       	TreeTillNode();
       {% endif %}
 
+
     });
 
 
@@ -43,7 +44,7 @@
 
 	  var tree_build = $(".themes").not(".jqtree-loading");
   	  var node = tree_build.tree('getNodeById', url);
-  	  tree_build.tree('selectNode', node);
+  	  tree_build.tree('openNode', node);
       
       // Javascript function to be used for checking objects in specific time of interval
       setTimeout(function(){
@@ -87,7 +88,7 @@
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
+                				'&nbsp;&nbsp;<a id='+node.id+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
 
                 			{% endif %}
             			);	            			
@@ -185,6 +186,19 @@
 
 	};
 
+
+	// method to handle hover on topics
+	function showTopicStats(){
+      // Javascript function to be used for checking objects in specific time of interval
+      setTimeout(function(){
+		$(".jqtree-title.jqtree_common").hover( function(){alert(this.textContent)});
+        // console.log($(".jqtree-element.jqtree_common"))
+        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { showTopicStats() }
+      }, 1000 );
+	}
+
+    // showTopicStats();
+
   </script>
 
   <style>
@@ -268,14 +282,14 @@
 {% endblock %}
 
 {% block meta_content %}
-	<a href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view"><h2 class="subheader">{% trans "Themes" %}</h2></a>
+	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view"><h2 class="subheader">{% trans "Themes" %}</h2></a>
 {% endblock %}
 
 {% block related_content %}
-<div class="panel" style="background-color:#ddd;">
 	{% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
 
+	<div class="panel" style="background-color:#ddd;">
 	<ul class="no-bullet" id="app-set-item"> 
 
 	    {% get_memberof_objects_count theme_GST_id groupid as count %}
@@ -296,9 +310,9 @@
 	      </li>
 	  
 	</ul>
-	
+	</div>
+
 	{% endif %}
-</div>
 {% endblock %}
 
 
@@ -555,9 +569,15 @@
 	<script type="text/javascript">
 
 // ------ jqtree tree ------
+    	$("document").on("hover", ".jqtree-title.jqtree_common", function(){
+    		setTimeout(function(){
+		      }, 1000);
+
+			alert($(this).siblings("a").attr("id"));
+		});
 
 		$("#add_theme_item").click(function() {
-		      $.ajax({
+			      $.ajax({
 		        type: "POST",
 		        url: "{% url 'add_theme_item' groupid %}",
 		        datatype: "html",

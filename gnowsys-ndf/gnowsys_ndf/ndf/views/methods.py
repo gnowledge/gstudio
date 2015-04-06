@@ -12,7 +12,7 @@ from mongokit import paginator
 import mongokit
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
 from gnowsys_ndf.settings import DEFAULT_GAPPS_LIST, WORKING_GAPPS, BENCHMARK
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
@@ -25,7 +25,7 @@ from gnowsys_ndf.notification import models as notification
 # import os -- Keep such imports here
 import datetime
 import time
-import sys
+from sys import getsizeof, exc_info
 import subprocess
 import re
 import ast
@@ -57,7 +57,7 @@ def get_execution_time(f):
 	        time1 = time.time()
 	        total_parm_size = 0
 	        for key, value in kwargs.iteritems():
-	           total_parm_size = total_parm_size + sys.getsizeof(value)
+	           total_parm_size = total_parm_size + getsizeof(value)
 	        total_param = len(kwargs)
 	        ret = f(*args,**kwargs)
 	        t2 = time.clock()
@@ -69,7 +69,7 @@ def get_execution_time(f):
 	        benchmark_node.parameters = unicode(total_param)
 	        benchmark_node.size_of_parameters = unicode(total_parm_size)
 	        benchmark_node.last_update = datetime.today()
-	        #benchmark_node.functionOplength = unicode(sys.getsizeof(ret))
+	        #benchmark_node.functionOplength = unicode(getsizeof(ret))
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
 	        except:	
@@ -1685,9 +1685,9 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
     elif type(field_data_type) == list:
 
-      if kwargs.has_key("field_instance"):
+      if "field_instance" in kwargs:
         if kwargs["field_instance"]["_type"] == RelationType or kwargs["field_instance"]["_type"] == "RelationType":
-          # Write RT related code 
+          # Write RT related code
           if not field_value:
             return None
           if field_value:
@@ -1883,349 +1883,353 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
     return ga_node
 
 
-
-@get_execution_time
+# @get_execution_time
 def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):
-  """Creates single or multiple GRelation documents (instances) based on given 
-  RelationType's cardinality (one-to-one / one-to-many).
+    """Creates single or multiple GRelation documents (instances) based on given
+    RelationType's cardinality (one-to-one / one-to-many).
 
-  Arguments:
-  subject_id -- ObjectId of the subject-node
-  relation_type_node -- Document of the RelationType node (Embedded document)
-  right_subject_id_or_list -- 
-    - When one to one relationship: Single ObjectId of the right_subject node
-    - When one to many relationship: List of ObjectId(s) of the right_subject node(s)
+    Arguments:
+    subject_id -- ObjectId of the subject-node
+    relation_type_node -- Document of the RelationType node (Embedded document)
+    right_subject_id_or_list --
+      - When one to one relationship: Single ObjectId of the right_subject node
+      - When one to many relationship: List of ObjectId(s) of the right_subject node(s)
 
-  Returns:
-  - When one to one relationship: Created/Updated/Existed document.
-  - When one to many relationship: Created/Updated/Existed list of documents.
-  
-  """
-  gr_node = None
-  multi_relations = False
+    Returns:
+    - When one to one relationship: Created/Updated/Existed document.
+    - When one to many relationship: Created/Updated/Existed list of documents.
+    """
+    gr_node = None
+    multi_relations = False
 
-  try:
-    subject_id = ObjectId(subject_id)
+    try:
+        subject_id = ObjectId(subject_id)
 
-    if relation_type_node["object_cardinality"]:
-      # If object_cardinality value exists and greater than 1 (or eaqual to 100)
-      # Then it signifies it's a one to many type of relationship
-      # assign multi_relations = True
-      if relation_type_node["object_cardinality"] > 1:
-        multi_relations = True
-
-        # Check whether right_subject_id_or_list is list or not
-        # If not convert it to list
-        if not isinstance(right_subject_id_or_list, list):
-          right_subject_id_or_list = [right_subject_id_or_list]
-
-        # Check whether all values of a list are of ObjectId data-type or not 
-        # If not convert them to ObjectId
-        for i, each in enumerate(right_subject_id_or_list):
-          right_subject_id_or_list[i] = ObjectId(each)
-
-    if multi_relations:
-      # For dealing with multiple relations (one to many)
-
-      # Iterate and find all relationships (including DELETED ones' also)
-      nodes = triple_collection.find(
-        {'_type': "GRelation", 'subject': subject_id, 'relation_type.$id': relation_type_node._id}
-      )
-
-      gr_node_list = []
-
-      for n in nodes:
-        if n.right_subject in right_subject_id_or_list:
-          if n.status != u"DELETED":
-            # If match found with existing one's, then only remove that ObjectId from the given list of ObjectIds
-            # Just to remove already existing entries (whose status is PUBLISHED)
-            right_subject_id_or_list.remove(n.right_subject)
-            gr_node_list.append(n)
-
-            node_collection.collection.update(
-              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-              {'$addToSet': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
-              upsert=False, multi=False
-            )
-
-            node_collection.collection.update(
-              {'_id': n.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-              {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-              upsert=False, multi=False
-            )
-
-        else:
-          # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
-          # So change their status from PUBLISHED to DELETED
-          right_subject_id_or_list.remove(n.right_subject)
-          n.status = u"DELETED"
-          n.save()
-          info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
-
-          node_collection.collection.update(
-            {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-            {'$pull': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
-            upsert=False, multi=False
-          )
-
-          node_collection.collection.update(
-            {'_id': n.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-            {'$pull': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-            upsert=False, multi=False
-          )
-
-      if right_subject_id_or_list:
-        # If still ObjectId list persists, it means either they are new ones' or from deleted ones'
-        # For deleted one's, find them and modify their status to PUBLISHED
-        # For newer one's, create them as new document
-        for nid in right_subject_id_or_list:
-          gr_node = triple_collection.one(
-            {'_type': "GRelation", 'subject': subject_id, 'relation_type.$id': relation_type_node._id, 'right_subject': nid}
-          )
-
-          if gr_node is None:
-            # New one found so create it
+        def _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, relation_type_text):
+            # Code for creating GRelation node
             gr_node = triple_collection.collection.GRelation()
 
             gr_node.subject = subject_id
             gr_node.relation_type = relation_type_node
-            gr_node.right_subject = nid
+            gr_node.right_subject = right_subject_id_or_list
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
-            info_message = " MultipleGRelation: GRelation ("+gr_node.name+") created successfully.\n"
+            gr_node_name = gr_node.name
+            info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
+                + "created successfully.\n"
 
-            left_subject = node_collection.one({'_id': subject_id}, {'relation_set': 1})
+            relation_type_node_name = relation_type_node.name
+            relation_type_node_inverse_name = relation_type_node.inverse_name
 
-            rel_exists = False
-            for each_dict in left_subject.relation_set:
-              if relation_type_node.name in each_dict:
-                rel_exists = True
-                break
+            left_subject = node_collection.one({
+                "_id": subject_id,
+                "relation_set." + relation_type_node_name: {"$exists": True}
+            })
 
-            if not rel_exists:
-              # Fetch corresponding document & append into it's relation_set
-              node_collection.collection.update(
-                {'_id': subject_id}, 
-                {'$addToSet': {'relation_set': {relation_type_node.name: [nid]}}}, 
-                upsert=False, multi=False
-              )
-
-            else:
-              node_collection.collection.update(
-                {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                {'$addToSet': {'relation_set.$.'+relation_type_node.name: nid}}, 
-                upsert=False, multi=False
-              )
-
-            right_subject = node_collection.one({'_id': nid}, {'relation_set': 1})
-
-            inv_rel_exists = False
-            for each_dict in right_subject.relation_set:
-              if relation_type_node.inverse_name in each_dict:
-                inv_rel_exists = True
-                break
-
-            if not inv_rel_exists:
-              # Fetch corresponding document & append into it's relation_set
-              node_collection.collection.update(
-                {'_id': nid}, 
-                {'$addToSet': {'relation_set': {relation_type_node.inverse_name: [subject_id]}}}, 
-                upsert=False, multi=False
-              )
+            if left_subject:
+                # Update value of grelation in existing as key-value pair value in
+                # given node's "relation_set" field
+                node_collection.collection.update({
+                    "_id": subject_id,
+                    "relation_set." + relation_type_node_name: {'$exists': True}
+                }, {
+                    "$addToSet": {"relation_set.$." + relation_type_node_name: right_subject_id_or_list}
+                },
+                    upsert=False, multi=False
+                )
 
             else:
-              node_collection.collection.update(
-                {'_id': nid, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-                {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-                upsert=False, multi=False
-              )
+                # Add grelation as new key-value pair value in given node's
+                # relation_set field
+                node_collection.collection.update({
+                    "_id": subject_id
+                }, {
+                    "$addToSet": {"relation_set": {relation_type_node_name: [right_subject_id_or_list]}}
+                },
+                    upsert=False, multi=False
+                )
 
-            gr_node_list.append(gr_node)
+            right_subject = node_collection.one({
+                '_id': right_subject_id_or_list,
+                "relation_set." + relation_type_node_inverse_name: {"$exists": True}
+            }, {
+                'relation_set': 1
+            })
 
-          else:
-            # Deleted one found so change it's status back to Published
-            if gr_node.status == u'DELETED':
-              gr_node.status = u"PUBLISHED"
-              gr_node.save()
-
-              info_message = " MultipleGRelation: GRelation ("+gr_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
-
-              node_collection.collection.update(
-                {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-                {'$addToSet': {'relation_set.$.'+relation_type_node.name: gr_node.right_subject}}, 
-                upsert=False, multi=False
-              )
-
-              node_collection.collection.update(
-                {'_id': gr_node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-                {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-                upsert=False, multi=False
-              )
-
-              gr_node_list.append(gr_node)
+            if right_subject:
+                # Update value of grelation in existing as key-value pair value in
+                # given node's "relation_set" field
+                node_collection.collection.update({
+                    "_id": right_subject_id_or_list, "relation_set." + relation_type_node_inverse_name: {'$exists': True}
+                }, {
+                    "$addToSet": {"relation_set.$." + relation_type_node_inverse_name: subject_id}
+                },
+                    upsert=False, multi=False
+                )
 
             else:
-              error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
-              # raise Exception(error_message)
+                # Add grelation as new key-value pair value in given node's
+                # relation_set field
+                node_collection.collection.update({
+                    "_id": right_subject_id_or_list
+                }, {
+                    "$addToSet": {"relation_set": {relation_type_node_inverse_name: [subject_id]}}
+                },
+                    upsert=False, multi=False
+                )
 
-      return gr_node_list
+            return gr_node
 
-    else:
-      # For dealing with single relation (one to one)
-      gr_node = None
+        def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text):
+            gr_node.status = u"PUBLISHED"
+            gr_node.save()
 
-      if isinstance(right_subject_id_or_list, list):
-        right_subject_id_or_list = ObjectId(right_subject_id_or_list[0])
+            gr_node_name = gr_node.name
+            relation_type_node_name = relation_type_node.name
+            relation_type_node_inverse_name = relation_type_node.inverse_name
 
-      else:
-        right_subject_id_or_list = ObjectId(right_subject_id_or_list)
+            subject_id = gr_node.subject
+            right_subject = gr_node.right_subject
 
-      gr_node_cur = triple_collection.find(
-        {'_type': "GRelation", 'subject': subject_id,'relation_type.$id': relation_type_node._id}
-      )
+            info_message = " %(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
+                + "status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
 
-      for node in gr_node_cur:
-        if node.right_subject == right_subject_id_or_list:
-          # If match found, it means it could be either DELETED one or PUBLISHED one
-
-          if node.status == u"DELETED":
-            # If deleted, change it's status back to Published from Deleted
-            node.status = u"PUBLISHED"
-            node.save()
-            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
-
-            node_collection.collection.update(
-              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-              {'$addToSet': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
-              upsert=False, multi=False
+            node_collection.collection.update({
+                "_id": subject_id, "relation_set." + relation_type_node_name: {'$exists': True}
+            }, {
+                "$addToSet": {"relation_set.$." + relation_type_node_name: right_subject}
+            },
+                upsert=False, multi=False
             )
 
-            node_collection.collection.update(
-              {'_id': node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-              {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-              upsert=False, multi=False
+            node_collection.collection.update({
+                "_id": right_subject, "relation_set." + relation_type_node_inverse_name: {'$exists': True}
+            }, {
+                "$addToSet": {'relation_set.$.' + relation_type_node_inverse_name: subject_id}
+            },
+                upsert=False, multi=False
             )
 
-          elif node.status == u"PUBLISHED":
-            node_collection.collection.update(
-              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-              {'$addToSet': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
-              upsert=False, multi=False
-            )
+            return gr_node
 
-            node_collection.collection.update(
-              {'_id': node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-              {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-              upsert=False, multi=False
-            )
-            info_message = " SingleGRelation: GRelation ("+node.name+") already exists !\n"
+        if relation_type_node["object_cardinality"]:
+            # If object_cardinality value exists and greater than 1 (or eaqual to 100)
+            # Then it signifies it's a one to many type of relationship
+            # assign multi_relations = True
+            type_of_relationship = relation_type_node.member_of_names_list
+            if relation_type_node["object_cardinality"] > 1:
+                multi_relations = True
 
-          # Set gr_node value as matched value, so that no need to create new one
-          node.reload()
-          gr_node = node
+                if META_TYPE[3] in type_of_relationship:
+                    # If Binary relationship found
+
+                    # Check whether right_subject_id_or_list is list or not
+                    # If not convert it to list
+                    if not isinstance(right_subject_id_or_list, list):
+                        right_subject_id_or_list = [right_subject_id_or_list]
+
+                    # Check whether all values of a list are of ObjectId data-type or not
+                    # If not convert them to ObjectId
+                    for i, each in enumerate(right_subject_id_or_list):
+                        right_subject_id_or_list[i] = ObjectId(each)
+
+                else:
+                    # Relationship Other than Binary one found; e.g, Triadic
+                    if right_subject_id_or_list:
+                        if not isinstance(right_subject_id_or_list[0], list):
+                            right_subject_id_or_list = [right_subject_id_or_list]
+
+                        # right_subject_id_or_list: [[id, id, ...], [id, id, ...], ...]
+                        for i, each_list in enumerate(right_subject_id_or_list):
+                            # each_list: [id, id, ...]
+                            for j, each in enumerate(each_list):
+                                right_subject_id_or_list[i][j] = ObjectId(each)
+
+            else:
+                if META_TYPE[3] in type_of_relationship:
+                    # If Binary relationship found
+                    if isinstance(right_subject_id_or_list, list):
+                        right_subject_id_or_list = ObjectId(right_subject_id_or_list[0])
+
+                    else:
+                        right_subject_id_or_list = ObjectId(right_subject_id_or_list)
+                else:
+                    # Relationship Other than Binary one found; e.g, Triadic
+                    # right_subject_id_or_list: [[id, id, ...], [id, id, ...], ...]
+                    if right_subject_id_or_list:
+                        if isinstance(right_subject_id_or_list[0], list):
+                            # Reduce it to [id, id, id, ...]
+                            right_subject_id_or_list = right_subject_id_or_list[0]
+
+                        for i, each_id in enumerate(right_subject_id_or_list):
+                            right_subject_id_or_list[i] = ObjectId(each_id)
+
+        if multi_relations:
+            # For dealing with multiple relations (one to many)
+
+            # Iterate and find all relationships (including DELETED ones' also)
+            nodes = triple_collection.find({
+                '_type': "GRelation", 'subject': subject_id,
+                'relation_type.$id': relation_type_node._id
+            })
+
+            gr_node_list = []
+
+            for n in nodes:
+                if n.right_subject in right_subject_id_or_list:
+                    if n.status != u"DELETED":
+                        # If match found with existing one's, then only remove that ObjectId from the given list of ObjectIds
+                        # Just to remove already existing entries (whose status is PUBLISHED)
+                        right_subject_id_or_list.remove(n.right_subject)
+                        gr_node_list.append(n)
+
+                        node_collection.collection.update(
+                          {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                          {'$addToSet': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
+                          upsert=False, multi=False
+                        )
+
+                        node_collection.collection.update(
+                          {'_id': n.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
+                          {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
+                          upsert=False, multi=False
+                        )
+
+                else:
+                    # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
+                    # So change their status from PUBLISHED to DELETED
+                    # right_subject_id_or_list.remove(n.right_subject)
+                    n.status = u"DELETED"
+                    n.save()
+                    info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
+
+                    node_collection.collection.update({
+                        '_id': subject_id, 'relation_set.' + relation_type_node.name: {'$exists': True}
+                    }, {
+                        '$pull': {'relation_set.$.' + relation_type_node.name: n.right_subject}
+                    },
+                        upsert=False, multi=False
+                    )
+
+                    res = node_collection.collection.update({
+                        '_id': n.right_subject, 'relation_set.' + relation_type_node.inverse_name: {'$exists': True}
+                    }, {
+                        '$pull': {'relation_set.$.' + relation_type_node.inverse_name: subject_id}
+                    },
+                        upsert=False, multi=False
+                    )
+
+            if right_subject_id_or_list:
+                # If still ObjectId list persists, it means either they are new ones'
+                # or from deleted ones'
+                # For deleted one's, find them and modify their status to PUBLISHED
+                # For newer one's, create them as new document
+                for nid in right_subject_id_or_list:
+                    gr_node = triple_collection.one({
+                        '_type': "GRelation", 'subject': subject_id,
+                        'relation_type.$id': relation_type_node._id, 'right_subject': nid
+                    })
+
+                    if gr_node is None:
+                        # New one found so create it
+                        gr_node = _create_grelation_node(subject_id, relation_type_node, nid, "MultipleGRelation")
+                        gr_node_list.append(gr_node)
+
+                    else:
+                        # Deleted one found so change it's status back to Published
+                        if gr_node.status == u'DELETED':
+                            gr_node = _update_deleted_to_published(gr_node, relation_type_node, "MultipleGRelation")
+                            gr_node_list.append(gr_node)
+
+                        else:
+                            error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
+                            # raise Exception(error_message)
+
+            return gr_node_list
 
         else:
-          # If match not found and if it's PUBLISHED one, modify it to DELETED
-          if node.status == u'PUBLISHED':
-            node.status = u"DELETED"
-            node.save()
+            # For dealing with single relation (one to one)
+            gr_node = None
 
-            node_collection.collection.update(
-              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-              {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
-              upsert=False, multi=False
-            )
+            relation_type_node_id = relation_type_node._id
+            relation_type_node_name = relation_type_node.name
+            relation_type_node_inverse_name = relation_type_node.inverse_name
 
-            node_collection.collection.update(
-              {'_id': node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-              {'$pull': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-              upsert=False, multi=False
-            )
-            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
-          
-          elif node.status == u'DELETED':
-            node_collection.collection.update(
-              {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-              {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
-              upsert=False, multi=False
-            )
+            gr_node_cur = triple_collection.find({
+                "_type": "GRelation", "subject": subject_id,
+                "relation_type.$id": relation_type_node_id
+            })
 
-            node_collection.collection.update(
-              {'_id': node.right_subject, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-              {'$pull': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-              upsert=False, multi=False
-            )
-            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            for node in gr_node_cur:
+                node_name = node.name
+                node_status = node.status
+                node_right_subject = node.right_subject
 
-      if gr_node is None:
-        # Code for creation
-        gr_node = triple_collection.collection.GRelation()
+                if node_right_subject == right_subject_id_or_list:
+                    # If match found, it means it could be either DELETED one or PUBLISHED one
 
-        gr_node.subject = subject_id
-        gr_node.relation_type = relation_type_node
-        gr_node.right_subject = right_subject_id_or_list
+                    if node_status == u"DELETED":
+                        # If deleted, change it's status back to Published from Deleted
+                        node = _update_deleted_to_published(node, relation_type_node, "SingleGRelation")
 
-        gr_node.status = u"PUBLISHED"
-        
-        gr_node.save()
-        info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+                    elif node_status == u"PUBLISHED":
+                        node_collection.collection.update({
+                            "_id": subject_id, "relation_set." + relation_type_node_name: {'$exists': True}
+                        }, {
+                            "$addToSet": {"relation_set.$." + relation_type_node_name: node_right_subject}
+                        },
+                            upsert=False, multi=False
+                        )
 
-        left_subject = node_collection.one({'_id': subject_id}, {'relation_set': 1})
+                        node_collection.collection.update({
+                            "_id": node_right_subject, "relation_set." + relation_type_node_inverse_name: {'$exists': True}
+                        }, {
+                            "$addToSet": {"relation_set.$." + relation_type_node_inverse_name: subject_id}
+                        },
+                            upsert=False, multi=False
+                        )
+                        info_message = " SingleGRelation: GRelation (%(node_name)s) already exists !\n" % locals()
 
-        rel_exists = False
-        for each_dict in left_subject.relation_set:
-          if relation_type_node.name in each_dict:
-            rel_exists = True
-            break
+                    # Set gr_node value as matched value, so that no need to create new one
+                    node.reload()
+                    gr_node = node
 
-        if not rel_exists:
-          # Fetch corresponding document & append into it's relation_set
-          node_collection.collection.update(
-            {'_id': subject_id}, 
-            {'$addToSet': {'relation_set': {relation_type_node.name: [right_subject_id_or_list]}}}, 
-            upsert=False, multi=False
-          )
+                else:
+                    # If match not found and if it's PUBLISHED one, modify it to DELETED
+                    if node.status == u'PUBLISHED':
+                        node.status = u"DELETED"
+                        node.save()
 
-        else:
-          node_collection.collection.update(
-            {'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
-            {'$addToSet': {'relation_set.$.'+relation_type_node.name: right_subject_id_or_list}}, 
-            upsert=False, multi=False
-          )
+                        node_collection.collection.update({
+                            '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
+                        }, {
+                            '$pull': {'relation_set.$.' + relation_type_node_name: node_right_subject}
+                        },
+                            upsert=False, multi=False
+                        )
 
-        right_subject = node_collection.one({'_id': right_subject_id_or_list}, {'relation_set': 1})
+                        node_collection.collection.update({
+                            '_id': node_right_subject, 'relation_set.' + relation_type_node_inverse_name: {'$exists': True}
+                        }, {
+                            '$pull': {'relation_set.$.' + relation_type_node_inverse_name: subject_id}
+                        },
+                            upsert=False, multi=False
+                        )
+                        info_message = " SingleGRelation: GRelation (%(node_name)s) status " % locals() \
+                            + "updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
-        inv_rel_exists = False
-        for each_dict in right_subject.relation_set:
-          if relation_type_node.inverse_name in each_dict:
-            inv_rel_exists = True
-            break
+            if gr_node is None:
+                # Code for creation
+                gr_node = _create_grelation_node(subject_id, relation_type_node, right_subject_id_or_list, "SingleGRelation")
 
-        if not inv_rel_exists:
-          # Fetch corresponding document & append into it's relation_set
-          node_collection.collection.update(
-            {'_id': right_subject_id_or_list}, 
-            {'$addToSet': {'relation_set': {relation_type_node.inverse_name: [subject_id]}}}, 
-            upsert=False, multi=False
-          )
+            return gr_node
 
-        else:
-          node_collection.collection.update(
-            {'_id': right_subject_id_or_list, 'relation_set.'+relation_type_node.inverse_name: {'$exists': True}}, 
-            {'$addToSet': {'relation_set.$.'+relation_type_node.inverse_name: subject_id}}, 
-            upsert=False, multi=False
-          )
+    except Exception as e:
+        error_message = "\n GRelationError (line #" + str(exc_info()[-1].tb_lineno) + "): " + str(e) + "\n"
+        raise Exception(error_message)
 
-      return gr_node
 
-  except Exception as e:
-      error_message = "\n GRelationError: " + str(e) + "\n"
-      raise Exception(error_message)
-
-      
-
-      
 ###############################################      ##############################################
 @get_execution_time
 def set_all_urls(member_of):
@@ -3859,3 +3863,31 @@ def delete_node(
     except Exception as e:
         delete_status_message = "Error (from delete_node) :-\n" + str(e)
         return (False, delete_status_message)
+
+
+def repository(request, group_id):
+    '''
+    It's an NROER repository. Which will hold the list of apps.
+    '''
+
+    gapp_metatype = node_collection.one({"_type": "MetaType", "name": "GAPP"})
+
+    gapps_list = [i.values()[0] for i in GSTUDIO_NROER_GAPPS]
+    # print gapps_list
+
+    gapps_obj_list = []
+
+    for each_gapp in gapps_list:
+        gapp_obj = node_collection.one({ '_type':'GSystemType',
+                                          'name': {"$regex": each_gapp, "$options": "i"},
+                                          "member_of": {"$in": [gapp_metatype._id]}
+                                        })
+        gapps_obj_list.append(gapp_obj)
+
+    return render_to_response("ndf/repository.html",
+                              { "gapps_obj_list": gapps_obj_list,
+                                "gapps_dict" : GSTUDIO_NROER_GAPPS,
+                                'group_id': group_id, 'groupid': group_id
+                              },
+                              context_instance=RequestContext(request)
+                            )

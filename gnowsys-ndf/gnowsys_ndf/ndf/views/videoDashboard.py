@@ -126,13 +126,22 @@ def video_detail(request, group_id, _id):
     else :
         pass
     vid_node = node_collection.one({"_id": ObjectId(_id)})
+
+    # First get the navigation list till topic from theme map
+    nav_l=request.GET.get('nav_li','')
+    breadcrumbs_list = []
+    nav_li = ""
+
+    if nav_l:
+      nav_li = nav_l
+
     if vid_node._type == "GSystemType":
 	return videoDashboard(request, group_id, _id)
     video_obj=request.GET.get("vid_id","")
     return render_to_response("ndf/video_detail.html",
                                   { 'node': vid_node,
                                     'group_id': group_id,
-                                    'groupid':group_id,
+                                    'groupid':group_id, 'nav_list':nav_li,
                                     'video_obj':video_obj
                                   },
                                   context_instance = RequestContext(request)

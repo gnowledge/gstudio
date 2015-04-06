@@ -20,6 +20,7 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.models import AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
@@ -405,10 +406,21 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               else:
                 field_value_list = request.POST.getlist(fi_name)
 
-              # field_instance_type = "GRelation"
-              for i, field_value in enumerate(field_value_list):
-                field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
-                field_value_list[i] = field_value
+              if META_TYPE[3] in field_instance.member_of_names_list:
+                # If Binary relationship found
+                # [id, id, ...]
+                # field_instance_type = "GRelation"
+                for i, field_value in enumerate(field_value_list):
+                  field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
+                  field_value_list[i] = field_value
+              else:
+                # Relationship Other than Binary one found; e.g, Triadic
+                # [[id, id, ...], [id, id, ...], ...]
+                # field_instance_type = "GRelation"
+                for i, field_value_inner_list in enumerate(field_value_list):
+                  for j, field_value in enumerate(field_value_inner_list):
+                    field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
+                    field_value_list[i][j] = field_value
 
               person_gs_triple_instance = create_grelation(person_gs._id, node_collection.collection.RelationType(field_instance), field_value_list)
 
@@ -437,7 +449,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     for attr in person_gs.attribute_set:
       if "email_id" in attr:
         if attr["email_id"]:
-          auth_node = node_collection.one({'_type': "Author", 'email': attr["email_id"]})
+          auth_node = node_collection.one({'_type': "Author", 'email': attr["email_id"].lower()})
           break
 
     if auth_node:
@@ -497,6 +509,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   default_template = "ndf/person_create_edit.html"
+
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
@@ -524,6 +537,32 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   if app_set_instance_id:
     person_gs.get_neighbourhood(person_gs.member_of)
+
+    if "trainer_teaches_course_in_college" in person_gs:
+      l = []
+      for each_course_college in person_gs.trainer_teaches_course_in_college:
+        # Fetch Course Type (i.e. nussd_course_type)
+        ct = ""
+        for each_attr in each_course_college[0].attribute_set:
+          if "nussd_course_type" in each_attr and each_attr:
+            ct = each_attr["nussd_course_type"]
+            break
+
+        univ_name = ""
+        for each_rel in each_course_college[1].relation_set:
+          if "college_affiliated_to" in each_rel and each_rel:
+              univ = node_collection.find_one({"_id": {"$in": each_rel["college_affiliated_to"]}})
+              univ_name = univ.name if univ else ""
+
+        l.append((
+            ct, each_course_college[0].name, each_course_college[1].name,
+            each_course_college[0]._id.__str__(),
+            each_course_college[1]._id.__str__(),
+            univ_name
+        ))
+
+      person_gs.trainer_teaches_course_in_college = l
+
     context_variables['node'] = person_gs
 
   try:
