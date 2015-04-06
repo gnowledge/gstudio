@@ -1,7 +1,7 @@
 ''' -- imports from python libraries -- '''
 import os
 import time
-import sys
+from sys import argv, exc_info
 import json
 from datetime import datetime
 
@@ -30,7 +30,7 @@ from gnowsys_ndf.factory_type import factory_gsystem_types, factory_attribute_ty
 ###############################################################################
 # Global variables
 
-filename = sys.argv[-1]
+filename = argv[-1]
 f = filename.split("/")
 if f[-1] == "ATs.json" or f[-1] == "RTs.json" or f[-1] == "STs.json":
   json_file = open(filename)
@@ -206,8 +206,8 @@ class Command(BaseCommand):
             node.member_of.append(glist._id)
             node.save()
             print "\n CollegeEvents Created."
-  
-        Event=node_collection.find_one({'_type':"GSystemType","name":"Event"})  
+
+        Event=node_collection.find_one({'_type':"GSystemType","name":"Event"})
         if Event:
           All_Event_Types=node_collection.find({"type_of": ObjectId(Event._id)})
           Eventtype=node_collection.one({'member_of':ObjectId(glist._id),"name":"Eventtype"})
@@ -215,20 +215,20 @@ class Command(BaseCommand):
           Event_type_list=[]
           College_type_list=[]
           for i in All_Event_Types:
-              if (GlistItem._id not in i.member_of): 
+              if (GlistItem._id not in i.member_of):
                   i.member_of.append(GlistItem._id)
                   i.save()
               if i.name not in ['Classroom Session','Exam']:
                  Event_type_list.append(i._id)
               if i.name in ['Classroom Session','Exam']:
                  College_type_list.append(i._id)
-                  
+
           node_collection.collection.update({'_id': ObjectId(Eventtype._id)}, {'$set': {'collection_set': Event_type_list}}, upsert=False, multi=False)
-          
+
           node_collection.collection.update({'_id': ObjectId(CollegeEvents._id)}, {'$set': {'collection_set': College_type_list}}, upsert=False, multi=False)
-          
+
         #End of adding Event Types and CollegeEvents
-        
+
         # Creating GSystem(s) of GList for GSTUDIO_TASK_TYPES
         # Divided in two parts:
         # 1) Creating Types as GList nodes from GSTUDIO_TASK_TYPES
@@ -285,7 +285,7 @@ class Command(BaseCommand):
         else:
           print " GList ("+glc_node_name+") container already created !"
           info_message += "\n GList ("+glc_node_name+") container already created !"
-        
+
         print "\n"
         info_message += "\n\n"
         log_list.append(info_message)
@@ -295,7 +295,7 @@ class Command(BaseCommand):
         log_list.append(info_message)
 
       except Exception as e:
-        error_message = "SetupStructureError: " + str(e)
+        error_message = "SetupStructureError (line # " + str(exc_info()[-1].tb_lineno) + "): " + str(e)
         print "\n " + error_message
         log_list.append(error_message)
         # raise Exception(error_message)
@@ -310,7 +310,7 @@ class Command(BaseCommand):
 
           with open(log_file_path, 'a') as log_file:
             log_file.writelines(log_list)
-      
+
     if options["clean_structure"]:
       try:
         info_message = "\n Performing structure cleaning activities...\n"

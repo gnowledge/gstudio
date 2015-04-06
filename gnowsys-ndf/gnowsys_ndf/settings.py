@@ -417,15 +417,25 @@ LOGGING = {
 
 LOGIN_REDIRECT_URL = "/"
 
-# Absolute filesystem path to the project's base directory, 
+# Absolute filesystem path to the project's base directory,
 # i.e. having settings.py file
 # Example: "/.../project-name/app-name/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
+# Binary - Only meant for RelationType's document to represent
+# Binary relationship, especially defined to differentiate
+# from other relationship(s), i.e. Triadic, etc.
+# Example (Binary): A >> son-of >> [B]
+# Example (Triadic): A >> teaches-course-in-college >> [Course, College]
+META_TYPE = [
+    u"GAPP", u"factory_types", u"Mapping_relations", u"Binary", u"Triadic"
+]
 
-GROUP_AGENCY_TYPES=["Other", "Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
+GROUP_AGENCY_TYPES = [
+    "Other", "Partner", "GovernmentAgency", "NGO", "College", "University",
+    "School", "Institution", "Project", "SpecialInterestGroup"
+]
 
 AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
