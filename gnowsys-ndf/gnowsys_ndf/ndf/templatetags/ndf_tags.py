@@ -1160,7 +1160,7 @@ def get_resources(node_id,resources):
 
 @get_execution_time
 @register.assignment_tag
-def get_contents(node_id, selected, choice):
+def get_contents(node_id, selected=None, choice=None):
 
 	contents = {}
 	image_contents = []
@@ -1172,6 +1172,7 @@ def get_contents(node_id, selected, choice):
 	name = ""
 	ob_id = ""
 
+	# print "node_id:",node_id,"\n"
 	obj = node_collection.one({'_id': ObjectId(node_id) })
 
 	RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
@@ -1255,6 +1256,46 @@ def get_contents(node_id, selected, choice):
 	# print "\n",contents,"\n"
 	return contents
 	
+
+@get_execution_time
+@register.assignment_tag
+def get_topic_res_count(node_id):
+	'''
+	This function returns the count of resources holding by topic
+	'''
+	contents = {}
+	image_contents = []
+	video_contents = []
+	document_contents = []
+	page_contents = []
+	audio_contents = []
+	interactive_contents = []
+	name = ""
+	ob_id = ""
+
+	# print "node_id: ",node_id,"\n"
+	obj = node_collection.one({'_id': ObjectId(node_id) })
+
+	RT_teaches = node_collection.one({'_type':'RelationType', 'name': 'teaches'})
+
+	if obj.language == u"hi":
+		# "right_subject" is the translated node hence to find those relations which has translated nodes with RT 'translation_of'
+		# These are populated when translated topic clicked.
+		trans_grelations = triple_collection.find({'_type':'GRelation','right_subject':obj._id,'relation_type.$id':RT_translation_of._id })               
+		# If translated topic then, choose its subject value since subject value is the original topic node for which resources are attached with RT teaches. 
+		if trans_grelations.count() > 0:
+			obj = node_collection.one({'_id': ObjectId(trans_grelations[0].subject)})
+
+	# If no translated topic then, take the "obj" value mentioned above which is original topic node for which resources are attached with RT teaches
+	list_grelations = triple_collection.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type.$id': RT_teaches._id })
+
+	count = list_grelations.count()
+
+
+	# print "count: ",count,"\n"
+	return count
+
+
 @get_execution_time
 @register.assignment_tag
 def get_teaches_list(node):
