@@ -505,7 +505,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
           event_coordinator_str = ""
           event_organized_by = []
           event_coordinator = []
-          event_node = collection.Node.one({'_id':ObjectId(event_gs._id)})
+          event_node = node_collection.one({'_id':ObjectId(event_gs._id)})
           for i in event_node.relation_set:
              if unicode('event_organised_by') in i.keys():
                 event_organized_by = i['event_organised_by']
@@ -517,14 +517,14 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
           site = Site.objects.get(pk=1)
           site = site.name.__str__()
           event_link = "http://" + site + event_url
-          event_organized_by_cur = collection.Node.find({"_id":{'$in':event_organized_by}})
-          event_coordinator_cur = collection.Node.find({"_id":{'$in':event_coordinator}})
+          event_organized_by_cur = node_collection.find({"_id":{'$in':event_organized_by}})
+          event_coordinator_cur = node_collection.find({"_id":{'$in':event_coordinator}})
           for i in event_coordinator_cur:
               event_coordinator_str = event_coordinator_str + i.name + "  "
           for i in event_organized_by_cur:
               event_organizer_str = event_coordinator_str + i.name + "  "     
           for j in event_attendees:
-                      auth = collection.Node.one({"_id":ObjectId(j)})
+                      auth = node_collection.one({"_id":ObjectId(j)})
                       user_obj = User.objects.get(id=auth.created_by)
                       if user_obj not in to_user_list:
                               to_user_list.append(user_obj)
