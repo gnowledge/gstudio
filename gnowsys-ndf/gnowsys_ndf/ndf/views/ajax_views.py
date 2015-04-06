@@ -3853,6 +3853,7 @@ def get_anncourses_allstudents(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
+
 @get_execution_time
 def get_course_details_for_trainer(request, group_id):
   """
@@ -3874,7 +3875,6 @@ def get_course_details_for_trainer(request, group_id):
       3) Key: college; Value: College GSystem's document
   """
   response_dict = {'success': False, 'message': ""}
-  all_students_text = ""
 
   try:
     if request.is_ajax() and request.method == "GET":
@@ -3883,88 +3883,113 @@ def get_course_details_for_trainer(request, group_id):
 
       # Check whether any field has missing value or not
       if course_type == "" or trainer_type == "":
-        error_message = "Invalid data: No data found in any of the field(s)!!!"
-        raise Exception(error_message)
+          error_message = "Invalid data: No data found in any of the field(s)!!!"
+          raise Exception(error_message)
+
+      # Using below text variable to fetch specific attribute based on which
+      # type of trainer we are dealing with
+      # Voluntary Teacher -- voln_tr_qualifications
+      # Master Trainer -- mast_tr_qualifications
+      fetch_attribute_for_trainer = ""
+      bool_trainer_type = None
+      if trainer_type == "Voluntary Teacher":
+          fetch_attribute_for_trainer = "voln_tr_qualifications"
+          bool_trainer_type = True
+      elif trainer_type == "Master Trainer":
+          fetch_attribute_for_trainer = "mast_tr_qualifications"
+          bool_trainer_type = False
 
       # Fetch required GSystemTypes (NUSSD Course, Announced Course, University, College)
-      course_gst = node_collection.one({'_type': "GSystemType", 'name': "NUSSD Course"}, {'_id': 1})
-      ann_course_gst = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"}, {'_id': 1})
-      college_gst = node_collection.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
-      university_gst = node_collection.one({'_type': "GSystemType", 'name': "University"}, {'_id': 1})
-      mis_admin = node_collection.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
+      course_gst = node_collection.one({
+          '_type': "GSystemType", 'name': "NUSSD Course"
+      }, {
+          '_id': 1
+      })
+      college_gst = node_collection.one({
+          '_type': "GSystemType", 'name': "College"
+      }, {
+          '_id': 1
+      })
+      university_gst = node_collection.one({
+          '_type': "GSystemType", 'name': "University"
+      }, {
+          '_id': 1
+      })
+      mis_admin = node_collection.one({
+          '_type': "Group", 'name': "MIS_admin"
+      }, {
+          '_id': 1
+      })
 
-      # Query that fetches Announced Course GSystems
-      # Group by Course
-      # Populate a list of Announced Course & College ObjectIds
-      op = node_collection.collection.aggregate([
-        {'$match': {
-          'member_of': ann_course_gst._id, 
-          'group_set': mis_admin._id,
-          'status': u"PUBLISHED", 
-          'attribute_set.nussd_course_type': course_type
-        }},
-        {'$group': {
-          '_id': {'course_id': "$relation_set.announced_for"},
-          'college_wise_data': {'$addToSet': {'ann_course_id': "$_id", 'college_id': "$relation_set.acourse_for_college"}}
-        }}
-      ])
+      course_enrollement_details = {}
+      course_requirements = {}
+      college_dict = {}
+      university_dict = {}
+      course_dict = {}
 
-      if op["result"]:
-        course_enrollement_details = {}
-        course_requirements = {}
-        college_dict = {}
-        university_dict = {}
+      # Fetching NUSSD Course(s) registered under MIS_admin group
+      nussd_courses_cur = node_collection.find({
+          "member_of": course_gst._id,
+          "group_set": mis_admin._id,
+          "attribute_set.nussd_course_type": course_type
+      }, {
+          "name": 1,
+          "attribute_set." + fetch_attribute_for_trainer: 1
+      })
 
+      for course in nussd_courses_cur:
+          course_dict[course.name] = course._id
 
-        for each in op["result"]:
-          course = None
-          if trainer_type == "Voluntary Teacher":
-            course = node_collection.one({'member_of': course_gst._id, '_id': {'$in': each["_id"]["course_id"][0]}}, {'_id': 1, 'name': 1, 'attribute_set.voln_tr_qualifications': 1})
-
-            for requirement in course.attribute_set:
+          # Set given course's requirements
+          for requirement in course.attribute_set:
               if requirement:
-                course_requirements[course.name] = requirement["voln_tr_qualifications"]
-          
-          elif trainer_type == "Master Trainer":
-            course = node_collection.one({'member_of': course_gst._id, '_id': {'$in': each["_id"]["course_id"][0]}}, {'_id': 1, 'name': 1, 'attribute_set.mast_tr_qualifications': 1})
-
-            for requirement in course.attribute_set:
-              if requirement:
-                course_requirements[course.name] = requirement["mast_tr_qualifications"]
+                  course_requirements[course.name] = requirement[fetch_attribute_for_trainer]
 
           course_enrollement_details[course.name] = []
 
-          if course:
-            for each_data in each["college_wise_data"]:
-              data_dict = {}
-              data_dict['ann_course_id'] = each_data["ann_course_id"]
-
-              college_gs = None
-              college_id = each_data["college_id"][0][0]
-              if college_id not in college_dict:
-                college_gs = node_collection.one({'member_of': college_gst._id, '_id': college_id}, {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1})
-                college_dict[college_id] = college_gs
-              else:
-                college_gs = college_dict[college_id]
-              data_dict['college'] = college_gs.name
-              
+      if nussd_courses_cur.count():
+          college_cur = node_collection.find({
+              "member_of": college_gst._id,
+              "group_set": mis_admin._id
+          }, {
+              "name": 1,
+              "college_affiliated_to": 1
+          })
+          for college in college_cur:
               university_gs = None
-              if college_id not in university_dict:
-                university_gs = node_collection.one({'member_of': university_gst._id, 'relation_set.affiliated_college': college_gs._id}, {'_id': 1, 'name': 1})
-                university_dict[college_id] = university_gs
-              else:
-                university_gs = university_dict[college_id]
-              data_dict['university'] = university_gs.name
+              if college._id not in university_dict:
+                  university_gs = node_collection.find_one({
+                      'member_of': university_gst._id,
+                      'relation_set.affiliated_college': college._id
+                  }, {
+                      '_id': 1,
+                      'name': 1
+                  })
+                  if university_gs:
+                      university_dict[college._id] = university_gs
 
-              course_enrollement_details[course.name].append(data_dict)
-              
-          else:
-            error_message = "No Course exists with such ObjectId(" + str(each["_id"]["course_id"])
-            raise Exception(error_message)
+                      college_data = {}
+                      college_data["college"] = college.name
+                      college_data["university"] = university_gs.name
+                      if bool_trainer_type:
+                          # If bool_trainer_type (True, i.e Voluntary Teacher)
+                          # Set organization_id as College's ObjectId
+                          # As creating linking between Voluntary Teacher & College
+                          college_data["organization_id"] = college._id
+                      else:
+                          # If bool_trainer_type (False, i.e Master Trainer)
+                          # Set organization_id as University's ObjectId
+                          # As creating linking between Master Trainer & University
+                          college_data["organization_id"] = university_gs._id
+                      college_dict[college._id] = college_data
 
-      else:
-        error_message = "No Course(s) announced of given type ("+course_type+") "
-        raise Exception(error_message)
+              if college._id in university_dict:
+                  for course_name in course_enrollement_details.keys():
+                      data_dict = {}
+                      data_dict["ann_course_id"] = course_dict[course_name]
+                      data_dict.update(college_dict[college._id])
+
+                      course_enrollement_details[course_name].append(data_dict)
 
       response_dict["course_enrollement_details"] = course_enrollement_details
       response_dict["course_requirements"] = course_requirements
@@ -3983,6 +4008,7 @@ def get_course_details_for_trainer(request, group_id):
     error_message = "TrainerCourseDetailError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
+
 
 @get_execution_time
 def get_students_for_approval(request, group_id):
