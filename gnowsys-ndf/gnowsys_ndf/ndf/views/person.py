@@ -449,7 +449,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     for attr in person_gs.attribute_set:
       if "email_id" in attr:
         if attr["email_id"]:
-          auth_node = node_collection.one({'_type': "Author", 'email': attr["email_id"]})
+          auth_node = node_collection.one({'_type': "Author", 'email': attr["email_id"].lower()})
           break
 
     if auth_node:
@@ -457,7 +457,14 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       if has_login_rt:
         # Linking GSystem Node and Author node via "has_login" relationship;
         gr_node = create_grelation(person_gs._id, has_login_rt, auth_node._id)
-      
+
+        # Set author_agency field's value of author node as "Program Officer"
+        # Required to identify at time of log-in in order to display
+        # required modules defined for Program Officers under MIS GApp
+        if auth_node.agency_type != u"Program Officer":
+          auth_node.agency_type = u"Program Officer"
+          auth_node.save()
+
       if "Program Officer" in person_gs.member_of_names_list:
         # If Person node (GSystem) is of Program Officer type
         # then only go for subscription

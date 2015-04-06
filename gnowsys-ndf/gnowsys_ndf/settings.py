@@ -420,7 +420,6 @@ LOGIN_REDIRECT_URL = "/"
 # Absolute filesystem path to the project's base directory,
 # i.e. having settings.py file
 # Example: "/.../project-name/app-name/"
-
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Binary - Only meant for RelationType's document to represent
@@ -440,6 +439,14 @@ GROUP_AGENCY_TYPES = [
 AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
 ]
+
+# Varible to toggle the visibility of author_agency_type field of Author
+# class in User-registration template (shown as Occupation)
+GSTUDIO_REGISTRATION_AUTHOR_AGENCY_TYPE = True
+
+# Varible to toggle the visibility of group_affiliation field of Author
+# class in User-registration template (shown as Organization)
+GSTUDIO_REGISTRATION_AFFILIATION = True
 
 # Built-in GAPPS list
 # ONLY TO BE EDITED - in case of adding new built-in GAPPS
