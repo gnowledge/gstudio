@@ -581,10 +581,10 @@ GSTUDIO_NROER_MENU = [{"Repository":[]}, {"Partners":["States", "Institutions", 
 GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"} ]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
-            "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
+            "States": "State Partners", "Institutions": "Institutional Partners", "Individuals": "Individual Partners",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
-
+            
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
