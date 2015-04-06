@@ -10,11 +10,20 @@
 	<h4>
 		<br/>
 		<small>
-			Sorry, but the requested page is unavailable due to a server error.
+			The requested page is unavailable.
 		<br/>
-			Our developers team have been notified, so check back later.
+			Our developers have been informed of this error.
 		<br/><br/>
-			If you want, head to the &nbsp; <a href="/home/"> <i class="fi-home"> </i> homepage</a>.
+			{% if site.SITE_NAME == "NROER" %}
+				Please Navigate back to:
+				<blockquote>
+					<a href="{% url 'repository' 'home' %}"> Repository </a> | 
+					<a href="{% url 'nroer_groups' 'home' 'Partners' %}"> Partners </a> | 
+					<a href="{% url 'nroer_groups' 'home' 'Groups' %}"> Groups </a>
+				</blockquote>
+			{% else %}
+				If you want, head to the &nbsp; <a href="/home/"> <i class="fi-home"> </i> homepage</a>.
+			{% endif %}
 		</small>
 	</h4>
 	</div>
