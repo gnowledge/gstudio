@@ -762,7 +762,7 @@
     var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
     var str_lbl="<span data-tooltip title='{{cs_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id='{{cs_node.pk}}' style='float:left;'>{{cs_node.name}}</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>"    
     var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
-
+    $("#"+cloned_ele_id).find(".sub-section-btn").removeAttr("disabled");
     $("#"+cloned_ele_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
     cs_cloned_id += 1
 
