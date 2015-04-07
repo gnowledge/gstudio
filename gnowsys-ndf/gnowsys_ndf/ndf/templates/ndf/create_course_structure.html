@@ -117,6 +117,10 @@
       text-overflow: ellipsis;
       font-size: 80%;
     }
+    input.lbl_of_cs, input.lbl_of_css{
+    width: 50% !important;
+    margin-top:6px;
+    }
 
     .div_lbl > label {
      display: inline-block;
@@ -156,7 +160,7 @@
 {% endblock %}
 {% block body_content %} 
   
-  
+
   <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert action=>
     <label id="alertModalLabel"></label>
     <a class="close-reveal-modal">&#215;</a>
@@ -353,7 +357,7 @@
           },
           complete: function (result) {
             if(success_state){
-              var str_btn="<div class='row'><div class='small-1 columns text-center fold-btn-div'><i class='fi-page-copy largesize'></i></div>"
+              var str_btn="<div class='row'><div class='small-1 columns text-center fold-btn-div'><i class='fi-minus largesize'></i></div>"
               var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id = "+ cs_new_id+" style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>"    
               var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
               $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop);
