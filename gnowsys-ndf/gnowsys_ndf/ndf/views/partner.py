@@ -135,16 +135,30 @@ def create_partner(request,group_id):
   return render_to_response("ndf/create_partner.html", {'groupid': group_id, 'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
     
 
-def partner_list(request,group_id):
-    group_name, group_id = get_group_name_id(group_id)
+def partner_list(request, group_id):
 
-    get_grp=node_collection.one({'_id':ObjectId(group_id)})
-    collection_set=[]
-    for each in get_grp.collection_set:
-        node=node_collection.one({'_id':each})
-        collection_set.append(node)
+    group_obj = get_group_name_id(group_id, get_obj=True)
+
+    collection_set = []
+    groups_category = None
+
+    if group_obj:
+        group_id = group_obj._id
+        group_name = group_obj.name
+        groups_category = group_obj.agency_type
+        groups_category = "Partner" if groups_category == "Partner" else "Group"
+
+        get_grp = node_collection.one({'_id': ObjectId(group_id)})
+
+        if get_grp:
+            for each in get_grp.collection_set:
+                node = node_collection.one({'_id': each})
+                collection_set.append(node)
+
+    # print GSTUDIO_NROER_MENU_MAPPINGS.get(group_name, None)
+    # print GSTUDIO_NROER_MENU
     return render_to_response("ndf/partner_list.html", 
-                          {'group_nodes': collection_set,
+                          {'group_nodes': collection_set, "groups_category": groups_category,
                            'groupid': group_id, 'group_id': group_id
                           }, context_instance=RequestContext(request))
 
