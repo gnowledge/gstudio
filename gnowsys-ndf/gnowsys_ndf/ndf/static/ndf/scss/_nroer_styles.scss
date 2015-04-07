@@ -26,6 +26,10 @@
   }
 }
 
+article.landing{
+    padding-top: 8%;
+}
+
 
 /* For landing page */
  #landing>header{
@@ -91,37 +95,77 @@ div.banner{
     border:2px solid lighten($primary-color,10%);
     border-width: 2px 0;
     &>*{
-    background-color: $primary-color;
+        background-color: $primary-color;
         .slide{
             padding: 1rem;
             margin: 0;
             background-color: darken($primary-color,5%);
-            height:50vh !important;
-            &>i{
+            height: 24em !important;
+            height: 50vh !important;
+            .slide-back-image{
                 position: absolute;
                 font-size: 17rem;
+                font-size: 17vw;
                 pointer-events: none;
                 color: white;
-                opacity:0.1;
-                right:5%;
+                opacity: 0.08;
+                right: 7%;
+            }
+            .count-box{
+                font-size: 120%;
+                font-size: 1.35vw;
+                opacity: 0.8;
+                padding-bottom: 1em;
+
+                .count{
+                    font-size: 1.75vw;
+                    padding-right: 5px;
+                }
+                a{
+                    font-size: 1.35vw;
+                }
+            }
+
+            .quotes{
+                opacity: 0.75;
+                font-family: "Times new Roman";
+                font-size: 200%;
+                font-size: 3vw;
+            }
+
+            .slide-2-icons{
+                opacity: 0.5;
+                font-size: 280%;
+                font-size: 3vw;
             }
         }
-    color:#eee;
-    margin:0;
-    h3,h4,h5,h6,blockquote{
-        color:white;
-    }
+        color:#eee;
+        margin:0;
+        h2,h3,h4,h5,h6,blockquote{
+            color:white;
+        }
+        h2{
+            font-size: 280%;
+            font-size: 3vw;
+        }
+        h3{
+            font-size: 180%;
+            font-size: 2vw;
+        }
         blockquote{
-            font-size: 140%;
-            font-style:italic;
+            font-size: 120%;
+            font-size: 1.35vw;
+            font-style: italic;
         }
-    p:first-child{
-        color:white;
-        font-size:120%;
+        p{
+            color:white;
+            font-size:120%;
+            font-size:1.35vw;
         }
-    
     }
+
     // Slick Carousel
     .slick-dots .button{
     }
+
 }
