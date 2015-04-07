@@ -1502,14 +1502,15 @@ ul#navigation li a.last {
 
   // Taken value of svg data of that node globally
   var svgdata;
-  $(document).ready(function() {
-      $(function() {
-        // For topic node landing page concept svg graph commented for time being
-        // svgdata = $('#chart-concept svg');
-        // $('#view-graph').append(svgdata);
+  // Commented bellow part ,not in use
+  // $(document).ready(function() {
+  //     $(function() {
+  //       // For topic node landing page concept svg graph commented for time being
+  //       // svgdata = $('#chart-concept svg');
+  //       // $('#view-graph').append(svgdata);
 
-      });
-  });
+  //     });
+  // });
 
   // on click of concept 
   $(document).on('click','#clickConceptGraph',function(){
@@ -1590,7 +1591,7 @@ ul#navigation li a.last {
         }
         else{
           // If no resource found for topic it will show bellow statement
-          var cont = "<h3>No resources available with '"+ selected + ": " + choice +"' in this topic</h3>"
+          var cont = "<b>Be the first to add a resource to this topic.</b>"
           $(".topic_content").html(cont);
         }
 
