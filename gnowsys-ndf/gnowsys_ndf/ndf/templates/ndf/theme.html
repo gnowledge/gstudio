@@ -80,22 +80,19 @@
 					$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:orange"></span> &nbsp;');				        		
 				}
 
-    			if (user == "True")
-    			{   
-    				if (node.node_type == "Topic"){        					
+    			   
+				if (node.node_type == "Topic"){        					
 
-    					$li.find('.jqtree-element').append(
-        					{% user_access_policy groupid request.user as user_access %}
-        					{% if user_access == "allow" %}
+					$li.find('.jqtree-element').append(
 
-                				'&nbsp;&nbsp;<a id='+node.id+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
+            				'&nbsp;&nbsp;<a id='+node.id+' name='+node.name+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
 
-                			{% endif %}
-            			);	            			
+        			);	            			
 
-    				}
-    				else{
-    					
+				}
+				else{
+					if (user == "True"){
+
     					$li.find('.jqtree-element').append(
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
@@ -104,10 +101,10 @@
                 			
                 			{% endif %}
         				);
+					}
 
-    				}
+				}
     					
-    			}           		
 
     		}
 
@@ -193,8 +190,11 @@
       setTimeout(function(){
 
 		$(".jqtree-title.jqtree_common").hover( function(){
+
 			var topic_id = $(this).siblings("a").attr("id");
-  			if ($(".jqtree-title.jqtree_common").attr("data-info") != topic_id ){
+			// var topic_name = $(this).siblings("a").attr("name");
+
+  			if ($(".jqtree-title.jqtree_common").attr("data-info") != topic_id && topic_id){
 			
 				$(".topic_stats").css("display", "none");
 
@@ -218,6 +218,8 @@
 	             				// alert(key+": "+len);
 	             				count += key+": "+len+"<br/>";
 	             			}
+
+	             			// count = "<b>Topic "+topic_name+"</b><br/>"+count
 
 	             			$(".topic_stats").html(count);
 	             			$(".topic_stats").css("display", "block");
@@ -248,6 +250,7 @@
   </script>
 
   <style>
+
   	#app-set-item li { padding:0.5em }
 
 	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
@@ -360,10 +363,7 @@
 
 	{% endif %}
 
-	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;">
-		Images:  <br/>
-		Videos:  
-	</div>
+	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
 {% endblock %}
 
 
