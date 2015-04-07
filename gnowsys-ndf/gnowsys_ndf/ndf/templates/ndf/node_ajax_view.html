@@ -771,8 +771,10 @@ ul#navigation li a.last {
           <!-- <div class="content" id="view-graph">  </div> -->
 
       <div class="topic_content" id="contents"> 
-        {{node.content_org}}
-
+        {% if node.content_org %}
+          {{node.content_org}}
+        {% endif %}
+        
         {% get_all_resources request node.pk as resources %}
           {% for key, val in resources.items %}
           <fieldset id="{{key}}">
