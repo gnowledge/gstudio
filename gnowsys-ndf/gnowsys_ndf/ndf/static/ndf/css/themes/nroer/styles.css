@@ -9213,27 +9213,40 @@ div.banner > * .slide .count-box .count {
 div.banner > * .slide .count-box a {
   font-size: 1.35vw;
 }
-/* line 131, ../../../scss/_nroer_styles.scss */
+/* line 129, ../../../scss/_nroer_styles.scss */
+div.banner > * .slide .quotes {
+  opacity: 0.75;
+  font-family: "Times new Roman";
+  font-size: 200%;
+  font-size: 3vw;
+}
+/* line 136, ../../../scss/_nroer_styles.scss */
+div.banner > * .slide .slide-2-icons {
+  opacity: 0.5;
+  font-size: 280%;
+  font-size: 3vw;
+}
+/* line 144, ../../../scss/_nroer_styles.scss */
 div.banner > * h2, div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 134, ../../../scss/_nroer_styles.scss */
+/* line 147, ../../../scss/_nroer_styles.scss */
 div.banner > * h2 {
   font-size: 280%;
   font-size: 3vw;
 }
-/* line 138, ../../../scss/_nroer_styles.scss */
+/* line 151, ../../../scss/_nroer_styles.scss */
 div.banner > * h3 {
   font-size: 180%;
   font-size: 2vw;
 }
-/* line 142, ../../../scss/_nroer_styles.scss */
+/* line 155, ../../../scss/_nroer_styles.scss */
 div.banner > * blockquote {
   font-size: 120%;
   font-size: 1.35vw;
   font-style: italic;
 }
-/* line 147, ../../../scss/_nroer_styles.scss */
+/* line 160, ../../../scss/_nroer_styles.scss */
 div.banner > * p {
   color: white;
   font-size: 120%;
