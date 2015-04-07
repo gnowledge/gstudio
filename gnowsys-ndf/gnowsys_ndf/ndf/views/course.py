@@ -4,12 +4,13 @@ import datetime
 import json
 
 ''' -- imports from installed packages -- '''
-from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
+from django.http import HttpResponseRedirect  # , HttpResponse uncomment when to use
 from django.http import HttpResponse
 from django.http import Http404
-from django.shortcuts import render_to_response #, render  uncomment when to use
+from django.shortcuts import render_to_response  # , render  uncomment when to use
 from django.template import RequestContext
 from django.template import TemplateDoesNotExist
+from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -22,9 +23,11 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import save_file
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data,get_execution_time
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
@@ -40,21 +43,21 @@ def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-      group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    ins_objectid = ObjectId()
+    if ins_objectid.is_valid(group_id) is False:
+      group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if group_ins:
         group_id = str(group_ins._id)
-      else :
+      else:
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
+        if auth:
           group_id = str(auth._id)
-    else :
+    else:
         pass
     
     if course_id is None:
-      course_ins = node_collection.find_one({'_type':"GSystemType", "name":"Course"})
+      course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
       if course_ins:
         course_id = str(course_ins._id)
 
@@ -66,7 +69,7 @@ def course(request, group_id, course_id=None):
       course_coll = node_collection.find({'member_of': {'$all': [ObjectId(GST_COURSE._id)]},
                                          '$or': [
                                             {'$and': [
-                                              {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                              {'name': {'$regex': search_field, '$options': 'i'}},
                                               {'$or': [
                                                 {'access_policy': u"PUBLIC"},
                                                 {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -75,7 +78,7 @@ def course(request, group_id, course_id=None):
                                               ]
                                             },
                                             {'$and': [
-                                              {'tags': {'$regex':search_field, '$options': 'i'}},
+                                              {'tags': {'$regex': search_field, '$options': 'i'}},
                                               {'$or': [
                                                 {'access_policy': u"PUBLIC"},
                                                 {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
@@ -91,14 +94,14 @@ def course(request, group_id, course_id=None):
 
       return render_to_response("ndf/course.html",
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId': app._id,
                                  'searching': True, 'query': search_field,
-                                 'course_coll': course_coll, 'groupid':group_id, 'group_id':group_id
-                                }, 
+                                 'course_coll': course_coll, 'groupid': group_id, 'group_id':group_id
+                                },
                                 context_instance=RequestContext(request)
                                 )
 
-    elif GST_COURSE._id == ObjectId(course_id):
+    else:
       # Course list view
       title = GST_COURSE.name
       course_coll = node_collection.find({'member_of': {'$all': [ObjectId(course_id)]}, 
@@ -106,7 +109,7 @@ def course(request, group_id, course_id=None):
                                              '$or': [
                                               {'access_policy': u"PUBLIC"},
                                               {'$and': [
-                                                {'access_policy': u"PRIVATE"}, 
+                                                {'access_policy': u"PRIVATE"},
                                                 {'created_by': request.user.id}
                                                 ]
                                               }
@@ -119,42 +122,48 @@ def course(request, group_id, course_id=None):
 
 @login_required
 @get_execution_time
-def create_edit(request, group_id, node_id = None):
+def create_edit(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
+    ins_objectid = ObjectId()
+    if ins_objectid.is_valid(group_id) is False:
         group_ins = node_collection.find_one({'_type': "Group","name": group_id})
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else :
+        else:
             auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
+            if auth:
                 group_id = str(auth._id)
-    else :
+    else:
         pass
-    context_variables = { 'title': GST_COURSE.name,
+    context_variables = {'title': GST_COURSE.name,
                           'group_id': group_id,
-                          'groupid':group_id
+                          'groupid': group_id
                       }
-
     if node_id:
         course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
         course_node = node_collection.collection.GSystem()
 
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),'group_set': ObjectId(group_id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(str((each.name).strip().lower()))
+
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE))
-        return HttpResponseRedirect(reverse('course', kwargs={'appId':app._id,'group_id': group_id}))
-        
+        return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id}))
+
     else:
         if node_id:
             context_variables['node'] = course_node
-            context_variables['groupid']=group_id
-            context_variables['group_id']=group_id
-            context_variables['appId']=app._id
+            context_variables['groupid'] = group_id
+            context_variables['group_id'] = group_id
+            context_variables['appId'] = app._id
+        context_variables['nodes_list'] = json.dumps(nodes_list)
         return render_to_response("ndf/course_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -162,28 +171,34 @@ def create_edit(request, group_id, node_id = None):
 
 @get_execution_time
 def course_detail(request, group_id, _id):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    ins_objectid = ObjectId()
+    if ins_objectid.is_valid(group_id) is False:
+        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else :
+        else:
             auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
+            if auth:
                 group_id = str(auth._id)
-    else :
+    else:
         pass
+    course_structure_exists = False
+    title = GST_COURSE.name
+
     course_node = node_collection.one({"_id": ObjectId(_id)})
-    if course_node._type == "GSystemType":
-      return course(request, group_id, _id)
+    if course_node.collection_set:
+        course_structure_exists = True
+
     return render_to_response("ndf/course_detail.html",
-                                  { 'node': course_node,
+                                  {'node': course_node,
                                     'groupid': group_id,
-                                    'group_id':group_id,
-                                    'appId':app._id
+                                    'group_id': group_id,
+                                    'appId': app._id,
+                                    'title':title,
+                                    'course_structure_exists': course_structure_exists
                                   },
-                                  context_instance = RequestContext(request)
+                                  context_instance=RequestContext(request)
         )
 
 @login_required
@@ -649,23 +664,23 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
 @login_required
 @get_execution_time
-def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
+def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
-  custom view for custom GAPPS
+  Detail view of NUSSD Course/ Announced Course
   """
   # print "\n Found course_detail n gone inn this...\n\n"
 
   auth = None
-  if ObjectId.is_valid(group_id) is False :
-    group_ins = node_collection.one({'_type': "Group","name": group_id})
+  if ObjectId.is_valid(group_id) is False:
+    group_ins = node_collection.one({'_type': "Group", "name": group_id})
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if group_ins:
       group_id = str(group_ins._id)
-    else :
+    else:
       auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
+      if auth:
         group_id = str(auth._id)
-  else :
+  else:
     pass
 
   app = None
@@ -677,7 +692,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   else:
     app = node_collection.one({'_id': ObjectId(app_id)})
 
-  app_name = app.name 
+  app_name = app.name
   # app_name = "mis"
   app_set = ""
   app_collection_set = []
@@ -698,7 +713,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   #Course structure collection _dict
   course_collection_dict = {}
   course_collection_list = []
-  course_collection_dict_exists = False
+  course_structure_exists = False
 
   if request.user:
     if auth is None:
@@ -724,13 +739,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       nodes = node_collection.find({'member_of': course_gst._id, 'group_set': ObjectId(group_id)})
 
 
-  cs_gst = node_collection.one({'_type': "GSystemType", 'name':"CourseSection"})
-  css_gst = node_collection.one({'_type': "GSystemType", 'name':"CourseSubSection"})
-  at_cs_hours = node_collection.one({'_type':'AttributeType', 'name':'course_structure_minutes'})
-  at_cs_assessment = node_collection.one({'_type':'AttributeType', 'name':'course_structure_assessment'})
-  at_cs_assignment = node_collection.one({'_type':'AttributeType', 'name':'course_structure_assignment'})
-  at_cs_min_marks = node_collection.one({'_type':'AttributeType', 'name':'min_marks'})
-  at_cs_max_marks = node_collection.one({'_type':'AttributeType', 'name':'max_marks'})
 
   if app_set_instance_id:
     template = "ndf/course_details.html"
@@ -742,32 +750,8 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
         property_order_list_ac = node.attribute_set
 
     # Course structure as list of dicts
-    for eachcs in node.collection_set:
-      cs_dict = {}
-      coll_node_cs = node_collection.one({'_id': ObjectId(eachcs), 'member_of':cs_gst._id}, {'name':1, 'collection_set':1})
-      if coll_node_cs:
-          cs_dict[coll_node_cs.name] = []
-          course_collection_list.append(cs_dict)
-          for eachcss in coll_node_cs.collection_set:
-            css_dict = {}
-            coll_node_css = node_collection.one({'_id': ObjectId(eachcss), 'member_of':css_gst._id},{'name':1,'collection_set':1,'attribute_set':1})
-            css_dict[coll_node_css.name] = {}
-            for eachattr in coll_node_css.attribute_set:
-              for eachk, eachv in eachattr.items():
-                if (eachk == "course_structure_minutes"):
-                  css_dict[coll_node_css.name]["Minutes"] = eachv
-                elif (eachk == "course_structure_assignment"):
-                  css_dict[coll_node_css.name]["Assignment"] = eachv
-                elif (eachk == "course_structure_assessment"):
-                  css_dict[coll_node_css.name]["Assessment"] = eachv
-                elif (eachk == "min_marks"):
-                  css_dict[coll_node_css.name]["Minimum-marks"] = eachv
-                elif (eachk == "max_marks"):
-                  css_dict[coll_node_css.name]["Maximum-marks"] = eachv
-            cs_dict[coll_node_cs.name].append(css_dict)
-
-    if course_collection_list:
-      course_collection_dict_exists = True
+    if node.collection_set:
+      course_structure_exists = True
 
 
   context_variables = { 'groupid': group_id, 
@@ -775,8 +759,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         'app_set_id': app_set_id,
                         'course_gst_name':course_gst.name,
                         'title':title,
-                        'course_collection_dict':json.dumps(course_collection_list),
-                        'course_collection_dict_exists':course_collection_dict_exists,
+                        'course_structure_exists':course_structure_exists,
                         'nodes': nodes, 'node': node,
                         'property_order_list': property_order_list,
                         'property_order_list_ac':property_order_list_ac,
@@ -794,7 +777,6 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                             )
   
   except TemplateDoesNotExist as tde:
-    # print "\n ", tde
     error_message = "\n CourseDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
   
@@ -805,7 +787,7 @@ def course_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
 @login_required
 @get_execution_time
-def create_course_struct(request, group_id,node_id):
+def create_course_struct(request, group_id, node_id):
     """
     This view is to create the structure of the Course.
     A Course holds CourseSection, which further holds CourseSubSection
@@ -821,72 +803,42 @@ def create_course_struct(request, group_id,node_id):
 
     """
 
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
+    ins_objectid = ObjectId()
+    if ins_objectid.is_valid(group_id) is False:
         group_ins = node_collection.find_one({'_type': "Group","name": group_id})
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else :
+        else:
             auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
+            if auth:
                 group_id = str(auth._id)
-    else :
+    else:
         pass
     app_id = None
     app_set_id = None
     property_order_list_cs = []
     property_order_list_css = []
-    course_collection_dict = {}
-    course_collection_list = []
-    cs_names = []
-    css_names = []
-    course_collection_dict_exists = False
-    coll_node_cs = None
-    coll_node_css = None
+    course_structure_exists = False
 
-    title = "Course Structure"
+    title = "Course Authoring"
 
     course_node = node_collection.one({"_id": ObjectId(node_id)})
 
-    cs_gst = node_collection.one({'_type': "GSystemType", 'name':"CourseSection"})
+    cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
     cs_gs = node_collection.collection.GSystem()
     cs_gs.member_of.append(cs_gst._id)
     property_order_list_cs = get_property_order_with_value(cs_gs)
 
-    css_gst = node_collection.one({'_type': "GSystemType", 'name':"CourseSubSection"})
+    css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSection"})
     css_gs = node_collection.collection.GSystem()
     css_gs.member_of.append(css_gst._id)
     property_order_list_css = get_property_order_with_value(css_gs)
 
-    at_cs_hours = node_collection.one({'_type':'AttributeType', 'name':'course_structure_minutes'})
-    at_cs_assessment = node_collection.one({'_type':'AttributeType', 'name':'course_structure_assessment'})
-    at_cs_assignment = node_collection.one({'_type':'AttributeType', 'name':'course_structure_assignment'})
-    at_cs_min_marks = node_collection.one({'_type':'AttributeType', 'name':'min_marks'})
-    at_cs_max_marks = node_collection.one({'_type':'AttributeType', 'name':'max_marks'})
 
-
-    #Course structure as list of dicts
-    for eachcs in course_node.collection_set:
-      cs_dict = {}
-      coll_node_cs = node_collection.one({'_id':ObjectId(eachcs),'member_of':cs_gst._id},{'name':1,'collection_set':1})
-      cs_names.append(coll_node_cs.name)
-      cs_dict[coll_node_cs.name]=[]
-      course_collection_list.append(cs_dict)
-      for eachcss in coll_node_cs.collection_set:
-        css_dict = {}
-        coll_node_css = node_collection.one({'_id':ObjectId(eachcss), 'member_of':css_gst._id},{'name':1,'collection_set':1,'attribute_set':1})
-        css_names.append(coll_node_css.name)
-        css_dict[coll_node_css.name]={}
-        for eachattr in coll_node_css.attribute_set:
-          for eachk,eachv in eachattr.items():
-            css_dict[coll_node_css.name][eachk] = eachv
-          if coll_node_css.collection_set:
-            css_dict[coll_node_css.name]["resources"] = coll_node_css.collection_set
-        cs_dict[coll_node_cs.name].append(css_dict)
-    
+    course_collection_list = course_node.collection_set
     if course_collection_list:
-      course_collection_dict_exists = True
+      course_structure_exists = True
 
     # for attr in course_node.attribute_set:
     #   if attr.has_key("evaluation_type"):
@@ -898,235 +850,360 @@ def create_course_struct(request, group_id,node_id):
     # else:
     #     eval_type_flag = False
 
-    if request.method == "POST":
-        listdict = request.POST.get("course_sec_dict_ele","")
-        changed_names = request.POST.get("changed_names","")
-        listdict = json.loads(listdict)
-        changed_names = json.loads(changed_names)
-        cs_ids = []
-        cs_reorder_ids = []
-        # print "\n\n Sent from template\n\n",listdict
-        #creating course structure GSystems
-        if not course_collection_dict_exists:
-          for course_sec_dict in listdict:
-            for cs,v in course_sec_dict.items():
-              cs_new = node_collection.collection.GSystem()
-              cs_new.member_of.append(cs_gst._id)
-              #set name
-              cs_new.name = cs
-              cs_new.modified_by=int(request.user.id)
-              cs_new.created_by=int(request.user.id)
-              cs_new.contributors.append(int(request.user.id))
-              #save the cs gs
-              cs_new.prior_node.append(course_node._id)
-              cs_new.save()
-              cs_ids.append(cs_new._id)
-              cs_reorder_ids.append(cs_new._id)
-              css_ids = []
-              for index2 in v:
-                for css,val in index2.items():
-                  css_new = node_collection.collection.GSystem()
-                  css_new.member_of.append(css_gst._id)
-                  #set name
-                  css_new.name = css
-                  css_new.modified_by=int(request.user.id)
-                  css_new.created_by=int(request.user.id)
-                  css_new.contributors.append(int(request.user.id))
-                  #save the css gs
-                  css_new.prior_node.append(cs_new._id)
-                  css_new.save()
-                  #add to cs collection_set
-                  css_ids.append(css_new._id)
-                  for propk, propv in val.items():
-                    # add attributes to css gs
-                    if(propk=="course_structure_minutes"):
-                      create_gattribute(css_new._id,at_cs_hours,int(propv))
-                    elif(propk=="course_structure_assessment"):
-                      create_gattribute(css_new._id,at_cs_assessment,propv)
-                    elif(propk=="course_structure_assignment"):
-                      create_gattribute(css_new._id,at_cs_assignment,propv)
-                    elif(propk=="min_marks"):
-                      create_gattribute(css_new._id,at_cs_min_marks,int(propv))
-                    elif(propk=="max_marks"):
-                      create_gattribute(css_new._id,at_cs_max_marks,int(propv))
-                    elif(propk=="resources"):
-                      node_collection.collection.update({'_id':css_new._id},{'$set':{'collection_set':propv}},upsert=False,multi=False)
-                      css_new.reload()
-              #append CSS to CS
-              node_collection.collection.update({'_id':cs_new._id},{'$set':{'collection_set':css_ids}},upsert=False,multi=False)
-            course_node_coll_set = course_node.collection_set
-            node_collection.collection.update({'_id':course_node._id},{'$set':{'collection_set':cs_reorder_ids}},upsert=False,multi=False)
-        else:
-          #if there is change in existing and modified course structure
-          if not course_collection_list == listdict:
-            #for every course section dict
-            for course_sec_dict in listdict:
-              #k is course section name and v is list of its each course subsection as dict
-              for k,v in course_sec_dict.items():#loops over course sections
-                var = [k in val_list for val_list in changed_names.values()]
-
-                if k in cs_names  or True in var:
-                  for cs_old_name,cs_new_name in changed_names.items():
-                    if k is not cs_old_name and k in cs_new_name:
-                      name_edited_node = node_collection.one({'name':cs_old_name,'prior_node':course_node._id,'member_of':cs_gst._id})
-                      node_collection.collection.update({'_id':name_edited_node._id},{'$set':{'name':cs_new_name[0]}})
-                      name_edited_node.reload()
-                    else:
-                      pass
-
-                  #IMP Fetch node with name 'k' as above code, if name changed, changes oldname to k 
-                  cs_node = node_collection.one({'name':k,'member_of':cs_gst._id,'prior_node':course_node._id},{'name':1,'collection_set':1})
-                  css_reorder_ids = []
-                  var1 = False
-                  for cssd in v:
-                    for cssname,cssdict in cssd.items():
-                      ab = [listings for listings in changed_names.values()]
-                      for cs_nodename in ab:
-                        if cs_node.name in cs_nodename:
-                          if cssname in cs_nodename[1].values():
-                            var1 = True
-                        else:
-                          var1 = False
-
-                      if cssname in css_names or var1 is True: 
-                        for cs_old_n,cs_val_list in changed_names.items():
-                          if len(cs_val_list)==2:
-                            if( cs_val_list[0]==k and type(cs_val_list[1]) is dict):
-                              for oldcssname,newcssname in cs_val_list[1].items():
-                                if (cssname==newcssname):
-                                  css_name_edited_node = node_collection.one({'name':oldcssname,'prior_node':cs_node._id,'member_of':css_gst._id})
-                                  node_collection.collection.update({'_id':css_name_edited_node._id},{'$set':{'name':newcssname}})
-                                  css_name_edited_node.reload()
-
-                        css_node=node_collection.one({'name':cssname,'member_of':css_gst._id,'prior_node':cs_node._id})
-                        for propk,propv in cssdict.items():
-                          if(propk==u"course_structure_minutes"):
-                            create_gattribute(css_node._id,at_cs_hours,int(propv))
-                          elif(propk==u"course_structure_assessment"):
-                            create_gattribute(css_node._id,at_cs_assessment,propv)
-                          elif(propk==u"course_structure_assignment"):
-                            create_gattribute(css_node._id,at_cs_assignment,propv)
-                          elif(propk==u"min_marks"):
-                            create_gattribute(css_node._id,at_cs_min_marks,int(propv))
-                          elif(propk==u"max_marks"):
-                            create_gattribute(css_node._id,at_cs_max_marks,int(propv))
-                          elif(propk=="resources"):
-                            node_collection.collection.update({'_id':css_node._id},{'$set':{'collection_set':propv}},upsert=False,multi=False)
-                            css_node.reload()
-                        css_reorder_ids.append(css_node._id)
-                      else:
-                        #create new css in existing cs
-                        css_new = node_collection.collection.GSystem()
-                        css_new.member_of.append(css_gst._id)
-                        #set name
-                        css_new.name = cssname
-                        css_new.modified_by=int(request.user.id)
-                        css_new.created_by=int(request.user.id)
-                        css_new.contributors.append(int(request.user.id))
-                        #save the css gs
-                        css_new.prior_node.append(cs_node._id)
-                        css_new.save()
-                        for propk,propv in cssdict.items():
-                          if(propk==u"course_structure_minutes"):
-                            create_gattribute(css_new._id,at_cs_hours,int(propv))
-                          elif(propk==u"course_structure_assessment"):
-                            create_gattribute(css_new._id,at_cs_assessment,propv)
-                          elif(propk==u"course_structure_assignment"):
-                            create_gattribute(css_new._id,at_cs_assignment,propv)
-                          elif(propk==u"min_marks"):
-                            create_gattribute(css_new._id,at_cs_min_marks,int(propv))
-                          elif(propk==u"max_marks"):
-                            create_gattribute(css_new._id,at_cs_max_marks,int(propv))
-                          elif(propk=="resources"):
-                            node_collection.collection.update({'_id':css_new._id},{'$set':{'collection_set':propv}},upsert=False,multi=False)
-                            css_new.reload()
-                        css_reorder_ids.append(css_new._id)
-
-                        #add to cs collection_set
-                    
-                  if cs_node.collection_set != css_reorder_ids:
-                    node_collection.collection.update({'_id':cs_node._id},{'$set':{'collection_set':css_reorder_ids}}, upsert=False, multi=False)
-                    cs_node.reload()
-                  else:
-                    pass
-                  cs_reorder_ids.append(cs_node._id)
-                else:
-                  cs_new = node_collection.collection.GSystem()
-                  cs_new.member_of.append(cs_gst._id)
-                  #set name
-                  cs_new.name = k
-                  cs_new.modified_by=int(request.user.id)
-                  cs_new.created_by=int(request.user.id)
-                  cs_new.contributors.append(int(request.user.id))
-                  #save the cs gs
-                  cs_new.prior_node.append(course_node._id)
-                  cs_new.save()
-
-                  cs_ids.append(cs_new._id)
-                  cs_reorder_ids.append(cs_new._id)
-                  for index2 in v:
-                    for css,val in index2.items():
-                      css_new = node_collection.collection.GSystem()
-                      css_new.member_of.append(css_gst._id)
-                      #set name
-                      css_new.name = css
-                      css_new.modified_by=int(request.user.id)
-                      css_new.created_by=int(request.user.id)
-                      css_new.contributors.append(int(request.user.id))
-                      #save the css gs
-                      css_new.prior_node.append(cs_new._id)
-                      css_new.save()
-                      for propk, propv in val.items():
-                        # add attributes to css gs
-                        if(propk==u"course_structure_minutes"):
-                          create_gattribute(css_new._id,at_cs_hours,int(propv))
-                        elif(propk==u"course_structure_assessment"):
-                          create_gattribute(css_new._id,at_cs_assessment,propv)
-                        elif(propk==u"course_structure_assignment"):
-                          create_gattribute(css_new._id,at_cs_assignment,propv)
-                        elif(propk==u"min_marks"):
-                          create_gattribute(css_new._id,at_cs_min_marks,int(propv))
-                        elif(propk==u"max_marks"):
-                          create_gattribute(css_new._id,at_cs_max_marks,int(propv))
-                        elif(propk=="resources"):
-                          node_collection.collection.update({'_id':css_new._id},{'$set':{'collection_set':propv}},upsert=False,multi=False)
-                          css_new.reload()
-                    #add to cs collection_set
-                    node_collection.collection.update({'_id':cs_new._id},{'$push':{'collection_set':css_new._id}},upsert=False,multi=False)
-            course_node_coll_set = course_node.collection_set
-            # for each in cs_ids:
-            #   if each not in course_node_coll_set:
-            #     course_node_coll_set.append(each)
-            node_collection.collection.update({'_id':course_node._id},{'$set':{'collection_set':cs_reorder_ids}},upsert=False,multi=False)
-          else:
-            print "No change"
-        app_id = request.POST.get("app_id","")
-        app_set_id = request.POST.get("app_set_id","")
-
-        return HttpResponseRedirect(reverse('mis:mis_app_instance_detail',kwargs={'group_id':group_id,'app_id':app_id,'app_set_id':app_set_id,'app_set_instance_id':course_node._id}))
-    elif request.method == "GET":
-      app_id = request.GET.get("app_id","")
-      app_set_id = request.GET.get("app_set_id","")
-
+    if request.method == "GET":
+      app_id = request.GET.get("app_id", "")
+      app_set_id = request.GET.get("app_set_id", "")
     return render_to_response("ndf/create_course_structure.html",
                                   { 'cnode': course_node,
                                     'groupid': group_id,
-                                    'group_id':group_id,
-                                    'title':title,
-                                    'node':None,
-                                    'app_id':app_id, 'app_set_id':app_set_id,
-                                    'coll_node_cs':coll_node_cs,
-                                    'coll_node_css':coll_node_css,
-                                    'course_collection_list':json.dumps(course_collection_list),
-                                    'property_order_list':property_order_list_cs,
-                                    'property_order_list_css':property_order_list_css
-                                    #'eval_type_flag': eval_type_flag
+                                    'group_id': group_id,
+                                    'title': title,
+                                    'app_id': app_id, 'app_set_id': app_set_id,
+                                    'property_order_list': property_order_list_cs,
+                                    'property_order_list_css': property_order_list_css
                                   },
-                                  context_instance = RequestContext(request)
+                                  context_instance=RequestContext(request)
         )
 
+
 @login_required
+def save_course_section(request, group_id):
+    '''
+    Accepts:
+     * NUSSD Course/Course node _id
+     * CourseSection name
+
+    Actions:
+     * Creates CourseSection GSystem with name received.
+     * Appends this new CourseSection node id into
+      NUSSD Course/Course collection_set
+
+    Returns:
+     * success (i.e True/False)
+     * ObjectId of CourseSection node
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        cs_node_name = request.POST.get("cs_name", '')
+        course_node_id = request.POST.get("course_node_id", '')
+        cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
+        cs_new = node_collection.collection.GSystem()
+        cs_new.member_of.append(cs_gst._id)
+        cs_new.name = cs_node_name
+        cs_new.modified_by = int(request.user.id)
+        cs_new.created_by = int(request.user.id)
+        cs_new.contributors.append(int(request.user.id))
+        course_node = node_collection.one({"_id": ObjectId(course_node_id)})
+        cs_new.prior_node.append(ObjectId(course_node._id))
+        cs_new.save()
+        node_collection.collection.update({'_id': course_node._id}, {'$push': {'collection_set': cs_new._id }}, upsert=False, multi=False)
+        response_dict["success"] = True
+        response_dict["cs_new_id"] = str(cs_new._id)
+        return HttpResponse(json.dumps(response_dict))
+
+
+def save_course_sub_section(request, group_id):
+    '''
+    Accepts:
+     * CourseSection node _id
+     * CourseSubSection name
+
+    Actions:
+     * Creates CourseSubSection GSystem with name received.
+     * Appends this new CourseSubSection node id into
+      CourseSection collection_set
+
+    Returns:
+     * success (i.e True/False)
+     * ObjectId of CourseSubSection node
+
+    '''
+
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        css_node_name = request.POST.get("css_name", '')
+        cs_node_id = request.POST.get("cs_node_id", '')
+        css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSection"})
+        css_new = node_collection.collection.GSystem()
+        css_new.member_of.append(css_gst._id)
+        # set name
+        css_new.name = css_node_name
+        css_new.modified_by = int(request.user.id)
+        css_new.created_by = int(request.user.id)
+        css_new.contributors.append(int(request.user.id))
+
+        cs_node = node_collection.one({"_id": ObjectId(cs_node_id)})
+        css_new.prior_node.append(cs_node._id)
+        css_new.save()
+        node_collection.collection.update({'_id': cs_node._id}, {'$push': {'collection_set': css_new._id }}, upsert=False, multi=False)
+        response_dict["success"] = True
+        response_dict["css_new_id"] = str(css_new._id)
+        return HttpResponse(json.dumps(response_dict))
+
+
+def change_node_name(request, group_id):
+    '''
+    Accepts:
+     * CourseSection/ CourseSubSection node _id
+     * New name for CourseSection node
+
+    Actions:
+     * Updates received node's name
+    '''
+
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        node_id = request.POST.get("node_id", '')
+        new_name = request.POST.get("new_name", '')
+        node = node_collection.one({"_id": ObjectId(node_id)})
+        node.name = new_name.strip()
+        node.save()
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
+
+
+def change_order(request, group_id):
+    '''
+    Accepts:
+     * 2 node ids.
+        Basically, either of CourseSection or CourseSubSection
+     * Parent node id
+        Either a NUSSD Course/Course or CourseSection
+
+    Actions:
+     * Swaps the 2 node ids in the collection set of received
+        parent node
+    '''
+
+    response_dict = {"success": False}
+    collection_set_list = []
+    if request.is_ajax() and request.method == "POST":
+        node_id_up = request.POST.get("node_id_up", '')
+        node_id_down = request.POST.get("node_id_down", '')
+        parent_node_id = request.POST.get("parent_node", '')
+
+        parent_node = node_collection.one({"_id": ObjectId(parent_node_id)})
+        collection_set_list = parent_node.collection_set
+        a, b = collection_set_list.index(ObjectId(node_id_up)), collection_set_list.index(ObjectId(node_id_down))
+        collection_set_list[b], collection_set_list[a] = collection_set_list[a], collection_set_list[b]
+        node_collection.collection.update({'_id': parent_node._id}, {'$set': {'collection_set': collection_set_list }}, upsert=False, multi=False)
+        parent_node.reload()
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
+
+
+def course_sub_section_prop(request, group_id):
+    '''
+    Accepts:
+     * CourseSubSection node _id
+     * Properties dict
+
+    Actions:
+     * Creates GAttributes with the values of received dict
+        for the respective CourseSubSection node
+
+    Returns:
+     * success (i.e True/False)
+     * If request.method is POST, all GAttributes in a dict structure,
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax():
+        if request.method == "POST":
+            assessment_flag = False
+
+            css_node_id = request.POST.get("css_node_id", '')
+            prop_dict = request.POST.get("prop_dict", '')
+            assessment_chk = json.loads(request.POST.get("assessment_chk", ''))
+
+            prop_dict = json.loads(prop_dict)
+
+            css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+
+            at_cs_hours = node_collection.one({'_type': 'AttributeType', 'name': 'course_structure_minutes'})
+            at_cs_assessment = node_collection.one({'_type': 'AttributeType', 'name': 'course_structure_assessment'})
+            at_cs_assignment = node_collection.one({'_type': 'AttributeType', 'name': 'course_structure_assignment'})
+            at_cs_min_marks = node_collection.one({'_type': 'AttributeType', 'name': 'min_marks'})
+            at_cs_max_marks = node_collection.one({'_type': 'AttributeType', 'name': 'max_marks'})
+
+            if assessment_chk is True:
+                create_gattribute(css_node._id, at_cs_assessment, True)
+                assessment_flag = True
+
+            for propk, propv in prop_dict.items():
+                # add attributes to css gs
+                if(propk == "course_structure_minutes"):
+                    create_gattribute(css_node._id, at_cs_hours, int(propv))
+                elif(propk == "course_structure_assignment"):
+                    create_gattribute(css_node._id, at_cs_assignment, propv)
+                if assessment_flag:
+                    if(propk == "min_marks"):
+                        create_gattribute(css_node._id, at_cs_min_marks, int(propv))
+                    if(propk == "max_marks"):
+                        create_gattribute(css_node._id, at_cs_max_marks, int(propv))
+            css_node.reload()
+            response_dict["success"] = True
+
+        else:
+            css_node_id = request.GET.get("css_node_id", '')
+            css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+
+            if css_node.attribute_set:
+                for each in css_node.attribute_set:
+                    for k, v in each.items():
+                        response_dict[k] = v
+                response_dict["success"] = True
+            else:
+                response_dict["success"] = False
+
+        return HttpResponse(json.dumps(response_dict))
+
 def add_units(request,group_id):
-    return render_to_response("ndf/course_units.html",
-                              context_instance = RequestContext(request)
-    )
+    '''
+    Accepts:
+     * CourseSubSection node _id
+     * NUSSD Course/Course node _id
+
+    Actions:
+     * Redirects to course_units.html
+    '''
+    variable = None
+    unit_node = None
+    css_node_id = request.GET.get('css_node_id', '')
+    unit_node_id = request.GET.get('unit_node_id', '')
+    course_node_id = request.GET.get('course_node', '')
+    app_id = request.GET.get('app_id', '')
+    app_set_id = request.GET.get('app_set_id', '')
+    css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+    course_node = node_collection.one({"_id": ObjectId(course_node_id)})
+    title = "Course Units"
+    try:
+        unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
+    except:
+        unit_node = None
+    variable = RequestContext(request, {
+        'group_id': group_id, 'groupid': group_id,
+        'css_node': css_node,
+        'title': title,
+        'app_set_id':app_set_id,
+        'app_id':app_id,
+        'unit_node': unit_node,
+        'course_node': course_node
+    })
+
+    template = "ndf/course_units.html"
+    return render_to_response(template, variable)
+
+
+
+def get_resources(request, group_id):
+    '''
+    Accepts:
+     * Name of GSystemType (Page, File, etc.)
+     * CourseSubSection node _id
+     * widget_for
+
+    Actions:
+     * Fetches all GSystems of selected GSystemType as resources
+
+    Returns:
+     * Returns Drawer with resources
+    '''
+    response_dict = {'success': False, 'message': ""}
+    try:
+        if request.is_ajax() and request.method == "POST":
+            css_node_id = request.POST.get('css_node_id', "")
+            unit_node_id = request.POST.get('unit_node_id', "")
+            widget_for = request.POST.get('widget_for', "")
+            resource_type = request.POST.get('resource_type', "")
+            resource_type = resource_type.strip()
+
+            list_resources = []
+            css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+            try:
+                unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
+            except:
+                unit_node = None
+            if resource_type:
+                if resource_type == "Pandora":
+                    resource_type = "Pandora_video"
+
+                resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
+                res = node_collection.find(
+                    {
+                        'member_of': resource_gst._id,
+                        'group_set': ObjectId(group_id),
+                        'status': u"PUBLISHED"
+                    }
+                )
+
+                for each in res:
+                    list_resources.append(each)
+
+                drawer_template_context = edit_drawer_widget("CourseUnits", group_id, unit_node, None, checked="collection_set", left_drawer_content=list_resources)
+                drawer_template_context["widget_for"] = widget_for
+                drawer_widget = render_to_string(
+                    'ndf/drawer_widget.html',
+                    drawer_template_context,
+                    context_instance=RequestContext(request)
+                )
+
+            return HttpResponse(drawer_widget)
+        else:
+            error_message = "Resource Drawer: Either not an ajax call or not a POST request!!!"
+            response_dict["message"] = error_message
+            return HttpResponse(json.dumps(response_dict))
+
+    except Exception as e:
+        error_message = "Resource Drawer: " + str(e) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
+
+
+
+def save_resources(request, group_id):
+    '''
+    Accepts:
+     * List of resources (i.e GSystem of Page, File, etc.)
+     * CourseSubSection node _id
+
+    Actions:
+     * Sets the received resources in respective node's collection_set
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        list_of_res = json.loads(request.POST.get('list_of_res', ""))
+        css_node_id = request.POST.get('css_node', "")
+        unit_name = request.POST.get('unit_name', "")
+        unit_name = unit_name.strip()
+        unit_node_id = request.POST.get('unit_node_id', "")
+
+        css_node = node_collection.one({"_id": ObjectId(css_node_id)})
+        list_of_res_ids = [ObjectId(each_res) for each_res in list_of_res]
+
+        try:
+            cu_new = node_collection.one({'_id': ObjectId(unit_node_id)})
+        except:
+            cu_new = None
+        if not cu_new:
+            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+            cu_new = node_collection.collection.GSystem()
+            cu_new.member_of.append(cu_gst._id)
+            # set name
+            cu_new.name = unit_name.strip()
+            cu_new.modified_by = int(request.user.id)
+            cu_new.created_by = int(request.user.id)
+            cu_new.contributors.append(int(request.user.id))
+
+            cu_new.prior_node.append(css_node._id)
+            cu_new.save()
+        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
+
+        if cu_new._id not in css_node.collection_set:
+            node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
+
+
+        node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
+        cu_new.reload()
+        response_dict["success"] = True
+        response_dict["cu_new_id"] = str(cu_new._id)
+        return HttpResponse(json.dumps(response_dict))

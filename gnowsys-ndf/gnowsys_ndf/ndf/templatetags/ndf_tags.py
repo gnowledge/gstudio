@@ -2209,6 +2209,16 @@ def get_group_name(groupid):
 
 	return group_name 
 
+
+@register.filter
+def concat(value1, value2):
+    """concatenate multiple received args
+    """
+    return_str = value1.__str__()
+    value2 = value2.__str__()
+    return return_str + value2
+
+
 @get_execution_time
 @register.filter
 def get_field_type(node_structure, field_name):

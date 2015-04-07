@@ -410,6 +410,7 @@ def user_activity(request, group_id):
     #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
     variable = RequestContext(request, {'user_activity':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
     return render_to_response(template, variable)
+
 @get_execution_time
 def group_dashboard(request, group_id):
     """
@@ -585,4 +586,3 @@ def group_dashboard(request, group_id):
         },
         context_instance=RequestContext(request)
     )
-

@@ -8,40 +8,20 @@
 {% endblock %}
 
 
-{% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-  <br/>
-  <div class="create card">
-    <div class="course">
-      <br/>
-      <a class="button medium" href="{% url 'create_edit' group_name_tag %}">
-        <span class="fi-plus">&nbsp;&nbsp;{% trans "New " %} {{title}}{% endblocktrans %}
-</span>
-      </a>
-    </div>
-  </div>
-  {% endif %}
-  {% endif %}
-{% endblock %}
-
-
 {% block page_tab %} Basic {% endblock %}
 {% block collection_tab %}{% trans "Add Module" %} {% endblock %}
 
 {% block collection %}
-<div class="content" id="panel-collection" style="width:95%;">
-  <div class="row">
-    <div class="small-12 columns">
-      <h5>{% trans "Add or Remove Module:" %} </h5>
-    </div>
-    <div class="small-12 columns">
-      <div id="module_drawer" >
-	<!-- {#% edit_drawer_widget "module" groupid node %#} -->
+  <div class="content" id="panel-collection" style="width:95%;">
+    <div class="row">
+      <div class="small-12 columns">
+        <h5>{% trans "Add or Remove Module:" %} </h5>
+      </div>
+      <div class="small-12 columns">
+        <div id="module_drawer" >
+        	<!-- {#% edit_drawer_widget "module" groupid node %#} -->
+        </div>
       </div>
     </div>
   </div>
-</div>
-
 {% endblock %}
