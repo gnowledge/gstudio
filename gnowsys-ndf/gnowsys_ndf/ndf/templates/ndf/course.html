@@ -14,7 +14,7 @@
 {% block meta_content %}
   <h2 class="subheader">{% trans "Courses" %}</h2>
 
-  {% if site.SITE_NAME != "NROER" %}
+  
 
     {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
@@ -27,7 +27,7 @@
       {% endif %}
     {% endif %}
 
-  {% endif %}
+  
 
 {% endblock %}
 
