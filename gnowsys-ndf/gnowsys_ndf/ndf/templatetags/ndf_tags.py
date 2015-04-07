@@ -1200,6 +1200,7 @@ def get_contents(node_id, selected=None, choice=None):
 	page_contents = []
 	audio_contents = []
 	interactive_contents = []
+	ebook_contents = []
 	name = ""
 	ob_id = ""
 
@@ -1251,6 +1252,8 @@ def get_contents(node_id, selected=None, choice=None):
 								interactive_contents.append((name, ob_id))
 							elif attr.object_value == "Documents":
 								document_contents.append((name, ob_id))
+							elif attr.object_value == "eBooks":
+								ebook_contents.append((name, ob_id))
 
 				else:
 					if not selected or choice == left_obj.language:
@@ -1267,6 +1270,8 @@ def get_contents(node_id, selected=None, choice=None):
 							interactive_contents.append((name, ob_id))
 						elif attr.object_value == "Documents":
 							document_contents.append((name, ob_id))
+						elif attr.object_value == "eBooks":
+								ebook_contents.append((name, ob_id))
 
 							
 	if image_contents:
@@ -1283,6 +1288,9 @@ def get_contents(node_id, selected=None, choice=None):
 	
 	if interactive_contents:
 		contents['Interactives'] = interactive_contents
+
+	if ebook_contents:
+		contents['eBooks'] = ebook_contents
 	
 	# print "\n",contents,"\n"
 	return contents
