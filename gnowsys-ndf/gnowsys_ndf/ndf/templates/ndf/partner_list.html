@@ -30,7 +30,7 @@
     <div class="group">
       <br/>
       <a class="button medium" 
-        {% if group_category == "Partner" %}
+        {% if groups_category == "Partner" %}
           href="{% url 'create_partner' group_name_tag %}">
         {% else%}
           href="{% url 'create_group' group_name_tag %}">
