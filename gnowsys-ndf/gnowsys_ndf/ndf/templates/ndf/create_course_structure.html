@@ -190,7 +190,7 @@
 
         <div class="row">
           <div class="small-10 small-centered columns sub-section-btn-div">
-            <input type="button" value="+ New Subsection" class="button round expand hoverstyle sub-section-btn">
+            <input type="button" value="+ New Subsection" class="button round expand hoverstyle sub-section-btn" disabled="disabled">
           </div>
         </div> 
     </li>
@@ -211,7 +211,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="small-10 small-centered columns units-btn-div"> 
+          <div class="small-10 small-centered columns units-btn-div hide"> 
           <a class="button round expand hoverstyle units-btn new-units-btn"> + New Units</a>
           </div>
         </div>
@@ -312,6 +312,7 @@
        cloned_ele_id = id+"_cloned"+cs_cloned_id;
        return cloned_ele_id}).removeClass("hide"));
       $("#"+cloned_ele_id).find("input[id=name]").focus()
+      $(".course-sec-btn").attr("disabled",true)
       cs_cloned_id+=1
     });
 
@@ -321,6 +322,7 @@
         $(this).before($("#course-subsection").clone().attr('id',function(i,id){
             cloned_ss_ele_id = id+"_cloned"+css_cloned_id;
             return cloned_ss_ele_id}).removeClass("hide"));
+        $("#"+cloned_ss_ele_id).find(".units-btn-div").addClass("hide")
         $("#"+cloned_ss_ele_id).find("input[id=name]").focus()
         css_cloned_id+=1
     });
@@ -356,6 +358,7 @@
             success_state = data["success"]
             if(success_state){
               cs_new_id = data["cs_new_id"]
+              $(".course-sec-btn").removeAttr("disabled")
             }
 
             // nothing
@@ -367,6 +370,8 @@
               var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
               $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop);
               $("#"+parent_id).attr("value",cs_new_id);
+              $("#"+parent_id).find(".sub-section-btn").removeAttr("disabled");
+
             }
           },
         });//end of ajax
@@ -384,6 +389,7 @@
           $("#"+parent_id).find("input.sub-section-btn").removeAttr("disabled")
       }
       $("#"+parent_id).remove()
+      $(".course-sec-btn").removeAttr("disabled")
     });
 
   // Save Course Section ---------------------------------------------------------------------------------
@@ -416,6 +422,7 @@
             success_state = data["success"]
             if(success_state){
               css_new_id = data["css_new_id"]
+              $(".units-btn-div").removeClass("hide")
             }
 
             // nothing
@@ -775,6 +782,7 @@
             var str_prop1="<div class='small-1 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
             css_cloned_id+=1
+            $(".units-btn-div").removeClass("hide")
             $("#"+cloned_ss_ele_id).find("div.input-cs-row").replaceWith(str_btn1+str_lbl1+str_prop1)
 
             //list of units
