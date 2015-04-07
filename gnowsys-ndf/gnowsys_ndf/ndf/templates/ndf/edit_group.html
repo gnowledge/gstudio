@@ -239,6 +239,16 @@ ul#graph-hover.f-dropdown{
   $("#app_selected").click( function() {
     var url="{% url 'app_selection' groupid %}";
 
+    left_drawer = $("#collection_set_drawer1 li:not(:first-child)");
+    if (left_drawer.length > 0) {
+      left_drawer.remove();
+    }
+
+    right_drawer = $("#collection_set_drawer2 li");
+    if (right_drawer.length > 0) {
+      right_drawer.remove();
+    }
+
     $.getJSON( url, function( data ) {
       $.each(data ,function(index, drawer_elements) {
         if(index == 0) {
