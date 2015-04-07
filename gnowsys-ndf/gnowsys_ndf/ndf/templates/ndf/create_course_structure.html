@@ -416,7 +416,7 @@
             // nothing
           },
           complete: function () {
-            var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-page largesize'></i></div>"
+            var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
             var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='"+ css_new_id+"' style='float:left;'>"+lbl_val+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>" 
             var str_prop="<div class='small-2 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
 
@@ -517,7 +517,7 @@
       }    
 
       });
-var var_this;
+  var var_this;
   // Rename Edit course structure name-------------------------------------------------------------------
     $(document).on('click','.edit_course_structure_name',function(){
       
@@ -577,12 +577,14 @@ var var_this;
       parent_id = $(this).parents("li").attr("id");
       if($("#"+parent_id).hasClass("hidden_children")){
           $(this).removeClass("fi-plus").addClass("fi-minus");
-          $("#"+parent_id).find("li,input").removeClass("hide");
+          $("#"+parent_id).find("li,input,a").removeClass("hide");
+          $("#"+parent_id).find("li.hidden_children")
+              .find(".fi-plus").removeClass("fi-plus").addClass("fi-minus")
           $("#"+parent_id).removeClass("hidden_children");
       }
       else{
           $(this).removeClass("fi-minus").addClass("fi-plus")
-          $("#"+parent_id).find("li,input").addClass("hide");
+          $("#"+parent_id).find("li,input,a").addClass("hide");
           $("#"+parent_id).addClass("hidden_children");
       }
     });
@@ -756,7 +758,7 @@ var var_this;
                 return cloned_ss_ele_id}).removeClass("hide").attr("value","{{css_node.pk}}"));
             $("#"+cloned_ss_ele_id).find(".units-btn").attr("data-css-id","{{css_node.pk}}")
 
-            var str_btn1="<div class='row'><div class='small-1 columns text-center'><i class='fi-page largesize'></i></div>"
+            var str_btn1="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
             var str_lbl1="<span data-tooltip title='{{css_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='{{css_node.pk}}' style='float:left;'>{{css_node.name}}</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>" 
             
             
@@ -769,9 +771,9 @@ var var_this;
             {% if css_node.collection_set %}
               {% for each_unit in css_node.collection_set %}
                 {% get_node each_unit as unit_node %}
-                    str_unit = "<div class='row'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='button expnad hoverstyle units-btn' data-unit-id='{{unit_node.pk}}' style='width:90%;' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a></div>"
-                    $(".units-btn").before($("#course-unit-li-id").clone().attr('id',"{{unit_node.pk}}").removeClass("hide"))
-                    $("#"+cloned_ss_ele_id).find(".new-units-btn").before(str_unit)
+                    str_unit = "<li class='row'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='button expnad hoverstyle units-btn' data-unit-id='{{unit_node.pk}}' style='width:90%;' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a>"
+                    str_opt = "</li>"
+                    $("#"+cloned_ss_ele_id).find(".new-units-btn").before(str_unit+str_opt)
               {% endfor %}
             {% endif %}
       {% endfor %}
