@@ -62,7 +62,7 @@
       color:white !important;
     }
 
-    .course-section-class, .course-sub-section-class{
+    .course-section-class, .course-sub-section-class, .course-unit-class{
       border-color:#757b80 !important; 
       margin: 10px !important;
       border: 1px solid;
@@ -71,7 +71,9 @@
     .div_lbl{
       margin-top: -5px;
     }
-
+    .course-unit-class{
+      height:30px;
+    }
     #name{
       margin: 5px !important;
     }
@@ -124,6 +126,10 @@
 
     .div_lbl > label {
      display: inline-block;
+    }
+
+    .unit-anch{
+      font-size:150%;
     }
 
 
@@ -206,7 +212,6 @@
         </div>
         <div class="row">
           <div class="small-10 small-centered columns units-btn-div"> 
-          <div class="units-list"></div>
           <a class="button round expand hoverstyle units-btn new-units-btn"> + New Units</a>
           </div>
         </div>
@@ -358,7 +363,7 @@
           complete: function (result) {
             if(success_state){
               var str_btn="<div class='row'><div class='small-1 columns text-center fold-btn-div'><i class='fi-minus largesize'></i></div>"
-              var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id = "+ cs_new_id+" style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>"    
+              var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id = "+ cs_new_id+" style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>"
               var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
               $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop);
               $("#"+parent_id).attr("value",cs_new_id);
@@ -438,12 +443,14 @@
       var parent_node;
       movenodeup = $current.attr("value")
       movenodedown = $previous.attr("value")
-
       if($current.attr("class") == "course-section-class"){
         parent_node = $("#course_node").val()
       }
-      else{
+      else if ($current.attr("class") == "course-sub-section-class"){
         parent_node =  $current.parents("li.course-section-class").attr("value");
+      }
+      else if ($current.attr("class") == "course-unit-class"){
+        parent_node =  $current.parents("li.course-sub-section-class").attr("value");
       }
       if($previous.length !== 0){
           $.ajax({
@@ -485,8 +492,11 @@
       if($current.attr("class") == "course-section-class"){
         parent_node = $("#course_node").val()
       }
-      else{
+      else if ($current.attr("class") == "course-sub-section-class"){
         parent_node =  $current.parents("li.course-section-class").attr("value");
+      }
+      else if ($current.attr("class") == "course-unit-class"){
+        parent_node =  $current.parents("li.course-sub-section-class").attr("value");
       }
       if($next.length !== 0){
           $.ajax({
@@ -771,9 +781,11 @@
             {% if css_node.collection_set %}
               {% for each_unit in css_node.collection_set %}
                 {% get_node each_unit as unit_node %}
-                    str_unit = "<li class='row'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='button expnad hoverstyle units-btn' data-unit-id='{{unit_node.pk}}' style='width:90%;' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a>"
-                    str_opt = "</li>"
-                    $("#"+cloned_ss_ele_id).find(".new-units-btn").before(str_unit+str_opt)
+
+                    str_unit = "<li class='course-unit-class' value='{{unit_node.pk}}'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class='small-4 columns end'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='units-btn unit-anch' data-unit-id='{{unit_node.pk}}' style='width:50%;' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a></div>"
+                    str_opt = "<div class='small-2 columns end'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></li>"
+                    $("#"+cloned_ss_ele_id).find(".new-units-btn").before(str_unit+ str_opt)
+
               {% endfor %}
             {% endif %}
       {% endfor %}
