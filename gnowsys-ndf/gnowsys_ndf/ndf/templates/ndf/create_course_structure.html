@@ -324,6 +324,7 @@
             return cloned_ss_ele_id}).removeClass("hide"));
         $("#"+cloned_ss_ele_id).find(".units-btn-div").addClass("hide")
         $("#"+cloned_ss_ele_id).find("input[id=name]").focus()
+        $(".sub-section-btn").attr("disabled",true)
         css_cloned_id+=1
     });
 
@@ -390,6 +391,7 @@
       }
       $("#"+parent_id).remove()
       $(".course-sec-btn").removeAttr("disabled")
+      $(".sub-section-btn").removeAttr("disabled")
     });
 
   // Save Course Section ---------------------------------------------------------------------------------
@@ -423,6 +425,7 @@
             if(success_state){
               css_new_id = data["css_new_id"]
               $(".units-btn-div").removeClass("hide")
+              $(".sub-section-btn").removeAttr("disabled")
             }
 
             // nothing
