@@ -78,7 +78,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
     mis_admin = None
     college_group_id = None
     latest_completed_on = None
-    unlock_enroll = False # Will only be True while editing (i.e. Re-opening Enrollment)
+    # unlock_enroll = False # Will only be True while editing (i.e. Re-opening Enrollment)
     reopen_task_id = None
     enrollment_last_date = None
     property_order_list = []
@@ -140,11 +140,11 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
     property_order_list = get_property_order_with_value(enrollment_gs)
 
-    if enrollment_last_date:
-        enrollment_last_date = enrollment_last_date.date()
-        current_date = datetime.datetime.now().date()
-        if enrollment_last_date <= current_date:
-            unlock_enroll = True
+    # if enrollment_last_date:
+    #     enrollment_last_date = enrollment_last_date.date()
+    #     current_date = datetime.datetime.now().date()
+    #     if enrollment_last_date <= current_date:
+    #         unlock_enroll = True
 
     if request.method == "POST":
         start_enroll = ""
@@ -673,8 +673,8 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
         'app_collection_set': app_collection_set,
         'app_set_id': app_set_id,
         'title': title,
-        'property_order_list': property_order_list,
-        'unlock_enroll':unlock_enroll
+        'property_order_list': property_order_list
+        # 'unlock_enroll':unlock_enroll
     }
 
     if app_set_instance_id:
@@ -931,7 +931,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                     })
                     if at_type_node:
                         at_node = None
-                        at_node = create_gattribute(sce_gs._id, at_type_node,u"CLOSED")
+                        at_node = create_gatrtibute(sce_gs._id, at_type_node,u"CLOSED")
                         if at_node:
                             #Change status of Task to Closed
                             task_at_type_node = node_collection.one({
@@ -1163,19 +1163,37 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
 
                 enrollment_task_dict = {}
                 approval_task_dict = {}
-                for each_task in sce_gs.attribute_set:
-                    if "has_approval_task" in each_task:
-                        if each_task["has_approval_task"]:
-                            approval_task_dict = each_task["has_approval_task"]
+                old_task = None
 
-                    if "has_enrollment_task" in each_task:
-                        if each_task["has_enrollment_task"]:
-                            enrollment_task_dict = each_task["has_enrollment_task"]
+                if "has_approval_task" in sce_gs:
+                    if sce_gs["has_approval_task"]:
+                        approval_task_dict = sce_gs["has_approval_task"]
+
+                if "has_enrollment_task" in sce_gs:
+                    if sce_gs["has_enrollment_task"]:
+                        enrollment_task_dict = sce_gs["has_enrollment_task"]
 
                 if str(task_node._id) not in approval_task_dict:
                     approval_task_dict[str(task_node._id)] = {}
 
                 at_rt_dict["has_approval_task"] = approval_task_dict
+
+                if "has_current_approval_task" in sce_gs:
+                    old_task = sce_gs["has_current_approval_task"]
+                    if old_task:
+                        old_app_task_dict = {}
+                        old_app_task_dict["_id"] = old_task[0]._id
+                        old_app_task_dict["Status"] = u"Closed"
+                        old_app_task_dict["modified_by"] = user_id
+                        old_app_task_dict["name"] = unicode(old_task[0].name)
+                        admin_user = User.objects.get(id=mis_admin.group_admin[0])
+                        old_app_task_dict["created_by_name"] = admin_user.username
+                        old_app_task_dict["content_org"] = "\n This StudentCourseApproval Task is no longer valid."
+
+                        old_app_task_dict["content_org"] = unicode(old_app_task_dict["content_org"])
+
+                        old_task_node_updated = create_task(old_app_task_dict)
+
                 at_rt_dict["has_current_approval_task"] = [task_node._id]
 
                 # Update the enrollment task as "Closed"
