@@ -4175,16 +4175,23 @@ def approve_students(request, group_id):
                     "has_enrolled": "$attribute_set.has_enrolled",
                     "has_approved": "$attribute_set.has_approved",
                     "has_rejected": "$attribute_set.has_rejected",
+                    "has_approval_task": "$attribute_set.has_approval_task",
                     "has_current_approval_task": "$relation_set.has_current_approval_task"
                 }
             }])
 
+            user_id = int(request.user.id)  # getting django user id
             remaining_count = None
             enrolled_list = []
             approved_list = []
             rejected_list = []
             error_id_list = []
+            has_approval_task_dict = {}
             approved_or_rejected_list = []
+
+            has_approval_task_dict = sce_gs["result"][0]["has_approval_task"]
+            if has_approval_task_dict:
+                has_approval_task_dict = has_approval_task_dict[0]
 
             enrolled_list = sce_gs["result"][0]["has_enrolled"]
             if enrolled_list:
@@ -4231,7 +4238,6 @@ def approve_students(request, group_id):
                 }
             }])
 
-
             # Performing multiprocessing to fasten out the below processing of
             # for loop; that is, performing approval of students to respective course(s)
             prev_approved_or_rejected_list = []
@@ -4244,50 +4250,6 @@ def approve_students(request, group_id):
                 prev_approved_or_rejected_list,
                 num_of_processes=multiprocessing.cpu_count()
             )
-            """
-            for each in students_selected:
-                # Fetch student node along with selected_course and course_enrollment_status
-                student_id = ObjectId(each)
-                stud_node = node_collection.collection.aggregate([{
-                    "$match": {
-                        "_id": student_id
-                    }
-                }, {
-                    "$project": {
-                        "selected_course": "$relation_set.selected_course",
-                        "course_enrollment_status": "$attribute_set.course_enrollment_status"
-                    }
-                }])
-                # Fetch selected_course ObjectIds -- Course(s) in which student is enrolled
-                selected_course = stud_node["result"][0]["selected_course"]
-                if selected_course:
-                    selected_course = selected_course[0]
-
-                # Fetch course_enrollment_status -- Holding Course(s) along with it's enrollment status
-                course_enrollment_status = stud_node["result"][0]["course_enrollment_status"]
-                if course_enrollment_status:
-                    course_enrollment_status = course_enrollment_status[0]
-                else:
-                    course_enrollment_status = {}
-
-                for each_course_id, str_course_id in course_ids:
-                    # If ObjectId exists in selected_course and ObjectId(in string format)
-                    # exists as key in course_enrollment_status
-                    # Then only update status as "Enrollment Approved"/"Enrollment Rejected"
-                    if each_course_id in selected_course and str_course_id in course_enrollment_status:
-                        # course_enrollment_status.update({str_course_id: course_enrollment_status_text})
-                        course_enrollment_status[str_course_id] = course_enrollment_status_text
-                        try:
-                            at_node = create_gattribute(student_id, course_enrollment_status_at, course_enrollment_status)
-                            if at_node:
-                                # If status updated, then only update approved_or_rejected_list
-                                # by appending given student's ObjectId into it
-                                if student_id not in approved_or_rejected_list:
-                                        approved_or_rejected_list.append(student_id)
-                        except Exception as e:
-                            error_id_list.append(student_id)
-                            continue
-            """
 
             approved_or_rejected_list.extend(new_list)
 
@@ -4321,23 +4283,80 @@ def approve_students(request, group_id):
             # Update status of Approval task
             has_current_approval_task_id = sce_gs["result"][0]["has_current_approval_task"]
             if has_current_approval_task_id:
-                has_current_approval_task_id = has_current_approval_task_id[0]
+                has_current_approval_task_id = has_current_approval_task_id[0][0]
 
             task_status_at = node_collection.one({
                 '_type': "AttributeType", 'name': "Status"
             })
 
             task_status_value = ""
+            task_status_msg = ""
             if remaining_count == 0:
                 if enrolled_count == (approved_count + rejected_count):
                     task_status_value = u"Closed"
+                    task_status_msg = "This task has been closed after successful completion " + \
+                        "of approval process of students."
+
             else:
                 task_status_value = u"In Progress"
+                task_status_msg = "This task is in progress."
 
             try:
-                attr_node = create_gattribute(has_current_approval_task_id[0], task_status_at, task_status_value)
+                # Update the approval task's status as "Closed"
+                task_dict = {}
+                task_dict["_id"] = has_current_approval_task_id
+                task_dict["Status"] = task_status_value
+
+                # Update decription of Approval task only at time of closing it
+                if task_status_value is u"Closed":
+                    old_task_node = node_collection.one({
+                        "_id": ObjectId(has_current_approval_task_id)
+                    }, {
+                        "name": 1
+                    })
+                    user_node = User.objects.get(id=user_id)
+                    task_dict["name"] = old_task_node.name
+                    task_dict["created_by_name"] = user_node.username
+
+                    task_message = task_status_msg + " Following are the details " + \
+                        "of this approval process:-" + \
+                        "\n Total No. of student(s) enrolled: " + str(enrolled_count) + \
+                        "\n Total No. of student(s) approved: " + str(approved_count) + \
+                        "\n Total No. of student(s) rejected: " + str(rejected_count) + \
+                        "\n Total No. of student(s) remaining: " + str(remaining_count)
+                    task_dict["content_org"] = unicode(task_message)
+
+                task_dict["modified_by"] = user_id
+                task_node = create_task(task_dict)
+
+                if task_status_value == u"Closed":
+                    # Update the StudentCourseEnrollment node's status as "CLOSED"
+                    at_type_node = None
+                    at_type_node = node_collection.one({
+                        '_type': "AttributeType",
+                        'name': u"enrollment_status"
+                    })
+                    if at_type_node:
+                        at_node = create_gattribute(enrollment_id, at_type_node, u"CLOSED")
+
+                    # Set completion status for closed approval task in StudentCourseEnrollment node's has_enrollment_task
+                    completed_on = datetime.datetime.now()
+
+                    if str(has_current_approval_task_id) in has_approval_task_dict:
+                        has_approval_task_dict[str(has_current_approval_task_id)] = {
+                            "completed_on": completed_on, "completed_by": user_id
+                        }
+                        at_type_node = None
+                        at_type_node = node_collection.one({
+                            '_type': "AttributeType",
+                            'name': u"has_approval_task"
+                        })
+
+                        if at_type_node:
+                            attr_node = create_gattribute(enrollment_id, at_type_node, has_approval_task_dict)
+
             except Exception as e:
-                error_id_list.append(has_current_approval_task_id[0])
+                error_id_list.append(has_current_approval_task_id)
 
             response_dict["success"] = True
             response_dict["enrolled"] = enrolled_count
