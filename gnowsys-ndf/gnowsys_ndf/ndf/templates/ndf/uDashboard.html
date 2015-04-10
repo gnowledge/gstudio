@@ -227,7 +227,7 @@
 	                <a href="{% url 'task_details' group_id node.pk %}">
 	                <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
 
-	                <h4>{{ node.name|truncatechars:20 }}</h4>
+	                <h4 title="{{ node.name }}">{{ node.name|truncatechars:20 }}</h4>
 
 	                <div>
 	                  <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
