@@ -507,7 +507,8 @@ def group_dashboard(request, group_id):
         # Get StudentCourseEnrollment nodes which are there for approval
         sce_cur = node_collection.find({
             'member_of': sce_gst._id, 'group_set': ObjectId(group_id),
-            "attribute_set.enrollment_status": {"$nin": [u"OPEN"]},
+            # "attribute_set.enrollment_status": {"$nin": [u"OPEN"]},
+            "attribute_set.enrollment_status": {"$in": [u"PENDING", "APPROVAL"]},
             'status': u"PUBLISHED"
         }, {
             'member_of': 1
