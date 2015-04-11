@@ -678,7 +678,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
             task_node = create_task(task_dict)
 
             # Update the current approval task as "Closed"
-            if not approval_task_dict[str(old_current_approval_task)]:
+            if old_current_approval_task and not approval_task_dict[str(old_current_approval_task)]:
                 old_app_task_dict = {}
                 old_app_task_dict["_id"] = old_current_approval_task
                 old_app_task_dict["Status"] = u"Closed"
@@ -874,14 +874,17 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     """
     Student enrollment
     """
+    user_id = int(request.user.id)  # getting django user's id
+    user_name = request.user.username  # getting django user's username
+
     auth = None
     if ObjectId.is_valid(group_id) is False:
         group_ins = node_collection.one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        auth = node_collection.one({'_type': 'Author', 'name': unicode(user_name) })
         if group_ins:
             group_id = str(group_ins._id)
         else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(user_name) })
             if auth:
                 group_id = str(auth._id)
 
@@ -901,12 +904,10 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     title = ""
     template_prefix = "mis"
 
-    user_id = int(request.user.id)  # getting django user id
-
     if user_id:
         if auth is None:
             auth = node_collection.one({
-                '_type': 'Author', 'name': unicode(request.user.username)
+                '_type': 'Author', 'name': unicode(user_name)
             })
 
         agency_type = auth.agency_type
@@ -934,6 +935,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     start_enroll = ""
     end_enroll = ""
     enrollment_task = {}
+    enrollment_status_val = ""
     enrollment_closed = False
     enrollment_reopen = False
     total_student_enroll_list = []
@@ -952,6 +954,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 'member_of': 1, 'name': 1,
                 'last_update': 1, 'attribute_set.start_enroll': 1,
                 'attribute_set.end_enroll': 1,
+                'attribute_set.enrollment_status': 1,
                 'attribute_set.has_enrollment_task': 1
             })
 
@@ -960,35 +963,68 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                     start_enroll = attr["start_enroll"]
                 elif attr and "end_enroll" in attr:
                     end_enroll = attr["end_enroll"]
+                elif attr and "enrollment_status" in attr:
+                    enrollment_status_val = attr["enrollment_status"]
                 elif attr and "has_enrollment_task" in attr:
                     enrollment_task = attr["has_enrollment_task"]
 
+            # Fetch on going enrollment task's id, in order to close and
+            # set it's status, if sce_gs node's duration gets expired
+            # Keep it here only as it is also being used
+            # below to close it's status on proper completion of process
             for task_objectid, task_details_dict in enrollment_task.items():
                 if not task_details_dict:
                     task_id = ObjectId(task_objectid)
 
-            #Check the end_enroll date on landing, if its past, set status of sce_gs to "closed"
+            # Check the end_enroll date on landing, if its' past,
+            # And if sce_gs status is "OPEN";
+            # Then set status of sce_gs to "Closed"
             if end_enroll:
                 end_enroll = end_enroll.date()
                 current_date = datetime.datetime.now().date()
-                if end_enroll < current_date:
-                    #close sce_gs
+                if (end_enroll < current_date) and (enrollment_status_val == u"OPEN"):
+                    # Close sce_gs
                     at_type_node = node_collection.one({
                         '_type': "AttributeType",
                         'name': u"enrollment_status"
                     })
                     if at_type_node:
                         at_node = None
-                        at_node = create_gattribute(sce_gs._id, at_type_node,u"CLOSED")
+                        at_node = create_gattribute(sce_gs._id, at_type_node, u"CLOSED")
                         if at_node:
-                            #Change status of Task to Closed
+                            # Change status of enrollment Task to Closed
                             task_at_type_node = node_collection.one({
                                 '_type': "AttributeType",
                                 'name': u"Status"
                             })
                             if task_at_type_node:
-                                task_at_node = None
-                                task_at_node = create_gattribute(task_id, task_at_type_node,u"Closed")
+                                task_dict = {}
+                                task_dict["_id"] = task_id
+                                task_dict["Status"] = u"Closed"
+                                task_dict["modified_by"] = user_id
+                                task_dict["created_by_name"] = user_name
+                                task_dict["content_org"] = "\n This Student-Course Enrollment Task is no longer valid (Enrollment duration expired)!!!"
+                                task_dict["content_org"] = unicode(task_dict["content_org"])
+
+                                task_node = create_task(task_dict)
+
+                                if task_node:
+                                    # Set expiration status for closed enrollment task in StudentCourseEnrollment node's has_enrollment_task
+                                    expired_on = datetime.datetime.now()
+
+                                    enrollment_task[str(task_id)] = {
+                                        "expired_on": expired_on
+                                    }
+                                    at_type_node = None
+                                    at_type_node = node_collection.one({
+                                        '_type': "AttributeType",
+                                        'name': u"has_enrollment_task"
+                                    })
+
+                                    if at_type_node:
+                                        attr_node = create_gattribute(sce_gs._id, at_type_node, enrollment_task)
+
+                            # Important as updated status is gtting used below
                             sce_gs.reload()
 
             sce_gs.get_neighbourhood(sce_gs.member_of)
@@ -1038,11 +1074,10 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                     "_" + ann_course_name
 
             task_dict["name"] = unicode(task_dict["name"])
-            task_dict["created_by"] = mis_admin.group_admin[0]
-            admin_user = User.objects.get(id=mis_admin.group_admin[0])
-            task_dict["created_by_name"] = admin_user.username
-            task_dict["modified_by"] = mis_admin.group_admin[0]
-            task_dict["contributors"] = [mis_admin.group_admin[0]]
+            task_dict["created_by"] = user_id
+            task_dict["created_by_name"] = user_name
+            task_dict["modified_by"] = user_id
+            task_dict["contributors"] = [user_id]
 
             MIS_GAPP = node_collection.one({
                 '_type': "GSystemType", 'name': "MIS"
@@ -1086,8 +1121,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
             # Set content for Re-open task (having it's own ObjectId)
             task_dict = {}
             task_dict["_id"] = task_node._id
-            task_dict["name"] = task_node.name
-            task_dict["created_by_name"] = admin_user.username
+            task_dict["created_by_name"] = user_name
             student_course_reopen_enrollment_url_link = ""
             site = Site.objects.get(pk=1)
             site = site.name.__str__()
@@ -1121,6 +1155,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
 
                         elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
                             at_rt_node = create_grelation(sce_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
+
             return HttpResponseRedirect(reverse(app_name.lower() + ":" + template_prefix + '_enroll',
                 kwargs={'group_id': group_id, "app_id": app_id, "app_set_id": app_set_id, "app_set_instance_id": app_set_instance_id}
             ))
@@ -1288,42 +1323,6 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 selected_course_rt, course_enrollment_status_at,
                 num_of_processes=multiprocessing.cpu_count()
             )
-
-            """
-            for each_student in student_cur["result"]:
-                prev_selected_course_ids = []
-                selected_course_ids = []
-                if each_student["selected_course"]:
-                    prev_selected_course_ids = each_student["selected_course"][0]
-                else:
-                    prev_selected_course_ids = each_student["selected_course"]
-
-                # course_enrollment_status = {}
-                # for attr in each_student.attribute_set:
-                #     if attr and "course_enrollment_status" in attr:
-                #         course_enrollment_status = attr["course_enrollment_status"]
-                #         break
-
-                selected_course_ids = ann_course_ids + prev_selected_course_ids
-                try:
-                    gr_node = create_grelation(each_student["_id"], selected_course_rt, selected_course_ids)
-                    #try block is used to avoid "Multiple results found" error
-                    try:
-                        course_enrollment_status = {}
-                        if each_student["course_enrollment_status"]:
-                            course_enrollment_status = each_student["course_enrollment_status"][0]
-
-                        for each_course_id in selected_course_ids:
-                            str_course_id = str(each_course_id)
-                            if str_course_id not in course_enrollment_status:
-                                course_enrollment_status.update({str_course_id: u"Enrolled"})
-                        at_node = create_gattribute(each_student["_id"], course_enrollment_status_at, course_enrollment_status)
-                    except Exception as e:
-                        gr_node = create_grelation(each_student["_id"], selected_course_rt, prev_selected_course_ids)
-                        continue
-                except Exception as e:
-                    continue
-            """
 
         # Save/Update GAttribute(s) and/or GRelation(s)
         for at_rt_name in at_rt_list:
