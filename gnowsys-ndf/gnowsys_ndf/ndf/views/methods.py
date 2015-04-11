@@ -2533,15 +2533,19 @@ def create_task(task_dict, task_type_creation="single"):
     task_dict_keys = task_dict.keys()
 
     if "_id" in task_dict:
-      task_node = node_collection.one({'_id': task_dict["_id"]})
+        task_node = node_collection.one({'_id': task_dict["_id"]})
+        task_dict["name"] = task_node.name
     else:
-      task_node = node_collection.collection.GSystem()
-      task_node["member_of"] = [task_gst._id]
+        task_node = node_collection.find_one({"member_of": task_gst._id, "name": task_dict["name"], "attribute_set.Status": {"$nin": ["Closed"]}})
+
+        if task_node is None:
+            task_node = node_collection.collection.GSystem()
+            task_node["member_of"] = [task_gst._id]
 
     # Store built in variables of task node
     # Iterate task_node using it's keys
     for key in task_node:
-        if key in ["Status", "Priority", "start_time", "end_time", "Assignee"]:
+        if key in ["Status", "Priority", "start_time", "end_time", "Assignee", "has_type"]:
             # Required because these values might come as key in node's document
             continue
 
