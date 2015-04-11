@@ -34,6 +34,7 @@
       	TreeTillNode();
       {% endif %}
 
+
     });
 
 
@@ -43,7 +44,7 @@
 
 	  var tree_build = $(".themes").not(".jqtree-loading");
   	  var node = tree_build.tree('getNodeById', url);
-  	  tree_build.tree('selectNode', node);
+  	  tree_build.tree('openNode', node);
       
       // Javascript function to be used for checking objects in specific time of interval
       setTimeout(function(){
@@ -87,7 +88,7 @@
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
+                				'&nbsp;&nbsp;<a id='+node.id+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
 
                 			{% endif %}
             			);	            			
@@ -185,6 +186,19 @@
 
 	};
 
+
+	// method to handle hover on topics
+	function showTopicStats(){
+      // Javascript function to be used for checking objects in specific time of interval
+      setTimeout(function(){
+		$(".jqtree-title.jqtree_common").hover( function(){alert(this.textContent)});
+        // console.log($(".jqtree-element.jqtree_common"))
+        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { showTopicStats() }
+      }, 1000 );
+	}
+
+    // showTopicStats();
+
   </script>
 
   <style>
@@ -268,43 +282,37 @@
 {% endblock %}
 
 {% block meta_content %}
-{% if user.is_authenticated %}
-{% user_access_policy groupid request.user as user_access %}
+	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view"><h2 class="subheader">{% trans "Themes" %}</h2></a>
+{% endblock %}
 
-<ul class="no-bullet" id="app-set-item"> 
+{% block related_content %}
+	{% if user.is_authenticated %}
+	{% user_access_policy groupid request.user as user_access %}
 
-    {% get_memberof_objects_count theme_GST_id groupid as count %}
-  
-      <li class="selected-app-set-item"> 
-        <div>
-  		  {% if user_access == "allow" %}
-          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right;color:#0b8a91;" title="Add Theme">
-            +&nbsp;Add
-          </a>
-          {% endif %}
+	<div class="panel" style="background-color:#ddd;">
+	<ul class="no-bullet" id="app-set-item"> 
 
-          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" style="color:#0b8a91;">
-            Theme ({{count}})
-          </a> 
+	    {% get_memberof_objects_count theme_GST_id groupid as count %}
+	  
+	      <li class="selected-app-set-item"> 
+	        <div>
+	  		  {% if user_access == "allow" %}
+	          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right;color:#0b8a91;" title="Add Theme">
+	            +&nbsp;Add
+	          </a>
+	          {% endif %}
 
-        </div>
-      </li>
-  
-</ul>
-<hr/>
-<br/>
+	          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" style="color:#0b8a91;">
+	            Theme ({{count}})
+	          </a> 
 
-<ul class="no-bullet">
-  	<li>
-      	<div>
-        	<a href="{% url 'topics' group_name_tag %}"> <input class="small button" type="button" value="Themes" > </a>
-      	</div>
-    </li>
+	        </div>
+	      </li>
+	  
+	</ul>
+	</div>
 
-  	<br/>
-  
-</ul>
-{% endif %}
+	{% endif %}
 {% endblock %}
 
 
@@ -396,7 +404,7 @@
 	<!-- For displaying themes items -->
 	{% if themes_cards  %}
 
-	<h3 class="subheader">Themes</h3><hr/>
+	
 		<div class="content row" id="panel2-4">
 
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -561,9 +569,15 @@
 	<script type="text/javascript">
 
 // ------ jqtree tree ------
+    	$("document").on("hover", ".jqtree-title.jqtree_common", function(){
+    		setTimeout(function(){
+		      }, 1000);
+
+			alert($(this).siblings("a").attr("id"));
+		});
 
 		$("#add_theme_item").click(function() {
-		      $.ajax({
+			      $.ajax({
 		        type: "POST",
 		        url: "{% url 'add_theme_item' groupid %}",
 		        datatype: "html",
@@ -590,7 +604,7 @@
 
 		});
 
-		// script for fold themes hierarchy
+		// script for fold themes_cards hierarchy
 		$(".fold").click(function() {
 			$(function() {				
 				location.href = "{% url 'theme_page' group_name_tag app_id %}";

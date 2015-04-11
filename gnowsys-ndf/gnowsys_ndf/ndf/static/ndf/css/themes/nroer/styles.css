@@ -1,5 +1,5 @@
 /*
-*   Metastudio Customization SASS
+*   NROER Customization SASS
 */
 /*
 *   Metstudio Default Skin File
@@ -1665,8 +1665,8 @@ select {
   padding: 0.875rem 1.5rem 0.875rem 0.875rem;
   font-size: 0.8125rem;
   transition: opacity 300ms ease-out;
-  background-color: #0094de;
-  border-color: #007fbf;
+  background-color: #0eacb5;
+  border-color: #0c949c;
   color: white;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
@@ -1708,9 +1708,9 @@ select {
 }
 /* line 122, ../../../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.secondary {
-  background-color: #aec0c9;
-  border-color: #8fa7b4;
-  color: #33444d;
+  background-color: #a9b2b3;
+  border-color: #909b9c;
+  color: white;
 }
 /* line 123, ../../../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.warning {
@@ -1722,7 +1722,7 @@ select {
 .alert-box.info {
   background-color: #fff0a5;
   border-color: #ffe66a;
-  color: #33444d;
+  color: #383e3e;
 }
 /* line 125, ../../../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.alert-close {
@@ -2268,8 +2268,8 @@ select {
   list-style: none;
   border-style: solid;
   border-width: 1px;
-  background-color: #009deb;
-  border-color: #008dd4;
+  background-color: #10c1cb;
+  border-color: #0eaeb7;
   border-radius: 5px;
 }
 /* line 122, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
@@ -2358,14 +2358,14 @@ button, .button {
   padding-bottom: 1.0625rem;
   padding-left: 2rem;
   font-size: 1rem;
-  background-color: #0094de;
-  border-color: #0076b2;
+  background-color: #0eacb5;
+  border-color: #0b8a91;
   color: white;
   transition: background-color 300ms ease-out;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button:hover, button:focus, .button:hover, .button:focus {
-  background-color: #0076b2;
+  background-color: #0b8a91;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button:hover, button:focus, .button:hover, .button:focus {
@@ -2373,13 +2373,13 @@ button:hover, button:focus, .button:hover, .button:focus {
 }
 /* line 223, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary, .button.secondary {
-  background-color: #aec0c9;
-  border-color: #819dab;
-  color: #333333;
+  background-color: #a9b2b3;
+  border-color: #859192;
+  color: white;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
-  background-color: #819dab;
+  background-color: #859192;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
@@ -2491,8 +2491,8 @@ button.round, .button.round {
 }
 /* line 240, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled, button[disabled], .button.disabled, .button[disabled] {
-  background-color: #0094de;
-  border-color: #0076b2;
+  background-color: #0eacb5;
+  border-color: #0b8a91;
   color: white;
   cursor: default;
   opacity: 0.7;
@@ -2500,7 +2500,7 @@ button.disabled, button[disabled], .button.disabled, .button[disabled] {
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
-  background-color: #0076b2;
+  background-color: #0b8a91;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
@@ -2508,20 +2508,20 @@ button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[dis
 }
 /* line 179, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
-  background-color: #0094de;
+  background-color: #0eacb5;
 }
 /* line 241, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary, button[disabled].secondary, .button.disabled.secondary, .button[disabled].secondary {
-  background-color: #aec0c9;
-  border-color: #819dab;
-  color: #333333;
+  background-color: #a9b2b3;
+  border-color: #859192;
+  color: white;
   cursor: default;
   opacity: 0.7;
   box-shadow: none;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  background-color: #819dab;
+  background-color: #859192;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
@@ -2529,7 +2529,7 @@ button.disabled.secondary:hover, button.disabled.secondary:focus, button[disable
 }
 /* line 179, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  background-color: #aec0c9;
+  background-color: #a9b2b3;
 }
 /* line 242, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.success, button[disabled].success, .button.disabled.success, .button[disabled].success {
@@ -4546,7 +4546,7 @@ label.error {
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_icon-bar.scss */
 .icon-bar > *:hover {
-  background: #0094de;
+  background: #0eacb5;
 }
 /* line 170, ../../../bower_components/foundation/scss/foundation/components/_icon-bar.scss */
 .icon-bar > * label {
@@ -4910,7 +4910,7 @@ kbd {
   margin-bottom: inherit;
   padding: 0.25rem 0.5rem 0.25rem;
   font-size: 0.6875rem;
-  background-color: #0094de;
+  background-color: #0eacb5;
   color: #666666;
 }
 /* line 96, ../../../bower_components/foundation/scss/foundation/components/_labels.scss */
@@ -4938,8 +4938,8 @@ kbd {
 }
 /* line 102, ../../../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.secondary, .secondary.label-list:empty:before {
-  background-color: #aec0c9;
-  color: #333333;
+  background-color: #a9b2b3;
+  color: #666666;
 }
 /* line 103, ../../../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.info, .info.label-list:empty:before {
@@ -5365,14 +5365,14 @@ ul.pagination li.unavailable:hover a, ul.pagination li.unavailable a:focus, ul.p
 }
 /* line 68, ../../../bower_components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li.current a, ul.pagination li.current button {
-  background: #0094de;
+  background: #0eacb5;
   color: white;
   font-weight: bold;
   cursor: default;
 }
 /* line 75, ../../../bower_components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li.current a:hover, ul.pagination li.current a:focus, ul.pagination li.current button:hover, ul.pagination li.current button:focus {
-  background: #0094de;
+  background: #0eacb5;
 }
 /* line 136, ../../../bower_components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li {
@@ -5396,10 +5396,10 @@ ul.pagination li {
 .panel {
   border-style: solid;
   border-width: 1px;
-  border-color: #c2ebff;
+  border-color: #c6f8fb;
   margin-bottom: 1.25rem;
   padding: 1.25rem;
-  background: #f9fdff;
+  background: #f9feff;
   color: #333333;
 }
 /* line 54, ../../../bower_components/foundation/scss/foundation/components/_panels.scss */
@@ -5427,10 +5427,10 @@ ul.pagination li {
 .panel.callout {
   border-style: solid;
   border-width: 1px;
-  border-color: #b8e7ff;
+  border-color: #bbf6fa;
   margin-bottom: 1.25rem;
   padding: 1.25rem;
-  background: #eef9ff;
+  background: #edfdfe;
   color: #333333;
 }
 /* line 54, ../../../bower_components/foundation/scss/foundation/components/_panels.scss */
@@ -5456,7 +5456,7 @@ ul.pagination li {
 }
 /* line 83, ../../../bower_components/foundation/scss/foundation/components/_panels.scss */
 .panel.callout a:not(.button) {
-  color: #0094de;
+  color: #0eacb5;
 }
 /* line 88, ../../../bower_components/foundation/scss/foundation/components/_panels.scss */
 .panel.radius {
@@ -5534,13 +5534,13 @@ ul.pagination li {
 }
 /* line 61, ../../../bower_components/foundation/scss/foundation/components/_progress-bars.scss */
 .progress .meter {
-  background: #0094de;
+  background: #0eacb5;
   height: 100%;
   display: block;
 }
 /* line 64, ../../../bower_components/foundation/scss/foundation/components/_progress-bars.scss */
 .progress.secondary .meter {
-  background: #aec0c9;
+  background: #a9b2b3;
   height: 100%;
   display: block;
 }
@@ -5619,12 +5619,12 @@ ul.pagination li {
 }
 /* line 146, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.radius .range-slider-handle {
-  background: #0094de;
+  background: #0eacb5;
   border-radius: 5px;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.radius .range-slider-handle:hover {
-  background: #0082c3;
+  background: #0c979f;
 }
 /* line 148, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round {
@@ -5633,12 +5633,12 @@ ul.pagination li {
 }
 /* line 150, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round .range-slider-handle {
-  background: #0094de;
+  background: #0eacb5;
   border-radius: 1000px;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round .range-slider-handle:hover {
-  background: #0082c3;
+  background: #0c979f;
 }
 /* line 152, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.disabled, .range-slider[disabled] {
@@ -5648,13 +5648,13 @@ ul.pagination li {
 }
 /* line 154, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.disabled .range-slider-handle, .range-slider[disabled] .range-slider-handle {
-  background: #0094de;
+  background: #0eacb5;
   cursor: default;
   opacity: 0.7;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.disabled .range-slider-handle:hover, .range-slider[disabled] .range-slider-handle:hover {
-  background: #0082c3;
+  background: #0c979f;
 }
 
 /* line 157, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
@@ -5662,7 +5662,7 @@ ul.pagination li {
   display: inline-block;
   position: absolute;
   height: 0.875rem;
-  background: #acbec8;
+  background: #a8b0b1;
 }
 
 /* line 163, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
@@ -5677,11 +5677,11 @@ ul.pagination li {
   cursor: pointer;
   -ms-touch-action: manipulation;
   touch-action: manipulation;
-  background: #0094de;
+  background: #0eacb5;
 }
 /* line 115, ../../../bower_components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider-handle:hover {
-  background: #0082c3;
+  background: #0c979f;
 }
 
 /* line 165, ../../../bower_components/foundation/scss/foundation/components/_reveal.scss */
@@ -6097,7 +6097,7 @@ dialog[open] {
 .sub-nav li.active a {
   border-radius: 3px;
   font-weight: normal;
-  background: #0094de;
+  background: #0eacb5;
   padding: 0.1875rem 1rem;
   cursor: default;
   color: white;
@@ -6106,7 +6106,7 @@ dialog[open] {
 .sub-nav dt.active a:hover,
 .sub-nav dd.active a:hover,
 .sub-nav li.active a:hover {
-  background: #007fbf;
+  background: #0c949c;
 }
 
 /* line 204, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
@@ -6164,7 +6164,7 @@ dialog[open] {
 }
 /* line 102, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
 .switch input:checked + label {
-  background: #0094de;
+  background: #0eacb5;
 }
 /* line 106, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
 .switch input:checked + label:after {
@@ -6195,7 +6195,7 @@ dialog[open] {
 }
 /* line 155, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
 .switch input:checked + label {
-  background: #0094de;
+  background: #0eacb5;
 }
 /* line 118, ../../../bower_components/foundation/scss/foundation/components/_switches.scss */
 .switch.large label {
@@ -6347,7 +6347,7 @@ table tr td {
   outline: none;
   display: block;
   background-color: inherit;
-  color: #005985;
+  color: #08676d;
   padding: 0.4rem 0.8rem;
   font-family: "Source Sans Pro", "Open Sans", "Ubuntu", "FreeSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1rem;
@@ -6359,7 +6359,7 @@ table tr td {
 /* line 55, ../../../bower_components/foundation/scss/foundation/components/_tabs.scss */
 .tabs dd.active a, .tabs .tab-title.active a {
   background-color: inherit;
-  color: #005985;
+  color: #08676d;
 }
 /* line 64, ../../../bower_components/foundation/scss/foundation/components/_tabs.scss */
 .tabs.radius dd:first-child a, .tabs.radius .tab:first-child a {
@@ -6458,7 +6458,7 @@ table tr td {
 }
 /* line 49, ../../../bower_components/foundation/scss/foundation/components/_thumbs.scss */
 .th:hover, .th:focus {
-  box-shadow: 0 0 6px 1px rgba(0, 148, 222, 0.5);
+  box-shadow: 0 0 6px 1px rgba(14, 172, 181, 0.5);
 }
 /* line 63, ../../../bower_components/foundation/scss/foundation/components/_thumbs.scss */
 .th.radius {
@@ -6475,8 +6475,8 @@ table tr td {
 }
 /* line 45, ../../../bower_components/foundation/scss/foundation/components/_tooltips.scss */
 .has-tip:hover, .has-tip:focus {
-  border-bottom: dotted 1px #004364;
-  color: #0094de;
+  border-bottom: dotted 1px #064d51;
+  color: #0eacb5;
 }
 /* line 51, ../../../bower_components/foundation/scss/foundation/components/_tooltips.scss */
 .has-tip.tip-left, .has-tip.tip-right {
@@ -6529,8 +6529,8 @@ table tr td {
 }
 /* line 95, ../../../bower_components/foundation/scss/foundation/components/_tooltips.scss */
 .tooltip.opened {
-  color: #0094de !important;
-  border-bottom: dotted 1px #004364 !important;
+  color: #0eacb5 !important;
+  border-bottom: dotted 1px #064d51 !important;
 }
 
 /* line 101, ../../../bower_components/foundation/scss/foundation/components/_tooltips.scss */
@@ -6797,13 +6797,13 @@ meta.foundation-mq-topbar {
   font-size: 1rem;
   padding-right: 16.66667px;
   padding-left: 16.66667px;
-  background-color: #0094de;
-  border-color: #0076b2;
+  background-color: #0eacb5;
+  border-color: #0b8a91;
   color: white;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button:hover, .top-bar-section ul li > a.button:focus {
-  background-color: #0076b2;
+  background-color: #0b8a91;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button:hover, .top-bar-section ul li > a.button:focus {
@@ -6811,13 +6811,13 @@ meta.foundation-mq-topbar {
 }
 /* line 325, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > a.button.secondary {
-  background-color: #aec0c9;
-  border-color: #819dab;
-  color: #333333;
+  background-color: #a9b2b3;
+  border-color: #859192;
+  color: white;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button.secondary:hover, .top-bar-section ul li > a.button.secondary:focus {
-  background-color: #819dab;
+  background-color: #859192;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button.secondary:hover, .top-bar-section ul li > a.button.secondary:focus {
@@ -6870,13 +6870,13 @@ meta.foundation-mq-topbar {
   font-size: 1rem;
   padding-right: 16.66667px;
   padding-left: 16.66667px;
-  background-color: #0094de;
-  border-color: #0076b2;
+  background-color: #0eacb5;
+  border-color: #0b8a91;
   color: white;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button:hover, .top-bar-section ul li > button:focus {
-  background-color: #0076b2;
+  background-color: #0b8a91;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button:hover, .top-bar-section ul li > button:focus {
@@ -6884,13 +6884,13 @@ meta.foundation-mq-topbar {
 }
 /* line 337, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > button.secondary {
-  background-color: #aec0c9;
-  border-color: #819dab;
-  color: #333333;
+  background-color: #a9b2b3;
+  border-color: #859192;
+  color: white;
 }
 /* line 162, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button.secondary:hover, .top-bar-section ul li > button.secondary:focus {
-  background-color: #819dab;
+  background-color: #859192;
 }
 /* line 168, ../../../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button.secondary:hover, .top-bar-section ul li > button.secondary:focus {
@@ -6941,17 +6941,17 @@ meta.foundation-mq-topbar {
 /* line 344, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li:hover:not(.has-form) > a {
   background-color: #555555;
-  background: #004a6f;
+  background: #075b60;
   color: white;
 }
 /* line 354, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li.active > a {
-  background: #009deb;
+  background: #10c1cb;
   color: white;
 }
 /* line 357, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li.active > a:hover {
-  background: #009deb;
+  background: #10c1cb;
   color: white;
 }
 /* line 365, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7131,7 +7131,7 @@ meta.foundation-mq-topbar {
   /* line 492, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.hover > a:not(.button) {
     background-color: #555555;
-    background: #004a6f;
+    background: #075b60;
     color: white;
   }
   /* line 501, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7143,18 +7143,18 @@ meta.foundation-mq-topbar {
   /* line 505, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li:not(.has-form) a:not(.button):hover {
     background-color: #555555;
-    background: #004a6f;
+    background: #075b60;
   }
   /* line 514, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.active:not(.has-form) a:not(.button) {
     padding: 0 16.66667px;
     line-height: 50px;
     color: white;
-    background: #009deb;
+    background: #10c1cb;
   }
   /* line 519, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.active:not(.has-form) a:not(.button):hover {
-    background: #009deb;
+    background: #10c1cb;
     color: white;
   }
   /* line 531, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7239,7 +7239,7 @@ meta.foundation-mq-topbar {
   .top-bar-section .dropdown li:not(.has-form):not(.active):hover > a:not(.button) {
     color: white;
     background-color: #555555;
-    background: #004a6f;
+    background: #075b60;
   }
   /* line 604, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .dropdown li label {
@@ -7288,12 +7288,12 @@ meta.foundation-mq-topbar {
   /* line 657, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .no-js .top-bar-section ul li:hover > a {
     background-color: #555555;
-    background: #004a6f;
+    background: #075b60;
     color: white;
   }
   /* line 666, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .no-js .top-bar-section ul li:active > a {
-    background: #009deb;
+    background: #10c1cb;
     color: white;
   }
   /* line 674, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7576,13 +7576,13 @@ td {
 /* Default Link Styles */
 /* line 217, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a {
-  color: #005985;
+  color: #08676d;
   text-decoration: none;
   line-height: inherit;
 }
 /* line 223, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a:hover, a:focus {
-  color: #002c43;
+  color: #043436;
 }
 /* line 230, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 a img {
@@ -7704,10 +7704,10 @@ code {
   font-family: Consolas, "Liberation Mono", Courier, monospace;
   font-weight: normal;
   color: #333333;
-  background-color: #e7ecef;
+  background-color: #e5e8e8;
   border-width: 1px;
   border-style: solid;
-  border-color: #cbd6dc;
+  border-color: #cdd2d2;
   padding: 0.125rem 0.3125rem 0.0625rem;
 }
 
@@ -9079,656 +9079,30 @@ th.hide-for-touch {
   }
 }
 /*
-*  Metstudio Platform Stylesheet
+*  NROER Platform Stylesheet
 */
-/* line 8, ../../../scss/_metastudio_styles.scss */
-body {
-  background-color: #fafafa;
-}
-
-/* line 14, ../../../scss/_metastudio_styles.scss */
-.top-bar a.language.button {
-  padding: 5px 10px;
-  margin-top: 3px;
-  background-color: #555;
-  color: black;
-}
-/* line 19, ../../../scss/_metastudio_styles.scss */
-.top-bar a.language.button:hover {
-  background-color: white;
-  color: black;
-}
-/* line 24, ../../../scss/_metastudio_styles.scss */
-.top-bar ul.language-selector {
-  height: 50px;
-  float: right;
-  margin: 0;
-}
-/* line 29, ../../../scss/_metastudio_styles.scss */
-.top-bar .active {
-  background-color: #005985 !important;
-}
-/* line 33, ../../../scss/_metastudio_styles.scss */
-.top-bar h1 .flag, article h1:not(.subheader) div .top-bar input .flag {
-  height: 20px;
-  margin-bottom: 4px;
-  margin-right: 2px;
-}
-/* line 38, ../../../scss/_metastudio_styles.scss */
-.top-bar h1 img, .top-bar article h1:not(.subheader) div input img, article h1:not(.subheader) div .top-bar input img {
-  /* Logo */
-  height: 40px;
-}
-/* line 42, ../../../scss/_metastudio_styles.scss */
-.top-bar h1 a, .top-bar article h1:not(.subheader) div input a, article h1:not(.subheader) div .top-bar input a {
-  color: white !important;
-}
-/* line 46, ../../../scss/_metastudio_styles.scss */
-.top-bar .group:hover {
-  background-color: #111;
-}
-/* line 51, ../../../scss/_metastudio_styles.scss */
-.top-bar .logout {
-  background-color: #f04124 !important;
-}
-/* line 55, ../../../scss/_metastudio_styles.scss */
-.top-bar .logout:hover {
-  background-color: #d32a0e !important;
-  transition: background-color 400ms ease-out;
-}
-
-/* line 62, ../../../scss/_metastudio_styles.scss */
+/* line 6, ../../../scss/_nroer_styles.scss */
 .workspace {
-  background: url("watermark.png") no-repeat 0 80%;
+  background: url("watermark.png") no-repeat 1% 65%;
   min-height: 100%;
   margin-bottom: -130px !important;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-/* line 65, ../../../scss/_metastudio_styles.scss */
+/* line 9, ../../../scss/_nroer_styles.scss */
 .workspace .app.button-bar {
   height: 45px;
 }
-/* line 77, ../../../scss/_metastudio_styles.scss */
+/* line 21, ../../../scss/_nroer_styles.scss */
 .workspace:after {
   content: "";
   display: block;
   height: 130px;
 }
 
-/* line 86, ../../../scss/_metastudio_styles.scss */
-body > footer {
-  padding: 20px 0;
-  position: relative;
-  color: #888;
-  min-height: 170px;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-/* line 94, ../../../scss/_metastudio_styles.scss */
-body > footer section:first-child {
-  border-bottom: 1px solid #222;
-  margin-bottom: 1rem;
-}
-/* line 98, ../../../scss/_metastudio_styles.scss */
-body > footer a {
-  color: #777;
-}
-/* line 100, ../../../scss/_metastudio_styles.scss */
-body > footer a:hover {
-  color: #eee;
-}
-/* line 104, ../../../scss/_metastudio_styles.scss */
-body > footer strong a {
-  border-bottom: 1px dotted #555;
-}
-
-/* line 111, ../../../scss/_metastudio_styles.scss */
-.coll-arrows {
-  cursor: pointer;
-  display: block;
-  padding: 0.5rem;
-}
-/* line 116, ../../../scss/_metastudio_styles.scss */
-.coll-arrows:hover {
-  background-color: #D3D3D3;
-}
-
-/* Sections */
-/* line 126, ../../../scss/_metastudio_styles.scss */
-main > nav {
-  border-top: 3px solid black;
-  position: relative;
-  z-index: 10;
-}
-/* line 130, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar {
-  background-color: #009deb;
-  /* Hide icons till we can retreive custom icons from the system */
-}
-/* line 132, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar .button-group {
-  margin: 0;
-}
-/* line 134, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar .button-group.tools {
-  padding: 5px;
-}
-/* line 140, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar li .button {
-  border: none;
-  font-size: 0.8rem;
-  padding: 0.8rem 1rem;
-  background-color: transparent;
-  color: black;
-  margin: 0;
-}
-/* line 144, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar li .button.home {
-  font-weight: bold;
-}
-/* line 147, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar li .button.settings, main > nav > .button-bar li .button#toggle-help {
-  padding: 6px 10px;
-  color: #333;
-  background-color: rgba(255, 255, 255, 0.3);
-}
-/* line 152, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar li .button.settings:hover, main > nav > .button-bar li .button#toggle-help:hover {
-  background-color: rgba(0, 0, 0, 0.2);
-  color: white;
-}
-/* line 157, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar li .button#toggle-help {
-  background-color: inherit;
-}
-/* line 161, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar li .button.settings:after {
-  border: none;
-}
-/* line 169, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar li .button:hover {
-  color: white;
-}
-/* line 175, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar li.active .button {
-  background-color: #0094de;
-  color: white;
-}
-/* line 183, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar .app i {
-  display: none !important;
-}
-
-/* line 195, ../../../scss/_metastudio_styles.scss */
-main > aside > div h2 {
-  color: #111;
-}
-/* line 198, ../../../scss/_metastudio_styles.scss */
-main > aside > div h3 {
-  font-size: 1.2rem;
-  font-weight: normal;
-  color: #222;
-}
-/* line 203, ../../../scss/_metastudio_styles.scss */
-main > aside > div h4 {
-  font-size: 1rem;
-  color: #222;
-}
-/* line 206, ../../../scss/_metastudio_styles.scss */
-main > aside > div h4 span {
-  display: none;
-}
-/* line 209, ../../../scss/_metastudio_styles.scss */
-main > aside > div h4:hover span {
-  display: inline;
-}
-/* line 213, ../../../scss/_metastudio_styles.scss */
-main > aside > div h5, main > aside > div h6 {
-  margin: 0;
-}
-/* line 217, ../../../scss/_metastudio_styles.scss */
-main > aside > div .f-dropdown.content {
-  width: auto;
-  padding: 0;
-  border: 1px solid #222;
-}
-/* line 221, ../../../scss/_metastudio_styles.scss */
-main > aside > div .f-dropdown.content .item {
-  width: 70px;
-}
-/* line 225, ../../../scss/_metastudio_styles.scss */
-main > aside > div header {
-  padding: 10px;
-}
-/* line 228, ../../../scss/_metastudio_styles.scss */
-main > aside > div footer {
-  background-color: #222;
-  min-height: 1rem;
-}
-/* line 231, ../../../scss/_metastudio_styles.scss */
-main > aside > div footer label {
-  font-size: 0.7rem;
-}
-/* line 238, ../../../scss/_metastudio_styles.scss */
-main > aside > div a, main > aside > div p {
-  color: white;
-}
-/* line 240, ../../../scss/_metastudio_styles.scss */
-main > aside > div a:hover, main > aside > div p:hover {
-  color: white;
-}
-/* line 244, ../../../scss/_metastudio_styles.scss */
-main > aside > div .side-nav.collection {
-  background-color: #444;
-  padding: 0;
-  border-bottom: 2px solid #009deb;
-  margin: 0;
-}
-/* line 249, ../../../scss/_metastudio_styles.scss */
-main > aside > div .side-nav.collection li {
-  border-bottom: 1px solid #555;
-}
-/* line 251, ../../../scss/_metastudio_styles.scss */
-main > aside > div .side-nav.collection li a {
-  border-left: 2px solid black;
-}
-/* line 254, ../../../scss/_metastudio_styles.scss */
-main > aside > div .side-nav.collection li.active a, main > aside > div .side-nav.collection li a:hover {
-  color: white !important;
-  border-left: 2px solid #009deb;
-  background-color: #009deb;
-}
-
-/* line 266, ../../../scss/_metastudio_styles.scss */
-article {
-  position: relative;
-  z-index: 1;
-  min-height: 400px;
-  overflow-x: visible;
-}
-/* line 271, ../../../scss/_metastudio_styles.scss */
-article > header, article form > header {
-  padding: 15px;
-  background-color: #f0f0f0;
-}
-/* line 284, ../../../scss/_metastudio_styles.scss */
-article h1:not(.subheader) .tabs {
-  display: inline-block;
-  position: relative;
-  bottom: -0.5rem;
-}
-/* line 290, ../../../scss/_metastudio_styles.scss */
-article h1:not(.subheader) div, article h1:not(.subheader) div input:not(.subheader) div {
-  display: inline-block;
-  position: relative;
-}
-/* line 293, ../../../scss/_metastudio_styles.scss */
-article h1:not(.subheader) div input {
-  height: 200%;
-  font-style: italic;
-  padding-left: 5px;
-  box-shadow: none;
-  border-width: 0 0 2px 0;
-  border-bottom: 2px dotted #222;
-  background-color: inherit;
-}
-/* line 303, ../../../scss/_metastudio_styles.scss */
-article h1:not(.subheader) div input:hover {
-  background-color: white;
-}
-
-/* Card block */
-/* line 320, ../../../scss/_metastudio_styles.scss */
-.card > * {
-  position: relative;
-  background-color: white;
-  padding: 7px;
-  border: 1px dashed #cceeff;
-  display: block;
-  opacity: 0.9;
-  overflow: hidden;
-}
-/* line 330, ../../../scss/_metastudio_styles.scss */
-.card > * > a {
-  color: inherit;
-  display: block;
-  position: relative;
-  z-index: 200;
-}
-/* line 337, ../../../scss/_metastudio_styles.scss */
-.card > *.published {
-  opacity: 1;
-  background-color: #e5f6ff;
-}
-/* line 341, ../../../scss/_metastudio_styles.scss */
-.card > *.unapproved {
-  opacity: 1;
-  border-style: solid;
-  border-color: #f04124;
-}
-/* line 347, ../../../scss/_metastudio_styles.scss */
-.card > *:hover {
-  border-style: solid;
-  opacity: 1;
-}
-/* line 353, ../../../scss/_metastudio_styles.scss */
-.card > *:hover i {
-  opacity: 0.3;
-}
-/* line 356, ../../../scss/_metastudio_styles.scss */
-.card > *:hover footer .age {
-  display: block;
-}
-/* line 360, ../../../scss/_metastudio_styles.scss */
-.card > * > i {
-  position: absolute;
-  top: -10px;
-  right: 10px;
-  font-size: 3rem;
-  color: #0094de;
-  opacity: 0.3;
-}
-/* line 368, ../../../scss/_metastudio_styles.scss */
-.card > * .preview {
-  float: left;
-  padding-right: 5px;
-  padding-top: 4px;
-}
-/* line 373, ../../../scss/_metastudio_styles.scss */
-.card > * header {
-  overflow: hidden;
-}
-/* line 376, ../../../scss/_metastudio_styles.scss */
-.card > * h5 {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  margin-bottom: 0;
-}
-/* line 381, ../../../scss/_metastudio_styles.scss */
-.card > * .label, .card > * .label-list:empty:before {
-  opacity: 0.5;
-}
-/* line 384, ../../../scss/_metastudio_styles.scss */
-.card > * p {
-  color: #555;
-  height: 80px;
-  background-repeat: no-repeat;
-  font-size: 80%;
-}
-/* line 390, ../../../scss/_metastudio_styles.scss */
-.card > * .th {
-  margin: 20px auto;
-  width: 80px;
-  height: 80px;
-  overflow: hidden;
-  display: none;
-}
-/* line 396, ../../../scss/_metastudio_styles.scss */
-.card > * .th:hover {
-  width: 150px;
-  height: 150px;
-}
-/* line 400, ../../../scss/_metastudio_styles.scss */
-.card > * .th img {
-  width: 100%;
-}
-/* line 404, ../../../scss/_metastudio_styles.scss */
-.card > * footer {
-  margin-top: 1rem;
-  font-size: 70%;
-  clear: both;
-  color: #e01818;
-}
-/* line 409, ../../../scss/_metastudio_styles.scss */
-.card > * footer .age {
-  display: none;
-  position: absolute;
-  background-color: white;
-  z-index: 100;
-  bottom: 0;
-  width: 100%;
-}
-
-/* line 420, ../../../scss/_metastudio_styles.scss */
-.edit-card {
-  position: relative;
-  background-color: white;
-  padding: 10px;
-  display: block;
-}
-
-/* Content Tabs */
-/* line 434, ../../../scss/_metastudio_styles.scss */
-article .tabs {
-  display: inline-block;
-}
-/* line 436, ../../../scss/_metastudio_styles.scss */
-article .tabs dd a {
-  border-radius: 4px;
-  border: 1px transparent;
-}
-/* line 440, ../../../scss/_metastudio_styles.scss */
-article .tabs dd.active a {
-  color: #009deb;
-  border: 1px solid;
-}
-/* line 444, ../../../scss/_metastudio_styles.scss */
-article .tabs dd:hover a {
-  color: #009deb;
-}
-/* line 448, ../../../scss/_metastudio_styles.scss */
-article .tabs i {
-  margin-right: 5px;
-  font-size: 1.3rem;
-}
-/* line 454, ../../../scss/_metastudio_styles.scss */
-article section.content {
-  background-color: white;
-  border: 1px solid #eee;
-}
-
-/* Default card */
-/* line 463, ../../../scss/_metastudio_styles.scss */
-.card > :hover .label, .card > :hover .label-list:empty:before {
-  opacity: 1;
-}
-
-/* line 468, ../../../scss/_metastudio_styles.scss */
-.gallery .card .th {
-  display: block;
-}
-
-/* Inline label list */
-/* line 476, ../../../scss/_metastudio_styles.scss */
-.label-list {
-  display: inline-block;
-  text-align: left;
-  margin-bottom: 0.1rem;
-}
-/* line 480, ../../../scss/_metastudio_styles.scss */
-.label-list:empty:before {
-  content: "UNTAGGED";
-  opacity: 0.2 !important;
-  padding: 2px;
-  background-color: transparent;
-}
-/* line 488, ../../../scss/_metastudio_styles.scss */
-.label-list .label, .label-list .label-list:empty:before {
-  text-transform: uppercase;
-  background-color: transparent;
-  padding: 2px;
-}
-
-/*************************** 2. Custom CSS overrides ***********************/
-/* Content area */
-/* line 504, ../../../scss/_metastudio_styles.scss */
-article {
-  padding-bottom: 4rem;
-}
-/* line 508, ../../../scss/_metastudio_styles.scss */
-article > header {
-  border-bottom: 1px solid #ddd;
-}
-/* line 512, ../../../scss/_metastudio_styles.scss */
-article > footer {
-  border-top: 1px dotted #ddd;
-}
-
-/* line 524, ../../../scss/_metastudio_styles.scss */
-textarea {
-  min-height: 6rem;
-}
-
-/*
-.orgitdown textarea{
-	min-height: 15rem!important;
-}
-#content{
-	min-height: 10rem;
-
-}
-*/
-/*#content>p{
-	font-size: inherit;
-	line-height: 1.4;
-	color: #222;
-}*/
-/*************************** 3. Custom CSS Below ***********************/
-/*CSS fix for tables generated via orgitdown*/
-/* line 544, ../../../scss/_metastudio_styles.scss */
-#content table td, #content colgroup col {
-  float: none !important;
-}
-
-/* line 549, ../../../scss/_metastudio_styles.scss */
-.user {
-  color: inherit;
-}
-
-/* line 552, ../../../scss/_metastudio_styles.scss */
-.user {
-  color: inherit;
-}
-
-/* line 555, ../../../scss/_metastudio_styles.scss */
-.user i {
-  margin-right: 3px;
-}
-
-/* line 558, ../../../scss/_metastudio_styles.scss */
-.user:hover i {
-  opacity: 1;
-}
-
-/* line 562, ../../../scss/_metastudio_styles.scss */
-a.node {
-  display: block;
-}
-
-/* line 566, ../../../scss/_metastudio_styles.scss */
-.button.edit {
-  margin-bottom: 0;
-}
-
-/************ Forms **************/
-/* Node edit */
-/* line 574, ../../../scss/_metastudio_styles.scss */
-input.node-title {
-  font-size: 3rem;
-  height: 4rem;
-  display: inline-block;
-}
-
-/* view-graph in node_details_base.html */
-/* line 581, ../../../scss/_metastudio_styles.scss */
-.graph-height {
-  height: 70%;
-}
-
-/*for graph and location*/
-/* line 586, ../../../scss/_metastudio_styles.scss */
-.graph-div {
-  height: 90%;
-  width: -webkit-calc(100% - 10px);
-  width: -o-calc(100% - 10px);
-  width: -moz-calc(100% - 10px);
-  width: calc(100% - 10px) !important;
-  top: 5% !important;
-  left: 5px !important;
-  padding: 0px !important;
-  margin-left: 0 !important;
-}
-
-/*for graph and location*/
-/* line 596, ../../../scss/_metastudio_styles.scss */
-.graph-div h3 {
-  border-bottom: 2px inset #154534;
-  padding: 0.25em 0;
-}
-
-/* line 601, ../../../scss/_metastudio_styles.scss */
-#view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
-  z-index: 1;
-  background-color: captiontext;
-  padding: 5px 15px 10px;
-  color: white !important;
-  opacity: 0.8;
-  font-size: 2rem;
-  box-shadow: 0 1px 10px 2px #A9A9A9;
-}
-
-/* line 612, ../../../scss/_metastudio_styles.scss */
-#view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
-  background-color: white;
-  border-radius: 30px;
-  padding: 5px 15px 10px;
-  transition: 2s;
-  opacity: 1;
-  color: black !important;
-  font-size: 2rem;
-}
-
-/****************** CUSTOM *********************/
-/* UI Button */
-/* line 627, ../../../scss/_metastudio_styles.scss */
-.ui.button {
-  margin-right: 0.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #ddd;
-  padding: 0.8rem;
-  z-index: 500;
-}
-/* line 637, ../../../scss/_metastudio_styles.scss */
-.ui.button label {
-  color: #666;
-}
-/* line 640, ../../../scss/_metastudio_styles.scss */
-.ui.button small {
-  margin-left: 2px;
-  display: inline;
-}
-/* line 644, ../../../scss/_metastudio_styles.scss */
-.ui.button:hover, .ui.button:active {
-  border-color: rgba(255, 255, 255, 0.2);
-  background-color: rgba(0, 0, 0, 0.9);
-}
-/* line 647, ../../../scss/_metastudio_styles.scss */
-.ui.button:hover label, .ui.button:active label {
-  color: #ddd;
-}
-/* line 650, ../../../scss/_metastudio_styles.scss */
-.ui.button:hover small, .ui.button:active small {
-  display: inline;
-}
-/* line 653, ../../../scss/_metastudio_styles.scss */
-.ui.button:hover:focus, .ui.button:active:focus {
-  font-weight: bold;
-}
-
 /* For landing page */
-/* line 662, ../../../scss/_metastudio_styles.scss */
+/* line 31, ../../../scss/_nroer_styles.scss */
 #landing > header {
   background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
   position: relative;
@@ -9737,19 +9111,19 @@ input.node-title {
   padding: 1rem 0 1rem 0;
   border-bottom: 2px solid #00CEFD;
 }
-/* line 670, ../../../scss/_metastudio_styles.scss */
+/* line 39, ../../../scss/_nroer_styles.scss */
 #landing > header .logo {
   color: #555;
   text-align: center;
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.8);
 }
-/* line 675, ../../../scss/_metastudio_styles.scss */
+/* line 44, ../../../scss/_nroer_styles.scss */
 #landing > header .logo img {
   max-width: 75%;
   margin-bottom: 0.5rem;
 }
-/* line 680, ../../../scss/_metastudio_styles.scss */
+/* line 49, ../../../scss/_nroer_styles.scss */
 #landing > header .logo h1, #landing > header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div #landing > header .logo input {
   font-size: 1.2rem;
   line-height: 1;
@@ -9758,117 +9132,77 @@ input.node-title {
   color: white;
 }
 
-/* line 693, ../../../scss/_metastudio_styles.scss */
+/* line 62, ../../../scss/_nroer_styles.scss */
 .landing {
   position: relative;
 }
-/* line 696, ../../../scss/_metastudio_styles.scss */
+/* line 65, ../../../scss/_nroer_styles.scss */
 .landing h2 {
   margin-top: 2rem;
 }
 
-/* line 701, ../../../scss/_metastudio_styles.scss */
+/* line 70, ../../../scss/_nroer_styles.scss */
 section.promo {
   background-color: rgba(0, 0, 0, 0.9);
   border-bottom: 4px solid #00CEFD;
 }
-/* line 704, ../../../scss/_metastudio_styles.scss */
+/* line 73, ../../../scss/_nroer_styles.scss */
 section.promo .meta {
   padding-left: 2rem;
   padding-right: 2rem;
 }
-/* line 707, ../../../scss/_metastudio_styles.scss */
+/* line 76, ../../../scss/_nroer_styles.scss */
 section.promo .meta h4 {
   color: white;
 }
 
-/* line 714, ../../../scss/_metastudio_styles.scss */
+/* line 83, ../../../scss/_nroer_styles.scss */
 ul.partner img {
   max-height: 150px;
 }
 
-/* line 719, ../../../scss/_metastudio_styles.scss */
+/* line 88, ../../../scss/_nroer_styles.scss */
 div.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
-  border: 2px solid #12b0ff;
+  border: 2px solid #12d9e4;
   border-width: 2px 0;
 }
-/* line 724, ../../../scss/_metastudio_styles.scss */
+/* line 93, ../../../scss/_nroer_styles.scss */
 div.banner > * {
-  background-color: #0094de;
+  background-color: #0eacb5;
   color: #eee;
   margin: 0;
 }
-/* line 726, ../../../scss/_metastudio_styles.scss */
+/* line 95, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide {
   padding: 1rem;
   margin: 0;
-  background-color: #0083c5;
-  height: 250px !important;
+  background-color: #0c969d;
+  height: 50vh !important;
 }
-/* line 731, ../../../scss/_metastudio_styles.scss */
+/* line 100, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide > i {
   position: absolute;
-  font-size: 15rem;
+  font-size: 17rem;
   pointer-events: none;
   color: white;
   opacity: 0.1;
   right: 5%;
 }
-/* line 742, ../../../scss/_metastudio_styles.scss */
+/* line 111, ../../../scss/_nroer_styles.scss */
 div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 745, ../../../scss/_metastudio_styles.scss */
+/* line 114, ../../../scss/_nroer_styles.scss */
 div.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 749, ../../../scss/_metastudio_styles.scss */
+/* line 118, ../../../scss/_nroer_styles.scss */
 div.banner > * p:first-child {
   color: white;
   font-size: 120%;
-}
-
-/* line 762, ../../../scss/_metastudio_styles.scss */
-aside#help h4 {
-  color: black;
-}
-/* line 765, ../../../scss/_metastudio_styles.scss */
-aside#help p, aside#help h5, aside#help h6 {
-  color: #ddd;
-  padding: 0.3rem 0.9375rem;
-}
-
-/* line 772, ../../../scss/_metastudio_styles.scss */
-.align-center {
-  margin: 0 auto;
-  display: block;
-}
-
-/* line 779, ../../../scss/_metastudio_styles.scss */
-#profile-img {
-  height: 40px;
-  margin-right: 5px;
-}
-
-/* line 788, ../../../scss/_metastudio_styles.scss */
-#replies-area .disc-replies {
-  padding: 10px;
-  background-color: #f8fdff;
-  width: 27em;
-  max-width: 40em;
-  margin-left: 48px;
-  margin-top: 10px;
-}
-/* line 797, ../../../scss/_metastudio_styles.scss */
-#replies-area .disc-replies .reply-btn {
-  cursor: pointer;
-}
-/* line 801, ../../../scss/_metastudio_styles.scss */
-#replies-area .disc-replies .reply-btn:hover {
-  font-weight: bold;
 }
 
 /*
@@ -9884,13 +9218,13 @@ aside#help p, aside#help h5, aside#help h6 {
 /* Too many apps cause breakage */
 /*
 /* Protects reflowing elements on error */
-/* line 20, ../../../scss/_app_styles.scss */
+/* line 21, ../../../scss/_app_styles.scss */
 [data-abide] span.error, [data-abide] small.error {
   position: absolute;
 }
 
 /*active color for side-nav links*/
-/* line 25, ../../../scss/_app_styles.scss */
+/* line 26, ../../../scss/_app_styles.scss */
 .side-nav li.active a:not(.button) {
   color: #acacac;
 }
@@ -9898,7 +9232,7 @@ aside#help p, aside#help h5, aside#help h6 {
 /*
 *   Foundation extensions
 */
-/* line 34, ../../../scss/_app_styles.scss */
+/* line 35, ../../../scss/_app_styles.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -9911,61 +9245,61 @@ pre {
   font-family: monospace;
 }
 
-/* line 47, ../../../scss/_app_styles.scss */
+/* line 48, ../../../scss/_app_styles.scss */
 .fixme {
   opacity: 0.5;
 }
-/* line 50, ../../../scss/_app_styles.scss */
+/* line 51, ../../../scss/_app_styles.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 53, ../../../scss/_app_styles.scss */
+/* line 54, ../../../scss/_app_styles.scss */
 .fixme:hover:after {
   content: " fixme";
   color: orange;
 }
 
 /* Utility class to display the child spans of this element on hover */
-/* line 62, ../../../scss/_app_styles.scss */
+/* line 63, ../../../scss/_app_styles.scss */
 .show-span-on-hover span {
   display: none;
 }
-/* line 65, ../../../scss/_app_styles.scss */
+/* line 66, ../../../scss/_app_styles.scss */
 .show-span-on-hover:hover span {
   display: inline;
 }
 
-/* line 71, ../../../scss/_app_styles.scss */
+/* line 72, ../../../scss/_app_styles.scss */
 .show-on-hover .show {
   display: none;
   z-index: 1000;
 }
-/* line 75, ../../../scss/_app_styles.scss */
+/* line 76, ../../../scss/_app_styles.scss */
 .show-on-hover:hover .show {
   display: block;
 }
 
 /* Utility class to display the next siblings on hoverr */
-/* line 80, ../../../scss/_app_styles.scss */
+/* line 81, ../../../scss/_app_styles.scss */
 .extra.app {
   display: none;
 }
 
 /* Effects */
-/* line 86, ../../../scss/_app_styles.scss */
+/* line 87, ../../../scss/_app_styles.scss */
 .drop-shadow, #landing > header {
   -webkit-box-shadow: 0px 0px 5px 1px black;
   box-shadow: 0px 0px 5px 1px black;
 }
 
-/* line 90, ../../../scss/_app_styles.scss */
+/* line 91, ../../../scss/_app_styles.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 94, ../../../scss/_app_styles.scss */
+/* line 95, ../../../scss/_app_styles.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -9974,13 +9308,13 @@ pre {
 }
 
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
-/* line 103, ../../../scss/_app_styles.scss */
+/* line 104, ../../../scss/_app_styles.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
      buttons when hovering. */
 }
-/* line 106, ../../../scss/_app_styles.scss */
+/* line 107, ../../../scss/_app_styles.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -9988,19 +9322,19 @@ pre {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 114, ../../../scss/_app_styles.scss */
+/* line 115, ../../../scss/_app_styles.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 116, ../../../scss/_app_styles.scss */
+/* line 117, ../../../scss/_app_styles.scss */
 .rating-bar.unrated:checked ~ label:before {
-  color: #aec0c9;
+  color: #a9b2b3;
 }
-/* line 122, ../../../scss/_app_styles.scss */
+/* line 123, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 124, ../../../scss/_app_styles.scss */
+/* line 125, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -10012,7 +9346,7 @@ pre {
   font-size: 1.5rem;
   margin: 0;
 }
-/* line 134, ../../../scss/_app_styles.scss */
+/* line 135, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -10020,32 +9354,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 143, ../../../scss/_app_styles.scss */
+/* line 144, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #ff980d;
   text-shadow: 0 0 1px #333;
 }
-/* line 152, ../../../scss/_app_styles.scss */
+/* line 153, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 157, ../../../scss/_app_styles.scss */
+/* line 158, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 165, ../../../scss/_app_styles.scss */
+/* line 166, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 171, ../../../scss/_app_styles.scss */
+/* line 172, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
@@ -10054,7 +9388,665 @@ pre {
   text-shadow: 0 0 1px #333;
 }
 
-/* line 180, ../../../scss/_app_styles.scss */
+/* line 181, ../../../scss/_app_styles.scss */
 body a:visited {
   color: #1d484a;
+}
+
+/* line 189, ../../../scss/_app_styles.scss */
+body {
+  background-color: #fafafa;
+}
+
+/* line 195, ../../../scss/_app_styles.scss */
+.top-bar a.language.button {
+  padding: 5px 10px;
+  margin-top: 3px;
+  background-color: #555;
+  color: black;
+}
+/* line 200, ../../../scss/_app_styles.scss */
+.top-bar a.language.button:hover {
+  background-color: white;
+  color: black;
+}
+/* line 205, ../../../scss/_app_styles.scss */
+.top-bar ul.language-selector {
+  height: 50px;
+  float: right;
+  margin: 0;
+}
+/* line 210, ../../../scss/_app_styles.scss */
+.top-bar .active {
+  background-color: #08676d !important;
+}
+/* line 214, ../../../scss/_app_styles.scss */
+.top-bar h1 .flag, article h1:not(.subheader) div .top-bar input .flag {
+  height: 20px;
+  margin-bottom: 4px;
+  margin-right: 2px;
+}
+/* line 219, ../../../scss/_app_styles.scss */
+.top-bar h1 img, .top-bar article h1:not(.subheader) div input img, article h1:not(.subheader) div .top-bar input img {
+  /* Logo */
+  height: 40px;
+}
+/* line 223, ../../../scss/_app_styles.scss */
+.top-bar h1 a, .top-bar article h1:not(.subheader) div input a, article h1:not(.subheader) div .top-bar input a {
+  color: white !important;
+}
+/* line 227, ../../../scss/_app_styles.scss */
+.top-bar .group:hover {
+  background-color: #111;
+}
+/* line 232, ../../../scss/_app_styles.scss */
+.top-bar .logout {
+  background-color: #f04124 !important;
+}
+/* line 236, ../../../scss/_app_styles.scss */
+.top-bar .logout:hover {
+  background-color: #d32a0e !important;
+  transition: background-color 400ms ease-out;
+}
+
+/* line 244, ../../../scss/_app_styles.scss */
+body > footer {
+  padding: 20px 0;
+  position: relative;
+  color: #888;
+  min-height: 170px;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+/* line 252, ../../../scss/_app_styles.scss */
+body > footer section:first-child {
+  border-bottom: 1px solid #222;
+  margin-bottom: 1rem;
+}
+/* line 256, ../../../scss/_app_styles.scss */
+body > footer a {
+  color: #bbbbbb !important;
+}
+/* line 258, ../../../scss/_app_styles.scss */
+body > footer a:hover {
+  color: #eee !important;
+}
+/* line 262, ../../../scss/_app_styles.scss */
+body > footer strong a {
+  border-bottom: 1px dotted #555;
+}
+
+/* line 268, ../../../scss/_app_styles.scss */
+.coll-arrows {
+  cursor: pointer;
+  display: block;
+  padding: 0.5rem;
+}
+/* line 273, ../../../scss/_app_styles.scss */
+.coll-arrows:hover {
+  background-color: #D3D3D3;
+}
+
+/* Sections */
+/* line 280, ../../../scss/_app_styles.scss */
+main > nav {
+  border-top: 3px solid black;
+  position: relative;
+  z-index: 10;
+}
+/* line 284, ../../../scss/_app_styles.scss */
+main > nav > .button-bar {
+  background-color: #10c1cb;
+  /* Hide icons till we can retreive custom icons from the system */
+}
+/* line 286, ../../../scss/_app_styles.scss */
+main > nav > .button-bar .button-group {
+  margin: 0;
+}
+/* line 288, ../../../scss/_app_styles.scss */
+main > nav > .button-bar .button-group.tools {
+  padding: 5px;
+}
+/* line 294, ../../../scss/_app_styles.scss */
+main > nav > .button-bar li .button {
+  border: none;
+  font-size: 0.8rem;
+  padding: 0.8rem 1rem;
+  background-color: transparent;
+  color: black;
+  margin: 0;
+}
+/* line 298, ../../../scss/_app_styles.scss */
+main > nav > .button-bar li .button.home {
+  font-weight: bold;
+}
+/* line 301, ../../../scss/_app_styles.scss */
+main > nav > .button-bar li .button.settings, main > nav > .button-bar li .button#toggle-help {
+  padding: 6px 10px;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+/* line 306, ../../../scss/_app_styles.scss */
+main > nav > .button-bar li .button.settings:hover, main > nav > .button-bar li .button#toggle-help:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+}
+/* line 311, ../../../scss/_app_styles.scss */
+main > nav > .button-bar li .button#toggle-help {
+  background-color: inherit;
+}
+/* line 315, ../../../scss/_app_styles.scss */
+main > nav > .button-bar li .button.settings:after {
+  border: none;
+}
+/* line 323, ../../../scss/_app_styles.scss */
+main > nav > .button-bar li .button:hover {
+  color: white;
+}
+/* line 329, ../../../scss/_app_styles.scss */
+main > nav > .button-bar li.active .button {
+  background-color: #0eacb5;
+  color: white;
+}
+/* line 337, ../../../scss/_app_styles.scss */
+main > nav > .button-bar .app i {
+  display: none !important;
+}
+
+/* line 349, ../../../scss/_app_styles.scss */
+main > aside > div h2 {
+  color: #111;
+}
+/* line 352, ../../../scss/_app_styles.scss */
+main > aside > div h3 {
+  font-size: 1.2rem;
+  font-weight: normal;
+  color: #222;
+}
+/* line 357, ../../../scss/_app_styles.scss */
+main > aside > div h4 {
+  font-size: 1rem;
+  color: #222;
+}
+/* line 360, ../../../scss/_app_styles.scss */
+main > aside > div h4 span {
+  display: none;
+}
+/* line 363, ../../../scss/_app_styles.scss */
+main > aside > div h4:hover span {
+  display: inline;
+}
+/* line 367, ../../../scss/_app_styles.scss */
+main > aside > div h5, main > aside > div h6 {
+  margin: 0;
+}
+/* line 371, ../../../scss/_app_styles.scss */
+main > aside > div .f-dropdown.content {
+  width: auto;
+  padding: 0;
+  border: 1px solid #222;
+}
+/* line 375, ../../../scss/_app_styles.scss */
+main > aside > div .f-dropdown.content .item {
+  width: 70px;
+}
+/* line 379, ../../../scss/_app_styles.scss */
+main > aside > div header {
+  padding: 10px;
+}
+/* line 382, ../../../scss/_app_styles.scss */
+main > aside > div footer {
+  background-color: #222;
+  min-height: 1rem;
+}
+/* line 385, ../../../scss/_app_styles.scss */
+main > aside > div footer label {
+  font-size: 0.7rem;
+}
+/* line 398, ../../../scss/_app_styles.scss */
+main > aside > div .side-nav.collection {
+  background-color: #444;
+  padding: 0;
+  border-bottom: 2px solid #10c1cb;
+  margin: 0;
+}
+/* line 403, ../../../scss/_app_styles.scss */
+main > aside > div .side-nav.collection li {
+  border-bottom: 1px solid #555;
+}
+/* line 405, ../../../scss/_app_styles.scss */
+main > aside > div .side-nav.collection li a {
+  border-left: 2px solid black;
+}
+/* line 408, ../../../scss/_app_styles.scss */
+main > aside > div .side-nav.collection li.active a, main > aside > div .side-nav.collection li a:hover {
+  color: white !important;
+  border-left: 2px solid #10c1cb;
+  background-color: #10c1cb;
+}
+
+/* line 421, ../../../scss/_app_styles.scss */
+article {
+  position: relative;
+  z-index: 1;
+  min-height: 400px;
+  overflow-x: visible;
+}
+/* line 426, ../../../scss/_app_styles.scss */
+article > header, article form > header {
+  padding: 15px;
+  background-color: #f0f0f0;
+}
+/* line 439, ../../../scss/_app_styles.scss */
+article h1:not(.subheader) .tabs {
+  display: inline-block;
+  position: relative;
+  bottom: -0.5rem;
+}
+/* line 445, ../../../scss/_app_styles.scss */
+article h1:not(.subheader) div, article h1:not(.subheader) div input:not(.subheader) div {
+  display: inline-block;
+  position: relative;
+}
+/* line 448, ../../../scss/_app_styles.scss */
+article h1:not(.subheader) div input {
+  height: 200%;
+  font-style: italic;
+  padding-left: 5px;
+  box-shadow: none;
+  border-width: 0 0 2px 0;
+  border-bottom: 2px dotted #222;
+  background-color: inherit;
+}
+/* line 458, ../../../scss/_app_styles.scss */
+article h1:not(.subheader) div input:hover {
+  background-color: white;
+}
+
+/* Card block */
+/* line 468, ../../../scss/_app_styles.scss */
+.card > * {
+  position: relative;
+  background-color: white;
+  padding: 7px;
+  border: 1px dashed #d0f9fb;
+  display: block;
+  opacity: 0.9;
+  overflow: hidden;
+}
+/* line 478, ../../../scss/_app_styles.scss */
+.card > * > a {
+  color: inherit;
+  display: block;
+  position: relative;
+  z-index: 200;
+}
+/* line 485, ../../../scss/_app_styles.scss */
+.card > *.published {
+  opacity: 1;
+  background-color: #e7fcfd;
+}
+/* line 489, ../../../scss/_app_styles.scss */
+.card > *.unapproved {
+  opacity: 1;
+  border-style: solid;
+  border-color: #f04124;
+}
+/* line 495, ../../../scss/_app_styles.scss */
+.card > *:hover {
+  border-style: solid;
+  opacity: 1;
+}
+/* line 501, ../../../scss/_app_styles.scss */
+.card > *:hover i {
+  opacity: 0.3;
+}
+/* line 504, ../../../scss/_app_styles.scss */
+.card > *:hover footer .age {
+  display: block;
+}
+/* line 508, ../../../scss/_app_styles.scss */
+.card > * > i {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  font-size: 3rem;
+  color: #0eacb5;
+  opacity: 0.3;
+}
+/* line 516, ../../../scss/_app_styles.scss */
+.card > * .preview {
+  float: left;
+  padding-right: 5px;
+  padding-top: 4px;
+}
+/* line 521, ../../../scss/_app_styles.scss */
+.card > * header {
+  overflow: hidden;
+}
+/* line 524, ../../../scss/_app_styles.scss */
+.card > * h5 {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-bottom: 0;
+}
+/* line 529, ../../../scss/_app_styles.scss */
+.card > * .label, .card > * .label-list:empty:before {
+  opacity: 0.5;
+}
+/* line 532, ../../../scss/_app_styles.scss */
+.card > * p {
+  color: #555;
+  height: 80px;
+  background-repeat: no-repeat;
+  font-size: 80%;
+}
+/* line 538, ../../../scss/_app_styles.scss */
+.card > * .th {
+  margin: 20px auto;
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  display: none;
+}
+/* line 544, ../../../scss/_app_styles.scss */
+.card > * .th:hover {
+  width: 150px;
+  height: 150px;
+}
+/* line 548, ../../../scss/_app_styles.scss */
+.card > * .th img {
+  width: 100%;
+}
+/* line 552, ../../../scss/_app_styles.scss */
+.card > * footer {
+  margin-top: 1rem;
+  font-size: 70%;
+  clear: both;
+  color: #e01818;
+}
+/* line 557, ../../../scss/_app_styles.scss */
+.card > * footer .age {
+  display: none;
+  position: absolute;
+  background-color: white;
+  z-index: 100;
+  bottom: 0;
+  width: 100%;
+}
+
+/* line 568, ../../../scss/_app_styles.scss */
+.edit-card {
+  position: relative;
+  background-color: white;
+  padding: 10px;
+  display: block;
+}
+
+/* Content Tabs */
+/* line 581, ../../../scss/_app_styles.scss */
+article .tabs {
+  display: inline-block;
+}
+/* line 583, ../../../scss/_app_styles.scss */
+article .tabs dd a {
+  border-radius: 4px;
+  border: 1px transparent;
+}
+/* line 587, ../../../scss/_app_styles.scss */
+article .tabs dd.active a {
+  color: #10c1cb;
+  border: 1px solid;
+}
+/* line 591, ../../../scss/_app_styles.scss */
+article .tabs dd:hover a {
+  color: #10c1cb;
+}
+/* line 595, ../../../scss/_app_styles.scss */
+article .tabs i {
+  margin-right: 5px;
+  font-size: 1.3rem;
+}
+/* line 601, ../../../scss/_app_styles.scss */
+article section.content {
+  background-color: white;
+  border: 1px solid #eee;
+}
+
+/* Default card */
+/* line 610, ../../../scss/_app_styles.scss */
+.card > :hover .label, .card > :hover .label-list:empty:before {
+  opacity: 1;
+}
+
+/* line 615, ../../../scss/_app_styles.scss */
+.gallery .card .th {
+  display: block;
+}
+
+/* Inline label list */
+/* line 623, ../../../scss/_app_styles.scss */
+.label-list {
+  display: inline-block;
+  text-align: left;
+  margin-bottom: 0.1rem;
+}
+/* line 627, ../../../scss/_app_styles.scss */
+.label-list:empty:before {
+  content: "UNTAGGED";
+  opacity: 0.2 !important;
+  padding: 2px;
+  background-color: transparent;
+}
+/* line 635, ../../../scss/_app_styles.scss */
+.label-list .label, .label-list .label-list:empty:before {
+  text-transform: uppercase;
+  background-color: transparent;
+  padding: 2px;
+}
+
+/*************************** 2. Custom CSS overrides ***********************/
+/* Content area */
+/* line 644, ../../../scss/_app_styles.scss */
+article {
+  padding-bottom: 4rem;
+}
+/* line 648, ../../../scss/_app_styles.scss */
+article > header {
+  border-bottom: 1px solid #ddd;
+}
+/* line 652, ../../../scss/_app_styles.scss */
+article > footer {
+  border-top: 1px dotted #ddd;
+}
+
+/* line 664, ../../../scss/_app_styles.scss */
+textarea {
+  min-height: 6rem;
+}
+
+/*
+.orgitdown textarea{
+  min-height: 15rem!important;
+}
+#content{
+  min-height: 10rem;
+
+}
+*/
+/*#content>p{
+  font-size: inherit;
+  line-height: 1.4;
+  color: #222;
+}*/
+/*************************** 3. Custom CSS Below ***********************/
+/*CSS fix for tables generated via orgitdown*/
+/* line 684, ../../../scss/_app_styles.scss */
+#content table td, #content colgroup col {
+  float: none !important;
+}
+
+/* line 689, ../../../scss/_app_styles.scss */
+.user {
+  color: inherit;
+}
+
+/* line 692, ../../../scss/_app_styles.scss */
+.user {
+  color: inherit;
+}
+
+/* line 695, ../../../scss/_app_styles.scss */
+.user i {
+  margin-right: 3px;
+}
+
+/* line 698, ../../../scss/_app_styles.scss */
+.user:hover i {
+  opacity: 1;
+}
+
+/* line 702, ../../../scss/_app_styles.scss */
+a.node {
+  display: block;
+}
+
+/* line 706, ../../../scss/_app_styles.scss */
+.button.edit {
+  margin-bottom: 0;
+}
+
+/************ Forms **************/
+/* Node edit */
+/* line 714, ../../../scss/_app_styles.scss */
+input.node-title {
+  font-size: 3rem;
+  height: 4rem;
+  display: inline-block;
+}
+
+/* view-graph in node_details_base.html */
+/* line 721, ../../../scss/_app_styles.scss */
+.graph-height {
+  height: 70%;
+}
+
+/*for graph and location*/
+/* line 726, ../../../scss/_app_styles.scss */
+.graph-div {
+  height: 90%;
+  width: -webkit-calc(100% - 10px);
+  width: -o-calc(100% - 10px);
+  width: -moz-calc(100% - 10px);
+  width: calc(100% - 10px) !important;
+  top: 5% !important;
+  left: 5px !important;
+  padding: 0px !important;
+  margin-left: 0 !important;
+}
+
+/*for graph and location*/
+/* line 736, ../../../scss/_app_styles.scss */
+.graph-div h3 {
+  border-bottom: 2px inset #154534;
+  padding: 0.25em 0;
+}
+
+/* line 741, ../../../scss/_app_styles.scss */
+#view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
+  z-index: 1;
+  background-color: captiontext;
+  padding: 5px 15px 10px;
+  color: white !important;
+  opacity: 0.8;
+  font-size: 2rem;
+  box-shadow: 0 1px 10px 2px #A9A9A9;
+}
+
+/* line 752, ../../../scss/_app_styles.scss */
+#view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
+  background-color: white;
+  border-radius: 30px;
+  padding: 5px 15px 10px;
+  transition: 2s;
+  opacity: 1;
+  color: black !important;
+  font-size: 2rem;
+}
+
+/****************** CUSTOM *********************/
+/* UI Button */
+/* line 767, ../../../scss/_app_styles.scss */
+.ui.button {
+  margin-right: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #ddd;
+  padding: 0.8rem;
+  z-index: 500;
+}
+/* line 777, ../../../scss/_app_styles.scss */
+.ui.button label {
+  color: #666;
+}
+/* line 780, ../../../scss/_app_styles.scss */
+.ui.button small {
+  margin-left: 2px;
+  display: inline;
+}
+/* line 784, ../../../scss/_app_styles.scss */
+.ui.button:hover, .ui.button:active {
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.9);
+}
+/* line 787, ../../../scss/_app_styles.scss */
+.ui.button:hover label, .ui.button:active label {
+  color: #ddd;
+}
+/* line 790, ../../../scss/_app_styles.scss */
+.ui.button:hover small, .ui.button:active small {
+  display: inline;
+}
+/* line 793, ../../../scss/_app_styles.scss */
+.ui.button:hover:focus, .ui.button:active:focus {
+  font-weight: bold;
+}
+
+/* line 802, ../../../scss/_app_styles.scss */
+aside#help h4 {
+  color: black;
+}
+/* line 805, ../../../scss/_app_styles.scss */
+aside#help p, aside#help h5, aside#help h6 {
+  color: #ddd;
+  padding: 0.3rem 0.9375rem;
+}
+
+/* line 812, ../../../scss/_app_styles.scss */
+.align-center {
+  margin: 0 auto;
+  display: block;
+}
+
+/* line 818, ../../../scss/_app_styles.scss */
+#profile-img {
+  height: 40px;
+  margin-right: 5px;
+}
+
+/* line 827, ../../../scss/_app_styles.scss */
+#replies-area .disc-replies {
+  padding: 10px;
+  background-color: #dffbfd;
+  width: 27em;
+  max-width: 40em;
+  margin-left: 48px;
+  margin-top: 10px;
+}
+/* line 836, ../../../scss/_app_styles.scss */
+#replies-area .disc-replies .reply-btn {
+  cursor: pointer;
+}
+/* line 840, ../../../scss/_app_styles.scss */
+#replies-area .disc-replies .reply-btn:hover {
+  font-weight: bold;
 }
