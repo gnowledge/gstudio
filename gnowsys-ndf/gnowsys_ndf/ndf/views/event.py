@@ -188,7 +188,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       nodes = node_collection.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
       
   node = None
-  event_reschedule_check = False
+  event_reschedule_check = True
   marks_list=[]
   Assesslist=[]
   batch=[]

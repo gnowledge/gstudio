@@ -4794,10 +4794,12 @@ def reschedule_task(request, group_id, node):
                  break
 
         reschedule_dates.append(datetime.datetime.today())
-        if event_details != False or reshedule_choice == "Attendance" :
+        if  reshedule_choice == "Attendance" :
+        	print "sfsfsaffasdfsaf"
         	create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
-        if session != str(1):
-          create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        if session != str(1) and reshedule_choice == "Assessment" :
+          print "coming here"
+          create_gattribute(ObjectId(node),marks_entry_completed[0],False)
         task_id['Reschedule_Task'] = True
         reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_attendance_task"})
 	create_gattribute(ObjectId(node),reschedule_event,task_id)
@@ -4892,11 +4894,11 @@ def event_assginee(request, group_id, app_set_instance_id=None):
           attendedlist.append(a['Name'])
 
  if attendancesession != str(1):
-   create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],True)
+   create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
  if assessmentdone == 'True':
      event_status = node_collection.one({"_type":"AttributeType","name":"event_status"})
      create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
-     create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
+     create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],True)
  
  reschedule_dates={}
  
@@ -4929,22 +4931,35 @@ def fetch_course_name(request, group_id,Course_type):
   return HttpResponse(json.dumps(course_list))
 
 @get_execution_time  
-def fetch_course_Module(request, group_id,Course_name):
+def fetch_course_Module(request, group_id,announced_course):
+  #Course_name 
   batch = request.GET.get('batchid','')
+  
   superdict={}
   module_Detail={}
   module_list=[]
   event_type_ids=[]
-  courses = node_collection.one({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
+  
+  courses = node_collection.one({"_id":ObjectId(announced_course)},{'relation_set.announced_for':1})
+  group_node = node_collection.one({"_id":ObjectId(group_id)},{'relation_set.group_of':1})
+  
   eventtypes = node_collection.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
   for i in eventtypes:
   	  event_type_ids.append(i._id)
+  
   for i in courses.relation_set:
     if unicode('announced_for') in i.keys():
       	announced_for = i['announced_for']  
-  courses=node_collection.find({"_id":{'$in':announced_for}})
-  trainers=node_collection.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
+  
+  for i in group_node.relation_set: 
+    if unicode('group_of') in i.keys():
+        for j in  i['group_of']:
+            group_of = j
+  
+  courses = node_collection.find({"_id":{'$in':announced_for}})
+  trainers = node_collection.find({"relation_set.trainer_teaches_course_in_college":[ObjectId(courses[0]._id),ObjectId(group_of)]})
   course_modules=node_collection.find({"_id":{'$in':courses[0].collection_set}})
+  
   #condition for all the modules to be listed is session in it should not be part of the event
   checklist=[]
   for i in course_modules:
