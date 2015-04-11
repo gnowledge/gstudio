@@ -58,11 +58,13 @@
       background-color: #D3D3D3 !important;
     }
 
-    #lbl_displ {
+    #lbl_displ, .table_lbl {
       color: #0b8a91;
+      cursor: default;
       font-weight: bold;
       font-size: 1rem;
     }
+
 
 {% endblock %}
 
@@ -355,7 +357,8 @@
               student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
               '<input type="button" class="button tiny select_all_rows" value="Select All" >' +
               '&nbsp;<input type="button" class="button tiny deselect_all_rows" value="De-Select All" >' +
-              '<label id="lbl_displ"></label>' +
+              '<label style="display:inline;" class="table_lbl">&nbsp;&nbsp;&nbsp;Click on the row to select</label>'+
+              '<label id="lbl_displ"></label>'
               '</table>';
 
               $("#divSt").html(nesc + esc + displ_stat + student_data_table); 
