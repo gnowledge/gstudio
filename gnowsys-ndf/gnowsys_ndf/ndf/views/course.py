@@ -34,7 +34,7 @@ GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': GAPPS[7]})
 app = GST_COURSE
 
 
-@login_required
+# @login_required
 @get_execution_time
 def course(request, group_id, course_id=None):
     """
@@ -617,16 +617,19 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     if app_set_instance_id:
         course_gs.get_neighbourhood(course_gs.member_of)
         context_variables['node'] = course_gs
-        # for attr in course_gs.attribute_set:
-        #     if attr:
-        #         for eachk, eachv in attr.items():
-        #             context_variables[eachk] = eachv
 
-        # for rel in course_gs.relation_set:
-        #     if rel:
-        #         for eachk, eachv in rel.items():
-        #             get_node_name = node_collection.one({'_id': eachv[0]})
-        #             context_variables[eachk] = get_node_name.name
+        if "Announced Course" in course_gs.member_of_names_list:
+            for attr in course_gs.attribute_set:
+                if attr:
+                    for eachk, eachv in attr.items():
+                        context_variables[eachk] = eachv
+
+            for rel in course_gs.relation_set:
+                if rel:
+                    for eachk, eachv in rel.items():
+                        if eachv:
+                            get_node_name = node_collection.one({'_id': eachv[0]})
+                            context_variables[eachk] = get_node_name.name
 
     try:
         return render_to_response(

@@ -1,13 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
-{% get_group_name groupid as group_name_tag %}
 
 <!-- GApps Menubar -->
-{% check_gapp_menus groupid as check_menu %}
-
-{% if check_menu %}
-  {% get_apps_for_groups groupid as gapps %}
-{% endif %}
 
 <style type="text/css">
   .top-bar.app {
@@ -47,7 +41,6 @@
   .app.top-bar-section ul > li{
     background-color: #0eacb5 !important;
   }
-
 </style>
 
 <input type="hidden" value="{{newgroup}}">

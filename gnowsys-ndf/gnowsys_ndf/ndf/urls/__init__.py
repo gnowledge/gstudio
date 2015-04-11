@@ -45,6 +45,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/video', include('gnowsys_ndf.ndf.urls.video')),
     (r'^(?P<group_id>[^/]+)/page', include('gnowsys_ndf.ndf.urls.page')),
     (r'^(?P<group_id>[^/]+)/group', include('gnowsys_ndf.ndf.urls.group')),
+    (r'^(?P<group_id>[^/]+)/partner', include('gnowsys_ndf.ndf.urls.partner')),
     (r'^(?P<group_id>[^/]+)/forum', include('gnowsys_ndf.ndf.urls.forum')),
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
@@ -59,6 +60,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/ratings', include('gnowsys_ndf.ndf.urls.ratings')),
     (r'^(?P<group_id>[^/]+)/topics', include('gnowsys_ndf.ndf.urls.topics')),
     (r'^(?P<group_id>[^/]+)/e-library', include('gnowsys_ndf.ndf.urls.e-library')),
+    (r'^(?P<group_id>[^/]+)/e-book', include('gnowsys_ndf.ndf.urls.e-book')),
     (r'^(?P<group_id>[^/]+)/term', include('gnowsys_ndf.ndf.urls.term')),
     (r'^(?P<group_id>[^/]+)/event', include('gnowsys_ndf.ndf.urls.event')),
     (r'^(?P<group_id>[^/]+)/data-review', include('gnowsys_ndf.ndf.urls.data_review')),
@@ -100,7 +102,9 @@ urlpatterns = patterns('',
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),
 
     url(r'^(?P<group_id>[^/]+)/$', 'gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
-
+    # ---listing sub partners---                    
+    url(r'^(?P<group_id>[^/]+)/partners$', 'gnowsys_ndf.ndf.views.partner.partner_list', name='partnerlist'),
+    # --------end of listing sub partners--------
     # -- tags --
     url(r'^(?P<group_id>[^/]+)/tags$', 'gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$', 'gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
@@ -124,6 +128,8 @@ urlpatterns = patterns('',
     # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
 
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
+
+    url(r'^(?P<group_id>[^/]+)/repository/?$', 'gnowsys_ndf.ndf.views.methods.repository', name='repository'),
 
     # django-registration
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),

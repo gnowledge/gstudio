@@ -102,6 +102,19 @@
             </a>
           </dd><br/>
         {% endif %}
+
+        <!-- eBooks -->
+        {% if ebook_pages %}
+          <dd data-filetype="eBooks">
+            <a href="#view-ebook">
+              <i class="fi-book"></i>
+              {% trans "eBooks" %}
+              <span class="count">
+                ({{ ebook_pages }})
+              </span>
+            </a>
+          </dd><br/>
+        {% endif %}
         
         <!-- Audio -->
         {% if audio_pages %}
@@ -140,6 +153,8 @@
         {% endif %}
         
         <!-- Pandora -->
+        {% comment %}
+        <!--
         {% if site.SITE_VIDEO == 'pandora_and_local' %}
 
           <dd data-filetype="Videos">
@@ -148,6 +163,8 @@
             </a>
           </dd><br/>
         {% endif %}
+        -->
+        {% endcomment %}
 
         {% if site.SITE_VIDEO == 'pandora' %}
           <dd data-filetype="Videos">
@@ -263,7 +280,19 @@
     {% endif %}
 
 
-    <!-- Tab View 4 - Audios -->
+    <!-- Tab View 4 - e-book -->
+    {% if ebook_pages %}
+      <div class="content" id="view-ebook" data-filetype="eBooks">
+        {% if title == "E-Library" %}
+          <a href='{% url "elib_paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+        {% else %}
+          <a href='{% url "paged_file_objs" group_name_tag "eBooks" 1 %}' class="first-load">1</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+
+    <!-- Tab View 5 - Audios -->
     {% if audio_pages %}
       <div class="content" id="view-audio" data-filetype="Audios">
         {% if title == "E-Library" %}
@@ -274,7 +303,7 @@
       </div>
     {% endif %}
 
-    <!-- Tab View #3 - Images -->
+    <!-- Tab View 6 - Images -->
     <div class="content" id="view-image" data-filetype="Images">
       {% if title == "E-Library" %}
         <a href='{% url "elib_paged_file_objs" group_name_tag "Images" 1 %}' class="first-load">1</a>
@@ -283,7 +312,7 @@
       {% endif %}
     </div>
 
-    <!-- Tab View #4 - Videos -->
+    <!-- Tab View 7 - Videos -->
     <div class="content" id="view-video" data-filetype="Videos">
       {% if title == "E-Library" %}
         <a href='{% url "elib_paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>
@@ -292,7 +321,7 @@
       {% endif %}
     </div>
 
-    <!-- Tab View #5 - pandora Videos -->
+    <!-- Tab View 8 - pandora Videos -->
     <div class="content" id="view-pandora-video" data-filetype="Videos">
       {% if title == "E-Library" %}
           <a href='{% url "elib_paged_file_objs" group_name_tag "Videos" 1 %}' class="first-load">1</a>

@@ -20,7 +20,7 @@
 
   <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
-  <link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> 
+  <link rel="stylesheet" href="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/styles.css"> 
 
   <!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> 
@@ -92,7 +92,7 @@
 
           <li>
             <!-- <a href="{#% url 'GAPPS' 'home' 'topics' %#}" {#% if nroer_menu.top_menu_selected == "Repository" %#}class="active"{#% endif %#}> -->
-            <a href="{% url 'topics' 'home' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
+            <a href="{% url 'repository' 'home' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
               Repository
             </a>
           </li>
@@ -318,7 +318,7 @@
                 <!-- <li> -->
                 {% if group_name_tag %}
                   
-                    {% if not "/nroer_groups" in request.path %}
+                    {% if not "/partner/" in request.path %}
                     <!-- while listing the partners and/or groups cards dont show any text -->
                       {% if "/dashboard/group" in request.path %}
                         <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
@@ -342,7 +342,8 @@
               
                 {% if group_name_tag == "home" %}
                 <!-- NROER level-two menu -->
-                  {% if request.path|length > 6 %}
+                  {% if request.path|length > 6 and "repository" not in request.path %}
+                    {% if "/partner/" not in request.path %}
                     <ul class="button-group nroer-menu">
                     {% for each_gapp in nroer_menu.gapps %}
                       {% for k, v in each_gapp.items %}
@@ -355,6 +356,7 @@
                       {% endfor %}
                     {% endfor %}
                     </ul>
+                  {% endif %}
                   {% endif %}
                 {% else %}
                   {% get_gapps_iconbar request groupid %}
@@ -543,6 +545,11 @@
       $(".card .page").prepend(function(){
         /* Attaches icon for node type */
         return "<i class='fi-page'></i>"
+      });
+
+      $(".card .ebook").prepend(function(){
+        /* Attaches icon for node type */
+        return "<i class='fi-book'></i>"
       });
 
       $("aside.page").prepend(function(){
