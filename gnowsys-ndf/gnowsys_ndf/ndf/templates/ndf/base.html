@@ -41,16 +41,16 @@
 
   <style>
 
-    div.group-link > a{
-      color: black;
-      font-size: 1.25em;
+    /*div.group-link > a{*/
+      /*color: black;*/
+      /*font-size: 1.25em;*/
       /*padding-top: 0.5em;*/
-    }
-
+    /*}*/
+/*
     div.group-link {padding-top: 0.6em;}
 
     ul.nroer-menu > li.active { box-shadow: 0 4px 0 0 #0eacb5; }
-
+*/
     {% block style %}{% endblock %}
 
   </style>
@@ -59,27 +59,30 @@
 
 <body itemscope itemtype="http://schema.org/Webpage">
     
-    {% get_group_object groupid as group_object %}
-    {% check_accounts_url request.path as is_ac_url %}
+  {% get_group_object groupid as group_object %}
+  {% check_accounts_url request.path as is_ac_url %}
 
-    <nav class="top-bar drop-shadow row" data-topbar role="navigation">
+  <!-- <div class="contain-to-grid sticky"> -->
+  <div class="row" id="top-headers">
 
-      <ul class="title-area ">
-        
-        <li class="name">
-            <h1>
-              <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
-            </h1>
-        </li>
+    <!-- top LHS logo -->
+    <a class="large-2 small-5 medium-5 columns drop-shadow logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+      <img src="{{site.LOGO}}">
+    </a>
+    
+    <!-- two menus headers -->
+    <div class="large-10 small-7 medium-7 columns two-nav-container">
+    
+      <!-- first menu header  -->
+      <nav class="top-bar drop-shadow" data-topbar role="navigation">
 
-        <li class="toggle-topbar menu-icon">
-          <a href="#">{% trans "Menu" %}</a>
-        </li>
+        <ul class="title-area">
+          <li class="name"> </li>
+          <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+          <li class="toggle-topbar"><a href="#"><span>{% trans "Menu" %}</span></a></li>
+        </ul>
 
-      </ul>
-
-     <section class="top-bar-section">
-
+        <section class="top-bar-section">
       <!-- Left Nav Section -->
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
@@ -278,65 +281,78 @@
         </ul>  
         <!-- Closes Right Nav section -->
 
-      </section>
-    </nav>
+        </section>
 
-    <div class="workspace">
-      <div class="off-canvas-wrap" data-offcanvas>
-        <div class="inner-wrap">
+      </nav>
+      <!-- closing of first nav -->
 
-         <!-- Off Canvas Meta Map -->
-         <aside id="help" class="left-off-canvas-menu">
-           <!-- whatever you want goes here -->
-           <!-- <h4><i class='fi-info'></i> Help</h4> -->
-           <ul class="off-canvas-list">
-            <!-- Shelf content code and logic -->
-            {% block shelf_content %} {% endblock %}
+      <!-- =========| divider between two nav's/header's |=========== -->
+
+      <!-- start of second nav  or group level header-->
+      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if not is_ac_url %}sticky{% endif %}{% endif %} drop-shadow" id="group-level-header">
+        <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
+        {% if not is_ac_url %}
+        {% if request.path != "/welcome" %}
+          <ul class="title-area">
+            <li class="name">
+              <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
+              <!-- <i class="fi-home"></i> -->
+            </li>
+            <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span>APPS</span></a></li>
           </ul>
-        </aside>
 
-        <main class="row">
-          {% if not is_ac_url %}
-          {% if request.path != "/welcome" %}
-          <!--
-          This menu-bar is meant especially for group which is selected 
-          from group's dropdown visible on site-bar.
+          <section class="top-bar-section">
+            <!-- Right Nav Section -->
 
-          Must be visible only when visiting a group.
-
-          Hence, via checking url (using 'check_accounts_url' templatetag) 
-          restricting visibility of this menu-bar.
-          -->
-          <nav class="drop-shadow">
-            <div class="button-bar app">
-              <!-- one that appears on left top, under main logo -->
-              <div class="medium-2 columns group-link">
-                <!-- <li class="left">
-                  <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a> 
-                </li> -->
-
-                <!-- <li> -->
+            <ul class="right" id="group-search-update">
+              <!-- update/about of group -->
+              <li class="">
                 {% if group_name_tag %}
-                  
-                    {% if not "/partner/" in request.path %}
-                    <!-- while listing the partners and/or groups cards dont show any text -->
-                      {% if "/dashboard/group" in request.path %}
-                        <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
-                          <i class="fi-record"></i> About
-                        </a>
-                      {% else %}
-                        <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
-                          <i class="fi-results"></i> Updates
-                        </a>
-                      {% endif %}
+                
+                  {% if not "/partner/" in request.path %}
+                  <!-- while listing the partners and/or groups cards dont show any text -->
+                    {% if "/dashboard/group" in request.path %}
+                      <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
+                        <i class="fi-record"></i> About
+                      </a>
+                    {% else %}
+                      <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
+                        <i class="fi-results"></i> Updates
+                      </a>
                     {% endif %}
+                  {% endif %}
 
                 {% endif %}
-                <!-- </li> -->
-              </div>
+              </li>
+              <!-- END of update/about of group -->
 
-              <!-- group level gapps which appears at LHS of search bar -->
+              <!-- search in the app bar -->
+              <li class="has-form">
+                <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                  name="search_form" method="GET" >
+                  <div class="row collapse">
+                    <div class="large-9 small-10 columns">
+                      <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                    </div>
+                    <div class="large-3 small-2 columns">
+                      <button type="submit" class="tiny button" value="" ><i class="fi-magnifying-glass"></i></button>
+                    </div>
+                  </div>
+                </form>
+              </li>
+              <!-- END of search in the app bar -->
 
+              <!-- <li class="has-dropdown">
+                <a href="#">Right Button Dropdown</a>
+                <ul class="dropdown">
+                  <li><a href="#">First link in dropdown</a></li>
+                  <li class="active"><a href="#">Active link in dropdown</a></li>
+                </ul>
+              </li> -->
+            </ul>
+
+            <ul class="left" id="group-apps">
               <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
               {% if site.SITE_NAME == "NROER" %} 
               
@@ -344,18 +360,19 @@
                 <!-- NROER level-two menu -->
                   {% if request.path|length > 6 and "repository" not in request.path %}
                     {% if "/partner/" not in request.path %}
-                    <ul class="button-group nroer-menu">
+                    <!-- <ul class="button-group nroer-menu"> -->
+                    <li class="divider"></li>
                     {% for each_gapp in nroer_menu.gapps %}
                       {% for k, v in each_gapp.items %}
                         <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
                           <!-- <a class="button" {#% if v %#} href="{#% url 'GAPPS' group_name_tag v %#}" {#% endif %#}> -->
-                          <a class="button" {% if v %} href="{% url v group_name_tag %}" {% endif %}>
+                          <a class="" {% if v %} href="{% url v group_name_tag %}" {% endif %}>
                             {{k}}
                           </a>
                         </li>
                       {% endfor %}
                     {% endfor %}
-                    </ul>
+                    <!-- </ul> -->
                   {% endif %}
                   {% endif %}
                 {% else %}
@@ -365,38 +382,36 @@
               {% else %}
                 {% get_gapps_iconbar request groupid %}
               {% endif %}
+            </ul>
 
-              <ul class="tools button-group medium-2 columns right">
-                
-                <!-- search in the app bar -->
-                <li class="has-form">
-                  <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-                    name="search_form" method="GET" >
-                    <div class="row collapse">
-                      <div class="large-10 columns">
-                        <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
-                      </div>
-                      <div class="large-2 columns">
-                        <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
-                      </div>
-                    </div>
-                  </form>
-                </li>
+          </section>
+        {% endif%} <!-- end of "/welcome" landing page check -->
+        {% endif %} <!-- end of "accounts" urls check -->
+        </nav>
+      </div>
 
-                <!-- help documentation for every app -->
-                <!--
-                <li class="right">
-                  <a id="toggle-help" class="button right-off-canvas-toggle" >
-                    <i class='button fi-lightbulb'></i>
-                  </a>
-                </li>
-                --> 
-              </ul>
-            </div>
-          </nav>
-          {% endif%} <!-- end of "/welcome" landing page check -->
-          {% endif %} <!-- end of "accounts" urls check -->
+      <!-- end of second nav -->
 
+    </div>
+    <!-- end of section appointed for two header's -->
+  </div>
+  <!-- end of LOGO + top header's -->
+
+  <div class="workspace">
+    <div class="off-canvas-wrap" data-offcanvas>
+      <div class="inner-wrap">
+
+        <!-- Off Canvas Meta Map -->
+        <aside id="help" class="left-off-canvas-menu">
+          <!-- whatever you want goes here -->
+          <!-- <h4><i class='fi-info'></i> Help</h4> -->
+          <ul class="off-canvas-list">
+            <!-- Shelf content code and logic -->
+            {% block shelf_content %} {% endblock %}
+          </ul>
+        </aside>
+
+        <main class="row">
           <!-- Start of sidebar section (main aside) -->
           <aside class="medium-2 columns">
             <div>
@@ -417,7 +432,7 @@
               </section>
 
               <div>
-              {% block add_resource_content %}  {% endblock %}
+                {% block add_resource_content %}  {% endblock %}
               </div>
             </div>
           </aside>
@@ -425,49 +440,27 @@
 
           <!-- Start of content section -->
           <article class="medium-10 columns">
-          <!-- The actual body content -->
-          <!-- Url redirection -->
+            <!-- The actual body content -->
+            <!-- Url redirection -->
 
-          {% get_group_type request.path request.user as group_type %}
-          
-          {% if group_type %}
-          {% block body_content %} {% endblock %} 
-          {% block extra_content %}  {% endblock %}  
-          {% endif %}
+            {% get_group_type request.path request.user as group_type %}
+            
+            {% if group_type %}
+            {% block body_content %} {% endblock %} 
+            {% block extra_content %}  {% endblock %}  
+            {% endif %}
 
-          <input type="hidden" value="{{newgroup}}"> 
-          <input type="hidden" value="{{groupid}}"> 
+            <input type="hidden" value="{{newgroup}}"> 
+            <input type="hidden" value="{{groupid}}"> 
 
           </article>
-        {% block data_review_pagination %}  {% endblock %}
-        <!-- End of content section --> 
-      </main>
-
-      <!-- Off Canvas User Shelf -->
-      {% comment %}
-      <!-- 
-      <aside id="help"  class="right-off-canvas-menu">
-        <ul class="off-canvas-list">
-
-          <li><label><h4>{% trans "User Guide" %}</h4></label></li>
-          {% block detailed_help_content %}  {% endblock %}
-          <li><label>{% trans "About this Application" %}</label></li>
-          {% block help_content %}  {% endblock %}
-          <li><label>{% trans "About this Group" %}</label></li>
-          {% block about_group %}  {% endblock %}
-          <li><label>Meta Studio {% trans "Version" %} 0.8.23</label></li>
-          <li><a href="#">{% trans "About metaStudio" %}</a></li>
-        </ul>
-      </aside>
-      -->
-      {% endcomment %}
-      <!-- close the off-canvas menu -->
-      
-      <a class="exit-off-canvas"></a>
-
+          {% block data_review_pagination %}  {% endblock %}
+          <!-- End of content section --> 
+        </main>
+      </div>
     </div>
   </div>
-</div>
+  <!-- end of workspace -->
 
   {% include "ndf/footer.html" with site=site %}
 

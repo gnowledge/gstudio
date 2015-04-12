@@ -34,14 +34,14 @@
 
 pre{
     width:92%;
-	overflow: auto;
-	border: 1px solid #eee;
-	border-left: 1rem solid #eee;
-	font: lighter 1.2rem/2rem Monaco;
-	background: url('/static/ndf/pre.png');
-	background-size:1px 4rem;
-	padding-left:0.5rem;
-	font-family: monospace;
+    overflow: auto;
+    border: 1px solid #eee;
+    border-left: 1rem solid #eee;
+    font: lighter 1.2rem/2rem Monaco;
+    background: url('/static/ndf/pre.png');
+    background-size:1px 4rem;
+    padding-left:0.5rem;
+    font-family: monospace;
 }
 
 
@@ -61,10 +61,10 @@ pre{
 /* Utility class to display the child spans of this element on hover */
 .show-span-on-hover{
     span{
-    display:none;
+        display:none;
     }
     &:hover span{
-    display:inline;
+        display:inline;
     }
 }
 .show-on-hover{
@@ -74,13 +74,13 @@ pre{
         z-index: 1000;
     }
     &:hover .show{
-    display:block;
+        display:block;
     }
 }
 /* Utility class to display the next siblings on hoverr */
 .extra.app {
   display: none;
-    
+
 }
 
 /* Effects */
@@ -102,25 +102,24 @@ pre{
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
 
 .rating-bar {
- 
 
   &>span {
       /* remove inline-block whitespace */
       font-size: 0;
-         /* flip the order so we can use the + and ~ combinators */
-  unicode-bidi: bidi-override;
-  direction: rtl;
+      /* flip the order so we can use the + and ~ combinators */
+      unicode-bidi: bidi-override;
+      direction: rtl;
   }
-    
-    &.unrated{
-        /* If the user has not rated yet */
-        &:checked ~ label:before{
+
+  &.unrated{
+    /* If the user has not rated yet */
+    &:checked ~ label:before{
       color: $secondary-color;
     }
-  }
-        
+}
 
-  [type*="radio"] {
+
+[type*="radio"] {
     display: none;
     & + label {
       /* only enough room for the star */
@@ -130,57 +129,59 @@ pre{
       width: 1em;
       height: 1.4em;
       white-space: nowrap;
-        font-size: 1.5rem;
-        margin:0;
+      font-size: 1.5rem;
+      margin:0;
       &:before {
         display: inline-block;
         text-indent: -9999px;
         content: '\2606'; /* WHITE STAR */
         color: #888;
-      }
+        }
     }
     &:checked ~ label:before,
-      & + label:hover ~ label:before,
-      & + label:hover:before {
+    & + label:hover ~ label:before,
+    & + label:hover:before {
       content: '\2605'; /* BLACK STAR */
       color: $highlight-color;
       text-shadow: 0 0 1px #333;
     }
-  }
-  
-  /* the hidden clearer */
-    
-  .last[type*="radio"] + label {
+}
+
+/* the hidden clearer */
+
+.last[type*="radio"] + label {
     text-indent: -9999px;
     width: .5em;
     margin-left: -.5em;
-  }
-  .last[type*="radio"] + label:before {
+}
+
+
+.last[type*="radio"] + label:before {
     width: .5em;
     height: 1.4em;
-  }
-  
+}
+
   /* this is gross, I threw this in to override the starred
-     buttons when hovering. */
+  buttons when hovering. */
   &:hover{
-     [type*="radio"] + label:before {
-    content: '\2606'; /* WHITE STAR */
-    color: #888;
-    text-shadow: none;
-  }
-  [type*="radio"] + label:hover ~ label:before,
-  [type*="radio"] + label:hover:before {
-    content: '\2605'; /* BLACK STAR */
-    color: $highlight-color;
-    text-shadow: 0 0 1px #333;
-  }
-  }
+   [type*="radio"] + label:before {
+        content: '\2606'; /* WHITE STAR */
+        color: #888;
+        text-shadow: none;
+    }
+    [type*="radio"] + label:hover ~ label:before,
+    [type*="radio"] + label:hover:before {
+        content: '\2605'; /* BLACK STAR */
+        color: $highlight-color;
+        text-shadow: 0 0 1px #333;
+    }
+}
 }
 
 body a{
   &:visited{
     color: #1d484a;
-  }
+}
 }
 
 
@@ -190,43 +191,101 @@ body{
     background-color: #fafafa;
 }
 
+#top-headers{
+    background-color: black;
+    margin-bottom: 1.5rem;
 
-.top-bar{
-    a.language.button{
-        padding: 5px 10px;
-        margin-top:3px;
-            background-color: #555;
-            color:black;
-            &:hover{
-                background-color: white;
-                color:black;
+    div.two-nav-container{
+        padding: 0;
+    }
+
+    a.logo{
+        height: $topbar-height * 2;
+        margin: 0;
+
+        img{
+          margin: 10% auto;
+          display: block;
+          // padding: 5px;
+        }
+
+        &:hover{
+            background-color: scale-color($topbar-bg-color, $lightness: 10%);
+        }
+    }
+
+    #group-level-header{
+
+        border-top: solid thin black;
+
+        .top-bar{
+            background-color: scale-color($topbar-bg-color, $lightness: 10%);
+
+            ul.title-area h1{
+                &:hover{
+                background-color: scale-color($topbar-bg-color, $lightness: 20%);
+                    
+                }
             }
         }
+
+        .top-bar-section li.active:not(.has-form) > a:not(.button){
+            background-color: scale-color($theme-color-invert, $lightness: 15%) !important;
+        }
+
+        .top-bar-section li a:not(.button), .top-bar-section li {
+            background-color: scale-color($topbar-bg-color, $lightness: 10%);
+        }
+        
+        .top-bar-section li a:not(.button):hover, .top-bar-section li:hover {
+            background-color: scale-color($theme-color-invert, $lightness: 10%) !important;
+        }
+
+    }
+}
+
+
+.top-bar{
+
+    a.language.button{
+        padding: 5px 10px;
+        margin-top: 2px;
+        background-color: #888;
+        color: black;
+        &:hover{
+          background-color: white;
+          color:black;
+        }
+    }
+
     ul.language-selector{
         height: $topbar-height;
         float: right;
-        margin:0;
+        margin: 0;
     }
+
     .active{
-        background-color:$theme-text-color!important;
+        // background-color: $theme-text-color !important;
+        background-color: scale-color($theme-color-invert, $lightness: 20%) !important;
     }
-    h1{
-        .flag{
-                height: 20px;
-            margin-bottom: 4px;
-            margin-right: 2px;
-            }
-        img{
-            /* Logo */
-      height: $topbar-height * 0.8;
-    }
-        a{
-      color:white!important;
-    }
-    }
-    .group:hover{
-        background-color: #111;
-    }
+    
+    //     h1{
+    //         .flag{
+    //                 height: 20px;
+    //             margin-bottom: 4px;
+    //             margin-right: 2px;
+    //             }
+    //         img{
+    //             /* Logo */
+    //       height: $topbar-height * 0.8;
+    //     }
+    //         a{
+    //       color:white!important;
+    //     }
+    //     }
+    //     .group:hover{
+    //         background-color: #111;
+    //     }
 
     // user logout option of RHS dropdown
     .logout{
@@ -241,145 +300,145 @@ body{
 
 
 
-body>footer{
-        //Site footer
-  padding:20px 0;
-  position: relative;
-        color:#888;
-        min-height: 170px;
-        background-color: rgba(0,0,0,0.8);
+                        body>footer{
+                            //Site footer
+                            padding:20px 0;
+                            position: relative;
+                            color:#888;
+                            min-height: 170px;
+                            background-color: rgba(0,0,0,0.8);
 
-       section:first-child{
-           border-bottom: 1px solid #222;
-           margin-bottom: 1rem;
-       }
-        a{
-          color: #bbbbbb !important;
-          &:hover{
-            color:#eee !important;
-          }
-      }
-      strong a{
-           border-bottom: 1px dotted #555;
-       }
-}
-
-
-.coll-arrows{
-  cursor:pointer;
-  display: block;
-  padding: 0.5rem;
-        
-  &:hover{
-    background-color: #D3D3D3;
-  }
-}
+                            section:first-child{
+                             border-bottom: 1px solid #222;
+                             margin-bottom: 1rem;
+                         }
+                         a{
+                          color: #bbbbbb !important;
+                          &:hover{
+                            color:#eee !important;
+                        }
+                    }
+                    strong a{
+                     border-bottom: 1px dotted #555;
+                 }
+             }
 
 
-/* Sections */
-main>nav{
-    border-top:3px solid black;
-    position: relative;
-    z-index: 10;
-    &>.button-bar{
-    background-color: $active-color;
-    .button-group{
-        margin: 0;
-        &.tools{
-           padding: 5px;
+             .coll-arrows{
+              cursor:pointer;
+              display: block;
+              padding: 0.5rem;
+
+              &:hover{
+                background-color: #D3D3D3;
+            }
         }
-    }
-    li{
-        
-        .button{
-            border: none;
-        font-size: 0.8rem;
-        padding: 0.8rem 1rem;
-            &.home{
-                font-weight: bold;
-            }
-            &.settings,&#toggle-help{
-                padding: 6px 10px;
-                color: #333;
-               // font-size: 110%;
-                background-color: rgba(255,255,255,0.3);
-                &:hover{
-                    background-color: rgba(0,0,0,0.2);
-                    color:white;
-                }
-            }
-            &#toggle-help{
-                background-color: inherit;
-            }
-            &.settings{
-                &:after{
+
+
+        /* Sections */
+        main>nav{
+            border-top:3px solid black;
+            position: relative;
+            z-index: 10;
+            &>.button-bar{
+                background-color: $active-color;
+                .button-group{
+                    margin: 0;
+                    &.tools{
+                     padding: 5px;
+                 }
+             }
+             li{
+
+                .button{
                     border: none;
+                    font-size: 0.8rem;
+                    padding: 0.8rem 1rem;
+                    &.home{
+                        font-weight: bold;
+                    }
+                    &.settings,&#toggle-help{
+                        padding: 6px 10px;
+                        color: #333;
+                        // font-size: 110%;
+                        background-color: rgba(255,255,255,0.3);
+                        &:hover{
+                            background-color: rgba(0,0,0,0.2);
+                            color:white;
+                        }
+                    }
+                    &#toggle-help{
+                        background-color: inherit;
+                    }
+                    &.settings{
+                        &:after{
+                            border: none;
+                        }
+                    }
+
+                    background-color: transparent;
+                    color: black;
+                    margin: 0;
+                    &:hover{
+                        color:white;
+                    }
+                }
+
+                &.active{
+                    .button{
+                        background-color: $primary-color;
+                        color:white;
+                    }
                 }
             }
-            
-        background-color: transparent;
-        color: black;
-        margin: 0;
-            &:hover{
-                color:white;
-            }
-        }
-        
-        &.active{
-            .button{
-                background-color: $primary-color;
-                color:white;
-            }
-        }
-    }
-    
-    /* Hide icons till we can retreive custom icons from the system */
-    .app i{
+
+            /* Hide icons till we can retreive custom icons from the system */
+            .app i{
                 display: none!important; 
             }
-  }
-}
+        }
+    }
 
 
-main>aside{
-    &>div{
-      
-        
-        
-        h2{
-            color:#111;
-        }
-        h3{
-            font-size: 1.2rem;
-            font-weight: normal;
-            color: #222;
-        }
-        h4{
-            font-size: 1rem;
-            color: #222;
-            span{
-                display: none;
+    main>aside{
+        &>div{
+
+
+
+            h2{
+                color:#111;
             }
-            &:hover span{
-                display: inline;
+            h3{
+                font-size: 1.2rem;
+                font-weight: normal;
+                color: #222;
             }
-        }
-        h5,h6{
-            margin: 0;
-        }
+            h4{
+                font-size: 1rem;
+                color: #222;
+                span{
+                    display: none;
+                }
+                &:hover span{
+                    display: inline;
+                }
+            }
+            h5,h6{
+                margin: 0;
+            }
             
-        .f-dropdown.content{
-            width: auto;
-            padding: 0;
-            border: 1px solid #222;
-            .item{
-                width: 70px;
+            .f-dropdown.content{
+                width: auto;
+                padding: 0;
+                border: 1px solid #222;
+                .item{
+                    width: 70px;
+                }
             }
-        }
-        header{
-           padding: 10px;
-        }
-        footer{
+            header{
+             padding: 10px;
+         }
+         footer{
             background-color: #222;
             min-height: 1rem;
             label{
@@ -390,11 +449,11 @@ main>aside{
         
         // Aside link styles
         a,p{
-                // color: white;
+            // color: white;
             &:hover{
                 // color:white;
             }
-            }
+        }
         .side-nav.collection{
             background-color: #444;
             padding: 0;
@@ -419,24 +478,24 @@ main>aside{
 
 // Article styles
 article{
-        position: relative;
-        z-index: 1;
-        min-height: 400px;
-        overflow-x: visible;
-        &>header,form>header{
-            padding: 15px;
+    position: relative;
+    z-index: 1;
+    min-height: 400px;
+    overflow-x: visible;
+    &>header,form>header{
+        padding: 15px;
         //  margin-bottom: 0.5rem;
-            background-color: #f0f0f0;
-        }
-        
-        &>footer{
-        }
+        background-color: #f0f0f0;
+    }
+
+    &>footer{
+    }
     
-  h1:not(.subheader){
-  //  font-family: $serif-font;
-  //    font-style: italic;
-  //    
-  .tabs{
+    h1:not(.subheader){
+      //  font-family: $serif-font;
+      //    font-style: italic;
+      //    
+      .tabs{
         display: inline-block;
         position: relative;
         bottom: -0.5rem;
@@ -456,11 +515,11 @@ article{
             background-color: inherit;
             
             &:hover{
-            background-color: white;
+                background-color: white;
             }
         }
     }
-  }
+}
 }
 
 
@@ -473,39 +532,39 @@ article{
   display: block;
   //color:$bg-color;
   opacity:0.9;
-    overflow: hidden;
-    
-    >a{
-        color:inherit;
-        display: block;
-        position: relative;
-        z-index: 200;
-    }
-    
-     &.published{
-        opacity: 1;
-        background-color: darken($bg-color,5%);
-    }
-    &.unapproved{
-        opacity: 1;
-        border-style: solid;
-        border-color: $alert-color;
-    }
+  overflow: hidden;
 
-    &:hover{
+  >a{
+    color:inherit;
+    display: block;
+    position: relative;
+    z-index: 200;
+}
+
+&.published{
+    opacity: 1;
+    background-color: darken($bg-color,5%);
+}
+&.unapproved{
+    opacity: 1;
+    border-style: solid;
+    border-color: $alert-color;
+}
+
+&:hover{
   border-style:solid;
   opacity:1;
-        >a{
-           
-        }
-        i{
-            opacity:0.3;
-        }
-        footer .age{
-            display: block;
-        }
+  >a{
+
+  }
+  i{
+    opacity:0.3;
 }
-    &>i{
+footer .age{
+    display: block;
+}
+}
+&>i{
   position: absolute;
   top: -10px;
   right: 10px;
@@ -513,56 +572,56 @@ article{
   color:$theme-color;
   opacity: 0.3;
 }
-    .preview{
-        float: left;
-        padding-right: 5px;
-        padding-top: 4px;
-    }
-    header{
-        overflow: hidden;
-    }
-    h5{
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        margin-bottom: 0;
-    }
-        .label{
-        opacity:0.5;
-    }
-    p{
-        color: #555;
-        height: 80px;
-        background-repeat: no-repeat;
-        font-size: 80%;
-    }
-    .th{
-        margin:20px auto;
-        width:80px;
-        height: 80px;
-        overflow: hidden;
-        display: none;
-        &:hover{
+.preview{
+    float: left;
+    padding-right: 5px;
+    padding-top: 4px;
+}
+header{
+    overflow: hidden;
+}
+h5{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-bottom: 0;
+}
+.label{
+    opacity:0.5;
+}
+p{
+    color: #555;
+    height: 80px;
+    background-repeat: no-repeat;
+    font-size: 80%;
+}
+.th{
+    margin:20px auto;
+    width:80px;
+    height: 80px;
+    overflow: hidden;
+    display: none;
+    &:hover{
         width: 150px;
         height: 150px;
     }
-        img{
+    img{
         width: 100%;
     }
 }
-    footer{
-        margin-top: 1rem;
-        font-size: 70%;
-        clear: both;
-        color: $meta-color;
-            .age{
-                display: none;
-                position: absolute;
-                background-color: white;
-                z-index: 100;
-                bottom: 0;
-                width: 100%;
-            }
-        }
+footer{
+    margin-top: 1rem;
+    font-size: 70%;
+    clear: both;
+    color: $meta-color;
+    .age{
+        display: none;
+        position: absolute;
+        background-color: white;
+        z-index: 100;
+        bottom: 0;
+        width: 100%;
+    }
+}
 }
 
 .edit-card{
@@ -576,32 +635,32 @@ article{
 
 /* Content Tabs */
 article{
-   
-        
-.tabs {
-    display: inline-block;
-    dd a{
-        border-radius: 4px;
-        border: 1px transparent;
-    }
-    dd.active a{
-        color:$active-color;
-        border: 1px solid;
-    }
-    dd:hover a{
-        color:$active-color;
-    }
-    
-    i{
-  margin-right: 5px;
-  font-size: 1.3rem;
-}
-}
 
-    section.content{
-        background-color:white;
-        border: 1px solid #eee;
-    }
+
+    .tabs {
+        display: inline-block;
+        dd a{
+            border-radius: 4px;
+            border: 1px transparent;
+        }
+        dd.active a{
+            color:$active-color;
+            border: 1px solid;
+        }
+        dd:hover a{
+            color:$active-color;
+        }
+
+        i{
+          margin-right: 5px;
+          font-size: 1.3rem;
+      }
+  }
+
+  section.content{
+    background-color:white;
+    border: 1px solid #eee;
+}
 
 
 }
@@ -623,16 +682,16 @@ article{
 .label-list{
   display: inline-block;
   text-align: left;
-    margin-bottom: 0.1rem;
-    &:empty:before{
-        content:"UNTAGGED";
-        @extend .label;
-        opacity:0.2!important;
+  margin-bottom: 0.1rem;
+  &:empty:before{
+    content:"UNTAGGED";
+    @extend .label;
+    opacity:0.2!important;
     padding: 2px;
-        background-color: transparent;
-    }
-    
-    .label{
+    background-color: transparent;
+}
+
+.label{
     text-transform: uppercase;
     background-color: transparent;
     padding: 2px;
@@ -642,20 +701,20 @@ article{
 /*************************** 2. Custom CSS overrides ***********************/
 /* Content area */
 article{
-    
+
   padding-bottom: 4rem; 
   
-    &>header{
-  border-bottom: 1px solid #ddd;
-//  margin-bottom: 1rem!important;
-}
-    &>footer{
-  border-top: 1px dotted #ddd;
-}
-    .breadcrumbs{
-  // display: none;
-  // background-color: #eee;
-}
+  &>header{
+      border-bottom: 1px solid #ddd;
+      //  margin-bottom: 1rem!important;
+  }
+  &>footer{
+      border-top: 1px dotted #ddd;
+  }
+  .breadcrumbs{
+      // display: none;
+      // background-color: #eee;
+  }
 }
 
 
@@ -677,23 +736,23 @@ textarea{
   font-size: inherit;
   line-height: 1.4;
   color: #222;
-}*/
-/*************************** 3. Custom CSS Below ***********************/
+  }*/
+  /*************************** 3. Custom CSS Below ***********************/
 
-/*CSS fix for tables generated via orgitdown*/
-#content table td, #content colgroup col{
-  float: none !important;
-}
+  /*CSS fix for tables generated via orgitdown*/
+  #content table td, #content colgroup col{
+      float: none !important;
+  }
 
 
-.user{
-  color: inherit;
-}
-.user{
-  color: inherit;
-}
-.user i{
-margin-right: 3px;
+  .user{
+      color: inherit;
+  }
+  .user{
+      color: inherit;
+  }
+  .user i{
+    margin-right: 3px;
 }
 .user:hover i{
   opacity:1;
@@ -739,7 +798,7 @@ input.node-title{
 }
 
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal{
-  
+
   z-index:1;
   background-color: captiontext;
   padding: 5px 15px 10px;
@@ -750,7 +809,7 @@ input.node-title{
 }
 
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover{
-  
+
   background-color: white;
   border-radius: 30px;
   padding: 5px 15px 10px;
@@ -773,11 +832,11 @@ input.node-title{
     padding: 0.5vw 0.75vw;
     z-index: 500;
     &.language{
-        
+
     }
     label{
-            color:#666;
-        }
+        color:#666;
+    }
     small{
         margin-left: 2px;
         display: inline;
@@ -805,7 +864,7 @@ aside#help{
     }
     p,h5,h6{
         color:#ddd;
-    padding: 0.3rem 0.9375rem;
+        padding: 0.3rem 0.9375rem;
     }
 }
 

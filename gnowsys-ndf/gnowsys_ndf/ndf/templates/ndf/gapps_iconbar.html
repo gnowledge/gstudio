@@ -4,7 +4,10 @@
 <!-- GApps Menubar -->
 
 <style type="text/css">
-  .top-bar.app {
+/*#group-level-header li{
+background-color: red !important;
+}*/
+  /*.top-bar.app {
     background-color: #10c1cb !important;
     height: 45px;
   }
@@ -40,19 +43,20 @@
 
   .app.top-bar-section ul > li{
     background-color: #0eacb5 !important;
-  }
+  }*/
 </style>
 
 <input type="hidden" value="{{newgroup}}">
-
+<!-- 
 <div class="medium-8 columns">
   <div class="contain-to-grid">
       
     <div class="top-bar app" data-topbar role="navigation">
 
       <div class="top-bar-section app">
-    
-        <ul class="app button-group">
+     -->
+        <!-- <ul class="app button-group"> -->
+        <li class="divider"></li>
           {% for index_key, app_dict in gapps.items %}
 
             {% check_is_gapp_for_gstaff groupid app_dict request.user as gstaff_access_for_gapp %}
@@ -65,7 +69,7 @@
 
                 <li class="has-dropdown {% comment %} Sets active class on active app{% endcomment %}
                 {% if app_dict.name|lower == selectedGapp|lower %} active
-                {% elif app_dict.id|safe == selectedGapp|safe %} active {% endif %}">
+                {% elif app_dict.id|safe == selectedGapp|safe %} active {% endif %}" style="background-color:red;">
 
                   <a class="{{app_dict.name|title}} app" href="{% url app_dict.name|lower group_name_tag %}">
                       {{app_name}}
@@ -122,44 +126,67 @@
             {% endif %}
 
           {% endfor %}
-        </ul>
-    
+        <!-- </ul> -->
+    <!-- 
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- ============= -->
 
 <script type="text/javascript">
-  
-  appTopBarWidth = document.getElementsByClassName("top-bar app")[0].offsetWidth;
 
-  allAppsArr = $("div.top-bar.app ul.app > li");
+  function adjustGroupApps()
+  {
 
-  flagExtraMenu = false;
+    var $groupHeader = $("#group-level-header"),
+      groupHeaderWidth = $groupHeader.width();
 
-  allAppsTotWidth = 0;
-  allAppsArr.each(function(){
+    var $groupRightUl = $("#group-search-update"),
+      groupRightUlWidth = $groupRightUl.width();
 
-    allAppsTotWidth += this.offsetWidth;
+    var $groupApps = $("#group-apps");
 
-    if( flagExtraMenu || ((allAppsTotWidth + 75) > appTopBarWidth))
-    {
-      if(!flagExtraMenu)
+    var availableWidth = groupHeaderWidth - groupRightUlWidth;
+    // console.log($("#group-search-update"));
+
+    var appTopBarWidth = groupHeaderWidth;
+
+    var allAppsArr = $groupApps.children("li");
+
+    var flagExtraMenu = false;
+
+    var allAppsTotWidth = 0;
+
+    allAppsArr.each(function(){
+      // console.log(this.offsetWidth)
+      allAppsTotWidth += this.offsetWidth;
+
+      if( flagExtraMenu || ((allAppsTotWidth + 100) > availableWidth))
       {
-        extraMenuHtml = '<li class="has-dropdown not-click extra-menu"> <a href="/Sample/task" class="Task app"> <b>. . .</b> </a> <ul class="dropdown"><li class="title back js-generated"><h5><a href="javascript:void(0)">Back</a></h5></li><li class="parent-link show-for-small"><a href="/Sample/task" class="parent-link js-generated"> Task </a></li> </ul> </li>'
-        $(this).before(extraMenuHtml);
-        $(".extra-menu ul.dropdown").append(this);
+        if(!flagExtraMenu)
+        {
+          // extraMenuHtml = '<li class="has-dropdown not-click extra-menu"> <a class="Task app"> <b>. . .</b> </a> <ul class="dropdown"><li class="title back js-generated"><h5><a href="javascript:void(0)">Back</a></h5></li><li class="parent-link show-for-small"><a class="parent-link js-generated"> Task </a></li> </ul> </li>'
+          var extraMenuHtml = '<li class="has-dropdown extra-menu"> <a> <b>. . .</b> </a> <ul class="dropdown"></ul> </li>';
+          $(this).before(extraMenuHtml);
+          $(".extra-menu > ul.dropdown").append(this);
+        }
+        else
+        {
+          $(".extra-menu > ul.dropdown").append(this);
+        }
+
+        flagExtraMenu = true;
       }
-      else
-      {
-        $(".extra-menu ul.dropdown").append(this);
-      }
 
-      flagExtraMenu = true;
-    }
+    });
 
-  });
+    // $(document).foundation('topbar', 'reflow');
+  }
 
+  adjustGroupApps();
+
+  // $("#group-level-header > nav").bind("resize", function(){adjustGroupApps()});
+  $("#group-level-header").resize(function(){console.log("kkkkkkkkkk")})
 </script>
