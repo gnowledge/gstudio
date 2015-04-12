@@ -4729,7 +4729,7 @@ def reschedule_task(request, group_id, node):
  if request.user.id in listing:
     
     reschedule_attendance = node_collection.one({"_type":"AttributeType","name":"reschedule_attendance"})
-    marks_entry_completed = node_collection.find({"_type":"AttributeType","name":"marks_entry_completed"})
+    marks_entry = node_collection.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
     reshedule_choice = request.POST.get('reshedule_choice','')
     session = request.POST.get('session','')
@@ -4780,7 +4780,7 @@ def reschedule_task(request, group_id, node):
                 if unicode ('reschedule_dates') in i['reschedule_attendance']:
                     reschedule_dates = i['reschedule_attendance']['reschedule_dates']
             if unicode('marks_entry_completed') in i.keys():
-                    event_details = i['marks_entry_completed']
+                    marks_entry_completed = i['marks_entry_completed']
             if unicode("event_attendance_task") in i.keys():
               task_id = i["event_attendance_task"]
 
@@ -4794,12 +4794,10 @@ def reschedule_task(request, group_id, node):
                  break
 
         reschedule_dates.append(datetime.datetime.today())
-        if  reshedule_choice == "Attendance" :
-        	print "sfsfsaffasdfsaf"
-        	create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
+        if reshedule_choice == "Attendance" or reshedule_choice == "" :
+                create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
         if session != str(1) and reshedule_choice == "Assessment" :
-          print "coming here"
-          create_gattribute(ObjectId(node),marks_entry_completed[0],False)
+          create_gattribute(ObjectId(node),marks_entry[0],False)
         task_id['Reschedule_Task'] = True
         reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_attendance_task"})
 	create_gattribute(ObjectId(node),reschedule_event,task_id)
@@ -5253,7 +5251,8 @@ def attendees_relations(request,group_id,node):
          course_assignment=False
          course_assessment=False
          reschedule = True
-         marks = False
+         #marks = False
+         marks = True
            
          member_of=node_collection.one({"_id":{'$in':event_has_attended[0].member_of}})
          if member_of.name != "Exam":
