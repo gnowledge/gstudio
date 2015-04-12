@@ -1149,11 +1149,11 @@ def get_all_resources(request,node_id):
                 obj_set.append(node._id)
                 for item in result_set:
                         obj_set.extend(item.keys())
-        resources={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        resources={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[], 'eBooks':[]}
         for each in obj_set:
                 n=node_collection.one({'_id':ObjectId(each)})
                 resources_dict=get_resources(each,resources)
-        res_dict={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[]}
+        res_dict={'Images':[],'Documents':[],'Audios':[],'Videos':[],'Interactives':[], 'eBooks':[]}
         
         for k,v in res_dict.items():
                 res_dict[k]={'fallback_lang':[],'other_languages':[]}
@@ -1200,6 +1200,7 @@ def get_contents(node_id, selected=None, choice=None):
 	page_contents = []
 	audio_contents = []
 	interactive_contents = []
+	ebook_contents = []
 	name = ""
 	ob_id = ""
 
@@ -1251,6 +1252,8 @@ def get_contents(node_id, selected=None, choice=None):
 								interactive_contents.append((name, ob_id))
 							elif attr.object_value == "Documents":
 								document_contents.append((name, ob_id))
+							elif attr.object_value == "eBooks":
+								ebook_contents.append((name, ob_id))
 
 				else:
 					if not selected or choice == left_obj.language:
@@ -1267,6 +1270,8 @@ def get_contents(node_id, selected=None, choice=None):
 							interactive_contents.append((name, ob_id))
 						elif attr.object_value == "Documents":
 							document_contents.append((name, ob_id))
+						elif attr.object_value == "eBooks":
+								ebook_contents.append((name, ob_id))
 
 							
 	if image_contents:
@@ -1283,6 +1288,9 @@ def get_contents(node_id, selected=None, choice=None):
 	
 	if interactive_contents:
 		contents['Interactives'] = interactive_contents
+
+	if ebook_contents:
+		contents['eBooks'] = ebook_contents
 	
 	# print "\n",contents,"\n"
 	return contents

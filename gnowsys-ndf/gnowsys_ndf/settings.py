@@ -548,7 +548,7 @@ RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
 RCS_REPO_DIR_HASH_LEVEL = 3
 
 
-GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "Maps", "Events", "Publications"]
+GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "eBooks", "Maps", "Events", "Publications"]
 
 GSTUDIO_RESOURCES_INTERACTIVITY_TYPE = [ "Active", "Expositive", "Mixed" ]
 
