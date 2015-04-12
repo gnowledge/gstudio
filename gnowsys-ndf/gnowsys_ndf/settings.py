@@ -417,19 +417,36 @@ LOGGING = {
 
 LOGIN_REDIRECT_URL = "/"
 
-# Absolute filesystem path to the project's base directory, 
+# Absolute filesystem path to the project's base directory,
 # i.e. having settings.py file
 # Example: "/.../project-name/app-name/"
-
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
+# Binary - Only meant for RelationType's document to represent
+# Binary relationship, especially defined to differentiate
+# from other relationship(s), i.e. Triadic, etc.
+# Example (Binary): A >> son-of >> [B]
+# Example (Triadic): A >> teaches-course-in-college >> [Course, College]
+META_TYPE = [
+    u"GAPP", u"factory_types", u"Mapping_relations", u"Binary", u"Triadic"
+]
 
-GROUP_AGENCY_TYPES=["Other", "Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
+GROUP_AGENCY_TYPES = [
+    "Other", "Partner", "GovernmentAgency", "NGO", "College", "University",
+    "School", "Institution", "Project", "SpecialInterestGroup"
+]
 
 AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
 ]
+
+# Varible to toggle the visibility of author_agency_type field of Author
+# class in User-registration template (shown as Occupation)
+GSTUDIO_REGISTRATION_AUTHOR_AGENCY_TYPE = True
+
+# Varible to toggle the visibility of group_affiliation field of Author
+# class in User-registration template (shown as Organization)
+GSTUDIO_REGISTRATION_AFFILIATION = True
 
 # Built-in GAPPS list
 # ONLY TO BE EDITED - in case of adding new built-in GAPPS
@@ -564,10 +581,10 @@ GSTUDIO_NROER_MENU = [{"Repository":[]}, {"Partners":["States", "Institutions", 
 GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"} ]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
-            "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
+            "States": "State Partners", "Institutions": "Institutional Partners", "Individuals": "Individual Partners",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
-
+            
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5

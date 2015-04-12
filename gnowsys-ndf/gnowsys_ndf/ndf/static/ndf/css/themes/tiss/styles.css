@@ -9878,58 +9878,59 @@ input.node-title {
   background-color: rgba(0, 0, 0, 0.5);
   color: #ddd;
   padding: 0.8rem;
+  padding: 0.5vw 0.75vw;
   z-index: 500;
 }
-/* line 777, ../../../scss/_app_styles.scss */
+/* line 778, ../../../scss/_app_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 780, ../../../scss/_app_styles.scss */
+/* line 781, ../../../scss/_app_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: inline;
 }
-/* line 784, ../../../scss/_app_styles.scss */
+/* line 785, ../../../scss/_app_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
   background-color: rgba(0, 0, 0, 0.9);
 }
-/* line 787, ../../../scss/_app_styles.scss */
+/* line 788, ../../../scss/_app_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 790, ../../../scss/_app_styles.scss */
+/* line 791, ../../../scss/_app_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 793, ../../../scss/_app_styles.scss */
+/* line 794, ../../../scss/_app_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
-/* line 802, ../../../scss/_app_styles.scss */
+/* line 803, ../../../scss/_app_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 805, ../../../scss/_app_styles.scss */
+/* line 806, ../../../scss/_app_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
 }
 
-/* line 812, ../../../scss/_app_styles.scss */
+/* line 813, ../../../scss/_app_styles.scss */
 .align-center {
   margin: 0 auto;
   display: block;
 }
 
-/* line 818, ../../../scss/_app_styles.scss */
+/* line 819, ../../../scss/_app_styles.scss */
 #profile-img {
   height: 40px;
   margin-right: 5px;
 }
 
-/* line 827, ../../../scss/_app_styles.scss */
+/* line 828, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies {
   padding: 10px;
   background-color: #dffbfd;
@@ -9938,11 +9939,11 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-left: 48px;
   margin-top: 10px;
 }
-/* line 836, ../../../scss/_app_styles.scss */
+/* line 837, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn {
   cursor: pointer;
 }
-/* line 840, ../../../scss/_app_styles.scss */
+/* line 841, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn:hover {
   font-weight: bold;
 }

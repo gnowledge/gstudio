@@ -3,6 +3,7 @@ import os
 import hashlib
 import datetime
 import json
+from itertools import chain  # Using from_iterable()
 
 
 # imports from installed packages
@@ -14,6 +15,7 @@ from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
 
 from mongokit import IS
+from mongokit import OR
 from mongokit import INDEX_ASCENDING, INDEX_DESCENDING
 
 try:
@@ -28,6 +30,7 @@ from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GROUP_AGENCY_TYPES, AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.rcslib import RCS
 from django.dispatch import receiver
 from registration.signals import user_registered
@@ -900,15 +903,14 @@ class AttributeType(Node):
 
 @connection.register
 class RelationType(Node):
-
     structure = {
         'inverse_name': unicode,
-        'subject_type': [ObjectId],	       # ObjectId's of Any Class
-        'object_type': [ObjectId],	       # ObjectId's of Any Class
+        'subject_type': [ObjectId],  # ObjectId's of Any Class
+        'object_type': [OR(ObjectId, list)],  # ObjectId's of Any Class
         'subject_cardinality': int,
-	'object_cardinality': int,
-	'subject_applicable_nodetype': basestring,		# NODE_TYPE_CHOICES [default (GST)]
-	'object_applicable_nodetype': basestring,
+        'object_cardinality': int,
+        'subject_applicable_nodetype': basestring,  # NODE_TYPE_CHOICES [default (GST)]
+        'object_applicable_nodetype': basestring,
         'slug': basestring,
         'is_symmetric': bool,
         'is_reflexive': bool,
@@ -920,10 +922,13 @@ class RelationType(Node):
 
     # User-Defined Functions ##########
     @staticmethod
-    def append_relation(rel_type_node, rel_dict, inverse_relation, left_or_right_subject=None):
+    def append_relation(
+        rel_type_node, rel_dict, inverse_relation, left_or_right_subject=None
+    ):
         """Appends details of a relation in format described below.
 
-        Keyword arguments: rel_type_node -- Document of RelationType
+        Keyword arguments:
+        rel_type_node -- Document of RelationType
         node rel_dict -- Dictionary to which relation-details are
         appended inverse_relation -- Boolean variable that indicates
         whether appending an relation or inverse-relation
@@ -947,16 +952,28 @@ class RelationType(Node):
           Value of RelationType node's name field,
           'subject_or_right_subject_list': List of Value(s) of
           GRelation node's subject field } }
-
         """
 
         left_or_right_subject_node = None
 
         if left_or_right_subject:
-            left_or_right_subject_node = node_collection.one({'_id': left_or_right_subject})
+            if META_TYPE[3] in rel_type_node.member_of_names_list:
+                # If Binary relationship found
+                left_or_right_subject_node = node_collection.one({
+                    '_id': left_or_right_subject
+                })
+            else:
+                left_or_right_subject_node = []
+                for each in left_or_right_subject:
+                    each_node = node_collection.one({
+                        '_id': each
+                    })
+                    left_or_right_subject_node.append(each_node)
 
             if not left_or_right_subject_node:
-                error_message = "\n AppendRelationError: Right subject with this ObjectId("+str(left_or_right_subject)+") doesn't exists !!!"
+                error_message = "\n AppendRelationError: Right subject with " \
+                    + "this ObjectId(" + str(left_or_right_subject) + ") " \
+                    + "doesn't exists !!!"
                 raise Exception(error_message)
 
         rel_name = ""
@@ -965,30 +982,33 @@ class RelationType(Node):
         subject_or_object_type = None
 
         if inverse_relation:
-          # inverse_relation = True
-          # Means looking from object type
-          # relation-type's name & inverse-name will be swapped
-          rel_name = rel_type_node.inverse_name
-          opp_rel_name = rel_type_node.name
-          if rel_type_node.altnames:
-          	if ";" in rel_type_node.altnames:
-          		alt_names = rel_type_node.altnames.split(";")[1]
-          else:
-          	alt_names = u""
-          subject_or_object_type = rel_type_node.subject_type
-          
+            # inverse_relation = True
+            # Means looking from object type
+            # relation-type's name & inverse-name will be swapped
+            rel_name = rel_type_node.inverse_name
+            opp_rel_name = rel_type_node.name
+
+            if rel_type_node.altnames:
+                if ";" in rel_type_node.altnames:
+                    alt_names = rel_type_node.altnames.split(";")[1]
+            else:
+                alt_names = u""
+
+            subject_or_object_type = rel_type_node.subject_type
+
         else:
-          # inverse_relation = False
-          # Means looking from subject type
-          # relation-type's name & inverse-name will be as it is
-          rel_name = rel_type_node.name
-          opp_rel_name = rel_type_node.inverse_name
-          if rel_type_node.altnames:
-          	if ";" in rel_type_node.altnames:
-          		alt_names = rel_type_node.altnames.split(";")[0]
-          else:
-          	alt_names = u""
-          subject_or_object_type = rel_type_node.object_type
+            # inverse_relation = False
+            # Means looking from subject type
+            # relation-type's name & inverse-name will be as it is
+            rel_name = rel_type_node.name
+            opp_rel_name = rel_type_node.inverse_name
+            if rel_type_node.altnames:
+                if ";" in rel_type_node.altnames:
+                    alt_names = rel_type_node.altnames.split(";")[0]
+            else:
+                alt_names = u""
+
+            subject_or_object_type = rel_type_node.object_type
 
         if not (rel_name in rel_dict):
             subject_or_right_subject_list = [left_or_right_subject_node] if left_or_right_subject_node else []
@@ -1506,13 +1526,12 @@ class Benchmark(DjangoDocument):
   }
   required_fields = ['name']
   use_dot_notation = True
-  
+
   def __unicode__(self):
     return self._id
-  
+
   def identity(self):
     return self.__unicode__()
-
 
 
 #  TRIPLE CLASS DEFINITIONS
@@ -1526,44 +1545,46 @@ class Triple(DjangoDocument):
     '_type': unicode,
     'name': unicode,
     'subject_scope': basestring,
-    'subject': ObjectId,	          # ObjectId's of GSystem Class
-    'lang': basestring,               # Put validation for standard language codes
+    'subject': ObjectId,  # ObjectId's of GSystem Class
+    'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
   }
-  
+
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True
+
   ########## Built-in Functions (Overridden) ##########
-  
   def __unicode__(self):
     return self._id
-  
+
   def identity(self):
     return self.__unicode__()
 
   def save(self, *args, **kwargs):
     is_new = False
-    
-    if not self.has_key('_id'):
-      is_new = True               # It's a new document, hence yet no ID!"
+
+    if "_id" not in self:
+      is_new = True  # It's a new document, hence yet no ID!"
 
     """
     Check for correct GSystemType match in AttributeType and GAttribute, similarly for RelationType and GRelation
     """
-    #it's me
-    subject_name = node_collection.one({'_id': self.subject}).name
     subject_system_flag = False
+
     subject_id = self.subject
-    subject_document = node_collection.one({"_id":self.subject})
-    # print subject_document
+    subject_document = node_collection.one({"_id": self.subject})
+    subject_name = subject_document.name
 
     subject_type_list = []
     subject_member_of_list = []
     name_value = u""
 
     if self._type == "GAttribute":
-      self.name = subject_name + " -- " + self.attribute_type['name'] + " -- " + unicode(self.object_value)
+      attribute_type_name = self.attribute_type['name']
+      attribute_object_value = unicode(self.object_value)
+
+      self.name = "%(subject_name)s -- %(attribute_type_name)s -- %(attribute_object_value)s" % locals()
       name_value = self.name
 
       subject_type_list = self.attribute_type['subject_type']
@@ -1574,7 +1595,7 @@ class Triple(DjangoDocument):
         subject_system_flag = True
 
       else:
-        # If instersection is not found with member_of fields' ObjectIds, 
+        # If instersection is not found with member_of fields' ObjectIds,
         # then check for type_of field of each one of the member_of node
         for gst_id in subject_member_of_list:
           gst_node = node_collection.one({'_id': gst_id}, {'type_of': 1})
@@ -1583,16 +1604,56 @@ class Triple(DjangoDocument):
             break
 
     elif self._type == "GRelation":
-      right_subject_document = node_collection.one({'_id': self.right_subject})
-      right_subject_name = node_collection.one({'_id': self.right_subject}).name
-      self.name = subject_name + " -- " + self.relation_type['name'] + " -- " + right_subject_name
-      name_value = self.name
-
       subject_type_list = self.relation_type['subject_type']
-      object_type_list= self.relation_type['object_type']
+      object_type_list = self.relation_type['object_type']
 
       left_subject_member_of_list = subject_document.member_of
-      right_subject_member_of_list = right_subject_document.member_of
+      relation_type_name = self.relation_type['name']
+
+      if META_TYPE[3] in self.relation_type.member_of_names_list:
+        # If Binary relationship found
+        # Single relation: ObjectId()
+        # Multi relation: [ObjectId(), ObjectId(), ...]
+        right_subject_document = node_collection.one({'_id': self.right_subject})
+
+        right_subject_member_of_list = right_subject_document.member_of
+        right_subject_name = right_subject_document.name
+
+        self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
+
+      else:
+        # Relationship Other than Binary one found; e.g, Triadic
+        # Single relation: [ObjectId(), ObjectId(), ...]
+        # Multi relation: [[ObjectId(), ObjectId(), ...], [ObjectId(), ObjectId(), ...], ...]
+        right_subject_member_of_list = []
+        right_subject_member_of_list_append = right_subject_member_of_list.append
+
+        right_subject_name_list = []
+        right_subject_name_list_append = right_subject_name_list.append
+
+        for each in self.right_subject:
+          # Here each is an ObjectId
+          right_subject_document = node_collection.one({
+            "_id": each
+          }, {
+            "name": 1, "member_of": 1
+          })
+
+          right_subject_member_of_list_append(right_subject_document.member_of)
+          right_subject_name_list_append(right_subject_document.name)
+
+        right_subject_name_list_str = " >> ".join(right_subject_name_list)
+
+        self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name_list_str)s" % locals()
+
+        # Very much required as list comparison using set doesn't work
+        # with list as it's sub-elements
+        # Hence, converting list into comma separated values by extending
+        # with other comma-separated values from another list(s)
+        object_type_list = list(chain.from_iterable(object_type_list))
+        right_subject_member_of_list = list(chain.from_iterable(right_subject_member_of_list))
+
+      name_value = self.name
 
       left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
       right_intersection = set(object_type_list) & set(right_subject_member_of_list)
@@ -1627,11 +1688,11 @@ class Triple(DjangoDocument):
           subject_system_flag = True
 
     if self._type =="GRelation" and subject_system_flag == False:
-      print "The 2 lists do not have any common element"
+      # print "The 2 lists do not have any common element"
       raise Exception("\n Cannot create the GRelation ("+name_value+") as the subject/object that you have mentioned is not a member of a GSytemType for which this RelationType is defined!!!\n")
 
     if self._type =="GAttribute" and subject_system_flag == False:
-      print "\n The 2 lists do not have any common element\n"
+      # print "\n The 2 lists do not have any common element\n"
       error_message = "\n "+name_value+ " -- subject_type_list ("+str(subject_type_list)+") -- subject_member_of_list ("+str(subject_member_of_list)+") \n"
       raise Exception(error_message + "Cannot create the GAttribute ("+name_value+") as the subject that you have mentioned is not a member of a GSystemType which this AttributeType is defined")
 
@@ -1650,7 +1711,7 @@ class Triple(DjangoDocument):
     #end of data_type_check
 
     super(Triple, self).save(*args, **kwargs)
-        
+
     history_manager = HistoryManager()
     rcs_obj = RCS()
     if is_new:
@@ -1659,7 +1720,7 @@ class Triple(DjangoDocument):
         fp = history_manager.get_file_path(self)
         message = "This document (" + self.name + ") is created on " + datetime.datetime.now().strftime("%d %B %Y")
         rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
-    
+
     else:
       # Update history-version-file
       fp = history_manager.get_file_path(self)
@@ -1697,24 +1758,22 @@ class GAttribute(Triple):
         'object_value_scope': basestring,
         'object_value': None		  # value -- it's data-type, is determined by attribute_type field
     }
-    
+
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
 
 
-  
-
 @connection.register
 class GRelation(Triple):
-
     structure = {
         'relation_type_scope': basestring,
-        'relation_type': RelationType,    # DBRef of RelationType Class
+        'relation_type': RelationType,  # DBRef of RelationType Class
         'right_subject_scope': basestring,
-        'right_subject': ObjectId,	  # ObjectId's of GSystems Class
+        # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
+        'right_subject': OR(ObjectId, list)
     }
-    
+
     required_fields = ['relation_type', 'right_subject']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents

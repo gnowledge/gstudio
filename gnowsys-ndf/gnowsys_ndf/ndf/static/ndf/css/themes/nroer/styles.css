@@ -9101,8 +9101,13 @@ th.hide-for-touch {
   height: 130px;
 }
 
+/* line 29, ../../../scss/_nroer_styles.scss */
+article.landing {
+  padding-top: 8%;
+}
+
 /* For landing page */
-/* line 31, ../../../scss/_nroer_styles.scss */
+/* line 35, ../../../scss/_nroer_styles.scss */
 #landing > header {
   background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
   position: relative;
@@ -9111,19 +9116,19 @@ th.hide-for-touch {
   padding: 1rem 0 1rem 0;
   border-bottom: 2px solid #00CEFD;
 }
-/* line 39, ../../../scss/_nroer_styles.scss */
+/* line 43, ../../../scss/_nroer_styles.scss */
 #landing > header .logo {
   color: #555;
   text-align: center;
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.8);
 }
-/* line 44, ../../../scss/_nroer_styles.scss */
+/* line 48, ../../../scss/_nroer_styles.scss */
 #landing > header .logo img {
   max-width: 75%;
   margin-bottom: 0.5rem;
 }
-/* line 49, ../../../scss/_nroer_styles.scss */
+/* line 53, ../../../scss/_nroer_styles.scss */
 #landing > header .logo h1, #landing > header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div #landing > header .logo input {
   font-size: 1.2rem;
   line-height: 1;
@@ -9132,77 +9137,120 @@ th.hide-for-touch {
   color: white;
 }
 
-/* line 62, ../../../scss/_nroer_styles.scss */
+/* line 66, ../../../scss/_nroer_styles.scss */
 .landing {
   position: relative;
 }
-/* line 65, ../../../scss/_nroer_styles.scss */
+/* line 69, ../../../scss/_nroer_styles.scss */
 .landing h2 {
   margin-top: 2rem;
 }
 
-/* line 70, ../../../scss/_nroer_styles.scss */
+/* line 74, ../../../scss/_nroer_styles.scss */
 section.promo {
   background-color: rgba(0, 0, 0, 0.9);
   border-bottom: 4px solid #00CEFD;
 }
-/* line 73, ../../../scss/_nroer_styles.scss */
+/* line 77, ../../../scss/_nroer_styles.scss */
 section.promo .meta {
   padding-left: 2rem;
   padding-right: 2rem;
 }
-/* line 76, ../../../scss/_nroer_styles.scss */
+/* line 80, ../../../scss/_nroer_styles.scss */
 section.promo .meta h4 {
   color: white;
 }
 
-/* line 83, ../../../scss/_nroer_styles.scss */
+/* line 87, ../../../scss/_nroer_styles.scss */
 ul.partner img {
   max-height: 150px;
 }
 
-/* line 88, ../../../scss/_nroer_styles.scss */
+/* line 92, ../../../scss/_nroer_styles.scss */
 div.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
   border: 2px solid #12d9e4;
   border-width: 2px 0;
 }
-/* line 93, ../../../scss/_nroer_styles.scss */
+/* line 97, ../../../scss/_nroer_styles.scss */
 div.banner > * {
   background-color: #0eacb5;
   color: #eee;
   margin: 0;
 }
-/* line 95, ../../../scss/_nroer_styles.scss */
+/* line 99, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide {
   padding: 1rem;
   margin: 0;
   background-color: #0c969d;
+  height: 24em !important;
   height: 50vh !important;
 }
-/* line 100, ../../../scss/_nroer_styles.scss */
-div.banner > * .slide > i {
+/* line 105, ../../../scss/_nroer_styles.scss */
+div.banner > * .slide .slide-back-image {
   position: absolute;
   font-size: 17rem;
+  font-size: 17vw;
   pointer-events: none;
   color: white;
-  opacity: 0.1;
-  right: 5%;
-}
-/* line 111, ../../../scss/_nroer_styles.scss */
-div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
-  color: white;
+  opacity: 0.08;
+  right: 7%;
 }
 /* line 114, ../../../scss/_nroer_styles.scss */
+div.banner > * .slide .count-box {
+  font-size: 120%;
+  font-size: 1.35vw;
+  opacity: 0.8;
+  padding-bottom: 1em;
+}
+/* line 120, ../../../scss/_nroer_styles.scss */
+div.banner > * .slide .count-box .count {
+  font-size: 1.75vw;
+  padding-right: 5px;
+}
+/* line 124, ../../../scss/_nroer_styles.scss */
+div.banner > * .slide .count-box a {
+  font-size: 1.35vw;
+}
+/* line 129, ../../../scss/_nroer_styles.scss */
+div.banner > * .slide .quotes {
+  opacity: 0.75;
+  font-family: "Times new Roman";
+  font-size: 200%;
+  font-size: 3vw;
+}
+/* line 136, ../../../scss/_nroer_styles.scss */
+div.banner > * .slide .slide-2-icons {
+  opacity: 0.5;
+  font-size: 280%;
+  font-size: 3vw;
+}
+/* line 144, ../../../scss/_nroer_styles.scss */
+div.banner > * h2, div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
+  color: white;
+}
+/* line 147, ../../../scss/_nroer_styles.scss */
+div.banner > * h2 {
+  font-size: 280%;
+  font-size: 3vw;
+}
+/* line 151, ../../../scss/_nroer_styles.scss */
+div.banner > * h3 {
+  font-size: 180%;
+  font-size: 2vw;
+}
+/* line 155, ../../../scss/_nroer_styles.scss */
 div.banner > * blockquote {
-  font-size: 140%;
+  font-size: 120%;
+  font-size: 1.35vw;
   font-style: italic;
 }
-/* line 118, ../../../scss/_nroer_styles.scss */
-div.banner > * p:first-child {
+/* line 160, ../../../scss/_nroer_styles.scss */
+div.banner > * p {
   color: white;
   font-size: 120%;
+  font-size: 1.35vw;
 }
 
 /*
@@ -9982,58 +10030,59 @@ input.node-title {
   background-color: rgba(0, 0, 0, 0.5);
   color: #ddd;
   padding: 0.8rem;
+  padding: 0.5vw 0.75vw;
   z-index: 500;
 }
-/* line 777, ../../../scss/_app_styles.scss */
+/* line 778, ../../../scss/_app_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 780, ../../../scss/_app_styles.scss */
+/* line 781, ../../../scss/_app_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: inline;
 }
-/* line 784, ../../../scss/_app_styles.scss */
+/* line 785, ../../../scss/_app_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
   background-color: rgba(0, 0, 0, 0.9);
 }
-/* line 787, ../../../scss/_app_styles.scss */
+/* line 788, ../../../scss/_app_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 790, ../../../scss/_app_styles.scss */
+/* line 791, ../../../scss/_app_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 793, ../../../scss/_app_styles.scss */
+/* line 794, ../../../scss/_app_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
-/* line 802, ../../../scss/_app_styles.scss */
+/* line 803, ../../../scss/_app_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 805, ../../../scss/_app_styles.scss */
+/* line 806, ../../../scss/_app_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
 }
 
-/* line 812, ../../../scss/_app_styles.scss */
+/* line 813, ../../../scss/_app_styles.scss */
 .align-center {
   margin: 0 auto;
   display: block;
 }
 
-/* line 818, ../../../scss/_app_styles.scss */
+/* line 819, ../../../scss/_app_styles.scss */
 #profile-img {
   height: 40px;
   margin-right: 5px;
 }
 
-/* line 827, ../../../scss/_app_styles.scss */
+/* line 828, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies {
   padding: 10px;
   background-color: #dffbfd;
@@ -10042,11 +10091,11 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-left: 48px;
   margin-top: 10px;
 }
-/* line 836, ../../../scss/_app_styles.scss */
+/* line 837, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn {
   cursor: pointer;
 }
-/* line 840, ../../../scss/_app_styles.scss */
+/* line 841, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn:hover {
   font-weight: bold;
 }

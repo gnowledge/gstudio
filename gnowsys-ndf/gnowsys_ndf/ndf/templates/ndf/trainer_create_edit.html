@@ -427,13 +427,8 @@
                   {% blocktrans with label_val=nussd_course_type.altnames %} {{label_val}} {% endblocktrans %}
                 </label>
               </div>
-              <div class="small-6 columns">
+              <div class="small-6 columns end">
                 {% html_widget groupid "" nussd_course_type %}
-              </div>
-
-              <!-- View button: To populate course details -->
-              <div class="small-2 columns end">
-                <input type="button" class="button tiny round expand" value="View" id="btnCourseDetails">
               </div>
             </div>
           </div>
@@ -642,118 +637,107 @@
       tab_id = parent_tab.attr("id");
       // Special case for Course tab
       if (tab_id == "panel_{{property_order_list.2.0}}") {
-        var row_count = $("#tblCourseDetails >tbody >tr").length;
+        event.preventDefault();
 
-        if (row_count < 2) {
-          $("#alertModalLabel").text("Add atleast two Courses which you volunteer to teach. To do so please follow below instructions:<br>1. Click on 'View' button, to change Course Type<br>2. Select required Course enrollment details and add it.");
-          $("#alertModal").addClass("alert");
-          $("#alertModal").foundation('reveal', 'open');
-          
-          return false;
-        }
+        // Reset course_requirements (dictionary), only when node exists meaning while editing
+          if (node_id != "") {
+            if (JSON.stringify(course_requirements) == "{}") {
+              course_requirements = node_course_requirements;
+            }
 
-        else {
-          event.preventDefault();
+            else {
+              $.each(course_requirements, function(k, v) {
+                if (node_course_requirements.hasOwnProperty(k)) {
+                  $.each(course_requirements[k], function(index, dict_val) {
+                    $.each(node_course_requirements[k], function(index, node_dict_val) {
+                      if (dict_val["text"] == node_dict_val["text"]) {
+                        dict_val["has_qualification"] = node_dict_val["has_qualification"];
+                        return false;
+                      }
+                    });
+                  });
+                }
+              });
+            }
+          }
 
-          // Reset course_requirements (dictionary), only when node exists meaning while editing
-            if (node_id != "") {
-              if (JSON.stringify(course_requirements) == "{}") {
-                course_requirements = node_course_requirements;
+        // Set Course Requirements
+          fieldset = "";
+          course_list = [];
+          main_fieldset_legend = "";
+          $("#tblCourseDetails > tbody > tr").each(function(index) {
+            courseSelected = $(this).find(".course").html();
+            
+            if (course_list.indexOf(courseSelected) < 0) {
+              course_list.push(courseSelected);
+
+              main_fieldset_legend_name = '{% trans "Course Qualification Specifications" %}'
+              main_fieldset_legend = "<legend>" +
+                                        "<label><b>" + main_fieldset_legend_name + "</b></label>" +
+                                      "</legend>"
+
+              inner_fieldset_legend_name = '{% trans "' + courseSelected + '" %}'
+              inner_fieldset_legend = "<legend>" +
+                                        "<label><b>" + inner_fieldset_legend_name + "</b></label>" +
+                                      "</legend>"
+
+              if (course_requirements.hasOwnProperty(courseSelected) && course_requirements[courseSelected] != "None") {
+                th1 = "{% trans 'Mandatory' %}"
+                th2 = "{% trans 'Qualifications' %}"
+                th3 = "{% trans 'Select' %}"
+                specification_table_head = "<thead>" + 
+                                             "<th class='width-10p text-center'>" + th1 + "</th>" +
+                                             "<th class='width-80p'>" + th2 + "</th>" +
+                                             "<th class='width-10p text-center'>" + th3 + "</th>" +
+                                           "</thead>"
+
+                table_rows = ""
+
+                $.each(course_requirements[courseSelected], function(index, requirement_dict){
+                  td1 = "<i class='fi-x medium'></i>";
+                  if (requirement_dict["mandatory"]) {
+                    td1 = "<i class='fi-check medium'></i>";
+                  }
+
+                  td2 = requirement_dict["text"];
+                  td3 = "<input type='checkbox' class='margin-0r requirement' id='has_requirement_'" + (index+1) + " name='has_requirement_'" + (index+1) + ">";
+                  if (requirement_dict.hasOwnProperty("has_qualification")) {
+                    if (requirement_dict["has_qualification"]) {
+                      td3 = "<input type='checkbox' class='margin-0r requirement' id='has_requirement_'" + (index+1) + " name='has_requirement_'" + (index+1) + " checked=''>";
+                    }
+                  }
+                  table_rows += "<tr>" +
+                                  "<td class='mandatory text-center'>" + td1 + "</td>" +
+                                  "<td class='text'>" + td2 + "</td>" +
+                                  "<td class='other text-center'>" + td3 + "</td>" +
+                               "</tr>"
+                });
+
+                specification_table_body = "<tbody>" + 
+                                              table_rows +
+                                           "</tbody>"
+
+                specification_table = "<table id='tblCourseRequirements'>" + 
+                                        specification_table_head +
+                                        specification_table_body +
+                                      "</table>"
               }
 
               else {
-                $.each(course_requirements, function(k, v) {
-                  if (node_course_requirements.hasOwnProperty(k)) {
-                    $.each(course_requirements[k], function(index, dict_val) {
-                      $.each(node_course_requirements[k], function(index, node_dict_val) {
-                        if (dict_val["text"] == node_dict_val["text"]) {
-                          dict_val["has_qualification"] = node_dict_val["has_qualification"];
-                          return false;
-                        }
-                      });
-                    });
-                  }
-                });
+                // Dont show table
+                specification_table = "<label class='note'>No qualification specifications are defined for this course !!!</label>"
               }
+
+              fieldset += "<fieldset id='fs" + (index + 1) + "'>" +
+                            inner_fieldset_legend +
+                            specification_table +
+                          "</fieldset>"
             }
+          });
+          $("#fsCourseRequirements").html(main_fieldset_legend + fieldset);
 
-          // Set Course Requirements
-            fieldset = ""
-            course_list = []
-            $("#tblCourseDetails > tbody > tr").each(function(index) {
-              courseSelected = $(this).find(".course").html();
-              
-              if (course_list.indexOf(courseSelected) < 0) {
-                course_list.push(courseSelected);
-
-                main_fieldset_legend_name = '{% trans "Course Qualification Specifications" %}'
-                main_fieldset_legend = "<legend>" +
-                                          "<label><b>" + main_fieldset_legend_name + "</b></label>" +
-                                        "</legend>"
-
-                inner_fieldset_legend_name = '{% trans "' + courseSelected + '" %}'
-                inner_fieldset_legend = "<legend>" +
-                                          "<label><b>" + inner_fieldset_legend_name + "</b></label>" +
-                                        "</legend>"
-
-                if (course_requirements.hasOwnProperty(courseSelected) && course_requirements[courseSelected] != "None") {
-                  th1 = "{% trans 'Mandatory' %}"
-                  th2 = "{% trans 'Qualifications' %}"
-                  th3 = "{% trans 'Select' %}"
-                  specification_table_head = "<thead>" + 
-                                               "<th class='width-10p text-center'>" + th1 + "</th>" +
-                                               "<th class='width-80p'>" + th2 + "</th>" +
-                                               "<th class='width-10p text-center'>" + th3 + "</th>" +
-                                             "</thead>"
-
-                  table_rows = ""
-
-                  $.each(course_requirements[courseSelected], function(index, requirement_dict){
-                    td1 = "<i class='fi-x medium'></i>";
-                    if (requirement_dict["mandatory"]) {
-                      td1 = "<i class='fi-check medium'></i>";
-                    }
-
-                    td2 = requirement_dict["text"];
-                    td3 = "<input type='checkbox' class='margin-0r requirement' id='has_requirement_'" + (index+1) + " name='has_requirement_'" + (index+1) + ">";
-                    if (requirement_dict.hasOwnProperty("has_qualification")) {
-                      if (requirement_dict["has_qualification"]) {
-                        td3 = "<input type='checkbox' class='margin-0r requirement' id='has_requirement_'" + (index+1) + " name='has_requirement_'" + (index+1) + " checked=''>";
-                      }
-                    }
-                    table_rows += "<tr>" +
-                                    "<td class='mandatory text-center'>" + td1 + "</td>" +
-                                    "<td class='text'>" + td2 + "</td>" +
-                                    "<td class='other text-center'>" + td3 + "</td>" +
-                                 "</tr>"
-                  });
-
-                  specification_table_body = "<tbody>" + 
-                                                table_rows +
-                                             "</tbody>"
-
-                  specification_table = "<table id='tblCourseRequirements'>" + 
-                                          specification_table_head +
-                                          specification_table_body +
-                                        "</table>"
-                }
-
-                else {
-                  // Dont show table
-                  specification_table = "<label class='note'>No qualification specifications are defined for this course !!!</label>"
-                }
-
-                fieldset += "<fieldset id='fs" + (index + 1) + "'>" +
-                              inner_fieldset_legend +
-                              specification_table +
-                            "</fieldset>"
-              }
-            });
-            $("#fsCourseRequirements").html(main_fieldset_legend + fieldset);
-
-          // Move to next Tab
-          $('.active').removeClass('active').next().addClass('active');
-        }
+        // Move to next Tab
+        $('.active').removeClass('active').next().addClass('active');
       }
 
       else if(parent_tab.find(':input[data-invalid]').length == 0) {
@@ -868,32 +852,41 @@
       });
     }
 
+  function is_course_n_college_set(course_college_list, value_as_list) {
+    for (var i = 0; i < course_college_list.length; i++) {
+      if (course_college_list[i][0] === value_as_list[0] && course_college_list[i][1] === value_as_list[1]) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  var prev_nussd_course_type = "";
   // If "nussd_course_type" is changed --------------------------------------------------------------
-    $("#nussd_course_type").on('change click', function(){
+    $("#nussd_course_type").on('change', function(){
       // Empty all dropdowns of "fsCourseDetails" -------------------------------------------------------
         empty3Select();
 
       // hide fieldset (fsCourseDetails)
         $("#fsCourseDetails").addClass("hide");
-    });
 
-  // On click of "btnCourseDetails" -----------------------------------------------------------------
-    $("#btnCourseDetails").click(function() {
-      // Forcefully blur nussd_course_type, so that it becomes data-invalid if not fill
-      $("#nussd_course_type").blur();
+      nussd_course_type = $("#nussd_course_type").val();
 
-      // Then check for data-invalid attribute
-      // if it doesn't exists, then only proceed to next step
-      if($("#nussd_course_type").attr("data-invalid") != "" && !$("#nussd_course_type").attr("data-invalid")) {
-
+      if(prev_nussd_course_type != nussd_course_type) {
         // Check whether any rows in "tblCourseDetails" exists
         // If yes, extract "ann_course_id" from those rows
-        ann_course_id_list = [];
+        course_n_college_list = [];
         $("#tblCourseDetails > tbody > tr").each(function() {
-          ann_course_id_list.push($(this).find(".ann_course_id").attr("id"));
+          row = $(this).find(".ann_course_id");
+          row_course_id = row.data("courseId");
+          row_organization_id = row.data("organizationId");
+
+          course_n_college_list.push([row_course_id, row_organization_id])
         });
 
-        nussd_course_type = $("#nussd_course_type").val();
+        // Reset prev_nussd_course_type
+        prev_nussd_course_type = nussd_course_type;
         success_state = false;
         $.ajax({
           url: "{% url 'get_course_details_for_trainer' group_id %}",
@@ -920,6 +913,8 @@
 
             if (success_state) {
               // Populate course_data (dictionary)
+              course_data = {};
+
               $.each(data["course_enrollement_details"], function(k, v_list){
                 // Add Course
                 if (!course_data.hasOwnProperty(k)) {
@@ -933,9 +928,9 @@
                   }
 
                   if (!course_data[k][v_dict["university"]].hasOwnProperty(v_dict["college"])) {
-                    if (ann_course_id_list.indexOf(v_dict["ann_course_id"]) < 0) {
+                    if (!is_course_n_college_set(course_n_college_list, [v_dict["ann_course_id"], v_dict["organization_id"]])) {
                       // Doesn't exists in table-rows, so add it
-                      course_data[k][v_dict["university"]][v_dict["college"]] = v_dict["ann_course_id"];
+                      course_data[k][v_dict["university"]][v_dict["college"]] = [v_dict["ann_course_id"], v_dict["organization_id"]];
                     }
 
                     else {
@@ -1022,7 +1017,9 @@
         courseSelected = $("#selCourse").val();
         universitySelected = $("#selUniversity").val();
         collegeSelected = $("#selCollege").val();
-        ann_course_id = course_data[courseSelected][universitySelected][collegeSelected]
+
+        ann_course_id = course_data[courseSelected][universitySelected][collegeSelected][0]
+        organization_id = course_data[courseSelected][universitySelected][collegeSelected][1]
 
         // Remove from course_data, and
         // from respective College, University & Course dropdown
@@ -1053,7 +1050,7 @@
                           "<td class='course'>" + courseSelected + "</td>" +
                           "<td class='college'>" + collegeSelected + "</td>" +
                           "<td class='text-center other'>" +
-                            "<input type='checkbox' class='ann_course_id' style='margin: 0.4rem 0 0 0;' id='"+ ann_course_id +"' name='delete_course'>" +
+                            "<input type='checkbox' class='ann_course_id' style='margin: 0.4rem 0 0 0;' id='"+ ann_course_id +"' name='delete_course' data-course-id='"+ ann_course_id +"' data-organization-id='"+ organization_id +"' >" +
                             "<input type='hidden' class='university' value='" + universitySelected + "' >" +
                           "</td>" +
                         "</tr>"
@@ -1121,12 +1118,11 @@
             table_row = $(this).closest("tr");
 
             // Fetch Course enrollment details from given row
-            // Course, University, College & Announced Course Id
+            // Course, University, College & Course Id
             courseSelected = table_row.find(".course").html();
             collegeSelected = table_row.find(".college").html();
             universitySelected = table_row.find(".university").val();
             annCourseIdSelected = table_row.find(".ann_course_id").attr("id");
-
 
             // Add fetched data into course_data
             if (course_data.hasOwnProperty(courseSelected)) {
@@ -1190,14 +1186,21 @@
     });
 
   // On click of "btnSaveTrainer" -------------------------------------------------------------------
-    $(document).on("click", "#btnSaveTrainer", function() {
-      // Store Announced Courses
-        ann_course_id_list = []
+    $(document).on("click", "#btnSaveTrainer", function(event) {
+      // Store Course(s) & Organization (College for Voulntary Teacher / University for Master Trainer)
+        // This list holds list(s) where each list has course and organization Ids
+        course_n_organization_id = [];
+
         $("#tblCourseDetails > tbody > tr").each(function() {
-          ann_course_id_list.push($(this).find(".ann_course_id").attr("id"));
+          row = $(this).find(".ann_course_id");
+
+          row_course_id = row.data("courseId");
+          row_organization_id = row.data("organizationId");
+
+          course_n_organization_id.push([row_course_id, row_organization_id]);
         });
 
-        $("input[name='{{property_order_list.2.1.0.name}}']").val(JSON.stringify(ann_course_id_list));
+        $("input[name='{{property_order_list.2.1.0.name}}']").val(JSON.stringify(course_n_organization_id));
 
       // Store trainer's Course specification
         course_requirements_list = [];
@@ -1233,18 +1236,18 @@
         $("#selCollege").removeAttr("required");
 
       // Store concatenated value of first, middle & last name field's values into name field (hidden input field)
-        name = ""
-        first_name = $("#first_name").val().trim()
-        middle_name = $("#middle_name").val().trim()
-        last_name = $("#last_name").val().trim()
+        name = "";
+        first_name = $("#first_name").val().trim();
+        middle_name = $("#middle_name").val().trim();
+        last_name = $("#last_name").val().trim();
 
-        name = first_name
+        name = first_name;
         if (middle_name != "") {
-          name = first_name + " " + middle_name
+          name = first_name + " " + middle_name;
         }
 
         if (last_name != "") {
-          name = name + " " + last_name
+          name = name + " " + last_name;
         }
 
         $("#name").val(name);
@@ -1308,15 +1311,15 @@
 
   // Signature Upload File Size Limit ---------------------------------------------------------------
     $("#uploadBtn_signature").change(function() {
-      var max_size = 40
-      var fsize=this.files[0].size
-      fsize=fsize/1024
-      if(fsize<=max_size){
+      var max_size = 40;
+      var fsize = this.files[0].size;
+      fsize = fsize/1024;
+      if(fsize <= max_size) {
         $('#uploadFile_signature').val(this.value);
-        }
+      }
       else {
         alert("Sorry. Max File Size Limit Exceeded");
-        $(this).val("")
+        $(this).val("");
         $('#uploadFile_signature').val(this.value);
       }
     });
@@ -1367,19 +1370,19 @@
 
   // Fill "tblCourseDetails", if editing node & values already exist for ann_course_id --------------
     {% if title == "Voluntary Teacher" %}
-      {% for each in node.trainer_of_course %}
-        course_details = "{{each.name}}"
-        course_details = course_details.split(" -- ");
+      {% for each_course_college in node.trainer_teaches_course_in_college %}
+        // Returns another list holding elements in following order
+        // course-type, course-name, college-name, course-id, college-id
 
         // Add a row with values (taken from node's attribute) into table
         var table_row = "<tr>" +
                           "<td class='counter'>{{forloop.counter}}.</td>" +
-                          "<td class='courseType'>" + course_details[1] + "</td>" +
-                          "<td class='course'>" + course_details[0] + "</td>" +
-                          "<td class='college'>" + course_details[2] + "</td>" +
+                          "<td class='courseType'>{{each_course_college.0}}</td>" +
+                          "<td class='course'>{{each_course_college.1}}</td>" +
+                          "<td class='college'>{{each_course_college.2}}</td>" +
                           "<td class='text-center other'>" +
-                            "<input type='checkbox' class='ann_course_id' style='margin: 0.4rem 0 0 0;' id='{{each.pk}}' name='delete_course'>" +
-                            "<input type='hidden' class='university' value='' >" +
+                            "<input type='checkbox' class='ann_course_id' style='margin: 0.4rem 0 0 0;' id='{{each_course_college.3}}' name='delete_course' data-course-id='{{each_course_college.3}}' data-organization-id='{{each_course_college.4}}' >" +
+                            "<input type='hidden' class='university' value='{{each_course_college.5}}' >" +
                           "</td>" +
                         "</tr>"
         $("#tblCourseDetails > tbody:last").append(table_row);
@@ -1467,5 +1470,4 @@
       {% endfor %}
 
     {% endif %}
-
 {% endblock %}
