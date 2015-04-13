@@ -41,16 +41,16 @@
 
   <style>
 
-    div.group-link > a{
-      color: black;
-      font-size: 1.25em;
+    /*div.group-link > a{*/
+      /*color: black;*/
+      /*font-size: 1.25em;*/
       /*padding-top: 0.5em;*/
-    }
-
+    /*}*/
+/*
     div.group-link {padding-top: 0.6em;}
 
     ul.nroer-menu > li.active { box-shadow: 0 4px 0 0 #0eacb5; }
-
+*/
     {% block style %}{% endblock %}
 
   </style>
@@ -59,344 +59,26 @@
 
 <body itemscope itemtype="http://schema.org/Webpage">
     
-    {% get_group_object groupid as group_object %}
-    {% check_accounts_url request.path as is_ac_url %}
+  {% get_group_object groupid as group_object %}
+  {% check_accounts_url request.path as is_ac_url %}
 
-    <nav class="top-bar drop-shadow row" data-topbar role="navigation">
+  {% include "ndf/header.html" %}
+  
+  <div class="workspace">
+    <div class="off-canvas-wrap" data-offcanvas>
+      <div class="inner-wrap">
 
-      <ul class="title-area ">
-        
-        <li class="name">
-            <h1>
-              <a href="{{site.HOME_PAGE|default_if_none:'/home/'}}" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a>
-            </h1>
-        </li>
-
-        <li class="toggle-topbar menu-icon">
-          <a href="#">{% trans "Menu" %}</a>
-        </li>
-
-      </ul>
-
-     <section class="top-bar-section">
-
-      <!-- Left Nav Section -->
-
-      <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
-      {% if site.SITE_NAME == "NROER" %} 
-      
-        <!-- NROER level one menu -->
-        {% get_nroer_menu request group_name_tag as nroer_menu %}
-
-        <ul class="left">
-
-          <li>
-            <!-- <a href="{#% url 'GAPPS' 'home' 'topics' %#}" {#% if nroer_menu.top_menu_selected == "Repository" %#}class="active"{#% endif %#}> -->
-            <a href="{% url 'repository' 'home' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
-              Repository
-            </a>
-          </li>
-
-          {% for each_menu in nroer_menu.top_menus %}
-            {% for menuk, menuv in each_menu.items %}
-
-            <li class="has-dropdown">
-              <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
-                href="{% url 'nroer_groups' 'home' menuk %}" 
-              > {{menuk}} </a>
-              <ul class="dropdown">
-                {% for each_sub_menu in menuv %}
-                <li>
-                  <a 
-                  {% for mapk, mapv in nroer_menu.mapping.items %}
-                    {% if each_sub_menu == mapk %}
-                      href="{% url 'partnerlist' mapv %}"
-                      {% if nroer_menu.sub_menu_selected == mapk %}
-                        class="active" 
-                      {% endif %}
-                    {% endif %}
-                  {% endfor %}
-                  >{{each_sub_menu}}
-                  </a>
-                </li>
-                {% endfor %}
-              </ul>
-            </li>
-
-            {% endfor %}
-          {% endfor %}
-
-        </ul>
-        <!-- -END of NROER level one menu -->
-      {% else %}
-      <ul class="left">
-
-        <!-- Current group selector -->
-        <li class="has-dropdown group">
-          <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
-            {{group_object.name|truncatechars:20}}
-          </a>
-          
-          <!-- If logged in show user groups -->
-          {% if user.is_authenticated %}
-          {% get_user_group request.user group_object.name as groups %}
-
-          {% else %}  
-          {% get_existing_groups_excluded group_object.name as groups %}
-
-          {% endif %} 
-
-          <!-- dropdown for group's -->
-          <ul class="dropdown">
-            
-            {% if groups == "None" %}
-              <li id="{{gp_id}}">
-                <a class="group" href="{% url 'groupchange' 'None' %}">{{gp_id}}</a>
-              </li>
-
-            {% else %}
-              {% for group_node in groups|slice:":10" %}
-                <li id="{{group_node}}">
-                {% if "Author" in group_node.member_of_names_list %}
-                <a data-tooltip aria-haspopup="true" class="has-tip tip-right" title="{{group_node.name|default:' -- '}}" class="group" href="{% url 'dashboard' request.user.pk %}">
-                  {{group_node.name|truncatechars:20}} (User group)
-                </a>
-                {% else %}
-                <a data-tooltip aria-haspopup="true" class="has-tip tip-right" title="{{group_node.name|default:' -- '}}" class="group" href="{% url 'groupchange' group_node.name %}">
-                  {{group_node.name|truncatechars:20}}
-                </a>
-                {% endif %}
-                </li>
-              {% endfor %}  
-            {% endif %} 
-
-            <li id="more_groups">
-              <a class="group" href="{% url 'group' 'home' %}">{% trans "See more groups..." %}</a>
-            </li>
-          </ul>
-          <!-- END of dropdown for group's -->
-
-        </li>
-
-      </ul>
-      {% endif %}
-      <!-- Closes Left Nav section -->
-
-       <!-- Right Nav Section -->
-      <ul class="right">
-
-      <!-- Language selector--> 
-      <li class="has-form"> 
-        <a href="#" class="rounded language button"  data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
-
-          <div id="languageModal" class="small reveal-modal" data-reveal> 
-              
-            <h3>Preferred language</h3> 
-            <form action="/i18n/setlang/" method="POST">
-              {% csrf_token %}
-              <!-- <input name="next" type="hidden" value="/pref_lang/?url={{request.path}}&group_id={{group_id}}&appid={{appId}}"/> -->
-              <input name="url" type="hidden" value="{{request.get_full_path}}"/>
-
-              <select name="language" id="lan">
-                {% for lang in LANGUAGES %}
-                <option value="{{ lang.0 }}">{{ lang.1 }}</option>
-                {% endfor %}
-              </select>
-              <input type="submit" class="button" value='{% trans "Set Language" %}' />
-                  <a class="close-reveal-modal">&#215;</a>
-            </form>
-
-            {% comment %}       
-            <!--                       {% get_languages as lan %} -->
-            <!--                   <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>     -->
-            <!--                   <h3>Secondary language</h3> -->
-            <!--                   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>       -->
-            <!--                   <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/> -->
-            <!--                   <a class="close-reveal-modal">&#215;</a> -->
-            {% endcomment %}
-
-          </div> 
-        </li>
-        <!-- end of language selector -->
-
-        <!-- If logged in show user options -->
-        {% if user.is_authenticated %}
-        <li class="has-dropdown">
-          {% get_profile_pic request.user.pk as prof_pic %}
-
-          {% if prof_pic %}
-          <a href="{% url 'dashboard' request.user.pk %}">
-            <img src="{% url 'getFileThumbnail' group_object prof_pic.pk %}" id="profile-img">
-            {{ user.username }}
-          </a>
-          
-          {% else %}
-          <a class="user" data-gnow="#aabb44" href="{% url 'dashboard' request.user.pk %}">
-            {{ user.username }}
-          </a>
-          {% endif %}
-          
-          <ul class="dropdown text-center">
-                
-            <li class="text-center">
-              <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
-            </li>
-            {% if user.is_superuser %}
-            <li class="text-center">
-              <a href="/admin/data">{% trans "Admin Data" %}</a>
-            </li>
-            <li class="text-center">
-              <a href="/admin/designer">{% trans "Admin Designer" %}</a>
-            </li>
-            {% endif %}
-            <li>
-              <a class="logout" href="{% url 'auth_logout' %}">
-                <i class="fi-power"></i> &nbsp;{% trans "Logout" %}
-              </a>
-            </li>
-          </ul>
-        </li>
-
-        <!-- Else show login link -->
-        {% else %}
-        <!-- 
-        check_accounts_url:
-          If accounts related url exists in path, then returns True; otherwise False
-
-        Required only for:
-          If path is other than accounts then only append it for redirection after login
-          Otherwise it will get into unending loop i.e. as soon as logs-in it gets logged-out
-          as redirection-url was of logout; similar case with password-reset!
-        -->
-        
-        <li class="has-form">
-          <a class="button" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
-            <i class="fi-key"></i> {% trans "Login" %}
-          </a>
-        </li>
-        {% endif %}
-        </ul>  
-        <!-- Closes Right Nav section -->
-
-      </section>
-    </nav>
-
-    <div class="workspace">
-      <div class="off-canvas-wrap" data-offcanvas>
-        <div class="inner-wrap">
-
-         <!-- Off Canvas Meta Map -->
-         <aside id="help" class="left-off-canvas-menu">
-           <!-- whatever you want goes here -->
-           <!-- <h4><i class='fi-info'></i> Help</h4> -->
-           <ul class="off-canvas-list">
+        <!-- Off Canvas Meta Map -->
+        <aside id="help" class="left-off-canvas-menu">
+          <!-- whatever you want goes here -->
+          <!-- <h4><i class='fi-info'></i> Help</h4> -->
+          <ul class="off-canvas-list">
             <!-- Shelf content code and logic -->
             {% block shelf_content %} {% endblock %}
           </ul>
         </aside>
 
         <main class="row">
-          {% if not is_ac_url %}
-          {% if request.path != "/welcome" %}
-          <!--
-          This menu-bar is meant especially for group which is selected 
-          from group's dropdown visible on site-bar.
-
-          Must be visible only when visiting a group.
-
-          Hence, via checking url (using 'check_accounts_url' templatetag) 
-          restricting visibility of this menu-bar.
-          -->
-          <nav class="drop-shadow">
-            <div class="button-bar app">
-              <!-- one that appears on left top, under main logo -->
-              <div class="medium-2 columns group-link">
-                <!-- <li class="left">
-                  <a id="toggle-shelf" class="button left-off-canvas-toggle"><i class='button fi-book-bookmark'></i></a> 
-                </li> -->
-
-                <!-- <li> -->
-                {% if group_name_tag %}
-                  
-                    {% if not "/partner/" in request.path %}
-                    <!-- while listing the partners and/or groups cards dont show any text -->
-                      {% if "/dashboard/group" in request.path %}
-                        <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
-                          <i class="fi-record"></i> About
-                        </a>
-                      {% else %}
-                        <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
-                          <i class="fi-results"></i> Updates
-                        </a>
-                      {% endif %}
-                    {% endif %}
-
-                {% endif %}
-                <!-- </li> -->
-              </div>
-
-              <!-- group level gapps which appears at LHS of search bar -->
-
-              <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
-              {% if site.SITE_NAME == "NROER" %} 
-              
-                {% if group_name_tag == "home" %}
-                <!-- NROER level-two menu -->
-                  {% if request.path|length > 6 and "repository" not in request.path %}
-                    {% if "/partner/" not in request.path %}
-                    <ul class="button-group nroer-menu">
-                    {% for each_gapp in nroer_menu.gapps %}
-                      {% for k, v in each_gapp.items %}
-                        <li {% if v == nroer_menu.selected_gapp %}class="active"{% endif %}>
-                          <!-- <a class="button" {#% if v %#} href="{#% url 'GAPPS' group_name_tag v %#}" {#% endif %#}> -->
-                          <a class="button" {% if v %} href="{% url v group_name_tag %}" {% endif %}>
-                            {{k}}
-                          </a>
-                        </li>
-                      {% endfor %}
-                    {% endfor %}
-                    </ul>
-                  {% endif %}
-                  {% endif %}
-                {% else %}
-                  {% get_gapps_iconbar request groupid %}
-                {% endif %}
-              <!-- END of NROER level two menu -->
-              {% else %}
-                {% get_gapps_iconbar request groupid %}
-              {% endif %}
-
-              <ul class="tools button-group medium-2 columns right">
-                
-                <!-- search in the app bar -->
-                <li class="has-form">
-                  <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-                    name="search_form" method="GET" >
-                    <div class="row collapse">
-                      <div class="large-10 columns">
-                        <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
-                      </div>
-                      <div class="large-2 columns">
-                        <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
-                      </div>
-                    </div>
-                  </form>
-                </li>
-
-                <!-- help documentation for every app -->
-                <!--
-                <li class="right">
-                  <a id="toggle-help" class="button right-off-canvas-toggle" >
-                    <i class='button fi-lightbulb'></i>
-                  </a>
-                </li>
-                --> 
-              </ul>
-            </div>
-          </nav>
-          {% endif%} <!-- end of "/welcome" landing page check -->
-          {% endif %} <!-- end of "accounts" urls check -->
-
           <!-- Start of sidebar section (main aside) -->
           <aside class="medium-2 columns">
             <div>
@@ -417,7 +99,7 @@
               </section>
 
               <div>
-              {% block add_resource_content %}  {% endblock %}
+                {% block add_resource_content %}  {% endblock %}
               </div>
             </div>
           </aside>
@@ -425,49 +107,27 @@
 
           <!-- Start of content section -->
           <article class="medium-10 columns">
-          <!-- The actual body content -->
-          <!-- Url redirection -->
+            <!-- The actual body content -->
+            <!-- Url redirection -->
 
-          {% get_group_type request.path request.user as group_type %}
-          
-          {% if group_type %}
-          {% block body_content %} {% endblock %} 
-          {% block extra_content %}  {% endblock %}  
-          {% endif %}
+            {% get_group_type request.path request.user as group_type %}
+            
+            {% if group_type %}
+            {% block body_content %} {% endblock %} 
+            {% block extra_content %}  {% endblock %}  
+            {% endif %}
 
-          <input type="hidden" value="{{newgroup}}"> 
-          <input type="hidden" value="{{groupid}}"> 
+            <input type="hidden" value="{{newgroup}}"> 
+            <input type="hidden" value="{{groupid}}"> 
 
           </article>
-        {% block data_review_pagination %}  {% endblock %}
-        <!-- End of content section --> 
-      </main>
-
-      <!-- Off Canvas User Shelf -->
-      {% comment %}
-      <!-- 
-      <aside id="help"  class="right-off-canvas-menu">
-        <ul class="off-canvas-list">
-
-          <li><label><h4>{% trans "User Guide" %}</h4></label></li>
-          {% block detailed_help_content %}  {% endblock %}
-          <li><label>{% trans "About this Application" %}</label></li>
-          {% block help_content %}  {% endblock %}
-          <li><label>{% trans "About this Group" %}</label></li>
-          {% block about_group %}  {% endblock %}
-          <li><label>Meta Studio {% trans "Version" %} 0.8.23</label></li>
-          <li><a href="#">{% trans "About metaStudio" %}</a></li>
-        </ul>
-      </aside>
-      -->
-      {% endcomment %}
-      <!-- close the off-canvas menu -->
-      
-      <a class="exit-off-canvas"></a>
-
+          {% block data_review_pagination %}  {% endblock %}
+          <!-- End of content section --> 
+        </main>
+      </div>
     </div>
   </div>
-</div>
+  <!-- end of workspace -->
 
   {% include "ndf/footer.html" with site=site %}
 
