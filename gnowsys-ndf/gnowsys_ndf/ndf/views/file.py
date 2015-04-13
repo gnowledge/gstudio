@@ -24,21 +24,14 @@ from django.contrib.auth.models import User
 from mongokit import paginator
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_node_common_fields, set_all_urls,get_execution_time
-from gnowsys_ndf.ndf.views.methods import get_group_name_id
-from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
+from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id  # , get_page
 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, MEDIA_ROOT  # , EXTRA_LANG_INFO, GAPPS
-from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
-# from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
-from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
-from gnowsys_ndf.ndf.views.methods import get_group_name_id, create_gattribute
 
 ############################################
 
@@ -954,6 +947,15 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
             count = count + 1
+
+            # Create a task for curators and assign task
+            if mod_group:
+              task_node = node_collection.collection.GSystem()
+              GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
+
+              get_node_common_fields(request, task_node, mod_group._id, GST_TASK)
+
+
             return fileobj._id, is_video
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
