@@ -325,8 +325,8 @@ table, th, td {
                    <fieldset> 
                           
                           
-                          <div class = "row" aling="center">
-                                <label> <h5> Please select what you want to reschedule <h5> </label>
+                          <div class = "row" align="center">
+                                <label> <h5> Please select what you want to reschedule </h5> </label>
                                 <br>
 
                                 <form>
@@ -737,7 +737,7 @@ if ( pass[0] == 'Edit'){
       {
         $('#attendance').append("<div class='row'>" 
          + "<div class='small-8 columns'> "
-         + " <fieldset>   "
+         + " <fieldset>"
          + "<div id='assessmentdiv'> <input type='checkbox'  class='assessmentchkbx' id='assessmentchkbx'> Assessment Done </div>"
          + "<div id='attendancediv'> <input type='checkbox'  class='attendancechkbx' id='attendancechkbx'> Attendance Done </div>"
          + " <br> <span style='color:red;'> Note:- Edit option will be closed after asessment is done. </span> "
@@ -765,20 +765,23 @@ else
 {     
         
       $('#attendance').append("<input class='tiny button' id='d' onclick='Download("+pass[1]+")' value='Download'>")
-      if(reschedule == true || marks_enter  == true)
+      
+      if(reschedule == true || marks_enter  == false)
            {
               $('#attendance').append("<input class='tiny button' id='d' onclick=EditAttendance('Edit') value='Edit'>" )
            }
       if(reschedule == false)
       {
+        <!-- reschedule == false meaning event edit functionality if closed and reschedule is not allow -->
         if ('{{Add}}' == 'Allow'){
-          $('#attendance').append("<input class='tiny button'  onclick=reschedule_time('attendance_reschedule') value='Re-Schedule'>" )
+          <!-- if admin show the reschedule till panel  --> 
+          $('#attendance').append("<input class='tiny button'  onclick=reschedule_time('attendance_reschedule',pass) value='Re-Schedule'>" )
           }
         if ('{{task_attendance}}' != 'False')
              {  
                 if('{{Add}}' == 'Stop')
                   {
-                  		$('#attendance').append("<input class='tiny button'  onclick=reschedule_event('attendance_reschedule') value='Re-Schedule'>" )
+                  		$('#attendance').append("<input class='tiny button'  onclick = reschedule_event('attendance_reschedule') value='Re-Schedule'>" )
                   }
              }  
         if ('{{task_attendance}}' == 'False')
@@ -795,16 +798,24 @@ else
 
 }
 
-function reschedule_time(type)
+function reschedule_time(type,value)
 {
+    
     var event_type = ""
-    var event_reschedule_check = '{{event_reschedule_check}}'
+    var marks_entry_completed = '{{marks_entry_completed}}'
     event_type  = String(type)
-    if (event_reschedule_check == 'False' && event_type == 'attendance_reschedule')
+    if (marks_entry_completed == 'True' && event_type == 'attendance_reschedule')
     {
+       if(value[1] != '1'){
         $('#rescheduleoption').foundation('reveal', 'open');
         $('#reschedule_check').empty()
-        $('#reschedule_check').append( "<input type='button' class='tiny button' onclick = reschedule_till_overlay('" + event_type + "') value='ok'>")
+        $('#reschedule_check').append( "<input type='button' class='tiny button' onclick = reschedule_till_overlay('" + event_type + "') value='ok'>")}
+        else
+        {
+             $('#reschedule_save').empty()
+             $('#reschedule_save').append( "<input type='button' class='tiny button' onclick=reschedule_event('" + event_type + "') value='Save'>")
+             $('#reschedulemodal').foundation('reveal', 'open');
+        }
     }
     else
     {
@@ -815,7 +826,7 @@ function reschedule_time(type)
 }
 
 function reschedule_till_overlay(type)
- {
+ {    
       if ( $('.sessiontype:checked').val() == 'Attendance')
       {
            $('#rescheduleoption').foundation('reveal', 'close');
