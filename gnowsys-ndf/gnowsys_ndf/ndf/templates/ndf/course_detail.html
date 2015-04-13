@@ -80,7 +80,7 @@
   <div id="cs-div"></div>
   {% if not course_structure_exists %}<div>
   <label>{% trans "You haven't added any content to this course yet" %}</label></div>{% endif %}
-  <span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}" target="_blank">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+  <span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
 </fieldset>
 
 {% endblock %}

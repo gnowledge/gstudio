@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
@@ -118,7 +118,6 @@ def course(request, group_id, course_id=None):
       template = "ndf/course.html"
       variable = RequestContext(request, {'title': title, 'course_nodes_count': course_coll.count(), 'course_coll': course_coll, 'groupid':group_id, 'appId':app._id, 'group_id':group_id})
       return render_to_response(template, variable)
-
 
 @login_required
 @get_execution_time
@@ -854,7 +853,7 @@ def create_course_struct(request, group_id, node_id):
       app_id = request.GET.get("app_id", "")
       app_set_id = request.GET.get("app_set_id", "")
     return render_to_response("ndf/create_course_structure.html",
-                                  { 'cnode': course_node,
+                                  {'cnode': course_node,
                                     'groupid': group_id,
                                     'group_id': group_id,
                                     'title': title,
@@ -902,6 +901,7 @@ def save_course_section(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 
+@login_required
 def save_course_sub_section(request, group_id):
     '''
     Accepts:
@@ -941,6 +941,7 @@ def save_course_sub_section(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 
+@login_required
 def change_node_name(request, group_id):
     '''
     Accepts:
@@ -962,6 +963,7 @@ def change_node_name(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 
+@login_required
 def change_order(request, group_id):
     '''
     Accepts:
@@ -992,6 +994,7 @@ def change_order(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 
+@login_required
 def course_sub_section_prop(request, group_id):
     '''
     Accepts:
@@ -1057,6 +1060,8 @@ def course_sub_section_prop(request, group_id):
 
         return HttpResponse(json.dumps(response_dict))
 
+
+@login_required
 def add_units(request,group_id):
     '''
     Accepts:
@@ -1084,8 +1089,8 @@ def add_units(request,group_id):
         'group_id': group_id, 'groupid': group_id,
         'css_node': css_node,
         'title': title,
-        'app_set_id':app_set_id,
-        'app_id':app_id,
+        'app_set_id': app_set_id,
+        'app_id': app_id,
         'unit_node': unit_node,
         'course_node': course_node
     })
@@ -1094,7 +1099,7 @@ def add_units(request,group_id):
     return render_to_response(template, variable)
 
 
-
+@login_required
 def get_resources(request, group_id):
     '''
     Accepts:
@@ -1159,7 +1164,7 @@ def get_resources(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 
-
+@login_required
 def save_resources(request, group_id):
     '''
     Accepts:
@@ -1207,3 +1212,40 @@ def save_resources(request, group_id):
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
         return HttpResponse(json.dumps(response_dict))
+
+
+@login_required
+def delete_from_course_structure(request, group_id):
+    '''
+    Accepts:
+     * ObjectId of node that is to be deleted.
+        It can be CourseSection/CourseSubSection/CourseUnit
+
+    Actions:
+     * Deletes the received node
+
+    Returns:
+     * success (i.e True/False)
+    '''
+    response_dict = {"success": False}
+    del_stat = False
+    if request.is_ajax() and request.method == "POST":
+        oid = request.POST.get("oid", '')
+        del_stat = delete_item(oid)
+        if del_stat:
+            response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
+
+
+def delete_item(item):
+    node_item = node_collection.one({'_id': ObjectId(item)})
+
+    if u"CourseUnit" not in node_item.member_of_names_list and node_item.collection_set:
+        for each in node_item.collection_set:
+            d_st = delete_item(each)
+
+    del_status, del_status_msg = delete_node(
+        node_id=node_item._id,
+        deletion_type=0
+    )
+    return del_status

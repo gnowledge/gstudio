@@ -12,7 +12,7 @@
 
   {{block.super}}
 
-  /* Resetting css-properties for fieldset (also legend, input) */
+    /* Resetting css-properties for fieldset (also legend, input) */
     /* fieldset (padding-bottom) */ 
     fieldset {
       padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
@@ -30,7 +30,8 @@
     .edit_course_structure_name{
       width: 30%;
     }
-  /* Setting css-properties for reveal-modal's label */
+    
+    /* Setting css-properties for reveal-modal's label */
     div.reveal-modal > label {
       color: white;
       font-weight: bold;
@@ -41,7 +42,6 @@
         padding:0 !important;
         padding-left:0 !important;
     }
-
 
     i:hover{
         cursor:pointer;
@@ -68,12 +68,15 @@
       border: 1px solid;
       display:block;
     }
+
     .div_lbl{
       margin-top: -5px;
     }
+
     .course-unit-class{
       height:30px;
     }
+
     #name{
       margin: 5px !important;
     }
@@ -82,10 +85,15 @@
       font-size:22px;
       color:#0b8a91 !important;
     }
+
+    span{
+    width:100px;
+    }
     
     .resource_icon{
       color:#0b8a91 !important;
     }
+
     .pricing-table .bullet-item {
       padding:0 !important;
     }
@@ -107,9 +115,10 @@
     .lbl_of_cs, .lbl_of_css{
       white-space: nowrap;
       overflow: hidden;
+      width: 35% !important;
       color:#0b8a91 !important;
       text-overflow: ellipsis;
-      font-size: 150%;
+      font-size: 130%;
     }
 
     .unit_name{
@@ -119,8 +128,9 @@
       text-overflow: ellipsis;
       font-size: 80%;
     }
+
     input.lbl_of_cs, input.lbl_of_css{
-    width: 50% !important;
+    width: 35% !important;
     margin-top:6px;
     }
 
@@ -129,48 +139,30 @@
     }
 
     .unit-anch{
-      font-size:150%;
+      font-size:130%;
     }
-
 
     .course-section-class:hover .cs_setting{
       display:block;
     }
-
-    .resource-drawer { 
-    border-color: #D3D3D3; border-style: solid; 
-    padding: 0 !important; 
-    overflow-y: auto;
-    }
-
-    div.resources_drawer_div div{
-      padding:7px;
-    }
-    .resource-drawer li.bullet-item:hover{
-    background-color: #ecf0f1; cursor:pointer;
-    }
-
-    .posted-by{ color: #808080; font-size: small; }
-
-    .selected-resource { background-color:lightgray !important ; }
-
-    .resource-type-image {
-    height:40px;    
-    background-repeat:no-repeat; background-size: 48px 48px;
-    width:16.667%;
-    }
-
-    .resource-type-image + div {
-    width:83.33333%%;
-    }
 {% endblock %}
-{% block body_content %} 
-  
 
-  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert action=>
-    <label id="alertModalLabel"></label>
+{% block body_content %} 
+
+
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <p id="alertModalLabel"></p>
+    <div class="row deletion">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+      </div>
+    </div>
     <a class="close-reveal-modal">&#215;</a>
   </div>
+
 
     <li class="hide course-section-class" id="course-section">
         <div class="row input-cs-row">
@@ -292,6 +284,7 @@
     <input type="hidden" id="app_set_id" name="app_set_id" value="{{app_set_id}}">
     <input type="hidden" id="app_id" name="app_id" value="{{app_id}}">
 {% endblock %}
+
 <script>
 {% block script %}
   {{block.super}}
@@ -366,9 +359,9 @@
           },
           complete: function (result) {
             if(success_state){
-              var str_btn="<div class='row'><div class='small-1 columns text-center fold-btn-div'><i class='fi-minus largesize'></i></div>"
-              var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id = "+ cs_new_id+" style='float:left;'>"+lbl_val+"</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>"
-              var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
+              var str_btn="<div class='row'><div class='small-1 columns text-center fold-btn-div'><span data-tooltip title='Expand/Collapse this Section'><i class='fi-minus largesize'></i></span></div>"
+              var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id = "+ cs_new_id+" style='float:left;'>"+lbl_val+"</label></span><span data-tooltip title='Edit name'><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></span></div>"
+              var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+"  "+"<span data-tooltip title='Delete'><i class='fi-trash largesize'></i></span></div></div>"
               $("#"+parent_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop);
               $("#"+parent_id).attr("value",cs_new_id);
               $("#"+parent_id).find(".sub-section-btn").removeAttr("disabled");
@@ -432,8 +425,8 @@
           },
           complete: function () {
             var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
-            var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='"+ css_new_id+"' style='float:left;'>"+lbl_val+"</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:right;'></i></div></span>" 
-            var str_prop="<div class='small-2 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
+            var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='"+ css_new_id+"' style='float:left;'>"+lbl_val+"</label><span><span data-tooltip title='Edit name'><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:left;'></i></span></div>" 
+            var str_prop="<div class='small-2 columns end css_setting'><span data-tooltip title='Settings'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i></span>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+"  "+"<span data-tooltip title='Deletee'><i class='fi-trash largesize'></i></span></div></div>"
 
             $("#"+curr_css_li_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-1 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
             $("#"+curr_css_li_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
@@ -491,6 +484,78 @@
       }    
     });
 
+  var li_ele;
+  // Deletion-----------------------------------------------------------------
+    $(document).on('click','.fi-trash',function(){
+      li_ele =  $(this).closest('li')
+      oid =  $(li_ele).attr("value");
+      li_class = $(li_ele).attr('class');
+      lbl_msg = ""
+
+      if(li_class == "course-section-class"){
+        css_msg = ""
+        cu_msg = ""
+        par_li_name = "{{cnode.name}}"
+        li_name = $(li_ele).find(".lbl_of_cs").text();
+        css_count = $(li_ele).find('li.course-sub-section-class').length
+        cu_count = $(li_ele).find('li.course-unit-class').length
+        if(cu_count>0){ cu_msg = "And its '"+cu_count+"' unit(s) will also be deleted. "}
+        if(css_count>0){ css_msg = "And its '"+css_count+"' Subsection(s) will be deleted. "+cu_msg}
+        lbl_msg = "This will delete Section '"+ li_name +"' from Course '"+ par_li_name +"'. "+ css_msg + "Do you want to continue?"
+      }
+      else if(li_class == "course-sub-section-class"){
+        cu_msg = ""
+        par_li_name = $(li_ele).parents('li.course-section-class').find('.lbl_of_cs').text();
+        li_name = $(li_ele).find(".lbl_of_css").text();
+        cu_count = $(li_ele).find('li.course-unit-class').length
+        if(cu_count>0){ cu_msg = "And its '"+cu_count+"' unit(s) will be deleted. "}
+        lbl_msg = "This will delete Subsection '"+ li_name +"' from Section '"+ par_li_name +"'. "+ cu_msg + "Do you want to continue?"
+      }
+      else if(li_class == "course-unit-class"){
+        par_li_name = $(li_ele).parents('li.course-sub-section-class').find('label').text();
+        li_name = $(li_ele).find('a').text();
+        lbl_msg = "This will delete Unit '"+ li_name +"' from Subsection '"+ par_li_name +"'. Do you want to continue?"
+      }
+      $("#alertModalLabel").text(lbl_msg);
+      $("#alertModal")
+        .removeClass("medium").addClass("small")
+        .addClass("alert")
+      $("#alertModal").foundation('reveal', 'open');
+    });
+
+  //trigger the ajax call to delete
+    function delete_func(){
+      $.ajax({
+        url: "{% url 'delete_from_cs' group_id %}",
+
+        data: {
+          oid: oid,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data){
+          success_state = data["success"]
+          if(success_state){
+            $(li_ele).remove()
+          }
+        },
+      });//end of ajax
+    }
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnConfirmYes", function() {
+        $("#alertModal").foundation('reveal', 'close');
+        delete_func();
+    });
+
+    $(document).on("click", "#btnConfirmNo", function() {
+        $("#alertModal").foundation('reveal', 'close');
+    });
+
   // Reordering li elements to move DOWN-----------------------------------------------------------------
     $(document).on('click','.fi-arrow-down',function(){
       var $current = $(this).closest('li');
@@ -530,31 +595,32 @@
               }
             },
           });//end of ajax
-
       }
       else{
         alert("You are on Last element")
       }    
 
       });
+  
   var var_this;
   // Rename Edit course structure name-------------------------------------------------------------------
     $(document).on('click','.edit_course_structure_name',function(){
       
       var_this = $(this)
-      node_id = $(var_this).prev().attr("id");
+      node_id = $(var_this).parent().prev().attr("id");
       if($(var_this).hasClass("fi-pencil")){
         //Only one course name can be renamed at once
-        node_for_edit = $(".ul-course-section").find(".fi-check").prev().attr('id')
+        node_for_edit = $(".ul-course-section").find(".fi-check").parent().prev().attr('id')
         if(node_for_edit){
           node_for_edit_class = $("#"+node_for_edit).attr('class')
           node_for_edit_text = $("#"+node_for_edit).val()
           $("#"+node_for_edit).replaceWith("<label name='lbl_name' class='"+node_for_edit_class+"' id='"+node_for_edit+"' style='float:left;'>"+ node_for_edit_text+"</label>")
           $(".ul-course-section").find(".fi-check").removeClass("fi-check").addClass("fi-pencil")
         }
-        lbl_text = $(var_this).prev().text()
-        lbl_text_class = $(var_this).prev().attr('class')
+        lbl_text = $(var_this).parent().prev().text()
+        lbl_text_class = $(var_this).parent().prev().attr('class')
         $(var_this).removeClass("fi-pencil").addClass("fi-check");
+        $(var_this).parent().attr('title','Click to Save')
         $("#"+node_id).replaceWith("<input type='text' id='"+node_id+"' class='"+lbl_text_class+"' value='"+ lbl_text +"' style='float:left;'>")
         $("#"+node_id).focus();
       }
@@ -580,6 +646,7 @@
               success_state = data["success"]
               if(success_state){
                 $(var_this).removeClass("fi-check").addClass("fi-pencil");
+                $(var_this).parent().attr('title','Edit name')
                 $("#"+node_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+node_id+"' style='float:left;'>"+ new_name+"</label>")
               }
             },
@@ -588,6 +655,7 @@
         else{
           $("#"+node_id).replaceWith("<label name='lbl_name' class='"+lbl_text_class+"' id='"+node_id+"' style='float:left;'>"+ lbl_text+"</label>")
           $(var_this).removeClass("fi-check").addClass("fi-pencil");
+          $(var_this).parent().attr('title','Edit name')
         }
       }
     });
@@ -748,11 +816,15 @@
       if($(this).data("unitId")){
         unit_node = $(this).data("unitId");
       }
-      turl = "{% url 'add_units' groupid %}?css_node_id="+ css_node+"&unit_node_id="+ unit_node+"&app_id={{app_id}}&app_set_id={{app_set_id}}&course_node={{cnode.pk}}"
+      turl = "{% url 'add_units' groupid %}?css_node_id="+ css_node+"&unit_node_id="+ unit_node+"&course_node={{cnode.pk}}"
+      if("{{app_id}}"){
+        turl += "&app_id={{app_id}}&app_set_id={{app_set_id}}"
+      }
       $(this).attr("href",turl)
     });
 
 {% endblock %}
+
 </script>
 {% block document_ready %}
   {{block.super}}
@@ -762,9 +834,9 @@
     $(".course-sec-btn").before($("#course-section").clone().attr('id',function(i,id){
     cloned_ele_id = id+"_cloned"+cs_cloned_id;
     return cloned_ele_id}).removeClass("hide").attr("value","{{cs_node.pk}}"))
-    var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
-    var str_lbl="<span data-tooltip title='{{cs_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id='{{cs_node.pk}}' style='float:left;'>{{cs_node.name}}</label><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>"    
-    var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
+    var str_btn="<div class='row'><div class='small-1 columns text-center'><span data-tooltip title='Collapse/Expand this Section'><i class='fi-minus largesize fold-btn'></i></span></div>"
+    var str_lbl="<span data-tooltip title='{{cs_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_cs' id='{{cs_node.pk}}' style='float:left;'>{{cs_node.name}}</label></span><span data-tooltip title='Edit name'><i class='fi-pencil cs_setting largesize edit_course_structure_name' style='float:left;'></i></span></div>"    
+    var str_prop="<div class='small-2 columns end cs_setting'>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+"  "+"<span data-tooltip title='Delete'><i class='fi-trash largesize'></i></span></div></div>"
     $("#"+cloned_ele_id).find(".sub-section-btn").removeAttr("disabled");
     $("#"+cloned_ele_id).find("div.input-cs-row").replaceWith(str_btn+str_lbl+str_prop)
     cs_cloned_id += 1
@@ -778,11 +850,11 @@
                 return cloned_ss_ele_id}).removeClass("hide").attr("value","{{css_node.pk}}"));
             $("#"+cloned_ss_ele_id).find(".units-btn").attr("data-css-id","{{css_node.pk}}")
 
-            var str_btn1="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
-            var str_lbl1="<span data-tooltip title='{{css_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='{{css_node.pk}}' style='float:left;'>{{css_node.name}}</label><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:left;'></i></div></span>" 
+            var str_btn1="<div class='row'><div class='small-1 columns text-center'><span data-tooltip title='Collapse/Expand this SubSection'><i class='fi-minus largesize fold-btn'></i></span></div>"
+            var str_lbl1="<span data-tooltip title='{{css_node.name}}'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='{{css_node.pk}}' style='float:left;'>{{css_node.name}}</label></span><span data-tooltip title='Edit name'><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:left;'></i></span></div>" 
             
             
-            var str_prop1="<div class='small-1 columns end css_setting'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></div>"
+            var str_prop1="<div class='small-1 columns end css_setting'><span data-tooltip title='Settings'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i></span>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+"  "+"<span data-tooltip title='Delete'><i class='fi-trash largesize'></i></span></div></div>"
 
             css_cloned_id+=1
             $(".units-btn-div").removeClass("hide")
@@ -794,7 +866,7 @@
                 {% get_node each_unit as unit_node %}
 
                     str_unit = "<li class='course-unit-class' value='{{unit_node.pk}}'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class='small-4 columns end'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='units-btn unit-anch' data-unit-id='{{unit_node.pk}}' style='width:50%;' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a></div>"
-                    str_opt = "<div class='small-2 columns end'>"+" "+"<i class='fi-arrow-down largesize'></i>"+" "+"<i class='fi-arrow-up largesize'></i></div></li>"
+                    str_opt = "<div class='small-2 columns end'>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+" "+"<span data-tooltip title='Delete'><i class='fi-trash largesize'></i></span></div></li>"
                     $("#"+cloned_ss_ele_id).find(".new-units-btn").before(str_unit+ str_opt)
 
               {% endfor %}

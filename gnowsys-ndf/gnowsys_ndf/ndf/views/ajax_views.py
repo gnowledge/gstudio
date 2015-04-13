@@ -850,65 +850,130 @@ def add_page(request, group_id):
   if request.is_ajax() and request.method == "POST":
 
     context_node_id = request.POST.get("context_node", '')
-    gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-    context_node = node_collection.one({'_id': ObjectId(context_node_id)})
-    name =request.POST.get('name','')
+    css_node_id = request.POST.get("css_node", '')
+    unit_name = request.POST.get("unit_name", '')
+    context_name = request.POST.get("context_name", '')
 
+    gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    name = request.POST.get('name', '')
     collection_list = []
-    if context_node:
-      for each in context_node.collection_set:
+    context_node = None
+    response_dict = {"success": False}
+    try:
+        context_node = node_collection.one({'_id': ObjectId(context_node_id)})
+    except:
+        if context_name == "Course":
+            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+            cu_new = node_collection.collection.GSystem()
+            cu_new.member_of.append(cu_gst._id)
+            cu_new.name = unit_name.strip()
+            cu_new.modified_by = int(request.user.id)
+            cu_new.created_by = int(request.user.id)
+            cu_new.contributors.append(int(request.user.id))
+            css_node = node_collection.one({'_id': ObjectId(css_node_id)})
+            cu_new.prior_node.append(css_node._id)
+            cu_new.save()
+            context_node = cu_new
+            response_dict["unit_node_id"] = str(cu_new._id)
+            node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
+
+    for each in context_node.collection_set:
         obj = node_collection.one({'_id': ObjectId(each), 'group_set': ObjectId(group_id)})
         collection_list.append(obj.name)
 
-      if name not in collection_list:
-
+    if name not in collection_list:
         page_node = node_collection.collection.GSystem()
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
-
         context_node.collection_set.append(page_node._id)
         context_node.save()
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
 
-        return HttpResponse("success")
+    else:
+        response_dict["success"] = False
+        return HttpResponse(json.dumps(response_dict))
 
-      else:
-        return HttpResponse("failure")
-
-    return HttpResponse("None")
+    response_dict["success"] = None
+    return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
 def add_file(request, group_id):
-  # this is context node getting from the url get request
-  context_node_id=request.GET.get('context_node','')
+    # this is context node getting from the url get request
+    context_node_id = request.GET.get('context_node', '')
 
-  if request.method == "POST":
+    if request.method == "POST":
 
-    new_list = []
-    # For checking the node is already available in gridfs or not
-    for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-      fileobj = node_collection.collection.File()
-      filemd5 = hashlib.md5(each.read()).hexdigest()
-      if not fileobj.fs.files.exists({"md5": filemd5}):
-        # If not available append to the list for making the collection for topic bellow
-        new_list.append(each)
-      else:
-        # If availbale ,then return to the topic page
-        var1 = "/"+group_id+"/topic_details/"+context_node_id+""
-        return HttpResponseRedirect(var1)
+        context_name = request.POST.get("context_name", "")
+        css_node_id = request.POST.get("css_node_id", "")
+        course_node = request.POST.get("course_node", "")
+        unit_name = request.POST.get("unit_name_file", "")
+        app_id = request.POST.get("app_id", "")
+        app_set_id = request.POST.get("app_set_id", "")
 
-    # After taking new_lst[] , now go for saving the files 
-    submitDoc(request, group_id)
+        if context_name is "Topic":
+            url_name = "/" + group_id + "/topic_details/" + context_node_id + ""
+        else:
+            # i.e  if context_name is "Course"
+            url_name = "/" + group_id + "/course/add_units/?css_node_id=" + \
+                css_node_id + "&unit_node_id=" + context_node_id + "&course_node="+ course_node
+            if app_id and app_set_id:
+                url_name += "&app_id=" + app_id + "&app_set_id=" + app_set_id + ""
+            if context_node_id:
+                # set the unit node name
+                node_collection.collection.update({'_id': ObjectId(context_node_id)}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 
-  # After file gets saved , that file's id should be saved in collection_set of context topic node
-  context_node = node_collection.one({'_id': ObjectId(context_node_id)})
-  for k in new_list:
-    file_obj = node_collection.one({'_type': 'File', 'name': unicode(k) })
+        new_list = []
+        # For checking the node is already available in gridfs or not
+        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+            fileobj = node_collection.collection.File()
+            filemd5 = hashlib.md5(each.read()).hexdigest()
+            if not fileobj.fs.files.exists({"md5": filemd5}):
+                # If not available append to the list for making the collection for topic below
+                new_list.append(each)
+            else:
+                # If availbale ,then return to the topic page
+                return HttpResponseRedirect(url_name)
+        # After taking new_lst[] , now go for saving the files
+        submitDoc(request, group_id)
 
-    context_node.collection_set.append(file_obj._id)
-    context_node.save()
+    # After file gets saved , that file's id should be saved in collection_set of context topic node
+    try:
+        context_node = node_collection.one({'_id': ObjectId(context_node_id)})
+    except:
+        context_node = None
+        # If unit node is not found, create CourseUnit GS
+        if context_name == "Course":
+            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+            cu_new = node_collection.collection.GSystem()
+            cu_new.member_of.append(cu_gst._id)
+            cu_new.name = unit_name.strip()
+            cu_new.modified_by = int(request.user.id)
+            cu_new.created_by = int(request.user.id)
+            cu_new.contributors.append(int(request.user.id))
+            css_node = node_collection.one({'_id': ObjectId(css_node_id)})
+            cu_new.prior_node.append(css_node._id)
+            cu_new.save()
+            node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
+            # context_node = node_collection.one({'_id': cu_new._id})
+            context_node = cu_new
+            context_node_id = str(cu_new._id)
+            url_name = "/" + group_id + "/course/add_units/?css_node_id=" + \
+                css_node_id + "&unit_node_id=" + context_node_id + "&course_node="+ course_node
+            if app_id and app_set_id:
+                url_name += "&app_id=" + app_id + "&app_set_id=" + app_set_id + ""
 
-  var1 = "/"+group_id+"/topic_details/"+context_node_id+""
-
-  return HttpResponseRedirect(var1)
+    for k in new_list:
+        try:
+            file_obj = node_collection.one({'_type': 'File', 'name': unicode(k)})
+        except:
+            return HttpResponseRedirect(url_name)
+        file_obj.prior_node.append(context_node._id)
+        file_obj.status = u"PUBLISHED"
+        file_obj.save()
+        context_node.collection_set.append(file_obj._id)
+        file_obj.save()
+        context_node.save()
+    return HttpResponseRedirect(url_name)
 
 
 

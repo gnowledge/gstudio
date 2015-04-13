@@ -766,128 +766,123 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
     size, unit = getFileSize(files)
-    size = {'size':round(size, 2), 'unit':unicode(unit)}
-    
-    if fileobj.fs.files.exists({"md5":filemd5}):
+    size = {'size': round(size, 2), 'unit': unicode(unit)}
+
+    if fileobj.fs.files.exists({"md5": filemd5}):
         # gridfs_collection = get_database()['fs.files']
-	cur_oid = gridfs_collection.find_one({"md5":filemd5}, {'docid':1, '_id':0})
-	# coll_new = get_database()['Nodes']
-	new_name = node_collection.find_one({'_id':ObjectId(str(cur_oid["docid"]))})     
+        cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+
+        # coll_new = get_database()['Nodes']
+        new_name = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
         # if calling function is passing oid=True as last parameter then reply with id and name.
         if "oid" in kwargs:
-          if kwargs["oid"]: 
-            # gridfs_collection = get_database()['fs.files']
-            cur_oid = gridfs_collection.find_one({"md5":filemd5}, {'docid':1, '_id':0})
-            # returning only ObjectId (of GSystem containing file info) in dict format.
-            # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
-            return cur_oid["docid"], 'True'
+            if kwargs["oid"]:
+                # gridfs_collection = get_database()['fs.files']
+                cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+                # returning only ObjectId (of GSystem containing file info) in dict format.
+                # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
+                return cur_oid["docid"], 'True'
         else:
-            return [files.name, new_name.name],'True'
+            return [files.name, new_name.name], 'True'
 
     else:
         try:
             files.seek(0)
-            filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
+            filetype = magic.from_buffer(files.read(100000), mime='true')  # Gusing filetype by python-magic
             filetype1 = mimetypes.guess_type(files.name)[0]
             if filetype1:
                 filetype1 = filetype1
-            else :
+            else:
                 filetype1 = ""
             filename = files.name
             fileobj.name = unicode(title)
 
             if language:
-                fileobj.language= unicode(language)
+                fileobj.language = unicode(language)
             fileobj.created_by = int(userid)
 
             fileobj.modified_by = int(userid)
 
             if int(userid) not in fileobj.contributors:
                 fileobj.contributors.append(int(userid))
-            
             if access_policy:
-                fileobj.access_policy = unicode(access_policy) # For giving privacy to file objects   
-            
+                fileobj.access_policy = unicode(access_policy)  # For giving privacy to file objects
             fileobj.file_size = size
-            group_object = node_collection.one({'_id':ObjectId(group_id)})
-            
+
+            group_object = node_collection.one({'_id': ObjectId(group_id)})
+
             if group_object._id not in fileobj.group_set:
-                fileobj.group_set.append(group_object._id)        #group id stored in group_set field
+                fileobj.group_set.append(group_object._id)  # group id stored in group_set field
             if usrname:
-                user_group_object=node_collection.one({'$and':[{'_type':u'Author'},{'name':usrname}]})
+                user_group_object = node_collection.one({'$and': [{'_type': u'Author'},{'name': usrname}]})
                 if user_group_object:
-                    if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
+                    if user_group_object._id not in fileobj.group_set:  # File creator_group_id stored in group_set field
                         fileobj.group_set.append(user_group_object._id)
 
             fileobj.member_of.append(GST_FILE._id)
-            #### ADDED ON 14th July.IT's DONE
+            #  ADDED ON 14th July.IT's DONE
             fileobj.url = set_all_urls(fileobj.member_of)
             fileobj.mime_type = filetype
-            if img_type == "" or img_type == None:
+            if img_type == "" or img_type is None:
                 if content_org:
                     fileobj.content_org = unicode(content_org)
                     # Required to link temporary files with the current user who is modifying this document
                     filename_content = slugify(title) + "-" + usrname + "-"
-                    fileobj.content = org2html(content_org, file_prefix = filename_content)
+                    fileobj.content = org2html(content_org, file_prefix=filename_content)
 
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 fileobj.tags = tags
-            
             fileobj.save()
+
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
-            node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
-            
+            node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
+
             # For making collection if uploaded file more than one
             if count == 0:
                 first_object = fileobj
             else:
-                node_collection.find_and_modify({'_id':first_object._id},{'$push':{'collection_set':fileobj._id}})
-                
-                
-            """ 
+                node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
+
+            """
             code for converting video into webm and converted video assigning to varible files
             """
-            if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
+            if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
                 is_video = 'True'
-                node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_VIDEO._id}})
-                node_collection.find_and_modify({'_id':fileobj._id},{'$set':{'mime_type':'video'}})
-            	# webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
-	       
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
+                # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
+
                 # '''storing thumbnail of video with duration in saved object'''
                 # tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
-       	        
                 # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-                
-       	        # if filename.endswith('.webm') == False:
+                # if filename.endswith('.webm') == False:
                 #     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
                 #     # saving webm video id into file object
                 #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-                
+
                 '''creating thread for converting vedio file into webm'''
                 t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
                 t.start()
-            
-            '''storing thumbnail of pdf and svg files  in saved object'''        
+
+            '''storing thumbnail of pdf and svg files  in saved object'''
             # if 'pdf' in filetype or 'svg' in filetype:
             #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
             #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-             
-            
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
-                node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
                 thumbnailimg = convert_image_thumbnail(files)
                 tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
-                node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-                
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': tobjectid}})
+
                 files.seek(0)
                 mid_size_img = convert_mid_size_image(files)
-                if  mid_size_img:
+                if mid_size_img:
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-                    node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
+                    node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
             return fileobj._id, is_video
         except Exception as e:
