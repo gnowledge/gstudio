@@ -1319,7 +1319,7 @@ def graph_nodes(request, group_id):
   node_metadata ='{"screen_name":"' + page_node.name + '",  "title":"' + page_node.name + '",  "_id":"'+ str(page_node._id) +'", "refType":"GSystem"}, '
   node_relations = ''
   exception_items = [
-                      "name", "content", "_id", "login_required", "attribute_set",
+                      "name", "content", "_id", "login_required", "attribute_set", "relation_set",
                       "member_of", "status", "comment_enabled", "start_publication",
                       "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
