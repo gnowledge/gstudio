@@ -699,6 +699,12 @@ class Node(DjangoDocument):
                     # convert rel_obj.relation_type [dictionary] to
                     # collection.Node(rel_obj.relation_type)
                     # [document-object]
+
+                    if META_TYPE[4] in rel_obj.relation_type.member_of_names_list:
+                        # We are not handling inverse relation processing for
+                        # Triadic relationship(s)
+                        continue
+
                     RelationType.append_relation(
                         node_collection.collection.RelationType(rel_obj.relation_type),
                         possible_relations, inverse_relation, rel_obj.subject
