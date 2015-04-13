@@ -2914,8 +2914,8 @@ def create_college_group_and_setup_data(college_node):
     return gfc, gr_gfc
 
 
-def get_published_version_dict(request,document_object):
-        """Returns the dictionary containing the list of revision numbers of published nodes.
+def get_published_version_list(request,document_object):
+        """Returns the list of revision numbers of published nodes.
         """
         published_node_version = []
         rcs = RCS()
@@ -2939,9 +2939,11 @@ def parse_data(doc):
   date_typelist = ['last_update','created_at']
   objecttypelist = ['member_of']
   languagelist = ['language']
+  content = ['content']
   for i in doc:
            
-           
+          if i in content:
+             doc[i] = str(doc[i]) 
           if i in user_idlist:
              if type(doc[i]) == list :
                       temp =   ""
@@ -2949,9 +2951,8 @@ def parse_data(doc):
                       		  if User.objects.filter(id = userid).exists():
 	                              user = User.objects.get(id = userid)
 	                              if user:
-	                                user_name = user.get_username
 	                                if temp:
-	                                        temp =temp  + "," + (user.get_username() ) 
+	                                        temp =temp  + "," + (str(user.get_username()) ) 
 	                                else:
 	                                        temp = str(user.get_username())        
 	              doc[i] = temp            
@@ -2960,7 +2961,7 @@ def parse_data(doc):
                       		  if User.objects.filter(id = doc[i]).exists():
 	                              user = User.objects.get(id = doc[i])
 	                              if user:
-	                                doc[i] = user.get_username()
+	                                doc[i] = str(user.get_username())
           elif i in date_typelist:
               doc[i] = datetime.strftime(doc[i],"%d %B %Y %H:%M")
           elif i in objecttypelist:
@@ -2969,13 +2970,14 @@ def parse_data(doc):
                    doc[i] = node.name
           elif i == "rating":
              new_str = ""
-             for k in doc[i]:
-                userid = k['user_id']
-                score = k['score']
-                if User.objects.filter(id = userid).exists():
-	                              user = User.objects.get(id = userid)
-	                              if user:
-	                                 new_str = new_str + "User" +":" + str(user.get_username()) + "  " + "Score" + str (score) + "\n"
+             if doc[i]:
+               for k in doc[i]:
+                  userid = k['user_id']
+                  score = k['score']
+                  if User.objects.filter(id = userid).exists():
+	                                user = User.objects.get(id = userid)
+	                                if user:
+	                                   new_str = new_str + "User" +":" + str(user.get_username()) + "  " + "Score" + str (score) + "\n"
 	     if not doc[i]:
 	              doc[i] = ""
 	     else:
