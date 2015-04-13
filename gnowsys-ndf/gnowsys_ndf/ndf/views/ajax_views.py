@@ -4938,8 +4938,7 @@ def fetch_course_Module(request, group_id,announced_course):
   module_list=[]
   event_type_ids=[]
   
-  courses = node_collection.one({"_id":ObjectId(announced_course)},{'relation_set.announced_for':1})
-  group_node = node_collection.one({"_id":ObjectId(group_id)},{'relation_set.group_of':1})
+  courses = node_collection.one({"_id":ObjectId(announced_course)},{'relation_set.announced_for':1,'relation_set.acourse_for_college':1})
   
   eventtypes = node_collection.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
   for i in eventtypes:
@@ -4948,15 +4947,13 @@ def fetch_course_Module(request, group_id,announced_course):
   for i in courses.relation_set:
     if unicode('announced_for') in i.keys():
       	announced_for = i['announced_for']  
-  
-  for i in group_node.relation_set: 
-    if unicode('group_of') in i.keys():
-        for j in  i['group_of']:
-            group_of = j
+    if unicode('acourse_for_college') in i.keys():
+        for j in  i['acourse_for_college']:
+            group_of = j  
   
   courses = node_collection.find({"_id":{'$in':announced_for}})
   trainers = node_collection.find({"relation_set.trainer_teaches_course_in_college":[ObjectId(courses[0]._id),ObjectId(group_of)]})
-  course_modules=node_collection.find({"_id":{'$in':courses[0].collection_set}})
+  course_modules = node_collection.find({"_id":{'$in':courses[0].collection_set}})
   
   #condition for all the modules to be listed is session in it should not be part of the event
   checklist=[]
