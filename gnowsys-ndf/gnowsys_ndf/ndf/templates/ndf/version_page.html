@@ -37,7 +37,7 @@ background:#b3ffb3;
       {% trans "Compare" %}
       {% endifequal %}
       {% trans "History" %} :
-      {{content1.3.name|title}}
+      {{content.3.name|title}}
     </h2>
   </div>
 
@@ -79,9 +79,12 @@ background:#b3ffb3;
           {% if user.is_authenticated %}
           {% if user.is_superuser or node.created_by == user.id %}
           {% if selected_versions.1 and selected_versions.2 %}
+          {% comment %}
           <a class="button tiny" href="{% url 'merge_doc' group_id node  selected_versions.1 selected_versions.2 %}" > Merge </a>	
+          {% endcomment %}
           <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.1 %}" > Revert to {{selected_versions.1}} </a>
           <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.2 %}" > Revert to {{selected_versions.2}} </a>
+          
           {% endif %}   
           {% endif %}   
           {% endif %}
@@ -112,7 +115,7 @@ background:#b3ffb3;
  </div>
 {% elif view == "merge" or view == "revert" %}
   <script>
-        document.location.href = '/{{group_id}}/page/{{node}}/version/{{ver}}'</script>
+        document.location.href = '/{{group_id}}/compare/{{node}}/version/{{ver}}'</script>
 
   {% else %}
  <div class="row" style = "overflow: auto; min-height: auto;max-height: 75vh;">  
@@ -128,16 +131,18 @@ background:#b3ffb3;
 
 {% block script %}
 
-a={{content|safe}}
+left_panel = {{content|safe}}
+if ( '{{content1}}' != 'none' )
+    { 
+      right_panel = {{content1|safe}}
+      right_panel.reverse()
+    }
 
 $('#compare-view').append("<table id='new' width='700'  </table>")
 $('#new').append("<thead> <th> Feild </th> <th> Value </th>  <th> Compared  </th>  </thead>")
 
-
-a1 = {{content1|safe}}
 h= 0
-a.reverse()
-$.each(a1,function(k,g)
+$.each(left_panel,function(k,g)
 {   h = h + 1
     $.each(g,function(c,v){
         
@@ -145,11 +150,13 @@ $.each(a1,function(k,g)
         
     
     });
-        t = a.pop(k)
-        $.each(t,function(c,v){
-        $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
-         });
-   
+        if ( '{{content1}}' != 'none' )
+        {
+          t = right_panel.pop(k)
+          $.each(t,function(c,v){
+          $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
+           });
+        }
 });
 $("#compare_versions").click(function() {
     if ($("#version_1").val() === $("#version_2").val()) {

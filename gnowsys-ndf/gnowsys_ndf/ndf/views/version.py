@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
-from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string,get_published_version_dict
+from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string,get_published_version_list
 from gnowsys_ndf.ndf.views.methods import parse_data
 try:
   from bson import ObjectId
@@ -16,7 +16,7 @@ from gnowsys_ndf.ndf.models import HistoryManager
 history_manager = HistoryManager()
 
 
-def version_node(request, group_id, node_id, version_no):
+def version_node(request, group_id, node_id, version_no = None):
     """Renders either a single or compared version-view based on request.
 
     In single version-view, all information of the node for the given version-number 
@@ -38,8 +38,7 @@ def version_node(request, group_id, node_id, version_no):
     else :
         pass
 
-    d=diff_match_patch()
-
+    d=diff_match_patch()    
     view = ""          # either single or compare
     selected_versions = {}
     node = node_collection.one({"_id": ObjectId(node_id)})
@@ -47,7 +46,16 @@ def version_node(request, group_id, node_id, version_no):
     fp = history_manager.get_file_path(node)
     listform = ['modified_by','created_by','last_update','name','content','contributors','rating','location','access_policy',
                 'type_of','status','tags','language','member_of','url','created_at','author_set']
-    versions= get_published_version_dict(request,node)
+    versions= get_published_version_list(request,node)
+    
+    if not version_no:
+       if versions:
+        version_no = versions.pop()
+        versions.append(version_no)
+       else:
+        version_no = node.current_version  
+        
+    
     if request.method == "POST":
         view = "compare"
 
@@ -59,26 +67,26 @@ def version_node(request, group_id, node_id, version_no):
         doc1=history_manager.get_version_document(node,version_2)     
         parse_data(doc)
         parse_data(doc1)
-        content_difference = htmldiff(doc['content'],doc1['content'])
-       
         for i in node1:
            try:
            
-               s=d.diff_compute(str(doc[i]),str(doc1[i]),True)
-               l=diff_prettyHtml(s)
-               node1[i]=l
+               s=htmldiff(str(doc[i]),str(doc1[i]),True)
+               node1[i]=s
            except:
                 node1[i]=node1[i]		       
-        content = node1
-        new_content = content_difference.replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
-        new_content = new_content.replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
-        content['content'] = new_content
-        content_1=doc
+        content = doc 
+        content_1 = node1
+        
+        content['content'] = doc['content'].replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        content_1['content'] = content_1['content'].replace("insert:"," ").replace("delete:","").replace("<tt>","").replace("</tt>","")
+        content_1['content'] = content_1['content'].replace("&lt;","<").replace("&gt;",">").replace("&quot;","\"")
+        
         new_content = []
         new_content1= []
+        
         for i in listform:
-           new_content.append({i:content[i]})
-           new_content1.append({i:str(content_1[i])})
+           new_content.append({i:str(content[i])})
+           new_content1.append({i:content_1[i]})
         content =  new_content
         content_1 =  new_content1
     else:
@@ -89,11 +97,11 @@ def version_node(request, group_id, node_id, version_no):
         new_content = []
         selected_versions = {"1": version_no, "2": ""}
         for i in listform:
-           new_content.append({i:data[i]})
+           new_content.append({i:str(data[i])})
         content =  new_content
         
         #content = data
-        content_1='none'
+        content_1="none"
     return render_to_response("ndf/version_page.html",
                               {'view': view,
                                'node': node,
@@ -211,7 +219,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      node.content=doc2.content
      node.modified_by=request.user.id
      node.save()
-     update_mobwrite = update_mobwrite_content_org(node)
+     #update_mobwrite = update_mobwrite_content_org(node)
      ver=history_manager.get_current_version(node)
      view='merge'
      
@@ -244,14 +252,11 @@ def revert_doc(request,group_id,node_id,version_1):
 		node[attr] =node[attr]
    node.modified_by=request.user.id
    node.save()
-   update_mobwrite = update_mobwrite_content_org(node)
    view ='revert'
    ver=history_manager.get_current_version(node)
    selected_versions=selected_versions = {"1": version_1, "2": ""}
-   
    return render_to_response("ndf/version_page.html",
                                {'view': view,
-                                'appId':app._id,
                                 'selected_versions': selected_versions, 
                                 'node':node,
                                 'groupid':group_id,
