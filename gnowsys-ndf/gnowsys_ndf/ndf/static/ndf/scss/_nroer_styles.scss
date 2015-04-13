@@ -12,18 +12,18 @@
     
     //This is the main content container between the header and footer
     background: url("watermark.png") no-repeat 1% 65%;
-  min-height: 100%;
-  margin-bottom: -130px!important;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-            
+    min-height: 100%;
+    margin-bottom: -130px!important;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    
     &:after{
         //Hack for setting div height to the height of the browser window
-    content:"";
-    display:block;
-    height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
-  }
+        content:"";
+        display:block;
+        height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
+    }
 }
 
 article.landing{
@@ -32,44 +32,44 @@ article.landing{
 
 
 /* For landing page */
- #landing>header{
-        background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
-        position: relative;
-        z-index: 50;
-        background-color: #0A253A;
-        padding:1rem 0 1rem 0;
-        @extend .drop-shadow;
-        border-bottom: 2px solid #00CEFD;
-        .logo{
-            color:#555;
-            text-align: center;
-            padding: 1rem;
-            background-color: rgba(0,0,0,0.8);
-            img{
-                max-width: 75%;
-                margin-bottom: 0.5rem;
-            }
-            
-            h1{
-        font-size: 1.2rem;
-            line-height: 1;
-        font-weight: bold;
-        text-transform: uppercase;
-                color:white;
-
-    }
+#landing>header{
+    background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
+    position: relative;
+    z-index: 50;
+    background-color: #0A253A;
+    padding:1rem 0 1rem 0;
+    @extend .drop-shadow;
+    border-bottom: 2px solid #00CEFD;
+    .logo{
+        color:#555;
+        text-align: center;
+        padding: 1rem;
+        background-color: rgba(0,0,0,0.8);
+        img{
+            max-width: 75%;
+            margin-bottom: 0.5rem;
         }
         
-    
+        h1{
+            font-size: 1.2rem;
+            line-height: 1;
+            font-weight: bold;
+            text-transform: uppercase;
+            color:white;
+
+        }
     }
+    
+    
+}
 
 .landing{
     position: relative;
     
-   h2{
-       margin-top: 2rem;
-   }
-    
+    h2{
+     margin-top: 2rem;
+ }
+ 
 }
 section.promo{
     background-color: rgba(0,0,0,0.9);
