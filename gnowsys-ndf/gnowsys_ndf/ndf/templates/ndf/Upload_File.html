@@ -53,21 +53,7 @@
 							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 						</div>
 					</div>
-					<div class ="row">
-						<div class="large-4 columns">
-							<b>Location</b>
-							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand" disabled> <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
-							</a>
-						</div>
-						<div class="large-4 columns">
-							<b>License</b>
-							<input id="license_id" name="License" type="text" placeholder="Enter valid license name"/>
-						</div>
-						<div class="large-4 columns">
-							<b>Source</b>
-							<input id="source_id" name="Source" type="text" placeholder="Enter source name"/>
-						</div>
-					</div>
+					
 					<div class ="row">
 						<div class="large-4 columns">
 							<b>Target Audience</b>
@@ -83,7 +69,9 @@
 							{% endif %}
 							{% endfor %}
 						</div>
-						<div class="large-4 columns">
+
+						{% comment %}
+						<!-- <div class="large-4 columns">
 							<b>File Type</b>
 							{% get_metadata_values as metadata %}
 	  						{% for k,v in metadata.items %}
@@ -96,6 +84,60 @@
 							</select>
 							{% endif %}
 							{% endfor %}
+						</div> -->
+						{% endcomment %}
+
+						<div class="large-4 columns">
+							<b>Subject</b>
+							{% get_metadata_values as metadata %}
+	  						{% for k,v in metadata.items %}
+	  						{% if k == "educationalsubject" %}
+							<select name="Subject">
+			         			<option>---Select from list---</option>
+			        			{% for opts in v %}		        														
+									<option>{% trans opts %}</option>
+								{% endfor %}
+							</select>
+							{% endif %}
+							{% endfor %}
+						</div>
+
+						<div class="large-4 columns">
+							<b>Educational Level</b>
+							{% get_metadata_values as metadata %}
+	  						{% for k,v in metadata.items %}
+	  						{% if k == "educationallevel" %}
+							<select name="Level">
+			         			<option>---Select from list---</option>
+			        			{% for opts in v %}		        														
+									<option>{% trans opts %}</option>
+								{% endfor %}
+							</select>
+							{% endif %}
+							{% endfor %}
+						</div>
+					</div>
+
+					<div class ="row">
+						<div class="large-4 columns">
+							<b>Location</b>
+							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand" disabled> <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+							</a>
+						</div>
+						<div class="large-4 columns">
+							<b>License</b>
+							<input id="license_id" name="License" type="text" placeholder="Enter valid license name"/>
+						</div>
+						<div class="large-4 columns">
+							<b>Source</b>
+							<input id="source_id" name="Source" type="text" placeholder="Enter source name"/>
+						</div>
+					</div>
+
+					<div class ="row">
+						<div class="large-4 columns">
+							<b>Based on url</b>
+							<input id="based_url_id" name="based_url" type="text" placeholder="Enter valid url"/>
 						</div>
 						<div class="large-4 columns">
 						</div>
