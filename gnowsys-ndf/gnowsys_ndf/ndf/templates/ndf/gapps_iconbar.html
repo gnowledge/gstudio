@@ -1,13 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
-{% get_group_name groupid as group_name_tag %}
 
 <!-- GApps Menubar -->
-{% check_gapp_menus groupid as check_menu %}
-
-{% if check_menu %}
-  {% get_apps_for_groups groupid as gapps %}
-{% endif %}
 
 <style type="text/css">
   .top-bar.app {
@@ -47,7 +41,6 @@
   .app.top-bar-section ul > li{
     background-color: #0eacb5 !important;
   }
-
 </style>
 
 <input type="hidden" value="{{newgroup}}">
@@ -68,7 +61,7 @@
               {% app_translations request app_dict as app_name %}
 
               <!-- applying nested menu for [Page, File, Task, Event] GAPPS -->
-              {% if app_name|lower == "page" or app_name|lower == "file" or app_name|lower == "event" or app_name|lower == "task" %}
+              {% if app_name|lower == "page" or app_name|lower == "file" or app_name|lower == "event" or app_name|lower == "task" or app_name|lower == "course" %}
 
                 <li class="has-dropdown {% comment %} Sets active class on active app{% endcomment %}
                 {% if app_dict.name|lower == selectedGapp|lower %} active
@@ -87,8 +80,10 @@
                         <a href="{% url 'uploadDoc' group_name_tag %}">
                       {% elif app_name|lower == "task" %}
                         <a href="{% url 'task_create_edit' group_name_tag %}">
-                      {% else %}
+                      {% elif app_name|lower == "event" %}
                         <a href="{% url 'event' group_name_tag %}">
+                      {% elif app_name|lower == "course" %}
+                        <a href="{% url 'create_edit' group_name_tag %}">
                       {% endif %}
                         {% if app_name|lower == "file"%}Upload{% else %}Create{% endif %} {{app_name}}
                       </a>

@@ -65,6 +65,10 @@
   overflow-y: auto;
   }
 
+  .resource_exists{
+  background-color: red !important;
+  }
+
   .resource-drawer li.bullet-item:hover{
   background-color: #ecf0f1; cursor:pointer;
   }
@@ -241,10 +245,6 @@ ul#navigation li a.last {
     color: #10c1cb;
  }
 
-table {
-  display: block;
-  overflow-y: scroll;
-}
 </style>
 
 
@@ -282,7 +282,15 @@ table {
     {% if breadcrumbs_list %}
       <ul class="breadcrumbs"> 
         {% for e in breadcrumbs_list %}
-              <li><b><a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a></b></li>
+
+              <li><b>
+              {% if node.pk != e.0 %}
+                <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
+              {% else %} 
+                {{e.1}} 
+              {% endif %}
+              </b></li>
+              
         {% endfor %}
       </ul>
     {% endif %}
@@ -293,7 +301,7 @@ table {
       {% if node %}
         {% get_publish_policy request groupid node as group_policy %}
         {% if group_policy == "allow" %}
-          &nbsp;&nbsp;&nbsp;<span style='position:fixed; color: gray;'>Draft</span>
+          &nbsp;&nbsp;&nbsp;<span data-tooltip title= "Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see." ><span style='position:relative; color: gray;'>Draft</span></span>
         {% endif %}
       {% endif %}
 
@@ -330,7 +338,18 @@ table {
                         {% endfor %}
                       </ul>
                     </li>
-                  {% elif k == "textcomplexity" %}
+                  {% elif k == "educationaluse" %}
+                    <li>
+                      <a> {% trans "Educational Use" %} &raquo;</a>
+                      <ul>
+                        {% for opts in v %}
+                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                    <!-- Commented bellow filters for time being will be using this filter at different place "So dont remove this code" -->
+                    {% comment %}                    
+                  <!-- {% elif k == "textcomplexity" %}
                     <li>
                       <a> {% trans "Text Complexity" %} &raquo;</a>
                       <ul>
@@ -338,7 +357,7 @@ table {
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
                         {% endfor %}
                       </ul>
-                    </li>
+                    </li> 
                   {% elif k == "educationalalignment" %}
                     <li>
                       <a> {% trans "Educational Alignment" %} &raquo;</a>
@@ -347,7 +366,8 @@ table {
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
                         {% endfor %}
                       </ul>
-                    </li>
+                    </li> -->
+                    {% endcomment %}                    
                   {% elif k == "language" %}
                     <li>
                       <a> {% trans "Language" %} &raquo;</a>
@@ -369,15 +389,6 @@ table {
                   {% elif k == "audience" %}
                     <li>
                       <a> {% trans "Audience" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "curricular" %}
-                    <li>
-                      <a> {% trans "Curricular" %} &raquo;</a>
                       <ul>
                         {% for opts in v %}
                           <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
@@ -504,13 +515,13 @@ table {
             {% get_teaches_list node as teaches_list %}
             {% if teaches_list %}
             <div class="panel">
-              <h6>This resource teaches you: </h6>
+              <h6>Resource for: </h6>
               {% for  each_node in teaches_list %}
               {% get_grid_fs_object each_node as grid_fs_obj %}
               {% if each_node.mime_type %}
-              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>,&nbsp;
               {% else %}
-              <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>
+              <a href="{% url 'topic_details' group_name_tag each_node.pk %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>
               {% if not forloop.last %},&nbsp; {% endif %}
               {% endif %}
               {% endfor %}
@@ -732,12 +743,9 @@ table {
         </div>
         <br/>
 	<div>
-         {% if node.prior_node|length > 0 %}
-   
-         {% for index_key, each_node in node.prior_node_dict.items %}
          {% get_grid_fs_object each_node as grid_fs_obj %}
-         {% if "Group" in node.member_of_names_list %}
-         {% get_object_value node as objvalue %}
+	 {% if "Group" in node.member_of_names_list %}
+	 {% get_object_value node as objvalue %}
 	    <table style="width:60%; border-width:0px;" >
 	      <tbody>
 		{% for key, value in objvalue.items %}
@@ -754,8 +762,6 @@ table {
 	      <tbody>
 	    </table>
               {% endif%}
-	    {% endfor %}
-            {% endif %}
 
 	</div>
         <!-- </div> -->
@@ -765,80 +771,91 @@ table {
           <!-- <div class="content" id="view-graph">  </div> -->
 
       <div class="topic_content" id="contents"> 
-            {% get_all_resources request node.pk as resources %}
-	    {% for key, val in resources.items %}
-	   <fieldset id="{{key}}">
-	     <legend>{{key}}</legend>
-	     {% if  key == "Images" %}
-	     {% for k,v in val.items %}
-	      {% if k == "fallback_lang" %}
-	       {% for each in v %}
-	      <a href ="{% url 'image_detail' group_name_tag each.pk %}" style="display: inline-block">
-	       <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-	       <br/><div>{{each.name}}</div>
-	     </a>&nbsp;&nbsp;&nbsp;&nbsp;
-	      {% endfor %}
-	      {% elif k == "other_languages" %}
-	      {% if v %}
-	      <fieldset id="{{k}}">
-		<legend>{% trans "In other languages" %}</legend>
-		{% for each in v %}
-		<a href ="{% url 'image_detail' group_name_tag each.pk %}" style="display: inline-block">
-		  <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-		  <br/><div>{{each.name}}</div>
-		</a>&nbsp;&nbsp;&nbsp;&nbsp;
-		{% endfor %}
-	      </fieldset>
-	      {% endif %}
-	      {% endif %}
-	      {% endfor %}
-	      {% elif  key == "Videos" %}
-	      {% for k,v in val.items %}
-	      {% if k == "fallback_lang" %}
-	       {% for each in v %}
-	      <a href ="{% url 'video_detail' group_name_tag each.pk %}" style="display: inline-block">
-	       <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-	       <br/><div>{{each.name}}</div>
-	     </a>&nbsp;&nbsp;&nbsp;&nbsp;
-	      {% endfor %}
-	      {% elif k == "other_languages" %}
-	      {% if v %}
-	      <fieldset id="{{k}}">
-		<legend>{% trans "In other languages" %}</legend>
-		{% for each in v %}
-		<a href ="{% url 'video_detail' group_name_tag each.pk %}" style="display: inline-block">
-		  <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-		  <br/><div>{{each.name}}</div>
-		</a>&nbsp;&nbsp;&nbsp;&nbsp;
-		{% endfor %}
-		</fieldset>
-	      {% endif %}
-	      {% endif %}
-	      {% endfor %}
-	      {% else %}
-	      {% for k,v in val.items %}
-	      {% if k == "fallback_lang" %}
-	      {% for each in v %}
-	      <a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
-	      {% endfor %}
-	      {% elif k == "other_languages" %}
-	      {% if v %}
-	      <fieldset id="{{k}}">
-		<legend>{% trans "In other languages" %}</legend>
-		{% for each in v %}
-	   	<a href ="{% url 'file_detail' group_name_tag each.pk %}"> {{each.name}} </a>&nbsp;&nbsp;&nbsp;
-		{% endfor %}
-		{% endif %}
-		{% endif %}
-	      	{% endfor %}
-	      </fieldset>	      
-	      {% endif %}
-	    </fieldset>
-	    {% endfor %}
-            </div>
+        {% if node.content_org %}
+          {{node.content_org}}
         {% endif %}
-        <!-- End of displaying topic page contents -->
+        
+        {% get_all_resources request node.pk as resources %}
+          {% for key, val in resources.items %}
+          <fieldset id="{{key}}">
+            <legend>{{key}}</legend>
+            {% if  key == "Images" %}
+              {% for k,v in val.items %}
+                {% if k == "fallback_lang" %}
+                  {% for each in v %}
+          
+                    <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                    <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                    <br/><div>{{each.name}}</div>
+                    </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                  {% endfor %}
+                {% elif k == "other_languages" %}
+                  {% if v %}
+                  <fieldset id="{{k}}">
+                    <legend>{% trans "In other languages" %}</legend>
+                    {% for each in v %}
+                      <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                      <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                      <br/><div>{{each.name}}</div>
+                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endfor %}
+                  </fieldset>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+            {% elif  key == "Videos" %}
+              {% for k,v in val.items %}
+                {% if k == "fallback_lang" %}
+                  {% for each in v %}
+                    <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                    <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                    <br/><div>{{each.name}}</div>
+                    </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                  {% endfor %}
+                {% elif k == "other_languages" %}
+                  {% if v %}
+                  <fieldset id="{{k}}">
+                    <legend>{% trans "In other languages" %}</legend>
+                    {% for each in v %}
+                      <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                      <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                      <br/><div>{{each.name}}</div>
+                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endfor %}
+                  </fieldset>
+                  {% endif %}          
+                {% endif %}                
+              {% endfor %}
+            
+            {% else %}
+              {% for k,v in val.items %}
+                {% if k == "fallback_lang" %}
+                  {% for each in v %}
+                    <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
+                    &nbsp;&nbsp;
+                  {% endfor %}
+                {% elif k == "other_languages" %}
+                  {% if v %}
+                    <fieldset id="{{k}}">
+                      <legend>{% trans "In other languages" %}</legend>
+                      {% for each in v %}
+                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
+                        &nbsp;&nbsp;
+                      {% endfor %}
+                    </fieldset>	      
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+          
+            {% endif %}
+
+          </fieldset>
+          {% endfor %}
       </div>
+      <!-- End of displaying topic page contents -->
+      {% endif %}
+
 
       {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
         <!-- Below code/widgets will only be shown for all resource instances/documents
@@ -889,7 +906,7 @@ table {
        <dd class="accordion-navigation">
        <a href="#panel1a" style="font-color:blue">Overview</a>
        <div id="panel1a" class="content active">
-	 <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 200px;">
+	 <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 200px; display: block;overflow-y: scroll;">
 	  <tbody>
 	   
 	    {% get_json node.pk as jsonobj %}
@@ -932,7 +949,7 @@ table {
             
 	      {% if key == "collection_set" %}
 	      {% if "None" not in value %}
-	      <table align ="center" style="width:80%; border-width:0px; height: 200px;" >
+	      <table align ="center" style="width:80%; border-width:0px; height: 200px; display: block;overflow-y: scroll;" >
 	      <tbody>
 	      <tr>
 		{% for each in value %}
@@ -960,7 +977,7 @@ table {
 	   {% for key, value in obj.items %}
               {% if key == "attribute_set" %}
 	  	{% if "None" not in value %}
-              <table align ="center" style="width:80%; border-width:0px; height: 200px;" >
+              <table align ="center" style="width:80%; border-width:0px; height: 200px;display: block;overflow-y: scroll;" >
 	      <tbody>
 	       <tr>
 	     {% for k, v in value.items %}
@@ -978,9 +995,6 @@ table {
              No Attributes associted with {{node.name}} resource.
 	     {% endif %}
              {% endfor %}
-	   	   
-
-  	   
           </div>
     </dd>
    <dd class="accordion-navigation">
@@ -1241,6 +1255,7 @@ table {
       <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
       {% endif %}               
     </ul>
+
   {% endif %}
 
     <!-- 
@@ -1263,21 +1278,27 @@ table {
         <span class="label">{% trans "No tags defined" %}</span>
       {% endif %}
 
-    </div><hr/>
+    </div>
 
-    <div>
-    {% include "ndf/rating.html" %} 
-    </div><br/>
+    {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
+      <div>
+      {% include "ndf/rating.html" %} 
+      </div><br/>
+    {% endif %}
 
     <div>
       <ul class="side-nav">
-        <li><b>{% trans "In other languages" %}</b></li>
+        <!-- Bellow part is commented because we are already listing other language resources in topic page -->
+        <!-- For time being commented this part to avoid confusion -->
+        {% comment %}        
+        <!-- <li><b>{% trans "In other languages" %}</b></li>
         {% get_possible_translations node as tran %}
         {% for each in tran %}
           {% for k,v in each.items %}
           <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
           {% endfor %}
-        {% endfor %}
+        {% endfor %} -->
+        {% endcomment %}
           
         <!-- This button translates given resource -->
         {% if user.is_authenticated %}
@@ -1303,7 +1324,7 @@ table {
           <a id="switch_group" class="tiny button" data-reveal-id="publish_resource"> 
               <span>{% trans "Publish this resource in other group/s" %} </span> 
             </a>
-            <div id="publish_resource" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+            <div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
 
               <div id="switchgrp" class="content">
                 <h4>{% trans "Select Groups" %}</h4>
@@ -1338,13 +1359,17 @@ table {
 <script type="text/javascript">
 
   // publishing resource in other groups
-  var data_list = ""
-  var saveflag = 0
+  var data_list = []
+
   function get_new_groups(){
-    $.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
-           data_list=data_list+String(item.id)+",";
-    });
+    data_list = []
+    $("#switchgrp #collection_set_drawer2").children("li").each(
+      function(c,v){
+        data_list.push($(v).attr("id"))
+      });
+    return data_list;
   }
+
 
   $(document).on('click',"#switch_group",function(){
     $('#switchgrp #collection_set_drawer1').html("");
@@ -1423,33 +1448,69 @@ table {
 
   });
 
-  $(document).on('click',"#save_switch_group",function(){
+  $(document).on('click',"#save_switch_group",function(event){
     var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
-    saveflag = 1;
-    get_new_groups();
-    new_groups=data_list;
+    new_groups = get_new_groups();
+    var error_grp = []
+    var msg = ""
+    success_state = false
     $.ajax({
-           url: turl,
-           type: 'POST',
-           data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            url: turl,
+            type: 'POST',
+            datatype:"json",
+            data: { new_groups_list : new_groups, csrfmiddlewaretoken: '{{ csrf_token }}'},
             success: function(data){
-                           alert("Successfully switched groups");
-                
-               },
+                      data = JSON.parse(data)
+                      success_state = data["success"]
+                      error_grp = data["resource_exists_in_grps"]
+                      msg = data["message"];
+            },
+            complete: function(){
+                      if(!success_state){
+                        $.each(error_grp,function(index,li_ele){
+                          apply_color_to_li(li_ele);
+                        })
+                        event.preventDefault();
+                      }
+                      else{
+                        $("#publish_resource").foundation('reveal', 'close');
+                      }
+                      alert(msg);
+            },
     }); //end of ajax
-
   }); //end of document click
+
+
+
+  function apply_color_to_li(element_id){
+    $("#switchgrp #collection_set_drawer2").children("li").each(
+      function(c,v){
+        if (element_id == $(v).attr("id")){
+          $(v).addClass("resource_exists");
+        }
+      });
+  }
+
+  //Overriding from drawer_widget.html
+  // To select the single as well as multiple items from list
+  $(document).on('click','#switchgrp #collection_set_drawer2 li.bullet-item',function(e){
+    if($(this).hasClass("resource_exists")){
+      $(this).removeClass("resource_exists")
+    }
+  });
+
 
   // Taken value of svg data of that node globally
   var svgdata;
-  $(document).ready(function() {
-      $(function() {
-        // For topic node landing page concept svg graph commented for time being
-        // svgdata = $('#chart-concept svg');
-        // $('#view-graph').append(svgdata);
+  // Commented bellow part ,not in use
+  // $(document).ready(function() {
+  //     $(function() {
+  //       // For topic node landing page concept svg graph commented for time being
+  //       // svgdata = $('#chart-concept svg');
+  //       // $('#view-graph').append(svgdata);
 
-      });
-  });
+  //     });
+  // });
 
   // on click of concept 
   $(document).on('click','#clickConceptGraph',function(){
@@ -1482,6 +1543,7 @@ table {
         if (data != "{}"){
           var k = Object.keys(data_obj); // To get the keys from incomming data
           if (selected){
+
             fs = "<b><i><u>Resources with "+ selected + ": " + choice +"  </u></i></b><br/>"  // Fieldset for one element
           }
           else{
@@ -1498,13 +1560,13 @@ table {
             for (var i = 0; i < len; i++) { 
               var res_id = data_obj[key][i][1]
               if (key == "Images"){
-                cont_list += "<a data-id="+res_id+" href='{% url 'image_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                cont_list += "<a data-id="+res_id+" href='{% url 'image_detail' group_name_tag 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
               }
               else if(key == "Videos"){
-                cont_list += "<a data-id="+res_id+" href='{% url 'video_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                cont_list += "<a data-id="+res_id+" href='{% url 'video_detail' group_name_tag 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'><img data-id="+res_id+" src='' data-src='{% url 'getFileThumbnail' group_name_tag 'replace_with_id' %}' /> <br/><div>"+data_obj[key][i][0]+"</div></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
               }
               else{
-                cont_list += "<a data-id="+res_id+" href='{% url 'file_detail' group_name_tag 'replace_with_id' %}' style='display: inline-block'>"+data_obj[key][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                cont_list += "<a data-id="+res_id+" href='{% url 'file_detail' group_name_tag 'replace_with_id' %}?nav_li={{nav_list}}' style='display: inline-block'>"+data_obj[key][i][0]+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
               }
             } 
 
@@ -1529,7 +1591,7 @@ table {
         }
         else{
           // If no resource found for topic it will show bellow statement
-          var cont = "<h3>No resources available with '"+ selected + ": " + choice +"' in this topic</h3>"
+          var cont = "<b>Be the first to add a resource to this topic.</b>"
           $(".topic_content").html(cont);
         }
 

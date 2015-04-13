@@ -34,6 +34,7 @@
       	TreeTillNode();
       {% endif %}
 
+
     });
 
 
@@ -43,7 +44,7 @@
 
 	  var tree_build = $(".themes").not(".jqtree-loading");
   	  var node = tree_build.tree('getNodeById', url);
-  	  tree_build.tree('selectNode', node);
+  	  tree_build.tree('openNode', node);
       
       // Javascript function to be used for checking objects in specific time of interval
       setTimeout(function(){
@@ -79,22 +80,19 @@
 					$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:orange"></span> &nbsp;');				        		
 				}
 
-    			if (user == "True")
-    			{   
-    				if (node.node_type == "Topic"){        					
+    			   
+				if (node.node_type == "Topic"){        					
 
-    					$li.find('.jqtree-element').append(
-        					{% user_access_policy groupid request.user as user_access %}
-        					{% if user_access == "allow" %}
+					$li.find('.jqtree-element').append(
 
-                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
+            				'&nbsp;&nbsp;<a id='+node.id+' name='+node.name+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
 
-                			{% endif %}
-            			);	            			
+        			);	            			
 
-    				}
-    				else{
-    					
+				}
+				else{
+					if (user == "True"){
+
     					$li.find('.jqtree-element').append(
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
@@ -103,10 +101,10 @@
                 			
                 			{% endif %}
         				);
+					}
 
-    				}
+				}
     					
-    			}           		
 
     		}
 
@@ -185,9 +183,99 @@
 
 	};
 
+
+	// method to handle hover on topics
+	function showTopicStats(){
+      // Javascript function to be used for checking objects in specific time of interval
+      setTimeout(function(){
+      	//  On hover of topic node manipulate resources only once
+
+		$(".jqtree-title.jqtree_common").hover( function(){
+
+			topic_id = $(this).siblings("a").attr("id");
+
+			// var topic_name = $(this).siblings("a").attr("name");
+			var data_info = $(this).attr("data-info");
+			var hover_context = this;
+
+			if ( ! data_info && topic_id ){
+			
+				$(".topic_stats").css("display", "none");
+
+				$.ajax({
+	            	url: "{% url 'get_topic_contents' groupid %}",
+	             	type: 'POST',
+	             	data:{
+	             		node_id: topic_id,
+	             		csrfmiddlewaretoken: '{{ csrf_token }}'
+	             	},
+	             	success: function(data){
+	             		
+	             		count = display_top_res(data)
+
+	             		if (data != "{}"){
+
+	             			$(".topic_stats").html(count);
+	             			$(hover_context).attr("data-info", data)
+
+	             			$(".topic_stats").css("display", "block");
+	             			
+	             		}
+
+	             	},
+	             	
+	            });
+
+
+			}
+			else{ 
+
+				var data = $(this).attr("data-info");
+				count = display_top_res(data)
+				$(".topic_stats").html(count);
+     			$(".topic_stats").css("display", "block");
+
+			}
+
+
+		});
+		
+        // console.log($(".jqtree-element.jqtree_common"))
+        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { 
+        	showTopicStats() 
+        }
+
+      }, 1000 );
+	}
+
+
+	function display_top_res(data){
+		data_obj = JSON.parse(data);
+ 		count = ""
+
+ 		if (data != "{}"){
+ 			var k = Object.keys(data_obj); // To get the keys from incomming data
+
+ 			for (var m = 0; m < k.length; m++) { 
+ 				var key = k[m];  
+ 				var len = data_obj[key].length;  // length of list as a value of key
+ 				// alert(key+": "+len);
+ 				count += key+": "+len+"<br/>";
+ 			}
+
+
+ 		}
+
+ 		return count
+
+	}
+
+	showTopicStats();
+
   </script>
 
   <style>
+
   	#app-set-item li { padding:0.5em }
 
 	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
@@ -268,43 +356,39 @@
 {% endblock %}
 
 {% block meta_content %}
-{% if user.is_authenticated %}
-{% user_access_policy groupid request.user as user_access %}
+	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view"><h2 class="subheader">{% trans "Themes" %}</h2></a>
+{% endblock %}
 
-<ul class="no-bullet" id="app-set-item"> 
+{% block related_content %}
+	{% if user.is_authenticated %}
+	{% user_access_policy groupid request.user as user_access %}
 
-    {% get_memberof_objects_count theme_GST_id groupid as count %}
-  
-      <li class="selected-app-set-item"> 
-        <div>
-  		  {% if user_access == "allow" %}
-          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right;color:#0b8a91;" title="Add Theme">
-            +&nbsp;Add
-          </a>
-          {% endif %}
+	<div class="panel" style="background-color:#ddd;">
+	<ul class="no-bullet" id="app-set-item"> 
 
-          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" style="color:#0b8a91;">
-            Theme ({{count}})
-          </a> 
+	    {% get_memberof_objects_count theme_GST_id groupid as count %}
+	  
+	      <li class="selected-app-set-item"> 
+	        <div>
+	  		  {% if user_access == "allow" %}
+	          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right;color:#0b8a91;" title="Add Theme">
+	            +&nbsp;Add
+	          </a>
+	          {% endif %}
 
-        </div>
-      </li>
-  
-</ul>
-<hr/>
-<br/>
+	          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" style="color:#0b8a91;">
+	            Theme ({{count}})
+	          </a> 
 
-<ul class="no-bullet">
-  	<li>
-      	<div>
-        	<a href="{% url 'topics' group_name_tag %}"> <input class="small button" type="button" value="Themes" > </a>
-      	</div>
-    </li>
+	        </div>
+	      </li>
+	  
+	</ul>
+	</div>
 
-  	<br/>
-  
-</ul>
-{% endif %}
+	{% endif %}
+
+	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
 {% endblock %}
 
 
@@ -396,7 +480,7 @@
 	<!-- For displaying themes items -->
 	{% if themes_cards  %}
 
-	<h3 class="subheader">Themes</h3><hr/>
+	
 		<div class="content row" id="panel2-4">
 
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -561,9 +645,15 @@
 	<script type="text/javascript">
 
 // ------ jqtree tree ------
+    	$("document").on("hover", ".jqtree-title.jqtree_common", function(){
+    		setTimeout(function(){
+		      }, 1000);
+
+			alert($(this).siblings("a").attr("id"));
+		});
 
 		$("#add_theme_item").click(function() {
-		      $.ajax({
+			      $.ajax({
 		        type: "POST",
 		        url: "{% url 'add_theme_item' groupid %}",
 		        datatype: "html",
@@ -590,7 +680,7 @@
 
 		});
 
-		// script for fold themes hierarchy
+		// script for fold themes_cards hierarchy
 		$(".fold").click(function() {
 			$(function() {				
 				location.href = "{% url 'theme_page' group_name_tag app_id %}";

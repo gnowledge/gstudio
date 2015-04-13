@@ -1,7 +1,7 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
-{% block title %} {{username}}'s - Dashboard  {% endblock %}
+{% block title %} {{username}} Dashboard Updates  {% endblock %}
 
 {% block head %}
   {{block.super}}
@@ -111,7 +111,7 @@
         <img alt="profile picture for this group." src="{% url 'get_mid_size_img' group_id prof_pic_obj.pk %}" id="group-image" class="group-images th">
 
       {% else %}
-        <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." id="group-image" class="group-images">
+        <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." id="group-image" class="group-images th">
 
       {% endif %}   
       
@@ -119,50 +119,35 @@
       <img src="" class="hide group-images" id="temp-group-image">
 
     </div>
-
-    {% if request.user.is_authenticated %}
     
-      <input type="file" name="has_profile_pic" class="hide" />
-      <input type="hidden" name="type" value="profile_pic" />
-      <input type="hidden" name="user" value="{{usr}}" />
-      
-      <!-- <p id="message" style="display:none">
-        {% trans "Please wait for uploading profile picture" %}
-      </p> -->
+    {% if request.user.is_authenticated %}
 
-      <div class="button expand tiny" id="group-img-edit-btn"> Edit </div>
-      <input class="button expand tiny hide" id="group-img-browse-btn" accept="image/*" name="has_profile_pic" type="file">
+      {% user_access_policy group_id request.user as user_policy %}
+      {% if user_policy == "allow" %}
 
-      <div class="row hide" id="group-img-save-cancel-btn">
+        <input type="file" name="has_profile_pic" class="hide" />
+        <input type="hidden" name="type" value="profile_pic" />
+        <input type="hidden" name="user" value="{{usr}}" />
+        
+        <div class="button expand tiny" id="group-img-edit-btn"> Edit </div>
+        <input class="button expand tiny hide" id="group-img-browse-btn" accept="image/*" name="has_profile_pic" type="file">
 
-        <div class="small-6 columns">
-          <input type="submit" class="button tiny expand" value="Save">
-        </div>
+        <div class="row hide" id="group-img-save-cancel-btn">
 
-        <div class="small-6 columns">
-          <div class="button tiny expand" id="group-img-cancel-btn">
-            Cancel
+          <div class="small-6 columns">
+            <input type="submit" class="button tiny expand" value="Save">
           </div>
-        </div>
 
-      </div>
-      
-    <!-- <div class="height-div" style="height:5px"> -->
-    <!-- this div is used for spaceing between the button Add phot button and profile picture area -->
-    <!-- </div> -->
-      <!-- 
-    <div style="position:relative";>
-        <div style="float:left;">
-            <a style="border-style:solid; border-width:1.5px; padding:3px 5px; border-radius:4px; border-color:#477D80; color:#477D80; " id="btnUploadGroupPic" >
-            Add a Photo
-          </a> 
-          <input type="file" name="has_profile_pic" id="groupdocfile" accept="image/*" class="hide" />
+          <div class="small-6 columns">
+            <div class="button tiny expand" id="group-img-cancel-btn">
+              Cancel
+            </div>
+          </div>
+
         </div>
-        <div>
-          <input type="submit" value="Save" style="font-size:15px;" />
-        </div>
-      </div> -->
-    {% endif %}
+        
+      {% endif %} <!-- user access policy check -->
+    {% endif %} <!-- authentication check -->
 
   </form>
   <!-- ---END OF form for group/profile picture on LHS -->
@@ -187,8 +172,7 @@
   <!-- Banner Div -->
 
   <!-- as per nroer specs, it doesn't want banner picture. So checking -->
-  {% get_site_name_from_settings as site_name %}
-  {% if site_name != "nroer" %}
+  {% if site.SITE_NAME != "NROER" %}
 
     <form id ="frmBanner" enctype="multipart/form-data" method="post" action="{% url 'group_dashboard' group_id %}">
       {% csrf_token %}
