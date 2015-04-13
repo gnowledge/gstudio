@@ -199,6 +199,10 @@ body{
         padding: 0;
     }
 
+    ul.dropdown{
+        box-shadow: 0px 2px 5px black;
+    }
+
     a.logo{
         height: $topbar-height * 2;
         margin: 0;
@@ -211,6 +215,7 @@ body{
 
         &:hover{
             background-color: scale-color($topbar-bg-color, $lightness: 10%);
+            transition: 0.8s all;
         }
     }
 
