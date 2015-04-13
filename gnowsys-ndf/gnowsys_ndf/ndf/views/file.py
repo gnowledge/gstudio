@@ -825,15 +825,19 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
 
             if usrname:
               user_obj = User.objects.get(username=usrname)
+              user_group_object=node_collection.one({'_type': "Author", 'name':usrname})
+
 
             group_object = node_collection.one({'_id':ObjectId(group_id)})
             mod_group = node_collection.one({'_type': "Group", 'name': "Clearing House Of "+group_object.name, 'group_type': "PRIVATE" })
             
             if group_object.edit_policy == "EDITABLE_MODERATED" or group_object.name == "home":
               if mod_group:
-                if user_obj.pk != group_object.created_by or user_obj.pk not in group_object.group_admin or not user_obj.is_superuser :
+                if user_obj.pk != group_object.created_by or user_obj.pk not in group_object.group_admin :
                   # Contributors area to save resources in moderated i.e clearing house group
                   fileobj.group_set.append(mod_group._id)
+                  # To store the author group id into the group_set(So that till resource not published by curators it should visible for user in its user space)
+                  fileobj.group_set.append(user_group_object._id)
 
                 else:
                   # Group admins i.e curators area to save resources
@@ -845,14 +849,15 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                   # After publishing resource to original group notification will receive to all subscribe users of the group
 
 
+            # Commented bellow code to avoid redundancy (this will be removed once testing done)
+            # if group_object._id not in fileobj.group_set:
+            #     fileobj.group_set.append(group_object._id)        #group id stored in group_set field
+            # if usrname:
+            #     user_group_object=node_collection.one({'$and':[{'_type':u'Author'},{'name':usrname}]})
+            #     if user_group_object:
+            #         if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
+            #             fileobj.group_set.append(user_group_object._id)
 
-            if group_object._id not in fileobj.group_set:
-                fileobj.group_set.append(group_object._id)        #group id stored in group_set field
-            if usrname:
-                user_group_object=node_collection.one({'$and':[{'_type':u'Author'},{'name':usrname}]})
-                if user_group_object:
-                    if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
-                        fileobj.group_set.append(user_group_object._id)
 
             fileobj.member_of.append(GST_FILE._id)
             #### ADDED ON 14th July.IT's DONE
