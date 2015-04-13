@@ -326,7 +326,7 @@ table, th, td {
                           
                           
                           <div class = "row" aling="center">
-                                <label> <h5> Please select what you want to reschedule <h5> </label>
+                                <label> <h5> Please select what you want to reschedule </h5> </label>
                                 <br>
 
                                 <form>
@@ -781,12 +781,13 @@ else
                   		$('#attendance').append("<input class='tiny button'  onclick=reschedule_event('attendance_reschedule') value='Re-Schedule'>" )
                   }
              }  
-        if ('{{task_attendance}}' == 'False')
+        if ('{{task_attendance}}' == 'False' && '{{Add}}' == 'Stop' )
           {
               $('#attendance_message').empty()
               $('#attendance_message').append("<label id = 'lbl_displ'   >  Your request to reschedule the event has been sent to Admin  </label>")
 
-          }          
+          } 
+     
       }
           
       
