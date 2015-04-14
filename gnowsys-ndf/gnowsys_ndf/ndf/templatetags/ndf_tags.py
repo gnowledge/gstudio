@@ -100,15 +100,30 @@ def get_site_variables():
 
    return  site_var
 
+
 @get_execution_time
 @register.assignment_tag
 def get_author_agency_types():
    return AUTHOR_AGENCY_TYPES
 
+
 @get_execution_time
 @register.assignment_tag
 def get_group_agency_types():
    return GROUP_AGENCY_TYPES
+
+
+@get_execution_time
+@register.assignment_tag
+def get_agency_type_of_group(group_id):
+	'''
+	Getting agency_type value of the group.
+	'''
+	group_obj = node_collection.one({"_id": ObjectId(group_id)})
+	group_agency_type = group_obj.agency_type
+	# print "group_agency_type : ", group_agency_type
+	return group_agency_type
+
 
 @get_execution_time
 @register.assignment_tag
@@ -119,6 +134,7 @@ def get_node_type(node):
       return nodetype
    else:
       return ""
+
 
 @get_execution_time
 @register.assignment_tag
