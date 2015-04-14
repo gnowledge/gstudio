@@ -182,25 +182,20 @@
         $(".save_units").addClass("hide");
         $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
 
-        // $("#res_type_name").val("");
-        // $(".res-opt-div").html("");
         $("#res_type_name").val(name);
         $(".button").removeClass("success");
         $(this1).addClass("success");
         if(name!="Quiz" && name=="Page"){
-          // $(".res-opt-div").removeClass("hide")
           $(".res-option").val("Create new "+ name)
           $(".res-option").removeClass("hide");
 
         }
         else if(name!="Quiz" && name!="Page"){
-          // $(".res-opt-div").removeClass("hide")
           $(".res-option").removeClass("hide");
           $(".res-option").val("Upload File")
   
         }
         else{
-          // $(".res-opt-div").addClass("hide")
           $(".res-option").addClass("hide")
         }
         draw_drawer(name);
@@ -296,8 +291,6 @@
                   n = 1;
                 }
                 $(".unit-list-div").find(".Page").text("Page ("+n+")")
-                // $(".res-option").removeClass("hide");
-                // draw_drawer("Page")
               }
             }
           }
@@ -323,9 +316,6 @@
           $("#unit_name_file").val(unit_name_val);
           $(".resources_drawer_div").html(""); 
           $('#docPost').submit();
-          // $(".res-opt-div").html("");
-          // $(".res-option").addClass("hide")
-          // $(".button").removeClass("success")
           unit_name_val = $("#unit_name").val()
           alert("Succesully added to Unit "+unit_name_val)
         }
