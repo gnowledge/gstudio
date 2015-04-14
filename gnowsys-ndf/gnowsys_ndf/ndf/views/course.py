@@ -723,15 +723,15 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
       agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
       if agency_type_node:
         for eachset in agency_type_node.collection_set:
-          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   if app_set_id:
     course_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = course_gst.name
     template = "ndf/course_list.html"
-    if request.method=="POST":
-      search = request.POST.get("search","")
-      classtype = request.POST.get("class","")
+    if request.method == "POST":
+      search = request.POST.get("search", "")
+      classtype = request.POST.get("class", "")
       # nodes = list(node_collection.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [course_gst._id]}}))
       nodes = node_collection.find({'member_of': course_gst._id, 'name': {'$regex': search, '$options': 'i'}})
     else:
@@ -756,12 +756,12 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
-                        'course_gst_name':course_gst.name,
-                        'title':title,
-                        'course_structure_exists':course_structure_exists,
+                        'course_gst_name': course_gst.name,
+                        'title': title,
+                        'course_structure_exists': course_structure_exists,
                         'nodes': nodes, 'node': node,
                         'property_order_list': property_order_list,
-                        'property_order_list_ac':property_order_list_ac,
+                        'property_order_list_ac': property_order_list_ac,
                         'is_link_needed': is_link_needed
                       }
 
@@ -1071,6 +1071,7 @@ def add_units(request,group_id):
     Actions:
      * Redirects to course_units.html
     '''
+    res_count_dict = {}
     variable = None
     unit_node = None
     css_node_id = request.GET.get('css_node_id', '')
@@ -1083,6 +1084,13 @@ def add_units(request,group_id):
     title = "Course Units"
     try:
         unit_node = node_collection.one({"_id": ObjectId(unit_node_id)})
+        for each in unit_node.collection_set:
+            each_node = node_collection.one({'_id': each})
+            a = each_node.member_of_names_list
+            alen = len(a)
+            while alen > 0:
+                res_count_dict = count_res(a[alen-1], res_count_dict)
+                alen = alen - 1
     except:
         unit_node = None
     variable = RequestContext(request, {
@@ -1092,12 +1100,20 @@ def add_units(request,group_id):
         'app_set_id': app_set_id,
         'app_id': app_id,
         'unit_node': unit_node,
-        'course_node': course_node
+        'course_node': course_node,
+        'res_count_dict': json.dumps(res_count_dict)
     })
 
     template = "ndf/course_units.html"
     return render_to_response(template, variable)
 
+
+def count_res(k,d):
+    if k not in d:
+        d[k] = 1
+    else:
+        d[k] = d[k] + 1
+    return d
 
 @login_required
 def get_resources(request, group_id):
@@ -1174,14 +1190,14 @@ def save_resources(request, group_id):
     Actions:
      * Sets the received resources in respective node's collection_set
     '''
-    response_dict = {"success": False}
+    response_dict = {"success": False,"create_new_unit": True}
     if request.is_ajax() and request.method == "POST":
         list_of_res = json.loads(request.POST.get('list_of_res', ""))
         css_node_id = request.POST.get('css_node', "")
         unit_name = request.POST.get('unit_name', "")
         unit_name = unit_name.strip()
         unit_node_id = request.POST.get('unit_node_id', "")
-
+        res_count_dict = {}
         css_node = node_collection.one({"_id": ObjectId(css_node_id)})
         list_of_res_ids = [ObjectId(each_res) for each_res in list_of_res]
 
@@ -1201,6 +1217,7 @@ def save_resources(request, group_id):
 
             cu_new.prior_node.append(css_node._id)
             cu_new.save()
+            response_dict["create_new_unit"] = True
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 
         if cu_new._id not in css_node.collection_set:
@@ -1209,8 +1226,17 @@ def save_resources(request, group_id):
 
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
         cu_new.reload()
+        for each in cu_new.collection_set:
+            each_node = node_collection.one({'_id': each})
+            a = each_node.member_of_names_list
+            alen = len(a)
+            while alen > 0:
+                res_count_dict = count_res(a[alen-1], res_count_dict)
+                alen = alen - 1
         response_dict["success"] = True
         response_dict["cu_new_id"] = str(cu_new._id)
+        response_dict["res_count_dict"] = res_count_dict
+
         return HttpResponse(json.dumps(response_dict))
 
 

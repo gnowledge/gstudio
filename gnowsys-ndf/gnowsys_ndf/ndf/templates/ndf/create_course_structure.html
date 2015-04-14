@@ -828,6 +828,8 @@
 </script>
 {% block document_ready %}
   {{block.super}}
+
+  $(".error").remove();
   {% for each_cs in cnode.collection_set %}
 
     {% get_node each_cs as cs_node %}

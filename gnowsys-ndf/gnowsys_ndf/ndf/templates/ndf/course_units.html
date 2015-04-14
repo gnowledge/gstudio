@@ -23,6 +23,10 @@
       border: 1px solid white;
   	}
 
+
+    .unit-name-div{
+      width:60% !important;
+    }
     .resource-drawer{ 
       border-color: #D3D3D3; border-style: solid; 
       padding: 0 !important; 
@@ -71,8 +75,8 @@
 
 {% block body_content %} 
 
-    <div class="row">
-      <div class="small-6 columns end">
+    <div class="row unit-name-div">
+      <div class="small-6 columns">
       <label>Enter Unit Name</label>
       </div>
       <div class="small-6 columns">
@@ -81,58 +85,57 @@
     </div>
       <div class="unit-list-div">
         <ul class="button-group">
-          <li><a onclick="open_div('Page',this)" class="button">Page </a></li>
-          <li><a onclick="open_div('File',this)" class="button">File </a></li>
-          <li><a onclick="open_div('Image')" class="button">Image </a></li>
-          <li><a onclick="open_div('Video')" class="button">Video </a></li>
-          <li><a onclick="open_div('Pandora')" class="button">Pandora</a></li>
-          <li><a onclick="open_div('Quiz')" class="button">Quiz</a></li>
+          <li><a onclick="open_div('Page',this)" class="Page button">Page</a></li>
+          <li><a onclick="open_div('File',this)" class="File button">File </a></li>
+          <li><a onclick="open_div('Image',this)" class="Image button">Image </a></li>
+          <li><a onclick="open_div('Video',this)" class="Video button">Video </a></li>
+          <li><a onclick="open_div('Pandora',this)" class="Pandora button">Pandora</a></li>
+          <li><a onclick="open_div('Quiz',this)" class="Quiz button">Quiz</a></li>
         </ul>
       </div>
-      <div id="view_add_page" class="row hide"> 
+      <div class="res-opt-div">
+        <div id="view_add_page" class="row hide"> 
 
-        <h5>{% trans "Add New Page: " %}</h5>
-        <!-- To enter name of the page -->
-        <div class="small-6 columns">
-          <input class="name_id" name="name" type="text" placeholder="Enter name ...">
-        </div>              
-        <div class="small-6 columns">
-          <input type="submit" id="add_page" value="Save Page" class="tiny round button"/>
-          <input type="button" id="cancel_btn" value="Cancel" class="tiny round button"/>
-        </div>
-      </div>          
-
-      <div id="view_add_file" class="hide">
-        <h5>{% trans "Add New File: " %}</h5><br/>
-        <!-- Upload file -->
-        <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' group_id %}?context_node={{unit_node.pk}}">
-        {% csrf_token %}
-          <div>
-            <span class="fi-upload"><input type="file" name="doc[]" id="docFile" multiple/></span>
+          <h5>{% trans "Add New Page: " %}</h5>
+          <!-- To enter name of the page -->
+          <div class="small-6 columns">
+            <input class="name_id" name="name" type="text" placeholder="Enter name ...">
+          </div>              
+          <div class="small-6 columns">
+            <input type="submit" id="add_page" value="Save Page" class="tiny round button"/>
+            <input type="button" id="cancel_btn" value="Cancel" class="tiny round button"/>
           </div>
-          <!-- For making access policy of files PUBLIC initially by uploading it from topic page -->
-          <input type="hidden" name="login-mode" value="PUBLIC">
-          <!-- Just a hidden value which enables us to retun to add_file() in ajax_views when any file gets uploaded -->
-          <input type="hidden" name="type" value="topic_file">
-          <!-- This is for getting the user of the uploaded file -->
-          <input type="hidden" name="context_name" id="context_name" value="Course">
-          <input type="hidden" name="unit_name_file" id="unit_name_file">
-          {% if app_id %}
-            <input type="hidden" name="app_id" id="app_id" value="{{app_id}}">
-            <input type="hidden" name="app_set_id" id="app_set_id" value="{{app_set_id}}">
-          {% endif %}
-          <input type="hidden" name="course_node" id="course_node" value="{{course_node.pk}}">
-          <input type="hidden" name="css_node_id" id="css_node_id" value="{{css_node.pk}}">
+        </div>          
 
-          <input type="hidden" name="user" value="{{request.user.pk}}">
-          <input type="submit" class="small round button" id="add_file" value="Save File">
-        </form>
-      </div>
+        <div id="view_add_file" class="hide">
+          <h5>{% trans "Add New File: " %}</h5><br/>
+          <!-- Upload file -->
+          <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' group_id %}?context_node={{unit_node.pk}}">
+          {% csrf_token %}
+            <div>
+              <span class="fi-upload"><input type="file" name="doc[]" id="docFile" multiple/></span>
+            </div>
+            <!-- For making access policy of files PUBLIC initially by uploading it from topic page -->
+            <input type="hidden" name="login-mode" value="PUBLIC">
+            <!-- Just a hidden value which enables us to retun to add_file() in ajax_views when any file gets uploaded -->
+            <input type="hidden" name="type" value="topic_file">
+            <!-- This is for getting the user of the uploaded file -->
+            <input type="hidden" name="context_name" id="context_name" value="Course">
+            <input type="hidden" name="unit_name_file" id="unit_name_file">
+            {% if app_id %}
+              <input type="hidden" name="app_id" id="app_id" value="{{app_id}}">
+              <input type="hidden" name="app_set_id" id="app_set_id" value="{{app_set_id}}">
+            {% endif %}
+            <input type="hidden" name="course_node" id="course_node" value="{{course_node.pk}}">
+            <input type="hidden" name="css_node_id" id="css_node_id" value="{{css_node.pk}}">
 
-      <div class="res-opt-div hide">
-        <input type="button" class="res-option button small">
+            <input type="hidden" name="user" value="{{request.user.pk}}">
+            <input type="submit" class="tiny round button" id="add_file" value="Save File">
+            <input type="button" id="cancel_btn" value="Cancel" class="tiny round button"/>
+          </form>
+        </div>
       </div>
-    {% block collection %}
+      <input type="button" class="res-option hide button small">
       <div class="collection_block_div">
           <span data-tooltip title="You will be redirected to Course Authoring page" style="float:right;">
             <a class="done_units small button round" style="float:right;">Add more units later..</a>
@@ -144,45 +147,61 @@
           <input type="hidden" name="hidden_unit_node_id" id="hidden_unit_node_id">
           <input type="hidden" name="res_type_name" id="res_type_name">
       </div>
-    {% endblock %}
 {% endblock %}
 
 <script>
 {% block script %}
   {{block.super}}
 
+    //Cancel button
     $(document).on("click", "#cancel_btn", function(){
-      $("#view_add_page").addClass("hide");
+      $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
+      $(".res-option").removeClass("hide");
       $(".name_id").val("");
     })
 
+    //Create new page/ Upload file button
     $(document).on("click", ".res-option", function(){
+      $(this).addClass("hide")
       n = $("#res_type_name").val();
       if(n == "Page"){
-        $(".res-opt-div").append($("#view_add_page"));
         $(".res-opt-div").find("#view_add_page").removeClass("hide");
+        $(".res-opt-div").find("#view_add_page .name_id").focus();
+        $(".res-opt-div").find("#view_add_file").addClass("hide");
+
       }
       else if(n == "File" || n == "Image" || n == "Video" || n == "Pandora"){
-        $(".res-opt-div").append($("#view_add_file"));
         $(".res-opt-div").find("#view_add_file").removeClass("hide");
+        $(".res-opt-div").find("#view_add_page").addClass("hide");
       }
       $(".save_units").addClass("hide")
     });
 
     function open_div(name,this1){
         $(".resources_drawer_div").html(""); 
-        $(".save_units").addClass("hide")
-        $("#res_type_name").val("")
-        $("#res_type_name").val(name)
-        $(".button").removeClass("success")
-        $(this1).addClass("success")
-        if(name!="Quiz"){
-          $(".res-opt-div").removeClass("hide")
+        $(".save_units").addClass("hide");
+        $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
+
+        // $("#res_type_name").val("");
+        // $(".res-opt-div").html("");
+        $("#res_type_name").val(name);
+        $(".button").removeClass("success");
+        $(this1).addClass("success");
+        if(name!="Quiz" && name=="Page"){
+          // $(".res-opt-div").removeClass("hide")
           $(".res-option").val("Create new "+ name)
+          $(".res-option").removeClass("hide");
+
+        }
+        else if(name!="Quiz" && name!="Page"){
+          // $(".res-opt-div").removeClass("hide")
+          $(".res-option").removeClass("hide");
+          $(".res-option").val("Upload File")
+  
         }
         else{
-          $(".res-opt-div").addClass("hide")
-          $(".res-option").val("")
+          // $(".res-opt-div").addClass("hide")
+          $(".res-option").addClass("hide")
         }
         draw_drawer(name);
     };
@@ -223,30 +242,19 @@
       });
     }
 
-  //save file button, check wether unit name is entered
-    $("#add_file").click(function() {
-      unit_name_val = $("#unit_name").val()
-      if(unit_name_val!=""){
-        $("#unit_name_file").val(unit_name_val);
-        $(".resources_drawer_div").html(""); 
-      }
-      else{
-        alert("Please enter unit name");
-        event.preventDefault();
-      }
-    })
 
   //save page
     $("#add_page").click(function() {
-      unit_name = $("#unit_name").val()
-      if(unit_name!=""){
+      unit_name = $("#unit_name").val();
+      page_name = $(".name_id").val();
+      if(unit_name!="" && page_name!=""){
         $.ajax({
           type: "POST",
           url: "{% url 'add_page' groupid %}",
           datatype: "html",
           data:{
             context_node: "{{unit_node.pk}}",
-            name: $(".name_id").val(),
+            name: page_name,
             css_node: "{{css_node.pk}}",
             unit_name: unit_name,
             context_name: "Course",
@@ -259,27 +267,78 @@
             if (data["success"] == false) {
               alert("Page name "+ page +" already available, Please choose different name");
             }
+            else if (data["success"] == true) {
+              alert("Succesully added to Unit "+unit_name)
 
-            if (data["success"] === true) {
-              draw_drawer("Page")
-              $(".save_units").removeClass("hide");
+      
+              $(".name_id").val("");
+
+              $("#hidden_unit_node_id").val(data["unit_node_id"]);
+              unit_node = data["unit_node_id"]
+              if(unit_node){
+                $(".resources_drawer_div").html(""); 
+                url_path = window.location.href;
+                location.replace(url_path.replace("undefined",unit_node));
+              }
+              else{
+                $(".resources_drawer_div").html(""); 
+                $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
+                $(".button").removeClass("success")
+
+                lbl_val = $(".unit-list-div").find(".Page").text();
+                n = parseInt(lbl_val.match(/\d+/));
+
+                one = 1;
+                if(n){
+                  n= n + one;
+                }
+                else{
+                  n = 1;
+                }
+                $(".unit-list-div").find(".Page").text("Page ("+n+")")
+                // $(".res-option").removeClass("hide");
+                // draw_drawer("Page")
+              }
             }
-
-            $(".name_id").val("");
-            $(".res-opt-div").addClass("hide");
-            $("#hidden_unit_node_id").val(data["unit_node_id"]);
-            unit_node = data["unit_node_id"]
-            if(unit_node){
-            url_path = window.location.href;
-            location.replace(url_path.replace("undefined",unit_node));}
           }
         });
       }
       else{
-        alert("Please enter unit name");
+        alert("Please enter name");
+        $("#unit_name").focus();
         event.preventDefault();
+
       }
     });
+
+
+  //Submit button for file
+  $('#docPost input[type=submit]').click(function(){
+      //save file button, check wether unit name is entered
+        unit_name_val = $("#unit_name").val()
+        if($("#docFile").val() != ""){
+
+
+        if(unit_name_val!=""){
+          $("#unit_name_file").val(unit_name_val);
+          $(".resources_drawer_div").html(""); 
+          $('#docPost').submit();
+          // $(".res-opt-div").html("");
+          // $(".res-option").addClass("hide")
+          // $(".button").removeClass("success")
+          unit_name_val = $("#unit_name").val()
+          alert("Succesully added to Unit "+unit_name_val)
+        }
+        else{
+          alert("Please enter unit name");
+          event.preventDefault();
+        }
+        }
+        else{
+          alert("Please select a file");
+          event.preventDefault();
+        }
+  })
 
 
   // Save units
@@ -295,7 +354,7 @@
       }
 
       //check if right drawer has values
-      if(total_resources_in_RHS.length > 0){
+      // if(total_resources_in_RHS.length > 0){
          if(unit_name_val){
           //fetch right drawer values
           $.each(total_resources_in_RHS,function(i,v){
@@ -323,23 +382,34 @@
         		  resp_dict = JSON.parse(data)
         		  $(".resources_drawer_div").html(""); 
               $(".save_units").addClass("hide")
-              $(".res-opt-div").addClass("hide")
+              $(".res-option").addClass("hide")
+              $(".button").removeClass("success")
         		  $(".done_units").removeClass("hide")
+              $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
+              dict_res = resp_dict["res_count_dict"]
+              if(dict_res){
+                update_res_count(dict_res);
+              }
               if($("#hidden_unit_node_id").val()==""){
                 $("#hidden_unit_node_id").val(resp_dict['cu_new_id'])
               }
+              if(resp_dict["create_new_unit"]){
+                url_path = window.location.href;
+                location.replace(url_path.replace("undefined",resp_dict['cu_new_id']));
+              }    
         		},
       		});
         }
         else{
-          alert("Please enter name for unit");
+          alert("Please enter unit name");
+          $("#unit_name").focus();
           event.preventDefault();
         }
-      }
-      else{
-        alert("Please select any resource");
-        event.preventDefault();
-      }
+      // }
+      // else{
+      //   alert("Please select any resource");
+      //   event.preventDefault();
+      // }
     });
 
 
@@ -351,10 +421,23 @@
       $(this).attr("href",turl)
 
     })
+
+  //function to display collection statistics
+  function update_res_count(dict_res){
+    $.each(dict_res,function(i,v){
+      $(".unit-list-div").find("."+i).text(i+" ("+v+")")
+    })
+  }
+
 {% endblock %}
 
 
 {% block document_ready %}
   {{block.super}}
+    {% if res_count_dict %}
+      dict_res = {{res_count_dict|safe}}
+      update_res_count(dict_res)
+    {% endif %}
+
 {% endblock %}
 </script
