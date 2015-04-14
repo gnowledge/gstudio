@@ -1,5 +1,6 @@
 {% extends "ndf/mis_base.html" %}
 {% load ndf_tags %}
+{% load url from future %}
 {% load i18n %}
 {% block title %} {{title}} {% endblock %}
 {% block url %}{% url 'create_edit' groupid node %}{% endblock %}
@@ -115,7 +116,10 @@
     		{% trans "Course Structure Details "%}
       </legend>
       <div id="cs-div"></div>
-  	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_collection_dict_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+
+      {% if not course_structure_exists %}<div>
+      <label>{% trans "You haven't added any content to this course yet" %}</label></div>{% endif %}
+  	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' group_name_tag node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}" target="_blank">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
     </fieldset>
   {% endif %}
 </div>
@@ -124,27 +128,39 @@
 
 {% block document_ready %}
   {{block.super}}
-  var course_sec_list = {{ course_collection_dict|safe|escape }}
-  console.log(course_sec_list)
-  for(var i in course_sec_list){
-    for(var i2 in course_sec_list[i]){
-    	cs_str = "<h6><b>"+i2+"</b></h6>"
-  		$("#cs-div").append(cs_str)
-        for( var newk in course_sec_list[i][i2]){
-            for (var csk in course_sec_list[i][i2][newk]){
-				css_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7><b>"+csk+"</b></h7><br>&nbsp;&nbsp;&nbsp;&nbsp;"
-				$("#cs-div").append(css_str)
-            	for( var prop in course_sec_list[i][i2][newk][csk]){
-            	prop_str = "&nbsp;&nbsp;"+prop+" - "+course_sec_list[i][i2][newk][csk][prop]+"<br>&nbsp;&nbsp;&nbsp;&nbsp;"
-            	$("#cs-div").append(prop_str)
-            	}
-            $("#cs-div").append("<br>")
-            }
-        }
-        $("#cs-div").append("<br>")
-    } 
-  }
 
+  {% for each_cs in node.collection_set %}
+    {% get_node each_cs as cs_node %}
+        cs_str = "<h6>"+{{forloop.counter}}+". {{cs_node.name}}</h6>"
+        $("#cs-div").append(cs_str)
+      {% if cs_node.collection_set %}
+        {% for each_css in cs_node.collection_set %}
+          {% get_node each_css as css_node %}
+            css_str = "&nbsp;&nbsp;<h7>"+ {{forloop.counter}}+". {{css_node.name}}</h7><br>"
+            $("#cs-div").append(css_str)
+            {% if css_node.collection_set %}
+              {% for each_unit in css_node.collection_set %}
+                {% get_node each_unit as unit_node %}
+                  cu_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7>"+ {{forloop.counter}}+". {{unit_node.name}}</h7><br>"
+                  $("#cs-div").append(cu_str)
+                  {% if unit_node.collection_set %}
+                    {% for each_res in unit_node.collection_set %}
+                      {% get_node each_res as res_node %}
+                        {% if res_node %}
+                          {% if res_node.member_of_names_list.0|lower == "page" or res_node.member_of_names_list.0|lower == "quiz" %}
+                            k = "{% url res_node.member_of_names_list.0|lower|concat:"_details" groupid res_node.pk %}"
+                          {% else %}
+                            k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
+                          {% endif %}
+                          var str_unit = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ {{forloop.counter}}+". <a href='"+k+"' target='_blank' class='unit_name'>{{res_node.name}}</a><br>"
+                          $("#cs-div").append(str_unit)
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+              {% endfor %}
+            {% endif %}
+        {% endfor %}
+      {% endif %}
+  {% endfor %}
 
 {% endblock %}
-

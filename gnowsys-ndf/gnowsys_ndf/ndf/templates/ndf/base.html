@@ -110,7 +110,7 @@
                   <a 
                   {% for mapk, mapv in nroer_menu.mapping.items %}
                     {% if each_sub_menu == mapk %}
-                      href="{% url 'groupchange' mapv %}"
+                      href="{% url 'partnerlist' mapv %}"
                       {% if nroer_menu.sub_menu_selected == mapk %}
                         class="active" 
                       {% endif %}

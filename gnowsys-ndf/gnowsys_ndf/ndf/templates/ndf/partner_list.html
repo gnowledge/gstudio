@@ -4,10 +4,10 @@
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
 
-{% block title %} Partner {% endblock %}
+{% block title %} {{groups_category}}s {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader">{% trans "Partners" %}</h2>
+<h2 class="subheader">{% trans groups_category %}s</h2>
 {% endblock %}
 
 
@@ -29,8 +29,13 @@
   <div class="create card">
     <div class="group">
       <br/>
-      <a class="button medium" href="{% url 'create_partner' group_name_tag %}">
-    	<span class="fi-plus">&nbsp;&nbsp;{% trans "New Partner" %}</span>
+      <a class="button medium" 
+        {% if groups_category == "Partner" %}
+          href="{% url 'create_partner' group_name_tag %}">
+        {% else%}
+          href="{% url 'create_group' group_name_tag %}">
+        {% endif %}
+    	<span class="fi-plus">&nbsp;&nbsp;{% blocktrans %} New {{groups_category}} {% endblocktrans %}</span>
       </a>
     </div>
   </div>
@@ -97,7 +102,7 @@
     {% if not searching %}
       <div class="row">
         <div class="small-12 columns">
-         {% blocktrans %} <h5>There are no partners created yet. <b>Be the first to create a Partner!</b></h5> {% endblocktrans %}
+         {% blocktrans %} <h5>There are no {{groups_category}} created yet. <b>Be the first to create a {{groups_category}}!</b></h5> {% endblocktrans %}
         </div>
       </div>
     {% endif %}
