@@ -11,12 +11,27 @@
 
 <script type="text/javascript">
 function reply_del{{eachrep}}() {
-   var repl_count=$("#replycount{{eachrep}}").val();
+  var repl_count=$("#replycount{{eachrep}}").val();
+  {% comment %}
+  // var loggedin_userid = "{{request.user.id}}";
+  // var authorid = $(this).attr("data-userid");
+  // storing ndf_tags return values in JS variables
+  // {% user_access_policy groupid request.user as user_access %}
+  // var user_access = "{{ user_access }}"; // "allow" or "disallow"
+
+  // {% edit_policy groupid node request.user as status %}
+  // var edit_policy = "{{ status }}"; // "allow" or "disallow"
+
+  // if( (loggedin_userid == authorid) || {{request.user.is}} )
+  // if( (user_access == "allow" && edit_policy == "allow") || (loggedin_userid == "{{request.user.id}}") )
+  // {
+    {% endcomment %}
+
    if (repl_count <= 0)
    {
       if (!window.confirm("Are you sure you want to delete this ?"))
       {
-         $("edit-options").class="f-dropdown";		
+         $("edit-options").class="f-dropdown";    
          return false;
       }
    }
@@ -26,6 +41,8 @@ function reply_del{{eachrep}}() {
       $("edit-options").hide();
       return false;
    }
+
+  // }
 }
   $(document).ready(function(){
 
@@ -163,7 +180,7 @@ function reply_del{{eachrep}}() {
 
    {% if eachrep.created_by == user_obj.id %}
      {% if eachrep != thread %}
-       <a class="tiny alert button" id="myname" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
+       <a class="tiny alert button" data-reply-id="{{eachrep.created_by}}" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
      
      {% endif %}
    {% endif %}

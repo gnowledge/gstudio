@@ -79,11 +79,10 @@
   </div>
   <br/>
   <div class="large-6 columns">
-
     {% if user.is_authenticated %}
 
       <!-- only for partners group: allow user to add reply even without being member of that partner group -->
-      {% if group_agency_type == "Partner" or user_access == "allow"  %}
+      {% if group_agency_type == "Partner" or request.user.id == eachrep.created_by or request.user.is_superuser  %}
 
         {% include "ndf/replytwistrep.html" %}
 
@@ -98,7 +97,7 @@
 
 <div class="response_change" id="refreshthread" class="large-12 columns">
 
-  {% get_reply thread eachrep forum csrf_token user groupid %}
+  {% get_reply request thread eachrep forum csrf_token user groupid %}
 
 </div>
 {% endfor %}
