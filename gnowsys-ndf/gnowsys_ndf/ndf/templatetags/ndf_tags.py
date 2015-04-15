@@ -346,8 +346,8 @@ def get_all_users_int_count():
 
 @get_execution_time
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(thread,parent,forum,token,user,group_id):
-	return {'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent,'groupid':group_id}
+def get_reply(request, thread,parent,forum,token,user,group_id):
+	return {'request':request, 'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent,'groupid':group_id}
 
 @get_execution_time
 @register.assignment_tag
