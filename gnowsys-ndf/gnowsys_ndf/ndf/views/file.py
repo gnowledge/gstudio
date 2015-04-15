@@ -20,6 +20,7 @@ from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 from mongokit import paginator
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
@@ -696,6 +697,9 @@ def submitDoc(request, group_id):
         source = request.POST.get("Source", "")
         Audience = request.POST.get("audience", "")
         fileType = request.POST.get("FileType", "")
+        subject = request.POST.get("Subject", "")
+        level = request.POST.get("Level", "")
+        Based_url = request.POST.get("based_url", "")
         map_geojson_data = request.POST.get('map-geojson-data')
 
         if map_geojson_data:
@@ -711,14 +715,14 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, map_geojson_data, oid=True)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, map_geojson_data, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, map_geojson_data, oid=True)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, map_geojson_data, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, map_geojson_data, oid=True)
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, map_geojson_data, oid=True)
             if not obj_id_instance.is_valid(f):
               alreadyUploadedFiles.append(f)
               title = mtitle
@@ -755,7 +759,7 @@ def submitDoc(request, group_id):
     
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, map_geojson_data=[], **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -826,7 +830,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             
             if group_object.edit_policy == "EDITABLE_MODERATED" or group_object.name == "home":
               if mod_group:
-                if user_obj.pk != group_object.created_by or user_obj.pk not in group_object.group_admin :
+                if user_obj.pk != group_object.created_by or user_obj.pk not in group_object.group_admin:
                   # Contributors area to save resources in moderated i.e clearing house group
                   fileobj.group_set.append(mod_group._id)
                   # To store the author group id into the group_set(So that till resource not published by curators it should visible for user in its user space)
@@ -887,10 +891,24 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
               aud = create_gattribute(fileobj._id, audience_AT, Audience)                
 
             if fileType:
-              # create gattribute for file with Audience value
+              # create gattribute for file with 'educationaluse' value
               educationaluse_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationaluse'})
               FType = create_gattribute(fileobj._id, educationaluse_AT, fileType)                
 
+            if subject:
+              # create gattribute for file with 'educationaluse' value
+              subject_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationalsubject'})
+              sub = create_gattribute(fileobj._id, subject_AT, subject)                
+
+            if level:
+              # create gattribute for file with 'educationaluse' value
+              educationallevel_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationallevel'})
+              edu_level = create_gattribute(fileobj._id, educationallevel_AT, level)                
+
+            if Based_url:
+              # create gattribute for file with 'educationaluse' value
+              basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
+              basedUrl = create_gattribute(fileobj._id, basedonurl_AT, Based_url)                
 
 
             files.seek(0)                                                                  #moving files cursor to start
@@ -952,8 +970,54 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             if mod_group:
               task_node = node_collection.collection.GSystem()
               GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
+              object_value = []
+              assignees = []
+              assignee_names = []
+              sitename = Site.objects.all()
+              sitename = sitename[0]
+              res_link = u"Click here to go for curation: http://"+sitename.name+"/"+mod_group.name.replace(" ","%20").encode('utf8')+"/file/"+str(fileobj._id)
 
-              get_node_common_fields(request, task_node, mod_group._id, GST_TASK)
+              # Create a task first time while uploading resource
+              task_node.name = u"Resource '"+fileobj.name+"' reported for curation"
+              task_node.created_by = user_obj.pk
+              task_node.group_set.append(mod_group._id)
+              task_node.member_of.append(GST_TASK._id)
+              task_node.content_org = unicode(res_link)
+              task_node.modified_by = user_obj.pk
+              task_node.status = u"DRAFT"
+              task_node.contributors.append(user_obj.pk)
+              task_node.save()
+
+              if task_node:
+                assignee_AT = node_collection.find_one({"_type": 'AttributeType', 'name': "Assignee" })
+                # List the group admins for assigning a task 
+                for each in fileobj.group_admin:
+                  object_value.append(each)
+
+                for each in fileobj.group_admin:
+                  assignees.append(User.objects.get(pk=int(each)) )
+
+                for each in fileobj.group_admin:
+                  assignee_names.append(User.objects.get(pk=int(each)).username )
+
+                # This sets assignees to task by setting attribute
+                ga_node = create_gattribute(task_node._id, assignee_AT, object_value)
+
+                # variable to hold user id for sending notification about its contribution
+                user_notified = user_obj
+                # Variable to hold list of group admins for assigning a task for curation of user contribution
+                task_assignees = assignees
+
+                for user in task_assignees:
+                  task_lable = "Task reported"
+                  msg = task_node.name + \
+                    "' Resource uploaded by " + user_obj.username + \
+                    "\n     - Status: Pending" + \
+                    "\n     - Assignee: " + ", ".join(assignee_names) + \
+                    "\n     - Url: http://" + sitename.name + "/" + mod_group.name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
+
+                  set_notif_val(request, mod_group._id, msg, task_lable, user)
+
 
 
             return fileobj._id, is_video
