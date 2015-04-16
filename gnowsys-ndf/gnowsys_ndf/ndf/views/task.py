@@ -141,10 +141,11 @@ def task_details(request, group_name, task_id):
   # Appending TaskType to blank_dict, i.e. "has_type" relationship
   if task_node.relation_set:
     for rel in task_node.relation_set:
-      for k in rel:
-        task_type = node_collection.one({'_id': rel[k][0]}, {'name': 1})
+      if "has_type" in rel and rel["has_type"]:
+        task_type = node_collection.one({'_id': rel["has_type"][0]}, {'name': 1})
         if task_type:
-          blank_dict[k] = task_type["name"]
+          blank_dict["has_type"] = task_type["name"]
+        break
 
   # Appending Watchers to blank_dict, i.e. values of node's author_set field
   if task_node.author_set:

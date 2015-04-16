@@ -183,7 +183,7 @@
           <img alt="Profile picture for this group." src="{% url 'read_file' group_id banner_pic.pk grid_fs_obj.filename %}"
           style="height:300px; width:1150px; position:absolute; z-index:auto;">
           {% else %}
-            <img src="/static/ndf/images/metastudio-site-banner.png" alt="Banner picture for this group." width="100%" style="background-color:white; border:solid 1px darkgray;">
+            <img src="/static/ndf/images/{{site.SITE_NAME|lower}}-site-banner.png" alt="Banner picture for this group." width="100%" style="background-color:white; border:solid 1px darkgray;">
         {% endif %}   
 
         <div class="row">
@@ -222,10 +222,12 @@
 
   <nav class="row" style="margin-top: 2em;">
     <dl class="tabs small-12 columns" data-tab data-options="deep_linking:false">
+      {% if approval %}
       <input type="hidden" id="enrollment_id">
       <input type="hidden" id="course_id" >
-
-      {% if approval %}
+      <input type="hidden" id="course_name" >
+      <input type="hidden" id="college_id" >
+      <input type="hidden" id="college_name" >
 
       <dd class="active" title="Enrollment Approval Details">
         <a href="#panel_enrollment_approval_details">
@@ -552,6 +554,9 @@
           if (success_state) {
             $("#enrollment_id").val(data["enrollment_details"]["pk"])
             $("#course_id").val(data["enrollment_details"]["CourseId"])
+            $("#course_name").val(data["enrollment_details"]["Course"])
+            $("#college_id").val(data["enrollment_details"]["CollegeId"])
+            $("#college_name").val(data["enrollment_details"]["College"])
 
             if(approval_data_review.length >0){
 
@@ -656,6 +661,9 @@
       if (students_selected.length > 0) {
         enrollment_id = $("#enrollment_id").val();
         course_id = $("#course_id").val();
+        course_name = $("#course_name").val();
+        college_id = $("#college_id").val();
+        college_name = $("#college_name").val();
 
         success_state = false
         approved = ""
@@ -669,6 +677,9 @@
             'approval_state': approval_state,
             'enrollment_id': enrollment_id,
             'course_id': course_id,
+            'course_name': course_name,
+            'college_id': college_id,
+            'college_name': college_name,
             'students_selected': students_selected,
             'csrfmiddlewaretoken': "{{csrf_token}}"
           },
