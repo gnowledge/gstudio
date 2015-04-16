@@ -33,7 +33,7 @@
         {% endif %}
      </div>
      <div id="performed on" class="small-2 column"  style="word-wrap: break-word;" >
-           {{i.created_at|timesince}} ago
+           {{i.last_update|timesince}} ago
      </div>
      <div class="small-2 small-pull-2 column" align="center" >
         {% if 'image' in i.mime_type %}
