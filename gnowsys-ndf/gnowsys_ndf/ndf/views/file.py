@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from mongokit import paginator
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
@@ -715,14 +716,14 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, map_geojson_data, oid=True)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, map_geojson_data, oid=True)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, map_geojson_data, oid=True)
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
             if not obj_id_instance.is_valid(f):
               alreadyUploadedFiles.append(f)
               title = mtitle
@@ -759,7 +760,7 @@ def submitDoc(request, group_id):
     
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, map_geojson_data=[], **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, request=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -830,13 +831,14 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             
             if group_object.edit_policy == "EDITABLE_MODERATED" or group_object.name == "home":
               if mod_group:
-                if user_obj.pk != group_object.created_by or user_obj.pk not in group_object.group_admin:
+                if not fileobj.group_set:
                   # Contributors area to save resources in moderated i.e clearing house group
                   fileobj.group_set.append(mod_group._id)
                   # To store the author group id into the group_set(So that till resource not published by curators it should visible for user in its user space)
                   fileobj.group_set.append(user_group_object._id)
+                # if user_obj.pk != group_object.created_by or user_obj.pk not in group_object.group_admin:
 
-                else:
+                elif mod_group._id in fileobj.group_set and user_obj.pk in group_object.group_admin:
                   # Group admins i.e curators area to save resources
                   if mod_group._id in fileobj.group_set :
                     fileobj.group_set.remove(mod_group._id)
@@ -991,13 +993,13 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
               if task_node:
                 assignee_AT = node_collection.find_one({"_type": 'AttributeType', 'name': "Assignee" })
                 # List the group admins for assigning a task 
-                for each in fileobj.group_admin:
+                for each in group_object.group_admin:
                   object_value.append(each)
 
-                for each in fileobj.group_admin:
+                for each in group_object.group_admin:
                   assignees.append(User.objects.get(pk=int(each)) )
 
-                for each in fileobj.group_admin:
+                for each in group_object.group_admin:
                   assignee_names.append(User.objects.get(pk=int(each)).username )
 
                 # This sets assignees to task by setting attribute
@@ -1358,7 +1360,9 @@ def getFileThumbnail(request, group_id, _id):
     if file_node is not None:
         if file_node.fs_file_ids:
           # getting latest uploaded pic's _id
-          file_fs = file_node.fs_file_ids[2]
+          file_fs = ""
+          if len(file_node.fs_file_ids) > 1:
+            file_fs = file_node.fs_file_ids[2]
          
           if (file_node.fs.files.exists(file_fs)):
 
