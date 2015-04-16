@@ -7,7 +7,7 @@
 {% block title %} {{groups_category}} {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader">{% trans groups_category %}</h2>
+<h2 class="subheader">{% trans "partners_category" %}</h2>
 {% endblock %}
 
 
@@ -48,7 +48,7 @@
 {% get_group_name groupid as group_name_tag %}
 <header class="row">
   <dl class="tabs" data-tab data-options="deep_linking:true">
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All {{ groups_category }} {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> {% trans "All" %} {{ groups_category }} {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
     <!--<dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>-->
   </dl>
 </header>
@@ -103,11 +103,11 @@
       
       <footer>
           <div class="age">
-            {{ node.agency_type}} created {{node.created_at|timesince}} ago by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span>
+            {% blocktrans %}{{ node.agency_type}} created {% endblocktrans %}{{node.created_at|timesince}} ago by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span>
         </div>
-        <span><strong>{{node.author_set|length}}</strong> Members</span>
+        <span><strong>{{node.author_set|length}}</strong> {% trans "Members" %}</span>
         {% get_group_resources node as obj_count %}
-        <span class="right"><strong>{{obj_count}}</strong> Objects</span>
+        <span class="right"><strong>{{obj_count}}</strong> {% trans "Objects" %}</span>
       </footer>
       </a>
 
@@ -125,7 +125,9 @@
     {% if not searching %}
       <div class="row">
         <div class="small-12 columns">
-         {% blocktrans %} <h5>There are no partners created yet. <b>Be the first to create a {{ groups_category }}!</b></h5> {% endblocktrans %}
+	{% blocktrans with groups_category as grps_category %}
+        <h5>There are no partners created yet.<b>Be the first to create a {{ grps_category }}!</b></h5>
+	{% endblocktrans %}
         </div>
       </div>
     {% endif %}

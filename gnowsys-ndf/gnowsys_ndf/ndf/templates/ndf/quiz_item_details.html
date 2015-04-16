@@ -23,14 +23,14 @@
 
 {% block meta_content %}
 {% get_group_name groupid as group_name_tag %}
-{% blocktrans %}  <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
+<p class="text-justify">A <b>{% trans "Quiz" %}</b> {% trans "is a sequenced collection of" %} <b>{% trans "quiz items" %}</b>. {% trans "A quiz-item can be any of the three types" %}: <strong><i>{% trans "short response, single-choice" %}</i></strong> {% trans "and" %} <strong><i>{% trans "multiple-choice" %}</i></strong>. <i>{% trans "submit response" %}</i> {% trans "and" %} <i>{% trans "match the following" %}</i> {% trans "types will be implemented very soon." %}</p>
 
-    <p class="text-justify">You can build a quiz in two ways:
+    <p class="text-justify">{% trans "You can build a quiz in two ways:" %}
       <ol  class="text-justify">
-	<li>By editing, Quiz node (via collection-list).</li>
-	<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
+	<li>{% trans "By editing, Quiz node (via collection-list)." %}</li>
+	<li>{% trans "By using 'Quiz-Item' button corresponding to the Quiz." %}</li>
       </ol>    </p>
-{% endblocktrans %}
+
     <!-- Add button -->
     {% if user.is_authenticated %}
 
