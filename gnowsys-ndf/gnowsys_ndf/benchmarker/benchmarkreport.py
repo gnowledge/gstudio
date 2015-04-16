@@ -4,6 +4,7 @@ import random
 from django.template import RequestContext
 from django.shortcuts import render_to_response, render
 from datetime import date,time,timedelta
+import json
 '''
     The First method to get called.
 '''
@@ -19,8 +20,13 @@ def report(request):
  
  search_cur = []
  if request.method == "POST":
-      if request.POST.get('methodlist','') != "ALL":
-        search_cur = col.find({'name':unicode(request.POST.get('methodlist',''))}).sort('last_update', -1).sort('time_taken',-1)
+      if request.POST.get('searchmethod','') != '':
+          search_cur = col.find({'name':unicode(request.POST.get('searchmethod',''))}).sort('last_update', -1).sort('time_taken',-1)
+          
+      else:
+        if request.POST.get('methodlist','') != "ALL":
+          print "sadfasfasdf",request.POST.get('methodlist','')
+          search_cur = col.find({'name':unicode(request.POST.get('methodlist',''))}).sort('last_update', -1).sort('time_taken',-1)
              
  avg = 0                      
  count = 0
@@ -56,3 +62,37 @@ def report(request):
                            
                            },context_instance = RequestContext(request)) 
 
+
+def month_view(request):
+ periodicview = request.POST.get('periodview','')
+ 
+ if periodicview == 'day':
+    timedelta1 = 0
+ if periodicview == 'week':
+    timedelta1 = 7
+ if periodicview == 'month':
+    timedelta1 = 30
+ if not periodicview:
+   timedelta1= 0   
+ date1=datetime.date.today() - timedelta(timedelta1) 
+ ti=time(0,0)
+ listofmethods = []
+ Today=datetime.datetime.combine(date1,ti)
+ 
+ bench_cur = col.aggregate([{'$match':{'last_update':{'$gte':Today}}}, {
+       '$group':
+         {
+           '_id': "$name",
+           'time_taken': { '$sum': 1 },
+         }
+         
+     },{'$sort': { 'time_taken': -1 }}
+   ]
+   
+   )
+                                  
+     #write a code to check to find the frequency of the most executed method
+     #primarily focus on the method getting maximum number of hits
+ return render_to_response("frequency_reports.html",
+                           {'bench_cur':json.dumps(bench_cur['result'], cls=NodeJSONEncoder),
+                           },context_instance = RequestContext(request)) 
