@@ -44,7 +44,8 @@
     "blockui": "*",
     "datatables-plugins": "~1.0.1",
     "DataTables": "~1.10.4",
-    "videojs": "~4.11.4"
+    "videojs": "~4.11.4",
+    "epub.js": "0.2.5"
   },
   "resolutions": {
     "jquery": "2.1.1"
