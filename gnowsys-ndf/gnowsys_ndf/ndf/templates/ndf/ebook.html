@@ -34,6 +34,7 @@
                 </b>
             </div>
           </div>
+          <hr/>
           {% if node.status == "PUBLISHED" or node.created_by == request.user.id %}
           <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
           {% endif %}
