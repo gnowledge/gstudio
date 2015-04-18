@@ -43,6 +43,7 @@ from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_templa
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
 from gnowsys_ndf.mobwrite.models import ViewObj
+from gnowsys_ndf.notification import models as notification
 
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -4033,6 +4034,7 @@ def get_students_for_approval(request, group_id):
           sce_gs.get_neighbourhood(sce_gs.member_of)
 
           data["pk"] = str(sce_gs._id)
+          data["CollegeId"] = sce_gs.for_college[0]._id
           data["College"] = sce_gs.for_college[0].name
 
           course_id_list = []
@@ -4154,15 +4156,20 @@ def approve_students(request, group_id):
 
         if request.is_ajax() and request.method == "POST":
             approval_state = request.POST.get("approval_state", "")
-            enrollment_id = request.POST.get("enrollment_id", "")
 
+            enrollment_id = request.POST.get("enrollment_id", "")
             enrollment_id = ObjectId(enrollment_id)
 
             course_ids = request.POST.get("course_id", "")
             course_ids = [(ObjectId(each.strip()), each.strip()) for each in course_ids.split(",")]
+            course_name = request.POST.get("course_name", "")
 
             students_selected = request.POST.getlist("students_selected[]", "")
             students_selected = [ObjectId(each_str_id) for each_str_id in students_selected]
+
+            college_id = request.POST.get("college_id", "")
+            college_id = ObjectId(college_id)
+            college_name = request.POST.get("college_name", "")
 
             sce_gs = node_collection.collection.aggregate([{
                 "$match": {
@@ -4175,16 +4182,24 @@ def approve_students(request, group_id):
                     "has_enrolled": "$attribute_set.has_enrolled",
                     "has_approved": "$attribute_set.has_approved",
                     "has_rejected": "$attribute_set.has_rejected",
+                    "has_approval_task": "$attribute_set.has_approval_task",
                     "has_current_approval_task": "$relation_set.has_current_approval_task"
                 }
             }])
 
+            user_id = int(request.user.id)  # getting django user's id
+            user_name = request.user.username  # getting django user's username
             remaining_count = None
             enrolled_list = []
             approved_list = []
             rejected_list = []
             error_id_list = []
+            has_approval_task_dict = {}
             approved_or_rejected_list = []
+
+            has_approval_task_dict = sce_gs["result"][0]["has_approval_task"]
+            if has_approval_task_dict:
+                has_approval_task_dict = has_approval_task_dict[0]
 
             enrolled_list = sce_gs["result"][0]["has_enrolled"]
             if enrolled_list:
@@ -4214,11 +4229,11 @@ def approve_students(request, group_id):
             course_enrollment_status_at = node_collection.one({
                 '_type': "AttributeType", 'name': "course_enrollment_status"
             })
+
             # For each student, approve enrollment into given course(Domain)/courses(Foundation Course)
             # For that update value as "Enrollment Approved" against corresponding course (Course ObjectId)
             # in "course_enrollment_status" attribute of respective student
             # This should be done only for Course(s) which exists in "selected_course" relation for that student
-
             stud_cur = node_collection.collection.aggregate([{
                 "$match": {
                     "_id": {"$in": students_selected}
@@ -4230,7 +4245,6 @@ def approve_students(request, group_id):
                     "course_enrollment_status": "$attribute_set.course_enrollment_status"
                 }
             }])
-
 
             # Performing multiprocessing to fasten out the below processing of
             # for loop; that is, performing approval of students to respective course(s)
@@ -4244,50 +4258,6 @@ def approve_students(request, group_id):
                 prev_approved_or_rejected_list,
                 num_of_processes=multiprocessing.cpu_count()
             )
-            """
-            for each in students_selected:
-                # Fetch student node along with selected_course and course_enrollment_status
-                student_id = ObjectId(each)
-                stud_node = node_collection.collection.aggregate([{
-                    "$match": {
-                        "_id": student_id
-                    }
-                }, {
-                    "$project": {
-                        "selected_course": "$relation_set.selected_course",
-                        "course_enrollment_status": "$attribute_set.course_enrollment_status"
-                    }
-                }])
-                # Fetch selected_course ObjectIds -- Course(s) in which student is enrolled
-                selected_course = stud_node["result"][0]["selected_course"]
-                if selected_course:
-                    selected_course = selected_course[0]
-
-                # Fetch course_enrollment_status -- Holding Course(s) along with it's enrollment status
-                course_enrollment_status = stud_node["result"][0]["course_enrollment_status"]
-                if course_enrollment_status:
-                    course_enrollment_status = course_enrollment_status[0]
-                else:
-                    course_enrollment_status = {}
-
-                for each_course_id, str_course_id in course_ids:
-                    # If ObjectId exists in selected_course and ObjectId(in string format)
-                    # exists as key in course_enrollment_status
-                    # Then only update status as "Enrollment Approved"/"Enrollment Rejected"
-                    if each_course_id in selected_course and str_course_id in course_enrollment_status:
-                        # course_enrollment_status.update({str_course_id: course_enrollment_status_text})
-                        course_enrollment_status[str_course_id] = course_enrollment_status_text
-                        try:
-                            at_node = create_gattribute(student_id, course_enrollment_status_at, course_enrollment_status)
-                            if at_node:
-                                # If status updated, then only update approved_or_rejected_list
-                                # by appending given student's ObjectId into it
-                                if student_id not in approved_or_rejected_list:
-                                        approved_or_rejected_list.append(student_id)
-                        except Exception as e:
-                            error_id_list.append(student_id)
-                            continue
-            """
 
             approved_or_rejected_list.extend(new_list)
 
@@ -4321,23 +4291,123 @@ def approve_students(request, group_id):
             # Update status of Approval task
             has_current_approval_task_id = sce_gs["result"][0]["has_current_approval_task"]
             if has_current_approval_task_id:
-                has_current_approval_task_id = has_current_approval_task_id[0]
+                has_current_approval_task_id = has_current_approval_task_id[0][0]
 
             task_status_at = node_collection.one({
                 '_type': "AttributeType", 'name': "Status"
             })
 
             task_status_value = ""
+            task_status_msg = ""
             if remaining_count == 0:
                 if enrolled_count == (approved_count + rejected_count):
                     task_status_value = u"Closed"
+                    task_status_msg = "This task has been closed after successful completion " + \
+                        "of approval process of students."
+
             else:
                 task_status_value = u"In Progress"
+                task_status_msg = "This task is in progress."
 
             try:
-                attr_node = create_gattribute(has_current_approval_task_id[0], task_status_at, task_status_value)
+                # Update the approval task's status as "Closed"
+                task_dict = {}
+                task_dict["_id"] = has_current_approval_task_id
+                task_dict["Status"] = task_status_value
+
+                # Update description of Approval task only at time of it's closure
+                if task_status_value is u"Closed":
+                    task_dict["created_by_name"] = user_name
+
+                    task_message = task_status_msg + " Following are the details " + \
+                        "of this approval process:-" + \
+                        "\n Total No. of student(s) enrolled: " + str(enrolled_count) + \
+                        "\n Total No. of student(s) approved: " + str(approved_count) + \
+                        "\n Total No. of student(s) rejected: " + str(rejected_count) + \
+                        "\n Total No. of student(s) remaining: " + str(remaining_count)
+                    task_dict["content_org"] = unicode(task_message)
+
+                task_dict["modified_by"] = user_id
+                task_node = create_task(task_dict)
+
+                if task_status_value == u"Closed":
+                    # Update the StudentCourseEnrollment node's status as "CLOSED"
+                    at_type_node = None
+                    at_type_node = node_collection.one({
+                        '_type': "AttributeType",
+                        'name': u"enrollment_status"
+                    })
+                    if at_type_node:
+                        at_node = create_gattribute(enrollment_id, at_type_node, u"CLOSED")
+
+                    # Set completion status for closed approval task in StudentCourseEnrollment node's has_enrollment_task
+                    completed_on = datetime.datetime.now()
+
+                    if str(has_current_approval_task_id) in has_approval_task_dict:
+                        has_approval_task_dict[str(has_current_approval_task_id)] = {
+                            "completed_on": completed_on, "completed_by": user_id
+                        }
+                        at_type_node = None
+                        at_type_node = node_collection.one({
+                            '_type': "AttributeType",
+                            'name': u"has_approval_task"
+                        })
+
+                        if at_type_node:
+                            attr_node = create_gattribute(enrollment_id, at_type_node, has_approval_task_dict)
+
+                    # Send intimation to PO's and admin to create batches
+                    from_user = user_id
+                    url_link_without_domain_part = ""
+                    url_link = ""
+                    activity_text = "batch creation"
+                    msg = "This is to inform you that approval process of " + \
+                        "students for " + college_name + " college has been " + \
+                        "completed with following details:" + \
+                        "\n\tCourse name: " + course_name + \
+                        "\n\tTotal No. of student(s) enrolled: " + str(enrolled_count) + \
+                        "\n\tTotal No. of student(s) approved: " + str(approved_count) + \
+                        "\n\tTotal No. of student(s) rejected: " + str(rejected_count) + \
+                        "\n\tTotal No. of student(s) remaining: " + str(remaining_count) + \
+                        "\n\nYou can proceed with batch creation for given course in this college."
+
+                    # Fetch college group to get Program Officers of the college
+                    college_group_node = node_collection.find_one({
+                        "_type": "Group", "relation_set.group_of": college_id
+                    }, {
+                        "created_by": 1, "group_admin": 1
+                    })
+
+                    to_django_user_list = []
+                    user_id_list = []
+                    user_id_list.extend(college_group_node.group_admin)
+                    user_id_list.append(college_group_node.created_by)
+                    for each_user_id in user_id_list:
+                        user_obj = User.objects.get(id=each_user_id)
+                        if user_obj not in to_django_user_list:
+                            to_django_user_list.append(user_obj)
+
+                    if url_link_without_domain_part:
+                        site = Site.objects.get(pk=1)
+                        site = site.name.__str__()
+
+                        domain = "http://" + site
+                        url_link = domain + url_link_without_domain_part
+
+                    render_label = render_to_string(
+                        "notification/label.html",
+                        {
+                            "sender": from_user,
+                            "activity": activity_text,
+                            "conjunction": "-",
+                            "link": url_link
+                        }
+                    )
+                    notification.create_notice_type(render_label, msg, "notification")
+                    notification.send(to_django_user_list, render_label, {"from_user": from_user})
+
             except Exception as e:
-                error_id_list.append(has_current_approval_task_id[0])
+                error_id_list.append(has_current_approval_task_id)
 
             response_dict["success"] = True
             response_dict["enrolled"] = enrolled_count
@@ -4520,67 +4590,6 @@ def get_students_for_batches(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict))
 
-
-def get_resources(request, group_id):
-    """
-    This view is for adding units to MIS Course Structure
-    Arguments:
-    group_id - ObjectId of the currently selected group
-    resource_type - name of GSystemType
-
-    Returns:
-    Drawer with resources
-    """
-    response_dict = {'success': False, 'message': ""}
-    try:
-        if request.is_ajax() and request.method == "POST":
-            resource_type = request.POST.get('resource_type', "")
-            widget_for = request.POST.get('widget_for', "")
-            list_resources = []
-            if resource_type:
-
-                if resource_type == "Pandora Video":
-                    resource_type = "Pandora_video"
-
-                resource_gst = node_collection.one({'_type': "GSystemType", 'name': resource_type})
-                res = node_collection.find(
-                    {
-                        'member_of': resource_gst._id,
-                        'group_set': ObjectId(group_id),
-                        'status': u"PUBLISHED"
-                    }
-                )
-
-                for each in res:
-                    list_resources.append(each)
-
-                drawer_template_context = edit_drawer_widget("CourseUnits", group_id, None, None, None, left_drawer_content=list_resources)
-                drawer_template_context["widget_for"] = widget_for
-                drawer_widget = render_to_string(
-                    'ndf/drawer_widget.html',
-                    drawer_template_context,
-                    context_instance = RequestContext(request)
-                )
-                # response_dict["drawer_widget"] = drawer_widget
-                # response_dict["success"] = True
-                # response_dict["reso"] = json.dumps(res['result'],cls=NodeJSONEncoder)
-                # print "\nresponse_dict---",response_dict["reso"]
-                # enrollment_columns = [
-                #   ("name", "Name"),
-                # ]
-                # response_dict["column_headers"] = enrollment_columns
-
-            return HttpResponse(drawer_widget)
-        else:
-            error_message = "Resource Drawer: Either not an ajax call or not a POST request!!!"
-            response_dict["message"] = error_message
-            return HttpResponse(json.dumps(response_dict))
-
-    except Exception as e:
-        error_message = "Resource Drawer: " + str(e) + "!!!"
-        response_dict["message"] = error_message
-        return HttpResponse(json.dumps(response_dict))
-
 # ====================================================================================================
 
 @get_execution_time
@@ -4729,7 +4738,7 @@ def reschedule_task(request, group_id, node):
  if request.user.id in listing:
     
     reschedule_attendance = node_collection.one({"_type":"AttributeType","name":"reschedule_attendance"})
-    marks_entry_completed = node_collection.find({"_type":"AttributeType","name":"marks_entry_completed"})
+    marks_entry = node_collection.find({"_type":"AttributeType","name":"marks_entry_completed"})
     reschedule_type = request.POST.get('reschedule_type','')
     reshedule_choice = request.POST.get('reshedule_choice','')
     session = request.POST.get('session','')
@@ -4780,7 +4789,7 @@ def reschedule_task(request, group_id, node):
                 if unicode ('reschedule_dates') in i['reschedule_attendance']:
                     reschedule_dates = i['reschedule_attendance']['reschedule_dates']
             if unicode('marks_entry_completed') in i.keys():
-                    event_details = i['marks_entry_completed']
+                    marks_entry_completed = i['marks_entry_completed']
             if unicode("event_attendance_task") in i.keys():
               task_id = i["event_attendance_task"]
 
@@ -4794,10 +4803,10 @@ def reschedule_task(request, group_id, node):
                  break
 
         reschedule_dates.append(datetime.datetime.today())
-        if event_details != False or reshedule_choice == "Attendance" :
-        	create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
-        if session != str(1):
-          create_gattribute(ObjectId(node),marks_entry_completed[0],True)
+        if reshedule_choice == "Attendance" or reshedule_choice == "" :
+                create_gattribute(ObjectId(node),reschedule_attendance,{"reschedule_till":b,"reschedule_allow":True,"reschedule_dates":reschedule_dates})
+        if session != str(1) and reshedule_choice == "Assessment" :
+          create_gattribute(ObjectId(node),marks_entry[0],False)
         task_id['Reschedule_Task'] = True
         reschedule_event=node_collection.one({"_type":"AttributeType","name":"event_attendance_task"})
 	create_gattribute(ObjectId(node),reschedule_event,task_id)
@@ -4900,11 +4909,11 @@ def event_assginee(request, group_id, app_set_instance_id=None):
           attendedlist.append(a['Name'])
 
  if attendancesession != str(1):
-   create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],True)
+   create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
  if assessmentdone == 'True':
      event_status = node_collection.one({"_type":"AttributeType","name":"event_status"})
      create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
-     create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
+     create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],True)
  
  reschedule_dates={}
  
@@ -4937,22 +4946,32 @@ def fetch_course_name(request, group_id,Course_type):
   return HttpResponse(json.dumps(course_list))
 
 @get_execution_time  
-def fetch_course_Module(request, group_id,Course_name):
+def fetch_course_Module(request, group_id,announced_course):
+  #Course_name 
   batch = request.GET.get('batchid','')
+  
   superdict={}
   module_Detail={}
   module_list=[]
   event_type_ids=[]
-  courses = node_collection.one({"_id":ObjectId(Course_name)},{'relation_set.announced_for':1})
+  
+  courses = node_collection.one({"_id":ObjectId(announced_course)},{'relation_set.announced_for':1,'relation_set.acourse_for_college':1})
+  
   eventtypes = node_collection.find({'_type': "GSystemType", 'name': {'$in': ["Classroom Session", "Exam"]}})
   for i in eventtypes:
   	  event_type_ids.append(i._id)
+  
   for i in courses.relation_set:
     if unicode('announced_for') in i.keys():
       	announced_for = i['announced_for']  
-  courses=node_collection.find({"_id":{'$in':announced_for}})
-  trainers=node_collection.find({"relation_set.trainer_of_course":ObjectId(Course_name)})
-  course_modules=node_collection.find({"_id":{'$in':courses[0].collection_set}})
+    if unicode('acourse_for_college') in i.keys():
+        for j in  i['acourse_for_college']:
+            group_of = j  
+  
+  courses = node_collection.find({"_id":{'$in':announced_for}})
+  trainers = node_collection.find({"relation_set.trainer_teaches_course_in_college":[ObjectId(courses[0]._id),ObjectId(group_of)]})
+  course_modules = node_collection.find({"_id":{'$in':courses[0].collection_set}})
+  
   #condition for all the modules to be listed is session in it should not be part of the event
   checklist=[]
   for i in course_modules:
@@ -5246,7 +5265,8 @@ def attendees_relations(request,group_id,node):
          course_assignment=False
          course_assessment=False
          reschedule = True
-         marks = False
+         #marks = False
+         marks = True
            
          member_of=node_collection.one({"_id":{'$in':event_has_attended[0].member_of}})
          if member_of.name != "Exam":

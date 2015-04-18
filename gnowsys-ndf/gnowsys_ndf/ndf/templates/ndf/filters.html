@@ -1,55 +1,66 @@
 <style type="text/css">
 
 	div#filter-area {
- 		border: solid transparent; 
+		border: dashed thistle;
  		border-radius: 5px;
+		padding: 0 5px 5px 5px;
 		margin-left: -10px;
  	}
 
-	div#filter-area:hover { border: dashed thistle; }
+	/*div#filter-area:hover { border: dashed thistle; }*/
 
-	div#add-filters, div#close-select-filters { cursor: pointer; height: 100%; }
-	div#add-filters:hover, div#close-select-filters:hover { background-color: lightgray; }
-
+	div#add-filters/*, div#close-select-filters*/ { cursor: pointer; height: 100%; }
+	div#add-filters:hover/*, div#close-select-filters:hover*/ { background-color: lightgray; }
+	/*
 	div#close-select-filters {
 		margin-left: 8px;
 		margin-right: -10px;
 		padding-bottom: 8px;
 	}
-
+	*/
 	div#create-filter { padding-top:0.75em; }
 
 	div#applied-filters { 
-		margin-top: -35px;
-		padding-left: 2em;
-	}
-	
-	div#add-filters {
-		margin-left: 25px;
-		margin-top: 5px; 
-		margin-bottom: -15px;
+		/*margin-top: -15px;*/
+		/*padding-left: 2em;*/
 		padding-bottom: 5px;
 		padding-top: 5px;
+	}
+	
+	#add-filters {
+		/*margin-left: 25px;*/
+		/*margin-top: 5px; */
+		/*margin-bottom: -15px;*/
+		padding-bottom: 5px;
+		/*padding-left: 5px;*/
+		cursor: pointer;
+	}
+
+	#filters-label{
+		opacity: 0.1;
+		/*position: absolute;*/
+		/*padding-left: 10px;*/
 	}
 
 	div#select-filters {
 		background-color: #efefef;
 		padding-top: 0.5em;
-	    margin-left: 10px;
-	    margin-right: 10px;
+	    margin-left: 5px;
+	    margin-right: 5px;
 	    margin-bottom: 5px;
 	    border-radius: 0 0 5px 5px;
 	}
 
 	div.filters{ 
-		padding: 5px 10px; 
+		/*padding: 5px 10px; */
 		margin: 2px 5px;
 		color: white;
+		font-size: 0.9em;
 	}
 
-	i.fi-x-circle{
-		padding-left: 10px;
-		font-size: small;
+	i.remove-filter{
+		padding-left: 8px;
+		font-size: 1.1em;
 		cursor: pointer;
 	}
 
@@ -60,25 +71,25 @@
 	
 	<!-- top-filter row -->
 	<div class="row" >
-		<div id="add-filters" class="small-1 columns text-center"> Add Filters </div>
-		<div id="applied-filters" class="small-11 columns"></div>
+		<h2 id="add-filters" class="small-2 columns text-center" title="Filters applied">
+			<span id="filters-count"></span> <span id="filters-label"></span>
+		</h2>
+		<div id="applied-filters" class="small-10 columns"></div>
 	</div>
-
-	<br/>
 
 	<!-- second filter row -->
 	<div class="row" id="select-filters">
-		
+		<!-- 
 		<div class="small-1 columns text-center" id="close-select-filters">
 			<i class="fi-x-circle" style="font-size:large;"></i>&nbsp; <br/>
 			Close
 		</div>
-		
-		<div class="small-11 columns" id="create-filter">
+		 -->
+		<div class="small-12 columns" id="create-filter">
 			<div class="row">
 				<div class="small-2 columns text-right"><h5>Select filter</h5></div>
 				<div class="small-4 columns">
-					<select name="search-field-name">
+					<select name="filter-field-name">
 						<option value="initial-select"> -- Select -- </option>
 						{% for key, val in filter_dict.items %}
 							<option value='{{val.value}}'
@@ -95,7 +106,7 @@
 					</select>
 				</div>
 				<div class="small-4 columns">
-					<select name="search-field-value"  
+					<select name="filter-field-value"  
 					onblur="$(this).css('height', '')"
 					onfocus="$(this).css('height', '6em')" multiple>
 						<option value=""> -- Select -- </option>
@@ -131,13 +142,13 @@
 	} )
 
 	// hide functionality on click of close filters
-	$("#close-select-filters").click(function(){
-		$( "#select-filters" ).slideUp();
-	})
+	// $("#close-select-filters").click(function(){
+	// 	$( "#select-filters" ).slideUp();
+	// })
 
 	// getting both the <select>
-	var $selectName = $("select[name='search-field-name']"),   // first <select>
-		$selectValue = $("select[name='search-field-value']"); // second <select>
+	var $selectName = $("select[name='filter-field-name']"),   // first <select>
+		$selectValue = $("select[name='filter-field-value']"); // second <select>
 
 	// handling change of first <select>;
 	// to populate second <select> with "value" field of this (first <select>'s) <option>.
@@ -198,13 +209,32 @@
 			var tempObj = new Object();
 			tempObj["selFieldValue"] 		= this.getAttribute("data-selFieldValue");;
 			tempObj["selFieldGstudioType"] 	= this.getAttribute("data-gstudio-type");
-			tempObj["selFieldText"] 			= this.getAttribute("data-selFieldText");
+			tempObj["selFieldText"] 		= this.getAttribute("data-selFieldText");
 			tempObj["selFieldPrimaryType"] 	= this.getAttribute("data-primary-type");
 
 			filtersObjArr.push(tempObj);
 		});
 
 		return filtersObjArr;
+	}
+
+	function updateFiltersCount(){
+
+		// looping to get all fiters after their addition.
+		var allFilters = $("#applied-filters").children("div.filters.label").length;
+
+		// setting the text/label of filters/filter based on count plurality
+		if(allFilters > 0)
+		{
+			$("#filters-label").html("<i class='fi-filter'></i>").fadeIn();
+			$("#filters-count").text(allFilters).fadeIn();
+		}
+		else
+		{
+			$("#filters-label").fadeOut();
+			$("#filters-count").fadeOut();
+		}
+
 	}
 
 	function getFiltersObjsInAndOrFormat()
@@ -247,7 +277,7 @@
 		var flagIsNewFilterSelected = false;
 
 		// getting second <select>'s selected options
-		var selOpts = $("select[name='search-field-value'] :not(:first-child):selected");
+		var selOpts = $("select[name='filter-field-value'] :not(:first-child):selected");
 
 		// getting already added filers as array of text strings
 		var prevFiltersArr = [];
@@ -287,13 +317,14 @@
 					filterDiv.setAttribute("data-primary-type", selFieldPrimaryType);
 
 					var closeBtn = document.createElement("i");
-					closeBtn.className = "fi-x-circle";
+					closeBtn.className = "fi-x-circle remove-filter";
 					closeBtn.title = "Remove this filter";
 					closeBtn.onclick = function(){
 						$(this).parent().fadeOut("slow", function(){
 							$(this).detach();
 							var filtersObjArr = getFiltersObjArr();
 							applyFilter(filtersObjArr);
+							updateFiltersCount();
 						});
 
 					};
@@ -302,6 +333,14 @@
 					// appending newly created filter element to applied-filters area
 					$("#applied-filters").append(filterDiv);
 
+					$(".remove-filter").mouseenter(function(){
+						$(this).parent("div.filters").css("text-decoration", "line-through")
+					});
+
+					$(".remove-filter").mouseleave(function(){
+						$(this).parent("div.filters").css("text-decoration", "none")
+					});
+
 					var filtersObj = new Object();
 					filtersObj["selFieldValue"] = selFieldValue;
 					filtersObj["selFieldGstudioType"] = selFieldGstudioType;
@@ -309,17 +348,19 @@
 					filtersObj["selFieldPrimaryType"] = selFieldPrimaryType;
 
 					filtersObjArr.push(filtersObj);
-
+					
 				}
 				else  // handling selection of already existing filter
 				{
-					alert('Filter - ( "' + filterText + '" ) is already applied !');
+					alert('Filter - [ "' + filterText + '" ] is already applied !');
 				}
 
 				// make the height of second select to initial
 				$selectValue.css("height", "");
 
 			});  // end of looping through selected filter
+
+			updateFiltersCount();
 
 			/**
 			===: Instructions :===

@@ -245,7 +245,9 @@ ul#navigation li a.last {
     color: #10c1cb;
  }
 
+
 </style>
+
 
 
 {% if user.is_authenticated %}
@@ -297,7 +299,6 @@ ul#navigation li a.last {
 
  
       <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
-
       {% if node %}
         {% get_publish_policy request groupid node as group_policy %}
         {% if group_policy == "allow" %}
@@ -306,7 +307,8 @@ ul#navigation li a.last {
       {% endif %}
 
       </h1>
-
+      
+        
       <h1 class="subheader">
       <dl class="tabs" data-tab> 
 
@@ -1121,6 +1123,7 @@ ul#navigation li a.last {
             {% endif %}
           {% endif %}
         </div>
+        
         <div class="medium-7 columns">
           {% get_create_url node.pk as create_url %}
           {% if is_group %}
@@ -1164,9 +1167,15 @@ ul#navigation li a.last {
               {% endif %}
             {% endif %}
           {% endif %}
-
         </div>
-
+        
+        <div class ="rows">
+           {% if user.is_authenticated %} 
+            <div class= "medium-12 columns" >
+                <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
+            </div>
+           {% endif %}
+        </div>     
         
 
         {% if node %}

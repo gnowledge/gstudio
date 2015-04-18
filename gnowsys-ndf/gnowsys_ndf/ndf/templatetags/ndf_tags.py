@@ -2209,6 +2209,16 @@ def get_group_name(groupid):
 
 	return group_name 
 
+
+@register.filter
+def concat(value1, value2):
+    """concatenate multiple received args
+    """
+    return_str = value1.__str__()
+    value2 = value2.__str__()
+    return return_str + value2
+
+
 @get_execution_time
 @register.filter
 def get_field_type(node_structure, field_name):
@@ -2509,11 +2519,11 @@ def get_filters_data(gst_name):
                     "language": GSTUDIO_RESOURCES_LANGUAGES,
                     # "educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
                     "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
-                    "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
+                    # "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
                     "educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
-                    "curricular": GSTUDIO_RESOURCES_CURRICULAR,
+                    # "curricular": GSTUDIO_RESOURCES_CURRICULAR,
                     "audience": GSTUDIO_RESOURCES_AUDIENCE,
-                    "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
+                    # "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
 				}
 
 	# following attr's values need to be get/not in settings:

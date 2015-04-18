@@ -4,7 +4,7 @@
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
 
-{% block title %} Partner {% endblock %}
+{% block title %} {{groups_category}} {% endblock %}
 
 {% block meta_content %}  
 <h2 class="subheader">{% trans groups_category %}</h2>
@@ -29,8 +29,13 @@
   <div class="create card">
     <div class="group">
       <br/>
-      <a class="button medium" href="{% url 'create_partner' group_name_tag %}">
-    	<span class="fi-plus">&nbsp;&nbsp;{% trans "New Partner" %}</span>
+      <a class="button medium"
+      {% if groups_category == "Partners" %}
+          href="{% url 'create_partner' group_name_tag %}">
+        {% else%}
+          href="{% url 'create_group' group_name_tag %}">
+        {% endif %}
+        <span class="fi-plus">&nbsp;&nbsp;{% blocktrans %} New {{groups_category}} {% endblocktrans %}</span>
       </a>
     </div>
   </div>
@@ -85,7 +90,7 @@
         <div class='{% if node.status == "PUBLISHED" %}published{% endif %} group'>
       {% endif %} 
 
-      <a href="{% url 'partnerlist' node.pk %}">
+      <a href="{% url 'partnerlist' node.name %}">
       <div class="row">
         <div class="small-10 columns">                             
             <b>

@@ -1,0 +1,140 @@
+<html>
+<head>
+<link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> 
+<script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> 
+  <link rel="stylesheet" href="/static/ndf/css/themes/metastudio/styles.css"> 
+  <script src="/static/ndf/bower_components/blockui/jquery.blockUI.js"></script> 
+<script src="/static/ndf/bower_components/d3/d3.min.js"></script>
+
+</head> 
+
+
+<style>
+
+.chart rect {
+  fill: steelblue;
+}
+
+.chart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+</style>
+
+<body>
+<center>
+<h4> Get the method freqencies </h4>
+
+<div class = "row">
+			       <div class= "small-3 column" align="right" >             
+			            <form method="POST" action = "{% url 'month_view' %}" >
+			            {% csrf_token %}
+			        <label> <h5>G et the Frequency for :</h5></label>         
+			       </div>         
+			       
+			       <div class= "small-2 column">             
+			            <select name = "periodview" >
+			              <option value = 'day' >  day </option>
+			              <option value = 'week' > week </option>
+			              <option value = 'month'> month </option>
+			            </select>
+			       </div>    
+			       <div class= "small-1 column">
+			               <input class = "button tiny" type="submit"  value = "search">
+                     </form>
+			       </div>
+			                
+			       <div class= "small-6 column"  align="left" >
+		                <form method="POST" action = "{% url 'report' %}" >
+			                    {% csrf_token %}
+			                    <input class = "button tiny" type="submit"  value = "report">
+                    </form>
+			       </div>     
+			               
+        
+</div>
+<h5 align="right" style="color:37852A; "> Click on the Graph bar to get the name and frequencies of the method </h5>
+<svg class="chart"></svg>
+</center>
+</body>
+
+
+<script>
+data = {{bench_cur|safe}}
+
+var margin = {top: 20, right: 30, bottom: 30, left: 20},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var chart = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  x.domain(data.map(function(d) { return d._id; }));
+  y.domain([0, d3.max(data, function(d) { return d.time_taken; })]);
+
+  chart.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  chart.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+  chart.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d._id); })
+      .attr("y", function(d) { return y(d.time_taken); })
+      .attr("height", function(d) { return height - y(d.time_taken); })
+      .attr("width", x.rangeBand()).on('click',function(d){method_name_frequency(d)});
+      function method_name_frequency(a)
+      {
+      
+         alert("name:" + "  " + a._id + " \n" + "frequency:" + "  " +a.time_taken)
+      }
+
+chart.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("Frequency");
+    
+    var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10, "%");
+    
+function type(d) {
+  d.time_taken = +d.time_taken; // coerce to number
+  return d;
+}
+
+</script>
+
+</html>
+

@@ -188,7 +188,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
       nodes = node_collection.find({'member_of': event_gst._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
       
   node = None
-  event_reschedule_check = False
+  marks_entry_completed = True
   marks_list=[]
   Assesslist=[]
   batch=[]
@@ -219,7 +219,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
        if(unicode('event_date_task')) in i.keys():
            event_task_date_reschedule = i['event_date_task']['Reschedule_Task']     
        if(unicode('marks_entry_completed')) in i.keys():    
-           event_reschedule_check = i['marks_entry_completed'] 
+           marks_entry_completed = i['marks_entry_completed'] 
                 
     for i in node.relation_set:
        if unicode('event_has_batch') in i.keys():
@@ -262,7 +262,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                         'reschedule'    : reschedule, 
                         'task_date' : event_task_date_reschedule,
                         'task_attendance' : event_task_Attendance_reschedule,
-                        'event_reschedule_check' :event_reschedule_check,
+                        'marks_entry_completed' :marks_entry_completed,
                         'Eventtype':Eventtype, 
                          # 'property_order_list': property_order_list
                       }
@@ -423,7 +423,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
         # print " ", field_set["name"]
 
         # * Fetch only Attribute field(s) / Relation field(s)
-        print "getting some thing****"
+        
         if field_set.has_key('_id'):
           field_instance = node_collection.one({'_id': field_set['_id']})
           field_instance_type = type(field_instance)

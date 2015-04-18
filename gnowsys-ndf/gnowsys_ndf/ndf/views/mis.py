@@ -124,6 +124,8 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
       if os.path.exists(app_set_view_file_path):
         # print "\n Call this function...\n"
+        if app_set_view_file_name == "course":
+          app_set_view_file_name = "mis_course"
         return eval(app_set_view_file_name + "_detail")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
 
       # print "\n Perform fallback code...\n"
