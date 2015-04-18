@@ -547,14 +547,16 @@
       $(this).datepicker('setDate', new Date(year, (month-1), day));
     },
   });
-  {% if node %}
-    {% if unlock_enroll %}
-      //allow to edit end_enroll date
-      $("#end_enroll").removeAttr("disabled")
-    {% else %}
-      //don't allow to edit enrollment dates
-      $("#end_enroll").attr("disabled",true)
+  /*
+    {% if node %}
+      {% if unlock_enroll %}
+        //allow to edit end_enroll date
+        $("#end_enroll").removeAttr("disabled")
+      {% else %}
+        //don't allow to edit enrollment dates
+        $("#end_enroll").attr("disabled",true)
+      {% endif %}
+      $("#start_enroll").attr("disabled",true)
     {% endif %}
-    $("#start_enroll").attr("disabled",true)
-  {% endif %}
+  */
 {% endblock %}

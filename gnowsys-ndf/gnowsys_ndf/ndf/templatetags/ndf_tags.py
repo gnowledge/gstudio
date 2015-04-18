@@ -2519,11 +2519,11 @@ def get_filters_data(gst_name):
                     "language": GSTUDIO_RESOURCES_LANGUAGES,
                     # "educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
                     "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
-                    "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
+                    # "educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
                     "educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
-                    "curricular": GSTUDIO_RESOURCES_CURRICULAR,
+                    # "curricular": GSTUDIO_RESOURCES_CURRICULAR,
                     "audience": GSTUDIO_RESOURCES_AUDIENCE,
-                    "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
+                    # "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
 				}
 
 	# following attr's values need to be get/not in settings:
