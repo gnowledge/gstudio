@@ -245,6 +245,23 @@ ul#navigation li a.last {
     color: #10c1cb;
  }
 
+ .border-thin-lightgray {
+    border: thin solid lightgray;
+ }
+
+ #ebook-area{
+  height: 40rem;
+  height: 80vh;
+ }
+
+ .redirection {
+  cursor: pointer;
+ }
+
+ .redirection:hover > small {
+  color: black;
+  transition: 0.5s all;
+ }
 
 </style>
 
@@ -631,10 +648,12 @@ ul#navigation li a.last {
                   <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     <p>Your browser does not support the audio element </p>
                   </iframe>
-                  {% elif 'pdf' in node.mime_type %}
-                      <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
-                      <br/>
-                      <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
+                {% elif 'pdf' in node.mime_type %}
+                  <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
+                  <br/>
+                  <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
+                {% elif 'epub' in node.mime_type %}
+
                 {% else %}
                   <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                     {{ grid_fs_obj.filename }}
@@ -644,6 +663,7 @@ ul#navigation li a.last {
             <!-- end of if 'image' in node.mime_type ... -->
 
           {% else %}
+            <!-- not a collection -->
               {% if 'image' in node.mime_type %}
                 <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
@@ -673,6 +693,86 @@ ul#navigation li a.last {
                 <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                 <br/>
                 <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
+              {% elif 'epub' in node.mime_type %}
+                <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
+                <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
+                <!-- <script type="text/javascript" src="https://raw.githubusercontent.com/futurepress/epub.js/master/build/libs/zip.min.js"></script> -->
+
+                <div class="row">
+                  <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
+                    <small class="fi-arrow-left"> Previous</small>
+                  </h2>
+                  <div class="small-8 columns text-center"></div>
+                  <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
+                    <small>Next <i class="fi-arrow-right"></i></small>
+                  </h2>
+                </div>
+                
+                <div class="row ebook-container border-thin-lightgray">
+                  <div class="small-12 columns" id="ebook-area"></div>
+                </div>
+                
+                <div class="row">
+                  <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
+                    <small class="fi-arrow-left"> Previous</small>
+                  </h2>
+
+                  <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    Download "{{ grid_fs_obj.filename }}"
+                  </a>
+                  <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
+                    <small>Next <i class="fi-arrow-right"></i></small>
+                  </h2>
+                </div>
+                
+                <script>
+                  // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
+                  var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}", {
+                    width: 400,
+                    height: false,
+                    restore: true
+                  });
+                  Book.renderTo("ebook-area");
+
+                  // REF - https://github.com/futurepress/epub.js/tree/master/documentation
+
+                  // Loads book chapter at a given spine position or epub CFI string.
+                  // Book.displayChapter('epubcfi(/6/6[Untitled-12]!4[Untitled-12]/2/64/6/2/2/1:0)');
+
+                  // Setting End to true will advance to the last page of the chapter.
+                  // Book.displayChapter(3, true);
+
+                  // Loads book chapter that has the given url:
+                  // var skip = Book.goto("chapter_001.xhtml");
+                  //             skip.then(function(){
+                  //                 console.log("On Chapter 1");
+                  //             })
+
+                  // Adds style to be attached to the body element rendered book.
+                  // Book.setStyle("font-size", "inherit");
+
+                  // Removes a style from the rendered book
+                  // Book.removeStyle(style)
+
+                  // Promises:
+                  // Book.getMetadata().then(function(meta){
+                  //   document.title = meta.bookTitle+" – "+meta.creator;
+                  // });
+
+                  // Book.getToc().then(function(toc){
+                  //     console.log(toc);
+                  // });
+
+                  // Book.on('book:pageChanged', function(location){
+                  //     console.log(location.anchorPage, location.pageRange)
+                  // });
+
+                  // Book.on('renderer:locationChanged', function(locationCfi){
+                  //     console.log(locationCfi)
+                  // });
+
+                </script>
+
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
