@@ -45,6 +45,7 @@ def event(request, group_id):
     pass
  #view written just to show the landing page of the events
  group_inverse_rel_id = [] 
+ Event_app = True
  Group_type=node_collection.one({'_id':ObjectId(group_id)})
  for i in Group_type.relation_set:
      if unicode("group_of") in i.keys():
@@ -88,6 +89,7 @@ def event(request, group_id):
                                              'groupid':group_id,
                                              'group_id':group_id,
                                              'group_name':group_id,
+                                             'Event_app':Event_app,
                                              'Add':Add
                                             },
                               context_instance = RequestContext(request)

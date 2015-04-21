@@ -51,8 +51,23 @@
 </div>
 
 <script>
-    $('#view-scheduler-calendar').on('toggled', function (event, tab) {
-        $('#calendar').fullCalendar({
+     
+    if( '{{Event_app}}'  == 'True' )
+    {
+        $('#view-scheduler-calendar').append( function (event, tab) {
+         calendar();
+        });
+    }
+    else
+    {
+        $('#view-scheduler-calendar').on('toggled', function (event, tab) {
+             calendar();
+        });
+    }
+    
+    function calendar()
+    {
+          $('#calendar').fullCalendar({
             default: true,
             header: {
                 left: 'prev,next today',
@@ -82,18 +97,29 @@
             },
                                 
             viewRender: function(view) {
-                if (view.name == 'month'){	
-	                var groupid='{{groupid}}';
-	                 $('#calendar').fullCalendar( 'removeEvents');
-	                for (i=1;i<=3;i++)
-	                {
-	                    ajaxcalls(i)
-	                }
+                if (view.name == 'month')
+                 {	
+	                  var groupid='{{groupid}}';
+	                  $('#calendar').fullCalendar( 'removeEvents');
+	                  
+	                  if( '{{Event_app}}'  == 'True' )
+                        {  
+	                           ajaxcalls('1')
+	                            
+	                      } 
+	                  else
+	                      {
+	                            for (i=1;i<=3;i++)
+	                            {
+	                                ajaxcalls(i)
+	                            } 
+	                      }         
                   }
             }
         });
-    });
-        
+       
+    
+    }    
     function ajaxcalls(no)
     {
 
