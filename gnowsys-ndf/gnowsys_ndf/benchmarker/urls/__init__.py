@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = patterns('gnowsys_ndf.benchmarker.benchmarkreport',
                        url(r'^report/', 'report', name='report'),
+                       url(r'^month/','month_view',name='month_view'),
                        )
                        
 #urlpatterns = patterns('',

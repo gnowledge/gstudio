@@ -4847,6 +4847,14 @@ def reschedule_task(request, group_id, node):
         return_message="Event Re-scheduled"
  else:
     reschedule_type = request.POST.get('reschedule_type','')
+    reshedule_choice = request.POST.get('reshedule_choice','')
+    if reschedule_type == "attendance_reschedule":
+       if  reshedule_choice == "Attendance" or reshedule_choice == "": 
+           content = "Attendance" 
+       if  reshedule_choice == "Assessment":
+           content = "Assessment"   
+    else:
+       content = "start time"
     Mis_admin=node_collection.find({"name":"MIS_admin"})
     Mis_admin_list=Mis_admin[0].group_admin
     Mis_admin_list.append(Mis_admin[0].created_by)
@@ -4859,11 +4867,11 @@ def reschedule_task(request, group_id, node):
     task_type = []
     task_type.append(node_collection.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id)
     task_dict.update({"has_type" :task_type})
-    task_dict.update({'name':unicode('Reschedule Task')})
+    task_dict.update({'name':unicode("Re-schedule Event" + " " + content)})
     task_dict.update({'group_set':b})
     task_dict.update({'created_by':request.user.id})
     task_dict.update({'modified_by':request.user.id})
-    task_dict.update({'content_org':unicode("Please Re-Schedule the Following event"+"   \t " "\n- Please click [[" + event_reschedule_link + "][here]] to reschedule event")})
+    task_dict.update({'content_org':unicode("Please Re-Schedule the Following event"+"   \t " "\n- Please click [[" + event_reschedule_link + "][here]] to reschedule event " + " " + content )})
     task_dict.update({'created_by_name':request.user.username})
     task_dict.update({'Status':unicode("New")}) 
     task_dict.update({'Priority':unicode('Normal')})
