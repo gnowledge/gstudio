@@ -74,16 +74,10 @@
           <b>{{course.name}}
           </b>
         </div>
-      
-        </div>
-        </br></a>
+      </div>
+          <hr/>
+          <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
 
-        <div class="label-list small-12 columns">
-          {% for tag in course.tags|slice:":3" %}
-          <a href="{% url 'tag_info' group_name_tag tag %}">
-            <span class="label" style="background-color:yellow">{{tag}}</span>
-          </a>{% endfor %}
-        </div>
           <footer>
             <div class="age">
               {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
@@ -92,6 +86,15 @@
             </div>
             <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
           </footer>
+          </a>
+
+        <div class="label-list small-12 columns">
+          {% for tag in course.tags|slice:":3" %}
+          <a href="{% url 'tag_info' group_name_tag tag %}">
+            <span class="label" style="background-color:yellow">{{tag}}</span>
+          </a>{% endfor %}
+        </div>
+          <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
       </div>
     </li>        
 
