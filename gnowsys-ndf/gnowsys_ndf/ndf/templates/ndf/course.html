@@ -72,43 +72,32 @@
   {% for course in course_coll %}
   <li class="card">
     <div class="course">
-      <header>
-        <div class="label-list">
-          {% for tag in course.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-          {% endfor %}
+      <a href="{% url 'course_detail' group_name_tag course %}">
+      <div class="row">
+        <div class="small-8 column">
+          <b>{{course.name}}
+          </b>
         </div>
-
-        <div class="th"><img src="/static/ndf/scss/themes/metastudio/logo.svg"></div>
-        
-        <h4>{{ course.name|truncatechars:20 }}
-          <div>
-            <small class="subheader">{{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
-            <br/>
-            by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
-            </small>
-          </div>
-        </h4>
-      </header>
-    
-      <p>{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
       
-      <a class="small button expand" href="{% url 'course_detail' group_name_tag course %}"> {% trans "View Details" %}</a>
+        </div>
+        </br></a>
 
-      {% comment %}
-      {% get_user_object node.created_by as user_obj %}
-      {% ifequal user_obj.username user.username %}
-      <a class="button alert tiny" href="{% url 'delete_module' group_name_tag course %}?next={{request.path}}">{% trans "Delete" %} </a>
-      {% endifequal %}
-      {% endcomment %}
-
-      <footer class="row">
-        <div class="small-7 columns"><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</div>
-        <div class="small-5 columns"><div class="right"><strong>{{course.version_dict|length}}</strong> Edit{{course.version_dict|pluralize}}</div></div>
-      </footer>
-
-    </div>
-  </li>
+        <div class="label-list small-12 columns">
+          {% for tag in course.tags|slice:":3" %}
+          <a href="{% url 'tag_info' group_name_tag tag %}">
+            <span class="label" style="background-color:yellow">{{tag}}</span>
+          </a>{% endfor %}
+        </div>
+          <footer>
+            <div class="age">
+              {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
+              <br/>
+              by <span class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</span> 
+            </div>
+            <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
+          </footer>
+      </div>
+    </li>        
 
   {% empty %}
     {% if not searching %}
