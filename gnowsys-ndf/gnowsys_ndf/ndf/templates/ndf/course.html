@@ -13,13 +13,9 @@
 
 {% block meta_content %}
   <h2 class="subheader">{% trans "Courses" %}</h2>
-
-  
-
     {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-
         <a class="small button" href="{% url 'create_edit' group_name_tag %}">
           <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
         </a>

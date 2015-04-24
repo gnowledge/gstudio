@@ -757,7 +757,7 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
       course_structure_exists = True
 
 
-  context_variables = { 'groupid': group_id, 
+  context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'course_gst_name': course_gst.name,
