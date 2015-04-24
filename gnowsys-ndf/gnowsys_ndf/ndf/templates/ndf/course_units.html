@@ -7,6 +7,10 @@
   
   {{block.super}}
 
+    .button{
+      font-size:1rem !important;
+    }
+
   	.td_cell{
   		background-color:#0b8a91 !important;
   		font-size:19px;
@@ -22,7 +26,6 @@
     table, th, td{
       border: 1px solid white;
   	}
-
 
     .unit-name-div{
       width:60% !important;
@@ -71,28 +74,58 @@
       margin-left:0 !important;
     }
 
+    #add_res, #new_res{
+      width:85%;
+    }
+
 {% endblock %}
+
+{% block meta_content %} 
+  <br/><br/>
+    <div class="row ">
+      <input type="button" id="new_res" value="+ New Resource" class="small button" disabled="disabled">
+    </div>
+    <div class="row ">
+      <input type="button" id="add_res" value="Add existing resource" class="small button" disabled="disabled">
+    </div>
+
+{% endblock %}
+
 
 {% block body_content %} 
 
     <div class="row unit-name-div">
-      <div class="small-6 columns">
-      <label>Enter Unit Name</label>
+      <div class="small-3 columns">
+          <label>{% trans "Enter Unit Name" %}</label>
       </div>
-      <div class="small-6 columns">
-      <input type="text" id="unit_name" value="{% if unit_node %} {{unit_node.name}}{% endif %}">
+      <div class="small-3 columns">
+          <input type="text" id="unit_name" value="{% if unit_node %} {{unit_node.name}}{% endif %}">
       </div>
+      <div class="small-2 columns">
+          <input type="button" id="create_unit" value="{% if unit_node %} Update Unit {% else %} Create Unit{% endif %}" class="tiny round button"/>
+      </div>
+      <div class="small-4 columns">
+          <span data-tooltip title="You will be redirected to Course Authoring page" style="float:right;">
+            <a class="done_units tiny button round" style="float:right;">Add more units later..</a>
+          </span>
+      </div>
+
     </div>
       <div class="unit-list-div">
         <ul class="button-group">
-          <li><a onclick="open_div('Page',this)" class="Page button">Page</a></li>
-          <li><a onclick="open_div('File',this)" class="File button">File </a></li>
-          <li><a onclick="open_div('Image',this)" class="Image button">Image </a></li>
-          <li><a onclick="open_div('Video',this)" class="Video button">Video </a></li>
-          <li><a onclick="open_div('Pandora',this)" class="Pandora button">Pandora</a></li>
-          <li><a onclick="open_div('Quiz',this)" class="Quiz button">Quiz</a></li>
+          <li><a onclick="open_div('Page',this)" class="Page button res-btn">Page</a></li>
+          <li><a onclick="open_div('File',this)" class="File button res-btn">File </a></li>
+          <li><a onclick="open_div('Image',this)" class="Image button res-btn">Image </a></li>
+          <li><a onclick="open_div('Video',this)" class="Video button res-btn">Video </a></li>
+          <li><a onclick="open_div('Pandora',this)" class="Pandora button res-btn">Pandora</a></li>
+          <li><a onclick="open_div('Quiz',this)" class="Quiz button res-btn">Quiz</a></li>
+
         </ul>
       </div>
+
+      <div class="row collection_details">
+      </div>
+
       <div class="res-opt-div">
         <div id="view_add_page" class="row hide"> 
 
@@ -137,14 +170,11 @@
       </div>
       <input type="button" class="res-option hide button small">
       <div class="collection_block_div">
-          <span data-tooltip title="You will be redirected to Course Authoring page" style="float:right;">
-            <a class="done_units small button round" style="float:right;">Add more units later..</a>
-          </span>
           </br></br></br>
 
           <div class="resources_drawer_div row"></div>
-          <input type="button" value="Save Units" class="save_units small button round hide">
-          <input type="hidden" name="hidden_unit_node_id" id="hidden_unit_node_id">
+          <input type="button" value="Save to Unit" class="save_units small button round hide">
+          <input type="hidden" name="hidden_unit_node_id" id="hidden_unit_node_id" value="{{unit_node.pk}}">
           <input type="hidden" name="res_type_name" id="res_type_name">
       </div>
 {% endblock %}
@@ -153,64 +183,102 @@
 {% block script %}
   {{block.super}}
 
-    //Cancel button
+  var res_name_flag = "";
+
+
+  //save unit button click
+    $(document).on("click", "#create_unit", function(){
+      unit_name_val = $("#unit_name").val();
+      unit_node_id = $("#hidden_unit_node_id").val();
+      $.ajax({
+
+        type: "POST",
+
+        url: "{% url 'create_edit_unit' groupid %}",
+
+        datatype: "json",
+
+        data:{
+          css_node_id: "{{css_node.pk}}",
+          unit_node_id: unit_node_id,
+          unit_name: unit_name_val,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+
+        success: function (data) {
+          resp_dict = JSON.parse(data)
+          unit_node = resp_dict["unit_node_id"]
+          $("#hidden_unit_node_id").val(unit_node)
+          url_path = window.location.href;
+          location.replace(url_path.replace("undefined",unit_node));
+        },
+      });
+    });
+
+  //Cancel button
     $(document).on("click", "#cancel_btn", function(){
       $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
       $(".res-option").removeClass("hide");
       $(".name_id").val("");
-    })
+    });
 
-    //Create new page/ Upload file button
+  //Create new page/ Upload file button
     $(document).on("click", ".res-option", function(){
       $(this).addClass("hide")
-      n = $("#res_type_name").val();
-      if(n == "Page"){
+      if(res_name_flag == "Page"){
         $(".res-opt-div").find("#view_add_page").removeClass("hide");
         $(".res-opt-div").find("#view_add_page .name_id").focus();
         $(".res-opt-div").find("#view_add_file").addClass("hide");
 
       }
-      else if(n == "File" || n == "Image" || n == "Video" || n == "Pandora"){
+      else if(res_name_flag == "File" || res_name_flag == "Image" || res_name_flag == "Video" || res_name_flag == "Pandora"){
         $(".res-opt-div").find("#view_add_file").removeClass("hide");
         $(".res-opt-div").find("#view_add_page").addClass("hide");
       }
       $(".save_units").addClass("hide")
     });
 
+  //Onclick of any resource type button
     function open_div(name,this1){
-        $(".resources_drawer_div").html(""); 
-        $(".save_units").addClass("hide");
-        $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
-
-        $("#res_type_name").val(name);
-        $(".button").removeClass("success");
-        $(this1).addClass("success");
-        if(name!="Quiz" && name=="Page"){
-          $(".res-option").val("Create new "+ name)
-          $(".res-option").removeClass("hide");
-
-        }
-        else if(name!="Quiz" && name!="Page"){
-          $(".res-option").removeClass("hide");
-          $(".res-option").val("Upload File")
-  
-        }
-        else{
-          $(".res-option").addClass("hide")
-        }
-        draw_drawer(name);
+        {% if unit_node %}
+          res_name_flag = name
+          console.log(res_name_flag)
+          update_res_count();
+          $(".button").removeClass("success");
+          $(this1).addClass("success");
+          $("#add_res,#new_res").removeAttr("disabled");
+        {% else %}
+          alert("Please create Unit")
+          return false;
+        {% endif %}
     };
 
+
+  //create new resource
+  $(document).on('click','#new_res',function(){
+    $(".collection_details").html("")
+    
+    if(res_name_flag=="Quiz" || res_name_flag=="Page"){
+      $(".res-option").val("Create new "+ res_name_flag)
+      $(".res-option").removeClass("hide");
+    }
+    else {
+      $(".res-option").removeClass("hide");
+      $(".res-option").val("Upload File")
+    }
+  })
+
+  //add from existing resources
+  $(document).on('click','#add_res',function(){
+    $(".collection_details").html("")
+    $(".res-option").addClass("hide");
+    draw_drawer(res_name_flag);
+  })
 
   // function to get drawer
     function draw_drawer(name){
       var resource_type_name = name;
-      if(!$("#hidden_unit_node_id").val()==""){
-        unit_node_id = $("#hidden_unit_node_id").val();
-      }
-      else{
-        unit_node_id = "{{unit_node.pk}}"
-      }
+      unit_node_id = $("#hidden_unit_node_id").val();
       resp_dict = {}
       $.ajax({
 
@@ -264,37 +332,15 @@
             }
             else if (data["success"] == true) {
               alert("Succesully added to Unit "+unit_name)
-
-      
               $(".name_id").val("");
+              $(".resources_drawer_div").html(""); 
+              $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
+              $(".button").removeClass("success")
 
-              $("#hidden_unit_node_id").val(data["unit_node_id"]);
-              unit_node = data["unit_node_id"]
-              if(unit_node){
-                $(".resources_drawer_div").html(""); 
-                url_path = window.location.href;
-                location.replace(url_path.replace("undefined",unit_node));
-              }
-              else{
-                $(".resources_drawer_div").html(""); 
-                $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
-                $(".button").removeClass("success")
-
-                lbl_val = $(".unit-list-div").find(".Page").text();
-                n = parseInt(lbl_val.match(/\d+/));
-
-                one = 1;
-                if(n){
-                  n= n + one;
-                }
-                else{
-                  n = 1;
-                }
-                $(".unit-list-div").find(".Page").text("Page ("+n+")")
-              }
             }
           }
         });
+      update_res_count();
       }
       else{
         alert("Please enter name");
@@ -306,29 +352,27 @@
 
 
   //Submit button for file
-  $('#docPost input[type=submit]').click(function(){
-      //save file button, check wether unit name is entered
-        unit_name_val = $("#unit_name").val()
-        if($("#docFile").val() != ""){
-
-
-        if(unit_name_val!=""){
-          $("#unit_name_file").val(unit_name_val);
-          $(".resources_drawer_div").html(""); 
-          $('#docPost').submit();
+    $('#docPost input[type=submit]').click(function(){
+        //save file button, check wether unit name is entered
           unit_name_val = $("#unit_name").val()
-          alert("Succesully added to Unit "+unit_name_val)
-        }
-        else{
-          alert("Please enter unit name");
-          event.preventDefault();
-        }
-        }
-        else{
-          alert("Please select a file");
-          event.preventDefault();
-        }
-  })
+          if($("#docFile").val() != ""){
+            if(unit_name_val!=""){
+              $("#unit_name_file").val(unit_name_val);
+              $(".resources_drawer_div").html(""); 
+              $('#docPost').submit();
+              unit_name_val = $("#unit_name").val()
+              alert("Succesully added to Unit "+unit_name_val)
+            }
+            else{
+              alert("Please enter unit name");
+              event.preventDefault();
+            }
+          }
+          else{
+            alert("Please select a file");
+            event.preventDefault();
+          }
+    })
 
 
   // Save units
@@ -336,12 +380,7 @@
       var resources_in_RHS = []
       unit_name_val = $("#unit_name").val()
       total_resources_in_RHS = $(".resources_drawer_div").find("#create_course_structure_drawer2").children("li")
-      if(!$("#hidden_unit_node_id").val()==""){
-        unit_node_id = $("#hidden_unit_node_id").val();
-      }
-      else{
-        unit_node_id = "{{unit_node.pk}}"
-      }
+      unit_node_id = $("#hidden_unit_node_id").val();
 
       //check if right drawer has values
       // if(total_resources_in_RHS.length > 0){
@@ -376,17 +415,7 @@
               $(".button").removeClass("success")
         		  $(".done_units").removeClass("hide")
               $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
-              dict_res = resp_dict["res_count_dict"]
-              if(dict_res){
-                update_res_count(dict_res);
-              }
-              if($("#hidden_unit_node_id").val()==""){
-                $("#hidden_unit_node_id").val(resp_dict['cu_new_id'])
-              }
-              if(resp_dict["create_new_unit"]){
-                url_path = window.location.href;
-                location.replace(url_path.replace("undefined",resp_dict['cu_new_id']));
-              }    
+                update_res_count();
         		},
       		});
         }
@@ -413,21 +442,55 @@
     })
 
   //function to display collection statistics
-  function update_res_count(dict_res){
-    $.each(dict_res,function(i,v){
-      $(".unit-list-div").find("."+i).text(i+" ("+v+")")
-    })
-  }
+    function update_res_count(){
+      
+      $(".collection_details").html("")
+      dict_res = {};
+      {% get_node unit_node.pk as unit_node %}
+      {% if unit_node.collection_set %}
+        {% for each_res in unit_node.collection_set %}
+          {% get_node each_res as res_node %}
+            {% if res_node %}
+              mem_of_name = "{{res_node.member_of_names_list.0}}"
+              if (!dict_res.hasOwnProperty(mem_of_name)){
+                dict_res[mem_of_name] = 1
+              }
+              else{
+                dict_res[mem_of_name] = dict_res[mem_of_name] + 1
+              }
+              {% if res_node.member_of_names_list.0|lower == "page" or res_node.member_of_names_list.0|lower == "quiz" %}
+                k = "{% url res_node.member_of_names_list.0|lower|concat:"_details" groupid res_node.pk %}"
+              {% else %}
+                k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
+              {% endif %}
+              var str_unit = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ {{forloop.counter}}+". <a href='"+k+"' target='_blank' class='unit_name'>{{res_node.name}}</a>    ({{res_node.member_of_names_list.0}})<br>"
+              $(".collection_details").append(str_unit)
+          {% endif %}
+        {% endfor %}
+      {% else %}
+          $(".collection_details").html("You haven't added any resources to this unit yet");
+      {% endif %} 
+
+      if(dict_res){
+        $.each(dict_res,function(i,v){
+          $(".unit-list-div").find("."+i).text(i+" ("+v+")");
+        })
+      }
+    }
 
 {% endblock %}
 
 
 {% block document_ready %}
   {{block.super}}
-    {% if res_count_dict %}
-      dict_res = {{res_count_dict|safe}}
-      update_res_count(dict_res)
-    {% endif %}
+    update_res_count()
+
+  // {% if unit_node %}
+  //   $(".res-btn").removeAttr("disabled");
+  // {% else %}
+  //   $(".res-btn").attr("disabled",true);
+  //   $(".res-btn").removeAttr("onclick");
+  // {% endif %}
 
 {% endblock %}
 </script
