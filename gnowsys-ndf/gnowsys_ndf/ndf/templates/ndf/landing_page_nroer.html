@@ -1,8 +1,9 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 
 {% load ndf_tags %}
 
-{% block title %} Welcome {% endblock %}
+{% block title %} {% trans "Welcome" %} {% endblock %}
 
 {% block head %}
 
@@ -65,24 +66,24 @@
                         <i class="fi-torsos slide-back-image"></i>
                         <div class="row">
                             <div class="small-12 columns">
-                                <h2> An initiative of Government of India </h2>
+                                <h2> {% trans "An initiative of Government of India" %} </h2>
                             </div>
                         </div>
                         <br/>
                         <div class="row">
                             <div class="small-8 push-1 offset-1 columns">
-                                <h3>Offering Open Educational Resources</h3>
+                                <h3>{% trans "Offering Open Educational Resources" %}</h3>
                                 <blockquote>
-                                    In all Indian Languages<br><br>
-                                    Created, adapted, translated and shared
+                                    {% trans "In all Indian Languages<br><br>
+                                    Created, adapted, translated and shared" %}
                                 </blockquote>
                             </div>
                             <div class="small-3 columns">
                                 <div class="count-box">
-                                    <span class="count"> {{all_files}}</span> Resources <br>
-                                    <span class="count"> {{all_users}}</span> Members <br>
+                                    <span class="count"> {{all_files}}</span> {% trans "Resources" %} <br>
+                                    <span class="count"> {{all_users}}</span> {% trans "Members" %} <br>
                                     <br>
-                                    <a href="../accounts/register/" class="ui button">Let's Join NROER</a>
+                                    <a href="../accounts/register/" class="ui button">{% trans "Let's Join NROER" %}</a>
                                 </div>
                                     
                                 <div>
@@ -128,22 +129,22 @@
                         <div class="medium-12 columns">
                             <div class="row">
                                 <div class="medium-12 columns">
-                                    <h3><i class="fi-arrows-in slide-2-icons"></i> &nbsp; Bridging divides</h3>
+                                    <h3><i class="fi-arrows-in slide-2-icons"></i> &nbsp; {% trans "Bridging divides" %}</h3>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="medium-12  push-1 columns">
-                                    <h3><i class="fi-annotate slide-2-icons"></i> &nbsp; Building partnerships</h3>
+                                    <h3><i class="fi-annotate slide-2-icons"></i> &nbsp; {% trans "Building partnerships" %}</h3>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="medium-12  push-2 columns">
-                                    <h3><i class="fi-results-demographics slide-2-icons"></i> &nbsp; Nurturing networks and interest groups</h3>
+                                    <h3><i class="fi-results-demographics slide-2-icons"></i> &nbsp; {% trans "Nurturing networks and interest groups" %}</h3>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="medium-12  push-3 columns">
-                                    <h3><i class="fi-magnifying-glass slide-2-icons"></i> &nbsp; Capturing and analyzing data</h3>
+                                    <h3><i class="fi-magnifying-glass slide-2-icons"></i> &nbsp; {% trans "Capturing and analyzing data" %}</h3>
                                 </div>
                             </div>
 
@@ -156,14 +157,14 @@
                         <i class="fi-asl slide-back-image"></i>
                         <div class="row">
                             <div class="small-12 columns">
-                                <h2> Connecting knowledge connecting people... </h2>
+                                <h2> {% trans "Connecting knowledge connecting people..." %} </h2>
                             </div>
                         </div>
                         <div class="row">
                             <div class="small-9 offset-3 columns">
                                 <h3>
                                     <span class="quotes">&#8220</span>
-                                        Strengthening school and teacher education
+                                        {% trans "Strengthening school and teacher education" %}
                                     <span class="quotes">&#8221</span>
                                 </h3>
                             </div>
