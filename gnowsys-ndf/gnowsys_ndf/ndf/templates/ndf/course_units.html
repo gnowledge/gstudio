@@ -190,6 +190,9 @@
   //create unit button click
     $(document).on("click", ".create_unit", function(event){
       unit_name_val = $(".unit_name").val();
+      {% if unit_node %}
+        old_unit_name = "{{unit_node.name}}"
+      {% endif %}
       unit_node_id = $("#hidden_unit_node_id").val();
       if(unit_name_val!=""){
 
@@ -218,7 +221,8 @@
         });
       }
       else{
-        alert("Please enter name");
+        alert("Please enter Unit name");
+        $(".unit_name").val(old_unit_name);
         event.preventDefault();
       }
     });
