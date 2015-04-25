@@ -106,20 +106,19 @@ def collection_nav(request, group_id):
   '''
   This ajax function retunrs the node on main template, when clicked on collection hierarchy
   '''
-  if request.is_ajax() and request.method == "POST":    
+  if request.is_ajax() and request.method == "POST":
     node_id = request.POST.get("node_id", '')
     curr_node_id = request.POST.get("curr_node", '')
     node_type = request.POST.get("nod_type", '')
-    
-    breadcrumbs_list = []
-    curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id) })
 
+    breadcrumbs_list = []
+    curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id)})
     if node_type == "Topic":
       theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
       for e in curr_node_obj.prior_node:
-        prior = node_collection.one({'_id': ObjectId(e) })
+        prior = node_collection.one({'_id': ObjectId(e)})
         if curr_node_obj._id in prior.collection_set and theme_item_GST._id in prior.member_of:
-          breadcrumbs_list.append( (str(prior._id), prior.name) )
+          breadcrumbs_list.append((str(prior._id), prior.name))
 
     topic = ""
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
@@ -127,10 +126,10 @@ def collection_nav(request, group_id):
     n_list = request.POST.get("nav", '')
 
     # This "n_list" is for manipulating breadcrumbs events and its navigation
-    if n_list:      
+    if n_list:
       # Convert the incomming listfrom template into python list
-      n_list = n_list.replace("&#39;","'")
-      n_list = ast.literal_eval(n_list) 
+      n_list = n_list.replace("&#39;", "'")
+      n_list = ast.literal_eval(n_list)
 
       # For removing elements from breadcrumbs list to manipulate basd on which node is clicked 
       for e in reversed(n_list):
@@ -850,65 +849,100 @@ def add_page(request, group_id):
   if request.is_ajax() and request.method == "POST":
 
     context_node_id = request.POST.get("context_node", '')
-    gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-    context_node = node_collection.one({'_id': ObjectId(context_node_id)})
-    name =request.POST.get('name','')
+    css_node_id = request.POST.get("css_node", '')
+    unit_name = request.POST.get("unit_name", '')
+    context_name = request.POST.get("context_name", '')
 
+    gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    name = request.POST.get('name', '')
     collection_list = []
-    if context_node:
-      for each in context_node.collection_set:
+    context_node = None
+    response_dict = {"success": False}
+    context_node = node_collection.one({'_id': ObjectId(context_node_id)})
+
+    for each in context_node.collection_set:
         obj = node_collection.one({'_id': ObjectId(each), 'group_set': ObjectId(group_id)})
         collection_list.append(obj.name)
 
-      if name not in collection_list:
-
+    if name not in collection_list:
         page_node = node_collection.collection.GSystem()
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
-
         context_node.collection_set.append(page_node._id)
         context_node.save()
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
 
-        return HttpResponse("success")
+    else:
+        response_dict["success"] = False
+        return HttpResponse(json.dumps(response_dict))
 
-      else:
-        return HttpResponse("failure")
-
-    return HttpResponse("None")
+    response_dict["success"] = None
+    return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
 def add_file(request, group_id):
-  # this is context node getting from the url get request
-  context_node_id=request.GET.get('context_node','')
+    # this is context node getting from the url get request
+    context_node_id = request.GET.get('context_node', '')
 
-  if request.method == "POST":
+    context_node = node_collection.one({'_id': ObjectId(context_node_id)})
+    if request.method == "POST":
 
-    new_list = []
-    # For checking the node is already available in gridfs or not
-    for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-      fileobj = node_collection.collection.File()
-      filemd5 = hashlib.md5(each.read()).hexdigest()
-      if not fileobj.fs.files.exists({"md5": filemd5}):
-        # If not available append to the list for making the collection for topic bellow
-        new_list.append(each)
-      else:
-        # If availbale ,then return to the topic page
-        var1 = "/"+group_id+"/topic_details/"+context_node_id+""
-        return HttpResponseRedirect(var1)
+        context_name = request.POST.get("context_name", "")
+        css_node_id = request.POST.get("css_node_id", "")
+        course_node = request.POST.get("course_node", "")
+        unit_name = request.POST.get("unit_name_file", "")
+        app_id = request.POST.get("app_id", "")
+        app_set_id = request.POST.get("app_set_id", "")
 
-    # After taking new_lst[] , now go for saving the files 
-    submitDoc(request, group_id)
+        if context_name is "Topic":
+            url_name = "/" + group_id + "/topic_details/" + context_node_id + ""
+        else:
+            # i.e  if context_name is "Course"
+            url_name = "/" + group_id + "/course/add_units/?css_node_id=" + \
+                css_node_id + "&unit_node_id=" + context_node_id + "&course_node="+ course_node
+            if app_id and app_set_id:
+                url_name += "&app_id=" + app_id + "&app_set_id=" + app_set_id + ""
+            if context_node_id:
+                # set the unit node name
+                node_collection.collection.update({'_id': ObjectId(context_node_id)}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
 
-  # After file gets saved , that file's id should be saved in collection_set of context topic node
-  context_node = node_collection.one({'_id': ObjectId(context_node_id)})
-  for k in new_list:
-    file_obj = node_collection.one({'_type': 'File', 'name': unicode(k) })
+        new_list = []
+        # For checking the node is already available in gridfs or not
+        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+            fileobj = node_collection.collection.File()
+            filemd5 = hashlib.md5(each.read()).hexdigest()
+            if not fileobj.fs.files.exists({"md5": filemd5}):
+                # If not available append to the list for making the collection for topic below
+                new_list.append(each)
+            else:
+                if context_name == "Course":
+                        # If file exists, PUBLISH it and add to collection set
+                        cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+                        old_file_node = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
+                        if old_file_node._id not in context_node.collection_set:
+                                context_node.collection_set.append(old_file_node._id)
+                                old_file_node.status = u"PUBLISHED"
+                                old_file_node.prior_node.append(context_node._id)
+                                old_file_node.save()
+                                context_node.save()
+                else:
+                        # If availbale ,then return to the topic page
+                        return HttpResponseRedirect(url_name)
+        # After taking new_lst[] , now go for saving the files
+        submitDoc(request, group_id)
 
-    context_node.collection_set.append(file_obj._id)
-    context_node.save()
+    # After file gets saved , that file's id should be saved in collection_set of context topic node
 
-  var1 = "/"+group_id+"/topic_details/"+context_node_id+""
-
-  return HttpResponseRedirect(var1)
+    for k in new_list:
+        cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+        file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
+        file_obj.prior_node.append(context_node._id)
+        file_obj.status = u"PUBLISHED"
+        file_obj.save()
+        context_node.collection_set.append(file_obj._id)
+        file_obj.save()
+        context_node.save()
+    return HttpResponseRedirect(url_name)
 
 
 

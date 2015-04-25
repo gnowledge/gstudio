@@ -127,6 +127,7 @@
             <input type="hidden" name="login-mode" value="PUBLIC">
             <!-- Just a hidden value which enables us to retun to add_file() in ajax_views when any file gets uploaded -->
             <input type="hidden" name="type" value="topic_file">
+            <input type="hidden" name="context_name" id="context_name" value="Topic">
             <!-- This is for getting the user of the uploaded file -->
             <input type="hidden" name="user" value="{{request.user.pk}}">
             <input type="submit" class="small round button" id="add_file" value="Save File">
@@ -171,14 +172,14 @@ $("#add_page").click(function() {
           csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function(data) {
-
+          data = JSON.parse(data)
           var page = $(".name_id").val();
 
-          if ($.trim(data) === "failure") {
+          if ($.trim(data["success"]) === false) {
             alert("Page name "+ page +" already available, Please choose different name");
           }
 
-          if ($.trim(data) === "success") {
+          if ($.trim(data["success"]) === true) {
             location.reload(true);
           }
 

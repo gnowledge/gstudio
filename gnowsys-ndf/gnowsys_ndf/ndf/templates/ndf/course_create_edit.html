@@ -1,27 +1,23 @@
 {% extends "ndf/node_edit_base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% block title %}
+  {% if node %}
+    Edit {{title}} {{node.name}}
+  {% else %}
+    Create {{title}}
+  {% endif %}
+{% endblock %}
 
 {% block meta_content %}
 {% blocktrans %} <h3>Building of a Course </h3>
   <p class="text-justify"><b>Course</b> is a sequenced collection of already freezed modules.</p>{% endblocktrans %}
 {% endblock %}
 
-
 {% block page_tab %} Basic {% endblock %}
-{% block collection_tab %}{% trans "Add Module" %} {% endblock %}
 
-{% block collection %}
-  <div class="content" id="panel-collection" style="width:95%;">
-    <div class="row">
-      <div class="small-12 columns">
-        <h5>{% trans "Add or Remove Module:" %} </h5>
-      </div>
-      <div class="small-12 columns">
-        <div id="module_drawer" >
-        	<!-- {#% edit_drawer_widget "module" groupid node %#} -->
-        </div>
-      </div>
-    </div>
-  </div>
+
+{% block document_ready %}
+  {{block.super}}
+  $(".collection_tab").hide();
 {% endblock %}
