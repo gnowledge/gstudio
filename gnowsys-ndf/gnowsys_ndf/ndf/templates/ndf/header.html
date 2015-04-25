@@ -36,7 +36,7 @@
           <li>
             <!-- <a href="{#% url 'GAPPS' 'home' 'topics' %#}" {#% if nroer_menu.top_menu_selected == "Repository" %#}class="active"{#% endif %#}> -->
             <a href="{% url 'repository' 'home' %}" {% if nroer_menu.top_menu_selected == "Repository" %}class="active"{% endif %}>
-              Repository
+              Repositoryhhh
             </a>
           </li>
 
@@ -44,14 +44,24 @@
             {% for menuk, menuv in each_menu.items %}
 
             <li class="has-dropdown">
+	      
               <a {% if nroer_menu.top_menu_selected == menuk %}class="active"{% endif %}
-                href="{% url 'nroer_groups' 'home' menuk %}" 
+              	 href="{% url 'nroer_groups' 'home' menuk %}" 
               > {{menuk}} </a>
               <ul class="dropdown">
+	
                 {% for each_sub_menu in menuv %}
                 <li>
                   <a 
                   {% for mapk, mapv in nroer_menu.mapping.items %}
+		     {% if mapv in "Teachers, Schools, Interest Groups" %}
+		     {% if each_sub_menu == mapk %}
+                      href="/{{mapv}}"
+                      {% if nroer_menu.sub_menu_selected == mapk %}
+                        class="active" 
+                      {% endif %}
+                    {% endif %}
+		     {% endif %}
                     {% if each_sub_menu == mapk %}
                       href="{% url 'partnerlist' mapv %}"
                       {% if nroer_menu.sub_menu_selected == mapk %}

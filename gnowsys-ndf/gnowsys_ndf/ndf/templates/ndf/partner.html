@@ -89,8 +89,11 @@
       {% else %}
         <div class='{% if node.status == "PUBLISHED" %}published{% endif %} group'>
       {% endif %} 
-
+      {% if node.name in "Schools, Teachers, Interest Groups"%} 
+      <a href="/{{node.name}}">
+      {% else %}      
       <a href="{% url 'partnerlist' node.name %}">
+	{% endif %}
       <div class="row">
         <div class="small-10 columns">                             
             <b>
