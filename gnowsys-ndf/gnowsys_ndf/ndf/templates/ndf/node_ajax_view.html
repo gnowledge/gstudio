@@ -326,10 +326,10 @@ ul#navigation li a.last {
 
       {% if topic %}
       <!-- Basic Description -->
-      <dd class="tab-title active page-view view_list"><a href="view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      <dd class="active page-view view_list"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
 
       <!-- Filter view for Topics -->
-      <dd class="tab-title filters-view">
+      <dd class="filters-view">
         <nav id="nav">
           <ul id="navigation">
             <li><a href="#" class="view-filters"><i class="fi-list"></i> {% trans "Filter based on" %} </a>
@@ -433,11 +433,11 @@ ul#navigation li a.last {
         
       {% else %}
       <!-- Basic Description -->
-      <dd class="tab-title active page-view"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      <dd class="tab-title active page-view"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       {% endif %}
     
       <!-- Info-box -->
-      <dd class="tab-title info-view"><a href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
+      <dd class="tab-title info-view"><a class="view-info" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       
       <!-- Discussion -->
       {% if "Group" not in node.member_of_names_list %}
@@ -445,7 +445,7 @@ ul#navigation li a.last {
         {% if node|is_File or node|is_Page %}         
         <!-- calling ndf tags for discussion replies -->
         {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-        <dd class="tab-title discussion-view"><a href="#view-discussion"><i class="fi-comment"></i>
+        <dd class="tab-title discussion-view"><a class="view-discussion" href="#view-discussion"><i class="fi-comment"></i>
 
           {% if all_replies %}
             <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
@@ -869,88 +869,87 @@ ul#navigation li a.last {
         <!-- Resource contents of topic -->
         {% if topic %}
         <!-- <div class="content" id="view-graph">  </div> -->
-        <div class="content topic_content" id="contents"> 
-          {% if node.content_org %}
-            {{node.content_org}}
-          {% endif %}
+        <div class="topic_content" id="contents"> 
           
           {% get_all_resources request node.pk as resources %}
-            {% for key, val in resources.items %}
-            <fieldset id="{{key}}">
-              <legend>{{key}}</legend>
-              {% if  key == "Images" %}
-                {% for k,v in val.items %}
-                  {% if k == "fallback_lang" %}
-                    {% for each in v %}
-            
-                      <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-                      <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-                      <br/><div>{{each.name}}</div>
-                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                    {% endfor %}
-                  {% elif k == "other_languages" %}
-                    {% if v %}
-                    <fieldset id="{{k}}">
-                      <legend>{% trans "In other languages" %}</legend>
+              {% for key, val in resources.items %}
+              <fieldset id="{{key}}">
+                <legend>{{key}}</legend>
+                {% if  key == "Images" %}
+                  {% for k,v in val.items %}
+                    {% if k == "fallback_lang" %}
                       {% for each in v %}
+              
                         <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
                         <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
                         <br/><div>{{each.name}}</div>
                         </a>&nbsp;&nbsp;&nbsp;&nbsp;
                       {% endfor %}
-                    </fieldset>
+                    {% elif k == "other_languages" %}
+                      {% if v %}
+                      <fieldset id="{{k}}">
+                        <legend>{% trans "In other languages" %}</legend>
+                        {% for each in v %}
+                          <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                          <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                          <br/><div>{{each.name}}</div>
+                          </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endfor %}
+                      </fieldset>
+                      {% endif %}
                     {% endif %}
-                  {% endif %}
-                {% endfor %}
+                  {% endfor %}
 
-              {% elif  key == "Videos" %}
-                {% for k,v in val.items %}
-                  {% if k == "fallback_lang" %}
-                    {% for each in v %}
-                      <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-                      <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-                      <br/><div>{{each.name}}</div>
-                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                    {% endfor %}
-                  {% elif k == "other_languages" %}
-                    {% if v %}
-                    <fieldset id="{{k}}">
-                      <legend>{% trans "In other languages" %}</legend>
+                {% elif  key == "Videos" %}
+                  {% for k,v in val.items %}
+                    {% if k == "fallback_lang" %}
                       {% for each in v %}
                         <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
                         <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
                         <br/><div>{{each.name}}</div>
                         </a>&nbsp;&nbsp;&nbsp;&nbsp;
                       {% endfor %}
-                    </fieldset>
-                    {% endif %}          
-                  {% endif %}                
-                {% endfor %}
-              
-              {% else %}
-                {% for k,v in val.items %}
-                  {% if k == "fallback_lang" %}
-                    {% for each in v %}
-                      <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
-                      &nbsp;&nbsp;
-                    {% endfor %}
-                  {% elif k == "other_languages" %}
-                    {% if v %}
+                    {% elif k == "other_languages" %}
+                      {% if v %}
                       <fieldset id="{{k}}">
                         <legend>{% trans "In other languages" %}</legend>
                         {% for each in v %}
-                          <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
-                          &nbsp;&nbsp;
+                          <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
+                          <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
+                          <br/><div>{{each.name}}</div>
+                          </a>&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endfor %}
-                      </fieldset>	      
+                      </fieldset>
+                      {% endif %}          
+                    {% endif %}                
+                  {% endfor %}
+                
+                {% else %}
+                  {% for k,v in val.items %}
+                    {% if k == "fallback_lang" %}
+                      {% for each in v %}
+                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
+                        &nbsp;&nbsp;
+                      {% endfor %}
+                    {% elif k == "other_languages" %}
+                      {% if v %}
+                        <fieldset id="{{k}}">
+                          <legend>{% trans "In other languages" %}</legend>
+                          {% for each in v %}
+                            <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
+                            &nbsp;&nbsp;
+                          {% endfor %}
+                        </fieldset>	      
+                      {% endif %}
                     {% endif %}
-                  {% endif %}
-                {% endfor %}
-            
-              {% endif %}
+                  {% endfor %}
+              
+                {% endif %}
 
-            </fieldset>
-            {% endfor %}
+              </fieldset>
+              {% endfor %}
+            
+
         </div>
         <!-- End of displaying topic page contents -->
         {% endif %}
@@ -1633,6 +1632,20 @@ ul#navigation li a.last {
     $('#view-concept-graph').foundation('reveal', 'open'); 
   });
 
+  $(document).on('click','.view-info',function(){
+    $(".topic_content").css("display", "none");
+    $("#view-info").css("display", "block");
+  });
+
+  $(document).on('click','.view-page',function(){
+    $(".topic_content").css("display", "block");
+    $("#view-info").css("display", "none");
+  });
+
+  $(document).on('click','.view-discussion',function(){
+    $("#view-info").css("display", "none");
+  });
+
   // select particular type to display contents in topic page
   $(".view_list").click(function() {
     
@@ -1690,6 +1703,8 @@ ul#navigation li a.last {
 
           }
 
+          $("#view-info").css("display", "none");     
+          $(".topic_content").css("display", "block");
           $(".topic_content").html(fs); // render the html data 'fs' in topic contents div
 
           // Both bellow statements will take the variable values used in above html code and replace with required attributes 
@@ -1705,8 +1720,10 @@ ul#navigation li a.last {
           
         }
         else{
+          $("#view-info").css("display", "none");     
           // If no resource found for topic it will show bellow statement
           var cont = "<b>Be the first to add a resource to this topic.</b>"
+          $(".topic_content").css("display", "block");
           $(".topic_content").html(cont);
         }
 
