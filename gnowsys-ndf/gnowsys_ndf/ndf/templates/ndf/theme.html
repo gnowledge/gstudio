@@ -196,7 +196,7 @@
 			// var topic_name = $(this).siblings("a").attr("name");
 			var data_info = $(this).attr("data-info");
 			var hover_context = this;
-			if ( data_info!="" && topic_id ){
+			if ( ! data_info && topic_id ){
 				$(".topic_stats").css("display", "none");
 
 				$.ajax({
@@ -219,7 +219,7 @@
 	             			
 	             		}
 	             		else{
-	             			$(hover_context).attr("data-info", "");
+	             			$(hover_context).attr("data-info", data);	             			
 	             		}
 
 	             	},
@@ -229,14 +229,14 @@
 
 			}
 			else{ 
-				if(topic_id){
+				
+				if (topic_id){
 					var data = $(this).attr("data-info");
-					if (data!=""){
-						count = display_top_res(data)
-						$(".topic_stats").html(count);
-		     			$(".topic_stats").css("display", "block");
-					}
+					count = display_top_res(data)
+					$(".topic_stats").html(count);
+	     			$(".topic_stats").css("display", "block");
 				}
+
 			}
 
 
@@ -263,9 +263,11 @@
  				var len = data_obj[key].length;  // length of list as a value of key
  				// alert(key+": "+len);
  				count += key+": "+len+"<br/>";
- 			}
+ 			} 			
 
-
+ 		}
+ 		else{
+ 			count += "No Resources !<br/>";
  		}
 
  		return count
