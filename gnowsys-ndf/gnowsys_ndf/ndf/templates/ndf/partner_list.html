@@ -7,7 +7,7 @@
 {% block title %} {{groups_category}}s {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader">{% trans "groups_category" %}s</h2>
+<h2 class="subheader">{{groups_category}}s</h2>
 {% endblock %}
 
 
@@ -81,7 +81,7 @@
       
       <footer>
           <div class="age">
-            {{ node.agency_type}} {% trans "created" %} {{node.created_at|timesince}} {% trans "ago by" %} {% endblocktrans %}<span class="user" href="" data-gnow="">{{node.user_details_dict.created_by}}</span>
+            {{ node.agency_type}} {% trans "created" %} {{node.created_at|timesince}} {% trans "ago by" %} <span class="user" href="" data-gnow="">{{node.user_details_dict.created_by}}</span>
         </div>
         <span><strong>{{node.author_set|length}}</strong> {% trans "Members" %}</span>
         {% get_group_resources node as obj_count %}
