@@ -10,8 +10,6 @@
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 {% endblock %}
 
-
-
 {% block style %}
   {{block.super}}
 
@@ -55,8 +53,8 @@
    <section class="medium-8 columns name-section" >
     <h3>
       <span class='node'>{{node.name}}</span>
-      <!-- <span><a class="small button fi-pencil " href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span> -->
-      <span><a class="fi-pencil " href="{% url 'create_edit' group_id node.pk %}"></a></span>
+      <span><a class="small button " href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span>
+      <!-- <span><a class="fi-pencil " href="{% url 'create_edit' group_id node.pk %}"></a></span> -->
 
       <!-- This button publishes the drafted resource -->
       {% if node %}
