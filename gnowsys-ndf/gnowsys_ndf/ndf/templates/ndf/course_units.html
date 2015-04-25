@@ -191,29 +191,36 @@
     $(document).on("click", ".create_unit", function(event){
       unit_name_val = $(".unit_name").val();
       unit_node_id = $("#hidden_unit_node_id").val();
-      $.ajax({
+      if(unit_name_val!=""){
 
-        type: "POST",
+        $.ajax({
 
-        url: "{% url 'create_edit_unit' groupid %}",
+          type: "POST",
 
-        datatype: "json",
+          url: "{% url 'create_edit_unit' groupid %}",
 
-        data:{
-          css_node_id: "{{css_node.pk}}",
-          unit_node_id: unit_node_id,
-          unit_name: unit_name_val,
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
+          datatype: "json",
 
-        success: function (data) {
-          resp_dict = JSON.parse(data)
-          unit_node = resp_dict["unit_node_id"]
-          $("#hidden_unit_node_id").val(unit_node)
-          url_path = window.location.href;
-          location.replace(url_path.replace("undefined",unit_node));
-        },
-      });
+          data:{
+            css_node_id: "{{css_node.pk}}",
+            unit_node_id: unit_node_id,
+            unit_name: unit_name_val,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+
+          success: function (data) {
+            resp_dict = JSON.parse(data)
+            unit_node = resp_dict["unit_node_id"]
+            $("#hidden_unit_node_id").val(unit_node)
+            url_path = window.location.href;
+            location.replace(url_path.replace("undefined",unit_node));
+          },
+        });
+      }
+      else{
+        alert("Please enter name");
+        event.preventDefault();
+      }
     });
 
 
@@ -253,6 +260,7 @@
     function open_div(name,this1){
         res_name_flag = name
         update_res_count();
+        $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
         $(".button").removeClass("success");
         $(".save_units").addClass("hide")
 
