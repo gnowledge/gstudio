@@ -17,8 +17,13 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/create_css/$', 'save_course_sub_section', name='save_course_sub_section'),
                         url(r'^/course_sub_section_prop/$', 'course_sub_section_prop', name='course_sub_section_prop'),
                         url(r'^/resources/', 'get_resources', name='get_resources'),
+
                         url(r'^/add_units/', 'add_units', name='add_units'),
-                        url(r'^/save_units/', 'save_resources', name='save_resources'),
+                        url(r'^/publish_course/', 'publish_course', name='publish_course'),
+                        
+                        url(r'^/save_res/', 'save_resources', name='save_resources'),
+                        url(r'^/create_edit_unit/', 'create_edit_unit', name='create_edit_unit'),
                         url(r'^/change_node_name/$', 'change_node_name', name='change_node_name'),
                         url(r'^/change_order/$', 'change_order', name='change_order'),
+                        url(r'^/delete/$', 'delete_from_course_structure', name='delete_from_cs'),
                        )
