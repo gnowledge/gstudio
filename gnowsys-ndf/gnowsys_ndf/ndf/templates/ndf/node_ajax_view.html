@@ -469,7 +469,7 @@ ul#navigation li a.last {
             <dd class="tab-title manage-view"><a class="view-manage" href="#view-manage"><i class="fi-clipboard-notes"></i> {% trans "Management" %}</a></dd>
           {% endif %}
         {% endif %}
-        
+
       {% endif %}
     </dl>
   </h1>
@@ -1157,10 +1157,43 @@ ul#navigation li a.last {
         </div>
 
         <!-- Only visible to the group admins and super user for managing group activities -->
-        
-            <div class="content" id="view-manage">
-              welcome
+        <div class="content" id="view-manage">
+
+          <div class="row">
+            <div class="small-6 columns">
+              <a href="#" data-options="align:right" data-dropdown="clearing_house" aria-controls="clearing_house" aria-expanded="false" class="button secondary medium">Manage Clearing House&nbsp;&nbsp;&raquo;</a><br/>
+              <ul id="clearing_house" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                <li><a href="#">Manage Approvers</a></li>
+                <li><a href="#">Manage Curators</a></li>
+                <li><a href="#">Manage Group Admins</a></li>
+              </ul>
+
+              <a href="#" data-options="align:right" data-dropdown="manage_partners" aria-controls="manage_partners" aria-expanded="false" class="button secondary medium">Manage Partners&nbsp;&nbsp;&raquo;</a><br/> 
+              <ul id="manage_partners" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                <li><a href="#">Manage Partner Admins</a></li>
+                <li><a href="#">Manage Partner MOU's</a></li>
+              </ul>
+
+              <a href="#" data-options="align:right" data-dropdown="manage_events" aria-controls="manage_events" aria-expanded="false" class="button secondary medium">Manage Events&nbsp;&nbsp;&raquo;</a> <br/>
+                <ul id="manage_events" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                  <li><a href="#">Manage Event Admins</a></li>
+                  <li><a href="#">Manage Event Coordinators</a></li>
+                  <li><a href="#">Manage Event Attendees</a></li>
+                </ul>
+
+              <a href="#" data-options="align:right" data-dropdown="manage_courses" aria-controls="manage_courses" aria-expanded="false" class="button secondary medium">Manage Courses&nbsp;&nbsp;&raquo;</a> <br/>
+              <ul id="manage_courses" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                <li><a href="#">Manage Course Admins</a></li>
+                <li><a href="#">Manage Course Subscribers</a></li>
+              </ul>
+
             </div>
+            <div class="small-6 columns">
+              <a href="#" class="round small button right">View Statistics</a> <br/>
+            </div>
+          </div>
+
+        </div>
         <!-- /////////////////// -->
 
         <div class="content" id="view-discussion">
