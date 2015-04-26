@@ -460,6 +460,16 @@ ul#navigation li a.last {
         </a></dd>
         {% endif %}
 
+      {% else %}
+      <!-- If its group then show management tab only for group admins and superuser-->
+        {% check_group node as is_group %}
+        {% if is_group %}
+          {% check_is_gstaff groupid request.user as is_gstaff %}
+          {% if is_gstaff %}
+            <dd class="tab-title manage-view"><a class="view-manage" href="#view-manage"><i class="fi-clipboard-notes"></i> {% trans "Management" %}</a></dd>
+          {% endif %}
+        {% endif %}
+        
       {% endif %}
     </dl>
   </h1>
@@ -1146,6 +1156,11 @@ ul#navigation li a.last {
           </dl>
         </div>
 
+        <!-- Only visible to the group admins and super user for managing group activities -->
+        
+            <div class="content" id="view-manage">
+              welcome
+            </div>
         <!-- /////////////////// -->
 
         <div class="content" id="view-discussion">
@@ -1643,6 +1658,10 @@ ul#navigation li a.last {
   });
 
   $(document).on('click','.view-discussion',function(){
+    $("#view-info").css("display", "none");
+  });
+
+  $(document).on('click','.view-manage',function(){
     $("#view-info").css("display", "none");
   });
 
