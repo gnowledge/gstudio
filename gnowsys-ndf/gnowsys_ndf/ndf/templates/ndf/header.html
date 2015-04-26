@@ -195,15 +195,17 @@
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
             {% if user.is_superuser %}
-            <li class="text-center">
-              <a href="/admin/data">{% trans "Admin Data" %}</a>
-            </li>
-            <li class="text-center">
-              <a href="/admin/designer">{% trans "Admin Designer" %}</a>
-            </li>
-            <li class="text-center">
-              <a href="/home/">{% trans "Home Dashboard" %}</a>
-            </li>
+              <li class="text-center">
+                <a href="/admin/data">{% trans "Admin Data" %}</a>
+              </li>
+              <li class="text-center">
+                <a href="/admin/designer">{% trans "Admin Designer" %}</a>
+              </li>
+              {% if site.SITE_NAME == "NROER" %} 
+                <li class="text-center">
+                  <a href="/home/">{% trans "Home Dashboard" %}</a>
+                </li>
+              {% endif %}
             {% endif %}
             <li>
               <a class="logout" href="{% url 'auth_logout' %}">
