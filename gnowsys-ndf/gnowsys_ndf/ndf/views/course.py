@@ -99,12 +99,13 @@ def course(request, group_id, course_id=None):
     #                                    'group_set': {'$all': [ObjectId(group_id)]}
     #                                }).sort('last_update', -1)
 
-    course_coll = node_collection.find({'member_of': GST_COURSE._id})
+    course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id)})
 
 
-    all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]}})
+    all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]},
+                            'group_set': ObjectId(group_id)})
 
-    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id})
+    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id,'group_set': ObjectId(group_id)})
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'app_id': app_id,
