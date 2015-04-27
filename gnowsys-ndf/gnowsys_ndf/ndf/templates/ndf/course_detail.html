@@ -81,8 +81,6 @@
    <section class="medium-3 columns name-section" >
 
      <span>{% include "ndf/rating.html" %} </span>
-
-
   </section>
 </header>
 
@@ -95,18 +93,34 @@
 </div>
 <br>
 {% if node_type != "Course" %}
+    <section class="medium-8 columns name-section" >
+      <div class="ann_for row">
+        <label class="small-3 columns "> {% trans "Announced Course for :"%}</label>
+        <span class="small-6 columns end"><u><a href="{% url 'course_detail' group_name_tag cnode.pk %}">{{cnode.name}}</a></u></span>
+      </div>
+      <br/>
+      <div class="course_desc row">
+        <label class="small-3 columns "> {% trans "Course Description :"%}</label>
+      <p>
+        {{cnode.content_org}}
+      </p>  
+      </div>
+    </section>
+    {% if user.is_authenticated %}
 
-<div class="ann_for row">
-  <label class="small-3 columns "> {% trans "Announced Course for :"%}</label>
-  <span class="small-6 columns end"><u><a href="{% url 'course_detail' group_name_tag cnode.pk %}">{{cnode.name}}</a></u></span>
-</div>
-<br/>
-<div class="course_desc row">
-  <label class="small-3 columns "> {% trans "Course Description :"%}</label>
-<p>
-  {{cnode.content_org}}
-</p>  
-</div>
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access != "allow" %}
+
+          <section class="medium-8 columns name-section" >
+          <div class="row">
+            <div class="small-6 columns">
+                <input type="button" class="button" value="Enroll">
+            </div>
+          </div>  
+          </section>
+
+      {% endif %}
+    {% endif %}
 {% endif %}
 
 <div id="view_page"></div>
