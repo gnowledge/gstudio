@@ -1,0 +1,33 @@
+{% extends "ndf/course_detail.html" %}
+
+{% load ndf_tags %}
+{% load i18n %}
+<!-- overiding block from node_detail_base.html -->
+{% block meta_content %}
+{% endblock %}
+
+{% block collection_content %}
+{% endblock %}
+
+{% block body_content %}
+{{block.super}}
+
+<div class="ann_for row">
+	<label class="small-3 columns "> {% trans "Announced Course for :"%}</label>
+	<span class="small-6 columns end"><u><a href="{% url 'course_detail' group_name_tag cnode.pk %}">{{cnode.name}}</a></u></span>
+</div>
+<br/>
+<div class="course_desc row">
+	<label class="small-3 columns "> {% trans "Course Description :"%}</label>
+<p>
+	{{cnode.content_org}}
+</p>	
+</div>
+{% endblock %}
+
+{% block document_ready %}
+	{{block.super}}
+		
+		$("#view_page").html("");
+
+{% endblock %}
