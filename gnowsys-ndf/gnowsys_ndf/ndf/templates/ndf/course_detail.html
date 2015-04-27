@@ -20,16 +20,20 @@
 
 
 <!-- overiding block from node_detail_base.html -->
-{% block meta_content %}
-{% endblock %}
-
 
 {% block collection_content %}
-  <div id="view_collection">
-    {% include "ndf/collection_ajax_view.html" %}  
-  </div>
-  <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+  {% if node_type == "Course" %}
+    {{node_type}}
+      <div id="view_collection">
+        {% include "ndf/collection_ajax_view.html" %}  
+      </div>
+      <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+  {% endif %}
 {% endblock %}
+
+{% block meta_content %}
+{% endblock %}
+  
 
 
 <!-- overiding block_related content -->
@@ -85,6 +89,20 @@
   {% endwith %}
 </div>
 <br>
+{% if node_type != "Course" %}
+
+<div class="ann_for row">
+  <label class="small-3 columns "> {% trans "Announced Course for :"%}</label>
+  <span class="small-6 columns end"><u><a href="{% url 'course_detail' group_name_tag cnode.pk %}">{{cnode.name}}</a></u></span>
+</div>
+<br/>
+<div class="course_desc row">
+  <label class="small-3 columns "> {% trans "Course Description :"%}</label>
+<p>
+  {{cnode.content_org}}
+</p>  
+</div>
+{% endif %}
 
 <div id="view_page"></div>
 
@@ -112,10 +130,12 @@
       alert(node.id);
     }
     );
+    {% if node_type == "Course" %}
 
       {% if not course_structure_exists %}
         $("#view_page").append("<label>{% trans 'You have not added any content to this course yet' %}</label>")
       {% endif %}
+    {% endif %}
 
 
       $("#view_collection").find("b.current").after('&nbsp;&nbsp;<span><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span>')

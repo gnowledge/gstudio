@@ -198,21 +198,21 @@ def course_detail(request, group_id, _id):
                         'group_id': group_id,
                         'app_id': app._id,
                         'title': title,
-                        'node': course_node
+                        'node': course_node,
+                        'node_type': gs_name
     }
     if gs_name == "Course":
         context_variables["course_structure_exists"] = course_structure_exists
+
     else:
         if course_node.relation_set:
             for rel in course_node.relation_set:
                 if "announced_for" in rel:
-                    cnode = node_collection.one({'_id':ObjectId(rel["announced_for"][0])})
+                    cnode = node_collection.one({'_id': ObjectId(rel["announced_for"][0])})
                     context_variables["cnode"] = cnode
                     break
 
-    template = "ndf/" + gs_name.lower().replace(' ','_') +"_detail.html"
-
-    return render_to_response(template,
+    return render_to_response("ndf/course_detail.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
         )
