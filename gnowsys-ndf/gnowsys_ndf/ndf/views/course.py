@@ -1357,14 +1357,30 @@ def delete_item(item):
 
 
 @login_required
-def publish_course(request, group_id):
+def enroll_generic(request, group_id):
+    response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
-        try:
-            node_id = request.POST.get("node_id", "")
-            node = node_collection.one({'_id': ObjectId(node_id)})
-            node.status = unicode("PUBLISHED")
-            node.modified_by = int(request.user.id)
-            node.save()
-        except:
-            return HttpResponse("Fail")
-    return HttpResponse("Success")
+        course_enrollment_status_at = node_collection.one({
+            "_type": "AttributeType", "name": "course_enrollment_status"
+        })
+        node_id = request.POST.get('node_id', '')
+        usr_id = request.POST.get('usr_id', '')
+        usr_id = int(usr_id)
+        auth_node = node_collection.one({'_type': "Author", 'created_by': usr_id})
+        auth_node
+        course_node = node_collection.one({'_id': ObjectId(node_id)})
+        auth_node.get_neighbourhood(auth_node.member_of)
+
+        course_enrollment_status = {}
+        if auth_node["course_enrollment_status"]:
+            course_enrollment_status = auth_node["course_enrollment_status"]
+
+        str_course_id = str(course_node._id)
+        if str_course_id not in course_enrollment_status:
+            course_enrollment_status.update({str_course_id: u"Approved"})
+
+        at_node = create_gattribute(auth_node["_id"], course_enrollment_status_at, course_enrollment_status)
+        response_dict['success'] = True
+        return HttpResponse(json.dumps(response_dict))
+    else:
+        return HttpResponse(json.dumps(response_dict))

@@ -130,6 +130,35 @@
 {% block script %}
   {{block.super}}
 
+    $(document).on("click", ".enroll-btn", function(event) {
+        console.log("{{request.user.id}}")
+        enr_btn = $(this)
+        $.ajax({
+          url: "{% url 'course_enroll' group_id %}",
+
+          data: {
+            node_id: "{{node.pk}}",
+            usr_id: "{{request.user.id}}",
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data){
+            success_state = data["success"]
+            if(success_state){
+              enr_btn.attr("disabled",true)
+                     .val("Enrolled");
+            }
+            else{
+              alert("Something went wrong. Please try again later.")
+            }
+          },
+        });//end of ajax
+    })
+
 {% endblock %}
 
 
