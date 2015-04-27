@@ -230,7 +230,8 @@ def create_topic(obj, prev, row, descrp):
 		topic_node.contributors.append(nroer_team.id)
 		topic_node.created_by = nroer_team.id
 		topic_node.group_set.append(group_id)
-		topic_node.content_org = unicode(descrp)
+		if descrp:
+			topic_node.content_org = unicode(descrp)
 		topic_node.language = u"en"
 		topic_node.member_of.append(topic_GST._id)
 		topic_node.modified_by = nroer_team.id
