@@ -15,15 +15,15 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
-
 try:
-  from bson import ObjectId
+    from bson import ObjectId
 except ImportError:  # old pymongo
-  from pymongo.objectid import ObjectId
+    from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT, GSTUDIO_TASK_TYPES
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
+from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import save_file
@@ -32,8 +32,11 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
+from gnowsys_ndf.notification import models as notification
 
-GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': GAPPS[7]})
+GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
+GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+
 app = GST_COURSE
 
 
@@ -45,80 +48,74 @@ def course(request, group_id, course_id=None):
     """
     ins_objectid = ObjectId()
     if ins_objectid.is_valid(group_id) is False:
-      group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if group_ins:
-        group_id = str(group_ins._id)
-      else:
+        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth:
-          group_id = str(auth._id)
+        if group_ins:
+            group_id = str(group_ins._id)
+        else:
+            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth:
+                group_id = str(auth._id)
     else:
         pass
-    
+    app_id = None
+    app_id = app._id
+    course_coll = None
+    all_course_coll = None
+    ann_course_coll = None
+    app_set_id = None
     if course_id is None:
-      course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
-      if course_ins:
-        course_id = str(course_ins._id)
+        course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
+        if course_ins:
+            course_id = str(course_ins._id)
 
-    if request.method == "POST":
-      # Course search view
-      title = GST_COURSE.name
-      
-      search_field = request.POST['search_field']
-      course_coll = node_collection.find({'member_of': {'$all': [ObjectId(GST_COURSE._id)]},
-                                         '$or': [
-                                            {'$and': [
-                                              {'name': {'$regex': search_field, '$options': 'i'}},
-                                              {'$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                                ]
-                                              }
-                                              ]
-                                            },
-                                            {'$and': [
-                                              {'tags': {'$regex': search_field, '$options': 'i'}},
-                                              {'$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                                ]
-                                              }
-                                              ]
-                                            }
-                                          ],
-                                         'group_set': {'$all': [ObjectId(group_id)]}
-                                     }).sort('last_update', -1)
+    app_set = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
+    app_set_id = app_set._id
 
-      # course_nodes_count = course_coll.count()
+    # Course search view
+    title = GST_COURSE.name
 
-      return render_to_response("ndf/course.html",
-                                {'title': title,
-                                 'appId': app._id,
-                                 'searching': True, 'query': search_field,
-                                 'course_coll': course_coll, 'groupid': group_id, 'group_id':group_id
-                                },
-                                context_instance=RequestContext(request)
-                                )
+    # course_coll = node_collection.find({'member_of': {'$all': [ObjectId(GST_COURSE._id)]},
+    #                                    '$or': [
+    #                                       {'$and': [
+    #                                         {'name': {'$regex': search_field, '$options': 'i'}},
+    #                                         {'$or': [
+    #                                           {'access_policy': u"PUBLIC"},
+    #                                           {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+    #                                           ]
+    #                                         }
+    #                                         ]
+    #                                       },
+    #                                       {'$and': [
+    #                                         {'tags': {'$regex': search_field, '$options': 'i'}},
+    #                                         {'$or': [
+    #                                           {'access_policy': u"PUBLIC"},
+    #                                           {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+    #                                           ]
+    #                                         }
+    #                                         ]
+    #                                       }
+    #                                     ],
+    #                                    'group_set': {'$all': [ObjectId(group_id)]}
+    #                                }).sort('last_update', -1)
 
-    else:
-      # Course list view
-      title = GST_COURSE.name
-      course_coll = node_collection.find({'member_of': {'$all': [ObjectId(course_id)]}, 
-                                             'group_set': {'$all': [ObjectId(group_id)]},
-                                             '$or': [
-                                              {'access_policy': u"PUBLIC"},
-                                              {'$and': [
-                                                {'access_policy': u"PRIVATE"},
-                                                {'created_by': request.user.id}
-                                                ]
-                                              }
-                                             ]
-                                            })
-      template = "ndf/course.html"
-      variable = RequestContext(request, {'title': title, 'course_nodes_count': course_coll.count(), 'course_coll': course_coll, 'groupid':group_id, 'appId':app._id, 'group_id':group_id})
-      return render_to_response(template, variable)
+    course_coll = node_collection.find({'member_of': GST_COURSE._id})
 
+
+    all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]}})
+
+    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id})
+    return render_to_response("ndf/course.html",
+                            {'title': title,
+                             'app_id': app_id,
+                             'app_set_id': app_set_id,
+                             'searching': True, 'course_coll': course_coll,
+                             'groupid': group_id, 'group_id': group_id,
+                             'all_course_coll': all_course_coll,
+                             'ann_course_coll': ann_course_coll
+                            },
+                            context_instance=RequestContext(request)
+                            )
 
 @login_required
 @get_execution_time
@@ -137,10 +134,11 @@ def create_edit(request, group_id, node_id=None):
                 group_id = str(auth._id)
     else:
         pass
+    at_course_type = node_collection.one({'_type': 'AttributeType', 'name': 'nussd_course_type'})
     context_variables = {'title': GST_COURSE.name,
-                          'group_id': group_id,
-                          'groupid': group_id
-                      }
+                        'group_id': group_id,
+                        'groupid': group_id
+                    }
     if node_id:
         course_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
@@ -155,6 +153,7 @@ def create_edit(request, group_id, node_id=None):
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE))
+        create_gattribute(course_node._id, at_course_type, u"General")
         return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id}))
 
     else:
@@ -162,7 +161,7 @@ def create_edit(request, group_id, node_id=None):
             context_variables['node'] = course_node
             context_variables['groupid'] = group_id
             context_variables['group_id'] = group_id
-            context_variables['appId'] = app._id
+            context_variables['app_id'] = app._id
         context_variables['nodes_list'] = json.dumps(nodes_list)
         return render_to_response("ndf/course_create_edit.html",
                                   context_variables,
@@ -189,17 +188,31 @@ def course_detail(request, group_id, _id):
     title = GST_COURSE.name
 
     course_node = node_collection.one({"_id": ObjectId(_id)})
+
     if course_node.collection_set:
         course_structure_exists = True
 
-    return render_to_response("ndf/course_detail.html",
-                                  {'node': course_node,
-                                    'groupid': group_id,
-                                    'group_id': group_id,
-                                    'appId': app._id,
-                                    'title':title,
-                                    'course_structure_exists': course_structure_exists
-                                  },
+    gs_name = course_node.member_of_names_list[0]
+    context_variables = {'groupid': group_id,
+                        'group_id': group_id,
+                        'app_id': app._id,
+                        'title': title,
+                        'node': course_node
+    }
+    if gs_name == "Course":
+        context_variables["course_structure_exists"] = course_structure_exists
+    else:
+        if course_node.relation_set:
+            for rel in course_node.relation_set:
+                if "announced_for" in rel:
+                    cnode = node_collection.one({'_id':ObjectId(rel["announced_for"][0])})
+                    context_variables["cnode"] = cnode
+                    break
+
+    template = "ndf/" + gs_name.lower().replace(' ','_') +"_detail.html"
+
+    return render_to_response(template,
+                                  context_variables,
                                   context_instance=RequestContext(request)
         )
 
@@ -210,8 +223,8 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     """
     Creates/Modifies document of given sub-types of Course(s).
     """
-
     auth = None
+    tiss_site = False
     if ObjectId.is_valid(group_id) is False:
         group_ins = node_collection.one({'_type': "Group", "name": group_id})
         auth = node_collection.one({
@@ -229,6 +242,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     else:
         pass
 
+    if GSTUDIO_SITE_NAME is "TISS":
+        tiss_site = True
+
     app = None
     if app_id is None:
         app = node_collection.one({'_type': "GSystemType", 'name': app_name})
@@ -236,8 +252,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             app_id = str(app._id)
     else:
         app = node_collection.one({'_id': ObjectId(app_id)})
-
-    app_name = app.name
     # app_set = ""
     app_collection_set = []
     title = ""
@@ -416,18 +430,25 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                     course_gs = ac_nc_code[0]
                     nc_id = ac_nc_code[1]
                     nc_course_code = ac_nc_code[2]
-
                     if not course_gs:
                         # Create new Announced Course GSystem
                         course_gs = node_collection.collection.GSystem()
                         course_gs.member_of.append(course_gst._id)
 
-                    # Prepare name for Announced Course GSystem
-                    c_name = unicode(
-                        nc_course_code + "_" + college_enrollment_code + "_"
-                        + start_time.strftime("%b_%Y") + "-"
-                        + end_time.strftime("%b_%Y")
-                    )
+                    if tiss_site:
+                        # Prepare name for Announced Course GSystem
+                        c_name = unicode(
+                            nc_course_code + "_" + college_enrollment_code + "_"
+                            + start_time.strftime("%b_%Y") + "-"
+                            + end_time.strftime("%b_%Y")
+                        )
+                    else:
+                        # Prepare name for Announced Course GSystem
+                        c_name = unicode(
+                            nc_course_code + "_"+ start_time.strftime("%b_%Y") + "-"
+                            + end_time.strftime("%b_%Y")
+                        )
+
                     request.POST["name"] = c_name
 
                     is_changed = get_node_common_fields(
@@ -496,6 +517,27 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                     ann_course_id_list.append(course_gs._id)
 
+
+            if not tiss_site:
+
+                site = Site.objects.get(pk=1)
+                site = site.name.__str__()
+                ann_course_url_link = "http://" + site + "/home/course/course_detail/" + \
+                    str(course_gs._id)
+                user_obj = User.objects.all()
+                # Sending email to all registered users on site NROER
+                render_label = render_to_string(
+                    "notification/label.html",
+                    {"sender": "NROER eCourses",
+                      "activity": "Course Announcement",
+                      "conjunction": "-"
+                    })
+                if user_obj:
+                    notification.create_notice_type(render_label," New eCourse '"\
+                        + str(course_gs.name) +"' has been announced."\
+                        +"Visit this link to enroll into this ecourse : " \
+                        + ann_course_url_link, "notification")
+                    notification.send(user_obj, render_label, {"from_user": "NROER eCourses"})
         else:
             is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
 
@@ -591,16 +633,25 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                                     node_collection.collection.RelationType(field_instance),
                                     field_value
                                 )
-
-        return HttpResponseRedirect(
-            reverse(
-                app_name.lower() + ":" + template_prefix + '_app_detail',
-                kwargs={
-                    'group_id': group_id, "app_id": app_id,
-                    "app_set_id": app_set_id
-                }
+        if tiss_site:
+            return HttpResponseRedirect(
+                reverse(
+                    app_name.lower() + ":" + template_prefix + '_app_detail',
+                    kwargs={
+                        'group_id': group_id, "app_id": app_id,
+                        "app_set_id": app_set_id
+                    }
+                )
             )
-        )
+        else:
+            return HttpResponseRedirect(
+                reverse(
+                    "course",
+                    kwargs={
+                        'group_id': group_id
+                    }
+                )
+            )
 
     univ = node_collection.one({
         '_type': "GSystemType", 'name': "University"
@@ -621,6 +672,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             {'name': 1}
         ).sort('name', 1)
 
+
     default_template = "ndf/course_create_edit.html"
     context_variables = {
         'groupid': group_id, 'group_id': group_id,
@@ -628,6 +680,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         'app_collection_set': app_collection_set,
         'app_set_id': app_set_id,
         'title': title,
+        'tiss_site': tiss_site,
         'university_cur': university_cur,
         'property_order_list': property_order_list
     }
@@ -787,6 +840,9 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
     error_message = "\n CourseDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+
+
+# Ajax views for setting up Course Structure 
 
 @login_required
 @get_execution_time
@@ -1101,7 +1157,6 @@ def add_units(request, group_id):
 
     template = "ndf/course_units.html"
     return render_to_response(template, variable)
-
 
 
 @login_required
