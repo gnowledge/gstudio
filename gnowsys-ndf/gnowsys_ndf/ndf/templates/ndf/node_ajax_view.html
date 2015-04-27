@@ -870,7 +870,7 @@ ul#navigation li a.last {
                 {% endif %}
               </tr>
               {% endfor %}
-              <tbody>
+              </tbody>
             </table>
             {% endif %}
         	</div>
@@ -880,7 +880,10 @@ ul#navigation li a.last {
         {% if topic %}
         <!-- <div class="content" id="view-graph">  </div> -->
         <div class="topic_content" id="contents"> 
-          
+          {% if node.content_org %}
+            {{node.content_org}} <hr/>
+          {% endif %}
+
           {% get_all_resources request node.pk as resources %}
               {% for key, val in resources.items %}
               <fieldset id="{{key}}">
@@ -1168,7 +1171,7 @@ ul#navigation li a.last {
                 <li><a href="#">Manage Group Admins</a></li>
               </ul>
               <div id="approver" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-                {% edit_drawer_widget "Group" group_id node 1 "Users" user_type="Approver" %}
+                <!-- {#% edit_drawer_widget "Group" group_id node 1 "Users" user_type="Approver" %#} -->
                 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
               </div>
 
@@ -1769,7 +1772,7 @@ ul#navigation li a.last {
             } 
 
             // fs variable will contain the contents list for a topic each time this variable will append with new values
-            fs = fs + "<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
+            fs = fs + "{% if node.content_org %} {{node.content_org}} <hr/>{% endif %}<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
 
           }
 
@@ -1792,7 +1795,7 @@ ul#navigation li a.last {
         else{
           $("#view-info").css("display", "none");     
           // If no resource found for topic it will show bellow statement
-          var cont = "<b>Be the first to add a resource to this topic.</b>"
+          var cont = "{% if node.content_org %} {{node.content_org}} <hr/>{% endif %}<b>Be the first to add a resource to this topic.</b>"
           $(".topic_content").css("display", "block");
           $(".topic_content").html(cont);
         }
