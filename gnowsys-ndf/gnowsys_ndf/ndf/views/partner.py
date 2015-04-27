@@ -25,6 +25,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups, get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import *
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 
 # ######################################################################################################################################
 
@@ -57,7 +58,8 @@ def create_partner(request,group_id):
   if request.method == "POST":
     colg = node_collection.collection.Group()
     Mod_colg = node_collection.collection.Group()
-
+    street = request.POST.get('street', "")
+    
     cname = request.POST.get('groupname', "").strip()
     colg.altnames = cname
     colg.name = unicode(cname)
@@ -72,15 +74,29 @@ def create_partner(request,group_id):
     if usrid not in colg.contributors:
       colg.contributors.append(usrid)
 
-    colg.group_type = request.POST.get('group_type', "")        
-    colg.edit_policy = request.POST.get('edit_policy', "")
-    colg.subscription_policy = request.POST.get('subscription', "")
+    #colg.group_type = request.POST.get('group_type', "")        
+    #colg.edit_policy = request.POST.get('edit_policy', "")
+    #colg.subscription_policy = request.POST.get('subscription', "")
     colg.visibility_policy = request.POST.get('existance', 'ANNOUNCED')
     colg.disclosure_policy = request.POST.get('member', 'DISCLOSED_TO_MEM')
     colg.encryption_policy = request.POST.get('encryption', 'NOT_ENCRYPTED')
     colg.agency_type = "Partner"
     colg.save()
-
+    # get alll attribute associated with partner
+    attribute_set=colg.get_possible_attributes(colg.member_of).keys()
+    activ="Request to become a partner"
+    msg = colg.name+" is interested to became a partner on the platform "
+    set_notif_val(request, colg._id, msg, activ, request.user)           
+    for each in attribute_set:
+        
+        if each !="apps_list":
+            obj_val = request.POST.get(each, "").strip()
+            att_type=node_collection.one({'_type':"AttributeType","name":each})
+            # set  Attribute type values for partner
+            create_gattribute(colg._id, att_type , object_value = obj_val)
+         
+ 
+       
     if colg.edit_policy == "EDITABLE_MODERATED":
       Mod_colg.altnames = cname + "Mod" 
       Mod_colg.name = cname + "Mod"     
