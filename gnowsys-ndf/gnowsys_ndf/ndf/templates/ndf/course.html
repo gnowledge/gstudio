@@ -213,9 +213,15 @@
           <div class="row">
             <div class="small-12 columns">
               <h5>
-               {% blocktrans %}
+                {% if user_access == "allow" %}
+                  {% blocktrans %}
                     This group doesn't have any Announced courses. <b>Be the first to Announce a course!</b>
-                    {% endblocktrans %}
+                  {% endblocktrans %}
+                {% else %}
+                  {% blocktrans %}
+                    This group doesn't have any Announced courses.
+                  {% endblocktrans %}
+                {% endif %}
               </h5>
             </div>
           </div>
