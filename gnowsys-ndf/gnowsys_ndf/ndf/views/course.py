@@ -186,6 +186,8 @@ def course_detail(request, group_id, _id):
     else:
         pass
     course_structure_exists = False
+    enrolled_status = False
+    check_enroll_status = False
     title = GST_COURSE.name
 
     course_node = node_collection.one({"_id": ObjectId(_id)})
@@ -203,6 +205,13 @@ def course_detail(request, group_id, _id):
     }
     if gs_name == "Course":
         context_variables["course_structure_exists"] = course_structure_exists
+        if course_node.relation_set:
+            for rel in course_node.relation_set:
+                if "announced_as" in rel:
+                    cnode = node_collection.one({'_id': ObjectId(rel["announced_as"][0])},{'_id':1})
+                    context_variables["acnode"] = str(cnode['_id'])
+                    check_enroll_status = True
+                    break
 
     else:
         if course_node.relation_set:
@@ -210,8 +219,24 @@ def course_detail(request, group_id, _id):
                 if "announced_for" in rel:
                     cnode = node_collection.one({'_id': ObjectId(rel["announced_for"][0])})
                     context_variables["cnode"] = cnode
+                    check_enroll_status = True
                     break
+    if check_enroll_status:
+        usr_id = int(request.user.id)
+        auth_node = node_collection.one({'_type': "Author", 'created_by': usr_id})
 
+        auth_node.get_neighbourhood(auth_node.member_of)
+
+        course_enrollment_status = {}
+        if auth_node["course_enrollment_status"]:
+            course_enrollment_status = auth_node["course_enrollment_status"]
+        if "acnode" in context_variables:
+            str_course_id = str(context_variables["acnode"])
+        else:
+            str_course_id = str(course_node._id)
+        if str_course_id in course_enrollment_status:
+            enrolled_status = True
+        context_variables['enrolled_status'] = enrolled_status
     return render_to_response("ndf/course_detail.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -1367,7 +1392,6 @@ def enroll_generic(request, group_id):
         usr_id = request.POST.get('usr_id', '')
         usr_id = int(usr_id)
         auth_node = node_collection.one({'_type': "Author", 'created_by': usr_id})
-        auth_node
         course_node = node_collection.one({'_id': ObjectId(node_id)})
         auth_node.get_neighbourhood(auth_node.member_of)
 
