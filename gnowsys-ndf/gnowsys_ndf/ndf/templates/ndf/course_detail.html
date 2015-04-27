@@ -93,7 +93,7 @@
 </div>
 <br>
 {% if node_type != "Course" %}
-    <section class="medium-8 columns name-section" >
+    <section class="medium-8 columns" >
       <div class="ann_for row">
         <label class="small-3 columns "> {% trans "Announced Course for :"%}</label>
         <span class="small-6 columns end"><u><a href="{% url 'course_detail' group_name_tag cnode.pk %}">{{cnode.name}}</a></u></span>
@@ -111,12 +111,12 @@
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access != "allow" %}
 
-          <section class="medium-8 columns name-section" >
-          <div class="row">
-            <div class="small-6 columns">
-                <input type="button" class="button" value="Enroll">
-            </div>
-          </div>  
+          <section class="medium-4 columns" >
+            <div class="row">
+              <div class="small-6 columns">
+                  <input type="button" class="button enroll-btn" value="Enroll">
+              </div>
+            </div>  
           </section>
 
       {% endif %}
@@ -129,6 +129,7 @@
 
 {% block script %}
   {{block.super}}
+
 {% endblock %}
 
 
@@ -149,18 +150,15 @@
       alert(node.id);
     }
     );
-    {% if node_type == "Course" %}
+    {% user_access_policy groupid request.user as user_access %}
+    {% if user_access == "allow" %}
+        {% if node_type == "Course" %}
 
-      {% if not course_structure_exists %}
-        $("#view_page").append("<label>{% trans 'You have not added any content to this course yet' %}</label>")
-      {% endif %}
-    {% endif %}
-
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-
+          {% if not course_structure_exists %}
+            $("#view_page").append("<label>{% trans 'You have not added any content to this course yet' %}</label>")
+          {% endif %}
+        {% endif %}
         $("#view_collection").find("b.current").after('&nbsp;&nbsp;<span><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span>')
-
     {% endif %}
 {% endblock %}
 
