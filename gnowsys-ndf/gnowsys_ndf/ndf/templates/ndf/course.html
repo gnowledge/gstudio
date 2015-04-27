@@ -38,15 +38,25 @@
 
     <header class="row" data-tab data-options="deep_linking:true">
     <dl class="tabs " data-tab role="tablist">
+    {% user_access_policy groupid request.user as user_access %}
+    {% if user_access == "allow" %}
         <dd class="tab-title active" role="presentational" ><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">{% trans "All Courses" %}</a></dd>
         <dd class="tab-title" role="presentational" ><a href="#panel2-2" role="tab" tabindex="0"aria-selected="false" controls="panel2-2">{% trans "Courses" %}</a></dd>
         <dd class="tab-title" role="presentational"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Announced Courses" %}</a></dd>
+    {% else %}
+        <dd class="tab-title active" role="presentational"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Announced Courses" %}</a></dd>
+    {% endif %}    
     </dl>
     </header>
 
   
 <div class="tabs-content small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
   <section role="tabpanel" aria-hidden="false" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-1">
+  {% else %}
+  <section role="tabpanel" aria-hidden="false" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-1">
+  {% endif %}
       {% for course in all_course_coll %}
 
         <li class="card">
@@ -65,16 +75,16 @@
               </div>
               <hr/>
               <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+            </a>
 
               <footer>
                 <div class="age">
                   {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
                   <br/>
-                  by <span class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</span> 
+                  by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
                 </div>
                 <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
               </footer>
-            </a>
 
             <div class="label-list small-12 columns">
               {% for tag in course.tags|slice:":3" %}
@@ -118,16 +128,16 @@
               </div>
               <hr/>
               <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+            </a>
 
               <footer>
                 <div class="age">
                   {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
                   <br/>
-                  by <span class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</span> 
+                  by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
                 </div>
                 <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
               </footer>
-            </a>
 
             <div class="label-list small-12 columns">
               {% for tag in course.tags|slice:":3" %}
@@ -154,7 +164,13 @@
 
 
   </section>
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
   <section role="tabpanel" aria-hidden="true" class="content small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-3">
+  {% else %}
+  <section role="tabpanel" aria-hidden="true" class="content active small-block-grid-1 medium-block-grid-2 large-block-grid-4" id="panel2-3">
+  {% endif %}
+
       {% for course in ann_course_coll %}
         <li class="card">
           {% if course.status == "DRAFT" %}
@@ -172,16 +188,16 @@
               </div>
               <hr/>
               <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+            </a>
 
               <footer>
                 <div class="age">
                   {{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
                   <br/>
-                  by <span class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</span> 
+                  by <a class="user" href="{% url 'dashboard' course.created_by %}" data-gnow="">{{course.user_details_dict.created_by}}</a> 
                 </div>
                 <span><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</span>
               </footer>
-            </a>
 
             <div class="label-list small-12 columns">
               {% for tag in course.tags|slice:":3" %}
