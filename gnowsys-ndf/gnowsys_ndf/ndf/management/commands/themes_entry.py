@@ -9,6 +9,8 @@ import datetime
 from django.core.management.base import BaseCommand, CommandError
 
 from django_mongokit import get_database
+from django.template.defaultfilters import slugify
+from gnowsys_ndf.ndf.org2any import org2html
 from mongokit import IS
 
 try:
@@ -145,6 +147,12 @@ def create_theme(row, descrp):
 			topic_node.group_set.append(group_id)
 			if descrp:
 				topic_node.content_org = unicode(descrp)
+				# Required to link temporary files with the current user who is
+				# modifying this document
+				usrname = nroer_team.username
+				filename = slugify(topic) + "-" + usrname + "-" + ObjectId().__str__()
+				topic_node.content = org2html(descrp, file_prefix=filename)
+
 			topic_node.language = u"en"
 			topic_node.member_of.append(topic_GST._id)
 			topic_node.modified_by = nroer_team.id
