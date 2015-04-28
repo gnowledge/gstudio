@@ -305,7 +305,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                         '_id': 1, 'name': 1, 'type_of': 1
                     })
                 )
-
     if app_set_id:
         course_gst = node_collection.one({
             '_type': "GSystemType", '_id': ObjectId(app_set_id)
@@ -536,27 +535,28 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                     ann_course_id_list.append(course_gs._id)
 
+            #commented email notifications to all registered user after announcement
+            # if not tiss_site:
 
-            if not tiss_site:
+            #     site = Site.objects.get(pk=1)
+            #     site = site.name.__str__()
+            #     ann_course_url_link = "http://" + site + "/home/course/course_detail/" + \
+            #         str(course_gs._id)
+            #     user_obj = User.objects.all()
+            #     # Sending email to all registered users on site NROER
+            #     render_label = render_to_string(
+            #         "notification/label.html",
+            #         {"sender": "NROER eCourses",
+            #           "activity": "Course Announcement",
+            #           "conjunction": "-"
+            #         })
+            #     if user_obj:
+            #         notification.create_notice_type(render_label," New eCourse '"\
+            #             + str(course_gs.name) +"' has been announced."\
+            #             +" Visit this link to enroll into this ecourse : " \
+            #             + ann_course_url_link, "notification")
+            #         notification.send(user_obj, render_label, {"from_user": "NROER eCourses"})
 
-                site = Site.objects.get(pk=1)
-                site = site.name.__str__()
-                ann_course_url_link = "http://" + site + "/home/course/course_detail/" + \
-                    str(course_gs._id)
-                user_obj = User.objects.all()
-                # Sending email to all registered users on site NROER
-                render_label = render_to_string(
-                    "notification/label.html",
-                    {"sender": "NROER eCourses",
-                      "activity": "Course Announcement",
-                      "conjunction": "-"
-                    })
-                if user_obj:
-                    notification.create_notice_type(render_label," New eCourse '"\
-                        + str(course_gs.name) +"' has been announced."\
-                        +"Visit this link to enroll into this ecourse : " \
-                        + ann_course_url_link, "notification")
-                    notification.send(user_obj, render_label, {"from_user": "NROER eCourses"})
         else:
             is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
 
