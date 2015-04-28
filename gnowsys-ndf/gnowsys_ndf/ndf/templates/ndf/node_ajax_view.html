@@ -880,9 +880,6 @@ ul#navigation li a.last {
         {% if topic %}
         <!-- <div class="content" id="view-graph">  </div> -->
         <div class="topic_content" id="contents"> 
-          {% if node.content_org %}
-            {{node.content_org}} <hr/>
-          {% endif %}
 
           {% get_all_resources request node.pk as resources %}
               {% for key, val in resources.items %}
