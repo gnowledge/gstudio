@@ -67,8 +67,10 @@
               <a href="{% url 'course_detail' group_name_tag course %}">
                 <div class="row">
                   <div class="small-8 column">
-                    <b>{{course.name}}
-                    </b>
+                    <b>{{course.name}}</b>
+                    {% if course.status == "PUBLISHED" %}
+                    <span data-tooltip title="Announced Course"><i class="fi-volume"></i></span>
+                    {% endif %}
                   </div>
                 </div>
                 <hr/>
@@ -227,6 +229,7 @@
                   </b>
                 </div>
               </div>
+              <span data-tooltip title="Announced Course"><i class="fi-volume"></i></span>
               <hr/>
               <span style="font-size:12px;">{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
             </a>
