@@ -863,7 +863,8 @@ def add_page(request, group_id):
 
     for each in context_node.collection_set:
         obj = node_collection.one({'_id': ObjectId(each), 'group_set': ObjectId(group_id)})
-        collection_list.append(obj.name)
+        if obj:
+            collection_list.append(obj.name)
 
     if name not in collection_list:
         page_node = node_collection.collection.GSystem()
