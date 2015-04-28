@@ -63,6 +63,8 @@ def course(request, group_id, course_id=None):
     course_coll = None
     all_course_coll = None
     ann_course_coll = None
+    enrolled_course_coll = []
+    course_enrollment_status = None
     app_set_id = None
     if course_id is None:
         course_ins = node_collection.find_one({'_type': "GSystemType", "name": "Course"})
@@ -75,37 +77,22 @@ def course(request, group_id, course_id=None):
     # Course search view
     title = GST_COURSE.name
 
-    # course_coll = node_collection.find({'member_of': {'$all': [ObjectId(GST_COURSE._id)]},
-    #                                    '$or': [
-    #                                       {'$and': [
-    #                                         {'name': {'$regex': search_field, '$options': 'i'}},
-    #                                         {'$or': [
-    #                                           {'access_policy': u"PUBLIC"},
-    #                                           {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-    #                                           ]
-    #                                         }
-    #                                         ]
-    #                                       },
-    #                                       {'$and': [
-    #                                         {'tags': {'$regex': search_field, '$options': 'i'}},
-    #                                         {'$or': [
-    #                                           {'access_policy': u"PUBLIC"},
-    #                                           {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-    #                                           ]
-    #                                         }
-    #                                         ]
-    #                                       }
-    #                                     ],
-    #                                    'group_set': {'$all': [ObjectId(group_id)]}
-    #                                }).sort('last_update', -1)
-
     course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id)})
-
 
     all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]},
                             'group_set': ObjectId(group_id)})
 
-    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id,'group_set': ObjectId(group_id)})
+    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id)})
+
+    auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
+
+    if auth_node.attribute_set:
+        for each in auth_node.attribute_set:
+            if each and "course_enrollment_status" in each:
+                course_enrollment_dict = each["course_enrollment_status"]
+                course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
+                enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
+
     return render_to_response("ndf/course.html",
                             {'title': title,
                              'app_id': app_id,
@@ -113,6 +100,7 @@ def course(request, group_id, course_id=None):
                              'searching': True, 'course_coll': course_coll,
                              'groupid': group_id, 'group_id': group_id,
                              'all_course_coll': all_course_coll,
+                             'enrolled_course_coll': enrolled_course_coll,
                              'ann_course_coll': ann_course_coll
                             },
                             context_instance=RequestContext(request)
@@ -225,17 +213,22 @@ def course_detail(request, group_id, _id):
         usr_id = int(request.user.id)
         auth_node = node_collection.one({'_type': "Author", 'created_by': usr_id})
 
-        auth_node.get_neighbourhood(auth_node.member_of)
 
         course_enrollment_status = {}
-        if auth_node["course_enrollment_status"]:
-            course_enrollment_status = auth_node["course_enrollment_status"]
+
+        if auth_node.attribute_set:
+            for each in auth_node.attribute_set:
+                if each and "course_enrollment_status" in each:
+                    course_enrollment_status = each["course_enrollment_status"]
+
         if "acnode" in context_variables:
             str_course_id = str(context_variables["acnode"])
         else:
             str_course_id = str(course_node._id)
-        if str_course_id in course_enrollment_status:
-            enrolled_status = True
+
+        if course_enrollment_status:
+            if str_course_id in course_enrollment_status:
+                enrolled_status = True
         context_variables['enrolled_status'] = enrolled_status
     return render_to_response("ndf/course_detail.html",
                                   context_variables,
@@ -846,14 +839,14 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
                         'property_order_list': property_order_list,
                         'property_order_list_ac': property_order_list_ac,
                         'is_link_needed': is_link_needed
-                      }
+                    }
 
   try:
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
     # return render_to_response([template, default_template], 
-    return render_to_response(template, 
+    return render_to_response(template,
                               context_variables,
                               context_instance = RequestContext(request)
                             )
@@ -1393,18 +1386,21 @@ def enroll_generic(request, group_id):
         usr_id = int(usr_id)
         auth_node = node_collection.one({'_type': "Author", 'created_by': usr_id})
         course_node = node_collection.one({'_id': ObjectId(node_id)})
-        auth_node.get_neighbourhood(auth_node.member_of)
 
         course_enrollment_status = {}
-        if auth_node["course_enrollment_status"]:
-            course_enrollment_status = auth_node["course_enrollment_status"]
+
+        if auth_node.attribute_set:
+            for each in auth_node.attribute_set:
+                if each and "course_enrollment_status" in each:
+                    course_enrollment_status = each["course_enrollment_status"]
 
         str_course_id = str(course_node._id)
-        if str_course_id not in course_enrollment_status:
-            course_enrollment_status.update({str_course_id: u"Approved"})
+        if course_enrollment_status is not None:
+            if str_course_id not in course_enrollment_status:
+                course_enrollment_status.update({str_course_id: u"Approved"})
 
-        at_node = create_gattribute(auth_node["_id"], course_enrollment_status_at, course_enrollment_status)
-        response_dict['success'] = True
+            at_node = create_gattribute(auth_node["_id"], course_enrollment_status_at, course_enrollment_status)
+            response_dict['success'] = True
         return HttpResponse(json.dumps(response_dict))
     else:
         return HttpResponse(json.dumps(response_dict))
