@@ -460,6 +460,16 @@ ul#navigation li a.last {
         </a></dd>
         {% endif %}
 
+      {% else %}
+      <!-- If its group then show management tab only for group admins and superuser-->
+        {% check_group node as is_group %}
+        {% if is_group %}
+          {% check_is_gstaff groupid request.user as is_gstaff %}
+          {% if is_gstaff %}
+            <dd class="tab-title manage-view"><a class="view-manage" href="#view-manage"><i class="fi-wrench"></i> {% trans "Management" %}</a></dd>
+          {% endif %}
+        {% endif %}
+
       {% endif %}
     </dl>
   </h1>
@@ -860,7 +870,7 @@ ul#navigation li a.last {
                 {% endif %}
               </tr>
               {% endfor %}
-              <tbody>
+              </tbody>
             </table>
             {% endif %}
         	</div>
@@ -870,7 +880,7 @@ ul#navigation li a.last {
         {% if topic %}
         <!-- <div class="content" id="view-graph">  </div> -->
         <div class="topic_content" id="contents"> 
-          
+
           {% get_all_resources request node.pk as resources %}
               {% for key, val in resources.items %}
               <fieldset id="{{key}}">
@@ -1146,6 +1156,62 @@ ul#navigation li a.last {
           </dl>
         </div>
 
+        <!-- Only visible to the group admins and super user for managing group activities -->
+        <div class="content" id="view-manage">
+
+          <div class="row">
+            <div class="small-6 columns">
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="clearing_house" aria-controls="clearing_house" data-reveal-id="cl_house_modal" aria-expanded="false" class="button secondary medium">Manage Clearing House&nbsp;&nbsp;&raquo;</a><br/>
+              <ul id="clearing_house" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                <li><a data-reveal-id="approver" class="approvers">Manage Approvers</a></li>    
+                <li><a href="#">Manage Curators</a></li>
+                <li><a href="#">Manage Group Admins</a></li>
+              </ul>
+              <div id="approver" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                <!-- {#% edit_drawer_widget "Group" group_id node 1 "Users" user_type="Approver" %#} -->
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+              </div>
+
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_partners" aria-controls="manage_partners" aria-expanded="false" class="button secondary medium">Manage Partners&nbsp;&nbsp;&raquo;</a><br/> 
+              <ul id="manage_partners" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                <li><a href="#">Manage Partner Admins</a></li>
+                <li><a href="#">Manage Partner MOU's</a></li>
+              </ul>
+
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_events" aria-controls="manage_events" aria-expanded="false" class="button secondary medium">Manage Events&nbsp;&nbsp;&raquo;</a> <br/>
+                <ul id="manage_events" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                  <li><a href="#">Manage Event Admins</a></li>
+                  <li><a href="#">Manage Event Coordinators</a></li>
+                  <li><a href="#">Manage Event Attendees</a></li>
+                </ul>
+
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_courses" aria-controls="manage_courses" aria-expanded="false" class="button secondary medium">Manage Courses&nbsp;&nbsp;&raquo;</a> <br/>
+              <ul id="manage_courses" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                <li><a href="#">Manage Course Admins</a></li>
+                <li><a href="#">Manage Course Subscribers</a></li>
+              </ul>
+
+            </div>
+            <div class="small-6 columns">
+              <a href="#" class="round small button right">View Statistics</a> <br/>
+            </div>
+          </div>
+
+        </div>
+        <div id="cl_house_modal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+          <div class="row">
+            <div class="small-4 columns">
+              <b>List Of Approvers</b>
+            </div>
+            <div class="small-4 columns">
+              <b>List Of Curators</b>
+            </div>
+            <div class="small-4 columns">
+              <b>List Of Admins</b>
+            </div>
+          </div>
+          <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </div>
         <!-- /////////////////// -->
 
         <div class="content" id="view-discussion">
@@ -1646,6 +1712,10 @@ ul#navigation li a.last {
     $("#view-info").css("display", "none");
   });
 
+  $(document).on('click','.view-manage',function(){
+    $("#view-info").css("display", "none");
+  });
+
   // select particular type to display contents in topic page
   $(".view_list").click(function() {
     
@@ -1699,7 +1769,7 @@ ul#navigation li a.last {
             } 
 
             // fs variable will contain the contents list for a topic each time this variable will append with new values
-            fs = fs + "<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
+            fs = fs + "{% if node.content_org %} {{node.content_org}} <hr/>{% endif %}<fieldset> <legend>"+key+"</legend>"+ cont_list +"</fieldset>";
 
           }
 
@@ -1722,7 +1792,7 @@ ul#navigation li a.last {
         else{
           $("#view-info").css("display", "none");     
           // If no resource found for topic it will show bellow statement
-          var cont = "<b>Be the first to add a resource to this topic.</b>"
+          var cont = "{% if node.content_org %} {{node.content_org}} <hr/>{% endif %}<b>Be the first to add a resource to this topic.</b>"
           $(".topic_content").css("display", "block");
           $(".topic_content").html(cont);
         }

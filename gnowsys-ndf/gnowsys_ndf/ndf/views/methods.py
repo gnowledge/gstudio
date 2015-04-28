@@ -403,6 +403,9 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
       elif checked == "Group":
         drawer = node_collection.find({'_type': u"Group", '_id': {'$nin': filtering} })
+        
+      elif checked == "Users":
+        drawer = node_collection.find({'_type': u"Author", '_id': {'$nin': filtering} })
 
       elif checked == "Forum":
         gst_forum_id = node_collection.one({'_type': "GSystemType", 'name': "Forum"})._id

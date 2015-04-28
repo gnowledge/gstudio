@@ -43,7 +43,7 @@
 
         {% if drawer1 != "None" %}
         <li class="price">
-            <input type="text" class="margin-0 search_items" id="{{widget_for}}_search" placeholder="Type atleast 3 characters to search in the resources"/>            
+            <input type="text" class="margin-0 search_items" id="{{widget_for}}_search" placeholder="Type atleast 3 characters to search"/>            
         </li>
         
         <div class="push-3 searching" style="display:none;"><progress></progress></div>
@@ -78,17 +78,21 @@
                   <!-- <b> {{value}} </b> -->
                 </div>       
 
-                <div class="small-12 columns text-left" style="padding-top:3px">
-                  <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
-                </div>     
+                {% if "Author" not in value.member_of_names_list %}
+                  <div class="small-12 columns text-left" style="padding-top:3px">
+                    <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                  </div>
+                {% endif %}     
               </div>
 
-              <div class="row">
+              {% if "Author" not in value.member_of_names_list %}
+                <div class="row">
 
-               <div class="small-12 columns text-left" style="padding-top:5px;">
-                {{ value.html_content|safe|striptags|truncatechars:50 }}
-               </div>  
-              </div>
+                 <div class="small-12 columns text-left" style="padding-top:5px;">
+                  {{ value.html_content|safe|striptags|truncatechars:50 }}
+                 </div>  
+                </div>
+              {% endif %}
             </div>
           </div>
 
@@ -273,16 +277,20 @@
                   <b> {{value.name}} </b>   
                 </div>                
                 <!-- <div class="small-7 columns text-right"> -->
+                {% if "Author" not in value.member_of_names_list %}
                 <div class="small-12 columns text-left" style="padding-top:3px">
                   <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
                 </div>     
+                {% endif %}
               </div>
 
+              {% if "Author" not in value.member_of_names_list %}
               <div class="row">
                 <div class="small-12 columns text-left" style="padding-top:5px;">
       {{ value.html_content|safe|striptags|truncatechars:50 }}
                 </div>
              </div>
+             {% endif %}
             </div>
           </div>
 
@@ -299,6 +307,13 @@
       <input type='button' id='{{widget_for}}_move_all_left' value='Move ALL to Left' class='button round small'>
     </div>  
   {% endif %}
+
+  {% if widget_for == "Group" %}
+    <div class="text-right"> 
+      <input type='button' id='{{widget_for}}_button' value='Save' class='button round small'>
+    </div>  
+  {% endif %}
+
 </div>
 </div>
 
