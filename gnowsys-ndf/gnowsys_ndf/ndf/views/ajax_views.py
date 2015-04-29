@@ -37,11 +37,12 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.file import * 
+from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
+from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
 
@@ -862,7 +863,8 @@ def add_page(request, group_id):
 
     for each in context_node.collection_set:
         obj = node_collection.one({'_id': ObjectId(each), 'group_set': ObjectId(group_id)})
-        collection_list.append(obj.name)
+        if obj:
+            collection_list.append(obj.name)
 
     if name not in collection_list:
         page_node = node_collection.collection.GSystem()
@@ -3150,38 +3152,46 @@ def get_courses(request, group_id):
     unset_nc - dictionary consisting of NUSSD-Course(s)
     """
     response_dict = {'success': False, 'message': ""}
-
     try:
         if request.is_ajax() and request.method == "GET":
             # Fetch field(s) from GET object
             nussd_course_type = request.GET.get("nussd_course_type", "")
 
-            # Check whether any field has missing value or not
-            if nussd_course_type == "":
-                error_message = "Invalid data: No data found in any of the " \
-                    + "field(s)!!!"
-                raise Exception(error_message)
+            if GSTUDIO_SITE_NAME == "TISS":
+                # Check whether any field has missing value or not
+                if nussd_course_type == "":
+                    error_message = "Invalid data: No data found in any of the " \
+                        + "field(s)!!!"
+                    raise Exception(error_message)
 
-            # Fetch "Announced Course" GSystemType
-            mis_admin = node_collection.one(
-                {'_type': "Group", 'name': "MIS_admin"},
-                {'name': 1}
-            )
-            if not mis_admin:
-                # If not found, throw exception
-                error_message = "'MIS_admin' (Group) doesn't exists... " \
-                    + "Please create it first!"
-                raise Exception(error_message)
+                mis_admin = node_collection.one(
+                    {'_type': "Group", 'name': "MIS_admin"},
+                    {'name': 1}
+                )
+                if not mis_admin:
+                    # If not found, throw exception
+                    error_message = "'MIS_admin' (Group) doesn't exists... " \
+                        + "Please create it first!"
+                    raise Exception(error_message)
 
-            # Fetch "Announced Course" GSystemType
-            nussd_course_gt = node_collection.one(
-                {'_type': "GSystemType", 'name': "NUSSD Course"}
-            )
-            if not nussd_course_gt:
-                # If not found, throw exception
-                error_message = "'NUSSD Course' (GSystemType) doesn't exists... " \
-                    + "Please create it first!"
-                raise Exception(error_message)
+                # Fetch "NUSSD Course" GSystemType
+                nussd_course_gt = node_collection.one(
+                    {'_type': "GSystemType", 'name': "NUSSD Course"}
+                )
+                if not nussd_course_gt:
+                    # If not found, throw exception
+                    error_message = "'NUSSD Course' (GSystemType) doesn't exists... " \
+                        + "Please create it first!"
+                    raise Exception(error_message)
+            else:
+                # Fetch "Course" GSystemType
+                nussd_course_gt = node_collection.one(
+                    {'_type': "GSystemType", 'name': "Course"}
+                )
+                mis_admin = node_collection.one(
+                    {'_id': ObjectId(group_id)},
+                    {'name': 1}
+                )
 
             # Type-cast fetched field(s) into their appropriate type
             nussd_course_type = unicode(nussd_course_type)
@@ -3217,7 +3227,6 @@ def get_courses(request, group_id):
                 " not a GET request!!!"
             response_dict["message"] = error_message
             return HttpResponse(json.dumps(response_dict))
-
     except Exception as e:
         error_message = "AnnouncedCourseError: " + str(e) + "!!!"
         response_dict["message"] = error_message

@@ -30,6 +30,7 @@
     .unit-name-div{
       width:60% !important;
     }
+
     .resource-drawer{ 
       border-color: #D3D3D3; border-style: solid; 
       padding: 0 !important; 
@@ -123,6 +124,8 @@
       <div class="res-opt-btns hide">
           <input type="button" id="new_res" value="+ New Resource" class="small button">
           <input type="button" id="add_res" value="Add existing resource" class="small button">
+          <a class="display_res">&#215;</a>
+
       </div>
 
       <div class="row collection_details">
@@ -284,6 +287,16 @@
         }
         $(".collection_details").html("");
     };
+
+
+  //Cross symbol
+    $(document).on('click','.display_res',function(){
+        $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
+        $(".button").removeClass("success");
+        $(".save_units").addClass("hide")
+        $(".res-opt-btns").addClass("hide");
+        update_res_count();
+    });
 
 
   

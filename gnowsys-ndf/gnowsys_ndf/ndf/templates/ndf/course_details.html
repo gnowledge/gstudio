@@ -21,197 +21,122 @@
 
 {% endblock %}
 
+
+{% block collection_content %}
+  <div id="view_collection">
+    {% include "ndf/collection_ajax_view.html" %}  
+  </div>
+  <span><a class="tiny button" href="{% url 'create_course_struct' groupid node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+
+{% endblock %}
+
+
 {% block head %}
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 {% endblock %}
 
 <!-- overiding block from node_detail_base.html -->
 {% block meta_content %}
-
-{% endblock %}
-
-
-<!-- overiding block from node_detail_base.html -->
-{% block collection_content %}
 {% endblock %}
 
 <!-- overiding block from node_detail_base.html -->
 {% block body_content %}
 
-<header class="row page">
-   <section class="medium-8 columns name-section" >
-    <h3>
-      <span class='node'>{{node.name}}</span>
+  <header class="row page">
+    <section class="medium-8 columns name-section" >
+      <h3>
+        <span class='node'>{{node.name}}</span>
 
-      <!-- <span><a class="small button fi-pencil " href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span> -->
-      <span><a class="fi-pencil " href="{% url 'mis:mis_app_instance_edit' group_id app_id app_set_id node.pk %}"></a></span>
+        <!-- <span><a class="small button fi-pencil " href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span> -->
 
-      <!-- This button publishes the drafted resource -->
-      {% if node %}
-        {% get_publish_policy request group_id node as group_policy %}
-        {% if group_policy == "allow" %}
-          <span><a class="small publish-btn button">{% trans "Publish" %}</a></span>
-        {% else %}
-          <a class="small publish-btn button" style="background-color:gray;" disabled>{% trans "Published" %}</a>
-        {% endif %}
-      {% endif %}
+      </h3>
+        <small>
+              <div class="age">
+                {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
+              <!-- <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span> -->
+              <!-- <a href=""><i class="fi-clock"></i> {% trans "View history" %}</a> -->
+              </div>
 
-      <span><a class="small button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
-    </h3>
-      <small>
-            <div class="age">
-              {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-              by <a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
-            <!-- <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span> -->
-            <!-- <a href=""><i class="fi-clock"></i> {% trans "View history" %}</a> -->
-            </div>
+        </small>
+    </section>
+    <section class="medium-3 columns name-section" >
+      <span>{% include "ndf/rating.html" %} </span>
+    </section>
+  </header>
 
-      </small>
-   </section>
-   <section class="medium-3 columns name-section" >
-
-     <span>{% include "ndf/rating.html" %} </span>
-
-
-  </section>
-</header>
-
-  <fieldset>
-    <legend>
-  		{% trans "Course Registration Details "%}
-    </legend>
-    {% if course_gst_name == "NUSSD Course" %}
-    	{% for tab_name, tab_fields_list in property_order_list %}
-    		<div class=" {% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
-    			{% for field in tab_fields_list %}
-    				<div class="small-6 columns"> 
-    					{{field.altnames}}
-    				</div>
-    				<div class="small-3 columns {{field.altnames}}">
-              {% if field.altnames == "Master Trainer: Minimum qualifications requirement" or field.altnames == "Voluntary Teacher: Minimum qualifications requirement" %}
-                {% for k in field.value %}
-                  {% for k1,v1 in k.items %}
-                      {% if k1 == "text" %}
-                        {{v1|title}}
-                      {% endif %}
+  <div class="tabs-content" style="padding: 0px 5px; width:1150px;">
+    <div class="active content row">
+      <dl class="accordion" data-accordion>
+        <dd class="accordion-navigation">
+          <a href="#course_accordion">{% trans "Course Details" %}</a>
+          <div id="course_accordion" class="content active">
+            <fieldset>
+              <legend>
+                {% trans "Course Registration Details "%}
+              </legend>
+              {% if course_gst_name == "NUSSD Course" %}
+                {% for tab_name, tab_fields_list in property_order_list %}
+                  <div class=" {% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+                    {% for field in tab_fields_list %}
+                      <div class="small-6 columns"> 
+                        {{field.altnames}}
+                      </div>
+                      <div class="small-3 columns {{field.altnames}}">
+                        {% if field.altnames == "Master Trainer: Minimum qualifications requirement" or field.altnames == "Voluntary Teacher: Minimum qualifications requirement" %}
+                          {% for k in field.value %}
+                            {% for k1,v1 in k.items %}
+                                {% if k1 == "text" %}
+                                  {{v1|title}}
+                                {% endif %}
+                            {% endfor %}
+                          {% endfor %}
+                        {% elif field.altnames == "Tags" %}
+                          {% for k in field.value %}
+                            {{k}}
+                          {% endfor %}
+                        {% else %}
+                          {{field.value|title}}
+                        {% endif %}
+                      </div>
+                      <br>
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              {% elif course_gst_name == "Announced Course" %}
+                {% for each in property_order_list_ac %}
+                  <div>
+                  {% for fieldk,fieldv in each.items %}
+                      <div class="small-6 columns"> 
+                        {{fieldk|title}}
+                      </div>
+                      <div class="small-3 columns end">
+                        {{fieldv|title}}
+                      </div>
                   {% endfor %}
                 {% endfor %}
-              {% elif field.altnames == "Tags" %}
-                {% for k in field.value %}
-    	   				  {{k}}
-                {% endfor %}
-              {% else %}
-                {{field.value|title}}
               {% endif %}
-    				</div>
-    				<br>
-    			{% endfor %}
-    		</div>
-    	{% endfor %}
-    {% elif course_gst_name == "Announced Course" %}
-      {% for each in property_order_list_ac %}
-        <div>
-        {% for fieldk,fieldv in each.items %}
-            <div class="small-6 columns"> 
-              {{fieldk|title}}
-            </div>
-            <div class="small-3 columns end">
-              {{fieldv|title}}
-            </div>
-        {% endfor %}
-      {% endfor %}
-    {% endif %}
-  </fieldset>
+            </fieldset> 
 
-  {% if course_gst_name == "NUSSD Course" %}
-    <fieldset>
-      <legend>
-    		{% trans "Course Structure Details "%}
-      </legend>
-      <div id="cs-div"></div>
+          </div>
+        </dd>      
+      </dl>
+    </div>
+  </div>
 
-      {% if not course_structure_exists %}<div>
-      <label>{% trans "You haven't added any content to this course yet" %}</label></div>{% endif %}
-  	<span class="small-6 columns  end right inline" ><a class=" button" href="{% url 'create_course_struct' groupid node.pk %}?app_id={{app_id}}&app_set_id={{app_set_id}}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
-    </fieldset>
-  {% endif %}
-</div>
 
+
+  <div id="view_page"></div>
 {% endblock %}
-
-
 
 
 {% block script %}
   {{block.super}}
 
-  $(document).on("click", ".publish-btn", function(){
-    a = $(this)
-    $.ajax({
-
-      type: "POST",
-
-      url: "{% url 'publish_course' group_id %}",
-
-      datatype: "json",
-
-      data:{
-        node_id : "{{node.pk}}",
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function (data) {
-        if(data=="Success"){
-          a.text("{% trans 'Published' %}")
-            .css("background-color","gray")
-            .attr("disabled",true)
-        }
-        else{
-        alert("Could not publish the Course at the moment. Try again later.")
-        }
-
-      },
-    });
-
+  $(document).on("click", ".collection", function(){
+      $("#course_accordion").removeClass("active");
   });
-{% endblock %}
 
-
-
-{% block document_ready %}
-  {{block.super}}
-
-  {% for each_cs in node.collection_set %}
-    {% get_node each_cs as cs_node %}
-        cs_str = "<h6>"+{{forloop.counter}}+". {{cs_node.name}}</h6>"
-        $("#cs-div").append(cs_str)
-      {% if cs_node.collection_set %}
-        {% for each_css in cs_node.collection_set %}
-          {% get_node each_css as css_node %}
-            css_str = "&nbsp;&nbsp;<h7>"+ {{forloop.counter}}+". {{css_node.name}}</h7><br>"
-            $("#cs-div").append(css_str)
-            {% if css_node.collection_set %}
-              {% for each_unit in css_node.collection_set %}
-                {% get_node each_unit as unit_node %}
-                  cu_str = "&nbsp;&nbsp;&nbsp;&nbsp;<h7>"+ {{forloop.counter}}+". {{unit_node.name}}</h7><br>"
-                  $("#cs-div").append(cu_str)
-                  {% if unit_node.collection_set %}
-                    {% for each_res in unit_node.collection_set %}
-                      {% get_node each_res as res_node %}
-                        {% if res_node %}
-                          {% if res_node.member_of_names_list.0|lower == "page" or res_node.member_of_names_list.0|lower == "quiz" %}
-                            k = "{% url res_node.member_of_names_list.0|lower|concat:"_details" groupid res_node.pk %}"
-                          {% else %}
-                            k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
-                          {% endif %}
-                          var str_unit = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ {{forloop.counter}}+". <a href='"+k+"' target='_blank' class='unit_name'>{{res_node.name}}</a><br>"
-                          $("#cs-div").append(str_unit)
-                      {% endif %}
-                    {% endfor %}
-                  {% endif %}
-              {% endfor %}
-            {% endif %}
-        {% endfor %}
-      {% endif %}
-  {% endfor %}
+  $("#view_collection").find("b.current").after('&nbsp;&nbsp;<span><a class="fi-pencil" href="{% url 'mis:mis_app_instance_edit' group_id app_id app_set_id node.pk %}">{% trans "Edit" %}</a></span>')
 
 {% endblock %}

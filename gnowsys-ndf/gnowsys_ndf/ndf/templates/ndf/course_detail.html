@@ -20,15 +20,27 @@
 
 
 <!-- overiding block from node_detail_base.html -->
-{% block meta_content %}
-{% endblock %}
-
 
 {% block collection_content %}
-  <div id="view_collection">
-    {% include "ndf/collection_ajax_view.html" %}  
-  </div>
+  {% if node_type == "Course" %}
+    {% user_access_policy groupid request.user as user_access %}
+    {% if user_access == "allow" %}
+      <div id="view_collection">
+        {% include "ndf/collection_ajax_view.html" %}  
+      </div>
+
+      <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+    {% elif enrolled_status %}
+        <div id="view_collection">
+          {% include "ndf/collection_ajax_view.html" %}  
+        </div>
+    {% endif %}
+  {% endif %}
 {% endblock %}
+
+{% block meta_content %}
+{% endblock %}
+  
 
 
 <!-- overiding block_related content -->
@@ -53,20 +65,10 @@
    <section class="medium-8 columns name-section" >
     <h3>
       <span class='node'>{{node.name}}</span>
-      <span><a class="small button " href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span>
       <!-- <span><a class="fi-pencil " href="{% url 'create_edit' group_id node.pk %}"></a></span> -->
 
       <!-- This button publishes the drafted resource -->
-      {% if node %}
-        {% get_publish_policy request group_id node as group_policy %}
-        {% if group_policy == "allow" %}
-          <span><a class="small publish-btn button">{% trans "Publish" %}</a></span>
-        {% else %}
-          <a class="small publish-btn button" style="background-color:gray;" disabled>{% trans "Published" %}</a>
-        {% endif %}
-      {% endif %}
 
-      <span><a class="small button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
     </h3>
       <small>
             <div class="age">
@@ -79,10 +81,7 @@
       </small>
    </section>
    <section class="medium-3 columns name-section" >
-
      <span>{% include "ndf/rating.html" %} </span>
-
-
   </section>
 </header>
 
@@ -94,6 +93,36 @@
   {% endwith %}
 </div>
 <br>
+{% if node_type != "Course" %}
+    <section class="medium-8 columns" >
+      <div class="ann_for row">
+        <label class="small-3 columns "> {% trans "Announced Course for :"%}</label>
+        <span class="small-6 columns end"><u><a href="{% url 'course_detail' group_name_tag cnode.pk %}">{{cnode.name}}</a></u></span>
+      </div>
+      <br/>
+      <div class="course_desc row">
+        <label class="small-3 columns "> {% trans "Course Description :"%}</label>
+      <p>
+        {{cnode.content_org}}
+      </p>  
+      </div>
+    </section>
+    {% if user.is_authenticated %}
+
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access != "allow" %}
+
+          <section class="medium-4 columns" >
+            <div class="row">
+              <div class="small-6 columns">
+                  <input type="button" class="button enroll-btn" value="Enroll">
+              </div>
+            </div>  
+          </section>
+
+      {% endif %}
+    {% endif %}
+{% endif %}
 
 <div id="view_page"></div>
 
@@ -102,39 +131,45 @@
 {% block script %}
   {{block.super}}
 
-  $(document).on("click", ".publish-btn", function(){
-    a = $(this)
-    $.ajax({
+    $(document).on("click", ".enroll-btn", function(event) {
+        console.log("{{request.user.id}}")
+        enr_btn = $(this)
+        $.ajax({
+          url: "{% url 'course_enroll' group_id %}",
 
-      type: "POST",
+          data: {
+            node_id: "{{node.pk}}",
+            usr_id: "{{request.user.id}}",
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
 
-      url: "{% url 'publish_course' group_id %}",
+          type: "POST",
 
-      datatype: "json",
+          dataType: "json",
 
-      data:{
-        node_id : "{{node.pk}}",
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function (data) {
-        if(data=="Success"){
-          a.text("{% trans 'Published' %}")
-            .css("background-color","gray")
-            .attr("disabled",true)
-        }
-        else{
-        alert("Could not publish the Course at the moment. Try again later.")
-        }
+          success: function(data){
+            success_state = data["success"]
+            if(success_state){
+              enr_btn.attr("disabled",true)
+                     .val("Enrolled");
+            }
+            else{
+              alert("Something went wrong. Please try again later.")
+            }
+          },
+        });//end of ajax
+    })
 
-      },
-    });
-
-  });
 {% endblock %}
 
 
 {% block document_ready %}
   {{block.super}}
+
+  {% if enrolled_status %}
+      $(".enroll-btn").attr("disabled",true)
+             .val("Enrolled");
+  {% endif %}
 
   $(function() {
     $('.tree').tree({
@@ -150,13 +185,16 @@
       alert(node.id);
     }
     );
+    {% user_access_policy groupid request.user as user_access %}
+    {% if user_access == "allow" %}
+        {% if node_type == "Course" %}
 
-      {% if not course_structure_exists %}
-        $("#view_page").append("<label>{% trans 'You have not added any content to this course yet' %}</label>")
-      {% endif %}
-
-
-
+          {% if not course_structure_exists %}
+            $("#view_page").append("<label>{% trans 'You have not added any content to this course yet' %}</label>")
+          {% endif %}
+        {% endif %}
+        $("#view_collection").find("b.current").after('&nbsp;&nbsp;<span><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span>')
+    {% endif %}
 {% endblock %}
 
 
