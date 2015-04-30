@@ -40,7 +40,7 @@ GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Co
 app = GST_COURSE
 
 
-# @login_required
+@login_required
 @get_execution_time
 def course(request, group_id, course_id=None):
     """
