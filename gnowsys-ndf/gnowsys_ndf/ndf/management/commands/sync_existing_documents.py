@@ -11,6 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.settings import AUTHOR_AGENCY_TYPES
 
 
 class Command(BaseCommand):
@@ -19,7 +20,17 @@ class Command(BaseCommand):
       + "(only if they doesn't exists) in your database."
 
   def handle(self, *args, **options):
-    # Keep latest fields to be added at top
+    # Keep latest changes in field(s) to be added at top
+
+    # Replacing invalid value of agency_type field belonging to Author node by "Other"
+    res = node_collection.collection.update(
+        {"_type": "Author", "agency_type": {"$nin": AUTHOR_AGENCY_TYPES}},
+        {"$set": {"agency_type": u"Other"}},
+        upsert=False, multi=True
+    )
+    if res['updatedExisting'] and res['nModified']:
+        print "\n Replacing invalid value of agency_type field belonging to Author node by 'Other'" + \
+            "... #" + res["n"].__str__() + " records updated."
 
     # From existing RelationType instance(s), finding Binary relationships
     # and Setting their "member_of" field's value as "Binary" (MetaType)

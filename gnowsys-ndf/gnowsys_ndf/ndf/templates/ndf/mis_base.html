@@ -33,41 +33,46 @@
     get_features_with_special_rights: Returns list of feature(s) for which creation rights should not be given
   -->
   {% endcomment %}
-  {% get_features_with_special_rights groupid request.user as features_list %}
+  {% if tiss_site %}
+    {% get_features_with_special_rights groupid request.user as features_list %}
 
-  <ul class="side-nav"> 
-    {% for each in app_collection_set %}
-    {% get_memberof_objects_count each.pk groupid as count %}
 
-    {% if app_set_id == each|safe %}
-      {% if '/new/' in request.path %}
-      <li class="active-app-set-edit">
-      {% else %}
-      <li class="active-app-set-view">
-      {% endif %}
-    {% else %}
-    <li>
-    {% endif %}
-    
-      <div class="row">
-        {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
-          <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
-            {{each.name}} ({{count}})
-          </a>
+    <ul class="side-nav"> 
+      {% for each in app_collection_set %}
+      {% get_memberof_objects_count each.pk groupid as count %}
 
-          {% if gstaff_access and each.name not in features_list %}
-          <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
-            +&nbsp; {% trans "Add" %}
-          </a>
-          {% endif %}
-
+      {% if app_set_id == each|safe %}
+        {% if '/new/' in request.path %}
+        <li class="active-app-set-edit">
         {% else %}
-          {{each.name}}
+        <li class="active-app-set-view">
         {% endif %}
-      </div>
-  	</li>
+      {% else %}
+      <li>
+      {% endif %}
+      
+        <div class="row">
+          {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
+            <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+              {{each.name}} ({{count}})
+            </a>
 
-  	{% endfor %}
+            {% if gstaff_access and each.name not in features_list %}
+            <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+              +&nbsp; {% trans "Add" %}
+            </a>
+            {% endif %}
 
-  </ul>
+          {% else %}
+            {{each.name}}
+          {% endif %}
+        </div>
+    	</li>
+
+    	{% endfor %}
+
+    </ul>
+  {% endif %}
+
+
 {% endblock %}

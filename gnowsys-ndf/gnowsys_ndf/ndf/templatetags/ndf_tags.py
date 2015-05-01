@@ -382,6 +382,7 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 	drawers = None
 	drawer1 = None
 	drawer2 = None
+	user_type = None
 
 	# Special case used while dealing with RelationType widget
 	left_drawer_content = None
@@ -394,11 +395,18 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 				checked = "Theme"
 			else:
 				checked = None
-			drawers, paged_resources = get_drawers(group_id, node._id, node.collection_set, checked)
+			drawers, paged_resources = get_drawers(group_id, node._id, node.collection_set, page_no, checked)
 
 		elif field == "prior_node":
 			checked = None
 			drawers, paged_resources = get_drawers(group_id, node._id, node.prior_node, checked)
+
+		elif field == "Group":
+			checked = checked
+			if kwargs.has_key("user_type"):
+				user_type = kwargs["user_type"]
+
+			drawers, paged_resources = get_drawers(group_id, node._id, node.group_admin, page_no, checked)
 
 		elif field == "module":
 			checked = "Module"
@@ -445,7 +453,7 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 
 	return {'template': 'ndf/drawer_widget.html', 
 					'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'page_info': paged_resources, 
-					'is_RT': checked, 'group_id': group_id, 'groupid': group_id
+					'is_RT': checked, 'group_id': group_id, 'groupid': group_id, 'user_type': user_type 
 				}
 
 @get_execution_time
@@ -1810,8 +1818,11 @@ def get_publish_policy(request, groupid, res_node):
 		if request.user.id:
 			if group_type == "Moderated":
 				base_group=get_prior_post_node(groupid)
-				if base_group and (base_group[len(base_group) - 1] is not None):
-					if base_group[len(base_group) - 1].status == "DRAFT" or node.status == "DRAFT":
+                                #if base_group and (base_group[len(base_group) - 1] is not None):
+                                # comment as it throws key error 45
+                                if base_group : 
+					#if base_group[len(base_group) - 1].status == "DRAFT" or node.status == "DRAFT":
+                                        if base_group.status == "DRAFT" or node.status == "DRAFT":
 						return "allow"
 
 			elif node.edit_policy == "NON_EDITABLE":
