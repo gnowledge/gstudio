@@ -40,7 +40,6 @@ GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Co
 app = GST_COURSE
 
 
-@login_required
 @get_execution_time
 def course(request, group_id, course_id=None):
     """
@@ -77,21 +76,24 @@ def course(request, group_id, course_id=None):
     # Course search view
     title = GST_COURSE.name
 
-    course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id)})
+    if request.user.id:
+        course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id)})
 
-    all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]},
-                            'group_set': ObjectId(group_id)})
+        all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]},
+                                'group_set': ObjectId(group_id)})
+
+
+        auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
+
+        if auth_node.attribute_set:
+            for each in auth_node.attribute_set:
+                if each and "course_enrollment_status" in each:
+                    course_enrollment_dict = each["course_enrollment_status"]
+                    course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
+                    enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
 
     ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id)})
 
-    auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
-
-    if auth_node.attribute_set:
-        for each in auth_node.attribute_set:
-            if each and "course_enrollment_status" in each:
-                course_enrollment_dict = each["course_enrollment_status"]
-                course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
-                enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
 
     return render_to_response("ndf/course.html",
                             {'title': title,
