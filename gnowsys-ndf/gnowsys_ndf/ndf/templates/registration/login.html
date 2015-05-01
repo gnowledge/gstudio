@@ -79,17 +79,19 @@
 				</div>
 
 				<!-- Forgot password link & New Registration link -->
-				<div class="row">
-					<div class="small-6 large-6 small-offset-1 large-offset-1 columns end">
-						<center>
-						<label>
-						<a title="Click here to register" href="{{ register_url }}">
-							{% trans "Don't have an account? Register yourself now." %}
-						</a>
-						</label>
-						</center>
+      			{% if site.SITE_NAME != "NROER" %} 
+					<div class="row">
+						<div class="small-6 large-6 small-offset-1 large-offset-1 columns end">
+							<center>
+							<label>
+							<a title="Click here to register" href="{{ register_url }}">
+								{% trans "Don't have an account? Register yourself now." %}
+							</a>
+							</label>
+							</center>
+						</div>
 					</div>
-				</div>
+				{% endif %}
 				<input type="hidden" name="next" value="{{ next }}" />
 			</form>
 		</div>
