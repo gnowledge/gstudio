@@ -42,7 +42,7 @@ from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
-from gnowsys_ndf.local_settings import GSTUDIO_SITE_NAME
+from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
 
