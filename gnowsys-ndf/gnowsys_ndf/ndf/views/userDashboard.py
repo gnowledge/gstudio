@@ -15,7 +15,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
 
 from gnowsys_ndf.ndf.models import *
@@ -287,7 +287,8 @@ def uDashboard(request, group_id):
             'user_groups':group_cur, 'user_task': task_cur, 'user_activity':user_activity,
             'dashboard_count':dashboard_count,
             'datavisual': json.dumps(datavisual),'show_only_pie':show_only_pie,
-            'total_activity_rating': total_activity_rating
+            'total_activity_rating': total_activity_rating,
+            'site_name' : GSTUDIO_SITE_NAME,
          },
         context_instance=RequestContext(request)
     )

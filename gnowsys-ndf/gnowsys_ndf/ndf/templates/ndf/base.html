@@ -144,6 +144,8 @@
         .ajaxStart(function() {
           $('article').block({ 
             message: '<h4>Processing... Please wait!</h4>',
+            centerX: false,
+            centerY: false,
             css: { 
               border: 'none', 
               padding: '15px', 
@@ -151,13 +153,15 @@
               backgroundColor: '#10c1cb !important', 
               '-webkit-border-radius': '10px', 
               '-moz-border-radius': '10px', 
-              opacity: 1.0
+              opacity: 1.0,
+              top: ($(window).height())/2 + 'px', left: '', right: '50px'
             }
           });
         })
         .ajaxStop(function() {
           $('article').unblock();
         });
+
     // Toggles the display of main sidebar for 12 col article view
       var toggleMainSidebar = function(){
         $("main>aside").toggle();
@@ -236,8 +240,7 @@
       }); //document closes
 
     // start of document.ready()
-      $(document).ready(function(){
-  
+      $(document).ready(function() {
         try{
 
           $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true);

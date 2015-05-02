@@ -28,6 +28,13 @@
 <br>
 <br>
 <ul class="side-nav">
+<li >
+  <div class="row">
+      <a class="small-6 columns" href="{% url 'event' group_name_tag %}" title="View all">
+              View all
+        </a>
+  </div>        
+</li>
 {% for each in app_collection_set %}
 
      {% if app_set_isd == each|safe %}
@@ -76,10 +83,9 @@
 
 
 {% block body_content %}
-<header class="row" style="margin: 1rem 0 0 0;">
-      <h2 class="medium-12 columns">
-    
-<h1> Select  and create events out of listed categories </h1>
-</header>
-</h2>
+
+<div id = 'view-scheduler-calendar'>
+   {% include "ndf/scheduler_calender.html"  %}
+</div>
+
 {% endblock %}

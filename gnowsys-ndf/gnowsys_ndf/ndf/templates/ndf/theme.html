@@ -193,13 +193,10 @@
 		$(".jqtree-title.jqtree_common").hover( function(){
 
 			topic_id = $(this).siblings("a").attr("id");
-
 			// var topic_name = $(this).siblings("a").attr("name");
 			var data_info = $(this).attr("data-info");
 			var hover_context = this;
-
 			if ( ! data_info && topic_id ){
-			
 				$(".topic_stats").css("display", "none");
 
 				$.ajax({
@@ -221,6 +218,9 @@
 	             			$(".topic_stats").css("display", "block");
 	             			
 	             		}
+	             		else{
+	             			$(hover_context).attr("data-info", data);	             			
+	             		}
 
 	             	},
 	             	
@@ -229,11 +229,13 @@
 
 			}
 			else{ 
-
-				var data = $(this).attr("data-info");
-				count = display_top_res(data)
-				$(".topic_stats").html(count);
-     			$(".topic_stats").css("display", "block");
+				
+				if (topic_id){
+					var data = $(this).attr("data-info");
+					count = display_top_res(data)
+					$(".topic_stats").html(count);
+	     			$(".topic_stats").css("display", "block");
+				}
 
 			}
 
@@ -261,9 +263,11 @@
  				var len = data_obj[key].length;  // length of list as a value of key
  				// alert(key+": "+len);
  				count += key+": "+len+"<br/>";
- 			}
+ 			} 			
 
-
+ 		}
+ 		else{
+ 			count += "No Resources !<br/>";
  		}
 
  		return count

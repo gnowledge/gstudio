@@ -403,6 +403,9 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
       elif checked == "Group":
         drawer = node_collection.find({'_type': u"Group", '_id': {'$nin': filtering} })
+        
+      elif checked == "Users":
+        drawer = node_collection.find({'_type': u"Author", '_id': {'$nin': filtering} })
 
       elif checked == "Forum":
         gst_forum_id = node_collection.one({'_type': "GSystemType", 'name': "Forum"})._id
@@ -558,210 +561,214 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
 
 @get_execution_time
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
-  """Updates the retrieved values of common fields from request into the given node."""
+    """Updates the retrieved values of common fields from request
+    into the given node.
+    """
 
-  group_obj = node_collection.one({'_id': ObjectId(group_id)})
-  # theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
-  # topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-  collection = None
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    # theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+    # topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+    # collection = None
 
-  if coll_set:
-      if "Theme" in coll_set.member_of_names_list:
-        node_type = theme_GST
-      if "theme_item" in coll_set.member_of_names_list:
-        node_type = theme_item_GST
-      if "Topic" in coll_set.member_of_names_list:
-        node_type = topic_GST
+    if coll_set:
+        if "Theme" in coll_set.member_of_names_list:
+            node_type = theme_GST
+        if "theme_item" in coll_set.member_of_names_list:
+            node_type = theme_item_GST
+        if "Topic" in coll_set.member_of_names_list:
+            node_type = topic_GST
 
-      name = request.POST.get('name_'+ str(coll_set._id),"")
-      content_org = request.POST.get(str(coll_set._id),"")
-      tags = request.POST.get('tags'+ str(coll_set._id),"")
-     
-  else:    
-    name =request.POST.get('name','').strip()
-    content_org = request.POST.get('content_org')
-    tags = request.POST.get('tags')
-
-  language= request.POST.get('lan')
-  sub_theme_name = request.POST.get("sub_theme_name", '')
-  add_topic_name = request.POST.get("add_topic_name", '')
-  is_changed = False
-  sub_theme_name = unicode(request.POST.get("sub_theme_name", ''))
-  add_topic_name = unicode(request.POST.get("add_topic_name", ''))
-  usrid = int(request.user.id)
-  usrname = unicode(request.user.username)
-  access_policy = request.POST.get("login-mode", '')
-  right_drawer_list = []
-  checked = request.POST.get("checked", '') 
-  check_collection = request.POST.get("check_collection", '') 
-  if check_collection:
-    if check_collection == "collection":
-      right_drawer_list = request.POST.get('collection_list','')
-    elif check_collection == "prior_node":    
-      right_drawer_list = request.POST.get('prior_node_list','')
-    elif check_collection == "teaches":    
-      right_drawer_list = request.POST.get('teaches_list','')
-    elif check_collection == "assesses":    
-      right_drawer_list = request.POST.get('assesses_list','')
-    elif check_collection == "module":    
-      right_drawer_list = request.POST.get('module_list','')
-
-
-  map_geojson_data = request.POST.get('map-geojson-data')
-  user_last_visited_location = request.POST.get('last_visited_location')
-  altnames = request.POST.get('altnames', '')
-  featured = request.POST.get('featured', '')
-
-  if map_geojson_data:
-    map_geojson_data = map_geojson_data + ","
-    map_geojson_data = list(ast.literal_eval(map_geojson_data))
-  else:
-    map_geojson_data = []
-  
-  # --------------------------------------------------------------------------- For create only
-  if not node.has_key('_id'):
-    
-    node.created_by = usrid
-    
-    if node_type._id not in node.member_of:
-      node.member_of.append(node_type._id)
-      if node_type.name == "Term":
-        node.member_of.append(topic_GST._id)
-        
-     
-    if group_obj._id not in node.group_set:
-      node.group_set.append(group_obj._id)
-
-    if access_policy == "PUBLIC":
-      node.access_policy = unicode(access_policy)
+        name = request.POST.get('name_' + str(coll_set._id), "")
+        content_org = request.POST.get(str(coll_set._id), "")
+        tags = request.POST.get('tags' + str(coll_set._id), "")
     else:
-      node.access_policy = unicode(access_policy)
+        name = request.POST.get('name', '').strip()
+        content_org = request.POST.get('content_org')
+        tags = request.POST.get('tags')
 
-    node.status = "PUBLISHED"
+    language = request.POST.get('lan')
+    sub_theme_name = request.POST.get("sub_theme_name", '')
+    add_topic_name = request.POST.get("add_topic_name", '')
+    is_changed = False
+    sub_theme_name = unicode(request.POST.get("sub_theme_name", ''))
+    add_topic_name = unicode(request.POST.get("add_topic_name", ''))
+    usrid = int(request.user.id)
+    usrname = unicode(request.user.username)
+    access_policy = request.POST.get("login-mode", '')
+    right_drawer_list = []
+    checked = request.POST.get("checked", '')
+    check_collection = request.POST.get("check_collection", '')
+    if check_collection:
+        if check_collection == "collection":
+            right_drawer_list = request.POST.get('collection_list', '')
+        elif check_collection == "prior_node":
+            right_drawer_list = request.POST.get('prior_node_list', '')
+        elif check_collection == "teaches":
+            right_drawer_list = request.POST.get('teaches_list', '')
+        elif check_collection == "assesses":
+            right_drawer_list = request.POST.get('assesses_list', '')
+        elif check_collection == "module":
+            right_drawer_list = request.POST.get('module_list', '')
 
-    is_changed = True
-          
-    # End of if
-    specific_url = set_all_urls(node.member_of)
-    node.url = specific_url
+    map_geojson_data = request.POST.get('map-geojson-data')
+    user_last_visited_location = request.POST.get('last_visited_location')
+    altnames = request.POST.get('altnames', '')
+    # featured = request.POST.get('featured', '')
 
-  if name:
-    if node.name != name:
-      node.name = name
-      is_changed = True
-  
-  if altnames or request.POST.has_key("altnames"):
-    if node.altnames != altnames:
-      node.altnames = altnames
-      is_changed = True
+    if map_geojson_data:
+        map_geojson_data = map_geojson_data + ","
+        map_geojson_data = list(ast.literal_eval(map_geojson_data))
+    else:
+        map_geojson_data = []
 
-  if (featured == True) or (featured == False) :
-    if node.featured != featured:
-      node.featured = featured
-      is_changed = True
+    # For create only ---------------------------------------------------------
+    if not ("_id" in node):
+        node.created_by = usrid
 
-  if sub_theme_name:
-    if node.name != sub_theme_name:
-      node.name = sub_theme_name
-      is_changed = True
-  
-  if add_topic_name:
-    if node.name != add_topic_name:
-      node.name = add_topic_name
-      is_changed = True
+        if node_type._id not in node.member_of:
+            node.member_of.append(node_type._id)
+            if node_type.name == "Term":
+                node.member_of.append(topic_GST._id)
 
-  #  language
-  if language:
-      node.language = unicode(language) 
-  else:
-      node.language = u"en"
+        if group_obj._id not in node.group_set:
+            node.group_set.append(group_obj._id)
 
-  #  access_policy
+        if access_policy == "PUBLIC":
+            node.access_policy = unicode(access_policy)
+        else:
+            node.access_policy = unicode(access_policy)
 
-  if access_policy:
-    # Policy will be changed only by the creator of the resource
-    # via access_policy(public/private) option on the template which is visible only to the creator
-    if access_policy == "PUBLIC" and node.access_policy != access_policy:
+        node.status = "PUBLISHED"
+        is_changed = True
+
+        # End of if
+        specific_url = set_all_urls(node.member_of)
+        node.url = specific_url
+
+    if name:
+        if node.name != name:
+            node.name = name
+            is_changed = True
+
+    if altnames or "altnames" in request.POST:
+        if node.altnames != altnames:
+            node.altnames = altnames
+            is_changed = True
+
+    # if featured or (not featured):
+    #     if node.featured != featured:
+    #         node.featured = featured
+    #         is_changed = True
+
+    if sub_theme_name:
+        if node.name != sub_theme_name:
+            node.name = sub_theme_name
+            is_changed = True
+
+    if add_topic_name:
+        if node.name != add_topic_name:
+            node.name = add_topic_name
+            is_changed = True
+
+    #  language
+    if language:
+        node.language = unicode(language)
+    else:
+        node.language = u"en"
+
+    #  access_policy
+    if access_policy:
+        # Policy will be changed only by the creator of the resource
+        # via access_policy(public/private) option on the template which
+        # is visible only to the creator
+        if access_policy == "PUBLIC" and node.access_policy != access_policy:
+            node.access_policy = u"PUBLIC"
+            # print "\n Changed: access_policy (pu 2 pr)"
+            is_changed = True
+        elif access_policy == "PRIVATE" and node.access_policy != access_policy:
+            node.access_policy = u"PRIVATE"
+            # print "\n Changed: access_policy (pr 2 pu)"
+            is_changed = True
+    else:
         node.access_policy = u"PUBLIC"
-        # print "\n Changed: access_policy (pu 2 pr)"
+
+    # For displaying nodes in home group as well as in creator group.
+    user_group_obj = node_collection.one({
+        '_type': ObjectId(group_id), 'name': usrname
+    })
+
+    if group_obj._id not in node.group_set:
+        node.group_set.append(group_obj._id)
+    else:
+        if user_group_obj:
+            if user_group_obj._id not in node.group_set:
+                node.group_set.append(user_group_obj._id)
+
+    # tags
+    if tags:
+        tags_list = []
+
+        for tag in tags.split(","):
+            tag = unicode(tag.strip())
+
+            if tag:
+                tags_list.append(tag)
+
+        if set(node.tags) != set(tags_list):
+            node.tags = tags_list
+            is_changed = True
+
+    #  Build collection, prior node, teaches and assesses lists
+    if check_collection:
+        changed = build_collection(node, check_collection, right_drawer_list, checked)
+        if changed:
+            is_changed = True
+
+    #  org-content
+    if content_org:
+        if node.content_org != content_org:
+            node.content_org = content_org
+
+            # Required to link temporary files with the current user who is
+            # modifying this document
+            usrname = request.user.username
+            filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
+            node.content = org2html(content_org, file_prefix=filename)
+            is_changed = True
+
+    # visited_location in author class
+    if node.location != map_geojson_data:
+        node.location = map_geojson_data  # Storing location data
         is_changed = True
-    elif access_policy == "PRIVATE" and node.access_policy != access_policy:
-        node.access_policy = u"PRIVATE"
-        # print "\n Changed: access_policy (pr 2 pu)"
-        is_changed = True
-  else:
-      node.access_policy = u"PUBLIC"
 
-  # For displaying nodes in home group as well as in creator group.
-  user_group_obj = node_collection.one({'$and': [{'_type': ObjectId(group_id)}, {'name': usrname}]})
+    if user_last_visited_location:
+        user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
-  if group_obj._id not in node.group_set:
-      node.group_set.append(group_obj._id)
-  else:
-      if user_group_obj:
-          if user_group_obj._id not in node.group_set:
-              node.group_set.append(user_group_obj._id)
+        author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
+        user_group_location = node_collection.one({
+            '_type': "Author", 'member_of': author._id, 'created_by': usrid,
+            'name': usrname
+        })
 
-  #  tags
-  if tags:
-    tags_list = []
+        if user_group_location:
+            if node._type == "Author" and user_group_location._id == node._id:
+                if node['visited_location'] != user_last_visited_location:
+                    node['visited_location'] = user_last_visited_location
+                    is_changed = True
 
-    for tag in tags.split(","):
-      tag = unicode(tag.strip())
+            else:
+                user_group_location['visited_location'] = user_last_visited_location
+                user_group_location.save()
 
-      if tag:
-        tags_list.append(tag)
+    if is_changed:
+        node.status = unicode("DRAFT")
 
-    if set(node.tags) != set(tags_list):
-      node.tags = tags_list
-      is_changed = True
+        node.modified_by = usrid
 
-  #  Build collection, prior node, teaches and assesses lists
-  if check_collection:
-    changed = build_collection(node, check_collection, right_drawer_list, checked)  
-    if changed == True:
-      is_changed = True
-    
-  #  org-content
-  if content_org:
-    if node.content_org != content_org:
-      node.content_org = content_org
-      
-      # Required to link temporary files with the current user who is modifying this document
-      usrname = request.user.username
-      filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
-      node.content = org2html(content_org, file_prefix=filename)
-      is_changed = True
+        if usrid not in node.contributors:
+            node.contributors.append(usrid)
 
-  # visited_location in author class
-  if node.location != map_geojson_data:
-    node.location = map_geojson_data # Storing location data
-    is_changed = True
-  
-  if user_last_visited_location:
-    user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
-
-    author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
-    user_group_location = node_collection.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-
-    if user_group_location:
-      if node._type == "Author" and user_group_location._id == node._id:
-        if node['visited_location'] != user_last_visited_location:
-          node['visited_location'] = user_last_visited_location
-          is_changed = True
-
-      else:
-        user_group_location['visited_location'] = user_last_visited_location
-        user_group_location.save()
-
-  if is_changed:
-    node.status = unicode("DRAFT")
-
-    node.modified_by = usrid
-
-    if usrid not in node.contributors:
-      node.contributors.append(usrid)
-  return is_changed
+    return is_changed
 
 
 # ============= END of def get_node_common_fields() ==============
