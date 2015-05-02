@@ -49,13 +49,15 @@
 
 
 {% get_all_replies reply as replies %}
+{% get_agency_type_of_group groupid as group_agency_type %}
+{% user_access_policy groupid user as user_access %}
 
 {% for eachrep in replies %}
 {% get_user_object eachrep.created_by as user_obj %}
 
+<br>
 <div class="row">
   <div id="insidediv" class="large-6 columns">
-
 
     <div class="row ">
       <div class="small-3 columns" style="margin-top:10px; color:darkgray">
@@ -77,9 +79,15 @@
   </div>
   <br/>
   <div class="large-6 columns">
-
     {% if user.is_authenticated %}
-    {% include "ndf/replytwistrep.html" %}
+
+      <!-- only for partners group: allow user to add reply even without being member of that partner group -->
+      {% if group_agency_type == "Partner" or request.user.id == eachrep.created_by or request.user.is_superuser  %}
+
+        {% include "ndf/replytwistrep.html" %}
+
+      {% endif %}
+
     {% endif %}
 
   </div>
@@ -89,7 +97,7 @@
 
 <div class="response_change" id="refreshthread" class="large-12 columns">
 
-  {% get_reply thread eachrep forum csrf_token user groupid %}
+  {% get_reply request thread eachrep forum csrf_token user groupid %}
 
 </div>
 {% endfor %}

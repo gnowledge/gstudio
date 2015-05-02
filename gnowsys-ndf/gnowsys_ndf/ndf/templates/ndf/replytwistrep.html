@@ -10,6 +10,7 @@
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
 <script type="text/javascript">
+
   function reply_del{{eachrep}}() {
     var repl_count=$("#replycount{{eachrep}}").val();
   
@@ -149,7 +150,7 @@
 
    {% if eachrep.created_by == user_obj.id %}
      {% if eachrep != thread %}
-       <a class="tiny alert button" id="myname" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
+       <a class="tiny alert button" data-reply-id="{{eachrep.created_by}}" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
      
      {% endif %}
    {% endif %}
