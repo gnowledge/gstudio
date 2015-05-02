@@ -1103,8 +1103,8 @@ def delete_file(request, group_id, _id):
 def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
+    imageCollection = ""
     # ins_objectid  = ObjectId()
-    # imageCollection=""
     # if ins_objectid.is_valid(group_id) is False :
     #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
     #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
