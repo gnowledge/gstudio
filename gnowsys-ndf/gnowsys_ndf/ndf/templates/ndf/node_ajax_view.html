@@ -1716,6 +1716,7 @@ ul#navigation li a.last {
     $("#view-info").css("display", "none");
   });
 
+  {% if topic %}
   // select particular type to display contents in topic page
   $(".view_list").click(function() {
     
@@ -1802,6 +1803,7 @@ ul#navigation li a.last {
       }
     });
   });
+  {% endif %}
 
   $(document).on('dblclick','.imgLightbox',function(){
     var img_node = $(this).attr('name');
