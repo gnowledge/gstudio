@@ -74,24 +74,25 @@
 				<!-- Login button -->
 				<div class="row">
 					<div class="small-2 large-2 small-offset-3 large-offset-3 columns end">
-						<input type="submit" class="button small expand" value="{% trans "Login" %}" style="font-size:15px" />
+						<input type="submit" class="button small expand" tabindex= "3" value="{% trans "Login" %}" style="font-size:15px" />
 					</div>
 				</div>
 
 				<!-- Forgot password link & New Registration link -->
-				<div class="row">
-					<div class="small-6 large-6 small-offset-1 large-offset-1 columns end">
-						<center>
-						<label>
-						<a title="Click here to register" href="{{ register_url }}">
-							{% trans "Don't have an account? Register yourself now." %}
-						</a>
-						</label>
-						</center>
+      			{% if site.SITE_NAME != "NROER" %} 
+					<div class="row">
+						<div class="small-6 large-6 small-offset-1 large-offset-1 columns end">
+							<center>
+							<label>
+							<a title="Click here to register" href="{{ register_url }}">
+								{% trans "Don't have an account? Register yourself now." %}
+							</a>
+							</label>
+							</center>
+						</div>
 					</div>
-				</div>
-				    
-				<!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+				{% endif %}
+				<input type="hidden" name="next" value="{{ next }}" />
 			</form>
 		</div>
 	</div>
@@ -103,8 +104,8 @@
 	// Setting tabindex for following html elements
 	$("#id_username").attr("tabindex", "1");
 	$("#id_password").attr("tabindex", "2");
-	$("a[title='Recover your password']").attr("tabindex", "3");
-	$("a[title='Click here to register']").attr("tabindex", "4");
+	$("a[title='Recover your password']").attr("tabindex", "4");
+	$("a[title='Click here to register']").attr("tabindex", "5");
 
 	$("input[id='id_username'], input[id='id_password']").each(function(){
 		$(this).attr("required", "");
