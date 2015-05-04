@@ -100,15 +100,30 @@ def get_site_variables():
 
    return  site_var
 
+
 @get_execution_time
 @register.assignment_tag
 def get_author_agency_types():
    return AUTHOR_AGENCY_TYPES
 
+
 @get_execution_time
 @register.assignment_tag
 def get_group_agency_types():
    return GROUP_AGENCY_TYPES
+
+
+@get_execution_time
+@register.assignment_tag
+def get_agency_type_of_group(group_id):
+	'''
+	Getting agency_type value of the group.
+	'''
+	group_obj = node_collection.one({"_id": ObjectId(group_id)})
+	group_agency_type = group_obj.agency_type
+	# print "group_agency_type : ", group_agency_type
+	return group_agency_type
+
 
 @get_execution_time
 @register.assignment_tag
@@ -119,6 +134,7 @@ def get_node_type(node):
       return nodetype
    else:
       return ""
+
 
 @get_execution_time
 @register.assignment_tag
@@ -330,8 +346,8 @@ def get_all_users_int_count():
 
 @get_execution_time
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(thread,parent,forum,token,user,group_id):
-	return {'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent,'groupid':group_id}
+def get_reply(request, thread,parent,forum,token,user,group_id):
+	return {'request':request, 'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent,'groupid':group_id}
 
 @get_execution_time
 @register.assignment_tag
@@ -2095,7 +2111,8 @@ def str_to_dict(str1):
 	                              if user:
 	                                dict_format[k] = user.get_username()
               else: 
-                      if v != [] and v != "None":
+                      # if v != [] and v != "None":
+                      if v:
                       		  if User.objects.filter(id = userid).exists():
 	                              user = User.objects.get(id = v)
 	                              if user:
