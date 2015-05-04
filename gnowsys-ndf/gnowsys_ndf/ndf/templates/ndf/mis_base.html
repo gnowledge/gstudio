@@ -26,14 +26,14 @@
 {% endblock %}
 
 {% block meta_content %}
-  {% check_is_gstaff groupid request.user as gstaff_access %}
 
-  {% comment %}
-  <!-- 
-    get_features_with_special_rights: Returns list of feature(s) for which creation rights should not be given
-  -->
-  {% endcomment %}
-  {% if tiss_site %}
+  {% if not hide_mis_meta_content %}
+    {% check_is_gstaff groupid request.user as gstaff_access %}
+    {% comment %}
+    <!-- 
+      get_features_with_special_rights: Returns list of feature(s) for which creation rights should not be given
+    -->
+    {% endcomment %}
     {% get_features_with_special_rights groupid request.user as features_list %}
 
 
