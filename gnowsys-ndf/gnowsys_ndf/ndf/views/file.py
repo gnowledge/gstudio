@@ -1205,26 +1205,26 @@ def file_detail(request, group_id, _id):
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    ins_objectid = ObjectId()
+    if ins_objectid.is_valid(group_id) is False:
+        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else :
+        else:
             auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
+            if auth:
                 group_id = str(auth._id)
-    else :
+    else:
         pass
 
     file_node = node_collection.one({"_id": ObjectId(_id)})
-
+    """
     if file_node is not None:
         if file_node.fs_file_ids:
           # getting latest uploaded pic's _id
           file_fs = file_node.fs_file_ids[2]
-         
+
           if (file_node.fs.files.exists(file_fs)):
 
             if len(file_node.fs_file_ids) > 0:
@@ -1240,6 +1240,26 @@ def getFileThumbnail(request, group_id, _id):
             return HttpResponse("")
     else:
         return HttpResponse("")
+    """
+    if file_node is not None:
+        fs_file_ids = file_node.fs_file_ids
+        if fs_file_ids and len(fs_file_ids) == 3:
+          # getting latest uploaded pic's _id
+          # file_fs = file_node.fs_file_ids[2]
+
+          # if (file_node.fs.files.exists(file_fs)):
+
+          f = file_node.fs.files.get(ObjectId(fs_file_ids[2]))
+
+          return HttpResponse(f.read(), content_type=f.content_type)
+
+          # else:
+          #     return HttpResponse("")
+        else:
+            return HttpResponse("")
+    else:
+        return HttpResponse("")
+
 
 @get_execution_time
 def readDoc(request, _id, group_id, file_name=""):

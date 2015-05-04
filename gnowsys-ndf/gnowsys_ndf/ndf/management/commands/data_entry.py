@@ -63,6 +63,7 @@ college_gst = node_collection.one({
     "_type": "GSystemType", "name": "College"
 })
 college_dict = {}
+college_name_dict = {}
 attr_type_dict = {}
 rel_type_dict = {}
 create_student_enrollment_code = False
@@ -612,6 +613,23 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
         degree_year = json_document["year of study"]
         if degree_year:
             query.update({"attribute_set.degree_year": degree_year})
+
+
+    if "college ( graduation )" in json_document:
+        college_name = json_document["college ( graduation )"]
+
+        if college_name not in college_name_dict:
+            college_node = node_collection.one({
+                "member_of": college_gst._id, "name": college_name
+            }, {
+                "name": 1
+            })
+            college_name_dict[college_name] = college_node
+
+        query.update({"relation_set.student_belongs_to_college": college_name_dict[college_name]._id})
+
+    info_message = "\n query for " + json_document['name'] + " : " + str(query) +  "\n"
+    log_list.append(info_message)
 
     node = node_collection.one(query)
 

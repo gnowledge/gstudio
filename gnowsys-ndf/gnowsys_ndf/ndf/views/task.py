@@ -62,11 +62,15 @@ def task(request, group_name, task_id=None):
     template = "ndf/task.html"
     variable = RequestContext(request, {'title': title, 'appId':app._id, 'TASK_inst': TASK_inst, 'group_id': group_id, 'groupid': group_id, 'group_name':group_name })
     return render_to_response(template, variable)
+
+
+@login_required
 @get_execution_time
 def task_details(request, group_name, task_id):
   """Renders given task's details.
-  
+
   """
+  group_id = None
   if ObjectId.is_valid(group_name) is False:
     group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })

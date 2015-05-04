@@ -48,14 +48,21 @@
           </div>
           <div class="small-4 column">
             {% if "image" in each_res.mime_type %}
-              <img src="{% url 'getFileThumbnail' group_id each_res.pk %}"/>
+              <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!" />
             {% elif "audio" in each_res.mime_type %}
               <span class="fi-music" style="font-size:40px"></span>
             {% elif "Pandora_video" in each_res.member_of_names_list and "video" in each_res.mime_type %}
             {% get_source_id each_res.pk as source_id %}
               <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
             {% elif "video" in each_res.mime_type and each_res.member_of_names_list|join:', ' != "Pandora_video" %}
-              <video width="100px;" src="{% url 'getFileThumbnail' group_id each_res.pk %}"/>                  
+              <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!"/>
+             {% comment %}
+             <!--
+              <video width="100px" src="{% url 'getFileThumbnail' group_id each_res.pk %}">
+               No thumbnail available!
+              </video>
+             -->
+             {% endcomment %}
             {% else %}
               <span class="fi-page-filled" style="font-size:40px"></span>
             {% endif %}
