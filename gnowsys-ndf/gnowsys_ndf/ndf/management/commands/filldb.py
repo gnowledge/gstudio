@@ -624,8 +624,8 @@ def clean_structure():
 
   # to fix broken documents which are having partial/outdated attributes/relations in their attribute_set/relation_set. 
   # first make their attribute_set and relation_set empty and them fill them with latest key-values. 
-  # gsystem_list = ["GSystem", "File", "Group", "Author"]
-  gsystem_list = ["Group", "Author"]
+  gsystem_list = ["GSystem", "File", "Group", "Author"]
+  # gsystem_list = ["Group", "Author"]
   node_collection.collection.update(
     {'_type': {'$in': gsystem_list}, 'attribute_set': {'$exists': True}, 'relation_set': {'$exists': True}},
     {'$set': {'attribute_set': [], 'relation_set': []}}, 
@@ -636,12 +636,16 @@ def clean_structure():
                               '$or': [{'attribute_set': []}, {'relation_set': []}] 
                             }, timeout=False)
 
-  for each_gs in gs:
+  gs_count = gs.count()
+  # for each_gs in gs:
+  gs_iter = iter(gs)
+  for i, each_gs in enumerate(gs_iter):
     attr_list = []  # attribute-list
     rel_list = []  # relation-list
     inv_rel_list = []  # inverse-relation-list
 
-    print " .",
+    # print " .",
+    print " \n Processing node #.", (i+1), " out of ", gs_count, " ... ",
     if each_gs.member_of_names_list:
       info_message = "\n\n >>> " + str(each_gs.name) + " ("+str(each_gs.member_of_names_list[0])+")"
     else:
@@ -766,7 +770,7 @@ def clean_structure():
     if res['n']:
       info_message = "\n\n\t" + str(each_gs.name) + " updated succesfully !"
       log_list.append(info_message)
-      # print " -- attribute_set & relation_set updated succesfully !"
+      print " -- attribute_set & relation_set updated succesfully !"
 
   # ------------------------------------------------------------------------------------
   # Close cursor object if still alive

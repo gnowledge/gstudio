@@ -279,6 +279,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
     course_gst = None
     course_gs = None
+    hide_mis_meta_content = True
     mis_admin = None
 
     property_order_list = []
@@ -687,6 +688,8 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             {'_id': 1, 'name': 1, 'group_admin': 1}
         )
 
+    if tiss_site:
+        hide_mis_meta_content = False
     if univ and mis_admin:
         university_cur = node_collection.find(
             {'member_of': univ._id, 'group_set': mis_admin._id},
@@ -701,7 +704,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         'app_collection_set': app_collection_set,
         'app_set_id': app_set_id,
         'title': title,
+        'hide_mis_meta_content':hide_mis_meta_content,
         'tiss_site': tiss_site,
+
         'university_cur': university_cur,
         'property_order_list': property_order_list
     }
