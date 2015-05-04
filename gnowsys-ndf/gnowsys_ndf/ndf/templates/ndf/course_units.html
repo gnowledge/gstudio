@@ -189,7 +189,6 @@
 
   var res_name_flag = "";
 
-
   //create unit button click
     $(document).on("click", ".create_unit", function(event){
       unit_name_val = $(".unit_name").val();
@@ -240,12 +239,14 @@
              .removeClass("edit_unit")
     });
 
+
   //Cancel button
     $(document).on("click", "#cancel_btn", function(){
       $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
       $(".res-opt-btns").removeClass("hide")
       $(".name_id").val("");
     });
+
 
   //Create new page/ Upload file button
     $(document).on("click", "#new_res", function(){
@@ -260,8 +261,10 @@
         $(".res-opt-div").find("#view_add_file").removeClass("hide");
         $(".res-opt-div").find("#view_add_page").addClass("hide");
       }
-      $(".save_units").addClass("hide")
+      $(".save_units").addClass("hide");
+      $(".collection_details").html("");
     });
+
 
   //Onclick of any resource type button
     function open_div(name,this1){
@@ -297,14 +300,14 @@
         $(".res-opt-btns").addClass("hide");
         update_res_count();
     });
-
-
   
+
   //add from existing resources
-  $(document).on('click','#add_res',function(){
-    $(".collection_details").html("")
-    draw_drawer(res_name_flag);
-  })
+    $(document).on('click','#add_res',function(){
+      $(".collection_details").html("")
+      draw_drawer(res_name_flag);
+    })
+
 
   // function to get drawer
     function draw_drawer(name){
@@ -469,6 +472,7 @@
       $(this).attr("href",turl)
 
     })
+
 
   //function to display collection statistics
     function update_res_count(){
