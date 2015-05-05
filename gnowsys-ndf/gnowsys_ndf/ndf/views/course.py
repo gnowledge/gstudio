@@ -77,10 +77,10 @@ def course(request, group_id, course_id=None):
     title = GST_COURSE.name
 
     if request.user.id:
-        course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id)})
+        course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"})
 
         all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]},
-                                'group_set': ObjectId(group_id)})
+                                'group_set': ObjectId(group_id),'status':{'$in':[u"PUBLISHED",u"DRAFT"]}})
 
 
         auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
@@ -92,7 +92,7 @@ def course(request, group_id, course_id=None):
                     course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
                     enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
 
-    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id)})
+    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id),'status':u"PUBLISHED"})
 
 
     return render_to_response("ndf/course.html",
@@ -135,7 +135,7 @@ def create_edit(request, group_id, node_id=None):
     else:
         course_node = node_collection.collection.GSystem()
 
-    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),'group_set': ObjectId(group_id) })
+    available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(GST_COURSE._id),'group_set': ObjectId(group_id),'status':{"$in":[u"DRAFT",u"PUBLISHED"]}})
 
     nodes_list = []
     for each in available_nodes:
@@ -1344,6 +1344,14 @@ def create_edit_unit(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 
+
+@login_required
+def delete_course(request, group_id, node_id):
+    del_stat = delete_item(node_id)
+    if del_stat:
+        return HttpResponseRedirect(reverse('course', kwargs={'group_id': ObjectId(group_id)}))
+
+
 @login_required
 def delete_from_course_structure(request, group_id):
     '''
@@ -1362,8 +1370,10 @@ def delete_from_course_structure(request, group_id):
     if request.is_ajax() and request.method == "POST":
         oid = request.POST.get("oid", '')
         del_stat = delete_item(oid)
+
         if del_stat:
             response_dict["success"] = True
+
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -1378,6 +1388,7 @@ def delete_item(item):
         node_id=node_item._id,
         deletion_type=0
     )
+
     return del_status
 
 

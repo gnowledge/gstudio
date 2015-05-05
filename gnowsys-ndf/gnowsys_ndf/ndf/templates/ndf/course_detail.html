@@ -13,6 +13,10 @@
 {% block style %}
   {{block.super}}
 
+  .fi-trash:hover{
+    color:red;
+  }
+
   .name-section{
     height:80px;
   }
@@ -60,6 +64,18 @@
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
 
+  <div id="alertModal" class="reveal-modal medium alert-box radius" data-reveal data-alert>
+    <p id="alertModalLabel"></p>
+    <div class="row deletion">
+      <div class="small-3 small-offset-3 columns">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+      </div>
+      <div class="small-3 columns end">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+      </div>
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
 
 <header class="row page">
    <section class="medium-8 columns name-section" >
@@ -160,6 +176,29 @@
         });//end of ajax
     })
 
+  // Click on delete button
+    $(document).on('click','.fi-trash',function(){
+      lbl_msg = "Are you sure you want to delete '{{node.name}}' course?"
+      $("#alertModalLabel").text(lbl_msg);
+      $("#alertModal")
+        .removeClass("medium").addClass("small")
+        .addClass("alert")
+      $("#alertModal").foundation('reveal', 'open');
+    });
+
+
+  //Confirm or Cancel Deletion
+    $(document).on("click", "#btnConfirmYes", function() {
+        $("#alertModal").foundation('reveal', 'close');
+        turl = "{% url 'del_course' group_id node.pk %}" 
+        $(".fi-trash").attr("href",turl)
+        location.href = $(".fi-trash").attr('href');
+    });
+
+    $(document).on("click", "#btnConfirmNo", function() {
+        $("#alertModal").foundation('reveal', 'close');
+    });
+
 {% endblock %}
 
 
@@ -193,7 +232,7 @@
             $("#view_page").append("<label>{% trans 'You have not added any content to this course yet' %}</label>")
           {% endif %}
         {% endif %}
-        $("#view_collection").find("b.current").after('&nbsp;&nbsp;<span><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span>')
+        $("#view_collection").find("b.current").after('&nbsp;&nbsp;<span><a class="fi-pencil" href="{% url 'create_edit' group_id node.pk %}">{% trans "Edit" %}</a></span>&nbsp;&nbsp;<span><a class="fi-trash">{% trans "Delete" %}</a></span>')
     {% endif %}
 {% endblock %}
 
