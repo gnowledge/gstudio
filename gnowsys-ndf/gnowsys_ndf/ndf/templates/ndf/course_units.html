@@ -242,6 +242,7 @@
 
   //Cancel button
     $(document).on("click", "#cancel_btn", function(){
+      reset_unit_lbl();
       $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
       $(".res-opt-btns").removeClass("hide")
       $(".name_id").val("");
@@ -251,6 +252,8 @@
   //Create new page/ Upload file button
     $(document).on("click", "#new_res", function(){
       $(".res-opt-btns").addClass("hide")
+      reset_unit_lbl();
+
       if(res_name_flag == "Page"){
         $(".res-opt-div").find("#view_add_page").removeClass("hide");
         $(".res-opt-div").find("#view_add_page .name_id").focus();
@@ -269,6 +272,7 @@
 
   //Onclick of any resource type button
     function open_div(name,this1){
+        reset_unit_lbl();
         res_name_flag = name
         update_res_count();
         $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
@@ -292,9 +296,21 @@
         $(".collection_details").html("");
     };
 
+  //function to remove textbox for unit name and replace it with label
+    function reset_unit_lbl(){
+        xy = $(".create_unit").attr('value');
+        if (xy == "Update Unit"){
+          $(".create_unit").addClass("edit_unit")
+          $(".edit_unit").removeClass("create_unit").attr('value',"Edit Unit")
+          $(".name-field").html('<label id="{{unit_node.pk}}" class="unit_name" value="{{unit_node.name}}"><h5>{{unit_node.name}}</h5></label>')
+        }
+
+    }
+
 
   //Cross symbol
     $(document).on('click','.display_res',function(){
+        reset_unit_lbl();
         $(".res-opt-div").find("#view_add_file, #view_add_page").addClass("hide");
         $(".button").removeClass("success");
         $(".save_units").addClass("hide")
@@ -305,6 +321,7 @@
 
   //add from existing resources
     $(document).on('click','#add_res',function(){
+      reset_unit_lbl();
       $(".collection_details").html("")
       draw_drawer(res_name_flag);
     })
@@ -343,6 +360,7 @@
 
   //save page
     $("#add_page").click(function() {
+      reset_unit_lbl();
       unit_node_id = "{{unit_node.pk}}"
       unit_name = $(".unit_name").text();
       page_name = $(".name_id").val();
@@ -388,7 +406,8 @@
 
   //Submit button for file
     $('#docPost input[type=submit]').click(function(){
-        //save file button, check wether unit name is entered
+          reset_unit_lbl();
+          //save file button, check wether unit name is entered
           unit_name_val = $(".unit_name").text();
           if($("#docFile").val() != ""){
             if(unit_name_val!=""){
@@ -411,6 +430,7 @@
 
   // Save units
     $(document).on('click','.save_units',function(){
+      reset_unit_lbl();
       var resources_in_RHS = []
       unit_name_val = $(".unit_name").text()
       total_resources_in_RHS = $(".resources_drawer_div").find("#create_course_structure_drawer2").children("li")
