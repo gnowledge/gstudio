@@ -902,11 +902,16 @@ def create_course_struct(request, group_id, node_id):
         pass
     app_id = None
     app_set_id = None
+    tiss_site = False
+
     property_order_list_cs = []
     property_order_list_css = []
     course_structure_exists = False
 
     title = "Course Authoring"
+
+    if GSTUDIO_SITE_NAME is "TISS":
+        tiss_site = True
 
     course_node = node_collection.one({"_id": ObjectId(node_id)})
 
@@ -943,6 +948,7 @@ def create_course_struct(request, group_id, node_id):
                                     'groupid': group_id,
                                     'group_id': group_id,
                                     'title': title,
+                                    'tiss_site':tiss_site,
                                     'app_id': app_id, 'app_set_id': app_set_id,
                                     'property_order_list': property_order_list_cs,
                                     'property_order_list_css': property_order_list_css
