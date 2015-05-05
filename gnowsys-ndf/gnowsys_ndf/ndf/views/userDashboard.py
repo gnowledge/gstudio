@@ -59,21 +59,21 @@ def userpref(request,group_id):
         auth.save()
     return HttpResponse("Success")
 
+@login_required
 @get_execution_time
 def uDashboard(request, group_id):
     usrid = group_id
-    
+
     ID = int(usrid)
     auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1,'created_at':1 })
     group_id = auth._id
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
-    
- 
+
     group_name = auth.name
     usrname = auth.name
     date_of_join = auth['created_at']
     current_user = request.user.pk
-    
+
     has_profile_pic = None
     profile_pic_image = None
     is_already_selected = None
