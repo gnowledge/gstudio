@@ -8,6 +8,7 @@ import mimetypes
 import os
 # import re
 import ox
+import pandora_client
 import threading
 from PIL import Image, ImageDraw  # install PIL example:pip install PIL
 from StringIO import StringIO
@@ -850,6 +851,36 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
                 is_video = 'True'
+                path="/home/supriya/Desktop/aeolian_top.webm"
+                username="supriya"
+                password="wetube"
+                print fileobj.name,"namemmmmmmmmmmmm"
+                base_url = "http://wetube.gnowledge.org/"
+                api_url = base_url + "api/"
+                # connenting to wetube api using pandora_client                                                                                  
+                api = pandora_client.API(api_url)
+                # signin takes username, password & returns user data                                                                            
+                api.signin(username=username, password=password)
+                # return metadata about the file                                                                                                 
+                info = ox.avinfo(path)
+                # oshash of file                                                                                                                 
+                oshash = info['oshash']
+                # add media file the given item                                                                                                  
+                r = api.addMedia({
+                    'id': oshash,
+                    'filename': fileobj.name,
+                    'info': info
+                })
+                # unique item id for file                                                                                                        
+                item = r['data']['item']
+                url = '%supload/direct/' % api_url
+                # upload one or more media file for given item                                                                                   
+                r = api.upload_chunks(url, path, {
+                    'id': oshash
+                })
+                print item,"checksum%%%%%%%%%%%"
+                #return base_url + item
+
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
                 # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
