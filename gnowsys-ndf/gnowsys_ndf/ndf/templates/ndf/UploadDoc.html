@@ -137,6 +137,11 @@
 
 
 		{% block script %}
+		$('input[type=file]').change( function(event) {
+		var tmppath = URL.createObjectURL(event.target.files[0]);
+		$("img").fadeIn("fast").attr('src',tmppath);
+		alert(tmppath);
+		});
 
 		$("#docFile").change(function() {
         var max_size =100000
@@ -173,5 +178,6 @@
 
 
 });
+
 {% endblock %}
 
