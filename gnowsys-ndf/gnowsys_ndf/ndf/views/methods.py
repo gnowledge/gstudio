@@ -2322,61 +2322,92 @@ def create_discussion(request, group_id, node_id):
 
 # to add discussion replie
 @get_execution_time
-def discussion_reply(request, group_id):
+def discussion_reply(request, group_id, node_id):
 
-  try:
+    try:
 
-    prior_node = request.POST.get("prior_node_id", "")
-    content_org = request.POST.get("reply_text_content", "") # reply content
+        prior_node = request.POST.get("prior_node_id", "")
+        content_org = request.POST.get("reply_text_content", "") # reply content
 
-    # process and save node if it reply has content  
-    if content_org:
-  
-      user_id = int(request.user.id)
-      user_name = unicode(request.user.username)
-
-      # auth = node_collection.one({'_type': 'Author', 'name': user_name })
-      reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
+        # process and save node if it reply has content  
+        if content_org:
       
-      # creating empty GST and saving it
-      reply_obj = node_collection.collection.GSystem()
+            user_id = int(request.user.id)
+            user_name = unicode(request.user.username)
 
-      reply_obj.name = unicode("Reply of:" + str(prior_node))
-      reply_obj.status = u"PUBLISHED"
+            # auth = node_collection.one({'_type': 'Author', 'name': user_name })
+            reply_st = node_collection.one({ '_type': 'GSystemType', 'name': 'Reply'})
+            
+            # creating empty GST and saving it
+            reply_obj = node_collection.collection.GSystem()
 
-      reply_obj.created_by = user_id
-      reply_obj.modified_by = user_id
-      reply_obj.contributors.append(user_id)
+            reply_obj.name = unicode("Reply of:" + str(prior_node))
+            reply_obj.status = u"PUBLISHED"
 
-      reply_obj.member_of.append(ObjectId(reply_st._id))
-      reply_obj.prior_node.append(ObjectId(prior_node))
-      reply_obj.group_set.append(ObjectId(group_id))
-  
-      reply_obj.content_org = unicode(content_org)
-      filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-      reply_obj.content = org2html(content_org, file_prefix=filename)
-  
-      # saving the reply obj
-      reply_obj.save()
+            reply_obj.created_by = user_id
+            reply_obj.modified_by = user_id
+            reply_obj.contributors.append(user_id)
 
-      formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
+            reply_obj.member_of.append(ObjectId(reply_st._id))
+            reply_obj.prior_node.append(ObjectId(prior_node))
+            reply_obj.group_set.append(ObjectId(group_id))
+        
+            reply_obj.content_org = unicode(content_org)
+            filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+            reply_obj.content = org2html(content_org, file_prefix=filename)
+        
+            # saving the reply obj
+            reply_obj.save()
+
+            formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
+            
+            # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
+            reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
+
+            # ---------- mail/notification sending -------
+            node = node_collection.one({"_id": ObjectId(node_id)})
+            node_creator_user_obj = User.objects.get(id=node.created_by)
+            node_creator_user_name = node_creator_user_obj.username
+
+            site = Site.objects.get(pk=1)
+            site = site.name.__str__()
+            
+            from_user = user_name
+
+            to_user_list = [node_creator_user_obj]
+
+            msg = "\n\nDear " + node_creator_user_name + ",\n\n" + \
+                  "A reply has been added in discussion under the " + \
+                  node.member_of_names_list[0] + " named: '" + \
+                  node.name + "' by '" + user_name + "'."
+
+            activity = "Discussion Reply"
+            render_label = render_to_string(
+                "notification/label.html",
+                {
+                    # "sender": from_user,
+                    "activity": activity,
+                    "conjunction": "-",
+                    "link": "url_link"
+                }
+            )
+            notification.create_notice_type(render_label, msg, "notification")
+            notification.send(to_user_list, render_label, {"from_user": from_user})
+
+            # ---------- END of mail/notification sending ---------
+
+            return HttpResponse( reply )
+
+        else: # no reply content
+
+            return HttpResponse(json.dumps(["no_content"]))      
+
+    except Exception as e:
       
-      # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
-      reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
+        error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
+        raise Exception(error_message)
 
-      return HttpResponse( reply )
-
-    else: # no reply content
-
-      return HttpResponse(json.dumps(["no_content"]))      
-
-  except Exception as e:
-    
-    error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
-    raise Exception(error_message)
-
-    return HttpResponse(json.dumps(["Server Error"]))
-
+        return HttpResponse(json.dumps(["Server Error"]))
 
 
 @get_execution_time
