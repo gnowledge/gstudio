@@ -161,7 +161,12 @@
 
           <div class="row">
             <div class="small-2 small-offset-9 columns end">
-              <input type="hidden" id="reopen_task_id" name="reopen_task_id" value="{{reopen_task_id}}" />
+              {% if reopen_task_id %}
+                <input type="hidden" id="reopen_task_id" name="reopen_task_id" value="{{reopen_task_id}}" />
+              {% else %}
+                <input type="hidden" id="admin_update" name="admin_update" value="admin_update" />
+              {% endif %}
+
               <input type="submit" class="button small expand" id="update_enroll" value="Update Enrollment">
             </div>
           </div>
