@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
+from mongokit import IS
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -790,6 +791,7 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
   is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
 
   template_prefix = "mis"
+  response_dict = {'success': False}
   context_variables = {}
 
   #Course structure collection _dict
@@ -811,14 +813,102 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
   if app_set_id:
     course_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = course_gst.name
-    template = "ndf/course_list.html"
-    if request.method == "POST":
-      search = request.POST.get("search", "")
-      classtype = request.POST.get("class", "")
-      # nodes = list(node_collection.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [course_gst._id]}}))
-      nodes = node_collection.find({'member_of': course_gst._id, 'name': {'$regex': search, '$options': 'i'}})
+    if course_gst.name == "NUSSD Course":
+      template_prefix = "course"
     else:
-      nodes = node_collection.find({'member_of': course_gst._id, 'group_set': ObjectId(group_id)})
+      template_prefix = course_gst.name.strip().lower().replace(' ', '_')
+    template = "ndf/" + template_prefix +"_list.html"
+    query = {}
+    if course_gst.name == "Announced Course":
+        college = {}
+        course = {}
+        ac_data_set = []
+        records_list = []
+
+
+        query = {
+            "member_of": course_gst._id,
+            "group_set": ObjectId(group_id),
+            "status": "PUBLISHED",
+            "attribute_set.ann_course_closure": u"Open",
+        }
+
+        res = node_collection.collection.aggregate([
+            {
+                '$match': query
+            }, {
+                '$project': {
+                    '_id': 0,
+                    'ac_id': "$_id",
+                    'name': '$name',
+                    'course': '$relation_set.announced_for',
+                    'college': '$relation_set.acourse_for_college',
+                    'nussd_course_type': '$attribute_set.nussd_course_type',
+                    'created_at': "$created_at"
+                }
+            },
+            {
+                '$sort': {'created_at': 1}
+            }
+        ])
+
+        records_list = res["result"]
+        if records_list:
+            for each in res["result"]:
+                if each["college"]:
+                    colg_id = each["college"][0][0]
+                    if colg_id not in college:
+                        c = node_collection.one({"_id": colg_id}, {"name": 1, "relation_set.college_affiliated_to": 1})
+                        each["college"] = c.name
+                        each["college_id"] = c._id
+                        college[colg_id] = {}
+                        college[colg_id]["name"] = each["college"]
+                        for rel in c.relation_set:
+                            if rel and "college_affiliated_to" in rel:
+                                univ_id = rel["college_affiliated_to"][0]
+                                u = node_collection.one({"_id": univ_id}, {"name": 1})
+                                each.update({"university": u.name})
+                                college[colg_id]["university"] = each["university"]
+                                college[colg_id]["university_id"] = u._id
+                                each["university_id"] = u._id
+                    else:
+                        each["college"] = college[colg_id]["name"]
+                        each["college_id"] = colg_id
+                        each.update({"university": college[colg_id]["university"]})
+                        each.update({"university_id": college[colg_id]["university_id"]})
+
+                if each["course"]:
+                    course_id = each["course"][0][0]
+                    if course_id not in course:
+                        each["course"] = node_collection.one({"_id": course_id}).name
+                        course[course_id] = each["course"]
+                    else:
+                        each["course"] = course[course_id]
+
+                ac_data_set.append(each)
+
+
+        column_headers = [
+                    ("name", "Announced Course Name"),
+                    ("course", "Course Name"),
+                    ("nussd_course_type", "Course Type"),
+                    ("college", "College"),
+                    ("university", "University")
+        ]
+
+
+        response_dict["column_headers"] = column_headers
+        response_dict["success"] = True
+        response_dict["students_data_set"] = ac_data_set
+
+    else:
+      if request.method == "POST":
+        search = request.POST.get("search", "")
+        classtype = request.POST.get("class", "")
+        # nodes = list(node_collection.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [course_gst._id]}}))
+        nodes = node_collection.find({'member_of': course_gst._id, 'name': {'$regex': search, '$options': 'i'}})
+      else:
+        nodes = node_collection.find({'member_of': course_gst._id, 'group_set': ObjectId(group_id)})
 
 
 
@@ -845,7 +935,8 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
                         'nodes': nodes, 'node': node,
                         'property_order_list': property_order_list,
                         'property_order_list_ac': property_order_list_ac,
-                        'is_link_needed': is_link_needed
+                        'is_link_needed': is_link_needed,
+                        'response_dict':json.dumps(response_dict, cls=NodeJSONEncoder)
                     }
 
   try:
