@@ -1,0 +1,56 @@
+{% extends "ndf/mis_base_list.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% block head %}
+  {{block.super}}
+
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block title %} {{ title }} {% endblock %}
+{% block body_content %} 
+      <div id="ac_listing_div"></div>    
+{% endblock %}
+
+
+{% block document_ready %}
+  {{block.super}}
+			data = {{response_dict|safe}}
+      column_headers = data["column_headers"];
+      ac_data_set = data["students_data_set"];
+      dataTable_columns_set = [];
+
+      if (ac_data_set.length > 0) {
+        // Define table
+        ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
+          '</table>';
+
+        $("#ac_listing_div").html(ac_table);
+
+        // Prepare title & data headers used in dataTable
+        $.each(column_headers, function(index, v) {
+          d = {};
+          d["data"] = v[0];
+          d["title"] = v[1];
+          dataTable_columns_set.push(d);
+        });
+
+        // Set defintion dataTable
+        sce_dt_var = $("#ac_table").dataTable({
+          "data": ac_data_set,
+          "columns": dataTable_columns_set,
+          "createdRow": function ( row, data, index ) {
+            // Attaching Announced Course's ObjectId to each row (i.e., assigning to it's id attribute)
+            $(row).attr("id", data["ac_id"]).addClass("row_rec");
+            $(row).find("td:nth-child(3)").attr("id", data["college_id"]);
+            $(row).find("td:nth-child(4)").attr("id", data["university_id"]);
+          }
+        });
+      }
+
+{% endblock %}
