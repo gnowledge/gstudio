@@ -461,15 +461,17 @@ ul#navigation li a.last {
         {% endif %}
       <!-- ---END of Discussion -->
 
-      {% else %}
-      <!-- If its group then show management tab only for group admins and superuser-->
-        {% check_group node as is_group %}
-        {% if is_group %}
-          {% check_is_gstaff groupid request.user as is_gstaff %}
-          {% if is_gstaff %}
-            <dd class="tab-title manage-view"><a class="view-manage" href="#view-manage"><i class="fi-wrench"></i> {% trans "Management" %}</a></dd>
+      {% comment %}
+        {% else %}
+        <!-- If its group then show management tab only for group admins and superuser-->
+          {% check_group node as is_group %}
+          {% if is_group %}
+            {% check_is_gstaff groupid request.user as is_gstaff %}
+            {% if is_gstaff %}
+              <dd class="tab-title manage-view"><a class="view-manage" href="#view-manage"><i class="fi-wrench"></i> {% trans "Management" %}</a></dd>
+            {% endif %}
           {% endif %}
-        {% endif %}
+      {% endcomment %}
 
       {% endif %}
     </dl>
