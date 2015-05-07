@@ -20,7 +20,7 @@
 
 {% block document_ready %}
   {{block.super}}
-			data = {{response_dict|safe}}
+      data = {{response_dict|safe}}
       column_headers = data["column_headers"];
       ac_data_set = data["students_data_set"];
       dataTable_columns_set = [];
