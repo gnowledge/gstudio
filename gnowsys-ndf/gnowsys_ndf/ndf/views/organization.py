@@ -90,7 +90,7 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
     if request.method == "POST":
       search = request.POST.get("search","")
       query = {'member_of': organization_gst._id, 'group_set': ObjectId(group_id), 'name': {'$regex': search, '$options': 'i'}}
-    
+
     else:
       query = {'member_of': organization_gst._id, 'group_set': ObjectId(group_id)}
 
@@ -102,14 +102,15 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
     default_template = "ndf/mis_list.html"
 
   if app_set_instance_id:
-    template = "ndf/" + organization_gst.name.strip().lower().replace(' ', '_') + "_details.html"
+
+    template = "ndf/organization_details.html"
     default_template = "ndf/mis_details.html"
 
     node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
     node.get_neighbourhood(node.member_of)
 
-  context_variables = { 'groupid': group_id, 
+  context_variables = { 'groupid': group_id,'group_id':group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title': title,
