@@ -126,18 +126,21 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
         records_list = res["result"]
         if records_list:
             for each in res["result"]:
-                if each["university"][0]:
-                    univ_id = each["university"][0][0]
-                    u = node_collection.one({"_id": univ_id}, {"name": 1})
-                    each["university"] = u.name
+                if each["university"]:
+                  if each["university"][0]:
+                      univ_id = each["university"][0][0]
+                      u = node_collection.one({"_id": univ_id}, {"name": 1})
+                      each["university"] = u.name
 
-                if each["state"][0]:
-                    state_id = each["state"][0][0]
-                    each["state"] = node_collection.one({"_id": state_id}).name
+                if each["state"]:
+                  if each["state"][0]:
+                      state_id = each["state"][0][0]
+                      each["state"] = node_collection.one({"_id": state_id}).name
 
-                if each["po"][0]:
-                    po_id = each["po"][0][0]
-                    each["po"] = node_collection.one({"_id": po_id}).name
+                if each["po"]:
+                  if each["po"][0]:
+                      po_id = each["po"][0][0]
+                      each["po"] = node_collection.one({"_id": po_id}).name
 
                 ac_data_set.append(each)
         column_headers = [
@@ -175,9 +178,10 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
         records_list = res["result"]
         if records_list:
             for each in res["result"]:
-                if each["state"][0]:
-                    state_id = each["state"][0][0]
-                    each["state"] = node_collection.one({"_id": state_id}).name
+                if each["state"]:
+                  if each["state"][0]:
+                      state_id = each["state"][0][0]
+                      each["state"] = node_collection.one({"_id": state_id}).name
 
                 ac_data_set.append(each)
         column_headers = [
