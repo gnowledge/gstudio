@@ -88,113 +88,104 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
     title = organization_gst.name
 
     query = {}
-    if request.method == "POST":
-      search = request.POST.get("search","")
-      query = {'member_of': organization_gst._id, 'group_set': ObjectId(group_id), 'name': {'$regex': search, '$options': 'i'}}
+    ac_data_set = []
+    records_list = []
+    query = {
+        "member_of": organization_gst._id,
+        "group_set": ObjectId(group_id),
+    }
+    if organization_gst.name == "College":
+      res = node_collection.collection.aggregate([
+          {
+              '$match': query
+          }, {
+              '$project': {
+                  '_id': 0,
+                  'org_id': "$_id",
+                  'name': '$name',
+                  'enrollment_code': '$attribute_set.enrollment_code',
+                  'state': '$relation_set.organization_belongs_to_state',
+                  'university': '$relation_set.college_affiliated_to',
+                  # 'college_group': '$relation_set.college_group',
+                  'po': '$relation_set.has_officer_incharge',
+                  'created_at': "$created_at"
+              }
+          },
+          {
+              '$sort': {'created_at': 1}
+          }
+      ])
 
-    else:
-      # query = {'member_of': organization_gst._id, 'group_set': ObjectId(group_id)}
+      records_list = res["result"]
+      if records_list:
+          for each in res["result"]:
+              if each["university"]:
+                if each["university"][0]:
+                    univ_id = each["university"][0][0]
+                    u = node_collection.one({"_id": univ_id}, {"name": 1})
+                    each["university"] = u.name
 
-      ac_data_set = []
-      records_list = []
-      query = {
-          "member_of": organization_gst._id,
-          "group_set": ObjectId(group_id),
-      }
-      if organization_gst.name == "College":
-        res = node_collection.collection.aggregate([
-            {
-                '$match': query
-            }, {
-                '$project': {
-                    '_id': 0,
-                    'org_id': "$_id",
-                    'name': '$name',
-                    'enrollment_code': '$attribute_set.enrollment_code',
-                    'state': '$relation_set.organization_belongs_to_state',
-                    'university': '$relation_set.college_affiliated_to',
-                    # 'college_group': '$relation_set.college_group',
-                    'po': '$relation_set.has_officer_incharge',
-                    'created_at': "$created_at"
-                }
-            },
-            {
-                '$sort': {'created_at': 1}
-            }
-        ])
+              if each["state"]:
+                if each["state"][0]:
+                    state_id = each["state"][0][0]
+                    each["state"] = node_collection.one({"_id": state_id}).name
 
-        records_list = res["result"]
-        if records_list:
-            for each in res["result"]:
-                if each["university"]:
-                  if each["university"][0]:
-                      univ_id = each["university"][0][0]
-                      u = node_collection.one({"_id": univ_id}, {"name": 1})
-                      each["university"] = u.name
+              if each["po"]:
+                if each["po"][0]:
+                    po_id = each["po"][0][0]
+                    each["po"] = node_collection.one({"_id": po_id}).name
 
-                if each["state"]:
-                  if each["state"][0]:
-                      state_id = each["state"][0][0]
-                      each["state"] = node_collection.one({"_id": state_id}).name
+              ac_data_set.append(each)
+      column_headers = [
+                  ("org_id", "Edit"),
+                  ("name", "College"),
+                  ("enrollment_code", "Code"),
+                  # ("college_group", "Group"),
+                  ("po", "Program Officer"),
+                  ("university", "University"),
+                  ("state", "State"),
+      ]
 
-                if each["po"]:
-                  if each["po"][0]:
-                      po_id = each["po"][0][0]
-                      each["po"] = node_collection.one({"_id": po_id}).name
+      response_dict["column_headers"] = column_headers
+      response_dict["success"] = True
+      response_dict["students_data_set"] = ac_data_set
 
-                ac_data_set.append(each)
-        column_headers = [
-                    ("org_id", "Edit"),
-                    ("name", "College"),
-                    ("enrollment_code", "Code"),
-                    # ("college_group", "Group"),
-                    ("po", "Program Officer"),
-                    ("university", "University"),
-                    ("state", "State"),
-        ]
+    elif organization_gst.name == "University":
+      res = node_collection.collection.aggregate([
+          {
+              '$match': query
+          }, {
+              '$project': {
+                  '_id': 0,
+                  'org_id': "$_id",
+                  'name': '$name',
+                  'state': '$relation_set.organization_belongs_to_state',
+                  'created_at': "$created_at"
+              }
+          },
+          {
+              '$sort': {'created_at': 1}
+          }
+      ])
 
-        response_dict["column_headers"] = column_headers
-        response_dict["success"] = True
-        response_dict["students_data_set"] = ac_data_set
+      records_list = res["result"]
+      if records_list:
+          for each in res["result"]:
+              if each["state"]:
+                if each["state"][0]:
+                    state_id = each["state"][0][0]
+                    each["state"] = node_collection.one({"_id": state_id}).name
 
-      elif organization_gst.name == "University":
-        res = node_collection.collection.aggregate([
-            {
-                '$match': query
-            }, {
-                '$project': {
-                    '_id': 0,
-                    'org_id': "$_id",
-                    'name': '$name',
-                    'state': '$relation_set.organization_belongs_to_state',
-                    'created_at': "$created_at"
-                }
-            },
-            {
-                '$sort': {'created_at': 1}
-            }
-        ])
+              ac_data_set.append(each)
+      column_headers = [
+                  ("org_id", "Edit"),
+                  ("name", "University"),
+                  ("state", "State"),
+      ]
 
-        records_list = res["result"]
-        if records_list:
-            for each in res["result"]:
-                if each["state"]:
-                  if each["state"][0]:
-                      state_id = each["state"][0][0]
-                      each["state"] = node_collection.one({"_id": state_id}).name
-
-                ac_data_set.append(each)
-        column_headers = [
-                    ("org_id", "Edit"),
-                    ("name", "University"),
-                    ("state", "State"),
-        ]
-
-        response_dict["column_headers"] = column_headers
-        response_dict["success"] = True
-        response_dict["students_data_set"] = ac_data_set
-
-
+      response_dict["column_headers"] = column_headers
+      response_dict["success"] = True
+      response_dict["students_data_set"] = ac_data_set
     response_dict["groupid"] = group_id
     response_dict["app_id"] = app_id
     response_dict["app_set_id"] = app_set_id
