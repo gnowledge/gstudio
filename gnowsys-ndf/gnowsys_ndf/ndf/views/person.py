@@ -71,6 +71,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   nodes = None
   nodes_keys = []
   node = None
+  response_dict = {'success': False}
   property_order_list = []
   widget_for = []
   is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
@@ -91,6 +92,13 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   if app_set_id:
     person_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
     title = person_gst.name
+    column_headers = None
+    query = {}
+    college = {}
+    course = {}
+    ac_data_set = []
+    records_list = []
+    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
 
     if title == "Student":
       person_gs = node_collection.collection.GSystem()
@@ -109,7 +117,57 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
       for each in univ_cur:
         univ_list.append(each)
-  
+
+
+    elif title == "Program Officer" or title == "Voluntary Teacher":
+        query = {
+            "member_of": person_gst._id,
+        }
+
+        res = node_collection.collection.aggregate([
+            {
+                '$match': query
+            }, {
+                '$project': {
+                    '_id': 0,
+                    'person_id': "$_id",
+                    'name': '$name',
+                    'gender': '$attribute_set.gender',
+                    'dob': '$attribute_set.dob',
+                    'email_id': '$attribute_set.email_id',
+                }
+            },
+            {
+                '$sort': {'name': 1}
+            }
+        ])
+
+        records_list = res["result"]
+        if records_list:
+            for each in res["result"]:
+                if each["dob"]:
+                    dob = each["dob"][0]
+                    each["dob"] = dob.strftime("%d-%b-%Y")
+
+                ac_data_set.append(each)
+
+        column_headers = [
+                    ("person_id", "Edit"),
+                    ("name", "Name"),
+                    ("email_id", "Email"),
+                    ("gender", "Gender"),
+                    ("dob", "Date of Birth"),
+        ]
+
+        response_dict["column_headers"] = column_headers
+        response_dict["success"] = True
+        response_dict["students_data_set"] = ac_data_set
+        response_dict["groupid"] = group_id
+        response_dict["app_id"] = app_id
+        response_dict["app_set_id"] = app_set_id
+
+        template = "ndf/person_list.html"
+
     else:
       query = {}
       if request.method == "POST":
@@ -206,8 +264,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
         ('email_id', 'Email ID')
       ]
 
-    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
-    default_template = "ndf/person_list.html"
+    default_template = "ndf/mis_list.html"
 
   if app_set_instance_id:
     template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_details.html"
@@ -224,11 +281,12 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
                         'property_order_list': property_order_list, 'lstFilters': widget_for,
                         'univ_list':json.dumps(univ_list, cls=NodeJSONEncoder),
-                        'is_link_needed': is_link_needed
+                        'is_link_needed': is_link_needed,
+                        'response_dict':json.dumps(response_dict, cls=NodeJSONEncoder)
                       }
 
   try:
-    return render_to_response([template, default_template], 
+    return render_to_response([template, default_template],
                               context_variables,
                               context_instance = RequestContext(request)
                             )
