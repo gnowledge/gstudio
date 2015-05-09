@@ -784,7 +784,6 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
   course_gst = None
   course_gs = None
 
-  nodes = None
   node = None
   property_order_list = []
   property_order_list_ac = []
@@ -813,19 +812,13 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
   if app_set_id:
     course_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = course_gst.name
-    if course_gst.name == "NUSSD Course":
-      template_prefix = "course"
-    else:
-      template_prefix = course_gst.name.strip().lower().replace(' ', '_')
-    template = "ndf/" + template_prefix +"_list.html"
+    template = "ndf/course_list.html"
     query = {}
+    college = {}
+    course = {}
+    ac_data_set = []
+    records_list = []
     if course_gst.name == "Announced Course":
-        college = {}
-        course = {}
-        ac_data_set = []
-        records_list = []
-
-
         query = {
             "member_of": course_gst._id,
             "group_set": ObjectId(group_id),
@@ -887,7 +880,6 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
 
                 ac_data_set.append(each)
 
-
         column_headers = [
                     ("name", "Announced Course Name"),
                     ("course", "Course Name"),
@@ -896,21 +888,47 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
                     ("university", "University")
         ]
 
-
-        response_dict["column_headers"] = column_headers
-        response_dict["success"] = True
-        response_dict["students_data_set"] = ac_data_set
-
     else:
-      if request.method == "POST":
-        search = request.POST.get("search", "")
-        classtype = request.POST.get("class", "")
-        # nodes = list(node_collection.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [course_gst._id]}}))
-        nodes = node_collection.find({'member_of': course_gst._id, 'name': {'$regex': search, '$options': 'i'}})
-      else:
-        nodes = node_collection.find({'member_of': course_gst._id, 'group_set': ObjectId(group_id)})
+        query = {
+            "member_of": course_gst._id,
+            "group_set": ObjectId(group_id),
+        }
+
+        res = node_collection.collection.aggregate([
+            {
+                '$match': query
+            }, {
+                '$project': {
+                    '_id': 0,
+                    'ac_id': "$_id",
+                    'name': '$name',
+                    'nussd_course_type': '$attribute_set.nussd_course_type',
+                    'created_at': "$created_at"
+                }
+            },
+            {
+                '$sort': {'created_at': 1}
+            }
+        ])
+
+        records_list = res["result"]
+        if records_list:
+            for each in res["result"]:
+                ac_data_set.append(each)
+
+        column_headers = [
+                    ("ac_id", "Edit"),
+                    ("name", "Course Name"),
+                    ("nussd_course_type", "Course Type"),
+        ]
 
 
+    response_dict["column_headers"] = column_headers
+    response_dict["success"] = True
+    response_dict["students_data_set"] = ac_data_set
+    response_dict["groupid"] = group_id
+    response_dict["app_id"] = app_id
+    response_dict["app_set_id"] = app_set_id
 
   if app_set_instance_id:
     template = "ndf/course_details.html"
@@ -932,7 +950,7 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
                         'course_gst_name': course_gst.name,
                         'title': title,
                         'course_structure_exists': course_structure_exists,
-                        'nodes': nodes, 'node': node,
+                        'node': node,
                         'property_order_list': property_order_list,
                         'property_order_list_ac': property_order_list_ac,
                         'is_link_needed': is_link_needed,
