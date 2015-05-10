@@ -1,0 +1,181 @@
+{% extends "ndf/mis_base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block style %}
+  {{block.super}}
+  .content_div{
+      background-color:white !important;
+      border-color:#0b8a91;
+      border-width:1px;
+      color:#0b8a91 !important;
+      margin-top: 20px;
+      margin-left: 80px;
+      padding: 0px;
+  }
+
+{% endblock %}
+
+
+{% block body_content %} 
+
+  <div id="view_event" style="margin-left: 40px;">
+    <header class="row event">
+      <section class="medium-7 columns" >
+        <h2>
+          <span class='node'>{{node.name}}</span>      
+        </h2>
+      </section>
+      <section class="medium-2 columns">
+        <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node.pk %}" class="button small">Edit</a>
+      </section>
+      {% if title == "College" %}
+        <section class="medium-3 columns" >
+          <a href="{% url 'groupchange' node.has_group.0 %}"><u>Go to College group</u></a>
+        </section>
+
+      {% endif %}
+    </header>
+  </div>
+
+  <div class="row">
+    <div class="tabs-content content_div" style="padding: 0px 5px; width:1150px;">
+      <div class="active content row">
+        <dl class="accordion" data-accordion>
+
+          <dd class="accordion-navigation">
+            <a href="#details_accordion">{% trans "MIS Details" %}</a>
+            <div id="details_accordion" class="content active"> 
+            {% if title == "College" %}
+
+                <div class="row">
+                  <div class="small-4 columns"> 
+                    <label>Program Officer</label>
+                  </div>
+                  <div class="small-7 end columns">
+                      {% if node.has_officer_incharge.0.name %}
+                        <label>{{node.has_officer_incharge.0.name|default_if_none:'--'}}</label>
+                      {% else %}
+                        <label>{% trans "NOT assinged." %}</label>
+                      {% endif %}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="small-4 columns"> 
+                    <label>Courses</label>
+                  </div>
+                  <div class="small-7 end columns">
+                      <label>{{node.college_has_acourse|length}}</label>
+                  </div>
+                </div>
+
+
+            {% else %}
+
+                <div class="row">
+                  <div class="small-4 columns"> 
+                    <label>Colleges</label>
+                  </div>
+                  <div class="small-7 end columns">
+                    {% for each_colg in node.affiliated_college %}
+                      <label>{{each_colg.name}}</label>
+                    {% endfor %}
+                  </div>
+                </div>
+
+
+            {% endif %}
+            </div>
+          </dd>
+
+          <dd class="accordion-navigation">
+            <a href="#address_accordion">{% trans "Other Details" %}</a>
+            <div id="address_accordion" class="content"> 
+                <div class="row">
+                  <div class="small-4 columns"> 
+                    <label>{% trans "Created by : " %}</label>
+                  </div>
+                  <div class="small-7 end columns">
+                      <label><a class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a></label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="small-4 columns"> 
+                    <label>{% trans "Created on : " %}</label>
+                  </div>
+                  <div class="small-7 end columns">
+                      <label>{{node.created_at}}</label>
+                  </div>
+                </div>
+
+                {% for tab_name, tab_fields_list in property_order_list %}
+                  {% if tab_name == "Organizational" %}
+                    {% for field in tab_fields_list %}
+                     {% if field.name != "location" %}
+                      <div class="row">
+                        <div class="small-4 columns"> 
+                          <label>{{field.altnames}}</label>
+                        </div>
+                        <div class="small-7 end columns">
+                          {% if field.type == "RelationType" %}
+                            {% for details in field.value %}
+                            <label>{{details.name}}</label>
+                            {% endfor %}
+                          {% elif field.name == "tags" %}
+                            {% for details in field.value %}
+                            <label>{{details|default_if_none:'--'}}</label>
+                            {% endfor %}
+                          {% else %}
+                            <label>{{field.value|default_if_none:'--'}}</label>
+                          {% endif %}
+                        </div>
+                      </div>
+                     {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+
+                {% if title == "College" %}
+
+                  <div class="row">                
+                    <div class="small-4 columns"> 
+                      <label>University</label>
+                    </div>
+                    <div class="small-7 end columns">
+                        <label>{{node.college_affiliated_to.0.name|default_if_none:'--'}}</label>
+                    </div>
+                  </div>
+                {% endif %}
+                <div class="row">
+                  <div class="small-4 columns"> 
+                    <label>State</label>
+                  </div>
+                  <div class="small-7 end columns">
+                      <label>{{node.organization_belongs_to_state.0.name|default_if_none:'--'}}</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="small-4 columns"> 
+                    <label>Country</label>
+                  </div>
+                  <div class="small-7 end columns">
+                      <label>{{node.organization_belongs_to_country.0.name|default_if_none:'--'}}</label>
+                  </div>
+                </div>
+            </div>
+          </dd>
+
+        </dl>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+
+
+// </script>
+{% endblock %}	

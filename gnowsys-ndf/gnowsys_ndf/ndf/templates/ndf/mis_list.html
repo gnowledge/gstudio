@@ -258,17 +258,18 @@
         <tr>
           <td class="counter">{{forloop.counter}}.</td>
           {% for each_key in nodes_keys %}
-          {% if forloop.counter == 1 %}
-          <td>{{each|get_dict_item:each_key.0|title}}</td>
-          {% elif forloop.counter > 2 %}
-          <td>{{each|get_dict_item:each_key.0|default:"--"}}</td>
-          {% else %}
-          <td>{{each|get_dict_item:each_key.0}}</td>
-          {% endif %}
+              {% if forloop.counter == 1 %}
+                  <td><a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each|get_dict_item:'_id' %}" >{{each|get_dict_item:each_key.0|title}}</a></td>
+              {% elif forloop.counter > 2 %}
+                  <td>{{each|get_dict_item:each_key.0|default:"--"}}</td>
+              {% else %}
+                  <td>{{each|get_dict_item:each_key.0}}</td>
+              {% endif %}
           {% endfor %}
+    
           {% if gstaff_access %}
-          <td class="name"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each|get_dict_item:'_id' %}" target="_blank" class="button tiny expand margin-0r width_edit">Edit</a></td>
-          <td id="{{each|get_dict_item:'_id'}}" class="width_delete objectsCheckbox"> <input type="checkbox"> </td>
+              <td class="name"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each|get_dict_item:'_id' %}" target="_blank" class="button tiny expand margin-0r width_edit">Edit</a></td>
+              <td id="{{each|get_dict_item:'_id'}}" class="width_delete objectsCheckbox"> <input type="checkbox"> </td>
           {% endif %}
         </tr>
         

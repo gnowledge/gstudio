@@ -1,7 +1,8 @@
-{% extends "ndf/mis_base_list.html" %}
+{% extends "ndf/mis_base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
+
 {% block head %}
   {{block.super}}
 
@@ -14,23 +15,28 @@
 
 {% block title %} {{ title }} {% endblock %}
 {% block body_content %} 
-      <div id="ac_listing_div"></div>    
+      <div id="org_listing_div"></div>    
 {% endblock %}
 
 
 {% block document_ready %}
   {{block.super}}
+    {% if response_dict %}
+
       data = {{response_dict|safe}}
       column_headers = data["column_headers"];
       ac_data_set = data["students_data_set"];
       dataTable_columns_set = [];
+      groupid_val = data["groupid"];
+      app_id_val = data["app_id"];
+      app_set_id_val = data["app_set_id"];
 
       if (ac_data_set.length > 0) {
         // Define table
         ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
           '</table>';
 
-        $("#ac_listing_div").html(ac_table);
+        $("#org_listing_div").html(ac_table);
 
         // Prepare title & data headers used in dataTable
         $.each(column_headers, function(index, v) {
@@ -44,13 +50,19 @@
         sce_dt_var = $("#ac_table").dataTable({
           "data": ac_data_set,
           "columns": dataTable_columns_set,
+          "columnDefs": [{ "width": "10%", "targets": 0 }],
           "createdRow": function ( row, data, index ) {
-            // Attaching Announced Course's ObjectId to each row (i.e., assigning to it's id attribute)
-            $(row).attr("id", data["ac_id"]).addClass("row_rec");
-            $(row).find("td:nth-child(3)").attr("id", data["college_id"]);
-            $(row).find("td:nth-child(4)").attr("id", data["university_id"]);
+            org_id = data["org_id"];
+            $(row).attr("id", org_id);
+            edit_url = "{% url 'mis:mis_app_instance_edit' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", org_id);
+
+            $(row).find("td:nth-child(1)").html("<a href='" + edit_url + "' title='Edit " + data['name'] + "' target='_blank'><i class='fi-pencil medium'></i></a>");
+
+            detail_url = "{% url 'mis:mis_app_instance_detail' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", org_id);
+            name = data['name']
+            $(row).find("td:nth-child(2)").html("<a href='" + detail_url + "'>"+name+"</a>");
           }
         });
       }
-
+    {% endif %}
 {% endblock %}

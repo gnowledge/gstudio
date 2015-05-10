@@ -4861,13 +4861,13 @@ def reschedule_task(request, group_id, node):
        if  reshedule_choice == "Attendance" or reshedule_choice == "": 
            content = "Attendance" 
        if  reshedule_choice == "Assessment":
-           content = "Assessment"   
+           content = "Assessment"
     else:
        content = "start time"
-    Mis_admin=node_collection.find({"name":"MIS_admin"})
-    Mis_admin_list=Mis_admin[0].group_admin
-    Mis_admin_list.append(Mis_admin[0].created_by)
-    path=request.POST.get('path','')
+    mis_admin_grp = node_collection.one({'_type':"Group","name":"MIS_admin"})
+    mis_admin_list = mis_admin_grp.group_admin
+    mis_admin_list.append(mis_admin_grp.created_by)
+    path = request.POST.get('path','')
     site = Site.objects.get(pk=1)
     site = site.name.__str__()
     event_reschedule_link = "http://" + site + path
@@ -4875,20 +4875,20 @@ def reschedule_task(request, group_id, node):
     glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
     task_type = []
     task_type.append(node_collection.one({'member_of': glist_gst._id, 'name':"Re-schedule Event"})._id)
-    task_dict.update({"has_type" :task_type})
-    task_dict.update({'name':unicode("Re-schedule Event" + " " + content)})
-    task_dict.update({'group_set':b})
-    task_dict.update({'created_by':request.user.id})
-    task_dict.update({'modified_by':request.user.id})
-    task_dict.update({'content_org':unicode("Please Re-Schedule the Following event"+"   \t " "\n- Please click [[" + event_reschedule_link + "][here]] to reschedule event " + " " + content )})
-    task_dict.update({'created_by_name':request.user.username})
-    task_dict.update({'Status':unicode("New")}) 
-    task_dict.update({'Priority':unicode('Normal')})
-    date1=datetime.date.today()
-    ti=datetime.time(0,0)
-    Today=datetime.datetime.combine(date1,ti)
-    task_dict.update({'start_time':Today})
-    task_dict.update({'Assignee':Mis_admin_list})
+    task_dict.update({"has_type": task_type})
+    task_dict.update({'name': unicode("Re-schedule Event" + " " + content)})
+    task_dict.update({'group_set': b})
+    task_dict.update({'created_by': request.user.id})
+    task_dict.update({'modified_by': request.user.id})
+    task_dict.update({'content_org': unicode("Please Re-Schedule the Following event"+"   \t " "\n- Please click [[" + event_reschedule_link + "][here]] to reschedule event " + " " + content )})
+    task_dict.update({'created_by_name': request.user.username})
+    task_dict.update({'Status': unicode("New")})
+    task_dict.update({'Priority': unicode('Normal')})
+    date1 = datetime.date.today()
+    ti = datetime.time(0,0)
+    Today = datetime.datetime.combine(date1,ti)
+    task_dict.update({'start_time': Today})
+    task_dict.update({'Assignee': mis_admin_list})
     task = create_task(task_dict)
 
     if  reschedule_type == 'event_reschedule' :
