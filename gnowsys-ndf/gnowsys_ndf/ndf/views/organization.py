@@ -27,6 +27,7 @@ from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, c
 from gnowsys_ndf.ndf.views.methods import create_college_group_and_setup_data,get_execution_time
 
 
+@login_required
 @get_execution_time
 def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
@@ -410,3 +411,4 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
   except Exception as e:
     error_message = "\n OrganizationCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
+    

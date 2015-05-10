@@ -124,39 +124,62 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
             "member_of": person_gst._id,
         }
 
-        res = node_collection.collection.aggregate([
-            {
-                '$match': query
-            }, {
-                '$project': {
-                    '_id': 0,
-                    'person_id': "$_id",
-                    'name': '$name',
-                    'gender': '$attribute_set.gender',
-                    'dob': '$attribute_set.dob',
-                    'email_id': '$attribute_set.email_id',
+        if title == "Program Officer":
+            res = node_collection.collection.aggregate([
+                {
+                    '$match': query
+                }, {
+                    '$project': {
+                        '_id': 0,
+                        'person_id': "$_id",
+                        'name': '$name',
+                        'college':'$relation_set.officer_incharge_of',
+                        'email_id': '$attribute_set.email_id',
+                    }
+                },
+                {
+                    '$sort': {'name': 1}
                 }
-            },
-            {
-                '$sort': {'name': 1}
-            }
-        ])
+            ])
+        else:
+            res = node_collection.collection.aggregate([
+                {
+                    '$match': query
+                }, {
+                    '$project': {
+                        '_id': 0,
+                        'person_id': "$_id",
+                        'name': '$name',
+                        'college':'$relation_set.trainer_of_college',
+                        'email_id': '$attribute_set.email_id',
+                    }
+                },
+                {
+                    '$sort': {'name': 1}
+                }
+            ])
 
         records_list = res["result"]
+        colg_list_name = []
         if records_list:
             for each in res["result"]:
-                if each["dob"]:
-                    dob = each["dob"][0]
-                    each["dob"] = dob.strftime("%d-%b-%Y")
+                if each["college"]:
+                    if each["college"][0]:
+                        colg_list_name = []
+                        for each_col in each["college"][0]:
+                            colg_id = each_col
+                            colg_node = node_collection.one({'_id':ObjectId(colg_id)})
+                            colg_list_name.append(colg_node.name)
 
+                each["college"] = colg_list_name
                 ac_data_set.append(each)
 
+        # print ac_data_set
         column_headers = [
                     ("person_id", "Edit"),
                     ("name", "Name"),
                     ("email_id", "Email"),
-                    ("gender", "Gender"),
-                    ("dob", "Date of Birth"),
+                    ("college", "College"),
         ]
 
         response_dict["column_headers"] = column_headers

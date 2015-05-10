@@ -21,6 +21,8 @@
 
 {% block document_ready %}
   {{block.super}}
+    {% if response_dict %}
+
       data = {{response_dict|safe}}
       column_headers = data["column_headers"];
       ac_data_set = data["students_data_set"];
@@ -62,5 +64,5 @@
           }
         });
       }
-
+    {% endif %}
 {% endblock %}
