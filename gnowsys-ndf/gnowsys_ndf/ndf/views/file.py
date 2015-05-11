@@ -863,21 +863,20 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 password="wetube"
                 base_url = "http://wetube.gnowledge.org/"
                 api_url = base_url + "api/"
-                # connenting to wetube api using pandora_client                                                                                  
+                # connenting to wetube api using pandora_client                                                                  
                 api = pandora_client.API(api_url)
-                # signin takes username, password & returns user data                                                                            
+                # signin takes username, password & returns user data                                                          
                 api.signin(username=username, password=password)
-                # return metadata about the file                                                                                                 
+                # return metadata about the file                                                                                  
                 info = ox.avinfo(path)
-                # oshash of file                                                                                                                 
                 oshash = info['oshash']
-                # add media file the given item                                                                                                  
+                # add media file the given item                                                                                    
                 r = api.addMedia({
                     'id': oshash,
                     'filename': fileobj.name,
                     'info': info
                 })
-                # unique item id for file                                                                                                        
+                # return unique item id for file                                                                                 
                 item = r['data']['item']
                 #source_id_AT = collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
                 #fileobj.rewind()
