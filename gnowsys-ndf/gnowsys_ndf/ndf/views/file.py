@@ -6,6 +6,7 @@ import magic
 import subprocess
 import mimetypes
 import os
+import tempfile
 # import re
 import ox
 import pandora_client
@@ -20,8 +21,11 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import get_valid_filename
+from django.core.files.move import file_move_safe
+from django.core.files.temp import gettempdir
+from django.core.files.uploadedfile import UploadedFile # django file handler
 # from django.contrib.auth.models import User
-
 from mongokit import paginator
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.org2any import org2html
@@ -766,6 +770,9 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     fileobj = node_collection.collection.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
+    
+    #path=files.temporary_file_path()
+    #print path,")))))))))))))))))"            
     size, unit = getFileSize(files)
     size = {'size': round(size, 2), 'unit': unicode(unit)}
 
@@ -851,10 +858,19 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
                 is_video = 'True'
-                path="/home/supriya/Desktop/aeolian_top.webm"
+                #path = files.temporary_file_path()
+                #tup = tempfile.mkstemp() # make a tmp file
+                #f = os.fdopen(tup[0], 'w') # open the tmp file for writing
+                #f.write(files.read()) # write the tmp file
+                #f.close()
+
+                ### return the path of the file
+                #filepath = tup[1] # get the filepath
+                print path,"@@@@@@@@@@@@@@@@@@@@@@"
+                #path=files.name                
+                #print path,"path@@@@@@@@@2"
                 username="supriya"
                 password="wetube"
-                print fileobj.name,"namemmmmmmmmmmmm"
                 base_url = "http://wetube.gnowledge.org/"
                 api_url = base_url + "api/"
                 # connenting to wetube api using pandora_client                                                                                  
@@ -873,13 +889,17 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 })
                 # unique item id for file                                                                                                        
                 item = r['data']['item']
+                #source_id_AT = collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+                #fileobj.rewind()
+                #gattibute_node = create_gattribute(fileobj, source_id_AT, item)
+                #print "attribute created success",item,fileobj._id
                 url = '%supload/direct/' % api_url
                 # upload one or more media file for given item                                                                                   
                 r = api.upload_chunks(url, path, {
                     'id': oshash
                 })
                 print item,"checksum%%%%%%%%%%%"
-                #return base_url + item
+                return base_url + item
 
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
@@ -894,8 +914,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
                 '''creating thread for converting vedio file into webm'''
-                t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
-                t.start()
+                #t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
+                #t.start()
 
             '''storing thumbnail of pdf and svg files  in saved object'''
             # if 'pdf' in filetype or 'svg' in filetype:
@@ -1149,7 +1169,7 @@ def file_detail(request, group_id, _id):
     #     pass
 
     group_name, group_id = get_group_name_id(group_id)
-
+    print _id,"file_detail"
     file_node = node_collection.one({"_id": ObjectId(_id)})
     file_node.get_neighbourhood(file_node.member_of)
     if file_node._type == "GSystemType":
@@ -1357,7 +1377,7 @@ def file_edit(request,group_id,_id):
             if file_node:
               get_node_metadata(request,file_node)
         # End of filling metadata
-
+        
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:
