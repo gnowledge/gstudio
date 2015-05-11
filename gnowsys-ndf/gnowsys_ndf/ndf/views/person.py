@@ -173,8 +173,8 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
                 each["college"] = colg_list_name
                 ac_data_set.append(each)
+                colg_list_name = []
 
-        # print ac_data_set
         column_headers = [
                     ("person_id", "Edit"),
                     ("name", "Name"),
