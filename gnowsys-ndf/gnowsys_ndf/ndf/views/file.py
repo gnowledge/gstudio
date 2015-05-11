@@ -858,17 +858,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
                 is_video = 'True'
-                #path = files.temporary_file_path()
-                #tup = tempfile.mkstemp() # make a tmp file
-                #f = os.fdopen(tup[0], 'w') # open the tmp file for writing
-                #f.write(files.read()) # write the tmp file
-                #f.close()
-
-                ### return the path of the file
-                #filepath = tup[1] # get the filepath
-                print path,"@@@@@@@@@@@@@@@@@@@@@@"
-                #path=files.name                
-                #print path,"path@@@@@@@@@2"
+                path = files.temporary_file_path() # method gets temporary location of the file
                 username="supriya"
                 password="wetube"
                 base_url = "http://wetube.gnowledge.org/"
