@@ -170,7 +170,6 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                             colg_id = each_col
                             colg_node = node_collection.one({'_id':ObjectId(colg_id)})
                             colg_list_name.append(colg_node.name)
-
                 each["college"] = colg_list_name
                 ac_data_set.append(each)
                 colg_list_name = []
@@ -362,6 +361,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   college_id = None
   student_enrollment_code = u""
   create_student_enrollment_code = False
+  existing_colg = []
   registration_date = None
 
   property_order_list = []
@@ -411,7 +411,9 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       person_gs.status = u"PUBLISHED"
 
     person_gs.save(is_changed=is_changed)
-
+    for each_rel in person_gs.relation_set:
+      if each_rel and "officer_incharge_of" in each_rel:
+        existing_colg = each_rel["officer_incharge_of"]
     if college_node:
         mis_admin = node_collection.one({
             "_type": "Group",
@@ -557,7 +559,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               for college_id in rel["officer_incharge_of"]:
                 if college_id not in college_id_list:
                   college_id_list.append(college_id)
-              
               break  # break outer-loop (of relation_set)
 
         if college_id_list:
@@ -575,7 +576,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 if rel["has_group"]:
                   if rel["has_group"][0] not in college_group_id_list:
                     college_group_id_list.append(rel["has_group"][0])
-                  
+
                   break  # break inner-loop (college.relation_set)
 
           if college_group_id_list:
@@ -586,6 +587,49 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               {'$addToSet': {'group_admin': auth_node.created_by}},
               upsert=False, multi=True
             )
+        old_college_id_list = []
+        if existing_colg:
+          if len(existing_colg) > len(college_id_list):
+            for each_colg_id in existing_colg:
+              if each_colg_id not in college_id_list:
+                old_college_id_list.append(each_colg_id)
+
+            old_college_cur = node_collection.find(
+              {'_id': {'$in': old_college_id_list}},
+              {'relation_set.has_group': 1}
+            )
+
+            old_college_group_id_list = []
+            for college in old_college_cur:
+              for rel in college.relation_set:
+                if rel and "has_group" in rel:
+                  if rel["has_group"]:
+                    if rel["has_group"][0] not in old_college_group_id_list:
+                      old_college_group_id_list.append(rel["has_group"][0])
+
+                    break  # break inner-loop (college.relation_set)
+
+            if old_college_group_id_list:
+              # If college-group list exists
+              # Then update their group_admin field (append PO's created_by)
+              res = node_collection.collection.update(
+                {'_id': {'$in': old_college_group_id_list}, '$or': [{'group_admin': auth_node.created_by},
+                {'author_set': auth_node.created_by}]},
+                {'$pull': {'group_admin': auth_node.created_by, 'author_set': auth_node.created_by}},
+                upsert=False, multi=True
+              )
+              # The code below is commented as the college groups are PRIVATE.
+              # for rel in person_gs.relation_set:
+              #   if rel and "officer_incharge_of" in rel:
+              #       pass
+              #   else:
+              #       node_collection.collection.update({'_id': auth_node._id},
+              #       {'$set': {'agency_type': u"Other"}},
+              #       upsert=False, multi=False
+              #       )
+              # Its purpose is to change the agency type back to Other
+
+              auth_node.reload()
 
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
@@ -651,13 +695,11 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                               context_variables,
                               context_instance = RequestContext(request)
                             )
-  
+
   except TemplateDoesNotExist as tde:
     error_message = "\n PersonCreateEditViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
-  
+
   except Exception as e:
     error_message = "\n PersonCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
-
-
