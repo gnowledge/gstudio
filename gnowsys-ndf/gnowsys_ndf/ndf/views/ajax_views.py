@@ -3848,7 +3848,7 @@ def get_anncourses_allstudents(request, group_id):
 
         # Find students which are not enrolled in selected announced course
         # query.update({'relation_set.selected_course': {'$ne': acourse_node._id}})
-        query.update({'relation_set.selected_course': {'$nin': acourse_val}})
+        # query.update({'relation_set.selected_course': {'$nin': acourse_val}})
 
         res = node_collection.collection.aggregate([
             {

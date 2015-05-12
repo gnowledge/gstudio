@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.views.person import *
 from gnowsys_ndf.ndf.views.enrollment import *
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 
-
+@login_required
 @get_execution_time
 def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
@@ -89,7 +89,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
     if request.user.id:
       if auth is None:
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
+        auth = node_collection.one({'_type': 'Author', 'created_by':int(request.user.id)})
 
       agency_type = auth.agency_type
       agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
@@ -326,8 +326,8 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                                         })
 
     return render_to_response(template, variable)
-      
-      
+
+
 @login_required
 @get_execution_time
 def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
@@ -439,7 +439,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             for each in object_type_cur:
               object_type.append({"name":each.name, "id":str(each._id)})
             systemtype_relationtype_set.append({"rt_name": eachrt.name, "type_id": str(eachrt._id), "object_type": object_type})
-    
+
     request_at_dict = {}
     request_rt_dict = {}
 
@@ -621,7 +621,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     template = "ndf/"+template_prefix+"_create_edit.html"
     variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
-      
+
+
 @login_required
 @get_execution_time
 def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
@@ -656,4 +657,3 @@ def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
                                         # 'nodes':nodes, 
                                         })
     return render_to_response(template, variable)
-        
