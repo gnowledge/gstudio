@@ -879,11 +879,9 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     'id': oshash
                 })
                 fileobj.reload()
-                print base_url + item
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
                 fileobj.reload()
-                print fileobj._id,fileobj.name,"***************"
                 # create gattribute 
                 source_id_AT = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
                 create_gattribute(fileobj._id, source_id_AT, unicode(item))
