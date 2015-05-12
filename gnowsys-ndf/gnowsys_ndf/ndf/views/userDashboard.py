@@ -59,21 +59,21 @@ def userpref(request,group_id):
         auth.save()
     return HttpResponse("Success")
 
+@login_required
 @get_execution_time
 def uDashboard(request, group_id):
     usrid = group_id
-    
+
     ID = int(usrid)
     auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1,'created_at':1 })
     group_id = auth._id
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
-    
- 
+
     group_name = auth.name
     usrname = auth.name
     date_of_join = auth['created_at']
     current_user = request.user.pk
-    
+
     has_profile_pic = None
     profile_pic_image = None
     is_already_selected = None
@@ -182,9 +182,10 @@ def uDashboard(request, group_id):
     
     activity = ""
     activity_user = node_collection.find(
-        {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
-        {"access_policy":{"$in":Access_policy}},{'member_of':{'$nin': [exclued_from_public]}},
-        {'$or':[{'created_by':int(ID)}, {'modified_by':int(ID)}]}] 
+        {'$and': [{'$or': [{'_type': 'GSystem'}, {'_type': 'group'}, {'_type': 'File'}]},
+        {"access_policy": {"$in": Access_policy}},{'status':{'$in':[u"DRAFT",u"PUBLISHED"]}},
+        {'member_of': {'$nin': [exclued_from_public]}},
+        {'$or': [{'created_by': int(ID)}, {'modified_by': int(ID)}]}]
     }).sort('last_update', -1).limit(10)
 
     a_user = []
@@ -210,7 +211,7 @@ def uDashboard(request, group_id):
         else:
             member_of = node_collection.find_one({"_id": each.member_of[0]})
             user_activity.append(each)
-    
+
     '''
     notification_list=[]    
     notification_object = notification.NoticeSetting.objects.filter(user_id=int(ID))

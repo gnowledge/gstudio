@@ -19,6 +19,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
@@ -26,12 +27,12 @@ from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, c
 from gnowsys_ndf.ndf.views.methods import create_college_group_and_setup_data,get_execution_time
 
 
+@login_required
 @get_execution_time
 def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   custom view for custom GAPPS
   """
-
   auth = None
   if ObjectId.is_valid(group_id) is False :
     group_ins = node_collection.one({'_type': "Group", "name": group_id})
@@ -65,6 +66,7 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
 
   nodes = None
   nodes_keys = []
+  response_dict = {'success': False}
   node = None
   property_order_list = []
   widget_for = []
@@ -87,35 +89,133 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
     title = organization_gst.name
 
     query = {}
-    if request.method == "POST":
-      search = request.POST.get("search","")
-      query = {'member_of': organization_gst._id, 'group_set': ObjectId(group_id), 'name': {'$regex': search, '$options': 'i'}}
-    
-    else:
-      query = {'member_of': organization_gst._id, 'group_set': ObjectId(group_id)}
+    ac_data_set = []
+    records_list = []
+    query = {
+        "member_of": organization_gst._id,
+        "group_set": ObjectId(group_id),
+    }
+    if organization_gst.name == "College":
+      res = node_collection.collection.aggregate([
+          {
+              '$match': query
+          }, {
+              '$project': {
+                  '_id': 0,
+                  'org_id': "$_id",
+                  'name': '$name',
+                  'enrollment_code': '$attribute_set.enrollment_code',
+                  'state': '$relation_set.organization_belongs_to_state',
+                  'university': '$relation_set.college_affiliated_to',
+                  # 'college_group': '$relation_set.college_group',
+                  'po': '$relation_set.has_officer_incharge',
+                  'created_at': "$created_at"
+              }
+          },
+          {
+              '$sort': {'created_at': 1}
+          }
+      ])
+
+      records_list = res["result"]
+      if records_list:
+          for each in res["result"]:
+              if each["university"]:
+                if each["university"][0]:
+                    univ_id = each["university"][0][0]
+                    u = node_collection.one({"_id": univ_id}, {"name": 1})
+                    each["university"] = u.name
+
+              if each["state"]:
+                if each["state"][0]:
+                    state_id = each["state"][0][0]
+                    each["state"] = node_collection.one({"_id": state_id}).name
+
+              if each["po"]:
+                if each["po"][0]:
+                    po_id = each["po"][0][0]
+                    each["po"] = node_collection.one({"_id": po_id}).name
+
+              ac_data_set.append(each)
+      column_headers = [
+                  ("org_id", "Edit"),
+                  ("name", "College"),
+                  ("enrollment_code", "Code"),
+                  # ("college_group", "Group"),
+                  ("po", "Program Officer"),
+                  ("university", "University"),
+                  ("state", "State"),
+      ]
+
+      response_dict["column_headers"] = column_headers
+      response_dict["success"] = True
+      response_dict["students_data_set"] = ac_data_set
+
+    elif organization_gst.name == "University":
+      res = node_collection.collection.aggregate([
+          {
+              '$match': query
+          }, {
+              '$project': {
+                  '_id': 0,
+                  'org_id': "$_id",
+                  'name': '$name',
+                  'state': '$relation_set.organization_belongs_to_state',
+                  'created_at': "$created_at"
+              }
+          },
+          {
+              '$sort': {'created_at': 1}
+          }
+      ])
+
+      records_list = res["result"]
+      if records_list:
+          for each in res["result"]:
+              if each["state"]:
+                if each["state"][0]:
+                    state_id = each["state"][0][0]
+                    each["state"] = node_collection.one({"_id": state_id}).name
+
+              ac_data_set.append(each)
+      column_headers = [
+                  ("org_id", "Edit"),
+                  ("name", "University"),
+                  ("state", "State"),
+      ]
+
+      response_dict["column_headers"] = column_headers
+      response_dict["success"] = True
+      response_dict["students_data_set"] = ac_data_set
+    response_dict["groupid"] = group_id
+    response_dict["app_id"] = app_id
+    response_dict["app_set_id"] = app_set_id
 
     nodes = list(node_collection.find(query).sort('name', 1))
 
     nodes_keys = [('name', "Name")]
 
-    template = "ndf/" + organization_gst.name.strip().lower().replace(' ', '_') + "_list.html"
+    # template = "ndf/" + organization_gst.name.strip().lower().replace(' ', '_') + "_list.html"
+    template = "ndf/organization_list.html"
     default_template = "ndf/mis_list.html"
 
   if app_set_instance_id:
-    template = "ndf/" + organization_gst.name.strip().lower().replace(' ', '_') + "_details.html"
+
+    template = "ndf/organization_details.html"
     default_template = "ndf/mis_details.html"
 
     node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
     node.get_neighbourhood(node.member_of)
 
-  context_variables = { 'groupid': group_id, 
+  context_variables = { 'groupid': group_id,'group_id':group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title': title,
                         'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
                         'property_order_list': property_order_list, 'lstFilters': widget_for,
-                        'is_link_needed': is_link_needed
+                        'is_link_needed': is_link_needed,
+                        'response_dict':json.dumps(response_dict, cls=NodeJSONEncoder)
                       }
 
   try:
@@ -311,3 +411,4 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
   except Exception as e:
     error_message = "\n OrganizationCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
+    

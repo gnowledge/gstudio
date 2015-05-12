@@ -44,7 +44,14 @@
       var $tree = $('.collection');
       var arr = [];  
       {% get_node_type node as node_type %}  
+      
       var node_type = "{{node_type}}";
+
+      if(node_type=="Course"){
+        $('.collection').tree({
+           autoOpen: true
+         });
+      }
 
       $tree.tree({
         selectable: true,

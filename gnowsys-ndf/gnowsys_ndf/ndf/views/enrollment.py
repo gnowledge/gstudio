@@ -179,6 +179,10 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
             reopen_task_id = request.POST.get("reopen_task_id", "")
             reopen_task_id = ObjectId(reopen_task_id)
 
+        admin_update = None
+        if "admin_update" in request.POST:
+            admin_update = request.POST.get("admin_update", "")
+
         at_rt_list = ["start_enroll", "end_enroll", "for_acourse", "for_college", "for_university", "enrollment_status", "has_enrolled", "has_enrollment_task", "has_approval_task"]
         at_rt_dict = {}
 
@@ -352,7 +356,50 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     enrollment_gs.status = u"PUBLISHED"
                     enrollment_gs.save()
 
-                if "_id" in enrollment_gs:
+                enrollment_task_ids = None
+                each_enrollment_task_node = None
+                list_of_task_status = [u'New', u'In Progress']
+                task_status = None
+                updated_one_task = False
+                if "_id" in enrollment_gs and admin_update is not None:
+                    for each_enrollment in enrollment_gs.attribute_set:
+                        if "has_enrollment_task" in each_enrollment:
+                            if each_enrollment["has_enrollment_task"]:
+                                enrollment_task_dict = each_enrollment["has_enrollment_task"]
+                                break
+                    enrollment_task_ids = enrollment_task_dict.keys()
+                    for each_enrollment_task in enrollment_task_ids:
+                        if not updated_one_task:
+                            each_enrollment_task_node = node_collection.one({'_id': ObjectId(each_enrollment_task)})
+                            task_status = each_enrollment_task_node.attribute_set[0]['Status']
+
+                            if task_status in list_of_task_status:
+                                task_dict = {}
+                                task_dict["_id"] = each_enrollment_task_node._id
+                                task_dict["modified_by"] = user_id
+                                task_dict["created_by_name"] = user_name
+                                content_text = each_enrollment_task_node['content_org']
+                                content_text += "\n\n- New enrollment dates are from : "+start_enroll.strftime("%d-%b-%Y")+" to " +end_enroll.strftime("%d-%b-%Y")
+                                task_dict["content_org"] = unicode(content_text)
+                                task_dict["start_time"] = start_enroll
+                                task_dict["end_time"] = end_enroll
+                                task_node = create_task(task_dict)
+
+                                enrollment_status_at = node_collection.one({
+                                    '_type': "AttributeType",
+                                    'name': u"enrollment_status"
+                                })
+                                end_enroll_at = node_collection.one({
+                                    '_type': "AttributeType",
+                                    'name': u"end_enroll"
+                                })
+                                at_status_node = create_gattribute(enrollment_gs._id, enrollment_status_at, u"OPEN")
+                                at_enroll_node = create_gattribute(enrollment_gs._id, end_enroll_at, end_enroll)
+                                updated_one_task = True
+
+                if not updated_one_task:
+                    admin_update = None
+                if "_id" in enrollment_gs and admin_update is None:
                     # [2] Create task for PO of respective college
                     # for Student-Course Enrollment
                     task_dict = {}
@@ -541,7 +588,50 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     enrollment_gs.status = u"PUBLISHED"
                     enrollment_gs.save()
 
-                if "_id" in enrollment_gs:
+                enrollment_task_ids = None
+                each_enrollment_task_node = None
+                list_of_task_status = [u'New', u'In Progress']
+                task_status = None
+                updated_one_task = False
+                if "_id" in enrollment_gs and admin_update is not None:
+                    for each_enrollment in enrollment_gs.attribute_set:
+                        if "has_enrollment_task" in each_enrollment:
+                            if each_enrollment["has_enrollment_task"]:
+                                enrollment_task_dict = each_enrollment["has_enrollment_task"]
+                                break
+                    enrollment_task_ids = enrollment_task_dict.keys()
+                    for each_enrollment_task in enrollment_task_ids:
+                        if not updated_one_task:
+                            each_enrollment_task_node = node_collection.one({'_id': ObjectId(each_enrollment_task)})
+                            task_status = each_enrollment_task_node.attribute_set[0]['Status']
+
+                            if task_status in list_of_task_status:
+                                task_dict = {}
+                                task_dict["_id"] = each_enrollment_task_node._id
+                                task_dict["modified_by"] = user_id
+                                task_dict["created_by_name"] = user_name
+                                content_text = each_enrollment_task_node['content_org']
+                                content_text += "\n- The duration for this enrollment task has been extended to "+end_enroll.strftime("%d-%b-%Y")+"."
+                                task_dict["content_org"] = unicode(content_text)
+                                task_dict["start_time"] = start_enroll
+                                task_dict["end_time"] = end_enroll
+                                task_node = create_task(task_dict)
+
+                                enrollment_status_at = node_collection.one({
+                                    '_type': "AttributeType",
+                                    'name': u"enrollment_status"
+                                })
+                                end_enroll_at = node_collection.one({
+                                    '_type': "AttributeType",
+                                    'name': u"end_enroll"
+                                })
+                                at_status_node = create_gattribute(enrollment_gs._id, enrollment_status_at, u"OPEN")
+                                at_enroll_node = create_gattribute(enrollment_gs._id, end_enroll_at, end_enroll)
+                                updated_one_task = True
+
+                if not updated_one_task:
+                    admin_update = None
+                if "_id" in enrollment_gs and admin_update is None:
                     # [2] Create task for PO of respective college
                     # for Student-Course Enrollment
                     task_dict = {}
@@ -664,6 +754,9 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                                 elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
                                     at_rt_node = create_grelation(enrollment_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
+
+
+
                 enrollment_gs = None
 
         if reopen_task_id:
@@ -677,6 +770,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
             task_dict["content_org"] = unicode(task_dict["content_org"])
             task_node = create_task(task_dict)
 
+        if reopen_task_id or admin_update is None:
             # Update the current approval task as "Closed"
             if old_current_approval_task and not approval_task_dict[str(old_current_approval_task)]:
                 old_app_task_dict = {}

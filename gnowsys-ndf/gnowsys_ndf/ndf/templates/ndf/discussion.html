@@ -228,13 +228,14 @@
         
         type: "POST",
 
-        url: "{% url 'discussion_reply' group_id %}",
+        url: "{% url 'discussion_reply' group_id node.pk %}",
 
         data: { 
 
           "csrfmiddlewaretoken": "{{ csrf_token }}",
           "prior_node_id": priorNodeId,
           "reply_text_content": replyContent
+
         },
 
         success: function(data){

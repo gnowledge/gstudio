@@ -23,6 +23,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/create_edit_unit/', 'create_edit_unit', name='create_edit_unit'),
                         url(r'^/change_node_name/$', 'change_node_name', name='change_node_name'),
                         url(r'^/change_order/$', 'change_order', name='change_order'),
-                        url(r'^/delete/$', 'delete_from_course_structure', name='delete_from_cs'),
+                        url(r'^/delete_from_structure/$', 'delete_from_course_structure', name='delete_from_cs'),
+                        url(r'^/delete/(?P<node_id>[\w-]+)$', 'delete_course', name='del_course'),
                         url(r'^/enroll/$', 'enroll_generic', name='course_enroll'),
                        )
