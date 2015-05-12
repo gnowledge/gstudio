@@ -27,7 +27,7 @@ from django.core.files.temp import gettempdir
 from django.core.files.uploadedfile import UploadedFile # django file handler
 # from django.contrib.auth.models import User
 from mongokit import paginator
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_node_common_fields, set_all_urls,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
@@ -38,7 +38,7 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, MEDIA_ROOT  # , EXTRA_LANG_INFO, GAPPS
+    from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD  # , EXTRA_LANG_INFO, GAPPS
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 # from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
 from gnowsys_ndf.ndf.org2any import org2html
@@ -856,14 +856,12 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
                 is_video = 'True'
                 path = files.temporary_file_path() # method gets temporary location of the file
-                username="supriya"
-                password="wetube"
                 base_url = "http://wetube.gnowledge.org/"
                 api_url = base_url + "api/"
                 # connenting to wetube api using pandora_client                                                                  
                 api = pandora_client.API(api_url)
                 # signin takes username, password & returns user data                                                          
-                api.signin(username=username, password=password)
+                api.signin(username=WETUBE_USERNAME, password=WETUBE_PASSWORD)
                 # return metadata about the file                                                                                  
                 info = ox.avinfo(path)
                 oshash = info['oshash']
