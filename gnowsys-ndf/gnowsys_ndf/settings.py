@@ -328,6 +328,9 @@ MIDDLEWARE_CLASSES = (
     # 'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
+
+    # 'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
      
 # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -378,6 +381,7 @@ INSTALLED_APPS = (
 #    'endless_pagination',
     'jsonrpc',
     'registration_email',
+    'memcache_admin',
 )
 
 AUTHENTICATION_BACKENDS=(
@@ -616,6 +620,14 @@ except:
 #        'LOCATION': 'default-cache'
 #    }
 #}
+
+# cache implementation with memcached and python-memcached binding:
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
 
 #USER_ONLINE_TIMEOUT = 300
 
