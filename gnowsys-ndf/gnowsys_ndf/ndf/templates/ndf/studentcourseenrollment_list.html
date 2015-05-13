@@ -3,149 +3,93 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
-{% block title %} {{ title }} {% endblock %}
-
-{% block style %}
+{% block head %}
   {{block.super}}
 
-  /* Setting css-properties for app-set in left panel */
-    .active-app-set, .active-app-set-edit, .active-app-set-view {
-      /*padding:0.5em 0 0.5em 0.5em; */
-      /*margin-left: -10px !important;*/
-      background-color:#efefef;
-    }
-
-    .active-app-set-edit {
-      border-right: 4px solid #808080;
-      font-weight: bold;
-    }
-
-    .active-app-set-view {
-      border-left: 4px solid #808080;
-      font-weight: bold;
-    }
-
-  /* css-properties for table */
-    .width_s_no {
-      width: 5%;
-    }
-
-    .width_edit {
-      width: 8%;
-    }
-
-    .width_delete {
-      width: 8%;
-      line-height: 0.5em;
-      text-align: center !important;
-    }
-
-    .width_name {
-      width: 31%;
-    }
-
-    .margin-0r {
-      margin: 0 !important;
-    }
-
-    .counter {
-      font-weight: bold;
-      text-align: right;
-    }
-
-    .tiny.button {
-      font-size: 1em !important;
-    }
-{% endblock%}
-
-{% block body_content %} 
-  {% check_is_gstaff groupid request.user as gstaff_access %}
-
-  {% comment %}
-  <!-- 
-    get_features_with_special_rights: Returns list of feature(s) for which creation rights should not be given
-  -->
-  {% endcomment %}
-  {% get_features_with_special_rights groupid request.user as features_list %}
-
-  {% if nodes %}
-    {% autopaginate nodes 25 %}
-  
-    <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
-     {% blocktrans %} <h3>Are you sure you want to delete? All of the following related data also will be deleted:</h3> {% endblocktrans %} 
-      <input class="button tiny confirmDeleteObjects" type="button" value="Confirm">
-      <input class="button tiny cancelDeleteObjects" type="button" value="Cancel">
-      <div id="deletion_results"></div>
-      <a class="close-reveal-modal">&#215;</a>
-    </div>
-
-    <div class="row" style="margin-top: 1rem;">
-      <form method="POST">
-        {% csrf_token %}
-        <div class="large-5 large-push-7 columns">
-          <div class="row collapse">
-            <div class="large-10 columns">
-              <input type="text" name="search" value="" placeholder="By name...">
-            </div>
-            <div class="large-2 columns end">
-              <input type="submit" class="button postfix" value="Search">
-              <input type="hidden" name="class" value="{{class_name}}">
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-  {% endif %}
-
-  <table>
-    <thead>
-      {% if nodes %}
-        <th class="width_s_no counter">{% trans "S. #" %}</th>
-        {% for each_key in nodes_keys %}
-        <th class="width_{{each_key.0}}">{{each_key.1}}</th>
-        {% endfor %}
-        {% if gstaff_access and group_name_tag != "MIS_admin" %}
-          <th class="width_edit">{% trans "Enroll" %}</th>
-        {% endif %}
-      {% endif %}
-    </thead>
-    
-    <tbody>
-      {% for each in nodes %}
-        <tr>
-          <td class="counter">{{forloop.counter}}.</td>
-          {% for each_key in nodes_keys %}
-          {% if forloop.counter == 1 %}
-          <td>{{each|get_dict_item:each_key.0|title}}</td>
-          {% elif forloop.counter > 2 %}
-          <td>{{each|get_dict_item:each_key.0|default:"--"}}</td>
-          {% else %}
-          <td>{{each|get_dict_item:each_key.0}}</td>
-          {% endif %}
-          {% endfor %}
-          {% if gstaff_access and group_name_tag == "MIS_admin" %}
-          <td>
-            <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">{% trans "Edit" %}</a>
-          </td>
-          {% endif %}
-
-          {% if gstaff_access and group_name_tag != "MIS_admin" %}
-            <td class="name"><a href="{% url 'mis:mis_enroll' groupid app_id app_set_id each|get_dict_item:'_id' %}" target="_blank" class="button tiny expand margin-0r width_edit">Enroll</a></td>
-          {% endif %}
-        </tr>
-        
-      {% empty %}
-        {% blocktrans %}<h3>No data to display</h3> {% endblocktrans %}
-
-      {% endfor %}
-    </tbody>
-  </table>
-
-  {% paginate %}
-
+  <!-- DataTables -->
+  <script src="/static/ndf/bower_components/DataTables/media/js/jquery.dataTables.js"></script>
+  <script src="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.js"></script>
+  <!-- DataTables CSS -->
+  <link href="/static/ndf/bower_components/datatables-plugins/integration/foundation/dataTables.foundation.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
-{% block script %}
-  {{block.super}}
+{% block title %} {{ title }} {% endblock %}
+{% block body_content %} 
+      <div id="org_listing_div"></div>    
 
-{% endblock %}  
+      <table style="float:right;">
+        <tr>
+          <th>Status</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>OPEN</td>
+          <td>Enrollment is Open</td>
+        </tr>
+        <tr>
+          <td>APPROVAL</td>
+          <td>Enrollment is Closed. Approval is Open</td>
+        </tr>
+        <tr>
+          <td>CLOSED</td>
+          <td>Approval is Closed</td>
+        </tr>
+        <tr>
+          <td>PENDING</td>
+          <td>Requested for Re-opening Enrollment</td>
+        </tr>
+      </table>
+{% endblock %}
+
+
+{% block document_ready %}
+  {{block.super}}
+    {% check_is_gstaff groupid request.user as gstaff_access %}
+    {% if response_dict %}
+
+      data = {{response_dict|safe}}
+      column_headers = data["column_headers"];
+      ac_data_set = data["students_data_set"];
+      dataTable_columns_set = [];
+      groupid_val = data["groupid"];
+      app_id_val = data["app_id"];
+      app_set_id_val = data["app_set_id"];
+
+      if (ac_data_set.length > 0) {
+        // Define table
+        ac_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="ac_table">' +
+          '</table>';
+
+        $("#org_listing_div").html(ac_table);
+
+        // Prepare title & data headers used in dataTable
+        $.each(column_headers, function(index, v) {
+          d = {};
+          d["data"] = v[0];
+          d["title"] = v[1];
+          dataTable_columns_set.push(d);
+        });
+
+        // Set defintion dataTable
+        sce_dt_var = $("#ac_table").dataTable({
+          "data": ac_data_set,
+          "columns": dataTable_columns_set,
+          "columnDefs": [{ "width": "10%", "targets": 0 }],
+          "createdRow": function ( row, data, index ) {
+            org_id = data["sce_id"];
+            name = data['name']
+            {% if gstaff_access and group_name_tag == "MIS_admin" %}
+              edit_url = "{% url 'mis:mis_app_instance_edit' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", org_id);
+              $(row).find("td:nth-child(1)").html("<a href='" + edit_url + "' title='Edit " + data['name'] + "' target='_blank'><i class='fi-pencil medium'></i>Edit</a>");
+            {% endif %}
+
+            {% if gstaff_access and group_name_tag != "MIS_admin" %}
+              enroll_url = "{% url 'mis:mis_enroll' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", org_id);
+              $(row).find("td:nth-child(1)").html("<a href='" + enroll_url + "' title='Enroll " + data['name'] + "' target='_blank'><i class='fi-pencil medium'></i>Enroll</a>");
+            {% endif %}
+            $(row).attr("id", org_id);
+          }
+        });
+      }
+    {% endif %}
+{% endblock %}

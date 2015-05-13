@@ -29,6 +29,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_TASK_TYPES  # , MEDIA_ROOT
 # from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_execution_time  # , parse_template_data, get_node_common_fields
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
@@ -893,7 +894,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
 
   sce_gst = None
   sce_gs = None
-
+  response_dict = {'success': False}
   nodes = None
   nodes_keys = []
   node = None
@@ -906,7 +907,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
 
   if request.user:
     if auth is None:
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      auth = node_collection.one({'_type': 'Author', 'created_by': int(request.user.id)})
     agency_type = auth.agency_type
     agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
@@ -916,19 +917,87 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
   if app_set_id:
     sce_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
     title = sce_gst.name
+    if title == "StudentCourseEnrollment":
+        query = {}
+        college = {}
+        course = {}
+        ac_data_set = []
+        records_list = []
+        query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id)}
 
-    query = {}
-    if request.method == "POST":
-      search = request.POST.get("search","")
-      query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id), 'name': {'$regex': search, '$options': 'i'}}
+        res = node_collection.collection.aggregate([
+            {
+                '$match': query
+            }, {
+                '$project': {
+                    '_id': 0,
+                    'sce_id': "$_id",
+                    'name': '$name',
+                    'college': '$relation_set.for_college',
+                    'start_enroll': '$attribute_set.start_enroll',
+                    'end_enroll': '$attribute_set.end_enroll',
+                    'enrollment_status': '$attribute_set.enrollment_status',
+                    'enrollment_stud': '$attribute_set.has_enrolled',
+                    'approved_stud': '$attribute_set.has_approved'
+                }
+            },
+            {
+                '$sort': {'name': 1}
+            }
+        ])
 
+        records_list = res["result"]
+        if records_list:
+            for each in res["result"]:
+                if each["college"]:
+                    if each["college"][0]:
+                        colg_list_name = []
+                        for each_col in each["college"][0]:
+                            colg_id = each_col
+                            colg_node = node_collection.one({'_id':ObjectId(colg_id)})
+                            colg_list_name.append(colg_node.name)
+                each["college"] = colg_list_name
+
+                enrollment_stud_count = 0
+                if each["enrollment_stud"]:
+                    if each["enrollment_stud"][0]:
+                        enrollment_stud_count = len(each["enrollment_stud"][0])
+                each["enrollment_stud"] = enrollment_stud_count
+
+                approved_stud_count = 0
+                if each["approved_stud"]:
+                    if each["approved_stud"][0]:
+                        approved_stud_count = len(each["approved_stud"][0])
+                each["approved_stud"] = approved_stud_count
+                ac_data_set.append(each)
+
+        column_headers = [
+                    ("sce_id", "Action"),
+                    ("name", "Name"),
+                    ("college", "College"),
+                    ("enrollment_stud", "Enrolled"),
+                    ("approved_stud", "Approved"),
+                    ("enrollment_status", "Status"),
+        ]
+
+        response_dict["column_headers"] = column_headers
+        response_dict["success"] = True
+        response_dict["students_data_set"] = ac_data_set
+        response_dict["groupid"] = group_id
+        response_dict["app_id"] = app_id
+        response_dict["app_set_id"] = app_set_id
     else:
-      query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id)}
+        if request.method == "POST":
+          search = request.POST.get("search", "")
+          query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id), 'name': {'$regex': search, '$options': 'i'}}
 
-    nodes = list(node_collection.find(query).sort('name', 1))
+        else:
+          query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id)}
 
-    nodes_keys = [('name', "Name")]
-    template = ""
+        nodes = list(node_collection.find(query).sort('name', 1))
+
+        nodes_keys = [('name', "Name")]
+        template = ""
     template = "ndf/" + sce_gst.name.strip().lower().replace(' ', '_') + "_list.html"
     default_template = "ndf/mis_list.html"
 
@@ -946,7 +1015,8 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
                         'title': title,
                         'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
                         'property_order_list': property_order_list, 'lstFilters': widget_for,
-                        'is_link_needed': is_link_needed
+                        'is_link_needed': is_link_needed,
+                        'response_dict':json.dumps(response_dict, cls=NodeJSONEncoder)
                       }
   try:
     return render_to_response([template, default_template], 
@@ -1001,7 +1071,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     if user_id:
         if auth is None:
             auth = node_collection.one({
-                '_type': 'Author', 'name': unicode(user_name)
+                '_type': 'Author', 'created_by': int(user_id)
             })
 
         agency_type = auth.agency_type
