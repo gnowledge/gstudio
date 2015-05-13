@@ -1,8 +1,11 @@
-
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% load cache %}
+
 {% block title %}Creating Thread to Forum:  {{forum.name}} {% endblock %}
+
+{% cache 3600 create_thread request.LANGUAGE_CODE %}
 
 {% block head %}
 
@@ -49,6 +52,8 @@
   <p>{% trans "Threads are new ideas on the topic" %}</p>
 {% endblock %}
 
+{% endcache %}
+
 
 {% block body_content %} 
     
@@ -80,6 +85,7 @@
 
   <form id="create_thread" method="POST">
   {% csrf_token %}
+  {% cache 3600 create_thread_form request.LANGUAGE_CODE %}
 
     <!-- forum name   -->
     <div class="row">
@@ -113,7 +119,8 @@
       </div>
 
     </div>
- 
+    
+    {% endcache %}
   </form>
 
 {% endblock %}

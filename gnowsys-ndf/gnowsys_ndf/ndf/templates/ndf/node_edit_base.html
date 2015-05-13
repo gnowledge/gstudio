@@ -2,9 +2,11 @@
 
 {% load i18n %}
 {% load ndf_tags %}
+{% load cache %}
 
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
 
+{% cache 3600 node_edit_base style %}
 {% block style %}
 
 .divider-line { font-size: xx-large; color:lightgray; }
@@ -34,7 +36,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 }
 
 {% endblock %}
-
+{% endcache %}
 
 
 {% block body_content %}
@@ -118,6 +120,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 	                <h5>{% trans "Settings" %}</h5>           
 	            	<div class="row">
 		    		{% if node.created_by == request.user.pk %}	
+
+		    			{% cache 300 node_edit_base_visibility node.access_policy request.LANGUAGE_CODE %}
 	                    <div class="large-4 columns">
 							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Visibility" %}</label></span>
 						</div>                    
@@ -142,6 +146,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 							<span></span>
 							</div>
 						</div>
+						{% endcache %}
+
 					{% else %}
 							
 						{% if not node %}
@@ -167,6 +173,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	            	</div>                
 	            	
+	    			{% cache 300 node_edit_base_lang_loc request.LANGUAGE_CODE %}
+
 	            	<div class="row">
 	                	<div class="large-4 columns">
 	                		<label class="inline">{% trans "Language" %}</label>
@@ -188,7 +196,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 							<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 							</a>
 	                    </div>
-		     		</div>                
+		     		</div>
+		     		{% endcache %}                
 	            </div> 
 			</div>  
 
@@ -224,6 +233,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 			<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}></div>
 		</div>
 		
+		{% cache 3600 node_edit_base_coll_type_radio request.LANGUAGE_CODE %}
+
 		<div class="choose" style="display:none;">
 		  	
 			<div class="row">
@@ -258,6 +269,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 			</div>
 		</div>
 
+		{% endcache %}
+
 		<div class="row drawers" style="display:none;">
 			<div class="small-12 columns">
 			  <div id="collection_drawer" >
@@ -270,6 +283,7 @@ background-repeat:no-repeat; background-size: 48px 48px
       
     {% endblock %}
     
+	{% cache 300 node_edit_base_metadata request.LANGUAGE_CODE %}
     <div class="content contents" id="panel-metadata" style="width:95%; display:none;" >      
       	<div class="row">
 		  	<h4>{% trans "Please add or edit Metadata" %} </h4>
@@ -323,6 +337,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		</div>
 		<div id="metadata_info"></div>
 	</div>	
+	{% endcache %}
     
     <!-- Kept this bellow commented part for future reference(Don't delete this) -->
 
@@ -392,6 +407,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   	{% block add_fields %} {% endblock %}
   
  	<!-- Overlay : Map Widget -->
+ 	{% cache 300 node_edit_base_map_widget %}
     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
     	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
         <a class="close-reveal-modal" >&#215;</a>
@@ -399,6 +415,7 @@ background-repeat:no-repeat; background-size: 48px 48px
         <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
       <!-- #{#%# endif %} -->
     </div>
+    {% endcache %}
 
     <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}"> -->
     <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button" />

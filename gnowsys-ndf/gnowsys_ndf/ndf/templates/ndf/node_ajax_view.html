@@ -1,6 +1,10 @@
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
+
 {% get_group_name groupid as group_name_tag %}
+
+{% cache 360 node_ajax_view request.LANGUAGE_CODE %}
 
 <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
 <script type="text/javascript">
@@ -291,6 +295,8 @@ ul#navigation li a.last {
 <!-- end dialog -->
 
 {% get_schema node as schema %} 
+
+{% endcache%}
 
 {% check_user_join request groupid as user_is_joined %}
 
@@ -1160,6 +1166,7 @@ ul#navigation li a.last {
         </div>
 
         <!-- Only visible to the group admins and super user for managing group activities -->
+        {% comment %}
         <div class="content" id="view-manage">
 
           <div class="row">
@@ -1215,6 +1222,8 @@ ul#navigation li a.last {
           </div>
           <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
+
+        {% endcomment %}
         <!-- /////////////////// -->
 
         <div class="content" id="view-discussion">
