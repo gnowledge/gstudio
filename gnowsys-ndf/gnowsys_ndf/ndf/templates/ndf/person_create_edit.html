@@ -362,4 +362,9 @@
           $(this).val(year)
         }
       });
+
+    //Allow to register PO without selecting any College
+    $("#officer_incharge_of").removeAttr("required");
+    $("#officer_incharge_of_modal #officer_incharge_of_move_all_right").remove()
+    $("#officer_incharge_of_modal #officer_incharge_of_move_all_left").remove()
 {% endblock %}
