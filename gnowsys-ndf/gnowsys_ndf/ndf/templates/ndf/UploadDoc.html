@@ -142,24 +142,24 @@
 
 
 		{% block script %}
-
+	
 		$("#docFile").change(function() {
-        var max_size =100000
-        var fsize=this.files[0].size
-        fsize=fsize/1024
-        {% check_is_gstaff groupid request.user as gstaff_access %}
-        if(fsize> max_size){
-          {% if gstaff_access%}
+		var max_size =100000
+		var fsize=this.files[0].size
+		fsize=fsize/1024
+		{% check_is_gstaff groupid request.user as gstaff_access %}
+		if(fsize> max_size){
+		{% if gstaff_access%}
           	$('#docFile').val(this.value);
-          {% else %}
+		{% else %}
           	alert("Sorry. Max File Size Limit Exceeded");
           	$(this).val("")
           	$('#docFile').val(this.value);
-          {% endif %}
-          }
-        else{
+		{% endif %}
+		}
+		else{
 		$('#docFile').val(this.value);}        
-      	});
+      		});
 		
 		$(document).on('submit',"form",function(){
 		if($("#docFile").val() != "")
@@ -178,5 +178,6 @@
 
 
 });
+
 {% endblock %}
 

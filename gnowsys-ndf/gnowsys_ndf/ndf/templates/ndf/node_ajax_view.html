@@ -615,7 +615,7 @@ ul#navigation li a.last {
                         {% trans "Your browser does not support the video tag." %}
                       </video>  
                     {% elif 'video' in node.mime_type %}
-                      <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
+		     <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
                         <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">    
                         <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
                         <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
@@ -694,12 +694,20 @@ ul#navigation li a.last {
                   {% trans "Your browser does not support the video tag." %}
                 </video>  
               {% elif 'video' in node.mime_type %}
+		{% get_source_id node.pk as source_id %}
+		{% if source_id %}
+                <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+                  <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                  {% trans "Your browser does not support the video tag." %}
+                </video>
+		{% else %}
                 <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
                   {% trans "Your browser does not support the video tag." %}
                 </video>
+		{% endif %}
               {% elif 'audio' in node.mime_type %}
                 <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
                   <p>Your browser does not support the audio element </p>
