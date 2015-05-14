@@ -6,8 +6,10 @@ import magic
 import subprocess
 import mimetypes
 import os
+import tempfile
 # import re
 import ox
+import pandora_client
 import threading
 from PIL import Image, ImageDraw  # install PIL example:pip install PIL
 from StringIO import StringIO
@@ -19,10 +21,13 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import get_valid_filename
+from django.core.files.move import file_move_safe
+from django.core.files.temp import gettempdir
+from django.core.files.uploadedfile import UploadedFile # django file handler
 # from django.contrib.auth.models import User
-
 from mongokit import paginator
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_node_common_fields, set_all_urls,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
@@ -33,12 +38,13 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, MEDIA_ROOT  # , EXTRA_LANG_INFO, GAPPS
+    from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD  # , EXTRA_LANG_INFO, GAPPS
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 # from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
+from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 ############################################
 
@@ -367,7 +373,6 @@ def file(request, group_id, file_id=None, page_no=1):
       datavisual.append({"name":"Video","count":videoCollection.count()})
       #datavisual.append({"name":"Pandora Video","count":pandoraCollection.count()})
       datavisual = json.dumps(datavisual)
-
       return render_to_response("ndf/file.html", 
                                 {'title': title,
                                  'appId':app._id,
@@ -448,6 +453,8 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
 def paged_file_objs(request, group_id, filetype, page_no):
     '''
     Method to implement pagination in File and E-Library app.
+
+
     '''
     if request.is_ajax() and request.method == "POST":
 
@@ -624,7 +631,6 @@ def paged_file_objs(request, group_id, filetype, page_no):
             result_cur = result_dict["result_cur"]
             result_paginated_cur = result_dict["result_cur"]
             result_pages = result_dict["result_pages"]
-     
         return render_to_response ("ndf/file_list_tab.html", {
                 "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
                 "resource_type": result_paginated_cur, "detail_urlname": "file_detail", 
@@ -704,7 +710,6 @@ def submitDoc(request, group_id):
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-
                     f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
@@ -846,12 +851,40 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
 
             """
-            code for converting video into webm and converted video assigning to varible files
+            code for uploading video to wetube.gnowledge.org
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
                 is_video = 'True'
+                path = files.temporary_file_path() # method gets temporary location of the file
+                base_url = "http://wetube.gnowledge.org/"
+                api_url = base_url + "api/"
+                # connenting to wetube api using pandora_client                                                                  
+                api = pandora_client.API(api_url)
+                # signin takes username, password & returns user data                                                          
+                api.signin(username=WETUBE_USERNAME, password=WETUBE_PASSWORD)
+                # return metadata about the file                                                                                  
+                info = ox.avinfo(path)
+                oshash = info['oshash']
+                # add media file the given item                                                                                    
+                r = api.addMedia({
+                    'id': oshash,
+                    'filename': fileobj.name,
+                    'info': info
+                })
+                # return unique item id for file                                                                                 
+                item = r['data']['item']
+                url = '%supload/direct/' % api_url
+                # upload one or more media file for given item                                                                                   
+                r = api.upload_chunks(url, path, {
+                    'id': oshash
+                })
+                fileobj.reload()
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
+                fileobj.reload()
+                # create gattribute 
+                source_id_AT = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+                create_gattribute(fileobj._id, source_id_AT, unicode(item))
                 # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
 
                 # '''storing thumbnail of video with duration in saved object'''
@@ -863,8 +896,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
                 '''creating thread for converting vedio file into webm'''
-                t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
-                t.start()
+                #t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
+                #t.start()
 
             '''storing thumbnail of pdf and svg files  in saved object'''
             # if 'pdf' in filetype or 'svg' in filetype:
@@ -1118,7 +1151,6 @@ def file_detail(request, group_id, _id):
     #     pass
 
     group_name, group_id = get_group_name_id(group_id)
-
     file_node = node_collection.one({"_id": ObjectId(_id)})
     file_node.get_neighbourhood(file_node.member_of)
     if file_node._type == "GSystemType":
@@ -1326,7 +1358,7 @@ def file_edit(request,group_id,_id):
             if file_node:
               get_node_metadata(request,file_node)
         # End of filling metadata
-
+        
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:
