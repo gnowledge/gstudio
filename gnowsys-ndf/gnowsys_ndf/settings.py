@@ -614,18 +614,12 @@ except:
 
 ########################################### for online_users_ramk
 
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#        'LOCATION': 'default-cache'
-#    }
-#}
-
 # cache implementation with memcached and python-memcached binding:
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
+        'TIMEOUT': 300,  #  60 * 5 = 300 seconds or 5 minutes
     }
 }
 
