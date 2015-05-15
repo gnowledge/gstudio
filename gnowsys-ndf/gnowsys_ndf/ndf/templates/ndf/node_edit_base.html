@@ -871,6 +871,14 @@ $(document).ready(function(){
 		tch_arr=[]  // for teaches
 		assess_arr=[] // for assesses		
 
+		// tags_str = $("#tags_id").val()
+		// escape_chars = "~!@#$%^&*()_+{}|:<>?/.,';][=-`'"
+		// if(tags_str.indexOf(escape_chars)>0){
+		// 	alert("Tags cannot contain special characters");
+		// 	event.preventDefault();
+
+		// }
+
  		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());
@@ -1018,15 +1026,7 @@ $(document).ready(function(){
 	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
 
-	$('#tags_id').keypress(function (e) {
-	    var regex = new RegExp("^[a-zA-Z0-9, ]+$");
-	    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-	    if (regex.test(str)) {
-	        return true;
-	    }
-	    e.preventDefault();
-	    return false;
-	});
+
 </script>
 
 {% endblock %}

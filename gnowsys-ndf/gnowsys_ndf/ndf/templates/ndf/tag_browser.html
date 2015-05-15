@@ -56,29 +56,6 @@
     </div>
   </form>
 
-  <script type = "text/javascript">
-
-    $(document).on('click','.search_tag',function(event){
-      tagstr = $("#value").val().trim()
-      if(tagstr==""){
-        alert("Enter tag name");
-        event.preventDefault();
-      }
-    })
-
-    $('#value').keypress(function (e) {
-        var regex = new RegExp("^[a-zA-Z0-9, ]+$");
-        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-        if (regex.test(str)) {
-            return true;
-        }
-        e.preventDefault();
-        return false;
-    });
-
-
-  </script>
-
   <hr></hr>
   {% if tagname %}
     {% if search_result %}
