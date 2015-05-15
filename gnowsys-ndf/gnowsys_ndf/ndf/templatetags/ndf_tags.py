@@ -14,6 +14,10 @@ from django.http import Http404
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
+
+# cache imports
+from django.core.cache import cache
+
 from mongokit import paginator
 from mongokit import IS
 
@@ -45,7 +49,6 @@ at_apps_list = node_collection.one({
 })
 translation_set=[]
 check=[]
-
 
 @get_execution_time
 @register.assignment_tag
@@ -79,26 +82,33 @@ def get_site_registration_variable_visibility(registration_variable=None):
 @get_execution_time
 @register.assignment_tag
 def get_site_variables():
-   site_var={}
-   site_var['ORG_NAME']=GSTUDIO_ORG_NAME
-   site_var['LOGO']=GSTUDIO_SITE_LOGO
-   site_var['COPYRIGHT']=GSTUDIO_COPYRIGHT
-   site_var['GIT_REPO']=GSTUDIO_GIT_REPO
-   site_var['PRIVACY_POLICY']=GSTUDIO_SITE_PRIVACY_POLICY
-   site_var['TERMS_OF_SERVICE']=GSTUDIO_SITE_TERMS_OF_SERVICE
-   site_var['ORG_LOGO']=GSTUDIO_ORG_LOGO
-   site_var['ABOUT']=GSTUDIO_SITE_ABOUT
-   site_var['SITE_POWEREDBY']=GSTUDIO_SITE_POWEREDBY
-   site_var['PARTNERS']=GSTUDIO_SITE_PARTNERS
-   site_var['GROUPS']=GSTUDIO_SITE_GROUPS
-   site_var['CONTACT']=GSTUDIO_SITE_CONTACT
-   site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
-   site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
-   site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
-   site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
-   site_var['SITE_NAME']=GSTUDIO_SITE_NAME
+	result = cache.get('site_var')
 
-   return  site_var
+	if result:
+		return result
+
+	site_var = {}
+	site_var['ORG_NAME']=GSTUDIO_ORG_NAME
+	site_var['LOGO']=GSTUDIO_SITE_LOGO
+	site_var['COPYRIGHT']=GSTUDIO_COPYRIGHT
+	site_var['GIT_REPO']=GSTUDIO_GIT_REPO
+	site_var['PRIVACY_POLICY']=GSTUDIO_SITE_PRIVACY_POLICY
+	site_var['TERMS_OF_SERVICE']=GSTUDIO_SITE_TERMS_OF_SERVICE
+	site_var['ORG_LOGO']=GSTUDIO_ORG_LOGO
+	site_var['ABOUT']=GSTUDIO_SITE_ABOUT
+	site_var['SITE_POWEREDBY']=GSTUDIO_SITE_POWEREDBY
+	site_var['PARTNERS']=GSTUDIO_SITE_PARTNERS
+	site_var['GROUPS']=GSTUDIO_SITE_GROUPS
+	site_var['CONTACT']=GSTUDIO_SITE_CONTACT
+	site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
+	site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
+	site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
+	site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
+	site_var['SITE_NAME']=GSTUDIO_SITE_NAME
+
+	cache.set('site_var', site_var, 60 * 30)
+
+	return  site_var
 
 
 @get_execution_time
@@ -1593,14 +1603,28 @@ def get_input_fields(fields_type,fields_name,translate=None):
 @get_execution_time
 @register.assignment_tag
 def group_type_info(groupid,user=0):
+
+	cache_key = "group_type_" + str(groupid)
+	cache_result = cache.get(cache_key)
+
+	if cache_result:
+		return cache_result	
+
 	group_gst = node_collection.one({'_id':ObjectId(groupid)})
 	
+	group_type = ""
+
 	if group_gst.post_node:
-		return "BaseModerated"
+		group_type = "BaseModerated"
 	elif group_gst.prior_node:
-		return "Moderated"   
+		group_type = "Moderated"   
 	else:
-		return  group_gst.group_type                        
+		group_type =  group_gst.group_type                        
+
+	if cache_result != group_type:
+		cache.set(cache_key, group_type)
+
+	return group_type
 
 
 @get_execution_time			
