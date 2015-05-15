@@ -4,8 +4,7 @@
 {% block title %} Tag Browser {% endblock %}
 
 {% block meta_content %}
-    <h2 class="subheader">{% trans "What are Tags?" %}</h2><hr/>
-    <p class="subheader">{% blocktrans %}<b>Tag</b> is like a keyword or category label. <br/>Tags helps you to find photos, videos, files and pages which have something in common.</p>{% endblocktrans%}
+    <p class="subheader">{% blocktrans %}<b>Tag</b> is like a keyword or category label. <br/><br/>Tags helps you to find photos, videos, files and pages which have something in common.</p>{% endblocktrans%}
 {% endblock %}
 
 {% block style %}
@@ -46,24 +45,38 @@
 
 {% block body_content %} 
 
-  <form id ="search_result" action="{% url 'tag_info' group_id %}" method="GET" onsubmit="return checkforBlank()">
+  <form id ="search_result" action="{% url 'tag_info' group_id tagname %}" method="GET" >
     <div class="row">
       <div class="small-3 columns">
-        <input type = "text" name = "search" id="value"  maxlength = "20" placeholder="Enter the tag">
+        <input type="text" name="search" id="value" placeholder="Enter the tag">
       </div>
       <div class="small-2 small-pull-7 columns">
-        <input class="button tiny" type="submit" value='Find a tag'>
+        <input class="button tiny search_tag" type="submit" value='Find a tag'>
       </div>
     </div>
   </form>
 
   <script type = "text/javascript">
-      function checkforBlank(){
-          if(document.getElementById("value").value == ""){
-              alert('Please Enter');
-              return false;
-          }
+
+    $(document).on('click','.search_tag',function(event){
+      tagstr = $("#value").val().trim()
+      if(tagstr==""){
+        alert("Enter tag name");
+        event.preventDefault();
       }
+    })
+
+    $('#value').keypress(function (e) {
+        var regex = new RegExp("^[a-zA-Z0-9, ]+$");
+        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        if (regex.test(str)) {
+            return true;
+        }
+        e.preventDefault();
+        return false;
+    });
+
+
   </script>
 
   <hr></hr>
@@ -76,37 +89,48 @@
   {% endif %}
   <br/>
 
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-{%  for each in search_result %}
+    {%  for each in search_result %}
 
-  <li class="card">
-    <div class ="published_page">
-      <a href="{% url 'page_details' group_id each.pk %}">
-      <header>
-        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-          <h3>{{ each.name|truncatechars:10 }}</h3>
-          <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-        <div>
-          <small class="subheader">
-            {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
-            <br/>
-            {% get_user_object each.created_by as user %}
-            by <span href="#" class="user" data-gnow="">{{ user }}</span> 
-          </small>
-        </div>
-      </header>
-     </a>
-        <div class="label-list">
-          {% for tag in each.tags %}
-             <a href="{% url 'tag_info' groupid tag %}"><span class="label"><mark>{{tag}}</mark></span></a>
-          {% endfor %}
-        </div>
-</div> 
-  </li>
+      <li class="card">
+        <div class ="published_page">
+          <a href="{% url 'page_details' group_id each.pk %}">
+            <header>
+              <div class="th">
+                <img src="/static/ndf/scss/metastudio/logo.svg"/>
+              </div>
+              <h3>{{ each.name|truncatechars:10 }}</h3>
+              <p>
+                {{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}
+              </p>
+              <div>
+                <small class="subheader">
+                  {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
+                  <br/>
+                  {% get_user_object each.created_by as user %}
+                  by <span href="#" class="user" data-gnow="">{{ user }}</span> 
+                </small>
+              </div>
+            </header>
+          </a>
+            <div class="label-list">
+              {% for tag in each.tags %}
+                 <a href="{% url 'tag_info' groupid tag %}"><span class="label"><mark>{{tag}}</mark></span></a>
+              {% endfor %}
+            </div>
+        </div> 
+      </li>
 
-  {% endfor %}
+    {% endfor %}
 
-</ul>
+  </ul>
 
+{% endblock %}
+
+
+{% block document_ready %}
+  {% if tagname %}
+    $("#value").val("{{tagname|safe}}")
+  {% endif %}
 {% endblock %}

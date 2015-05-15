@@ -195,7 +195,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 			<div class="row">
 				<div class="small-8 columns">
 					<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','">
-						<h3><span class="subheader"> {% trans "Tag'" %} {{node.tags|pluralize|default_if_none:""}} 
+						<h3><span class="subheader"> {% trans "Tag" %} {{node.tags|pluralize|default_if_none:""}} 
 						</span></h3>
 			    	</span>
 			    	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas..."> 
@@ -1018,6 +1018,15 @@ $(document).ready(function(){
 	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
 
+	$('#tags_id').keypress(function (e) {
+	    var regex = new RegExp("^[a-zA-Z0-9, ]+$");
+	    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+	    if (regex.test(str)) {
+	        return true;
+	    }
+	    e.preventDefault();
+	    return false;
+	});
 </script>
 
 {% endblock %}
