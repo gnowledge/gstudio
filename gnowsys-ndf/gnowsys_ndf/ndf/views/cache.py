@@ -1,6 +1,7 @@
 from django import http
 from django.shortcuts import render_to_response
 from django.conf import settings
+from django.core.cache import cache
 
 import datetime, re
 import subprocess
@@ -77,9 +78,10 @@ def cache_status(request):
         ))
 
 
-def invalidate_view_cache(view_name, args=[], namespace=None, key_prefix=None):
+def invalidate_cache_page(view_name, args=[], namespace=None, key_prefix=None):
     """
-        This function allows you to invalidate any view-level cache. 
+        This function allows you to invalidate any view-level cache which is implemented 
+        with @cache_page.
         view_name: view function you wish to invalidate or it's named url pattern
         args: any arguments passed to the view function
         namepace: optioal, if an application namespace is needed
@@ -88,7 +90,7 @@ def invalidate_view_cache(view_name, args=[], namespace=None, key_prefix=None):
     from django.core.urlresolvers import reverse
     from django.http import HttpRequest
     from django.utils.cache import get_cache_key
-    from django.core.cache import cache
+    
     # create a fake request object
     request = HttpRequest()
     # Loookup the request path:
@@ -110,3 +112,18 @@ def invalidate_view_cache(view_name, args=[], namespace=None, key_prefix=None):
             cache.set(key, None, 0)
         return True
     return False
+
+
+def invalidate_set_cache(cache_key):
+    '''
+        Invalidates cache set by cache.set() method.
+        Returns True with key value set to NULL, if key found else returns False.
+    '''
+    
+    cache_result = cache.get(cache_key)
+
+    if cache_result:
+        cache.set(cache_key, None, 0)
+        return True
+    else:
+        return False
