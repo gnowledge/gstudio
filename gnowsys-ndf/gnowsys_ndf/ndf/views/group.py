@@ -18,7 +18,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
 
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
@@ -44,7 +44,7 @@ def group(request, group_id, app_id=None, agency_type=None):
   group_name, group_id = get_group_name_id(group_id)
 
   query_dict = {}
-  if (app_id == "agency_type") and (agency_type in GROUP_AGENCY_TYPES):
+  if (app_id == "agency_type") and (agency_type in GSTUDIO_GROUP_AGENCY_TYPES):
     query_dict["agency_type"] = agency_type
   # print "=========", app_id, agency_type
 

@@ -431,12 +431,12 @@ META_TYPE = [
     u"GAPP", u"factory_types", u"Mapping_relations", u"Binary", u"Triadic"
 ]
 
-GROUP_AGENCY_TYPES = [
+GSTUDIO_GROUP_AGENCY_TYPES = [
     "Other", "Partner", "GovernmentAgency", "NGO", "College", "University",
     "School", "Institution", "Project", "SpecialInterestGroup"
 ]
 
-AUTHOR_AGENCY_TYPES = [
+GSTUDIO_AUTHOR_AGENCY_TYPES = [
     "Student", "Teacher", "TeacherTrainer", "Faculty", "Researcher", "Other"
 ]
 
@@ -460,7 +460,7 @@ GAPPS = [
 # ONLY TO BE EDITED in local_settings file
 # In order to edit (redorderig purpose or adding new ones) this list,
 # please make use of local_settings file
-WORKING_GAPPS = [
+GSTUDIO_WORKING_GAPPS = [
     u"Page", u"File", u"E-Library", u"Forum", u"Quiz", u"Task", u"Topics",
     u"Course", u"Module", u"Observation", "Batch", u"Event"
 ]
@@ -472,7 +472,7 @@ WORKING_GAPPS = [
 GSTUDIO_DEFAULT_GAPPS_LIST = []
 
 # Defined all site specific variables
-GSTUDIO_ORG_NAME='''<p>
+GSTUDIO_ORG_NAME = '''<p>
 A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR), India</a>.
 </p>'''
 GSTUDIO_SITE_LOGO="/static/ndf/css/themes/metastudio/logo.svg"
@@ -584,7 +584,7 @@ GSTUDIO_NROER_MENU_MAPPINGS = {
             "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
             "Teachers": "Teachers", "Interest Groups": "Interest Groups", "Schools": "Schools"
             }
-            
+
 GSTUDIO_RESOURCES_CREATION_RATING = 5
 
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5

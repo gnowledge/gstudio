@@ -35,7 +35,7 @@ from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
 
 # from gnowsys_ndf.settings import LANGUAGES
-# from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
+# from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES,GSTUDIO_AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
@@ -104,13 +104,13 @@ def get_site_variables():
 @get_execution_time
 @register.assignment_tag
 def get_author_agency_types():
-   return AUTHOR_AGENCY_TYPES
+   return GSTUDIO_AUTHOR_AGENCY_TYPES
 
 
 @get_execution_time
 @register.assignment_tag
 def get_group_agency_types():
-   return GROUP_AGENCY_TYPES
+   return GSTUDIO_GROUP_AGENCY_TYPES
 
 
 @get_execution_time
