@@ -2548,6 +2548,14 @@ def get_user_activity(userObject):
 
 @get_execution_time
 def get_file_node(file_name=""):
+  # if cached result exists return it
+  cache_key = u'get_file_node' + slugify(unicode(file_name))
+  cache_result = cache.get(cache_key)
+
+  if cache_result:
+      return cache_result
+  # ---------------------------------
+
   file_list=[]
   new=[]
   a=str(file_name).split(',')
@@ -2563,6 +2571,7 @@ def get_file_node(file_name=""):
           if filedoc:
              for i in filedoc:
 		            file_list.append(i.name)	
+  cache.set(cache_key, file_list, 60*15)
   return file_list	
 
 @get_execution_time
