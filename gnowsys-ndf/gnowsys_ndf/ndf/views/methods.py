@@ -13,7 +13,7 @@ import mongokit
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
-from gnowsys_ndf.settings import DEFAULT_GAPPS_LIST, WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, WORKING_GAPPS, BENCHMARK
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -186,11 +186,11 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
     """
     gapps_list = []
 
-    global DEFAULT_GAPPS_LIST
-    gapps_list = DEFAULT_GAPPS_LIST
+    global GSTUDIO_DEFAULT_GAPPS_LIST
+    gapps_list = GSTUDIO_DEFAULT_GAPPS_LIST
 
     if not gapps_list or not default_gapp_listing:
-        # If DEFAULT_GAPPS_LIST not set (i.e. empty)
+        # If GSTUDIO_DEFAULT_GAPPS_LIST not set (i.e. empty)
         # Or we need to setup list for selection purpose of GAPPS
         # for a group
         gapps_list = WORKING_GAPPS

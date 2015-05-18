@@ -469,7 +469,7 @@ WORKING_GAPPS = [
 # if not set by specific group
 # DON'T EDIT this variable here.
 # ONLY TO BE EDITED in local_settings file
-DEFAULT_GAPPS_LIST = []
+GSTUDIO_DEFAULT_GAPPS_LIST = []
 
 # Defined all site specific variables
 GSTUDIO_ORG_NAME='''<p>
