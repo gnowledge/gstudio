@@ -460,15 +460,15 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                     if tiss_site:
                         # Prepare name for Announced Course GSystem
                         c_name = unicode(
-                            nc_course_code + "_" + college_enrollment_code + "_"
-                            + start_time.strftime("%b_%Y") + "-"
-                            + end_time.strftime("%b_%Y")
+                            nc_course_code + " - " + college_enrollment_code + " - "
+                            + start_time.strftime("%b %Y") + " - "
+                            + end_time.strftime("%b %Y")
                         )
                     else:
                         # Prepare name for Announced Course GSystem
                         c_name = unicode(
-                            nc_course_code + "_"+ start_time.strftime("%b_%Y") + "-"
-                            + end_time.strftime("%b_%Y")
+                            nc_course_code + " - "+ start_time.strftime("%b %Y") + " - "
+                            + end_time.strftime("%b %Y")
                         )
 
                     request.POST["name"] = c_name

@@ -510,7 +510,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 # get type of resourc
 @get_execution_time
 def get_resource_type(request,node_id):
-  get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
+  get_resource_type=node_collection.one({'_id':ObjectId(node_id)})
   get_type=get_resource_type._type
   return get_type 
                           
@@ -1150,100 +1150,95 @@ def check_page_first_creation(request,node):
 
 
 @get_execution_time
-def tag_info(request, group_id, tagname = None):
+def tag_info(request, group_id, tagname=None):
     '''
     Function to get all the resources related to tag
     '''
-
     group_name, group_id = get_group_name_id(group_id)
-
+    group_id = ObjectId(group_id)
     cur = None
     total = None
-    total_length = None  
+    total_length = None
     yesterdays_result = []
     week_ago_result = []
     search_result = []
-    group_cur_list = [] #for AutheticatedUser
+    group_cur_list = []  # for AutheticatedUser
     today = date.today()
-    yesterdays_search = {date.today()-timedelta(days=1)}
-    week_ago_search = {date.today()-timedelta(days=7)}
+    yesterdays_search = {date.today() - timedelta(days=1)}
+    week_ago_search = {date.today() - timedelta(days=7)}
     locale.setlocale(locale.LC_ALL, '')
     userid = request.user.id
-    collection = get_database()[Node.collection_name]
+    # collection = get_database()[Node.collection_name]
+    tag_str = request.GET.get("search", "")
+    tag_search = tag_str.lower()
+    # if coming from search, set tagname value to search value
+    if tag_search:
+        tagname = tag_search
 
-    if not tagname:
-        tagname = request.GET["search"].lower()
-
-    if request.user.is_superuser:  #Superuser can see private an public files 
+    if request.user.is_superuser:  # Superuser can see private an public files
         if tagname:
-            cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                          # '$or':[   {'access_policy':u'PUBLIC'},
-                                          #           {'access_policy':u'PRIVATE'}
-                                          #       ],   
-                                         'status':u'PUBLISHED'
-                                    }
-                                 )
+            cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                        'group_set':ObjectId(group_id)
+                  })
             for every in cur:
                 search_result.append(every)
 
-        total = len(search_result)
-        total = locale.format("%d", total, grouping=True)
-        if len(search_result) == 0:
-            total_length = len(search_result)    
-
-    elif request.user.is_authenticated():   #Autheticate user can see all public files  
-        group_cur = collection.Node.find({'_type':'Group',
-                                           '$or':[ {'created_by':userid},
-                                                 {'group_admin':userid},
-                                                 {'author_set':userid},
-                                                 {'group_type':u'PUBLIC'},
-                                               ]
-                                    }      
-                                )
-        for each in group_cur:
-            group_cur_list.append(each._id)
-
-        if tagname and (group_id in group_cur_list):
-            cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                         'group_set':{'$in': [group_id]},
-                                         'status':u'PUBLISHED'
-                                    }
-                             )
-            for every in cur: 
+    # Autheticate user can see all public files
+    elif request.user.is_authenticated():
+        # group_cur = node_collection.find({'_type': 'Group',
+        #                                   '$or': [
+        #                                       {'created_by': userid},
+        #                                       {'group_admin': userid},
+        #                                       {'author_set': userid},
+        #                                       {'group_type': u'PUBLIC'},
+        #                                     ]
+        #                                   })
+        # for each in group_cur:
+        #     group_cur_list.append(each._id)
+        if tagname:  # and (group_id in group_cur_list):
+            cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                         'group_set': ObjectId(group_id),
+                                         '$or': [
+                                            {'status': u'PUBLISHED'},
+                                            {'created_by': userid},
+                                          ]
+                                      })
+            for every in cur:
                 search_result.append(every)
 
+    else:  # Unauthenticated user can see all public files.
+        group_node = node_collection.one({'_id': ObjectId(group_id)})
+        if group_node.group_type == u"PUBLIC":
+            if tagname:
+                cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                               'group_set': group_id,
+                                               'status': u'PUBLISHED'
+                                            }
+                                     )
+                for every in cur:
+                    search_result.append(every)
+
+    if search_result:
         total = len(search_result)
         total = locale.format("%d", total, grouping=True)
         if len(search_result) == 0:
             total_length = len(search_result)
-
-    else: #Unauthenticated user can see all public files.
-        if tagname:
-            cur = collection.Node.find( { 'tags':{'$in':[tagname]},
-                                           'access_policy':u'PUBLIC',
-                                           'status':u'PUBLISHED'
-                                        }
-                                 )
-            for every in cur:
-                search_result.append(every)
-
-        total = len(search_result)
-        total = locale.format("%d", total, grouping=True)
-        if len(search_result) == 0:
-            total_length = len(search_result)
-    
+    context_variable = {'group_id': group_id, 'groupid': group_id,
+                        'search_result': search_result,
+                        'tagname': tagname, 'total': total,
+                        'total_length': total_length}
     return render_to_response(
         "ndf/tag_browser.html",
-        {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},
+        context_variable,
         context_instance=RequestContext(request)
     )
 
 
-#code for merging two text Documents
+# code for merging two text Documents
 import difflib
 @get_execution_time
-def diff_string(original,revised):
-        
+def diff_string(original, revised):
+
         # build a list of sentences for each input string
         original_text = _split_with_maintain(original)
         new_text = _split_with_maintain(revised)
