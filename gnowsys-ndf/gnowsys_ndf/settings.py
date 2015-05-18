@@ -1,6 +1,6 @@
- # Django settings for gnowsys-ndf project.
+# Django settings for gnowsys-ndf project.
 from django.conf import global_settings
-#from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+# from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
 DEBUG = True
@@ -8,190 +8,219 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
-LANGUAGES = (('en', 'English'),('hi', 'Hindi'))
+LANGUAGES = (('en', 'English'), ('hi', 'Hindi'))
 
-# ('mr', 'Marathi'),('mun','Munda'),('mni','Manipuri'),('ori','Oriya'),('pi','Pali'),('raj','Rajasthani'),('lah','Lahnda'),('gu','Gujarati'),('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'), ('dra','Dravidian'), ('gon','Gondi'), ('bra','Braj'), ('mi','Malayalam'), ('mai','Maithili'), ('mag','Magahi'), ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'), ('awa','Awadhi'),('sa','Sanskrit'),('sat','Santali'), ('him','Himachali'), ('sd','Sindhi'), ('af', 'Afrikaans'), ('as','Assamese'),('ar', 'Arabic'), ('az', 'Azerbaijani'), ('bg', 'Bulgarian'), ('be', 'Belarusian'), ('bn', 'Bengali'), ('br', 'Breton'), ('bs', 'Bosnian'), ('ca', 'Catalan'),('bho','Bhojpuri'), ('cs', 'Czech'), ('cy', 'Welsh'), ('da', 'Danish'), ('de', 'German'), ('el', 'Greek'), ('en-gb', 'British English'), ('eo', 'Esperanto'), ('es', 'Spanish'), ('es-ar', 'Argentinian Spanish'), ('es-mx', 'Mexican Spanish'), ('es-ni', 'Nicaraguan Spanish'), ('es-ve', 'Venezuelan Spanish'), ('et', 'Estonian'), ('eu', 'Basque'), ('fa', 'Persian'), ('fi', 'Finnish'), ('fr', 'French'), ('fy-nl', 'Frisian'), ('ga', 'Irish'), ('gl', 'Galician'), ('he', 'Hebrew'),('hr', 'Croatian'), ('hu', 'Hungarian'), ('ia', 'Interlingua'), ('id', 'Indonesian'), ('is', 'Icelandic'), ('it', 'Italian'), ('ja', 'Japanese'), ('ka', 'Georgian'), ('kk', 'Kazakh'), ('km', 'Khmer'), ('kn', 'Kannada'), ('ko', 'Korean'), ('lb', 'Luxembourgish'), ('lt', 'Lithuanian'), ('lv', 'Latvian'), ('mk', 'Macedonian'), ('ml', 'Malayalam'), ('mn', 'Mongolian'), ('my', 'Burmese'), ('nb', 'Norwegian Bokmal'), ('ne', 'Nepali'), ('nl', 'Dutch'), ('nn', 'Norwegian Nynorsk'), ('os', 'Ossetic'), ('pa', 'Punjabi'), ('pl', 'Polish'), ('pt', 'Portuguese'), ('pt-br', 'Brazilian Portuguese'), ('ro', 'Romanian'), ('ru', 'Russian'), ('sk', 'Slovak'), ('sl', 'Slovenian'), ('sq', 'Albanian'), ('sr', 'Serbian'), ('sr-latn', 'Serbian Latin'), ('sv', 'Swedish'), ('sw', 'Swahili'), ('ta', 'Tamil'), ('te', 'Telugu'), ('th', 'Thai'), ('tr', 'Turkish'), ('tt', 'Tatar'), ('udm', 'Udmurt'), ('uk', 'Ukrainian'), ('ur', 'Urdu'), ('vi', 'Vietnamese'), ('zh-cn', 'Simplified Chinese'), ('zh-tw', 'Traditional Chinese')) 
+# ('mr', 'Marathi'),('mun','Munda'),('mni','Manipuri'),('ori','Oriya'),
+# ('pi','Pali'),('raj','Rajasthani'),('lah','Lahnda'),('gu','Gujarati'),
+# ('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'), ('dra','Dravidian'),
+# ('gon','Gondi'), ('bra','Braj'), ('mi','Malayalam'), ('mai','Maithili'),
+# ('mag','Magahi'), ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'),
+# ('awa','Awadhi'),('sa','Sanskrit'),('sat','Santali'), ('him','Himachali'),
+# ('sd','Sindhi'), ('af', 'Afrikaans'), ('as','Assamese'),('ar', 'Arabic'),
+# ('az', 'Azerbaijani'), ('bg', 'Bulgarian'), ('be', 'Belarusian'),
+# ('bn', 'Bengali'), ('br', 'Breton'), ('bs', 'Bosnian'), ('ca', 'Catalan'),
+# ('bho','Bhojpuri'), ('cs', 'Czech'), ('cy', 'Welsh'), ('da', 'Danish'),
+# ('de', 'German'), ('el', 'Greek'), ('en-gb', 'British English'),
+# ('eo', 'Esperanto'), ('es', 'Spanish'), ('es-ar', 'Argentinian Spanish'),
+# ('es-mx', 'Mexican Spanish'), ('es-ni', 'Nicaraguan Spanish'),
+# ('es-ve', 'Venezuelan Spanish'), ('et', 'Estonian'), ('eu', 'Basque'),
+# ('fa', 'Persian'), ('fi', 'Finnish'), ('fr', 'French'), ('fy-nl', 'Frisian'),
+# ('ga', 'Irish'), ('gl', 'Galician'), ('he', 'Hebrew'),('hr', 'Croatian'),
+# ('hu', 'Hungarian'), ('ia', 'Interlingua'), ('id', 'Indonesian'),
+# ('is', 'Icelandic'), ('it', 'Italian'), ('ja', 'Japanese'), ('ka', 'Georgian'),
+# ('kk', 'Kazakh'), ('km', 'Khmer'), ('kn', 'Kannada'), ('ko', 'Korean'),
+# ('lb', 'Luxembourgish'), ('lt', 'Lithuanian'), ('lv', 'Latvian'),
+# ('mk', 'Macedonian'), ('ml', 'Malayalam'), ('mn', 'Mongolian'),
+# ('my', 'Burmese'), ('nb', 'Norwegian Bokmal'), ('ne', 'Nepali'),
+# ('nl', 'Dutch'), ('nn', 'Norwegian Nynorsk'), ('os', 'Ossetic'),
+# ('pa', 'Punjabi'), ('pl', 'Polish'), ('pt', 'Portuguese'),
+# ('pt-br', 'Brazilian Portuguese'), ('ro', 'Romanian'), ('ru', 'Russian'),
+# ('sk', 'Slovak'), ('sl', 'Slovenian'), ('sq', 'Albanian'), ('sr', 'Serbian'),
+# ('sr-latn', 'Serbian Latin'), ('sv', 'Swedish'), ('sw', 'Swahili'),
+# ('ta', 'Tamil'), ('te', 'Telugu'), ('th', 'Thai'), ('tr', 'Turkish'),
+# ('tt', 'Tatar'), ('udm', 'Udmurt'), ('uk', 'Ukrainian'), ('ur', 'Urdu'),
+# ('vi', 'Vietnamese'), ('zh-cn', 'Simplified Chinese'), ('zh-tw', 'Traditional Chinese')) 
 
 EXTRA_LANG_INFO = {
     'mr': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'mr',
         'name': 'Marathi',
         'name_local': 'Marathi'
     },
     'mun': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'mun',
         'name': 'Munda',
         'name_local': 'Munda'
     },
 
     'mni': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'ug',
         'name': 'Manipuri',
         'name_local': 'Manipuri'
     },
     'ori': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'ori',
         'name': 'Oriya',
         'name_local': 'Oriya'
     },
     'mr': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'mr',
         'name': 'Marathi',
         'name_local': 'Marathi'
     },
     'pi': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'pi',
         'name': 'Pali',
         'name_local': 'Pali'
     },
     'raj': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'raj',
         'name': 'Rajasthani',
         'name_local': 'Rajasthani'
     },
     'sa': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'sa',
         'name': 'Sanskrit',
         'name_local': 'Sanskrit'
     },
 
     'sat': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'sat',
         'name': 'Santali',
         'name_local': 'Santali'
     },
     'sd': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'sa',
         'name': 'Sindhi',
         'name_local': 'Sindhi'
     },
     'as': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'as',
         'name': 'Assamese',
         'name_local': 'Assamese'
     },
     'awa': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'awa',
         'name': 'Awadhi',
         'name_local': 'Awadhi'
     },
     'bho': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'bho',
         'name': 'Bhojpuri',
         'name_local': 'Bhojpuri'
     },
     'bh': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'bh',
         'name': 'Bihari',
         'name_local': 'Bihari'
     },
     'bra': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'bho',
         'name': 'Braj',
         'name_local': 'Braj'
     },
     'gon': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'gon',
         'name': 'Gondi',
         'name_local': 'Gondi'
     },
     'dra': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'bho',
         'name': 'Dravidian',
         'name_local': 'Dravidian'
     },
     'gu': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'gu',
         'name': 'Gujarati',
         'name_local': 'Gujarati'
     },
     'him': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'him',
         'name': 'Himachali',
         'name_local': 'Himachali'
     },
     'ks': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'ks',
         'name': 'Kashmiri',
         'name_local': 'Kashmiri'
     },
     'kha': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'kha',
         'name': 'Khasi',
         'name_local': 'Khasi'
     },
     'kok': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'kok',
         'name': 'Konkani',
         'name_local': 'Konkani'
     },
     'kru': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'kru',
         'name': 'Kurukh',
         'name_local': 'Kurukh'
     },
     'lah': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'lah',
         'name': 'Lahnda',
         'name_local': 'Lahnda'
     },
     'lus': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'lus',
         'name': 'Lushai',
         'name_local': 'Lushai'
     },
     'mag': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'mag',
         'name': 'Magahi',
         'name_local': 'Magahi'
     },
     'mai': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'mai',
         'name': 'Maithili',
         'name_local': 'Maithili'
     },
     'mi': {
-        'bidi': True, # right-to-left
+        'bidi': True,  # right-to-left
         'code': 'mi',
         'name': 'Malayalam',
         'name_local': 'Malayalam'
     },
-    
 }
+
 # Add custom languages not provided by Django
 import django.conf.locale
 LANG_INFO = dict(django.conf.locale.LANG_INFO.items() + EXTRA_LANG_INFO.items())
 django.conf.locale.LANG_INFO = LANG_INFO
 
 # Languages using BiDi (right-to-left) layout
-#LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",) 
+# LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
 
 # #SMTP setting for sending mail (Using python default SMTP server)
 EMAIL_USE_TLS = False
@@ -201,19 +230,19 @@ EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'testing@example.com'
 
-#SMTP setting for sending mail (Using gmail SMTP server)
-#EMAIL_USE_TLS = True
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_PORT = 587
-#EMAIL_HOST_USER = 'yourcompletegmailaddr'
-#EMAIL_HOST_PASSWORD = 'yourpassword'
+# SMTP setting for sending mail (Using gmail SMTP server)
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'yourcompletegmailaddr'
+# EMAIL_HOST_PASSWORD = 'yourpassword'
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
-PASSWORD_COMPLEXITY = { # You can ommit any or all of these for no limit for that particular set
-    "UPPER": 1,       # Uppercase                 
-    "LOWER": 1,       # Lowercase                                                                                                 
-    "DIGITS": 1,      # Digits                                                                                                    
+PASSWORD_COMPLEXITY = {  # You can ommit any or all of these for no limit for that particular set
+    "UPPER": 1,       # Uppercase
+    "LOWER": 1,       # Lowercase
+    "DIGITS": 1,      # Digits
 }
 
 ADMINS = (
@@ -224,7 +253,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'example-sqlite3.db',
     },
     'mongodb': {
@@ -305,7 +334,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -315,7 +344,7 @@ SECRET_KEY = '7st0sdv&amp;7yw*eh)zmaz8#t48nr$&amp;ql#ow=$0l^#b_b&amp;$9c*$4c'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #  'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -324,12 +353,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
+    # 'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
     # 'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-     
-# Uncomment the next line for simple clickjacking protection:
+    # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -352,10 +380,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.i18n',
     'django.core.context_processors.request',
     'django.core.context_processors.static',
-    #'django.core.context_processors.csrf',
+    # 'django.core.context_processors.csrf',
 )
 
-INSTALLED_APPS = (  
+INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -363,28 +391,28 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',    
+    'django.contrib.staticfiles',
     'gnowsys_ndf.benchmarker',
     'registration',
     'djangoratings',
     'notification',
     'pagination',
-    # 'gnowsys_ndf.mobwrite',   #textb
-#    'south',           #textb
-    # 'django_extensions',  #textb
-    # 'reversion',      #textb
+    # 'gnowsys_ndf.mobwrite',       #textb
+    # 'south',                      #textb
+    # 'django_extensions',          #textb
+    # 'reversion',                  #textb
     # 'django.contrib.flatpages',   #textb
-    # 'online_status',                       #for online_users     
-#    'endless_pagination',
+    # 'online_status',              #for online_users
+    # 'endless_pagination',
     'jsonrpc',
     'registration_email',
 )
 
-AUTHENTICATION_BACKENDS=(
-'registration_email.auth.EmailBackend',
+AUTHENTICATION_BACKENDS = (
+    'registration_email.auth.EmailBackend',
 )
 
-ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
+ACCOUNT_ACTIVATION_DAYS = 2  # Two days for activation.
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -475,28 +503,28 @@ GSTUDIO_DEFAULT_GAPPS_LIST = []
 GSTUDIO_ORG_NAME = '''<p>
 A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR), India</a>.
 </p>'''
-GSTUDIO_SITE_LOGO="/static/ndf/css/themes/metastudio/logo.svg"
-GSTUDIO_COPYRIGHT=""
-GSTUDIO_GIT_REPO="https://github.com/gnowledge/gstudio"
-GSTUDIO_SITE_PRIVACY_POLICY=""
-GSTUDIO_SITE_TERMS_OF_SERVICE=""
-GSTUDIO_SITE_DEFAULT_LANGUAGE=u"en"
-GSTUDIO_SITE_ABOUT=""
-GSTUDIO_SITE_POWEREDBY=""
-GSTUDIO_SITE_CONTACT=""
-GSTUDIO_SITE_PARTNERS=""
-GSTUDIO_SITE_GROUPS=""
-GSTUDIO_ORG_LOGO=""
-GSTUDIO_SITE_ORG=""
-GSTUDIO_SITE_CONTRIBUTE=""
-GSTUDIO_SITE_VIDEO="pandora_and_local"  #possible values are 'local','pandora' and 'pandora_and_local'
-GSTUDIO_SITE_LANDING_PAGE="udashboard"  #possible values are 'home' and 'udashboard'
+GSTUDIO_SITE_LOGO = "/static/ndf/css/themes/metastudio/logo.svg"
+GSTUDIO_COPYRIGHT = ""
+GSTUDIO_GIT_REPO = "https://github.com/gnowledge/gstudio"
+GSTUDIO_SITE_PRIVACY_POLICY = ""
+GSTUDIO_SITE_TERMS_OF_SERVICE = ""
+GSTUDIO_SITE_DEFAULT_LANGUAGE = u"en"
+GSTUDIO_SITE_ABOUT = ""
+GSTUDIO_SITE_POWEREDBY = ""
+GSTUDIO_SITE_CONTACT = ""
+GSTUDIO_SITE_PARTNERS = ""
+GSTUDIO_SITE_GROUPS = ""
+GSTUDIO_ORG_LOGO = ""
+GSTUDIO_SITE_ORG = ""
+GSTUDIO_SITE_CONTRIBUTE = ""
+GSTUDIO_SITE_VIDEO = "pandora_and_local"  # possible values are 'local','pandora' and 'pandora_and_local'
+GSTUDIO_SITE_LANDING_PAGE = "udashboard"  # possible values are 'home' and 'udashboard'
 GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome". Default is: "/home"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
 
 # Visibility for 'Create Group'
-CREATE_GROUP_VISIBILITY=True
+CREATE_GROUP_VISIBILITY = True
 
 EMACS_INIT_FILE_PATH = "~/.emacs"
 
@@ -504,8 +532,8 @@ EMACS_INIT_FILE_PATH = "~/.emacs"
 
 """Settings for org-editor-content-to-html
 
-Default settings required for uploading org-editor content into 
-exported html form 
+Default settings required for uploading org-editor content into
+exported html form
 """
 
 from django.conf import settings
@@ -527,58 +555,58 @@ WYSIWYG = getattr(settings, 'GSTUDIO_WYSIWYG',
 
 """Revision Control System (RCS) Configuration
 
-It operates only on single files; and hence used in this project 
-to keep track of history of each document belonging to different 
+It operates only on single files; and hence used in this project
+to keep track of history of each document belonging to different
 collections (models).
 
 """
 
-# Indicates list of collection-names whose documents' history has to be 
+# Indicates list of collection-names whose documents' history has to be
 # maintained.
-VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes', 
+VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes',
                           'GSystemTypes', 'GSystems']
 
-# Absolute filesystem path to the directory that will hold all rcs-files 
+# Absolute filesystem path to the directory that will hold all rcs-files
 # (history-files corresponding to every json-file created for each document)
 RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
 
-# Indicates the "hash-level-number", i.e the number of sub-directories that 
-# will be created for the corresponding document under it's 
+# Indicates the "hash-level-number", i.e the number of sub-directories that
+# will be created for the corresponding document under it's
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
 
 
-GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "eBooks", "Maps", "Events", "Publications"]
+GSTUDIO_RESOURCES_EDUCATIONAL_USE = ["Images", "Audios", "Videos", "Interactives", "Documents", "eBooks", "Maps", "Events", "Publications"]
 
-GSTUDIO_RESOURCES_INTERACTIVITY_TYPE = [ "Active", "Expositive", "Mixed" ]
+GSTUDIO_RESOURCES_INTERACTIVITY_TYPE = ["Active", "Expositive", "Mixed"]
 
-GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = [ "NCF", "State", "All" ]
+GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = ["NCF", "State", "All"]
 
-GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = [ "Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary" ]
+GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = ["Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary"]
 
-GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = [ "Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy" ]
+GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = ["Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy"]
 
-GSTUDIO_RESOURCES_CURRICULAR = [ "True", "False" ]
+GSTUDIO_RESOURCES_CURRICULAR = ["True", "False"]
 
-GSTUDIO_RESOURCES_AUDIENCE = [ "Teachers", "Students", "Teacher educators" ]
+GSTUDIO_RESOURCES_AUDIENCE = ["Teachers", "Students", "Teacher educators"]
 
-GSTUDIO_RESOURCES_TEXT_COMPLEXITY = [ "Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard" ]
+GSTUDIO_RESOURCES_TEXT_COMPLEXITY = ["Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard"]
 
-GSTUDIO_RESOURCES_LANGUAGES = [ "English","Gujarati" ,"Hindi" ,"Manipuri" ,"Marathi" ,"Mizo" ,"Telugu" ]
+GSTUDIO_RESOURCES_LANGUAGES = ["English", "Gujarati", "Hindi", "Manipuri", "Marathi", "Mizo", "Telugu"]
 
-GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above" ] 
+GSTUDIO_RESOURCES_AGE_RANGE = ["5-10", "11-20", "21-30", "31-40", "41 and above"]
 
-GSTUDIO_RESOURCES_TIME_REQUIRED = [ "0-2M","2-5M", "5-15M", "15-45M" ]
+GSTUDIO_RESOURCES_TIME_REQUIRED = ["0-2M", "2-5M", "5-15M", "15-45M"]
 
-GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above" ] 
+GSTUDIO_RESOURCES_AGE_RANGE = ["5-10", "11-20", "21-30", "31-40", "41 and above"]
 
-GSTUDIO_RESOURCES_READING_LEVEL = [  ] 
+GSTUDIO_RESOURCES_READING_LEVEL = []
 
 GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
 
-GSTUDIO_NROER_MENU = [{"Repository":[]}, {"Partners":["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
+GSTUDIO_NROER_MENU = [{"Repository": []}, {"Partners": ["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-GSTUDIO_NROER_GAPPS = [ {"Curated Zone": "topics"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"} ]
+GSTUDIO_NROER_GAPPS = [{"Curated Zone": "topics"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"}]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
             "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
@@ -591,13 +619,11 @@ GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
 
 GSTUDIO_RESOURCES_REPLY_RATING = 2
 
-
-
 try:
     from local_settings import *
-    #print "Local settings applied"
+    # print "Local settings applied"
 except:
-    #print "Default settings applied"
+    # print "Default settings applied"
     pass
 
 # #textb
