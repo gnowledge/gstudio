@@ -1,6 +1,9 @@
 {% extends "ndf/base.html" %}
 
 {% load ndf_tags %}
+{% load cache %}
+
+{% cache 3600 repository request.LANGUAGE_CODE %}
 
 {% block title %} Repository {% endblock %}
 
@@ -79,3 +82,4 @@
 	</script>	
 
 {% endblock %}
+{% endcache %}

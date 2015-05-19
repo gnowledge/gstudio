@@ -167,7 +167,9 @@ urlpatterns = patterns('',
         name='registration_register'),
 
     url(r'^accounts/', include('registration_email.backends.default.urls')),
+
    # --end of django-registration
 
+   (r'^status/cache/$', 'gnowsys_ndf.ndf.views.cache.cache_status'),
     # url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )

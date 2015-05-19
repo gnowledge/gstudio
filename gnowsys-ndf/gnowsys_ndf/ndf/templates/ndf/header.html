@@ -1,15 +1,18 @@
 {% load get_nroer_menu  get_user_group  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar from ndf_tags %}
 
 {% load i18n %}
+{% load cache %}
 
   <!-- <div class="contain-to-grid sticky"> -->
   <div class="row" id="top-headers">
 
     <!-- top LHS logo -->
+    {% cache 3600 site_logo %}
     <a class="large-2 small-5 medium-5 columns drop-shadow logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
       <img src="{{site.LOGO}}">
     </a>
-    
+    {% endcache %}
+
     <!-- two menus headers -->
     <div class="large-10 small-7 medium-7 columns two-nav-container">
     
@@ -26,6 +29,7 @@
       <!-- Left Nav Section -->
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
+      {% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %}
       {% if site.SITE_NAME == "NROER" %} 
       
         <!-- NROER level one menu -->
@@ -54,14 +58,16 @@
                 <li>
                   <a 
                   {% for mapk, mapv in nroer_menu.mapping.items %}
-		     {% if mapv in "Teachers, Schools, Interest Groups" %}
-		     {% if each_sub_menu == mapk %}
-                      href="/{{mapv}}"
-                      {% if nroer_menu.sub_menu_selected == mapk %}
-                        class="active" 
+
+                    {% if mapv in "Teachers, Schools, Interest Groups" %}
+                      {% if each_sub_menu == mapk %}
+                        href="/{{mapv}}"
+                        {% if nroer_menu.sub_menu_selected == mapk %}
+                          class="active" 
+                        {% endif %}
                       {% endif %}
-                    {% endif %}
-		     {% endif %}
+          		      {% endif %}
+
                     {% if each_sub_menu == mapk %}
                       href="{% url 'partnerlist' mapv %}"
                       {% if nroer_menu.sub_menu_selected == mapk %}
@@ -133,6 +139,8 @@
 
       </ul>
       {% endif %}
+      {% endcache %}
+
       <!-- Closes Left Nav section -->
 
        <!-- Right Nav Section -->
@@ -175,6 +183,8 @@
         <!-- If logged in show user options -->
         {% if user.is_authenticated %}
         <li class="has-dropdown">
+
+          {% cache 300 profile_pic request.user.pk %}
           {% get_profile_pic request.user.pk as prof_pic %}
 
           {% if prof_pic %}
@@ -188,6 +198,7 @@
             {{ user.username }}
           </a>
           {% endif %}
+          {% endcache %}
           
           <ul class="dropdown text-center">
                 
@@ -245,9 +256,11 @@
 
       <!-- start of second nav  or group level header-->
       <div class="contain-to-grid {% if request.path != '/welcome' %}{% if not is_ac_url %}sticky{% endif %}{% endif %} drop-shadow" id="group-level-header">
+        
         <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
         {% if not is_ac_url %}
         {% if request.path != "/welcome" %}
+          {% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %}
           <ul class="title-area">
             <li class="name">
               <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
@@ -340,7 +353,8 @@
             </ul>
 
           </section>
-        {% endif%} <!-- end of "/welcome" landing page check -->
+          {% endcache %}
+        {% endif %} <!-- end of "/welcome" landing page check -->
         {% endif %} <!-- end of "accounts" urls check -->
         </nav>
       </div>

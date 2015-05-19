@@ -1,6 +1,10 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
+
+{% cache 300 edit_forum request.LANGUAGE_CODE %}
+
 {% block title %}Edit Forum{% endblock %}
 
 {% block head %}
@@ -185,6 +189,7 @@
      -->
   {% endcomment %}
 {% endblock %}
+{% endcache %}
 
 {% block script %}
   var old_forum_name;

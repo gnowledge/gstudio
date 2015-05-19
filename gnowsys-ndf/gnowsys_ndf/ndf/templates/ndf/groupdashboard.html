@@ -1,6 +1,8 @@
 {% extends "ndf/node_details_base.html" %}
 {% load i18n %}
+{% load cache %}
 {% load ndf_tags %}
+
 <!-- from django.contrib.auth.decorators import login_required -->
 {% block title %} Group Dashboard {% endblock %}
 
@@ -138,6 +140,7 @@ $(document).ready(function()
 {% endblock %}
 
 <!-- overide meta_content block from base.html -->
+{% cache 300 groupdashboard_meta_content %}
 {% block meta_content %}
 
   <h4>
@@ -157,6 +160,7 @@ $(document).ready(function()
   </div>
 
 {% endblock %}
+{% endcache %}
 <!-- end of meta_content block -->
 
 {% block app_action_list %}

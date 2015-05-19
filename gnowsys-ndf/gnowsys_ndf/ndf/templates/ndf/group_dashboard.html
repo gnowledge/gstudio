@@ -1,6 +1,8 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
+
 {% block title %} {{username}} Dashboard Updates  {% endblock %}
 
 {% block head %}
@@ -107,13 +109,15 @@
 
     <div id="group_picture"> 
             
+      {% cache 600 group_profile_pic group_id  %}
       {% if prof_pic_obj %}
         <img alt="profile picture for this group." src="{% url 'get_mid_size_img' group_id prof_pic_obj.pk %}" id="group-image" class="group-images th">
 
       {% else %}
         <img src="/static/ndf/images/metaStudio-profile.svg" alt="Profile picture for this group." id="group-image" class="group-images th">
 
-      {% endif %}   
+      {% endif %}
+      {% endcache %}
       
       <!-- empty image tag to hold uploaded image -->
       <img src="" class="hide group-images" id="temp-group-image">

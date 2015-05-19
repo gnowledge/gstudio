@@ -1,6 +1,7 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% load cache %}
 
 {% block title %} Create a sub group of {{maingroup}}{% endblock %}
 
@@ -31,6 +32,8 @@
 
   <form class="row" method="post" action="{% url 'create_sub_group' group_id %}" id="create_sub_group">
     {% csrf_token %}
+    {% cache 3600 create_sub_group request.LANGUAGE_CODE %}
+
       <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
         <div style='display:table-row;' >
           <div style='display:table-cell;'> 
@@ -131,6 +134,7 @@
         </div>
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
       </div>
+      {% endcache %}
   </form>
 {% endblock %}
 

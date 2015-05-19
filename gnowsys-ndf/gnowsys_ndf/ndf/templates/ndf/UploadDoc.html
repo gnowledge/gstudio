@@ -1,5 +1,7 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
+{% load cache %}
+
 {% load ndf_tags %}
 {% block title %} Upload Document {% endblock %}
 
@@ -66,6 +68,7 @@
 		</fieldset>
 		<fieldset>
 			<legend>{% trans "Select Language" %}</legend>
+			{% cache 600 upload_doc_language request.LANGUAGE %}
 			<div class="large-4 columns">
 			  <select name="lan">
 					      {% get_language_info_list for LANGUAGES as languages %}
@@ -73,7 +76,9 @@
 					      <option value="{{ language.code }}">{{ language.name }} 
 					      </option>
 					      {% endfor %}
-					    </select></div>
+					    </select>
+			</div>
+			{% endcache %}
 		</fieldset>
 
 		<fieldset>

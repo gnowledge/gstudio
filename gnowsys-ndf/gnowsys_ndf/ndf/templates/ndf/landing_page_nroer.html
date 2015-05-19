@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% load ndf_tags %}
+{% load cache %}
 
 {% block title %} {% trans "Welcome" %} {% endblock %}
 
@@ -21,46 +22,13 @@
     {% get_site_variables as site %}
     {% get_all_users_int_count as all_users %}
     {% get_all_file_int_count as all_files %}
-<!-- 
-    <div>
-        <div class="row">
-            <div class="medium-6 columns">
-                <section class="logo">
-                    <img src="/static/ndf/css/themes/nroer/logo.svg">
-                    <h1>National Repository <br>Of Open Educational Resources</h1>
-                </section>
 
-            </div>
-            <div class="medium-6 columns">
-            </div>
-        </div>
-    </div>
- -->
+    {% cache 1800 welcome_slider request.LANGUAGE_CODE %} <!-- caching slider for 30 mins -->
+
     <article class="landing row">
         <section class="promo">
             <div class="banner">
                 <div id="group-banner">
-<!-- 
-                    <div class="slide row" style="background-color:#10a05d">
-                        <br/>
-                        <i class="fi-torsos"></i>
-                        <h3 class="medium-12 columns">
-                            <blockquote>Connecting Knowledge, Connecting People..</blockquote>
-                        </h3>
-
-                        <div class="medium-8 columns">
-                            <p>The NROER is an ambitious inititative by the Government Of India to design and develop a knowledge management system for the benefit of every human on this planet.</p>
-                        </div>
-
-                        <div class="medium-4 columns">
-                            <a href="../accounts/register/" class="main large ui button">Let's Join NROER</a>
-                        </div>
-
-                        <h4 class="medium-12 columns">
-                            {{all_files}} open resources &nbsp; | &nbsp; <span>{{all_users}} Members</span>
-                        </h4>
-                    </div>
- -->
 
                     <div class="slide" style="background-color:#10a05d">
                         <i class="fi-torsos slide-back-image"></i>
@@ -91,38 +59,6 @@
                             </div>
                         </div>
                     </div>
-<!-- 
-                    <div class="slide row" style="background-color:#3710a0">
-                    <br/>
-                        <i class="fi-web"></i>
-                        <div class="medium-12 columns">
-                            <div class="row">
-                                <div class="medium-3 columns">
-                                    <h3>Collaborative</h3>
-                                    <br/>
-                                    <h5>Built by the people, and for the people, we believe in making education a truly social process</h5>
-                                </div>
-                                <div class="medium-3 columns">
-                                    <h3>Open</h3>
-                                    <br/>
-                                    <h5>The project is built on the philosophies of keeping knowledge free and open to everyone</h5>
-                                </div>
-                                <div class="medium-3 columns">
-                                    <h3>Accessible</h3>
-                                    <br/>
-                                    <h5>With official partnerships with national educational organisations and institutes, NROER offers unparalleled reach to humanity</h5>
-                                </div>
-                                <div class="medium-3 columns">
-                                    <h3>Semantic</h3>
-                                    <br/>
-                                    <h5>Developed using the latest in open semantic standards, educational resources can finally become machine readable</h5>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
- -->
 
                     <div class="slide row" style="background-color:#0F69B4">
                         <i class="fi-lightbulb slide-back-image"></i>
@@ -169,48 +105,17 @@
                                 </h3>
                             </div>
                         </div>
-<!--                         <div class="row">
-                            <div class="small-12 columns">
-                                <h2></h2>
-                            </div>
-                        </div>
- -->
+
                     </div>
 
 
                 </div>
             </div>
             <!-- end of banner -->
-<!--    
-            <div class="meta row">
-                <div class="medium-4 columns">
-                    <a href="{{ site.PARTNERS }}" class="main large ui button">
-                        <h4>Partners</h4>
-                        <p>Join a prestiguous list of institutions that provide a curated selection of high quality open educational content to the repository</p>
-                    </a>
-                </div>
-                <div class="medium-4 columns">
-                    <a href="{{ site.CONTRIBUTE }}" class="main large ui button">
-                        <h4>Teachers and Students</h4>
-                        <p>Publish your teaching material and build a profile as a valuable resource person for the country</p>
-                    </a>
-                </div>
-                <div class="medium-4 columns">
-                    <a href="/home/e-library" class="main large ui button expand">
-                        <h4>Explore</h4>
-                        <div class="row">
-                            <div class="medium-6 columns"> {{all_files}} <small>Open Resources</small>
-                            </div>
-                            <div class="medium-6 columns"> {{all_users}} <small>Members</small>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
--->
         </section>
 
     </article>
+    {% endcache %}
     
     <script>
 

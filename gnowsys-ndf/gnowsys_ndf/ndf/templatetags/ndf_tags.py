@@ -14,6 +14,10 @@ from django.http import Http404
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
+
+# cache imports
+from django.core.cache import cache
+
 from mongokit import paginator
 from mongokit import IS
 
@@ -45,7 +49,6 @@ at_apps_list = node_collection.one({
 })
 translation_set=[]
 check=[]
-
 
 @get_execution_time
 @register.assignment_tag
@@ -79,26 +82,33 @@ def get_site_registration_variable_visibility(registration_variable=None):
 @get_execution_time
 @register.assignment_tag
 def get_site_variables():
-   site_var={}
-   site_var['ORG_NAME']=GSTUDIO_ORG_NAME
-   site_var['LOGO']=GSTUDIO_SITE_LOGO
-   site_var['COPYRIGHT']=GSTUDIO_COPYRIGHT
-   site_var['GIT_REPO']=GSTUDIO_GIT_REPO
-   site_var['PRIVACY_POLICY']=GSTUDIO_SITE_PRIVACY_POLICY
-   site_var['TERMS_OF_SERVICE']=GSTUDIO_SITE_TERMS_OF_SERVICE
-   site_var['ORG_LOGO']=GSTUDIO_ORG_LOGO
-   site_var['ABOUT']=GSTUDIO_SITE_ABOUT
-   site_var['SITE_POWEREDBY']=GSTUDIO_SITE_POWEREDBY
-   site_var['PARTNERS']=GSTUDIO_SITE_PARTNERS
-   site_var['GROUPS']=GSTUDIO_SITE_GROUPS
-   site_var['CONTACT']=GSTUDIO_SITE_CONTACT
-   site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
-   site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
-   site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
-   site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
-   site_var['SITE_NAME']=GSTUDIO_SITE_NAME
+	result = cache.get('site_var')
 
-   return  site_var
+	if result:
+		return result
+
+	site_var = {}
+	site_var['ORG_NAME']=GSTUDIO_ORG_NAME
+	site_var['LOGO']=GSTUDIO_SITE_LOGO
+	site_var['COPYRIGHT']=GSTUDIO_COPYRIGHT
+	site_var['GIT_REPO']=GSTUDIO_GIT_REPO
+	site_var['PRIVACY_POLICY']=GSTUDIO_SITE_PRIVACY_POLICY
+	site_var['TERMS_OF_SERVICE']=GSTUDIO_SITE_TERMS_OF_SERVICE
+	site_var['ORG_LOGO']=GSTUDIO_ORG_LOGO
+	site_var['ABOUT']=GSTUDIO_SITE_ABOUT
+	site_var['SITE_POWEREDBY']=GSTUDIO_SITE_POWEREDBY
+	site_var['PARTNERS']=GSTUDIO_SITE_PARTNERS
+	site_var['GROUPS']=GSTUDIO_SITE_GROUPS
+	site_var['CONTACT']=GSTUDIO_SITE_CONTACT
+	site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
+	site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
+	site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
+	site_var['HOME_PAGE']=GSTUDIO_SITE_HOME_PAGE
+	site_var['SITE_NAME']=GSTUDIO_SITE_NAME
+
+	cache.set('site_var', site_var, 60 * 30)
+
+	return  site_var
 
 
 @get_execution_time
@@ -146,6 +156,7 @@ def get_node(node):
         else:
             return ""
 
+
 @get_execution_time
 @register.assignment_tag
 def get_schema(node):
@@ -163,6 +174,7 @@ def get_schema(node):
    else:
 	return [0,""]
 
+
 @get_execution_time
 @register.filter
 def is_Page(node):
@@ -171,6 +183,7 @@ def is_Page(node):
 		return 1
 	else:
 		return 0
+
 
 @get_execution_time
 @register.filter
@@ -181,6 +194,7 @@ def is_Quiz(node):
 	else:
 		return 0
 
+
 @get_execution_time
 @register.filter
 def is_File(node):
@@ -190,15 +204,18 @@ def is_File(node):
 	else:
 		return 0
 
+
 @get_execution_time
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
 
+
 @get_execution_time
 @register.assignment_tag
 def get_languages():
         return LANGUAGES
+
 
 @get_execution_time
 @register.assignment_tag
@@ -234,6 +251,7 @@ def get_node_ratings(request,node):
         except Exception as e:
                 print "Error in get_node_ratings "+str(e)
 
+
 @get_execution_time
 @register.assignment_tag
 def get_group_resources(group):
@@ -242,7 +260,8 @@ def get_group_resources(group):
 		return res.count
 	except Exception as e:
 		print "Error in get_group_resources "+str(e)
-	
+
+
 @get_execution_time
 @register.assignment_tag
 def all_gapps():
@@ -251,6 +270,7 @@ def all_gapps():
 	except Exception as expt:
 		print "Error in get_gapps "+str(expt)
 
+
 @get_execution_time
 @register.assignment_tag
 def get_create_group_visibility():
@@ -258,6 +278,7 @@ def get_create_group_visibility():
 		return True
 	else:
 		return False
+
 
 @get_execution_time
 @register.assignment_tag
@@ -282,6 +303,7 @@ def check_is_user_group(group_id):
 	except Exception as exptn:
 		print "Exception in check_user_group "+str(exptn)
 
+
 @get_execution_time
 @register.assignment_tag
 def switch_group_conditions(user,group_id):
@@ -295,6 +317,7 @@ def switch_group_conditions(user,group_id):
 	except Exception as ex:
 		print "Exception in switch_group_conditions"+str(ex)
 
+
 @get_execution_time
 @register.assignment_tag
 def get_all_user_groups():
@@ -303,6 +326,7 @@ def get_all_user_groups():
 		return list(all_groups)
 	except:
 		print "Exception in get_all_user_groups"
+
 
 @get_execution_time
 @register.assignment_tag
@@ -317,11 +341,13 @@ def get_group_object(group_id = None):
 		group_object = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return group_object
 
+
 @get_execution_time
 @register.assignment_tag
 def get_states_object(request):
    group_object = node_collection.one({'$and':[{'_type':u'Group'},{'name':u'State Partners'}]})
    return group_object
+
 
 @get_execution_time
 @register.simple_tag
@@ -335,6 +361,7 @@ def get_all_users_to_invite():
 	except Exception as e:
 		print str(e)
 
+
 @get_execution_time
 @register.assignment_tag
 def get_all_users_int_count():
@@ -344,10 +371,12 @@ def get_all_users_int_count():
 	all_users = len(User.objects.all())
 	return all_users
 
+
 @get_execution_time
 @register.inclusion_tag('ndf/twist_replies.html')
 def get_reply(request, thread,parent,forum,token,user,group_id):
 	return {'request':request, 'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent,'groupid':group_id}
+
 
 @get_execution_time
 @register.assignment_tag
@@ -391,6 +420,7 @@ def get_attribute_value(node_id, attr):
 
 	# print "attr_val: ",attr_val,"\n"
 	return attr_val
+
 
 @get_execution_time
 @register.inclusion_tag('ndf/drawer_widget.html')
@@ -472,6 +502,7 @@ def edit_drawer_widget(field, group_id, node=None, page_no=1, checked=None, **kw
 					'is_RT': checked, 'group_id': group_id, 'groupid': group_id, 'user_type': user_type 
 				}
 
+
 @get_execution_time
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
@@ -551,6 +582,7 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 					drawer2.append(each_node)
 
 		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid, 'groupid': groupid}
+
 
 @get_execution_time
 @register.assignment_tag
@@ -636,6 +668,7 @@ def get_gapps_iconbar(request, group_id):
             'groupid': group_id
         }
 
+
 @get_execution_time
 @register.assignment_tag
 def get_nroer_menu(request, group_name):
@@ -700,6 +733,7 @@ def get_nroer_menu(request, group_name):
 	# print "nroer_menu_dict : ", nroer_menu_dict
 	return nroer_menu_dict
 # ---------- END of get_nroer_menu -----------
+
 
 @get_execution_time
 @register.assignment_tag
@@ -809,6 +843,7 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 	# print global_disc_all_replies
 	return global_disc_all_replies
 # global_disc_all_replies = []
+
 	
 @get_execution_time
 @register.assignment_tag
@@ -828,8 +863,9 @@ def get_forum_twists(forum):
 		each['latest_reply'] = global_thread_latest_reply
 		ret_replies.append(each)
 	return ret_replies
-lp=[]
 
+
+lp=[]
 @get_execution_time
 def get_rec_objs(ob_id):
 	lp.append(ob_id)
@@ -837,6 +873,7 @@ def get_rec_objs(ob_id):
 	for each in exstng_reply:
 		get_rec_objs(each)
 	return lp
+
 
 @get_execution_time
 @register.assignment_tag
@@ -847,6 +884,7 @@ def get_twist_replies(twist):
 	for each in exstng_reply:
 		lst=get_rec_objs(each)
 	return ret_replies
+
 
 @get_execution_time
 @register.assignment_tag
@@ -877,6 +915,7 @@ def check_user_join(request,group_id):
 	else:
 		return "nullobj"
 	
+
 @get_execution_time
 @register.assignment_tag
 def check_group(group_id):
@@ -885,6 +924,7 @@ def check_group(group_id):
 		return fl
 	else:
 		return ""
+
 
 @get_execution_time
 @register.assignment_tag
@@ -897,6 +937,7 @@ def get_existing_groups():
 		if items.name:
 			group.append(items)
 	return group
+
 
 @get_execution_time
 @register.assignment_tag
@@ -913,6 +954,7 @@ def get_existing_groups_excluding_username():
 		if items.name:
 			group.append(items)
 	return group
+
 
 @get_execution_time
 @register.assignment_tag
@@ -934,6 +976,7 @@ def get_existing_groups_excluded(grname):
 
   return group_cur
 
+
 @get_execution_time
 @register.assignment_tag
 def get_group_policy(group_id,user):
@@ -945,6 +988,7 @@ def get_group_policy(group_id,user):
 	except:
 		pass
 	return policy
+
 
 @get_execution_time
 @register.assignment_tag
@@ -983,6 +1027,7 @@ def get_user_group(user, selected_group_name):
 
   return group_list
 
+
 @get_execution_time
 @register.assignment_tag
 def get_profile_pic(user_pk):
@@ -1003,6 +1048,7 @@ def get_profile_pic(user_pk):
                 break
 
     return profile_pic_image
+
 
 @get_execution_time
 @register.assignment_tag
@@ -1036,6 +1082,7 @@ def get_theme_node(groupid, node):
 # 		grpName = node_collection.one({'_id': ObjectId(each) }).name.__str__()
 # 		GroupName.append(grpName)
 # 	 return GroupName
+
 
 @get_execution_time
 @register.assignment_tag
@@ -1212,6 +1259,7 @@ def get_resources(node_id,resources):
                                         resources.setdefault(k,[]).append(obj)
     
         return resources
+
 
 @get_execution_time
 @register.assignment_tag
@@ -1593,14 +1641,28 @@ def get_input_fields(fields_type,fields_name,translate=None):
 @get_execution_time
 @register.assignment_tag
 def group_type_info(groupid,user=0):
+
+	cache_key = "group_type_" + str(groupid)
+	cache_result = cache.get(cache_key)
+
+	if cache_result:
+		return cache_result	
+
 	group_gst = node_collection.one({'_id':ObjectId(groupid)})
 	
+	group_type = ""
+
 	if group_gst.post_node:
-		return "BaseModerated"
+		group_type = "BaseModerated"
 	elif group_gst.prior_node:
-		return "Moderated"   
+		group_type = "Moderated"   
 	else:
-		return  group_gst.group_type                        
+		group_type =  group_gst.group_type                        
+
+	if cache_result != group_type:
+		cache.set(cache_key, group_type)
+
+	return group_type
 
 
 @get_execution_time			
@@ -2058,7 +2120,8 @@ def get_object_value(node):
 def get_json(node):
    node_obj = node_collection.one({'_id':ObjectId(str(node))})
    return json.dumps(node_obj, cls=NodeJSONEncoder, sort_keys = True)  
-   
+
+
 @get_execution_time
 @register.filter("is_in")
 # filter added to test if vaiable is inside of list or dict
