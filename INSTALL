@@ -7,7 +7,7 @@ Use corresponding package names if you are using an RPM based distro
 
 1. Installing required packages and its dependencies
 	
-    (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev libfreetype6-dev zlib1g-dev ffmpeg ffmpeg2theora
+    (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg ffmpeg2theora
 
 2. Get latest version of gstudio-mongokit -  Try one of the following commands:
 
