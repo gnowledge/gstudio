@@ -1,4 +1,7 @@
 {% load i18n %}
+{% load cache %}
+
+{% cache 3600 graph_collection_static_head %}
 
 {% block head %}
 
@@ -124,6 +127,9 @@
             }
 
 	</style>
+
+	{% endcache %}
+
 	<body>
 
 		<!-- This is panel on LHS of graph -->

@@ -1,7 +1,7 @@
-
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% load cache %}
 
 {% block title %} Create a new partner {% endblock %}
 
@@ -19,12 +19,13 @@
   {% endif %}
 {% endblock %}
 
-{% block body_content %} 
+{% block body_content %}
 
   <h2>{% trans "Create a new partner" %}</h2><br>
 
   <form data-abide id="create_group" class="row" method="post" action="{% url 'create_partner' group_id %}">
     {% csrf_token %}
+    {% cache 3600 create_partner request.user.id request.LANGUAGE_CODE %}
     <fieldset>
     <legend>Partners Details</legend>
    
@@ -196,6 +197,7 @@
     </div>
      
 </fieldset>
+  {% endcache %}
 
 {% comment %}
       <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
@@ -205,7 +207,7 @@
           </div>
           <div style='display:table-cell;'> 
             <input type="text"  id="group_name" name="groupname" placeholder="Enter partner Name" required>
-	    <small class="error">{% trans "Name is required and must be a string" %}</small>
+      <small class="error">{% trans "Name is required and must be a string" %}</small>
             <label id="message" style="display:none; color:red"></label>
           </div> 
             <font size="3" >{% trans "Partner Type" %}</font>
@@ -240,7 +242,7 @@
             </select>
           </div>
         </div>
-	<div style='display:table-row;'>
+  <div style='display:table-row;'>
           <div style='display:table-cell;'> 
             <font size="3" >{% trans "Group Encryption policy" %}</font>
           </div>
@@ -268,7 +270,7 @@
             <input type="submit" value="Create Partner" id="grpsubmit" class="button">
           </div>
         </div>
-	{% endcomment %}
+  {% endcomment %}
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
 <input type="" value="Create Partner" id="grpsubmit" class="button disabled">
       </div>

@@ -1,5 +1,9 @@
+{% load i18n %}
+{% load cache %}
+
+{% cache 3600 map_widget_header %}
 {% block head %}
-{% load i18n%}
+
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 	<!-- JS Links -->
@@ -35,7 +39,7 @@
 		.popup-content:focus {	background-color: #FFFFE0; border-color: buttonface; border-style: dashed; margin-bottom: 0.5em; padding: 0.25em; }		
 
 	</style>
-
+{% endcache %}
 
 <body>
 
@@ -55,6 +59,7 @@
 
 	<input type="hidden" value="{{ visited_location }}" name="last_visited_location"/>
 	
+	{% cache 300 map_widget_JS mode source %}
 	<script type="text/javascript">
 		 
 
@@ -64,12 +69,12 @@
 	 	osm 	  = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
         
         // Lets try to access some Bhuvan WMS tiles, currently does not work
-        var bhuvan = L.tileLayer.wms("http://tile3.nrsc.gov.in/tilecache/tilecache.py", {
-    layers: 'bhuvan_imagery',
-    format: 'image/jpeg',
-            crs : L.CRS.EPSG4326,
-    attribution: "Indian Remote Sensing Satellites, NRSC"
-});
+		//         var bhuvan = L.tileLayer.wms("http://tile3.nrsc.gov.in/tilecache/tilecache.py", {
+		//     layers: 'bhuvan_imagery',
+		//     format: 'image/jpeg',
+		//             crs : L.CRS.EPSG4326,
+		//     attribution: "Indian Remote Sensing Satellites, NRSC"
+		// });
 
 	 	// initialize the map on the "map" div with a given center and zoom
 	 	var map = L.map('map').setView([25.92,79.84], 5).addLayer(osm);
@@ -396,3 +401,5 @@
 	{% endif %}
 
 	</script>
+
+	{% endcache %}

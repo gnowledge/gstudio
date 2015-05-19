@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
+{% load cache %}
 
 {% load ndf_tags %}
 {% load pagination_tags %}
@@ -471,11 +472,13 @@
 		<hr/>
 
 		{% if node %}
+			{% cache 300 theme_tree node.name request.LANGUAGE_CODE %}
 			<!-- If "Theme" node -->
-			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>	
+			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
 
 			<!-- testing -->
 			{% include 'ndf/theme_drag_zoom_d3tree.html' %}
+			{% endcache %}
 			
 		{% endif %}
 
@@ -484,7 +487,8 @@
 	<!-- For displaying themes items -->
 	{% if themes_cards  %}
 
-	
+		{% cache 300 theme_card_listing request.LANGUAGE_CODE %}
+			
 		<div class="content row" id="panel2-4">
 
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -543,8 +547,9 @@
 		</ul>
 
 		</div>
-
-
+		
+	{% endcache %}
+	
 	{% endif %}
 
 	{% if themes_list_items %}

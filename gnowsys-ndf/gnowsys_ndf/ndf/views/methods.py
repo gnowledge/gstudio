@@ -8,6 +8,8 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response  # , render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.cache import cache
+
 from mongokit import paginator
 import mongokit
 
@@ -98,9 +100,19 @@ def get_group_name_id(group_name_or_id, get_obj=False):
       Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
       - "res_group_obj" will contain entire object.
     '''
+    # if cached result exists return it
+    if not get_obj:
+        slug = slugify(group_name_or_id)
+        cache_key = 'get_group_name_id_' + str(slug) if slug else str(abs(hash(group_name_or_id)))
+        cache_result = cache.get(cache_key)
+
+        if cache_result:
+            return cache_result
+    # ---------------------------------
 
     # case-1: argument - "group_name_or_id" is ObjectId
     if ObjectId.is_valid(group_name_or_id):
+
         group_obj = node_collection.one({"_id": ObjectId(group_name_or_id)})
 
         # checking if group_obj is valid
@@ -112,6 +124,10 @@ def get_group_name_id(group_name_or_id, get_obj=False):
             if get_obj:
                 return group_obj
             else:
+                # setting cache with both ObjectId and group_name
+                cache.set(cache_key, (group_name, group_id), 60*60)
+                cache_key = u'get_group_name_id_' + slugify(group_name)
+                cache.set(cache_key, (group_name, group_id), 60*60)
                 return group_name, group_id
 
     # case-2: argument - "group_name_or_id" is group name
@@ -127,6 +143,10 @@ def get_group_name_id(group_name_or_id, get_obj=False):
             if get_obj:
                 return group_obj
             else:
+                # setting cache with both ObjectId and group_name
+                cache.set(cache_key, (group_name, group_id), 60*60)
+                cache_key = u'get_group_name_id_' + slugify(group_id)
+                cache.set(cache_key, (group_name, group_id), 60*60)
                 return group_name, group_id
 
     if get_obj:
@@ -2529,6 +2549,14 @@ def get_user_activity(userObject):
 
 @get_execution_time
 def get_file_node(file_name=""):
+  # if cached result exists return it
+  cache_key = u'get_file_node' + slugify(unicode(file_name))
+  cache_result = cache.get(cache_key)
+
+  if cache_result:
+      return cache_result
+  # ---------------------------------
+
   file_list=[]
   new=[]
   a=str(file_name).split(',')
@@ -2544,6 +2572,7 @@ def get_file_node(file_name=""):
           if filedoc:
              for i in filedoc:
 		            file_list.append(i.name)	
+  cache.set(cache_key, file_list, 60*15)
   return file_list	
 
 @get_execution_time
