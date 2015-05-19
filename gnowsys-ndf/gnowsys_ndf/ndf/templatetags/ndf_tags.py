@@ -626,7 +626,7 @@ def get_gapps_iconbar(request, group_id):
         group_obj = node_collection.one({
             "_id": group_id
         }, {
-            "name": 1, "attribute_set.apps_list": 1
+            "name": 1, "attribute_set.apps_list": 1, '_type': 1
         })
         if group_obj:
             group_name = group_obj.name
@@ -636,7 +636,6 @@ def get_gapps_iconbar(request, group_id):
                 if attr and "apps_list" in attr:
                     gapps_list = attr["apps_list"]
                     break
-
         if not gapps_list:
             # If gapps not found for group, then make use of default apps list
             gapps_list = get_gapps(default_gapp_listing=True)
@@ -647,6 +646,15 @@ def get_gapps_iconbar(request, group_id):
             if node:
                 i += 1
                 gapps[i] = {"id": node["_id"], "name": node["name"].lower()}
+
+        if group_obj._type == "Author":
+			# user_gapps = ["page", "file"]
+			user_gapps = [gapp_name.lower() for gapp_name in GSTUDIO_USER_GAPPS_LIST]
+			for k, v in gapps.items():
+				for k1, v1 in v.items():
+					if k1 == "name":
+						if v1.lower() not in user_gapps:
+							del gapps[k]
 
         return {
             "template": "ndf/gapps_iconbar.html",
