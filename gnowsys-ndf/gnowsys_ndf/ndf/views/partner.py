@@ -18,7 +18,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
 
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection

@@ -22,7 +22,7 @@ from mongokit import paginator
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 try:
@@ -39,7 +39,7 @@ from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
 
 # from gnowsys_ndf.settings import LANGUAGES
-# from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
+# from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES,GSTUDIO_AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
@@ -114,13 +114,13 @@ def get_site_variables():
 @get_execution_time
 @register.assignment_tag
 def get_author_agency_types():
-   return AUTHOR_AGENCY_TYPES
+   return GSTUDIO_AUTHOR_AGENCY_TYPES
 
 
 @get_execution_time
 @register.assignment_tag
 def get_group_agency_types():
-   return GROUP_AGENCY_TYPES
+   return GSTUDIO_GROUP_AGENCY_TYPES
 
 
 @get_execution_time
@@ -626,7 +626,7 @@ def get_gapps_iconbar(request, group_id):
         group_obj = node_collection.one({
             "_id": group_id
         }, {
-            "name": 1, "attribute_set.apps_list": 1
+            "name": 1, "attribute_set.apps_list": 1, '_type': 1
         })
         if group_obj:
             group_name = group_obj.name
@@ -636,7 +636,6 @@ def get_gapps_iconbar(request, group_id):
                 if attr and "apps_list" in attr:
                     gapps_list = attr["apps_list"]
                     break
-
         if not gapps_list:
             # If gapps not found for group, then make use of default apps list
             gapps_list = get_gapps(default_gapp_listing=True)
@@ -647,6 +646,15 @@ def get_gapps_iconbar(request, group_id):
             if node:
                 i += 1
                 gapps[i] = {"id": node["_id"], "name": node["name"].lower()}
+
+        if group_obj._type == "Author":
+			# user_gapps = ["page", "file"]
+			user_gapps = [gapp_name.lower() for gapp_name in GSTUDIO_USER_GAPPS_LIST]
+			for k, v in gapps.items():
+				for k1, v1 in v.items():
+					if k1 == "name":
+						if v1.lower() not in user_gapps:
+							del gapps[k]
 
         return {
             "template": "ndf/gapps_iconbar.html",

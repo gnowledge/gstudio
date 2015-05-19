@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node
-from gnowsys_ndf.settings import AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES
 
 
 class Command(BaseCommand):
@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     # Replacing invalid value of agency_type field belonging to Author node by "Other"
     res = node_collection.collection.update(
-        {"_type": "Author", "agency_type": {"$nin": AUTHOR_AGENCY_TYPES}},
+        {"_type": "Author", "agency_type": {"$nin": GSTUDIO_AUTHOR_AGENCY_TYPES}},
         {"$set": {"agency_type": u"Other"}},
         upsert=False, multi=True
     )
