@@ -102,7 +102,8 @@ def get_group_name_id(group_name_or_id, get_obj=False):
     '''
     # if cached result exists return it
     if not get_obj:
-        cache_key = u'get_group_name_id_' + slugify(unicode(group_name_or_id))
+        slug = slugify(group_name_or_id)
+        cache_key = 'get_group_name_id_' + str(slug) if slug else str(abs(hash(group_name_or_id)))
         cache_result = cache.get(cache_key)
 
         if cache_result:
