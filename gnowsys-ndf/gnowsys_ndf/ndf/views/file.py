@@ -43,7 +43,6 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 # from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
-from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 ############################################

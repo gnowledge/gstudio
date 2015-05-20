@@ -25,6 +25,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
 from gnowsys_ndf.ndf.views.methods import create_college_group_and_setup_data,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 
 @login_required
@@ -34,18 +35,18 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
   custom view for custom GAPPS
   """
   auth = None
-  if ObjectId.is_valid(group_id) is False :
-    group_ins = node_collection.one({'_type': "Group", "name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-      group_id = str(group_ins._id)
-    else :
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-        group_id = str(auth._id)
-  else :
-    pass
-
+  # if ObjectId.is_valid(group_id) is False :
+  #   group_ins = node_collection.one({'_type': "Group", "name": group_id})
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+  #     group_id = str(group_ins._id)
+  #   else :
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if auth :
+  #       group_id = str(auth._id)
+  # else :
+  #   pass
+  group_name,group_id = get_group_name_id(group_id)
   app = None
   if app_id is None:
     app = node_collection.one({'_type': "GSystemType", 'name': app_name})
@@ -239,27 +240,26 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
   Creates/Modifies document of given organization-type.
   """
   auth = None
-  if ObjectId.is_valid(group_id) is False :
-    group_ins = node_collection.one({'_type': "Group","name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-      group_id = str(group_ins._id)
-    else :
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-        group_id = str(auth._id)
-  else :
-    pass
-
+  # if ObjectId.is_valid(group_id) is False :
+  #   group_ins = node_collection.one({'_type': "Group","name": group_id})
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+  #     group_id = str(group_ins._id)
+  #   else :
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if auth :
+  #       group_id = str(auth._id)
+  # else :
+  #   pass
+  group_name, group_id = get_group_name_id(group_id)
   app = None
   if app_id is None:
     app = node_collection.one({'_type': "GSystemType", 'name': app_name})
     if app:
       app_id = str(app._id)
   else:
-    app = node_collection.one({'_id': ObjectId(app_id)})
-
-  app_name = app.name 
+    app = node_collection.one({'_id': ObjectId(app_id)},{'_id':1, 'name':1})
+  app_name = app.name
 
   # app_name = "mis"
   app_set = ""
@@ -282,22 +282,19 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
         app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
-
   # for eachset in app.collection_set:
   #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   if app_set_id:
     organization_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
-    template = "ndf/" + organization_gst.name.strip().lower().replace(' ', '_') + "_create_edit.html"
+    template = "ndf/organization_create_edit.html"
     title = organization_gst.name
     organization_gs = node_collection.collection.GSystem()
     organization_gs.member_of.append(organization_gst._id)
 
   if app_set_instance_id:
     organization_gs = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
-
   property_order_list = get_property_order_with_value(organization_gs)#.property_order
-
   if request.method == "POST":
     # [A] Save organization-node's base-field(s)
     is_changed = get_node_common_fields(request, organization_gs, group_id, organization_gst)
@@ -307,7 +304,7 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
       organization_gs.status = u"PUBLISHED"
 
     organization_gs.save(is_changed=is_changed)
-  
+
     # [B] Store AT and/or RT field(s) of given organization-node (i.e., organization_gs)
     for tab_details in property_order_list:
       for field_set in tab_details[1]:
@@ -385,7 +382,6 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
       )
     )
 
-  default_template = "ndf/organization_create_edit.html"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
@@ -393,13 +389,14 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
                         'title':title,
                         'property_order_list': property_order_list
                       }
-
   if app_set_instance_id:
-    organization_gs.get_neighbourhood(organization_gs.member_of)
-    context_variables['node'] = organization_gs
+    #   organization_gs.get_neighbourhood(organization_gs.member_of)
+    #   context_variables['node'] = organization_gs
+    context_variables['node_id'] = organization_gs._id
+    context_variables['node_name'] = organization_gs.name
 
   try:
-    return render_to_response([template, default_template], 
+    return render_to_response(template,
                               context_variables,
                               context_instance = RequestContext(request)
                             )
