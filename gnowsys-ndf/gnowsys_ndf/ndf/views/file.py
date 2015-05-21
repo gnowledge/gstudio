@@ -806,7 +806,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             fileobj.created_by = int(userid)
 
             fileobj.modified_by = int(userid)
-
+            fileobj.status = u'PUBLISHED'
             if int(userid) not in fileobj.contributors:
                 fileobj.contributors.append(int(userid))
             if access_policy:
