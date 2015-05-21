@@ -247,7 +247,7 @@ i.remove-tag{
 
 						<!-- show tags error msg -->
 						<div class="row hide" id="tags_error">
-							<div class="small-10 columns small-push-2">{% trans 'Non empty tags can have only alphanumeric characters, underscore(_), dash(-) and spaces.' %}</div>
+							<div class="small-10 columns small-push-2">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>
 						</div>
 
 						<!-- show added tags -->
@@ -941,7 +941,7 @@ $(document).ready(function(){
 
 		if(textValue.length < 1){ return false; }
 
-		if(textValue.match(/[^A-Za-z0-9\-\_\ ]/g))
+		if(textValue.match(/[^A-Za-z0-9\-\ ]/g))
 		{	// having special characters
 			$('#tags_error').removeClass("hide");
 			return false;
