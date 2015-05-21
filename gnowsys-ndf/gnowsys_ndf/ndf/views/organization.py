@@ -198,12 +198,12 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
 
     # template = "ndf/" + organization_gst.name.strip().lower().replace(' ', '_') + "_list.html"
     template = "ndf/organization_list.html"
-    default_template = "ndf/mis_list.html"
+    # default_template = "ndf/mis_list.html"
 
   if app_set_instance_id:
 
     template = "ndf/organization_details.html"
-    default_template = "ndf/mis_details.html"
+    # default_template = "ndf/mis_details.html"
 
     node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
@@ -220,13 +220,13 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
                       }
 
   try:
-    return render_to_response([template, default_template], 
+    return render_to_response(template, 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
   
   except TemplateDoesNotExist as tde:
-    error_message = "\n O rganizationDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
+    error_message = "\n OrganizationDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
   
   except Exception as e:
@@ -377,7 +377,7 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
 
     return HttpResponseRedirect(
       reverse(
-        app_name.lower()+":"+template_prefix+'_app_detail', 
+        app_name.lower()+":"+template_prefix+'_app_detail',
         kwargs={'group_id': group_id, "app_id": app_id, "app_set_id": app_set_id}
       )
     )
@@ -386,7 +386,7 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
   context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
-                        'title':title,
+                        'title': title,
                         'property_order_list': property_order_list
                       }
   if app_set_instance_id:
@@ -400,12 +400,11 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
                               context_variables,
                               context_instance = RequestContext(request)
                             )
-  
+
   except TemplateDoesNotExist as tde:
     error_message = "\n OrganizationCreateEditViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
-  
+
   except Exception as e:
     error_message = "\n OrganizationCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
-    
