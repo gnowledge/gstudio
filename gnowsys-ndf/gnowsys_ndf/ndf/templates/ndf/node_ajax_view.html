@@ -1394,22 +1394,24 @@ ul#navigation li a.last {
                   </li>
                {% endif %}
               {% endif %}
-            {% if user_is_joined == "joined" %}
-              {% if is_user_group and node.created_by != request.user %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
+            {% if group_name_tag != "home"%}
+              {% if user_is_joined == "joined" %}
+                {% if is_user_group and node.created_by != request.user %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
 
-              {% else %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
-              {% endif %} 
+                {% else %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
+                {% endif %} 
 
-            {% elif user_is_joined == "not" or not user.is_authenticated %}
-              {% if is_user_group and node.created_by != request.user %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
+              {% elif user_is_joined == "not" or not user.is_authenticated %}
+                {% if is_user_group and node.created_by != request.user %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
 
-              {% else %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                {% else %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                {% endif %}
+
               {% endif %}
-
             {% endif %}
 
             {% endif %}
