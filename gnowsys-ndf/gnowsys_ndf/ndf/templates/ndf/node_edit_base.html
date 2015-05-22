@@ -1083,11 +1083,10 @@ $(document).ready(function(){
 	    		condition_result_var = true;
 	    	}
 	    {% endif %}
-	    substr = "mod";
-	    var val_chk = name.indexOf(substr);
+	    var val_chk = name.search(/mod$/gi)    
     	if (condition_result_var && name != "")
 	    {
-			if(val_chk==-1 || val_chk != (name.length-3)){
+			if(val_chk == -1){
 				if (nodes.indexOf(name) != -1)  
 				{ 
 					$("#message").css("display", "block");
@@ -1095,7 +1094,7 @@ $(document).ready(function(){
 					event.preventDefault();
 				}
 			}
-			else if (val_chk == (name.length-3)){
+			else if (val_chk != -1){
 				$("#message").css("display", "block");
 				$("#message").text("Name cannot include 'Mod'.");
 				event.preventDefault();

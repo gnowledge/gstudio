@@ -229,12 +229,11 @@
   $("#create_group").submit(function(event){
     var name = $("#group_name").val().trim().toLowerCase();
     var nodes = {{nodes_list|safe}} 
-    substr = "mod";
-    var val_chk = name.indexOf(substr);
+    var val_chk = name.search(/mod$/gi)    
     $("#message").css("display", "none");
     if (name != "")
     {
-      if(val_chk==-1 || val_chk != (name.length-3)){
+      if(val_chk == -1){
         if (nodes.indexOf(name) >= 0)  
           { 
             $("#message").css("display", "block");
@@ -242,7 +241,7 @@
             event.preventDefault();
           }
       }
-      else if (val_chk == (name.length-3)){
+      else if (val_chk != -1){
           $("#message").css("display", "block");
           $("#message").text("Name cannot include 'Mod'.");
           event.preventDefault();
