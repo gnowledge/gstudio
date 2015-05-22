@@ -16,39 +16,39 @@
 <!-- css for drawer widget -->
 <style type = "text/css">
 
-.divider-line { font-size: xx-large; color:lightgray; }
-.line-height-2 { line-height:2; }
-.line-height-2pt5 { line-height:2.5; }
-.fontsize-x-large { font-size: x-large; }
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
 
-.margin-0 { margin: 0 !important ;}
+  .margin-0 { margin: 0 !important ;}
 
-.resource-drawer {
-border-color: #D3D3D3; border-style: solid;
-padding: 0 !important;
-overflow-y: auto;
-}
+  .resource-drawer {
+  border-color: #D3D3D3; border-style: solid;
+  padding: 0 !important;
+  overflow-y: auto;
+  }
 
-.resource-drawer li.bullet-item:hover{
-background-color: #ecf0f1; cursor:pointer;
-}
+  .resource-drawer li.bullet-item:hover{
+  background-color: #ecf0f1; cursor:pointer;
+  }
 
-.posted-by{ color: #808080; font-size: small; }
+  .posted-by{ color: #808080; font-size: small; }
 
-.selected-resource { background-color:lightgray !important ; }
+  .selected-resource { background-color:lightgray !important ; }
 
-.resource-type-image {
-height:40px;
-background-repeat:no-repeat; background-size: 48px 48px
-}
+  .resource-type-image {
+  height:40px;
+  background-repeat:no-repeat; background-size: 48px 48px
+  }
 
-ul#graph-hover.f-dropdown{
-  width: inherit !important;
-}
+  ul#graph-hover.f-dropdown{
+    width: inherit !important;
+  }
 
-#graph-hover > li > a:hover {
-  color: #555555;
-}
+  #graph-hover > li > a:hover {
+    color: #555555;
+  }
 
 </style>
 
@@ -69,7 +69,7 @@ ul#graph-hover.f-dropdown{
           </div>
 
           <div style='display:table-cell;'> 
-            <select name="subscription_policy" id="subscription_policy">
+            <select name="subscription_policy" id="subscription_policy" disabled="disabled">
               <option id="OPEN">{% trans "OPEN" %}</option>
               <option id="BY_REQUEST">{% trans "BY REQUEST" %}</option>
               <option id="BY_INVITATION">{% trans "BY INVITATION" %}</option>
@@ -87,20 +87,14 @@ ul#graph-hover.f-dropdown{
               {% endfor %}
             </select>
           </div>
- 
-
-        </div>
-
-
+         </div>
         <div style='display:table-row;'>
- 
           <div style='display:table-cell;' colspan='2' align="middle"> 
             <input type="button" id="changeButton" value="Change"  class="button">
             <img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
             <font id="status"></font>
           </div>
         </div>
-        
       </div>
      </div>   
     {% else %}
@@ -127,7 +121,8 @@ ul#graph-hover.f-dropdown{
 
       <div style='display:table-cell;'> 
         <select name="edit_policy" id="edit_policy">
-         <option id="EDITABLE_NON_MODERATED">{% trans "EDITABLE amd NON_MODERATED" %}</option>
+         <option id="EDITABLE_NON_MODERATED">{% trans "EDITABLE amd NON_MODERATED" %}
+         </option>
          <option id="EDITABLE_MODERATED">{% trans "EDITABLE and MODERATED" %}</option>
          <option id="NON_EDITABLE">{% trans "NON_EDITABLE" %}</option>
        </select> 
@@ -140,9 +135,8 @@ ul#graph-hover.f-dropdown{
     <div style='display:table-cell;'> 
       <font size="3" >{% trans "Group Subscription policy" %}</font>
     </div>
-
     <div style='display:table-cell;'> 
-      <select name="subscription_policy" id="subscription_policy">
+      <select name="subscription_policy" id="subscription_policy" disabled="disabled">
        <option id="OPEN">{% trans "OPEN" %}</option>
        <option id="BY_REQUEST">{% trans "BY REQUEST" %}</option>
        <option id="BY_INVITATION">{% trans "BY INVITATION" %}</option>
@@ -154,7 +148,7 @@ ul#graph-hover.f-dropdown{
   </div>
 
   <div style='display:table-cell;'> 
-    <select name="visibility_policy" id="visibility_policy">
+    <select name="visibility_policy" id="visibility_policy" disabled="disabled">
      <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
      <option id="NOT_ANNOUNCED">{% trans "NOT ANNOUNCED" %}</option>
    </select>
@@ -169,7 +163,7 @@ ul#graph-hover.f-dropdown{
   </div>
 
   <div style='display:table-cell;'> 
-    <select name="disclosure_policy" id="disclosure_policy">
+    <select name="disclosure_policy" id="disclosure_policy" disabled="disabled">
      <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED TO MEMBERS" %}</option>
      <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT DISCLOSED TO MEMBERS" %}</option>
    </select>
@@ -180,7 +174,7 @@ ul#graph-hover.f-dropdown{
 </div>
 
 <div style='display:table-cell;'> 
-  <select name="encryption_policy" id="encryption_policy">
+  <select name="encryption_policy" id="encryption_policy" disabled="disabled">
    <option id="NOT_ENCRYPTED">{% trans "NOT ENCRYPTED" %}</option>
    <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
  </select>
@@ -195,7 +189,7 @@ ul#graph-hover.f-dropdown{
   <div style='display:table-cell;'> 
     <select name="agency_type" id="agency_type">
      {% for each in agency_types %}
-     <option id="{{each}}">{{each}}</option>
+        <option id="{{each}}">{{each}}</option>
      {% endfor %}
    </select>
  </div>

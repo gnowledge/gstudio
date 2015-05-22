@@ -1278,12 +1278,12 @@ ul#navigation li a.last {
             {% if is_group %}
               {% check_is_gstaff groupid request.user as is_gstaff %}
               {% if is_gstaff %}
-              <a href="{% url edit_url group_name_tag %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              <a href="{% url edit_url group_id %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
 
             {% else %}
               {% if user_is_joined == "joined" or user_is_joined == "author" %}
-                <a href="{% url edit_url group_name_tag node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+                <a href="{% url edit_url group_id node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
             {% endif %}
           {% endif %}
@@ -1297,10 +1297,10 @@ ul#navigation li a.last {
 
               {% if is_group %}
                 {% if user.is_superuser or node.created_by == user.id %}
-                  <a href="{% url 'publish_group' group_name_tag node %}" class="tiny round button edit">{% trans "Publish" %}</a>
+                  <a href="{% url 'publish_group' group_id node %}" class="tiny round button edit">{% trans "Publish" %}</a>
                 {% endif %}
               {% else %}
-                <a href="{% url 'publish_page' group_name_tag node %}" class="tiny round button edit">{% trans "Publish" %}</a><br/>
+                <a href="{% url 'publish_page' group_id node %}" class="tiny round button edit">{% trans "Publish" %}</a><br/>
               {% endif %}
             
             {% else %}
@@ -1394,22 +1394,24 @@ ul#navigation li a.last {
                   </li>
                {% endif %}
               {% endif %}
-            {% if user_is_joined == "joined" %}
-              {% if is_user_group and node.created_by != request.user %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
+            {% if group_name_tag != "home"%}
+              {% if user_is_joined == "joined" %}
+                {% if is_user_group and node.created_by != request.user %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
 
-              {% else %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
-              {% endif %} 
+                {% else %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
+                {% endif %} 
 
-            {% elif user_is_joined == "not" or not user.is_authenticated %}
-              {% if is_user_group and node.created_by != request.user %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
+              {% elif user_is_joined == "not" or not user.is_authenticated %}
+                {% if is_user_group and node.created_by != request.user %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
 
-              {% else %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                {% else %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                {% endif %}
+
               {% endif %}
-
             {% endif %}
 
             {% endif %}
