@@ -1278,12 +1278,12 @@ ul#navigation li a.last {
             {% if is_group %}
               {% check_is_gstaff groupid request.user as is_gstaff %}
               {% if is_gstaff %}
-              <a href="{% url edit_url group_name_tag %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              <a href="{% url edit_url group_id %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
 
             {% else %}
               {% if user_is_joined == "joined" or user_is_joined == "author" %}
-                <a href="{% url edit_url group_name_tag node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+                <a href="{% url edit_url group_id node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
             {% endif %}
           {% endif %}
