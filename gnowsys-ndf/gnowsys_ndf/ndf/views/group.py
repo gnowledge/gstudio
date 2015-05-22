@@ -207,9 +207,9 @@ def create_group(request,group_id):
     if usrid not in colg.contributors:
       colg.contributors.append(usrid)
 
-    colg.group_type = request.POST.get('group_type', "")        
+    colg.group_type = request.POST.get('group_type', "")
     colg.edit_policy = request.POST.get('edit_policy', "")
-    colg.subscription_policy = request.POST.get('subscription', "")
+    colg.subscription_policy = request.POST.get('subscription', "OPEN")
     colg.visibility_policy = request.POST.get('existance', 'ANNOUNCED')
     colg.disclosure_policy = request.POST.get('member', 'DISCLOSED_TO_MEM')
     colg.encryption_policy = request.POST.get('encryption', 'NOT_ENCRYPTED')
@@ -691,7 +691,7 @@ def create_sub_group(request,group_id):
               colg.contributors.append(usrid)
           colg.group_type = request.POST.get('group_type', "")
           colg.edit_policy = request.POST.get('edit_policy', "")
-          colg.subscription_policy = request.POST.get('subscription', "")
+          colg.subscription_policy = request.POST.get('subscription', "OPEN")
           colg.visibility_policy = request.POST.get('existance', "ANNOUNCED")
           colg.disclosure_policy = request.POST.get('member', "DISCLOSED_TO_MEM")
           colg.encryption_policy = request.POST.get('encryption', "NOT_ENCRYPTED")

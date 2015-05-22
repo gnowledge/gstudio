@@ -229,24 +229,35 @@
   $("#create_group").submit(function(event){
     var name = $("#group_name").val().trim().toLowerCase();
     var nodes = {{nodes_list|safe}} 
+    substr = "mod";
+    var val_chk = name.indexOf(substr);
 
-    if (name != "")
-    {
-      if (nodes.indexOf(name) != -1)  
-      { 
+    console.log(val_chk);
+    event.preventDefault();
+    if(val_chk < 0){
+      if (name != "")
+      {
+        if (nodes.indexOf(name) != -1)  
+        { 
+          $("#message").css("display", "block");
+          $("#message").text("Group '"+ name +"' already exist. Please choose another name");
+          event.preventDefault();
+        }
+      }
+      else if (name == ""){
         $("#message").css("display", "block");
-        $("#message").text("Group '"+ name +"' already exist. Please choose another name");
+        $("#message").text("Group name cannot be empty.");
         event.preventDefault();
       }
+      else
+      {
+        $("#message").css("display", "none");
+      }
     }
-    else if (name == ""){
-      $("#message").css("display", "block");
-      $("#message").text("Group name cannot be empty.");
-      event.preventDefault();
-    }
-    else
-    {
-      $("#message").css("display", "none");
+    else{
+        $("#message").css("display", "block");
+        $("#message").text("Name cannot include 'Mod'.");
+        event.preventDefault();
     }
   });
 
