@@ -35,6 +35,24 @@ height:40px;
 background-repeat:no-repeat; background-size: 48px 48px
 }
 
+#tags_error{
+	color: red;
+}
+
+div.tags{ 
+	/*padding: 5px 10px; */
+	margin: 2px 5px;
+	/*color: white;*/
+	font-size: 1em;
+	border: solid thin #FFD400;
+}
+
+i.remove-tag{
+	padding-left: 8px;
+	font-size: 1.1em;
+	cursor: pointer;
+}
+
 {% endblock %}
 {% endcache %}
 
@@ -55,7 +73,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% endif %} 
 		</span></h3>		
 
-	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
+	    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
   		<label id="message" style="display:none; color:red"></label>
 
 	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
@@ -203,11 +221,45 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			<div class="row">
 				<div class="small-8 columns">
-					<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','">
-						<h3><span class="subheader"> {% trans "Tag" %} {{node.tags|pluralize|default_if_none:""}} 
-						</span></h3>
+					<span>
+
+						<div class="row">
+							<h3 >
+								
+							<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
+							</span>
+
+							</h3>
+							<div class="small-9 columns">
+							<div class="row collapse">
+								
+							<div class="small-10 columns">
+						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
+						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
+					        </div>
+					        <div class="small-2 columns">
+					          <span tabindex="3" id="add-tag-btn" class="tiny button">{% trans 'Add Tag' %}</span>
+					        </div>
+							</div>							
+
+							</div>
+						</div>
+
+						<!-- show tags error msg -->
+						<div class="row hide" id="tags_error">
+							<div class="small-10 columns small-push-2">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>
+						</div>
+
+						<!-- show added tags -->
+						<div class="row">
+							<div id="added_tags" class="small-9 small-push-3 columns">
+								{% for each_tag in node.tags %}
+									<div class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>
+								{% endfor %}
+							</div>
+						</div>
+
 			    	</span>
-			    	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas..."> 
 		    	</div>
 	    	</div>      
     	</div>
@@ -418,7 +470,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     {% endcache %}
 
     <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}"> -->
-    <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button" />
+    <input type="submit" tabindex="4" id="save-node" value="Save as Draft And Preview" class="round button" />
 
 </form>
 
@@ -879,6 +931,103 @@ $(document).ready(function(){
 
 	});
 
+	var tags = document.getElementById("tags_id");
+	var addedTags = document.getElementById("added_tags");
+
+	function checkTag()
+	{
+		var textValue = tags.value.trim();
+		// console.log(textValue.length);
+
+		if(textValue.length < 1){ return false; }
+
+		if(textValue.match(/[^A-Za-z0-9\-\ ]/g))
+		{	// having special characters
+			$('#tags_error').removeClass("hide");
+			return false;
+		}
+		else
+		{	// passed the test and now add tag label
+			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
+			return true;
+		}
+	}
+
+	tags.onchange = checkTag;
+	tags.onmouseup = checkTag;
+	tags.onkeyup = checkTag;
+
+	function updateAllTags() {
+		
+		var tagsArr = new Array();
+
+		$("#added_tags").children("div.tags.label").each(function(){
+			tagsArr.push(this.textContent.trim().toLowerCase());
+		});
+
+		$("input:hidden[name='tags']").val(tagsArr.toString());
+		// console.log(tagsArr)
+	}
+	
+
+	function removeTag(){
+		$(this).parent().fadeOut("slow", function(){
+			$(this).detach();
+		});
+
+		updateAllTags();
+	};
+
+	$(".remove-tag").click(removeTag);
+
+	$(".remove-tag").mouseenter(function(){
+		$(this).parent("div.tags").css("text-decoration", "line-through");
+	});
+
+	$(".remove-tag").mouseleave(function(){
+		$(this).parent("div.tags").css("text-decoration", "none");
+	});
+
+	function addTag() {
+		if(checkTag())
+		{
+			var textValue = tags.value.trim().toLowerCase();
+			tags.value = '';
+
+			var tagDiv = document.createElement("div");
+			tagDiv.className = "tags label radius info";
+			tagDiv.appendChild(document.createTextNode(textValue));
+			// tagDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+
+			var closeBtn = document.createElement("i");
+			closeBtn.className = "fi-x-circle remove-tag";
+			closeBtn.title = "Remove this tag";
+			closeBtn.onclick = removeTag;
+
+			$(closeBtn).mouseenter(function(){
+				$(this).parent("div.tags").css("text-decoration", "line-through");
+			});
+
+			$(closeBtn).mouseleave(function(){
+				$(this).parent("div.tags").css("text-decoration", "none");
+			});
+
+			tagDiv.appendChild(closeBtn);
+
+			addedTags.appendChild(tagDiv);
+
+			updateAllTags();
+		}
+		else
+		{
+			$('#tags_error').removeClass("hide");
+		}
+		tags.focus();
+	}
+
+	var addTagBtn = document.getElementById("add-tag-btn");
+	addTagBtn.onclick = addTag;
+	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
                       
@@ -952,6 +1101,8 @@ $(document).ready(function(){
     	{
           $("#message").css("display", "none");
 	    }
+
+	    updateAllTags();
 	});
 
 
