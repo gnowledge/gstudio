@@ -22,6 +22,24 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     # Keep latest changes in field(s) to be added at top
 
+    # --- adding all activated and logged-in user's id into author_set of "home" group ---
+    all_authors = node_collection.find({"_type": "Author"})
+    authors_list = [auth.created_by for auth in all_authors]
+
+    home_group = node_collection.one({"_type":"Group", "name": "home"}) 
+    prev_home_author_set = home_group.author_set
+    total_author_set = list(set(authors_list + home_group.author_set))
+
+    result = node_collection.collection.update({"_type": "Group", "name": u"home", "author_set": {"$ne": total_author_set} }, {"$set": {"author_set": total_author_set}}, upsert=False, multi=False )
+
+    if result['updatedExisting']: # and result['nModified']:
+        home_group.reload()
+        print "\n Updated author_set of 'home' group:" + \
+            "\n\t - Previously it was   : " + str(prev_home_author_set) + \
+            "\n\t - Now it's updated to : " + str(home_group.author_set)
+    # --------------------------------------------------------------------------
+
+
     # Replacing invalid value of agency_type field belonging to Author node by "Other"
     res = node_collection.collection.update(
         {"_type": "Author", "agency_type": {"$nin": GSTUDIO_AUTHOR_AGENCY_TYPES}},
