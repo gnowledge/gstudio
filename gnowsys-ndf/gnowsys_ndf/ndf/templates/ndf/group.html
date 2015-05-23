@@ -68,7 +68,7 @@
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
   <!-- Existing card list-->
-  {% get_group_type request.path request.user as group_type %}
+  <!-- #{#% get_group_type request.path request.user as group_type %} -->
   {% group_type_info groupid request.user as grouptype %}
 
   {% autopaginate group_nodes 23 %}

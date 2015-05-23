@@ -28,7 +28,7 @@ class Command(BaseCommand):
         {"$set": {"agency_type": u"Other"}},
         upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n Replacing invalid value of agency_type field belonging to Author node by 'Other'" + \
             "... #" + res["n"].__str__() + " records updated."
 
@@ -45,7 +45,7 @@ class Command(BaseCommand):
         },
             upsert=False, multi=True
         )
-        if res["updatedExisting"] and res["nModified"]:
+        if res["updatedExisting"]: # and res["nModified"]:
             print "\n 'member_of' field updated in following RelationType " \
                 + "instance(s) representing 'Binary Relationships':", res["n"]
 
@@ -63,7 +63,7 @@ class Command(BaseCommand):
         },
             upsert=False, multi=False
         )
-        if res['updatedExisting'] and res['nModified']:
+        if res['updatedExisting']: # and res['nModified']:
             print "\n Replaced object_type of 'trainer_of_course' relationship" \
                 + " from 'Announced Course' to 'NUSSD Course'."
 
@@ -74,7 +74,7 @@ class Command(BaseCommand):
         },
             upsert=False, multi=False
         )
-        if res['updatedExisting'] and res['nModified']:
+        if res['updatedExisting']: # and res['nModified']:
             print "\n Replaced object_type of 'master_trainer_of_course' relationship" \
                 + " from 'Announced Course' to 'NUSSD Course'."
 
@@ -84,7 +84,7 @@ class Command(BaseCommand):
         {'$set': {'attribute_type_set': [], 'relation_type_set': []}},
         upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n Appending attribute_type_set and relation_type_set fields to existing MetaType nodes."
 
     # Renames RelaionType names -- "has_corresponding_task" to "has_current_approval_task"
@@ -93,7 +93,7 @@ class Command(BaseCommand):
         {'$set': {'name': u"has_current_approval_task"}}, 
         upsert=False, multi=False
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'name' field updated of RelationType (Renamed from has_corresponding_task to has_current_approval_task)"
 
     # Replaces "for_acourse" RelationType's object_cardinality field's value from 1 to 100
@@ -103,7 +103,7 @@ class Command(BaseCommand):
         upsert=False, multi=False
     )
 
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n Replaced 'for_acourse' RelationType's 'object_cardinality' field's value from 1 to 100."
     
     file_gst = node_collection.one({'_type':'GSystemType', 'name': 'File'}) 
@@ -141,7 +141,7 @@ class Command(BaseCommand):
                 upsert=False, multi=True
             )
 
-            if res['updatedExisting'] and res['nModified']:
+            if res['updatedExisting']: # and res['nModified']:
                 print "\n 'created_by, modified_by & contributors' field updated for pandora videos in following no. of documents: ", res['n']
 
 
@@ -181,7 +181,7 @@ class Command(BaseCommand):
         {'$set': {'status': u"PUBLISHED"}}, 
         upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'status' field updated for all TYPE's node(s) in following no. of documents: ", res['n']
 
     # Update object_value of GAttribute(s) of "Assignee" AttributeType
@@ -312,7 +312,7 @@ class Command(BaseCommand):
                 {'$set': {'object_type': [ann_course._id]}}, 
                 upsert=False, multi=False
               )
-        if res['updatedExisting'] and res['nModified']:
+        if res['updatedExisting']: # and res['nModified']:
             print "\n Replaced object_type of 'has_course' relationship from 'NUSSD Course' to 'Announced Course'."
 
     # Adds "relation_set" field (with default value as []) to all documents belonging to GSystems.
@@ -320,7 +320,7 @@ class Command(BaseCommand):
                             {'$set': {'relation_set': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'relation_set' field added to following no. of documents: ", res['n']
 
     # Adds "attribute_set" field (with default value as []) to all documents belonging to GSystems.
@@ -328,7 +328,7 @@ class Command(BaseCommand):
                             {'$set': {'attribute_set': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'attribute_set' field added to following no. of documents: ", res['n']
 
     # Adds "license" field (with default value as "") to all documents belonging to GSystems.
@@ -336,7 +336,7 @@ class Command(BaseCommand):
                             {'$set': {'license': None}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'license' field added to following no. of documents: ", res['n']
 
     # Adding "Agency_type" field adding to group documents with default values
@@ -344,7 +344,7 @@ class Command(BaseCommand):
                             {'$set': {'agency_type': "Project" }}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
        print "\n 'agency_type' field added to 'Group' documents totalling to : ", res['n']
 
     # Adding "Agency_type" field adding to author documents with default values
@@ -352,7 +352,7 @@ class Command(BaseCommand):
                             {'$set': {'agency_type': "Others" }}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
        print "\n 'agency_type' field added to 'Author' documents totalling to : ", res['n']
 
 
@@ -367,7 +367,7 @@ class Command(BaseCommand):
                             {'$unset': {'cr_or_xcr': False }}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
        print "\n Already existing 'cr_or_xcr' field removed from documents totalling to : ", res['n']
 
     # Adding "curricular" field with no default value
@@ -375,7 +375,7 @@ class Command(BaseCommand):
                             {'$set': {'curricular': False }}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'curricular' field added to all Group documents totalling to : ", res['n']
 
     # Removing existing "partners" field with no default value
@@ -383,7 +383,7 @@ class Command(BaseCommand):
                             {'$unset': {'partners': False }}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
        print "\n Already existing 'partners' field removed from documents totalling to : ", res['n']
 
     # Adding "partner" field with no default value
@@ -391,7 +391,7 @@ class Command(BaseCommand):
                             {'$set': {'partner': False }}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'partner' field added to all Group documents totalling to : ", res['n']
 
     # Adding "preferred_languages" field with no default value
@@ -399,7 +399,7 @@ class Command(BaseCommand):
                             {'$set': {'preferred_languages': {}}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'preferred_languages' field added to all author documents totalling to : ", res['n']
 
 
@@ -408,7 +408,7 @@ class Command(BaseCommand):
                             {'$set': {'rating': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'rating' field added to following no. of documents: ", res['n']
     
     # Adds 'subject_scope', 'attribute_type_scope', 'object_value_scope' field (with default value as "") to all documents which belongs to GAttribute
@@ -416,7 +416,7 @@ class Command(BaseCommand):
                             {'$set': {'group_admin': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'group_admin' field added to following no. of documents: ", res['n']
 
     # Adds 'subject_scope', 'attribute_type_scope', 'object_value_scope' field (with default value as "") to all documents which belongs to GAttribute
@@ -424,7 +424,7 @@ class Command(BaseCommand):
                             {'$set': {'subject_scope':"", 'attribute_type_scope':"", 'object_value_scope': ""}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'subject_scope', 'attribute_type_scope', 'object_value_scope' fields added to following no. of documents: ", res['n']
 
     # Adds 'subject_scope', 'relation_type_scope', 'right_subject_scope' field (with default value as "") to all documents which belongs to GRelation
@@ -432,7 +432,7 @@ class Command(BaseCommand):
                             {'$set': {'subject_scope':"", 'relation_type_scope':"", 'right_subject_scope': ""}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n 'subject_scope', 'relation_type_scope', 'right_subject_scope' fields added to following no. of documents: ", res['n']
 
     # Adds "annotations" field (with default value as []) to all documents belonging to GSystems
@@ -440,7 +440,7 @@ class Command(BaseCommand):
                             {'$set': {'annotations': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n annotations field added to following no. of documents: ", res['n']
 
     # Adds "group_set" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
@@ -448,7 +448,7 @@ class Command(BaseCommand):
                             {'$set': {'group_set': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n group_set field added to following no. of documents: ", res['n']
 
     # Adds "property_order" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
@@ -456,7 +456,7 @@ class Command(BaseCommand):
                             {'$set': {'property_order': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n property_order field added to following no. of documents: ", res['n']
 
     # Adding "modified_by" field with None as it's default value
@@ -464,7 +464,7 @@ class Command(BaseCommand):
                             {'$set': {'modified_by': None}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n modified_by field added to following no. of documents: ", res['n']
 
     # Adding "complex_data_type" field with empty list as it's default value
@@ -472,7 +472,7 @@ class Command(BaseCommand):
                             {'$set': {'complex_data_type': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n complex_data_type field added to following no. of documents: ", res['n']
 
     # Adding "post_node" field with empty list as it's default value
@@ -480,7 +480,7 @@ class Command(BaseCommand):
                             {'$set': {'post_node': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n post_node field added to following no. of documents: ", res['n']
 
     # Adding "collection_set" field with empty list as it's default value
@@ -488,7 +488,7 @@ class Command(BaseCommand):
                             {'$set': {'collection_set': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n collection_set field added to following no. of documents: ", res['n']
 
     # Adding "location" field with no default value
@@ -496,7 +496,7 @@ class Command(BaseCommand):
                             {'$set': {'location': []}}, 
                             upsert=False, multi=True
     )
-    if res['updatedExisting'] and res['nModified']:
+    if res['updatedExisting']: # and res['nModified']:
         print "\n location field added to following no. of documents: ", res['n'],"\n"
 
     # Adding "language" field with no default value
