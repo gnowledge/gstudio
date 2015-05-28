@@ -1908,7 +1908,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
-
+    print subject_id, relation_type_node, right_subject_id_or_list,"@@@@@@@@@@@@@@@@"
     try:
         subject_id = ObjectId(subject_id)
 
@@ -1921,7 +1921,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.right_subject = right_subject_id_or_list
 
             gr_node.status = u"PUBLISHED"
+            print "befor save"
             gr_node.save()
+            print "after save"
+
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"

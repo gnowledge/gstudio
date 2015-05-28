@@ -1569,7 +1569,7 @@ class Triple(DjangoDocument):
 
   def save(self, *args, **kwargs):
     is_new = False
-
+    print "savvvvvvvvvvvvvvveeee"
     if "_id" not in self:
       is_new = True  # It's a new document, hence yet no ID!"
 
@@ -1615,19 +1615,9 @@ class Triple(DjangoDocument):
 
       left_subject_member_of_list = subject_document.member_of
       relation_type_name = self.relation_type['name']
-
-      if META_TYPE[3] in self.relation_type.member_of_names_list:
-        # If Binary relationship found
-        # Single relation: ObjectId()
-        # Multi relation: [ObjectId(), ObjectId(), ...]
-        right_subject_document = node_collection.one({'_id': self.right_subject})
-
-        right_subject_member_of_list = right_subject_document.member_of
-        right_subject_name = right_subject_document.name
-
-        self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
-
-      else:
+      print META_TYPE[3],"*****************"
+      if META_TYPE[4] in self.relation_type.member_of_names_list:
+        #  print META_TYPE[3], self.relation_type.member_of_names_list,"!!!!!!!!!!!!!!!!!!!!!"  
         # Relationship Other than Binary one found; e.g, Triadic
         # Single relation: [ObjectId(), ObjectId(), ...]
         # Multi relation: [[ObjectId(), ObjectId(), ...], [ObjectId(), ObjectId(), ...], ...]
@@ -1636,7 +1626,7 @@ class Triple(DjangoDocument):
 
         right_subject_name_list = []
         right_subject_name_list_append = right_subject_name_list.append
-
+        print self.right_subject,"%%%%%%%%%%%%%",type(self.right_subject)
         for each in self.right_subject:
           # Here each is an ObjectId
           right_subject_document = node_collection.one({
@@ -1658,7 +1648,21 @@ class Triple(DjangoDocument):
         # with other comma-separated values from another list(s)
         object_type_list = list(chain.from_iterable(object_type_list))
         right_subject_member_of_list = list(chain.from_iterable(right_subject_member_of_list))
+      
 
+      else:
+          #META_TYPE[3] in self.relation_type.member_of_names_list:
+          # If Binary relationship found
+          # Single relation: ObjectId()
+          # Multi relation: [ObjectId(), ObjectId(), ...]
+          right_subject_document = node_collection.one({'_id': self.right_subject})
+
+          right_subject_member_of_list = right_subject_document.member_of
+          right_subject_name = right_subject_document.name
+
+          self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
+
+      
       name_value = self.name
 
       left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
