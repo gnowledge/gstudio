@@ -9786,7 +9786,6 @@ article section.content {
 }
 /* line 718, ../../../scss/_app_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
-  text-transform: uppercase;
   background-color: transparent;
   padding: 2px;
 }

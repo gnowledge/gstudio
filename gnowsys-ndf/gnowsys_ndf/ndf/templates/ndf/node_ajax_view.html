@@ -1,6 +1,10 @@
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
+
 {% get_group_name groupid as group_name_tag %}
+
+{% cache 360 node_ajax_view request.LANGUAGE_CODE %}
 
 <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
 <script type="text/javascript">
@@ -291,6 +295,8 @@ ul#navigation li a.last {
 <!-- end dialog -->
 
 {% get_schema node as schema %} 
+
+{% endcache%}
 
 {% check_user_join request groupid as user_is_joined %}
 
@@ -986,7 +992,7 @@ ul#navigation li a.last {
           <!-- Content for Concept Graph -->
           <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
             <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
-            <!-- {#% include "ndf/graph_concept.html" %#} -->
+            {% include "ndf/graph_concept.html" %}
           </div>
 
           <div id="view-levels" style="display:none;">
@@ -1168,6 +1174,7 @@ ul#navigation li a.last {
         </div>
 
         <!-- Only visible to the group admins and super user for managing group activities -->
+        {% comment %}
         <div class="content" id="view-manage">
 
           <div class="row">
@@ -1223,6 +1230,8 @@ ul#navigation li a.last {
           </div>
           <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
+
+        {% endcomment %}
         <!-- /////////////////// -->
 
         <div class="content" id="view-discussion">
@@ -1238,7 +1247,7 @@ ul#navigation li a.last {
 
   <footer>
     <p><small>
-      <em>{% trans "Created by" %} {{ node.user_details_dict.contributors|join:', ' }}</em>
+      <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> at {{node.last_update}}
     </small></p>
   </footer>
         
@@ -1269,12 +1278,12 @@ ul#navigation li a.last {
             {% if is_group %}
               {% check_is_gstaff groupid request.user as is_gstaff %}
               {% if is_gstaff %}
-              <a href="{% url edit_url group_name_tag %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+              <a href="{% url edit_url group_id %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
 
             {% else %}
               {% if user_is_joined == "joined" or user_is_joined == "author" %}
-                <a href="{% url edit_url group_name_tag node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+                <a href="{% url edit_url group_id node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
             {% endif %}
           {% endif %}
@@ -1288,10 +1297,10 @@ ul#navigation li a.last {
 
               {% if is_group %}
                 {% if user.is_superuser or node.created_by == user.id %}
-                  <a href="{% url 'publish_group' group_name_tag node %}" class="tiny round button edit">{% trans "Publish" %}</a>
+                  <a href="{% url 'publish_group' group_id node %}" class="tiny round button edit">{% trans "Publish" %}</a>
                 {% endif %}
               {% else %}
-                <a href="{% url 'publish_page' group_name_tag node %}" class="tiny round button edit">{% trans "Publish" %}</a><br/>
+                <a href="{% url 'publish_page' group_id node %}" class="tiny round button edit">{% trans "Publish" %}</a><br/>
               {% endif %}
             
             {% else %}
@@ -1385,22 +1394,24 @@ ul#navigation li a.last {
                   </li>
                {% endif %}
               {% endif %}
-            {% if user_is_joined == "joined" %}
-              {% if is_user_group and node.created_by != request.user %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
+            {% if group_name_tag != "home"%}
+              {% if user_is_joined == "joined" %}
+                {% if is_user_group and node.created_by != request.user %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
 
-              {% else %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
-              {% endif %} 
+                {% else %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
+                {% endif %} 
 
-            {% elif user_is_joined == "not" or not user.is_authenticated %}
-              {% if is_user_group and node.created_by != request.user %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
+              {% elif user_is_joined == "not" or not user.is_authenticated %}
+                {% if is_user_group and node.created_by != request.user %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
 
-              {% else %}
-              <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                {% else %}
+                <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                {% endif %}
+
               {% endif %}
-
             {% endif %}
 
             {% endif %}

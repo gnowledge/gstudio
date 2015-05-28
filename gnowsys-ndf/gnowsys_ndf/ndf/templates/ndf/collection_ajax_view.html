@@ -1,10 +1,13 @@
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
 
 {% block head %}
 
+  {% cache 3600 collection_view_static_files %}
   <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+  {% endcache %}
     
   <script type="text/javascript">
     $(document).ready(function() {      

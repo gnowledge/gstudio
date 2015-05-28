@@ -1,13 +1,17 @@
 {% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
 {% get_group_name groupid as group_name_tag %}
 
-{% load i18n %}
 <!-- orgitdown! -->
+{% cache 3600 editor_static_files %}
 <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
 <!-- orgitdown! toolbar settings -->
 <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
 <!-- orgitdown! skin -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+{% endcache %}
 
 <style type="text/css">
 
@@ -226,6 +230,8 @@ $(".orgitdownButton.orgitdownButton10 a").click(function(){
 		});
 
 </script>
+
+{% cache 3600 editor_menu %}
 <div id="bib-text" class="reveal-modal" data-reveal>
 <dl class="accordion" data-accordion id="bib1">
 </dl>
@@ -264,4 +270,4 @@ $(".orgitdownButton.orgitdownButton10 a").click(function(){
   </dl>
 <a class="close-reveal-modal">&#215;</a>
 </div>
-
+{% endcache %}

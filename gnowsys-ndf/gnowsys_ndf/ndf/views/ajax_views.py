@@ -23,6 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from mongokit import paginator
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 
 try:
     from bson import ObjectId
@@ -664,10 +665,25 @@ def get_collection_list(collection_list, node):
   else:
     return collection_list
 
+
+
 @get_execution_time
 def get_tree_hierarchy(request, group_id, node_id):
+
+    Collapsible = request.GET.get("collapsible", "")
+    # print "Collapsible : ", Collapsible
+
+    # if cached result exists return it
+    cache_key = u'get_tree_hierarchy_' + unicode(group_id) + "_" + unicode(node_id) + "_" + unicode(Collapsible) 
+    # print cache_key
+    cache_result = cache.get(cache_key)
+    # print cache_result
+
+    if cache_result:
+        return HttpResponse(cache_result)
+    # ---------------------------------
+
     node = node_collection.one({'_id':ObjectId(node_id)})
-    Collapsible = request.GET.get("collapsible", "");
 
     data = ""
     collection_list = []
@@ -693,8 +709,10 @@ def get_tree_hierarchy(request, group_id, node_id):
 
     if Collapsible:
       data = { "name": theme_node.name, "children": collection_list }
+      cache.set(cache_key, json.dumps(data), 60*15)
     else:
       data = collection_list
+      cache.set(cache_key, json.dumps(data), 60*15)
 
     return HttpResponse(json.dumps(data))
 # ###End of manipulating theme topic hierarchy####
@@ -1358,7 +1376,7 @@ def graph_nodes(request, group_id):
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set",
                       "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
                       "property_order", "rating", "apps_list", "annotations", "instance of"

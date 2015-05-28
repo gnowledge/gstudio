@@ -29,7 +29,7 @@ from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
-from gnowsys_ndf.settings import GROUP_AGENCY_TYPES, AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.rcslib import RCS
 from django.dispatch import receiver
@@ -1158,7 +1158,7 @@ class Group(GSystem):
         'visibility_policy': lambda x: x in EXISTANCE_POLICY,
         'disclosure_policy': lambda x: x in LIST_MEMBER_POLICY,
         'encryption_policy': lambda x: x in ENCRYPTION_POLICY,
-        'agency_type': lambda x: x in GROUP_AGENCY_TYPES
+        'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES
     }
 
     def is_gstaff(self, user):
@@ -1201,7 +1201,7 @@ class Author(Group):
     use_dot_notation = True
 
     validators = {
-        'agency_type': lambda x: x in AUTHOR_AGENCY_TYPES         # agency_type inherited from Group class
+        'agency_type': lambda x: x in GSTUDIO_AUTHOR_AGENCY_TYPES         # agency_type inherited from Group class
     }
 
     required_fields = ['name', 'password']

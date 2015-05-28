@@ -685,8 +685,8 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             each_course_college[1]._id.__str__(),
             univ_name
         ))
-
-      person_gs.trainer_teaches_course_in_college = l
+      if l:
+        person_gs.trainer_teaches_course_in_college = l
 
     context_variables['node'] = person_gs
 

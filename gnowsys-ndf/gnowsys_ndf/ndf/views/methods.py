@@ -8,12 +8,14 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response  # , render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.cache import cache
+
 from mongokit import paginator
 import mongokit
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
-from gnowsys_ndf.settings import DEFAULT_GAPPS_LIST, WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -98,9 +100,19 @@ def get_group_name_id(group_name_or_id, get_obj=False):
       Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
       - "res_group_obj" will contain entire object.
     '''
+    # if cached result exists return it
+    if not get_obj:
+        slug = slugify(group_name_or_id)
+        cache_key = 'get_group_name_id_' + str(slug) if slug else str(abs(hash(group_name_or_id)))
+        cache_result = cache.get(cache_key)
+
+        if cache_result:
+            return cache_result
+    # ---------------------------------
 
     # case-1: argument - "group_name_or_id" is ObjectId
     if ObjectId.is_valid(group_name_or_id):
+
         group_obj = node_collection.one({"_id": ObjectId(group_name_or_id)})
 
         # checking if group_obj is valid
@@ -112,6 +124,10 @@ def get_group_name_id(group_name_or_id, get_obj=False):
             if get_obj:
                 return group_obj
             else:
+                # setting cache with both ObjectId and group_name
+                cache.set(cache_key, (group_name, group_id), 60*60)
+                cache_key = u'get_group_name_id_' + slugify(group_name)
+                cache.set(cache_key, (group_name, group_id), 60*60)
                 return group_name, group_id
 
     # case-2: argument - "group_name_or_id" is group name
@@ -127,6 +143,10 @@ def get_group_name_id(group_name_or_id, get_obj=False):
             if get_obj:
                 return group_obj
             else:
+                # setting cache with both ObjectId and group_name
+                cache.set(cache_key, (group_name, group_id), 60*60)
+                cache_key = u'get_group_name_id_' + slugify(group_id)
+                cache.set(cache_key, (group_name, group_id), 60*60)
                 return group_name, group_id
 
     if get_obj:
@@ -172,7 +192,7 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
         that is, in menu-bar and GAPPs selection menu for a given group
         - True: DEFAULT_GAPPS (menu-bar)
             - At present used in listing GAPPS whenever a new group is created
-        - False: WORKING_GAPPS (selection-menu)
+        - False: GSTUDIO_WORKING_GAPPS (selection-menu)
             - At present used in listing GAPPS for setting-up GAPPS for a group
 
     already_selected_gapps -- (Optional argument)
@@ -186,14 +206,14 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
     """
     gapps_list = []
 
-    global DEFAULT_GAPPS_LIST
-    gapps_list = DEFAULT_GAPPS_LIST
+    global GSTUDIO_DEFAULT_GAPPS_LIST
+    gapps_list = GSTUDIO_DEFAULT_GAPPS_LIST
 
     if not gapps_list or not default_gapp_listing:
-        # If DEFAULT_GAPPS_LIST not set (i.e. empty)
+        # If GSTUDIO_DEFAULT_GAPPS_LIST not set (i.e. empty)
         # Or we need to setup list for selection purpose of GAPPS
         # for a group
-        gapps_list = WORKING_GAPPS
+        gapps_list = GSTUDIO_WORKING_GAPPS
 
         # If already_selected_gapps is non-empty,
         # Then append their names in list of GApps to be excluded
@@ -491,7 +511,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 # get type of resourc
 @get_execution_time
 def get_resource_type(request,node_id):
-  get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
+  get_resource_type=node_collection.one({'_id':ObjectId(node_id)})
   get_type=get_resource_type._type
   return get_type 
                           
@@ -581,10 +601,12 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         name = request.POST.get('name_' + str(coll_set._id), "")
         content_org = request.POST.get(str(coll_set._id), "")
         tags = request.POST.get('tags' + str(coll_set._id), "")
+        
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
         tags = request.POST.get('tags')
+        # print "tags: --------- ", tags
 
     language = request.POST.get('lan')
     sub_theme_name = request.POST.get("sub_theme_name", '')
@@ -705,18 +727,19 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
                 node.group_set.append(user_group_obj._id)
 
     # tags
-    if tags:
-        tags_list = []
+    # if tags:
+    tags_list = []
 
-        for tag in tags.split(","):
-            tag = unicode(tag.strip())
+    for tag in tags.split(","):
+        tag = unicode(tag.strip())
 
-            if tag:
-                tags_list.append(tag)
+        if tag:
+            tags_list.append(tag)
 
-        if set(node.tags) != set(tags_list):
-            node.tags = tags_list
-            is_changed = True
+    if set(node.tags) != set(tags_list):
+        node.tags = tags_list
+        is_changed = True
+      
 
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
@@ -1131,100 +1154,95 @@ def check_page_first_creation(request,node):
 
 
 @get_execution_time
-def tag_info(request, group_id, tagname = None):
+def tag_info(request, group_id, tagname=None):
     '''
     Function to get all the resources related to tag
     '''
-
     group_name, group_id = get_group_name_id(group_id)
-
+    group_id = ObjectId(group_id)
     cur = None
     total = None
-    total_length = None  
+    total_length = None
     yesterdays_result = []
     week_ago_result = []
     search_result = []
-    group_cur_list = [] #for AutheticatedUser
+    group_cur_list = []  # for AutheticatedUser
     today = date.today()
-    yesterdays_search = {date.today()-timedelta(days=1)}
-    week_ago_search = {date.today()-timedelta(days=7)}
+    yesterdays_search = {date.today() - timedelta(days=1)}
+    week_ago_search = {date.today() - timedelta(days=7)}
     locale.setlocale(locale.LC_ALL, '')
     userid = request.user.id
-    collection = get_database()[Node.collection_name]
+    # collection = get_database()[Node.collection_name]
+    tag_str = request.GET.get("search", "")
+    tag_search = tag_str.lower()
+    # if coming from search, set tagname value to search value
+    if tag_search:
+        tagname = tag_search
 
-    if not tagname:
-        tagname = request.GET["search"].lower()
-
-    if request.user.is_superuser:  #Superuser can see private an public files 
+    if request.user.is_superuser:  # Superuser can see private an public files
         if tagname:
-            cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                          # '$or':[   {'access_policy':u'PUBLIC'},
-                                          #           {'access_policy':u'PRIVATE'}
-                                          #       ],   
-                                         'status':u'PUBLISHED'
-                                    }
-                                 )
+            cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                        'group_set':ObjectId(group_id)
+                  })
             for every in cur:
                 search_result.append(every)
 
-        total = len(search_result)
-        total = locale.format("%d", total, grouping=True)
-        if len(search_result) == 0:
-            total_length = len(search_result)    
-
-    elif request.user.is_authenticated():   #Autheticate user can see all public files  
-        group_cur = collection.Node.find({'_type':'Group',
-                                           '$or':[ {'created_by':userid},
-                                                 {'group_admin':userid},
-                                                 {'author_set':userid},
-                                                 {'group_type':u'PUBLIC'},
-                                               ]
-                                    }      
-                                )
-        for each in group_cur:
-            group_cur_list.append(each._id)
-
-        if tagname and (group_id in group_cur_list):
-            cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                         'group_set':{'$in': [group_id]},
-                                         'status':u'PUBLISHED'
-                                    }
-                             )
-            for every in cur: 
+    # Autheticate user can see all public files
+    elif request.user.is_authenticated():
+        # group_cur = node_collection.find({'_type': 'Group',
+        #                                   '$or': [
+        #                                       {'created_by': userid},
+        #                                       {'group_admin': userid},
+        #                                       {'author_set': userid},
+        #                                       {'group_type': u'PUBLIC'},
+        #                                     ]
+        #                                   })
+        # for each in group_cur:
+        #     group_cur_list.append(each._id)
+        if tagname:  # and (group_id in group_cur_list):
+            cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                         'group_set': ObjectId(group_id),
+                                         '$or': [
+                                            {'status': u'PUBLISHED'},
+                                            {'created_by': userid},
+                                          ]
+                                      })
+            for every in cur:
                 search_result.append(every)
 
+    else:  # Unauthenticated user can see all public files.
+        group_node = node_collection.one({'_id': ObjectId(group_id)})
+        if group_node.group_type == u"PUBLIC":
+            if tagname:
+                cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                               'group_set': group_id,
+                                               'status': u'PUBLISHED'
+                                            }
+                                     )
+                for every in cur:
+                    search_result.append(every)
+
+    if search_result:
         total = len(search_result)
         total = locale.format("%d", total, grouping=True)
         if len(search_result) == 0:
             total_length = len(search_result)
-
-    else: #Unauthenticated user can see all public files.
-        if tagname:
-            cur = collection.Node.find( { 'tags':{'$in':[tagname]},
-                                           'access_policy':u'PUBLIC',
-                                           'status':u'PUBLISHED'
-                                        }
-                                 )
-            for every in cur:
-                search_result.append(every)
-
-        total = len(search_result)
-        total = locale.format("%d", total, grouping=True)
-        if len(search_result) == 0:
-            total_length = len(search_result)
-    
+    context_variable = {'group_id': group_id, 'groupid': group_id,
+                        'search_result': search_result,
+                        'tagname': tagname, 'total': total,
+                        'total_length': total_length}
     return render_to_response(
         "ndf/tag_browser.html",
-        {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},
+        context_variable,
         context_instance=RequestContext(request)
     )
 
 
-#code for merging two text Documents
+# code for merging two text Documents
 import difflib
 @get_execution_time
-def diff_string(original,revised):
-        
+def diff_string(original, revised):
+
         # build a list of sentences for each input string
         original_text = _split_with_maintain(original)
         new_text = _split_with_maintain(revised)
@@ -2537,6 +2555,14 @@ def get_user_activity(userObject):
 
 @get_execution_time
 def get_file_node(file_name=""):
+  # if cached result exists return it
+  cache_key = u'get_file_node' + slugify(unicode(file_name))
+  cache_result = cache.get(cache_key)
+
+  if cache_result:
+      return cache_result
+  # ---------------------------------
+
   file_list=[]
   new=[]
   a=str(file_name).split(',')
@@ -2552,6 +2578,7 @@ def get_file_node(file_name=""):
           if filedoc:
              for i in filedoc:
 		            file_list.append(i.name)	
+  cache.set(cache_key, file_list, 60*15)
   return file_list	
 
 @get_execution_time

@@ -1,7 +1,9 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% load cache %}
 
+{% cache 300 create_group request.LANGUAGE_CODE %}
 {% block title %} Create a new group {% endblock %}
 
 {% block meta_content %}
@@ -24,6 +26,7 @@
     {% endfor %}
   {% endif %}
 {% endblock %}
+{% endcache %}
 
 {% block body_content %} 
 
@@ -31,7 +34,7 @@
 
   <form id="create_group" class="row" method="post" action="{% url 'create_group' group_id %}">
     {% csrf_token %}
-
+    {% cache 3600 create_group request.LANGUAGE_CODE %}
       <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
         <div style='display:table-row;' >
           <div style='display:table-cell;'> 
@@ -70,7 +73,7 @@
             <font size="3" >Group Subscription policy</font>
           </div>
           <div style='display:table-cell;'> 
-            <select name="subscription" class="subscptn">
+            <select name="subscription" class="subscptn" disabled="disabled">
               <option id="OPEN">{% trans "OPEN" %}</option>
               <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
               <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
@@ -95,7 +98,7 @@
             <font size="3">{% trans "Group Member Visibility" %}</font>
           </div>
           <div style='display:table-cell;'> 
-            <select name="member" class="mem" disabled>
+            <select name="member" class="mem" disabled="disabled">
               <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED_TO_MEM" %}</option>
               <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT_DISCLOSED_TO_MEM" %}</option>
             </select>
@@ -107,7 +110,7 @@
             <font size="3" >{% trans "Group Encryption policy" %}</font>
           </div>
           <div style='display:table-cell;'> 
-            <select name="encryption" class="encr" disabled>
+            <select name="encryption" class="encr" disabled="disabled">
               <option id="NOT_ENCRYPTED">{% trans "NOT_ENCRYPTED" %}</option>
               <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
             </select>
@@ -117,7 +120,7 @@
             <font size="3" >{% trans "Group Existance visibility" %}</font>
           </div>
           <div style='display:table-cell;'> 
-            <select name="existance" class="existance" disabled>
+            <select name="existance" class="existance" disabled="disabled">
               <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
               <option id="NOT_ANNOUNCED">{% trans "NOT_ANNOUNCED" %}</option>
             </select>
@@ -132,8 +135,11 @@
         </div>
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
       </div>
+    {% endcache %}
   </form>
+
 {% endblock %}
+
 
 {% block head %}
 <script type="text/javascript">
@@ -223,24 +229,28 @@
   $("#create_group").submit(function(event){
     var name = $("#group_name").val().trim().toLowerCase();
     var nodes = {{nodes_list|safe}} 
-
+    var val_chk = name.search(/mod$/gi)    
+    $("#message").css("display", "none");
     if (name != "")
     {
-      if (nodes.indexOf(name) != -1)  
-      { 
-        $("#message").css("display", "block");
-        $("#message").text("Group '"+ name +"' already exist. Please choose another name");
-        event.preventDefault();
+      if(val_chk == -1){
+        if (nodes.indexOf(name) >= 0)  
+          { 
+            $("#message").css("display", "block");
+            $("#message").text("Group '"+ name +"' already exist. Please choose another name");
+            event.preventDefault();
+          }
+      }
+      else if (val_chk != -1){
+          $("#message").css("display", "block");
+          $("#message").text("Name cannot include 'Mod'.");
+          event.preventDefault();
       }
     }
     else if (name == ""){
       $("#message").css("display", "block");
       $("#message").text("Group name cannot be empty.");
       event.preventDefault();
-    }
-    else
-    {
-      $("#message").css("display", "none");
     }
   });
 

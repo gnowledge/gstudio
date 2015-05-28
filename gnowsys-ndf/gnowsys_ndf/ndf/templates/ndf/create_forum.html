@@ -1,13 +1,14 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
+
+{% cache 3600 create_forum request.LANGUAGE_CODE %}
+
 {% block title %}Create Forum{% endblock %}
 
 {% block head %}
     
-  <!-- <link rel="stylesheet" href="/static/ndf/css/foundation-datepicker.css"> 
- <script src="/static/ndf/js/foundation-datepicker.js"></script>
-  -->
   <!-- Datetimepicker  -->
   <!-- <link rel="stylesheet" media="all" type="text/css" href="/static/ndf/css/jquery-ui.css" /> -->
  <!--  <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
@@ -24,7 +25,7 @@
 <!-- orgitdown! skin -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
-  <style type="text/css">
+<!--   <style type="text/css">
 /*    #save_form{ margin-top: 2em; }
     .startDtInput, .endDtInput {box-shadow: 0 5px 5px #808080; width: 230px; }
 
@@ -39,22 +40,14 @@
     .text-align-middle {  padding: 0.6em 1em 0 2em ;  }
 */
   </style>
-
-  <!-- <script type="text/javascript">
-    // $(document).ready(function(){
-
-    //     $('#startdate').fdatepicker();
-    //     $('#enddate').fdatepicker();
-
-    // });
-  </script> -->
-  
+ -->
 {% endblock %}
+<!-- end of head block -->
 
 
 {% block meta_content %}
-{% blocktrans %}  <h3 class="subheader">Starting Discussions</h3>
-  <p class="text-justify">Use a relevant topic for the <b>forum</b> so that interested people can join the discussion</p> {% endblocktrans %}
+  {% blocktrans %}  <h3 class="subheader">Starting Discussions</h3>
+    <p class="text-justify">Use a relevant topic for the <b>forum</b> so that interested people can join the discussion</p> {% endblocktrans %}
 {% endblock %}
 
 {% block body_content %} 
@@ -190,7 +183,9 @@
   </form>
  -->
  {% endcomment %}
-{% endblock %}
+{% endblock %} <!-- end of body block -->
+
+{% endcache %} <!-- end of cache -->
 
 {% block script %}
 
