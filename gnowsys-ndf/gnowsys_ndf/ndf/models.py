@@ -1146,10 +1146,12 @@ class Group(GSystem):
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
 
         'group_admin': [int],		     # ObjectId of Author class
-        'partner': bool                       # Shows partners exists for a group or not
+        'moderation_level': int              # range from 0 till any integer level
     }
 
     use_dot_notation = True
+
+    default_values = {'moderation_level': 0}
 
     validators = {
         'group_type': lambda x: x in TYPES_OF_GROUP,
