@@ -38,6 +38,18 @@ class Command(BaseCommand):
             "\n\t - Previously it was   : " + str(prev_home_author_set) + \
             "\n\t - Now it's updated to : " + str(home_group.author_set)
 
+    
+    # --------------------------------------------------------------------------
+    # 'group_admin' of group should not be empty. So updating one for [] with creator of group.
+    all_groups = node_collection.find({'_type': 'Group'})
+    for each_group in all_groups:
+        if not each_group.group_admin:
+            res = node_collection.collection.update({'_id': ObjectId(each_group._id)}, {'$set': {'group_admin': [each_group.created_by]}}, upsert=False, multi=False)
+
+            if res['updatedExisting']:
+                each_group.reload()
+                print 'updated group_admin of: ' + each_group.name + ' from [] to :' + unicode(each_group.group_admin)
+
 
     # --------------------------------------------------------------------------
     # removing <'partner': bool> field from Group objects
