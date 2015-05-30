@@ -11,5 +11,6 @@ urlpatterns = patterns('',
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
     (r'^$', include('gnowsys_ndf.ndf.urls')),
     (r'^ndf/', include('gnowsys_ndf.ndf.urls')),
+    (r'^mailclient/', include('gnowsys_ndf.ndf.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
