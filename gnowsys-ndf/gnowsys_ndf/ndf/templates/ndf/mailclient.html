@@ -1,0 +1,81 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+<!-- The StyleSheet of the side column -->
+{% block style %}
+	.BoxNames{
+		padding-left: 40px;
+	}
+	.activeMailBox{
+		position: relative;
+	}
+	.mailBoxContent{
+		min-height: 100%;
+		position: relative;
+	}
+	.boxController{
+		margin-bottom: 0px;
+	}
+{% endblock %}
+
+{% block head %}
+<script src="/static/ndf/js/mailbox.js"></script>
+{% endblock %}
+
+{% block meta_content %}
+  <h2 class="subheader">{% trans "MailBoxes" %}</h2>
+{% endblock %}
+ 
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+      <div class="task">
+      <br/>
+      <a class="button medium" href="{% url 'mailbox_create_edit' groupid %}">
+        <span class="fi-plus">&nbsp;&nbsp;{% trans "New Mail Box" %}</span>
+      </a>
+    </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+ 
+{% block add_resource_content %}
+	<div class="BoxNames" style="padding-right:10px">
+		<a onclick="setMailBoxName(document.getElementById('box0').innerHTML)" ><h3 id="box0">{% trans "MetaBox" %}</a></h3>
+		<a onclick="setMailBoxName(document.getElementById('box1').innerHTML)" ><h3 id="box1">{% trans "LolBox" %}</a></h3>
+	</div>
+{% endblock %}
+
+{% block body_content %}
+
+	<!-- To Display the name of the active mailbox -->
+	<div class="activeMailBox">
+		<h2 id="mailBoxName">MetaBox</h2>
+	</div>
+	
+	<!-- To Display the mails (first 10) of the active mailbox -->
+	<div class="mailBoxContent">
+		<!-- generate them iteratively -->
+		
+		<div id="mail0">
+			
+		</div>
+
+	</div>
+
+	<!-- To Display the at the bottom of the mail box -->
+	<div class="boxController">
+		
+	</div>
+{% endblock %}
+ 

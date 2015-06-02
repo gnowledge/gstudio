@@ -488,8 +488,10 @@ GSTUDIO_REGISTRATION_AFFILIATION = True
 GAPPS = [
     u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz",
     u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Topics",
-    u"E-Library", u"Meeting", u"Bib_App", u"Observation", u"Event", u"E-Book",u"MailClient"
+    u"E-Library", u"Meeting", u"Bib_App", u"Observation", u"Event", u"E-Book"
 ]
+
+#,u"MailClient"
 
 # This holds the list of stable GAPPS
 # ONLY TO BE EDITED in local_settings file
@@ -497,7 +499,7 @@ GAPPS = [
 # please make use of local_settings file
 GSTUDIO_WORKING_GAPPS = [
     u"Page", u"File", u"E-Library", u"Forum", u"Quiz", u"Task", u"Topics",
-    u"Course", u"Module", u"Observation", "Batch", u"Event",u"MailClient"
+    u"Course", u"Module", u"Observation", "Batch", u"Event"
 ]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
