@@ -114,6 +114,9 @@
 
 {% block body_content %} 
   {% if title == "MIS" %}
+  <div>
+    <a href="{% url 'mis:get_mis_reports' group_id %}">REPORTS</a>
+ </div>
 
   <div class="row">
     <div class="small-12 small-centered columns">

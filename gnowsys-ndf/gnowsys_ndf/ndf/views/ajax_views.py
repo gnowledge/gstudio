@@ -3028,6 +3028,7 @@ def get_students_assignments(request, group_id):
     print "\n StudentDataGetError: " + str(e)
     raise Http404(e)
 
+@login_required
 @get_execution_time
 def get_districts(request, group_id):
   """
@@ -3084,6 +3085,8 @@ def get_districts(request, group_id):
     error_message = "\n DistrictFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
+
+@login_required
 @get_execution_time
 def get_affiliated_colleges(request, group_id):
   """
@@ -3111,25 +3114,29 @@ def get_affiliated_colleges(request, group_id):
       university_id = request.GET.get("university_id", "")
       req_university = None
       req_affiliated_colleges = None
-
+      colg_gst = node_collection.one({'_type': "GSystemType", 'name': "College"})
       # Check whether any field has missing value or not
       if university_id == "":
         error_message = "AffiliatedCollegeFindError: Invalid data (No university selected)!!!"
         raise Exception(error_message)
 
-      # Type-cast fetched field(s) into their appropriate type
-      university_id = ObjectId(university_id)
+      if university_id == "ALL":
+        req_affiliated_colleges = node_collection.find({'member_of': colg_gst._id}, {'name': 1}).sort('name', 1)
 
-      # Fetch required university
-      req_university = node_collection.one({'_id': university_id})
+      else:
+        # Type-cast fetched field(s) into their appropriate type
+        university_id = ObjectId(university_id)
 
-      if not req_university:
-        error_message = "AffiliatedCollegeFindError: No university exists with given ObjectId("+university_id+")!!!"
-        raise Exception(error_message)
+        # Fetch required university
+        req_university = node_collection.one({'_id': university_id})
 
-      for each in req_university["relation_set"]:
-        if u"affiliated_college" in each.keys():
-          req_affiliated_colleges = node_collection.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
+        if not req_university:
+          error_message = "AffiliatedCollegeFindError: No university exists with given ObjectId("+university_id+")!!!"
+          raise Exception(error_message)
+
+        for each in req_university["relation_set"]:
+          if u"affiliated_college" in each.keys():
+            req_affiliated_colleges = node_collection.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
       
       req_affiliated_colleges_list = []
       for each in req_affiliated_colleges:
@@ -5470,3 +5477,67 @@ def get_batches_with_acourse(request, group_id):
   except Exception as e:
     error_message = "\n BatchFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
+
+
+@login_required
+@get_execution_time
+def get_universities(request, group_id):
+    """
+    This view fetches Universities belonging to given state.
+
+    Arguments:
+    group_id - ObjectId of the currently selected group
+    state_id - ObjectId of the currently selected state`
+
+    Returns:
+    A dictionary consisting of following key:-
+    universities - a list variable consisting of two elements i.e.,
+                first-element: University's ObjectId,
+                second-element:University's name
+    message - a string variable giving the error-message
+    """
+
+    try:
+        if request.is_ajax() and request.method == "GET":
+            state_id = request.GET.get("state_id", "")
+
+            # universities -- [first-element: subject (University's ObjectId),
+            # second-element: manipulated-name-value (University's name)]
+            universities = []
+            univ_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+            mis_admin_grp = node_collection.one({'_type': "Group", 'name': "MIS_admin"})
+
+            if state_id == "ALL":
+                # Fetching all universities belonging to given state in sorted order by name
+                university_cur = node_collection.find(
+                    {
+                        'member_of': univ_gst._id,
+                        'group_set': mis_admin_grp._id,
+                    }).sort('name', 1)
+
+            else:
+                # Fetching all universities belonging to given state in sorted order by name
+                university_cur = node_collection.find(
+                    {
+                        'member_of': univ_gst._id,
+                        'group_set': mis_admin_grp._id,
+                        'relation_set.organization_belongs_to_state': ObjectId(state_id)
+                    }).sort('name', 1)
+
+            if university_cur.count():
+                for d in university_cur:
+                    universities.append([str(d._id), d.name])
+
+            else:
+                error_message = "No University found for the selected State"
+                raise Exception(error_message)
+
+            return HttpResponse(json.dumps(universities))
+
+        else:
+            error_message = " UniversityFetchError: Either not an ajax call or not a GET request!!!"
+            return HttpResponse(json.dumps({'message': " UniversityFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+    except Exception as e:
+        error_message = str(e)
+        return HttpResponse(json.dumps({'message': error_message}))
