@@ -43,7 +43,7 @@ background:#b3ffb3;
 
   <hr style="height:5px;background-color: #0B6580;" />
 
-  <div id="compare_versions_div" style="">
+  <div id="compare_versions_div" style="padding-left: 130px;">
   <form method="POST" action="">
     {% csrf_token %}
 
@@ -94,70 +94,68 @@ background:#b3ffb3;
 
   </form>
   </div>
-  {{trail|safe}}
-  {% if  view == "single" %}
-    <div id="single-view" style="padding-bottom: 20px">
-      <table cellpadding="8">
-	<tr>
-	<th align="right">{% trans "Fields" %}</th>
-          <th align="left">{% trans "Version" %} #{{selected_versions.1}}</th>
-	</tr>
-        {% for i in content %}
-	        {% for k,v in i.items %}
-	          <tr>
-              <td align="right" valign="top">{{k|title}}</td>
-              <td>    {{v|safe}}    </td>
-	          </tr>
-		      {% endfor %}
-	     {% endfor %}
-      </table>
-   
- </div>
-{% elif view == "merge" or view == "revert" %}
+  
+  
+{% if view == "merge" or view == "revert" %}
   <script>
         document.location.href = '/{{group_id}}/compare/{{node}}/version/{{ver}}'</script>
 
   {% else %}
- <div class="row" style = "overflow: auto; min-height: auto;max-height: 75vh;">  
- <div class="medium-5 columns"> 
-    <div id="compare-view" style="padding-bottom: 20px;  width:250%;">
+  {% comment %}
+ <!-- <div class="row" style = "overflow: auto; min-height: auto;max-height: 75vh;">   --> {% endcomment %}
+ <div class="medium-12 columns"> 
+    <div id="compare-view" style="padding-bottom: 20px; padding-left: 120px; width:500x;" >
     </div>
  </div>
- </div>
-	
+ {% comment %}
+ <!-- </div> -->
+	{% endcomment %}
 
   {% endif %}
 {% endblock %}
 
 {% block script %}
+toggleMainSidebar()
+drawtable()
 
-left_panel = {{content|safe}}
-if ( '{{content1}}' != 'none' )
-    { 
-      right_panel = {{content1|safe}}
-      right_panel.reverse()
-    }
+function drawtable()
+{
+		left_panel = {{content|safe}}
+		if ( '{{content1}}' != 'none' )
+		    { 
+		      right_panel = {{content1|safe}}
+		      right_panel.reverse()
+		    }
 
-$('#compare-view').append("<table id='new' width='700'  </table>")
-$('#new').append("<thead> <th> Feild </th> <th> Value </th>  <th> Compared  </th>  </thead>")
-
-h= 0
-$.each(left_panel,function(k,g)
-{   h = h + 1
-    $.each(g,function(c,v){
-        
-        $('#new').append("<tr id = " +  "rows" + k  + " >  <td style='vertical-align: top;'> " + c.toUpperCase().replace('_',' ')   + "</td> <td style='vertical-align: top;'>" + v + "</td> ")
-        
-    
-    });
-        if ( '{{content1}}' != 'none' )
-        {
-          t = right_panel.pop(k)
-          $.each(t,function(c,v){
-          $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
-           });
+		$('#compare-view').append("<table id='new' </table>")
+		
+		if ( '{{content1}}' != 'none' )
+		{
+			$('#new').append("<thead> <tr> <th width='150'> Feild </th>  <th width='600' > Value </th>  <th width='600' > Compared  </th> </tr> </thead>")
         }
-});
+        else
+        {
+        	$('#new').append("<thead> <tr> <th width='150'> Feild </th>  <th width='1000' > Value </th>   </tr> </thead>")	
+        }
+		
+		h= 0
+		
+		$.each(left_panel,function(k,g)
+		{   h = h + 1
+		    $.each(g,function(c,v){
+		        $('#new').append("<tr id = " +  "rows" + k  + " >  <td style='vertical-align: top;'> " + c.toUpperCase().bold().replace('_',' ')   + "</td> <td style='vertical-align: top;'>" + v + "</td> ")
+		    });
+		    
+		    if ( '{{content1}}' != 'none' )
+		     {
+		        t = right_panel.pop(k)
+		        $.each(t,function(c,v){
+		        $('#rows' + k).append(" <td style='vertical-align: top;'> " + v + "</td> </tr>")
+		        });
+		     }
+		});
+}
+
 $("#compare_versions").click(function() {
     if ($("#version_1").val() === $("#version_2").val()) {
 	alert ("Please select different versions!!!")
