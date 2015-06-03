@@ -688,6 +688,7 @@ def get_mis_reports(request, group_id, **kwargs):
         return_data_set = []
         rec = None
         colg_cur = None
+        data_for_report1 = {}
         data_dict = request.POST.get("data_set", "")
         gst_name = request.POST.get("gst_name", "")
         if gst_name == "Event":
@@ -868,7 +869,7 @@ def get_mis_reports(request, group_id, **kwargs):
                                             {
                                               '_id': {'State': statename,
                                               'University': univname,
-                                              'College': each.name,
+                                              'College': each._id,
                                               },
                                               'total_students': {'$sum': 1}
                                             }
@@ -876,6 +877,7 @@ def get_mis_reports(request, group_id, **kwargs):
                 ])
 
                 resultset = rec['result']
+                
                 if resultset:
                     for each in resultset:
                         if each["_id"]:
@@ -886,8 +888,11 @@ def get_mis_reports(request, group_id, **kwargs):
                             if each['_id']['University']:
                                 univ_node = node_collection.one({'_id': ObjectId(each['_id']['University'][0])})
                                 each["university"] = univ_node.name
+                                data_for_report1["university_id"] = str(univ_node._id)
                             if each['_id']['College']:
-                                each["college"] = each['_id']['College']
+                                colg_node = node_collection.one({'_id': ObjectId(each['_id']['College'])})
+                                each["college"] = colg_node.name
+                                data_for_report1["college_id"] = str(colg_node._id)
                             del each['_id']
                             try:
                                 print each['total_students']
@@ -910,7 +915,7 @@ def get_mis_reports(request, group_id, **kwargs):
             response_dict["column_headers"] = column_headers
             response_dict["success"] = True
             response_dict["return_data_set"] = return_data_set
-
+            response_dict["data_for_report1"] = json.dumps(data_for_report1)
         return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
     else:
