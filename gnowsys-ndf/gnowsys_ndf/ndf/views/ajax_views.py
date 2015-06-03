@@ -4941,7 +4941,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  
  performance_record=node_collection.find({"_type":"AttributeType","name":"performance_record"})
  
- student_details=node_collection.find({"_type":"AttributeType","name":"attendance_record"})
+ student_attendace_record=node_collection.find({"_type":"AttributeType","name":"attendance_record"})
  
  marks_entry_completed=node_collection.find({"_type":"AttributeType","name":"marks_entry_completed"})
  
@@ -4949,42 +4949,42 @@ def event_assginee(request, group_id, app_set_instance_id=None):
 
  event_node = node_collection.one({"_id":ObjectId(app_set_instance_id)})
 
+ student_details = node_collection.one({"_type":"AttributeType","name":"student_event_details"})
+
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
- 
  for info in Event_attended_by:
      a=ast.literal_eval(info)
      if (a['Name'] != 'undefined'):
       student_dict={}
-      Assignment_dict = {}
-      Assessment_dict = {}
       attendance_dict = {}
+      performance_record_dict = {}
+      marks_dict = {}
       student_node = node_collection.find_one({"_id":ObjectId(a['Name'])})
       
       for i in student_node.attribute_set:
-          if unicode("Assignment_marks_record") in i.keys():
-            Assignment_dict.update(i["Assignment_marks_record"])
-          if unicode("Assessment_marks_record") in i.keys():
-            Assessment_dict.update(i["Assessment_marks_record"])
+          if unicode('student_event_details') in i.keys():
+            student_dict.update(i['student_event_details'])
           if unicode("attendance_record") in i.keys():
             attendance_dict.update(i["attendance_record"])
-      
+          if unicode("performance_record") in i.keys():
+            performance_record_dict.update(i["performance_record"])
+            
       if (a['save'] == '2' or a['save'] == '3'):
-        student_dict.update(Assignment_dict)
-        student_dict[Event[0]]=a['Attendance_marks']
-        create_gattribute(ObjectId(a['Name']),Assignment_rel[0],student_dict)
+        marks_dict["Assignment_marks_record"] = a['Attendance_marks']
       if(a['save'] == '2' or  a['save'] == '4'):
-      	student_dict.update(Assessment_dict) 
-        student_dict[Event[0]] = a['Assessment_marks']
-        create_gattribute(ObjectId(a['Name']),Assessmentmarks_rel[0],student_dict)
+      	marks_dict["Assessment_marks_record"] = a['Assessment_marks']
+      if (a['save'] == '2' or a['save'] == '3' or a['save'] == '4'):
+        student_dict[Event[0]] = marks_dict 
+        create_gattribute(ObjectId(a['Name']),student_details,student_dict)
+      
       if(a['save'] == '5'):
-      	student_dict.update(Assessment_dict)
-        student_dict[Event[0]] = a['Assessment_marks'] 
-        create_gattribute(ObjectId(a['Name']),performance_record[0], student_dict)
-      attendance_dict.update({unicode(Event[0]):a['Presence']})  
-      create_gattribute(ObjectId(a['Name']),student_details[0],attendance_dict)
+      	performance_record_dict[Event[0]] = a['Assessment_marks'] 
+        create_gattribute(ObjectId(a['Name']),performance_record[0],performance_record_dict)
       if(a['Presence'] == 'True'):
           attendedlist.append(a['Name'])
+      attendance_dict.update({unicode(Event[0]):a['Presence']})  
+      create_gattribute(ObjectId(a['Name']),student_attendace_record[0],attendance_dict)
 
  if attendancesession != str(1):
    create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
@@ -5293,28 +5293,31 @@ def get_attendance(request,group_id,node):
       dict2={}
       for j in  attendees.attribute_set:
          if member_of.name != "Exam":
-            	if   unicode('Assignment_marks_record') in j.keys():
-                
-                   if str(node._id) in j['Assignment_marks_record']:
-                      val=True
-                      assign=True
-                      dict1.update({'marks':j['Assignment_marks_record'][str(node._id)]})
-                   else:
-                      dict1.update({'marks':"0"})
-            	if  unicode('Assessment_marks_record') in j.keys():
-	               if(str(node._id) in j['Assessment_marks_record']):
-	                  val=True
-	                  asses=True
-	                  dict2.update({'marks':j['Assessment_marks_record'][str(node._id)]})
-	               else:
-	                  dict2.update({'marks':"0"})
+            	if   unicode('student_event_details') in j.keys():
+                   if(unicode(node._id) in j['student_event_details'].keys()):
+                           if unicode('Assignment_marks_record') in j['student_event_details'][str(node._id)].keys():
+                              val=True
+                              assign=True
+                              dict1.update({'marks':j['student_event_details'][str(node._id)]['Assignment_marks_record']})
+                           else:
+                              dict1.update({'marks':"0"})
+                      	   if unicode('Assessment_marks_record')  in j['student_event_details'][str(node._id)].keys():
+          	                  val=True
+          	                  asses=True
+          	                  dict2.update({'marks':j['student_event_details'][str(node._id)]['Assessment_marks_record']})
+          	           else:
+          	                  dict2.update({'marks':"0"})
+                           break;              
+                else:
+                        dict1.update({'marks':'0'})
+                        dict2.update({'marks':'0'})           
          if member_of.name == "Exam":
             dict1.update({'marks':"0"})
             if  unicode('performance_record') in j.keys():
-               if(str(j['performance_record']['Event']) == str(node._id)) is True:
+               if(unicode(node._id) in j['performance_record'].keys()) :
                   val=True
                   asses=True
-                  dict2.update({'marks':j['performance_record']['marks']}) 
+                  dict2.update({'marks':j['performance_record'][unicode(node._id)]}) 
                else:
                   dict2.update({'marks':"0"})
       temp_attendance.update({'id':str(i._id)})
