@@ -255,7 +255,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                     # dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
                     dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
-                
+
                 tempdict['id'] = str(host._id)
                 events_arr.append(tempdict)
 
@@ -690,10 +690,8 @@ def get_mis_reports(request, group_id, **kwargs):
         colg_cur = None
         data_dict = request.POST.get("data_set", "")
         gst_name = request.POST.get("gst_name", "")
-        print "\n\n gst_name-------",gst_name
         if gst_name == "Event":
             gst_name = "Classroom Session"
-            print "\n\n gst_name+++++",gst_name
         ac_year = request.POST.get("academic_year", "")
         if ac_year:
             if ac_year != "ALL":
@@ -732,12 +730,8 @@ def get_mis_reports(request, group_id, **kwargs):
 
             start_date = datetime.datetime.strptime(start_date,"%d/%m/%Y")
             end_date = datetime.datetime.strptime(end_date,"%d/%m/%Y")
-            print "\n\n"
-            print "\n\n",type(start_date)
-            print "\n\n",end_date
             query.update({'attribute_set.start_time': {'$gte': start_date}})
             query.update({'attribute_set.end_time': {'$lte': end_date}})
-            print "\n\n query",query
         if state_id and not university_id and not college_id:
             selected_filters = 1
         elif state_id and university_id and not college_id:
@@ -855,7 +849,6 @@ def get_mis_reports(request, group_id, **kwargs):
                 if gst_node.name == "Student":
                     query.update({'relation_set.student_belongs_to_college': each._id})
 
-                print "\n\n colg name",each.name
                 if each.relation_set:
                     for each_rel in each.relation_set:
                         if gst_node.name == "Classroom Session":
