@@ -1161,9 +1161,9 @@ class Group(GSystem):
         'disclosure_policy': lambda x: x in LIST_MEMBER_POLICY,
         'encryption_policy': lambda x: x in ENCRYPTION_POLICY,
         'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES,
-        'name': lambda x: x not in \
-        [ group_obj['name'] for group_obj in \
-        node_collection.find({'_type': 'Group'}, {'name': 1, '_id': 0})]
+        # 'name': lambda x: x not in \
+        # [ group_obj['name'] for group_obj in \
+        # node_collection.find({'_type': 'Group'}, {'name': 1, '_id': 0})]
     }
 
     def is_gstaff(self, user):
