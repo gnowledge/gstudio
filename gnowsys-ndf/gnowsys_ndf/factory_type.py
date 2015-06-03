@@ -31,7 +31,8 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'GList','meta_type':'factory_types'},
                          {'name':'ProgramEventGroup','meta_type':'factory_types'},
                          {'name':'CourseEventGroup','meta_type':'factory_types'},
-                         {'name':'PartnerGroup','meta_type':'factory_types'}
+                         {'name':'PartnerGroup','meta_type':'factory_types'},
+                         {'name':'ModeratingGroup','meta_type':'factory_types'}
                         ]
 
 
