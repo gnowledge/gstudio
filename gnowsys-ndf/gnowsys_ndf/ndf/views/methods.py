@@ -605,7 +605,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
-        tags = request.POST.get('tags')
+        tags = request.POST.get('tags','')
         # print "tags: --------- ", tags
 
     language = request.POST.get('lan')
