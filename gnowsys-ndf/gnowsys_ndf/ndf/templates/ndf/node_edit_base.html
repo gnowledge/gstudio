@@ -1083,14 +1083,22 @@ $(document).ready(function(){
 	    		condition_result_var = true;
 	    	}
 	    {% endif %}
+	    var val_chk = name.search(/mod$/gi)    
     	if (condition_result_var && name != "")
 	    {
-	      if (nodes.indexOf(name) != -1)  
-	      { 
-	        $("#message").css("display", "block");
-	        $("#message").text("{{title}} '" + name +"' already exist. Please choose another name");
-	        event.preventDefault();
-	      }
+			if(val_chk == -1){
+				if (nodes.indexOf(name) != -1)  
+				{ 
+					$("#message").css("display", "block");
+					$("#message").text("{{title}} '" + name +"' already exist. Please choose another name");
+					event.preventDefault();
+				}
+			}
+			else if (val_chk != -1){
+				$("#message").css("display", "block");
+				$("#message").text("Name cannot include 'Mod'.");
+				event.preventDefault();
+			}
 	    }
 	    else if (name == ""){
 	      $("#message").css("display", "block");

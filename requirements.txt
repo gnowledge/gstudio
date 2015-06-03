@@ -21,3 +21,4 @@ numpy
 python-memcached
 django-memcache-admin
 pandora-client
+pymongo==2.8

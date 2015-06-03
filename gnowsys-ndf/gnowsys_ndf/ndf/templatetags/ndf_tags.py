@@ -1654,18 +1654,19 @@ def group_type_info(groupid,user=0):
 	cache_result = cache.get(cache_key)
 
 	if cache_result:
-		return cache_result	
+		return cache_result
 
-	group_gst = node_collection.one({'_id':ObjectId(groupid)})
+	group_gst = node_collection.one({'_id': ObjectId(groupid)},
+		{'post_node': 1, 'prior_node': 1, 'group_type': 1})
 	
 	group_type = ""
 
 	if group_gst.post_node:
 		group_type = "BaseModerated"
 	elif group_gst.prior_node:
-		group_type = "Moderated"   
+		group_type = "Moderated"
 	else:
-		group_type =  group_gst.group_type                        
+		group_type = group_gst.group_type
 
 	if cache_result != group_type:
 		cache.set(cache_key, group_type)
