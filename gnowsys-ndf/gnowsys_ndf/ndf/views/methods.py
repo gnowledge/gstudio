@@ -3006,9 +3006,12 @@ def parse_data(doc):
   '''Section to parse node '''
   user_idlist = ['modified_by','created_by','author_set','contributors']
   date_typelist = ['last_update','created_at']
-  objecttypelist = ['member_of']
+  objecttypelist = ['member_of','group_set', 'collection_set','prior_node']
   languagelist = ['language']
   content = ['content']
+  keys_by_dict = ['attribute_set', 'relation_set']
+  keys_by_filesize = ['file_size']
+
   for i in doc:
            
           if i in content:
@@ -3037,6 +3040,37 @@ def parse_data(doc):
                for j in doc[i]:
                    node = node_collection.one({"_id":ObjectId(j)})
                    doc[i] = node.name
+          if i in keys_by_dict:
+              att_dic = {}
+              if "None" not in doc[i]:
+                      if type(doc[i]) != str and i == "attribute_set":
+                              str1 =""
+                              for att in doc[i]:
+                                      for k1, v1 in att.items():
+                                        if type(v1) == list:
+                                                str1 = ""
+                                                if type(v1[0]) in [OrderedDict, dict]:
+                                                    for each in v1:
+                                                        str1 += str(each["name"]) + ", "
+                                                else:
+                                                    str1 = ",".join(v1)
+                                                att_dic[k1] = str1
+                                        else:
+                                                att_dic[k1] = str(v1)
+                              for att,value in att_dic.items():
+                                  str1 =  str1 + att + " : " + value + "  "+"\n"
+                              doc[i] = str1                    
+                      if i == "relation_set":
+                              str1 =""
+                              for each in doc[i]:
+                                      for k1, v1 in each.items():
+                                              for rel in v1:
+                                                      rel = node_collection.one({'_id':ObjectId(rel)})
+                                                      att_dic[k1] = rel.name
+                              for att,value in att_dic.items():
+                                  str1 =  str1 + att + " : " + value + "  "+"\n"
+                              doc[i] = str1        
+  
           elif i == "rating":
              new_str = ""
              if doc[i]:

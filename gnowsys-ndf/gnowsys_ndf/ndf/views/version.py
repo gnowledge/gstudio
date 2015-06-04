@@ -45,7 +45,8 @@ def version_node(request, group_id, node_id, version_no = None):
     node1 = node_collection.one({"_id": ObjectId(node_id)})
     fp = history_manager.get_file_path(node)
     listform = ['modified_by','created_by','last_update','name','content','contributors','rating','location','access_policy',
-                'type_of','status','tags','language','member_of','url','created_at','author_set']
+                'type_of','status','tags','language','member_of','url','created_at','author_set',
+'group_set', 'collection_set','prior_node','attribute_set', 'relation_set']
     versions= get_published_version_list(request,node)
     
     if not version_no:
