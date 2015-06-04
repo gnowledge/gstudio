@@ -94,8 +94,12 @@
 						{% for key, val in filter_dict.items %}
 							<option value='{{val.value}}'
 							data-primary-type='{{val.data_type}}'
-							data-gstudio-type='{{val.type}}'>
-								{{key}}
+							data-gstudio-type='{{val.type}}' data-name-field='{{key}}'>
+								{% if val.altnames %}
+									{{val.altnames}}
+								{% else %}
+									{{key}}
+								{% endif %}
 							</option>
 						{% endfor %}
 						<!-- generating <option>'s of following type
@@ -154,7 +158,8 @@
 	// to populate second <select> with "value" field of this (first <select>'s) <option>.
 	$selectName.change(function(){
 		// ff: first filter. getting the name and value field of it.
-		var ffName = $selectName.children("option:selected").text().trim(),
+		var ffName = $selectName.children("option:selected").attr("data-name-field").trim(),
+			// ffName = $selectName.children("option:selected").text().trim(),
 			ffValues = $selectName.children("option:selected").val().trim(),
 			ffPriDataType = $selectName.children("option:selected").attr("data-primary-type").trim(),
 			ffType = $selectName.children("option:selected").attr("data-gstudio-type").trim();
