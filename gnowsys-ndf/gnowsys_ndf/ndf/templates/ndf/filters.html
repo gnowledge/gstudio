@@ -159,7 +159,7 @@
 	$selectName.change(function(){
 		// ff: first filter. getting the name and value field of it.
 		var ffName = $selectName.children("option:selected").attr("data-name-field").trim(),
-			// ffName = $selectName.children("option:selected").text().trim(),
+			ffAltnames = $selectName.children("option:selected").text().trim(),
 			ffValues = $selectName.children("option:selected").val().trim(),
 			ffPriDataType = $selectName.children("option:selected").attr("data-primary-type").trim(),
 			ffType = $selectName.children("option:selected").attr("data-gstudio-type").trim();
@@ -188,6 +188,7 @@
 				newOption.value = ffName;
 				newOption.text = String(ffValuesArr[i]).trim();
 				newOption.setAttribute("data-gstudio-type", ffType);
+				newOption.setAttribute("data-value-altnames", ffAltnames);
 				newOption.setAttribute("data-primary-type", ffPriDataType);
 				$selectValue.append(newOption);
 			};
@@ -301,10 +302,11 @@
 				// console.log(this.text)
 				
 				var selFieldValue = this.value.trim(),  // value id parent/key from first <select>
+					selFieldValueAltnames = this.getAttribute("data-value-altnames").trim(),
 					selFieldText  = this.text.trim(),   // actual text value of this <option>
 					selFieldGstudioType = this.getAttribute("data-gstudio-type").trim(),
 					selFieldPrimaryType = this.getAttribute("data-primary-type").trim(),
-					filterText = selFieldValue + ": " + selFieldText;  // text to be visible as filter
+					filterText = selFieldValueAltnames + ": " + selFieldText;  // text to be visible as filter
 
 				// checking if filter does exists in already selected/added filters
 				if(prevFiltersArr.indexOf(filterText) < 0)
@@ -320,6 +322,7 @@
 					filterDiv.setAttribute("data-gstudio-type", selFieldGstudioType);
 					filterDiv.setAttribute("data-selFieldText", selFieldText);
 					filterDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+					filterDiv.setAttribute("data-value-altnames", selFieldValueAltnames);
 
 					var closeBtn = document.createElement("i");
 					closeBtn.className = "fi-x-circle remove-filter";
@@ -348,6 +351,7 @@
 
 					var filtersObj = new Object();
 					filtersObj["selFieldValue"] = selFieldValue;
+					filtersObj["selFieldValueAltnames"] = selFieldValueAltnames;
 					filtersObj["selFieldGstudioType"] = selFieldGstudioType;
 					filtersObj["selFieldText"] = selFieldText;
 					filtersObj["selFieldPrimaryType"] = selFieldPrimaryType;
