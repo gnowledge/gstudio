@@ -1,0 +1,27 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+{% load get_mails_in_box from ndf_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div id="mailContent">
+
+{% get_mails_in_box mailboxname as emails %}
+	{% for mail in emails %}
+		<div id="myModal{{ mail.mail_id }}" class="reveal-modal" animation="None" data-reveal>
+    				<h3>{{ mail.mail_data.text }}</h3>
+    				<br>
+    				<a class="close-reveal-modal">&#215;</a>                
+  		</div>
+
+		<div id={{ mail.mail_id }} style="border-top:1px solid gray; height:fit-content; padding-top: 2px; padding-bottom: 2px;" >
+			<h4><a onclick="window.location.href='#'" data-reveal-id="myModal{{ mail.mail_id }}">{{ mail.mail_data }}</a></h4>
+		</div>
+	{% endfor %}
+</div>
+</body>
+</html>
+

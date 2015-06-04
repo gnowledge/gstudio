@@ -14,6 +14,7 @@ from django.http import Http404
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
+from django_mailbox.models import Mailbox
 
 # cache imports
 from django.core.cache import cache
@@ -2654,3 +2655,26 @@ def get_filters_data(gst_name):
 							}
 
 	return filter_dict
+
+@get_execution_time
+@register.assignment_tag
+def get_mails_in_box(mailboxname):
+	all_mail_boxes= Mailbox.objects.all()
+	required_mailbox=None
+	print mailboxname
+	for box in all_mail_boxes:
+		if box.name == mailboxname:
+			required_mailbox=box
+			break
+
+	if required_mailbox is not None:
+		emails=[]
+		all_mails=required_mailbox.get_new_mail()
+		all_mails=list(reversed(all_mails))
+		i=1
+		for mail in all_mails:
+			emails.append({'mail_id':i, 'mail_data':mail})
+			i=i+1
+		return emails
+	else:
+		print 'lol'
