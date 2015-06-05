@@ -5555,3 +5555,236 @@ def get_universities(request, group_id):
     except Exception as e:
         error_message = str(e)
         return HttpResponse(json.dumps({'message': error_message}))
+
+
+# MIS Reports
+@get_execution_time
+def get_events(request, group_id):
+  """
+  This view returns list of students along with required data based on selection criteria
+  to student_data_review.html
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  """
+  response_dict = {'success': False, 'message': ""}
+  all_students_text = ""
+  group_name, group_id = get_group_name_id(group_id)
+  try:
+    if request.is_ajax() and request.method == "POST":
+      # groupid = request.POST.get("groupid", None)
+      # app_id = request.POST.get("app_id", None)
+      # app_set_id = request.POST.get("app_set_id", None)
+      # stud_reg_year = str(request.POST.get("reg_year", None))
+      query_rcvd = str(request.POST.get("query", ''))
+      # university_id = request.POST.get("student_belongs_to_university",None)
+      # college_id = request.POST.get("student_belongs_to_college",None)
+
+      person_gst = node_collection.one({'_type': "GSystemType", 'name': "Classroom Session"}, {'name': 1, 'type_of': 1})
+
+      widget_for = []
+      query = {}
+      result_set = None
+      if query_rcvd:
+        query = eval(query_rcvd)
+        groupid = group_id
+        gapp_gst = node_collection.one({'name':"GAPP"})
+        mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
+        app_id = mis_gapp._id
+        app_set_id = person_gst._id
+
+      person_gs = node_collection.collection.GSystem()
+      person_gs.member_of.append(person_gst._id)
+      person_gs.get_neighbourhood(person_gs.member_of)
+      # university_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+      mis_admin = node_collection.one({"_type": "Group", "name": "MIS_admin"}, {"_id": 1})
+
+
+      rec = node_collection.collection.aggregate([{'$match': query},
+                                  {'$project': {'_id': 0,
+                                                'stud_id': '$_id',
+                                                'Name': '$name',
+                                                'Course': '$attribute_set.nussd_course_type',
+                                                'VT': '$relation_set.event_coordinator',
+                                                'Session': '$relation_set.session_of',
+                                                'Start': '$attribute_set.start_time',
+                                                'End': '$attribute_set.end_time',
+                                                'Batch':"$relation_set.event_has_batch",
+                                                'Status': '$attribute_set.event_status',
+                                  }},
+                                  {'$sort': {'Name': 1}}
+            ])
+      json_data = []
+      filename = ""
+      column_header = []
+      course_section_node_id = course_subsection_node = None
+      result_set = rec["result"]
+      if result_set:
+        # old_dict = result_set[0]
+        for old_dict in result_set:
+          if old_dict:
+            if u"Session" in old_dict:
+               course_subsection_node = node_collection.one({'_id': ObjectId(old_dict['Session'][0][0])})
+               if course_subsection_node:
+                 course_section_node_id = course_subsection_node.prior_node[0]
+                 old_dict.update({'Module': [[course_section_node_id]]})
+               if course_section_node_id:
+                 course_section_node = node_collection.one({'_id': ObjectId(course_section_node_id)})
+                 nussd_course_node = course_section_node.prior_node[0]
+                 old_dict.update({'NUSSD Course': [[nussd_course_node]]})
+            if u"stud_id" in old_dict:
+              event_node = node_collection.one({'_id': ObjectId(old_dict['stud_id'])})
+              if event_node:
+                colg_group_id = event_node.group_set[0]
+                colg_group_node = node_collection.one({'_id':ObjectId(colg_group_id)})
+                if colg_group_node.relation_set:
+                  for rel in colg_group_node.relation_set:
+                    if rel and 'group_of' in rel:
+                      colg_node_id = rel['group_of'][0]
+                      colg_node = node_collection.one({'_id': ObjectId(colg_node_id)},{'name':1,'relation_set':1})
+                      colg_node_name = colg_node.name
+                      old_dict.update({'College': colg_node_name})
+                      if colg_node.relation_set:
+                        for rel in colg_node.relation_set:
+                          if rel and 'college_affiliated_to' in rel:
+                            univ_id = rel['college_affiliated_to'][0]
+                            old_dict.update({'University': [[univ_id]]})
+              result_set[0] = old_dict
+
+      if result_set:
+        for each_dict in result_set:
+          new_dict = {}
+          for each_key in each_dict:
+            if each_dict[each_key]:
+              if type(each_dict[each_key]) == list:
+                data = each_dict[each_key][0]
+              else:
+                data = each_dict[each_key]
+
+              if type(data) == list:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                
+                  elif type(data[0]) in [ObjectId]:
+                    # new_dict[each_key] = str(data)
+                    d_list = []
+                    for oid in data:
+                      d = node_collection.one({'_id': oid}, {'name': 1})
+                      d_list.append(str(d.name))
+                    new_dict[each_key] = ', '.join(str(n) for n in d_list)
+                
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+                
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+                
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+                
+                else:
+                  new_dict[each_key] = str(data)
+
+              else:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                  elif type(data[0]) in [ObjectId]:
+                    new_dict[each_key] = str(data)
+
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+
+                else:
+                  new_dict[each_key] = str(data)
+
+            else:
+              new_dict[each_key] = ""
+
+          json_data.append(new_dict)
+
+        # Start: CSV file processing -------------------------------------------
+        column_header = [u'Name', u'Course', u'VT',u'University', u'College', u'NUSSD Course',u'Module', u'Session', u'Start', u'End', u'Batch', u'Status']
+
+        t = time.strftime("%c").replace(":", "_").replace(" ", "_")
+        filename = "csv/" + "events_data_" + t + ".csv"
+        filepath = os.path.join(STATIC_ROOT, filename)
+        filedir = os.path.dirname(filepath)
+        if not os.path.exists(filedir):
+          os.makedirs(filedir)
+        with open(filepath, 'wb') as csv_file:
+          fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
+          fw.writerow(dict((col,col) for col in column_header))
+          for row in json_data:
+            v = {}
+            v["stud_id"] = row.pop("stud_id")
+            fw.writerow(row)
+            row.update(v)
+        # End: CSV file processing --------------------------------------------
+
+      # Column headers to be displayed on html
+      column_headers = [
+          # ('University', 'University'),
+          # ('College ( Graduation )', 'College'),
+          ("University", "University"),
+          ("College", "College"),
+          ("Name", "Name"),
+          ("Course", "Course"),
+          ("VT", "VT"),
+          ("NUSSD Course", "NUSSD Course"),
+          ("Module", "Module"),
+          ('Session', 'Session'),
+          ('Start', 'Start'),
+          ('End', 'End'),
+          ('Batch', 'Batch'),
+          ('Status', 'Status'),
+      ]
+      # college = node_collection.one({'_id': ObjectId(college_id)}, {"name": 1})
+      students_count = len(json_data)
+      response_dict["success"] = True
+      response_dict["groupid"] = group_id
+      response_dict["app_id"] = app_id
+      response_dict["app_set_id"] = app_set_id
+      response_dict["filename"] = filename
+      response_dict["students_count"] = students_count
+      response_dict["column_headers"] = column_headers
+      response_dict["students_data_set"] = json_data
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+    
+    else:
+      error_message = "StudentFindError: Either not an ajax call or not a POST request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+  except OSError as oe:
+    error_message = "StudentFindError: " + str(oe) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+  except Exception as e:
+    error_message = "StudentFindError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+

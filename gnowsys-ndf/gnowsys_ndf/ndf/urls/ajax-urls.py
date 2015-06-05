@@ -43,6 +43,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
 
                        # Ajax-urls required for MIS --------------------------------
                        
+    url(r'^get_events/', 'get_events', name='get_events'),
     url(r'^get_universities/', 'get_universities', name='get_universities'),
     url(r'^get_students_for_batches/', 'get_students_for_batches', name='get_students_for_batches'),
     url(r'^get_anncourses_allstudents/', 'get_anncourses_allstudents', name='get_anncourses_allstudents'),
