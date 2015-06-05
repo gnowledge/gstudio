@@ -451,6 +451,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 for ac_nc_code in ac_nc_code_list:
                     course_gs = ac_nc_code[0]
                     nc_id = ac_nc_code[1]
+                    cnode_for_content = node_collection.one({'_id': ObjectId(nc_id)})
                     nc_course_code = ac_nc_code[2]
                     if not course_gs:
                         # Create new Announced Course GSystem
@@ -480,6 +481,9 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                         # Remove this when publish button is setup on interface
                         course_gs.status = u"PUBLISHED"
 
+                    course_gs.content_org = cnode_for_content.content_org
+                    course_gs.content = cnode_for_content.html_content
+                    
                     course_gs.save(is_changed=is_changed)
 
                     # [B] Store AT and/or RT field(s) of given course-node
