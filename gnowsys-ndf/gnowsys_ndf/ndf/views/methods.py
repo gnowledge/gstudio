@@ -847,6 +847,8 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         for each in nlist:
           if each not in node.collection_set:
             node.collection_set.append(each)
+            node.status = u"PUBLISHED"
+            node.save()
             # After adding it to collection_set also make the 'node' as prior node for added collection element
             node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
 
