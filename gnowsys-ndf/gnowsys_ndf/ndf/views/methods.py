@@ -606,8 +606,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
         tags = request.POST.get('tags')
-        # print "tags: --------- ", tags
-
+       
     language = request.POST.get('lan')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
@@ -1926,7 +1925,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
-    print subject_id, relation_type_node, right_subject_id_or_list,"@@@@@@@@@@@@@@@@"
     try:
         subject_id = ObjectId(subject_id)
 
@@ -1939,10 +1937,8 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             gr_node.right_subject = right_subject_id_or_list
 
             gr_node.status = u"PUBLISHED"
-            print "befor save"
             gr_node.save()
-            print "after save"
-
+            
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"

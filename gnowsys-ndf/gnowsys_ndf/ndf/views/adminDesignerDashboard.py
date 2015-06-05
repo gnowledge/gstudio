@@ -20,11 +20,9 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = node_collection.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype,'name':{'$nin':[u'Voluntary Teacher']}}).sort('last_update', -1)
-        #nodes = node_collection.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
+        nodes = node_collection.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
     else :
-        nodes = node_collection.find({'_type':class_name,'name':{'$nin':[u'Voluntary Teacher']}}).sort('last_update', -1)
-        #nodes = node_collection.find({'_type':class_name}).sort('last_update', -1)
+        nodes = node_collection.find({'_type':class_name}).sort('last_update', -1)
         
 
     objects_details = []
@@ -57,8 +55,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         groups.append({'id':each._id,"title":each.name})
     
     systemtypes = []
-    #systemtype = node_collection.find({'_type':"GSystemType"})
-    systemtype = node_collection.find({'_type':"GSystemType",'name':{'$nin':[u'Voluntary Teacher']}})
+    systemtype = node_collection.find({'_type':"GSystemType"})
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
 

@@ -541,8 +541,8 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 				drawer1['en']='en'
 				drawer1['mar']='mar'
 		else:
-			drawer = node_collection.find({"_type":types,'name':{'$nin':[u'Voluntary Teacher']}})
-			#drawer = node_collection.find({"_type":types})
+			#drawer = node_collection.find({"_type":types,'name':{'$nin':[u'Voluntary Teacher']}})
+			drawer = node_collection.find({"_type":types})
 			for each in drawer:
 				drawer1[str(each._id)]=each
 		return {'template': template1, 'widget_for': fields_name, 'drawer1': drawer1, 'selected_value': fields_value}
@@ -568,8 +568,7 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 
 		if types in ["all_types"]:
 			for each in alltypes:
-				for eachnode in node_collection.find({"_type": each ,'name':{'$nin':[u'Voluntary Teacher']}}):
-				#for eachnode in node_collection.find({"_type": each}):
+				for eachnode in node_collection.find({"_type": each}):
 					if fields_value_id_list:
 						if eachnode._id not in fields_value_id_list:
 							drawer1[eachnode._id] = eachnode
