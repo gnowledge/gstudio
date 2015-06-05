@@ -147,7 +147,8 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                         if translate:
                             if key in ("name","inverse_name"):
                                 new_instance_type[key] = unicode(request.POST.get(key+"_trans",""))
-                                                
+                                language= request.POST.get('lan')
+                                new_instance_type.language=language
                                 
                             else:
                                 new_instance_type[key] = unicode(request.POST.get(key,""))
@@ -201,6 +202,13 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
         if user_id not in new_instance_type.contributors:
             new_instance_type.contributors.append(user_id)
+        parent_node=node_collection.one({'_id':ObjectId(node_id)})
+        if translate and class_name == "RelationType":
+            new_instance_type.subject_type = parent_node.subject_type
+            new_instance_type.object_type = parent_node.object_type
+        if translate and class_name == "AttributeType":
+            new_instance_type.data_type = parent_node.data_type
+            new_instance_type.subject_type = parent_node.subject_type
 
         new_instance_type.save()
         if translate:        
