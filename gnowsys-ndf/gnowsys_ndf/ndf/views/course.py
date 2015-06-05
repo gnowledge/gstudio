@@ -161,7 +161,7 @@ def create_edit(request, group_id, node_id=None):
                               )
 
 
-@login_required
+# @login_required
 @get_execution_time
 def course_detail(request, group_id, _id):
     ins_objectid = ObjectId()
@@ -212,27 +212,28 @@ def course_detail(request, group_id, _id):
                     context_variables["cnode"] = cnode
                     check_enroll_status = True
                     break
-    if check_enroll_status:
-        usr_id = int(request.user.id)
-        auth_node = node_collection.one({'_type': "Author", 'created_by': usr_id})
+    if request.user.id:
+        if check_enroll_status:
+            usr_id = int(request.user.id)
+            auth_node = node_collection.one({'_type': "Author", 'created_by': usr_id})
 
 
-        course_enrollment_status = {}
+            course_enrollment_status = {}
 
-        if auth_node.attribute_set:
-            for each in auth_node.attribute_set:
-                if each and "course_enrollment_status" in each:
-                    course_enrollment_status = each["course_enrollment_status"]
+            if auth_node.attribute_set:
+                for each in auth_node.attribute_set:
+                    if each and "course_enrollment_status" in each:
+                        course_enrollment_status = each["course_enrollment_status"]
 
-        if "acnode" in context_variables:
-            str_course_id = str(context_variables["acnode"])
-        else:
-            str_course_id = str(course_node._id)
+            if "acnode" in context_variables:
+                str_course_id = str(context_variables["acnode"])
+            else:
+                str_course_id = str(course_node._id)
 
-        if course_enrollment_status:
-            if str_course_id in course_enrollment_status:
-                enrolled_status = True
-        context_variables['enrolled_status'] = enrolled_status
+            if course_enrollment_status:
+                if str_course_id in course_enrollment_status:
+                    enrolled_status = True
+            context_variables['enrolled_status'] = enrolled_status
     return render_to_response("ndf/course_detail.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -483,7 +484,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                     course_gs.content_org = cnode_for_content.content_org
                     course_gs.content = cnode_for_content.html_content
-                    
+
                     course_gs.save(is_changed=is_changed)
 
                     # [B] Store AT and/or RT field(s) of given course-node
