@@ -708,16 +708,15 @@ $(document).ready(function(){
 		});
 
 	});
-
-	{% if is_group or node %}
+      	{% if is_group or node or not node %}
 		$(".collection_tab").click(function() {
-			var collection = "heterogeneous";
+      			var collection = "heterogeneous";
+        
 	{% else %}
 		$(".collection").click(function() {
-			var collection = this.value;
+      			var collection = this.value;
 	{% endif %}
-
-		$("#publish_resource").foundation('reveal', 'close');
+      		$("#publish_resource").foundation('reveal', 'close');
 		$("input[type='radio'][name='col']").attr("checked", false);
 		$("input[type='radio'][name='coll']").attr("checked", false);
 		
