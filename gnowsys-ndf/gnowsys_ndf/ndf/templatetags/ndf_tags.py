@@ -2644,6 +2644,7 @@ def get_filters_data(gst_name):
 
 		filter_dict[k] = {
 	    					"data_type": v["data_type"].__name__,
+	    					"altnames": v['altnames'],
 	    					"type" : "attribute",
 	    					"value": json.dumps(static_mapping.get(k, []))
 	    				}
