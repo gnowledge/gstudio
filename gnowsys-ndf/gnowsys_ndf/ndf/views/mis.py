@@ -812,7 +812,7 @@ def get_mis_reports(request, group_id, **kwargs):
                       'relation_set.organization_belongs_to_state': {'$in': state_id_list},
                       'group_set': mis_admin_grp._id})
             else:
-                if gst_node.name == "Student":
+                if gst_node.name == "Student" or gst_node.name == "Voluntary Teacher":
                     query.update({'relation_set.person_belongs_to_state': ObjectId(state_id)})
 
                 university_cur = node_collection.find({'member_of': univ_gst._id,
@@ -852,6 +852,10 @@ def get_mis_reports(request, group_id, **kwargs):
 
                 if each.relation_set:
                     for each_rel in each.relation_set:
+                        if gst_node.name == "Voluntary Teacher":
+                            # if each_rel and "college_has_trainer" in each_rel:
+                            #     colg_node_id = each_rel["college_has_trainer"][0]
+                            query.update({'relation_set.trainer_of_college': ObjectId(each._id)})
                         if gst_node.name == "Classroom Session":
                             if each_rel and "has_group" in each_rel:
                                 colg_group_node_id = each_rel["has_group"][0]
@@ -861,6 +865,7 @@ def get_mis_reports(request, group_id, **kwargs):
                         if each_rel and "organization_belongs_to_state" in each_rel:
                             statename = each_rel["organization_belongs_to_state"]
                             # print "\n\n statename", statename
+                print "\n\nquery",query
                 rec = node_collection.collection.aggregate([
                                           {
                                             '$match': query
@@ -877,7 +882,6 @@ def get_mis_reports(request, group_id, **kwargs):
                 ])
 
                 resultset = rec['result']
-                
                 if resultset:
                     for each in resultset:
                         each['query'] = str(query)
@@ -896,7 +900,7 @@ def get_mis_reports(request, group_id, **kwargs):
                                 # data_for_report1["college_id"] = str(colg_node._id)
                             del each['_id']
                             try:
-                                print each['total_students']
+                                l = each['total_students']
                             except:
                                 del each['total_students']
 
@@ -912,6 +916,8 @@ def get_mis_reports(request, group_id, **kwargs):
                 column_headers.append(('total_students',"Total Students"))
             elif gst_node.name == "Classroom Session":
                 column_headers.append(('total_students',"Total Events"))
+            elif gst_node.name == "Voluntary Teacher":
+                column_headers.append(('total_students',"Total VTs"))
 
             response_dict["column_headers"] = column_headers
             response_dict["success"] = True

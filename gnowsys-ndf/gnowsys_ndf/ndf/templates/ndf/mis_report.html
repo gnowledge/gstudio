@@ -315,8 +315,9 @@
 
     $(document).on("click", ".total_val", function() {
       gst_name = $("#fetchDataOf").val()
+      query_data = $(this).attr('data-query');
+
       if(gst_name == "Student"){
-          query_data = $(this).attr('data-query');
           $.ajax({
             url:"{% url 'get_students' groupid %}",
 
@@ -412,8 +413,7 @@
               },
           });
       }
-      else{
-          query_data = $(this).attr('data-query');
+      else if (gst_name == "Event"){
           $.ajax({
             url:"{% url 'get_events' groupid %}",
 
@@ -496,6 +496,99 @@
                         $(row).attr("id", s_id);
                         detail_url = "{% url 'event_app_instance_detail' groupid  'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_set_id", app_set_id_val).replace("stud_id", s_id);
                         $(row).find("td:nth-child(3)").html("<a href='" + detail_url + "' target='_blank'>"+data['Name']+"</a>");
+                      }
+                    });
+                  }
+                }
+                else {
+                  $("#alertModal").removeClass("success").removeClass("warning");
+                  $("#alertModal").addClass("alert");
+                  $("#alertModal").foundation('reveal', 'open');
+                }
+              },
+          });
+      }
+      else if (gst_name == "Voluntary Teacher"){
+          $.ajax({
+            url:"{% url 'get_voluntary_teachers' groupid %}",
+
+            data: {
+              'query': query_data,
+              'gst_name':gst_name,
+              'csrfmiddlewaretoken': "{{csrf_token}}"
+            },
+
+            type: "POST",
+
+            dataType: "json",
+
+              success: function(data) {
+                success_state = data["success"];
+                $("#alertModalLabel").text(data["message"]);
+
+                if (success_state) {
+                  // $("#report2").html(data["students_data_review"]);
+            
+                  groupid_val = data["groupid"];
+                  app_id_val = data["app_id"];
+                  app_set_id_val = data["app_set_id"];
+                  var caption_college = ""
+                  var caption_university = ""
+                  filename = data["filename"];
+                  if (data.hasOwnProperty("university")){
+                    university = data["university"];
+                    caption_university = '<h4>' + university + '</h4>';
+                  }
+                  if (data.hasOwnProperty("college")){
+                    college = data["college"];
+                    caption_college = '<h3>' + college + '</h3>';
+                  }
+                  students_count = data["students_count"];
+                  column_headers = data["column_headers"];
+                  students_data_set = data["students_data_set"];
+                  dataTable_columns_set = [];
+                  download_link = "{% static 'filename' %}".replace('filename', filename);
+
+                  if (parseInt(students_count) <= 0) {
+                    c = '<div class="row">' +
+                      '<div class="large-4 large-centered columns">' +
+                        '<p class="alert-box alert radius text-center text-size-15">No records match the given criteria !!!</p>' +
+                      '</div>' +
+                    '</div>'
+                    $("#report2").html(c);
+                  }
+
+                  else {
+                    // Define table
+                    student_data_table = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="student_data_table">' +
+                      '<caption>' +
+                        caption_college +
+                        caption_university +
+                        '<h6>Total No. of Students Registered: <b>' + students_count + '</b></h6>' +
+                        '<a href="' + download_link + '" download="">' +
+                          '<span class="fi-download large">&nbsp;&nbsp;&nbsp;Download Students\' data (CSV)</span>' +
+                        '</a>' + 
+                      '</caption>' +
+                    '</table>';
+                    $("#report2").html(student_data_table);
+                    
+                    // Prepare title & data headers used in dataTable
+                    $.each(column_headers, function(index, v) {
+                      d = {};
+                      d["data"] = v[0];
+                      d["title"] = v[1];
+                      dataTable_columns_set.push(d);
+                    });
+
+                    // Set defintion dataTable
+                    sce_dt_var = $("#student_data_table").dataTable({
+                      "data": students_data_set,
+                      "columns": dataTable_columns_set,
+                      "columnDefs": [{ "width": "15%", "targets": 1 }],
+                      "createdRow": function ( row, data, index ) {
+                        // Attaching Student's ObjectId to each row (i.e., assigning to it's id attribute)
+                        s_id = data["stud_id"];
+                        $(row).attr("id", s_id);
                       }
                     });
                   }
