@@ -21,7 +21,13 @@
 <div class="row">
 <div class="large-6 columns text-center">{{node.language|default_if_none:"en"}}</div>
 
-<div class="large-6 columns"><select name="language" id="lan">{% for each in lan %}<option value="{{each}}">{{each}}</option>{% endfor %}</select>
+<div class="large-6 columns">
+<select name="lan" id="lan">
+{% get_language_info_list for LANGUAGES as languages %}
+{% for language in languages %}
+<option value={{ language.code }}>{{ language.name }}</option>
+{% endfor %}
+</select>
 </div>
 <hr style="height:5px;background-color: #0B6580;" />
 </div>
@@ -167,7 +173,7 @@
 <!-- {% endif %} -->
 <!-- </div> -->
 
-<!-- {% endif %} -->
+<!-- {% endif %}lan -->
 
 {% endblock %}
 
