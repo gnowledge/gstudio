@@ -169,8 +169,8 @@ factory_relation_types = [
     }, 
 
     {'translation_of': {
-            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP'],
-            'object_type':['Page','Topic','Theme','theme_item','File','GAPP'], 
+            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
+            'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'], 
             'inverse_name':'translation_of', 
             'meta_type':'factory_types'
         }
