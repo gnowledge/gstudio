@@ -60,8 +60,6 @@
     </div>
   </div>
 
-
-
   <fieldset>
     <legend>
       <label>{% trans 'Filters' %}</label>
@@ -154,6 +152,8 @@
       $("select#univ_list").attr("disabled",true).empty();
       $("select#colg_list").attr("disabled",true).empty();
       $("select#state_list").prop("selectedIndex", 0);
+      $("#report1").html('')
+      $("#report2").html('')
 
       $("#ac_year_list").val('')
       if (sel_type == "Student"){
