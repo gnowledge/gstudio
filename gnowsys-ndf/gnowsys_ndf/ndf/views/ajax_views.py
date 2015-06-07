@@ -2265,7 +2265,6 @@ def get_students(request, group_id):
       app_id = request.POST.get("app_id", None)
       app_set_id = request.POST.get("app_set_id", None)
       stud_reg_year = str(request.POST.get("reg_year", None))
-      # query_rcvd = str(request.POST.get("query", ''))
       university_id = request.POST.get("student_belongs_to_university",None)
       college_id = request.POST.get("student_belongs_to_college",None)
 
@@ -2273,14 +2272,6 @@ def get_students(request, group_id):
 
       widget_for = []
       query = {}
-      # if query_rcvd:
-      #   query = eval(query_rcvd)
-      #   groupid = group_id
-      #   gapp_gst = node_collection.one({'name':"GAPP"})
-      #   mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
-      #   app_id = mis_gapp._id
-      #   app_set_id = node_collection.one({'_type':"GSystemType",'name':"Student"})._id
-
       person_gs = node_collection.collection.GSystem()
       person_gs.member_of.append(person_gst._id)
       person_gs.get_neighbourhood(person_gs.member_of)
@@ -5573,7 +5564,6 @@ def get_detailed_report(request, group_id):
   message - Basestring giving the error/information message
   """
   response_dict = {'success': False, 'message': ""}
-  # all_students_text = ""
   column_header = []
   group_name, group_id = get_group_name_id(group_id)
   app_set_id = None
@@ -5586,7 +5576,6 @@ def get_detailed_report(request, group_id):
       person_gst = node_collection.one({'_type': "GSystemType", 'name': gst_name})
       gapp_gst = node_collection.one({'name':"GAPP"})
       mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
-      # groupid = group_id
       app_id = mis_gapp._id
       result_set = None
       if query_rcvd:
@@ -5668,7 +5657,7 @@ def get_detailed_report(request, group_id):
       filename = ""
       course_section_node_id = course_subsection_node = None
       result_set = rec["result"]
-      print "\n\n result_set",result_set
+      # print "\n\n result_set",result_set
       if result_set:
         # old_dict = result_set[0]
         for old_dict in result_set:
@@ -5855,16 +5844,16 @@ def get_detailed_report(request, group_id):
       return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
     
     else:
-      error_message = "StudentFindError: Either not an ajax call or not a POST request!!!"
+      error_message = "ReportFetchError: Either not an ajax call or not a POST request!!!"
       response_dict["message"] = error_message
       return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
   except OSError as oe:
-    error_message = "StudentFindError: " + str(oe) + "!!!"
+    error_message = "ReportFetchError: " + str(oe) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
   except Exception as e:
-    error_message = "StudentFindError: " + str(e) + "!!!"
+    error_message = "ReportFetchError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
