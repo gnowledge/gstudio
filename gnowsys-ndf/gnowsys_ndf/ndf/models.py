@@ -1146,10 +1146,12 @@ class Group(GSystem):
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
 
         'group_admin': [int],		     # ObjectId of Author class
-        'partner': bool                       # Shows partners exists for a group or not
+        'moderation_level': int              # range from 0 till any integer level
     }
 
     use_dot_notation = True
+
+    default_values = {'moderation_level': -1}
 
     validators = {
         'group_type': lambda x: x in TYPES_OF_GROUP,
@@ -1158,7 +1160,10 @@ class Group(GSystem):
         'visibility_policy': lambda x: x in EXISTANCE_POLICY,
         'disclosure_policy': lambda x: x in LIST_MEMBER_POLICY,
         'encryption_policy': lambda x: x in ENCRYPTION_POLICY,
-        'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES
+        'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES,
+        # 'name': lambda x: x not in \
+        # [ group_obj['name'] for group_obj in \
+        # node_collection.find({'_type': 'Group'}, {'name': 1, '_id': 0})]
     }
 
     def is_gstaff(self, user):
