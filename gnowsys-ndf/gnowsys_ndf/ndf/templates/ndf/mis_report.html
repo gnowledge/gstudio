@@ -160,9 +160,13 @@
         $(".ac_year").removeClass("hide");
         $(".event_duration").addClass("hide")
       }
-      else{
+      else if(sel_type == "Event") {
         $(".ac_year").addClass("hide").val('');
         $(".event_duration").removeClass("hide")
+      }
+      else{
+        $(".ac_year").addClass("hide").val('');
+        $(".event_duration").addClass("hide")
       }
     });
     $("select#state_list").change(function() {
@@ -371,9 +375,9 @@
                   '<caption>' +
                     caption_college +
                     caption_university +
-                    '<h6>Total No. of Students Registered: <b>' + students_count + '</b></h6>' +
+                    '<h6>No. of '+ gst_name +'s: <b>' + students_count + '</b></h6>' +
                     '<a href="' + download_link + '" download="">' +
-                      '<span class="fi-download large">&nbsp;&nbsp;&nbsp;Download Students\' data (CSV)</span>' +
+                      '<span class="fi-download large">&nbsp;&nbsp;&nbsp;Download '+gst_name+'\' data (CSV)</span>' +
                     '</a>' + 
                   '</caption>' +
                 '</table>';
