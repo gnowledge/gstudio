@@ -865,7 +865,7 @@ def get_mis_reports(request, group_id, **kwargs):
                         if each_rel and "organization_belongs_to_state" in each_rel:
                             statename = each_rel["organization_belongs_to_state"]
                             # print "\n\n statename", statename
-                print "\n\nquery",query
+                # print "\n\nquery",query
                 rec = node_collection.collection.aggregate([
                                           {
                                             '$match': query
