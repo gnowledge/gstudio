@@ -5620,7 +5620,7 @@ def get_detailed_report(request, group_id):
                 ])
       elif person_gst.name == "Classroom Session":
           app_set_id = person_gst._id
-          column_header = [u'Name', u'Course', u'VT',u'University', u'College', u'NUSSD Course',u'Module', u'Session', u'Start', u'End', u'Batch', u'Status']
+          column_header = [u'Name', u'Course', u'VT',u'University', u'College', u'NUSSD Course',u'Module', u'Session', u'Start', u'End', u'Batch', u'Status',u'Attendance']
 
           rec = node_collection.collection.aggregate([{'$match': query},
                                 {'$project': {'_id': 0,
@@ -5633,6 +5633,8 @@ def get_detailed_report(request, group_id):
                                               'End': '$attribute_set.end_time',
                                               'Batch': "$relation_set.event_has_batch",
                                               'Status': '$attribute_set.event_status',
+                                              'Attendees': "$relation_set.has_attendees",
+                                              'Attended': "$relation_set.has_attended",
                                 }},
                                 {'$sort': {'Start': 1}}
           ])
@@ -5700,6 +5702,25 @@ def get_detailed_report(request, group_id):
                               univ_id = rel['college_affiliated_to'][0]
                               old_dict.update({'University': [[univ_id]]})
             if person_gst.name == "Classroom Session":
+                if u'Attendees' in old_dict:
+                    if old_dict['Attendees']:
+                        old_dict['Attendees'] = len(old_dict['Attendees'][0])
+                    else:
+                        old_dict['Attendees'] = "Not Applicable"
+                if u'Attended' in old_dict:
+                    if old_dict['Attended']:
+                        old_dict['Attended'] = len(old_dict['Attended'][0])
+                    else:
+                        old_dict['Attended'] = "Not Applicable"
+                if old_dict['Attended'] != "Not Applicable" and old_dict['Attendees'] != "Not Applicable":
+
+                    attendance_percent = (old_dict['Attended']/float(old_dict['Attendees']))*100
+                    old_dict['Attendance'] = str(round(attendance_percent,2))+" %"
+                else:
+                    old_dict['Attendance'] = "Pending"
+
+                del old_dict['Attended']
+                del old_dict['Attendees']
                 if u"Session" in old_dict:
                    course_subsection_node = node_collection.one({'_id': ObjectId(old_dict['Session'][0][0])})
                    if course_subsection_node:
@@ -5840,6 +5861,8 @@ def get_detailed_report(request, group_id):
               ('End', 'End'),
               ('Batch', 'Batch'),
               ('Status', 'Status'),
+              ('Attendance', 'Attendance'),
+
           ]
       elif person_gst.name == "Student":
           column_headers = [
