@@ -70,8 +70,8 @@ $("#lan option[value='{{v}}']").remove();
 {% if "Theme" not in node.member_of_names_list %}
 
  Description: </br></br>
-<textarea name="content" class="field left">{{node.content_org|default_if_none:""}}</textarea>
-          </div></div>
+<div name="content" class="field left" >{{node.content_org|default_if_none:""}}</div>
+          </div></div></br>
 <div class="row">
 <div class="medium-8 columns">
 {% trans "Tags: " %} </br></br>
@@ -160,8 +160,8 @@ $("#lan option[value='{{v}}']").remove();
 
 <div class="medium-8 columns">
  Description: </br></br>
-<textarea name="content" class="field left">{{each.content_org|default_if_none:""}}</textarea>
-          </div>
+<div name="content" class="field left">{{each.content_org|default_if_none:""}</div>
+          </div></br>
 {% endif %}
 </div>
   
