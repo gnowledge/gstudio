@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.views.methods import *
 
 # ######################################################################################################################################
 
-gst_group = node_collection.one({"_type": "GSystemType", 'name': GAPPS[2]})
+gst_group = node_collection.one({"_type": "GSystemType", 'name': "Group"})
 app = gst_group
 
 # ######################################################################################################################################

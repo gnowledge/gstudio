@@ -2230,13 +2230,17 @@ def annotationlibInSelText(request, group_id):
 
   return HttpResponse(json.dumps(sg_obj.annotations))
 
+
 @get_execution_time
 def delComment(request, group_id):
   '''
   Delete comment from thread
   '''
   return HttpResponse("comment deleted")
+
+
 # Views related to MIS -------------------------------------------------------------
+
 
 @get_execution_time
 def get_students(request, group_id):
@@ -2254,13 +2258,14 @@ def get_students(request, group_id):
   """
   response_dict = {'success': False, 'message': ""}
   all_students_text = ""
-
+  group_name, group_id = get_group_name_id(group_id)
   try:
     if request.is_ajax() and request.method == "POST":
       groupid = request.POST.get("groupid", None)
       app_id = request.POST.get("app_id", None)
       app_set_id = request.POST.get("app_set_id", None)
       stud_reg_year = str(request.POST.get("reg_year", None))
+      query_rcvd = str(request.POST.get("query", ''))
       university_id = request.POST.get("student_belongs_to_university",None)
       college_id = request.POST.get("student_belongs_to_college",None)
 
@@ -2268,6 +2273,14 @@ def get_students(request, group_id):
 
       widget_for = []
       query = {}
+      if query_rcvd:
+        query = eval(query_rcvd)
+        groupid = group_id
+        gapp_gst = node_collection.one({'name':"GAPP"})
+        mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
+        app_id = mis_gapp._id
+        app_set_id = node_collection.one({'_type':"GSystemType",'name':"Student"})._id
+
       person_gs = node_collection.collection.GSystem()
       person_gs.member_of.append(person_gst._id)
       person_gs.get_neighbourhood(person_gs.member_of)
@@ -2292,85 +2305,85 @@ def get_students(request, group_id):
       # Fetch field(s) from POST object
       # if request.POST.has_key("student_belongs_to_university"):
       #   university_id = query_data = request.POST.get("student_belongs_to_university", "")
+      if not query_rcvd:
+        for each in widget_for:
+          field_name = each["name"]
 
-      for each in widget_for:
-        field_name = each["name"]
+          if each["_type"] == "BaseField":
+            if field_name in request.POST:
+              query_data = request.POST.get(field_name, "")
+              query_data = parse_template_data(each["data_type"], query_data)
+              if field_name == "name":
+                query.update({field_name: {'$regex': query_data, '$options': "i"}})
+              else:
+                query.update({field_name: query_data})
 
-        if each["_type"] == "BaseField":
-          if field_name in request.POST:
-            query_data = request.POST.get(field_name, "")
-            query_data = parse_template_data(each["data_type"], query_data)
-            if field_name == "name":
-              query.update({field_name: {'$regex': query_data, '$options': "i"}})
-            else:
-              query.update({field_name: query_data})
+          elif each["_type"] == "AttributeType":
+            if field_name in request.POST:
+              query_data = request.POST.get(field_name, "")
+              query_data = parse_template_data(each["data_type"], query_data)
+              query.update({"attribute_set."+field_name: query_data})
 
-        elif each["_type"] == "AttributeType":
-          if field_name in request.POST:
-            query_data = request.POST.get(field_name, "")
-            query_data = parse_template_data(each["data_type"], query_data)
-            query.update({"attribute_set."+field_name: query_data})
+          # elif each["_type"] == "RelationType":
+          #   if request.POST.has_key(field_name):
+          #     print field_name,"\n\n"
+          #     query_data = request.POST.get(field_name, "")
+          #     query_data = parse_template_data(each["data_type"], query_data, field_instance=each)
+          #     print query_data,"\n\n"
 
-        # elif each["_type"] == "RelationType":
-        #   if request.POST.has_key(field_name):
-        #     print field_name,"\n\n"
-        #     query_data = request.POST.get(field_name, "")
-        #     query_data = parse_template_data(each["data_type"], query_data, field_instance=each)
-        #     print query_data,"\n\n"
+          #     if field_name == "student_belongs_to_university":
+          #       university_id = query_data
+          #     else:
+          #       query.update({"relation_set."+field_name: query_data})
 
-        #     if field_name == "student_belongs_to_university":
-        #       university_id = query_data
-        #     else:
-        #       query.update({"relation_set."+field_name: query_data})
+        student = node_collection.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
+        query["member_of"] = student._id
 
-      student = node_collection.one({'_type': "GSystemType", 'name': "Student"}, {'_id': 1})
-      query["member_of"] = student._id
-
-      date_lte = datetime.datetime.strptime("31/12/" + stud_reg_year, "%d/%m/%Y")
-      date_gte = datetime.datetime.strptime("1/1/" + stud_reg_year, "%d/%m/%Y")
-      query["attribute_set.registration_date"] = {'$gte': date_gte, '$lte': date_lte} 
-      college_groupid = None
-      if college_id:
-        # Get selected college's groupid, where given college should belongs to MIS_admin group
-        college_groupid = node_collection.one({'_id': ObjectId(college_id), 'group_set': mis_admin._id, 'relation_set.has_group': {'$exists': True}}, 
-                                              {'relation_set.has_group': 1, 'name': 1}
-        )
-        response_dict["college"] = college_groupid.name
-
-      if college_groupid:
-        for each in college_groupid.relation_set:
-          if "has_group" in each.keys():
-            college_groupid = each["has_group"][0]
-            break
-      else:
+        date_lte = datetime.datetime.strptime("31/12/" + stud_reg_year, "%d/%m/%Y")
+        date_gte = datetime.datetime.strptime("1/1/" + stud_reg_year, "%d/%m/%Y")
+        query["attribute_set.registration_date"] = {'$gte': date_gte, '$lte': date_lte} 
         college_groupid = None
+        if college_id:
+          # Get selected college's groupid, where given college should belongs to MIS_admin group
+          college_groupid = node_collection.one({'_id': ObjectId(college_id), 'group_set': mis_admin._id, 'relation_set.has_group': {'$exists': True}}, 
+                                                {'relation_set.has_group': 1, 'name': 1}
+          )
+          response_dict["college"] = college_groupid.name
 
-      groupid = ObjectId(groupid)
-      group_set_to_check = []
-
-      if groupid == mis_admin._id:
-        # It means group is either a college group or MIS_admin group
-        # In either case append MIS_admin group's ObjectId
-        # and if college_groupid exists, append it's ObjectId too!
         if college_groupid:
-          group_set_to_check.append(college_groupid)
+          for each in college_groupid.relation_set:
+            if "has_group" in each.keys():
+              college_groupid = each["has_group"][0]
+              break
         else:
-          group_set_to_check.append(mis_admin._id)
+          college_groupid = None
 
-      else:
-        # Otherwise, append given group's ObjectId
-        group_set_to_check.append(groupid)
+        groupid = ObjectId(groupid)
+        group_set_to_check = []
 
-      if university_id:
-        university_id = ObjectId(university_id)
-        university = node_collection.one({'_id': university_id}, {'name': 1})
-        if university:
-          response_dict["university"] = university.name
-          query.update({'relation_set.student_belongs_to_university': university_id})
+        if groupid == mis_admin._id:
+          # It means group is either a college group or MIS_admin group
+          # In either case append MIS_admin group's ObjectId
+          # and if college_groupid exists, append it's ObjectId too!
+          if college_groupid:
+            group_set_to_check.append(college_groupid)
+          else:
+            group_set_to_check.append(mis_admin._id)
 
-      query.update({'group_set': {'$in': group_set_to_check}})
-      query.update({'status': u"PUBLISHED"})
+        else:
+          # Otherwise, append given group's ObjectId
+          group_set_to_check.append(groupid)
 
+        if university_id:
+          university_id = ObjectId(university_id)
+          university = node_collection.one({'_id': university_id}, {'name': 1})
+          if university:
+            response_dict["university"] = university.name
+            query.update({'relation_set.student_belongs_to_university': university_id})
+
+        query.update({'group_set': {'$in': group_set_to_check}})
+        query.update({'status': u"PUBLISHED"})
+        # till here
       rec = node_collection.collection.aggregate([{'$match': query},
                                   {'$project': {'_id': 0,
                                                 'stud_id': '$_id', 
@@ -2401,9 +2414,10 @@ def get_students(request, group_id):
                                                 'Stream / Degree Specialization': '$attribute_set.degree_specialization',
                                                 'College Enrolment Number / Roll No': '$attribute_set.college_enroll_num',
                                                 'College ( Graduation )': '$relation_set.student_belongs_to_college',
+                                                'University': '$relation_set.student_belongs_to_university',
                                                 'Are you registered for NSS?': '$attribute_set.is_nss_registered'
                                   }},
-                                  {'$sort': {'Name': 1}}
+                                  {'$sort': {'Enrollment Code': 1}}
             ])
       json_data = []
       filename = ""
@@ -2475,11 +2489,11 @@ def get_students(request, group_id):
 
             else:
               new_dict[each_key] = ""
-          
+
           json_data.append(new_dict)
 
         # Start: CSV file processing -------------------------------------------
-        column_header = [u"Enrollment Code", u'Name', u'Reg# Date', u'Gender', u'Birth Date', u'Religion', u'Email ID', u'Languages Known', u'Caste', u'Contact Number (Mobile)', u'Alternate Number / Landline', u'House / Street', u'Village', u'Taluka', u'Town / City', u'District', u'State', u'Pin Code', u'Year of Passing 12th Standard', u'Degree Name / Highest Degree', u'Year of Study', u'Stream / Degree Specialization', u'College Enrolment Number / Roll No', u'College ( Graduation )', u'Are you registered for NSS?']
+        column_header = [u"Enrollment Code", u'Name', u'Reg# Date', u'Gender', u'Birth Date', u'Religion', u'Email ID', u'Languages Known', u'Caste', u'Contact Number (Mobile)', u'Alternate Number / Landline', u'House / Street', u'Village', u'Taluka', u'Town / City', u'District', u'State', u'Pin Code', u'Year of Passing 12th Standard', u'Degree Name / Highest Degree', u'Year of Study', u'Stream / Degree Specialization', u'College Enrolment Number / Roll No', u'College ( Graduation )', u'Are you registered for NSS?','University']
 
         t = time.strftime("%c").replace(":", "_").replace(" ", "_")
         filename = "csv/" + "student_registration_data_" + t + ".csv"
@@ -2495,20 +2509,20 @@ def get_students(request, group_id):
             v["stud_id"] = row.pop("stud_id")
             fw.writerow(row)
             row.update(v)
-        # End: CSV file processing ----------------------------------------------
+        # End: CSV file processing --------------------------------------------
 
       # Column headers to be displayed on html
       column_headers = [
-          ("Enrollment Code", "Enrollment Code"), 
-          ("stud_id", "Edit"), 
-          ("Name", "Name"), 
-          ("Reg# Date", "Reg# Date"), 
-          ("Gender", "Gender"), 
-          ("Birth Date", "Birth Date"), 
-          ("Email ID", "Email ID"), 
+          ('University', 'University'),
+          ('College ( Graduation )', 'College'),
+          ("Name", "Name"),
+          ("Enrollment Code", "Enr Code"),
+          ("Email ID", "Email ID"),
+          ('Year of Study', 'Year of Study'),
+          ('Contact Number (Mobile)', 'Phone'),
+          ('Degree Name / Highest Degree', 'Degree'),
+          ('House / Street', 'Street')
       ]
-
-      
       # college = node_collection.one({'_id': ObjectId(college_id)}, {"name": 1})
       students_count = len(json_data)
       response_dict["success"] = True
@@ -3028,6 +3042,7 @@ def get_students_assignments(request, group_id):
     print "\n StudentDataGetError: " + str(e)
     raise Http404(e)
 
+@login_required
 @get_execution_time
 def get_districts(request, group_id):
   """
@@ -3084,6 +3099,8 @@ def get_districts(request, group_id):
     error_message = "\n DistrictFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
+
+@login_required
 @get_execution_time
 def get_affiliated_colleges(request, group_id):
   """
@@ -3111,25 +3128,29 @@ def get_affiliated_colleges(request, group_id):
       university_id = request.GET.get("university_id", "")
       req_university = None
       req_affiliated_colleges = None
-
+      colg_gst = node_collection.one({'_type': "GSystemType", 'name': "College"})
       # Check whether any field has missing value or not
       if university_id == "":
         error_message = "AffiliatedCollegeFindError: Invalid data (No university selected)!!!"
         raise Exception(error_message)
 
-      # Type-cast fetched field(s) into their appropriate type
-      university_id = ObjectId(university_id)
+      if university_id == "ALL":
+        req_affiliated_colleges = node_collection.find({'member_of': colg_gst._id}, {'name': 1}).sort('name', 1)
 
-      # Fetch required university
-      req_university = node_collection.one({'_id': university_id})
+      else:
+        # Type-cast fetched field(s) into their appropriate type
+        university_id = ObjectId(university_id)
 
-      if not req_university:
-        error_message = "AffiliatedCollegeFindError: No university exists with given ObjectId("+university_id+")!!!"
-        raise Exception(error_message)
+        # Fetch required university
+        req_university = node_collection.one({'_id': university_id})
 
-      for each in req_university["relation_set"]:
-        if u"affiliated_college" in each.keys():
-          req_affiliated_colleges = node_collection.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
+        if not req_university:
+          error_message = "AffiliatedCollegeFindError: No university exists with given ObjectId("+university_id+")!!!"
+          raise Exception(error_message)
+
+        for each in req_university["relation_set"]:
+          if u"affiliated_college" in each.keys():
+            req_affiliated_colleges = node_collection.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
       
       req_affiliated_colleges_list = []
       for each in req_affiliated_colleges:
@@ -5449,8 +5470,8 @@ def page_scroll(request,group_id,page):
       )
 
 
-
-@get_execution_time 
+@login_required
+@get_execution_time
 def get_batches_with_acourse(request, group_id):
   """
   This view returns list of batches that match given criteria
@@ -5492,3 +5513,509 @@ def get_batches_with_acourse(request, group_id):
   except Exception as e:
     error_message = "\n BatchFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
+
+
+@login_required
+@get_execution_time
+def get_universities(request, group_id):
+    """
+    This view fetches Universities belonging to given state.
+
+    Arguments:
+    group_id - ObjectId of the currently selected group
+    state_id - ObjectId of the currently selected state`
+
+    Returns:
+    A dictionary consisting of following key:-
+    universities - a list variable consisting of two elements i.e.,
+                first-element: University's ObjectId,
+                second-element:University's name
+    message - a string variable giving the error-message
+    """
+
+    try:
+        if request.is_ajax() and request.method == "GET":
+            state_id = request.GET.get("state_id", "")
+
+            # universities -- [first-element: subject (University's ObjectId),
+            # second-element: manipulated-name-value (University's name)]
+            universities = []
+            univ_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+            mis_admin_grp = node_collection.one({'_type': "Group", 'name': "MIS_admin"})
+
+            if state_id == "ALL":
+                # Fetching all universities belonging to given state in sorted order by name
+                university_cur = node_collection.find(
+                    {
+                        'member_of': univ_gst._id,
+                        'group_set': mis_admin_grp._id,
+                    }).sort('name', 1)
+
+            else:
+                # Fetching all universities belonging to given state in sorted order by name
+                university_cur = node_collection.find(
+                    {
+                        'member_of': univ_gst._id,
+                        'group_set': mis_admin_grp._id,
+                        'relation_set.organization_belongs_to_state': ObjectId(state_id)
+                    }).sort('name', 1)
+
+            if university_cur.count():
+                for d in university_cur:
+                    universities.append([str(d._id), d.name])
+
+            else:
+                error_message = "No University found for the selected State"
+                raise Exception(error_message)
+
+            return HttpResponse(json.dumps(universities))
+
+        else:
+            error_message = " UniversityFetchError: Either not an ajax call or not a GET request!!!"
+            return HttpResponse(json.dumps({'message': " UniversityFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+    except Exception as e:
+        error_message = str(e)
+        return HttpResponse(json.dumps({'message': error_message}))
+
+
+# MIS Reports
+@get_execution_time
+def get_events(request, group_id):
+  """
+  This view returns list of students along with required data based on selection criteria
+  to student_data_review.html
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  """
+  response_dict = {'success': False, 'message': ""}
+  all_students_text = ""
+  group_name, group_id = get_group_name_id(group_id)
+  try:
+    if request.is_ajax() and request.method == "POST":
+      # groupid = request.POST.get("groupid", None)
+      # app_id = request.POST.get("app_id", None)
+      # app_set_id = request.POST.get("app_set_id", None)
+      # stud_reg_year = str(request.POST.get("reg_year", None))
+      query_rcvd = str(request.POST.get("query", ''))
+      # university_id = request.POST.get("student_belongs_to_university",None)
+      # college_id = request.POST.get("student_belongs_to_college",None)
+
+      person_gst = node_collection.one({'_type': "GSystemType", 'name': "Classroom Session"}, {'name': 1, 'type_of': 1})
+
+      widget_for = []
+      query = {}
+      result_set = None
+      if query_rcvd:
+        query = eval(query_rcvd)
+        groupid = group_id
+        gapp_gst = node_collection.one({'name':"GAPP"})
+        mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
+        app_id = mis_gapp._id
+        app_set_id = person_gst._id
+
+      person_gs = node_collection.collection.GSystem()
+      person_gs.member_of.append(person_gst._id)
+      person_gs.get_neighbourhood(person_gs.member_of)
+      # university_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+      mis_admin = node_collection.one({"_type": "Group", "name": "MIS_admin"}, {"_id": 1})
+
+
+      rec = node_collection.collection.aggregate([{'$match': query},
+                                  {'$project': {'_id': 0,
+                                                'stud_id': '$_id',
+                                                'Name': '$name',
+                                                'Course': '$attribute_set.nussd_course_type',
+                                                'VT': '$relation_set.event_coordinator',
+                                                'Session': '$relation_set.session_of',
+                                                'Start': '$attribute_set.start_time',
+                                                'End': '$attribute_set.end_time',
+                                                'Batch':"$relation_set.event_has_batch",
+                                                'Status': '$attribute_set.event_status',
+                                  }},
+                                  {'$sort': {'Name': 1}}
+            ])
+      json_data = []
+      filename = ""
+      column_header = []
+      course_section_node_id = course_subsection_node = None
+      result_set = rec["result"]
+      if result_set:
+        # old_dict = result_set[0]
+        for old_dict in result_set:
+          if old_dict:
+            if u"Session" in old_dict:
+               course_subsection_node = node_collection.one({'_id': ObjectId(old_dict['Session'][0][0])})
+               if course_subsection_node:
+                 course_section_node_id = course_subsection_node.prior_node[0]
+                 old_dict.update({'Module': [[course_section_node_id]]})
+               if course_section_node_id:
+                 course_section_node = node_collection.one({'_id': ObjectId(course_section_node_id)})
+                 nussd_course_node = course_section_node.prior_node[0]
+                 old_dict.update({'NUSSD Course': [[nussd_course_node]]})
+            if u"stud_id" in old_dict:
+              event_node = node_collection.one({'_id': ObjectId(old_dict['stud_id'])})
+              if event_node:
+                colg_group_id = event_node.group_set[0]
+                colg_group_node = node_collection.one({'_id':ObjectId(colg_group_id)})
+                if colg_group_node.relation_set:
+                  for rel in colg_group_node.relation_set:
+                    if rel and 'group_of' in rel:
+                      colg_node_id = rel['group_of'][0]
+                      colg_node = node_collection.one({'_id': ObjectId(colg_node_id)},{'name':1,'relation_set':1})
+                      colg_node_name = colg_node.name
+                      old_dict.update({'College': colg_node_name})
+                      if colg_node.relation_set:
+                        for rel in colg_node.relation_set:
+                          if rel and 'college_affiliated_to' in rel:
+                            univ_id = rel['college_affiliated_to'][0]
+                            old_dict.update({'University': [[univ_id]]})
+              result_set[0] = old_dict
+
+      if result_set:
+        for each_dict in result_set:
+          new_dict = {}
+          for each_key in each_dict:
+            if each_dict[each_key]:
+              if type(each_dict[each_key]) == list:
+                data = each_dict[each_key][0]
+              else:
+                data = each_dict[each_key]
+
+              if type(data) == list:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                
+                  elif type(data[0]) in [ObjectId]:
+                    # new_dict[each_key] = str(data)
+                    d_list = []
+                    for oid in data:
+                      d = node_collection.one({'_id': oid}, {'name': 1})
+                      d_list.append(str(d.name))
+                    new_dict[each_key] = ', '.join(str(n) for n in d_list)
+                
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+                
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+                
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+                
+                else:
+                  new_dict[each_key] = str(data)
+
+              else:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                  elif type(data[0]) in [ObjectId]:
+                    new_dict[each_key] = str(data)
+
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+
+                else:
+                  new_dict[each_key] = str(data)
+
+            else:
+              new_dict[each_key] = ""
+
+          json_data.append(new_dict)
+
+        # Start: CSV file processing -------------------------------------------
+        column_header = [u'Name', u'Course', u'VT',u'University', u'College', u'NUSSD Course',u'Module', u'Session', u'Start', u'End', u'Batch', u'Status']
+
+        t = time.strftime("%c").replace(":", "_").replace(" ", "_")
+        filename = "csv/" + "events_data_" + t + ".csv"
+        filepath = os.path.join(STATIC_ROOT, filename)
+        filedir = os.path.dirname(filepath)
+        if not os.path.exists(filedir):
+          os.makedirs(filedir)
+        with open(filepath, 'wb') as csv_file:
+          fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
+          fw.writerow(dict((col,col) for col in column_header))
+          for row in json_data:
+            v = {}
+            v["stud_id"] = row.pop("stud_id")
+            fw.writerow(row)
+            row.update(v)
+        # End: CSV file processing --------------------------------------------
+
+      # Column headers to be displayed on html
+      column_headers = [
+          # ('University', 'University'),
+          # ('College ( Graduation )', 'College'),
+          ("University", "University"),
+          ("College", "College"),
+          ("Name", "Name"),
+          ("Course", "Course"),
+          ("VT", "VT"),
+          ("NUSSD Course", "NUSSD Course"),
+          ("Module", "Module"),
+          ('Session', 'Session'),
+          ('Start', 'Start'),
+          ('End', 'End'),
+          ('Batch', 'Batch'),
+          ('Status', 'Status'),
+      ]
+      # college = node_collection.one({'_id': ObjectId(college_id)}, {"name": 1})
+      students_count = len(json_data)
+      response_dict["success"] = True
+      response_dict["groupid"] = group_id
+      response_dict["app_id"] = app_id
+      response_dict["app_set_id"] = app_set_id
+      response_dict["filename"] = filename
+      response_dict["students_count"] = students_count
+      response_dict["column_headers"] = column_headers
+      response_dict["students_data_set"] = json_data
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+    
+    else:
+      error_message = "StudentFindError: Either not an ajax call or not a POST request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+  except OSError as oe:
+    error_message = "StudentFindError: " + str(oe) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+  except Exception as e:
+    error_message = "StudentFindError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+
+# MIS Reports
+@get_execution_time
+def get_voluntary_teachers(request, group_id):
+  """
+  This view returns list of students along with required data based on selection criteria
+  to student_data_review.html
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  """
+  response_dict = {'success': False, 'message': ""}
+  all_students_text = ""
+  group_name, group_id = get_group_name_id(group_id)
+  try:
+    if request.is_ajax() and request.method == "POST":
+      # groupid = request.POST.get("groupid", None)
+      # app_id = request.POST.get("app_id", None)
+      # app_set_id = request.POST.get("app_set_id", None)
+      # stud_reg_year = str(request.POST.get("reg_year", None))
+      query_rcvd = str(request.POST.get("query", ''))
+      # university_id = request.POST.get("student_belongs_to_university",None)
+      # college_id = request.POST.get("student_belongs_to_college",None)
+
+      person_gst = node_collection.one({'_type': "GSystemType", 'name': "Voluntary Teacher"}, {'name': 1, 'type_of': 1})
+
+      widget_for = []
+      query = {}
+      result_set = None
+      if query_rcvd:
+        query = eval(query_rcvd)
+        groupid = group_id
+        gapp_gst = node_collection.one({'name':"GAPP"})
+        mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
+        app_id = mis_gapp._id
+        app_set_id = person_gst._id
+
+      person_gs = node_collection.collection.GSystem()
+      person_gs.member_of.append(person_gst._id)
+      person_gs.get_neighbourhood(person_gs.member_of)
+      # university_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+      mis_admin = node_collection.one({"_type": "Group", "name": "MIS_admin"}, {"_id": 1})
+
+
+      rec = node_collection.collection.aggregate([{'$match': query},
+                                  {'$project': {'_id': 0,
+                                                'stud_id': '$_id',
+                                                'Name': '$name',
+                                                'Email ID': '$attribute_set.email_id',
+                                                'Phone': '$attribute_set.mobile_number',
+                                                'Street': '$attribute_set.town_city',
+                                                'Events':'$relation_set.coordinator_of_event'
+                                  }},
+                                  {'$sort': {'Name': 1}}
+            ])
+      json_data = []
+      filename = ""
+      column_header = []
+      course_section_node_id = course_subsection_node = None
+      result_set = rec["result"]
+      if result_set:
+        # old_dict = result_set[0]
+        for old_dict in result_set:
+          if old_dict:
+            if u"stud_id" in old_dict:
+              vt_node = node_collection.one({'_id': ObjectId(old_dict['stud_id'])})
+              if vt_node:
+                for rel in vt_node.relation_set:
+                  if rel and 'trainer_of_college' in rel:
+                    colg_node_id = rel['trainer_of_college'][0]
+                    colg_node = node_collection.one({'_id': ObjectId(colg_node_id)},{'name':1,'relation_set':1})
+                    colg_node_name = colg_node.name
+                    old_dict.update({'College': colg_node_name})
+                    if colg_node.relation_set:
+                      for rel in colg_node.relation_set:
+                        if rel and 'college_affiliated_to' in rel:
+                          univ_id = rel['college_affiliated_to'][0]
+                          old_dict.update({'University': [[univ_id]]})
+              result_set[0] = old_dict
+
+      if result_set:
+        for each_dict in result_set:
+          new_dict = {}
+          for each_key in each_dict:
+            if each_dict[each_key]:
+              if type(each_dict[each_key]) == list:
+                data = each_dict[each_key][0]
+              else:
+                data = each_dict[each_key]
+
+              if type(data) == list:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                
+                  elif type(data[0]) in [ObjectId]:
+                    # new_dict[each_key] = str(data)
+                    d_list = []
+                    for oid in data:
+                      d = node_collection.one({'_id': oid}, {'name': 1})
+                      d_list.append(str(d.name))
+                    new_dict[each_key] = ', '.join(str(n) for n in d_list)
+                
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+                
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+                
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+                
+                else:
+                  new_dict[each_key] = str(data)
+
+              else:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                  elif type(data[0]) in [ObjectId]:
+                    new_dict[each_key] = str(data)
+
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+
+                else:
+                  new_dict[each_key] = str(data)
+
+            else:
+              new_dict[each_key] = ""
+
+          json_data.append(new_dict)
+
+        # Start: CSV file processing -------------------------------------------
+        column_header = [u'University', u'College',u'Name', u'Email ID', u'Phone', u'Street',u'Events']
+
+        t = time.strftime("%c").replace(":", "_").replace(" ", "_")
+        filename = "csv/" + "voluntary_teachers_" + t + ".csv"
+        filepath = os.path.join(STATIC_ROOT, filename)
+        filedir = os.path.dirname(filepath)
+        if not os.path.exists(filedir):
+          os.makedirs(filedir)
+        with open(filepath, 'wb') as csv_file:
+          fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
+          fw.writerow(dict((col,col) for col in column_header))
+          for row in json_data:
+            v = {}
+            v["stud_id"] = row.pop("stud_id")
+            fw.writerow(row)
+            row.update(v)
+        # End: CSV file processing --------------------------------------------
+
+      # Column headers to be displayed on html
+      column_headers = [
+          ('University', 'University'),
+          ('College', 'College'),
+          ("Name", "Name"),
+          ("Email ID", "Email ID"),
+          ("Phone", "Phone"),
+          ("Street", "Street"),
+          ("Events", "Events"),
+      ]
+      # college = node_collection.one({'_id': ObjectId(college_id)}, {"name": 1})
+      students_count = len(json_data)
+      response_dict["success"] = True
+      response_dict["groupid"] = group_id
+      response_dict["app_id"] = app_id
+      response_dict["app_set_id"] = app_set_id
+      response_dict["filename"] = filename
+      response_dict["students_count"] = students_count
+      response_dict["column_headers"] = column_headers
+      response_dict["students_data_set"] = json_data
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+    
+    else:
+      error_message = "StudentFindError: Either not an ajax call or not a POST request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+  except OSError as oe:
+    error_message = "StudentFindError: " + str(oe) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+  except Exception as e:
+    error_message = "StudentFindError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))

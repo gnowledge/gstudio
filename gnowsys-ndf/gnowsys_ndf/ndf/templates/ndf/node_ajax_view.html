@@ -1015,10 +1015,11 @@ ul#navigation li a.last {
           {% endif %}
          
           <!-- Tab View Map Widget -->
+        {% elif node.location %}
           <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
             <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
             <a class="close-reveal-modal" >&#215;</a>
-            <!-- {#% include "ndf/map_widget.html" with mode="read" %#} -->
+            {% include "ndf/map_widget.html" with mode="read" %}
             <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
             <!-- #{#%# endif %} -->
           </div>
@@ -1448,7 +1449,6 @@ ul#navigation li a.last {
     <!-- Below code/widgets will only be shown for all resource instances/documents
          which are neither Topic nor Concept
     -->
-    <!-- <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {#% trans "Location" %#}</a></li> -->
 
     <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
     </li>
@@ -1465,6 +1465,8 @@ ul#navigation li a.last {
       {% endif %}               
     </ul>
 
+  {% elif node.location %}
+    <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></li>
   {% endif %}
 
     <!-- 
@@ -1874,40 +1876,40 @@ ul#navigation li a.last {
     })
   });
   
-  /*
-  $(document).on('open', '#view-map-widget[data-reveal]', function () {  
+  
+  // $(document).on('open', '#view-map-widget[data-reveal]', function () {  
     
-    $.ajax({
-      url: "{#% url 'get_visited_location' groupid %#}",
-      success: function(data){ 
+  //   $.ajax({
+  //     url: "{% url 'get_visited_location' groupid %}",
+  //     success: function(data){ 
 
-        data = JSON.parse(data);
+  //       data = JSON.parse(data);
 
-        var lastVisitedLocationVal = data;
+  //       var lastVisitedLocationVal = data;
         
-        if(lastVisitedLocationVal){
+  //       if(lastVisitedLocationVal){
 
-          if(lastVisitedLocationVal == "[]"){
-            lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-          }
+  //         if(lastVisitedLocationVal == "[]"){
+  //           lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+  //         }
 
-          if(lastVisitedLocationVal.length > 0){
-                // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
-                var zoom = lastVisitedLocationVal.pop(),
-                    lng = lastVisitedLocationVal[1],
-                    lat = lastVisitedLocationVal[0];
-                  map.setView([lat, lng], zoom);
-                }
-        }
-        else if( tempArr.length )
-        {
-          var group = new L.featureGroup(tempArr)
-              map.fitBounds(group.getBounds());
-        }
+  //         if(lastVisitedLocationVal.length > 0){
+  //               // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+  //               var zoom = lastVisitedLocationVal.pop(),
+  //                   lng = lastVisitedLocationVal[1],
+  //                   lat = lastVisitedLocationVal[0];
+  //                 map.setView([lat, lng], zoom);
+  //               }
+  //       }
+  //       else if( tempArr.length )
+  //       {
+  //         var group = new L.featureGroup(tempArr)
+  //             map.fitBounds(group.getBounds());
+  //       }
 
-      }
-    });
-  });
+  //     }
+  //   });
+  // });
 
 
   $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
@@ -1939,5 +1941,5 @@ ul#navigation li a.last {
 
     // map.setView([lat, lng], zoom);
   });
-  */
+  
 </script>

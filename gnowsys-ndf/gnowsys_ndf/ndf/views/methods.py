@@ -99,6 +99,13 @@ def get_group_name_id(group_name_or_id, get_obj=False):
 
       Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
       - "res_group_obj" will contain entire object.
+
+      Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
+      try:
+          group_id = ObjectId(group_id)
+      except:
+          group_name, group_id = get_group_name_id(group_id)
+
     '''
     # if cached result exists return it
     if not get_obj:
@@ -605,7 +612,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
-        tags = request.POST.get('tags')
+        tags = request.POST.get('tags','')
         # print "tags: --------- ", tags
 
     language = request.POST.get('lan')
