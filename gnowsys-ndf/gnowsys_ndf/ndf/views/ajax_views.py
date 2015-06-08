@@ -5010,8 +5010,9 @@ def event_assginee(request, group_id, app_set_instance_id=None):
     for j in event_node.attribute_set:
        if unicode('reschedule_attendance') in j.keys():
           reschedule_dates = j['reschedule_attendance']
-    reschedule_dates["reschedule_allow"] = False
-    create_gattribute(ObjectId(app_set_instance_id),reschedule_attendance,reschedule_dates)
+    if attendancesession != str(1):
+        reschedule_dates["reschedule_allow"] = False
+        create_gattribute(ObjectId(app_set_instance_id),reschedule_attendance,reschedule_dates)
     if attendancesession == str(1):
     	event_status = node_collection.one({"_type":"AttributeType","name":"event_status"})
         create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
