@@ -541,6 +541,7 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 				drawer1['en']='en'
 				drawer1['mar']='mar'
 		else:
+			#drawer = node_collection.find({"_type":types,'name':{'$nin':[u'Voluntary Teacher']}})
 			drawer = node_collection.find({"_type":types})
 			for each in drawer:
 				drawer1[str(each._id)]=each
@@ -2185,7 +2186,7 @@ def str_to_dict(str1):
               else: 
                       # if v != [] and v != "None":
                       if v:
-                      		  if User.objects.filter(id = userid).exists():
+                      		  if User.objects.filter(id = v).exists():
 	                              user = User.objects.get(id = v)
 	                              if user:
 	                                dict_format[k] = user.get_username()
