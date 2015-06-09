@@ -116,12 +116,6 @@
         <span class="small-6 columns end"><u><a href="{% url 'course_detail' group_name_tag cnode.pk %}">{{cnode.name}}</a></u></span>
       </div>
       <br/>
-      <div class="course_desc row">
-        <label class="small-3 columns "> {% trans "Course Description :"%}</label>
-      <p>
-        {{cnode.content_org}}
-      </p>  
-      </div>
     </section>
     {% if user.is_authenticated %}
 

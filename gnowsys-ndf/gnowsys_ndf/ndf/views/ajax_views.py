@@ -2230,13 +2230,17 @@ def annotationlibInSelText(request, group_id):
 
   return HttpResponse(json.dumps(sg_obj.annotations))
 
+
 @get_execution_time
 def delComment(request, group_id):
   '''
   Delete comment from thread
   '''
   return HttpResponse("comment deleted")
+
+
 # Views related to MIS -------------------------------------------------------------
+
 
 @get_execution_time
 def get_students(request, group_id):
@@ -2254,7 +2258,7 @@ def get_students(request, group_id):
   """
   response_dict = {'success': False, 'message': ""}
   all_students_text = ""
-
+  group_name, group_id = get_group_name_id(group_id)
   try:
     if request.is_ajax() and request.method == "POST":
       groupid = request.POST.get("groupid", None)
@@ -2292,7 +2296,6 @@ def get_students(request, group_id):
       # Fetch field(s) from POST object
       # if request.POST.has_key("student_belongs_to_university"):
       #   university_id = query_data = request.POST.get("student_belongs_to_university", "")
-
       for each in widget_for:
         field_name = each["name"]
 
@@ -2370,7 +2373,6 @@ def get_students(request, group_id):
 
       query.update({'group_set': {'$in': group_set_to_check}})
       query.update({'status': u"PUBLISHED"})
-
       rec = node_collection.collection.aggregate([{'$match': query},
                                   {'$project': {'_id': 0,
                                                 'stud_id': '$_id', 
@@ -2401,9 +2403,10 @@ def get_students(request, group_id):
                                                 'Stream / Degree Specialization': '$attribute_set.degree_specialization',
                                                 'College Enrolment Number / Roll No': '$attribute_set.college_enroll_num',
                                                 'College ( Graduation )': '$relation_set.student_belongs_to_college',
+                                                'University': '$relation_set.student_belongs_to_university',
                                                 'Are you registered for NSS?': '$attribute_set.is_nss_registered'
                                   }},
-                                  {'$sort': {'Name': 1}}
+                                  {'$sort': {'Enrollment Code': 1}}
             ])
       json_data = []
       filename = ""
@@ -2475,11 +2478,11 @@ def get_students(request, group_id):
 
             else:
               new_dict[each_key] = ""
-          
+
           json_data.append(new_dict)
 
         # Start: CSV file processing -------------------------------------------
-        column_header = [u"Enrollment Code", u'Name', u'Reg# Date', u'Gender', u'Birth Date', u'Religion', u'Email ID', u'Languages Known', u'Caste', u'Contact Number (Mobile)', u'Alternate Number / Landline', u'House / Street', u'Village', u'Taluka', u'Town / City', u'District', u'State', u'Pin Code', u'Year of Passing 12th Standard', u'Degree Name / Highest Degree', u'Year of Study', u'Stream / Degree Specialization', u'College Enrolment Number / Roll No', u'College ( Graduation )', u'Are you registered for NSS?']
+        column_header = [u"Enrollment Code", u'Name', u'Reg# Date', u'Gender', u'Birth Date', u'Religion', u'Email ID', u'Languages Known', u'Caste', u'Contact Number (Mobile)', u'Alternate Number / Landline', u'House / Street', u'Village', u'Taluka', u'Town / City', u'District', u'State', u'Pin Code', u'Year of Passing 12th Standard', u'Degree Name / Highest Degree', u'Year of Study', u'Stream / Degree Specialization', u'College Enrolment Number / Roll No', u'College ( Graduation )', u'Are you registered for NSS?','University']
 
         t = time.strftime("%c").replace(":", "_").replace(" ", "_")
         filename = "csv/" + "student_registration_data_" + t + ".csv"
@@ -2495,20 +2498,20 @@ def get_students(request, group_id):
             v["stud_id"] = row.pop("stud_id")
             fw.writerow(row)
             row.update(v)
-        # End: CSV file processing ----------------------------------------------
+        # End: CSV file processing --------------------------------------------
 
       # Column headers to be displayed on html
       column_headers = [
-          ("Enrollment Code", "Enrollment Code"), 
-          ("stud_id", "Edit"), 
-          ("Name", "Name"), 
-          ("Reg# Date", "Reg# Date"), 
-          ("Gender", "Gender"), 
-          ("Birth Date", "Birth Date"), 
-          ("Email ID", "Email ID"), 
+          ('University', 'University'),
+          ('College ( Graduation )', 'College'),
+          ("Name", "Name"),
+          ("Enrollment Code", "Enr Code"),
+          ("Email ID", "Email ID"),
+          ('Year of Study', 'Year of Study'),
+          ('Contact Number (Mobile)', 'Phone'),
+          ('Degree Name / Highest Degree', 'Degree'),
+          ('House / Street', 'Street')
       ]
-
-      
       # college = node_collection.one({'_id': ObjectId(college_id)}, {"name": 1})
       students_count = len(json_data)
       response_dict["success"] = True
@@ -2535,6 +2538,7 @@ def get_students(request, group_id):
     error_message = "StudentFindError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
 
 @get_execution_time
 def get_statewise_data(request, group_id):
@@ -3028,6 +3032,7 @@ def get_students_assignments(request, group_id):
     print "\n StudentDataGetError: " + str(e)
     raise Http404(e)
 
+@login_required
 @get_execution_time
 def get_districts(request, group_id):
   """
@@ -3084,6 +3089,8 @@ def get_districts(request, group_id):
     error_message = "\n DistrictFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
 
+
+@login_required
 @get_execution_time
 def get_affiliated_colleges(request, group_id):
   """
@@ -3111,25 +3118,29 @@ def get_affiliated_colleges(request, group_id):
       university_id = request.GET.get("university_id", "")
       req_university = None
       req_affiliated_colleges = None
-
+      colg_gst = node_collection.one({'_type': "GSystemType", 'name': "College"})
       # Check whether any field has missing value or not
       if university_id == "":
         error_message = "AffiliatedCollegeFindError: Invalid data (No university selected)!!!"
         raise Exception(error_message)
 
-      # Type-cast fetched field(s) into their appropriate type
-      university_id = ObjectId(university_id)
+      if university_id == "ALL":
+        req_affiliated_colleges = node_collection.find({'member_of': colg_gst._id}, {'name': 1}).sort('name', 1)
 
-      # Fetch required university
-      req_university = node_collection.one({'_id': university_id})
+      else:
+        # Type-cast fetched field(s) into their appropriate type
+        university_id = ObjectId(university_id)
 
-      if not req_university:
-        error_message = "AffiliatedCollegeFindError: No university exists with given ObjectId("+university_id+")!!!"
-        raise Exception(error_message)
+        # Fetch required university
+        req_university = node_collection.one({'_id': university_id})
 
-      for each in req_university["relation_set"]:
-        if u"affiliated_college" in each.keys():
-          req_affiliated_colleges = node_collection.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
+        if not req_university:
+          error_message = "AffiliatedCollegeFindError: No university exists with given ObjectId("+university_id+")!!!"
+          raise Exception(error_message)
+
+        for each in req_university["relation_set"]:
+          if u"affiliated_college" in each.keys():
+            req_affiliated_colleges = node_collection.find({'_id': {'$in': each[u"affiliated_college"]}}, {'name': 1}).sort('name', 1)
       
       req_affiliated_colleges_list = []
       for each in req_affiliated_colleges:
@@ -4941,7 +4952,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  
  performance_record=node_collection.find({"_type":"AttributeType","name":"performance_record"})
  
- student_details=node_collection.find({"_type":"AttributeType","name":"attendance_record"})
+ student_attendace_record=node_collection.find({"_type":"AttributeType","name":"attendance_record"})
  
  marks_entry_completed=node_collection.find({"_type":"AttributeType","name":"marks_entry_completed"})
  
@@ -4949,25 +4960,42 @@ def event_assginee(request, group_id, app_set_instance_id=None):
 
  event_node = node_collection.one({"_id":ObjectId(app_set_instance_id)})
 
+ student_details = node_collection.one({"_type":"AttributeType","name":"student_event_details"})
+
  #code for saving Attendance and Assesment of Assignment And Assesment Session
  attendedlist=[]
- 
  for info in Event_attended_by:
      a=ast.literal_eval(info)
      if (a['Name'] != 'undefined'):
       student_dict={}
+      attendance_dict = {}
+      performance_record_dict = {}
+      marks_dict = {}
+      student_node = node_collection.find_one({"_id":ObjectId(a['Name'])})
+      
+      for i in student_node.attribute_set:
+          if unicode('student_event_details') in i.keys():
+            student_dict.update(i['student_event_details'])
+          if unicode("attendance_record") in i.keys():
+            attendance_dict.update(i["attendance_record"])
+          if unicode("performance_record") in i.keys():
+            performance_record_dict.update(i["performance_record"])
+            
       if (a['save'] == '2' or a['save'] == '3'):
-        student_dict.update({"marks":a['Attendance_marks'],'Event':ObjectId(Event[0])})
-        create_gattribute(ObjectId(a['Name']),Assignment_rel[0], student_dict)
+        marks_dict["Assignment_marks_record"] = a['Attendance_marks']
       if(a['save'] == '2' or  a['save'] == '4'):
-        student_dict.update({"marks":a['Assessment_marks'],'Event':ObjectId(Event[0])})
-        create_gattribute(ObjectId(a['Name']),Assessmentmarks_rel[0], student_dict)
+      	marks_dict["Assessment_marks_record"] = a['Assessment_marks']
+      if (a['save'] == '2' or a['save'] == '3' or a['save'] == '4'):
+        student_dict[Event[0]] = marks_dict 
+        create_gattribute(ObjectId(a['Name']),student_details,student_dict)
+      
       if(a['save'] == '5'):
-        student_dict.update({"marks":a['Assessment_marks'],'Event':ObjectId(Event[0])})
-        create_gattribute(ObjectId(a['Name']),performance_record[0], student_dict)
-      create_gattribute(ObjectId(a['Name']),student_details[0],{"atandance":a['Presence'],'Event':ObjectId(Event[0])})
+      	performance_record_dict[Event[0]] = a['Assessment_marks'] 
+        create_gattribute(ObjectId(a['Name']),performance_record[0],performance_record_dict)
       if(a['Presence'] == 'True'):
           attendedlist.append(a['Name'])
+      attendance_dict.update({unicode(Event[0]):a['Presence']})  
+      create_gattribute(ObjectId(a['Name']),student_attendace_record[0],attendance_dict)
 
  if attendancesession != str(1):
    create_gattribute(ObjectId(app_set_instance_id),marks_entry_completed[0],False)
@@ -4982,8 +5010,9 @@ def event_assginee(request, group_id, app_set_instance_id=None):
     for j in event_node.attribute_set:
        if unicode('reschedule_attendance') in j.keys():
           reschedule_dates = j['reschedule_attendance']
-    reschedule_dates["reschedule_allow"] = False
-    create_gattribute(ObjectId(app_set_instance_id),reschedule_attendance,reschedule_dates)
+    if attendancesession != str(1):
+        reschedule_dates["reschedule_allow"] = False
+        create_gattribute(ObjectId(app_set_instance_id),reschedule_attendance,reschedule_dates)
     if attendancesession == str(1):
     	event_status = node_collection.one({"_type":"AttributeType","name":"event_status"})
         create_gattribute(ObjectId(app_set_instance_id),event_status,unicode('Completed'))
@@ -5268,34 +5297,39 @@ def get_attendance(request,group_id,node):
  assign=False
  asses=False
  member_of=node_collection.one({"_id":{'$in':node.member_of}})
+ 
  for i in attendee_name_list:
     if (i._id in attendieslist):
-      attendees=node_collection.one({"_id":ObjectId(i._id)})
+      attendees = node_collection.one({"_id":ObjectId(i._id)})
       dict1={}
       dict2={}
       for j in  attendees.attribute_set:
          if member_of.name != "Exam":
-            if   unicode('Assignment_marks_record') in j.keys():
-               if (str(j['Assignment_marks_record']['Event']) == str(node._id)) is True:
-                  val=True
-                  assign=True
-                  dict1.update({'marks':j['Assignment_marks_record']['marks']})
-               else:
-                  dict1.update({'marks':"0"})
-            if  unicode('Assessment_marks_record') in j.keys():
-               if(str(j['Assessment_marks_record']['Event']) == str(node._id)) is True:
-                  val=True
-                  asses=True
-                  dict2.update({'marks':j['Assessment_marks_record']['marks']})
-               else:
-                  dict2.update({'marks':"0"})
+            	if   unicode('student_event_details') in j.keys():
+                   if(unicode(node._id) in j['student_event_details'].keys()):
+                           if unicode('Assignment_marks_record') in j['student_event_details'][str(node._id)].keys():
+                              val=True
+                              assign=True
+                              dict1.update({'marks':j['student_event_details'][str(node._id)]['Assignment_marks_record']})
+                           else:
+                              dict1.update({'marks':"0"})
+                      	   if unicode('Assessment_marks_record')  in j['student_event_details'][str(node._id)].keys():
+          	                  val=True
+          	                  asses=True
+          	                  dict2.update({'marks':j['student_event_details'][str(node._id)]['Assessment_marks_record']})
+          	           else:
+          	                  dict2.update({'marks':"0"})
+                           break;              
+                else:
+                        dict1.update({'marks':'0'})
+                        dict2.update({'marks':'0'})           
          if member_of.name == "Exam":
             dict1.update({'marks':"0"})
             if  unicode('performance_record') in j.keys():
-               if(str(j['performance_record']['Event']) == str(node._id)) is True:
+               if(unicode(node._id) in j['performance_record'].keys()) :
                   val=True
                   asses=True
-                  dict2.update({'marks':j['performance_record']['marks']}) 
+                  dict2.update({'marks':j['performance_record'][unicode(node._id)]}) 
                else:
                   dict2.update({'marks':"0"})
       temp_attendance.update({'id':str(i._id)})
@@ -5427,8 +5461,8 @@ def page_scroll(request,group_id,page):
       )
 
 
-
-@get_execution_time 
+@login_required
+@get_execution_time
 def get_batches_with_acourse(request, group_id):
   """
   This view returns list of batches that match given criteria
@@ -5470,3 +5504,402 @@ def get_batches_with_acourse(request, group_id):
   except Exception as e:
     error_message = "\n BatchFetchError: " + str(e) + "!!!"
     return HttpResponse(json.dumps({'message': error_message}))
+
+
+@login_required
+@get_execution_time
+def get_universities(request, group_id):
+    """
+    This view fetches Universities belonging to given state.
+
+    Arguments:
+    group_id - ObjectId of the currently selected group
+    state_id - ObjectId of the currently selected state`
+
+    Returns:
+    A dictionary consisting of following key:-
+    universities - a list variable consisting of two elements i.e.,
+                first-element: University's ObjectId,
+                second-element:University's name
+    message - a string variable giving the error-message
+    """
+
+    try:
+        if request.is_ajax() and request.method == "GET":
+            state_id = request.GET.get("state_id", "")
+
+            # universities -- [first-element: subject (University's ObjectId),
+            # second-element: manipulated-name-value (University's name)]
+            universities = []
+            univ_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+            mis_admin_grp = node_collection.one({'_type': "Group", 'name': "MIS_admin"})
+
+            if state_id == "ALL":
+                # Fetching all universities belonging to given state in sorted order by name
+                university_cur = node_collection.find(
+                    {
+                        'member_of': univ_gst._id,
+                        'group_set': mis_admin_grp._id,
+                    }).sort('name', 1)
+
+            else:
+                # Fetching all universities belonging to given state in sorted order by name
+                university_cur = node_collection.find(
+                    {
+                        'member_of': univ_gst._id,
+                        'group_set': mis_admin_grp._id,
+                        'relation_set.organization_belongs_to_state': ObjectId(state_id)
+                    }).sort('name', 1)
+
+            if university_cur.count():
+                for d in university_cur:
+                    universities.append([str(d._id), d.name])
+
+            else:
+                error_message = "No University found for the selected State"
+                raise Exception(error_message)
+
+            return HttpResponse(json.dumps(universities))
+
+        else:
+            error_message = " UniversityFetchError: Either not an ajax call or not a GET request!!!"
+            return HttpResponse(json.dumps({'message': " UniversityFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+    except Exception as e:
+        error_message = str(e)
+        return HttpResponse(json.dumps({'message': error_message}))
+
+
+
+# MIS Reports
+@get_execution_time
+def get_detailed_report(request, group_id):
+  """
+  This view returns list of students along with required data based on selection criteria
+  to student_data_review.html
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  """
+  response_dict = {'success': False, 'message': ""}
+  column_header = []
+  group_name, group_id = get_group_name_id(group_id)
+  app_set_id = None
+  try:
+    if request.is_ajax() and request.method == "POST":
+      query_rcvd = str(request.POST.get("query", ''))
+      gst_name = str(request.POST.get("gst_name", ''))
+      if gst_name == "Event":
+          gst_name = "Classroom Session"
+      person_gst = node_collection.one({'_type': "GSystemType", 'name': gst_name})
+      gapp_gst = node_collection.one({'name':"GAPP"})
+      mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
+      app_id = mis_gapp._id
+      result_set = None
+      if query_rcvd:
+        query = eval(query_rcvd)
+
+      mis_admin = node_collection.one({"_type": "Group", "name": "MIS_admin"}, {"_id": 1})
+      if person_gst.name == "Voluntary Teacher":
+          column_header = [u'University', u'College',u'Name', u'Email ID', u'Phone', u'Street',u'Events']
+
+          rec = node_collection.collection.aggregate([{'$match': query},
+                                      {'$project': {'_id': 0,
+                                                    'stud_id': '$_id',
+                                                    'Name': '$name',
+                                                    'Email ID': '$attribute_set.email_id',
+                                                    'Phone': '$attribute_set.mobile_number',
+                                                    'Street': '$attribute_set.town_city',
+                                                    'Events': '$relation_set.coordinator_of_event'
+                                      }},
+                                      {'$sort': {'Name': 1}}
+                ])
+      elif person_gst.name == "Classroom Session":
+          app_set_id = person_gst._id
+          column_header = [u'Name', u'Course', u'VT',u'University', u'College', u'NUSSD Course',u'Module', u'Session', u'Start', u'End', u'Batch', u'Status',u'Attendance']
+
+          rec = node_collection.collection.aggregate([{'$match': query},
+                                {'$project': {'_id': 0,
+                                              'stud_id': '$_id',
+                                              'Name': '$name',
+                                              'Course': '$attribute_set.nussd_course_type',
+                                              'VT': '$relation_set.event_coordinator',
+                                              'Session': '$relation_set.session_of',
+                                              'Start': '$attribute_set.start_time',
+                                              'End': '$attribute_set.end_time',
+                                              'Batch': "$relation_set.event_has_batch",
+                                              'Status': '$attribute_set.event_status',
+                                              'Attendees': "$relation_set.has_attendees",
+                                              'Attended': "$relation_set.has_attended",
+                                }},
+                                {'$sort': {'Start': 1}}
+          ])
+
+      elif person_gst.name == "Student":
+          column_header = [u"Enrollment Code", u'Name', u'Reg# Date', u'Gender', u'Birth Date', u'Religion', u'Email ID', u'Languages Known', u'Caste', u'Contact Number (Mobile)', u'Alternate Number / Landline', u'House / Street', u'Village', u'Taluka', u'Town / City', u'District', u'State', u'Pin Code', u'Year of Passing 12th Standard', u'Degree Name / Highest Degree', u'Year of Study', u'Stream / Degree Specialization', u'College Enrolment Number / Roll No', u'College ( Graduation )', u'Are you registered for NSS?','University']
+          rec = node_collection.collection.aggregate([{'$match': query},
+                                      {'$project': {'_id': 0,
+                                                    'stud_id': '$_id', 
+                                                    'Enrollment Code': '$attribute_set.enrollment_code',
+                                                    'Name': '$name',
+                                                    # 'First Name': '$attribute_set.first_name',
+                                                    # 'Middle Name': '$attribute_set.middle_name',
+                                                    # 'Last Name': '$attribute_set.last_name',
+                                                    'Reg# Date': '$attribute_set.registration_date',
+                                                    'Gender': '$attribute_set.gender',
+                                                    'Birth Date': '$attribute_set.dob',
+                                                    'Religion': '$attribute_set.religion',
+                                                    'Email ID': '$attribute_set.email_id',
+                                                    'Languages Known': '$attribute_set.languages_known',
+                                                    'Caste': '$relation_set.student_of_caste_category',
+                                                    'Contact Number (Mobile)': '$attribute_set.mobile_number',
+                                                    'Alternate Number / Landline': '$attribute_set.alternate_number',
+                                                    'House / Street': '$attribute_set.house_street',
+                                                    'Village': '$attribute_set.village',
+                                                    'Taluka': '$attribute_set.taluka',
+                                                    'Town / City': '$attribute_set.town_city',
+                                                    'District': '$relation_set.person_belongs_to_district',
+                                                    'State': '$relation_set.person_belongs_to_state',
+                                                    'Pin Code': '$attribute_set.pin_code',
+                                                    'Year of Passing 12th Standard': '$attribute_set.12_passing_year',
+                                                    'Degree Name / Highest Degree': '$attribute_set.degree_name',
+                                                    'Year of Study': '$attribute_set.degree_year',
+                                                    'Stream / Degree Specialization': '$attribute_set.degree_specialization',
+                                                    'College Enrolment Number / Roll No': '$attribute_set.college_enroll_num',
+                                                    'College ( Graduation )': '$relation_set.student_belongs_to_college',
+                                                    'University': '$relation_set.student_belongs_to_university',
+                                                    'Are you registered for NSS?': '$attribute_set.is_nss_registered'
+                                      }},
+                                      {'$sort': {'Enrollment Code': 1}}
+                ])
+
+      json_data = []
+      filename = ""
+      course_section_node_id = course_subsection_node = None
+      result_set = rec["result"]
+      # print "\n\n result_set",result_set
+      if result_set:
+        # old_dict = result_set[0]
+        for old_dict in result_set:
+          if old_dict:
+            if person_gst.name == "Voluntary Teacher":
+                if u"stud_id" in old_dict:
+                  vt_node = node_collection.one({'_id': ObjectId(old_dict['stud_id'])})
+                  if vt_node:
+                    for rel in vt_node.relation_set:
+                      if rel and 'trainer_of_college' in rel:
+                        colg_node_id = rel['trainer_of_college'][0]
+                        colg_node = node_collection.one({'_id': ObjectId(colg_node_id)},{'name':1,'relation_set':1})
+                        colg_node_name = colg_node.name
+                        old_dict.update({'College': colg_node_name})
+                        if colg_node.relation_set:
+                          for rel in colg_node.relation_set:
+                            if rel and 'college_affiliated_to' in rel:
+                              univ_id = rel['college_affiliated_to'][0]
+                              old_dict.update({'University': [[univ_id]]})
+            if person_gst.name == "Classroom Session":
+                if u'Attendees' in old_dict:
+                    if old_dict['Attendees']:
+                        old_dict['Attendees'] = len(old_dict['Attendees'][0])
+                    else:
+                        old_dict['Attendees'] = "Not Applicable"
+                if u'Attended' in old_dict:
+                    if old_dict['Attended']:
+                        old_dict['Attended'] = len(old_dict['Attended'][0])
+                    else:
+                        old_dict['Attended'] = "Not Applicable"
+                if old_dict['Attended'] != "Not Applicable" and old_dict['Attendees'] != "Not Applicable":
+
+                    attendance_percent = (old_dict['Attended']/float(old_dict['Attendees']))*100
+                    old_dict['Attendance'] = str(round(attendance_percent,2))+" %"
+                else:
+                    old_dict['Attendance'] = "Pending"
+
+                del old_dict['Attended']
+                del old_dict['Attendees']
+                if u"Session" in old_dict:
+                   course_subsection_node = node_collection.one({'_id': ObjectId(old_dict['Session'][0][0])})
+                   if course_subsection_node:
+                     course_section_node_id = course_subsection_node.prior_node[0]
+                     old_dict.update({'Module': [[course_section_node_id]]})
+                   if course_section_node_id:
+                     course_section_node = node_collection.one({'_id': ObjectId(course_section_node_id)})
+                     nussd_course_node = course_section_node.prior_node[0]
+                     old_dict.update({'NUSSD Course': [[nussd_course_node]]})
+                if u"stud_id" in old_dict:
+                  event_node = node_collection.one({'_id': ObjectId(old_dict['stud_id'])})
+                  if event_node:
+                    colg_group_id = event_node.group_set[0]
+                    colg_group_node = node_collection.one({'_id':ObjectId(colg_group_id)})
+                    if colg_group_node.relation_set:
+                      for rel in colg_group_node.relation_set:
+                        if rel and 'group_of' in rel:
+                          colg_node_id = rel['group_of'][0]
+                          colg_node = node_collection.one({'_id': ObjectId(colg_node_id)},{'name':1,'relation_set':1})
+                          colg_node_name = colg_node.name
+                          old_dict.update({'College': colg_node_name})
+                          if colg_node.relation_set:
+                            for rel in colg_node.relation_set:
+                              if rel and 'college_affiliated_to' in rel:
+                                univ_id = rel['college_affiliated_to'][0]
+                                old_dict.update({'University': [[univ_id]]})
+            result_set[0] = old_dict
+
+      if result_set:
+        for each_dict in result_set:
+          new_dict = {}
+          for each_key in each_dict:
+            if each_dict[each_key]:
+              if type(each_dict[each_key]) == list:
+                data = each_dict[each_key][0]
+              else:
+                data = each_dict[each_key]
+
+              if type(data) == list:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                
+                  elif type(data[0]) in [ObjectId]:
+                    # new_dict[each_key] = str(data)
+                    d_list = []
+                    for oid in data:
+                      d = node_collection.one({'_id': oid}, {'name': 1})
+                      d_list.append(str(d.name))
+                    new_dict[each_key] = ', '.join(str(n) for n in d_list)
+                
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+                
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+                
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+                
+                else:
+                  new_dict[each_key] = str(data)
+
+              else:
+                # Perform parsing
+                if type(data) == list:
+                  # Perform parsing
+                  if type(data[0]) in [unicode, basestring, int]:
+                    new_dict[each_key] = ', '.join(str(d) for d in data)
+                  elif type(data[0]) in [ObjectId]:
+                    new_dict[each_key] = str(data)
+
+                elif type(data) == datetime.datetime:
+                  new_dict[each_key] = data.strftime("%d/%m/%Y")
+
+                elif type(data) == long:
+                  new_dict[each_key] = str(data)
+
+                elif type(data) == bool:
+                  if data:
+                    new_dict[each_key] = "Yes"
+                  else:
+                    new_dict[each_key] = "No"
+
+                else:
+                  new_dict[each_key] = str(data)
+
+            else:
+              new_dict[each_key] = ""
+
+          json_data.append(new_dict)
+
+        # Start: CSV file processing -------------------------------------------
+
+        t = time.strftime("%c").replace(":", "_").replace(" ", "_")
+        filename = "csv/" + gst_name + "_" + t + ".csv"
+        filepath = os.path.join(STATIC_ROOT, filename)
+        filedir = os.path.dirname(filepath)
+        if not os.path.exists(filedir):
+          os.makedirs(filedir)
+        with open(filepath, 'wb') as csv_file:
+          fw = csv.DictWriter(csv_file, delimiter=',', fieldnames=column_header)
+          fw.writerow(dict((col,col) for col in column_header))
+          for row in json_data:
+            v = {}
+            v["stud_id"] = row.pop("stud_id")
+            fw.writerow(row)
+            row.update(v)
+        # End: CSV file processing --------------------------------------------
+
+      if person_gst.name == "Voluntary Teacher":
+          # Column headers to be displayed on html
+          column_headers = [
+              ('University', 'University'),
+              ('College', 'College'),
+              ("Name", "Name"),
+              ("Email ID", "Email ID"),
+              ("Phone", "Phone"),
+              ("Street", "Street"),
+              ("Events", "Events"),
+          ]
+      elif person_gst.name == "Classroom Session":
+          column_headers = [
+              ("University", "University"),
+              ("College", "College"),
+              ("Name", "Name"),
+              ("Course", "Course"),
+              ("VT", "VT"),
+              ("NUSSD Course", "NUSSD Course"),
+              ("Module", "Module"),
+              ('Session', 'Session'),
+              ('Start', 'Start'),
+              ('End', 'End'),
+              ('Batch', 'Batch'),
+              ('Status', 'Status'),
+              ('Attendance', 'Attendance'),
+
+          ]
+      elif person_gst.name == "Student":
+          column_headers = [
+              ('University', 'University'),
+              ('College ( Graduation )', 'College'),
+              ("Name", "Name"),
+              ("Enrollment Code", "Enr Code"),
+              ("Email ID", "Email ID"),
+              ('Year of Study', 'Year of Study'),
+              ('Contact Number (Mobile)', 'Phone'),
+              ('Degree Name / Highest Degree', 'Degree'),
+              ('House / Street', 'Street')
+          ]
+
+      students_count = len(json_data)
+      response_dict["success"] = True
+      response_dict["groupid"] = group_id
+      response_dict["app_id"] = app_id
+      response_dict["app_set_id"] = app_set_id
+      response_dict["filename"] = filename
+      response_dict["students_count"] = students_count
+      response_dict["column_headers"] = column_headers
+      response_dict["students_data_set"] = json_data
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+    
+    else:
+      error_message = "ReportFetchError: Either not an ajax call or not a POST request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+  except OSError as oe:
+    error_message = "ReportFetchError: " + str(oe) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+  except Exception as e:
+    error_message = "ReportFetchError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))

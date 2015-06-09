@@ -99,6 +99,13 @@ def get_group_name_id(group_name_or_id, get_obj=False):
 
       Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
       - "res_group_obj" will contain entire object.
+
+      Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
+      try:
+          group_id = ObjectId(group_id)
+      except:
+          group_name, group_id = get_group_name_id(group_id)
+
     '''
     # if cached result exists return it
     if not get_obj:
@@ -606,8 +613,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
         tags = request.POST.get('tags')
-        # print "tags: --------- ", tags
-
     language = request.POST.get('lan')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
@@ -849,6 +854,8 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         for each in nlist:
           if each not in node.collection_set:
             node.collection_set.append(each)
+            node.status = u"PUBLISHED"
+            node.save()
             # After adding it to collection_set also make the 'node' as prior node for added collection element
             node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
 
@@ -1926,7 +1933,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
-
     try:
         subject_id = ObjectId(subject_id)
 
@@ -1940,6 +1946,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"
@@ -3006,9 +3013,12 @@ def parse_data(doc):
   '''Section to parse node '''
   user_idlist = ['modified_by','created_by','author_set','contributors']
   date_typelist = ['last_update','created_at']
-  objecttypelist = ['member_of']
+  objecttypelist = ['member_of','group_set', 'collection_set','prior_node']
   languagelist = ['language']
   content = ['content']
+  keys_by_dict = ['attribute_set', 'relation_set']
+  keys_by_filesize = ['file_size']
+
   for i in doc:
            
           if i in content:
@@ -3037,6 +3047,37 @@ def parse_data(doc):
                for j in doc[i]:
                    node = node_collection.one({"_id":ObjectId(j)})
                    doc[i] = node.name
+          if i in keys_by_dict:
+              att_dic = {}
+              if "None" not in doc[i]:
+                      if type(doc[i]) != str and i == "attribute_set":
+                              str1 =""
+                              for att in doc[i]:
+                                      for k1, v1 in att.items():
+                                        if type(v1) == list:
+                                                str1 = ""
+                                                if type(v1[0]) in [OrderedDict, dict]:
+                                                    for each in v1:
+                                                        str1 += str(each["name"]) + ", "
+                                                else:
+                                                    str1 = ",".join(v1)
+                                                att_dic[k1] = str1
+                                        else:
+                                                att_dic[k1] = str(v1)
+                              for att,value in att_dic.items():
+                                  str1 =  str1 + att + " : " + value + "  "+"\n"
+                              doc[i] = str1                    
+                      if i == "relation_set":
+                              str1 =""
+                              for each in doc[i]:
+                                      for k1, v1 in each.items():
+                                              for rel in v1:
+                                                      rel = node_collection.one({'_id':ObjectId(rel)})
+                                                      att_dic[k1] = rel.name
+                              for att,value in att_dic.items():
+                                  str1 =  str1 + att + " : " + value + "  "+"\n"
+                              doc[i] = str1        
+  
           elif i == "rating":
              new_str = ""
              if doc[i]:

@@ -22,7 +22,7 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     # Keep latest changes in field(s) to be added at top
 
-    # --- adding all activated and logged-in user's id into author_set of "home" group ---
+    # adding all activated and logged-in user's id into author_set of "home" group ---
     all_authors = node_collection.find({"_type": "Author"})
     authors_list = [auth.created_by for auth in all_authors]
 
@@ -37,9 +37,37 @@ class Command(BaseCommand):
         print "\n Updated author_set of 'home' group:" + \
             "\n\t - Previously it was   : " + str(prev_home_author_set) + \
             "\n\t - Now it's updated to : " + str(home_group.author_set)
+
+    
     # --------------------------------------------------------------------------
+    # 'group_admin' of group should not be empty. So updating one for [] with creator of group.
+    all_groups = node_collection.find({'_type': 'Group'})
+    for each_group in all_groups:
+        if not each_group.group_admin:
+            res = node_collection.collection.update({'_id': ObjectId(each_group._id)}, {'$set': {'group_admin': [each_group.created_by]}}, upsert=False, multi=False)
+
+            if res['updatedExisting']:
+                each_group.reload()
+                print 'updated group_admin of: ' + each_group.name + ' from [] to :' + unicode(each_group.group_admin)
 
 
+    # --------------------------------------------------------------------------
+    # removing <'partner': bool> field from Group objects
+    res = node_collection.collection.update({'_type': {'$in': ['Group']}}, {'$unset': {'partner': False }}, upsert=False, multi=True)
+
+    if res['updatedExisting']: # and res['nModified']:
+        print "\n Removed 'partner' field from " + res['n'].__str__() + " Group instances."
+
+
+    # --------------------------------------------------------------------------
+    # Adding <'moderation_level': -1> field to Group objects
+    node_collection.collection.update({'_type': {'$in': ['Group']}}, {'$set': {'moderation_level': -1 }}, upsert=False, multi=True)
+
+    if res['updatedExisting']: # and res['nModified']:
+        print "\n Added 'moderation_level' field to " + res['n'].__str__() + " Group instances."
+
+
+    # -----------------------------------------------------------------------------
     # Replacing invalid value of agency_type field belonging to Author node by "Other"
     res = node_collection.collection.update(
         {"_type": "Author", "agency_type": {"$nin": GSTUDIO_AUTHOR_AGENCY_TYPES}},
@@ -50,6 +78,8 @@ class Command(BaseCommand):
         print "\n Replacing invalid value of agency_type field belonging to Author node by 'Other'" + \
             "... #" + res["n"].__str__() + " records updated."
 
+
+    # -----------------------------------------------------------------------------
     # From existing RelationType instance(s), finding Binary relationships
     # and Setting their "member_of" field's value as "Binary" (MetaType)
     mt_binary = node_collection.one({
@@ -404,13 +434,13 @@ class Command(BaseCommand):
     if res['updatedExisting']: # and res['nModified']:
        print "\n Already existing 'partners' field removed from documents totalling to : ", res['n']
 
-    # Adding "partner" field with no default value
-    res = node_collection.collection.update({'_type': {'$in': ['Group']}, 'partner': {'$exists': False}}, 
-                            {'$set': {'partner': False }}, 
-                            upsert=False, multi=True
-    )
-    if res['updatedExisting']: # and res['nModified']:
-        print "\n 'partner' field added to all Group documents totalling to : ", res['n']
+    # # Adding "partner" field with no default value
+    # res = node_collection.collection.update({'_type': {'$in': ['Group']}, 'partner': {'$exists': False}}, 
+    #                         {'$set': {'partner': False }}, 
+    #                         upsert=False, multi=True
+    # )
+    # if res['updatedExisting']: # and res['nModified']:
+    #     print "\n 'partner' field added to all Group documents totalling to : ", res['n']
 
     # Adding "preferred_languages" field with no default value
     res = node_collection.collection.update({'_type': {'$in': ['Author']}, 'preferred_languages': {'$exists': False}}, 

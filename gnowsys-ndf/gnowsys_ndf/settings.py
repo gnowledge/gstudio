@@ -498,8 +498,8 @@ GAPPS = [
 # In order to edit (redorderig purpose or adding new ones) this list,
 # please make use of local_settings file
 GSTUDIO_WORKING_GAPPS = [
-    u"Page", u"File", u"E-Library", u"Forum", u"Quiz", u"Task", u"Topics",
-    u"Course", u"Module", u"Observation", "Batch", u"Event"
+    u"Page", u"File", u"E-Library", u"Forum", u"Task", u"Topics",
+    u"Course", u"Observation", u"Event"
 ]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
@@ -628,6 +628,9 @@ GSTUDIO_RESOURCES_CREATION_RATING = 5
 GSTUDIO_RESOURCES_REGISTRATION_RATING = 5
 
 GSTUDIO_RESOURCES_REPLY_RATING = 2
+
+# the level of moderation means level of sub mode group hierarchy
+GSTUDIO_GROUP_MODERATION_LEVEL = 1
 
 try:
     from local_settings import *
