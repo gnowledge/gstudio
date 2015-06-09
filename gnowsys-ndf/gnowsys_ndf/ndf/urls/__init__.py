@@ -81,6 +81,10 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis', namespace='mis-po'), {'app_name': "MIS-PO"}),
     # ---end of mis
 
+    # moderation
+    url(r'^(?P<group_id>[^/]+)/under_moderation/(?P<node_id>[\w-]+)$', 'gnowsys_ndf.ndf.views.group.under_moderation', name='under_moderation'),
+    # ---end of moderation
+
     # meeting app
     # (r'^online/', include('online_status.urls')),   #for online_users.
     # url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
