@@ -1,0 +1,41 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+  <script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+{% endblock %}
+
+
+{% block meta_content %}
+  <h3 class="subheader">{% trans title %} </h3>
+{% endblock %}
+
+{% block body_content %}
+  <h2 class="medium-12 columns">
+    {{ title }} : {{ mailboxname }}
+  </h2>
+  <h3 class="medium-12 columns">
+  Are you sure you want to delete this mailbox?
+  </h3>
+
+  <form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
+    {% csrf_token %}
+    <input type="submit" id="save-yes" name="save-yes" value="YES" class="button small"/>
+    <input type="submit" id="save-no" name="save-no" value="NO" class="button small"/>
+    <input type="hidden" name="user_id" value="{{user.id}}">
+    <input type="hidden" name="mailbox_name" value="{{mailboxname}}">
+  </form>
+{% endblock %}
