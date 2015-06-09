@@ -246,25 +246,22 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
   	
     if not task_id: # create
       task_type = request.POST.get("assignees","")
-      print "the task type",task_type
-
       Assignees = request.POST.get("Assignee","").split(',')
       Assignees = [int(x) for x in Assignees]
-      print "the Assignees",Assignees
-      if task_type != "Multiple Assignee" :
+      if task_type != "Group Assignees" :
           for i in Assignees:
             if i: 
               task_node = create_task(request,task_id,group_id)  
-              create_task_at_rt(request,rt_list,at_list,task_node,i)
+              create_task_at_rt(request,rt_list,at_list,task_node,i,group_name,group_id)
               collection_set_ids.append(ObjectId(task_node._id))
           if len(Assignees)>1:
               task_node = create_task(request,task_id,group_id)
               task_node.collection_set = collection_set_ids
               task_node.save()  
-              create_task_at_rt(request,rt_list,at_list,task_node,request.user.id)  
+              create_task_at_rt(request,rt_list,at_list,task_node,request.user.id,group_name,group_id)  
       else: 
             task_node = create_task(request,task_id,group_id)  
-            create_task_at_rt(request,rt_list,at_list,task_node,Assignees)
+            create_task_at_rt(request,rt_list,at_list,task_node,Assignees,group_name,group_id)
     else: #update
          task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
          update(request,rt_list,at_list,task_node,group_id,group_name)
@@ -576,7 +573,7 @@ def create_task(request,task_id,group_id):
     return task_node
 
 
-def create_task_at_rt(request,rt_list,at_list,task_node,assign):
+def create_task_at_rt(request,rt_list,at_list,task_node,assign,group_name,group_id):
   file_id=(request.POST.get("files"))
   file_name=(request.POST.get("files_name"))
 
@@ -633,38 +630,26 @@ def create_task_at_rt(request,rt_list,at_list,task_node,assign):
         attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
         ga_node = create_gattribute(task_node._id, attributetype_key, file_id)
 
-  '''
-  if count == 0:  
-    # request.POST.getlist("Assignee","").append(request.user.username)   
-    assignee_list = []
-    assignee_list_id = request.POST.getlist("Assignee", "")
-    
-    if assignee_list_id:
-      b = assignee_list_id.pop().split(',')
-      print b
-      for eachuser in b:
+  
+  assignee_list = []
+  assignee_list_id = []
+  assignee_list_id.append(assign)
+  user_to_be_notified = []
+  if assignee_list_id:
+      for eachuser in assignee_list_id:
         if eachuser:
-          bx = User.objects.get(id=int(eachuser))
-        
-          if bx:
-            if bx.username not in assignee_list:
+              bx = User.objects.get(id=int(eachuser))
               assignee_list.append(bx.username)
-
-            # Adding to list which holds user's to be notified about the task
-            if bx not in user_to_be_notified:
               user_to_be_notified.append(bx)
+      for eachuser in user_to_be_notified:
+          activ = "Task reported"
+          msg = "Task '" + task_node.name + \
+            "' has been reported by " + request.user.username + \
+            "\n     - Status: " + request.POST.get('Status', '') + \
+            "\n     - Assignee: " + ", ".join(assignee_list) + \
+            "\n     - Url: http://" + sitename.name + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
 
-    # Iterating & notifying 
-    # list which holds user's to be notified about the task
-    for eachuser in user_to_be_notified:
-      activ = "Task reported"
-      msg = "Task '" + task_node.name + \
-        "' has been reported by " + request.user.username + \
-        "\n     - Status: " + request.POST.get('Status', '') + \
-        "\n     - Assignee: " + ", ".join(assignee_list) + \
-        "\n     - Url: http://" + sitename.name + "/" + group_name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
-
-      set_notif_val(request, group_id, msg, activ, eachuser)'''
+          set_notif_val(request, group_id, msg, activ, eachuser)
 
 
 @login_required    
