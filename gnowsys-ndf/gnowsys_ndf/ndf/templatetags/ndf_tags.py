@@ -2,9 +2,13 @@
 import re
 # import magic
 from collections import OrderedDict
+import os
 from time import time
 import json
 import ox
+import mailbox
+import email.utils
+import datetime
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
@@ -2656,25 +2660,137 @@ def get_filters_data(gst_name):
 
 	return filter_dict
 
+# required dictionary
+# _DAY = {
+# 	'1' : 'Monday',
+# 	'2' : 'Tuesday',
+# 	'3' : 'Wednesday',
+# 	'4' : 'Thursday',
+# 	'5' : 'Friday',
+# 	'6' : 'Saturday',
+# 	'7' : 'Sunday',
+# }
+
+# _MONTH = {
+# 	'1' : 'January',
+# 	'2' : 'February',
+# 	'3' : 'March',
+# 	'4' : 'April',
+# 	'5' : 'May',
+# 	'6' : 'June',
+# 	'7' : 'July',
+# 	'8' : 'August',
+# 	'9' : 'September',
+# 	'10' : 'October',
+# 	'11' : 'November',
+# 	'12' : 'December',
+# }
+
+def read_mails(path, count = 0):
+	cur_path = path + '/cur'
+
+
+# Function to store the newly fetched mails stored in 'maildir' format
+def store_mails(request, mails, path):
+
+	for mail in mails:
+		from_addr = email.utils.formataddr(('Author', mail.from_address[0]))
+		to_addr = email.utils.formataddr(('Recipient', mail.to_addresses[0]))
+		now = datetime.datetime.now()
+		cc_addr = None
+		if len(mail.to_addresses) > 1:
+			nameslist = mail.to_addresseses[1:-1]		
+			cc_list=""
+			for names in nameslist:
+				cc_list = cc_list + names + ';'
+			
+			cc_list = cc_list + mail.to_addresses[-1]
+			cc_addr = email.utils.formataddr(('CC List', cc_list))
+		print path
+		mbox = mailbox.Maildir(path)
+		mbox.lock()
+
+		try:
+			msg=mailbox.mboxMessage()
+			unixform = mail.mailbox.name + ' ' + now.ctime()
+			msg.set_unixfrom(unixform)
+			msg['From'] = from_addr
+			msg['To'] = to_addr
+			if len(mail.to_addresses) > 1:
+				msg['CC'] = cc_addr
+			
+			msg['Subject'] = mail.subject
+			msg.set_payload(mail.text)
+			
+			# To prepare a list of path of the attachments in comma-separated format
+			if mail.attachments.count > 0:
+				all_attachments = mail.attachments.all()
+				all_attachments_path = ''
+				for attachment in all_attachments:
+					all_attachments_path = all_attachments_path + attachment.document.path + ';'
+				
+				msg['Attachments'] = all_attachments_path
+
+				
+
+			mbox.add(msg)
+			mbox.flush()
+
+		except Exception as ex:
+			print ex
+			# redirect to the error-display page
+		finally:
+			mbox.unlock()
+	return
+
+
+
 @get_execution_time
 @register.assignment_tag
-def get_mails_in_box(mailboxname):
+def get_mails_in_box(request, mailboxname, username):
 	all_mail_boxes= Mailbox.objects.all()
 	required_mailbox=None
-	print mailboxname
 	for box in all_mail_boxes:
 		if box.name == mailboxname:
 			required_mailbox=box
 			break
 
+	settings_dir = os.path.dirname(__file__)
+	PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+	path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
+	path = path + username
+
+	print 'FETCHING NEW MAILS :::::::::::::::::::::'
 	if required_mailbox is not None:
 		emails=[]
 		all_mails=required_mailbox.get_new_mail()
 		all_mails=list(reversed(all_mails))
-		i=1
+		no_of_new_mails = len(all_mails)
+
 		for mail in all_mails:
 			emails.append({'mail_id':i, 'mail_data':mail})
-			i=i+1
+
+		print 'FETCHING NEW MAILS DONE :::::::::::::::::::::'
+
+		print 'STORING NEW MAILS :::::::::::::::::::::'
+		store_mails(request, all_mails,path)
+		print ' STORAGE DONE '
+			
+		if no_of_new_mails < 10:
+			if not os.path.exists(path):
+				os.makedirs(path)
+			if not os.path.exists(path + '/tmp'): 
+				os.makedirs(path + '/tmp')
+			if not os.path.exists(path + '/cur'):
+				os.makedirs(path + '/cur')
+			if not os.path.exists(path + '/new'):
+				os.makedirs(path + '/new')
+
+			# load prev mails to make the count 10
+			# stored_mails_fetched = read_mails(path,count=5)
+		
+
+
 		return emails
 	else:
 		print 'lol'
