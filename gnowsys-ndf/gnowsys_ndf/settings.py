@@ -412,6 +412,7 @@ INSTALLED_APPS = (
     'jsonrpc',
     'registration_email',
     'memcache_admin',
+    'django_mailbox',
 )
 
 AUTHENTICATION_BACKENDS = (
