@@ -124,7 +124,7 @@
 	 
 	    <div class="medium-5 columns">
 	    	
-	    	<input type = 'button' onclick = "filllist()" value = "Done">
+	    	<input type = 'button' onclick = "fillist()" value = "Done">
 	    </div>
 	    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 	</div>                   
@@ -223,7 +223,7 @@
       <!-- Assignee & Estimated time -->
     	<div class="row">
     	  
-	    	  <div class="medium-6 columns">
+	    	  <div class="medium-4 columns">
 	    	    <label>Estimated time</label>
 	    	    <input id="Estimated time" name="Estimated_time" type="text" value="{{Estimated_time}}" placeholder="Enter Hours..."/>
 	    	    <small class="error">Please give Time in HH:MM:SS</small>
@@ -243,7 +243,10 @@
 				<br>
 				<label class = "fi-plus " id = "selectAssignees" data-reveal-id = "selectAssigneeslist" value ="select Asssignees"> </label>
 			</div>
-	        
+	        <div class= "medium-2 columns">
+				<br>
+				<label id = "assignee_warning" >   </label>
+			</div>       
     	
     	</div>
     	<div>
@@ -315,7 +318,7 @@
           <input type="hidden" name="files" id="trial" >
           <input type="hidden" name="files_name" id="filename" >
           <input type="hidden" name="page_url" value="{{request.path}}">
-          <input type="hidden" name = "Assignee" id="Assignee">
+          <input type="hidden" name = "Assignee" id="Assignee" required>
 
           <!-- Save button -->
           <input type="submit" id="save-node" value="Save" class="button small expand"/>
@@ -346,7 +349,12 @@
       if ($.inArray(this.value, watchers_arr) == -1) {
         watchers_arr.push(this.value);
       }
-    });
+     });
+    if( $('#Assignee').val() == "")
+      {
+      	$('#assignee_warning').append("<h6 style = 'color:red;'> Assignees not selected </h6>")
+      	return false;
+	  } 
     
     $('#hidden_watchers').val(watchers_arr);
   });
@@ -488,10 +496,11 @@
    
   });
 
-	function filllist()
+	function fillist()
 	{
 	      assignee_list=[]
 	      disp_assignee_list = []
+	      $('#assignee_warning').empty()
 	      if ($('#assignees').val() == "Group Assignees" || $('#assignees').val() == "Multiple Assignee" ){
 	       
 	      $('#list').children(":checkbox").each(function(){ 
@@ -592,6 +601,7 @@
 
   function enableselect() {
     document.getElementById('customDropdown').disabled = "";
+    
   }
 {% endblock %}
 

@@ -97,9 +97,7 @@ def task_details(request, group_name, task_id):
     if attr:
       if attributetype_key.name == "Assignee":
         u_list = []
-        print "Asdf",attr.object_value
         for each_id in attr.object_value:
-          print "the object",type(each_id)
           u = User.objects.get(id=each_id)
           if u:
             if u.username not in u_list:
@@ -213,7 +211,7 @@ def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None,
 
 @login_required
 @get_execution_time
-def create_edit_task(request, group_name, task_id=None,task_dict):
+def create_edit_task(request, group_name, task_id=None, task=None, count=0):
   """Creates/Modifies details about the given Task.
   
   """
@@ -248,8 +246,11 @@ def create_edit_task(request, group_name, task_id=None,task_dict):
   	
     if not task_id: # create
       task_type = request.POST.get("assignees","")
+      print "the task type",task_type
+
       Assignees = request.POST.get("Assignee","").split(',')
       Assignees = [int(x) for x in Assignees]
+      print "the Assignees",Assignees
       if task_type != "Multiple Assignee" :
           for i in Assignees:
             if i: 
@@ -314,9 +315,11 @@ def create_edit_task(request, group_name, task_id=None,task_dict):
           blank_dict[k] = rel[k]
 
     blank_dict["node"] = task_node
-    Assignee_name = (User.objects.get(id=int(blank_dict["Assignee"][0])))
-    blank_dict["Assignee_name"] = Assignee_name.username
-
+    Assignee = ""
+    for i in blank_dict["Assignee"]:
+        Assignee_name = (User.objects.get(id=int(i)))
+        Assignee = Assignee_name.username + "," +  Assignee
+    blank_dict["Assignee_name"] = Assignee
     # Appending Watchers to blank_dict, i.e. values of node's author_set field
     if task_node.author_set:
       watchers_list = []
