@@ -42,15 +42,13 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
 
                        # Ajax-urls required for MIS --------------------------------
-                       
-    url(r'^get_voluntary_teachers/', 'get_voluntary_teachers', name='get_voluntary_teachers'),
-    url(r'^get_events/', 'get_events', name='get_events'),
+
+    url(r'^get_detailed_report/', 'get_detailed_report', name='get_detailed_report'),
     url(r'^get_universities/', 'get_universities', name='get_universities'),
     url(r'^get_students_for_batches/', 'get_students_for_batches', name='get_students_for_batches'),
     url(r'^get_anncourses_allstudents/', 'get_anncourses_allstudents', name='get_anncourses_allstudents'),
     url(r'^get_courses/', 'get_courses', name='get_courses'),
     url(r'^get_batches_with_acourse/', 'get_batches_with_acourse', name='get_batches_with_acourse'),
-                       
     url(r'^get_announced_courses_with_ctype/', 'get_announced_courses_with_ctype', name='get_announced_courses_with_ctype'),
     url(r'^get_colleges/(?P<app_id>[\w-]+)$', 'get_colleges', name='get_colleges'),
     url(r'^get_districts/', 'get_districts', name='get_districts'),
@@ -58,7 +56,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^get_students/', 'get_students', name='get_students'),
     url(r'^get_students_for_approval/', 'get_students_for_approval', name='get_students_for_approval'),
     url(r'^approve_students/', 'approve_students', name='approve_students'),
-                    
     url(r'^get_statewise_data/', 'get_statewise_data', name='get_statewise_data'),
     url(r'^get_college_wise_students_data/', 'get_college_wise_students_data', name='get_college_wise_students_data'),
     url(r'^rechedule_event/(?P<node>[\w-]+)$','reschedule_task',name='reschedule_task'),
@@ -83,7 +80,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
     url(r'^insert_picture/', 'insert_picture', name="insert_picture"),
     #url for infinite scroll down
-    url(r'^page_scroll/(?P<page>[^/]+)$', 'page_scroll', name='page_scroll'),    
+    url(r'^page_scroll/(?P<page>[^/]+)$', 'page_scroll', name='page_scroll'),
     url(r'^check_date/(?P<node>[\w-]+)$', 'check_date', name='check_date'),
     url(r'^save_time/(?P<node>[\w-]+)$', 'save_time', name='save_time'),
 )

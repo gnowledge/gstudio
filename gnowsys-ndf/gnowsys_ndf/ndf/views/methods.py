@@ -612,9 +612,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
-        tags = request.POST.get('tags','')
-        # print "tags: --------- ", tags
-
+        tags = request.POST.get('tags')
     language = request.POST.get('lan')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
@@ -856,6 +854,8 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         for each in nlist:
           if each not in node.collection_set:
             node.collection_set.append(each)
+            node.status = u"PUBLISHED"
+            node.save()
             # After adding it to collection_set also make the 'node' as prior node for added collection element
             node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
 
@@ -1933,7 +1933,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
-
     try:
         subject_id = ObjectId(subject_id)
 
@@ -1947,6 +1946,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"
