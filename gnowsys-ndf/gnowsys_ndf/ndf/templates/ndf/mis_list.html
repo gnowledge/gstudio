@@ -106,9 +106,9 @@
           {{each.name}}
         {% endif %}
       </div>
-  	</li>
+    </li>
 
-  	{% endfor %}
+    {% endfor %}
   </ul>
 {% endblock %}
 
@@ -161,6 +161,11 @@
       </div>
     </div>
 
+    <div>
+      <span class="button small">
+        <a href="{% url 'mis:get_mis_reports' group_id %}" style="float:right;color:white;">MIS REPORTS</a>
+      </span>
+    </div>
     <div class="small-4 columns end">
       <ul>
         {% for university_name, students_count in university_wise_students_count %}
@@ -173,6 +178,7 @@
         {% endfor %}
       </ul>    
     </div>    
+
   </div>
 
   <!-- Hidden Accordion for University listing -->
@@ -653,4 +659,4 @@
 
     return datesList;
   }
-{% endblock %}	
+{% endblock %}  

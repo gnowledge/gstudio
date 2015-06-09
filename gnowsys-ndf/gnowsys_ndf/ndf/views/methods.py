@@ -101,6 +101,13 @@ def get_group_name_id(group_name_or_id, get_obj=False):
 
       Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
       - "res_group_obj" will contain entire object.
+
+      Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
+      try:
+          group_id = ObjectId(group_id)
+      except:
+          group_name, group_id = get_group_name_id(group_id)
+
     '''
     # if cached result exists return it
     if not get_obj:
@@ -653,8 +660,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
         tags = request.POST.get('tags')
-        # print "tags: --------- ", tags
-
     language = request.POST.get('lan')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
@@ -850,6 +855,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
 @get_execution_time
 def build_collection(node, check_collection, right_drawer_list, checked):
+
     is_changed = False
 
     if check_collection == "prior_node":
@@ -2048,7 +2054,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
-
     try:
         subject_id = ObjectId(subject_id)
 
@@ -2062,6 +2067,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"

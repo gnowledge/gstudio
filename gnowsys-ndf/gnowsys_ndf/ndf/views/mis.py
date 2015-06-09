@@ -7,27 +7,29 @@ import datetime
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from django.shortcuts import render_to_response #, render  uncomment when to use
+from django.shortcuts import render_to_response  # , render  uncomment when to use
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
-
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+# from mongokit import paginator
 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
-
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.organization import *
 from gnowsys_ndf.ndf.views.course import *
 from gnowsys_ndf.ndf.views.person import *
 from gnowsys_ndf.ndf.views.enrollment import *
+from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type
 from gnowsys_ndf.ndf.views.methods import get_execution_time
+
 
 @login_required
 @get_execution_time
@@ -37,18 +39,18 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     """
 
     auth = None
-    if ObjectId.is_valid(group_id) is False :
-      group_ins = node_collection.one({'_type': "Group","name": group_id})
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if group_ins:
-        group_id = str(group_ins._id)
-      else :
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-          group_id = str(auth._id)
-    else :
-      pass
-
+    # if ObjectId.is_valid(group_id) is False :
+    #   group_ins = node_collection.one({'_type': "Group","name": group_id})
+    #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #   if group_ins:
+    #     group_id = str(group_ins._id)
+    #   else :
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if auth :
+    #       group_id = str(auth._id)
+    # else :
+    #   pass
+    group_name, group_id = get_group_name_id(group_id)
     app = None
     if app_id is None:
       app = node_collection.one({'_type': "GSystemType", 'name': app_name})
@@ -57,12 +59,12 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     else:
       app = node_collection.one({'_id': ObjectId(app_id)})
 
-    app_name = app.name 
+    app_name = app.name
 
-    app_collection_set = [] 
+    app_collection_set = []
     atlist = []
     rtlist = []
-    
+
     app_set = ""
     nodes = ""
     # nodes_dict = ""
@@ -213,15 +215,16 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         system.get_neighbourhood(systemtype._id)
 
         # array of dict for events ---------------------
-                
-        if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
+
+        # if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
+        if 'organiser_of_event' in system and len(system.organiser_of_event): # gives list of events
 
             for event in system.organiser_of_event:
                 event.get_neighbourhood(event.member_of)
-                
+
                 tempdict = {}
                 tempdict['title'] = event.name
-                
+
                 if event.start_time:# and len(event.start_time) == 16:
                     # print "\n start_time: ", event.start_time, " -- ", event.start_time.strftime('%m/%d/%Y %H:%M')
                     # dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
@@ -235,7 +238,8 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                 tempdict['id'] = str(event._id)
                 events_arr.append(tempdict)
 
-        elif system.has_key('event_organised_by'): # gives list of colleges/host of events
+        # elif system.has_key('event_organised_by'): # gives list of colleges/host of events
+        elif 'event_organised_by' in system:  # gives list of colleges/host of events
 
             for host in system.event_organised_by:
                 host.get_neighbourhood(host.member_of)
@@ -251,7 +255,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                     # dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
                     dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
-                
+
                 tempdict['id'] = str(host._id)
                 events_arr.append(tempdict)
 
@@ -335,17 +339,18 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     create new instance of app_set of apps view for custom GAPPS
     """
     auth = None
-    if ObjectId.is_valid(group_id) is False :
-      group_ins = node_collection.one({'_type': "Group","name": group_id})
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if group_ins:
-        group_id = str(group_ins._id)
-      else :
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-          group_id = str(auth._id)
-    else :
-      pass
+    group_name, group_id = get_group_name_id(group_id)
+    # if ObjectId.is_valid(group_id) is False :
+    #   group_ins = node_collection.one({'_type': "Group","name": group_id})
+    #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #   if group_ins:
+    #     group_id = str(group_ins._id)
+    #   else :
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if auth :
+    #       group_id = str(auth._id)
+    # else :
+    #   pass
 
     app = None
     if app_id is None:
@@ -355,10 +360,10 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     else:
       app = node_collection.one({'_id': ObjectId(app_id)})
 
-    app_name = app.name 
+    app_name = app.name
 
     # app_name = "mis"
-    app_collection_set = [] 
+    app_collection_set = []
     # app = node_collection.find_one({"_id":ObjectId(app_id)})
     app_set = ""
     app_set_instance_name = ""
@@ -483,7 +488,6 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         app_set_instance_name = system.name
         title =  system.name+"-"+"edit"
 
-        
     if request.method=="POST": # post methods
         tags = request.POST.get("tags","")
         content_org = unicode(request.POST.get("content_org",""))
@@ -498,7 +502,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         for eachrtset in systemtype_relationtype_set:
             if request.POST.get(eachrtset["type_id"],""):
                 request_rt_dict[eachrtset["type_id"]] = request.POST.get(eachrtset["type_id"],"")
-        
+
         if File == 'True':
             if file1:
                 f = save_file(file1, name, request.user.id, group_id, content_org, tags)
@@ -512,22 +516,22 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                 newgsystem = node_collection.collection.File()
         else:
             newgsystem = node_collection.collection.GSystem()
-        if app_set_instance_id :
+        if app_set_instance_id:
             newgsystem = node_collection.find_one({"_id": ObjectId(app_set_instance_id)})
 
         newgsystem.name = name
-        newgsystem.member_of=[ObjectId(app_set_id)]
-        
-        if not app_set_instance_id :
+        newgsystem.member_of = [ObjectId(app_set_id)]
+
+        if not app_set_instance_id:
             newgsystem.created_by = request.user.id
-        
+
         newgsystem.modified_by = request.user.id
         newgsystem.status = u"PUBLISHED"
 
         newgsystem.group_set.append(ObjectId(group_id))
 
         if tags:
-             newgsystem.tags = tags.split(",")
+            newgsystem.tags = tags.split(",")
 
         if content_org:
             usrname = request.user.username
@@ -548,7 +552,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
         # check if user_group_location exist in proper format then add it into newgsystem
         if user_last_visited_location:
-    
+
             user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
             author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
@@ -560,8 +564,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
         newgsystem.save()
 
-        if not app_set_instance_id :
-            for key,value in request_at_dict.items():
+        if not app_set_instance_id:
+            for key, value in request_at_dict.items():
                 attributetype_key = node_collection.find_one({"_id":ObjectId(key)})
                 ga_node = create_gattribute(newgsystem._id, attributetype_key, value)
                 # newattribute = triple_collection.collection.GAttribute()
@@ -569,7 +573,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                 # newattribute.attribute_type = attributetype_key
                 # newattribute.object_value = value
                 # newattribute.save()
-            for key,value in request_rt_dict.items():
+            for key, value in request_rt_dict.items():
                 if key:
                     relationtype_key = node_collection.find_one({"_id": ObjectId(key)})
                 if value:
@@ -589,8 +593,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                     attribute_instance.object_value = request.POST.get(each["database_id"],"")
                     # attribute_instance.save()
                     ga_node = create_gattribute(attribute_instance.subject, attribute_instance.attribute_type, attribute_instance.object_value)
-                else :
-                    if request.POST.get(each["type_id"],""):
+                else:
+                    if request.POST.get(each["type_id"], ""):
                         attributetype_key = node_collection.find_one({"_id":ObjectId(each["type_id"])})
                         # newattribute = triple_collection.collection.GAttribute()
                         # newattribute.subject = newgsystem._id
@@ -657,3 +661,284 @@ def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
                                         # 'nodes':nodes, 
                                         })
     return render_to_response(template, variable)
+
+
+@login_required
+@get_execution_time
+def get_mis_reports(request, group_id, **kwargs):
+    title = "Reports"
+    group_name, group_id = get_group_name_id(group_id)
+    states = []
+    selected_filters = 0
+    # states -- [first-element: subject (State's ObjectId),
+    #            second-element: manipulated-name-value (State's name)]
+    query = {}
+    response_dict = {}
+
+    state_gst = node_collection.one({'_type': "GSystemType", 'name': "State"})
+    mis_admin_grp = node_collection.one({'_type': "Group", 'name': "MIS_admin"})
+    state_cur = node_collection.find({'member_of': state_gst._id,
+                                      'group_set': mis_admin_grp._id},{'name':1,'_id':1})
+
+    if request.is_ajax() and request.method == "POST":
+        state_id = university_id = college_id = None
+        end_date = start_date = None
+        gst_node = state_node = univ_node = college_node = None
+        univ_ids = []
+        return_data_set = []
+        rec = None
+        colg_cur = None
+        data_for_report1 = {}
+        data_dict = request.POST.get("data_set", "")
+        gst_name = request.POST.get("gst_name", "")
+        if gst_name == "Event":
+            gst_name = "Classroom Session"
+        ac_year = request.POST.get("academic_year", "")
+        if ac_year:
+            if ac_year != "ALL":
+                academic_year = ac_year
+                date_gte = datetime.datetime.strptime("1/1/" + academic_year, "%d/%m/%Y")
+                date_lte = datetime.datetime.strptime("31/12/" + academic_year, "%d/%m/%Y")
+                query.update({'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte}})
+
+        gst_node = node_collection.one({'_type': 'GSystemType', 'name': unicode(gst_name)})
+        # print "gst_node", gst_node.name
+        query.update({'member_of': gst_node._id})
+        data_dict = json.loads(data_dict)
+        univ_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+        colg_gst = node_collection.one({'_type': "GSystemType", 'name': "College"})
+        if "state" in data_dict:
+            if data_dict["state"]:
+                state_id = data_dict['state']
+                if state_id != "ALL":
+                    state_node = node_collection.one({'_id': ObjectId(state_id)})
+        if "university" in data_dict:
+            if data_dict["university"]:
+                university_id = data_dict['university']
+                if university_id != "ALL":
+                    univ_node = node_collection.one({'_id': ObjectId(university_id)})
+        if "college" in data_dict:
+            if data_dict["college"]:
+                college_id = data_dict['college']
+                if college_id != "ALL":
+                    college_node = node_collection.one({'_id': ObjectId(college_id)})
+        if "start_date" in data_dict:
+            start_date = data_dict['start_date']
+        if "end_date" in data_dict:
+            end_date = data_dict['end_date']
+
+        if start_date and end_date:
+
+            start_date = datetime.datetime.strptime(start_date,"%d/%m/%Y")
+            end_date = datetime.datetime.strptime(end_date,"%d/%m/%Y")
+            query.update({'attribute_set.start_time': {'$gte': start_date}})
+            query.update({'attribute_set.end_time': {'$lte': end_date}})
+        if state_id and not university_id and not college_id:
+            selected_filters = 1
+        elif state_id and university_id and not college_id:
+            selected_filters = 2
+        elif state_id and university_id and college_id:
+            selected_filters = 3
+
+        # print "\nselected_filters\n", selected_filters
+        if selected_filters == 1:
+            if state_id == "ALL":
+                state_id_list = []
+                for each in state_cur:
+                    state_id_list.append(each._id)
+                if gst_node.name == "Student":
+                    query.update({'relation_set.person_belongs_to_state': {'$in':state_id_list}})
+                university_cur = node_collection.find({'member_of': univ_gst._id,
+                      'relation_set.organization_belongs_to_state': {'$in':state_id_list},
+                      'group_set': mis_admin_grp._id})
+            else:
+                if gst_node.name == "Student":
+                    query.update({'relation_set.person_belongs_to_state': ObjectId(state_id)})
+
+                university_cur = node_collection.find({'member_of': univ_gst._id,
+                  'relation_set.organization_belongs_to_state': ObjectId(state_id),
+                  'group_set': mis_admin_grp._id})
+
+            for each in university_cur:
+                univ_ids.append(each._id)
+            colg_cur = node_collection.find({'member_of': colg_gst._id,
+                        'relation_set.college_affiliated_to': {'$in': univ_ids},
+                        'group_set': mis_admin_grp._id})
+
+        elif selected_filters == 2:
+            if state_id == "ALL":
+                state_id_list = []
+                for each in state_cur:
+                    state_id_list.append(each._id)
+                if gst_node.name == "Student":
+                    query.update({'relation_set.person_belongs_to_state': {'$in':state_id_list}})
+                university_cur = node_collection.find({'member_of': univ_gst._id,
+                      'relation_set.organization_belongs_to_state': {'$in':state_id_list},
+                      'group_set': mis_admin_grp._id})
+            else:
+                if gst_node.name == "Student":
+                    query.update({'relation_set.person_belongs_to_state': ObjectId(state_id)})
+
+                university_cur = node_collection.find({'member_of': univ_gst._id,
+                  'relation_set.organization_belongs_to_state': ObjectId(state_id),
+                  'group_set': mis_admin_grp._id})
+
+            if university_id == "ALL":
+                univ_id_list = []
+                for each in university_cur:
+                    univ_id_list.append(each._id)
+                if gst_node.name == "Student":
+                    query.update({'relation_set.student_belongs_to_university': {'$in': univ_id_list}})
+                colg_cur = node_collection.find({'member_of': colg_gst._id,
+                  'relation_set.college_affiliated_to': {'$in': univ_id_list},
+                  'group_set': mis_admin_grp._id})
+            else:
+                if gst_node.name == "Student":
+                    query.update({'relation_set.student_belongs_to_university': ObjectId(university_id)})
+
+                colg_cur = node_collection.find({'member_of': colg_gst._id,
+                  'relation_set.college_affiliated_to': ObjectId(university_id),
+                  'group_set': mis_admin_grp._id})
+
+        elif selected_filters == 3:
+            if state_id == "ALL":
+                state_id_list = []
+                for each in state_cur:
+                    state_id_list.append(each._id)
+                if gst_node.name == "Student":
+                    query.update({'relation_set.person_belongs_to_state': {'$in': state_id_list}})
+                university_cur = node_collection.find({
+                      'member_of': univ_gst._id,
+                      'relation_set.organization_belongs_to_state': {'$in': state_id_list},
+                      'group_set': mis_admin_grp._id})
+            else:
+                if gst_node.name == "Student" or gst_node.name == "Voluntary Teacher":
+                    query.update({'relation_set.person_belongs_to_state': ObjectId(state_id)})
+
+                university_cur = node_collection.find({'member_of': univ_gst._id,
+                  'relation_set.organization_belongs_to_state': ObjectId(state_id),
+                  'group_set': mis_admin_grp._id})
+
+            if university_id == "ALL":
+                univ_id_list = []
+                for each in university_cur:
+                    univ_id_list.append(each._id)
+                # query.update({'relation_set.person_belongs_to_state': {'$in':state_id_list}})
+                if gst_node.name == "Student":
+                    query.update({'relation_set.student_belongs_to_university': {'$in': univ_id_list}})
+                colg_cur = node_collection.find({'member_of': colg_gst._id,
+                      'relation_set.college_affiliated_to': {'$in': univ_id_list},
+                      'group_set': mis_admin_grp._id})
+            else:
+                # query.update({'relation_set.person_belongs_to_state': ObjectId(state_id)})
+                if gst_node.name == "Student":
+                    query.update({'relation_set.student_belongs_to_university': ObjectId(university_id)})
+
+                colg_cur = node_collection.find({'member_of': colg_gst._id,
+                  'relation_set.college_affiliated_to': ObjectId(university_id),
+                  'group_set': mis_admin_grp._id})
+
+            colg_id_list = []
+            if college_node:
+                colg_cur = node_collection.find({'_id': ObjectId(college_id)})
+            for each in colg_cur:
+                colg_id_list.append(each._id)
+            colg_cur.rewind()
+        # print "\n gst_name", gst_node.name
+        if colg_cur:
+            for each in colg_cur:
+                if gst_node.name == "Student":
+                    query.update({'relation_set.student_belongs_to_college': each._id})
+
+                if each.relation_set:
+                    for each_rel in each.relation_set:
+                        if gst_node.name == "Voluntary Teacher":
+                            # if each_rel and "college_has_trainer" in each_rel:
+                            #     colg_node_id = each_rel["college_has_trainer"][0]
+                            query.update({'relation_set.trainer_of_college': ObjectId(each._id)})
+                        if gst_node.name == "Classroom Session":
+                            if each_rel and "has_group" in each_rel:
+                                colg_group_node_id = each_rel["has_group"][0]
+                                query.update({'group_set': ObjectId(colg_group_node_id)})
+                        if each_rel and "college_affiliated_to" in each_rel:
+                            univname = each_rel["college_affiliated_to"]
+                        if each_rel and "organization_belongs_to_state" in each_rel:
+                            statename = each_rel["organization_belongs_to_state"]
+                            # print "\n\n statename", statename
+                # print "\n\nquery",query
+                rec = node_collection.collection.aggregate([
+                                          {
+                                            '$match': query
+                                          },
+                                          {'$group':
+                                            {
+                                              '_id': {'State': statename,
+                                              'University': univname,
+                                              'College': each._id,
+                                              },
+                                              'total_students': {'$sum': 1}
+                                            }
+                                          }
+                ])
+
+                resultset = rec['result']
+                if resultset:
+                    for each in resultset:
+                        each['query'] = str(query)
+                        if each["_id"]:
+                            if each['_id']['State']:
+                                # each["state"] = each['_id']['State']
+                                state_node = node_collection.one({'_id': ObjectId(each['_id']['State'][0])})
+                                each["state"] = state_node.name
+                            if each['_id']['University']:
+                                univ_node = node_collection.one({'_id': ObjectId(each['_id']['University'][0])})
+                                each["university"] = univ_node.name
+                                # data_for_report1["university_id"] = str(univ_node._id)
+                            if each['_id']['College']:
+                                colg_node = node_collection.one({'_id': ObjectId(each['_id']['College'])})
+                                each["college"] = colg_node.name
+                                # data_for_report1["college_id"] = str(colg_node._id)
+                            del each['_id']
+                            try:
+                                l = each['total_students']
+                            except:
+                                del each['total_students']
+
+                        return_data_set.append(each)
+                # print "\n return_data_set", return_data_set
+            column_headers = [
+                        ("state", "State"),
+                        ("university", "University"),
+                        ("college", "College"),
+            ]
+
+            if gst_node.name == "Student":
+                column_headers.append(('total_students',"Total Students"))
+            elif gst_node.name == "Classroom Session":
+                column_headers.append(('total_students',"Total Events"))
+            elif gst_node.name == "Voluntary Teacher":
+                column_headers.append(('total_students',"Total VTs"))
+
+            response_dict["column_headers"] = column_headers
+            response_dict["success"] = True
+            response_dict["return_data_set"] = return_data_set
+            # response_dict["data_for_report1"] = json.dumps(data_for_report1)
+        return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
+    else:
+
+        # Fetching all states belonging to given state in sorted order by name
+        if state_cur.count():
+            for d in state_cur:
+                states.append([str(d._id), str(d.name)])
+
+        return render_to_response("ndf/mis_report.html",
+                                {'title': title,
+                                'group_id': group_id,
+                                'groupid': group_id,
+                                'states_list': json.dumps(states)
+                                },
+                                context_instance=RequestContext(request)
+                                )
+
+

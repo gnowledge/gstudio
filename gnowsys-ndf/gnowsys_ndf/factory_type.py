@@ -28,7 +28,11 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'techreport','meta_type':'factory_types'},
                          {'name':'unpublished_entry','meta_type':'factory_types'},
                          {'name':'booklet','meta_type':'factory_types'},
-                         {'name':'GList','meta_type':'factory_types'}
+                         {'name':'GList','meta_type':'factory_types'},
+                         {'name':'ProgramEventGroup','meta_type':'factory_types'},
+                         {'name':'CourseEventGroup','meta_type':'factory_types'},
+                         {'name':'PartnerGroup','meta_type':'factory_types'},
+                         {'name':'ModeratingGroup','meta_type':'factory_types'}
                         ]
 
 
@@ -169,8 +173,8 @@ factory_relation_types = [
     }, 
 
     {'translation_of': {
-            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP'],
-            'object_type':['Page','Topic','Theme','theme_item','File','GAPP'], 
+            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
+            'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'], 
             'inverse_name':'translation_of', 
             'meta_type':'factory_types'
         }
