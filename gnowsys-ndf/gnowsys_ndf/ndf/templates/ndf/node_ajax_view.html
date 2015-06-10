@@ -1263,14 +1263,16 @@ ul#navigation li a.last {
   <!-- Modal links for associated views like graphs and map-->
   <ul class="side-nav">
     <div class="panel" style="background-color:#ddd;">
+      {% get_group_object groupid as group_object %}
 
       {% user_access_policy groupid request.user as user_access %} 
       
       {% if user.is_authenticated %}
-      <b>{% trans "Actions" %}</b><br/>
-      <div class="row">         
+        <b>{% trans "Actions" %}</b><br/>
+        <div class="row">         
         <div class="medium-6 columns">
           
+      {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
           {% edit_policy groupid node request.user as status %}
           {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
             {% get_edit_url node.pk as edit_url %}
@@ -1376,14 +1378,16 @@ ul#navigation li a.last {
            {% endif %}
         </div>     
         
+      {% endifnotequal %}
 
         {% if node %}
           {% check_group node as is_group %}
           {% if is_group %}
-
+          
             {% get_group_policy node request.user as policy %}
             {% get_prior_post_node group_id as groupname %}
 
+          {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
             <input type="hidden" id="groupname" value="{{node}}">
             {% if user.is_authenticated %}
               {% if user_access == "allow" %}
@@ -1417,6 +1421,7 @@ ul#navigation li a.last {
 
             {% endif %}
 
+          {% endifnotequal %}
             <!-- Triggers the modals -->
             <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
 
@@ -1425,7 +1430,10 @@ ul#navigation li a.last {
 
             {% check_is_gstaff groupid request.user as is_gstaff %}
             {% if is_gstaff %}
-              {% include "ndf/invite_users.html" %}
+
+              {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
+                  {% include "ndf/invite_users.html" %}
+              {% endifnotequal %}
 
               {% include "ndf/invite_admins.html" %}
             {% endif %} 
@@ -1434,6 +1442,14 @@ ul#navigation li a.last {
 
       </div>      
       {% endif %}
+
+      {% ifequal group_object.edit_policy "EDITABLE_MODERATED" %}
+        {% if is_gstaff %}
+          <a class="tiny expand button" href="{% url 'data_review' group_name_tag %}">
+            Moderate Resources
+          </a>
+        {% endif %} 
+      {% endifequal %}
 
       <!-- This button converts collection into module -->
       {% comment %}
@@ -1477,6 +1493,7 @@ ul#navigation li a.last {
     </li> 
     --> 
     
+          {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
     <br/>
     <div class="label-list"> 
       <b>{% trans "Tags" %}</b><br/>
@@ -1521,6 +1538,7 @@ ul#navigation li a.last {
         {% endif %}
       </ul>
     </div>
+          {% endifnotequal %}
 
     {% if user.is_authenticated %}
     {% switch_group_conditions request.user group_id as switch_conditions %}
@@ -1552,7 +1570,7 @@ ul#navigation li a.last {
         </div>
         </div>
       {% endif %} 
-    {% endif %}
+      {% endif %}
 
     </div>
   </ul>
