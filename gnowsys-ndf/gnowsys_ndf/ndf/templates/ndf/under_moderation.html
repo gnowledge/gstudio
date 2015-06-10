@@ -1,0 +1,65 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+
+{% block title %} {{title}} {% endblock %}
+
+{% block body_content %}
+	{% if request.user.id == node.created_by or user.is_superuser %}
+	<h3> Hello {{request.user.username}}, "{{node.name}}" resource is successfully uploaded!</h3>
+	<h4><small>
+	 As resource has been uploaded in the Moderated group, it will undergo moderation process and then published to "{{group_name_tag}}". We will intimate you as on when resource gets published to this group.
+	 Till that time resource is accesible to your user group.
+	</small></h4>
+	<br/>
+		
+	{% group_type_info group_id request.user as grouptype %}
+	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+      <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if node.status == "DRAFT" %}
+            <div class="draft page">
+          {% elif node.status == "PUBLISHED" %}
+            <div class="published page">
+          {% endif %}
+        {% else %}
+          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} page'>
+        {% endif %} 
+
+          <a href="{% url 'file_detail' request.user.username node %}">
+          <div class="row">
+            <div class="small-10 columns">                             
+                <b>
+                  {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+                </b>
+            </div>
+          </div>
+          {% if node.status == "PUBLISHED" or node.created_by == request.user.id %}
+          <hr/>
+          <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+          {% endif %}
+          <footer>
+            <div class="age">
+              {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+              <br/>
+              by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            </div>
+            <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
+          </footer>
+          </a>
+
+          <div class="label-list small-12 columns">
+          {% for tag in node.tags|slice:":3" %}
+            <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
+          {% endfor %}
+          </div>
+
+        
+        </div>
+      </li>
+	</ul>
+      
+	{% endif %}
+{% endblock%}
