@@ -390,7 +390,7 @@ class CreateSubGroup(CreateGroup):
         Returns sub-group having particular member_of.
         Else return False
         '''
-        member_of = node_collection.one({'_type': 'GSystemType', 'name': member_of})
+        member_of = node_collection.one({'_type': 'GSystemType', 'name': unicode(member_of)})
 
         group_obj = node_collection.one({
                                         '_type': 'Group',
@@ -1345,5 +1345,3 @@ def create_sub_group(request,group_id):
       return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
   except Exception as e:
       print "Exception in create subgroup "+str(e)
-
-
