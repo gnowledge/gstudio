@@ -227,7 +227,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
 			assesses_list=assesses_list.split(",")
 	create_grelation_list(quiz_item_node._id,"assesses",assesses_list)
 
-        return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id, 'appId':app._id,'app_id': quiz_item_node._id}))
+        return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id, 'app_id': quiz_item_node._id}))
         
     else:
         if node_id:
@@ -272,7 +272,7 @@ def create_edit_quiz(request, group_id, node_id=None):
 
         # get_node_common_fields(request, quiz_node, group_id, gst_quiz)
         quiz_node.save(is_changed=get_node_common_fields(request, quiz_node, group_id, gst_quiz))
-	get_node_metadata(request,quiz_node,gst_quiz)
+	# get_node_metadata(request, quiz_node,gst_quiz)
 	
        
 	
@@ -288,7 +288,7 @@ def create_edit_quiz(request, group_id, node_id=None):
 	create_grelation_list(quiz_node._id,"assesses",assesses_list)
 
 	
-        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id,'appId':app._id, 'app_id': quiz_node._id}))
+        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'app_id': quiz_node._id}))
 	
     else:
         if node_id:

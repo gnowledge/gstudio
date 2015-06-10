@@ -23,6 +23,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         nodes = node_collection.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
     else :
         nodes = node_collection.find({'_type':class_name}).sort('last_update', -1)
+        
 
     objects_details = []
     for each in nodes:
@@ -37,8 +38,8 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
         for members in each.member_of:
             member.append(node_collection.one({ '_id': members}).name+" - "+str(members))
         
-        for coll in each.collection_set:
-            collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
+        # for coll in each.collection_set:
+        #     collection_list.append(node_collection.one({ '_id': coll}).name+" - "+str(coll))
         
         if class_name in ("GSystemType"):
             for at_set in each.attribute_type_set:
@@ -143,7 +144,8 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
                         if translate:
                             if key in ("name","inverse_name"):
                                 new_instance_type[key] = unicode(request.POST.get(key+"_trans",""))
-                                                
+                                language= request.POST.get('lan')
+                                new_instance_type.language=language
                                 
                             else:
                                 new_instance_type[key] = unicode(request.POST.get(key,""))
@@ -197,6 +199,13 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
 
         if user_id not in new_instance_type.contributors:
             new_instance_type.contributors.append(user_id)
+        parent_node=node_collection.one({'_id':ObjectId(node_id)})
+        if translate and class_name == "RelationType":
+            new_instance_type.subject_type = parent_node.subject_type
+            new_instance_type.object_type = parent_node.object_type
+        if translate and class_name == "AttributeType":
+            new_instance_type.data_type = parent_node.data_type
+            new_instance_type.subject_type = parent_node.subject_type
 
         new_instance_type.save()
         if translate:        

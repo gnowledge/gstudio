@@ -96,7 +96,7 @@ i.remove-tag{
 				  	<a>{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
 				</dd>
 				<!-- change name of collection tab overide block in your code -->
-				<dd class="collection_tab" data-reveal-id="{% if node %}{% if is_group == False %}publish_resource{% endif %}{% endif %}" title="Click here to add/edit collection">
+				<dd class="collection_tab" data-reveal-id="{% if not node %}{% if is_group == False %}publish_resource{% endif %}{% endif %}" title="Click here to add/edit collection">
 				  	<a>{% block collection_tab %} {% trans "Collection" %} {% endblock %}</a>
 				</dd>
 				<!-- change name of metadata tab overide block in your code -->
@@ -117,14 +117,14 @@ i.remove-tag{
 	</div>
         
   	{% csrf_token %}
-
+        {% comment %}
   	<div id="publish_resource" class="reveal-modal" data-reveal style="width:500px;">
   		Do you want to create:<br/><br/>
   		<input class="collection" type="radio" name="coll" value="homogeneous"> &nbsp;Homogeneous Collection<br/>
   		<input class="collection" type="radio" name="coll" value="heterogeneous"> &nbsp;Heterogeneous Collection
   		<a class="close-reveal-modal">&#215;</a>
   	</div>
-  
+        {% endcomment %}
   	<div id="node-details-edit-div" class="tabs-content" > 
 
     	<div class="active content row contents" id="panel-name-description">
@@ -708,16 +708,15 @@ $(document).ready(function(){
 		});
 
 	});
-
-	{% if is_group or not node %}
+      	{% if is_group or node or not node %}
 		$(".collection_tab").click(function() {
-			var collection = "heterogeneous";
+      			var collection = "heterogeneous";
+        
 	{% else %}
 		$(".collection").click(function() {
-			var collection = this.value;
+      			var collection = this.value;
 	{% endif %}
-
-		$("#publish_resource").foundation('reveal', 'close');
+      		$("#publish_resource").foundation('reveal', 'close');
 		$("input[type='radio'][name='col']").attr("checked", false);
 		$("input[type='radio'][name='coll']").attr("checked", false);
 		
