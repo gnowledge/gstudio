@@ -1,7 +1,9 @@
-{% load get_nroer_menu  get_user_group  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar from ndf_tags %}
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar from ndf_tags %}
 
 {% load i18n %}
 {% load cache %}
+
+  {% get_group_object groupid as group_object %}
 
   <!-- <div class="contain-to-grid sticky"> -->
   <div class="row" id="top-headers">
@@ -194,7 +196,7 @@
           </a>
           
           {% else %}
-          <a class="user" data-gnow="#aabb44" href="{% url 'dashboard' request.user.pk %}">
+          <a class="user" href="{% url 'dashboard' request.user.pk %}">
             {{ user.username }}
           </a>
           {% endif %}
@@ -255,15 +257,18 @@
       <!-- =========| divider between two nav's/header's |=========== -->
 
       <!-- start of second nav  or group level header-->
-      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if not is_ac_url %}sticky{% endif %}{% endif %} drop-shadow" id="group-level-header">
-        
+      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %} drop-shadow" id="group-level-header">
+
+
         <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
+        <!-- don't show this app bar for groups with editable moderated -->
+        {% ifnotequal group_object.edit_policy  'EDITABLE_MODERATED' %}
         {% if not is_ac_url %}
         {% if request.path != "/welcome" %}
           {% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %}
           <ul class="title-area">
             <li class="name">
-              <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
+              <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home">{{group_object.edit_policy}}</i></a></h1>
               <!-- <i class="fi-home"></i> -->
             </li>
             <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
@@ -357,6 +362,8 @@
         {% endif %} <!-- end of "/welcome" landing page check -->
         {% endif %} <!-- end of "accounts" urls check -->
         </nav>
+
+        {% endifnotequal %} <!-- end of "group's edit_policy" urls check -->
       </div>
 
       <!-- end of second nav -->
