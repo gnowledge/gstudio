@@ -459,11 +459,10 @@ def publish_page(request,group_id,node):
         node.content_org = unicode(page_node.content_org)
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
-        node.save() 
+        node.save()
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
-
+    if 'Quiz' in node.member_of_names_list or 'QuizItem' in node.member_of_names_list:
+        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'app_id': node._id}))
     return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
-
-

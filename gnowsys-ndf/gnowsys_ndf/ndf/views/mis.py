@@ -812,7 +812,7 @@ def get_mis_reports(request, group_id, **kwargs):
                       'relation_set.organization_belongs_to_state': {'$in': state_id_list},
                       'group_set': mis_admin_grp._id})
             else:
-                if gst_node.name == "Student" or gst_node.name == "Voluntary Teacher":
+                if gst_node.name == "Student":
                     query.update({'relation_set.person_belongs_to_state': ObjectId(state_id)})
 
                 university_cur = node_collection.find({'member_of': univ_gst._id,
@@ -845,17 +845,44 @@ def get_mis_reports(request, group_id, **kwargs):
                 colg_id_list.append(each._id)
             colg_cur.rewind()
         # print "\n gst_name", gst_node.name
+        vt_colg_ids = []
+        if gst_node.name == "Voluntary Teacher":
+            if colg_cur:
+                for each in colg_cur:
+                    list_of_colg_id = [each._id]
+                    query.update({'relation_set.trainer_teaches_course_in_college': {"$elemMatch":{"$elemMatch":{"$in": list_of_colg_id}}}})
+                    n = node_collection.find(query)
+                    if n:
+                        # for eachvt in n:
+                        #     if eachvt.relation_set:
+                        #         for rel in eachvt.relation_set:
+                        #             if rel and 'trainer_teaches_course_in_college' in rel:
+                        #                 old_dictcc = rel['trainer_teaches_course_in_college']
+                        #                 for cc_dict in old_dictcc:
+                        #                     for colg_course in cc_dict:
+                        #                         n = node_collection.one({'_id': ObjectId(colg_course)})
+                        #                         if 'College' in n.member_of_names_list:
+                        #                             if n._id == each._id:
+                        #                                 vt_colg_ids.append(each._id)
+                        vt_colg_ids.append(each._id)
+                    # del query['relation_set.trainer_teaches_course_in_college']
+            if vt_colg_ids:
+                colg_cur = node_collection.find({'_id': {'$in': vt_colg_ids}})
+                del query['relation_set.trainer_teaches_course_in_college']
+            else:
+                colg_cur.rewind()
+
         if colg_cur:
             for each in colg_cur:
                 if gst_node.name == "Student":
                     query.update({'relation_set.student_belongs_to_college': each._id})
+                if gst_node.name == "Voluntary Teacher":
+                    list_of_colg_id = [ObjectId(each._id)]
+                    query.update({'relation_set.trainer_teaches_course_in_college': {"$elemMatch":{"$elemMatch":{"$in": list_of_colg_id}}}})
 
                 if each.relation_set:
+                    # print "\n\n each/relation_set",each.relation_set
                     for each_rel in each.relation_set:
-                        if gst_node.name == "Voluntary Teacher":
-                            # if each_rel and "college_has_trainer" in each_rel:
-                            #     colg_node_id = each_rel["college_has_trainer"][0]
-                            query.update({'relation_set.trainer_of_college': ObjectId(each._id)})
                         if gst_node.name == "Classroom Session":
                             if each_rel and "has_group" in each_rel:
                                 colg_group_node_id = each_rel["has_group"][0]
@@ -864,8 +891,9 @@ def get_mis_reports(request, group_id, **kwargs):
                             univname = each_rel["college_affiliated_to"]
                         if each_rel and "organization_belongs_to_state" in each_rel:
                             statename = each_rel["organization_belongs_to_state"]
-                            # print "\n\n statename", statename
-                # print "\n\nquery",query
+                        colgname = each._id
+
+                # print "\n\nquery", query
                 rec = node_collection.collection.aggregate([
                                           {
                                             '$match': query
@@ -882,6 +910,7 @@ def get_mis_reports(request, group_id, **kwargs):
                 ])
 
                 resultset = rec['result']
+                # print "\n\n resultset", resultset
                 if resultset:
                     for each in resultset:
                         each['query'] = str(query)

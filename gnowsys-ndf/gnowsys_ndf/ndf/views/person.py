@@ -150,7 +150,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         '_id': 0,
                         'person_id': "$_id",
                         'name': '$name',
-                        'college':'$relation_set.trainer_of_college',
+                        'collegecourse': '$relation_set.trainer_teaches_course_in_college',
                         'email_id': '$attribute_set.email_id',
                     }
                 },
@@ -163,16 +163,38 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
         colg_list_name = []
         if records_list:
             for each in res["result"]:
-                if each["college"]:
-                    if each["college"][0]:
-                        colg_list_name = []
-                        for each_col in each["college"][0]:
-                            colg_id = each_col
-                            colg_node = node_collection.one({'_id':ObjectId(colg_id)})
-                            colg_list_name.append(colg_node.name)
+                if 'college' in each:
+                    if each['college']:
+                        if each["college"][0]:
+                            colg_list_name = []
+                            for each_col in each["college"][0]:
+                                colg_id = each_col
+                                colg_node = node_collection.one({'_id':ObjectId(colg_id)})
+                                colg_list_name.append(colg_node.name)
                 each["college"] = colg_list_name
+                colg_list_name = []
+                str_colg_course = ""
+                if 'collegecourse' in each:
+                    if each['collegecourse']:
+                        if each["collegecourse"][0]:
+                            # each["collegecourse"][0] is list of lists
+                            for eachcc in each["collegecourse"][0]:
+                                # eachcc is one list holding Course and College
+                                first = True
+                                for colg_course in eachcc:
+                                    n = node_collection.one({'_id': ObjectId(colg_course)}).name
+                                    str_colg_course += n
+                                    if first:
+                                        str_colg_course += " - "
+                                    else:
+                                        str_colg_course += "; "
+                                    first = False
+                                    # print "\n\nvt", eachcc
+                                    # colg_list_name = eachcc
+                    each["college"] = str_colg_course
                 ac_data_set.append(each)
                 colg_list_name = []
+
 
         column_headers = [
                     ("person_id", "Edit"),

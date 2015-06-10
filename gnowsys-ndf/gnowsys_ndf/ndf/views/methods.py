@@ -612,7 +612,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     else:
         name = request.POST.get('name', '').strip()
         content_org = request.POST.get('content_org')
-        tags = request.POST.get('tags')
+        tags = request.POST.get('tags','')
     language = request.POST.get('lan')
     sub_theme_name = request.POST.get("sub_theme_name", '')
     add_topic_name = request.POST.get("add_topic_name", '')
