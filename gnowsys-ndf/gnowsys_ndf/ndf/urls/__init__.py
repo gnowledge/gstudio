@@ -82,7 +82,7 @@ urlpatterns = patterns('',
     # ---end of mis
 
     # moderation
-    url(r'^(?P<group_id>[^/]+)/under_moderation/(?P<node_id>[\w-]+)$', 'gnowsys_ndf.ndf.views.group.under_moderation', name='under_moderation'),
+    url(r'^(?P<group_id>[^/]+)/under_moderation/(?P<node_id>[\w-]+)$', 'gnowsys_ndf.ndf.views.moderator.under_moderation', name='under_moderation'),
     # ---end of moderation
 
     # meeting app
