@@ -1,6 +1,6 @@
 # from django.views.generic import TemplateView
 from django.shortcuts import render
-
+import sqlite3
 # from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME
 # from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING,
 # GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
@@ -21,17 +21,40 @@ from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 from django_mailbox.models import Mailbox
+import socket
 
 @login_required
 def mailclient(request, group_id):
     group_name, group_id = get_group_name_id(group_id)
     home_grp_id = node_collection.one({'name': "home"})
 
-    boxes = Mailbox.objects.all()
-
     mailbox_names = []
-    for box in boxes:
-        mailbox_names.append(box.name)
+    try:
+        conn = sqlite3.connect('/home/akazuko/Developer/metastudio/gstudio/gnowsys-ndf/example-sqlite3.db')
+        user_id = str(request.user.id)  
+        query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
+        cursor = conn.execute(query)
+
+        mailbox_ids=[]
+        for row in cursor:
+            mailbox_ids.append(row[0])
+        print mailbox_ids        
+        query = 'select name from django_mailbox_mailbox where id='
+        for box_id in mailbox_ids:
+            box_id = str(box_id)
+            query_2 = query + box_id
+            cursor = conn.execute(query_2)
+            for row in cursor:
+                mailbox_names.append(row[0])
+
+    # add exception
+    except socket.gaierror:
+        print "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
+
+    # boxes = Mailbox.objects.all()
+
+    # for box in boxes:
+    #     mailbox_names.append(box.name)
 
     if group_id == home_grp_id['_id']:
         return render(request, 'ndf/oops.html')
@@ -39,7 +62,8 @@ def mailclient(request, group_id):
     return render(request, 'ndf/mailclient.html', {
         'groupname': group_name,
         'groupid': group_id,
-        'mailboxnames': mailbox_names
+        'mailboxnames': mailbox_names,
+        'mailboxids' : mailbox_ids
     })
  
 #-----------------Dictionary of popular servers--------------#
@@ -72,8 +96,8 @@ def mailbox_create_edit(request, group_id):
         mailbox_name = request.POST.get("mailboxname", "")
         emailid = request.POST.get("emailid", "")
         pwd = request.POST.get("password", "")
-        emailid_split = emailid.split('@')
-        domain = emailid_split.split('.')
+        domain = request.POST.get("domain", "")
+        emailid_split= emailid.split('@')
  
         # make a mailbox from the above details
         newbox = Mailbox()
@@ -81,19 +105,21 @@ def mailbox_create_edit(request, group_id):
  
         # TODO: find the webserver address using user's choice as selected from
         # a drop down box
-        webserver = server_dict["gmail"]
-        uri = ""
-        uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver
+        webserver = server_dict[domain]
+        uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + '?archive=' + mailbox_name
         newbox.uri = uri
         try:
             newbox.get_connection()
             newbox.save()
+            conn = sqlite3.connect('/home/akazuko/Developer/metastudio/gstudio/gnowsys-ndf/example-sqlite3.db')
+            user_id = str(request.user.id)
+            query = 'insert into user_mailboxes values (?,?);'
+            cursor = conn.execute(query, (request.user.id, newbox.id))
+            conn.commit()
+            conn.close()
+
         except socket.gaierror:
             print "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
-        print mailbox_name
-        print emailid
-        print pwd
-        print uri
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
  
     else:
@@ -113,7 +139,7 @@ def render_mailbox_pane(request,group_id):
         variable = RequestContext(request, {
         'groupname': group_name,
         'groupid': group_id,
-        'mailboxname': request.POST['mailBoxName']
+        'mailboxname': request.POST['mailBoxName'],
+        'username' : request.POST['username']
         })
         return render_to_response(template,variable)
-
