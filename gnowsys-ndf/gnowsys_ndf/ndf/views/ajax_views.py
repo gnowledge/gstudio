@@ -756,14 +756,17 @@ def get_collection(request, group_id, node_id):
   # print "\nnode: ",node.name,"\n"
   collection_list = []
 
-  if node:
-    if node.collection_set:
+ # def a(p,q,r):
+#		collection_list.append({'name': p, 'id': q,'node_type': r})
+
+  if node and node.collection_set:
       for each in node.collection_set:
         obj = node_collection.one({'_id': ObjectId(each) })
         if obj:
-          node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-          collection_list.append({'name': obj.name, 'id': obj.pk,'node_type': node_type})
-          collection_list = get_inner_collection(collection_list, obj)
+        	node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+        	a=collection_list.append
+	    	a(obj.name,obj.pk,node_type)
+        	collection_list = get_inner_collection(collection_list, obj)
 
 
   data = collection_list
