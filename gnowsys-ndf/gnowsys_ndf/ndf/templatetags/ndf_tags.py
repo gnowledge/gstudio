@@ -771,11 +771,10 @@ def thread_reply_count( oid ):
 				global_thread_latest_reply["content_org"] = each.content_org
 				global_thread_latest_reply["last_update"] = each.last_update
 				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
-			else:
-				if global_thread_latest_reply["last_update"] < each.last_update:
-					global_thread_latest_reply["content_org"] = each.content_org
-					global_thread_latest_reply["last_update"] = each.last_update
-					global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+			elif global_thread_latest_reply["last_update"] < each.last_update:
+				global_thread_latest_reply["content_org"] = each.content_org
+				global_thread_latest_reply["last_update"] = each.last_update
+				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
 					
 			thread_reply_count(each._id)
 	
