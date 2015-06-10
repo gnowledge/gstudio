@@ -812,7 +812,7 @@ def get_mis_reports(request, group_id, **kwargs):
                       'relation_set.organization_belongs_to_state': {'$in': state_id_list},
                       'group_set': mis_admin_grp._id})
             else:
-                if gst_node.name == "Student" or gst_node.name == "Voluntary Teacher":
+                if gst_node.name == "Student":
                     query.update({'relation_set.person_belongs_to_state': ObjectId(state_id)})
 
                 university_cur = node_collection.find({'member_of': univ_gst._id,
@@ -846,7 +846,6 @@ def get_mis_reports(request, group_id, **kwargs):
             colg_cur.rewind()
         # print "\n gst_name", gst_node.name
         vt_colg_ids = []
-
         if gst_node.name == "Voluntary Teacher":
             if colg_cur:
                 for each in colg_cur:
@@ -867,7 +866,11 @@ def get_mis_reports(request, group_id, **kwargs):
                         #                                 vt_colg_ids.append(each._id)
                         vt_colg_ids.append(each._id)
                     # del query['relation_set.trainer_teaches_course_in_college']
+            if vt_colg_ids:
                 colg_cur = node_collection.find({'_id': {'$in': vt_colg_ids}})
+                del query['relation_set.trainer_teaches_course_in_college']
+            else:
+                colg_cur.rewind()
 
         if colg_cur:
             for each in colg_cur:
