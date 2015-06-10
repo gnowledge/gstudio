@@ -165,6 +165,8 @@ class CreateGroup(object):
         else:
             group_obj.moderation_level = -1
 
+        group_obj.status == u"PUBLISHED"
+
         # returning basic fields filled group object 
         return group_obj
 
