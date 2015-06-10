@@ -5597,7 +5597,7 @@ def get_detailed_report(request, group_id):
       if gst_name == "Event":
           gst_name = "Classroom Session"
       person_gst = node_collection.one({'_type': "GSystemType", 'name': gst_name})
-      gapp_gst = node_collection.one({'name':"GAPP"})
+      gapp_gst = node_collection.one({'_type':'MetaType','name':"GAPP"})
       mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
       app_id = mis_gapp._id
       result_set = None
@@ -5617,7 +5617,6 @@ def get_detailed_report(request, group_id):
                                                     'Street': '$attribute_set.town_city',
                                                     'Events': '$relation_set.coordinator_of_event',
                                                     'College-Course': '$relation_set.trainer_teaches_course_in_college',
-
                                       }},
                                       {'$sort': {'Name': 1}}
                 ])
