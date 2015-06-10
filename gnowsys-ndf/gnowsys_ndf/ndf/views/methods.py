@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
+#from django.utils.text import slugify
 from django.shortcuts import render_to_response  # , render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
@@ -38,7 +39,7 @@ from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
 from collections import OrderedDict
-
+#import pyopencl
 col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
@@ -1169,7 +1170,6 @@ def tag_info(request, group_id, tagname=None):
     group_cur_list = []  # for AutheticatedUser
     today = date.today()
     yesterdays_search = {date.today() - timedelta(days=1)}
-    week_ago_search = {date.today() - timedelta(days=7)}
     locale.setlocale(locale.LC_ALL, '')
     userid = request.user.id
     # collection = get_database()[Node.collection_name]
