@@ -18,101 +18,25 @@
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 {% endblock %}
 
-{% block style %}
-  /* Setting css-properties for ui-datepicker */
-    #ui-datepicker-div {
-      box-shadow: 0 5px 5px #808080;
-      width: 230px;
-    }
-
-    .ui-widget {
-      font-family: inherit;
-      font-size: inherit;
-    }
-
-    .ui-corner-all {
-    
-      border-radius: 0;
-    }
-
-    #ui-datepicker-div dt.ui_tpicker_minute_label {
-    
-      margin-bottom: 0;
-    }
-
-    .ui-slider-horizontal {
-    
-      margin-top: 1em;
-    }
-
-    .ui-datepicker-title select {
-      background-color: #e6e6e6;
-      /*border-collapse: separate;
-      border-spacing: 30px 0px;*/
-      font-family: inherit;
-      /*font-size: 0.3em;*/
-      font-weight: normal;
-      height: 1.5rem;
-      /*margin: 30px 0;*/
-      padding: 0;
-    }
-
-  /* Resetting css-properties for fieldset (also legend, input) */
-    /* fieldset (padding-bottom) */ 
-    fieldset {
-      padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
-    }
-
-    /* legend (background-color) */
-    fieldset legend {
-      background-color: transparent !important;
-    }
-
-    /* input (margin) */
-    fieldset input {
-      margin: 0 !important;
-    }
-  
-  /* Setting css-properties for small.error */
-    small.error {
-      padding: 0 0.5em !important;
-      position: relative !important;
-    }
-
-  
-  #list{
-    max-height: 80px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding-left: 10px;
-  }
-
-  .selFile {
-    border-radius: 1px;
-    box-shadow: 3px 3px 3px 1px rgba(9,9,9,0.2);
-  }
-{% endblock %}
 
 {% block meta_content %}
-  <h3 class="subheader">{% trans "Create Mailbox" %} </h3>
+  <h3 class="subheader">{% trans "Edit Mailbox" %} </h3>
 {% endblock %}
 
 {% block body_content %}
   <!-- reveal-modal removed -->
-  
+
   <form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
     {% csrf_token %}
 
+        
     <h2 class="medium-12 columns">
       {% if node %}
-        Editing {{title}}: {{node.name}}
       {% else %}
-        <!-- title=add a new mailbox -->
-        {{title}} 
+        {{title}} : {{ mailboxname }}
       {% endif %}
     </h2>
-
-    <br/><br/><br/><br/>
+    <br/><br/>
 
     <div class="medium-6 columns end">
       
@@ -124,7 +48,7 @@
           <small class="error">Please give your Mail Box a descriptive name.</small>
         </div>
       </div>
-
+<br/><br/>      
       <!-- E-Mail ID -->
       <div class="row">
         <div class="medium-12 columns">
@@ -133,7 +57,7 @@
           <small class="error">Please enter an email id for this mail box.</small>
         </div>
       </div>
-
+<br/><br/>
     <!-- Password -->
       <div class="row">
         <div class="medium-12 columns">
@@ -142,7 +66,7 @@
           <small class="error">Please enter the password for this email id.</small>
         </div>
       </div>
-      
+      <br/><br/>
       <!-- Domains List -->
       <div class="row">
         <div class="medium-12 columns">
@@ -164,6 +88,7 @@
           <input type="hidden" name="page_url" value="{{request.path}}">
           <!-- deleted above -->
           <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
+          
           <!-- Save button -->
           <input type="submit" id="save-node" value="Save" class="button small expand"/>
         </div>

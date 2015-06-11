@@ -47,6 +47,7 @@ from django.contrib.sites.models import Site
 # from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES,GSTUDIO_AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
+from django_mailbox.models import Mailbox
 
 register = Library()
 at_apps_list = node_collection.one({
@@ -629,11 +630,13 @@ def get_gapps_iconbar(request, group_id):
         group_name = ""
         group_id = ObjectId(group_id)
         # Fetch group
+        print group_id
         group_obj = node_collection.one({
             "_id": group_id
         }, {
             "name": 1, "attribute_set.apps_list": 1, '_type': 1
         })
+        
         if group_obj:
             group_name = group_obj.name
 
@@ -652,8 +655,8 @@ def get_gapps_iconbar(request, group_id):
             if node:
                 i += 1
                 gapps[i] = {"id": node["_id"], "name": node["name"].lower()}
-
-        if group_obj._type == "Author":
+        print group_obj,"grp obj"
+        if group_obj and group_obj._type == "Author":
 			# user_gapps = ["page", "file"]
 			user_gapps = [gapp_name.lower() for gapp_name in GSTUDIO_USER_GAPPS_LIST]
 			for k, v in gapps.items():
@@ -3103,7 +3106,6 @@ def get_mails_in_box(request, mailboxname, username, mail_type):
 		if box.name == mailboxname:
 			required_mailbox=box
 			break
-
 	settings_dir = os.path.dirname(__file__)
 	PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
 	path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
