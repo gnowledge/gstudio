@@ -68,7 +68,7 @@ def mailclient(request, group_id):
 
     # add exception
     except :
-        print "Possible Database Error fn1"
+        print "Possible Database Error when taking mailbox ids for a specific user"
         error_obj= "Possible Database Error fn1"
         return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj})
         #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
@@ -119,7 +119,7 @@ def mailbox_create_edit(request, group_id):
         try:
             #the below two stmts can throw an exception          
             newbox.get_connection()
-            conn = sqlite3.connect('/home/tiwari/Desktop/gstd/gstudio/gnowsys-ndff/example-sqlite3.db')
+            conn = sqlite3.connect('/home/tiwari/Desktop/gstd/gstudio/gnowsys-ndf/example-sqlite3.db')
 
             #save() fn is called after the above two stmts to ensure that 'save' is done only if both the above stmts DO NOT throw
             #any exception!
@@ -187,6 +187,7 @@ def mailbox_edit(request, group_id,mailboxname):
   if request.method == "POST":  # create or edit
         # get all data from the form
         mailbox_name = request.POST.get("mailboxname", "")
+        mailbox_name = mailbox_name.replace(" ","_")
         emailid = request.POST.get("emailid", "")
         pwd = request.POST.get("password", "")
         domain = request.POST.get("domain","")
