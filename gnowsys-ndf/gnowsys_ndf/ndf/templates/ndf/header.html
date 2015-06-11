@@ -268,7 +268,7 @@
           {% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %}
           <ul class="title-area">
             <li class="name">
-              <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home">{{group_object.edit_policy}}</i></a></h1>
+              <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
               <!-- <i class="fi-home"></i> -->
             </li>
             <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
