@@ -5597,7 +5597,7 @@ def get_detailed_report(request, group_id):
       if gst_name == "Event":
           gst_name = "Classroom Session"
       person_gst = node_collection.one({'_type': "GSystemType", 'name': gst_name})
-      gapp_gst = node_collection.one({'name':"GAPP"})
+      gapp_gst = node_collection.one({'_type':'MetaType','name':"GAPP"})
       mis_gapp = node_collection.one({'member_of':gapp_gst._id,'name':"MIS"})
       app_id = mis_gapp._id
       result_set = None
@@ -5606,7 +5606,7 @@ def get_detailed_report(request, group_id):
 
       mis_admin = node_collection.one({"_type": "Group", "name": "MIS_admin"}, {"_id": 1})
       if person_gst.name == "Voluntary Teacher":
-          column_header = [u'University', u'College',u'Name', u'Email ID', u'Phone', u'Street',u'Events']
+          column_header = [u'University', u'College',u'Name', u'Email ID', u'Phone', u'Street',u'Events',u'College-Course']
 
           rec = node_collection.collection.aggregate([{'$match': query},
                                       {'$project': {'_id': 0,
@@ -5615,7 +5615,8 @@ def get_detailed_report(request, group_id):
                                                     'Email ID': '$attribute_set.email_id',
                                                     'Phone': '$attribute_set.mobile_number',
                                                     'Street': '$attribute_set.town_city',
-                                                    'Events': '$relation_set.coordinator_of_event'
+                                                    'Events': '$relation_set.coordinator_of_event',
+                                                    'College-Course': '$relation_set.trainer_teaches_course_in_college',
                                       }},
                                       {'$sort': {'Name': 1}}
                 ])
@@ -5682,26 +5683,63 @@ def get_detailed_report(request, group_id):
       filename = ""
       course_section_node_id = course_subsection_node = None
       result_set = rec["result"]
-      # print "\n\n result_set",result_set
       if result_set:
         # old_dict = result_set[0]
         for old_dict in result_set:
           if old_dict:
             if person_gst.name == "Voluntary Teacher":
-                if u"stud_id" in old_dict:
-                  vt_node = node_collection.one({'_id': ObjectId(old_dict['stud_id'])})
-                  if vt_node:
-                    for rel in vt_node.relation_set:
-                      if rel and 'trainer_of_college' in rel:
-                        colg_node_id = rel['trainer_of_college'][0]
-                        colg_node = node_collection.one({'_id': ObjectId(colg_node_id)},{'name':1,'relation_set':1})
-                        colg_node_name = colg_node.name
-                        old_dict.update({'College': colg_node_name})
-                        if colg_node.relation_set:
-                          for rel in colg_node.relation_set:
-                            if rel and 'college_affiliated_to' in rel:
-                              univ_id = rel['college_affiliated_to'][0]
-                              old_dict.update({'University': [[univ_id]]})
+                str_colg_course = ""
+                if 'Events' in old_dict:
+                    if old_dict['Events']:
+                        if old_dict['Events'][0]:
+                            old_dict['Events'] = str(len(old_dict['Events'][0]))
+                        else:
+                            old_dict['Events'] = [0]
+
+                old_colg = []
+                if 'College-Course' in old_dict:
+                    if old_dict['College-Course']:
+                        if old_dict["College-Course"][0]:
+                            for old_dictcc in old_dict["College-Course"][0]:
+                                # old_dictcc is one list holding Course and College
+                                first = True
+                                for colg_course in old_dictcc:
+                                    n = node_collection.one({'_id': ObjectId(colg_course)})
+                                    if 'College' in n.member_of_names_list:
+                                      if 'College' in old_dict:
+                                        if n.name not in old_colg:
+                                            old_colg.append(n.name)
+                                        else:
+                                            pass
+                                      else:
+                                          old_colg.append(n.name)
+                                      str_colg = ""
+                                      for each in old_colg:
+                                          str_colg += each +" \n"
+                                      old_dict.update({'College': str(str_colg)})
+                                      if n.relation_set:
+                                        for rel in n.relation_set:
+                                          if rel and 'college_affiliated_to' in rel:
+                                            univ_id = rel['college_affiliated_to'][0]
+                                            univ_name = node_collection.one({'_id': ObjectId(univ_id)}).name
+                                            if 'University' in old_dict and univ_name not in old_dict['University']:
+                                              old_univ = old_dict['University']+"; "
+                                            else:
+                                              old_univ = ""
+                                            new_univ_list = str(old_univ) + univ_name
+                                            old_dict.update({'University': new_univ_list})
+                                    str_colg_course += n.name
+                                    if first:
+                                        str_colg_course += " - "
+                                    else:
+                                        str_colg_course += "; "
+                                    first = False
+                    old_dict["College-Course"][0] = str_colg_course
+
+                else:
+                    old_dict.update({'College': "Not Assigned"})
+                    old_dict.update({'University': "Not Assigned"})
+
             if person_gst.name == "Classroom Session":
                 if u'Attendees' in old_dict:
                     if old_dict['Attendees']:
@@ -5748,8 +5786,6 @@ def get_detailed_report(request, group_id):
                               if rel and 'college_affiliated_to' in rel:
                                 univ_id = rel['college_affiliated_to'][0]
                                 old_dict.update({'University': [[univ_id]]})
-            result_set[0] = old_dict
-
       if result_set:
         for each_dict in result_set:
           new_dict = {}
@@ -5766,7 +5802,6 @@ def get_detailed_report(request, group_id):
                   # Perform parsing
                   if type(data[0]) in [unicode, basestring, int]:
                     new_dict[each_key] = ', '.join(str(d) for d in data)
-                
                   elif type(data[0]) in [ObjectId]:
                     # new_dict[each_key] = str(data)
                     d_list = []
@@ -5774,19 +5809,15 @@ def get_detailed_report(request, group_id):
                       d = node_collection.one({'_id': oid}, {'name': 1})
                       d_list.append(str(d.name))
                     new_dict[each_key] = ', '.join(str(n) for n in d_list)
-                
                 elif type(data) == datetime.datetime:
                   new_dict[each_key] = data.strftime("%d/%m/%Y")
-                
                 elif type(data) == long:
                   new_dict[each_key] = str(data)
-                
                 elif type(data) == bool:
                   if data:
                     new_dict[each_key] = "Yes"
                   else:
                     new_dict[each_key] = "No"
-                
                 else:
                   new_dict[each_key] = str(data)
 
@@ -5816,7 +5847,6 @@ def get_detailed_report(request, group_id):
 
             else:
               new_dict[each_key] = ""
-
           json_data.append(new_dict)
 
         # Start: CSV file processing -------------------------------------------
@@ -5847,6 +5877,7 @@ def get_detailed_report(request, group_id):
               ("Phone", "Phone"),
               ("Street", "Street"),
               ("Events", "Events"),
+              ("College-Course", "College-Course"),
           ]
       elif person_gst.name == "Classroom Session":
           column_headers = [
