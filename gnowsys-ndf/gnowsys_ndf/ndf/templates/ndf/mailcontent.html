@@ -8,7 +8,7 @@
 </head>
 <body>
 <div id="mailContent">
-{% get_mails_in_box request mailboxname username as emails %}
+{% get_mails_in_box request mailboxname username type as emails %}
 	{% for mail in emails %}
 		<div id="myModal{{ mail.mail_id }}" class="reveal-modal" animation="None" data-reveal>
     				<h3>{{ mail.mail_data.text }}</h3>
