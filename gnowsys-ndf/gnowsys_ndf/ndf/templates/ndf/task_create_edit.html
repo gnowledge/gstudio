@@ -279,9 +279,10 @@
     		  </div>
         </div>
   	  </div>
-
+      {% comment %}
       <!-- Watchers list -->
-    	<div class="row">
+    	<!-- 
+      <div class="row">
         <div class="medium-12 columns">
           <label>Watchers</label>
 
@@ -290,7 +291,8 @@
     	  </div>
       	<input type="hidden" name="watchers" id="hidden_watchers" value="">
       </div>
-
+      -->
+      {% endcomment %}
       {% if Upload_Task %}
       	{% get_file_node request Upload_Task as new %}
         <div class="row">
@@ -301,13 +303,7 @@
         	</div>
       	{% endfor %}
         </div>
-
-      {% else %}
-        <div class="row">
-          <p class="medium-6 columns end">--</p>
-        </div>
-
-    	{% endif %}
+      {% endif %}
 
       <!-- Hidden variables & Save button -->
       <div class="row" >
