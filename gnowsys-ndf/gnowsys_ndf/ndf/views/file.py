@@ -755,7 +755,7 @@ def submitDoc(request, group_id):
                 if group_object.edit_policy == 'EDITABLE_MODERATED':
                     # print "----------4-----------"
                     # create_moderator_task(group_id, resource_id=f)
-                    return HttpResponseRedirect(reverse('under_moderation', kwargs={'group_id': group_id, 'node_id': f }))
+                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_id, 'node_id': f }))
                 else:
                     # print "----------5-----------"
                     return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
