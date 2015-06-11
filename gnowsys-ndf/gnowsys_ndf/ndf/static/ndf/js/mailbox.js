@@ -8,7 +8,7 @@ function setMailBoxName(username, csrf_token, mailBoxName,type) {
 	b=b.replace('dummy',mailBoxName);
 	$("#delete_box").attr("href", b);
 	
-	$.post( 'mailresponse/', {'mailBoxName':mailBoxName, 'username': username, 'csrfmiddlewaretoken': csrf_token, 'type': type }, function(data){		
+	$.post( 'mailclient/mailresponse/', {'mailBoxName':mailBoxName, 'username': username, 'csrfmiddlewaretoken': csrf_token, 'type': type }, function(data){		
 		var content = $(data).filter( '#mailContent' );
 		$( ".mailBoxContent" ).empty().append( content );
 	});
