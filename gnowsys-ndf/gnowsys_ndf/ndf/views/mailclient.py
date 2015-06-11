@@ -1,6 +1,5 @@
 # from django.views.generic import TemplateView
 from django.shortcuts import render
-
 # from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME
 # from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING,
 # GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
@@ -48,15 +47,16 @@ def mailclient(request, group_id):
 
     mailbox_names = []
     try:
+
         conn = sqlite3.connect('/home/tiwari/Desktop/gstd/gstudio/gnowsys-ndf/example-sqlite3.db')
         user_id = str(request.user.id)
+
         query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
         cursor = conn.execute(query)
 
         mailbox_ids=[]
         for row in cursor:
             mailbox_ids.append(row[0])
-            
         print mailbox_ids        
         query = 'select name from django_mailbox_mailbox where id='
         for box_id in mailbox_ids:
@@ -72,16 +72,17 @@ def mailclient(request, group_id):
         error_obj= "Possible Database Error fn1"
         return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj})
         #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
+
     if group_id == home_grp_id['_id']:
         return render(request, 'ndf/oops.html')
 
     return render(request, 'ndf/mailclient.html', {
         'groupname': group_name,
         'groupid': group_id,
-        'mailboxnames': mailbox_names
+        'mailboxnames': mailbox_names,
+        'mailboxids' : mailbox_ids
     })
-
-
+ 
 @login_required
 @get_execution_time
 def mailbox_create_edit(request, group_id):
@@ -142,13 +143,13 @@ def mailbox_create_edit(request, group_id):
             # return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
             #TODO: Redirect to mailclient_error_display
             #return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
-        except :
+        except Exception as e:
             print "Possible DATABASE Error"
+            print e
             error_obj= "Possible DATABASE Error"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj})
             #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
-
     else:
         title = "Add A New Mailbox"
         variable = RequestContext(request, {'title': title,
@@ -165,9 +166,11 @@ def render_mailbox_pane(request,group_id):
         variable = RequestContext(request, {
         'groupname': group_name,
         'groupid': group_id,
-        'mailboxname': request.POST['mailBoxName']
+        'mailboxname': request.POST['mailBoxName'],
+        'username' : request.POST['username']
         })
         return render_to_response(template,variable)
+
 
 @login_required
 @get_execution_time

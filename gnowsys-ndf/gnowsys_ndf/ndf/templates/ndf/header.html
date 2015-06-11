@@ -206,12 +206,12 @@
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
 
+
             <!-- CHANGE DONE HERE, MAILCLIENT ADDED -->
             {%if user.is_authenticated %}
             <li class="text-center">
               <a href="/{{ user.username }}/mailclient">{% trans "MailClient" %}</a>
             {% endif %}
-
 
             {% if user.is_superuser %}
               <li class="text-center">

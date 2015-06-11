@@ -491,6 +491,8 @@ GAPPS = [
     u"E-Library", u"Meeting", u"Bib_App", u"Observation", u"Event", u"E-Book"
 ]
 
+#,u"MailClient"
+
 # This holds the list of stable GAPPS
 # ONLY TO BE EDITED in local_settings file
 # In order to edit (redorderig purpose or adding new ones) this list,

@@ -7,3 +7,4 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.mailclient',
                        url(r'^[/]delete[/](?P<mailboxname>[\w-]+)$', 'mailbox_delete', name='mailbox_delete'),
                        # url(r'^[/]error[/]', 'mailclient_error_display', name='mailclient_error_display'),                       
                        )
+
