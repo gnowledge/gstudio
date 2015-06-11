@@ -551,6 +551,7 @@ def create_task(request,task_id,group_id):
     # Adding watchers to node's author_set
     if watchers:
       task_node.author_set = []
+      user_to_be_notified= 	[]
       for each_watchers in watchers.split(','):
         bx = User.objects.get(id=int(each_watchers))
 

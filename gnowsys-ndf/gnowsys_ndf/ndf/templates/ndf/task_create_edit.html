@@ -350,9 +350,14 @@
         watchers_arr.push(this.value);
       }
      });
-    if( $('#Assignee').val() == "")
+     
+    if ('{{Assignee_name}}' != "" )
+    {
+        return true;     
+    }  
+    else if( $('#Assignee').val() == "" )
       {
-      	$('#assignee_warning').append("<h6 style = 'color:red;'> Assignees not selected </h6>")
+        $('#assignee_warning').append("<h6 style = 'color:red;'> Assignees not selected </h6>")
       	return false;
 	  } 
     
