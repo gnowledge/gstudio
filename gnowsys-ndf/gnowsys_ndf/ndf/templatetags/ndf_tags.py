@@ -2666,25 +2666,24 @@ def get_filters_data(gst_name):
 # To store the attachments coming from the mail to the user group
 def store_attachment(file, path):
 	ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        # print group_id
-        pass
+	if ins_objectid.is_valid(group_id) is False:
+		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		if group_ins:
+			group_id = str(group_ins._id)
+		else :
+			auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+			if auth :
+				group_id = str(auth._id)
+	else :
+		pass
 
-    alreadyUploadedFiles = []
-    str1 = ''
-    img_type=""
-    topic_file = ""
-    is_video = ""
-    obj_id_instance = ObjectId()
+	alreadyUploadedFiles = []
+	str1 = ''
+	img_type=""
+	topic_file = ""
+	is_video = ""
+	obj_id_instance = ObjectId()
 
 	mtitle = request.POST.get("docTitle", "")
 	userid = request.POST.get("user", "")
@@ -2701,19 +2700,19 @@ def store_attachment(file, path):
 	i = 1
 
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-        if mtitle:
-            if index == 0:
-                f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-            else:
-                title = mtitle + "_" + str(i) #increament title        
-                f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-                i = i + 1
-        else:
-            title = each.name
-            f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-        if not obj_id_instance.is_valid(f):
-            alreadyUploadedFiles.append(f)
-            title = mtitle
+		if mtitle:
+			if index == 0:
+				f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+			else:
+				title = mtitle + "_" + str(i) #increament title        
+				f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+				i = i + 1
+		else:
+			title = each.name
+			f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+		if not obj_id_instance.is_valid(f):
+			alreadyUploadedFiles.append(f)
+			title = mtitle
 
 
 first_object = ''
@@ -2858,7 +2857,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 #     # saving webm video id into file object
                 #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
-                '''creating thread for converting vedio file into webm'''
+                '''creating thread for converting video file into webm'''
                 #t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
                 #t.start()
 
@@ -2884,20 +2883,22 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
 
+
+
 def getFileSize(File):
-    """
-    obtain file size if provided file object
-    """
-    try:
-        File.seek(0,os.SEEK_END)
-        num=int(File.tell())
-        for x in ['bytes','KB','MB','GB','TB']:
-            if num < 1024.0:
-                return  (num, x)
-            num /= 1024.0
-    except Exception as e:
-        print "Unabe to calucalate size",e
-        return 0,'bytes'
+	"""
+	obtain file size if provided file object
+	"""
+	try:
+		File.seek(0,os.SEEK_END)
+		num=int(File.tell())
+		for x in ['bytes','KB','MB','GB','TB']:
+			if num < 1024.0:
+			    return  (num, x)
+			num /= 1024.0
+	except Exception as e:
+		print "Unabe to calucalate size",e
+		return 0,'bytes'
 
 
 def convert_image_thumbnail(files):
@@ -3028,11 +3029,21 @@ def convertVideo(files, userid, fileobj, filename):
 
 def read_mails(path, count = 0):
 	cur_path = path + '/cur'
+	new_path = path + '/new'
+	# for dirname, directories, files in os.walk(new_path):
+	# 	print files
+	# 	for name in files:
+
+	# 		print open(os.path.join(new_path,name)).read()
+	# 		print ':' * 20
+	mbox = mailbox.Maildir(path)
+	for message in mbox:
+		print message['subject']
 
 
 # Function to store the newly fetched mails stored in 'maildir' format
 def store_mails(request, mails, path):
-
+	# print request
 	for mail in mails:
 		from_addr = email.utils.formataddr(('Author', mail.from_address[0]))
 		to_addr = email.utils.formataddr(('Recipient', mail.to_addresses[0]))
@@ -3085,7 +3096,7 @@ def store_mails(request, mails, path):
 
 @get_execution_time
 @register.assignment_tag
-def get_mails_in_box(request, mailboxname, username):
+def get_mails_in_box(request, mailboxname, username, mail_type):
 	all_mail_boxes= Mailbox.objects.all()
 	required_mailbox=None
 	for box in all_mail_boxes:
@@ -3113,30 +3124,28 @@ def get_mails_in_box(request, mailboxname, username):
 	if not os.path.exists(path + '/new'):
 		os.makedirs(path + '/new')
 
-	print 'FETCHING NEW MAILS :::::::::::::::::::::'
 	if required_mailbox is not None:
 		emails=[]
-		all_mails=required_mailbox.get_new_mail()
-		all_mails=list(reversed(all_mails))
-		no_of_new_mails = len(all_mails)
-		i=1
-		for mail in all_mails:
-			emails.append({'mail_id':i, 'mail_data':mail})
-			i+=1
-		print 'FETCHING NEW MAILS DONE :::::::::::::::::::::'
+		if mail_type == 1:
+			print 'FETCHING NEW MAILS'
+			all_mails=required_mailbox.get_new_mail()
+			all_mails=list(reversed(all_mails))
+			no_of_new_mails = len(all_mails)
+			i=1
+			for mail in all_mails:
+				emails.append({'mail_id':i, 'mail_data':mail})
+				i+=1
+			print 'FETCHING NEW MAILS DONE'
 
-		print 'STORING NEW MAILS :::::::::::::::::::::'
-		store_mails(request, all_mails,path)
-		print ' STORAGE DONE '
+			print 'STORING NEW MAILS'
+			store_mails(request, all_mails,path)
+			print 'STORAGE DONE'
 			
-		if no_of_new_mails < 10:
-			print 'under construction'
-
-			# load prev mails to make the count 10
-			# stored_mails_fetched = read_mails(path,count=5)
+			return emails
 		
-
-
-		return emails
+		else:
+			print 'FETCHING OLD MAILS'
+			
+			print 'FETCHING DONE'
 	else:
 		print 'lol'
