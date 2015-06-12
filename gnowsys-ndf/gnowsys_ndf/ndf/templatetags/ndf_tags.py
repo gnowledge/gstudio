@@ -3030,18 +3030,15 @@ def convertVideo(files, userid, fileobj, filename):
 	
 
 
-def read_mails(path, count = 0):
+def read_mails(path, _type, start, end):
 	cur_path = path + '/cur'
 	new_path = path + '/new'
-	# for dirname, directories, files in os.walk(new_path):
-	# 	print files
-	# 	for name in files:
+	
+	if _type == 1:
+		all_unread_mails = os.listdir(new_path)
+		if len(all_unread_mails) > end:
+			print 'l'
 
-	# 		print open(os.path.join(new_path,name)).read()
-	# 		print ':' * 20
-	mbox = mailbox.Maildir(path)
-	for message in mbox:
-		print message['subject']
 
 
 # Function to store the newly fetched mails stored in 'maildir' format
