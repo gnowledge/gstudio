@@ -7,7 +7,7 @@ import time
 import ast
 import json
 import math
-import multiprocessing
+import multiprocessing 
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -750,7 +750,7 @@ def get_inner_collection(collection_list, node):
   else:
     return collection_list
 
-@get_execution_time
+"""@get_execution_time
 def get_collection(request, group_id, node_id):
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
@@ -764,8 +764,7 @@ def get_collection(request, group_id, node_id):
         obj = node_collection.one({'_id': ObjectId(each) })
         if obj:
         	node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        	a=collection_list.append
-	    	a(obj.name,obj.pk,node_type)
+        	collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
         	collection_list = get_inner_collection(collection_list, obj)
 
 
@@ -773,7 +772,40 @@ def get_collection(request, group_id, node_id):
 
   return HttpResponse(json.dumps(data))
 # ###End of manipulating nodes collection####
+"""
+@get_execution_time
+def get_collection(request, group_id, node_id):
+	node = node_collection.one({'_id':ObjectId(node_id)})
+  # print "\nnode: ",node.name,"\n"
+	collection_list = []
+  
+ # def a(p,q,r):
+#		collection_list.append({'name': p, 'id': q,'node_type': r})
+	processes=[]
+	def sed(lst):
+		for each in lst:
+			obj = node_collection.one({'_id': ObjectId(each) })
+			if obj:
+			  node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+        a=collection_list.append
+        a({'name':obj.name,'id':obj.pk,'node_type':node_type})
+        collection_list = get_inner_collection(collection_list, obj)
+			#collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+			  
 
+	if node and node.collection_set:
+		t=len(node.collection_set)
+		x=multiprocessing.cpu_count
+		n2=t/x
+		for i in range(x):
+			processes.append(multiprocessing.Process(target=sed,args=(node.collection_set[i*n2:(i+1)*n2])))
+		for i in range(x):
+			processes[i].start()
+		for i in range(x):
+			processes[i].join()
+	data = collection_list
+
+	return HttpResponse(json.dumps(data))
 @get_execution_time
 def add_sub_themes(request, group_id):
   if request.is_ajax() and request.method == "POST":
