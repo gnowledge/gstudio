@@ -75,9 +75,27 @@
 	<td class="view">{{ resource.timerequired }}</td>
 	<td class="right-border">{{ resource.textcomplexity }}</td>
 
-</tr>
+	<!-- moderation -->
+	{% if title == "moderation" %}
 
+		<td class="view"> <!-- editorial discussion -->
+			0 | Replies
+			<!-- get the count of editorial discussion here -->
+		</td>
+		<td class="view"> <!-- approval -->
+			Not Approved
+		</td>
+		<td class="view right-border"> <!-- approval -->
+			Not Rejected
+		</td>
+
+	{% endif %}
+
+
+</tr>
+<!-- ======================================= -->
 <tr id="blank-row-{{resource.pk}}"></tr>
+<!-- ======================================= -->
 
 <tr id="edit-row-{{resource.pk}}" data-row-name="{{resource.name}}">
 
@@ -261,7 +279,7 @@
 	<td class="hide-el" data-field="timerequired">
 		<input type="text" class="time-required" value="{{resource.timerequired}}"/>
 	</td>
-	<td class="hide-el" data-field="textcomplexity" class="right-border">
+	<td class="hide-el right-border" data-field="textcomplexity" class="right-border">
 		<select name="textcomplexity">
 			<option value="{{resource.textcomplexity}}"> -- Select -- </option>
 			{% for each_tc in static_textcomplexity %}		
@@ -272,4 +290,24 @@
 			</option> -->
 		</select>				
 	</td>
+
+	{% if title == "moderation" %}
+
+	<!-- editorial discussion -->
+	<td class="hide-el"> 
+		<input type="button" data-reveal-id="editorial_discussion_overlay" class="button tiny expand"  data-id="editorial-discussion" value="Discuss" data-action="editorial-discussion"/>
+		<!-- get the count of editorial discussion here -->
+	</td>
+
+	<!-- approval -->
+	<td class="hide-el"> 
+		<input type="button" class="button tiny expand success" data-approve-id="{{resource.pk}}" data-id="action-btn-approve-{{resource.pk}}" value="Approve" data-action="approve" onclick="approveResource('{{resource.pk}}')">
+	</td>
+
+	<!-- rejection -->
+	<td class="hide-el"> 
+		<input type="button" class="button tiny expand alert" data-approve-id="{{resource.pk}}" value="Reject"  data-id="action-btn-reject-{{resource.pk}}" data-action="reject" onclick="rejectResource('{{resource.pk}}')">
+	</td>
+
+	{% endif %}
 </tr>
