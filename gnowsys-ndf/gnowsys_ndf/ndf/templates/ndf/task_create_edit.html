@@ -105,13 +105,35 @@
 {% endblock %}
 
 {% block body_content %}
+  
   <div id="myModal" class="reveal-modal" animation="None" data-reveal>
     <h3> Please wait till file is Uploading... </h3>                
+  </div>
+  
+  <div id="selectAssigneeslist" class="tiny reveal-modal" animation="None" data-reveal>
+    <h3> Assignees </h3> 
+    
+    <div id="list">
+    </div>
+    <div class="row">
+	    <div class="medium-5 columns" id = "assignee_drop_down_div">
+	    	    <select name="Assignee" class="medium" id="customDropdown2" data-invalid="">
+	            <option value="" selected="selected">{% trans "- - - Select Assignee - - -" %}</option>
+	    		  </select>
+	    </div>    
+	 
+	    <div class="medium-5 columns">
+	    	
+	    	<input type = 'button' onclick = "fillist()" value = "Done">
+	    </div>
+	    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+	</div>                   
   </div>
 
   <form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
     {% csrf_token %}
 
+      
     <h2 class="medium-12 columns">
       {% if node %}
         Editing {{title}}: {{node.name}}
@@ -136,7 +158,7 @@
           <small class="error">{% trans "Please select Task Type." %}</small>
         </div>
       </div>
-
+      
       <!-- Name -->
       {% if not task_id %}
     	<div class="row">
@@ -200,47 +222,43 @@
 
       <!-- Assignee & Estimated time -->
     	<div class="row">
-    	  <div class="medium-6 columns">
-    	    <label>Assignee</label>
-    	   	<select name="Assignee" class="medium" id="customDropdown2" data-invalid="">
-            <option value="" selected="selected">{% trans "- - - Select Assignee - - -" %}</option>
-    		  </select>
-    	  </div>
-
-    	  <div class="medium-3 columns end">
-    	    <label>Estimated time</label>
-    	    <input id="Estimated time" name="Estimated_time" type="text" value="{{Estimated_time}}" placeholder="Enter Hours..."/>
-    	    <small class="error">Please give Time in HH:MM:SS</small>
-    	  </div>
+    	  
+	    	  <div class="medium-4 columns">
+	    	    <label>Estimated time</label>
+	    	    <input id="Estimated time" name="Estimated_time" type="text" value="{{Estimated_time}}" placeholder="Enter Hours..."/>
+	    	    <small class="error">Please give Time in HH:MM:SS</small>
+	    	  </div>
+		    
+		     <div class = "medium-4 columns">
+		        <label> To be done By </label>
+				<select name = "assignees" class = "assignees" id = "assignees">
+				<option value = 'Select'> -- select -- </option>
+				<option value = 'Single Assignee'> Single Assignee </option>	
+				<option value = 'Multiple Assignee'>  Multiple Assignee </option>
+				<option value = 'Group Assignees'>  Group Assignees </option>
+				</select>
+		 	 </div>
+	    	
+	    	<div class= "medium-2 columns">
+				<br>
+				<label class = "fi-plus " id = "selectAssignees" data-reveal-id = "selectAssigneeslist" value ="select Asssignees"> </label>
+			</div>
+	        <div class= "medium-2 columns">
+				<br>
+				<label id = "assignee_warning" >   </label>
+			</div>       
+    	
     	</div>
-  	
-      <!-- Group members listing -->
-      <!--
-      {% get_existing_groups as groups %}
-    	<div class="row" id="AssigneeType">	
-    	  <div class="medium-12 columns">
-    	    <fieldset>
-            <legend>
-              Select Memebers : <input type="checkbox" onClick='toggle(this)' id="selectAllOptions" checked="" /> Select/Deselect All
-            </legend>
-      
-        		<div id="list">
-        		</div>
-          </fieldset>
-      	</div>
-      </div>
-      -->
+    	<div>
+    	    <div id = "assignee_information_div">
+    	    	<label> <h3>  Assignees Assigned for task: </h3> </lable>
+    	    </div>
 
-    	<!--
-    	<div class="row">
-    		<div class="medium-9 columns">	
-    			<fieldset>
-            <input type="radio" name="single" value="Single Assignee" onClick='toggle(this)'>Single Assignee &nbsp;&nbsp;&nbsp;
-      			<input type="radio" name="single" value="Group Assignee" onClick='toggle(this)'>Group Assignee <br>
-    			</fieldset>
-    		</div>
-      </div>
-    	-->
+	    	<div id="selected_assignees">
+	    	</div>
+	    	<br>	
+    	    <br>
+        </div>
 
       <!-- Upload files -->
       <div class="row">
@@ -250,7 +268,8 @@
           </div>
         </div>
       </div>
-
+      	
+      </div>
       <!-- Describe -->
       <div class="row">
   	    <div id="contentlist" class="medium-12 columns content">
@@ -260,9 +279,10 @@
     		  </div>
         </div>
   	  </div>
-
+      {% comment %}
       <!-- Watchers list -->
-    	<div class="row">
+    	<!-- 
+      <div class="row">
         <div class="medium-12 columns">
           <label>Watchers</label>
 
@@ -271,7 +291,8 @@
     	  </div>
       	<input type="hidden" name="watchers" id="hidden_watchers" value="">
       </div>
-
+      -->
+      {% endcomment %}
       {% if Upload_Task %}
       	{% get_file_node request Upload_Task as new %}
         <div class="row">
@@ -282,13 +303,7 @@
         	</div>
       	{% endfor %}
         </div>
-
-      {% else %}
-        <div class="row">
-          <p class="medium-6 columns end">--</p>
-        </div>
-
-    	{% endif %}
+      {% endif %}
 
       <!-- Hidden variables & Save button -->
       <div class="row" >
@@ -299,6 +314,7 @@
           <input type="hidden" name="files" id="trial" >
           <input type="hidden" name="files_name" id="filename" >
           <input type="hidden" name="page_url" value="{{request.path}}">
+          <input type="hidden" name = "Assignee" id="Assignee" required>
 
           <!-- Save button -->
           <input type="submit" id="save-node" value="Save" class="button small expand"/>
@@ -309,6 +325,8 @@
 {% endblock %}
 
 {% block script %}
+
+
   $("#parent").autocomplete({
     source: "{% url 'search_tasks' groupid %}" + $("#parent").val(),
     select: function(event, ui) {
@@ -327,7 +345,17 @@
       if ($.inArray(this.value, watchers_arr) == -1) {
         watchers_arr.push(this.value);
       }
-    });
+     });
+     
+    if ('{{Assignee_name}}' != "" )
+    {
+        return true;     
+    }  
+    else if( $('#Assignee').val() == "" )
+      {
+        $('#assignee_warning').append("<h6 style = 'color:red;'> Assignees not selected </h6>")
+      	return false;
+	  } 
     
     $('#hidden_watchers').val(watchers_arr);
   });
@@ -441,7 +469,7 @@
         break;
       }
     }
-
+    
     $(this).parent().remove();
 
     var select = document.getElementById('trial');
@@ -453,6 +481,48 @@
     var select_docfile = document.getElementById('docFile');
     select_docfile.value = "";
   }
+  $('#selectAssignees').click(function(){
+   <!-- Get the value from the Assigne Drop down -->
+   if ($('#assignees').val() == "Group Assignees" || $('#assignees').val() == "Multiple Assignee" )
+   {
+   	select_values("customDropdown2");
+   	$('#list').show()
+   	$("#assignee_drop_down_div").hide()
+   }
+   else
+   {
+   		$("#assignee_drop_down_div").show()
+   		$('#list').hide()	
+   }
+   
+  });
+
+	function fillist()
+	{
+	      assignee_list=[]
+	      disp_assignee_list = []
+	      $('#assignee_warning').empty()
+	      if ($('#assignees').val() == "Group Assignees" || $('#assignees').val() == "Multiple Assignee" ){
+	       
+	      $('#list').children(":checkbox").each(function(){ 
+	            if (this.checked == true)
+	 			{  
+					assignee_list.push(Number(this.value))
+					disp_assignee_list.push($('#' + this.value + '').text())
+                }
+	      });
+	      		$("#Assignee").attr('value',assignee_list)
+	      }
+	      else
+	      {		disp_assignee_list.push($('#customDropdown2 option:selected').text())
+            	$('#Assignee').attr('value',$('#customDropdown2').val())
+	      }
+	      
+	      	$('#Assignees_list').attr('value',assignee_list)
+	      	$('#selected_assignees').empty()
+	      	$('#selected_assignees').append("<label> <h4>" + disp_assignee_list + "</h4></label>")
+	      	$('#selectAssigneeslist').foundation('reveal', 'close');
+	}
 
   function toggle(source) {
     /*
@@ -489,6 +559,7 @@
   }
 
   function select_values(source) {
+   
     document.getElementById("list").innerHTML = ""; 
     
     var y = document.getElementById(source);
@@ -508,6 +579,8 @@
       checkbox.id = "group_assignee_" + a;
 
       var label = document.createElement('label');
+      label.id = a;
+      label.value = y[i].text
       label.appendChild(document.createTextNode(String(y[i].text)));
 
       //fieldset.appendChild(checkbox);
@@ -529,6 +602,7 @@
 
   function enableselect() {
     document.getElementById('customDropdown').disabled = "";
+    
   }
 {% endblock %}
 
@@ -561,6 +635,12 @@
     var end_date = document.getElementById("end_date");
     end_date.value = "{{end_time|date:'d/m/Y'}}";
   {% endif %}
+  {% if Assignee_name %}
+  Assignee_name ='{{Assignee_name}}'
+  	$('#selected_assignees').append("<label>  <h4>" + Assignee_name + " </h4></label>")
+  {% else %}
+    $('#selected_assignees').append("<label> <h4> No Assignees Assigned </h4> </label>")	
+  {% endif %}
 
   // Populates group's user(s) into Assignee & Watcher widgets respectively
   $.ajax({
@@ -588,7 +668,9 @@
           }
 
           else {
+            
             $("select[name='Assignee'] option[value='{{Assignee}}']").prop("selected", true);
+          	
           }
         {% endif %}
 
