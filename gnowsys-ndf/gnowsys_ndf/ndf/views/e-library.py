@@ -100,6 +100,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
   
 	educationaluse_stats = {}
+	
 
 	if files:
 		eu_list = []  # count 
@@ -119,13 +120,13 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 		# print educationaluse_stats
 		result_paginated_cur = files
 		result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
-
-	datavisual.append({"name":"Doc", "count": educationaluse_stats.get("Documents", 0)})
-	datavisual.append({"name":"Image","count": educationaluse_stats.get("Images", 0)})
-	datavisual.append({"name":"Video","count": educationaluse_stats.get("Videos", 0)})
-	datavisual.append({"name":"Interactives","count": educationaluse_stats.get("Interactives", 0)})
-	datavisual.append({"name":"Audios","count": educationaluse_stats.get("Audios", 0)})
-	datavisual.append({"name":"eBooks","count": educationaluse_stats.get("eBooks", 0)})
+	a=datavisual.append
+	a({"name":"Doc", "count": educationaluse_stats.get("Documents", 0)})
+	a({"name":"Image","count": educationaluse_stats.get("Images", 0)})
+	a({"name":"Video","count": educationaluse_stats.get("Videos", 0)})
+	a({"name":"Interactives","count": educationaluse_stats.get("Interactives", 0)})
+	a({"name":"Audios","count": educationaluse_stats.get("Audios", 0)})
+	a({"name":"eBooks","count": educationaluse_stats.get("eBooks", 0)})
 	datavisual = json.dumps(datavisual)
 
 	return render_to_response("ndf/resource_list.html", 
