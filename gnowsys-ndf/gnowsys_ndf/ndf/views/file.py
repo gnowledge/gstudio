@@ -7,6 +7,7 @@ import subprocess
 import mimetypes
 import os
 import tempfile
+import pyopencl as cl 
 # import re
 import ox
 import pandora_client
@@ -1242,10 +1243,8 @@ def getFileThumbnail(request, group_id, _id):
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth:
-                group_id = str(auth._id)
+        elif auth:
+            group_id = str(auth._id)
     else:
         pass
 
@@ -1296,6 +1295,7 @@ def getFileThumbnail(request, group_id, _id):
 def readDoc(request, _id, group_id, file_name=""):
     '''Return Files 
     '''
+    print cl.VERSION
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = node_collection.find_one({'_type': "Group","name": group_id})
