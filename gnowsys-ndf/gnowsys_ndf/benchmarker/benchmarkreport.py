@@ -16,7 +16,7 @@ def report(request):
  ti=time(0,0)
  listofmethods = []
  Today=datetime.datetime.combine(date1,ti)
- bench_cur = col.find({'last_update':{'$gte':Today}}).sort('last_update', -1).sort('time_taken',-1)
+ bench_cur = col.find({'last_update':{'$gte':Today}}).sort('last_update', -1)
  
  search_cur = []
  if request.method == "POST":
