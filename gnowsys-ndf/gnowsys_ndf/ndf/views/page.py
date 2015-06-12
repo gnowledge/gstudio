@@ -1,6 +1,7 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
+import multiprocessing as mp 
 from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
@@ -414,11 +415,22 @@ def translate_node(request,group_id,node_id=None):
 
         content = data
         node_details=[]
-        for k,v in content.items():
-            
+        def multi_(lst):
+          for k,v in lst:
             node_name = content['name']
             node_content_org=content['content_org']
             node_tags=content['tags']
+        processes=[]
+        n1=len(content.items())
+        x=mp.cpu_count()
+        lst1=content.items()
+        n2=n1/x
+        for i in x:
+          processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2])))
+        for i in x:
+          processes[i].start()
+        for i in x:
+          processes[i].join()
             
         return render_to_response("ndf/translation_page.html",
                                {'content': content,
