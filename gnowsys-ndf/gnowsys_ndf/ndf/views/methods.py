@@ -35,6 +35,7 @@ import ast
 import string
 import json
 import locale
+import multiprocessing as mp 
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
@@ -227,11 +228,24 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
         # Then append their names in list of GApps to be excluded
         if already_selected_gapps:
             gapps_list_remove = gapps_list.remove
-            for each_gapp in already_selected_gapps:
+            def multi_(lst):
+              for each_gapp in lst:
                 gapp_name = each_gapp["name"]
 
                 if gapp_name in gapps_list:
                     gapps_list_remove(gapp_name)
+            processes=[]
+            n1=len(already_selected_gapps)
+            lst1=already_selected_gapps
+            x=mp.cpu_count()
+            n2=n1/x
+            for i in x:
+              processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2])))
+            for i in x:
+              processes[i].start()
+            for i in x:
+              processes[i].join()
+
 
     # Find all GAPPs
     meta_type = node_collection.one({
@@ -1031,6 +1045,33 @@ def build_collection(node, check_collection, right_drawer_list, checked):
   else:
     return False
 
+"""
+@get_execution_time
+def get_versioned_page(node):
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+  (fp)
+    rev_no =""
+    proc1=subprocess.Popen(cmd,shell=True,
+        stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+      if line.find('revision')!=-1 and line.find('selected') == -1:
+          rev_no=string.split(line,'revision')
+          rev_no=rev_no[1].strip( '\t\n\r')
+          rev_no=rev_no.split()[0]
+      if line.find('status')!=-1:
+          up_ind=line.find('status')
+          if line.find(('PUBLISHED'),up_ind) !=-1:
+	             rev_no=rev_no.split()[0]
+               node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
+               return (node,rev_no)    
+      if rev_no == '1.1':
+           node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
+           return(node,'1.1')
+"""
 
 @get_execution_time
 def get_versioned_page(node):
@@ -1049,15 +1090,14 @@ def get_versioned_page(node):
       if line.find('status')!=-1:
           up_ind=line.find('status')
           if line.find(('PUBLISHED'),up_ind) !=-1:
-	       rev_no=rev_no.split()[0]
-               node=history_manager.get_version_document(node,rev_no)
-               proc1.kill()
-               return (node,rev_no)    
+           rev_no=rev_no.split()[0]
+           node=history_manager.get_version_document(node,rev_no)
+           proc1.kill()
+           return (node,rev_no)   
       if rev_no == '1.1':
            node=history_manager.get_version_document(node,'1.1')
            proc1.kill()
            return(node,'1.1')
-
 
 
 @get_execution_time
