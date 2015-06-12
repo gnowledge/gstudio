@@ -634,7 +634,10 @@ def create_task_at_rt(request,rt_list,at_list,task_node,assign,group_name,group_
   
   assignee_list = []
   assignee_list_id = []
-  assignee_list_id.append(assign)
+  if type(assign) == list:
+    assignee_list_id = assign
+  else:   
+    assignee_list_id.append(assign)
   user_to_be_notified = []
   if assignee_list_id:
       for eachuser in assignee_list_id:
