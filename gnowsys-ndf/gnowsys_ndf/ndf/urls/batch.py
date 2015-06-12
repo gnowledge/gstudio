@@ -7,4 +7,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.batch',
                        url(r'^/save_batch_stud$', 'save_students_for_batches', name='save_batch_stud'),
                        url(r'^/detail/(?P<_id>[\w-]+)$', 'detail', name='detail'),
                        url(r'^/delete_batch/(?P<_id>[\w-]+)$', 'delete_batch', name='delete_batch'),
+                       url(r'^/get_possible_batches/$', 'get_possible_batches', name='get_possible_batches'),
                        )
+
