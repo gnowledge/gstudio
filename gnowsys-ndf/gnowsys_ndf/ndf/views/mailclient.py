@@ -310,7 +310,7 @@ def mailbox_delete(request, group_id,mailboxname):
               for row in cursor:
                   mailbox_names.append(row[0])
               # edit mailbox with passed mailbox_id 
-              box = None
+            box = None
               flag = 0
               boxes= Mailbox.active_mailboxes.all()
               for box in boxes:
