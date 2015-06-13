@@ -1,0 +1,30 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+
+{% block title %} {{title}} {% endblock %}
+
+
+{% block style %}
+{% endblock %}
+
+{% block body_content %}
+
+  <h4>Following resources are under moderation</h4>
+  
+  <div class="tabs-content gallery">
+
+    {% group_type_info groupid request.user as grouptype %}
+
+    <!-- Tab View #1 - All -->
+    <div class="content row active" id="view-all" data-filetype="all">
+
+      {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="moderation_status" filetype="all" res_type_name="" page_info=file_pages %}
+
+    </div>
+
+  </div>
+
+{% endblock %}
