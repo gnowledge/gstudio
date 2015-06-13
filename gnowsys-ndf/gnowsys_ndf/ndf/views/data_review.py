@@ -91,7 +91,7 @@ def data_review(request, group_id, page_no=1, **kwargs):
     files_list = []
 
     for each_resource in paged_resources.items:
-        each_resource, ver = get_page(request, each_resource) 
+        # each_resource, ver = get_page(request, each_resource) 
         each_resource.get_neighbourhood(each_resource.member_of)
         files_list.append(node_collection.collection.GSystem(each_resource))
         # print "==============", each_resource.name, " : ", each_resource.group_set
