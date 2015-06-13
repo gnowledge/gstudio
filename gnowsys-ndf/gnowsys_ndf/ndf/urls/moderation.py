@@ -7,6 +7,9 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.moderation',
 						# simple moderation having data-review view with/without page no.
 						url(r'^[/]$', 'moderation', name='moderation'),
 
+						# showing the status of all objects under moderation
+						url(r'^/status/all-under-moderation/$', 'all_under_moderation', name='all_under_moderation'),
+						
 						# showing the status of under moderation object
 						url(r'^/status/(?P<node_id>[\w-]+)$', 'moderation_status', name='moderation_status'),
 	
