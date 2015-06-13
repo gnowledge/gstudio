@@ -302,6 +302,7 @@ class CreateSubGroup(CreateGroup):
         Creates sub-group with given args.
         Returns tuple containing True/False, sub_group_object/error.
         '''
+        # print "kwargs : ", kwargs
 
         try:
             parent_group_id = ObjectId(parent_group_id)
@@ -418,6 +419,11 @@ class CreateModeratedGroup(CreateSubGroup):
         super(CreateSubGroup, self).__init__(request)
         self.request = request
         self.edit_policy = 'EDITABLE_MODERATED'
+        self.altnames = {
+            'ModeratingGroup': [u'Clearing House', u'Curation House'],
+            'ProgramEventGroup': [],
+            'CourseEventGroup': []
+        }
 
     def create_new_moderated_group(self, group_name, moderation_level=1, **kwargs):
         '''
@@ -496,10 +502,16 @@ class CreateModeratedGroup(CreateSubGroup):
                 self.increment_hierarchy_mod_level(parent_group_id)
                 pg_moderation_level += 1
 
-            
+            try:
+                sg_altnames = self.altnames[sg_member_of][pg_moderation_level-1] \
+                                + u" of " + pg_name
+            except Exception, e:
+                sg_altnames = sg_name
+
             # create new sub-group and append it to parent group:
             sub_group = self.create_subgroup(parent_group_id, sg_name, \
-              sg_member_of, moderation_level=(pg_moderation_level-1))
+              sg_member_of, moderation_level=(pg_moderation_level-1), \
+               group_altnames=sg_altnames)
 
             return sub_group
 
