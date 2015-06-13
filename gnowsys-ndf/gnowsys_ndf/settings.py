@@ -609,7 +609,7 @@ GSTUDIO_RESOURCES_AGE_RANGE = ["5-10", "11-20", "21-30", "31-40", "41 and above"
 
 GSTUDIO_RESOURCES_READING_LEVEL = []
 
-GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Other"]
+GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Moderation", "Other"]
 
 GSTUDIO_NROER_MENU = [{"Repository": []}, {"Partners": ["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
