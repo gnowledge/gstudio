@@ -117,6 +117,7 @@ def all_under_moderation(request, group_id):
 		return render_to_response('ndf/all_under_moderation_status.html', {
 			"group_id": group_id, "groupid": group_id, "title": "All Under Moderation Resources",
 			"files": all_resources, "detail_urlname": "moderation_status", "filetype": "all", 
+			"dont_show_error": True
 			}, RequestContext(request))
 
 	else:
