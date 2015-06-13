@@ -43,7 +43,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
 from gnowsys_ndf.ndf.views.methods import create_gattribute
-from gnowsys_ndf.ndf.views.moderator import create_moderator_task, get_moderator_group_set
+from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 ############################################
 
@@ -752,9 +752,11 @@ def submitDoc(request, group_id):
             else:
                 group_object = node_collection.one({'_id': ObjectId(group_id)})
 
-                if group_object.edit_policy == 'EDITABLE_MODERATED':
+                if group_object.edit_policy == 'EDITABLE_MODERATED' and isinstance(f, ObjectId):
                     # print "----------4-----------"
-                    # create_moderator_task(group_id, resource_id=f)
+                    fileobj = node_collection.one({'_id': ObjectId(f)})
+                    # newly appended group id in group_set is at last
+                    create_moderator_task(request, fileobj.group_set[len(fileobj.group_set)-1], fileobj._id)
                     return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_id, 'node_id': f }))
                 else:
                     # print "----------5-----------"
@@ -843,6 +845,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             # if group is of EDITABLE_MODERATED, update group_set accordingly
             if group_object.edit_policy == "EDITABLE_MODERATED":
                 fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
+                fileobj.status = u'MODERATION'
 
             if usrname:
                 user_group_object = node_collection.one({'$and': [{'_type': u'Author'},{'name': usrname}]})
