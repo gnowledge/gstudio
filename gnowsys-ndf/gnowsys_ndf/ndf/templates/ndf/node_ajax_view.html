@@ -325,7 +325,7 @@ ul#navigation li a.last {
     </small></h4>
   {% endif %}
 
-  <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
+  <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.altnames|default_if_none:node.name}}</span>
   {% if node %}
     {% get_publish_policy request groupid node as group_policy %}
     {% if group_policy == "allow" %}
