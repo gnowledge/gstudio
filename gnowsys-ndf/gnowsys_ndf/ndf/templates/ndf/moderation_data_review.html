@@ -45,7 +45,11 @@ function approveResource (oid) {
 						// fetching resource object EDIT row
 						var $resEditRow = $("tr#edit-row-" + oid);
 
-						$($resEditRow).add($resViewRow).add($resBlankRow).fadeOut();
+						$($resEditRow).add($resViewRow).add($resBlankRow).animate({
+							opacity: 0.1
+						}, 1000).fadeOut(1000);
+
+						setCurrEditRowToNone(oid)
 
 						// changing/reducing total count of resources in the page 
 						var $resCount = $("#data-resources-count");
