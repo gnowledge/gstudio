@@ -1,5 +1,5 @@
 #+OPTIONS: ^:nil
-
+Documentation for developers of gstudio
 * Version Control of Resources Using Revision Control System (RCS)
   
   RCS is a freely available file revision control system that can be used 
@@ -122,7 +122,7 @@
 ** Code-snippet: Implementing all above functionalities together
 
 #+BEGIN_EXAMPLE
-   from gXnowsys_ndf.ndf.models import *
+   from gnowsys_ndf.ndf.models import *
    from bson import ObjectId
    from django_mongokit import get_database
    
@@ -412,4 +412,3 @@
    Actual O/P returned: ''
    
    After formatting: Nothing returned as there is no difference.
-
