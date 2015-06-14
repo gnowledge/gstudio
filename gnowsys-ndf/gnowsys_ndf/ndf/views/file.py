@@ -7,7 +7,7 @@ import subprocess
 import mimetypes
 import os
 import tempfile
-import pyopencl as cl 
+import sys
 # import re
 import ox
 import pandora_client
@@ -1295,7 +1295,7 @@ def getFileThumbnail(request, group_id, _id):
 def readDoc(request, _id, group_id, file_name=""):
     '''Return Files 
     '''
-    print cl.VERSION
+    #sys.stdout.write(cl.VERSION)
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = node_collection.find_one({'_type': "Group","name": group_id})
