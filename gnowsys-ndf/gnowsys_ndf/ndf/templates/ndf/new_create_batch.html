@@ -151,6 +151,7 @@
 
   <div id="batch-details"></div>
 
+
   <fieldset id="make_batch_fs" class="hide small-12 columns">
   <table id="batch_create_edit_table">
     <tbody>
@@ -170,6 +171,30 @@
   </fieldset>
   
  </form>
+    <div id="batch_list" class="reveal-modal medium" data-reveal style="height:500px;"> 
+      <table>
+        <thead>
+          <tr>
+            <th width="500">{% trans "Users" %}</th>
+            <th>{% trans "Action" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in user_list %}
+          <tr>
+            <td>{{user.username}}</td>
+              {% if can_remove %}
+                    <td><a class="button alert tiny remove" href="#" id="{{user.id}}">{% trans "Remove" %}</a></td>
+              {% endif %}
+          </tr>
+          {% endfor %}
+          <input type="hidden" value="{{node_id}}" id="node_id" />
+      </tbody>
+      </table>
+
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
 {% endblock %}
 <script>
 {% block script%}
@@ -333,9 +358,12 @@
                 var row = table.insertRow(-1);
                 var cell1 = row.insertCell(0);
                 var cell2 = row.insertCell(1);
-                cell1.innerHTML = key;
-                cell2.innerHTML = val.length+" student(s)";
-                cell1.className = "existing_batch";
+                var cell3 = row.insertCell(2);
+                cell1.innerHTML = "View";
+                cell1.className = "view_batch";
+                cell2.innerHTML = key;
+                cell2.className = "existing_batch";
+                cell3.innerHTML = val.length+" student(s)";
               })
             }
           }
@@ -381,13 +409,28 @@
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
       batch_user_list_dict[batch_name] = arr;
-      cell1.innerHTML = batch_name;
-      cell2.innerHTML = batch_user_list_dict[batch_name].length+" student(s)";
-      cell1.className = "existing_batch";
+      cell2.innerHTML = batch_name;
+      cell2.className = "existing_batch";
+      cell3.innerHTML = batch_user_list_dict[batch_name].length+" student(s)";
+      cell1.innerHTML = "View";
+      cell1.className = "view_batch";
       $(".batch_name_inp").val('');
       $('.ajax_input_name').val('');
       $(".datatable_div").html('');
+    })
+
+  //view batch members on click of 'View'
+    $(document).on( 'click', '.view_batch  ', function () {
+      batch_name_from_table = $(this).next('.existing_batch').html();
+      batch_member_list = []
+      console.log(batch_name_from_table)
+      if(batch_user_list_dict.hasOwnProperty(batch_name_from_table)){
+        batch_member_list = batch_user_list_dict[batch_name_from_table]
+      }
+      console.log(batch_member_list)
+
     })
 
   // add to existing batch
