@@ -134,6 +134,7 @@ def mailbox_create_edit(request, group_id):
             error_obj= "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
         
+        #only on calling save() the mailbox is alotted an id
         newbox.save()
 
         try:
@@ -157,7 +158,7 @@ def mailbox_create_edit(request, group_id):
             print error
             error_obj= str(error) + ",mailbox_create_edit() fn, Mailbox created will be deleted"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-        #save() will be called only when no exceptions occur
+        
         
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
     else:
@@ -236,7 +237,7 @@ def mailbox_edit(request, group_id,mailboxname):
             settings_dir3 = os.path.dirname(settings_dir2)
             path = os.path.abspath(os.path.dirname(settings_dir3))
             #may throw error        
-            conn = sqlite3.connect(path + '/eexample-sqlite3.db')
+            conn = sqlite3.connect(path + '/example-sqlite3.db')
             user_id = str(request.user.id)
             query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
             cursor = conn.execute(query)
@@ -325,7 +326,7 @@ def mailbox_delete(request, group_id,mailboxname):
                     #delete from out 'mapping' database (the database which tracks which user_id is asscociated with which mailbox_id )                    
 
                     # conn2 = sqlite3.connect(path + '/example-sqlite3.db')
-                    query = 'delete from user_mailboxes where mailbox_id=\''+str(box.id)+'\''
+                    query = 'delete from user_mailboxes where mailbox_id='+str(box.id)
                     cursor = conn.execute(query)
                     conn.commit()
                     #NOTE: we must delete the mailbox from our 'mapping' database first and then from django_mailbox database because 
