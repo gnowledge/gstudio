@@ -1,9 +1,22 @@
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+
+{% block title %} {{title}} {% endblock %}
+
 {% get_group_name groupid as group_name_tag %}
+{% get_group_object groupid as group_object %}
 
 {% block style %}
+
+	#data-review-table thead{
+		border-bottom: 2px solid rgb(221, 221, 221);
+		background-color: #EFEFEF;
+	}
+
+	#data-review-table thead > tr:nth-child(2){
+		background-color: #F5F5F5;
+	}
 
 	#data-review-table td, th {
 		border-right: solid thin #eee;
@@ -136,7 +149,7 @@
 {% endblock %}
 
 {% block body_content %}
-
+	
 	{% check_user_join request groupid as user_is_joined %}
     {% user_access_policy groupid request.user as user_access %}
 
@@ -144,19 +157,25 @@
 <form method="GET" action="{% url 'data_review_search' group_name_tag %}">
 	
 	<div class="row">
-		<div class="small-4 columns">
+		<div class="small-9 columns">
+			<!-- kept for future-use/filters -->
+			<h3 class="text-center">
+				{{group_object.altnames|default_if_none:group_object.name}}
+				<small>
+					(<span id="data-resources-count">{{page_info.count}}</span>)
+				</small>
+			</h3>
+		</div>
+		<div class="small-3 columns">
 			<div class="row collapse">
 				<div class="small-10 columns">
-					<input type="text" id="dr-search" name="search_text" placeholder="Search in the Data Review" value="{{search_text}}">
+					<input type="text" id="dr-search" name="search_text" placeholder="Search in the {{group_object.altnames|default_if_none:group_object.name}}" value="{{search_text}}" title="Search in the '{{group_object.altnames|default_if_none:group_object.name}}'">
 				</div>
 				<div class="small-2 columns">
 					<!-- <div id="dr-search-btn" class="button postfix">Search</div> -->
 					<button type="submit" class="button postfix">Search</button>
 				</div>
 			</div>
-		</div>
-		<div class="small-8 columns">
-			<!-- kept for future-use/filters -->
 		</div>
 	</div>
 

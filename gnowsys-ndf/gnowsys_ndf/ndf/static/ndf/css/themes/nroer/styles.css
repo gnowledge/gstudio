@@ -9776,26 +9776,35 @@ article h1:not(.subheader) div input:hover {
 .card > *.published hr {
   border-color: #7ee2a8;
 }
-/* line 564, ../../../scss/_app_styles.scss */
+/* line 565, ../../../scss/_app_styles.scss */
+.card > *.moderation {
+  opacity: 1;
+  background-color: #efefef;
+}
+/* line 570, ../../../scss/_app_styles.scss */
+.card > *.moderation hr {
+  border-color: #bcbcbc;
+}
+/* line 575, ../../../scss/_app_styles.scss */
 .card > *.unapproved {
   opacity: 1;
   border-style: solid;
   border-color: #f04124;
 }
-/* line 570, ../../../scss/_app_styles.scss */
+/* line 581, ../../../scss/_app_styles.scss */
 .card > *:hover {
   border-style: solid;
   opacity: 1;
 }
-/* line 576, ../../../scss/_app_styles.scss */
+/* line 587, ../../../scss/_app_styles.scss */
 .card > *:hover i {
   opacity: 0.3;
 }
-/* line 579, ../../../scss/_app_styles.scss */
+/* line 590, ../../../scss/_app_styles.scss */
 .card > *:hover footer .age {
   display: block;
 }
-/* line 584, ../../../scss/_app_styles.scss */
+/* line 595, ../../../scss/_app_styles.scss */
 .card > * > i {
   position: absolute;
   top: -10px;
@@ -9804,34 +9813,34 @@ article h1:not(.subheader) div input:hover {
   color: #0eacb5;
   opacity: 0.3;
 }
-/* line 593, ../../../scss/_app_styles.scss */
+/* line 604, ../../../scss/_app_styles.scss */
 .card > * .preview {
   float: left;
   padding-right: 5px;
   padding-top: 4px;
 }
-/* line 598, ../../../scss/_app_styles.scss */
+/* line 609, ../../../scss/_app_styles.scss */
 .card > * header {
   overflow: hidden;
 }
-/* line 601, ../../../scss/_app_styles.scss */
+/* line 612, ../../../scss/_app_styles.scss */
 .card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
 }
-/* line 606, ../../../scss/_app_styles.scss */
+/* line 617, ../../../scss/_app_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 609, ../../../scss/_app_styles.scss */
+/* line 620, ../../../scss/_app_styles.scss */
 .card > * p {
   color: #555;
   height: 80px;
   background-repeat: no-repeat;
   font-size: 80%;
 }
-/* line 615, ../../../scss/_app_styles.scss */
+/* line 626, ../../../scss/_app_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -9839,23 +9848,23 @@ article h1:not(.subheader) div input:hover {
   overflow: hidden;
   display: none;
 }
-/* line 621, ../../../scss/_app_styles.scss */
+/* line 632, ../../../scss/_app_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 625, ../../../scss/_app_styles.scss */
+/* line 636, ../../../scss/_app_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 629, ../../../scss/_app_styles.scss */
+/* line 640, ../../../scss/_app_styles.scss */
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
   color: #e01818;
 }
-/* line 634, ../../../scss/_app_styles.scss */
+/* line 645, ../../../scss/_app_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -9865,7 +9874,7 @@ article h1:not(.subheader) div input:hover {
   width: 100%;
 }
 
-/* line 645, ../../../scss/_app_styles.scss */
+/* line 656, ../../../scss/_app_styles.scss */
 .edit-card {
   position: relative;
   background-color: white;
@@ -9874,36 +9883,36 @@ article h1:not(.subheader) div input:hover {
 }
 
 /* Content Tabs */
-/* line 658, ../../../scss/_app_styles.scss */
+/* line 669, ../../../scss/_app_styles.scss */
 article .tabs {
   display: inline-block;
 }
-/* line 660, ../../../scss/_app_styles.scss */
+/* line 671, ../../../scss/_app_styles.scss */
 article .tabs dd a {
   border-radius: 4px;
   border: 1px transparent;
 }
-/* line 664, ../../../scss/_app_styles.scss */
+/* line 675, ../../../scss/_app_styles.scss */
 article .tabs dd.active a {
   color: #10c1cb;
   border: 1px solid;
 }
-/* line 668, ../../../scss/_app_styles.scss */
+/* line 679, ../../../scss/_app_styles.scss */
 article .tabs dd:hover a {
   color: #10c1cb;
 }
-/* line 672, ../../../scss/_app_styles.scss */
+/* line 683, ../../../scss/_app_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
-/* line 678, ../../../scss/_app_styles.scss */
+/* line 689, ../../../scss/_app_styles.scss */
 article section.content {
   background-color: white;
   border: 1px solid #eee;
 }
 
-/* line 685, ../../../scss/_app_styles.scss */
+/* line 696, ../../../scss/_app_styles.scss */
 .card > div:hover {
   box-shadow: 0 0 10px lightgray;
   transition: 0.9s;
@@ -9912,31 +9921,31 @@ article section.content {
 }
 
 /* Default card */
-/* line 693, ../../../scss/_app_styles.scss */
+/* line 704, ../../../scss/_app_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 698, ../../../scss/_app_styles.scss */
+/* line 709, ../../../scss/_app_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 706, ../../../scss/_app_styles.scss */
+/* line 717, ../../../scss/_app_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 710, ../../../scss/_app_styles.scss */
+/* line 721, ../../../scss/_app_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
   background-color: transparent;
 }
-/* line 718, ../../../scss/_app_styles.scss */
+/* line 729, ../../../scss/_app_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   background-color: transparent;
   padding: 2px;
@@ -9944,20 +9953,20 @@ article section.content {
 
 /*************************** 2. Custom CSS overrides ***********************/
 /* Content area */
-/* line 727, ../../../scss/_app_styles.scss */
+/* line 738, ../../../scss/_app_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 731, ../../../scss/_app_styles.scss */
+/* line 742, ../../../scss/_app_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
 }
-/* line 735, ../../../scss/_app_styles.scss */
+/* line 746, ../../../scss/_app_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
 
-/* line 747, ../../../scss/_app_styles.scss */
+/* line 758, ../../../scss/_app_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -9978,44 +9987,44 @@ textarea {
   }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 767, ../../../scss/_app_styles.scss */
+/* line 778, ../../../scss/_app_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 772, ../../../scss/_app_styles.scss */
+/* line 783, ../../../scss/_app_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 775, ../../../scss/_app_styles.scss */
+/* line 786, ../../../scss/_app_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 778, ../../../scss/_app_styles.scss */
+/* line 789, ../../../scss/_app_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 781, ../../../scss/_app_styles.scss */
+/* line 792, ../../../scss/_app_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 785, ../../../scss/_app_styles.scss */
+/* line 796, ../../../scss/_app_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 789, ../../../scss/_app_styles.scss */
+/* line 800, ../../../scss/_app_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 797, ../../../scss/_app_styles.scss */
+/* line 808, ../../../scss/_app_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -10023,13 +10032,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 804, ../../../scss/_app_styles.scss */
+/* line 815, ../../../scss/_app_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 809, ../../../scss/_app_styles.scss */
+/* line 820, ../../../scss/_app_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -10043,13 +10052,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 819, ../../../scss/_app_styles.scss */
+/* line 830, ../../../scss/_app_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 824, ../../../scss/_app_styles.scss */
+/* line 835, ../../../scss/_app_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -10060,7 +10069,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 835, ../../../scss/_app_styles.scss */
+/* line 846, ../../../scss/_app_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -10073,7 +10082,7 @@ input.node-title {
 
 /****************** CUSTOM *********************/
 /* UI Button */
-/* line 850, ../../../scss/_app_styles.scss */
+/* line 861, ../../../scss/_app_styles.scss */
 .ui.button {
   margin-right: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -10083,56 +10092,56 @@ input.node-title {
   padding: 0.5vw 0.75vw;
   z-index: 500;
 }
-/* line 861, ../../../scss/_app_styles.scss */
+/* line 872, ../../../scss/_app_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 864, ../../../scss/_app_styles.scss */
+/* line 875, ../../../scss/_app_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: inline;
 }
-/* line 868, ../../../scss/_app_styles.scss */
+/* line 879, ../../../scss/_app_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
   background-color: rgba(0, 0, 0, 0.9);
 }
-/* line 871, ../../../scss/_app_styles.scss */
+/* line 882, ../../../scss/_app_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 874, ../../../scss/_app_styles.scss */
+/* line 885, ../../../scss/_app_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 877, ../../../scss/_app_styles.scss */
+/* line 888, ../../../scss/_app_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
-/* line 886, ../../../scss/_app_styles.scss */
+/* line 897, ../../../scss/_app_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 889, ../../../scss/_app_styles.scss */
+/* line 900, ../../../scss/_app_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
 }
 
-/* line 896, ../../../scss/_app_styles.scss */
+/* line 907, ../../../scss/_app_styles.scss */
 .align-center {
   margin: 0 auto;
   display: block;
 }
 
-/* line 902, ../../../scss/_app_styles.scss */
+/* line 913, ../../../scss/_app_styles.scss */
 #profile-img {
   height: 40px;
   margin-right: 5px;
 }
 
-/* line 911, ../../../scss/_app_styles.scss */
+/* line 922, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies {
   padding: 10px;
   background-color: #dffbfd;
@@ -10141,11 +10150,11 @@ aside#help p, aside#help h5, aside#help h6 {
   margin-left: 48px;
   margin-top: 10px;
 }
-/* line 920, ../../../scss/_app_styles.scss */
+/* line 931, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn {
   cursor: pointer;
 }
-/* line 924, ../../../scss/_app_styles.scss */
+/* line 935, ../../../scss/_app_styles.scss */
 #replies-area .disc-replies .reply-btn:hover {
   font-weight: bold;
 }

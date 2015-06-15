@@ -318,7 +318,14 @@ ul#navigation li a.last {
   </ul>
   {% endif %}
 
-  <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>
+  {% if node.status == 'MODERATION' %}
+    <h4><small>
+      Note: Following Resource is Under Moderation -
+      <a href="{% url 'moderation_status' group_id node.pk %}">Check the current status of Moderation</a>
+    </small></h4>
+  {% endif %}
+
+  <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.altnames|default_if_none:node.name}}</span>
   {% if node %}
     {% get_publish_policy request groupid node as group_policy %}
     {% if group_policy == "allow" %}
@@ -1263,12 +1270,13 @@ ul#navigation li a.last {
   <!-- Modal links for associated views like graphs and map-->
   <ul class="side-nav">
     <div class="panel" style="background-color:#ddd;">
+      {% get_group_object groupid as group_object %}
 
       {% user_access_policy groupid request.user as user_access %} 
       
       {% if user.is_authenticated %}
-      <b>{% trans "Actions" %}</b><br/>
-      <div class="row">         
+        <b>{% trans "Actions" %}</b><br/>
+        <div class="row">         
         <div class="medium-6 columns">
           
           {% edit_policy groupid node request.user as status %}
@@ -1287,7 +1295,6 @@ ul#navigation li a.last {
                 <a href="{% url edit_url group_id node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
             {% endif %}
-          {% endif %}
         </div>
         <div class="medium-6 columns">
 
@@ -1357,7 +1364,7 @@ ul#navigation li a.last {
                   <a href="{% url create_url group_name_tag %}" class="tiny round button">
                     <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} Topic</span>
                   </a>
-                {% else %}
+                {% elif node.member_of_names_list.0 != "Group"  %}
                   <a href="{% url create_url group_name_tag %}" class="tiny round button">
                     <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                   </a>
@@ -1376,14 +1383,16 @@ ul#navigation li a.last {
            {% endif %}
         </div>     
         
+      {% endif %}
 
         {% if node %}
           {% check_group node as is_group %}
           {% if is_group %}
-
+          
             {% get_group_policy node request.user as policy %}
             {% get_prior_post_node group_id as groupname %}
 
+          {% if group_object.edit_policy == 'EDITABLE_MODERATED' and "Group" in group_object.member_of_names_list %}
             <input type="hidden" id="groupname" value="{{node}}">
             {% if user.is_authenticated %}
               {% if user_access == "allow" %}
@@ -1417,6 +1426,7 @@ ul#navigation li a.last {
 
             {% endif %}
 
+          {% endif %}
             <!-- Triggers the modals -->
             <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
 
@@ -1425,7 +1435,10 @@ ul#navigation li a.last {
 
             {% check_is_gstaff groupid request.user as is_gstaff %}
             {% if is_gstaff %}
-              {% include "ndf/invite_users.html" %}
+
+              {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
+                  {% include "ndf/invite_users.html" %}
+              {% endifnotequal %}
 
               {% include "ndf/invite_admins.html" %}
             {% endif %} 
@@ -1434,6 +1447,18 @@ ul#navigation li a.last {
 
       </div>      
       {% endif %}
+
+      {% ifequal group_object.edit_policy "EDITABLE_MODERATED" %}
+        {% if request.user.id in group_object.group_admin or request.user.is_superuser or request.user.id == group_object.created_by %}
+          <a class="tiny expand button" href="{% url 'moderation' group_name_tag %}">
+            Moderate Resources
+          </a>
+
+          <a class="tiny expand button" href="{% url 'all_under_moderation' group_id %}">
+            Moderation Status
+          </a>
+        {% endif %} 
+      {% endifequal %}
 
       <!-- This button converts collection into module -->
       {% comment %}
@@ -1477,6 +1502,7 @@ ul#navigation li a.last {
     </li> 
     --> 
     
+          {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
     <br/>
     <div class="label-list"> 
       <b>{% trans "Tags" %}</b><br/>
@@ -1521,6 +1547,7 @@ ul#navigation li a.last {
         {% endif %}
       </ul>
     </div>
+          {% endifnotequal %}
 
     {% if user.is_authenticated %}
     {% switch_group_conditions request.user group_id as switch_conditions %}
@@ -1529,10 +1556,10 @@ ul#navigation li a.last {
           {% endif %}
 
     {% if not is_group %}
-        <div class="row">
-        <div class="small-12 columns">
 
-          <a id="switch_group" class="tiny button" data-reveal-id="publish_resource"> 
+        <!-- if resource is already under moderation, dont show publish to other button -->
+        {% if node.status != "MODERATION" %}
+          <a id="switch_group" class="tiny button expand" data-reveal-id="publish_resource"> 
               <span>{% trans "Publish this resource in other group/s" %} </span> 
             </a>
             <div id="publish_resource" class="reveal-modal" data-reveal style="position:absolute;"> 
@@ -1548,11 +1575,10 @@ ul#navigation li a.last {
               <a class="close-reveal-modal">&#215;</a>
 
             </div>          
+        {% endif %}
           
-        </div>
-        </div>
       {% endif %} 
-    {% endif %}
+      {% endif %}
 
     </div>
   </ul>
