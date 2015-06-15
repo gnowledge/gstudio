@@ -5,8 +5,7 @@ collaborative application/resource creation, curation and publication
 framework. The following is a list of such features with breif
 description of what is expected from each feature.
 
-* Pages
-  A base App
+* Pages: A base App
 ** DONE Collaboratively edit pages
 ** DONE text processing using orgmode (JS plain text editor with orgmode menu)
 ** DONE support for LaTeX using MathJax
@@ -35,7 +34,7 @@ description of what is expected from each feature.
 *** TODO groups and subgroups
 *** DONE listing members for private groups for members only
 *** DONE PARTIAL-COMPLETE subscribe and unsubscribe from groups by group admin/moderator
-*** DONE support for moderated groups (public or private)
+*** DONE support for multi-level moderated groups (public or private)
 *** TODO encrypted groups based on web-of-trust
 ** TODO social networking
 *** TODO share (broadcast to other social media sites)
@@ -47,11 +46,12 @@ description of what is expected from each feature.
 ** Search
 *** DONE context based search
 *** DONE generic site-wide search
+*** DONE resource filtering 
 ** Version Control
 *** DONE versioning data
 *** DONE versioning metadata
 *** TODO versioning files
-** TODO user dashboard
+** DONE user dashboard
 ** PARTIALLYDONE shelf: bookmarking resources from the site
 ** ONGOING context based help
 ** PARTIALLYDONE Responsive frontend suitable for desktop, tablets, phones etc.
@@ -75,7 +75,7 @@ description of what is expected from each feature.
 *** DONE moderators
 *** TODO members of a group based on configuration
 *** DONE members in a forum
-** TODO sms and email support for interacting with the portal
+** ONGOING sms and email support for interacting with the portal
 ** TODO dynamic template variable support while composing text
 ** PARTIALLYDONE data visualization app
 * Custom Online Application Designer
@@ -114,7 +114,7 @@ description of what is expected from each feature.
 *** to the mentors
 *** to the admins
 * DONE Management of Students, Trainers, Mentors, Fellows 
-* TODO distributed p2p sync between servers based on group mirroring
+* ONGOING distributed p2p sync between servers based on group mirroring
 * Application for citizen science projects
 ** DONE Observations app
 * Extra feathers to be added to the cap of gstudio!
@@ -126,13 +126,15 @@ description of what is expected from each feature.
 *** PARTIALLYDONE gnu mailman (mailing list) integration
 *** PARTIALLYDONE wikimedia integration
 *** PARTIALLYDONE zotero integration
-** Custom App for Task management
+** DONE  Task management
 *** DONE creation of a task
 *** DONE assigning to a member of the group
+*** DONE task assigned to multiple members of a group
+*** DONE task assigned to more than one member expecting any member to complete the task
 *** DONE status modification
 *** DONE discussion
 *** DONE tags
-
+*** DONE calendar view
 
    
 * Project Ideas for Interns
