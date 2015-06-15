@@ -52,34 +52,26 @@ page_id = node_collection.find_one({'_type': "GSystemType", "name": "Page"}, {"_
 # data review in File app
 @login_required
 @get_execution_time
-def data_review(request, group_id, page_no=1):
+def data_review(request, group_id, page_no=1, **kwargs):
     '''
     To get all the information related to every resource object in the group.
+
+    To get processed context_variables into another variable,
+    pass <get_paged_resources=True> as last arg.
+
+    e.g:
+    context_variables = data_review(request, group_id, page_no, get_paged_resources=True)
     '''
-    # getting group obj from name
-
-    # group_obj = node_collection.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
-
-    # # checking if passed group_id is group name or group Id
-    # if group_obj and (group_id == group_obj.name):
-    #     # group_name = group_id
-    #     group_id = group_obj._id
-      
-    # else:  # passes group_id is _id and not name
-    #     ins_objectid = ObjectId()
-    #     if ins_objectid.is_valid(group_id):
-    #         # retrieve Obj by _id
-    #         group_obj = node_collection.one({"_id": ObjectId(group_id)})
-    #         if group_obj:
-    #             # group_name = group_obj.name
-    #             group_id = group_id       # for clarity
-
-    group_name, group_id = get_group_name_id(group_id)
-
+    
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    
     files_obj = node_collection.find({'$or': [
                                     {'member_of': {'$in': [ObjectId(file_id._id), ObjectId(page_id._id)]},
                                     # '_type': 'File', 'fs_file_ids': {'$ne': []},
-                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    'group_set': {'$in': [ObjectId(group_id)]},
                                     '$or': [
                                         {'access_policy': u"PUBLIC"},
                                         {'$and': [
@@ -99,17 +91,17 @@ def data_review(request, group_id, page_no=1):
     files_list = []
 
     for each_resource in paged_resources.items:
-        each_resource, ver = get_page(request, each_resource) 
+        # each_resource, ver = get_page(request, each_resource) 
         each_resource.get_neighbourhood(each_resource.member_of)
         files_list.append(node_collection.collection.GSystem(each_resource))
+        # print "==============", each_resource.name, " : ", each_resource.group_set
         # print "\n\n\n========", each_resource.keys()
         # for each, val in each_resource.iteritems():
           # print each, "--", val,"\n"
 
     files_obj.close()
 
-    return render_to_response("ndf/data_review.html",
-        {
+    context_variables = {
             "group_id": group_id, "groupid": group_id,
             "files": files_list, "page_info": paged_resources,
             "urlname": "data_review_page", "second_arg": "",
@@ -124,7 +116,16 @@ def data_review(request, group_id, page_no=1):
             "static_audience": GSTUDIO_RESOURCES_AUDIENCE,
             "static_status": list(STATUS_CHOICES),
             "static_textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
-        },
+        }
+
+    if kwargs.get('get_paged_resources', False):
+        return  context_variables
+
+    template_name = "ndf/data_review.html"
+
+    return render_to_response(
+        template_name,
+        context_variables,
         context_instance=RequestContext(request)
     )
 # ---END of data review in File app
@@ -132,8 +133,11 @@ def data_review(request, group_id, page_no=1):
 @get_execution_time
 def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
 
-    group_name, group_id = get_group_name_id(group_id)
-
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    
     # check if request is from form or from next page
     if request.GET.has_key("search_text"):
         search_text = request.GET.get("search_text", "")
@@ -194,7 +198,11 @@ def data_review_save(request, group_id):
 
     userid = request.user.pk
 
-    group_name, group_id = get_group_name_id(group_id)
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     group_obj = node_collection.one({"_id": ObjectId(group_id)})
 
     node_oid = request.POST.get("node_oid", "")

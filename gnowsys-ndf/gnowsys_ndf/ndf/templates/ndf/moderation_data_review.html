@@ -1,0 +1,79 @@
+{% extends "ndf/data_review.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% get_group_name groupid as group_name_tag %}
+{% get_group_object groupid as group_object %}
+
+{% block body_content %}
+{{ block.super }}
+
+<div id="editorial_discussion_overlay" class="reveal-modal text-center" data-reveal>
+	Editorial Discussion:
+	<br/>
+	<hr/>
+	Feature under process!
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+
+{% endblock body_content %}
+
+{% block script %}
+{{ block.super }}
+// <script type="text/javascript">
+
+function approveResource (oid) {
+	var msg = "Resource having ID: " + String(oid) + " will be approved from this group\n\n- Press 'OK' to Approve the resource\n- Press 'Cancel' to cancel the action"
+	
+	approveConfirm = window.confirm(msg);
+			
+	if(approveConfirm)
+	{
+		$.ajax({
+				type: "POST",
+				url: "{% url 'approve_resource' group_id %}",
+				data:{
+					node_oid: oid,
+					csrfmiddlewaretoken: '{{ csrf_token }}'
+				},
+				success: function(data){
+					if(parseInt(data))
+					{
+						alert("Resource is successfully approved from this group.");
+
+						// fetching resource blank seperator row
+						var $resBlankRow = $("tr#blank-row-" + "5577ed2b90b5502857a8e67d");
+						// fetching resource object VIEW row
+						var $resViewRow = $("tr#view-row-" + oid);
+						// fetching resource object EDIT row
+						var $resEditRow = $("tr#edit-row-" + oid);
+
+						$($resEditRow).add($resViewRow).add($resBlankRow).animate({
+							opacity: 0.1
+						}, 1000).fadeOut(1000);
+
+						setCurrEditRowToNone(oid)
+
+						// changing/reducing total count of resources in the page 
+						var $resCount = $("#data-resources-count");
+						var resourcesCount = parseInt($resCount.text());
+						$resCount.text(--resourcesCount);
+					}
+					else
+					{
+						alert("Resource is NOT approved.\nSomething went wrong!");
+					}
+				}
+			})
+	}	
+	// else {/*alert("Cancelled");*/ }
+}
+
+function rejectResource (oid) {
+	alert("Feature under progress!")
+}
+
+
+
+// </script>
+{% endblock script %}
