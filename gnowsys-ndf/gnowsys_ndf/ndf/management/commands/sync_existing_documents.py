@@ -61,7 +61,7 @@ class Command(BaseCommand):
 
     # --------------------------------------------------------------------------
     # Adding <'moderation_level': -1> field to Group objects
-    node_collection.collection.update({'_type': {'$in': ['Group']}}, {'$set': {'moderation_level': -1 }}, upsert=False, multi=True)
+    node_collection.collection.update({'_type': {'$in': ['Group']}, 'edit_policy': {'$nin': ['EDITABLE_MODERATED']}}, {'$set': {'moderation_level': -1 }}, upsert=False, multi=True)
 
     if res['updatedExisting']: # and res['nModified']:
         print "\n Added 'moderation_level' field to " + res['n'].__str__() + " Group instances."

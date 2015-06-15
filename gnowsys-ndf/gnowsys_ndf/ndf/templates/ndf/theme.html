@@ -472,7 +472,7 @@
 		<hr/>
 
 		{% if node %}
-			{% cache 300 theme_tree node.name request.LANGUAGE_CODE %}
+			{% cache 300 theme_tree node.pk request.LANGUAGE_CODE %}
 			<!-- If "Theme" node -->
 			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
 

@@ -110,6 +110,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
     # if cached result exists return it
     if not get_obj:
         slug = slugify(group_name_or_id)
+        # for unicode strings like hindi-text slugify doesn't works
         cache_key = 'get_group_name_id_' + str(slug) if slug else str(abs(hash(group_name_or_id)))
         cache_result = cache.get(cache_key)
 
@@ -152,7 +153,7 @@ def get_group_name_id(group_name_or_id, get_obj=False):
             else:
                 # setting cache with both ObjectId and group_name
                 cache.set(cache_key, (group_name, group_id), 60*60)
-                cache_key = u'get_group_name_id_' + slugify(group_id)
+                cache_key = u'get_group_name_id_' + slugify(group_name)
                 cache.set(cache_key, (group_name, group_id), 60*60)
                 return group_name, group_id
 
