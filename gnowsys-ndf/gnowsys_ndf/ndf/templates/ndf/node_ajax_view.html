@@ -1279,7 +1279,6 @@ ul#navigation li a.last {
         <div class="row">         
         <div class="medium-6 columns">
           
-      {% if group_object.edit_policy == 'EDITABLE_MODERATED' and "Group" in group_object.member_of_names_list %}
           {% edit_policy groupid node request.user as status %}
           {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
             {% get_edit_url node.pk as edit_url %}
@@ -1296,7 +1295,6 @@ ul#navigation li a.last {
                 <a href="{% url edit_url group_id node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
             {% endif %}
-          {% endif %}
         </div>
         <div class="medium-6 columns">
 
