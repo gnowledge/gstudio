@@ -69,24 +69,25 @@
 
   <div class="activeMailBox" style="height: 4.5rem">
     <h2 id="mailBoxName" style="float: left; width:50%;">MetaBox</h2>
-      
-
     <div class="boxController" style="float: right; width:50%;" align="right">
-    <a id="delete_box" href="{% url 'mailbox_delete' groupid 'dummy' %}" class="button small">Delete Mailbox</a>
+    <a id="set_box" href="{% url 'mailbox_settings' groupid 'dummy' %}" class="button small">Mailbox Settings</a>
+      <!-- <a id="delete_box" href="{% url 'mailbox_delete' groupid 'dummy' %}" class="button small">Delete Mailbox</a> -->
       <!-- 'dummy' is passed to satify the requirement of having an arg there as later we replace the url with sth else which has one -->
-      <a id ="edit_box" href="{% url 'mailbox_edit' groupid 'dummy' %}" class="button small">Edit Mailbox</a>
+      <!-- <a id ="edit_box" href="{% url 'mailbox_edit' groupid 'dummy' %}" class="button small">Edit Mailbox</a> -->
       <a class="button small" href="#">
             {% trans "<" %}
-          </a>
-          <a class="button small" href="#">
-            {% trans ">" %}
-          </a>
+      </a>
+      <a class="button small" href="#">
+        {% trans ">" %}
+      </a>
     </div>
   </div>
+
   <div class='tabSpace'>
     <div id='tab1' style="float:left; width:45%;border-right-style: solid; border-right-width: 1px;">
       <h3  ><a id="unreadMailsLink" href=""  onclick="">{% trans "Unread Mails" %}</a></h3>
     </div>
+
     <div id='tab2' style="float:right; width:54%;">
       <h3 style="margin-left: 20px;" ><a  id="readMailsLink"  href=""  onclick="">{% trans "Read Mails" %}</a></h3>
     </div>
