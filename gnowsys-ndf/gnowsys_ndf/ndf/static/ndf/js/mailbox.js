@@ -1,12 +1,10 @@
 function setMailBoxName(username, csrf_token, mailBoxName,type) {
 	document.getElementById( 'mailBoxName' ).innerHTML = mailBoxName;
-	a=$("#edit_box").attr("href");
-	a=a.replace('dummy',mailBoxName);
-	$("#edit_box").attr("href", a);
-	
-	b=$("#delete_box").attr("href");
-	b=b.replace('dummy',mailBoxName);
-	$("#delete_box").attr("href", b);
+
+	/*code to set the 'mailbox_settings' url*/
+	set_link=$("#set_box").attr("href");
+	set_link=set_link.replace('dummy',mailBoxName);
+	$("#set_box").attr("href", set_link);
 	
 	$.post( 'mailclient/mailresponse/', {'mailBoxName':mailBoxName, 'username': username, 'csrfmiddlewaretoken': csrf_token, 'type': type }, function(data){		
 		var content = $(data).filter( '#mailContent' );
