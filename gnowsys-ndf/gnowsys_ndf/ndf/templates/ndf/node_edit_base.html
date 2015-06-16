@@ -73,7 +73,7 @@ i.remove-tag{
 		{% endif %} 
 		</span></h3>		
 
-	    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
+	    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
   		<label id="message" style="display:none; color:red"></label>
 
 	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>

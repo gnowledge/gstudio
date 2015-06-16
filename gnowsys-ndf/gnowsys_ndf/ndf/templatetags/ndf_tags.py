@@ -2216,7 +2216,8 @@ def str_to_dict(str1):
                                       for k1, v1 in each.items():
                                               for rel in v1:
                                                       rel = node_collection.one({'_id':ObjectId(rel)})
-                                                      att_dic[k1] = rel.name
+                                                      if rel:
+                                                      	att_dic[k1] = rel.name
                                       dict_format[k] = att_dic
                                 
       if k in keys_by_filesize:

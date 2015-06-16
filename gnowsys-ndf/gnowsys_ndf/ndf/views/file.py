@@ -1,4 +1,3 @@
-
 ''' -- Imports from python libraries -- '''
 import json
 import hashlib
@@ -45,6 +44,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
 from gnowsys_ndf.ndf.views.methods import create_gattribute
+from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 ############################################
 
@@ -671,19 +671,24 @@ def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        # print group_id
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     # print group_id
+    #     pass
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     alreadyUploadedFiles = []
     str1 = ''
@@ -716,30 +721,46 @@ def submitDoc(request, group_id):
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-            if not obj_id_instance.is_valid(f):
+                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
+                # print "f: ", f
+            # if not obj_id_instance.is_valid(f):
+            # check if file is already uploaded file
+            if isinstance(f, list):
               alreadyUploadedFiles.append(f)
               title = mtitle
         
         # str1 = alreadyUploadedFiles
        
         if img_type != "": 
+            # print "----------1-----------"
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))
 
         elif topic_file != "": 
             
+            # print "----------2-----------"
             return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
         else:
             if alreadyUploadedFiles:
                 # return HttpResponseRedirect(page_url+'?var='+str1)
                 # if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
-                return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                # print "----------3-----------", alreadyUploadedFiles[0][1]
+                return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][1].__str__() }))
                 # else:
                     # if alreadyUploadedFiles[0][1]:
                         # return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
             else:
-                return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
+                group_object = node_collection.one({'_id': ObjectId(group_id)})
+
+                if group_object.edit_policy == 'EDITABLE_MODERATED' and isinstance(f, ObjectId):
+                    # print "----------4-----------"
+                    fileobj = node_collection.one({'_id': ObjectId(f)})
+                    # newly appended group id in group_set is at last
+                    create_moderator_task(request, fileobj.group_set[len(fileobj.group_set)-1], fileobj._id)
+                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_id, 'node_id': f }))
+                else:
+                    # print "----------5-----------"
+                    return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
 
                 # if is_video == "True":
                 #     return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
@@ -747,6 +768,7 @@ def submitDoc(request, group_id):
                 #     return HttpResponseRedirect(page_url)
 
     else:
+        # print "----------6-----------"
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
 
 
@@ -787,7 +809,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
                 return cur_oid["docid"], 'True'
         else:
-            return [files.name, new_name.name], 'True'
+            # print "already Uploaded file"
+            return [files.name, new_name._id], 'True'
 
     else:
         try:
@@ -816,7 +839,14 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             group_object = node_collection.one({'_id': ObjectId(group_id)})
 
             if group_object._id not in fileobj.group_set:
-                fileobj.group_set.append(group_object._id)  # group id stored in group_set field
+                # group id stored in group_set field
+                fileobj.group_set.append(group_object._id)
+
+            # if group is of EDITABLE_MODERATED, update group_set accordingly
+            if group_object.edit_policy == "EDITABLE_MODERATED":
+                fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
+                fileobj.status = u'MODERATION'
+
             if usrname:
                 user_group_object = node_collection.one({'$and': [{'_type': u'Author'},{'name': usrname}]})
                 if user_group_object:
@@ -916,6 +946,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
+            # print "----- fileobj._id", fileobj._id
             return fileobj._id, is_video
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e

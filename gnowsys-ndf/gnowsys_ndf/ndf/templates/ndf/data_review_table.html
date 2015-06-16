@@ -14,6 +14,9 @@
 			<th class="text-center right-border" colspan="3">Alignment & Level</th>
 			<th class="text-center right-border" colspan="7">Curate</th>
 			<th class="text-center right-border" colspan="3">Advance</th>
+			{% if title == "moderation" %}
+				<th class="text-center right-border" colspan="3">Moderation</th>
+			{% endif %}
 		</tr>
 		<tr class="bottom-border">
 
@@ -61,7 +64,14 @@
 			<!-- Advance -->
 			<th class="expand-width-3">Reading Level</th>
 			<th>Time Required</th>
-			<th class="expand-width-3">Text Complexity</th>
+			<th class="expand-width-3 right-border">Text Complexity</th>
+
+			<!-- moderation -->
+			{% if title == "moderation" %}
+				<th class="expand-width-2">Discuss</th>
+				<th class="expand-width-2">Approve</th>
+				<th class="expand-width-3">Reject</th>
+			{% endif %}
 
 		</tr>
 

@@ -561,6 +561,17 @@ article{
         border-color: lighten(#2ecc71, 20%);
       }
   }
+
+  &.moderation{
+      opacity: 1;
+      // background-color: darken($bg-color,5%);
+      background-color: #efefef;
+
+      hr{
+        border-color: darken(#efefef, 20%);
+      }
+  }
+
   &.unapproved{
       opacity: 1;
       border-style: solid;
