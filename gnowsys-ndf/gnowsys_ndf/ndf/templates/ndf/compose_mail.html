@@ -1,0 +1,22 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+{% endblock %}
+
+
+{% block meta_content %}
+  <h3 class="subheader">
+  {{title}}
+  </h3>
+{% endblock %}
+
+{% block body_content %}
+    Write New Mail:
+    <br></br>
+    {{mailbox_name}}
+{% endblock %}
