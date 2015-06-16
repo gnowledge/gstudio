@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 # from django.template.defaultfilters import slugify
+from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.views.generic import View
@@ -26,6 +27,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
+from gnowsys_ndf.ndf.org2any import org2html
 
 # ######################################################################################################################################
 
@@ -69,7 +71,7 @@ class CreateGroup(object):
 
         # If arg is kwargs, provide following dict as kwargs arg to this function.
         group_fields = {
-          'group_altnames': '', 'group_type': '', 'edit_policy': '',
+          'altnames': '', 'group_type': '', 'edit_policy': '',
           'agency_type': '', 'moderation_level': ''
         }
         # call in following way
@@ -79,10 +81,10 @@ class CreateGroup(object):
         # getting the data into variables
         name = group_name
 
-        if kwargs.get('group_altnames', ''):
-            altnames = kwargs.get('group_altnames', name) 
+        if kwargs.get('altnames', ''):
+            altnames = kwargs.get('altnames', name) 
         else:
-            altnames = self.request.POST.get('alt_groupname', "").strip()
+            altnames = self.request.POST.get('altnames', "").strip()
 
         if kwargs.get('group_type', ''):
             group_type = kwargs.get('group_type', '') 
@@ -124,6 +126,11 @@ class CreateGroup(object):
         else:
             agency_type = self.request.POST.get('agency_type', 'Other')
 
+        if kwargs.get('content_org', ''):
+            content_org = kwargs.get('content_org', '') 
+        else:
+            content_org = self.request.POST.get('content_org', '')
+
         # whenever we are passing int: 0, condition gets false
         # therefor casting to str
         if str(kwargs.get('moderation_level', '')):
@@ -159,13 +166,25 @@ class CreateGroup(object):
         group_obj.encryption_policy = encryption_policy
         group_obj.agency_type = agency_type
 
+        #  org-content
+        if content_org:
+            if group_obj.content_org != content_org:
+                group_obj.content_org = content_org
+
+                # Required to link temporary files with the current user who is
+                # modifying this document
+                usrname = self.request.user.username
+                filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+                group_obj.content = org2html(content_org, file_prefix=filename)
+                is_changed = True
+
         # decision for adding moderation_level
         if group_obj.edit_policy == "EDITABLE_MODERATED":
             group_obj.moderation_level = int(moderation_level)
         else:
             group_obj.moderation_level = -1
 
-        group_obj.status == u"PUBLISHED"
+        group_obj.status = u"PUBLISHED"
 
         # returning basic fields filled group object 
         return group_obj
@@ -511,7 +530,7 @@ class CreateModeratedGroup(CreateSubGroup):
             # create new sub-group and append it to parent group:
             sub_group = self.create_subgroup(parent_group_id, sg_name, \
               sg_member_of, moderation_level=(pg_moderation_level-1), \
-               group_altnames=sg_altnames)
+               altnames=sg_altnames)
 
             return sub_group
 
@@ -753,26 +772,9 @@ def create_group(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
 
-  # a = CreateSubGroup(request, "home", "moderated")
-  # print "======= ", a.is_group_exists("jhjh")
-  # print "--------- ", a.create_group(group_name="kjhk")
-  # print ".... ", a.get_group_edit_policy(group_id)
-  # print ".... ", a.get_subgroup_fields(group_id, "jhgjhg")
-  # print ".... ", a.get_group_edit_policy(group_id)
-  # try:
-  #     print "--------"
-  #     # print a.create_subgroup('home', "a-3", "Group")
-  #     m = CreateModeratedGroup(request, request.POST.get('groupname', "").strip(), request.POST.get('group_type', ""))
-  #     m.create_new_moderated_group(request.POST.get('groupname', "").strip(), moderation_level=2)
-  #     print "--------", m
-  # except Exception, e:
-  #     pass
-
-
   if request.method == "POST":
 
-    # colg = node_collection.collection.Group()
-    cname = request.POST.get('groupname', "").strip()
+    cname = request.POST.get('name', "").strip()
     edit_policy = request.POST.get('edit_policy', "")
     group_type = request.POST.get('group_type', "")
     moderation_level = request.POST.get('moderation_level', '1')
@@ -795,51 +797,6 @@ def create_group(request,group_id):
         
     if result[0]:
         colg = result[1]
-
-    # colg.altnames = cname
-    # colg.altnames = request.POST.get('alt_groupname', "").strip()
-    # colg.name = unicode(cname)
-    # colg.member_of.append(gst_group._id)
-    # usrid = int(request.user.id)
-  
-    # colg.created_by = usrid
-    # if usrid not in colg.author_set:
-    #   colg.author_set.append(usrid)
-
-    # colg.modified_by = usrid
-    # if usrid not in colg.contributors:
-    #   colg.contributors.append(usrid)
-
-    # colg.group_type = request.POST.get('group_type', "")
-    # colg.edit_policy = request.POST.get('edit_policy', "")
-    # colg.subscription_policy = request.POST.get('subscription', "OPEN")
-    # colg.visibility_policy = request.POST.get('existance', 'ANNOUNCED')
-    # colg.disclosure_policy = request.POST.get('member', 'DISCLOSED_TO_MEM')
-    # colg.encryption_policy = request.POST.get('encryption', 'NOT_ENCRYPTED')
-    # colg.agency_type = request.POST.get('agency_type', "")
-    # if colg.edit_policy == "EDITABLE_MODERATED":
-    #   colg.moderation_level = request.POST.get('moderation_level', '1')
-    # # colg.save()
-
-    # if colg.edit_policy == "EDITABLE_MODERATED":
-    #   Mod_colg = node_collection.collection.Group()
-    #   Mod_colg.altnames = cname + "_mod"
-    #   Mod_colg.name = cname + "Mod"     
-    #   Mod_colg.group_type = "PRIVATE"
-
-    #   Mod_colg.created_by = usrid
-    #   if usrid not in Mod_colg.author_set:
-    #     Mod_colg.author_set.append(usrid)
-
-    #   Mod_colg.modified_by = usrid
-    #   if usrid not in Mod_colg.contributors:
-    #     Mod_colg.contributors.append(usrid)
-
-    #   Mod_colg.prior_node.append(colg._id)
-    #   Mod_colg.save()
-
-    #   colg.post_node.append(Mod_colg._id)
-    #   # colg.save()
 
     # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
@@ -1013,62 +970,150 @@ def group_dashboard(request, group_id=None):
                           )
 
 
-@login_required
-@get_execution_time
-def edit_group(request, group_id):
-  ins_objectid  = ObjectId()
-  is_auth_node = False
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-      group_id = str(group_ins._id)
-    else:
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-        group_id = str(auth._id)
-        is_auth_node = True
-
-  else:
-    pass
-  page_node = node_collection.one({"_id": ObjectId(group_id)})
-  title = gst_group.name
-  if request.method == "POST":
-    is_node_changed=get_node_common_fields(request, page_node, group_id, gst_group)
+# @login_required
+# @get_execution_time
+# def edit_group(request, group_id):
+  
+#   # page_node = node_collection.one({"_id": ObjectId(group_id)})
+#   # title = gst_group.name
+#   # if request.method == "POST":
+#   #   is_node_changed=get_node_common_fields(request, page_node, group_id, gst_group)
     
-    if page_node.access_policy == "PUBLIC":
-      page_node.group_type = "PUBLIC"
+#   #   if page_node.access_policy == "PUBLIC":
+#   #     page_node.group_type = "PUBLIC"
 
-    if page_node.access_policy == "PRIVATE":
-      page_node.group_type = "PRIVATE"
-    page_node.save(is_changed=is_node_changed)
-    page_node.save()
-    group_id=page_node._id
-    page_node.get_neighbourhood(page_node.member_of)
-    return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
+#   #   if page_node.access_policy == "PRIVATE":
+#   #     page_node.group_type = "PRIVATE"
+#     # page_node.save(is_changed=is_node_changed)
+#     # page_node.save()
+#   #   group_id=page_node._id
+#   #   page_node.get_neighbourhood(page_node.member_of)
+#   #   return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
 
-  else:
-    if page_node.status == u"DRAFT":
-      page_node, ver = get_page(request, page_node)
-      page_node.get_neighbourhood(page_node.member_of) 
+#   # else:
+#   #   if page_node.status == u"DRAFT":
+#   #     page_node, ver = get_page(request, page_node)
+#   #     page_node.get_neighbourhood(page_node.member_of) 
 
-  available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
-  nodes_list = []
-  for each in available_nodes:
-      nodes_list.append(str((each.name).strip().lower()))
+#   # available_nodes = node_collection.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+#   # nodes_list = []
+#   # for each in available_nodes:
+#   #     nodes_list.append(str((each.name).strip().lower()))
 
-  return render_to_response("ndf/edit_group.html",
-                                    { 'node': page_node,'title':title,
-                                      'appId':app._id,
-                                      'groupid':group_id,
-                                      'nodes_list': nodes_list,
-                                      'group_id':group_id,
-                                      'is_auth_node':is_auth_node
+#   # return render_to_response("ndf/edit_group.html",
+#   #                                   { 'node': page_node,'title':title,
+#   #                                     'appId':app._id,
+#   #                                     'groupid':group_id,
+#   #                                     'nodes_list': nodes_list,
+#   #                                     'group_id':group_id,
+#   #                                     'is_auth_node':is_auth_node
+#   #                                     },
+#   #                                   context_instance=RequestContext(request)
+#   #                                   )
+    
+#     group_obj = get_group_name_id(group_id, get_obj=True)
+
+#     if request.method == "POST":
+#         is_node_changed = get_node_common_fields(request, group_obj, group_id, gst_group)
+#         # print "=== ", is_node_changed
+
+#         if group_obj.access_policy == "PUBLIC":
+#             group_obj.group_type = "PUBLIC"
+
+#         elif group_obj.access_policy == "PRIVATE":
+#             group_obj.group_type = "PRIVATE"
+
+#         group_obj.save(is_changed=is_node_changed)
+
+#         group_obj.get_neighbourhood(group_obj.member_of)
+
+#         return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_obj._id}))
+
+#     elif request.method == "GET":
+#         if group_obj.status == u"DRAFT":
+#             group_obj, ver = get_page(request, group_obj)
+#             group_obj.get_neighbourhood(group_obj.member_of) 
+
+#         available_nodes = node_collection.find({'_type': u'Group', '_id': {'$nin': [group_obj._id]}}, {'name': 1, '_id': 0})
+#         nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
+#         # print nodes_list
+
+#         return render_to_response("ndf/create_group.html",
+#                                         {   
+#                                         'node': group_obj,
+#                                         'title': 'Group',
+#                                         # 'appId':app._id,
+#                                         'groupid':group_id,
+#                                         'group_id':group_id,
+#                                         'nodes_list': nodes_list,
+#                                         # 'is_auth_node':is_auth_node
+#                                       },
+#                                     context_instance=RequestContext(request)
+#                                     )
+
+# @get_execution_time    
+# @login_required
+class EditGroup(View):
+    """
+    Class to handle create/edit group requests.
+    """
+
+    @method_decorator(login_required)
+    @method_decorator(get_execution_time)
+    def get(self, request, group_id):
+        """
+        Catering GET request of rendering group create/edit form.
+        """
+
+        group_obj = get_group_name_id(group_id, get_obj=True)
+
+        if group_obj.status == u"DRAFT":
+            group_obj, ver = get_page(request, group_obj)
+            group_obj.get_neighbourhood(group_obj.member_of) 
+
+        available_nodes = node_collection.find({'_type': u'Group','_id': {'$nin': [group_obj._id]}},
+            {'name': 1, '_id': 0})
+        nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
+        # print nodes_list
+
+        # if in the case we can replace "ndf/create_group.html" with "ndf/edit_group.html"
+        return render_to_response("ndf/create_group.html",
+                                        {   
+                                        'node': group_obj,
+                                        'title': 'Group', # 'appId':app._id,
+                                        'groupid': group_id, 'group_id': group_id,
+                                        'nodes_list': nodes_list,
+                                        # 'is_auth_node':is_auth_node
                                       },
                                     context_instance=RequestContext(request)
                                     )
 
+    def post(self, request, group_id):
+        '''
+        To handle post request of group form.
+        To save edited or newly-created group's data. 
+        '''
+        group_obj = get_group_name_id(group_id, get_obj=True)
 
+        is_node_changed = get_node_common_fields(request, group_obj, group_id, gst_group)
+        # print "=== ", is_node_changed
+
+        if group_obj.access_policy == "PUBLIC":
+            group_obj.group_type = "PUBLIC"
+
+        elif group_obj.access_policy == "PRIVATE":
+            group_obj.group_type = "PRIVATE"
+
+        group_obj.status = u"PUBLISHED"
+        group_obj.save(is_changed=is_node_changed)
+
+        group_obj.get_neighbourhood(group_obj.member_of)
+
+        return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_obj._id}))
+
+# ===END of class EditGroup() ===
+    
+        
 @login_required
 @get_execution_time
 def app_selection(request, group_id):
@@ -1286,7 +1331,7 @@ def create_sub_group(request,group_id):
       if request.method == "POST":
           colg = node_collection.collection.Group()
           Mod_colg=node_collection.collection.Group()
-          cname=request.POST.get('groupname', "")
+          cname=request.POST.get('name', "")
           colg.altnames=cname
           colg.name = unicode(cname)
           colg.member_of.append(gst_group._id)
