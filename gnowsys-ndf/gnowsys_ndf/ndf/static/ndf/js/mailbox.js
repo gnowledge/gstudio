@@ -15,6 +15,7 @@ function setMailBoxName(username, csrf_token, mailBoxName,type) {
 }
 
 function alterHyperLink(username, csrf_token, mailBoxName,type){
+	document.getElementById( 'mailBoxName' ).innerHTML = mailBoxName;
 	var newFunction1 = "setMailBoxName('" + username + "','" + csrf_token + "','" + mailBoxName + "'," + "1" + ")";
 	var newFunction2 = "setMailBoxName('" + username + "','" + csrf_token + "','" + mailBoxName + "'," + "0" + ")";
 	$("#unreadMailsLink").attr('onclick',newFunction1);

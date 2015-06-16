@@ -52,6 +52,7 @@ def mailclient(request, group_id):
         settings_dir3 = os.path.dirname(settings_dir2)
         path = os.path.abspath(os.path.dirname(settings_dir3))
         
+        #may throw error
         conn = sqlite3.connect(path + '/example-sqlite3.db')
         user_id = str(request.user.id)
 
@@ -61,7 +62,7 @@ def mailclient(request, group_id):
         mailbox_ids=[]
         for row in cursor:
             mailbox_ids.append(row[0])
-        print mailbox_ids        
+        print "mbox ids", mailbox_ids        
         query = 'select name from django_mailbox_mailbox where id='
         for box_id in mailbox_ids:
             box_id = str(box_id)
@@ -71,12 +72,12 @@ def mailclient(request, group_id):
                 mailbox_names.append(row[0])
 
     # add exception
-    except :
-        print "Possible Database Error when taking mailbox ids for a specific user"
-        error_obj= "Possible Database Error fn1"
-        return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
+    except Exception as error:
+        error_obj= str(error) + ", mailclient() fn"
+        return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
         #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
 
+    #TODO: Handle the test case which requires the next two lines of code
     if group_id == home_grp_id['_id']:
         return render(request, 'ndf/oops.html')
 
@@ -109,63 +110,62 @@ def mailbox_create_edit(request, group_id):
         # make a mailbox from the above details
         newbox = Mailbox()
         newbox.name = mailbox_name
-
-
         webserver = server_dict[domain]
+
         try:
-          uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + "?archive=" + mailbox_name.replace(" ","_")
-          newbox.uri = uri
+            uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + "?archive=" + mailbox_name.replace(" ","_")
+            newbox.uri = uri
         except IndexError: 
-          print "Incorrect Email ID given"
-          error_obj="Incorrect Email ID given"
-          return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
-          #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
-          #TODO: Redirect to mailclient_error_display
-          return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
+            print "Incorrect Email ID given!"
+            error_obj= "Incorrect Email ID given!"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+            return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
+        
         try:
-            #the below two stmts can throw an exception          
+            #may throw exception
             newbox.get_connection()
+        except socket.gaierror :
+            print "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
+            error_obj= "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+            
+        except IMAP4.error:
+            print "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
+            error_obj= "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+        
+        newbox.save()
+
+        try:
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
             path = os.path.abspath(os.path.dirname(settings_dir3))
-        
-            conn = sqlite3.connect(path + '/example-sqlite3.db')
 
-            #save() fn is called after the above two stmts to ensure that 'save' is done only if both the above stmts DO NOT throw
-            #any exception!
-            newbox.save()
+            #may throw exception
+            conn = sqlite3.connect(path + '/example-sqlite3.db')
             user_id = str(request.user.id)
             query = 'insert into user_mailboxes values (?,?);'
-            cursor = conn.execute(query, (request.user.id, newbox.id))
+
+            #may throw exception
+            cursor = conn.execute(query, (request.user.id, newbox.id))            
             conn.commit()
             conn.close()
-
-        except socket.gaierror :
-            print "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
-            error_obj= "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
-            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
-            #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
-        except IMAP4.error:
-            print "Credentials problem"
-            error_obj= "Credentials problem"
-            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
-            # return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
-            #TODO: Redirect to mailclient_error_display
-            #return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
-        except Exception as e:
-            print "Possible DATABASE Error"
-            print e
-            error_obj= "Possible DATABASE Error"
-            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
-            #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
+        except Exception as error:
+            #Very imp: must delete the mailbox if this exception occurs
+            newbox.delete()
+            print error
+            error_obj= str(error) + ",mailbox_create_edit() fn, Mailbox created will be deleted"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+        #save() will be called only when no exceptions occur
+        
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
     else:
         title = "Add A New Mailbox"
         variable = RequestContext(request, {'title': title,
                                             'groupname': group_name,
-                                             'groupid': group_id,
-                                             'group_id': group_id,
+                                            "group_id" : group_id,
+                                            "groupid" : group_id,
                                             'server_dict' : server_dict 
                                             })
         return render_to_response(template, variable)
@@ -176,10 +176,12 @@ def render_mailbox_pane(request,group_id):
     if request.method=='POST' and request.is_ajax():
         variable = RequestContext(request, {
         'groupname': group_name,
-        'groupid': group_id,
-        'group_id': group_id,
+        "group_id" : group_id,
+        "groupid" : group_id,
         'mailboxname': request.POST['mailBoxName'],
-        'username' : request.POST['username']
+        'username' : request.POST['username'],
+        'mail_type' : request.POST['mail_type'],
+        'displayFrom' : request.POST['startFrom']
         })
         return render_to_response(template,variable)
 
@@ -199,7 +201,6 @@ def mailbox_edit(request, group_id,mailboxname):
                                             
                                         })
     template = "ndf/edit_mailbox.html"
-
     if request.method == "POST":  # create or edit
         # get all data from the form
         mailbox_name = request.POST.get("mailboxname", "")
@@ -208,59 +209,62 @@ def mailbox_edit(request, group_id,mailboxname):
         pwd = request.POST.get("password", "")
         domain = request.POST.get("domain","")
         emailid_split = emailid.split('@')
-
-
         webserver = server_dict[domain]
-        uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + "?archive=" + mailbox_name.replace(" ","_")
 
-        newbox= Mailbox()
-        newbox.uri = uri
         try:
+            uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + "?archive=" + mailbox_name.replace(" ","_")
+        except IndexError:
+            error_obj= "Incorrect Email ID given!"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+
+        try: 
+            newbox= Mailbox()
+            newbox.uri = uri
+            #may throw error
             newbox.get_connection()
-            #if the above completes without throwing an exception next lines will be executed
+        except socket.gaierror :
+            print "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
+            error_obj= "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+            
+        except IMAP4.error:
+            print "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
+            error_obj= "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+            
+        try:
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
             path = os.path.abspath(os.path.dirname(settings_dir3))
-        
+            #may throw error        
             conn = sqlite3.connect(path + '/example-sqlite3.db')
             user_id = str(request.user.id)
-            query_2uery = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
+            query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
             cursor = conn.execute(query)
 
-            mailbox_ids=[]
-            for row in cursor:
-                mailbox_ids.append(row[0])
-          
-            # edit mailbox with passed mailbox_id 
-            box = None
-            flag = 0
-            boxes= Mailbox.active_mailboxes.all()
-            for box in boxes:
-                if box.name == mailboxname and box.id in mailbox_ids:
-                    flag = 1
-                    break
+        except Exception as error:
+            print error
+            error_obj= str(error) + ", mailbox_edit() fn"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+            
+        mailbox_ids=[]
+        for row in cursor:
+            mailbox_ids.append(row[0])
 
-            if flag == 1:
-                box.name= mailbox_name
-                box.uri=uri
-                box.save()
-        except socket.gaierror :
-            print "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
-            error_obj= "CONNECTION ERROR, COULDNT CONFIGURE MAILBOX WEBSERVER"
-            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
-            #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
-        except IMAP4.error:
-            print "Credentials problem"
-            error_obj= "Credentials problem"
-            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
-            #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
-        except :
-            print "Possible DATABASE Error"
-            error_obj= "Possible DATABASE Error"
-            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
-            #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
+        # edit mailbox with passed mailbox_id 
+        box = None
+        flag = 0
+        boxes= Mailbox.active_mailboxes.all()
+        for box in boxes:
+            if box.name == mailboxname and box.id in mailbox_ids:
+                flag = 1
+                break
 
+        if flag == 1:
+            box.name= mailbox_name
+            box.uri=uri
+            box.save()
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
     return render_to_response(template, variable)
 
@@ -268,83 +272,88 @@ def mailbox_edit(request, group_id,mailboxname):
 @login_required
 @get_execution_time
 def mailbox_delete(request, group_id,mailboxname):
-  group_name, group_id = get_group_name_id(group_id)
-  title = "Delete Mailbox"
-  variable = RequestContext(request, {'title': title,
-                                      'groupname': group_name,
-                                       'groupid': group_id,
-                                       'group_id': group_id,
-                                      'mailboxname' : mailboxname,
-                                      })
-  template = "ndf/delete_mailbox.html"
-  if request.method == "POST":  # create or edit
-    yes = request.POST.get("save-yes",None)
-    no = request.POST.get("save-no",None)
-    mailbox_name= request.POST.get("mailbox_name","")
-    user_id = request.POST.get("user_id","")
-    mailbox_names = []
-    
-    if yes == "YES":
-      try:
-          settings_dir1 = os.path.dirname(__file__)
-          settings_dir2 = os.path.dirname(settings_dir1)
-          settings_dir3 = os.path.dirname(settings_dir2)
-          path = os.path.abspath(os.path.dirname(settings_dir3))
-        
-          conn = sqlite3.connect(path + '/example-sqlite3.db')
-          # user_id = str(request.user.id)
-          #user_id already sourced
-          query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
-          cursor = conn.execute(query)
+    group_name, group_id = get_group_name_id(group_id)
+    title = "Delete Mailbox"
+    variable = RequestContext(request, {'title': title,
+                                        'groupname': group_name,
+                                        "group_id" : group_id,
+                                        "groupid" : group_id,
+                                        'mailboxname' : mailboxname,
+                                        })
+    template = "ndf/delete_mailbox.html"
+    if request.method == "POST":  # create or edit
+        yes = request.POST.get("save-yes",None)
+        no = request.POST.get("save-no",None)
+        mailbox_name= request.POST.get("mailbox_name","")
+        user_id = request.POST.get("user_id","")
+        mailbox_names = []
+        if yes == "YES":
+            settings_dir1 = os.path.dirname(__file__)
+            settings_dir2 = os.path.dirname(settings_dir1)
+            settings_dir3 = os.path.dirname(settings_dir2)
+            path = os.path.abspath(os.path.dirname(settings_dir3))
+                
+            try:
+                conn = sqlite3.connect(path + '/example-sqlite3.db')
+                query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
+                cursor = conn.execute(query)
+            except Exception as error:
+                print error
+                error_obj= str(error) + ", mailbox_delete() fn"
+                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
 
-          mailbox_ids=[]
-          for row in cursor:
-              mailbox_ids.append(row[0])
-              
-          print mailbox_ids        
-          query = 'select name from django_mailbox_mailbox where id='
-          for box_id in mailbox_ids:
-              box_id = str(box_id)
-              query_2 = query + box_id
-              cursor = conn.execute(query_2)
-              for row in cursor:
-                  mailbox_names.append(row[0])
-              # edit mailbox with passed mailbox_id 
-            box = None
-              flag = 0
-              boxes= Mailbox.active_mailboxes.all()
-              for box in boxes:
-                if box.name == mailbox_name and box.id in mailbox_ids:
-                  flag = 1
-                  break
+            mailbox_ids=[]
+            for row in cursor:
+                mailbox_ids.append(row[0])                  
+            print mailbox_ids        
+            query = 'select name from django_mailbox_mailbox where id='
+            for box_id in mailbox_ids:
+                box_id = str(box_id)
+                query_2 = query + box_id
+                cursor = conn.execute(query_2)
+                for row in cursor:
+                    mailbox_names.append(row[0])
+                # edit mailbox with passed mailbox_id 
+                box = None
+                flag = 0
+                boxes= Mailbox.active_mailboxes.all()
+                for box in boxes:
+                    if box.name == mailbox_name and box.id in mailbox_ids:
+                        flag = 1
+                        break
 
-              if flag == 1:
-                box.delete()
-                print "%s Deleted from django_mailbox" % mailbox_name
-              else:
-                print "Box not found > (fn: delete_mailbox)"
-      # add exception
-      except :
-          print "Possible Database Error fn1"
-          error_obj= "Possible Database Error fn1"
-          return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj, 'groupid': group_id, 'group_id': group_id})
-      print yes
-      print no 
-      print mailbox_name
-      print user_id
-    return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
-  return render_to_response(template, variable)
+                if flag == 1:
+                    #delete from out 'mapping' database (the database which tracks which user_id is asscociated with which mailbox_id )                    
+
+                    # conn2 = sqlite3.connect(path + '/example-sqlite3.db')
+                    query = 'delete from user_mailboxes where mailbox_id='+str(box.id)
+                    cursor = conn.execute(query)
+                    conn.commit()
+                    #NOTE: we must delete the mailbox from our 'mapping' database first and then from django_mailbox database because 
+                    # when you call the delete function of django_mailbox API on a mailbox object, the mailbox id is lost!
+                    # And we need that id value to delete from our 'mapping' database. Hence order is important
+
+                    #delete mailbox from django_mailbox's database
+                    box.delete()
+                    
+                    print "%s Deleted from django_mailbox" % mailbox_name
+                else:
+                    print "Box not found > (fn: delete_mailbox)"
+            conn.close()
+            # conn2.close()
+        return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
+    return render_to_response(template, variable)
 
 @get_execution_time
 def mailclient_error_display(request, group_id, error_obj):
-  template = "ndf/mailclient_error.html"
-  group_name, group_id = get_group_name_id(group_id)
-  title = "Error Page"
-  # print error_obj
-  context_dict = { "title" : title,
-                   "group_name" : group_name,
-                   "group_id" : group_id,
-                   "groupid" : group_id
-                   }
-  variable = RequestContext(request,context_dict)
-  return render_to_response(template,variable)
+    template = "ndf/mailclient_error.html"
+    group_name, group_id = get_group_name_id(group_id)
+    title = "Error Page"
+    # print error_obj
+    context_dict = { "title" : title,
+                    "group_name" : group_name,
+                    "group_id" : group_id,
+                    "groupid" : group_id
+                    }
+    variable = RequestContext(request,context_dict)
+    return render_to_response(template,variable)
