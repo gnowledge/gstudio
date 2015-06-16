@@ -32,7 +32,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, server_sync
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
@@ -301,7 +301,6 @@ def create_edit_page(request, group_id, node_id=None):
     else:
         page_node = node_collection.collection.GSystem()
         
-
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
@@ -433,7 +432,8 @@ def translate_node(request,group_id,node_id=None):
     )        
 
 
-@get_execution_time        
+@get_execution_time
+@server_sync        
 def publish_page(request,group_id,node):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
