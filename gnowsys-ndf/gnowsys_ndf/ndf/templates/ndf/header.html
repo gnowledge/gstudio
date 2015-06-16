@@ -1,8 +1,9 @@
-{% load get_nroer_menu  get_user_group  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar from ndf_tags %}
+{% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar from ndf_tags %}
 
 {% load i18n %}
 {% load cache %}
 
+  {% get_group_object groupid as group_object %}
   <!-- <div class="contain-to-grid sticky"> -->
   <div class="row" id="top-headers">
 
@@ -29,7 +30,7 @@
       <!-- Left Nav Section -->
 
       <!-- add GSTUDIO_SITE_NAME = "NROER" in the local_settings.py file, to check locally -->
-      {% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %}
+      <!-- {#% cache 3600 top_header request.LANGUAGE_CODE request.path request.user.username %} -->
       {% if site.SITE_NAME == "NROER" %} 
       
         <!-- NROER level one menu -->
@@ -139,7 +140,7 @@
 
       </ul>
       {% endif %}
-      {% endcache %}
+      <!-- {#% endcache %} -->
 
       <!-- Closes Left Nav section -->
 
@@ -194,7 +195,7 @@
           </a>
           
           {% else %}
-          <a class="user" data-gnow="#aabb44" href="{% url 'dashboard' request.user.pk %}">
+          <a class="user" href="{% url 'dashboard' request.user.pk %}">
             {{ user.username }}
           </a>
           {% endif %}
@@ -261,14 +262,15 @@
       <!-- closing of first nav -->
 
       <!-- =========| divider between two nav's/header's |=========== -->
-
       <!-- start of second nav  or group level header-->
-      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if not is_ac_url %}sticky{% endif %}{% endif %} drop-shadow" id="group-level-header">
-        
+      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %} drop-shadow" id="group-level-header">
+
         <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
+        <!-- don't show this app bar for groups with editable moderated -->
+        {% if "ModeratingGroup" not in group_object.member_of_names_list %}
         {% if not is_ac_url %}
         {% if request.path != "/welcome" %}
-          {% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %}
+          <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
           <ul class="title-area">
             <li class="name">
               <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
@@ -361,10 +363,12 @@
             </ul>
 
           </section>
-          {% endcache %}
+          <!-- {#% endcache %} -->
         {% endif %} <!-- end of "/welcome" landing page check -->
         {% endif %} <!-- end of "accounts" urls check -->
         </nav>
+
+        {% endif %} <!-- end of "group's edit_policy" urls check -->
       </div>
 
       <!-- end of second nav -->

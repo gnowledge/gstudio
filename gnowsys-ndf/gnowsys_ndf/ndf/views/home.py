@@ -94,7 +94,7 @@ def landing_page(request):
                                 context_instance=RequestContext(request)
                             )
     else:
-        return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
+        return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home", "groupid": "home"}) )
 
 
 
