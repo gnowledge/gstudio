@@ -71,9 +71,8 @@
     <h2 id="mailBoxName" style="float: left; width:50%;">MetaBox</h2>
     <div class="boxController" style="float: right; width:50%;" align="right">
     <a id="set_box" href="{% url 'mailbox_settings' groupid 'dummy' %}" class="button small">Mailbox Settings</a>
-      <!-- <a id="delete_box" href="{% url 'mailbox_delete' groupid 'dummy' %}" class="button small">Delete Mailbox</a> -->
-      <!-- 'dummy' is passed to satify the requirement of having an arg there as later we replace the url with sth else which has one -->
-      <!-- <a id ="edit_box" href="{% url 'mailbox_edit' groupid 'dummy' %}" class="button small">Edit Mailbox</a> -->
+    <a id="compose_mail" href="{% url 'compose_mail' groupid 'dummy' %}" class="button small">Write Mail</a>
+      
       <a class="button small" href="#">
             {% trans "<" %}
       </a>

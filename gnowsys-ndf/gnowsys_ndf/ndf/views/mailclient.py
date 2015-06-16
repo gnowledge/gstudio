@@ -150,6 +150,7 @@ def mailbox_create_edit(request, group_id):
             #may throw exception
             conn = sqlite3.connect(path + '/example-sqlite3.db')
             user_id = str(request.user.id)
+            #query to insert (user.id,mailbox.id) pair in 'mapping' database
             query = 'insert into user_mailboxes values (?,?);'
 
             #may throw exception
@@ -158,6 +159,7 @@ def mailbox_create_edit(request, group_id):
             conn.close()
         except Exception as error:
             #Very imp: must delete the mailbox if this exception occurs
+            #TODO: not only delete newbox but also remove entry from 'mapping' Database
             newbox.delete()
             print error
             error_obj= str(error) + ",mailbox_create_edit() fn, Mailbox created will be deleted"
@@ -376,3 +378,19 @@ def mailbox_settings(request, group_id,mailboxname):
                     }
     variable = RequestContext(request,context_dict)
     return render_to_response(template,variable)    
+
+@login_required
+@get_execution_time
+def compose_mail(request, group_id,mailboxname):    
+    template = "ndf/compose_mail.html"
+    group_name, group_id = get_group_name_id(group_id)
+    title = "New Mail"
+
+    context_dict = { "title" : title,
+                    "group_name" : group_name,
+                    "group_id" : group_id,
+                    "groupid" : group_id,
+                    "mailbox_name" : mailboxname
+                    }
+    variable = RequestContext(request,context_dict)
+    return render_to_response(template,variable)
