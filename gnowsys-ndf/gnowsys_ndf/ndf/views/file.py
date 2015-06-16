@@ -85,7 +85,6 @@ def file(request, group_id, file_id=None, page_no=1):
     shelves = []
     shelf_list = {}
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
     #   dbref_has_shelf = has_shelf_RT.get_dbref()
