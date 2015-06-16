@@ -223,7 +223,7 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # Languages using BiDi (right-to-left) layout
 # LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
 
-# # #SMTP setting for sending mail (Using python default SMTP server)
+# # # #SMTP setting for sending mail (Using python default SMTP server)
 # EMAIL_USE_TLS = False
 # EMAIL_HOST = 'localhost'
 # EMAIL_PORT = 1025
@@ -236,7 +236,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 't.metastudio@gmail.com'
-EMAIL_HOST_PASSWORD = 'yolo12345'
+EMAIL_HOST_PASSWORD = ''
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
