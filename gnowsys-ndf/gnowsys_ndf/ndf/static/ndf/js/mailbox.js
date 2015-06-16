@@ -1,23 +1,91 @@
-function setMailBoxName(username, csrf_token, mailBoxName,type) {
-	document.getElementById( 'mailBoxName' ).innerHTML = mailBoxName;
-	a=$("#edit_box").attr("href");
-	a=a.replace('dummy',mailBoxName);
-	$("#edit_box").attr("href", a);
+// The Global variables
+var Readstart;
+var Unreadstart;
+var typeOfMail; // 0 for the unread ones and 1 for the read ones
+var mailbox_name;
+var userName;
+var CSRFtoken;
+function countInitialize(){
+	Readstart = 0;
+	Unreadstart = 0;
+	typeOfMail = 0;
+}
+
+function increaseMailFetchCount(){
+	if (typeOfMail == 0){
+		Unreadstart = Unreadstart + 50;
+	}
+	else{
+		Readstart = Readstart + 50;
+	}
+	alert('Unread: ' + Unreadstart + ' Read: ' + Readstart);
+	getMails();
+}
+
+
+function decreaseMailFetchCount(){
+	if (typeOfMail == 0){
+		Unreadstart = Unreadstart - 50;
+		if(Unreadstart < 0){
+			Unreadstart = 0;
+		}
+	}
+	else {
+		Readstart = Readstart - 50;
+		if(Readstart < 0) { 
+			Readstart = 0;
+		}
+	}
+	alert('Unread: ' + Unreadstart + ' Read: ' + Readstart);
+	getMails();
+
+}
+
+
+function getMails(){
+	var temp = 0;
+	if(typeOfMail == 0){
+		temp = Unreadstart;
+	}
+	else {
+		temp = Readstart;
+	}
 	
-	b=$("#delete_box").attr("href");
-	b=b.replace('dummy',mailBoxName);
-	$("#delete_box").attr("href", b);
-	
-	$.post( 'mailclient/mailresponse/', {'mailBoxName':mailBoxName, 'username': username, 'csrfmiddlewaretoken': csrf_token, 'type': type }, function(data){		
+	$.post( 'mailresponse/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'startFrom': temp}, function(data){		
 		var content = $(data).filter( '#mailContent' );
 		$( ".mailBoxContent" ).empty().append( content );
 	});
 }
 
-function alterHyperLink(username, csrf_token, mailBoxName,type){
+
+// Function to put a POST request to fetch mails
+function setMailBoxName(username, csrf_token, mailBoxName) {
 	document.getElementById( 'mailBoxName' ).innerHTML = mailBoxName;
-	var newFunction1 = "setMailBoxName('" + username + "','" + csrf_token + "','" + mailBoxName + "'," + "1" + ")";
-	var newFunction2 = "setMailBoxName('" + username + "','" + csrf_token + "','" + mailBoxName + "'," + "0" + ")";
-	$("#unreadMailsLink").attr('onclick',newFunction1);
-	$("#readMailsLink").attr('onclick',newFunction2);
+	mailbox_name = mailBoxName;
+	userName = username;
+	CSRFtoken = csrf_token;
+	countInitialize();
+	getMails();
+
+	a=$("#set_box").attr("href");
+	a=a.replace('dummy',mailBoxName);
+	$("#set_box").attr("href", a);
+
 }
+
+$(document).ready(function(){
+	$("#unreadMailsLink").click(function(){
+		Unreadstart = 0;
+		typeOfMail = 0;
+		getMails();
+	});
+
+	$("#readMailsLink").click(function(){
+		Readstart = 0;
+		typeOfMail = 1;
+		getMails();
+	});
+});
+
+
+
