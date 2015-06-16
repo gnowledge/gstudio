@@ -12,6 +12,11 @@ import datetime
 from bson import json_util
 
 
+#for creating deault mailbox : Metabox
+from django_mailbox.models import Mailbox
+from imaplib import IMAP4
+import socket
+
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -3170,3 +3175,44 @@ def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
 			print 'FETCHING DONE'
 	else:
 		print 'lol'
+
+##############################################
+#Fn to create the default metastudio mailbox for the studio
+##############################################
+def create_deault_mailbox(request,username):
+	newbox = Mailbox()
+	newbox.name= "Metabox"
+	#TODO: implement real email id 
+	#uri = "imap+ssl://"+username+"%40metastudio.org:"+password+"@mimap.metastudio.com"
+
+	#TODO: ask gn sir, whether the Metabox should ALWAYS have same password as user's login pwd or should the user be 
+	#allowed to change it
+
+	uri = "imap+ssl://t.metastudio%40gmail.com:yolo12345@imap.gmail.com?archive=Metabox"
+	try:
+		newbox.get_connection()
+	except Exception as e:
+		print e
+		return render(request, 'ndf/mailclient_error.html', {'error_obj': str(e),'groupid': group_id,'group_id': group_id})
+	newbox.save()
+	try:
+		settings_dir1 = os.path.dirname(__file__)
+		settings_dir2 = os.path.dirname(settings_dir1)
+		settings_dir3 = os.path.dirname(settings_dir2)
+		path = os.path.abspath(os.path.dirname(settings_dir3))
+
+            #may throw exception
+		conn = sqlite3.connect(path + '/example-sqlite3.db')
+		user_id = str(request.user.id)
+		query = 'insert into user_mailboxes values (?,?);'
+
+		#may throw exception
+		cursor = conn.execute(query, (request.user.id, newbox.id))            
+		conn.commit()
+		conn.close()
+	except Exception as error:
+		#Very imp: must delete the mailbox if this exception occurs
+		newbox.delete()
+		print error
+		error_obj= str(error) + ",create_default_mailbox() fn, Mailbox created will be deleted"
+		return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})

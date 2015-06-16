@@ -11,12 +11,12 @@
 
 {% block meta_content %}
   <h3 class="subheader">
-  Error Page
+  {{title}}
   </h3>
 {% endblock %}
 
 {% block body_content %}
-    <h2>OOPS! Something went wrong!</h2>
+    Write New Mail:
     <br></br>
-    <h3>{{ error_obj }}</h3> 
+    {{mailbox_name}}
 {% endblock %}

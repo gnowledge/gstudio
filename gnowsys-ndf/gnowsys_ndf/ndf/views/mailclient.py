@@ -25,6 +25,7 @@ import socket
 from imaplib import IMAP4
 import sqlite3
 import os
+import re
 #-----------------Dictionary of popular servers--------------#
 server_dict = {
     "Gmail": "imap.gmail.com",
@@ -109,6 +110,9 @@ def mailbox_create_edit(request, group_id):
         emailid_split = emailid.split('@')
         # make a mailbox from the above details
         newbox = Mailbox()
+
+        #TODO: clean up mailbox_name since it will later go as part of url for :settings, edit and delete pages.
+        characters_not_allowed= ['!','@',]
         newbox.name = mailbox_name
         webserver = server_dict[domain]
 
@@ -134,6 +138,7 @@ def mailbox_create_edit(request, group_id):
             error_obj= "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
         
+        #only on calling save() the mailbox is alotted an id
         newbox.save()
 
         try:
@@ -145,6 +150,7 @@ def mailbox_create_edit(request, group_id):
             #may throw exception
             conn = sqlite3.connect(path + '/example-sqlite3.db')
             user_id = str(request.user.id)
+            #query to insert (user.id,mailbox.id) pair in 'mapping' database
             query = 'insert into user_mailboxes values (?,?);'
 
             #may throw exception
@@ -153,11 +159,12 @@ def mailbox_create_edit(request, group_id):
             conn.close()
         except Exception as error:
             #Very imp: must delete the mailbox if this exception occurs
+            #TODO: not only delete newbox but also remove entry from 'mapping' Database
             newbox.delete()
             print error
             error_obj= str(error) + ",mailbox_create_edit() fn, Mailbox created will be deleted"
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-        #save() will be called only when no exceptions occur
+        
         
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
     else:
@@ -354,6 +361,38 @@ def mailclient_error_display(request, group_id, error_obj):
                     "group_name" : group_name,
                     "group_id" : group_id,
                     "groupid" : group_id
+                    }
+    variable = RequestContext(request,context_dict)
+    return render_to_response(template,variable)
+
+@login_required
+@get_execution_time
+def mailbox_settings(request, group_id,mailboxname):    
+    template = "ndf/mailclient_settings.html"
+    group_name, group_id = get_group_name_id(group_id)
+    title = "Settings Page"
+    
+    context_dict = { "title" : title,
+                    "group_name" : group_name,
+                    "group_id" : group_id,
+                    "groupid" : group_id,
+                    "mailbox_name" : mailboxname
+                    }
+    variable = RequestContext(request,context_dict)
+    return render_to_response(template,variable)    
+
+@login_required
+@get_execution_time
+def compose_mail(request, group_id,mailboxname):    
+    template = "ndf/compose_mail.html"
+    group_name, group_id = get_group_name_id(group_id)
+    title = "New Mail"
+
+    context_dict = { "title" : title,
+                    "group_name" : group_name,
+                    "group_id" : group_id,
+                    "groupid" : group_id,
+                    "mailbox_name" : mailboxname
                     }
     variable = RequestContext(request,context_dict)
     return render_to_response(template,variable)
