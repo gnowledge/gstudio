@@ -108,7 +108,7 @@ to_reduce_doc_requirement = u'storing_to_be_reduced_doc'
 indexed_word_list_requirement = u'storing_indexed_words'
 
 # CUSTOM DATA-TYPE DEFINITIONS
-STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED', u'DELETED')
+STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED', u'DELETED', u'MODERATION')
 STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')

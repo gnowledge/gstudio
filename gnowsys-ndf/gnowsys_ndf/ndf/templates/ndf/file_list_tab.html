@@ -29,15 +29,19 @@
           <div class="draft">
         {% elif each_res.status == "PUBLISHED" %}
           <div class="published">
+        {% elif each_res.status == "MODERATION" %}
+          <div class="moderation">
         {% endif %}
+      {% elif each_res.status == "MODERATION" %}
+        <div class='moderation'>
       {% else %}
         <div class='{% if each_res.status == "PUBLISHED" %}published{% endif %}'>
       {% endif %} 
 
       {% if "Pandora_video" in each.member_of_names_list %}
-        <a href="{% url detail_urlname group_name_tag each_res %}?vid_id={{src_id}}">
+        <a href="{% url detail_urlname group_id each_res %}?vid_id={{src_id}}">
       {% else %}
-        <a href="{% url detail_urlname group_name_tag each_res %}">
+        <a href="{% url detail_urlname group_id each_res %}">
       {% endif %}
 
         <div class="row">
@@ -79,6 +83,14 @@
           <div class="small-6 columns">{{each_res.mime_type|truncatechars:15}}</div>
           <div class="small-6 columns"><div class="right"><strong>{{each_res.file_size.size}}</strong> {{each_res.file_size.unit}}</div></div>
         </footer>
+        <footer>
+            <div class="age">
+              {{ each_res.member_of_names_list|join:', ' }} created {{each_res.created_at|timesince}} ago 
+              <br/>
+            <span><strong>{{each_res.contributors|length}}</strong> Contributor{{each_res.contributors|pluralize}} | </span>
+              by <span class="user" href="{% url 'dashboard' each_res.created_by %}" data-gnow="">{{each_res.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
+            </div>
+          </footer>
           </a>
 
           <div class="label-list small-12 columns">
@@ -97,15 +109,16 @@
       {% if not searching %}
         <div class="row">
           <div class="small-11 small-offset-1 columns">
-      
             {% if res_type_name == "collection" %}
               <h5> {% trans "This group doesn't have any collections." %}</h5>
             {% elif filter_result == "False" %}
               <h5> {% trans "Sorry, No resources found with selected filters :(" %}</h5>
             {% else %}
+              {% if not dont_show_error %}
               <h5> 
                 {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %}
               </h5>
+              {% endif %}
             {% endif %}
 
           </div>
