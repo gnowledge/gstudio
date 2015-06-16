@@ -298,28 +298,29 @@ def get_forum_repl_type(forrep_id):
 
 @get_execution_time
 def check_existing_group(group_name):
+  a=node_collection.find
   if type(group_name) == 'unicode':
-    colg = node_collection.find({'_type': u'Group', "name": group_name})
+    colg = a({'_type': u'Group', "name": group_name})
     if colg.count()>0:
       return True
     if ins_objectid.is_valid(group_name):    #if group_name holds group_id
-      colg = node_collection.find({'_type': u'Group', "_id": ObjectId(group_name)})
+      colg = a({'_type': u'Group', "_id": ObjectId(group_name)})
     if colg.count()>0:
       return True
     else:
-      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      colg = a({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
       if colg.count()>0:
         return True      
   else:
     if ins_objectid.is_valid(group_name):     #if group_name holds group_id
-      colg = node_collection.find({'_type': u'Group', "_id": ObjectId(group_name)})
+      colg = a({'_type': u'Group', "_id": ObjectId(group_name)})
       if colg.count()>0:
         return True
-      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      colg = a({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
       if colg.count()>0:
         return True
     else:
-      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
+      colg = a({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
   if colg.count() >= 1:
     return True
   else:
@@ -1498,17 +1499,20 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   if not isinstance(at_rt_objectid_or_attr_name_list, list):
     at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
 
+  a=type_of_set.append  
   if not type_of_set:
     node["property_order"] = []
+    b=node["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          type_of_set.append(type_of)
+          a(type_of)
 
       for po in gst["property_order"]:
         if po not in node["property_order"]:
-          node["property_order"].append(po)
+          b(po)    
+          
 
   BASE_FIELD_METADATA = {
     'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
@@ -1520,6 +1524,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   }
 
   widget_data_list = []
+  c=widget_data_list.append
   for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
     if type(at_rt_objectid_or_attr_name) == ObjectId: #ObjectId.is_valid(at_rt_objectid_or_attr_name):
       # For attribute-field(s) and/or relation-field(s)
@@ -1579,7 +1584,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
         data_type = node.structure[field.name]
         value = node[field.name]
 
-      widget_data_list.append({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
+      c({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
                               '_id': field._id, 
                               'data_type': data_type,
                               'name': field.name, 'altnames': altnames,
@@ -1590,7 +1595,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
       # For node's base-field(s)
 
       # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
-      widget_data_list.append({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+      c({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
                               'data_type': node.structure[at_rt_objectid_or_attr_name],
                               'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
                               'value': node[at_rt_objectid_or_attr_name],
