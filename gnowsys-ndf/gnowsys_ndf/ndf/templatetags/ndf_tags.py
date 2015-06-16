@@ -9,6 +9,8 @@ import ox
 import mailbox
 import email.utils
 import datetime
+from bson import json_util
+
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
@@ -3096,7 +3098,10 @@ def store_mails(request, mails, path):
 
 @get_execution_time
 @register.assignment_tag
-def get_mails_in_box(request, mailboxname, username, mail_type):
+def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
+	print '*' * 20
+	print mail_type, '  <<<>>>  ', displayFrom
+	print '*' * 20
 	all_mail_boxes= Mailbox.objects.all()
 	required_mailbox=None
 	for box in all_mail_boxes:
@@ -3125,7 +3130,7 @@ def get_mails_in_box(request, mailboxname, username, mail_type):
 
 	if required_mailbox is not None:
 		emails=[]
-		if mail_type == 1:
+		if mail_type == '0':
 			print 'FETCHING NEW MAILS'
 			all_mails=required_mailbox.get_new_mail()
 			all_mails=list(reversed(all_mails))
@@ -3133,6 +3138,22 @@ def get_mails_in_box(request, mailboxname, username, mail_type):
 			i=1
 			for mail in all_mails:
 				emails.append({'mail_id':i, 'mail_data':mail})
+
+				# To manage the mails that comes as a part of the server-sync technique
+				if mail.subject == 'SYNCDATA':
+					if mail.attachments.count > 0:
+						all_attachments = mail.attachments.all()
+						all_attachments_path = ''
+						for attachment in all_attachments:
+							all_attachments_path = all_attachments_path + attachment.document.path + ';'
+						print all_attachments_path[:-1]
+						with open(all_attachments_path[:-1],'r') as json_file:
+							json_data = json_file.read()
+							json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','')
+							json_data = json_util.loads(json_data[1:-1])
+							temp_node = Node()
+							temp_node.save(json_data)
+
 				i+=1
 			print 'FETCHING NEW MAILS DONE'
 
