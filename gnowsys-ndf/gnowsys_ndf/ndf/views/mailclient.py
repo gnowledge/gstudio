@@ -25,6 +25,7 @@ import socket
 from imaplib import IMAP4
 import sqlite3
 import os
+import re
 #-----------------Dictionary of popular servers--------------#
 server_dict = {
     "Gmail": "imap.gmail.com",
@@ -109,6 +110,9 @@ def mailbox_create_edit(request, group_id):
         emailid_split = emailid.split('@')
         # make a mailbox from the above details
         newbox = Mailbox()
+
+        #TODO: clean up mailbox_name since it will later go as part of url for :settings, edit and delete pages.
+        characters_not_allowed= ['!','@',]
         newbox.name = mailbox_name
         webserver = server_dict[domain]
 
@@ -356,3 +360,19 @@ def mailclient_error_display(request, group_id, error_obj):
                     }
     variable = RequestContext(request,context_dict)
     return render_to_response(template,variable)
+
+@login_required
+@get_execution_time
+def mailbox_settings(request, group_id,mailboxname):    
+    template = "ndf/mailclient_settings.html"
+    group_name, group_id = get_group_name_id(group_id)
+    title = "Settings Page"
+    
+    context_dict = { "title" : title,
+                    "group_name" : group_name,
+                    "group_id" : group_id,
+                    "groupid" : group_id,
+                    "mailbox_name" : mailboxname
+                    }
+    variable = RequestContext(request,context_dict)
+    return render_to_response(template,variable)    
