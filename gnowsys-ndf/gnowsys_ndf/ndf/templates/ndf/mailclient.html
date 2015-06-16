@@ -57,9 +57,9 @@
 {% block add_resource_content %}
 
   <div class="BoxNames" style="padding-right:10px">
-    <a onclick="setMailBoxName('{{ user.username }}', '{{ csrf_token }}', document.getElementById('MetaBox').innerHTML,1); alterHyperLink('{{ user.username }}', '{{ csrf_token }}', document.getElementById('MetaBox').innerHTML,1)" ><h3 id="MetaBox">{% trans "MetaBox" %}</h3></a>
+    <a onclick="setMailBoxName('{{ user.username }}', '{{ csrf_token }}', document.getElementById('MetaBox').innerHTML);" ><h3 id="MetaBox">{% trans "MetaBox" %}</h3></a>
     {% for box in mailboxnames %}
-    <a onclick="setMailBoxName('{{ user.username }}','{{ csrf_token }}', document.getElementById('{{ box }}').innerHTML,1) ;alterHyperLink('{{ user.username }}', '{{ csrf_token }}', document.getElementById('{{ box }}').innerHTML,1)" ><h3 id={{ box }}>{% trans box %}</h3></a>
+    <a onclick="setMailBoxName('{{ user.username }}','{{ csrf_token }}', document.getElementById('{{ box }}').innerHTML);" ><h3 id={{ box }}>{% trans box %}</h3></a>
     {% endfor %}
   </div>
 {% endblock %}
@@ -71,28 +71,27 @@
     <h2 id="mailBoxName" style="float: left; width:50%;">MetaBox</h2>
     <div class="boxController" style="float: right; width:50%;" align="right">
     <a id="set_box" href="{% url 'mailbox_settings' groupid 'dummy' %}" class="button small">Mailbox Settings</a>
-    <a id="compose_mail" href="{% url 'compose_mail' groupid 'dummy' %}" class="button small">Write Mail</a>
-      
-      <a class="button small" href="#">
+    <a id="compose_mail" href="{% url 'compose_mail' groupid 'dummy' %}" class="button small">Write Mail</a>    
+    <a class="button small" onclick="decreaseMailFetchCount();">
             {% trans "<" %}
-      </a>
-      <a class="button small" href="#">
-        {% trans ">" %}
-      </a>
+          </a>
+          <a class="button small" onclick="increaseMailFetchCount();">
+            {% trans ">" %}
+          </a>
     </div>
   </div>
+  <div class='tabSpace' style = "height: 46px;">
 
-  <div class='tabSpace'>
     <div id='tab1' style="float:left; width:45%;border-right-style: solid; border-right-width: 1px;">
-      <h3  ><a id="unreadMailsLink" href=""  onclick="">{% trans "Unread Mails" %}</a></h3>
+      <h3><a  id="unreadMailsLink">{% trans "Unread Mails" %}</a></h3>
     </div>
 
     <div id='tab2' style="float:right; width:54%;">
-      <h3 style="margin-left: 20px;" ><a  id="readMailsLink"  href=""  onclick="">{% trans "Read Mails" %}</a></h3>
+      <h3 id="readMailsLink" style="margin-left: 20px;" ><a>{% trans "Read Mails" %}</a></h3>
     </div>
   </div>
   <!-- To Display the mails (first 10) of the active mailbox -->
-  <div class="mailBoxContent" style="height: 100rem; margin-top: 42px">
+  <div class="mailBoxContent" style="height: 100rem;">
     <!-- generate them iteratively -->
     
   </div>
@@ -100,3 +99,4 @@
   <!-- To Display the at the bottom of the mail box -->
   
 {% endblock %}
+

@@ -186,7 +186,9 @@ def render_mailbox_pane(request,group_id):
         "group_id" : group_id,
         "groupid" : group_id,
         'mailboxname': request.POST['mailBoxName'],
-        'username' : request.POST['username']
+        'username' : request.POST['username'],
+        'mail_type' : request.POST['mail_type'],
+        'displayFrom' : request.POST['startFrom']
         })
         return render_to_response(template,variable)
 
@@ -292,7 +294,6 @@ def mailbox_delete(request, group_id,mailboxname):
         mailbox_name= request.POST.get("mailbox_name","")
         user_id = request.POST.get("user_id","")
         mailbox_names = []
-        
         if yes == "YES":
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
@@ -341,6 +342,7 @@ def mailbox_delete(request, group_id,mailboxname):
 
                     #delete mailbox from django_mailbox's database
                     box.delete()
+                    
                     print "%s Deleted from django_mailbox" % mailbox_name
                 else:
                     print "Box not found > (fn: delete_mailbox)"

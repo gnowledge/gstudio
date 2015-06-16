@@ -34,6 +34,9 @@ import ast
 import string
 import json
 import locale
+import pymongo
+from bson import BSON
+from bson import json_util
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
@@ -84,6 +87,22 @@ def get_execution_time(f):
         return wrap
     if BENCHMARK == 'OFF':
         return f
+
+import json
+import bson
+def server_sync(func):
+    def wrap(*args, **kwargs):
+        ret = func(*args, **kwargs)
+        node = node_collection.one({'_id': ObjectId(kwargs['node'])})
+        # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
+        node_json = bson.json_util.dumps(node)
+        # node_json = json.dumps(node)
+        with open('/home/akazuko/test.json','w') as outfile:
+            json.dump(node_json, outfile)
+        print node_json
+        return ret
+
+    return wrap
 
 
 @get_execution_time
