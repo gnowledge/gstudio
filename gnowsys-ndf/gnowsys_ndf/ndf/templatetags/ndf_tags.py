@@ -3155,10 +3155,19 @@ def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
 						print all_attachments_path[:-1]
 						with open(all_attachments_path[:-1],'r') as json_file:
 							json_data = json_file.read()
-							json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','')
+							json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
 							json_data = json_util.loads(json_data[1:-1])
-							temp_node = Node()
-							temp_node.save(json_data)
+							
+							# We need to check from the _type what we have that needs to be saved
+							temp_node = node_collection.collection.GSystem()
+							# temp_node.structure = json_data
+							for key, values in json_data.items():
+								temp_node[key] = values
+							
+							print '*' * 30
+							print temp_node.structure
+							print '*' * 30
+							temp_node.save()
 
 				i+=1
 			print 'FETCHING NEW MAILS DONE'
