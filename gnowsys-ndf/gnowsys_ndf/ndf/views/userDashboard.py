@@ -67,7 +67,7 @@ def uDashboard(request, group_id):
     usrid = int(group_id)
     c=node_collection.find 
     d=node_collection.one
-    auth = b({'_type': "Author", 'created_by': usrid})
+    auth = d({'_type': "Author", 'created_by': usrid})
     group_id = auth._id
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
 
