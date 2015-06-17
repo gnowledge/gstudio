@@ -795,7 +795,7 @@ def get_collection(request, group_id, node_id):
 
 	if node and node.collection_set:
 		t=len(node.collection_set)
-		x=multiprocessing.cpu_count
+		x=multiprocessing.cpu_count()
 		n2=t/x
 		for i in range(x):
 			processes.append(multiprocessing.Process(target=sed,args=(node.collection_set[i*n2:(i+1)*n2])))
