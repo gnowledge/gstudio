@@ -240,14 +240,12 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
             lst1=already_selected_gapps
             x=mp.cpu_count()
             n2=n1/x
-            for i in x:
+            for i in range(x):
               processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2])))
-            for i in x:
+            for i in range(x):
               processes[i].start()
-            for i in x:
+            for i in range(x):
               processes[i].join()
-
-
     # Find all GAPPs
     meta_type = node_collection.one({
         "_type": "MetaType", "name": META_TYPE[0]
@@ -1624,21 +1622,23 @@ def get_property_order_with_value(node):
     
     demo["property_order"] = []
     type_of_set = []
+    type_of_set_append_temp=type_of_set.append
+    demo_prop_append_temp=demo["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          type_of_set.append(type_of)
+          type_of_set_append_temp(type_of)
 
       for po in gst["property_order"]:
         if po not in demo["property_order"]:
-          demo["property_order"].append(po)
+          demo_prop_append_temp(po)
 
     demo.get_neighbourhood(node["member_of"])
-
+    new_property_order_append_temp=new_property_order.append
     for tab_name, list_field_id_or_name in demo['property_order']:
       list_field_set = get_widget_built_up_data(list_field_id_or_name, demo, type_of_set)
-      new_property_order.append([tab_name, list_field_set])
+      new_property_order_append_temp([tab_name, list_field_set])
 
     demo["property_order"] = new_property_order
   
@@ -1649,9 +1649,10 @@ def get_property_order_with_value(node):
       
       if type_of_nodes.count():
         demo["property_order"] = []
+        demo_prop_append_temp=demo["property_order"].append
         for to in type_of_nodes:
           for po in to["property_order"]:
-            demo["property_order"].append(po)
+            demo_prop_append_temp(po)
 
       node_collection.collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
 
