@@ -697,6 +697,7 @@ def submitDoc(request, group_id):
     is_video = ""
     obj_id_instance = ObjectId()
     if request.method == "POST":
+        #a=request.POST.get
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
         language = request.POST.get("lan", "")
