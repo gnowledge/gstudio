@@ -97,7 +97,7 @@ def server_sync(func):
         # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
         node_json = bson.json_util.dumps(node)
         # node_json = json.dumps(node)
-        with open('/home/akazuko/test.json','w') as outfile:
+        with open('/home/tiwari/test.json','w') as outfile:
             json.dump(node_json, outfile)
         print node_json
         return ret
