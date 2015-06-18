@@ -90,6 +90,7 @@ def get_execution_time(f):
 
 import json
 import bson
+from django.core.mail import EmailMessage
 def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
@@ -99,7 +100,12 @@ def server_sync(func):
         # node_json = json.dumps(node)
         with open('/home/tiwari/test.json','w') as outfile:
             json.dump(node_json, outfile)
-        print node_json
+        mail = EmailMessage()
+        mail.subject = "SYNCDATA"
+        mail.to = ['djangotest94@gmail.com']
+        mail.attach_file('/home/tiwari/test.json')
+        mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+        mail.send()
         return ret
 
     return wrap
