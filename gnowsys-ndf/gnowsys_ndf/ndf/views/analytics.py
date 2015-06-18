@@ -106,26 +106,53 @@ def list_activities(request):
 
 	return render_to_response ("ndf/analytics_list_details.html",
 															{ "data" : lst})
-
+'''
 def activities_summary(request):
 	a = collection.find({"user" : request.user.username}).sort("last_update",1)
 	lst = []
-	sessions_dict ={}
+	sessions_list ={}
 	for doc in a :
 		#print '\n'+str(doc)
 		lst.append(doc)
 		sk = str(doc[u"session_key"])	
-		if sk in sessions_dict.keys():
-			sessions_dict[sk]["end_date"]	= doc[u"last_update"]		
-			sessions_dict[sk]["activities"]	+= 1
-			sessions_dict[sk]["duration"] = sessions_dict[sk]["end_date"] - sessions_dict[sk]["start_date"]
+		if sk in sessions_list.keys():
+			sessions_list[sk]["end_date"]	= doc[u"last_update"]		
+			sessions_list[sk]["activities"]	+= 1
+			sessions_list[sk]["duration"] = sessions_list[sk]["end_date"] - sessions_list[sk]["start_date"]
 		else :
-			sessions_dict[sk]	= {}
-			sessions_dict[sk]["start_date"]	= doc[u"last_update"]
-			sessions_dict[sk]["activities"]	= 1
-			#print str(sessions_dict)+'\n'
+			sessions_list[sk]	= {}
+			sessions_list[sk]["start_date"]	= doc[u"last_update"]
+			sessions_list[sk]["activities"]	= 1
+			#print str(sessions_list)+'\n'
 
-	#print sessions_dict
+	#print sessions_list
 
 	return render_to_response("ndf/analytics_summary.html",
-															{ "data" : sessions_dict})
+															{ "data" : sessions_list})
+'''
+def activities_summary(request):
+	a = collection.find({"user" : request.user.username}).sort("last_update",1)
+	lst = []
+	sessions_list =[]
+	d={}
+	i=-1
+	
+	for doc in a :
+		#print '\n'+str(doc)
+		lst.append(doc)
+		sk = str(doc[u"session_key"])
+		if i!=-1 and d['session_key']==sk :
+			sessions_list[i]["end_date"]	= doc[u"last_update"]		
+			sessions_list[i]["activities"]	+= 1
+			sessions_list[i]["duration"] = sessions_list[i]["end_date"] - sessions_list[i]["start_date"]
+		else :
+			d= {}
+			i+=1
+			d["session_key"]=sk
+			d["start_date"]	= doc[u"last_update"]
+			d["activities"]	= 1
+			sessions_list.append(d)
+
+
+	return render_to_response("ndf/analytics_summary.html",
+															{ "data" : sessions_list})
