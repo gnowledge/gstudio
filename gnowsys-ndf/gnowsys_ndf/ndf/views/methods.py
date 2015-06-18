@@ -12,6 +12,7 @@ from django.core.cache import cache
 
 from mongokit import paginator
 import mongokit
+import json
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -68,12 +69,28 @@ def get_execution_time(f):
 	        benchmark_node =  col.Benchmark()
 	        benchmark_node.time_taken = unicode(str(time_diff))
 	        benchmark_node.name = unicode(f.func_name)
+	        try :
+	        	#print args[0]
+	        
+	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+	        except : 
+	        	pass
+
+	        try :
+	        	benchmark_node.user = unicode(args[0].user.username)
+	        except :
+	        	pass
+	        
 	        benchmark_node.parameters = unicode(total_param)
 	        benchmark_node.size_of_parameters = unicode(total_parm_size)
 	        benchmark_node.last_update = datetime.today()
 	        #benchmark_node.functionOplength = unicode(getsizeof(ret))
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
+	        	url = benchmark_node.calling_url.split("/")
+	        	benchmark_node.action = url[2]
+	        	if url[3] != '' : 
+	        		benchmark_node.action += '/'+url[3]
 	        except:	
 	        	pass 
 	        benchmark_node.save()

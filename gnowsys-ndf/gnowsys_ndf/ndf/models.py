@@ -1525,6 +1525,10 @@ class Benchmark(DjangoDocument):
   objects = models.Manager()
 
   collection_name = 'Benchmarks'
+
+  #defining a separate collection for the analytics data.
+  collection_analytics = 'Analytics'
+
   structure = {
     '_type':unicode,
     'name': unicode,
@@ -1533,8 +1537,12 @@ class Benchmark(DjangoDocument):
     'size_of_parameters':unicode,
     'function_output_length':unicode,
     'calling_url':unicode,
-    'last_update': datetime.datetime
+    'last_update': datetime.datetime,
+    'action' : basestring,
+    'user' : basestring,
+    'session_key' : basestring
   }
+
   required_fields = ['name']
   use_dot_notation = True
 
