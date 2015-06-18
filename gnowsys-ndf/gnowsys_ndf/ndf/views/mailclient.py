@@ -343,6 +343,15 @@ def mailbox_delete(request, group_id,mailboxname):
                     #delete mailbox from django_mailbox's database
                     box.delete()
                     
+                    # get it from the user
+                    want_archive=None
+                    if want_archive:
+                        # change the mailbox folder from its existing location to the archives data folder
+                        print 'PENDING!'
+                    else:
+                        # directly delete the folder from the system
+                        print 'PENDING!'
+
                     print "%s Deleted from django_mailbox" % mailbox_name
                 else:
                     print "Box not found > (fn: delete_mailbox)"
