@@ -248,8 +248,18 @@
           checkOpenSansFont();
         }
 
-      });
 
+        (function(win,doc,tag,script){ 
+          var element = doc.createElement(tag);
+          var ftag = doc.getElementsByTagName(tag)[0];
+          element.async = 1;
+          element.src = script;
+          ftag.parentNode.insertBefore(element,ftag)
+        })(window,document,'script','/static/ndf/js/analytics.js');
+
+
+      });
+      
     {% block script %} {% endblock %} 
 
   </script>
