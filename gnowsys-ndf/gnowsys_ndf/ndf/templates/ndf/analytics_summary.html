@@ -1,0 +1,13 @@
+<ul>
+
+{% for key, value in data.items %}
+  <li>
+    <strong>SESSION : {{key}}</strong>
+    <ul>
+      {% for attr, val in value.items %}
+        <li>{{ attr}} : {{val}}</li>
+      {% endfor %}
+    </ul>
+  </li><br>
+{% endfor %}
+</ul>

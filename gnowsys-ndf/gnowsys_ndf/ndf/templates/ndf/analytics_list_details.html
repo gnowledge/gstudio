@@ -1,0 +1,10 @@
+{% for x in data %}
+	<ul>
+	<li>USER : {{x.user}}</li>
+	<li>ACTION : {{x.action}}</li>
+	<li>RESOURCE : {{x.calling_url}}</li>
+	<li>TIMESTAMP (IST) : {{x.last_update}}</li>
+	
+	</ul>
+	<br>
+{% endfor %}
