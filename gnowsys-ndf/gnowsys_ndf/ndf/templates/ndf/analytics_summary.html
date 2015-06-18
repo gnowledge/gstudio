@@ -1,0 +1,14 @@
+<ul>
+
+{% for x in data %}
+  <li>
+    <strong>SESSION : {{x.session_key}}</strong>
+    <li> Start_date : {{x.start_date}}</li>
+	<li> End_date : {{x.end_date}}</li>
+    <li> Duration : {{x.duration}}</li>
+    <li> Activities : {{x.activities}}</li>
+    
+  </li>
+  <br>
+{% endfor %}
+</ul>
