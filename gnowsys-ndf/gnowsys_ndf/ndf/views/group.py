@@ -661,8 +661,9 @@ def group(request, group_id, app_id=None, agency_type=None):
                                    }).sort('last_update', -1)
 
       if cur_groups_user.count():
-        for group in cur_groups_user:
-          group_nodes.append(group)
+      #  for group in cur_groups_user:
+      #   group_nodes.append(group)
+        group_nodes=[group for group in cur_groups_user]
 
       group_count = cur_groups_user.count()
         
@@ -680,9 +681,9 @@ def group(request, group_id, app_id=None, agency_type=None):
                                    }).sort('last_update', -1)
   
       if cur_public.count():
-        for group in cur_public:
-          group_nodes.append(group)
-      
+#       for group in cur_public:
+#         group_nodes.append(group)
+        group_nodes=[group for group in cur_public]
       group_count = cur_public.count()
 
     return render_to_response("ndf/group.html",
