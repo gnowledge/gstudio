@@ -3051,12 +3051,13 @@ def read_mails(path, _type, start, end):
 
 # Function to store the newly fetched mails stored in 'maildir' format
 def store_mails(request, mails, path):
-	# print request
+
 	for mail in mails:
 		from_addr = email.utils.formataddr(('Author', mail.from_address[0]))
 		to_addr = email.utils.formataddr(('Recipient', mail.to_addresses[0]))
 		now = datetime.datetime.now()
 		cc_addr = None
+		
 		if len(mail.to_addresses) > 1:
 			nameslist = mail.to_addresses[1:-1]		
 			cc_list=""
@@ -3065,7 +3066,7 @@ def store_mails(request, mails, path):
 			
 			cc_list = cc_list + mail.to_addresses[-1]
 			cc_addr = email.utils.formataddr(('CC List', cc_list))
-		print path
+
 		mbox = mailbox.Maildir(path)
 		mbox.lock()
 
@@ -3105,25 +3106,37 @@ def store_mails(request, mails, path):
 @get_execution_time
 @register.assignment_tag
 def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
-	print '*' * 20
-	print mail_type, '  <<<>>>  ', displayFrom
-	print '*' * 20
+
+	'''
+	This function establishes the connection and fetches the mails from the corresponding imap server.
+	During fetching it checks for the subject of the mail and then segregates mails either for local 
+	storage or update the mongodb with the data received. The mails are stored in maildir format in the 
+	'ndf/mailbox_data' folder.
+
+	'''
+
+	# To get the mail box instance based upon the unique name of the mailbox
 	all_mail_boxes= Mailbox.objects.all()
 	required_mailbox=None
 	for box in all_mail_boxes:
 		if box.name == mailboxname:
 			required_mailbox=box
 			break
+	
+	# To find the path to the mailbox_data folder where the mails are stored in the maildir format
 	settings_dir = os.path.dirname(__file__)
 	PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
 	path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
 	path = path + username
+	
+	
+	# Necessary for the storage of mails in maildir format : if not exists -> make the corresponding the directories
 	if not os.path.exists(path):
 		os.makedirs(path)
+	
 	path = path + '/' + mailboxname
 	if not os.path.exists(path):
 		os.makedirs(path)
-	print path
 
 	if not os.path.exists(path):
 		os.makedirs(path)
@@ -3136,6 +3149,7 @@ def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
 
 	if required_mailbox is not None:
 		emails=[]
+
 		if mail_type == '0':
 			print 'FETCHING NEW MAILS'
 			all_mails=required_mailbox.get_new_mail()
@@ -3152,15 +3166,20 @@ def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
 						all_attachments_path = ''
 						for attachment in all_attachments:
 							all_attachments_path = all_attachments_path + attachment.document.path + ';'
-						print all_attachments_path[:-1]
 						with open(all_attachments_path[:-1],'r') as json_file:
 							json_data = json_file.read()
 							json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
 							json_data = json_util.loads(json_data[1:-1])
 							
 							# We need to check from the _type what we have that needs to be saved
-							temp_node = node_collection.collection.GSystem()
-							# temp_node.structure = json_data
+							temp_node = node_collection.one({'_type': u'GSystem', '_id': json_data['_id']})
+							if temp_node['name'] != []:
+								print '*' * 30
+								print 'exists'
+								print '*' * 30
+							else:
+								temp_node = node_collection.collection.GSystem()
+							
 							for key, values in json_data.items():
 								temp_node[key] = values
 							
@@ -3183,7 +3202,7 @@ def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
 			
 			print 'FETCHING DONE'
 	else:
-		print 'lol'
+		print 'ERROR : NO SUCH MAILBOX'
 
 ##############################################
 #Fn to create the default metastudio mailbox for the studio
