@@ -31,4 +31,4 @@ function registerEvent(action, resource) {
 	});
 }
 
-registerEvent('link', location.pathname);
+registerEvent('video/seen', '04:32');
