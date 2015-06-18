@@ -294,8 +294,9 @@ def create_edit_page(request, group_id, node_id=None):
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
-    for each in available_nodes:
-      nodes_list.append(str((each.name).strip().lower()))
+   # for each in available_nodes:
+   #   nodes_list.append(str((each.name).strip().lower()))
+    node_list=[str((each.name).strip().lower()) for each in available_nodes]
 
     if node_id:
         page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
