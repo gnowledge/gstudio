@@ -691,6 +691,7 @@ def submitDoc(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     alreadyUploadedFiles = []
+    alreadyUploadedFiles_append_temp=alreadyUploadedFiles.append
     str1 = ''
     img_type=""
     topic_file = ""
@@ -727,7 +728,7 @@ def submitDoc(request, group_id):
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
             if isinstance(f, list):
-              alreadyUploadedFiles.append(f)
+              alreadyUploadedFiles_append_temp(f)
               title = mtitle
         
         # str1 = alreadyUploadedFiles
@@ -1237,16 +1238,17 @@ def file_detail(request, group_id, _id):
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
         shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
-        
+        shelves_append_temp=shelves.append
         if shelf:
             for each in shelf:
                 shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
-                shelves.append(shelf_name)
+                shelves_append_temp(shelf_name)
 
-                shelf_list[shelf_name.name] = []         
+                shelf_list[shelf_name.name] = []   
+                shelf_list_shelfname_append_temp=shelf_list[shelf_name.name].append      
                 for ID in shelf_name.collection_set:
                     shelf_item = node_collection.one({'_id': ObjectId(ID) })
-                    shelf_list[shelf_name.name].append(shelf_item.name)
+                    shelf_list_shelfname_append_temp(shelf_item.name)
                 
         else:
             shelves = []
