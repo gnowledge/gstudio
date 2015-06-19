@@ -1235,8 +1235,8 @@ def tag_info(request, group_id, tagname=None):
             cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
                                         'group_set':ObjectId(group_id)
                   })
-            for every in cur:
-                search_result.append(every)
+           
+            search_result=[every for every in cur]
 
     # Autheticate user can see all public files
     elif request.user.is_authenticated():
@@ -1258,8 +1258,8 @@ def tag_info(request, group_id, tagname=None):
                                             {'created_by': userid},
                                           ]
                                       })
-            for every in cur:
-                search_result.append(every)
+            
+            search_result=[every for every in cur]
 
     else:  # Unauthenticated user can see all public files.
         group_node = node_collection.one({'_id': ObjectId(group_id)})
@@ -1270,8 +1270,8 @@ def tag_info(request, group_id, tagname=None):
                                                'status': u'PUBLISHED'
                                             }
                                      )
-                for every in cur:
-                    search_result.append(every)
+                
+                search_result=[every for every in cur]
 
     if search_result:
         total = len(search_result)
@@ -1502,19 +1502,19 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   if not isinstance(at_rt_objectid_or_attr_name_list, list):
     at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
 
-  a=type_of_set.append  
+  type_of_set_append_temp=type_of_set.append  
   if not type_of_set:
     node["property_order"] = []
-    b=node["property_order"].append
+    node_property_order_append_temp=node["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          a(type_of)
+          type_of_set_append_temp(type_of)
 
       for po in gst["property_order"]:
         if po not in node["property_order"]:
-          b(po)    
+          node_property_order_append_temp(po)    
           
 
   BASE_FIELD_METADATA = {
@@ -1527,7 +1527,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   }
 
   widget_data_list = []
-  c=widget_data_list.append
+  widget_data_list_append_temp=widget_data_list.append
   for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
     if type(at_rt_objectid_or_attr_name) == ObjectId: #ObjectId.is_valid(at_rt_objectid_or_attr_name):
       # For attribute-field(s) and/or relation-field(s)
@@ -1587,7 +1587,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
         data_type = node.structure[field.name]
         value = node[field.name]
 
-      c({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
+      widget_data_list_append_temp({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
                               '_id': field._id, 
                               'data_type': data_type,
                               'name': field.name, 'altnames': altnames,
@@ -1598,7 +1598,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
       # For node's base-field(s)
 
       # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
-      c({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+      widget_data_list_append_temp({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
                               'data_type': node.structure[at_rt_objectid_or_attr_name],
                               'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
                               'value': node[at_rt_objectid_or_attr_name],
