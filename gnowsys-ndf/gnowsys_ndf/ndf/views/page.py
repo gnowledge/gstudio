@@ -176,10 +176,10 @@ def page(request, group_id, app_id=None):
 
           if node is None:
             node = node_collection.find({'member_of':ObjectId(app_id)})
-
+          content_append_temp=content.append
           for nodes in node:
             node,ver=get_versioned_page(nodes) 
-            content.append(node)  
+            content_append_temp(node)  
 
                     
           # rcs content ends here
