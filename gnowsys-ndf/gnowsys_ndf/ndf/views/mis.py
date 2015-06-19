@@ -469,16 +469,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                 File = 'True'
         
     if app_set_instance_id : # at and rt set editing instance
-        system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})
-"""     for eachatset in systemtype_attributetype_set :
-            eachattribute = triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
-            if eachattribute :
-                eachatset['database_value'] = eachattribute.object_value
-                eachatset['database_id'] = str(eachattribute._id)
-            else :
-                eachatset['database_value'] = ""
-                eachatset['database_id'] = ""
-"""     def multi_(lst):
+        system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})    
+        def multi_(lst):
             for eachatset in lst:
                 eachattribute=triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
                 if eachattribute :
@@ -498,20 +490,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         for i in range(x):
             processes[i].join()
 
-
-
-"""     for eachrtset in systemtype_relationtype_set :
-            eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})       
-            if eachrelation:
-                right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
-                eachrtset['database_id'] = str(eachrelation._id)
-                eachrtset["database_value"] = right_subject.name
-                eachrtset["database_value_id"] = str(right_subject._id)
-            else :
-                eachrtset['database_id'] = ""
-                eachrtset["database_value"] = ""
-                eachrtset["database_value_id"] = ""
-"""     def multi_2(lst):
+        def multi_2(lst):
             for eachrtset in lst:
                 eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})       
                 if eachrelation:
@@ -551,10 +530,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         map_geojson_data = request.POST.get('map-geojson-data') # getting markers
         user_last_visited_location = request.POST.get('last_visited_location') # getting last visited location by user
         file1 = request.FILES.get('file', '')
-"""     for each in systemtype_attributetype_set:
-            if request.POST.get(each["type_id"],"") :
-                request_at_dict[each["type_id"]] = request.POST.get(each["type_id"],"")
-"""     def multi_3(lst):
+
+        def multi_3(lst):
             for each in lst:
                 if request.POST.get(each["type_id"],"") :
                     request_at_dict[each["type_id"]] = request.POST.get(each["type_id"],"")
@@ -568,10 +545,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         for i in range(x):
             processes3[i].join()
 
-"""     for eachrtset in systemtype_relationtype_set:
-            if request.POST.get(eachrtset["type_id"],""):
-                request_rt_dict[eachrtset["type_id"]] = request.POST.get(eachrtset["type_id"],"")
-"""     def multi_4(lst):
+        def multi_4(lst):
             for eachrtset in lst:
                 if request.POST.get(eachrtset["type_id"],""):
                     request_rt_dict[eachrtset["type_id"]] = request.POST.get(eachrtset["type_id"],"")
@@ -647,15 +621,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         newgsystem.save()
 
         if not app_set_instance_id:
-"""         for key, value in request_at_dict.items():
-                attributetype_key = node_collection.find_one({"_id":ObjectId(key)})
-                ga_node = create_gattribute(newgsystem._id, attributetype_key, value)
-                # newattribute = triple_collection.collection.GAttribute()
-                # newattribute.subject = newgsystem._id
-                # newattribute.attribute_type = attributetype_key
-                # newattribute.object_value = value
-                # newattribute.save()
-"""         def multi_5(lst):
+        
+            def multi_5(lst):
                 for key,value in lst:
                     attributetype_key = node_collection.find_one({"_id":ObjectId(key)})
                     ga_node = create_gattribute(newgsystem._id, attributetype_key, value)
@@ -693,7 +660,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n1=len(lst12)
             n2=n1/x
             for i in range(x):
-                processes6.append(mp.Process(target=multi_6,args=(request_rt_dict.items()[i*n2:(i+1)*n2])))
+                processes6.append(mp.Process(target=multi_6,args=(lst12[i*n2:(i+1)*n2])))
             for i in range(x):
                 processes6[i].start()
             for i in range(x):
