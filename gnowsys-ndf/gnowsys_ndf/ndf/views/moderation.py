@@ -84,7 +84,7 @@ def moderation_status(request, group_id, node_id):
     	is_under_moderation = False
 
     # print "is_under_moderation : ", is_under_moderation
-    print "=== ", current_mod_group_obj._id
+    # print "=== ", current_mod_group_obj._id
 
     return render_to_response('ndf/under_moderation.html', {
 		'group_id': group_id, 'groupid': group_id, 'node': node, 'title': 'Under Moderation Status',
@@ -154,9 +154,9 @@ def approve_resource(request, group_id):
 		# make deep copy of object and not to copy it's reference with [:].
 		group_set_details_dict = get_moderator_group_set(node_group_set[:], group_id, get_details=True)
 		updated_group_set = group_set_details_dict['updated_group_set']
-		print "==== updated_group_set : ", updated_group_set
-		print "==== node_group_set : ", node_group_set
-		print "==== group_set_details_dict : ", group_set_details_dict
+		# print "==== updated_group_set : ", updated_group_set
+		# print "==== node_group_set : ", node_group_set
+		# print "==== group_set_details_dict : ", group_set_details_dict
 
 		# if set(node_group_set) != set(updated_group_set):
 		if group_set_details_dict['is_group_set_updated']:
