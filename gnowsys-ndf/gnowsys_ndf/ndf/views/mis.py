@@ -568,10 +568,10 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         for i in range(x):
             processes3[i].join()
 
-        for eachrtset in systemtype_relationtype_set:
+"""     for eachrtset in systemtype_relationtype_set:
             if request.POST.get(eachrtset["type_id"],""):
                 request_rt_dict[eachrtset["type_id"]] = request.POST.get(eachrtset["type_id"],"")
-        def multi_4(lst):
+"""     def multi_4(lst):
             for eachrtset in lst:
                 if request.POST.get(eachrtset["type_id"],""):
                     request_rt_dict[eachrtset["type_id"]] = request.POST.get(eachrtset["type_id"],"")
