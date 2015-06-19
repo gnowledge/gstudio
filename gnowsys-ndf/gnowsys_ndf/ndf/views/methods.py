@@ -502,9 +502,10 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id not in nlist:
           dict1[each._id] = each
 
-      for oid in nlist:
-        obj = node_collection.one({'_id': oid})
-        dict2.append(obj)
+#    for oid in nlist:
+#     obj = node_collection.one({'_id': oid})
+#     dict2.append(obj)
+      dict2=[node_collection.one({'_id': oid}) for oid in nlist]
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -516,9 +517,10 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
           if each._id not in nlist:
             dict1[each._id] = each
           
-      for oid in nlist: 
-        obj = node_collection.one({'_id': oid})
-        dict2.append(obj)
+   # for oid in nlist: 
+   #    obj = node_collection.one({'_id': oid})
+   #    dict2.append(obj)
+      dict2=[node_collection.one({'_id': oid})  for oid in nlist]
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -755,6 +757,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
         if tag:
             tags_list.append(tag)
+
+
 
     if set(node.tags) != set(tags_list):
         node.tags = tags_list
