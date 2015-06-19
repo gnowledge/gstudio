@@ -724,7 +724,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   nav_l=request.GET.get('nav_li','')
   breadcrumbs_list = []
   nav_li = ""
-
+  breadcrumbs_list_append_temp=breadcrumbs_list.append
   if nav_l:
     nav_li = nav_l
     nav_l = str(nav_l).split(",")
@@ -739,9 +739,9 @@ def topic_detail_view(request, group_id, app_Id=None):
             if each_obj.prior_node:
                 theme_obj = node_collection.one({'_id': ObjectId(each_obj.prior_node[0] ) })
                 theme_id = theme_obj._id
-                breadcrumbs_list.append( (str(theme_obj._id), theme_obj.name) )
+                breadcrumbs_list_append_temp( (str(theme_obj._id), theme_obj.name) )
 
-        breadcrumbs_list.append( (str(each_obj._id), each_obj.name) )
+        breadcrumbs_list_append_temp( (str(each_obj._id), each_obj.name) )
 
 
 
@@ -752,6 +752,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 
   ###shelf###
   shelves = []
+  shelves_append_temp=shelves.append
   shelf_list = {}
   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
@@ -763,12 +764,13 @@ def topic_detail_view(request, group_id, app_Id=None):
 	  if shelf:
 	    for each in shelf:
 	        shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)}) 
-	        shelves.append(shelf_name)
+	        shelves_append_temp(shelf_name)
 
 	        shelf_list[shelf_name.name] = []
+            shelf_list_shlefname_append_temp=shelf_list[shelf_name.name].append
 	        for ID in shelf_name.collection_set:
 	        	shelf_item = node_collection.one({'_id': ObjectId(ID) })
-	        	shelf_list[shelf_name.name].append(shelf_item.name)
+	        	shelf_list_shlefname_append_temp(shelf_item.name)
 
 	  else:
 	    shelves = []
