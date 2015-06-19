@@ -637,7 +637,7 @@ def get_topic_contents(request, group_id):
 def get_collection_list(collection_list, node):
   inner_list = []
   error_list = []
-  
+  inner_list_append_temp=inner_list.append
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -651,9 +651,9 @@ def get_collection_list(collection_list, node):
               inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
               if inner_sub_list:
-                inner_list.append(inner_sub_list[0])
+                inner_list_append_temp(inner_sub_list[0])
               else:
-                inner_list.append(inner_sub_dict)
+                inner_list_append_temp(inner_sub_dict)
 
               cl.update({'children': inner_list })
       else:
@@ -775,25 +775,25 @@ def get_collection(request, group_id, node_id):
 """
 @get_execution_time
 def get_collection(request, group_id, node_id):
-	node = node_collection.one({'_id':ObjectId(node_id)})
+  node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
-	collection_list = []
+  collection_list = []
+  collection_list_append_temp=collection_list.append
   
  # def a(p,q,r):
 #		collection_list.append({'name': p, 'id': q,'node_type': r})
-	processes=[]
-	def sed(lst):
-    a=collection_list.append
+  processes=[]
+  def sed(lst):
 		for each in lst:
 			obj = node_collection.one({'_id': ObjectId(each) })
 			if obj:
 			  node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        a({'name':obj.name,'id':obj.pk,'node_type':node_type})
-        collection_list = get_inner_collection(collection_list, obj)
+                          collection_list_append_temp({'name':obj.name,'id':obj.pk,'node_type':node_type})
+                          collection_list = get_inner_collection(collection_list, obj)
 			#collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
 			  
 
-	if node and node.collection_set:
+  if node and node.collection_set:
 		t=len(node.collection_set)
 		x=multiprocessing.cpu_count()
 		n2=t/x
@@ -803,9 +803,9 @@ def get_collection(request, group_id, node_id):
 			processes[i].start()
 		for i in range(x):
 			processes[i].join()
-	data = collection_list
+  data = collection_list
 
-	return HttpResponse(json.dumps(data))
+  return HttpResponse(json.dumps(data))
 @get_execution_time
 def add_sub_themes(request, group_id):
   if request.is_ajax() and request.method == "POST":
