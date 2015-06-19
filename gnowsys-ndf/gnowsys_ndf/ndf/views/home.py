@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.views.generic import RedirectView
 from gnowsys_ndf.ndf.views.methods import get_execution_time
-import pyopencl 
 
 try:
     from bson import ObjectId
