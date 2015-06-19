@@ -55,11 +55,11 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     app = None
     a=node_collection.one
     if app_id is None:
-      app = a({'_type': "GSystemType", 'name': app_name})
+      app = node_collection.one({'_type': "GSystemType", 'name': app_name})
       if app:
         app_id = str(app._id)
     else:
-      app = a({'_id': ObjectId(app_id)})
+      app = node_collection.one({'_id': ObjectId(app_id)})
 
     app_name = app.name
 
@@ -93,16 +93,16 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
     if request.user.id:
       if auth is None:
-        auth = a({'_type': 'Author', 'created_by':int(request.user.id)})
+        auth = node_collection.one({'_type': 'Author', 'created_by':int(request.user.id)})
 
       agency_type = auth.agency_type
-      agency_type_node = a({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+      agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
       if agency_type_node:
         #b=app_collection_set.append
         #for eachset in agency_type_node.collection_set:
         #  b(a({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))     
 
-        app_collection_set=[a({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]  
+        app_collection_set=[node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]  
 
 
     # for eachset in app.collection_set:
@@ -111,14 +111,14 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
-      app_set = a({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+      app_set = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
       
       view_file_extension = ".py"
       app_set_view_file_name = ""
       app_set_view_file_path = ""
 
       if app_set.type_of:
-        app_set_type_of = a({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
+        app_set_type_of = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
 
         app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
         # print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
@@ -163,10 +163,10 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       template = "ndf/"+template_prefix+"_list.html"
       title = app_name
 
-      university_gst = a({'_type': "GSystemType", 'name': "University"})
-      student_gst = a({'_type': "GSystemType", 'name': "Student"})
+      university_gst = node_collection.one({'_type': "GSystemType", 'name': "University"})
+      student_gst = node_collection.one({'_type': "GSystemType", 'name': "Student"})
 
-      mis_admin = a(
+      mis_admin = node_collection.one(
           {'_type': "Group", 'name': "MIS_admin"},
           {'_id': 1}
       )
@@ -208,15 +208,15 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         #for each in systemtype.relation_type_set:
         #    systemtype_relationtype_set.append({"rt_name":each.name,"type_id":str(each._id)})
         systemtype_relationtype_set=[{"rt_name":each.name,"type_id":str(each._id)} for each in systemtype.relation_type_set] 
-        c=atlist.append
-        d=rtlist.append   
+        atlist_append_temp=atlist.append
+        rtlist_append_temp=rtlist.append   
         for eachatset in systemtype_attributetype_set :
             for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])}):
-                c({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
+                atlist_append_temp({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
         for eachrtset in systemtype_relationtype_set :
             for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
                 right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
-                d({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
+                rtlist_append_temp({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
 
         # To support consistent view
 
@@ -224,7 +224,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         system.get_neighbourhood(systemtype._id)
 
         # array of dict for events ---------------------
-        e=events_arr.append
+        events_arr_append_temp=events_arr.append
         # if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
         if 'organiser_of_event' in system and len(system.organiser_of_event): # gives list of events
             for event in system.organiser_of_event:
@@ -244,7 +244,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                     dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
                 tempdict['id'] = str(event._id)
-                e.append(tempdict)
+                events_arr_append_temp(tempdict)
 
         # elif system.has_key('event_organised_by'): # gives list of colleges/host of events
         elif 'event_organised_by' in system:  # gives list of colleges/host of events
@@ -265,25 +265,25 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                     tempdict['end'] = dt
 
                 tempdict['id'] = str(host._id)
-                e(tempdict)
+                events_arr_append_temp(tempdict)
 
         # print json.dumps(events_arr)
 
         # END --- array of dict for events ---------------------
-
+        property_display_order_append_temp=property_display_order.append
         for tab_name, fields_order in property_order:
             display_fields = []
-            f=display_fields.append
+            display_fields_append_temp=display_fields.append
             for field, altname in fields_order:
                 if system.structure[field] == bool:
-                    f((altname, ("Yes" if system[field] else "No")))
+                    display_fields_append_temp((altname, ("Yes" if system[field] else "No")))
 
                 elif not system[field]:
-                    f((altname, system[field]))
+                    display_fields_append_temp((altname, system[field]))
                     continue
 
                 elif system.structure[field] == datetime.datetime:
-                    f((altname, system[field].date()))
+                    display_fields_append_temp((altname, system[field].date()))
 
                 elif type(system.structure[field]) == list:
                     if system[field]:
@@ -291,20 +291,20 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                             name_list = []
                             for right_sub_dict in system[field]:
                                 name_list.append(right_sub_dict.name)
-                            f((altname, ", ".join(name_list)))
+                            display_fields_append_temp((altname, ", ".join(name_list)))
                         elif system.structure[field][0] == datetime.datetime:
                             date_list = []
                             #for dt in system[field]:
                             #    date_list.append(dt.strftime("%d/%m/%Y"))
                             date_list=[dt.strftime("%d/%m/%Y") for dt in system[field]]
-                            f((altname, ", ".join(date_list)))
+                            display_fields_append_temp((altname, ", ".join(date_list)))
                         else:
-                            f((altname, ", ".join(system[field])))
+                            display_fields_append_temp((altname, ", ".join(system[field])))
 
                 else:
-                    f((altname, system[field]))
+                    display_fields_append_temp((altname, system[field]))
 
-            property_display_order.append((tab_name, display_fields))
+            property_display_order_append_temp((tab_name, display_fields))
 
         # End of code
 
@@ -660,10 +660,11 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                     attributetype_key = node_collection.find_one({"_id":ObjectId(key)})
                     ga_node = create_gattribute(newgsystem._id, attributetype_key, value)
             processes5=[]
-            n1=len(request_at_dict.items())
+            lst11=request_at_dict.items()
+            n1=len(lst11)
             n2=n1/x
             for i in range(x):
-                processes5.append(mp.Process(target=multi_5,args=(request_at_dict.items()[i*n2:(i+1)*n2])))
+                processes5.append(mp.Process(target=multi_5,args=(lst11[i*n2:(i+1)*n2])))
             for i in range(x):
                 processes5[i].start()
             for i in range(x):
@@ -688,7 +689,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         right_subject = node_collection.find_one({"_id": ObjectId(value)})
                         gr_node = create_grelation(newgsystem._id, relationtype_key, right_subject._id)
             processes6=[]
-            n1=len(request_rt_dict.items())
+            lst12=request_rt_dict.items()
+            n1=len(lst12)
             n2=n1/x
             for i in range(x):
                 processes6.append(mp.Process(target=multi_6,args=(request_rt_dict.items()[i*n2:(i+1)*n2])))
