@@ -723,7 +723,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
-
+  inner_list_append_temp=inner_list.append
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -736,9 +736,9 @@ def get_inner_collection(collection_list, node):
             inner_sub_list = get_inner_collection(inner_sub_list, col_obj)
 
             if inner_sub_list:
-              inner_list.append(inner_sub_list[0])
+              inner_list_append_temp(inner_sub_list[0])
             else:
-              inner_list.append(inner_sub_dict)
+              inner_list_append_temp(inner_sub_dict)
 
             cl.update({'children': inner_list })
       else:
@@ -783,11 +783,11 @@ def get_collection(request, group_id, node_id):
 #		collection_list.append({'name': p, 'id': q,'node_type': r})
 	processes=[]
 	def sed(lst):
+    a=collection_list.append
 		for each in lst:
 			obj = node_collection.one({'_id': ObjectId(each) })
 			if obj:
 			  node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        a=collection_list.append
         a({'name':obj.name,'id':obj.pk,'node_type':node_type})
         collection_list = get_inner_collection(collection_list, obj)
 			#collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
@@ -3103,9 +3103,9 @@ def get_districts(request, group_id):
         }).sort('name', 1)
 
         if cur_districts.count():
-          for d in cur_districts:
-            districts.append([str(d.subject), d.name.split(" -- ")[0]])
-
+       #  for d in cur_districts:
+       #    districts.append([str(d.subject), d.name.split(" -- ")[0]])
+          districts=[[str(d.subject), d.name.split(" -- ")[0]] for d in cur_districts]
         else:
           error_message = "No districts found"
           raise Exception(error_message)
@@ -5468,6 +5468,8 @@ def page_scroll(request,group_id,page):
        page='1'  
     if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
+    user_activity_append_temp=user_activity.append
+    files_list_append_temp=files_list.append
     for each in (paged_resources.page(int(page))).object_list:
             if each.created_by == each.modified_by :
                if each.last_update == each.created_at:
@@ -5478,9 +5480,9 @@ def page_scroll(request,group_id,page):
                activity =  'created'
         
             if each._type == 'Group':
-               user_activity.append(each)
+               user_activity_append_temp(each)
             each.update({'activity':activity})
-            files_list.append(each)
+            files_list_append_temp(each)
             
  else:
       page=0           
