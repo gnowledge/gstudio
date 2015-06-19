@@ -40,7 +40,6 @@ from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
 from collections import OrderedDict
-#import pyopencl
 col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
@@ -297,29 +296,28 @@ def get_forum_repl_type(forrep_id):
 
 @get_execution_time
 def check_existing_group(group_name):
-  a=node_collection.find
   if type(group_name) == 'unicode':
-    colg = a({'_type': u'Group', "name": group_name})
+    colg = node_collection.find({'_type': u'Group', "name": group_name})
     if colg.count()>0:
       return True
     if ins_objectid.is_valid(group_name):    #if group_name holds group_id
-      colg = a({'_type': u'Group', "_id": ObjectId(group_name)})
+      colg = node_collection.find({'_type': u'Group', "_id": ObjectId(group_name)})
     if colg.count()>0:
       return True
     else:
-      colg = a({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
       if colg.count()>0:
         return True      
   else:
     if ins_objectid.is_valid(group_name):     #if group_name holds group_id
-      colg = a({'_type': u'Group', "_id": ObjectId(group_name)})
+      colg = node_collection.find({'_type': u'Group', "_id": ObjectId(group_name)})
       if colg.count()>0:
         return True
-      colg = a({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
       if colg.count()>0:
         return True
     else:
-      colg = a({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
+      colg = node_collection.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
   if colg.count() >= 1:
     return True
   else:
@@ -502,9 +500,6 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id not in nlist:
           dict1[each._id] = each
 
-#    for oid in nlist:
-#     obj = node_collection.one({'_id': oid})
-#     dict2.append(obj)
       dict2=[node_collection.one({'_id': oid}) for oid in nlist]
 
       dict_drawer['1'] = dict1
@@ -517,9 +512,6 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
           if each._id not in nlist:
             dict1[each._id] = each
           
-   # for oid in nlist: 
-   #    obj = node_collection.one({'_id': oid})
-   #    dict2.append(obj)
       dict2=[node_collection.one({'_id': oid})  for oid in nlist]
 
       dict_drawer['1'] = dict1
@@ -758,13 +750,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         if tag:
             tags_list.append(tag)
 
-
-
     if set(node.tags) != set(tags_list):
         node.tags = tags_list
         is_changed = True
       
-
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
         changed = build_collection(node, check_collection, right_drawer_list, checked)
