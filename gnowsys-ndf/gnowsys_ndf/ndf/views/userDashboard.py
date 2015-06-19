@@ -65,7 +65,7 @@ def userpref(request,group_id):
 @get_execution_time
 def uDashboard(request, group_id):
     usrid = int(group_id) 
-    auth = d({'_type': "Author", 'created_by': usrid})
+    auth = node_collection.one({'_type': "Author", 'created_by': usrid})
     group_id = auth._id
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
 
@@ -131,7 +131,7 @@ def uDashboard(request, group_id):
                     # Reset already uploaded as to be selected
                     profile_pic_image = create_grelation(auth._id, has_profile_pic, right_subject)
 
-                profile_pic_image = d({'_type': "File", '_id': right_subject})
+                profile_pic_image = node_collection.one({'_type': "File", '_id': right_subject})
 
             else:
                 # Otherwise (md5 doesn't exists)
@@ -266,7 +266,7 @@ def uDashboard(request, group_id):
         if auth:
             for each in auth.relation_set:
                 if "has_profile_pic" in each:
-                    profile_pic_image = d(
+                    profile_pic_image = node_collection.one(
                         {'_type': "File", '_id': each["has_profile_pic"][0]}
                     )
 
