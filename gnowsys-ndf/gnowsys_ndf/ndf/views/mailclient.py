@@ -26,6 +26,7 @@ from imaplib import IMAP4
 import sqlite3
 import os
 import re
+from django.core.mail import EmailMessage
 #-----------------Dictionary of popular servers--------------#
 server_dict = {
     "Gmail": "imap.gmail.com",
@@ -86,8 +87,7 @@ def mailclient(request, group_id):
         'groupname': group_name,
         'groupid': group_id,
         'group_id': group_id,
-        'mailboxnames': mailbox_names,
-        'mailboxids' : mailbox_ids
+        'mailboxnames': mailbox_names
     })
  
 @login_required
@@ -404,4 +404,42 @@ def compose_mail(request, group_id,mailboxname):
                     "mailbox_name" : mailboxname
                     }
     variable = RequestContext(request,context_dict)
+
+    if request.method == "POST":
+        user_id = request.POST.get("user_id","")
+        to = request.POST.get("to_addrs", "")
+        subject = request.POST.get("subject", "")
+        to=to.replace(" ","")
+        to_list=to.split(";")
+
+        cc = request.POST.get("cc_addrs", "")
+        if cc:
+            cc=cc.replace(" ","")
+            cc_list=cc.split(";")
+        
+        bcc = request.POST.get("bcc_addrs", "")
+        if bcc:
+            bcc=bcc.replace(" ","")
+            bcc_list=bcc.split(";")
+
+        mail = EmailMessage()
+        mail.to = to_list
+        if cc:
+            mail.cc = cc_list
+        if bcc:
+            mail.bcc = bcc_list
+
+        #TODO: extract email id from db using mailbox name and user id
+        mail.from_email = "MetaStudio <abtiwari94@gmail.com>"
+        mail.body = "hi_test_mail_from_metastudio_"
+        mail.subject= subject
+        try:
+            mail.send()
+        except Exception as error:
+                print error
+                error_obj= str(error) + ", compose_mail() fn"
+                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
+        
+        print "post"
+
     return render_to_response(template,variable)
