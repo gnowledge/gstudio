@@ -970,14 +970,16 @@ def group_dashboard(request, group_id=None):
       shelf_list = {}
 
       if shelf:
+        shelves_append_temp=shelves.append
         for each in shelf:
           shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
-          shelves.append(shelf_name)
+          shelves_append_temp(shelf_name)
 
           shelf_list[shelf_name.name] = []
+          shelf_lst_shelfname_append=shelf_list[shelf_name.name].append
           for ID in shelf_name.collection_set:
             shelf_item = node_collection.one({'_id': ObjectId(ID) })
-            shelf_list[shelf_name.name].append(shelf_item.name)
+            shelf_lst_shelfname_append(shelf_item.name)
               
       else:
           shelves = []
