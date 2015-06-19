@@ -750,29 +750,7 @@ def get_inner_collection(collection_list, node):
   else:
     return collection_list
 
-"""@get_execution_time
-def get_collection(request, group_id, node_id):
-  node = node_collection.one({'_id':ObjectId(node_id)})
-  # print "\nnode: ",node.name,"\n"
-  collection_list = []
 
- # def a(p,q,r):
-#		collection_list.append({'name': p, 'id': q,'node_type': r})
-
-  if node and node.collection_set:
-      for each in node.collection_set:
-        obj = node_collection.one({'_id': ObjectId(each) })
-        if obj:
-        	node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        	collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
-        	collection_list = get_inner_collection(collection_list, obj)
-
-
-  data = collection_list
-
-  return HttpResponse(json.dumps(data))
-# ###End of manipulating nodes collection####
-"""
 @get_execution_time
 def get_collection(request, group_id, node_id):
   node = node_collection.one({'_id':ObjectId(node_id)})
@@ -783,7 +761,7 @@ def get_collection(request, group_id, node_id):
  # def a(p,q,r):
 #		collection_list.append({'name': p, 'id': q,'node_type': r})
   processes=[]
-  def sed(lst):
+  def multi_(lst):
 		for each in lst:
 			obj = node_collection.one({'_id': ObjectId(each) })
 			if obj:
@@ -798,7 +776,7 @@ def get_collection(request, group_id, node_id):
 		x=multiprocessing.cpu_count()
 		n2=t/x
 		for i in range(x):
-			processes.append(multiprocessing.Process(target=sed,args=(node.collection_set[i*n2:(i+1)*n2])))
+			processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2])))
 		for i in range(x):
 			processes[i].start()
 		for i in range(x):
@@ -3103,8 +3081,6 @@ def get_districts(request, group_id):
         }).sort('name', 1)
 
         if cur_districts.count():
-       #  for d in cur_districts:
-       #    districts.append([str(d.subject), d.name.split(" -- ")[0]])
           districts=[[str(d.subject), d.name.split(" -- ")[0]] for d in cur_districts]
         else:
           error_message = "No districts found"
