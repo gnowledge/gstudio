@@ -1206,10 +1206,10 @@ def get_prior_node(node_id):
 	if topic_GST._id in obj.member_of:
 
 		if obj.prior_node:
-			for each in obj.prior_node:
-				node = node_collection.one({'_id': ObjectId(each) })
-				prior.append(( node._id , node.name ))
-
+	#	for each in obj.prior_node:
+#			node = node_collection.one({'_id': ObjectId(each) })
+	#		prior.append(( node._id , node.name ))
+			prior=[(node_collection.one({'_id': ObjectId(each) })._id,node_collection.one({'_id': ObjectId(each) }).name) for each in obj.prior_node]
 		return prior
 
 	return prior
@@ -2079,10 +2079,10 @@ def get_source_id(obj_id):
 @get_execution_time
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
    get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
-   a=r_list.append
-   b=translation_list.append
+   r_list_append_temp=r_list.append
+   translation_list_append_temp=translation_list.append
    if obj_id not in r_list:
-      a(obj_id)
+      r_list_append_temp(obj_id)
       node_sub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
       node_rightsub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
       
@@ -2091,20 +2091,20 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
          for each in list(node_sub_rt):
             right_subject = node_collection.one({'_id':each.right_subject})
             if right_subject._id not in r_list:
-               a(right_subject._id)
+               r_list_append_temp(right_subject._id)
       if list(node_rightsub_rt):
          node_rightsub_rt.rewind()
          for each in list(node_rightsub_rt):
             right_subject = node_collection.one({'_id':each.subject})
             if right_subject._id not in r_list:
-               a(right_subject._id)
+               r_list_append_temp(right_subject._id)
       if r_list:
          r_list.remove(obj_id)
          for each in r_list:
             dic={}
             node = node_collection.one({'_id':each})
             dic[node._id]=node.language
-            b(dic)
+            translation_list_append_temp(dic)
             get_translation_relation(each,translation_list, r_list)
    return translation_list
 
