@@ -41,6 +41,12 @@ this template is modified. So for the fields in the template it supports -
   data-abide>
     {% csrf_token %}
 
+    <!-- node_id, name -->
+    {% if node %}
+      <input type="hidden" name="node_id" value="{{node.pk}}">
+      <input type="hidden" name="name" value="{{node.name}}">
+    {% endif %}
+
     <!-- name -->
     <div class="row">
       <div class="small-12 medium-6 medium-centered columns">
@@ -129,7 +135,7 @@ this template is modified. So for the fields in the template it supports -
         </div>
       </div>
     </div>
-
+    
     <!-- moderation level -->
     <div class="row {% if node.edit_policy != 'EDITABLE_MODERATED' %}hide{% endif%}" id="moderation-level">
       <div class="small-12 medium-6 medium-centered columns">
@@ -140,8 +146,9 @@ this template is modified. So for the fields in the template it supports -
           </div>
 
           <div class="small-8 columns">
-            <select {%if node.edit_policy == 'EDITABLE_MODERATED' %} disabled {% endif %} name="moderation_level">
-              <option value="0">--- {% trans "Select Level" %} ---</option>
+            <select name="moderation_level">
+              <!-- EDITABLE_MODERATED group cannot have moderation_level to 0 -->
+              <option value="1">--- {% trans "Select Level" %} ---</option>
               {% get_allowed_moderation_levels as mod_levels %}
               {% for each_level in mod_levels %}
                 <option value="{{each_level}}" 
