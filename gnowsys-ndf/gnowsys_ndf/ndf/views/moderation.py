@@ -98,7 +98,7 @@ def all_under_moderation(request, group_id):
 	group_obj = get_group_name_id(group_id, get_obj=True)
 
 	if not group_obj.edit_policy == 'EDITABLE_MODERATED':
-		raise Http404(error_message) 
+		raise Http404('Group is not EDITABLE_MODERATED') 
 
 	mod_group_instance = CreateModeratedGroup(request)
 	group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(group_obj._id)
