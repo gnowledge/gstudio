@@ -1451,13 +1451,17 @@ ul#navigation li a.last {
 
       {% ifequal group_object.edit_policy "EDITABLE_MODERATED" %}
         {% if request.user.id in group_object.group_admin or request.user.is_superuser or request.user.id == group_object.created_by %}
-          <a class="tiny expand button" href="{% url 'moderation' group_name_tag %}">
-            Moderate Resources
-          </a>
+          {% if 'ModeratingGroup' in group_object.member_of_names_list %}
+            <a class="tiny expand button" href="{% url 'moderation' group_name_tag %}">
+              Moderate Resources
+            </a>
+          {% endif %}
 
-          <a class="tiny expand button" href="{% url 'all_under_moderation' group_id %}">
-            Moderation Status
-          </a>
+          {% if 'Group' in group_object.member_of_names_list %}
+            <a class="tiny expand button" href="{% url 'all_under_moderation' group_id %}">
+              Moderation Status
+            </a>
+          {% endif %} 
         {% endif %} 
       {% endifequal %}
 
@@ -1503,7 +1507,6 @@ ul#navigation li a.last {
     </li> 
     --> 
     
-          {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
     <br/>
     <div class="label-list"> 
       <b>{% trans "Tags" %}</b><br/>
@@ -1517,6 +1520,8 @@ ul#navigation li a.last {
       {% endif %}
 
     </div>
+    
+    {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
 
     {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
       <div>
