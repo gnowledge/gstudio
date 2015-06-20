@@ -33,6 +33,13 @@ from gnowsys_ndf.ndf.org2any import org2html
 
 gst_group = node_collection.one({"_type": "GSystemType", 'name': u"Group"})
 app = gst_group
+            
+group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'Group'})
+moderating_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+
+file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
+page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
+task_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Task'})
 
 # ######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
@@ -50,16 +57,17 @@ class CreateGroup(object):
 
     def is_group_exists(self, arg_group_name):
         '''
-        checks if group with the given name exists.
-        Returns True: If group exists.
+        Checks if group with the given name exists.
+        Returns Bool.
+            - True: If group exists.
+            - False: If group doesn't exists.
         '''
-        name = arg_group_name
-        group = node_collection.find_one({
-                    '_type': 'Group',
-                    'name': unicode(name)
-                })
+        
+        group = node_collection.find_one({'_type': 'Group', 'name': unicode(arg_group_name)})
+
         if group:
             return True
+
         else:
             return False
 
@@ -67,24 +75,31 @@ class CreateGroup(object):
     def get_group_fields(self, group_name, **kwargs):
         '''
         function to fill the empty group object with values supplied.
-        group information may be sent either from "request" or from "kwargs".
+        - group name is must and it's first argument.
+        - group information may be sent either from "request" or from "kwargs".
 
         # If arg is kwargs, provide following dict as kwargs arg to this function.
         group_fields = {
           'altnames': '', 'group_type': '', 'edit_policy': '',
-          'agency_type': '', 'moderation_level': ''
+          'agency_type': '', 'moderation_level': '',
+          ...., ...
         }
+
         # call in following way
         class_instance_var.get_group_fields(group_name, **group_fields)
+        (NOTE: use ** before dict variables, in above case it's group_fields so it's: **group_fields)
         '''
 
         # getting the data into variables
         name = group_name
 
+        # to check if existing group is getting edited
+        node_id = kwargs.get('node_id', None)
+
         if kwargs.get('altnames', ''):
             altnames = kwargs.get('altnames', name) 
         else:
-            altnames = self.request.POST.get('altnames', "").strip()
+            altnames = self.request.POST.get('altnames', name).strip()
 
         if kwargs.get('group_type', ''):
             group_type = kwargs.get('group_type', '') 
@@ -127,7 +142,7 @@ class CreateGroup(object):
             agency_type = self.request.POST.get('agency_type', 'Other')
 
         if kwargs.get('content_org', ''):
-            content_org = kwargs.get('content_org', '') 
+            content_org = kwargs.get('content_org', '')
         else:
             content_org = self.request.POST.get('content_org', '')
 
@@ -138,15 +153,26 @@ class CreateGroup(object):
         else:
             moderation_level = self.request.POST.get('moderation_level', '-1')
 
-        # instantiated empty group object
-        group_obj = node_collection.collection.Group()
+        if node_id:
+            # Existing group: if node_id exists means group already exists.
+            # So fetch that group and use same object to override the fields.
+            group_obj = node_collection.one({'_id': ObjectId(node_id)})
+        else:
+            # New group: instantiate empty group object
+            group_obj = node_collection.collection.Group()
 
-        # filling the values with variables in empty group object
+        # filling the values with variables in group object:
         group_obj.name = unicode(name)
         group_obj.altnames = unicode(altnames)
-        group_obj.member_of.append(gst_group._id)
-        group_obj.type_of.append(gst_group._id)
+
+        # while doing append operation make sure to-be-append is not in the list
+        if gst_group._id not in group_obj.member_of:
+            group_obj.member_of.append(gst_group._id)
+
+        if gst_group._id not in group_obj.type_of:
+            group_obj.type_of.append(gst_group._id)
       
+        # user related fields:
         user_id = int(self.request.user.id)
         group_obj.created_by = user_id
         group_obj.modified_by = user_id
@@ -157,6 +183,7 @@ class CreateGroup(object):
         if user_id not in group_obj.group_admin:
             group_obj.group_admin.append(user_id)
 
+        # group specific fields:
         group_obj.group_type = group_type
         group_obj.access_policy = access_policy
         group_obj.edit_policy = edit_policy
@@ -167,23 +194,22 @@ class CreateGroup(object):
         group_obj.agency_type = agency_type
 
         #  org-content
-        if content_org:
-            if group_obj.content_org != content_org:
-                group_obj.content_org = content_org
+        if group_obj.content_org != content_org:
+            group_obj.content_org = content_org
 
-                # Required to link temporary files with the current user who is
-                # modifying this document
-                usrname = self.request.user.username
-                filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-                group_obj.content = org2html(content_org, file_prefix=filename)
-                is_changed = True
+            # Required to link temporary files with the current user who is:
+            usrname = self.request.user.username
+            filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+            group_obj.content = org2html(content_org, file_prefix=filename)
+            is_changed = True
 
         # decision for adding moderation_level
         if group_obj.edit_policy == "EDITABLE_MODERATED":
             group_obj.moderation_level = int(moderation_level)
         else:
-            group_obj.moderation_level = -1
+            group_obj.moderation_level = -1  # non-moderated group.
 
+        # group's should not have draft stage. So publish them:
         group_obj.status = u"PUBLISHED"
 
         # returning basic fields filled group object 
@@ -195,12 +221,17 @@ class CreateGroup(object):
     def create_group(self, group_name, **kwargs):
         '''
         Creates group with given args.
-        Returns tuple containing True/False, sub_group_object/error.
+        - Takes group name as compulsory argument.
+        - Returns tuple containing: (True/False, sub_group_object/error)
         '''
 
-        # checking if group exists with same name
-        if not self.is_group_exists(group_name):
+        node_id = kwargs.get('node_id', None)
+        # print "node_id : ", node_id
 
+        # checking if group exists with same name
+        if not self.is_group_exists(group_name) or node_id:
+
+            # print "group_name : ", group_name
             group_obj = self.get_group_fields(group_name, **kwargs)
 
             try:
@@ -214,49 +245,68 @@ class CreateGroup(object):
         else:
             return False, 'Group with same name exists.'
 
-    # --- END --- create_group() ------
+    # --- END --- create_group() ---
 
 
     def get_group_edit_policy(self, group_id):
         '''
         Returns "edit_policy" of the group.
+        - Takes group_id as compulsory and only argument.
+        - Returns: either "edit_policy" or boolian "False". 
         '''
+
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
         if group_obj:
             return group_obj.edit_policy
+            
         else:
           return False
     # --- END --- get_group_edit_policy() ------
 
+
     def get_group_type(self, group_id):
         '''
         Returns "group_type" of the group.
+        - Takes group_id as compulsory and only argument.
+        - Returns: either "group_type" or boolian "False". 
         '''
+
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
         if group_obj:
             return group_obj.group_type
+
         else:
           return False
     # --- END --- get_group_type() ------
 
+
     def get_all_subgroups_obj_list(self, group_id):
         '''
         Returns mongokit (find) cursor of sub-group documents.
+        - Takes group_id as compulsory and only argument.
         '''
+
         group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
         # check if group has post_node. Means it has sub-group/s
         if group_obj and group_obj.post_node:
             return node_collection.find({'_id': {'$in': group_obj.post_node} })
+
         else:
           return False
     # --- END --- get_all_subgroups_obj_list() ------
 
+
     def get_all_subgroups_member_of_list(self, group_id):
         '''
         Returns list of names of "member_of" of sub-groups.
+        - Takes group_id as compulsory and only argument.
         '''
+
         sg_member_of_list = []
+        # get all underlying groups
         all_sg = self.get_all_subgroups_obj_list(group_id)
 
         if all_sg:
@@ -418,7 +468,7 @@ class CreateSubGroup(CreateGroup):
                                         '_type': 'Group',
                                         'prior_node': {'$in': [ObjectId(group_id)]},
                                         'member_of': member_of._id
-                                        })
+                                    })
 
         if group_obj:
             return group_obj
@@ -438,40 +488,53 @@ class CreateModeratedGroup(CreateSubGroup):
         super(CreateSubGroup, self).__init__(request)
         self.request = request
         self.edit_policy = 'EDITABLE_MODERATED'
+        # maintaining dict of group types and their corresponding sub-groups altnames.
+        # referenced while creating new moderated sub-groups.
         self.altnames = {
             'ModeratingGroup': [u'Clearing House', u'Curation House'],
             'ProgramEventGroup': [],
             'CourseEventGroup': []
         }
 
-    def create_new_moderated_group(self, group_name, moderation_level=1, **kwargs):
+
+    def create_edit_moderated_group(self, group_name, moderation_level=1, **kwargs):
         '''
-        Creates top level group with given args.
-        Returns tuple containing True/False, sub_group_object/error.
+        Creates/Edits top level group as well as underlying sub-mod groups.
+        - Takes group_name as compulsory argument and optional kwargs.
+        - Returns tuple: (True/False, sub_group_object/error)
         '''
 
-        if not self.is_group_exists(group_name):
+        # retrieves node_id. means it's edit operation of existing group.
+        node_id = kwargs.get('node_id', None)
+
+        # checking if group exists with same name
+        if not self.is_group_exists(group_name) or node_id:
+
             # values will be taken from POST form fields
-            group_obj = self.get_group_fields(group_name)
+            group_obj = self.get_group_fields(group_name, node_id=node_id)
 
             try:
                 group_obj.save()
             except Exception, e:
                 # if any errors return tuple with False and error
-                print e
+                # print e
                 return False, e
 
+            if node_id:
+                self.check_reset_mod_group_hierarchy(top_group_obj=group_obj)
+
             # self.add_subgroup_to_parents_postnode(parent_group_id, group_obj._id, sg_member_of)
-            parent_group_id = group_obj._id
-            for each_sg_iter in range(0, int(moderation_level)):
-                result = self.add_moderation_level(parent_group_id, 'ModeratingGroup')
-                # result is tuple of (bool, newly-created-sub-group-obj)
-                if result[0]:
-                    parent_group_id = result[1]._id
-                else:
-                    # if result is False, means sub-group is not created.
-                    # In this case, there is no point to go ahead and create subsequent sub-group.
-                    break
+            else:
+                parent_group_id = group_obj._id
+                for each_sg_iter in range(0, int(moderation_level)):
+                    result = self.add_moderation_level(parent_group_id, 'ModeratingGroup')
+                    # result is tuple of (bool, newly-created-sub-group-obj)
+                    if result[0]:
+                        parent_group_id = result[1]._id
+                    else:
+                        # if result is False, means sub-group is not created.
+                        # In this case, there is no point to go ahead and create subsequent sub-group.
+                        break
 
             return True, group_obj
         
@@ -528,11 +591,11 @@ class CreateModeratedGroup(CreateSubGroup):
                 sg_altnames = sg_name
 
             # create new sub-group and append it to parent group:
-            sub_group = self.create_subgroup(parent_group_id, sg_name, \
+            sub_group_result_tuple = self.create_subgroup(parent_group_id, sg_name, \
               sg_member_of, moderation_level=(pg_moderation_level-1), \
                altnames=sg_altnames)
 
-            return sub_group
+            return sub_group_result_tuple
 
 
     def increment_hierarchy_mod_level(self, group_id):
@@ -568,7 +631,7 @@ class CreateModeratedGroup(CreateSubGroup):
             return False
 
 
-    def get_all_group_hierarchy(self, group_id):
+    def get_all_group_hierarchy(self, group_id, top_group_obj=None, with_deleted=False):
         '''
         Provide _id of any of the group and get list of all groups.
         Order will be from top to bottom.
@@ -576,22 +639,42 @@ class CreateModeratedGroup(CreateSubGroup):
         NOTE: this function will return hierarchy of 
         only groups with edit_policy: 'EDITABLE_MODERATED'
         '''
-        top_group = self.get_top_group_of_hierarchy(group_id)
+        result = self.get_top_group_of_hierarchy(group_id)
 
-        if top_group[0]:
+        if result[0]:
             # getting object of top group
-            top_group = top_group[1]
+            top_group = result[1]
 
-        else:  # fail to get top group
-            return top_group
+        elif top_group_obj:
+            # if top group is in args
+            top_group = top_group_obj
+
+        else:
+            # fail to get top group
+            return result
 
         all_sub_group_list = [top_group]
 
         group_obj = top_group
 
-        while group_obj and group_obj.post_node:
+        while group_obj and (group_obj.post_node or with_deleted):
+            
+            temp_group_obj_name = group_obj.name
             group_obj = self.get_particular_member_of_subgroup(group_obj._id, 'ModeratingGroup')
+
+            if with_deleted and not group_obj:
+                try:
+                    temp_group_name = unicode(group_obj_name + '_mod')
+                except:
+                    temp_group_name = unicode(temp_group_obj_name + '_mod')
+
+                group_obj = node_collection.one({'_type': u'Group',
+                    'name': temp_group_name})
+                if not group_obj:
+                    return True, all_sub_group_list
+
             if group_obj:
+                group_obj_name = group_obj.name
                 all_sub_group_list.append(group_obj)
             else:
                 return False, [top_group]
@@ -617,10 +700,261 @@ class CreateModeratedGroup(CreateSubGroup):
         # send overwritten/first curr_group_obj's "_id"
         return True, curr_group_obj
 
+
+    def check_reset_mod_group_hierarchy(self, top_group_obj):
+        
+        result = self.get_all_group_hierarchy(top_group_obj._id, \
+            top_group_obj=top_group_obj, with_deleted=True)
+        # print "888888\n", result
+
+        group_moderation_level = 0
+        last_sg_id = top_group_obj._id
+
+        if result[0]:
+
+            all_sub_group_obj_list = result[1]
+
+            # Zero index is top-group
+            print [g.name for g in all_sub_group_obj_list]
+
+            top_group_moderation_level = top_group_obj.moderation_level
+            group_moderation_level = top_group_moderation_level
+
+            # ml: moderation_level
+            if [ml.moderation_level for ml in all_sub_group_obj_list] == \
+            [m for m in range(top_group_moderation_level, -1, -1)]:
+                print "=== return"
+                return
+
+            top_group_name = top_group_obj.name
+
+            for index, each_sg in enumerate(all_sub_group_obj_list):
+                print "\n=== group_moderation_level : ", group_moderation_level
+                print each_sg.moderation_level, "=== each_sg name : ", each_sg.name
+
+                # pg: parent group
+                pg_obj = all_sub_group_obj_list[index - 1] if (index > 0) else top_group_obj
+                pg_id = pg_obj._id
+                pg_name = pg_obj.name
+
+                try:
+                    sg_altnames = self.altnames['ModeratingGroup'][index-1] \
+                                    + u" of " + pg_name
+                except Exception, e:
+                    sg_altnames = each_sg.name
+
+                if each_sg._id == top_group_obj._id:
+                    sg_altnames = each_sg.altnames 
+                    member_of_id = group_gst._id
+                else:
+                    member_of_id = moderating_group_gst._id
+
+                print "=== altnames: ", sg_altnames
+                if group_moderation_level > 0:
+                    print "=== level > 0", each_sg.name
+
+                    node_collection.collection.update({'_id': each_sg._id},
+                        {'$set': {
+                            'altnames': sg_altnames,
+                            'member_of': [member_of_id],
+                            'moderation_level': group_moderation_level,
+                            'status': u'PUBLISHED'
+                            } 
+                        },
+                        upsert=False, multi=False )
+                        
+                    if pg_id != each_sg._id:
+                        self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, 'ModeratingGroup')
+
+                    group_moderation_level -= 1
+                    last_sg_id = each_sg._id
+                    last_sg_moderation_level = each_sg.moderation_level
+
+                elif group_moderation_level == 0:
+                    print "=== level == 0", each_sg.name
+                    if (each_sg.moderation_level != group_moderation_level) or each_sg.post_node:
+                        node_collection.collection.update({'_id': each_sg._id},
+                            {'$set': {
+                                'altnames': sg_altnames,
+                                'member_of': [member_of_id],
+                                'moderation_level': group_moderation_level,
+                                'status': u'PUBLISHED',
+                                'post_node': []
+                                } 
+                            },
+                            upsert=False, multi=False )
+                        
+                        if pg_id != each_sg._id:
+                            self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, 'ModeratingGroup')
+                    group_moderation_level -= 1
+                    last_sg_id = each_sg._id
+                    last_sg_moderation_level = each_sg.moderation_level
+
+                elif group_moderation_level < 0:
+                    print "=== level < 0", each_sg.name
+
+                    # getting all the resources under group
+                    group_res_cur = node_collection.find({
+                        'member_of': {'$in': [file_gst._id, page_gst._id, task_gst._id]},
+                        'group_set': {'$in': [each_sg._id]} })
+
+                    for each_group_res in group_res_cur:
+
+                        group_set = each_group_res.group_set
+                        if each_sg._id in group_set:
+                            group_set.pop(group_set.index(each_sg._id))
+                        if top_group_obj._id not in group_set:
+                            group_set.append(top_group_obj._id)
+
+                        each_group_res.group_set = group_set
+                        each_group_res.status = u'PUBLISHED'
+                        each_group_res.save()
+
+                    node_collection.collection.update({
+                        '_id': each_sg._id},
+                        {'$set': {
+                            'member_of': [group_gst._id],
+                            'status': u'DELETED',
+                            'moderation_level': -1,
+                            'post_node': []
+                            }
+                        }, upsert=False, multi=False )
+                    last_sg_id = each_sg._id
+                    last_sg_moderation_level = each_sg.moderation_level
+
+        print "out of for === group_moderation_level", group_moderation_level
+
+        if group_moderation_level >= 0:
+            for each_sg_iter in range(0, group_moderation_level+1):
+                print each_sg_iter, " === each_sg_iter", last_sg_id
+                result = self.add_moderation_level(last_sg_id, 'ModeratingGroup')
+                # result is tuple of (bool, newly-created-sub-group-obj)
+                if result[0]:
+                    last_sg_id = result[1]._id
+                    print " === new group created: ", result[0].name
+                else:
+                    # if result is False, means sub-group is not created.
+                    # In this case, there is no point to go ahead and create subsequent sub-group.
+                    break
+
 # --- END of class CreateModeratedGroup ---
 # -----------------------------------------
 
 
+class GroupCreateEditHandler(View):
+    """
+    Class to handle create/edit group requests.
+    This class should handle all the types ofgroup create/edit requests.
+    Currently it supports the functionality for following types of groups:
+        - Normal Groups
+        - Moderating Groups
+        - Pending:
+            -- Sub Groups
+            -- CourseEvent Group
+            -- ProgramEvent Group
+    """
+    @method_decorator(login_required)
+    @method_decorator(get_execution_time)
+    def get(self, request, group_id, action):
+        """
+        Catering GET request of group's create/edit.
+        Render's to create_group template.
+        """
+
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+
+        group_obj = None
+        nodes_list = []
+
+        if action == "edit":  # to edit existing group
+
+            group_obj = get_group_name_id(group_id, get_obj=True)
+        
+            # as group edit will not have provision to change name field.
+            # there is no need to send nodes_list while group edit.
+
+        elif action == "create":  # to create new group
+
+            available_nodes = node_collection.find({'_type': u'Group'}, {'name': 1, '_id': 0})
+        
+            # making list of group names (to check uniqueness of the group):
+            nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
+            # print nodes_list
+        
+        # why following logic exists? Do we need so?
+        # if group_obj.status == u"DRAFT":
+        #     group_obj, ver = get_page(request, group_obj)
+        #     group_obj.get_neighbourhood(group_obj.member_of) 
+
+        title = action + ' Group'
+
+        # In the case of need, we can simply replace:
+        # "ndf/create_group.html" with "ndf/edit_group.html"
+        return render_to_response("ndf/create_group.html",
+                                    {
+                                        'node': group_obj, 'title': title,
+                                        'nodes_list': nodes_list,
+                                        'groupid': group_id, 'group_id': group_id
+                                        # 'appId':app._id, # 'is_auth_node':is_auth_node
+                                      }, context_instance=RequestContext(request))
+    # --- END of get() ---
+
+    @method_decorator(login_required)
+    @method_decorator(get_execution_time)
+    def post(self, request, group_id, action):
+        '''
+        To handle post request of group form.
+        To save edited or newly-created group's data. 
+        '''
+        
+        # getting group's object:
+        group_obj = get_group_name_id(group_id, get_obj=True)
+
+        # getting field values from form:
+        group_name = request.POST.get('name', '').strip()  # hidden-form-field
+        node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
+        edit_policy = request.POST.get('edit_policy', '')
+
+        # check if group's editing policy is already 'EDITABLE_MODERATED' or
+        # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
+        if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
+
+            moderation_level = request.POST.get('moderation_level', '')
+            # print "~~~~~~~ ", moderation_level
+
+            # instantiate moderated group
+            mod_group = CreateModeratedGroup(request)
+
+            # calling method to create new group
+            result = mod_group.create_edit_moderated_group(group_name, moderation_level, node_id=node_id)
+            
+        else:
+
+            # instantiate moderated group
+            group = CreateGroup(request)
+
+            # calling method to create new group
+            result = group.create_group(group_name, node_id=node_id)
+
+        # print result[0], "\n=== result : ", result[1].name, "\n\n"
+        if result[0]:
+            # operation success: redirect to group-detail page
+            group_obj = result[1]
+            group_name = group_obj.name
+            url_name = 'groupchange'
+
+        else:
+            # operation fail: redirect to group-listing
+            group_name = 'home'
+            url_name = 'group'
+
+        return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
+
+# ===END of class EditGroup() ===
+    
 
 @get_execution_time
 def group(request, group_id, app_id=None, agency_type=None):
@@ -762,90 +1096,78 @@ def group(request, group_id, app_id=None, agency_type=None):
                               }, context_instance=RequestContext(request))
 
 
-
-@login_required
-@get_execution_time
-def create_group(request,group_id):
-
-  try:
-      group_id = ObjectId(group_id)
-  except:
-      group_name, group_id = get_group_name_id(group_id)
-
-  if request.method == "POST":
-
-    cname = request.POST.get('name', "").strip()
-    edit_policy = request.POST.get('edit_policy', "")
-    group_type = request.POST.get('group_type', "")
-    moderation_level = request.POST.get('moderation_level', '1')
-
-    if request.POST.get('edit_policy', "") == "EDITABLE_MODERATED":
-
-        # instantiate moderated group
-        mod_group = CreateModeratedGroup(request)
-
-        # calling method to create new group
-        result = mod_group.create_new_moderated_group(cname, moderation_level)
-        
-    else:
-
-        # instantiate moderated group
-        group = CreateGroup(request)
-
-        # calling method to create new group
-        result = group.create_group(cname)
-        
-    if result[0]:
-        colg = result[1]
-
-    # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-
-    # has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
-
-    shelves = []
-    shelf_list = {}
-    
-    # if auth:
-    #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
-
-    #   if shelf:
-    #     for each in shelf:
-    #       shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
-    #       shelves.append(shelf_name)
-
-    #       shelf_list[shelf_name.name] = []         
-    #       for ID in shelf_name.collection_set:
-    #         shelf_item = node_collection.one({'_id': ObjectId(ID) })
-    #         shelf_list[shelf_name.name].append(shelf_item.name)
-                  
-    #   else:
-    #     shelves = []
-
-    return render_to_response("ndf/groupdashboard.html", 
-                                {'groupobj': colg, 'appId': app._id, 'node': colg,
-                                  'user': request.user,
-                                  'groupid': colg._id, 'group_id': colg._id,
-                                  'shelf_list': shelf_list,'shelves': shelves
-                                },context_instance=RequestContext(request))
-
-
-  # for rendering empty form page:
-  available_nodes = node_collection.find({'_type': u'Group'})
-  nodes_list = []
-  for each in available_nodes:
-      nodes_list.append(str((each.name).strip().lower()))
-  return render_to_response("ndf/create_group.html", {'groupid': group_id, 'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
-
-
+# @login_required
 # @get_execution_time
-#def home_dashboard(request):
-#     try:
-#         groupobj=node_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-#     except Exception as e:
-#         groupobj=""
-#         pass
-#     print "frhome--",groupobj
-#     return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'user':request.user,'curgroup':groupobj},context_instance=RequestContext(request))
+# def create_group(request, group_id):
+
+#   try:
+#       group_id = ObjectId(group_id)
+#   except:
+#       group_name, group_id = get_group_name_id(group_id)
+
+#   if request.method == "POST":
+
+#     cname = request.POST.get('name', "").strip()
+#     edit_policy = request.POST.get('edit_policy', "")
+#     group_type = request.POST.get('group_type', "")
+#     moderation_level = request.POST.get('moderation_level', '1')
+
+#     if request.POST.get('edit_policy', "") == "EDITABLE_MODERATED":
+
+#         # instantiate moderated group
+#         mod_group = CreateModeratedGroup(request)
+
+#         # calling method to create new group
+#         result = mod_group.create_edit_moderated_group(cname, moderation_level)
+        
+#     else:
+
+#         # instantiate moderated group
+#         group = CreateGroup(request)
+
+#         # calling method to create new group
+#         result = group.create_group(cname)
+        
+#     if result[0]:
+#         colg = result[1]
+
+#     # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+
+#     # has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
+
+#     shelves = []
+#     shelf_list = {}
+    
+#     # if auth:
+#     #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })
+
+#     #   if shelf:
+#     #     for each in shelf:
+#     #       shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
+#     #       shelves.append(shelf_name)
+
+#     #       shelf_list[shelf_name.name] = []         
+#     #       for ID in shelf_name.collection_set:
+#     #         shelf_item = node_collection.one({'_id': ObjectId(ID) })
+#     #         shelf_list[shelf_name.name].append(shelf_item.name)
+                  
+#     #   else:
+#     #     shelves = []
+
+#     return render_to_response("ndf/groupdashboard.html", 
+#                                 {'groupobj': colg, 'appId': app._id, 'node': colg,
+#                                   'user': request.user,
+#                                   'groupid': colg._id, 'group_id': colg._id,
+#                                   'shelf_list': shelf_list,'shelves': shelves
+#                                 },context_instance=RequestContext(request))
+
+
+#   # for rendering empty form page:
+#   available_nodes = node_collection.find({'_type': u'Group'})
+#   nodes_list = []
+#   for each in available_nodes:
+#       nodes_list.append(str((each.name).strip().lower()))
+#   return render_to_response("ndf/create_group.html", {'groupid': group_id, 'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 
 @login_required
@@ -1051,67 +1373,69 @@ def group_dashboard(request, group_id=None):
 #                                     context_instance=RequestContext(request)
 #                                     )
 
-# @get_execution_time    
-# @login_required
-class EditGroup(View):
-    """
-    Class to handle create/edit group requests.
-    """
 
-    @method_decorator(login_required)
-    @method_decorator(get_execution_time)
-    def get(self, request, group_id):
-        """
-        Catering GET request of rendering group create/edit form.
-        """
+# class EditGroup(View):
+#     """
+#     Class to handle create/edit group requests.
+#     """
 
-        group_obj = get_group_name_id(group_id, get_obj=True)
+#     @method_decorator(login_required)
+#     @method_decorator(get_execution_time)
+#     def get(self, request, group_id):
+#         """
+#         Catering GET request of rendering group create/edit form.
+#         """
 
-        if group_obj.status == u"DRAFT":
-            group_obj, ver = get_page(request, group_obj)
-            group_obj.get_neighbourhood(group_obj.member_of) 
+#         group_obj = get_group_name_id(group_id, get_obj=True)
 
-        available_nodes = node_collection.find({'_type': u'Group','_id': {'$nin': [group_obj._id]}},
-            {'name': 1, '_id': 0})
-        nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
-        # print nodes_list
+#         if group_obj.status == u"DRAFT":
+#             group_obj, ver = get_page(request, group_obj)
+#             group_obj.get_neighbourhood(group_obj.member_of) 
 
-        # if in the case we can replace "ndf/create_group.html" with "ndf/edit_group.html"
-        return render_to_response("ndf/create_group.html",
-                                        {   
-                                        'node': group_obj,
-                                        'title': 'Group', # 'appId':app._id,
-                                        'groupid': group_id, 'group_id': group_id,
-                                        'nodes_list': nodes_list,
-                                        # 'is_auth_node':is_auth_node
-                                      },
-                                    context_instance=RequestContext(request)
-                                    )
+#         available_nodes = node_collection.find({'_type': u'Group','_id': {'$nin': [group_obj._id]}},
+#             {'name': 1, '_id': 0})
+#         nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
+#         # print nodes_list
 
-    def post(self, request, group_id):
-        '''
-        To handle post request of group form.
-        To save edited or newly-created group's data. 
-        '''
-        group_obj = get_group_name_id(group_id, get_obj=True)
+#         # if in the case we can replace "ndf/create_group.html" with "ndf/edit_group.html"
+#         return render_to_response("ndf/create_group.html",
+#                                         {   
+#                                         'node': group_obj,
+#                                         'title': 'Group', # 'appId':app._id,
+#                                         'groupid': group_id, 'group_id': group_id,
+#                                         'nodes_list': nodes_list,
+#                                         # 'is_auth_node':is_auth_node
+#                                       },
+#                                     context_instance=RequestContext(request)
+#                                     )
 
-        is_node_changed = get_node_common_fields(request, group_obj, group_id, gst_group)
-        # print "=== ", is_node_changed
+#     @method_decorator(login_required)
+#     @method_decorator(get_execution_time)
+#     def post(self, request, group_id):
+#         '''
+#         To handle post request of group form.
+#         To save edited or newly-created group's data. 
+#         '''
+#         group_obj = get_group_name_id(group_id, get_obj=True)
 
-        if group_obj.access_policy == "PUBLIC":
-            group_obj.group_type = "PUBLIC"
+#         is_node_changed = get_node_common_fields(request, group_obj, group_id, gst_group)
+#         # print "=== ", is_node_changed
+        
+#         group_obj.group_type = unicode(request.POST.get("group_type", ""))
+#         group_obj.agency_type = unicode(request.POST.get("agency_type", ""))
+#         edit_policy = unicode(request.POST.get("edit_policy", ""))
 
-        elif group_obj.access_policy == "PRIVATE":
-            group_obj.group_type = "PRIVATE"
+#         is_node_changed = True
 
-        group_obj.status = u"PUBLISHED"
-        group_obj.save(is_changed=is_node_changed)
+#         group_obj.status = u"PUBLISHED"
 
-        group_obj.get_neighbourhood(group_obj.member_of)
+#         group_obj.save(is_changed=is_node_changed)
 
-        return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_obj._id}))
+#         group_obj.get_neighbourhood(group_obj.member_of)
 
-# ===END of class EditGroup() ===
+#         return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_obj._id}))
+
+# # ===END of class EditGroup() ===
     
         
 @login_required
