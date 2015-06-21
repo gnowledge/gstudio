@@ -53,6 +53,8 @@ class CreateGroup(object):
     def __init__(self, request):
         super(CreateGroup, self).__init__()
         self.request = request
+        self.moderated_groups_member_of = ['ProgramEventGroup',\
+         'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']
 
 
     def is_group_exists(self, arg_group_name):
@@ -341,7 +343,8 @@ class CreateSubGroup(CreateGroup):
         # get basic fields filled group object
         group_obj = self.get_group_fields(sub_group_name, **kwargs)
 
-        if sg_member_of in ['ProgramEventGroup', 'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']:
+        # if sg_member_of in ['ProgramEventGroup', 'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']:
+        if sg_member_of in self.moderated_groups_member_of:
             
             # overriding member_of field of subgroup
             member_of_group = node_collection.one({'_type': u'GSystemType', 'name': unicode(sg_member_of)})
@@ -354,10 +357,11 @@ class CreateSubGroup(CreateGroup):
 
         else:  # for normal sub-groups
             if not group_obj.group_type:
+                # if group_type is not specified take it from parent:
                 group_obj.group_type = self.get_group_type(parent_group_id)
 
-            if not group_obj.edit_policy:
-                group_obj.edit_policy = self.get_group_edit_policy(parent_group_id)
+            # if not group_obj.edit_policy:
+            #     group_obj.edit_policy = self.get_group_edit_policy(parent_group_id)
 
         # check if group object's prior_node has _id of parent group, otherwise add one.
         if ObjectId(parent_group_id) not in group_obj.prior_node:
@@ -371,18 +375,12 @@ class CreateSubGroup(CreateGroup):
         Creates sub-group with given args.
         Returns tuple containing True/False, sub_group_object/error.
         '''
-        # print "kwargs : ", kwargs
 
         try:
             parent_group_id = ObjectId(parent_group_id)
 
         except:
             parent_group_name, parent_group_id = get_group_name_id(group_id)
-        # except:  # it's parent group's name (str). so dereference to get "_id"
-        #     parent_group_obj = node_collection.one({"_type": {"$in": ["Group", "Author"] }, "name": unicode(parent_group_id)})
-        #     # checking if group_obj is valid
-        #     if parent_group_obj:
-        #         parent_group_id = parent_group_obj._id
 
         # checking feasible conditions to add this sub-group
         if not self.check_subgroup_feasibility(parent_group_id, sg_member_of):
@@ -415,21 +413,25 @@ class CreateSubGroup(CreateGroup):
         - parent group's edit_policy
         - child group's member_of
         Returns True if it is OK to create sub-group with suplied fields.
+        Otherwise returns False.
         '''
         if sg_member_of == 'Group':
+            # i.e: group is normal-sub-group.
             return True
 
-        elif sg_member_of in ['ProgramEventGroup', 'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']:
+        # elif sg_member_of in ['ProgramEventGroup', 'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']:
+        elif sg_member_of in self.moderated_groups_member_of:
             if self.get_group_edit_policy(parent_group_id) == 'EDITABLE_MODERATED':
                 
                 # if current sub-groups member_of is in parent's any one of the sub-group,
-                # means sub-group with current property exists in/for parent group.
+                # i.e: sub-group with current property exists in/for parent group.
                 # And no sibling with these property can exists together (like normal sub-groups).
 
                 if sg_member_of in self.get_all_subgroups_member_of_list(parent_group_id):
                     return False
                 else:
                     return True
+
             else:
                 return False
 
@@ -459,7 +461,7 @@ class CreateSubGroup(CreateGroup):
 
     def get_particular_member_of_subgroup(self, group_id, member_of):
         '''
-        Returns sub-group having particular member_of.
+        Returns sub-group-object having supplied particular member_of.
         Else return False
         '''
         member_of = node_collection.one({'_type': 'GSystemType', 'name': unicode(member_of)})
@@ -472,6 +474,7 @@ class CreateSubGroup(CreateGroup):
 
         if group_obj:
             return group_obj
+
         else:
             return False
 
@@ -501,7 +504,7 @@ class CreateModeratedGroup(CreateSubGroup):
         '''
         Creates/Edits top level group as well as underlying sub-mod groups.
         - Takes group_name as compulsory argument and optional kwargs.
-        - Returns tuple: (True/False, sub_group_object/error)
+        - Returns tuple: (True/False, top_group_object/error)
         '''
 
         # retrieves node_id. means it's edit operation of existing group.
@@ -521,16 +524,24 @@ class CreateModeratedGroup(CreateSubGroup):
                 return False, e
 
             if node_id:
+                # i.e: Editing already existed group object.
+                # method modifies the underlying mod-sub-group structure and doesn't return anything.
                 self.check_reset_mod_group_hierarchy(top_group_obj=group_obj)
 
-            # self.add_subgroup_to_parents_postnode(parent_group_id, group_obj._id, sg_member_of)
             else:
+                # i.e: New group is created and following code will create
+                # sub-mod-groups as per specified in the form.
                 parent_group_id = group_obj._id
+
                 for each_sg_iter in range(0, int(moderation_level)):
+
                     result = self.add_moderation_level(parent_group_id, 'ModeratingGroup')
+
                     # result is tuple of (bool, newly-created-sub-group-obj)
                     if result[0]:
+                        # overwritting parent's group_id with currently/newly-created group object
                         parent_group_id = result[1]._id
+
                     else:
                         # if result is False, means sub-group is not created.
                         # In this case, there is no point to go ahead and create subsequent sub-group.
@@ -545,18 +556,23 @@ class CreateModeratedGroup(CreateSubGroup):
     def add_moderation_level(self, parent_group_id, sg_member_of, increment_mod_level=False):
         '''
         Adds the moderation sub group to parent group.
-        - expects "_id/name" of parent and sub_group's "member_of".
+        - compulsory argument:
+            - "_id/name" of parent
+            - sub_group's "member_of": <str>.
         - increment_mod_level: If you want to add next moderation subgroup, despite of 
                     moderation_level is 0.
                     In this case, if value is True, 
                     moderation_level of all top hierarchy groups will be updated by 1.
         '''
+        # getting group object
         parent_group_object = get_group_name_id(parent_group_id, get_obj=True)
 
         # pg: parent group
         pg_name = parent_group_object.name
         pg_moderation_level = parent_group_object.moderation_level
 
+        # possible/next mod group name: 
+        # sg: sub group
         sg_name = pg_name + unicode('_mod')
 
         # no need to check following here, because it's being checked at sub-group creation time.
@@ -600,29 +616,40 @@ class CreateModeratedGroup(CreateSubGroup):
 
     def increment_hierarchy_mod_level(self, group_id):
         '''
-        Raises moderation_level by one of all the groups in the hierarchy.
+        Raises moderation_level by one of all the groups (right from top) in the hierarchy.
+        Takes group_id as compulsory argument.
+        Returns boolian True/False, depending on Success/Failure.
         '''
 
         try:
             group_id = ObjectId(group_id)
-
         except:
             group_name, group_id = get_group_name_id(group_id)
 
+        # firstly getting all the sub-group-object list
         result = self.get_all_group_hierarchy(group_id)
 
         if result[0]:
+            # get group's object's list into variables
             group_list = result[1]
+            # flag
             is_updated = False
 
             for each_group in group_list:
+
+                # change flag to True
                 is_updated = True
+
                 # adding +1 to existing moderation_level
-                each_group.moderation_level += 1
-                each_group.save()
+                updated_moderation_level = each_group.moderation_level + 1
+
+                node_collection.collection.update({'_id': each_group._id},
+                            {'$set': {'moderation_level': updated_moderation_level } },
+                            upsert=False, multi=False )
 
             if is_updated:
                 return True
+
             else:
                 return False
 
@@ -633,12 +660,23 @@ class CreateModeratedGroup(CreateSubGroup):
 
     def get_all_group_hierarchy(self, group_id, top_group_obj=None, with_deleted=False):
         '''
-        Provide _id of any of the group and get list of all groups.
+        Provide _id of any of the group in the hierarchy and get list of all groups.
         Order will be from top to bottom.
+        Arguments it takes:
+            - "group_id": Takes _id of any of the group among hierarchy
+            - "top_group_obj":  Takes object of top group (optional).
+                                To be used in certain conditions.
+            - "with_deleted":   Takes boolian value.
+                                If it's True - returns all the groups irrespective of:
+                                post_node and status field whether it's deleted or not.
+                                To be used catiously in certain conditions.
         e.g: [top_gr_obj, sub_gr_obj, sub_sub_gr_obj, ..., ...]
         NOTE: this function will return hierarchy of 
         only groups with edit_policy: 'EDITABLE_MODERATED'
         '''
+        # It will be good to go through proper flow.
+        # Despite of either argument of top_group_obj is provided or not.
+        # That's why using following step:
         result = self.get_top_group_of_hierarchy(group_id)
 
         if result[0]:
@@ -646,53 +684,75 @@ class CreateModeratedGroup(CreateSubGroup):
             top_group = result[1]
 
         elif top_group_obj:
-            # if top group is in args
+            # if top group is in args and result if negative.
             top_group = top_group_obj
 
         else:
             # fail to get top group
             return result
 
+        # starting list with top-group's object:
         all_sub_group_list = [top_group]
 
+        # taking top_group's object in group_obj. which will be used to start while loop
         group_obj = top_group
 
+        # loop till overwritten group_obj exists and 
+        # if group_obj.post_node exists or with_deleted=True
         while group_obj and (group_obj.post_node or with_deleted):
             
+            # getting previous group objects name before it get's overwritten
             temp_group_obj_name = group_obj.name
+
             group_obj = self.get_particular_member_of_subgroup(group_obj._id, 'ModeratingGroup')
 
+            # if in the case group_obj doesn't exists and with_deleted=True
             if with_deleted and not group_obj:
+
                 try:
                     temp_group_name = unicode(group_obj_name + '_mod')
                 except:
                     temp_group_name = unicode(temp_group_obj_name + '_mod')
 
+                # firing named query here. with the rule of group names are unique and cannot be edited.
                 group_obj = node_collection.one({'_type': u'Group',
                     'name': temp_group_name})
+
+                # required to break the while loop along with with_deleted=True
                 if not group_obj:
                     return True, all_sub_group_list
 
+            # group object found with regular conditions
             if group_obj:
                 group_obj_name = group_obj.name
                 all_sub_group_list.append(group_obj)
+                
+            # group object not found with regular conditions and arg: with_deleted=False (default val)
             else:
-                return False, [top_group]
+                # return partially-completed/incompleted (at least with top-group-obj) group hierarchy list.
+                return False, all_sub_group_list
 
+        # while loop completed. now return computed list
         return True, all_sub_group_list
 
 
     def get_top_group_of_hierarchy(self, group_id):
         '''
-        getting top group object of hierarchy.
-        Returns mongokit object of top group.
+        For getting top group object of hierarchy.
+        Arguments:
+        - group_id: _id of any of the group in the hierarchy.
+        Returns top-group-object.
         '''
         curr_group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
         # loop till there is no end of prior_node or till reaching at top group.
         while curr_group_obj and curr_group_obj.prior_node:
+
+            # fetching object having curr_group_obj in it's prior_node:
             curr_group_obj = node_collection.one({'_id': curr_group_obj.prior_node[0]})
 
+            # hierarchy does exists for 'EDITABLE_MODERATED' groups.
+            # if edit_policy of fetched group object is not 'EDITABLE_MODERATED' return false.
             if curr_group_obj.edit_policy != 'EDITABLE_MODERATED':
                 return False, "One of the group: " + str(curr_group_obj._id) \
                  + " is not with edit_policy: EDITABLE_MODERATED."
@@ -702,56 +762,93 @@ class CreateModeratedGroup(CreateSubGroup):
 
 
     def check_reset_mod_group_hierarchy(self, top_group_obj):
+        '''
+        This is the method to reset/adjust all the group objects in the hierarchy,
+        right from top group to last group.
+        Method works-on/reset's/updates following fields of group object \
+        according to top group object's fields:
+            - moderation_level
+            - post_node
+            - status
+            - altnames
+            - member_of
+        NOTE: "prior_node" is not updated or not taken into consideration.
+              can be used in future/in-some-cases.
+        Argument:
+            - top_group_obj: Top group's object
+        '''
+
+        # instantiate variable group_moderation_level.
+        # used for setting moderation_level of all groups
+        group_moderation_level = 0
+
+        # last sub-groups _id
+        last_sg_id = top_group_obj._id
         
+        # getting all the group hierarchy irrespective of 
+        # it's fields like post_node, moderation_level, status
         result = self.get_all_group_hierarchy(top_group_obj._id, \
             top_group_obj=top_group_obj, with_deleted=True)
-        # print "888888\n", result
-
-        group_moderation_level = 0
-        last_sg_id = top_group_obj._id
 
         if result[0]:
 
+            # getting all the group objects hierarchy in the list:
             all_sub_group_obj_list = result[1]
+            # Zero index of all_sub_group_obj_list is top-group.
 
-            # Zero index is top-group
-            print [g.name for g in all_sub_group_obj_list]
+            # print [g.name for g in all_sub_group_obj_list]
 
             top_group_moderation_level = top_group_obj.moderation_level
+            top_group_name = top_group_obj.name
+
+            # overwritting group_moderation_level
             group_moderation_level = top_group_moderation_level
 
+            # checking moderation_level hierarchy lists of:
+            # - list created from iterating over all_sub_group_obj_list and 
+            # - list created from range starts from top_group_obj's moderation_level till 0.
+            # if these both are same then there is no point in going ahead and do processing.
+            # bacause there is no changes in the underlying heirarchy.
+            # So return from here if both lists are equal.
             # ml: moderation_level
             if [ml.moderation_level for ml in all_sub_group_obj_list] == \
             [m for m in range(top_group_moderation_level, -1, -1)]:
-                print "=== return"
+                # print "=== return"
                 return
 
-            top_group_name = top_group_obj.name
-
+            # looping through each group object of/in \
+            # all_sub_group_obj_list with current iteration index:
             for index, each_sg in enumerate(all_sub_group_obj_list):
-                print "\n=== group_moderation_level : ", group_moderation_level
-                print each_sg.moderation_level, "=== each_sg name : ", each_sg.name
+                # print "\n=== group_moderation_level : ", group_moderation_level
+                # print each_sg.moderation_level, "=== each_sg name : ", each_sg.name
 
+                # getting immediate parent group of current iterated group w.r.t. all_sub_group_obj_list
                 # pg: parent group
                 pg_obj = all_sub_group_obj_list[index - 1] if (index > 0) else top_group_obj
                 pg_id = pg_obj._id
                 pg_name = pg_obj.name
 
+                # even we need to update altnames field \
+                 # w.r.t. altnames dict (defined at class level variable)
                 try:
                     sg_altnames = self.altnames['ModeratingGroup'][index-1] \
                                     + u" of " + pg_name
                 except Exception, e:
+                    # if not found in altnames dict (defined at class level variable)
                     sg_altnames = each_sg.name
 
+                # do not update altnames field of top group w.r.t altnames dict and 
+                # keep Group gst's id in member_of of top-group's object:
                 if each_sg._id == top_group_obj._id:
                     sg_altnames = each_sg.altnames 
                     member_of_id = group_gst._id
                 else:
                     member_of_id = moderating_group_gst._id
 
-                print "=== altnames: ", sg_altnames
+                # print "=== altnames: ", sg_altnames
+
                 if group_moderation_level > 0:
-                    print "=== level > 0", each_sg.name
+                    # print "=== level > 0", each_sg.name
 
                     node_collection.collection.update({'_id': each_sg._id},
                         {'$set': {
@@ -763,46 +860,75 @@ class CreateModeratedGroup(CreateSubGroup):
                         },
                         upsert=False, multi=False )
                         
+                    # except top-group, add current group's _id in top group's post_node
                     if pg_id != each_sg._id:
                         self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, 'ModeratingGroup')
 
+                    # one group/element of all_sub_group_obj_list is processed now \
+                    # decrement group_moderation_level by 1:
                     group_moderation_level -= 1
+
+                    # update last_sg variables:
                     last_sg_id = each_sg._id
                     last_sg_moderation_level = each_sg.moderation_level
 
                 elif group_moderation_level == 0:
-                    print "=== level == 0", each_sg.name
-                    if (each_sg.moderation_level != group_moderation_level) or each_sg.post_node:
-                        node_collection.collection.update({'_id': each_sg._id},
-                            {'$set': {
-                                'altnames': sg_altnames,
-                                'member_of': [member_of_id],
-                                'moderation_level': group_moderation_level,
-                                'status': u'PUBLISHED',
-                                'post_node': []
-                                } 
-                            },
-                            upsert=False, multi=False )
+                    # only difference in above level>0 and this level==0 is:
+                    #   last/leaf group-node (w.r.t. top_group_object.moderation_level) \
+                    #   of hierarchy should not have post_node.
+
+                    # print "=== level == 0", each_sg.name
+                    node_collection.collection.update({'_id': each_sg._id},
+                        {'$set': {
+                            'altnames': sg_altnames,
+                            'member_of': [member_of_id],
+                            'moderation_level': group_moderation_level,
+                            'status': u'PUBLISHED',
+                            'post_node': []
+                            } 
+                        },
+                        upsert=False, multi=False )
+                    
+                    # except top-group, add current group's _id in top group's post_node
+                    if pg_id != each_sg._id:
+                        self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, 'ModeratingGroup')
                         
-                        if pg_id != each_sg._id:
-                            self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, 'ModeratingGroup')
+                    # one group/element of all_sub_group_obj_list is processed now \
+                    # decrement group_moderation_level by 1:
                     group_moderation_level -= 1
+
+                    # update last_sg variables:
                     last_sg_id = each_sg._id
                     last_sg_moderation_level = each_sg.moderation_level
 
                 elif group_moderation_level < 0:
-                    print "=== level < 0", each_sg.name
+                    # Now these/this are/is already created underlying moderated group's in the hierarchy.
+                    # We do need to update following fields of this group object:
+                    #     - moderation_level: -1
+                    #     - status: u"DELETED"
+                    #     - member_of: [<_id of Group gst>]
+                    #     - post_node: []
 
-                    # getting all the resources under group
+                    # While doing above process, resources in these/this group need to be freed.
+                    # So, fetching all the resources in this group and publishing them to top-group
+
+                    # print "=== level < 0", each_sg.name
+
+                    # getting all the resources (of type: File, Page, Task) under this group:
                     group_res_cur = node_collection.find({
                         'member_of': {'$in': [file_gst._id, page_gst._id, task_gst._id]},
                         'group_set': {'$in': [each_sg._id]} })
 
+                    # iterating over each resource under this group:
                     for each_group_res in group_res_cur:
 
                         group_set = each_group_res.group_set
+
+                        # removing current sub-groups _id from group_set:
                         if each_sg._id in group_set:
                             group_set.pop(group_set.index(each_sg._id))
+
+                        # adding top-group's _id in group_set:
                         if top_group_obj._id not in group_set:
                             group_set.append(top_group_obj._id)
 
@@ -810,6 +936,7 @@ class CreateModeratedGroup(CreateSubGroup):
                         each_group_res.status = u'PUBLISHED'
                         each_group_res.save()
 
+                    # updating current sub-group with above stated changes:
                     node_collection.collection.update({
                         '_id': each_sg._id},
                         {'$set': {
@@ -819,19 +946,29 @@ class CreateModeratedGroup(CreateSubGroup):
                             'post_node': []
                             }
                         }, upsert=False, multi=False )
+
+                    # updating last_sg variables
                     last_sg_id = each_sg._id
                     last_sg_moderation_level = each_sg.moderation_level
 
-        print "out of for === group_moderation_level", group_moderation_level
+        # print "out of for === group_moderation_level", group_moderation_level
 
+        # despite of above looping and iterations, group_moderation_level is > 0 \
+        # i.e: new moderated sub-group/s need to be created. (moderation level of parent group has raised).
         if group_moderation_level >= 0:
+
+            # range(0, 0) will results: [] and range(0, 1) will results: [0]
+            # hence, group_moderation_level is need to be increased by 1
             for each_sg_iter in range(0, group_moderation_level+1):
-                print each_sg_iter, " === each_sg_iter", last_sg_id
+
+                # print each_sg_iter, " === each_sg_iter", last_sg_id
                 result = self.add_moderation_level(last_sg_id, 'ModeratingGroup')
                 # result is tuple of (bool, newly-created-sub-group-obj)
+
                 if result[0]:
                     last_sg_id = result[1]._id
-                    print " === new group created: ", result[0].name
+                    # print " === new group created: ", result[0].name
+                    
                 else:
                     # if result is False, means sub-group is not created.
                     # In this case, there is no point to go ahead and create subsequent sub-group.
