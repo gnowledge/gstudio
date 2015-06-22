@@ -106,37 +106,15 @@ def list_activities(request):
 
 	return render_to_response ("ndf/analytics_list_details.html",
 															{ "data" : lst})
-'''
-def activities_summary(request):
-	a = collection.find({"user" : request.user.username}).sort("last_update",1)
-	lst = []
-	sessions_list ={}
-	for doc in a :
-		#print '\n'+str(doc)
-		lst.append(doc)
-		sk = str(doc[u"session_key"])	
-		if sk in sessions_list.keys():
-			sessions_list[sk]["end_date"]	= doc[u"last_update"]		
-			sessions_list[sk]["activities"]	+= 1
-			sessions_list[sk]["duration"] = sessions_list[sk]["end_date"] - sessions_list[sk]["start_date"]
-		else :
-			sessions_list[sk]	= {}
-			sessions_list[sk]["start_date"]	= doc[u"last_update"]
-			sessions_list[sk]["activities"]	= 1
-			#print str(sessions_list)+'\n'
 
-	#print sessions_list
-
-	return render_to_response("ndf/analytics_summary.html",
-															{ "data" : sessions_list})
-'''
-def activities_summary(request):
-	a = collection.find({"user" : request.user.username}).sort("last_update",1)
+def session_summary(request):
+	a = collection.find({"user" : request.user.username}).sort("last_update",-1)
+	#print a
 	lst = []
 	sessions_list =[]
 	d={}
 	i=-1
-	
+	normalize(a)
 	for doc in a :
 		#print '\n'+str(doc)
 		lst.append(doc)
@@ -151,8 +129,119 @@ def activities_summary(request):
 			d["session_key"]=sk
 			d["start_date"]	= doc[u"last_update"]
 			d["activities"]	= 1
+			d["user"]	= doc[u"user"]
 			sessions_list.append(d)
 
 
 	return render_to_response("ndf/analytics_summary.html",
 															{ "data" : sessions_list})
+															
+															
+															
+															
+def normalize(a) :
+
+	def gapp_list(gapp):
+		return {
+				"page": page_acti,
+				"file": file_acti,
+				"course": course_acti,
+				"forum": forum_acti,
+				"task": task_acti,
+				"event": event_acti,
+				"dashboard": dashbard_acti,
+				"group": group_acti,
+				#"image": image_acti,
+				#"video": video_acti,
+		}.get(gapp,default_acti)
+
+	segre1 = ["file/thumbnail",'None','']
+	prev_calling_url=""
+	for doc in a :
+		
+		if 'ajax' in str(doc[u'action']) or str(doc[u'action']) in segre1 :
+			pass
+
+		else :
+			
+			if doc[u'calling_url']==prev_calling_url :
+				pass
+			else :
+				prev_calling_url=doc[u'calling_url']
+
+				url = str(doc[u'calling_url']).split("/")			
+				group_id = Gid(url[1])
+				gapp = url[2]
+
+				print gapp
+				print group_id
+
+				#gapp_list(gapp)(url,doc[u'last_update'],doc[u'user'])
+				
+
+
+	return 0
+
+
+def page_acti(url,last_update,user):
+	print doc
+	return 0
+
+def file_acti(url,last_update,user):
+	return 0
+
+def forum_acti(url,last_update,user):
+
+	return 0
+
+def course_acti(url,last_update,user):
+	return 0
+
+def task_acti(url,last_update,user):
+	return 0
+
+def event_acti(url,last_update,user):
+	return 0
+
+def dashbard_acti(url,last_update,user):
+	return 0
+
+def group_acti(url,last_update,user):
+	return 0
+
+def image_acti(url,last_update,user):
+	return 0
+
+def video_acti(url,last_update,user):
+	return 0
+
+def default_acti(url,last_update,user):
+	pass
+	return 0
+
+
+
+def Gid(group):
+	group_id = group;
+	ins_objectid = ObjectId()
+	if ins_objectid.is_valid(group_id) is False:
+		group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+		#auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		if group_ins:
+			group_id = str(group_ins._id)
+		else:
+			auth = node_collection.one({'_type': 'Author', 'name': group_id })
+			if auth:
+				group_id = str(auth._id)
+			pass
+	else:
+		pass
+
+	return group_id	
+
+
+				
+			
+			
+
+

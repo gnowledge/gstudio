@@ -206,6 +206,9 @@
             <li class="text-center">
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
+            <li class="text-center">
+              <a href='/analytics/'>{% trans "Activities" %}</a>
+            </li>
             {% if user.is_superuser %}
               <li class="text-center">
                 <a href="/admin/data">{% trans "Admin Data" %}</a>
