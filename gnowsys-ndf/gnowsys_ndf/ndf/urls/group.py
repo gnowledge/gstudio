@@ -1,11 +1,12 @@
 from django.conf.urls import patterns, url
+from gnowsys_ndf.ndf.views.group import GroupCreateEditHandler
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.group',
                         url(r'^[/]$', 'group', name='group'),
                         url(r'^/(?P<app_id>[\w-]+)$', 'group', name='group'),
-                        url(r'^/create_group/', 'create_group', name='create_group'),
+                        url(r'^/create_group/', GroupCreateEditHandler.as_view(), {'action': 'create'}, name='create_group'),
+                        url(r'^/edit_group/', GroupCreateEditHandler.as_view(), {'action': 'edit'}, name='edit_group'),
                         url(r'^/group_publish/(?P<node>[\w-]+)$', 'publish_group', name='publish_group'),
-                        url(r'^/edit_group/', 'edit_group', name='edit_group'),
                         url(r'^/switch_group/(?P<node_id>[\w-]+)$', 'switch_group', name='switch_group'),
                         url(r'^/app_selection/', 'app_selection', name='app_selection'),
                         url(r'^/create_sub_group/', 'create_sub_group', name='create_sub_group'),
