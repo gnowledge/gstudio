@@ -724,6 +724,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   nav_l=request.GET.get('nav_li','')
   breadcrumbs_list = []
   nav_li = ""
+  #a temp. variable which stores the lookup for append method
   breadcrumbs_list_append_temp=breadcrumbs_list.append
   if nav_l:
     nav_li = nav_l
@@ -752,6 +753,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 
   ###shelf###
   shelves = []
+  #a temp. variable which stores the lookup for append method
   shelves_append_temp=shelves.append
   shelf_list = {}
   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
@@ -767,6 +769,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 	        shelves_append_temp(shelf_name)
 
 	        shelf_list[shelf_name.name] = []
+	        #a temp. variable which stores the lookup for append method
                 shelf_list_shlefname_append_temp=shelf_list[shelf_name.name].append
 	        for ID in shelf_name.collection_set:
 	        	shelf_item = node_collection.one({'_id': ObjectId(ID) })
