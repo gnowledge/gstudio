@@ -5,18 +5,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script src="/static/ndf/js/mailbox.js"></script>
+<script src="/ckeditor/ckeditor.js"></script>
 </head>
 <body>
 <div id="mailContent">
-{% get_mails_in_box request mailboxname username mail_type displayFrom as emails %}
+{% get_mails_in_box mailboxname username mail_type displayFrom as emails %}
 	{% for mail in emails %}
 		<div id="myModal{{ mail.mail_id }}" class="reveal-modal" animation="None" data-reveal>
-    				<h3>{{ mail.mail_data.text }}</h3>
-    				<a class="close-reveal-modal">&#215;</a>                
+    		<a class="close-reveal-modal">&#215;</a>            
   		</div>
 
 		<div id={{ mail.mail_id }} style="border-top:1px solid gray; height:fit-content; padding-top: 2px; padding-bottom: 2px;" >
-			<h4><a onclick="window.location.href='#'" data-reveal-id="myModal{{ mail.mail_id }}">{{ mail.mail_data.Subject }}</a></h4>
+			<h4><a onclick="window.location.href='#'; updateStatus('{{ mail.mail_data.file_name }}') ; readBody('{{ mail.mail_id }}','{{ mail.mail_data.text }}');" data-reveal-id="myModal{{ mail.mail_id }}">{{ mail.mail_data.Subject }}</a></h4>
 		</div>
 	{% endfor %}
 </div>
