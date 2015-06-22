@@ -2079,8 +2079,8 @@ def get_source_id(obj_id):
 @get_execution_time
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
    get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
-   r_list_append_temp=r_list.append
-   translation_list_append_temp=translation_list.append
+   r_list_append_temp=r_list.append #a temp. variable which stores the lookup for append method
+   translation_list_append_temp=translation_list.append#a temp. variable which stores the lookup
    if obj_id not in r_list:
       r_list_append_temp(obj_id)
       node_sub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
