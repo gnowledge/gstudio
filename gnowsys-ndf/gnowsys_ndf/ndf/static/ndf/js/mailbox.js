@@ -59,8 +59,9 @@ function getMails(){
 
 
 // Function to put a POST request to fetch mails
-function setMailBoxName(username, csrf_token, mailBoxName) {
+function setMailBoxName(username, csrf_token, mailBoxName, emailid) {
 	document.getElementById( 'mailBoxName' ).innerHTML = mailBoxName;
+	document.getElementById( 'emailIdBox' ).innerHTML = emailid;
 	/*code to set the 'mailbox_settings' url*/
 	set_link=$("#set_box").attr("href");
 	set_link=set_link.replace('dummy',mailBoxName);

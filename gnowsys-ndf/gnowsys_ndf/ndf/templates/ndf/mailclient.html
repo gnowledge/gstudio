@@ -60,8 +60,8 @@
 
   <div class="BoxNames" style="padding-right:10px">
     <a onclick="setMailBoxName('{{ user.username }}', '{{ csrf_token }}', document.getElementById('MetaBox').innerHTML);" ><h3 id="MetaBox">{% trans "MetaBox" %}</h3></a>
-    {% for box in mailboxnames %}
-    <a onclick="setMailBoxName('{{ user.username }}','{{ csrf_token }}', document.getElementById('{{ box }}').innerHTML);" ><h3 id={{ box }}>{% trans box %}</h3></a>
+    {% for box in mailbox_data %}
+    <a onclick="setMailBoxName('{{ user.username }}','{{ csrf_token }}', document.getElementById('{{ box.name }}').innerHTML, '{{ box.emailid }}');" ><h3 id={{ box.name }}>{% trans box.name %}</h3></a>
     {% endfor %}
   </div>
 {% endblock %}
@@ -70,7 +70,10 @@
   <!-- To Display the name of the active mailbox -->
 
   <div class="activeMailBox" style="height: 4.5rem">
-    <h2 id="mailBoxName" style="float: left; width:50%;">MetaBox</h2>
+    <h2 id="mailBoxName" style="float: left; width:50%;">MetaBox
+    </h2>
+    
+    
     <div class="boxController" style="float: right; width:50%;" align="right">
     <a id="set_box" href="{% url 'mailbox_settings' groupid 'dummy' %}" class="button small">Mailbox Settings</a>
     <a id="compose_mail" href="{% url 'compose_mail' groupid 'dummy' %}" class="button small">Write Mail</a>    
@@ -81,7 +84,9 @@
            {% trans ">" %}
           </a>
     </div>
+    <p id="emailIdBox"></p>
   </div>
+  <br>
   <div class='tabSpace' style = "height: 46px;">
 
     <div id='tab1' style="float:left; width:45%;border-right-style: solid; border-right-width: 1px;">

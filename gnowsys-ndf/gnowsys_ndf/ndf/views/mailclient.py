@@ -63,6 +63,8 @@ def mailclient(request, group_id):
         cursor = conn.execute(query)
 
         mailbox_ids=[]
+        mailbox_emailids=[]
+        all_mailboxes_in_db = Mailbox.active_mailboxes.all()
         for row in cursor:
             mailbox_ids.append(row[0])
         print "mbox ids", mailbox_ids        
@@ -73,6 +75,10 @@ def mailclient(request, group_id):
             cursor = conn.execute(query_2)
             for row in cursor:
                 mailbox_names.append(row[0])
+                temp_box = Mailbox.active_mailboxes.get(id=box_id)
+                temp_uri = temp_box.uri
+                emailid = temp_uri.split("//")[1].split(":")[0].replace('%40','@')
+                mailbox_emailids.append(emailid)
 
     # add exception
     except Exception as error:
@@ -83,12 +89,18 @@ def mailclient(request, group_id):
     #TODO: Handle the test case which requires the next two lines of code
     if group_id == home_grp_id['_id']:
         return render(request, 'ndf/oops.html')
+    mailbox_data = []
+    for i in range(len(mailbox_names)):
+        temp = {}
+        temp['name'] = mailbox_names[i]
+        temp['emailid'] = mailbox_emailids[i]
+        mailbox_data.append(temp)
 
     return render(request, 'ndf/mailclient.html', {
         'groupname': group_name,
         'groupid': group_id,
         'group_id': group_id,
-        'mailboxnames': mailbox_names
+        'mailbox_data': mailbox_data
     })
  
 @login_required
@@ -363,7 +375,7 @@ def mailbox_delete(request, group_id,mailboxname):
                         break
 
                 if flag == 1:
-                    #delete from out 'mapping' database (the database which tracks which user_id is asscociated with which mailbox_id )                    
+                    #delete from our 'mapping' database (the database which tracks which user_id is asscociated with which mailbox_id )                    
 
                     # conn2 = sqlite3.connect(path + '/example-sqlite3.db')
                     query = 'delete from user_mailboxes where mailbox_id='+str(box.id)
@@ -375,16 +387,6 @@ def mailbox_delete(request, group_id,mailboxname):
 
                     #delete mailbox from django_mailbox's database
                     box.delete()
-                    
-                    # get it from the user
-                    want_archive=None
-                    if want_archive:
-                        # change the mailbox folder from its existing location to the archives data folder
-                        print 'PENDING!'
-                    else:
-                        # directly delete the folder from the system
-                        print 'PENDING!'
-
                     print "%s Deleted from django_mailbox" % mailbox_name
                 else:
                     print "Box not found > (fn: delete_mailbox)"
@@ -443,7 +445,10 @@ def compose_mail(request, group_id,mailboxname):
         to = request.POST.get("to_addrs", "")
         subject = request.POST.get("subject", "")
         body = request.POST.get("body_editor", "")
-        
+        #files = request.POST.get("attached_files","")
+        # print '*'*30
+        # print "files",files
+        # print '*'*30
         to=to.replace(" ","")
         to_list=to.split(";")
 
