@@ -11,6 +11,7 @@
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
 
+  <script src="/static/ndf/js/mailclientcheck.js"></script>
   <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
   <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
@@ -122,6 +123,7 @@
           <label>Mailbox Name <font color="red">*</font></label>
           <input id="name_id" name="mailboxname" type="text" placeholder="Enter name..." required>
           <small class="error">Please give a Mailbox name.It should contain only alphabets, digits and undescores.</small>
+          <small id="name_id_error"></small>
         </div>
       </div>
 
@@ -131,6 +133,7 @@
           <label>Email ID <font color="red">*</font></label>
           <input id="email_id" name="emailid" type="text" placeholder="Enter Email ID for this mail box..." required>
           <small class="error">Please enter an email id for this mail box.</small>
+          <small id="email_id_error"></small>
         </div>
       </div>
 
@@ -165,7 +168,9 @@
           <!-- deleted above -->
           <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
           <!-- Save button -->
+          <div id="saveButton">
           <input type="submit" id="save-node" value="Save" class="button small expand"/>
+          </div>
         </div>
       </div>
     </div>
