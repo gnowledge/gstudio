@@ -80,7 +80,11 @@ function setMailBoxName(username, csrf_token, mailBoxName, emailid) {
 }
 
 function updateStatus(filename){
-	alert(filename);
+	alert(typeOfMail);
+	if(typeOfMail == 0){
+	$.post( 'mailstatuschange/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'file_name': filename}, function(data){		
+	});
+	}
 }
 
 // <textarea name=\"editor1\" id=\"editor1\">&lt;p&gt;
@@ -104,6 +108,3 @@ $(document).ready(function(){
 		getMails();
 	});
 });
-
-
-

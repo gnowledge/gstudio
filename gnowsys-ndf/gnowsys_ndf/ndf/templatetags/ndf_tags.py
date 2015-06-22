@@ -3279,6 +3279,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 				emails.append({'mail_id':i, 'mail_data':mail})
 				i+=1
 			print 'FETCHING DONE'
+			return emails
 	else:
 		print 'ERROR : NO SUCH MAILBOX'
 
@@ -3322,3 +3323,20 @@ def create_deault_mailbox(request,username):
 		print error
 		error_obj= str(error) + ",create_default_mailbox() fn, Mailbox created will be deleted"
 		return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+
+import shutil
+@get_execution_time
+@register.assignment_tag
+def mail_status_change(mailboxname, username, mail_type, file_name):
+	settings_dir = os.path.dirname(__file__)
+	PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+	path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
+	path = path + username
+	path = path + '/' + mailboxname
+
+	new_path = path + '/new/' + file_name
+	cur_path = path + '/cur/' + file_name
+
+	shutil.move(new_path,cur_path)
+
+	return True

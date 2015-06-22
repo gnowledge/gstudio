@@ -1,0 +1,5 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+{% load mail_status_change from ndf_tags %}
+{% mail_status_change mailboxname username mail_type filename as success %}

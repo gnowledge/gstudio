@@ -1,0 +1,20 @@
+{% load i18n %}
+{% load cache %}
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/static/ndf/js/mailbox.js"></script>
+</head>
+<body>
+<div id="message">
+	<p style="color:red">{{ display_message }}</p>
+</div>
+<div id="Button_data">
+	{% if success %}
+	<input type="submit" id="save-node" value="Save" class="button small expand"/>
+	{% else %}
+	<input type="submit" id="save-node" value="Save" class="button small expand" disabled />
+	{% endif %}
+</div>
+</body>
+</html>
