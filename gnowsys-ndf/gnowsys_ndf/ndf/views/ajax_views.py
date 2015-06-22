@@ -637,7 +637,7 @@ def get_topic_contents(request, group_id):
 def get_collection_list(collection_list, node):
   inner_list = []
   error_list = []
-  inner_list_append_temp=inner_list.append
+  inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -723,7 +723,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
-  inner_list_append_temp=inner_list.append
+  inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -760,7 +760,9 @@ def get_collection(request, group_id, node_id):
   
  # def a(p,q,r):
 #		collection_list.append({'name': p, 'id': q,'node_type': r})
+  #this empty list will have the Process objects as its elements
   processes=[]
+  #Function used by Processes implemented below
   def multi_(lst):
 		for each in lst:
 			obj = node_collection.one({'_id': ObjectId(each) })
@@ -773,14 +775,15 @@ def get_collection(request, group_id, node_id):
 
   if node and node.collection_set:
 		t=len(node.collection_set)
-		x=multiprocessing.cpu_count()
-		n2=t/x
+		x=multiprocessing.cpu_count()#returns no of cores in the cpu 
+		n2=t/x#divides the list into those many parts
+		#Process object is created.The list after being partioned is also given as an argument. 
 		for i in range(x):
 			processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2])))
 		for i in range(x):
-			processes[i].start()
+			processes[i].start()#each Process started
 		for i in range(x):
-			processes[i].join()
+			processes[i].join()#each Process converges
   data = collection_list
 
   return HttpResponse(json.dumps(data))
@@ -3081,6 +3084,7 @@ def get_districts(request, group_id):
         }).sort('name', 1)
 
         if cur_districts.count():
+          #loop replaced by a list comprehension
           districts=[[str(d.subject), d.name.split(" -- ")[0]] for d in cur_districts]
         else:
           error_message = "No districts found"
@@ -5444,6 +5448,7 @@ def page_scroll(request,group_id,page):
        page='1'  
     if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
+    # temp. variables which stores the lookup for append method
     user_activity_append_temp=user_activity.append
     files_list_append_temp=files_list.append
     for each in (paged_resources.page(int(page))).object_list:
