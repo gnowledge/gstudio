@@ -635,6 +635,9 @@ GSTUDIO_RESOURCES_REPLY_RATING = 2
 # the level of moderation means level of sub mode group hierarchy
 GSTUDIO_GROUP_MODERATION_LEVEL = 1
 
+# allowed moderation levels
+GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
+
 try:
     from local_settings import *
     # print "Local settings applied"
