@@ -17,12 +17,15 @@
   <h2 class="medium-12 columns">
     {{ title }} : {{ mailboxname }}
   </h2>
-  <h3 class="medium-12 columns">
-  Are you sure you want to delete this mailbox?
-  </h3>
-
   <form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
     {% csrf_token %}
+    <h3>Do you want to save the mails in this mailbox?</h3> 
+    <input type="radio" name="mails_save_option" value="YES">Yes<br>
+    <input type="radio" name="mails_save_option" value="NO">No
+
+    <br><br>
+    <h3>Are you sure you want to delete this mailbox?</h3>
+
     <input type="submit" id="save-yes" name="save-yes" value="YES" class="button small"/>
     <input type="submit" id="save-no" name="save-no" value="NO" class="button small"/>
     <input type="hidden" name="user_id" value="{{user.id}}">

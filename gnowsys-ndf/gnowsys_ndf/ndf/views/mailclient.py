@@ -26,6 +26,7 @@ from imaplib import IMAP4
 import sqlite3
 import os
 import re
+import shutil
 from django.core.mail import EmailMessage
 #-----------------Dictionary of popular servers--------------#
 server_dict = {
@@ -291,10 +292,42 @@ def mailbox_delete(request, group_id,mailboxname):
     if request.method == "POST":  # create or edit
         yes = request.POST.get("save-yes",None)
         no = request.POST.get("save-no",None)
+        save_mails = request.POST.get("mails_save_option",None)
         mailbox_name= request.POST.get("mailbox_name","")
         user_id = request.POST.get("user_id","")
         mailbox_names = []
+
+        if save_mails == "YES" and yes == "YES":
+            mails_path_dir1 = os.path.dirname(__file__)
+            mails_path_dir2 = os.path.dirname(mails_path_dir1)
+            src = str(mails_path_dir2) + "/mailbox_data/" + str(request.user.username) + "/" + mailboxname
+            dst = str(mails_path_dir2) + "/mailbox_data" + "/Archived_Mails/" + str(request.user.username) + "/" + mailboxname 
+            print '*'*30
+            print src
+            print dst
+            try:
+                shutil.move(src,dst)
+            except Exception as error:
+                print error
+                error_obj= str(error) + ", mailbox_delete() fn"
+                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
+            
+        elif save_mails== "NO" and yes =="YES":
+            mails_path_dir1 = os.path.dirname(__file__)
+            mails_path_dir2 = os.path.dirname(mails_path_dir1)
+            src = str(mails_path_dir2) + "/mailbox_data/" + str(request.user.username) + "/" + mailboxname
+                       
+            print '*'*30
+            print src
+            try:
+                shutil.rmtree(src)
+            except Exception as error:
+                print error
+                error_obj= str(error) + ", mailbox_delete() fn"
+                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
+
         if yes == "YES":
+            
             settings_dir1 = os.path.dirname(__file__)
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
@@ -409,6 +442,7 @@ def compose_mail(request, group_id,mailboxname):
         user_id = request.POST.get("user_id","")
         to = request.POST.get("to_addrs", "")
         subject = request.POST.get("subject", "")
+        
         to=to.replace(" ","")
         to_list=to.split(";")
 
@@ -431,15 +465,15 @@ def compose_mail(request, group_id,mailboxname):
 
         #TODO: extract email id from db using mailbox name and user id
         mail.from_email = "MetaStudio <abtiwari94@gmail.com>"
-        mail.body = "hi_test_mail_from_metastudio_"
         mail.subject= subject
+        mail.body= "UNDER CONSTRUCTION"
         try:
             mail.send()
         except Exception as error:
                 print error
                 error_obj= str(error) + ", compose_mail() fn"
                 return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})    
-        
-        print "post"
+
+        return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
 
     return render_to_response(template,variable)
