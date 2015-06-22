@@ -1528,6 +1528,34 @@ def get_group_type(group_id, user):
     except Exception as e:
         raise Http404(e)
 
+
+@get_execution_time
+@register.assignment_tag
+def get_possible_group_type_values():
+	'''
+	Returns TYPES_OF_GROUP defined in models.py 
+	'''
+	return TYPES_OF_GROUP
+
+
+@get_execution_time
+@register.assignment_tag
+def get_possible_edit_policy_values():
+	'''
+	Returns EDIT_POLICY defined in models.py 
+	'''
+	return EDIT_POLICY
+
+
+@get_execution_time
+@register.assignment_tag
+def get_allowed_moderation_levels():
+	'''
+	Returns GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS from settings.
+	'''
+	return GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS
+
+
 @get_execution_time
 @register.assignment_tag
 def check_accounts_url(url_path):
