@@ -104,7 +104,7 @@ def uDashboard(request, group_id):
 
         if has_profile_pic_str in request.FILES:
             pp = request.FILES[has_profile_pic_str]
-            has_profile_pic = d({'_type': "RelationType", 'name': has_profile_pic_str})
+            has_profile_pic = node_collection.one({'_type': "RelationType", 'name': has_profile_pic_str})
 
             # Find md5
             pp_md5 = hashlib.md5(pp.read()).hexdigest()
@@ -202,7 +202,9 @@ def uDashboard(request, group_id):
     #for i in activity_user:
     #    if i._type != 'Batch' or i._type != 'Course' or i._type != 'Module':
     #        a_user.append(i)
+    #loop replaced by a list comprehension
     a_user=[i for i in activity_user if (i._type != 'Batch' or i._type != 'Course' or i._type != 'Module')]        
+    #a temp. variable which stores the lookup for append method
     user_activity_append_temp=user_activity.append
     for each in a_user:
         if each.created_by == each.modified_by:
@@ -246,6 +248,7 @@ def uDashboard(request, group_id):
          'group_set': {'$all': [ObjectId(group_id)]}}
     )
     collab_drawer = []
+    #a temp. variable which stores the lookup for append method
     collab_drawer_append_temp=collab_drawer.append
     """
     To populate collaborators according
@@ -278,6 +281,7 @@ def uDashboard(request, group_id):
     quiz_create_rate = quiz_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
     reply_create_rate = reply_count.count() * GSTUDIO_RESOURCES_REPLY_RATING
     thread_create_rate = thread_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
+
     datavisual.append({"name": "Forum", "count": forum_create_rate})
     datavisual.append({"name": "File", "count": file_create_rate})
     datavisual.append({"name": "Page", "count": page_create_rate})
@@ -306,7 +310,6 @@ def uDashboard(request, group_id):
         context_instance=RequestContext(request)
     )
        
-   
 @get_execution_time
 def user_preferences(request,group_id,auth_id):
     try:
