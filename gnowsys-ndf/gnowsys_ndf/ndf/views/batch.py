@@ -158,47 +158,66 @@ def save_students_for_batches(request, group_id):
     edit_batch = []
     if request.method == 'POST':
         batch_user_list = request.POST.get('batch_user_list_dict', '')
-        print "\n\n batch_user_list_dict", batch_user_list
+        # print "\n\n batch_user_list_dict", batch_user_list
         batch_user_list = json.loads(batch_user_list)
         ac_id = request.POST.get('ac_id', '')
-        print "\n\n ac_id", ac_id
+        # print "\n\n ac_id", ac_id
         # raise Exception("batch")
         for k, v in batch_user_list.items():
-            save_batch(k, v, group_id, request, ac_id)
+            save_btch(k, v, group_id, request, ac_id)
         return HttpResponseRedirect(reverse('batch', kwargs={'group_id': group_id}))
 
 
 @get_execution_time
-def save_batch(batch_name, user_list, group_id, request, ac_id):
+def save_batch(request, group_id):
+# def save_batch(batch_name, user_list, group_id, request, ac_id):
 
-    rt_has_batch_member = node_collection.one({'_type':'RelationType', 'name':'has_batch_member'})
-    all_batches_in_grp=[]
-    b_node = node_collection.one({'member_of':GST_BATCH._id,'name':unicode(batch_name)})
-    if not b_node:
-        b_node = node_collection.collection.GSystem()
-        b_node.member_of.append(GST_BATCH._id)
-        b_node.created_by = int(request.user.id)
-        b_node.group_set.append(ObjectId(group_id))
-        b_node.name = batch_name
-        b_node.name = batch_name
-        b_node['altnames'] = batch_name.replace('_',' ')
+    group_name, group_id = get_group_name_id(group_id)
+    response_dict = {"success": False}
+    # new_batch_node = None
+    rt_group_has_batch = node_collection.one({'_type': 'RelationType', 'name': 'group_has_batch'})
+    rt_has_course = node_collection.one({'_type': 'RelationType', 'name': 'has_course'})
+    rt_has_batch_member = node_collection.one({'_type': 'RelationType', 'name': 'has_batch_member'})
+    if request.is_ajax() and request.method == "POST":
+        ac_id = request.POST.get("ac_id", '')
+        batch_name = request.POST.get("batch_name", '')
+        batch_id = request.POST.get("batch_id", '')
+        user_list = request.POST.getlist("user_list[]", '')
+        # create_new_batch = request.POST.get("create_new_batch", '')
+        response_dict["old_batches"] = find_batches_of_ac(ac_id)
+        user_list = [ObjectId(each) for each in user_list]
+        all_batches_in_grp = []
+        if not batch_id:
+            # b_node = node_collection.one({'member_of':GST_BATCH._id,'name':unicode(batch_name)})
+            b_node = node_collection.collection.GSystem()
+            b_node.member_of.append(GST_BATCH._id)
+            b_node.created_by = int(request.user.id)
+            b_node.group_set.append(ObjectId(group_id))
+            b_node.name = batch_name
+            b_node['altnames'] = batch_name.replace('_', ' ')
 
-        b_node.contributors.append(int(request.user.id))
-        b_node.modified_by = int(request.user.id)
-        b_node.save()
-        all_batches_in_grp.append(b_node._id)
+            b_node.contributors.append(int(request.user.id))
+            b_node.modified_by = int(request.user.id)
+            b_node.save()
+            all_batches_in_grp.append(b_node._id)
 
-    rt_group_has_batch = node_collection.one({'_type':'RelationType', 'name':'group_has_batch'})
-    rt_has_course = node_collection.one({'_type':'RelationType', 'name':'has_course'})
-    relation_coll = triple_collection.find({'_type':'GRelation','relation_type.$id':rt_group_has_batch._id,'subject':ObjectId(group_id)})
+            relation_coll = triple_collection.find({'_type': 'GRelation', 'relation_type.$id': rt_group_has_batch._id,'subject':ObjectId(group_id)})
 
-    for each in relation_coll:
-        all_batches_in_grp.append(each.right_subject)
-        # to get all batches of the group
-    create_grelation(b_node._id,rt_has_batch_member,user_list)
-    print "\n\n ac_id", ac_id
-    create_grelation(b_node._id,rt_has_course,ObjectId(ac_id))
-    create_grelation(ObjectId(group_id),rt_group_has_batch,all_batches_in_grp)
+            for each in relation_coll:
+                all_batches_in_grp.append(each.right_subject)
+                # to get all batches of the group
+            create_grelation(ObjectId(group_id), rt_group_has_batch, all_batches_in_grp)
+            create_grelation(b_node._id, rt_has_course, ObjectId(ac_id))
+            response_dict['new_batch_created'] = True
+            response_dict['new_batch_node_name'] = b_node.name
+            response_dict['new_batch_node_id'] = str(b_node._id)
+        else:
+            response_dict['new_batch_created'] = False
+            b_node = node_collection.one({'_id': ObjectId(batch_id)})
+        if user_list:
+            create_grelation(b_node._id, rt_has_batch_member, user_list)
+        response_dict['success'] = True
+        return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
 
 @get_execution_time
@@ -265,9 +284,27 @@ def get_possible_batches(request, group_id):
     Returns:
      * Batches of selected course
     '''
+    group_name, group_id = get_group_name_id(group_id)
     response_dict = {"success": False}
+    new_batch_node = None
     if request.is_ajax() and request.method == "POST":
         ac_id = request.POST.get("ac_id", '')
+        create_new_batch = request.POST.get("create_new_batch", '')
         response_dict["old_batches"] = find_batches_of_ac(ac_id)
+        # ac_node = node_collection.one({'_id': ObjectId(ac_id)})
+        # if create_new_batch:
+        #     print "\n\n under create new batch"
+        #     b_name = ac_node.name + " - Batch " + str(len(response_dict["old_batches"])+1)
+        #     user_list = []
+        #     new_batch_node = save_batch(b_name, user_list, group_id, request, ac_id)
+        #     print "\n\nnew_batch_node._id", new_batch_node._id
+        #     if new_batch_node:
+        #         response_dict['new_batch_name'] = new_batch_node.name
+        #         response_dict['new_batch_id'] = new_batch_node.name
+        #         # if new_batch_node.relation_set:
+        #         #     for rel in new_batch_node.relation_set:
+        #         #         if rel and 'has_batch_member' in rel:
+        #         #             list_of_members = rel['has_batch_member']
         response_dict["success"] = True
+
         return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
