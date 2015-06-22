@@ -120,7 +120,6 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 		# print educationaluse_stats
 		result_paginated_cur = files
 		result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
-	#a=datavisual.append
 	datavisual.append({"name":"Doc", "count": educationaluse_stats.get("Documents", 0)})
 	datavisual.append({"name":"Image","count": educationaluse_stats.get("Images", 0)})
 	datavisual.append({"name":"Video","count": educationaluse_stats.get("Videos", 0)})
