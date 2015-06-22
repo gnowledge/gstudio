@@ -88,6 +88,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     if agency_type_node:
  #     for eachset in agency_type_node.collection_set:
  #      app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+      #loop replaced by a list comprehension
       app_collection_set=[node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]
 
 
@@ -119,6 +120,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
 #     for each in univ_cur:
 #       univ_list.append(each)
+      #loop replaced by a list comprehension
       univ_list=[each for each in univ_cur]
 
 
