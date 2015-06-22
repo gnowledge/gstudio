@@ -767,7 +767,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 	        shelves_append_temp(shelf_name)
 
 	        shelf_list[shelf_name.name] = []
-            shelf_list_shlefname_append_temp=shelf_list[shelf_name.name].append
+                shelf_list_shlefname_append_temp=shelf_list[shelf_name.name].append
 	        for ID in shelf_name.collection_set:
 	        	shelf_item = node_collection.one({'_id': ObjectId(ID) })
 	        	shelf_list_shlefname_append_temp(shelf_item.name)
