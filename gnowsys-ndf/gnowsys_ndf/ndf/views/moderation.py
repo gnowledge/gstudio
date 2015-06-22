@@ -84,7 +84,7 @@ def moderation_status(request, group_id, node_id):
     	is_under_moderation = False
 
     # print "is_under_moderation : ", is_under_moderation
-    print "=== ", current_mod_group_obj._id
+    # print "=== ", current_mod_group_obj._id
 
     return render_to_response('ndf/under_moderation.html', {
 		'group_id': group_id, 'groupid': group_id, 'node': node, 'title': 'Under Moderation Status',
@@ -98,10 +98,11 @@ def all_under_moderation(request, group_id):
 	group_obj = get_group_name_id(group_id, get_obj=True)
 
 	if not group_obj.edit_policy == 'EDITABLE_MODERATED':
-		raise Http404(error_message) 
+		raise Http404('Group is not EDITABLE_MODERATED') 
 
 	mod_group_instance = CreateModeratedGroup(request)
 	group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(group_obj._id)
+	group_hierarchy_obj_list = []
 
 	if group_hierarchy_result[0]:
 		group_hierarchy_obj_list = group_hierarchy_result[1]
@@ -116,8 +117,8 @@ def all_under_moderation(request, group_id):
 
 		return render_to_response('ndf/all_under_moderation_status.html', {
 			"group_id": group_id, "groupid": group_id, "title": "All Under Moderation Resources",
-			"files": all_resources, "detail_urlname": "moderation_status", "filetype": "all", 
-			"dont_show_error": True
+			"files": all_resources, "group_hierarchy_obj_list": group_hierarchy_obj_list,
+			"detail_urlname": "moderation_status", "filetype": "all", "dont_show_error": True
 			}, RequestContext(request))
 
 	else:
@@ -154,9 +155,9 @@ def approve_resource(request, group_id):
 		# make deep copy of object and not to copy it's reference with [:].
 		group_set_details_dict = get_moderator_group_set(node_group_set[:], group_id, get_details=True)
 		updated_group_set = group_set_details_dict['updated_group_set']
-		print "==== updated_group_set : ", updated_group_set
-		print "==== node_group_set : ", node_group_set
-		print "==== group_set_details_dict : ", group_set_details_dict
+		# print "==== updated_group_set : ", updated_group_set
+		# print "==== node_group_set : ", node_group_set
+		# print "==== group_set_details_dict : ", group_set_details_dict
 
 		# if set(node_group_set) != set(updated_group_set):
 		if group_set_details_dict['is_group_set_updated']:
