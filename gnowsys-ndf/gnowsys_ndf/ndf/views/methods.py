@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
-#from django.utils.text import slugify
 from django.shortcuts import render_to_response  # , render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
@@ -228,23 +227,28 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
         # Then append their names in list of GApps to be excluded
         if already_selected_gapps:
             gapps_list_remove = gapps_list.remove
+            #Function used by Processes implemented below
             def multi_(lst):
               for each_gapp in lst:
                 gapp_name = each_gapp["name"]
 
                 if gapp_name in gapps_list:
                     gapps_list_remove(gapp_name)
+            #this empty list will have the Process objects as its elements
             processes=[]
             n1=len(already_selected_gapps)
             lst1=already_selected_gapps
+            #returns no of cores in the cpu
             x=mp.cpu_count()
+            #divides the list into those many parts
             n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
             for i in range(x):
               processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2])))
             for i in range(x):
-              processes[i].start()
+              processes[i].start() #each Process started 
             for i in range(x):
-              processes[i].join()
+              processes[i].join() #each Process converges
     # Find all GAPPs
     meta_type = node_collection.one({
         "_type": "MetaType", "name": META_TYPE[0]
@@ -499,7 +503,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
       for each in drawer:
         if each._id not in nlist:
           dict1[each._id] = each
-
+      #loop replaced by a list comprehension
       dict2=[node_collection.one({'_id': oid}) for oid in nlist]
 
       dict_drawer['1'] = dict1
@@ -511,7 +515,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id != nid:
           if each._id not in nlist:
             dict1[each._id] = each
-          
+      #loop replaced by a list comprehension    
       dict2=[node_collection.one({'_id': oid})  for oid in nlist]
 
       dict_drawer['1'] = dict1
@@ -1210,6 +1214,7 @@ def tag_info(request, group_id, tagname=None):
     group_cur_list = []  # for AutheticatedUser
     today = date.today()
     yesterdays_search = {date.today() - timedelta(days=1)}
+    week_ago_search = {date.today() - timedelta(days=7)}
     locale.setlocale(locale.LC_ALL, '')
     userid = request.user.id
     # collection = get_database()[Node.collection_name]
@@ -1224,7 +1229,7 @@ def tag_info(request, group_id, tagname=None):
             cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
                                         'group_set':ObjectId(group_id)
                   })
-           
+            #loop replaced by a list comprehension
             search_result=[every for every in cur]
 
     # Autheticate user can see all public files
@@ -1247,7 +1252,7 @@ def tag_info(request, group_id, tagname=None):
                                             {'created_by': userid},
                                           ]
                                       })
-            
+            #loop replaced by a list comprehension
             search_result=[every for every in cur]
 
     else:  # Unauthenticated user can see all public files.
@@ -1259,7 +1264,7 @@ def tag_info(request, group_id, tagname=None):
                                                'status': u'PUBLISHED'
                                             }
                                      )
-                
+                #loop replaced by a list comprehension
                 search_result=[every for every in cur]
 
     if search_result:
@@ -1490,10 +1495,11 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   """
   if not isinstance(at_rt_objectid_or_attr_name_list, list):
     at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
-
+  #a temp. variable which stores the lookup for append method
   type_of_set_append_temp=type_of_set.append  
   if not type_of_set:
     node["property_order"] = []
+    #a temp. variable which stores the lookup for append method
     node_property_order_append_temp=node["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
@@ -1516,6 +1522,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   }
 
   widget_data_list = []
+  #a temp. variable which stores the lookup for append method
   widget_data_list_append_temp=widget_data_list.append
   for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
     if type(at_rt_objectid_or_attr_name) == ObjectId: #ObjectId.is_valid(at_rt_objectid_or_attr_name):
@@ -1615,6 +1622,7 @@ def get_property_order_with_value(node):
     
     demo["property_order"] = []
     type_of_set = []
+    #temp. variables which stores the lookup for append method
     type_of_set_append_temp=type_of_set.append
     demo_prop_append_temp=demo["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
@@ -1628,6 +1636,7 @@ def get_property_order_with_value(node):
           demo_prop_append_temp(po)
 
     demo.get_neighbourhood(node["member_of"])
+    #a temp. variable which stores the lookup for append method
     new_property_order_append_temp=new_property_order.append
     for tab_name, list_field_id_or_name in demo['property_order']:
       list_field_set = get_widget_built_up_data(list_field_id_or_name, demo, type_of_set)
@@ -1642,6 +1651,7 @@ def get_property_order_with_value(node):
       
       if type_of_nodes.count():
         demo["property_order"] = []
+        #a temp. variable which stores the lookup for append method
         demo_prop_append_temp=demo["property_order"].append
         for to in type_of_nodes:
           for po in to["property_order"]:
