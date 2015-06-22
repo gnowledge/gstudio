@@ -442,6 +442,7 @@ def compose_mail(request, group_id,mailboxname):
         user_id = request.POST.get("user_id","")
         to = request.POST.get("to_addrs", "")
         subject = request.POST.get("subject", "")
+        body = request.POST.get("body_editor", "")
         
         to=to.replace(" ","")
         to_list=to.split(";")
@@ -466,7 +467,8 @@ def compose_mail(request, group_id,mailboxname):
         #TODO: extract email id from db using mailbox name and user id
         mail.from_email = "MetaStudio <abtiwari94@gmail.com>"
         mail.subject= subject
-        mail.body= "UNDER CONSTRUCTION"
+        mail.content_subtype = "html"
+        mail.body = body 
         try:
             mail.send()
         except Exception as error:

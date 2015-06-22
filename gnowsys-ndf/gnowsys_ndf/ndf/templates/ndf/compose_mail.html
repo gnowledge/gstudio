@@ -6,6 +6,7 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
+	 <script src="/static/ndf/ckeditor/ckeditor.js"></script>
 {% endblock %}
 
 
@@ -72,10 +73,11 @@
       	</br>
 
 		<div class ="row">
-			<fieldset>
-				<legend>{% trans "Body" %}</legend>
-				{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="What do you want this mail to contain?" %}
-			</fieldset>
+			<label>Body:</font></label>
+			<textarea name="body_editor" id="body_editor">What do you want to put in this mail?</textarea>
+            <script>
+                CKEDITOR.replace( 'body_editor' );
+            </script>
 		</div>
 
 		<!-- <input type="file" id="file_id"> -->
