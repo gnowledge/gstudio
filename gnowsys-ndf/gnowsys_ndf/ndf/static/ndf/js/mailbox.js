@@ -76,11 +76,6 @@ function setMailBoxName(username, csrf_token, mailBoxName) {
 	CSRFtoken = csrf_token;
 	countInitialize();
 	getMails();
-
-	a=$("#set_box").attr("href");
-	a=a.replace('dummy',mailBoxName);
-	$("#set_box").attr("href", a);
-
 }
 
 $(document).ready(function(){

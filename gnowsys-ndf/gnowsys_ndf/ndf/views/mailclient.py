@@ -469,6 +469,7 @@ def compose_mail(request, group_id,mailboxname):
         mail.subject= subject
         mail.content_subtype = "html"
         mail.body = body 
+        print body
         try:
             mail.send()
         except Exception as error:
