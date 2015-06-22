@@ -99,6 +99,11 @@
     <a class="close-reveal-modal">&#215;</a>
   </div>
 
+
+    <div id="batch_info" class="reveal-modal medium" data-reveal style="height:500px;overflow-y: auto !important;"> 
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
 <div class="course_details_div">
   <fieldset id="stud-count" class="small-10 columns">
     <div class="row">
@@ -174,6 +179,7 @@
   var ac;
   var added_ids_list = []
   var batch_name_index;
+  var batch_name;
   var ac_name_as_prefix;
   var batch_user_list_dict = {}
   var batch_user_list_list = {}
@@ -339,6 +345,7 @@
                   cell2.className += " existing_batch";
                   cell2.id = val[1];
                   cell3.innerHTML = val[0].length+" student(s)";
+                  cell3.className = "stud_count_in_batch";
                   val.pop();
                 })
               })
@@ -426,6 +433,7 @@
             cell2.className += " existing_batch";
             cell2.id = new_batch_node['new_batch_node_id']
             cell3.innerHTML = batch_user_list_dict[batch_name].length+" student(s)";
+            cell3.className = "stud_count_in_batch";
             cell1.innerHTML = "View";
             cell1.className = "view_batch";
           }
@@ -439,35 +447,86 @@
 
   //view batch members on click of 'View'
     $(document).on( 'click', '.view_batch  ', function () {
-      batch_name_from_table = $(this).next('.existing_batch').html();
-      batch_member_list = []
-      if(batch_user_list_dict.hasOwnProperty(batch_name_from_table)){
-        batch_member_list = batch_user_list_dict[batch_name_from_table]
-      }
+
+      batch_id = $(this).next('.existing_batch').attr('id');
+      batch_name = $(this).next('.existing_batch').html();
+      $.ajax({
+        url: "{% url 'batch_detail' groupid %}",
+
+        data: {
+          'batch_id': batch_id,
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        success: function(data){
+          $("#batch_info").html("")
+          var table = document.createElement("TABLE");
+          table.id = batch_id
+          table.className = "batch_table_id"
+          $.each(data, function(index){
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            cell1.innerHTML = data[index]['name'];
+            var cell2 = row.insertCell(1);
+            cell2.innerHTML = "Remove from Batch";
+            cell2.id = data[index]['_id'];
+            cell2.className = 'button alert remove_stud';
+          })
+          $("#batch_info").append(table)
+          $('#batch_info').foundation('reveal', 'open');
+
+
+        },
+      });//end of ajax
+
+
+
     })
 
-  // add to existing batch
-    // $(document).on( 'click', '.existing_batch', function () {
-    //     arr = []
-    //     old_arr = []
-    //     sce_dt_var.$("tr.selected").each(function () {
-    //         arr.push(this.id);
-    //         $("#"+this.id).removeClass('selected');
-    //     });
-    //     v = $(this).html()
-    //     if (arr.length>0){
-    //       if(batch_user_list_dict.hasOwnProperty(v)){
-    //         old_arr = batch_user_list_dict[v]
-    //         batch_user_list_dict[v] = old_arr.concat(arr)
-    //       }
-    //       $(".batch_name_inp").val('');
-    //       $('.ajax_input_name').val('');
-    //       $(".datatable_div").html('');
-    //       $(this).next('td').html(batch_user_list_dict[v].length+ " student(s)")
-    //     }
-    //     $(".create_batch_row").attr("disabled",true)
-    // })
-  
+
+  //view batch members on click of 'View'
+    $(document).on( 'click', '.remove_stud  ', function () {
+
+      stud_id = $(this).attr('id');
+      batch_id = $(".batch_table_id").attr('id')
+      $(this).closest("tr").remove()
+      $.ajax({
+        url: "{% url 'remove_stud_from_batch' groupid %}",
+
+        data: {
+          'batch_id': batch_id,
+          'stud_id': stud_id,
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data){
+          status = data
+          if(status=="success"){
+            if(batch_user_list_dict.hasOwnProperty(batch_name)){
+              old_arr = batch_user_list_dict[batch_name]
+              if(old_arr.indexOf(stud_id)>=0){
+                i = old_arr.indexOf(stud_id)
+                old_arr.splice(i,1)
+              }
+              batch_user_list_dict[batch_name] = old_arr
+
+            }
+            $("#batch_create_edit_table").find("#"+batch_id).next('.stud_count_in_batch').html(old_arr.length+ "student(s)")
+          }
+        },
+      });//end of ajax
+
+
+    })
+
+
   // Make an ajax call to search approved student 
   // of the selected AC with entered name
   // ajax search student by name
@@ -494,7 +553,7 @@
               'search_text': search_text,
               'ac_id': ac_id,
               'added_ids_list':added_ids_list,
-              csrfmiddlewaretoken: '{{ csrf_token }}'
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
             success: function(data) {
               data = JSON.parse(data)

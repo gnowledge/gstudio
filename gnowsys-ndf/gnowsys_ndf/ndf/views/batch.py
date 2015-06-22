@@ -235,6 +235,70 @@ def detail(request, group_id, _id):
     return render_to_response(template, variable)
 
 
+@get_execution_time
+def remove_stud_from_batch(request, group_id):
+    group_name, group_id = get_group_name_id(group_id)
+    if request.is_ajax() and request.method == "POST":
+        batch_id = request.POST.get("batch_id", '')
+        stud_id = request.POST.get("stud_id", '')
+        rt_has_batch_member = node_collection.one({'_type':'RelationType','name':'has_batch_member'})
+        grelation_node = triple_collection.one({'_type':'GRelation',
+                        'relation_type.$id':rt_has_batch_member._id,
+                        'subject':ObjectId(batch_id),'status':u'PUBLISHED',
+                        'right_subject': ObjectId(stud_id)})
+        rel_name = grelation_node.relation_type.name
+        inv_rel_name = grelation_node.relation_type.inverse_name
+        subj = grelation_node.subject
+        right_subj = grelation_node.right_subject
+
+        # Remove right-subject-node's ObjectId from the value
+        # corresponding to subject-node's "relation-name" key
+        # referenced in relation_set field
+        res = node_collection.collection.update({
+            '_id': subj,
+            'relation_set.' + rel_name: {'$exists': True}
+        }, {
+            '$pull': {'relation_set.$.' + rel_name: right_subj}
+        },
+            upsert=False, multi=False
+        )
+        # Remove subject-node's ObjectId from the value corresponding
+        # to right-subject-node's "inverse-relation-name" key
+        # referenced in relation_set field
+        res = node_collection.collection.update({
+            '_id': right_subj,
+            'relation_set.' + inv_rel_name: {'$exists': True}
+        }, {
+            '$pull': {'relation_set.$.' + inv_rel_name: subj}
+        },
+            upsert=False, multi=False
+        )
+
+        grelation_node.status = u"DELETED"
+        grelation_node.save()
+        status = "success"
+        return HttpResponse(json.dumps(status, cls=NodeJSONEncoder))
+
+
+@get_execution_time
+def batch_detail(request, group_id):
+    group_name, group_id = get_group_name_id(group_id)
+    new_batch_node = None
+    if request.is_ajax() and request.method == "GET":
+        batch_id = request.GET.get("batch_id", '')
+
+        student_coll = []
+        node = node_collection.one({'_id':ObjectId(batch_id)})
+        rt_has_batch_member = node_collection.one({'_type':'RelationType','name':'has_batch_member'})
+        relation_coll = triple_collection.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'subject':node._id,'status':u'PUBLISHED'})
+
+        for each in relation_coll:
+            n = node_collection.one({'_id':ObjectId(each.right_subject)})
+            student_coll.append(n)
+        return HttpResponse(json.dumps(student_coll, cls=NodeJSONEncoder))
+
+
+
 @login_required
 @get_execution_time
 def delete_batch(request, group_id, _id):
