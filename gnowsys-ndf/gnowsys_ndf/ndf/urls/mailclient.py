@@ -7,6 +7,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.mailclient',
                        url(r'^[/]delete[/](?P<mailboxname>[\w-]+)$', 'mailbox_delete', name='mailbox_delete'),
                        url(r'^[/]settings[/](?P<mailboxname>[\w-]+)$', 'mailbox_settings', name='mailbox_settings'),
                        url(r'^[/]new_mail[/](?P<mailboxname>[\w-]+)$', 'compose_mail', name='compose_mail'),
+                       url(r'^[/]mailstatuschange[/]','update_mail_status', name='update_mail_status'),
                        # url(r'^[/]error[/]', 'mailclient_error_display', name='mailclient_error_display'),                       
                        )
 

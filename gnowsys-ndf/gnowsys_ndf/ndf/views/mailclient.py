@@ -375,16 +375,6 @@ def mailbox_delete(request, group_id,mailboxname):
 
                     #delete mailbox from django_mailbox's database
                     box.delete()
-                    
-                    # get it from the user
-                    want_archive=None
-                    if want_archive:
-                        # change the mailbox folder from its existing location to the archives data folder
-                        print 'PENDING!'
-                    else:
-                        # directly delete the folder from the system
-                        print 'PENDING!'
-
                     print "%s Deleted from django_mailbox" % mailbox_name
                 else:
                     print "Box not found > (fn: delete_mailbox)"
@@ -480,3 +470,18 @@ def compose_mail(request, group_id,mailboxname):
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
 
     return render_to_response(template,variable)
+
+def update_mail_status(request,group_id):
+    group_name, group_id = get_group_name_id(group_id)
+    template = "ndf/mailstatuschange.html"
+    if request.method=='POST' and request.is_ajax():
+        variable = RequestContext(request, {
+        'groupname': group_name,
+        "group_id" : group_id,
+        "groupid" : group_id,
+        'mailboxname': request.POST['mailBoxName'],
+        'username' : request.POST['username'],
+        'mail_type' : request.POST['mail_type'],
+        'filename' : request.POST['file_name']
+        })
+        return render_to_response(template,variable)
