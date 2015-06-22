@@ -78,6 +78,18 @@ function setMailBoxName(username, csrf_token, mailBoxName) {
 	getMails();
 }
 
+function updateStatus(filename){
+	alert(filename);
+}
+
+// <textarea name=\"editor1\" id=\"editor1\">&lt;p&gt;
+// &lt;/p&gt;</textarea><script>CKEDITOR.replace( 'editor1' );</script>
+function readBody(mail_id,text){
+	var content = text;
+    var elementName = "myModal" + mail_id;
+    document.getElementById(elementName).innerHTML = content;    			
+}
+
 $(document).ready(function(){
 	$("#unreadMailsLink").click(function(){
 		Unreadstart = 0;
