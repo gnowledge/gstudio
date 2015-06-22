@@ -6,7 +6,6 @@ import subprocess
 import mimetypes
 import os
 import tempfile
-import sys
 # import re
 import ox
 import pandora_client
@@ -691,6 +690,7 @@ def submitDoc(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     alreadyUploadedFiles = []
+    #a temp. variable which stores the lookup for append method
     alreadyUploadedFiles_append_temp=alreadyUploadedFiles.append
     str1 = ''
     img_type=""
@@ -698,7 +698,6 @@ def submitDoc(request, group_id):
     is_video = ""
     obj_id_instance = ObjectId()
     if request.method == "POST":
-        #a=request.POST.get
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
         language = request.POST.get("lan", "")
@@ -1238,13 +1237,15 @@ def file_detail(request, group_id, _id):
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
         shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
+        #a temp. variable which stores the lookup for append method
         shelves_append_temp=shelves.append
         if shelf:
             for each in shelf:
                 shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
                 shelves_append_temp(shelf_name)
 
-                shelf_list[shelf_name.name] = []   
+                shelf_list[shelf_name.name] = []
+                #a temp. variable which stores the lookup for append method
                 shelf_list_shelfname_append_temp=shelf_list[shelf_name.name].append      
                 for ID in shelf_name.collection_set:
                     shelf_item = node_collection.one({'_id': ObjectId(ID) })
@@ -1328,7 +1329,6 @@ def getFileThumbnail(request, group_id, _id):
 def readDoc(request, _id, group_id, file_name=""):
     '''Return Files 
     '''
-    #sys.stdout.write(cl.VERSION)
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = node_collection.find_one({'_type': "Group","name": group_id})
