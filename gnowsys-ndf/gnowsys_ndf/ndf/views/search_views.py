@@ -258,6 +258,7 @@ def results_search(request, group_id, return_only_dict = None):
 				For each matching GSystem, see if the GSystem has already been added to the list of ids and add if not added.
 				result is added only if belongs to the list of public groups
 				"""
+				#temp. variables which stores the lookup for append method
                                 all_ids_append_temp=all_ids.append
                                 search_results_ex_name_append_temp=search_results_ex['name'].append
 				for j in exact_match: 
@@ -276,6 +277,7 @@ def results_search(request, group_id, return_only_dict = None):
 				split_stem_match = []					# will hold all the split stem match results
 				len_stemmed = len(search_str_stemmed)	
 				c = 0							# GEN. COUNTER 
+                                #a temp. variable which stores the lookup for append method
                                 split_stem_match_append_temp=split_stem_match.append
 				while c < len_stemmed:	
 						word = search_str_stemmed[c]
@@ -302,6 +304,7 @@ def results_search(request, group_id, return_only_dict = None):
 				For each matching GSystem, see if the GSystem has already been returned in search results and add if not 					already added.
 				Result is added only if belongs to the list of public groups and has public access policy
 				"""
+                                #a temp. variable which stores the lookup for append method
 				search_results_st_name_append=search_results_st['name'].append
 				for j in split_stem_match:
 				                c = 0
@@ -343,6 +346,7 @@ def results_search(request, group_id, return_only_dict = None):
 									   {"group_set":ObjectId(group_id)},
 									   {"tags":search_str_user}]},
 						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
+                                # temp. variables which stores the lookup for append method
                                 all_ids_append_temp=all_ids.append
                                 search_results_ex_tags_append_temp=search_results_ex['tags'].append
 				for j in exact_match:
@@ -363,6 +367,7 @@ def results_search(request, group_id, return_only_dict = None):
 				split_stem_match = []
 				c = 0						# GEN. COUNTER 
 				len_stemmed = len(search_str_stemmed)
+				#a temp. variable which stores the lookup for append method
                                 split_stem_match_append_temp=split_stem_match.append
 				while c < len_stemmed:
 						word = search_str_stemmed[c]
@@ -388,6 +393,7 @@ def results_search(request, group_id, return_only_dict = None):
 				For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
 				Result is added only if belongs to the list of public groups and has public access policy
 				"""
+				#a temp. variable which stores the lookup for append method
 				search_results_st_tags_append=search_results_st['tags'].append
 				for j in split_stem_match:
 						c = 0
@@ -411,6 +417,7 @@ def results_search(request, group_id, return_only_dict = None):
 			content_docs = []
 			content_match_pairs = []	# STORES A DICTIONARY OF MATCHING DOCUMENTS AND NO_OF_WORDS THAT MATCH SEARCH QUERY
 			sorted_content_match_pairs = []				# STORES THE ABOVE DICTIONARY IN A SORTED MANNER
+                        #a temp. variable which stores the lookup for append method
 			content_match_pairs_append_temp=content_match_pairs.append
 			if (search_by_contents == True):
 				# FETCH ALL THE GSYSTEMS THAT HAVE BEEN MAP REDUCED.
@@ -435,6 +442,7 @@ def results_search(request, group_id, return_only_dict = None):
 						c += 1
 					match_counts.insert(c, pair['matches'])
 					sorted_content_match_pairs.insert(c, pair)	# SORTED INSERT (INCREASING ORDER)
+                                #a temp. variable which stores the lookup for append method
 				search_results_st_content_append_temp=search_results_st['content'].append
 				for docId in sorted_content_match_pairs:
 					doc = node_collection.find_one({"_id":docId['doc_id'], "access_policy":Access_policy}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
