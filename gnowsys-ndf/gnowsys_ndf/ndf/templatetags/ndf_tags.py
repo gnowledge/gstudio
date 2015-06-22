@@ -3038,14 +3038,74 @@ def convertVideo(files, userid, fileobj, filename):
 	
 
 
-def read_mails(path, _type, start, end):
+from os import listdir
+from os.path import isfile, join
+from email.parser import Parser
+def read_mails(path, _type, displayFrom):
 	cur_path = path + '/cur'
 	new_path = path + '/new'
 	
-	if _type == 1:
-		all_unread_mails = os.listdir(new_path)
-		if len(all_unread_mails) > end:
-			print 'l'
+	start = displayFrom
+	end  = displayFrom + 20
+
+	p = Parser()
+
+	mails_list = []
+
+	if _type == '0':
+		all_unread_mails = [ f for f in listdir(new_path) if isfile(join(new_path,f))]
+		
+		if end > len(all_unread_mails):
+			end = len(all_unread_mails)
+
+		all_unread_mails.sort()
+		all_unread_mails.reverse()
+		required_mails = all_unread_mails[start:end]
+
+		temp = {}
+
+		for temp_mail in required_mails:
+			msg = p.parse(open(join(new_path, temp_mail)))
+			for key in msg.keys():
+				if key == 'Attachments':
+					if msg[key] != '':
+						temp[key] = msg[key].split(';')
+					else:
+						temp[key] = []
+				else:		
+					temp[key] = msg[key]
+
+			msg['text'] = msg.get_payload()
+			mails_list.append(msg)
+			
+		return mails_list
+	
+	if _type == '1':
+		all_unread_mails = [ f for f in listdir(cur_path) if isfile(join(cur_path,f))]
+		
+		if end > len(all_unread_mails):
+			end = len(all_unread_mails)
+
+		all_unread_mails.sort()
+		all_unread_mails.reverse()
+		required_mails = all_unread_mails[start:end]
+
+		temp = {}
+
+		for temp_mail in required_mails:
+			msg = p.parse(open(join(cur_path,temp_mail)))
+			for key in msg.keys():
+				if key == 'Attachments':
+					if msg[key] != '':
+						temp[key] = msg[key].split(';')
+					else:
+						temp[key] = []
+				else:		
+					temp[key] = msg[key]
+
+			msg['text'] = msg.get_payload()
+			mails_list.append(msg)
+		return mails_list	
 
 
 
@@ -3147,59 +3207,72 @@ def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
 	if not os.path.exists(path + '/new'):
 		os.makedirs(path + '/new')
 
+	displayFrom = int(displayFrom)
+
 	if required_mailbox is not None:
 		emails=[]
 
 		if mail_type == '0':
-			print 'FETCHING NEW MAILS'
-			all_mails=required_mailbox.get_new_mail()
-			all_mails=list(reversed(all_mails))
-			no_of_new_mails = len(all_mails)
+			if displayFrom == 0:
+				print 'FETCHING NEW MAILS'
+				all_mails=required_mailbox.get_new_mail()
+				all_mails=list(reversed(all_mails))
+				no_of_new_mails = len(all_mails)
+				print 'FETCHING DONE'
+
+				# To manage the mails that comes as a part of the server-sync technique
+				# if mail.subject == 'SYNCDATA':
+				# 	if mail.attachments.count > 0:
+				# 		all_attachments = mail.attachments.all()
+				# 		all_attachments_path = ''
+				# 		for attachment in all_attachments:
+				# 			all_attachments_path = all_attachments_path + attachment.document.path + ';'
+				# 		with open(all_attachments_path[:-1],'r') as json_file:
+				# 			json_data = json_file.read()
+				# 			json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
+				# 			json_data = json_util.loads(json_data[1:-1])
+							
+				# 			# We need to check from the _type what we have that needs to be saved
+				# 			temp_node = node_collection.one({'_type': u'GSystem', '_id': json_data['_id']})
+				# 			if temp_node['name'] != []:
+				# 				print '*' * 30
+				# 				print 'exists'
+				# 				print '*' * 30
+				# 			else:
+				# 				temp_node = node_collection.collection.GSystem()
+							
+				# 			for key, values in json_data.items():
+				# 				temp_node[key] = values
+							
+				# 			print '*' * 30
+				# 			print temp_node.structure
+				# 			print '*' * 30
+				# 			temp_node.save()
+
+				# To read the mails from the directories
+			
+
+				print 'STORING NEW MAILS'
+				store_mails(request, all_mails,path)
+				print 'STORAGE DONE'
+			
+			print 'FETCHING FROM LOCAL STORAGE'
+			all_mails = read_mails(path, mail_type, displayFrom)
 			i=1
 			for mail in all_mails:
 				emails.append({'mail_id':i, 'mail_data':mail})
-
-				# To manage the mails that comes as a part of the server-sync technique
-				if mail.subject == 'SYNCDATA':
-					if mail.attachments.count > 0:
-						all_attachments = mail.attachments.all()
-						all_attachments_path = ''
-						for attachment in all_attachments:
-							all_attachments_path = all_attachments_path + attachment.document.path + ';'
-						with open(all_attachments_path[:-1],'r') as json_file:
-							json_data = json_file.read()
-							json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
-							json_data = json_util.loads(json_data[1:-1])
-							
-							# We need to check from the _type what we have that needs to be saved
-							temp_node = node_collection.one({'_type': u'GSystem', '_id': json_data['_id']})
-							if temp_node['name'] != []:
-								print '*' * 30
-								print 'exists'
-								print '*' * 30
-							else:
-								temp_node = node_collection.collection.GSystem()
-							
-							for key, values in json_data.items():
-								temp_node[key] = values
-							
-							print '*' * 30
-							print temp_node.structure
-							print '*' * 30
-							temp_node.save()
-
 				i+=1
-			print 'FETCHING NEW MAILS DONE'
 
-			print 'STORING NEW MAILS'
-			store_mails(request, all_mails,path)
-			print 'STORAGE DONE'
-			
-			return emails
+			print 'FETCHING DONE'
 		
+			return emails
 		else:
 			print 'FETCHING OLD MAILS'
-			
+			all_mails = read_mails(path, mail_type, displayFrom)
+			i=1
+			for mail in all_mails:
+				emails.append({'mail_id':i, 'mail_data':mail})
+				i+=1
 			print 'FETCHING DONE'
 	else:
 		print 'ERROR : NO SUCH MAILBOX'

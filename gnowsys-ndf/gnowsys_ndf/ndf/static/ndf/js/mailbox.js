@@ -5,6 +5,7 @@ var typeOfMail; // 0 for the unread ones and 1 for the read ones
 var mailbox_name;
 var userName;
 var CSRFtoken;
+var countValue = 20;
 function countInitialize(){
 	Readstart = 0;
 	Unreadstart = 0;
@@ -13,30 +14,30 @@ function countInitialize(){
 
 function increaseMailFetchCount(){
 	if (typeOfMail == 0){
-		Unreadstart = Unreadstart + 50;
+		Unreadstart = Unreadstart + countValue;
 	}
 	else{
-		Readstart = Readstart + 50;
+		Readstart = Readstart + countValue;
 	}
-	alert('Unread: ' + Unreadstart + ' Read: ' + Readstart);
+	// alert('Unread: ' + Unreadstart + ' Read: ' + Readstart);
 	getMails();
 }
 
 
 function decreaseMailFetchCount(){
 	if (typeOfMail == 0){
-		Unreadstart = Unreadstart - 50;
+		Unreadstart = Unreadstart - countValue;
 		if(Unreadstart < 0){
 			Unreadstart = 0;
 		}
 	}
 	else {
-		Readstart = Readstart - 50;
+		Readstart = Readstart - countValue;
 		if(Readstart < 0) { 
 			Readstart = 0;
 		}
 	}
-	alert('Unread: ' + Unreadstart + ' Read: ' + Readstart);
+	// alert('Unread: ' + Unreadstart + ' Read: ' + Readstart);
 	getMails();
 
 }

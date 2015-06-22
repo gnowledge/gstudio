@@ -491,8 +491,6 @@ GAPPS = [
     u"E-Library", u"Meeting", u"Bib_App", u"Observation", u"Event", u"E-Book"
 ]
 
-#,u"MailClient"
-
 # This holds the list of stable GAPPS
 # ONLY TO BE EDITED in local_settings file
 # In order to edit (redorderig purpose or adding new ones) this list,
@@ -502,10 +500,10 @@ GSTUDIO_WORKING_GAPPS = [
     u"Course", u"Observation", u"Event"
 ]
 
-##TODO: ADD REPLICATION GROUP NAMES
-# GSTUDIO_REPLICATION_GROUPS = [
-#     u"User",
-# ]
+
+GSTUDIO_REPLICATION_GROUPS = [
+    u"Author", u"home"
+]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # if not set by specific group

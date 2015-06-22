@@ -16,7 +16,7 @@
   		</div>
 
 		<div id={{ mail.mail_id }} style="border-top:1px solid gray; height:fit-content; padding-top: 2px; padding-bottom: 2px;" >
-			<h4><a onclick="window.location.href='#'" data-reveal-id="myModal{{ mail.mail_id }}">{{ mail.mail_data }}</a></h4>
+			<h4><a onclick="window.location.href='#'" data-reveal-id="myModal{{ mail.mail_id }}">{{ mail.mail_data.Subject }}</a></h4>
 		</div>
 	{% endfor %}
 </div>
