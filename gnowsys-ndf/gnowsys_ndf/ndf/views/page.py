@@ -176,6 +176,7 @@ def page(request, group_id, app_id=None):
 
           if node is None:
             node = node_collection.find({'member_of':ObjectId(app_id)})
+          #a temp. variable which stores the lookup for append method
           content_append_temp=content.append
           for nodes in node:
             node,ver=get_versioned_page(nodes) 
@@ -296,6 +297,7 @@ def create_edit_page(request, group_id, node_id=None):
     nodes_list = []
    # for each in available_nodes:
    #   nodes_list.append(str((each.name).strip().lower()))
+    #loop replaced by a list comprehension
     node_list=[str((each.name).strip().lower()) for each in available_nodes]
 
     if node_id:
