@@ -81,9 +81,7 @@ function setMailBoxName(username, csrf_token, mailBoxName) {
 function updateStatus(filename){
 	alert(typeOfMail);
 	if(typeOfMail == 0){
-		alert('WORKED');
 	$.post( 'mailstatuschange/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'file_name': filename}, function(data){		
-		alert('SHIFTED!');
 	});
 	}
 }
@@ -109,6 +107,3 @@ $(document).ready(function(){
 		getMails();
 	});
 });
-
-
-
