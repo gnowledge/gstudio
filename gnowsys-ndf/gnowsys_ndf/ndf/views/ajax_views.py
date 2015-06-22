@@ -4578,12 +4578,12 @@ def get_students_for_batches(request, group_id):
     result_set = None
     query = {}
     try:
-        if request.is_ajax() and request.method == "GET":
-            ann_course_id = unicode(request.GET.get('ac_id', ""))
-            added_ids_list = request.GET.getlist('added_ids_list[]', "")
+        if request.is_ajax() and request.method == "POST":
+            ann_course_id = unicode(request.POST.get('ac_id', ""))
+            added_ids_list = request.POST.getlist('added_ids_list[]', "")
             if added_ids_list:
                 added_ids_list = list(set(added_ids_list))
-            search_text = unicode(request.GET.get('search_text', ""))
+            search_text = unicode(request.POST.get('search_text', ""))
             stud_gst = node_collection.one({'_type': "GSystemType", 'name': "Student"})
             query.update({'member_of': stud_gst._id})
             if added_ids_list:
