@@ -3041,6 +3041,11 @@ def convertVideo(files, userid, fileobj, filename):
 from os import listdir
 from os.path import isfile, join
 from email.parser import Parser
+
+def sorted_ls(path):
+    mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
+    return list(sorted(os.listdir(path), key=mtime))
+
 def read_mails(path, _type, displayFrom):
 	cur_path = path + '/cur'
 	new_path = path + '/new'
@@ -3053,18 +3058,17 @@ def read_mails(path, _type, displayFrom):
 	mails_list = []
 
 	if _type == '0':
-		all_unread_mails = [ f for f in listdir(new_path) if isfile(join(new_path,f))]
+		# all_unread_mails = [ f for f in listdir(new_path) if isfile(join(new_path,f))]
+		all_unread_mails = sorted_ls(new_path)
+		all_unread_mails.reverse()
 		
 		if end > len(all_unread_mails):
 			end = len(all_unread_mails)
 
-		all_unread_mails.sort()
-		all_unread_mails.reverse()
 		required_mails = all_unread_mails[start:end]
 
-		temp = {}
-
 		for temp_mail in required_mails:
+			temp = {}
 			msg = p.parse(open(join(new_path, temp_mail)))
 			for key in msg.keys():
 				if key == 'Attachments':
@@ -3074,25 +3078,24 @@ def read_mails(path, _type, displayFrom):
 						temp[key] = []
 				else:		
 					temp[key] = msg[key]
-
-			msg['text'] = msg.get_payload()
-			mails_list.append(msg)
+			temp['text'] = msg.get_payload()
+			temp['file_name'] = temp_mail
+			mails_list.append(temp)
 			
 		return mails_list
 	
 	if _type == '1':
-		all_unread_mails = [ f for f in listdir(cur_path) if isfile(join(cur_path,f))]
+		# all_unread_mails = [ f for f in listdir(cur_path) if isfile(join(cur_path,f))]
+		all_unread_mails = sorted_ls(cur_path)
+		all_unread_mails.reverse()
 		
 		if end > len(all_unread_mails):
 			end = len(all_unread_mails)
 
-		all_unread_mails.sort()
-		all_unread_mails.reverse()
 		required_mails = all_unread_mails[start:end]
 
-		temp = {}
-
 		for temp_mail in required_mails:
+			temp = {}
 			msg = p.parse(open(join(cur_path,temp_mail)))
 			for key in msg.keys():
 				if key == 'Attachments':
@@ -3102,15 +3105,15 @@ def read_mails(path, _type, displayFrom):
 						temp[key] = []
 				else:		
 					temp[key] = msg[key]
+			temp['text'] = msg.get_payload()
+			mails_list.append(temp)
 
-			msg['text'] = msg.get_payload()
-			mails_list.append(msg)
 		return mails_list	
 
 
 
 # Function to store the newly fetched mails stored in 'maildir' format
-def store_mails(request, mails, path):
+def store_mails(mails, path):
 
 	for mail in mails:
 		from_addr = email.utils.formataddr(('Author', mail.from_address[0]))
@@ -3140,8 +3143,10 @@ def store_mails(request, mails, path):
 				msg['CC'] = cc_addr
 			
 			msg['Subject'] = mail.subject
-			msg.set_payload(mail.text)
-			
+			mail_data = mail.html
+			mail_data = mail_data.replace('\r', '')
+			msg.set_payload(mail_data)
+
 			# To prepare a list of path of the attachments in comma-separated format
 			if mail.attachments.count > 0:
 				all_attachments = mail.attachments.all()
@@ -3165,7 +3170,7 @@ def store_mails(request, mails, path):
 
 @get_execution_time
 @register.assignment_tag
-def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
+def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 
 	'''
 	This function establishes the connection and fetches the mails from the corresponding imap server.
@@ -3253,7 +3258,7 @@ def get_mails_in_box(request, mailboxname, username, mail_type, displayFrom):
 			
 
 				print 'STORING NEW MAILS'
-				store_mails(request, all_mails,path)
+				store_mails(all_mails,path)
 				print 'STORAGE DONE'
 			
 			print 'FETCHING FROM LOCAL STORAGE'
