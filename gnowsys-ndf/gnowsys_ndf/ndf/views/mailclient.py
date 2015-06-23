@@ -344,7 +344,7 @@ def mailbox_delete(request, group_id,mailboxname):
             settings_dir2 = os.path.dirname(settings_dir1)
             settings_dir3 = os.path.dirname(settings_dir2)
             path = os.path.abspath(os.path.dirname(settings_dir3))
-                
+            conn = None
             try:
                 conn = sqlite3.connect(path + '/example-sqlite3.db')
                 query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
@@ -373,6 +373,7 @@ def mailbox_delete(request, group_id,mailboxname):
                 query = 'delete from user_mailboxes where mailbox_id='+str(box.id)
                 cursor = conn.execute(query)
                 conn.commit()
+
                 #NOTE: we must delete the mailbox from our 'mapping' database first and then from django_mailbox database because 
                 # when you call the delete function of django_mailbox API on a mailbox object, the mailbox id is lost!
                 # And we need that id value to delete from our 'mapping' database. Hence order is important
@@ -382,7 +383,8 @@ def mailbox_delete(request, group_id,mailboxname):
                 print "%s Deleted from django_mailbox" % mailbox_name
             else:
                 print "Box not found > (fn: delete_mailbox)"
-        conn.close()
+            conn.close()
+
         return HttpResponseRedirect(reverse('mailclient', args=(group_id,)))
     return render_to_response(template, variable)
 
@@ -439,14 +441,14 @@ def compose_mail(request, group_id,mailboxname):
         sum_size = 0
         files_list = request.FILES.getlist('attached_files')
 
-        if files_list is not None:
-            for f in files_list:
-                sum_size = sum_size+f.size
-            print sum_size
-            print (sum_size/(1024.0*1024.0))
-            if (sum_size/(1024.0*1024.0)) > 25:
-                error_obj= "Attachment Size is %dMB. It exceeds maximum allowed size : 25MB. Please go back and \"re-select\"  attachments. Press the 'back' button on your browser. Your data will still be there." % (sum_size/(1024.0*1024.0))
-                return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+        # if files_list is not None:
+        #     for f in files_list:
+        #         sum_size = sum_size+f.size
+        #     print sum_size
+        #     print (sum_size/(1024.0*1024.0))
+        #     if (sum_size/(1024.0*1024.0)) > 25:
+        #         error_obj= "Attachment Size is %dMB. It exceeds maximum allowed size : 25MB. Please go back and \"re-select\"  attachments. Press the 'back' button on your browser. Your data will still be there." % (sum_size/(1024.0*1024.0))
+        #         return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
 
         to=to.replace(" ","")
         to_list=to.split(";")

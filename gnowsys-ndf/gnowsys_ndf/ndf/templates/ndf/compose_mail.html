@@ -6,7 +6,8 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
-	 <script src="/static/ndf/ckeditor/ckeditor.js"></script>
+	<script src="/static/ndf/ckeditor/ckeditor.js"></script>
+  <script src="/static/ndf/js/mailsend_filesize_check.js"></script>
 {% endblock %}
 
 
@@ -86,7 +87,8 @@
 		<div class ="row">
 			<label>Attach Files:</label>
 			(Please ensure all your files are in the same folder when uploading multiple files)
-			 <input type="file" name="attached_files" id="attached_files_id" accept="file_extension|audio/*|video/*|image/*|media_type" multiple> 	
+			 <input type="file" name="attached_files" id="attached_files_id" accept="file_extension|audio/*|video/*|image/*|media_type" multiple> 
+       <p id="fileError" style="color:red"></p>
 		</div>		
 
 		<!-- <input type="file" id="file_id"> -->
