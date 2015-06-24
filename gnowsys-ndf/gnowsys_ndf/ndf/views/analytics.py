@@ -184,9 +184,49 @@ def normalize(a) :
 
 
 def page_acti(url,last_update,user):
+	ins_objectid = ObjectId()
+	if ins_objectid.is_valid(url[3]) is False:
+		if url[3] == "delete":
+			if ins_objectid.is_valid(url[4]) is True:
+				n=node_collection.find_one({"_id":ObjectId(url[4])})
+				if n['status']=="HIDDEN" or n['status']=="DELETED":
+					print "you deleted a page"
+
+
+	else :
+		try : 
+			n = node_collection.find_one({"_id":ObjectId(url[3])})
+			author_id = n[u'created_by']
+			auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
+			if auth[u'name']==user:
+				created_at = n[u'created_at']
+			print (last_update - created_at).seconds
+			print last_update
+			if (last_update - created_at).seconds < 5 :
+				print "You created a page"
+			else :
+				print "You viewed a page"
+		except :
+			pass
 	
+		if  url[3] == "page_publish" :
+			if ins_objectid.is_valid(url[4]) is True:
+				n=node_collection.find_one({"_id":ObjectId(url[4])})
+				if n['status']=="PUBLISHED" :
+					print "you published a page"
+
+
+		''' elif ins_objectid.is_valid(url[3]) is True:
+				n=node_collection.find_one({"_id":ObjectId(url[3])})
+				if url[4] == "translate" :
+					print "you translated a page"
+	'''
+
+
+		
 	return 0
 
+	
 def file_acti(url,last_update,user):
 	return 0
 
@@ -198,12 +238,14 @@ def forum_acti(url,last_update,user):
 			if ins_objectid.is_valid(url[4]) is True:
 				n=node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
-					print "you delted a forum"
+					print "you deleted a forum"
+
 			elif url[4]=="thread":
 				if ins_objectid.is_valid(url[6]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[6])})
 					if n['status']=="HIDDEN" or n['status']=="DELETED":
 						print "you deleted a forum ka thread"
+
 			elif url[4]=="reply":
 				if ins_objectid.is_valid(url[7]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[7])})
