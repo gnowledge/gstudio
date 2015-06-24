@@ -163,7 +163,7 @@ def normalize(a) :
 			pass
 
 		else :
-			
+
 			if doc[u'calling_url']==prev_calling_url :
 				pass
 			else :
@@ -174,9 +174,9 @@ def normalize(a) :
 				gapp = url[2]
 
 				print gapp
-				print group_id
+				print doc[u'calling_url']
 
-				#gapp_list(gapp)(url,doc[u'last_update'],doc[u'user'])
+				gapp_list(gapp)(url,doc[u'last_update'],doc[u'user'])
 				
 
 
@@ -184,13 +184,43 @@ def normalize(a) :
 
 
 def page_acti(url,last_update,user):
-	print doc
+	
 	return 0
 
 def file_acti(url,last_update,user):
 	return 0
 
 def forum_acti(url,last_update,user):
+	
+	ins_objectid = ObjectId()
+	if ins_objectid.is_valid(url[3]) is False:
+		if(url[3]=="delete"):
+			if ins_objectid.is_valid(url[4]) is True:
+				n=node_collection.find_one({"_id":ObjectId(url[4])})
+				if n['status']=="HIDDEN" or n['status']=="DELETED":
+					print "you delted a forum"
+			elif url[4]=="thread":
+				if ins_objectid.is_valid(url[6]) is True:
+					n=node_collection.find_one({"_id":ObjectId(url[6])})
+					if n['status']=="HIDDEN" or n['status']=="DELETED":
+						print "you deleted a forum ka thread"
+			elif url[4]=="reply":
+				if ins_objectid.is_valid(url[7]) is True:
+					n=node_collection.find_one({"_id":ObjectId(url[7])})
+					if n['status']=="HIDDEN" or n['status']=="DELETED":
+						print "you deleted a forum ka thread ka reply"
+
+	else:
+		n=node_collection.find_one({"_id":ObjectId(url[3])})
+		author_id=n[u'created_by']
+		auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
+		if auth[u'name']==user:
+			created_at = n[u'created_at']
+			print (last_update - created_at).seconds
+			if (last_update - created_at).seconds < 5 :
+				print "You created a forum"
+			else :
+				print "You viewed a forum"
 
 	return 0
 
