@@ -431,9 +431,8 @@ def translate_node(request,group_id,node_id=None):
                               context_instance = RequestContext(request)
     )        
 
-
+from gnowsys_ndf.ndf.views.methods import capture_data
 @get_execution_time
-@server_sync        
 def publish_page(request,group_id,node):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
@@ -460,6 +459,8 @@ def publish_page(request,group_id,node):
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
         node.save()
+
+        capture_data(file_object=node, file_data=None, content_type='page')
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
