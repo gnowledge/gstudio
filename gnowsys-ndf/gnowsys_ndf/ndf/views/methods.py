@@ -69,13 +69,22 @@ def get_execution_time(f):
 	        benchmark_node =  col.Benchmark()
 	        benchmark_node.time_taken = unicode(str(time_diff))
 	        benchmark_node.name = unicode(f.func_name)
-	        try :
-	        	#print args[0]
+	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
 	        
+	        # Determine if POST or GET data is available with the request
+	        try :
+	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
+	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
+	        except : 
+	        	pass
+	        
+	        # Determine if session_key is available with the request
+	        try :
 	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
 	        except : 
 	        	pass
 
+	        # Determine if username is available with the request
 	        try :
 	        	benchmark_node.user = unicode(args[0].user.username)
 	        except :
@@ -88,11 +97,24 @@ def get_execution_time(f):
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
 	        	url = benchmark_node.calling_url.split("/")
-	        	benchmark_node.action = url[2]
-	        	if url[3] != '' : 
-	        		benchmark_node.action += '/'+url[3]
-	        except:	
-	        	pass 
+	        	if  url[2] == "" : 
+	        		benchmark_node.action = None
+	        	else : 
+	        		benchmark_node.action = url[2]
+		        	if url[3] != '' : 
+		        		benchmark_node.action += '/'+url[3]
+		        if url[1] != "" : 
+		        	benchmark_node.group_id = group
+	        		group = url[1]
+	        		try :
+	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+	        			if bool(n) :
+	        				benchmark_node.group_id = group;
+	        		except :
+	        			group_name, group = get_group_name_id(group)
+	        			benchmark_node.group_id = group
+	        except : 
+	        	pass
 	        benchmark_node.save()
 	        return ret
    if BENCHMARK == 'ON': 

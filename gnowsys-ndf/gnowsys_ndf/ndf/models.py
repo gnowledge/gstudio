@@ -1526,9 +1526,6 @@ class Benchmark(DjangoDocument):
 
   collection_name = 'Benchmarks'
 
-  #defining a separate collection for the analytics data.
-  collection_analytics = 'Analytics'
-
   structure = {
     '_type':unicode,
     'name': unicode,
@@ -1540,7 +1537,9 @@ class Benchmark(DjangoDocument):
     'last_update': datetime.datetime,
     'action' : basestring,
     'user' : basestring,
-    'session_key' : basestring
+    'session_key' : basestring,
+    'group_id' : ObjectId,
+    'has_data' : dict
   }
 
   required_fields = ['name']
@@ -1551,6 +1550,33 @@ class Benchmark(DjangoDocument):
 
   def identity(self):
     return self.__unicode__()
+
+# Benchmarking Class Defination
+@connection.register
+class Analytics(DjangoDocument):
+
+  objects = models.Manager()
+
+  collection_name = 'Analytics'
+
+  structure = {
+    'timestamp': datetime.datetime,
+    'action' : dict,
+    'args' : list,
+    'user' : basestring,
+    'session_key' : basestring
+  }
+
+  required_fields = ['timestamp', 'action']
+  use_dot_notation = True
+
+  def __unicode__(self):
+    return self._id
+
+  def identity(self):
+    return self.__unicode__()
+
+
 
 
 #  TRIPLE CLASS DEFINITIONS
