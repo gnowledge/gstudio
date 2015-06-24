@@ -28,7 +28,7 @@ from django.core.files.uploadedfile import UploadedFile # django file handler
 from mongokit import paginator
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_node_common_fields, set_all_urls,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_node_common_fields, set_all_urls,get_execution_time, capture_data
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
 
@@ -714,14 +714,14 @@ def submitDoc(request, group_id):
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy,False, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, False, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
+                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, False)
                 # print "f: ", f
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
@@ -772,10 +772,9 @@ def submitDoc(request, group_id):
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
 
 
-    
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None,server_sync=False, **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -879,6 +878,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             else:
                 node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
 
+            
+
             """
             code for uploading video to wetube.gnowledge.org
             """
@@ -933,6 +934,17 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
             #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+
+
+            '''
+            For server-sync
+            '''
+            # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
+            # can be sent as a mail to the mailing-list
+            if not server_sync:
+              print 'capture_data called'
+              capture_data(file_object=fileobj, file_data=files, content_type=filetype1)
+
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
@@ -947,6 +959,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
             # print "----- fileobj._id", fileobj._id
+
+
             return fileobj._id, is_video
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e

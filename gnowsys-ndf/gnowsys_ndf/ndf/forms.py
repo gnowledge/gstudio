@@ -29,6 +29,4 @@ class UserChangeform(PasswordChangeForm):
     new_password1 = PasswordField(label="New password") 
 
 class UserResetform(SetPasswordForm):
-    new_password1 = PasswordField(label="New password") 
-    
-
+    new_password1 = PasswordField(label="New password")

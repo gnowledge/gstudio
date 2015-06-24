@@ -223,20 +223,20 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # Languages using BiDi (right-to-left) layout
 # LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
 
-# #SMTP setting for sending mail (Using python default SMTP server)
-EMAIL_USE_TLS = False
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'testing@example.com'
+# # # #SMTP setting for sending mail (Using python default SMTP server)
+# EMAIL_USE_TLS = False
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 1025
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
+# DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 # SMTP setting for sending mail (Using gmail SMTP server)
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'yourcompletegmailaddr'
-# EMAIL_HOST_PASSWORD = 'yourpassword'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 't.metastudio@gmail.com'
+EMAIL_HOST_PASSWORD = 'yolo12345'
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
@@ -413,6 +413,7 @@ INSTALLED_APPS = (
     'jsonrpc',
     'registration_email',
     'memcache_admin',
+    'django_mailbox',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -498,6 +499,11 @@ GAPPS = [
 GSTUDIO_WORKING_GAPPS = [
     u"Page", u"File", u"E-Library", u"Forum", u"Task", u"Topics",
     u"Course", u"Observation", u"Event"
+]
+
+
+GSTUDIO_REPLICATION_GROUPS = [
+    u"Author", u"home"
 ]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
