@@ -402,6 +402,7 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
+    'captcha',	
     # 'gnowsys_ndf.mobwrite',       #textb
     # 'south',                      #textb
     # 'django_extensions',          #textb
@@ -529,7 +530,6 @@ GSTUDIO_SITE_LANDING_PAGE = "udashboard"  # possible values are 'home' and 'udas
 GSTUDIO_SITE_HOME_PAGE = None  # it is url rendered on template. e.g: "/welcome". Default is: "/home"
 GSTUDIO_SITE_NAME = "metaStudio"  # holds the name of site. e.g: "NROER, "tiss" etc. (Override it in local_settings)
 # GSTUDIO_SITE_EDITOR = "orgitdown"  #possible values are 'aloha'and 'orgitdown'
-
 # Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY = True
 
@@ -669,3 +669,7 @@ CACHES = {
 
 WETUBE_USERNAME = "glab"
 WETUBE_PASSWORD = "gl@b$@)we!ube"
+#Captcha settings
+CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.math_challenge'
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
+
