@@ -140,7 +140,7 @@ def session_summary(request):
 															
 															
 def normalize(a) :
-
+	a=a.sort("last_update",1)
 	def gapp_list(gapp):
 		return {
 				"page": page_acti,
@@ -167,8 +167,7 @@ def normalize(a) :
 			if doc[u'calling_url']==prev_calling_url :
 				pass
 			else :
-				prev_calling_url=doc[u'calling_url']
-
+				#prev_url = prev_calling_url.split("/")
 				url = str(doc[u'calling_url']).split("/")			
 				group_id = Gid(url[1])
 				gapp = url[2]
@@ -176,8 +175,11 @@ def normalize(a) :
 				print gapp
 				print doc[u'calling_url']
 
-				gapp_list(gapp)(url,doc[u'last_update'],doc[u'user'])
 				
+				#gapp_list(gapp)(url,prev_url,doc[u'last_update'],doc[u'user'])
+			
+				gapp_list(gapp)(url,doc[u'last_update'],doc[u'user'])
+				prev_calling_url=doc[u'calling_url']
 
 
 	return 0
@@ -228,7 +230,40 @@ def page_acti(url,last_update,user):
 
 	
 def file_acti(url,last_update,user):
+	ins_objectid= ObjectId()
+
+	if(url[3]=="submit"):
+		print "you uploaded a file"
+	#elif(url[3]=="uploadDoc"):
+		#pass
+	elif(url[3]=="readDoc"):
+		print "you downloaded the doc "+ url[5]
+
+	elif url[3]=="details":
+		if(ins_objectid.is_valid(url[4])):
+			n=node_collection.find_one({"_id":ObjectId(url[4])})
+			try :
+				print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
+			except Exception :
+				pass
+
+	elif(ins_objectid.is_valid(url[3])):
+		n=node_collection.find_one({"_id":ObjectId(url[3])})
+		try :
+			print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
+		except Exception :
+			pass
+	elif(url[3]=="delete"):
+			if ins_objectid.is_valid(url[4]) is True:
+				n=node_collection.find_one({"_id":ObjectId(url[4])})
+				if n['status']=="HIDDEN" or n['status']=="DELETED":
+					print "you deleted a file"
+	elif(url[3]=="edit" or url[3]=="edit_file"):
+			if ins_objectid.is_valid(url[4]) is True:
+				print "you edited a file"
+	
 	return 0
+
 
 def forum_acti(url,last_update,user):
 	
