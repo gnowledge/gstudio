@@ -3254,33 +3254,34 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 				print 'FETCHING DONE'
 
 				# To manage the mails that comes as a part of the server-sync technique
-				# if mail.subject == 'SYNCDATA':
-				# 	if mail.attachments.count > 0:
-				# 		all_attachments = mail.attachments.all()
-				# 		all_attachments_path = ''
-				# 		for attachment in all_attachments:
-				# 			all_attachments_path = all_attachments_path + attachment.document.path + ';'
-				# 		with open(all_attachments_path[:-1],'r') as json_file:
-				# 			json_data = json_file.read()
-				# 			json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
-				# 			json_data = json_util.loads(json_data[1:-1])
+				for mail in all_mails:
+					if mail.subject == 'SYNCDATA':
+						if mail.attachments.count > 0:
+							all_attachments = mail.attachments.all()
+							all_attachments_path = ''
+							for attachment in all_attachments:
+								all_attachments_path = all_attachments_path + attachment.document.path + ';'
+							with open(all_attachments_path[:-1],'r') as json_file:
+								json_data = json_file.read()
+								json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
+								json_data = json_util.loads(json_data[1:-1])
 							
-				# 			# We need to check from the _type what we have that needs to be saved
-				# 			temp_node = node_collection.one({'_type': u'GSystem', '_id': json_data['_id']})
-				# 			if temp_node['name'] != []:
-				# 				print '*' * 30
-				# 				print 'exists'
-				# 				print '*' * 30
-				# 			else:
-				# 				temp_node = node_collection.collection.GSystem()
+								# We need to check from the _type what we have that needs to be saved
+								temp_node = node_collection.one({'_type': u'GSystem', '_id': json_data['_id']})
+								if temp_node['name'] != []:
+									print '*' * 30
+									print 'exists'
+									print '*' * 30
+								else:
+									temp_node = node_collection.collection.GSystem()
 							
-				# 			for key, values in json_data.items():
-				# 				temp_node[key] = values
+								for key, values in json_data.items():
+									temp_node[key] = values
 							
-				# 			print '*' * 30
-				# 			print temp_node.structure
-				# 			print '*' * 30
-				# 			temp_node.save()
+								print '*' * 30
+								print temp_node.structure
+								print '*' * 30
+								temp_node.save()
 
 				# To read the mails from the directories
 			

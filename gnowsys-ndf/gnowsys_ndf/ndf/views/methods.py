@@ -98,12 +98,12 @@ def server_sync(func):
         # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
         node_json = bson.json_util.dumps(node)
         # node_json = json.dumps(node)
-        with open('/home/tiwari/test.json','w') as outfile:
+        with open('/home/tiwari/node_data.json','w') as outfile:
             json.dump(node_json, outfile)
         mail = EmailMessage()
         mail.subject = "SYNCDATA"
         mail.to = ['djangotest94@gmail.com']
-        mail.attach_file('/home/tiwari/test.json')
+        mail.attach_file('/home/tiwari/node_data.json')
         mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
         mail.send()
         return ret
