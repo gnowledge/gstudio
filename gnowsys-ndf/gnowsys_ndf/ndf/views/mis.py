@@ -666,8 +666,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                 processes5[i].start()#each Process started
             for i in range(x):
                 processes5[i].join()#each Process converges
-
-"""         for key, value in request_rt_dict.items():
+            """
+             for key, value in request_rt_dict.items():
                 if key:
                     relationtype_key = node_collection.find_one({"_id": ObjectId(key)})
                 if value:
@@ -678,13 +678,15 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                     # newrelation.relation_type = relationtype_key
                     # newrelation.right_subject = right_subject._id
                     # newrelation.save()
-"""         def multi_6(lst):#Function used by Processes implemented below
+            """
+            def multi_6(lst):#Function used by Processes implemented below
                 for key,value in lst:
                     if key:
                         relationtype_key = node_collection.find_one({"_id": ObjectId(key)})
                     if value:
                         right_subject = node_collection.find_one({"_id": ObjectId(value)})
                         gr_node = create_grelation(newgsystem._id, relationtype_key, right_subject._id)
+
             #this empty list will have the Process objects as its elements
             processes6=[]
             lst12=request_rt_dict.items()
@@ -702,7 +704,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
         if app_set_instance_id:
             # editing instance
-"""         for each in systemtype_attributetype_set:
+            """
+            for each in systemtype_attributetype_set:
                 if each["database_id"]:
                     attribute_instance = triple_collection.find_one({"_id": ObjectId(each['database_id'])})
                     attribute_instance.object_value = request.POST.get(each["database_id"],"")
@@ -717,7 +720,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         # newattribute.object_value = request.POST.get(each["type_id"],"")
                         # newattribute.save()
                         ga_node = create_gattribute(newgsystem._id, attributetype_key, request.POST.get(each["type_id"],""))
-"""         def multi_7(lst):#Function used by Processes implemented below
+            """
+            def multi_7(lst):#Function used by Processes implemented below
                 for each in lst:
                     if each["database_id"]:
                         attribute_instance = triple_collection.find_one({"_id": ObjectId(each['database_id'])})
@@ -747,7 +751,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                 processes7[i].join()#each Process converges
 
 
-"""         for eachrt in systemtype_relationtype_set:
+            """
+            for eachrt in systemtype_relationtype_set:
                 if eachrt["database_id"]:
                     relation_instance = triple_collection.find_one({"_id":ObjectId(eachrt['database_id'])})
                     relation_instance.right_subject = ObjectId(request.POST.get(eachrt["database_id"],""))
@@ -763,7 +768,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         # newrelation.relation_type = relationtype_key
                         # newrelation.right_subject = right_subject._id
                         # newrelation.save()
-"""         def multi_8(lst):#Function used by Processes implemented below
+            """
+            def multi_8(lst):#Function used by Processes implemented below
                 for eachrt in lst:
                     if eachrt["database_id"]:
                         relation_instance = triple_collection.find_one({"_id":ObjectId(eachrt['database_id'])})
