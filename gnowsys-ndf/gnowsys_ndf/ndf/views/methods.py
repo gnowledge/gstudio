@@ -4005,27 +4005,3 @@ def repository(request, group_id):
                             )
 
 
-def find_batches_of_ac(ac_id):
-    '''
-    Arguments: ac_id - ObjectId of Announced Course ID
-    Returns: list of dict
-    '''
-    GST_BATCH = node_collection.one({'_type': "GSystemType", 'name': 'Batch'})
-    batch_user_list_dict = []
-    list_of_members = []
-    if ac_id:
-        batch_cur = node_collection.find({'member_of': GST_BATCH._id,
-                            'relation_set.has_course': ObjectId(ac_id)})
-        for each_batch in batch_cur:
-            each_batch_dict = {}
-            if each_batch.relation_set:
-                for rel in each_batch.relation_set:
-                    list_of_members = []
-                    if rel and 'has_batch_member' in rel:
-                        list_of_members.append(rel['has_batch_member'])
-                        list_of_members.append(str(each_batch._id))
-                each_batch_dict[each_batch.name] = list_of_members
-            batch_user_list_dict.append(each_batch_dict)
-            # batch_user_list_dict.append(str(each_batch._id))
-    # print "\n\nBatches----------", batch_user_list_dict
-    return batch_user_list_dict

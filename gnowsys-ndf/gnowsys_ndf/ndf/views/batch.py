@@ -16,7 +16,7 @@ except ImportError:  # old pymongo
 # from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import create_grelation, get_execution_time, get_group_name_id, find_batches_of_ac
+from gnowsys_ndf.ndf.views.methods import create_grelation, get_execution_time, get_group_name_id
 
 GST_BATCH = node_collection.one({"_type": "GSystemType", 'name': "Batch"})
 app = GST_BATCH
@@ -182,7 +182,7 @@ def save_batch(request, group_id):
         batch_id = request.POST.get("batch_id", '')
         user_list = request.POST.getlist("user_list[]", '')
         # create_new_batch = request.POST.get("create_new_batch", '')
-        response_dict["old_batches"] = find_batches_of_ac(ac_id)
+        # response_dict["old_batches"] = find_batches_of_ac(ac_id)
         user_list = [ObjectId(each) for each in user_list]
         all_batches_in_grp = []
         if not batch_id:
@@ -199,12 +199,12 @@ def save_batch(request, group_id):
             b_node.save()
             all_batches_in_grp.append(b_node._id)
 
+            rt_group_has_batch = node_collection.one({'_type': 'RelationType', 'name': 'group_has_batch'})
             relation_coll = triple_collection.find({'_type': 'GRelation', 'relation_type.$id': rt_group_has_batch._id,'subject':ObjectId(group_id)})
 
             for each in relation_coll:
                 all_batches_in_grp.append(each.right_subject)
                 # to get all batches of the group
-            rt_group_has_batch = node_collection.one({'_type': 'RelationType', 'name': 'group_has_batch'})
             rt_has_course = node_collection.one({'_type': 'RelationType', 'name': 'has_course'})
 
             create_grelation(ObjectId(group_id), rt_group_has_batch, all_batches_in_grp)
@@ -355,21 +355,23 @@ def get_possible_batches(request, group_id):
     if request.is_ajax() and request.method == "POST":
         ac_id = request.POST.get("ac_id", '')
         create_new_batch = request.POST.get("create_new_batch", '')
-        response_dict["old_batches"] = find_batches_of_ac(ac_id)
-        # ac_node = node_collection.one({'_id': ObjectId(ac_id)})
-        # if create_new_batch:
-        #     print "\n\n under create new batch"
-        #     b_name = ac_node.name + " - Batch " + str(len(response_dict["old_batches"])+1)
-        #     user_list = []
-        #     new_batch_node = save_batch(b_name, user_list, group_id, request, ac_id)
-        #     print "\n\nnew_batch_node._id", new_batch_node._id
-        #     if new_batch_node:
-        #         response_dict['new_batch_name'] = new_batch_node.name
-        #         response_dict['new_batch_id'] = new_batch_node.name
-        #         # if new_batch_node.relation_set:
-        #         #     for rel in new_batch_node.relation_set:
-        #         #         if rel and 'has_batch_member' in rel:
-        #         #             list_of_members = rel['has_batch_member']
         response_dict["success"] = True
-
+        batch_user_list_dict = []
+        list_of_members = []
+        if ac_id:
+            batch_cur = node_collection.find({'member_of': GST_BATCH._id,
+                                'relation_set.has_course': ObjectId(ac_id)})
+            for each_batch in batch_cur:
+                each_batch_dict = {}
+                if each_batch.relation_set:
+                    for rel in each_batch.relation_set:
+                        list_of_members = []
+                        if rel and 'has_batch_member' in rel:
+                            list_of_members.append(rel['has_batch_member'])
+                            list_of_members.append(str(each_batch._id))
+                    each_batch_dict[each_batch.name] = list_of_members
+                batch_user_list_dict.append(each_batch_dict)
+                # batch_user_list_dict.append(str(each_batch._id))
+        # print "\n\nBatches----------", batch_user_list_dict
+        response_dict["old_batches"] = batch_user_list_dict
         return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
