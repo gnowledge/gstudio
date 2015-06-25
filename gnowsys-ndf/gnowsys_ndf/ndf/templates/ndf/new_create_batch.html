@@ -358,15 +358,11 @@
 
     });//end of nextbtn.click()
 
-  //function to show div batch create edit on selecting any student
-    function create_or_add_to_existing_batch () {
-      $("#make_batch_fs").removeClass("hide")
-    }
 
   // Click event: "Student data" Row of DataTable
     $(document).on( 'click', '#student_data_table tbody tr', function () {
       $(this).toggleClass('selected');
-      create_or_add_to_existing_batch();
+      $("#make_batch_fs").removeClass("hide")
       $(".create_batch_row").removeAttr("disabled")
     });
 
@@ -395,58 +391,62 @@
           $(this).removeClass('selected');
           arr.push(this.id);
       });
-      if($(this).hasClass('existing_batch')){
-        batch_name = $(this).text()
-        if(batch_user_list_dict.hasOwnProperty(batch_name)){
-          old_arr = batch_user_list_dict[batch_name]
-          batch_user_list_dict[batch_name] = old_arr.concat(arr)
-          $(this).next('td').html(batch_user_list_dict[batch_name].length+ " student(s)")
-          arr = batch_user_list_dict[batch_name]
-          batch_id = $(this).attr('id')
-        }
-      }
-
-      $.ajax({
-        url: "{% url 'save_batch' groupid %}",
-
-        data: {
-          'ac_id': ac_id,
-          'batch_name': batch_name,
-          'batch_id': batch_id,
-          'user_list':arr,
-          'csrfmiddlewaretoken': "{{csrf_token}}"
-        },
-
-        type: "POST",
-
-        dataType: "json",
-
-        success: function(data){
-          new_batch_node = data
-          new_batch_node['new_batch_created']
-          if(new_batch_node['new_batch_created']){
-            var table = document.getElementById("batch_create_edit_table");
-            var row = table.insertRow(-1);
-            var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
-            var cell3 = row.insertCell(2);
-            batch_user_list_dict[batch_name] = arr;
-            cell2.innerHTML = "<span data-tooltip title='Click to Add to this Batch'>"+new_batch_node['new_batch_node_name']+"</span>";
-
-            cell2.className = "save";
-            cell2.className += " existing_batch";
-            cell2.id = new_batch_node['new_batch_node_id']
-            cell3.innerHTML = "<span data-tooltip title='Total students'>"+batch_user_list_dict[batch_name].length+" student(s)<span>";
-            cell3.className = "stud_count_in_batch";
-            cell1.innerHTML = "<span data-tooltip title='Click to view/edit'>View</span>";
-
-            cell1.className = "view_batch";
+      if (arr.length != 0){
+        if($(this).hasClass('existing_batch')){
+          batch_name = $(this).text()
+          if(batch_user_list_dict.hasOwnProperty(batch_name)){
+            old_arr = batch_user_list_dict[batch_name]
+            batch_user_list_dict[batch_name] = old_arr.concat(arr)
+            $(this).next('td').html(batch_user_list_dict[batch_name].length+ " student(s)")
+            arr = batch_user_list_dict[batch_name]
+            batch_id = $(this).attr('id')
           }
-          $(".batch_name_inp").val('');
-          $('.ajax_input_name').val('');
-          $(".datatable_div").html('');
-        },
-      });//end of ajax
+        }
+
+        $.ajax({
+          url: "{% url 'save_batch' groupid %}",
+
+          data: {
+            'ac_id': ac_id,
+            'batch_name': batch_name,
+            'batch_id': batch_id,
+            'user_list':arr,
+            'csrfmiddlewaretoken': "{{csrf_token}}"
+          },
+
+          type: "POST",
+
+          dataType: "json",
+
+          success: function(data){
+            new_batch_node = data
+            if(new_batch_node['new_batch_created']){
+              var table = document.getElementById("batch_create_edit_table");
+              var row = table.insertRow(-1);
+              var cell1 = row.insertCell(0);
+              var cell2 = row.insertCell(1);
+              var cell3 = row.insertCell(2);
+              batch_user_list_dict[batch_name] = arr;
+              cell2.innerHTML = "<span data-tooltip title='Click to Add to this Batch'>"+new_batch_node['new_batch_node_name']+"</span>";
+
+              cell2.className = "save";
+              cell2.className += " existing_batch";
+              cell2.id = new_batch_node['new_batch_node_id']
+              cell3.innerHTML = "<span data-tooltip title='Total students'>"+batch_user_list_dict[batch_name].length+" student(s)<span>";
+              cell3.className = "stud_count_in_batch";
+              cell1.innerHTML = "<span data-tooltip title='Click to view/edit'>View</span>";
+
+              cell1.className = "view_batch";
+            }
+            $(".batch_name_inp").val('');
+            $('.ajax_input_name').val('');
+            $(".datatable_div").html('');
+          },
+        });//end of ajax
+      }
+      else{
+        alert("Please select students");
+      }
 
     })
 
