@@ -336,8 +336,6 @@
               $.each(batch_data, function(index){
                 $.each(batch_data[index], function(key,val){
                   batch_user_list_dict[key] = val[0]
-
-
                   var row = table.insertRow(-1);
                   var cell1 = row.insertCell(0);
                   var cell2 = row.insertCell(1);
@@ -398,7 +396,7 @@
           arr.push(this.id);
       });
       if($(this).hasClass('existing_batch')){
-        batch_name = $(this).html()
+        batch_name = $(this).text()
         if(batch_user_list_dict.hasOwnProperty(batch_name)){
           old_arr = batch_user_list_dict[batch_name]
           batch_user_list_dict[batch_name] = old_arr.concat(arr)
@@ -433,13 +431,15 @@
             var cell2 = row.insertCell(1);
             var cell3 = row.insertCell(2);
             batch_user_list_dict[batch_name] = arr;
-            cell2.innerHTML = new_batch_node['new_batch_node_name']
+            cell2.innerHTML = "<span data-tooltip title='Click to Add to this Batch'>"+new_batch_node['new_batch_node_name']+"</span>";
+
             cell2.className = "save";
             cell2.className += " existing_batch";
             cell2.id = new_batch_node['new_batch_node_id']
-            cell3.innerHTML = batch_user_list_dict[batch_name].length+" student(s)";
+            cell3.innerHTML = "<span data-tooltip title='Total students'>"+batch_user_list_dict[batch_name].length+" student(s)<span>";
             cell3.className = "stud_count_in_batch";
-            cell1.innerHTML = "View";
+            cell1.innerHTML = "<span data-tooltip title='Click to view/edit'>View</span>";
+
             cell1.className = "view_batch";
           }
           $(".batch_name_inp").val('');
@@ -454,7 +454,7 @@
     $(document).on( 'click', '.view_batch  ', function () {
 
       batch_id = $(this).next('.existing_batch').attr('id');
-      batch_name = $(this).next('.existing_batch').html();
+      batch_name = $(this).next('.existing_batch').text();
       $.ajax({
         url: "{% url 'batch_detail' groupid %}",
 
@@ -494,7 +494,6 @@
 
   //view batch members on click of 'View'
     $(document).on( 'click', '.remove_stud  ', function () {
-
       stud_id = $(this).attr('id');
       batch_id = $(".batch_table_id").attr('id')
       $(this).closest("tr").remove()
@@ -521,9 +520,8 @@
                 old_arr.splice(i,1)
               }
               batch_user_list_dict[batch_name] = old_arr
-
             }
-            $("#batch_create_edit_table").find("#"+batch_id).next('.stud_count_in_batch').html(old_arr.length+ "student(s)")
+            $("#batch_create_edit_table").find("#"+batch_id).next('.stud_count_in_batch').html(old_arr.length+ " student(s)")
           }
         },
       });//end of ajax
