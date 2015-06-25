@@ -175,8 +175,6 @@ def save_batch(request, group_id):
     group_name, group_id = get_group_name_id(group_id)
     response_dict = {"success": False}
     # new_batch_node = None
-    rt_group_has_batch = node_collection.one({'_type': 'RelationType', 'name': 'group_has_batch'})
-    rt_has_course = node_collection.one({'_type': 'RelationType', 'name': 'has_course'})
     rt_has_batch_member = node_collection.one({'_type': 'RelationType', 'name': 'has_batch_member'})
     if request.is_ajax() and request.method == "POST":
         ac_id = request.POST.get("ac_id", '')
@@ -206,6 +204,9 @@ def save_batch(request, group_id):
             for each in relation_coll:
                 all_batches_in_grp.append(each.right_subject)
                 # to get all batches of the group
+            rt_group_has_batch = node_collection.one({'_type': 'RelationType', 'name': 'group_has_batch'})
+            rt_has_course = node_collection.one({'_type': 'RelationType', 'name': 'has_course'})
+
             create_grelation(ObjectId(group_id), rt_group_has_batch, all_batches_in_grp)
             create_grelation(b_node._id, rt_has_course, ObjectId(ac_id))
             response_dict['new_batch_created'] = True
