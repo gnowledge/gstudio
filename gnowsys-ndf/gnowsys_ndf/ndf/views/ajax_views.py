@@ -4599,8 +4599,8 @@ def get_students_for_batches(request, group_id):
                                                     'name': '$name',
                                                     # 'email_id': '$attribute_set.email_id',
                                                     # 'phone': '$attribute_set.mobile_number',
-                                                    # 'year_of_study': '$attribute_set.degree_year',
-                                                    # 'degree': '$attribute_set.degree_specialization',
+                                                    'year_of_study': '$attribute_set.degree_year',
+                                                    'degree': '$attribute_set.degree_specialization',
                                                     # 'college': '$relation_set.student_belongs_to_college',
                                                     # 'college_roll_num': '$attribute_set.college_enroll_num',
                                                     # 'university': '$relation_set.student_belongs_to_university',
@@ -4612,6 +4612,8 @@ def get_students_for_batches(request, group_id):
             column_headers = [
                         ('enrollment_code', 'Enr Code'),
                         ("name", "Name"),
+                        ("degree", "Degree/Stream"),
+                        ("year_of_study", "Year of Study"),
             ]
 
             students_count = len(result_set)
