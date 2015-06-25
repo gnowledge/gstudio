@@ -54,6 +54,9 @@
     font-size: 1rem;
   }
 
+  .existing_batch, .view_batch{
+    text-decoration: underline;
+  }
 
   .posted-by{ color: #808080; font-size: small; }
 
@@ -166,7 +169,6 @@
         <input type="button" class="save small round button" value="Save">
         <input type="button" class="cancel small round button" value="Cancel">
       </div>
-  <input type="submit" class="button right inline" id="save_batch" name="save_batch" value="Save">
   <input type="hidden" name="batch_user_list_dict" id="batch_user_list_dict">
   <input type="hidden" name="ac_id" id="ac_id">
   </div>
@@ -334,17 +336,19 @@
               $.each(batch_data, function(index){
                 $.each(batch_data[index], function(key,val){
                   batch_user_list_dict[key] = val[0]
+
+
                   var row = table.insertRow(-1);
                   var cell1 = row.insertCell(0);
                   var cell2 = row.insertCell(1);
                   var cell3 = row.insertCell(2);
-                  cell1.innerHTML = "View";
+                  cell1.innerHTML = "<span data-tooltip title='Click to view/edit'>View</span>";
                   cell1.className = "view_batch";
-                  cell2.innerHTML = key;
+                  cell2.innerHTML = "<span data-tooltip title='Click to Add to this Batch'>"+key+"</span>";
                   cell2.className = "save";
                   cell2.className += " existing_batch";
                   cell2.id = val[1];
-                  cell3.innerHTML = val[0].length+" student(s)";
+                  cell3.innerHTML = "<span data-tooltip title='Total students'>"+val[0].length+" student(s)<span>";
                   cell3.className = "stud_count_in_batch";
                   val.pop();
                 })
@@ -390,6 +394,7 @@
       $(".batch_create_div").addClass("hide");
       batch_name = $(".batch_name_inp").val();
       sce_dt_var.$("tr.selected").each(function () {
+          $(this).removeClass('selected');
           arr.push(this.id);
       });
       if($(this).hasClass('existing_batch')){
