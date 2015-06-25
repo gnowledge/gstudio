@@ -468,19 +468,25 @@
 
         success: function(data){
           $("#batch_info").html("")
-          var table = document.createElement("TABLE");
-          table.id = batch_id
-          table.className = "batch_table_id"
-          $.each(data, function(index){
-            var row = table.insertRow(-1);
-            var cell1 = row.insertCell(0);
-            cell1.innerHTML = data[index]['name'];
-            var cell2 = row.insertCell(1);
-            cell2.innerHTML = "Remove from Batch";
-            cell2.id = data[index]['_id'];
-            cell2.className = 'button alert remove_stud';
-          })
-          $("#batch_info").append(table)
+          if(data!=""){
+            var table = document.createElement("TABLE");
+            table.id = batch_id
+            table.className = "batch_table_id"
+            $.each(data, function(index){
+              var row = table.insertRow(-1);
+              var cell1 = row.insertCell(0);
+              cell1.innerHTML = data[index]['name'];
+              var cell2 = row.insertCell(1);
+              cell2.innerHTML = "Remove from Batch";
+              cell2.id = data[index]['_id'];
+              cell2.className = 'button alert remove_stud';
+            })
+            $("#batch_info").append(table)
+          }
+          else{
+            $("#batch_info").html("No data to display")
+          }
+          $("#batch_info").append("<a class='close-reveal-modal'>&#215;</a>")
           $('#batch_info').foundation('reveal', 'open');
 
 
@@ -492,7 +498,7 @@
     })
 
 
-  //view batch members on click of 'View'
+  //remove batch members 
     $(document).on( 'click', '.remove_stud  ', function () {
       stud_id = $(this).attr('id');
       batch_id = $(".batch_table_id").attr('id')
@@ -619,40 +625,14 @@
         }
     })
 
-  // On click of Batch link 
-    $(document).on("click",".edit_batch", function(event){
-    });
   
-  // Confirm create batch reveal modal
-    var create_batch_flag = false;
-    $(document).on("click", "#btnConfirmYes", function() {
-      create_batch_flag = true;
-      $("#alertModal").foundation('reveal', 'close');
-      add_new_batch();
-      });
+  //
+    $(document).on('click','.cancel',function(){
+        $(".batch_create_div").addClass("hide")
+        $(".batch_name_inp").val("");
+        $(".create_batch_row").removeAttr("disabled")
+    });
 
-      $(document).on("click", "#btnConfirmNo", function() {
-        create_batch_flag = false;
-        $("#alertModal").foundation('reveal', 'close');
-      });
-
-  //Saving students to batch as batch members
-    // $("#form-batch").submit(function(event){
-    //     stop_submit = true
-    //     $.each(batch_user_list_dict,function(k,v){
-    //       if(v.length < 30){
-    //         stop_submit = false
-    //       }
-    //     })
-    //     if(stop_submit && batch_user_list_dict){
-    //       $("#batch_user_list_dict").val(JSON.stringify(batch_user_list_dict))
-    //       $("#ac_id").val(ac_id)
-    //     }
-    //     else{
-    //       alert("Batch should have atleast 30 members. ")
-    //       event.preventDefault();
-    //     }
-    // }); // end of save_after_create_batch
 
 {% endblock %}
 </script>
