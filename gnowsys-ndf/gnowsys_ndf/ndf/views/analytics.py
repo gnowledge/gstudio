@@ -160,33 +160,45 @@ def normalize(a) :
 				#"video": video_acti,
 		}.get(gapp,default_acti)
 
-	segre1 = ["file/thumbnail",'None','']
-	prev_calling_url=""
-	for doc in a :
-		
+	segre1 = ["file/thumbnail",'None','',"home"]
+	temp_doc = { u"calling_url" : None , u'last_update' : None}
+	for doc in a :		
 		if 'ajax' in str(doc[u'action']) or str(doc[u'action']) in segre1 :
+			#removing the doc with useless urls
 			pass
-
 		else :
-
-			if doc[u'calling_url']==prev_calling_url :
-				pass
+			#removing the redundant sequence of docs
+			if temp_doc[u'calling_url'] == doc[u'calling_url'] :
+				if u'has_data' in doc.keys() :
+					if doc[u'has_data']["POST"] :
+						temp_doc = doc
+					else :
+						if doc[u'has_data']["GET"] :
+							temp_doc = doc
+				else :
+					temp_doc = doc
 			else :
-				#prev_url = prev_calling_url.split("/")
-				url = str(doc[u'calling_url']).split("/")			
-				group_id = Gid(url[1])
-				gapp = url[2]
-
-				#print gapp
 				#print doc[u'calling_url']
-
 				
-				#gapp_list(gapp)(url,prev_url,doc[u'last_update'],doc[u'user'])
+				if temp_doc[u'calling_url'] != None :
+					url = str(temp_doc[u'calling_url']).split("/")
+					group_id = Gid(url[1])
+					gapp = url[2]
+					gapp_list(gapp)(url,temp_doc[u'last_update'],temp_doc[u'user'])
+				
+				temp_doc = doc
 			
-				gapp_list(gapp)(url,doc[u'last_update'],doc[u'user'])
-				prev_calling_url=doc[u'calling_url']
+		
+
+					
+		#gapp_list(gapp)(url,prev_url,doc[u'last_update'],doc[u'user'])
+				
+		
+				
 
 
+
+			
 	return 0
 
 
@@ -266,19 +278,23 @@ def file_acti(url,last_update,user):
 			print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
 			analytics_doc.action="you viewed a file"
 		except Exception :
-			pass
+			analytics_doc.action="no action"
+
 	elif(url[3]=="delete"):
 			if ins_objectid.is_valid(url[4]) is True:
 				n=node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
 					print "you deleted a file"
 					analytics_doc.action="you deleted a file"
+	
 	elif(url[3]=="edit" or url[3]=="edit_file"):
 			if ins_objectid.is_valid(url[4]) is True:
 				print "you edited a file"
 				analytics_doc.action="you edited a file"
+	
 	else:
 		analytics_doc.action="no action"
+	
 	analytics_doc.save()
 	
 	return 0
