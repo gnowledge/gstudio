@@ -714,14 +714,14 @@ def submitDoc(request, group_id):
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy,False, oid=True)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy,server_sync = False, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, False, oid=True)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, server_sync = False, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, False)
+                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, server_sync = False)
                 # print "f: ", f
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
@@ -774,11 +774,11 @@ def submitDoc(request, group_id):
 
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None,server_sync=False, **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None,**kwargs):
     """
       this will create file object and save files in gridfs collection
     """
-    
+    server_sync = kwargs["server_sync"]
     global count, first_object
     
     # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 

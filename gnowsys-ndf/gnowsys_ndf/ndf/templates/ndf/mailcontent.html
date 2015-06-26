@@ -1,7 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load cache %}
-{% load get_mails_in_box from ndf_tags %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +10,6 @@
 </head>
 <body>
 <div id="mailContent">
-{% get_mails_in_box mailboxname username mail_type displayFrom as emails %}
 	{% for mail in emails %}
 		<div id="myModal{{ mail.mail_id }}" class="reveal-modal" animation="None" data-reveal>
     		<a class="close-reveal-modal">&#215;</a>            
