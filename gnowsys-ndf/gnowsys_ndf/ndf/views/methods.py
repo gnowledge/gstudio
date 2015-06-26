@@ -55,7 +55,6 @@ ins_objectid = ObjectId()
 def get_execution_time(f):
    if BENCHMARK == 'ON': 
 
-  
 	    def wrap(*args,**kwargs):
 	        time1 = time.time()
 	        total_parm_size = 0
@@ -97,22 +96,31 @@ def get_execution_time(f):
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
 	        	url = benchmark_node.calling_url.split("/")
-	        	if  url[2] == "" : 
+
+
+	        	if url[1] != "" : 
+	        		group = url[1]
+	        		benchmark_node.group = group
+	        		try :
+	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+	        			if bool(n) :
+	        				benchmark_node.group = group;
+	        		except :
+	        			group_name, group = get_group_name_id(group)
+	        			benchmark_node.group = str(group)
+	        	else :
+	        		pass
+
+	        	if url[2] == "" : 
 	        		benchmark_node.action = None
 	        	else : 
 	        		benchmark_node.action = url[2]
 		        	if url[3] != '' : 
-		        		benchmark_node.action += '/'+url[3]
-		        if url[1] != "" : 
-		        	benchmark_node.group_id = group
-	        		group = url[1]
-	        		try :
-	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
-	        			if bool(n) :
-	        				benchmark_node.group_id = group;
-	        		except :
-	        			group_name, group = get_group_name_id(group)
-	        			benchmark_node.group_id = group
+		        		benchmark_node.action +=  str('/'+url[3])
+		        	else : 
+		        		pass
+
+
 	        except : 
 	        	pass
 	        benchmark_node.save()

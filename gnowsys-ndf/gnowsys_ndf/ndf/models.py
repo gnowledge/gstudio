@@ -1538,7 +1538,7 @@ class Benchmark(DjangoDocument):
     'action' : basestring,
     'user' : basestring,
     'session_key' : basestring,
-    'group_id' : ObjectId,
+    'group' : basestring,
     'has_data' : dict
   }
 

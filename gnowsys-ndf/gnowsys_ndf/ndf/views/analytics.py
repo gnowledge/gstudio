@@ -160,16 +160,20 @@ def normalize(a) :
 				#"video": video_acti,
 		}.get(gapp,default_acti)
 
-	segre1 = ["file/thumbnail",'None','',"home"]
-	temp_doc = { u"calling_url" : None , u'last_update' : None}
-	for doc in a :		
+	segre1 = ["file/thumbnail",'None','',"home", "image/get_mid_size_img"]
+	temp_doc = { u"calling_url" : None , u'last_update' : datetime.datetime(1900, 1, 1, 11, 19, 54)}
+	for doc in a :
+		#removing the doc with useless urls
 		if 'ajax' in str(doc[u'action']) or str(doc[u'action']) in segre1 :
-			#removing the doc with useless urls
 			pass
 		else :
-			#removing the redundant sequence of docs
-			if temp_doc[u'calling_url'] == doc[u'calling_url'] :
-				if u'has_data' in doc.keys() :
+			# removing the redundant sequence of docs
+
+			# refining the data based on the calling url, session key, and the time between accessing reourse
+			if temp_doc[u'calling_url'] == doc[u'calling_url']  and (doc[u'last_update'] - temp_doc[u'last_update'] < datetime.timedelta(0,300)):
+				
+				# prioritizing between the docs based on the POST and GET data
+				if u'has_data' in doc.keys() and bool(doc[u'has_data']) == 1 :
 					if doc[u'has_data']["POST"] :
 						temp_doc = doc
 					else :
@@ -177,10 +181,15 @@ def normalize(a) :
 							temp_doc = doc
 				else :
 					temp_doc = doc
+			
 			else :
-				#print doc[u'calling_url']
-				
 				if temp_doc[u'calling_url'] != None :
+					#print temp_doc[u'calling_url']
+					try :
+						pass
+						#print temp_doc[u'has_data']
+					except : 
+						pass
 					url = str(temp_doc[u'calling_url']).split("/")
 					group_id = Gid(url[1])
 					gapp = url[2]
@@ -219,8 +228,8 @@ def page_acti(url,last_update,user):
 			auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
 			if auth[u'name']==user:
 				created_at = n[u'created_at']
-			print (last_update - created_at).seconds
-			print last_update
+			#print (last_update - created_at).seconds
+			#print last_update
 			if (last_update - created_at).seconds < 5 :
 				print "You created a page"
 			else :
@@ -250,8 +259,7 @@ def file_acti(url,last_update,user):
 	ins_objectid= ObjectId()
 	analytics_doc=col.Analytics()
 	analytics_doc.timestamp=last_update
-	print last_update
-
+	
 	if(url[3]=="submit"):
 		print "you uploaded a file"
 		analytics_doc.action="you uploaded a file"
@@ -293,6 +301,7 @@ def file_acti(url,last_update,user):
 				analytics_doc.action="you edited a file"
 	
 	else:
+		print url
 		analytics_doc.action="no action"
 	
 	analytics_doc.save()
@@ -328,7 +337,7 @@ def forum_acti(url,last_update,user):
 		auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
 		if auth[u'name']==user:
 			created_at = n[u'created_at']
-			print (last_update - created_at).seconds
+			#print (last_update - created_at).seconds
 			if (last_update - created_at).seconds < 5 :
 				print "You created a forum"
 			else :
