@@ -35,12 +35,15 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
 from gnowsys_ndf.ndf.views.methods import create_gattribute
 
-col = db[Benchmark.collection_analytics]
+col = db[Analytics.collection_name]
+
+
 #logger = logging.getLogger(__name__)
 
 
 def page_view(request):
-
+	pass
+	'''
 	event = col.Benchmark()
 	event["_type"] = u"analytics"
 	event["name"] = u"analytics"
@@ -71,8 +74,8 @@ def page_view(request):
 	#inserting the event object in the Analytics collection.
 
 	event.save()
-
-	return HttpResponse(json.dumps(transaction))
+	'''
+	return HttpResponse("0")
 
 def default(request, group_id):
 	return HttpResponse(group_id)
@@ -103,6 +106,8 @@ def list_activities(request):
 
 	#print(lst[0][u'user'])
 	#print(a.toArray())
+
+
 
 	return render_to_response ("ndf/analytics_list_details.html",
 															{ "data" : lst})
@@ -172,8 +177,8 @@ def normalize(a) :
 				group_id = Gid(url[1])
 				gapp = url[2]
 
-				print gapp
-				print doc[u'calling_url']
+				#print gapp
+				#print doc[u'calling_url']
 
 				
 				#gapp_list(gapp)(url,prev_url,doc[u'last_update'],doc[u'user'])
@@ -231,19 +236,27 @@ def page_acti(url,last_update,user):
 	
 def file_acti(url,last_update,user):
 	ins_objectid= ObjectId()
+	analytics_doc=col.Analytics()
+	analytics_doc.timestamp=last_update
+	print last_update
 
 	if(url[3]=="submit"):
 		print "you uploaded a file"
+		analytics_doc.action="you uploaded a file"
+		
+
 	#elif(url[3]=="uploadDoc"):
 		#pass
 	elif(url[3]=="readDoc"):
 		print "you downloaded the doc "+ url[5]
+		analytics_doc.action="you downloaded a file"
 
 	elif url[3]=="details":
 		if(ins_objectid.is_valid(url[4])):
 			n=node_collection.find_one({"_id":ObjectId(url[4])})
 			try :
 				print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
+				analytics_doc.action="you viewed a file"
 			except Exception :
 				pass
 
@@ -251,6 +264,7 @@ def file_acti(url,last_update,user):
 		n=node_collection.find_one({"_id":ObjectId(url[3])})
 		try :
 			print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
+			analytics_doc.action="you viewed a file"
 		except Exception :
 			pass
 	elif(url[3]=="delete"):
@@ -258,9 +272,14 @@ def file_acti(url,last_update,user):
 				n=node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
 					print "you deleted a file"
+					analytics_doc.action="you deleted a file"
 	elif(url[3]=="edit" or url[3]=="edit_file"):
 			if ins_objectid.is_valid(url[4]) is True:
 				print "you edited a file"
+				analytics_doc.action="you edited a file"
+	else:
+		analytics_doc.action="no action"
+	analytics_doc.save()
 	
 	return 0
 

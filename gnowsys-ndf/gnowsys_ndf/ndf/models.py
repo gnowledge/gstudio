@@ -1557,17 +1557,17 @@ class Analytics(DjangoDocument):
 
   objects = models.Manager()
 
-  collection_name = 'Analytics'
+  collection_name = 'Analytic_col'
 
   structure = {
     'timestamp': datetime.datetime,
-    'action' : dict,
+    'action' : basestring,
     'args' : list,
-    'user' : basestring,
+    'user' : dict,
     'session_key' : basestring
   }
 
-  required_fields = ['timestamp', 'action']
+  required_fields = ['timestamp','action']
   use_dot_notation = True
 
   def __unicode__(self):
