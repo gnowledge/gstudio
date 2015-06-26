@@ -37,8 +37,6 @@ urlpatterns = patterns('',
     # (r'^$', HomeRedirectView.as_view()),        
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-
-
     url(r'^(?P<group_id>[^/]+)/mailclient[/]error[/](?P<error_obj>[\w-]+)$', 'gnowsys_ndf.ndf.views.mailclient.mailclient_error_display', name='mailclient_error_display'),                       
     url(r'^captcha/', include('captcha.urls')),
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),

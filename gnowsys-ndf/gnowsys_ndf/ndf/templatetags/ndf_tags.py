@@ -47,6 +47,14 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_gapps, get_all_resources_for_group, get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_drawers, get_group_name_id, cast_to_data_type
 from gnowsys_ndf.mobwrite.models import TextObj
+
+# mailclient
+# from gnowsys_ndf.ndf.views.file import save_file
+
+count = 0
+first_object = ''
+
+
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
 
@@ -2703,368 +2711,370 @@ def get_filters_data(gst_name):
 
 
 # To store the attachments coming from the mail to the user group
-def store_attachment(file, path):
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False:
-		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else :
-			auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-			if auth :
-				group_id = str(auth._id)
-	else :
-		pass
+# def store_attachment(file, path):
+# 	ins_objectid  = ObjectId()
+# 	if ins_objectid.is_valid(group_id) is False:
+# 		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+# 		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		if group_ins:
+# 			group_id = str(group_ins._id)
+# 		else :
+# 			auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 			if auth :
+# 				group_id = str(auth._id)
+# 	else :
+# 		pass
 
-	alreadyUploadedFiles = []
-	str1 = ''
-	img_type=""
-	topic_file = ""
-	is_video = ""
-	obj_id_instance = ObjectId()
+# 	alreadyUploadedFiles = []
+# 	str1 = ''
+# 	img_type=""
+# 	topic_file = ""
+# 	is_video = ""
+# 	obj_id_instance = ObjectId()
 
-	mtitle = request.POST.get("docTitle", "")
-	userid = request.POST.get("user", "")
-	language = request.POST.get("lan", "")
-	img_type = request.POST.get("type", "")
-	topic_file = request.POST.get("type", "")
-	doc = request.POST.get("doc", "")
-	usrname = request.user.username
-	page_url = request.POST.get("page_url", "")
-	content_org = request.POST.get('content_org', '')
-	access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
-	tags = request.POST.get('tags', "")
+# 	mtitle = request.POST.get("docTitle", "")
+# 	userid = request.POST.get("user", "")
+# 	language = request.POST.get("lan", "")
+# 	img_type = request.POST.get("type", "")
+# 	topic_file = request.POST.get("type", "")
+# 	doc = request.POST.get("doc", "")
+# 	usrname = request.user.username
+# 	page_url = request.POST.get("page_url", "")
+# 	content_org = request.POST.get('content_org', '')
+# 	access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
+# 	tags = request.POST.get('tags', "")
 
-	i = 1
+# 	i = 1
 
-	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-		if mtitle:
-			if index == 0:
-				f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-			else:
-				title = mtitle + "_" + str(i) #increament title        
-				f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-				i = i + 1
-		else:
-			title = each.name
-			f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-		if not obj_id_instance.is_valid(f):
-			alreadyUploadedFiles.append(f)
-			title = mtitle
+# 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+# 		if mtitle:
+# 			if index == 0:
+# 				f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+# 			else:
+# 				title = mtitle + "_" + str(i) #increament title        
+# 				f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+# 				i = i + 1
+# 		else:
+# 			title = each.name
+# 			f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+# 		if not obj_id_instance.is_valid(f):
+# 			alreadyUploadedFiles.append(f)
+# 			title = mtitle
 
 
-# first_object = ''
-# def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, **kwargs):
-#     """
-#       this will create file object and save files in gridfs collection
-#     """
+
+# ????????????? START
+first_object = ''
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, **kwargs):
+    """
+      this will create file object and save files in gridfs collection
+    """
     
-#     global count, first_object
+    global count, first_object
     
-#     # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 
-#     # this is to prevent from forming collection of first object containing subsequent objects.
-#     count = kwargs["count"] if "count" in kwargs else count
-#     first_object = kwargs["first_object"] if "first_object" in kwargs else first_object
+    # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 
+    # this is to prevent from forming collection of first object containing subsequent objects.
+    count = kwargs["count"] if "count" in kwargs else count
+    first_object = kwargs["first_object"] if "first_object" in kwargs else first_object
     
-#     is_video = ""
-#     fileobj = node_collection.collection.File()
-#     filemd5 = hashlib.md5(files.read()).hexdigest()
-#     files.seek(0)
-#     size, unit = getFileSize(files)
-#     size = {'size': round(size, 2), 'unit': unicode(unit)}
+    is_video = ""
+    fileobj = node_collection.collection.File()
+    filemd5 = hashlib.md5(files.read()).hexdigest()
+    files.seek(0)
+    size, unit = getFileSize(files)
+    size = {'size': round(size, 2), 'unit': unicode(unit)}
 
-#     if fileobj.fs.files.exists({"md5": filemd5}):
-#         # gridfs_collection = get_database()['fs.files']
-#         cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+    if fileobj.fs.files.exists({"md5": filemd5}):
+        # gridfs_collection = get_database()['fs.files']
+        cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
 
-#         # coll_new = get_database()['Nodes']
-#         new_name = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
-#         # if calling function is passing oid=True as last parameter then reply with id and name.
-#         if "oid" in kwargs:
-#             if kwargs["oid"]:
-#                 # gridfs_collection = get_database()['fs.files']
-#                 cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
-#                 # returning only ObjectId (of GSystem containing file info) in dict format.
-#                 # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
-#                 return cur_oid["docid"], 'True'
-#         else:
-#             return [files.name, new_name.name], 'True'
+        # coll_new = get_database()['Nodes']
+        new_name = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
+        # if calling function is passing oid=True as last parameter then reply with id and name.
+        if "oid" in kwargs:
+            if kwargs["oid"]:
+                # gridfs_collection = get_database()['fs.files']
+                cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+                # returning only ObjectId (of GSystem containing file info) in dict format.
+                # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
+                return cur_oid["docid"], 'True'
+        else:
+            return [files.name, new_name.name], 'True'
 
-#     else:
-#         try:
-#             files.seek(0)
-#             filetype = magic.from_buffer(files.read(100000), mime='true')  # Gusing filetype by python-magic
-#             filetype1 = mimetypes.guess_type(files.name)[0]
-#             if filetype1:
-#                 filetype1 = filetype1
-#             else:
-#                 filetype1 = ""
-#             filename = files.name
-#             fileobj.name = unicode(title)
+    else:
+        try:
+            files.seek(0)
+            filetype = magic.from_buffer(files.read(100000), mime='true')  # Gusing filetype by python-magic
+            filetype1 = mimetypes.guess_type(files.name)[0]
+            if filetype1:
+                filetype1 = filetype1
+            else:
+                filetype1 = ""
+            filename = files.name
+            fileobj.name = unicode(title)
 
-#             if language:
-#                 fileobj.language = unicode(language)
-#             fileobj.created_by = int(userid)
+            if language:
+                fileobj.language = unicode(language)
+            fileobj.created_by = int(userid)
 
-#             fileobj.modified_by = int(userid)
-#             fileobj.status = u'PUBLISHED'
-#             if int(userid) not in fileobj.contributors:
-#                 fileobj.contributors.append(int(userid))
-#             if access_policy:
-#                 fileobj.access_policy = unicode(access_policy)  # For giving privacy to file objects
-#             fileobj.file_size = size
+            fileobj.modified_by = int(userid)
+            fileobj.status = u'PUBLISHED'
+            if int(userid) not in fileobj.contributors:
+                fileobj.contributors.append(int(userid))
+            if access_policy:
+                fileobj.access_policy = unicode(access_policy)  # For giving privacy to file objects
+            fileobj.file_size = size
 
-#             group_object = node_collection.one({'_id': ObjectId(group_id)})
+            group_object = node_collection.one({'_id': ObjectId(group_id)})
 
-#             if group_object._id not in fileobj.group_set:
-#                 fileobj.group_set.append(group_object._id)  # group id stored in group_set field
-#             if usrname:
-#                 user_group_object = node_collection.one({'$and': [{'_type': u'Author'},{'name': usrname}]})
-#                 if user_group_object:
-#                     if user_group_object._id not in fileobj.group_set:  # File creator_group_id stored in group_set field
-#                         fileobj.group_set.append(user_group_object._id)
+            if group_object._id not in fileobj.group_set:
+                fileobj.group_set.append(group_object._id)  # group id stored in group_set field
+            if usrname:
+                user_group_object = node_collection.one({'$and': [{'_type': u'Author'},{'name': usrname}]})
+                if user_group_object:
+                    if user_group_object._id not in fileobj.group_set:  # File creator_group_id stored in group_set field
+                        fileobj.group_set.append(user_group_object._id)
 
-#             fileobj.member_of.append(GST_FILE._id)
-#             #  ADDED ON 14th July.IT's DONE
-#             fileobj.url = set_all_urls(fileobj.member_of)
-#             fileobj.mime_type = filetype
-#             if img_type == "" or img_type is None:
-#                 if content_org:
-#                     fileobj.content_org = unicode(content_org)
-#                     # Required to link temporary files with the current user who is modifying this document
-#                     filename_content = slugify(title) + "-" + usrname + "-"
-#                     fileobj.content = org2html(content_org, file_prefix=filename_content)
+            fileobj.member_of.append(GST_FILE._id)
+            #  ADDED ON 14th July.IT's DONE
+            fileobj.url = set_all_urls(fileobj.member_of)
+            fileobj.mime_type = filetype
+            if img_type == "" or img_type is None:
+                if content_org:
+                    fileobj.content_org = unicode(content_org)
+                    # Required to link temporary files with the current user who is modifying this document
+                    filename_content = slugify(title) + "-" + usrname + "-"
+                    fileobj.content = org2html(content_org, file_prefix=filename_content)
 
-#                 if not type(tags) is list:
-#                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-#                 fileobj.tags = tags
-#             fileobj.save()
+                if not type(tags) is list:
+                    tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+                fileobj.tags = tags
+            fileobj.save()
 
-#             files.seek(0)                                                                  #moving files cursor to start
-#             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
-#             node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
+            files.seek(0)                                                                  #moving files cursor to start
+            objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
+            node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
 
-#             # For making collection if uploaded file more than one
-#             if count == 0:
-#                 first_object = fileobj
-#             else:
-#                 node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
+            # For making collection if uploaded file more than one
+            if count == 0:
+                first_object = fileobj
+            else:
+                node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
 
-#             """
-#             code for uploading video to wetube.gnowledge.org
-#             """
-#             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
-#                 is_video = 'True'
-#                 path = files.temporary_file_path() # method gets temporary location of the file
-#                 base_url = "http://wetube.gnowledge.org/"
-#                 api_url = base_url + "api/"
-#                 # connenting to wetube api using pandora_client                                                                  
-#                 api = pandora_client.API(api_url)
-#                 # signin takes username, password & returns user data                                                          
-#                 api.signin(username=WETUBE_USERNAME, password=WETUBE_PASSWORD)
-#                 # return metadata about the file                                                                                  
-#                 info = ox.avinfo(path)
-#                 oshash = info['oshash']
-#                 # add media file the given item                                                                                    
-#                 r = api.addMedia({
-#                     'id': oshash,
-#                     'filename': fileobj.name,
-#                     'info': info
-#                 })
-#                 # return unique item id for file                                                                                 
-#                 item = r['data']['item']
-#                 url = '%supload/direct/' % api_url
-#                 # upload one or more media file for given item                                                                                   
-#                 r = api.upload_chunks(url, path, {
-#                     'id': oshash
-#                 })
-#                 fileobj.reload()
-#                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
-#                 node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
-#                 fileobj.reload()
-#                 # create gattribute 
-#                 source_id_AT = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
-#                 create_gattribute(fileobj._id, source_id_AT, unicode(item))
-#                 # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
+            """
+            code for uploading video to wetube.gnowledge.org
+            """
+            if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
+                is_video = 'True'
+                path = files.temporary_file_path() # method gets temporary location of the file
+                base_url = "http://wetube.gnowledge.org/"
+                api_url = base_url + "api/"
+                # connenting to wetube api using pandora_client                                                                  
+                api = pandora_client.API(api_url)
+                # signin takes username, password & returns user data                                                          
+                api.signin(username=WETUBE_USERNAME, password=WETUBE_PASSWORD)
+                # return metadata about the file                                                                                  
+                info = ox.avinfo(path)
+                oshash = info['oshash']
+                # add media file the given item                                                                                    
+                r = api.addMedia({
+                    'id': oshash,
+                    'filename': fileobj.name,
+                    'info': info
+                })
+                # return unique item id for file                                                                                 
+                item = r['data']['item']
+                url = '%supload/direct/' % api_url
+                # upload one or more media file for given item                                                                                   
+                r = api.upload_chunks(url, path, {
+                    'id': oshash
+                })
+                fileobj.reload()
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
+                fileobj.reload()
+                # create gattribute 
+                source_id_AT = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+                create_gattribute(fileobj._id, source_id_AT, unicode(item))
+                # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
 
-#                 # '''storing thumbnail of video with duration in saved object'''
-#                 # tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
-#                 # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-#                 # if filename.endswith('.webm') == False:
-#                 #     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
-#                 #     # saving webm video id into file object
-#                 #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+                # '''storing thumbnail of video with duration in saved object'''
+                # tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
+                # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+                # if filename.endswith('.webm') == False:
+                #     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+                #     # saving webm video id into file object
+                #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
-#                 '''creating thread for converting video file into webm'''
-#                 #t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
-#                 #t.start()
+                '''creating thread for converting video file into webm'''
+                #t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
+                #t.start()
 
-#             '''storing thumbnail of pdf and svg files  in saved object'''
-#             # if 'pdf' in filetype or 'svg' in filetype:
-#             #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
-#             #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
-#             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-#             '''storing thumbnail of image in saved object'''
-#             if 'image' in filetype:
-#                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
-#                 thumbnailimg = convert_image_thumbnail(files)
-#                 tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
-#                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': tobjectid}})
+            '''storing thumbnail of pdf and svg files  in saved object'''
+            # if 'pdf' in filetype or 'svg' in filetype:
+            #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
+            #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
+            #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+            '''storing thumbnail of image in saved object'''
+            if 'image' in filetype:
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
+                thumbnailimg = convert_image_thumbnail(files)
+                tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': tobjectid}})
 
-#                 files.seek(0)
-#                 mid_size_img = convert_mid_size_image(files)
-#                 if mid_size_img:
-#                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-#                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
-#             count = count + 1
-#             return fileobj._id, is_video
-#         except Exception as e:
-#             print "Some Exception:", files.name, "Execption:", e
-
-
-
-# def getFileSize(File):
-# 	"""
-# 	obtain file size if provided file object
-# 	"""
-# 	try:
-# 		File.seek(0,os.SEEK_END)
-# 		num=int(File.tell())
-# 		for x in ['bytes','KB','MB','GB','TB']:
-# 			if num < 1024.0:
-# 			    return  (num, x)
-# 			num /= 1024.0
-# 	except Exception as e:
-# 		print "Unabe to calucalate size",e
-# 		return 0,'bytes'
+                files.seek(0)
+                mid_size_img = convert_mid_size_image(files)
+                if mid_size_img:
+                    mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
+                    node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
+            count = count + 1
+            return fileobj._id, is_video
+        except Exception as e:
+            print "Some Exception:", files.name, "Execption:", e
 
 
-# def convert_image_thumbnail(files):
-#     """
-#     convert image file into thumbnail
-#     """
-#     files.seek(0)
-#     thumb_io = StringIO()
-#     size = 128, 128
-#     img = Image.open(StringIO(files.read()))
-#     img.thumbnail(size, Image.ANTIALIAS)
-#     img.save(thumb_io, "JPEG")
-#     thumb_io.seek(0)
-#     return thumb_io
+
+def getFileSize(File):
+	"""
+	obtain file size if provided file object
+	"""
+	try:
+		File.seek(0,os.SEEK_END)
+		num=int(File.tell())
+		for x in ['bytes','KB','MB','GB','TB']:
+			if num < 1024.0:
+			    return  (num, x)
+			num /= 1024.0
+	except Exception as e:
+		print "Unabe to calucalate size",e
+		return 0,'bytes'
 
 
-# def convert_pdf_thumbnail(files,_id):
-#     '''
-#     convert pdf file's thumnail
-#     '''
-#     filename = str(_id)
-#     os.system("mkdir -p "+ "/tmp"+"/"+filename+"/")
-#     fd = open('%s/%s/%s' % (str("/tmp"),str(filename),str(filename)), 'wb')
-#     files.seek(0)
-#     fd.write(files.read())
-#     fd.close()
-#     subprocess.check_call(['convert', '-thumbnail', '128x128',str("/tmp/"+filename+"/"+filename+"[0]"),str("/tmp/"+filename+"/"+filename+"-thumbnail.png")])
-#     thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
-#     return thumb_pdf
-    
+def convert_image_thumbnail(files):
+    """
+    convert image file into thumbnail
+    """
+    files.seek(0)
+    thumb_io = StringIO()
+    size = 128, 128
+    img = Image.open(StringIO(files.read()))
+    img.thumbnail(size, Image.ANTIALIAS)
+    img.save(thumb_io, "JPEG")
+    thumb_io.seek(0)
+    return thumb_io
 
 
-# def convert_mid_size_image(files, **kwargs):
-#     """
-#     convert image into mid size image w.r.t. max width of 500
-#     """
-#     files.seek(0)
-#     mid_size_img = StringIO()
-#     size = (500, 300)  # (width, height)
-#     img = Image.open(StringIO(files.read()))
-#     # img = img.resize(size, Image.ANTIALIAS)
-#     # img.save(mid_size_img, "JPEG")
-#     # mid_size_img.seek(0)
-
-#     if (img.size > size) or (img.size[0] >= size[0]):
-#       # both width and height are more than width:500 and height:300
-#       # or
-#       # width is more than width:500
-#       factor = img.size[0]/500.00
-#       img = img.resize((500, int(img.size[1] / factor)), Image.ANTIALIAS)
-
-#     elif (img.size <= size) or (img.size[0] <= size[0]): 
-#       img = img.resize(img.size, Image.ANTIALIAS)
-
-#     if "extension" in kwargs:
-#       if kwargs["extension"]:
-#         img.save(mid_size_img, kwargs["extension"])
-
-#     else:    
-#       img.save(mid_size_img, "JPEG")
-
-#     mid_size_img.seek(0)
-
-#     return mid_size_img
-
+def convert_pdf_thumbnail(files,_id):
+    '''
+    convert pdf file's thumnail
+    '''
+    filename = str(_id)
+    os.system("mkdir -p "+ "/tmp"+"/"+filename+"/")
+    fd = open('%s/%s/%s' % (str("/tmp"),str(filename),str(filename)), 'wb')
+    files.seek(0)
+    fd.write(files.read())
+    fd.close()
+    subprocess.check_call(['convert', '-thumbnail', '128x128',str("/tmp/"+filename+"/"+filename+"[0]"),str("/tmp/"+filename+"/"+filename+"-thumbnail.png")])
+    thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
+    return thumb_pdf
     
 
-# def convertVideo(files, userid, fileobj, filename):
-#     """
-#     converting video into webm format, if video already in webm format ,then pass to create thumbnails
-#     """
-#     objid = fileobj._id
-#     fileVideoName = str(objid)
-#     initialFileName = str(objid)
-#     os.system("mkdir -p "+ "/tmp"+"/"+str(userid)+"/"+fileVideoName+"/")
-#     fd = open('%s/%s/%s/%s' % (str("/tmp"), str(userid),str(fileVideoName), str(fileVideoName)), 'wb')
-#     for chunk in files.chunks():
-#         fd.write(chunk)
-#     fd.close()
-#     if files._get_name().endswith('.webm') == False:
-#         proc = subprocess.Popen(['ffmpeg', '-y', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")])
-#         proc.wait()
-#         files = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
-#     else : 
-#         files = open("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
-#     filetype = "video"
-#     oxData = ox.avinfo("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
-#     duration = oxData['duration'] # fetching duration of video by python ox
-#     duration = int(duration)
-#     secs, mins, hrs = 00, 00, 00
-#     if duration > 60 :
-#         secs  = duration % 60
-#         mins = duration / 60
-#         if mins > 60 :
-#             hrs = mins / 60
-#             mins = mins % 60 
-#     else:
-#         secs = duration
-#     videoDuration = ""
-#     durationTime = str(str(hrs)+":"+str(mins)+":"+str(secs)) # calculating Time duration of video in hrs,mins,secs
 
-#     if duration > 30 :
-# 	videoDuration = "00:00:30"
-#     else :
-#     	videoDuration = "00:00:00"    	
-#     proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
-#     proc.wait()
-#     background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
-#     fore = Image.open(MEDIA_ROOT+"ndf/images/poster.jpg")
-#     background.paste(fore, (120, 100))
-#     draw = ImageDraw.Draw(background)
-#     draw.text((120, 100), durationTime, (255, 255, 255)) # drawing duration time on thumbnail image
-#     background.save("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
-#     thumbnailvideo = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
+def convert_mid_size_image(files, **kwargs):
+    """
+    convert image into mid size image w.r.t. max width of 500
+    """
+    files.seek(0)
+    mid_size_img = StringIO()
+    size = (500, 300)  # (width, height)
+    img = Image.open(StringIO(files.read()))
+    # img = img.resize(size, Image.ANTIALIAS)
+    # img.save(mid_size_img, "JPEG")
+    # mid_size_img.seek(0)
+
+    if (img.size > size) or (img.size[0] >= size[0]):
+      # both width and height are more than width:500 and height:300
+      # or
+      # width is more than width:500
+      factor = img.size[0]/500.00
+      img = img.resize((500, int(img.size[1] / factor)), Image.ANTIALIAS)
+
+    elif (img.size <= size) or (img.size[0] <= size[0]): 
+      img = img.resize(img.size, Image.ANTIALIAS)
+
+    if "extension" in kwargs:
+      if kwargs["extension"]:
+        img.save(mid_size_img, kwargs["extension"])
+
+    else:    
+      img.save(mid_size_img, "JPEG")
+
+    mid_size_img.seek(0)
+
+    return mid_size_img
+
     
-#     webmfiles = files
-#     '''storing thumbnail of video with duration in saved object'''
-#     tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
+
+def convertVideo(files, userid, fileobj, filename):
+    """
+    converting video into webm format, if video already in webm format ,then pass to create thumbnails
+    """
+    objid = fileobj._id
+    fileVideoName = str(objid)
+    initialFileName = str(objid)
+    os.system("mkdir -p "+ "/tmp"+"/"+str(userid)+"/"+fileVideoName+"/")
+    fd = open('%s/%s/%s/%s' % (str("/tmp"), str(userid),str(fileVideoName), str(fileVideoName)), 'wb')
+    for chunk in files.chunks():
+        fd.write(chunk)
+    fd.close()
+    if files._get_name().endswith('.webm') == False:
+        proc = subprocess.Popen(['ffmpeg', '-y', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")])
+        proc.wait()
+        files = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
+    else : 
+        files = open("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
+    filetype = "video"
+    oxData = ox.avinfo("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
+    duration = oxData['duration'] # fetching duration of video by python ox
+    duration = int(duration)
+    secs, mins, hrs = 00, 00, 00
+    if duration > 60 :
+        secs  = duration % 60
+        mins = duration / 60
+        if mins > 60 :
+            hrs = mins / 60
+            mins = mins % 60 
+    else:
+        secs = duration
+    videoDuration = ""
+    durationTime = str(str(hrs)+":"+str(mins)+":"+str(secs)) # calculating Time duration of video in hrs,mins,secs
+
+    if duration > 30 :
+	videoDuration = "00:00:30"
+    else :
+    	videoDuration = "00:00:00"    	
+    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
+    proc.wait()
+    background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
+    fore = Image.open(MEDIA_ROOT+"ndf/images/poster.jpg")
+    background.paste(fore, (120, 100))
+    draw = ImageDraw.Draw(background)
+    draw.text((120, 100), durationTime, (255, 255, 255)) # drawing duration time on thumbnail image
+    background.save("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
+    thumbnailvideo = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
     
-#     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-#     if filename.endswith('.webm') == False:
-#         tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
-#         # saving webm video id into file object
+    webmfiles = files
+    '''storing thumbnail of video with duration in saved object'''
+    tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
+    
+    node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+    if filename.endswith('.webm') == False:
+        tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+        # saving webm video id into file object
 	
-#         node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+        node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 	
-
+# ????????????? END
 
 from os import listdir
 from os.path import isfile, join
@@ -3198,6 +3208,7 @@ def store_mails(mails, path):
 
 
 import urllib2
+# , getFileSize, convert_image_thumbnail, convert_pdf_thumbnail
 @get_execution_time
 @register.assignment_tag
 def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
@@ -3250,6 +3261,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 		if mail_type == '0':
 			if displayFrom == 0:
 				print 'FETCHING NEW MAILS'
+				print required_mailbox
 				all_mails=required_mailbox.get_new_mail()
 				all_mails=list(reversed(all_mails))
 				print 'FETCHING DONE'
@@ -3277,40 +3289,72 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 							json_data = json_util.loads(json_data[1:-1])
 							print json_data
 							
-							# We need to check from the _type what we have that needs to be saved
-							temp_node = node_collection.find_one({'_type': u'GSystem', '_id': json_data['_id'] })
-							print '*' * 20
-							print 'TEMP_NODE'
-							print temp_node
-							print '*' * 20
-							if temp_node is not None:
-								node_exists = True
-								print '*' * 30
-								print 'exists'
-								print '*' * 30
-							else:
-								temp_node = node_collection.collection.GSystem()
+							# # We need to check from the _type what we have that needs to be saved
+							# temp_node = node_collection.find_one({'_type': u'GSystem', '_id': json_data['_id'] })
+							# print '*' * 20
+							# print 'TEMP_NODE'
+							# print temp_node
+							# print '*' * 20
+							# if temp_node is not None:
+							# 	node_exists = True
+							# 	print '*' * 30
+							# 	print 'exists'
+							# 	print '*' * 30
+							# else:
+							# 	temp_node = node_collection.collection.GSystem()
 							
-							''' dictionary updation/creation '''
-							for key, values in json_data.items():
-								# if key != 'fs_file_ids':
-								temp_node[key] = values
+							# ''' dictionary updation/creation '''
+							# for key, values in json_data.items():
+							# 	# if key != 'fs_file_ids':
+							# 	temp_node[key] = values
 							
 							if file_object_path != '':
+								
 								''' for the creation of the file object '''
+								
 								if 'video' in temp_node['mime_type']:
 									src_url = ''
 									pass
 								elif 'image' in temp_node['mime_type']:
-									pass
+									with open(file_object_path,'rb+') as to_be_saved_file:
+										# Check the group_id
+										node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], json_data["group_set"], json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],True, oid=True)
+										node_to_update = node_collection.one({ "_id": node_id })
+
+										for key, values in json_data.items():
+											if key != 'fs_file_ids':
+												node_to_update[key] = values
+
+										node_to_update.update()
 								else:
 									pass
-
-							print '*' * 30
-							print temp_node.structure
-							print '*' * 30
+							else:
+								''' for pages '''
+								# We need to check from the _type what we have that needs to be saved
+								temp_node = node_collection.find_one({'_type': u'GSystem', '_id': json_data['_id'] })
+								print '*' * 20
+								print 'TEMP_NODE'
+								print temp_node
+								print '*' * 20
+								if temp_node is not None:
+									node_exists = True
+									print '*' * 30
+									print 'exists'
+									print '*' * 30
+								else:
+									temp_node = node_collection.collection.GSystem()
 							
-							temp_node.save()
+								''' dictionary updation/creation '''
+								for key, values in json_data.items():
+									# if key != 'fs_file_ids':
+									temp_node[key] = values
+
+								print '*' * 30
+								print temp_node.structure
+								print '*' * 30
+								temp_node.save()
+
+
 				# To read the mails from the directories
 				print 'STORING NEW MAILS'
 				store_mails(all_mails,path)

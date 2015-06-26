@@ -23,6 +23,7 @@ from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 
+
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import datetime
@@ -183,6 +184,7 @@ def server_sync(func):
 @server_sync
 def capture_data(file_object=None, file_data=None, content_type=None):
     pass
+
 
 @get_execution_time
 def get_group_name_id(group_name_or_id, get_obj=False):
