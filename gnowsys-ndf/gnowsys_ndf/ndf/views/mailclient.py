@@ -486,8 +486,7 @@ def compose_mail(request, group_id,mailboxname):
             mail.attach(f.name,f.read(),f.content_type)
         print body
         try:
-            pass
-            #mail.send()
+            mail.send()
         except Exception as error:
                 print error
                 error_obj= str(error) + ", compose_mail() fn"
