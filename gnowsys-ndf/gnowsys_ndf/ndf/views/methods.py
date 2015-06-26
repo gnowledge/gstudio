@@ -99,16 +99,10 @@ def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
 
-        node = node_collection.one({'_id': ObjectId(kwargs['node'])})
-        # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
-        node_json = bson.json_util.dumps(node)
-        # node_json = json.dumps(node)
-        with open('/home/tiwari/node_data.json','w') as outfile:
-            json.dump(node_json, outfile)
+        ''' The mails that would be sent '''
         mail = EmailMessage()
         mail.subject = "SYNCDATA"
         mail.to = ['djangotest94@gmail.com']
-        mail.attach_file('/home/tiwari/node_data.json')
         mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
 
         ''' To fetch the data about the node '''
@@ -1322,7 +1316,7 @@ def get_page(request, node):
                 #     if node1.created_by ==request.user.id:
                 #           return (node2,ver2)
                 #      else:
-                #	   return (node2,ver2)
+                #      return (node2,ver2)
         return (node1, ver1)
 
 
@@ -2533,7 +2527,7 @@ def set_all_urls(member_of):
     else:
         url = u"None"
     return url
-###############################################	##########################
+############################################### ##########################
 
 
 @login_required
