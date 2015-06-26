@@ -132,6 +132,7 @@ def mailbox_create_edit(request, group_id):
         try:
             uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + "?archive=" + mailbox_name.replace(" ","_")
             newbox.uri = uri
+            print uri
         except IndexError: 
             print "Incorrect Email ID given!"
             error_obj= "Incorrect Email ID given!"
@@ -190,18 +191,360 @@ def mailbox_create_edit(request, group_id):
                                             })
         return render_to_response(template, variable)
 
+
+
+from os import listdir
+from os.path import isfile, join
+from email.parser import Parser
+
+def sorted_ls(path):
+    mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
+    return list(sorted(os.listdir(path), key=mtime))
+
+def read_mails(path, _type, displayFrom):
+    cur_path = path + '/cur'
+    new_path = path + '/new'
+    
+    start = displayFrom
+    end  = displayFrom + 20
+
+    p = Parser()
+
+    mails_list = []
+
+    if _type == '0':
+        # all_unread_mails = [ f for f in listdir(new_path) if isfile(join(new_path,f))]
+        all_unread_mails = sorted_ls(new_path)
+        all_unread_mails.reverse()
+        
+        if end > len(all_unread_mails):
+            end = len(all_unread_mails)
+
+        required_mails = all_unread_mails[start:end]
+
+        for temp_mail in required_mails:
+            temp = {}
+            msg = p.parse(open(join(new_path, temp_mail)))
+            for key in msg.keys():
+                if key == 'Attachments':
+                    if msg[key] != '':
+                        temp[key] = msg[key].split(';')
+                    else:
+                        temp[key] = []
+                else:       
+                    temp[key] = msg[key]
+            temp['text'] = msg.get_payload()
+            temp['file_name'] = temp_mail
+            mails_list.append(temp)
+            
+        return mails_list
+    
+    if _type == '1':
+        # all_unread_mails = [ f for f in listdir(cur_path) if isfile(join(cur_path,f))]
+        all_unread_mails = sorted_ls(cur_path)
+        all_unread_mails.reverse()
+        
+        if end > len(all_unread_mails):
+            end = len(all_unread_mails)
+
+        required_mails = all_unread_mails[start:end]
+
+        for temp_mail in required_mails:
+            temp = {}
+            msg = p.parse(open(join(cur_path,temp_mail)))
+            for key in msg.keys():
+                if key == 'Attachments':
+                    if msg[key] != '':
+                        temp[key] = msg[key].split(';')
+                    else:
+                        temp[key] = []
+                else:       
+                    temp[key] = msg[key]
+            temp['text'] = msg.get_payload()
+            mails_list.append(temp)
+
+        return mails_list   
+
+
+
+# Function to store the newly fetched mails stored in 'maildir' format
+def store_mails(mails, path):
+
+    for mail in mails:
+        from_addr = email.utils.formataddr(('Author', mail.from_address[0]))
+        to_addr = email.utils.formataddr(('Recipient', mail.to_addresses[0]))
+        now = datetime.datetime.now()
+        cc_addr = None
+        
+        if len(mail.to_addresses) > 1:
+            nameslist = mail.to_addresses[1:-1]     
+            cc_list=""
+            for names in nameslist:
+                cc_list = cc_list + names + ';'
+            
+            cc_list = cc_list + mail.to_addresses[-1]
+            cc_addr = email.utils.formataddr(('CC List', cc_list))
+
+        mbox = mailbox.Maildir(path)
+        mbox.lock()
+
+        try:
+            msg=mailbox.mboxMessage()
+            unixform = mail.mailbox.name + ' ' + now.ctime()
+            msg.set_unixfrom(unixform)
+            msg['From'] = from_addr
+            msg['To'] = to_addr
+            if len(mail.to_addresses) > 1:
+                msg['CC'] = cc_addr
+            
+            msg['Subject'] = mail.subject
+            mail_data = mail.html
+            mail_data = mail_data.replace('\r', '')
+            msg.set_payload(mail_data)
+
+            # To prepare a list of path of the attachments in comma-separated format
+            if mail.attachments.count > 0:
+                all_attachments = mail.attachments.all()
+                all_attachments_path = ''
+                for attachment in all_attachments:
+                    all_attachments_path = all_attachments_path + attachment.document.path + ';'
+                
+                msg['Attachments'] = all_attachments_path
+
+                
+
+            mbox.add(msg)
+            mbox.flush()
+
+        except Exception as ex:
+            print ex
+            # redirect to the error-display page
+        finally:
+            mbox.unlock()
+    return
+
+
+import urllib2
+import io
+from gnowsys_ndf.ndf.views.file import save_file
+from django_mailbox.models import Mailbox
+import mailbox
+import email.utils
+import datetime
+from bson import json_util
+@get_execution_time
+def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
+
+    '''
+    This function establishes the connection and fetches the mails from the corresponding imap server.
+    During fetching it checks for the subject of the mail and then segregates mails either for local 
+    storage or update the mongodb with the data received. The mails are stored in maildir format in the 
+    'ndf/mailbox_data' folder.
+
+    '''
+
+    # To get the mail box instance based upon the unique name of the mailbox
+    all_mail_boxes= Mailbox.objects.all()
+    required_mailbox=None
+    for box in all_mail_boxes:
+        if box.name == mailboxname:
+            required_mailbox=box
+            break
+    
+    # To find the path to the mailbox_data folder where the mails are stored in the maildir format
+    settings_dir = os.path.dirname(__file__)
+    PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+    path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
+    path = path + username
+    
+    
+    # Necessary for the storage of mails in maildir format : if not exists -> make the corresponding the directories
+    if not os.path.exists(path):
+        os.makedirs(path)
+    
+    path = path + '/' + mailboxname
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+    if not os.path.exists(path + '/tmp'): 
+        os.makedirs(path + '/tmp')
+    if not os.path.exists(path + '/cur'):
+        os.makedirs(path + '/cur')
+    if not os.path.exists(path + '/new'):
+        os.makedirs(path + '/new')
+
+    displayFrom = int(displayFrom)
+
+    if required_mailbox is not None:
+        emails=[]
+
+        if mail_type == '0':
+            if displayFrom == 0:
+                print 'FETCHING NEW MAILS'
+                print required_mailbox
+                all_mails=required_mailbox.get_new_mail()
+                all_mails=list(reversed(all_mails))
+                print 'FETCHING DONE'
+
+                print len(all_mails)
+                # To manage the mails that comes as a part of the server-sync technique
+                for mail in all_mails:
+                    if 'SYNCDATA' in mail.subject:
+                        all_attachments = mail.attachments.all()
+                        all_attachments_path = []
+                        
+                        json_file_path = ''
+                        file_object_path = ''
+
+                        for attachment in all_attachments:
+                            if attachment.document.path[-4:] == 'json':
+                                json_file_path = attachment.document.path
+                            else:
+                                file_object_path = attachment.document.path
+
+                        node_exists = False
+                        with open(json_file_path,'r') as json_file:
+                            json_data = json_file.read()
+                            json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
+                            json_data = json_util.loads(json_data[1:-1])
+                            print json_data
+                            
+                            # # We need to check from the _type what we have that needs to be saved
+                            # temp_node = node_collection.find_one({'_type': u'GSystem', '_id': json_data['_id'] })
+                            # print '*' * 20
+                            # print 'TEMP_NODE'
+                            # print temp_node
+                            # print '*' * 20
+                            # if temp_node is not None:
+                            #   node_exists = True
+                            #   print '*' * 30
+                            #   print 'exists'
+                            #   print '*' * 30
+                            # else:
+                            #   temp_node = node_collection.collection.GSystem()
+                            
+                            # ''' dictionary updation/creation '''
+                            # for key, values in json_data.items():
+                            #   # if key != 'fs_file_ids':
+                            #   temp_node[key] = values
+                            
+                            if file_object_path != '':
+                                
+                                ''' for the creation of the file object '''
+                                
+                                if 'video' in json_data['mime_type']:
+                                    src_url = ''
+                                    pass
+                                elif 'image' in json_data['mime_type']:
+                                    with open(file_object_path,'rb+') as to_be_saved_file:
+                                        # Check the group_id IMPORTANT
+                                        print 'IN IMAGE """""""""""""""""""""""""""""""""""""""""""""""""""""'
+                                        req_groupid = None
+                                        for obj in json_data["group_set"]:
+                                            temp_obj = node_collection.one({"_id": obj, "_type" : "Group" })
+                                            if temp_obj is not None:
+                                                req_groupid = obj
+                                                break
+                                        print req_groupid, " <<< ID"
+                                        
+                                        to_be_saved_file = io.BytesIO(to_be_saved_file.read())
+                                        to_be_saved_file.name = json_data["name"]
+
+                                        node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True)
+                                        
+                                        if type(node_id) == list:
+                                            print 'it is node list'
+                                            node_id = node_id[1]
+                                        
+                                        print '*' * 20
+                                        print node_id
+                                        print '*' * 20
+                                        node_to_update = node_collection.one({ "_id": node_id })
+                                        print '*' * 20
+                                        print node_to_update
+                                        print '*' * 20
+                                        for key, values in json_data.items():
+                                            if key != 'fs_file_ids':
+                                                node_to_update[key] = values
+
+                                        node_to_update.update()
+                                else:
+                                    pass
+                            else:
+                                ''' for pages '''
+                                # We need to check from the _type what we have that needs to be saved
+                                temp_node = node_collection.find_one({'_type': u'GSystem', '_id': json_data['_id'] })
+                                print '*' * 20
+                                print 'TEMP_NODE'
+                                print temp_node
+                                print '*' * 20
+                                if temp_node is not None:
+                                    node_exists = True
+                                    print '*' * 30
+                                    print 'exists'
+                                    print '*' * 30
+                                else:
+                                    temp_node = node_collection.collection.GSystem()
+                            
+                                ''' dictionary updation/creation '''
+                                for key, values in json_data.items():
+                                    # if key != 'fs_file_ids':
+                                    temp_node[key] = values
+
+                                print '*' * 30
+                                print temp_node.structure
+                                print '*' * 30
+                            
+                                temp_node.save()
+
+                # To read the mails from the directories
+            
+
+                print 'STORING NEW MAILS'
+                store_mails(all_mails,path)
+                print 'STORAGE DONE'
+            
+            print 'FETCHING FROM LOCAL STORAGE'
+            all_mails = read_mails(path, mail_type, displayFrom)
+            i=1
+            for mail in all_mails:
+                emails.append({'mail_id':i, 'mail_data':mail})
+                i+=1
+
+            print 'FETCHING DONE'
+        
+            return emails
+        else:
+            print 'FETCHING OLD MAILS'
+            all_mails = read_mails(path, mail_type, displayFrom)
+            i=1
+            for mail in all_mails:
+                emails.append({'mail_id':i, 'mail_data':mail})
+                i+=1
+            print 'FETCHING DONE'
+            return emails
+    else:
+        print 'ERROR : NO SUCH MAILBOX'
+        return None
+
+@login_required
+@get_execution_time
 def render_mailbox_pane(request,group_id):
     group_name, group_id = get_group_name_id(group_id)
     template = "ndf/mailcontent.html"
     if request.method=='POST' and request.is_ajax():
+        mails = get_mails_in_box(request.POST['mailBoxName'], request.POST['username'], request.POST['mail_type'], request.POST['startFrom'])
         variable = RequestContext(request, {
         'groupname': group_name,
         "group_id" : group_id,
-        "groupid" : group_id,
-        'mailboxname': request.POST['mailBoxName'],
-        'username' : request.POST['username'],
-        'mail_type' : request.POST['mail_type'],
-        'displayFrom' : request.POST['startFrom']
+        "groupid"  : group_id,
+        "emails"   : mails 
+        # 'mailboxname': request.POST['mailBoxName'],
+        # 'username' : request.POST['username'],
+        # 'mail_type' : request.POST['mail_type'],
+        # 'displayFrom' : request.POST['startFrom']
         })
         return render_to_response(template,variable)
 
