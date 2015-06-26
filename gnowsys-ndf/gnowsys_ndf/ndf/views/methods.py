@@ -90,10 +90,14 @@ def get_execution_time(f):
 
 import json
 import bson
+import shutil
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
 def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
+
         node = node_collection.one({'_id': ObjectId(kwargs['node'])})
         # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
         node_json = bson.json_util.dumps(node)
@@ -105,11 +109,80 @@ def server_sync(func):
         mail.to = ['djangotest94@gmail.com']
         mail.attach_file('/home/tiwari/node_data.json')
         mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+
+        ''' To fetch the data about the node '''
+        # the actual file
+        file_data = kwargs['file_data'] 
+        # the node file
+        node = kwargs['file_object'] 
+        # content-type of the file
+        content_type = kwargs['content_type'] 
+
+        ''' path where the json file that contains the information about node is loated ''' 
+        settings_dir1 = os.path.dirname(__file__)
+        settings_dir2 = os.path.dirname(settings_dir1)
+        settings_dir3 = os.path.dirname(settings_dir2)
+        gen_path = os.path.abspath(os.path.dirname(settings_dir3))
+        if file_data:
+            file_path = gen_path + '/' + str(file_data.name)
+        node_data_path = gen_path + '/node_data.json'
+
+        
+        if 'image' in content_type:
+            # To make the fs_file_ids filed set empty
+
+            node.fs_file_ids = []
+            # pass the image data as attachment
+            file_data.seek(0)
+            # path = default_storage.save(file_path, ContentFile(file_data.read()))
+            with open(file_path,'wb+') as outfile:
+                outfile.write(file_data.read())
+
+            mail.attach_file(file_path)
+               
+
+        elif 'video' in content_type:
+            # on the reciever end send the url
+            node.fs_file_ids = []
+            pass
+        else:
+            #the other documents which need only the json data to be sent
+            node.fs_file_ids = []
+
+            if file_data:
+                file_data.seek(0)
+                file_path = gen_path + '/' + str(file_data.name)
+                # path = default_storage.save(file_path, ContentFile(file_data.read()))
+                with open(file_path,'wb+') as outfile:
+                    outfile.write(file_data.read())
+
+                mail.attach_file(file_path)
+            # shutil.rmtree(file_path)
+        
+        # node = node_collection.one({'_id': ObjectId(kwargs['node'])})
+        # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
+        node_json = bson.json_util.dumps(node)
+
+        
+        
+        # # node_json = json.dumps(node)
+        with open(node_data_path,'w') as outfile:
+            json.dump(node_json, outfile)
+        
+        mail.attach_file(node_data_path)
         mail.send()
+        os.remove(node_data_path)
+        if file_data:
+            os.remove(file_path)
+
         return ret
 
     return wrap
 
+@get_execution_time
+@server_sync
+def capture_data(file_object=None, file_data=None, content_type=None):
+    pass
 
 @get_execution_time
 def get_group_name_id(group_name_or_id, get_obj=False):
