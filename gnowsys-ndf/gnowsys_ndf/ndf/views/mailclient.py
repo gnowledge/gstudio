@@ -469,7 +469,9 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                             
                                     ''' dictionary creation '''
                                     for key, values in json_data.items():
-                                        temp_node[key] = values
+                                        temp_dict = {}
+                                        temp_dict[key] = values
+                                        temp_node.update(temp_dict)
 
                                     temp_node.save()
 

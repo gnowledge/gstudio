@@ -22,7 +22,7 @@ from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type, forum_notification_status
 from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete,get_execution_time
-from gnowsys_ndf.ndf.views.methods import get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_group_name_id, capture_data
 from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
 from gnowsys_ndf.settings import GAPPS
@@ -195,6 +195,9 @@ def create_forum(request, group_id):
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
         colf.save()
+
+        ''' server_sync '''
+        capture_data(file_object=colf, file_data=None, content_type='forum_page')
 
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
@@ -505,6 +508,9 @@ def create_thread(request, group_id, forum_id):
         
         colrep.group_set.append(colg._id)
         colrep.save()
+
+        ''' server_sync '''
+        capture_data(file_object=colrep, file_data=None, content_type='forum_thread_new')
 
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(colrep._id)
@@ -845,6 +851,10 @@ def edit_thread(request,group_id,forum_id,thread_id):
             filename = slugify(name) + "-" + usrname + "-"
             thread.content = org2html(content_org, file_prefix=filename)
         thread.save() 
+
+        ''' server_sync '''
+        capture_data(file_object=thread, file_data=None, content_type='forum_page')
+
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(thread._id)
         for each in colg.author_set:
             if each != colg.created_by:
@@ -903,6 +913,11 @@ def delete_reply(request,group_id,forum_id,thread_id,node_id):
     activity = ""
 
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+
+    # ??? CHECK
+    ''' server_sync '''
+        capture_data(file_object=op, file_data=None, content_type='forum_page')
+
     replyobj=node_collection.one({'_id':ObjectId(node_id)})
     forumobj=node_collection.one({"_id": ObjectId(forum_id)})
     threadobj=node_collection.one({"_id": ObjectId(thread_id)})
