@@ -710,11 +710,10 @@ def submitDoc(request, group_id):
         tags = request.POST.get('tags', "")
 
         i = 1
-
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy,server_sync = False, oid=True)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, server_sync = False, oid=True)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
                     f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, server_sync = False, oid=True)
@@ -871,26 +870,20 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 fileobj.tags = tags
-            print fileobj._id , '<<< Before .save()'
-            fileobj.save()
 
-            t = node_collection.one({"_id" : fileobj._id})
-            if t is not None:
-              print fileobj._id , '<<< After .save()'
-            else:
-              print 'Not exists'
+            fileobj.save()
 
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
             node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
 
+            print '+' * 20
             # For making collection if uploaded file more than one
             if count == 0:
                 first_object = fileobj
             else:
                 node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
 
-            
 
             """
             code for uploading video to wetube.gnowledge.org

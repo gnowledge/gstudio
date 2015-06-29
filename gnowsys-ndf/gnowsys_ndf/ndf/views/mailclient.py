@@ -416,8 +416,46 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                                 ''' for the creation of the file object '''
                                 
                                 if 'video' in json_data['mime_type']:
-                                    src_url = ''
-                                    pass
+                                    with open(file_object_path,'rb+') as to_be_saved_file:
+                                        print 'IN VIDEO """""""""""""""""""""""""""""""""""""""""""""""""""""'
+                                        req_groupid = None
+                                        for obj in json_data["group_set"]:
+                                            temp_obj = node_collection.one({"_id": obj, "_type" : "Group" })
+                                            if temp_obj is not None:
+                                                req_groupid = obj
+                                                break
+                                        # print req_groupid, " <<< ID"
+                                        
+                                        to_be_saved_file = io.BytesIO(to_be_saved_file.read())
+                                        to_be_saved_file.name = json_data["name"]
+
+                                        # print json_data["_id"] , '<<< JSON_DATA ID'
+                                        node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True,object_id=json_data["_id"],oid=True)
+
+                                        # print node_id, '<<< NODE _ID RETURN'
+                                        
+                                        if type(node_id) == list:
+                                            # print 'it is node list'
+                                            node_id = node_id[1]
+                                        
+
+                                        # print '*' * 20
+                                        # print node_id, '<<< NODE _ID'
+                                        # print '*' * 20
+                                        
+                                        node_to_update = node_collection.one({ "_id": node_id })
+                                        
+                                        # print '*' * 20
+                                        # print node_to_update
+                                        # print '*' * 20
+                                        
+                                        # print json_data["content"], "<<< Outside"
+                                        for key, values in json_data.items():
+                                            if key != 'fs_file_ids':
+                                                temp_dict = {}
+                                                temp_dict[key] = values
+                                                node_to_update.update(temp_dict)
+                                                # 
                                 elif 'image' in json_data['mime_type']:
                                     with open(file_object_path,'rb+') as to_be_saved_file:
                                         print 'IN IMAGE """""""""""""""""""""""""""""""""""""""""""""""""""""'
@@ -427,32 +465,32 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                                             if temp_obj is not None:
                                                 req_groupid = obj
                                                 break
-                                        print req_groupid, " <<< ID"
+                                        # print req_groupid, " <<< ID"
                                         
                                         to_be_saved_file = io.BytesIO(to_be_saved_file.read())
                                         to_be_saved_file.name = json_data["name"]
 
-                                        print json_data["_id"] , '<<< JSON_DATA ID'
+                                        # print json_data["_id"] , '<<< JSON_DATA ID'
                                         node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True,object_id=json_data["_id"],oid=True)
 
-                                        print node_id, '<<< NODE _ID RETURN'
+                                        # print node_id, '<<< NODE _ID RETURN'
                                         
                                         if type(node_id) == list:
-                                            print 'it is node list'
+                                            # print 'it is node list'
                                             node_id = node_id[1]
                                         
 
-                                        print '*' * 20
-                                        print node_id, '<<< NODE _ID'
-                                        print '*' * 20
+                                        # print '*' * 20
+                                        # print node_id, '<<< NODE _ID'
+                                        # print '*' * 20
                                         
                                         node_to_update = node_collection.one({ "_id": node_id })
                                         
-                                        print '*' * 20
-                                        print node_to_update
-                                        print '*' * 20
+                                        # print '*' * 20
+                                        # print node_to_update
+                                        # print '*' * 20
                                         
-                                        print json_data["content"], "<<< Outside"
+                                        # print json_data["content"], "<<< Outside"
                                         for key, values in json_data.items():
                                             if key != 'fs_file_ids':
                                                 temp_dict = {}

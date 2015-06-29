@@ -101,7 +101,7 @@ def server_sync(func):
 
         ''' The mails that would be sent '''
         mail = EmailMessage()
-        mail.subject = "SYNCDATA"
+        subject = "SYNCDATA"
         mail.to = ['djangotest94@gmail.com']
         mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
 
@@ -123,7 +123,7 @@ def server_sync(func):
         node_data_path = gen_path + '/node_data.json'
 
         
-        if 'image' in content_type:
+        if 'image' in content_type or 'video' in content_type or 'document' in content_type:
             # To make the fs_file_ids filed set empty
             if file_data:
                 node.fs_file_ids = []
@@ -136,10 +136,10 @@ def server_sync(func):
                 mail.attach_file(file_path)
                
 
-        elif 'video' in content_type:
-            # on the reciever end send the url
-            node.fs_file_ids = []
-            pass
+        # elif 'video' in content_type:
+        #     # on the reciever end send the url
+        #     node.fs_file_ids = []
+        #     pass
         else:
             #the other documents which need only the json data to be sent
             if file_data:
@@ -164,6 +164,7 @@ def server_sync(func):
             json.dump(node_json, outfile)
         
         mail.attach_file(node_data_path)
+        mail.subject = subject + str(node._id)
         mail.send()
         os.remove(node_data_path)
         if file_data:
