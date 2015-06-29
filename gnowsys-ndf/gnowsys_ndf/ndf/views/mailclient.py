@@ -398,6 +398,22 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                         json_file_path = ''
                         file_object_path = ''
 
+
+                        #TODO: implement reading signed attachments. Decryting and then processing them.
+                        # decrypted_files_list = []
+                        # for attachment in all_attachments:
+                        #     filename = attachment.document.path
+                        #     op_file_name = filename.split('.sig')[0]
+                        #     command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
+                        #     subprocess.call([command],shell=True)
+                        #     decrypted_files_list.append(op_file_name)
+
+                        # for afile in decrypted_files_list:
+                        #     if afile[-4:] == 'json':
+                        #         json_file_path = afile
+                        #     else:
+                        #         file_object_path = afile
+
                         for attachment in all_attachments:
                             if attachment.document.path[-4:] == 'json':
                                 json_file_path = attachment.document.path

@@ -2712,14 +2712,19 @@ def get_filters_data(gst_name):
 ##############################################
 #Fn to create the default metastudio mailbox for the studio
 ##############################################
-def create_deault_mailbox(request,username):
+def create_default_mailbox(request,username):
 	newbox = Mailbox()
 	newbox.name= "Metabox"
-	#TODO: implement real email id 
-	#uri = "imap+ssl://"+username+"%40metastudio.org:"+password+"@mimap.metastudio.com"
-
+	
+	
 	#TODO: ask gn sir, whether the Metabox should ALWAYS have same password as user's login pwd or should the user be 
 	#allowed to change it
+	
+	#TODO: implement real email id 
+	#'@' has been replaced by '%40' as required by uri format
+	# emailid= username+'.metastudio%40gnowledge.org'
+	# password= 'free@glab'
+	# uri = "imap+ssl://"+emailid+':'+password+'@imap.gmail.com?archive=Metabox'
 
 	uri = "imap+ssl://t.metastudio%40gmail.com:yolo12345@imap.gmail.com?archive=Metabox"
 	try:
@@ -2734,7 +2739,7 @@ def create_deault_mailbox(request,username):
 		settings_dir3 = os.path.dirname(settings_dir2)
 		path = os.path.abspath(os.path.dirname(settings_dir3))
 
-            #may throw exception
+        #may throw exception
 		conn = sqlite3.connect(path + '/example-sqlite3.db')
 		user_id = str(request.user.id)
 		query = 'insert into user_mailboxes values (?,?);'

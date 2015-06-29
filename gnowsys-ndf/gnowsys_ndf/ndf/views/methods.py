@@ -101,9 +101,12 @@ def server_sync(func):
 
         ''' The mails that would be sent '''
         mail = EmailMessage()
-        mail.subject = "SYNCDATA"
+        subject = "SYNCDATA"
         mail.to = ['djangotest94@gmail.com']
         mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+
+        # command = 'gpg --output ' + op_file_name + ' --sign ' + filename
+        # subprocess.call([command],shell=True)
 
         ''' To fetch the data about the node '''
         # the actual file
@@ -121,7 +124,7 @@ def server_sync(func):
         if file_data:
             file_path = gen_path + '/' + str(file_data.name)
         node_data_path = gen_path + '/node_data.json'
-
+        subject += str(node._id)
         
         if 'image' in content_type:
             # To make the fs_file_ids filed set empty
@@ -132,6 +135,12 @@ def server_sync(func):
             # path = default_storage.save(file_path, ContentFile(file_data.read()))
             with open(file_path,'wb+') as outfile:
                 outfile.write(file_data.read())
+
+            ''' Run command to sign the file'''
+            # op_file_name = file_path + '.sig'    
+            # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
+            # subprocess.call([command],shell=True)
+            # mail.attach_file(op_file_name)
 
             mail.attach_file(file_path)
                
@@ -151,6 +160,12 @@ def server_sync(func):
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
 
+                ''' Run command to sign the file'''
+                # op_file_name = file_path + '.sig'    
+                # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
+                # subprocess.call([command],shell=True)
+                # mail.attach_file(op_file_name)
+
                 mail.attach_file(file_path)
             # shutil.rmtree(file_path)
         
@@ -164,11 +179,21 @@ def server_sync(func):
         with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
         
+        ''' Run command to sign the file'''
+        # json_op_file_name = node_data_path + '.sig'    
+        # command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
+        # subprocess.call([command],shell=True)
+        # mail.attach_file(json_op_file_name)
+
         mail.attach_file(node_data_path)
+        mail.subject = subject
         mail.send()
+
         os.remove(node_data_path)
+        # os.remove(json_op_file_name)
         if file_data:
             os.remove(file_path)
+            # os.remove(op_file_name)
 
         return ret
 
@@ -178,7 +203,6 @@ def server_sync(func):
 @server_sync
 def capture_data(file_object=None, file_data=None, content_type=None):
     pass
-
 
 @get_execution_time
 def get_group_name_id(group_name_or_id, get_obj=False):
