@@ -10,5 +10,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.analytics',
     url(r'^/page_view/', 'page_view', name='page_view'),
 	url(r'^/list_activities/', 'list_activities', name='list_activities'),
 	url(r'^/session_summary/', 'session_summary', name='session_summary'),
+	url(r'^/group_analytics/', 'group_analytics', name='group_analytics'),
 
 )

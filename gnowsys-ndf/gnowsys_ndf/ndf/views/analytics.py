@@ -113,13 +113,14 @@ def list_activities(request):
 															{ "data" : lst})
 
 def session_summary(request):
-	a = collection.find({"user" : request.user.username}).sort("last_update",-1)
+	#a = collection.find({"user" : request.user.username}).sort("last_update",-1)
 	#print a
 	lst = []
 	sessions_list =[]
 	d={}
 	i=-1
-	normalize(a)
+	#normalize(a)
+	'''
 	for doc in a :
 		#print '\n'+str(doc)
 		lst.append(doc)
@@ -136,13 +137,55 @@ def session_summary(request):
 			d["activities"]	= 1
 			d["user"]	= doc[u"user"]
 			sessions_list.append(d)
-
+	'''
+	query("user", {"username" : request.user.username})
 
 	return render_to_response("ndf/analytics_summary.html",
 															{ "data" : sessions_list})
+
+	
+Analytics_collection = db['Analytic_col']														
 															
-															
-															
+						
+# to see the data in analytics  
+def query(analytics_type,details) :
+	
+	if analytics_type == "user" :
+		a = Analytics_collection.find({"user" : str(details['username']) }).sort("last_update",-1).limit(1)
+		timestamp = datetime.datetime(1900,1,1)
+		if a is None :
+			pass
+		else :
+			for doc in a :
+				#print doc['timestamp']
+				timestamp = doc['timestamp']
+				break
+		a = collection.find({"user" : details['username'], "last_update": {"$gt":timestamp}}).sort("last_update",-1)
+		if a is None:
+			print "your Analytics is up to date"
+		else :
+			normalize(a)
+
+	else :
+		group_id = details['group_id']	
+		n = node_collection.find_one({"_id" : group_id})
+		if n is not None :
+			member_list = n[u'author_set'] + n[u'group_admin']
+			for member in member_list :
+				author_name = node_collection.find_one({"_type" : "Author", "created_by" : int(member)})
+				if author_name is not None :
+					#print author_name[u'name']
+					query("user",{"username" : author_name[u'name'] })
+
+def group_analytics(request):
+	query("group",{"group_id" : ObjectId("558a60be9928ec1dc22e5e62")})
+
+	return(HttpResponse ("Hi"))
+
+
+
+
+
 															
 def normalize(a) :
 	a=a.sort("last_update",1)
@@ -229,7 +272,7 @@ def page_acti(url,last_update,user):
 			if auth[u'name']==user:
 				created_at = n[u'created_at']
 			#print (last_update - created_at).seconds
-			#print last_update
+			
 			if (last_update - created_at).seconds < 5 :
 				print "You created a page"
 			else :
@@ -259,6 +302,7 @@ def file_acti(url,last_update,user):
 	ins_objectid= ObjectId()
 	analytics_doc=col.Analytics()
 	analytics_doc.timestamp=last_update
+	analytics_doc.user = user 
 	
 	if(url[3]=="submit"):
 		print "you uploaded a file"

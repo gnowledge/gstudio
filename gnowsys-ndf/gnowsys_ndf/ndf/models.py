@@ -1563,7 +1563,7 @@ class Analytics(DjangoDocument):
     'timestamp': datetime.datetime,
     'action' : basestring,
     'args' : list,
-    'user' : dict,
+    'user' : basestring,
     'session_key' : basestring
   }
 

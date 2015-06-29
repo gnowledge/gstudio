@@ -6,7 +6,10 @@ Use corresponding package names if you are using an RPM based distro
 
 
 1. Installing required packages and its dependencies
-	
+	// first use 3 commands to download ppa repository and then 	use this command as ffmpeg doesn't exist now
+	sudo add-apt-repository ppa:mc3man/trusty-media
+	sudo apt-get update
+	sudo apt-get install ffmpeg gstreamer0.10-ffmpeg
     (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg ffmpeg2theora
 
 2. Get latest version of gstudio-mongokit -  Try one of the following commands:
