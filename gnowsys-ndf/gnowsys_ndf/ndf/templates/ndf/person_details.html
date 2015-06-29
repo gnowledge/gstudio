@@ -33,7 +33,7 @@
 
       <dl class="row tabs" data-tab data-options="deep_linking:true">
         {% for tab_details in property_order_list %}
-        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to add {{tab_details.0}} details...">
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to see {{tab_details.0}} details.">
           <a href="#panel_{{tab_details.0}}">{{tab_details.0}}</a>
         </dd>
         {% endfor %}
@@ -73,9 +73,33 @@
               <label>{{field.altnames}}</label>
             </div>
             <div class="small-7 end columns">
-              {% if field.type == "RelationType" %}
-                {% for details in field.value %}
-                <label>{{details.name}}</label>
+              {% if field.altnames == "Caste" or field.altnames == "District" or field.altnames == "State" or field.altnames == "College ( Graduation )" %}
+                <label>{{field.value.0.name|title}}</label>
+              {% elif field.altnames == "Languages Known" %}
+                {% for each_lang in field.value %}
+                  <label>{{each_lang|title}}</label>
+                {% endfor %}
+
+              {% elif field.altnames == "College(s)" %}
+                {% for each_colg in field.value %}
+                  <label>{{each_colg.name}} </label>
+                {% endfor %}
+
+              {% elif field.altnames == "Volunteer to teach Course in College"  %}
+                {% for course_colg in field.value %}
+                  <label>{{course_colg.0.name|title}} - {{course_colg.1.name|title}}</label>
+                {% endfor %}
+
+              {% elif field.altnames == "Voluntary Teacher: Minimum qualifications requirement"  %}
+                {% for min_qual in field.value %}
+                  {% for key,val in min_qual.items %}
+                    <label>{{key|title}} 
+                    {% for reqd_qual in val %}
+                       - {{reqd_qual}}</label>
+                    {% empty %}
+                       - Not specified</label>
+                    {% endfor %}
+                  {% endfor %}
                 {% endfor %}
               {% else %}
                 <label>{{field.value|title}}</label>
