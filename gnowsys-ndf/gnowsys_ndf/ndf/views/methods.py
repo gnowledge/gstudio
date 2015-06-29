@@ -126,34 +126,32 @@ def server_sync(func):
         node_data_path = gen_path + '/node_data.json'
         subject += str(node._id)
         
-        if 'image' in content_type:
+        if 'image' in content_type or 'video' in content_type or 'document' in content_type:
             # To make the fs_file_ids filed set empty
+            if file_data:
+                node.fs_file_ids = []
+                # pass the image data as attachment
+                file_data.seek(0)
+                # path = default_storage.save(file_path, ContentFile(file_data.read()))
+                with open(file_path,'wb+') as outfile:
+                    outfile.write(file_data.read())
 
-            node.fs_file_ids = []
-            # pass the image data as attachment
-            file_data.seek(0)
-            # path = default_storage.save(file_path, ContentFile(file_data.read()))
-            with open(file_path,'wb+') as outfile:
-                outfile.write(file_data.read())
+                ''' Run command to sign the file'''
+                # op_file_name = file_path + '.sig'    
+                # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
+                # subprocess.call([command],shell=True)
+                # mail.attach_file(op_file_name)
 
-            ''' Run command to sign the file'''
-            # op_file_name = file_path + '.sig'    
-            # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
-            # subprocess.call([command],shell=True)
-            # mail.attach_file(op_file_name)
+                mail.attach_file(file_path)
 
-            mail.attach_file(file_path)
-               
-
-        elif 'video' in content_type:
-            # on the reciever end send the url
-            node.fs_file_ids = []
-            pass
+        # elif 'video' in content_type:
+        #     # on the reciever end send the url
+        #     node.fs_file_ids = []
+        #     pass
         else:
             #the other documents which need only the json data to be sent
-            node.fs_file_ids = []
-
             if file_data:
+                node.fs_file_ids = []
                 file_data.seek(0)
                 file_path = gen_path + '/' + str(file_data.name)
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
@@ -186,7 +184,7 @@ def server_sync(func):
         # mail.attach_file(json_op_file_name)
 
         mail.attach_file(node_data_path)
-        mail.subject = subject
+        mail.subject = subject + str(node._id)
         mail.send()
 
         os.remove(node_data_path)
