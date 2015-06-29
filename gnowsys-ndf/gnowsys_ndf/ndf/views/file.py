@@ -896,37 +896,46 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             code for uploading video to wetube.gnowledge.org
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
-                is_video = 'True'
-                path = files.temporary_file_path() # method gets temporary location of the file
-                base_url = "http://wetube.gnowledge.org/"
-                api_url = base_url + "api/"
-                # connenting to wetube api using pandora_client                                                                  
-                api = pandora_client.API(api_url)
-                # signin takes username, password & returns user data                                                          
-                api.signin(username=WETUBE_USERNAME, password=WETUBE_PASSWORD)
-                # return metadata about the file                                                                                  
-                info = ox.avinfo(path)
-                oshash = info['oshash']
-                # add media file the given item                                                                                    
-                r = api.addMedia({
-                    'id': oshash,
-                    'filename': fileobj.name,
-                    'info': info
-                })
-                # return unique item id for file                                                                                 
-                item = r['data']['item']
-                url = '%supload/direct/' % api_url
-                # upload one or more media file for given item                                                                                   
-                r = api.upload_chunks(url, path, {
-                    'id': oshash
-                })
+                
+                # --- code for wetube processing part ---
+
+                # is_video = 'True'
+                # path = files.temporary_file_path() # method gets temporary location of the file
+                # base_url = "http://wetube.gnowledge.org/"
+                # api_url = base_url + "api/"
+                # # connenting to wetube api using pandora_client                                                                  
+                # api = pandora_client.API(api_url)
+                # # signin takes username, password & returns user data                                                          
+                # api.signin(username=WETUBE_USERNAME, password=WETUBE_PASSWORD)
+                # # return metadata about the file                                                                                  
+                # info = ox.avinfo(path)
+                # oshash = info['oshash']
+                # # add media file the given item                                                                                    
+                # r = api.addMedia({
+                #     'id': oshash,
+                #     'filename': fileobj.name,
+                #     'info': info
+                # })
+                # # return unique item id for file                                                                                 
+                # item = r['data']['item']
+                # url = '%supload/direct/' % api_url
+                # # upload one or more media file for given item                                                                                   
+                # r = api.upload_chunks(url, path, {
+                #     'id': oshash
+                # })
+                # --- END of code for wetube processing part ---
+
                 fileobj.reload()
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
-                node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
+                # node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
                 fileobj.reload()
-                # create gattribute 
-                source_id_AT = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
-                create_gattribute(fileobj._id, source_id_AT, unicode(item))
+
+                # --- code for wetube processing part ---
+                # # create gattribute 
+                # source_id_AT = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+                # create_gattribute(fileobj._id, source_id_AT, unicode(item))
+                # --- END of code for wetube processing part ---
+
                 # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
 
                 # '''storing thumbnail of video with duration in saved object'''
