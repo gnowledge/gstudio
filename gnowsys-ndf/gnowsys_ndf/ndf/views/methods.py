@@ -123,7 +123,7 @@ def server_sync(func):
         node_data_path = gen_path + '/node_data.json'
 
         
-        if 'image' in content_type or 'video' in content_type or 'document' in content_type:
+        if 'image' in content_type or 'video' in content_type:
             # To make the fs_file_ids filed set empty
             if file_data:
                 node.fs_file_ids = []
