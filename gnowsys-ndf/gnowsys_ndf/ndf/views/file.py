@@ -788,6 +788,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     
     is_video = ""
     fileobj = node_collection.collection.File()
+    
+    if server_sync:
+      fileobj["_id"] = ObjectId(kwargs["object_id"])
+
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
     size, unit = getFileSize(files)
@@ -829,6 +833,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
 
             fileobj.modified_by = int(userid)
             fileobj.status = u'PUBLISHED'
+
             if int(userid) not in fileobj.contributors:
                 fileobj.contributors.append(int(userid))
             if access_policy:
@@ -866,7 +871,14 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 fileobj.tags = tags
+            print fileobj._id , '<<< Before .save()'
             fileobj.save()
+
+            t = node_collection.one({"_id" : fileobj._id})
+            if t is not None:
+              print fileobj._id , '<<< After .save()'
+            else:
+              print 'Not exists'
 
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
@@ -935,16 +947,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
-
-            '''
-            For server-sync
-            '''
-            # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
-            # can be sent as a mail to the mailing-list
-            if not server_sync:
-              print 'capture_data called'
-              capture_data(file_object=fileobj, file_data=files, content_type=filetype1)
-
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
@@ -959,6 +961,16 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
             # print "----- fileobj._id", fileobj._id
+
+
+            '''
+            For server-sync
+            '''
+            # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
+            # can be sent as a mail to the mailing-list
+            if not server_sync:
+              print 'capture_data called'
+              capture_data(file_object=fileobj, file_data=files, content_type=filetype1)
 
 
             return fileobj._id, is_video

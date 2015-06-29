@@ -411,25 +411,6 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                             json_data = json_util.loads(json_data[1:-1])
                             print json_data
                             
-                            # # We need to check from the _type what we have that needs to be saved
-                            # temp_node = node_collection.find_one({'_type': u'GSystem', '_id': json_data['_id'] })
-                            # print '*' * 20
-                            # print 'TEMP_NODE'
-                            # print temp_node
-                            # print '*' * 20
-                            # if temp_node is not None:
-                            #   node_exists = True
-                            #   print '*' * 30
-                            #   print 'exists'
-                            #   print '*' * 30
-                            # else:
-                            #   temp_node = node_collection.collection.GSystem()
-                            
-                            # ''' dictionary updation/creation '''
-                            # for key, values in json_data.items():
-                            #   # if key != 'fs_file_ids':
-                            #   temp_node[key] = values
-                            
                             if file_object_path != '':
                                 
                                 ''' for the creation of the file object '''
@@ -439,7 +420,6 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                                     pass
                                 elif 'image' in json_data['mime_type']:
                                     with open(file_object_path,'rb+') as to_be_saved_file:
-                                        # Check the group_id IMPORTANT
                                         print 'IN IMAGE """""""""""""""""""""""""""""""""""""""""""""""""""""'
                                         req_groupid = None
                                         for obj in json_data["group_set"]:
@@ -452,52 +432,54 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                                         to_be_saved_file = io.BytesIO(to_be_saved_file.read())
                                         to_be_saved_file.name = json_data["name"]
 
-                                        node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True)
+                                        print json_data["_id"] , '<<< JSON_DATA ID'
+                                        node_id, is_video = save_file(to_be_saved_file, json_data["name"], json_data["created_by"], req_groupid, json_data["content_org"], json_data["tags"], json_data["mime_type"].split('/')[1], json_data["language"], username, json_data["access_policy"],server_sync=True,object_id=json_data["_id"],oid=True)
+
+                                        print node_id, '<<< NODE _ID RETURN'
                                         
                                         if type(node_id) == list:
                                             print 'it is node list'
                                             node_id = node_id[1]
                                         
+
                                         print '*' * 20
-                                        print node_id
+                                        print node_id, '<<< NODE _ID'
                                         print '*' * 20
+                                        
                                         node_to_update = node_collection.one({ "_id": node_id })
+                                        
                                         print '*' * 20
                                         print node_to_update
                                         print '*' * 20
+                                        
+                                        print json_data["content"], "<<< Outside"
                                         for key, values in json_data.items():
                                             if key != 'fs_file_ids':
-                                                node_to_update[key] = values
-
-                                        node_to_update.update()
+                                                temp_dict = {}
+                                                temp_dict[key] = values
+                                                node_to_update.update(temp_dict)
                                 else:
+                                    # for pdf and all
                                     pass
                             else:
-                                ''' for pages '''
                                 # We need to check from the _type what we have that needs to be saved
-                                temp_node = node_collection.find_one({'_type': u'GSystem', '_id': json_data['_id'] })
-                                print '*' * 20
-                                print 'TEMP_NODE'
-                                print temp_node
-                                print '*' * 20
+                                temp_node = node_collection.one({"_id" : json_data["_id"]})
+                                print "IN ELSE"
                                 if temp_node is not None:
-                                    node_exists = True
-                                    print '*' * 30
-                                    print 'exists'
-                                    print '*' * 30
+                                    for key, values in json_data.items():
+                                        if key != 'fs_file_ids':
+                                            temp_dict = {}
+                                            temp_dict[key] = values
+                                            temp_node.update(temp_dict)
                                 else:
+                                    # for pages
                                     temp_node = node_collection.collection.GSystem()
                             
-                                ''' dictionary updation/creation '''
-                                for key, values in json_data.items():
-                                    # if key != 'fs_file_ids':
-                                    temp_node[key] = values
+                                    ''' dictionary creation '''
+                                    for key, values in json_data.items():
+                                        temp_node[key] = values
 
-                                print '*' * 30
-                                print temp_node.structure
-                                print '*' * 30
-                            
-                                temp_node.save()
+                                    temp_node.save()
 
                 # To read the mails from the directories
             

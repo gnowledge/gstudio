@@ -125,15 +125,15 @@ def server_sync(func):
         
         if 'image' in content_type:
             # To make the fs_file_ids filed set empty
+            if file_data:
+                node.fs_file_ids = []
+                # pass the image data as attachment
+                file_data.seek(0)
+                # path = default_storage.save(file_path, ContentFile(file_data.read()))
+                with open(file_path,'wb+') as outfile:
+                    outfile.write(file_data.read())
 
-            node.fs_file_ids = []
-            # pass the image data as attachment
-            file_data.seek(0)
-            # path = default_storage.save(file_path, ContentFile(file_data.read()))
-            with open(file_path,'wb+') as outfile:
-                outfile.write(file_data.read())
-
-            mail.attach_file(file_path)
+                mail.attach_file(file_path)
                
 
         elif 'video' in content_type:
@@ -142,9 +142,8 @@ def server_sync(func):
             pass
         else:
             #the other documents which need only the json data to be sent
-            node.fs_file_ids = []
-
             if file_data:
+                node.fs_file_ids = []
                 file_data.seek(0)
                 file_path = gen_path + '/' + str(file_data.name)
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
