@@ -23,12 +23,17 @@
   <header class="row event">
     <section class="medium-12 columns" >
       <h2>
-        <span class='node'>{{node.name}}</span>      
-        <small class="label-list"> 
+        <span class='node'>{{node.name}}
+        {% if "Student" in node.member_of_names_list %}
+          - {{node.enrollment_code}}
+        {% endif %}
+        </span>
+<!--         <small class="label-list"> 
         {% for tag in node.tags %}
         <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
         {% endfor %}
         </small>      
+ -->
       </h2>
 
       <dl class="row tabs" data-tab data-options="deep_linking:true">
@@ -150,7 +155,8 @@
         {{ node.member_of_names_list.0 }} 
         Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
         <br>
-        <small>
+
+<!--         <small>
           <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
           {% for seq_no, version_no in node.version_dict.items|slice:"-6:" reversed %}
           <abbr title="Version #{{version_no}}">
@@ -164,6 +170,7 @@
           </abbr> 
           {% endfor %}
         </small>
+ -->
       </p>
       </div>
 
