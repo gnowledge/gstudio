@@ -367,9 +367,10 @@ def get_possible_batches(request, group_id):
                     for rel in each_batch.relation_set:
                         list_of_members = []
                         if rel and 'has_batch_member' in rel:
+                            print "\n\nrel['has_batch_member']",rel['has_batch_member']
                             list_of_members.append(rel['has_batch_member'])
                             list_of_members.append(str(each_batch._id))
-                    each_batch_dict[each_batch.name] = list_of_members
+                            each_batch_dict[each_batch.name] = list_of_members
                 batch_user_list_dict.append(each_batch_dict)
                 # batch_user_list_dict.append(str(each_batch._id))
         # print "\n\nBatches----------", batch_user_list_dict
