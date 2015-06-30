@@ -447,31 +447,53 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                                     
                                     node_to_update = node_collection.one({ "_id": node_id })
                                     
+                                    temp_dict = {}
                                     for key, values in json_data.items():
                                         if key != 'fs_file_ids':
-                                            temp_dict = {}
+                                            # if key in map(unicode,node_to_update.structure.keys()) and node_to_update.structure[key] is unicode:
+                                                # temp_dict[key] = values
+                                            # else:
+                                                # temp_dict[key] = values
                                             temp_dict[key] = values
-                                            node_to_update.update(temp_dict)
+                                    node_to_update.update(temp_dict)
+                                    node_to_update.save()
                             
                             else:
                                 # We need to check from the _type what we have that needs to be saved
                                 temp_node = node_collection.one({"_id" : json_data["_id"]})
+                                
                                 print "IN ELSE"
+                                
                                 if temp_node is not None:
+                                    print 'already exists and updating'
+                                    print '#' * 20
+                                    print temp_node
+                                    print '#' * 20
+                                    temp_dict = {}
                                     for key, values in json_data.items():
-                                        if key != 'fs_file_ids':
-                                            temp_dict = {}
+                                        if key != u'fs_file_ids':
+                                            # if key in map(unicode,temp_node.structure.keys()) and temp_node.structure[key] is unicode:
+                                                # temp_dict[key] = unicode(values)
+                                            # else:
+                                                # temp_dict[key] = values
                                             temp_dict[key] = values
-                                            temp_node.update(temp_dict)
+
+                                    temp_node.update(temp_dict)
+                                    temp_node.save()
+                                
                                 else:
                                     # for pages
                                     temp_node = node_collection.collection.GSystem()
-                            
+                                
+                                    temp_dict = {}
                                     ''' dictionary creation '''
                                     for key, values in json_data.items():
-                                        temp_dict = {}
+                                        # if key in map(unicode,temp_node.structure.keys()) and temp_node.structure[key] is unicode:
+                                            # temp_node[key] = unicode(values)
+                                        # else:
+                                            # temp_node[key] = values
                                         temp_dict[key] = values
-                                        temp_node.update(temp_dict)
+                                    temp_node.update(temp_dict)
 
                                     temp_node.save()
 

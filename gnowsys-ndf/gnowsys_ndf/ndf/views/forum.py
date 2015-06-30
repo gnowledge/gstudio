@@ -641,6 +641,9 @@ def add_node(request, group_id):
         
         colrep.group_set.append(colg._id)
         colrep.save()
+
+        ''' server_sync '''
+        capture_data(file_object=colrep, file_data=None, content_type='forum_reply')
         # print "----------", colrep._id
         groupname = colg.name
         
@@ -777,6 +780,10 @@ def delete_thread(request,group_id,forum_id,node_id):
     else :
         pass
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    
+    ''' server_sync '''
+    capture_data(file_object=op, file_data=None, content_type='forum_page')
+
     node=node_collection.one({'_id':ObjectId(node_id)})
     forum_threads = []
     exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
