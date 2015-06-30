@@ -83,7 +83,7 @@ def page(request, group_id, app_id=None):
     # Code for user shelf
     shelves = []
     shelf_list = {}
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
