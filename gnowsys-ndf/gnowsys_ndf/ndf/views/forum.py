@@ -916,7 +916,7 @@ def delete_reply(request,group_id,forum_id,thread_id,node_id):
 
     # ??? CHECK
     ''' server_sync '''
-        capture_data(file_object=op, file_data=None, content_type='forum_page')
+    capture_data(file_object=op, file_data=None, content_type='forum_page')
 
     replyobj=node_collection.one({'_id':ObjectId(node_id)})
     forumobj=node_collection.one({"_id": ObjectId(forum_id)})
