@@ -25,6 +25,7 @@ from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete,get_executio
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
+from gnowsys_ndf.ndf.views.methods import create_gattribute, get_group_name_id
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.org2any import org2html
 
@@ -392,32 +393,44 @@ def display_thread(request,group_id, thread_id, forum_id=None):
     '''
     Method to display thread and it's content
     '''
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
-
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
     try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    try:
+
         thread = node_collection.one({'_id': ObjectId(thread_id)})
-        rep_lst=get_all_replies(thread)
-        lst_rep=list(rep_lst)
+        # if thread.attribute_set:
+        #     for attr in thread.attribute_set:
+        #         if attr and 'thread_close_date' in attr:
+        #             thread_close_date_time = attr['thread_close_date']
+        # if thread_close_date_time is not None:
+        #     curr_date_time = datetime.datetime.now()
+        #     if curr_date_time > thread_close_date_time:
+        #         allow_to_reply = False
+        rep_lst, allow_to_rep = get_all_replies(thread,request.user.id)
+        lst_rep = list(rep_lst)
         if lst_rep:
-            reply_count=len(lst_rep)
+            reply_count = len(lst_rep)
         else:
-            reply_count=0
+            reply_count = 0
         # print "reply count=",reply_count
         forum = ""
-        
+
         for each in thread.prior_node:
-            forum=node_collection.one({'$and':[{'member_of': {'$all': [forum_gst._id]}},{'_id':ObjectId(each)}]})
+            forum = node_collection.one({'$and':[{'member_of': {'$all': [forum_gst._id]}},{'_id':ObjectId(each)}]})
             if forum:
                 usrname = User.objects.get(id=forum.created_by).username
                 variables = RequestContext(request,
@@ -425,6 +438,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                                                 'thread':thread,
                                                 'groupid':group_id,
                                                 'group_id':group_id,
+                                                'allowance': allow_to_rep,
                                                 'eachrep':thread,
                                                 'user':request.user,
                                                 'reply_count':reply_count,
@@ -432,7 +446,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                                             })
                 return render_to_response("ndf/thread_details.html",variables)
         usrname = User.objects.get(id=thread.created_by).username
-        variables= RequestContext(request,
+        variables = RequestContext(request,
                                             {   'forum':thread,
                                                 'thread':None,
                                                 'groupid':group_id,
@@ -475,18 +489,19 @@ def create_thread(request, group_id, forum_id):
         colg = node_collection.one({'_id':ObjectId(group_id)})
 
         name = unicode(request.POST.get('thread_name',""))
-        
+        resp = eval(request.POST.get('release_resp',""))
         content_org = request.POST.get('content_org',"")
+        thread_close_date = request.POST.get('thread_close_date', '')
+        if thread_close_date:
+            thread_close_date = datetime.datetime.strptime(thread_close_date, "%d/%m/%Y %H:%M")
 
         # -------------------
         colrep = node_collection.collection.GSystem()
-    
+
         colrep.member_of.append(twist_gst._id)
         #### ADDED ON 14th July
         colrep.access_policy = u"PUBLIC"
         colrep.url = set_all_urls(colrep.member_of)
-        
-        
         colrep.prior_node.append(forum._id)
         colrep.name = name
         if content_org:
@@ -502,9 +517,14 @@ def create_thread(request, group_id, forum_id):
 
         if usrid not in colrep.contributors:
             colrep.contributors.append(usrid)
-        
         colrep.group_set.append(colg._id)
         colrep.save()
+        gattr_rel_resp = node_collection.one({'_type':"AttributeType",'name':'thread_release_response'})
+        gattr_thread_close_date = node_collection.one({'_type':"AttributeType",'name':'thread_close_date'})
+        create_gattribute(colrep._id, gattr_rel_resp, resp)
+        if thread_close_date:
+            create_gattribute(colrep._id, gattr_thread_close_date, thread_close_date)
+
 
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(colrep._id)
