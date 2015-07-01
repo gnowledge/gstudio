@@ -1661,7 +1661,7 @@ ul#navigation li a.last {
 
     {% if topic %}
     
-      location.href = "{% url 'theme_page' group_name_tag theme_id %}?selected="+clicked_node+"";
+      location.href = "{% url 'theme_page' group_name_tag theme_id %}?tree=hierarchical&selected="+clicked_node+"";
 
     {% else %}
 
