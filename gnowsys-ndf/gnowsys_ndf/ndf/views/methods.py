@@ -105,8 +105,10 @@ def server_sync(func):
         mail.to = ['djangotest94@gmail.com']
         mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
 
-        # command = 'gpg --output ' + op_file_name + ' --sign ' + filename
-        # subprocess.call([command],shell=True)
+        ''' Get current date and time to timestamp json and the document being captured by this function.
+         This done so that files in syncdata folder will have unique name'''
+         timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_")
+
 
         ''' To fetch the data about the node '''
         # the actual file
@@ -136,14 +138,6 @@ def server_sync(func):
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
 
-                ''' Run command to sign the file'''
-                # op_file_name = file_path + '.sig'    
-                # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
-                # subprocess.call([command],shell=True)
-                # mail.attach_file(op_file_name)
-
-                mail.attach_file(file_path)
-
         # elif 'video' in content_type:
         #     # on the reciever end send the url
         #     node.fs_file_ids = []
@@ -157,16 +151,23 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
-
-                ''' Run command to sign the file'''
-                # op_file_name = file_path + '.sig'    
-                # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
-                # subprocess.call([command],shell=True)
-                # mail.attach_file(op_file_name)
-
-                mail.attach_file(file_path)
-            # shutil.rmtree(file_path)
         
+        ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
+        /home/tiwari/Desktop/gstd/gstudio/gnowsys-ndf/gnowsys_ndf/ndf
+
+
+        # op_file_name = file_path + '.sig'    
+        # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
+        # subprocess.call([command],shell=True)
+        # path1 = os.path.dirname(__file__)
+        # path2 = os.path.dirname(path1)
+        # dst = str(path2) + "/syncdata/"
+        # src = op_file_name
+        # mail.attach_file(op_file_name)
+        # shutil.move(dst,src)
+        
+        mail.attach_file(file_path)
+
         # node = node_collection.one({'_id': ObjectId(kwargs['node'])})
         # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
         node_json = bson.json_util.dumps(node)
