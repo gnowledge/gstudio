@@ -47,12 +47,11 @@
 #insidediv .user i { border-radius: 50px; margin-left: 5px;}
 </style>
 
-
-{% get_all_replies reply as replies %}
+{% get_all_replies reply user.id as result_set %}
 {% get_agency_type_of_group groupid as group_agency_type %}
 {% user_access_policy groupid user as user_access %}
 
-{% for eachrep in replies %}
+{% for eachrep in result_set.0 %}
 {% get_user_object eachrep.created_by as user_obj %}
 
 <br>
@@ -79,6 +78,7 @@
   </div>
   <br/>
   <div class="large-6 columns">
+    {% if result_set.1 %}
     {% if user.is_authenticated %}
 
       <!-- only for partners group: allow user to add reply even without being member of that partner group -->
@@ -88,6 +88,7 @@
 
       {% endif %}
 
+    {% endif %}
     {% endif %}
 
   </div>
