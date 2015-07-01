@@ -1279,6 +1279,7 @@ def file_detail(request, group_id, _id):
             shelves = []
 
     annotations = json.dumps(file_node.annotations)
+    # print "=== ", type(file_node)
 
     return render_to_response(file_template,
                               { 'node': file_node,
@@ -1385,6 +1386,16 @@ def readDoc(request, _id, group_id, file_name=""):
             return HttpResponse("")
     else:
         return HttpResponse("")
+
+@get_execution_time
+def read_attachment(request, group_id, file_path):
+  file_path = '/' + file_path
+  with open(file_path,'r') as download_file:
+    mime = magic.Magic(mime=True)
+    response = HttpResponse(download_file.read(), content_type=mime.from_file(file_path))
+    response['Content-Disposition'] = 'attachment; filename=' + file_path.split("/")[-1]
+    return response
+
 @get_execution_time
 def file_edit(request,group_id,_id):
     ins_objectid  = ObjectId()
