@@ -102,7 +102,6 @@ def list_activities(request):
 	
 	lst = []
 	for doc in a :
-		print doc
 		lst.append(doc)
 	
 	return render_to_response ("ndf/analytics_list_details.html", { "data" : lst})
@@ -216,7 +215,6 @@ def normalize(cursor) :
 				"group": group_activity,
 		}.get(gapp,default_activity)
 
-
 	filtering_list = ["file/thumbnail",'None','',"home", "image/get_mid_size_img"]
 	temp_doc = { u"calling_url" : None , u'last_update' : datetime.datetime(1900, 1, 1, 11, 19, 54)}
 	for doc in cursor :
@@ -225,10 +223,10 @@ def normalize(cursor) :
 		else :
 			if temp_doc[u'calling_url'] == doc[u'calling_url'] and temp_doc[u'session_key'] == doc[u'session_key'] and (doc[u'last_update'] - temp_doc[u'last_update'] < datetime.timedelta(0,300)):
 				if u'has_data' in doc.keys() and bool(doc[u'has_data']) == 1 :
-					if doc[u'has_data']["POST"] :
+					if doc[u'has_data']["POST"] == True :
 						temp_doc = doc
 					else :
-						if doc[u'has_data']["GET"] :
+						if doc[u'has_data']["GET"] == True :
 							temp_doc = doc
 				else :
 					temp_doc = doc
@@ -239,8 +237,13 @@ def normalize(cursor) :
 					group_id = Gid(url[1])
 					gapp = url[2]
 					gapp_list(gapp)(group_id,url,temp_doc)
-				
 				temp_doc = doc
+
+	if temp_doc[u'calling_url'] != None :
+		url = str(temp_doc[u'calling_url']).split("/")
+		group_id = Gid(url[1])
+		gapp = url[2]
+		gapp_list(gapp)(group_id,url,temp_doc)
 
 	return 1		
 
@@ -261,7 +264,8 @@ def page_activity(group_id,url,doc):
 	analytics_doc.session_key = doc[u'session_key']
 	analytics_doc.group_id = group_id
 	analytics_doc.action = [None]*5
-
+	analytics_doc.args = [None]*5
+	analytics_doc.action[1] = 'page'
 
 	if ins_objectid.is_valid(url[3]) is False :
 		if url[3] == "delete":
@@ -269,6 +273,9 @@ def page_activity(group_id,url,doc):
 				n = node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
 					analytics_doc.action = ["deleted","page"]
+					analytics_doc.args[1] = str(url[3])
+					analytics_doc.save()
+					return 1
 	else :
 		try : 
 			n = node_collection.find_one({"_id":ObjectId(url[3])})
@@ -278,22 +285,36 @@ def page_activity(group_id,url,doc):
 				created_at = n[u'created_at']
 					
 			if (doc[u'last_update'] - created_at).seconds < 5 :
-				analytics_doc.action = ["created","page"]
+				analytics_doc.action[0] = "created"
+				analytics_doc.args[1] = str(url[3])
+				analytics_doc.save()
+				return 1
 			else :
-				analytics_doc.action = ["viewed","page"]
+				analytics_doc.action[0] = "viewed"
+				analytics_doc.args[1] = str(url[3])
+				analytics_doc.save()
+				return 1
 		
 	
 			if  url[3] == "page_publish" :
 				if ins_objectid.is_valid(url[4]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[4])})
 					if n['status']=="PUBLISHED" :
-						analytics_doc.action = ["published","page"]
+						analytics_doc.action[0] = "published"
+						analytics_doc.args[1] = str(url[3])
+						analytics_doc.save()
+						return 1
 
+			if url[3] =="edit" :
+				if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+					analytics_doc.action[0] = 'edit'
+					analytics_doc.args[3] = str(url[4]);
+					analytics_doc.save();
+					return 1
 		except Exception :
 			analytics_doc.action = ["no action"]
-
-
-	analytics_doc.save()
+			analytics_doc.save()
+			return 1
 
 		
 	return 0
@@ -351,41 +372,126 @@ def file_activity(group_id,url,doc):
 	'''
 	return 0
 
-
 def forum_activity(group_id,url,doc):
 	ins_objectid = ObjectId()
-	'''
+	analytics_doc=col.Analytics()
+	analytics_doc.timestamp=doc[u'last_update']
+	analytics_doc.user = doc[u'user'] 
+	analytics_doc.session_key = doc[u'session_key']
+	analytics_doc.group_id = group_id
+	analytics_doc.action = [None]*5
+	analytics_doc.args = [None]*5
+	analytics_doc.action[3] = 'forum'
+	
 	if ins_objectid.is_valid(url[3]) is False:
 		if(url[3]=="delete"):
 			if ins_objectid.is_valid(url[4]) is True:
 				n=node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
-					print "you deleted a forum"
+					analytics_doc.action[0] = 'delete'
+					analytics_doc.args[3] = url[4];
+					analytics_doc.save();
+					return 1
 
 			elif url[4]=="thread":
 				if ins_objectid.is_valid(url[6]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[6])})
 					if n['status']=="HIDDEN" or n['status']=="DELETED":
-						print "you deleted a forum ka thread"
+						analytics_doc.action[0] = 'delete'
+						analytics_doc.action[2] = 'thread'
+						analytics_doc.args[2] = url[6];
+						analytics_doc.args[3] = url[5];
+						analytics_doc.save();
+						return 1
 
 			elif url[4]=="reply":
 				if ins_objectid.is_valid(url[7]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[7])})
 					if n['status']=="HIDDEN" or n['status']=="DELETED":
-						print "you deleted a forum ka thread ka reply"
+						analytics_doc.action[0] = 'delete'
+						analytics_doc.action[2] = 'thread'
+						analytics_doc.action[1] = 'reply'
+						analytics_doc.args[1] = url[7];
+						analytics_doc.args[2] = url[6];
+						analytics_doc.args[3] = url[5];
+						analytics_doc.save();
+						return 1
+
+		elif url[3]=="thread" :
+			try :
+				if ins_objectid.is_valid(url[4]) is True:
+					analytics_doc.action[0] = 'view'
+					analytics_doc.action[2] = 'thread'
+					analytics_doc.args[2] = str(url[4]);
+					analytics_doc.save();
+					return 1
+			except :
+				pass
+
+		elif url[3]=="edit_forum" :
+			if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+				analytics_doc.action[0] = 'edit'
+				analytics_doc.args[3] = str(url[4]);
+				analytics_doc.save();
+				return 1
+
+		elif url[3]=="edit_thread" :
+			if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+				analytics_doc.action[0] = 'edit'
+				analytics_doc.action[2] = 'thread'
+				analytics_doc.args[3] = str(url[4]);
+				analytics_doc.args[2] = str(url[5]);
+				analytics_doc.save();
+				return 1
+
+		elif url[3] == 'add_node' :
+			if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+				analytics_doc.action[0] = 'add'
+				analytics_doc.action[3] = 'reply'
+				analytics_doc.save();
+				return 1
 
 	else:
 		n=node_collection.find_one({"_id":ObjectId(url[3])})
-		author_id=n[u'created_by']
-		auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
-		if auth[u'name']==user:
-			created_at = n[u'created_at']
-			#print (last_update - created_at).seconds
-			if (last_update - created_at).seconds < 5 :
-				print "You created a forum"
-			else :
-				print "You viewed a forum"
-	'''
+		try :
+			if url[4] == 'thread' :
+				if url[5] == 'create' :
+					if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+						try :
+							author = node_collection.find_one({"_type" : "Author", "name" : doc[u'user']})
+						except : 
+							pass
+						if author : 
+							try : 
+								forums = node_collection.find({"url" : "forum/thread" , "created_by" : author[u'created_by']})
+								print forums;
+								for created_forums in forums : 
+									if (doc[u'last_update'] - created_forums[u'created_at']).seconds < 5 : 
+										analytics_doc.action[0] = 'crete'
+										analytics_doc.action[2] = 'thread'
+										analytics_doc.args[2] = str(created_forums[u'_id']);
+										analytics_doc.args[3] = url[3];
+										analytics_doc.save();
+										return 1
+							except : 
+								pass
+
+		except :
+			author_id=n[u'created_by']
+			auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
+			if auth[u'name']==doc[u'user']:
+				created_at = n[u'created_at']
+				if (doc[u'last_update'] - created_at).seconds < 5 :
+					analytics_doc.action[0] = 'create'
+					analytics_doc.args[3] = url[3];
+					analytics_doc.save();
+					return 1
+				else :
+					analytics_doc.action[0] = 'view'
+					analytics_doc.args[3] = url[3];
+					analytics_doc.save();
+					return 1
+
 	return 0
 
 def course_activity(group_id,url,doc):
