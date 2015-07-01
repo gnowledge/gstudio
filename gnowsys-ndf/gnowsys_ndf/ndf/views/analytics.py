@@ -97,98 +97,113 @@ def list_activities(request):
 		start_date = datetime.datetime.now() - datetime.timedelta(7)
 		end_date = datetime.datetime.now()
 	
-	a = collection.find({"user" : request.user.username, "last_update": {"$gt":start_date,"$lt":end_date}}).sort("last_update",-1)
+	query("user",{ "username" : request.user.username })
+	a = db['Analytic_col'].find({"user" : request.user.username}).sort("timestamp",-1)
 	
 	lst = []
 	for doc in a :
+		print doc
 		lst.append(doc)
-	#print a
+	
+	return render_to_response ("ndf/analytics_list_details.html", { "data" : lst})
 
-	#print(lst[0][u'user'])
-	#print(a.toArray())
-
-
-
-	return render_to_response ("ndf/analytics_list_details.html",
-															{ "data" : lst})
 
 def session_summary(request):
-	#a = collection.find({"user" : request.user.username}).sort("last_update",-1)
-	#print a
+	query("user",{ "username" : request.user.username })
+	a = db['Analytic_col'].find({"user" : request.user.username}).sort("timestamp",-1)
+	
 	lst = []
 	sessions_list =[]
 	d={}
 	i=-1
-	#normalize(a)
-	'''
+	
 	for doc in a :
-		#print '\n'+str(doc)
-		lst.append(doc)
-		sk = str(doc[u"session_key"])
+		print '\n'+str(doc)
+		'''
+		sk = str(doc.session_key)
 		if i!=-1 and d['session_key']==sk :
-			sessions_list[i]["end_date"]	= doc[u"last_update"]		
+			sessions_list[i]["end_date"] = doc.timestamp	
 			sessions_list[i]["activities"]	+= 1
 			sessions_list[i]["duration"] = sessions_list[i]["end_date"] - sessions_list[i]["start_date"]
 		else :
 			d= {}
 			i+=1
 			d["session_key"]=sk
-			d["start_date"]	= doc[u"last_update"]
+			d["start_date"]	= doc.timestamp
 			d["activities"]	= 1
-			d["user"]	= doc[u"user"]
+			d["user"]	= doc.user
 			sessions_list.append(d)
-	'''
-	query("user", {"username" : request.user.username})
-
+		'''
+	
 	return render_to_response("ndf/analytics_summary.html",
 															{ "data" : sessions_list})
 
-	
-Analytics_collection = db['Analytic_col']														
-															
-						
-# to see the data in analytics  
-def query(analytics_type,details) :
-	
-	if analytics_type == "user" :
-		a = Analytics_collection.find({"user" : str(details['username']) }).sort("last_update",-1).limit(1)
-		timestamp = datetime.datetime(1900,1,1)
-		if a is None :
-			pass
-		else :
-			for doc in a :
-				#print doc['timestamp']
-				timestamp = doc['timestamp']
-				break
-		a = collection.find({"user" : details['username'], "last_update": {"$gt":timestamp}}).sort("last_update",-1)
-		if a is None:
-			print "your Analytics is up to date"
-		else :
-			normalize(a)
 
-	else :
-		group_id = details['group_id']	
-		n = node_collection.find_one({"_id" : group_id})
-		if n is not None :
-			member_list = n[u'author_set'] + n[u'group_admin']
-			for member in member_list :
-				author_name = node_collection.find_one({"_type" : "Author", "created_by" : int(member)})
-				if author_name is not None :
-					#print author_name[u'name']
-					query("user",{"username" : author_name[u'name'] })
+
 
 def group_analytics(request):
-	query("group",{"group_id" : ObjectId("558a60be9928ec1dc22e5e62")})
+	query("group",{"group_id" : ObjectId("55717125421aa91eecbf8843")})
 
 	return(HttpResponse ("Hi"))
 
 
 
-
-
+	
+Analytics_collection = db['Analytic_col']														
 															
-def normalize(a) :
-	a=a.sort("last_update",1)
+	
+
+
+def query(analytics_type,details) :
+	'''
+	This function checks the Analytics data(for a user) in Analytic_col and gets the time to which the query set is updated. 
+	Based on the time, it fetches raw data from Benchmark collection and hands over to normalize to do the filtering and redundancy check.
+	
+	In case, the analytics_type is 'group', the function resolves the members of the group and calls itself recursively for each user, to update the Analytic_col.
+	
+	'''
+
+	if analytics_type == "user" :
+		cursor = Analytics_collection.find({"user" : str(details['username']) }).sort("timestamp",-1).limit(1)
+		latest_timestamp = datetime.datetime(1900,1,1)
+		if cursor is None :
+			pass
+		else :
+			for doc in cursor :
+				latest_timestamp = doc['timestamp']
+				break
+		
+		raw_data = collection.find({"user" : details['username'], "last_update": {"$gt":latest_timestamp}}).sort("last_update",-1)
+		if raw_data is None:
+			pass
+		else :
+			normalize(raw_data)
+
+	else :
+		group_id = details['group_id']	
+		group_node = node_collection.find_one({"_id" : group_id})
+		if group_node is not None :
+			member_list = group_node[u'author_set'] + group_node[u'group_admin']
+			for member in member_list :
+				author = node_collection.find_one({"_type" : "Author", "created_by" : int(member)})
+				if author is not None :
+					query("user",{"username" : author[u'name'] })
+
+	return 1
+
+
+def normalize(cursor) :
+	'''
+		Normailizes the raw data from Benchmark collection so as to filter irrelevent content - 
+		* filtering_list is the list of unwanted actions that gets filtered out
+		* for documents having the same structure, only one is taken to remove redundancy
+
+		Based on the GAPP name, the document is passed to functions in 'gapp_list' for further analysis
+
+	'''
+
+	cursor = cursor.sort("last_update",1)
+	
 	def gapp_list(gapp):
 		return {
 				"page": page_acti,
@@ -203,19 +218,14 @@ def normalize(a) :
 				#"video": video_acti,
 		}.get(gapp,default_acti)
 
-	segre1 = ["file/thumbnail",'None','',"home", "image/get_mid_size_img"]
+
+	filtering_list = ["file/thumbnail",'None','',"home", "image/get_mid_size_img"]
 	temp_doc = { u"calling_url" : None , u'last_update' : datetime.datetime(1900, 1, 1, 11, 19, 54)}
-	for doc in a :
-		#removing the doc with useless urls
-		if 'ajax' in str(doc[u'action']) or str(doc[u'action']) in segre1 :
+	for doc in cursor :
+		if 'ajax' in str(doc[u'action']) or str(doc[u'action']) in filtering_list :
 			pass
 		else :
-			# removing the redundant sequence of docs
-
-			# refining the data based on the calling url, session key, and the time between accessing reourse
-			if temp_doc[u'calling_url'] == doc[u'calling_url']  and (doc[u'last_update'] - temp_doc[u'last_update'] < datetime.timedelta(0,300)):
-				
-				# prioritizing between the docs based on the POST and GET data
+			if temp_doc[u'calling_url'] == doc[u'calling_url'] and temp_doc[u'session_key'] == doc[u'session_key'] and (doc[u'last_update'] - temp_doc[u'last_update'] < datetime.timedelta(0,300)):
 				if u'has_data' in doc.keys() and bool(doc[u'has_data']) == 1 :
 					if doc[u'has_data']["POST"] :
 						temp_doc = doc
@@ -227,31 +237,13 @@ def normalize(a) :
 			
 			else :
 				if temp_doc[u'calling_url'] != None :
-					#print temp_doc[u'calling_url']
-					try :
-						pass
-						#print temp_doc[u'has_data']
-					except : 
-						pass
 					url = str(temp_doc[u'calling_url']).split("/")
 					group_id = Gid(url[1])
 					gapp = url[2]
 					gapp_list(gapp)(url,temp_doc[u'last_update'],temp_doc[u'user'])
-				
 				temp_doc = doc
-			
-		
 
-					
-		#gapp_list(gapp)(url,prev_url,doc[u'last_update'],doc[u'user'])
-				
-		
-				
-
-
-
-			
-	return 0
+	return 1		
 
 
 def page_acti(url,last_update,user):

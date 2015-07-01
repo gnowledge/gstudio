@@ -69,35 +69,26 @@ def get_execution_time(f):
 	        benchmark_node.time_taken = unicode(str(time_diff))
 	        benchmark_node.name = unicode(f.func_name)
 	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
-	        
-	        # Determine if POST or GET data is available with the request
 	        try :
 	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
 	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
 	        except : 
 	        	pass
-	        
-	        # Determine if session_key is available with the request
 	        try :
 	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
 	        except : 
 	        	pass
-
-	        # Determine if username is available with the request
 	        try :
 	        	benchmark_node.user = unicode(args[0].user.username)
 	        except :
 	        	pass
-	        
 	        benchmark_node.parameters = unicode(total_param)
 	        benchmark_node.size_of_parameters = unicode(total_parm_size)
 	        benchmark_node.last_update = datetime.today()
-	        #benchmark_node.functionOplength = unicode(getsizeof(ret))
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
 	        	url = benchmark_node.calling_url.split("/")
-
-
+	        	
 	        	if url[1] != "" : 
 	        		group = url[1]
 	        		benchmark_node.group = group
@@ -119,8 +110,6 @@ def get_execution_time(f):
 		        		benchmark_node.action +=  str('/'+url[3])
 		        	else : 
 		        		pass
-
-
 	        except : 
 	        	pass
 	        benchmark_node.save()
