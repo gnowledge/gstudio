@@ -224,6 +224,7 @@ def read_mails(path, _type, displayFrom):
 
         for temp_mail in required_mails:
             temp = {}
+            temp_list = []
             msg = p.parse(open(join(new_path, temp_mail)))
             for key in msg.keys():
                 if key == 'Attachments':
@@ -233,6 +234,16 @@ def read_mails(path, _type, displayFrom):
                         temp[key] = []
                 else:       
                     temp[key] = msg[key]
+            
+            for attachment_path in temp["Attachments"]:
+                if attachment_path != '':
+                    _name = attachment_path.split("/")[-1]
+                    temp_list.append(_name)
+
+            temp["attachment_filename"] = temp_list
+
+            print temp["attachment_filename"], "<<< ATTACH"
+
             temp['text'] = msg.get_payload()
             temp['file_name'] = temp_mail
             mails_list.append(temp)
@@ -251,6 +262,7 @@ def read_mails(path, _type, displayFrom):
 
         for temp_mail in required_mails:
             temp = {}
+            temp_list = []
             msg = p.parse(open(join(cur_path,temp_mail)))
             for key in msg.keys():
                 if key == 'Attachments':
@@ -260,6 +272,13 @@ def read_mails(path, _type, displayFrom):
                         temp[key] = []
                 else:       
                     temp[key] = msg[key]
+
+            for attachment_path in temp["Attachments"]:
+                if attachment_path != '':
+                    _name = attachment_path.split("/")[-1]
+                    temp_list.append(_name)
+
+            temp["attachment_filename"] = temp_list
             temp['text'] = msg.get_payload()
             mails_list.append(temp)
 
@@ -409,7 +428,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                             json_data = json_file.read()
                             json_data=json_data.replace('\\"','"').replace('\\\\"','\'').replace('\\\n','').replace('\\\\n','')
                             json_data = json_util.loads(json_data[1:-1])
-                            print json_data
+                            # print json_data
                             
                             if file_object_path != '':
                                 ''' for the creation of the file object '''
@@ -446,13 +465,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                                 # We need to check from the _type what we have that needs to be saved
                                 temp_node = node_collection.one({"_id" : json_data["_id"]})
                                 
-                                print "IN ELSE"
-                                
                                 if temp_node is not None:
-                                    print 'already exists and updating'
-                                    print '#' * 20
-                                    print temp_node
-                                    print '#' * 20
                                     temp_dict = {}
                                     for key, values in json_data.items():
                                         if key != u'fs_file_ids':
