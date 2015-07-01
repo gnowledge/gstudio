@@ -138,7 +138,13 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                                         'meta_type':'factory_types'}},
                            {'entry_list':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
                                           'data_type':'basestring',
-                                          'meta_type':'factory_types'}}]
+                                          'meta_type':'factory_types'}},
+                           {'thread_release_response':{'gsystem_names_list':['Twist'],
+                                        'data_type':'bool',
+                                        'meta_type':'factory_types'}},
+                           {'thread_close_date':{'gsystem_names_list':['Twist'],
+                                        'data_type':'datetime.datetime',
+                                        'meta_type':'factory_types'}}]
 
 # the following types are useful when BibApp's second phase
 # development begins. Currently this data is not set as attributes
