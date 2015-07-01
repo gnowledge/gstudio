@@ -138,14 +138,16 @@
 <!-- end of head block -->
 
 <!-- <input type="button" id="reply_forum{{eachrep}}" value="Reply" class="button"/> -->
-{% get_all_replies eachrep as rep_cnt %}
-<input type="hidden" id="replycount{{eachrep}}" style="visibility:hidden" value="{{rep_cnt.count}}">
+{% get_all_replies eachrep request.user.id as result_set %}
+<input type="hidden" id="replycount{{eachrep}}" style="visibility:hidden" value="{{result_set.0.count}}">
 <div class="row">
-  <div class="small-2 columns">
-    <button id="reply_forum{{eachrep}}" class="button large postfix" style="height: 2.5em;">
-      Reply  &nbsp;|&nbsp; <i class="fi-refresh"></i>
-    </button>
- </div>
+  {% if result_set.1 %}
+    <div class="small-2 columns">
+      <button id="reply_forum{{eachrep}}" class="button large postfix" style="height: 2.5em;">
+        Reply  &nbsp;|&nbsp; <i class="fi-refresh"></i>
+      </button>
+   </div>
+ {% endif %}
     {% get_group_name groupid as group_name_tag %}
 
    {% if eachrep.created_by == user_obj.id %}
