@@ -162,23 +162,31 @@
                 {{thread_content|truncatewords:25}}
               {% endwith %}
             </td>
-          
-            <td class="text-center">{{ each.thread_reply_count }}</td>
-            <td>
-              <div class="row">
-                <div class="small-3 columns">
-                  <a class="user"></a>
-                  <br/>
-                  <i class="gray-text">{{ each.latest_reply.user|truncatechars:10 }}</i>                  
-                </div>
-                <div class="small-9 columns">
-                  {{ each.latest_reply.content_org|truncatechars:25 }}
-                  <br/>
-                  <span class="gray-text">{{ each.latest_reply.last_update }}</span>
-                </div>
-              </div>
 
-            </td>
+            <td class="text-center">{{ each.thread_reply_count }}</td>
+            {% get_attribute_value each.pk 'thread_release_response' as resp_val %}
+              <td>
+              {% check_is_gstaff groupid request.user as gstaff_access %}
+              {% if resp_val or each.latest_reply.user == request.user.username or gstaff_access %}
+                <div class="row">
+                  <div class="small-3 columns">
+                    <a class="user"></a>
+                    <br/>
+                    <i class="gray-text">{{ each.latest_reply.user|truncatechars:10 }}</i>
+                  </div>
+                  <div class="small-9 columns">
+                    {{ each.latest_reply.content_org|truncatechars:25 }}
+                    <br/>
+                    <span class="gray-text">{{ each.latest_reply.last_update }}</span>
+                  </div>
+                </div>
+
+              {% else %}
+                  <div class="small-9 columns">
+                    <span class="gray-text">Hidden</span>
+                  </div>
+              {% endif %}
+              </td>
           </tr>
 
         {% endfor %}
