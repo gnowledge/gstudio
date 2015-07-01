@@ -192,6 +192,7 @@ def query(analytics_type,details) :
 	return 1
 
 
+
 def normalize(cursor) :
 	'''
 		Normailizes the raw data from Benchmark collection so as to filter irrelevent content - 
@@ -203,20 +204,17 @@ def normalize(cursor) :
 	'''
 
 	cursor = cursor.sort("last_update",1)
-	
 	def gapp_list(gapp):
 		return {
-				"page": page_acti,
-				"file": file_acti,
-				"course": course_acti,
-				"forum": forum_acti,
-				"task": task_acti,
-				"event": event_acti,
-				"dashboard": dashbard_acti,
-				"group": group_acti,
-				#"image": image_acti,
-				#"video": video_acti,
-		}.get(gapp,default_acti)
+				"page": page_activity,
+				"file": file_activity,
+				"course": course_activity,
+				"forum": forum_activity,
+				"task": task_activity,
+				"event": event_activity,
+				"dashboard": dashbard_activity,
+				"group": group_activity,
+		}.get(gapp,default_activity)
 
 
 	filtering_list = ["file/thumbnail",'None','',"home", "image/get_mid_size_img"]
@@ -240,69 +238,78 @@ def normalize(cursor) :
 					url = str(temp_doc[u'calling_url']).split("/")
 					group_id = Gid(url[1])
 					gapp = url[2]
-					gapp_list(gapp)(url,temp_doc[u'last_update'],temp_doc[u'user'])
+					gapp_list(gapp)(group_id,url,temp_doc)
+				
 				temp_doc = doc
 
 	return 1		
 
+				
+def page_activity(group_id,url,doc):
+	'''
+	This function updates the Analytic_col database with the new activities done on the 
+	page of MetaStudio, and also to see whether the page is published,deleted we
+    check the status in the Nodes collection of database.
+	And also we are assuming here that if the difference between the last update and created at 
+	is less than 5 seconds then we should have created the page else we must have viewed the page.
+	'''
 
-def page_acti(url,last_update,user):
 	ins_objectid = ObjectId()
-	if ins_objectid.is_valid(url[3]) is False:
+	analytics_doc=col.Analytics()
+	analytics_doc.timestamp=doc[u'last_update']
+	analytics_doc.user = doc[u'user'] 
+	analytics_doc.session_key = doc[u'session_key']
+	analytics_doc.group_id = group_id
+	analytics_doc.action = [None]*5
+
+
+	if ins_objectid.is_valid(url[3]) is False :
 		if url[3] == "delete":
 			if ins_objectid.is_valid(url[4]) is True:
-				n=node_collection.find_one({"_id":ObjectId(url[4])})
+				n = node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
-					print "you deleted a page"
-
-
+					analytics_doc.action = ["deleted","page"]
 	else :
 		try : 
 			n = node_collection.find_one({"_id":ObjectId(url[3])})
 			author_id = n[u'created_by']
 			auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
-			if auth[u'name']==user:
+			if auth[u'name']==doc[u'user']:
 				created_at = n[u'created_at']
-			#print (last_update - created_at).seconds
-			
-			if (last_update - created_at).seconds < 5 :
-				print "You created a page"
+					
+			if (doc[u'last_update'] - created_at).seconds < 5 :
+				analytics_doc.action = ["created","page"]
 			else :
-				print "You viewed a page"
-		except :
-			pass
+				analytics_doc.action = ["viewed","page"]
+		
 	
-		if  url[3] == "page_publish" :
-			if ins_objectid.is_valid(url[4]) is True:
-				n=node_collection.find_one({"_id":ObjectId(url[4])})
-				if n['status']=="PUBLISHED" :
-					print "you published a page"
+			if  url[3] == "page_publish" :
+				if ins_objectid.is_valid(url[4]) is True:
+					n=node_collection.find_one({"_id":ObjectId(url[4])})
+					if n['status']=="PUBLISHED" :
+						analytics_doc.action = ["published","page"]
+
+		except Exception :
+			analytics_doc.action = ["no action"]
 
 
-		''' elif ins_objectid.is_valid(url[3]) is True:
-				n=node_collection.find_one({"_id":ObjectId(url[3])})
-				if url[4] == "translate" :
-					print "you translated a page"
-	'''
-
+	analytics_doc.save()
 
 		
 	return 0
 
 	
-def file_acti(url,last_update,user):
+def file_activity(group_id,url,doc):
 	ins_objectid= ObjectId()
 	analytics_doc=col.Analytics()
-	analytics_doc.timestamp=last_update
-	analytics_doc.user = user 
-	
+	analytics_doc.timestamp=doc[u'last_update']
+	analytics_doc.user = doc[u'user'] 
+	analytics_doc.session_key = doc[u'session_key']
+	'''
 	if(url[3]=="submit"):
 		print "you uploaded a file"
 		analytics_doc.action="you uploaded a file"
-		
-
-	#elif(url[3]=="uploadDoc"):
-		#pass
+	
 	elif(url[3]=="readDoc"):
 		print "you downloaded the doc "+ url[5]
 		analytics_doc.action="you downloaded a file"
@@ -338,16 +345,16 @@ def file_acti(url,last_update,user):
 	
 	else:
 		print url
-		analytics_doc.action="no action"
+		analytics_doc.action = "no action"
 	
 	analytics_doc.save()
-	
+	'''
 	return 0
 
 
-def forum_acti(url,last_update,user):
-	
+def forum_activity(group_id,url,doc):
 	ins_objectid = ObjectId()
+	'''
 	if ins_objectid.is_valid(url[3]) is False:
 		if(url[3]=="delete"):
 			if ins_objectid.is_valid(url[4]) is True:
@@ -378,31 +385,31 @@ def forum_acti(url,last_update,user):
 				print "You created a forum"
 			else :
 				print "You viewed a forum"
-
+	'''
 	return 0
 
-def course_acti(url,last_update,user):
+def course_activity(group_id,url,doc):
 	return 0
 
-def task_acti(url,last_update,user):
+def task_activity(group_id,url,doc):
 	return 0
 
-def event_acti(url,last_update,user):
+def event_activity(group_id,url,doc):
 	return 0
 
-def dashbard_acti(url,last_update,user):
+def dashbard_activity(group_id,url,doc):
 	return 0
 
-def group_acti(url,last_update,user):
+def group_activity(group_id,url,doc):
 	return 0
 
-def image_acti(url,last_update,user):
+def image_activity(group_id,url,doc):
 	return 0
 
-def video_acti(url,last_update,user):
+def video_activity(group_id,url,doc):
 	return 0
 
-def default_acti(url,last_update,user):
+def default_activity(group_id,url,doc):
 	pass
 	return 0
 
