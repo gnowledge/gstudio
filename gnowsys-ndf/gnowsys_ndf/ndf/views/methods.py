@@ -107,7 +107,7 @@ def server_sync(func):
 
         ''' Get current date and time to timestamp json and the document being captured by this function.
          This done so that files in syncdata folder will have unique name'''
-         timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_")
+        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_")
 
 
         ''' To fetch the data about the node '''
@@ -137,6 +137,7 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
+                mail.attach_file(file_path)
 
         # elif 'video' in content_type:
         #     # on the reciever end send the url
@@ -151,11 +152,10 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
+                mail.attach_file(file_path)
         
         ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
-        /home/tiwari/Desktop/gstd/gstudio/gnowsys-ndf/gnowsys_ndf/ndf
-
-
+        
         # op_file_name = file_path + '.sig'    
         # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
         # subprocess.call([command],shell=True)
@@ -166,7 +166,7 @@ def server_sync(func):
         # mail.attach_file(op_file_name)
         # shutil.move(dst,src)
         
-        mail.attach_file(file_path)
+        
 
         # node = node_collection.one({'_id': ObjectId(kwargs['node'])})
         # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
