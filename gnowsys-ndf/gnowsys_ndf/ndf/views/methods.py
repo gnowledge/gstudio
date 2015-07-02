@@ -95,6 +95,7 @@ import shutil
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
+
 def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
@@ -123,6 +124,7 @@ def server_sync(func):
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
         gen_path = os.path.abspath(os.path.dirname(settings_dir3))
+        file_path = ""
         if file_data:
             file_path = gen_path + '/' + str(file_data.name)
         node_data_path = gen_path + '/node_data.json'
@@ -137,12 +139,8 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
-                mail.attach_file(file_path)
 
-        # elif 'video' in content_type:
-        #     # on the reciever end send the url
-        #     node.fs_file_ids = []
-        #     pass
+
         else:
             #the other documents which need only the json data to be sent
             if file_data:
@@ -152,38 +150,34 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
-                mail.attach_file(file_path)
         
         ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
-        
-        # op_file_name = file_path + '.sig'    
-        # command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
-        # subprocess.call([command],shell=True)
-        # path1 = os.path.dirname(__file__)
-        # path2 = os.path.dirname(path1)
-        # dst = str(path2) + "/syncdata/"
-        # src = op_file_name
-        # mail.attach_file(op_file_name)
-        # shutil.move(dst,src)
-        
-        
+        path1 = os.path.dirname(__file__)
+        path2 = os.path.dirname(path1)
+        dst = str(path2) + "/syncdata"
+        if not os.path.exists(dst):
+            os.makedirs(dst)
 
-        # node = node_collection.one({'_id': ObjectId(kwargs['node'])})
-        # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
+        if file_data:
+            op_file_name = file_path.split(file_data.name)[0]+ timestamp + '_' + file_data.name + '.sig'
+            command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
+            subprocess.call([command],shell=True)    
+            src = op_file_name
+            shutil.move(src,dst)
+            mail.attach_file(file_path)         
+        
         node_json = bson.json_util.dumps(node)
-
-        
-        
-        # # node_json = json.dumps(node)
         with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
         
-        ''' Run command to sign the file'''
-        # json_op_file_name = node_data_path + '.sig'    
-        # command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
-        # subprocess.call([command],shell=True)
+        ''' Run command to sign the json file, rename and move to syncdata folder'''
+        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '.sig'
+        command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
+        subprocess.call([command],shell=True)
+        src = json_op_file_name
+        shutil.move(src,dst)
         # mail.attach_file(json_op_file_name)
-
+        
         mail.attach_file(node_data_path)
         mail.subject = subject + str(node._id)
         mail.send()
@@ -193,9 +187,7 @@ def server_sync(func):
         if file_data:
             os.remove(file_path)
             # os.remove(op_file_name)
-
         return ret
-
     return wrap
 
 @get_execution_time
