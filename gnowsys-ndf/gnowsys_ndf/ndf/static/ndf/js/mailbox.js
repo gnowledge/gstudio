@@ -6,6 +6,7 @@ var mailbox_name;
 var userName;
 var CSRFtoken;
 var countValue = 20;
+
 function countInitialize(){
 	Readstart = 0;
 	Unreadstart = 0;
