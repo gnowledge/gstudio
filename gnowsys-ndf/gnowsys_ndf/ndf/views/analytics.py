@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import pymongo
+import re
 
 
 ''' -- imports from installed packages -- '''
@@ -140,10 +141,62 @@ def session_summary(request):
 
 
 
-def group_analytics(request):
-	query("group",{"group_id" : ObjectId("55717125421aa91eecbf8843")})
+def group_summary(request,group_id):
+	group_id=ObjectId("5583c42b9e745633325439d0")
+	query("group",{ "group_id" : group_id })
+	a = db['Analytic_col'].find({"group_id" : str(group_id)}).sort("timestamp",-1)
 
-	return(HttpResponse ("Hi"))
+	lst = []
+	for doc in a :
+		lst.append(doc)
+	sessions_list =[]
+	d={}
+	i=-1
+	'''
+	for doc in a :
+		print '\n'+str(doc)
+	'''
+	
+	num_of_forums=db['Nodes'].find({"url":"forum", "group_set":group_id, "status":"DRAFT"}).count()	
+	print num_of_forums
+	num_of_threads=db['Nodes'].find({"url":"forum/thread", "group_set":group_id, "status":"DRAFT"}).count()
+	print "\n" + str(num_of_threads)
+
+	regx=re.compile("^Reply of:.*")
+
+	num_of_replies=db['Nodes'].find({"name": regx,"group_set":group_id, "status":"DRAFT"}).count()
+	print "\n" + str(num_of_replies)
+
+	num_of_files=db['Nodes'].find({"url":"file", "group_set":group_id, "status":"PUBLISHED"}).count()
+	print "\n" + str(num_of_files)
+
+	num_of_pages=db['Nodes'].find({"url":"page", "group_set":group_id, "status":"PUBLISHED"}).count()
+	print "\n" + str(num_of_pages)
+		
+		
+		
+	return (HttpResponse("hello"))
+	#return render_to_response("ndf/analytics_summary.html",
+															#{ "data" : sessions_list})
+	
+	
+
+
+	
+
+def group_list_activities(request,group_id):
+	group_id=ObjectId("5583c42b9e745633325439d0")
+	query("group",{ "group_id" : group_id })
+	a = db['Analytic_col'].find({"group_id" : str(group_id)}).sort("timestamp",-1)
+	lst=[]
+
+	for doc in a:
+		lst.append(doc)
+
+	return render_to_response("ndf/analytics_list_group_details.html",
+															{ "data" : lst})
+	
+		
 
 
 
@@ -325,6 +378,7 @@ def file_activity(group_id,url,doc):
 	ins_objectid= ObjectId()
 	analytics_doc=col.Analytics()
 	analytics_doc.timestamp=doc[u'last_update']
+	analytics_doc.session_key=doc[u'session_key']
 	analytics_doc.user = doc[u'user'] 
 	analytics_doc.group_id = group_id
 	analytics_doc.action=[None]*5
@@ -475,7 +529,7 @@ def forum_activity(group_id,url,doc):
 						if author : 
 							try : 
 								forums = node_collection.find({"url" : "forum/thread" , "created_by" : author[u'created_by']})
-								print forums;
+								
 								for created_forums in forums : 
 									if (doc[u'last_update'] - created_forums[u'created_at']).seconds < 5 : 
 										analytics_doc.action[0] = 'crete'
