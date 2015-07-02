@@ -266,18 +266,35 @@ def page_activity(group_id,url,doc):
 	analytics_doc.group_id = group_id
 	analytics_doc.action = [None]*5
 	analytics_doc.args = [None]*5
-	analytics_doc.action[1] = 'page'
+	analytics_doc.action[1] = "page"
 
-	if ins_objectid.is_valid(url[3]) is False :
-		if url[3] == "delete":
-			if ins_objectid.is_valid(url[4]) is True:
-				n = node_collection.find_one({"_id":ObjectId(url[4])})
-				if n['status']=="HIDDEN" or n['status']=="DELETED":
-					analytics_doc.action = ["deleted","page"]
-					analytics_doc.args[1] = str(url[3])
-					analytics_doc.save()
-					return 1
-	else :
+	
+	if url[3] == "delete":
+		if ins_objectid.is_valid(url[4]) is True:
+			n = node_collection.find_one({"_id":ObjectId(url[4])})
+			if n['status']=="HIDDEN" or n['status']=="DELETED":
+				analytics_doc.action[0] = "delete"
+				analytics_doc.args[1] = str(url[4])
+				analytics_doc.save()
+				return 1
+
+	elif  url[3] == "page_publish" :
+		if ins_objectid.is_valid(url[4]) is True:
+			n=node_collection.find_one({"_id":ObjectId(url[4])})
+			if n['status']=="PUBLISHED" :
+				analytics_doc.action[0] = "publish"
+				analytics_doc.args[1] = str(url[4])
+				analytics_doc.save()
+				return 1
+
+	elif url[3] =="edit" :
+		if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
+			analytics_doc.action[0] = "edit"
+			analytics_doc.args[3] = str(url[4]);
+			analytics_doc.save();
+			return 1
+		
+	else:
 		try : 
 			n = node_collection.find_one({"_id":ObjectId(url[3])})
 			author_id = n[u'created_by']
@@ -286,38 +303,22 @@ def page_activity(group_id,url,doc):
 				created_at = n[u'created_at']
 					
 			if (doc[u'last_update'] - created_at).seconds < 5 :
-				analytics_doc.action[0] = "created"
+				analytics_doc.action[0] = "create"
 				analytics_doc.args[1] = str(url[3])
 				analytics_doc.save()
 				return 1
 			else :
-				analytics_doc.action[0] = "viewed"
+				analytics_doc.action[0] = "view"
 				analytics_doc.args[1] = str(url[3])
 				analytics_doc.save()
 				return 1
-		
-			if  url[3] == "page_publish" :
-				if ins_objectid.is_valid(url[4]) is True:
-					n=node_collection.find_one({"_id":ObjectId(url[4])})
-					if n['status']=="PUBLISHED" :
-						analytics_doc.action[0] = "published"
-						analytics_doc.args[1] = str(url[3])
-						analytics_doc.save()
-						return 1
 
-			if url[3] =="edit" :
-				if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
-					analytics_doc.action[0] = 'edit'
-					analytics_doc.args[3] = str(url[4]);
-					analytics_doc.save();
-					return 1
 		except Exception :
-			analytics_doc.action = ["no action"]
-			analytics_doc.save()
-			return 1
+			pass
 
 		
 	return 0
+
 
 	
 def file_activity(group_id,url,doc):
@@ -378,7 +379,9 @@ def file_activity(group_id,url,doc):
 
 	
 	analytics_doc.save()
+
 	return 0
+
 
 def forum_activity(group_id,url,doc):
 	ins_objectid = ObjectId()
@@ -441,6 +444,7 @@ def forum_activity(group_id,url,doc):
 				analytics_doc.args[3] = str(url[4]);
 				analytics_doc.save();
 				return 1
+
 
 		elif url[3]=="edit_thread" :
 			if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
