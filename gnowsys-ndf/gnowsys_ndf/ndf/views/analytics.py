@@ -110,7 +110,7 @@ def list_activities(request):
 def session_summary(request):
 	query("user",{ "username" : request.user.username })
 	a = db['Analytic_col'].find({"user" : request.user.username}).sort("timestamp",-1)
-	
+
 	lst = []
 	sessions_list =[]
 	d={}
@@ -216,6 +216,7 @@ def normalize(cursor) :
 		}.get(gapp,default_activity)
 
 	filtering_list = ["file/thumbnail",'None','',"home", "image/get_mid_size_img"]
+
 	temp_doc = { u"calling_url" : None , u'last_update' : datetime.datetime(1900, 1, 1, 11, 19, 54)}
 	for doc in cursor :
 		if 'ajax' in str(doc[u'action']) or str(doc[u'action']) in filtering_list :
@@ -295,7 +296,6 @@ def page_activity(group_id,url,doc):
 				analytics_doc.save()
 				return 1
 		
-	
 			if  url[3] == "page_publish" :
 				if ins_objectid.is_valid(url[4]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[4])})
@@ -325,51 +325,59 @@ def file_activity(group_id,url,doc):
 	analytics_doc=col.Analytics()
 	analytics_doc.timestamp=doc[u'last_update']
 	analytics_doc.user = doc[u'user'] 
-	analytics_doc.session_key = doc[u'session_key']
-	'''
-	if(url[3]=="submit"):
-		print "you uploaded a file"
-		analytics_doc.action="you uploaded a file"
+	analytics_doc.group_id = group_id
+	analytics_doc.action=[None]*5
+	analytics_doc.args=[None]*5
+	analytics_doc.action[2]="file"
+
 	
+	
+	if(url[3]=="submit"):
+		analytics_doc.action[0]="upload"
+		
+		
 	elif(url[3]=="readDoc"):
-		print "you downloaded the doc "+ url[5]
-		analytics_doc.action="you downloaded a file"
+		analytics_doc.action[0]="download"
+		analytics_doc.action[3]=url[5]
+		analytics_doc.args[2]=str(url[4])
 
 	elif url[3]=="details":
 		if(ins_objectid.is_valid(url[4])):
 			n=node_collection.find_one({"_id":ObjectId(url[4])})
 			try :
-				print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
-				analytics_doc.action="you viewed a file"
+				analytics_doc.args[2]=str(url[4])
+				analytics_doc.action[0]="view"
+				analytics_doc.action[1]=str(n[u"mime_type"])
+				analytics_doc.action[3]=str(n[u"name"]) 
 			except Exception :
-				pass
+				return 0
 
 	elif(ins_objectid.is_valid(url[3])):
 		n=node_collection.find_one({"_id":ObjectId(url[3])})
 		try :
-			print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
-			analytics_doc.action="you viewed a file"
+			analytics_doc.action[0] = "view"
+			analytics_doc.args[2] = str(url[3])
+			analytics_doc.action[1] = str(n[u"mime_type"]) 
+			analytics_doc.action[3] = str(n[u"name"]) 
 		except Exception :
-			analytics_doc.action="no action"
+			return 0
 
 	elif(url[3]=="delete"):
 			if ins_objectid.is_valid(url[4]) is True:
 				n=node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
-					print "you deleted a file"
-					analytics_doc.action="you deleted a file"
+					analytics_doc.action[0]="delete"
+					analytics_doc.args[2]=str(url[4])
 	
 	elif(url[3]=="edit" or url[3]=="edit_file"):
 			if ins_objectid.is_valid(url[4]) is True:
-				print "you edited a file"
-				analytics_doc.action="you edited a file"
-	
+				analytics_doc.action[0] = "edit"
+				analytics_doc.args[2] = str(url[4])
 	else:
-		print url
-		analytics_doc.action = "no action"
+		return 0
+
 	
 	analytics_doc.save()
-	'''
 	return 0
 
 def forum_activity(group_id,url,doc):
@@ -392,7 +400,6 @@ def forum_activity(group_id,url,doc):
 					analytics_doc.args[3] = url[4];
 					analytics_doc.save();
 					return 1
-
 			elif url[4]=="thread":
 				if ins_objectid.is_valid(url[6]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[6])})
@@ -429,14 +436,14 @@ def forum_activity(group_id,url,doc):
 				pass
 
 		elif url[3]=="edit_forum" :
-			if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+			if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 				analytics_doc.action[0] = 'edit'
 				analytics_doc.args[3] = str(url[4]);
 				analytics_doc.save();
 				return 1
 
 		elif url[3]=="edit_thread" :
-			if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+			if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 				analytics_doc.action[0] = 'edit'
 				analytics_doc.action[2] = 'thread'
 				analytics_doc.args[3] = str(url[4]);
@@ -445,7 +452,7 @@ def forum_activity(group_id,url,doc):
 				return 1
 
 		elif url[3] == 'add_node' :
-			if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+			if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 				analytics_doc.action[0] = 'add'
 				analytics_doc.action[3] = 'reply'
 				analytics_doc.save();
@@ -456,7 +463,7 @@ def forum_activity(group_id,url,doc):
 		try :
 			if url[4] == 'thread' :
 				if url[5] == 'create' :
-					if doc[u'has_data'] and doc[u'has_data']["POST"] == True :
+					if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 						try :
 							author = node_collection.find_one({"_type" : "Author", "name" : doc[u'user']})
 						except : 

@@ -1568,7 +1568,7 @@ class Analytics(DjangoDocument):
     'session_key' : basestring
   }
 
-  required_fields = ['timestamp','action']
+  required_fields = ['timestamp']
   use_dot_notation = True
 
   def __unicode__(self):
