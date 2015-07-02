@@ -158,12 +158,16 @@ def server_sync(func):
         if not os.path.exists(dst):
             os.makedirs(dst)
 
+        path_for_this_capture = dst + '/' + timestamp
+        if not os.path.exists(path_for_this_capture):
+            os.makedirs(path_for_this_capture)
+
         if file_data:
             op_file_name = file_path.split(file_data.name)[0]+ timestamp + '_' + file_data.name + '.sig'
             command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
             subprocess.call([command],shell=True)    
             src = op_file_name
-            shutil.move(src,dst)
+            shutil.move(src,path_for_this_capture)
             mail.attach_file(file_path)         
         
         node_json = bson.json_util.dumps(node)
@@ -175,12 +179,12 @@ def server_sync(func):
         command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
         subprocess.call([command],shell=True)
         src = json_op_file_name
-        shutil.move(src,dst)
+        shutil.move(src,path_for_this_capture)
         # mail.attach_file(json_op_file_name)
         
         mail.attach_file(node_data_path)
         mail.subject = subject + str(node._id)
-        mail.send()
+        #mail.send()
 
         os.remove(node_data_path)
         # os.remove(json_op_file_name)
