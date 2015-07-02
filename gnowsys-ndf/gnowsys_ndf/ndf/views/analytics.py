@@ -113,8 +113,8 @@ def list_activities(request):
 															{ "data" : lst})
 
 def session_summary(request):
-	#a = collection.find({"user" : request.user.username}).sort("last_update",-1)
-	#print a
+	a = collection.find({"user" : request.user.username}).sort("last_update",-1)
+	print a
 	lst = []
 	sessions_list =[]
 	d={}
@@ -151,7 +151,7 @@ Analytics_collection = db['Analytic_col']
 def query(analytics_type,details) :
 	
 	if analytics_type == "user" :
-		a = Analytics_collection.find({"user" : str(details['username']) }).sort("last_update",-1).limit(1)
+		a = Analytics_collection.find({"user" : str(details['username']) }).sort("timestamp",-1).limit(1)
 		timestamp = datetime.datetime(1900,1,1)
 		if a is None :
 			pass
@@ -178,7 +178,7 @@ def query(analytics_type,details) :
 					query("user",{"username" : author_name[u'name'] })
 
 def group_analytics(request):
-	query("group",{"group_id" : ObjectId("558a60be9928ec1dc22e5e62")})
+	query("group",{"group_id" : ObjectId("5583c42b9e745633325439d0")})
 
 	return(HttpResponse ("Hi"))
 
@@ -191,17 +191,17 @@ def normalize(a) :
 	a=a.sort("last_update",1)
 	def gapp_list(gapp):
 		return {
-				"page": page_acti,
-				"file": file_acti,
-				"course": course_acti,
-				"forum": forum_acti,
-				"task": task_acti,
-				"event": event_acti,
-				"dashboard": dashbard_acti,
-				"group": group_acti,
-				#"image": image_acti,
-				#"video": video_acti,
-		}.get(gapp,default_acti)
+				"page": page_activity,
+				"file": file_activity,
+				"course": course_activity,
+				"forum": forum_activity,
+				"task": task_activity,
+				"event": event_activity,
+				"dashboard": dashbard_activity,
+				"group": group_activity,
+				#"image": image_activity,
+				#"video": video_activity,
+		}.get(gapp,default_activity)
 
 	segre1 = ["file/thumbnail",'None','',"home", "image/get_mid_size_img"]
 	temp_doc = { u"calling_url" : None , u'last_update' : datetime.datetime(1900, 1, 1, 11, 19, 54)}
@@ -236,7 +236,7 @@ def normalize(a) :
 					url = str(temp_doc[u'calling_url']).split("/")
 					group_id = Gid(url[1])
 					gapp = url[2]
-					gapp_list(gapp)(url,temp_doc[u'last_update'],temp_doc[u'user'])
+					gapp_list(gapp)(group_id,url,temp_doc)
 				
 				temp_doc = doc
 			
@@ -254,7 +254,9 @@ def normalize(a) :
 	return 0
 
 
-def page_acti(url,last_update,user):
+def page_activity(group_id,url,doc):
+	pass
+	'''
 	ins_objectid = ObjectId()
 	if ins_objectid.is_valid(url[3]) is False:
 		if url[3] == "delete":
@@ -287,93 +289,103 @@ def page_acti(url,last_update,user):
 					print "you published a page"
 
 
-		''' elif ins_objectid.is_valid(url[3]) is True:
-				n=node_collection.find_one({"_id":ObjectId(url[3])})
-				if url[4] == "translate" :
-					print "you translated a page"
-	'''
-
+		
+		'''
 
 		
 	return 0
 
 	
-def file_acti(url,last_update,user):
+def file_activity(group_id,url,doc):
 	ins_objectid= ObjectId()
 	analytics_doc=col.Analytics()
-	analytics_doc.timestamp=last_update
-	analytics_doc.user = user 
+	analytics_doc.timestamp=doc[u'last_update']
+	analytics_doc.user = doc[u'user'] 
+	analytics_doc.group_id = group_id
+	analytics_doc.action=[None]*5
+	analytics_doc.args=[None]*5
+	analytics_doc.action[2]="file"
+
+	
 	
 	if(url[3]=="submit"):
-		print "you uploaded a file"
-		analytics_doc.action="you uploaded a file"
+		analytics_doc.action[0]="Uploaded "
+		
 		
 
-	#elif(url[3]=="uploadDoc"):
-		#pass
 	elif(url[3]=="readDoc"):
-		print "you downloaded the doc "+ url[5]
-		analytics_doc.action="you downloaded a file"
+		analytics_doc.action[0]="Downloaded "
+		analytics_doc.action[3]=url[5]
+		analytics_doc.args[2]=str(url[4])
 
 	elif url[3]=="details":
 		if(ins_objectid.is_valid(url[4])):
 			n=node_collection.find_one({"_id":ObjectId(url[4])})
 			try :
-				print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
-				analytics_doc.action="you viewed a file"
+				analytics_doc.args[2]=str(url[4])
+				analytics_doc.action[0]="viewed "
+				analytics_doc.action[1]=str(n[u"mime_type"]) + "  "
+				analytics_doc.action[3]=str(n[u"name"]) + " "
 			except Exception :
-				pass
+				return 0
 
 	elif(ins_objectid.is_valid(url[3])):
 		n=node_collection.find_one({"_id":ObjectId(url[3])})
 		try :
-			print "you viewed a " + str(n[u"mime_type"]) + "  " + str(n[u"name"])
-			analytics_doc.action="you viewed a file"
+			analytics_doc.action[0] = "viewed "
+			analytics_doc.args[2] = str(url[3])
+			analytics_doc.action[1] = str(n[u"mime_type"]) + "  "
+			analytics_doc.action[3] = str(n[u"name"]) + " "
 		except Exception :
-			analytics_doc.action="no action"
+			return 0
 
 	elif(url[3]=="delete"):
 			if ins_objectid.is_valid(url[4]) is True:
 				n=node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
-					print "you deleted a file"
-					analytics_doc.action="you deleted a file"
+					analytics_doc.action[0]="Deleted "
+					analytics_doc.args[2]=str(url[4])
 	
 	elif(url[3]=="edit" or url[3]=="edit_file"):
 			if ins_objectid.is_valid(url[4]) is True:
-				print "you edited a file"
-				analytics_doc.action="you edited a file"
-	
+				analytics_doc.action[0] = "Edited"
+				analytics_doc.args[2] = str(url[4])
 	else:
-		print url
-		analytics_doc.action="no action"
+		return 0
+
 	
 	analytics_doc.save()
 	
 	return 0
 
 
-def forum_acti(url,last_update,user):
+def forum_activity(group_id,url,doc):
+	pass
+	'''ins_objectid= ObjectId()
+	analytics_doc=col.Analytics()
+	analytics_doc.timestamp=doc[u'last_update']
+	analytics_doc.user = doc[u'user'] 
 	
-	ins_objectid = ObjectId()
+
 	if ins_objectid.is_valid(url[3]) is False:
 		if(url[3]=="delete"):
 			if ins_objectid.is_valid(url[4]) is True:
 				n=node_collection.find_one({"_id":ObjectId(url[4])})
 				if n['status']=="HIDDEN" or n['status']=="DELETED":
-					print "you deleted a forum"
+					analytics_doc.action="Deleted a forum"
+					 
 
 			elif url[4]=="thread":
 				if ins_objectid.is_valid(url[6]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[6])})
 					if n['status']=="HIDDEN" or n['status']=="DELETED":
-						print "you deleted a forum ka thread"
+						analytics_doc.action="Deleted a forum ka thread"
 
 			elif url[4]=="reply":
 				if ins_objectid.is_valid(url[7]) is True:
 					n=node_collection.find_one({"_id":ObjectId(url[7])})
 					if n['status']=="HIDDEN" or n['status']=="DELETED":
-						print "you deleted a forum ka thread ka reply"
+						analytics_doc.action="Deleted a forum ka thread ka reply"
 
 	else:
 		n=node_collection.find_one({"_id":ObjectId(url[3])})
@@ -386,31 +398,31 @@ def forum_acti(url,last_update,user):
 				print "You created a forum"
 			else :
 				print "You viewed a forum"
-
+'''
 	return 0
 
-def course_acti(url,last_update,user):
+def course_activity(group_id,url,doc):
 	return 0
 
-def task_acti(url,last_update,user):
+def task_activity(group_id,url,doc):
 	return 0
 
-def event_acti(url,last_update,user):
+def event_activity(group_id,url,doc):
 	return 0
 
-def dashbard_acti(url,last_update,user):
+def dashbard_activity(group_id,url,doc):
 	return 0
 
-def group_acti(url,last_update,user):
+def group_activity(group_id,url,doc):
 	return 0
 
-def image_acti(url,last_update,user):
+def image_activity(group_id,url,doc):
 	return 0
 
-def video_acti(url,last_update,user):
+def video_activity(group_id,url,doc):
 	return 0
 
-def default_acti(url,last_update,user):
+def default_activity(group_id,url,doc):
 	pass
 	return 0
 

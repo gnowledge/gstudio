@@ -1561,13 +1561,14 @@ class Analytics(DjangoDocument):
 
   structure = {
     'timestamp': datetime.datetime,
-    'action' : basestring,
+    'action' : list,
     'args' : list,
     'user' : basestring,
+    'group_id' : basestring,
     'session_key' : basestring
   }
 
-  required_fields = ['timestamp','action']
+  required_fields = ['timestamp']
   use_dot_notation = True
 
   def __unicode__(self):
