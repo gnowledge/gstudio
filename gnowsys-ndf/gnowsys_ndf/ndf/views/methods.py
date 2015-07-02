@@ -177,6 +177,10 @@ def server_sync(func):
 @get_execution_time
 @server_sync
 def capture_data(file_object=None, file_data=None, content_type=None):
+    '''
+    Serves as an itermediate function to capture the node details and allow
+    the decorator to send the created/updated node through E-Mail
+    '''
     pass
 
 
@@ -931,6 +935,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
                 user_group_location[
                     'visited_location'] = user_last_visited_location
                 user_group_location.save()
+                
+                ''' server_sync '''
+                capture_data(file_object=user_group_location, file_data=None, content_type='user_group_creation')
 
     if is_changed:
         node.status = unicode("DRAFT")
@@ -1503,9 +1510,13 @@ def update_mobwrite_content_org(node_system):
         textobj = TextObj.objects.get(filename=filename)
         textobj.text = content_org
         textobj.save()
+        ''' server_sync '''
+        capture_data(file_object=textobj, file_data=None, content_type='update_mobwrite_content_org')
     else:
         textobj = TextObj(filename=filename, text=content_org)
         textobj.save()
+        ''' server_sync '''
+        capture_data(file_object=textobj, file_data=None, content_type='update_mobwrite_content_org')
     return textobj
 
 
@@ -1636,6 +1647,8 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
             gr_node.right_subject = ObjectId(relation_id)
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            ''' server_sync '''
+            capture_data(file_object=gr_node, file_data=None, content_type='grelation_list_creation')
 
 
 @get_execution_time
@@ -2008,6 +2021,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
             ga_node.object_value = object_value
             ga_node.save()
+            ''' server_sync '''
+            capture_data(file_object=ga_node, file_data=None, content_type='gattribute_create')
 
             if object_value == u"None":
                 info_message = " GAttribute (" + ga_node.name + \
@@ -2039,6 +2054,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                 ga_node.status = u"DELETED"
                 ga_node.save()
+                
+                ''' server_sync '''
+                capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
+                
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
@@ -2085,6 +2104,9 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                     if ga_node.status == u"DELETED":
                         ga_node.status = u"PUBLISHED"
                         ga_node.save()
+                        
+                        ''' server_sync '''
+                        capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
 
                         info_message = " GAttribute (" + ga_node.name + \
                             ") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
@@ -2099,6 +2121,9 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                     else:
                         ga_node.status = u"PUBLISHED"
                         ga_node.save()
+                        ''' server_sync '''
+                        capture_data(file_object=ga_node, file_data=None, content_type='gattribute_publish')
+
 
                         info_message = " GAttribute (" + \
                             ga_node.name + ") updated successfully.\n"
@@ -2159,6 +2184,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            ''' server_sync '''
+            capture_data(file_object=gr_node, file_data=None, content_type='grelation_create')
+
             
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
@@ -2229,6 +2257,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text):
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+
+            ''' server_sync '''
+            capture_data(file_object=gr_node, file_data=None, content_type='gattribute_update_delete_to_published')
 
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
@@ -2359,6 +2390,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # right_subject_id_or_list.remove(n.right_subject)
                     n.status = u"DELETED"
                     n.save()
+        
+                    ''' server_sync '''
+                    capture_data(file_object=n, file_data=None, content_type='deletion')
+
                     info_message = " MultipleGRelation: GRelation (" + n.name + \
                         ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
@@ -2469,6 +2504,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         node.status = u"DELETED"
                         node.save()
 
+                        ''' server_sync '''
+                        capture_data(file_object=node, file_data=None, content_type='delete')
+
                         node_collection.collection.update({
                             '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
                         }, {
@@ -2570,6 +2608,9 @@ def create_discussion(request, group_id, node_id):
 
             thread_obj.save()
 
+            ''' server_sync '''
+            capture_data(file_object=thread_obj, file_data=None, content_type='discussion_create')
+            
             # creating GRelation
             # create_grelation(node_id, relation_type, twist_st)
             response_data = ["thread-created", str(thread_obj._id)]
@@ -2628,6 +2669,9 @@ def discussion_reply(request, group_id, node_id):
 
             # saving the reply obj
             reply_obj.save()
+
+            ''' server_sync '''
+            capture_data(file_object=reply_obj, file_data=None, content_type='discussion_reply')
 
             formated_time = reply_obj.created_at.strftime(
                 "%B %d, %Y, %I:%M %p")
@@ -2908,6 +2952,9 @@ def create_task(task_dict, task_type_creation="single"):
     # GAttribute(s)/GRelation(s)
     task_node.status = u"PUBLISHED"
     task_node.save()
+
+    ''' server_sync '''
+    capture_data(file_object=task_node, file_data=None, content_type='task_create')
 
     # Create GAttribute(s)/GRelation(s)
     for attr_or_rel_name in task_dict_keys:
@@ -3226,6 +3273,9 @@ def create_college_group_and_setup_data(college_node):
         gfc.contributors = [creator_and_modifier]
         gfc.status = u"PUBLISHED"
         gfc.save()
+
+        ''' server_sync '''
+        capture_data(file_object=gfc, file_data=None, content_type='college_group_create')
 
     if "_id" in gfc:
         has_group_rt = node_collection.one(
@@ -3702,6 +3752,9 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
 
         gr_node.status = u"DELETED"
         gr_node.save()
+        
+        ''' server_sync '''
+        capture_data(file_object=gr_node, file_data=None, content_type='delete_node')
 
     try:
         # print "\n 1 >> Begin..."
@@ -4100,6 +4153,9 @@ def delete_node(
                 # Only changes the status of given node to DELETED
                 node_to_be_deleted.status = u"DELETED"
                 node_to_be_deleted.save()
+                
+                ''' server_sync '''
+                capture_data(file_object=node_to_be_deleted, file_data=None, content_type='delete_node')
 
             # Perform Purge operation on deleting-node
             if deletion_type == 1:

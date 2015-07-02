@@ -320,6 +320,9 @@ def edit_forum(request,group_id,forum_id):
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
         colf.save()
+        
+        ''' server_sync '''
+        capture_data(file_object=colf, file_data=None, content_type='forum_edit')
 
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
@@ -735,7 +738,12 @@ def delete_forum(request,group_id,node_id,relns=None):
     else :
         pass
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    
     node=node_collection.one({'_id':ObjectId(node_id)})
+    
+    ''' server_sync '''
+    capture_data(file_object=node, file_data=None, content_type='forum_delete')
+
     #send notifications to all group members
     colg=node_collection.one({'_id':ObjectId(group_id)})
     for each in colg.author_set:
@@ -780,15 +788,16 @@ def delete_thread(request,group_id,forum_id,node_id):
     else :
         pass
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
-    
-    ''' server_sync '''
-    capture_data(file_object=op, file_data=None, content_type='forum_page')
 
     node=node_collection.one({'_id':ObjectId(node_id)})
     forum_threads = []
     exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
     exstng_reply.sort('created_at')
     forum_node=node_collection.one({'_id':ObjectId(forum_id)})
+
+    ''' server_sync '''
+    capture_data(file_object=node, file_data=None, content_type='thread_delete')
+
     for each in exstng_reply:
         forum_threads.append(each.name)
     #send notifications to all group members
@@ -860,7 +869,7 @@ def edit_thread(request,group_id,forum_id,thread_id):
         thread.save() 
 
         ''' server_sync '''
-        capture_data(file_object=thread, file_data=None, content_type='forum_page')
+        capture_data(file_object=thread, file_data=None, content_type='thread_edit')
 
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(thread._id)
         for each in colg.author_set:
@@ -922,10 +931,11 @@ def delete_reply(request,group_id,forum_id,thread_id,node_id):
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
 
     # ??? CHECK
-    ''' server_sync '''
-    capture_data(file_object=op, file_data=None, content_type='forum_page')
-
     replyobj=node_collection.one({'_id':ObjectId(node_id)})
+    
+    ''' server_sync '''
+    capture_data(file_object=replyobj, file_data=None, content_type='forum_page')
+
     forumobj=node_collection.one({"_id": ObjectId(forum_id)})
     threadobj=node_collection.one({"_id": ObjectId(thread_id)})
     # notifications to all group members
