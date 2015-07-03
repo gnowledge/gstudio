@@ -58,12 +58,16 @@ class Command(BaseCommand):
 				tstamp = folder_name
 				mail.subject= "SYNCDATA_"+tstamp
 
+				folder_empty = 1
 				for filename in list_of_syncdata_files:
 					file_path = path + '/' + filename
 					mail.attach_file(file_path)
+					folder_empty = 0
 					print file_path
 
 				mail.from_email = "Gstudio <t.metastudio@gmail.com>"
 				mail.to = ['djangotest94@gmail.com']
-				mail.send()
+				if folder_empty == 0:
+					mail.send()
+					
 				shutil.move(path,sent_folder_path)
