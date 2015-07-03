@@ -396,18 +396,11 @@ def server_sync(mail,username):
         ''' Code to decrypt every attachment and create a list with the file paths of decrypted attachments'''
         list_of_decrypted_attachments = []
         for attachment in all_attachments:
-            print '--'*30
-            print attachment
             filename = attachment.document.path
-            print filename
             op_file_name = filename.split('_sig')[0]
-            print op_file_name
             command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
             subprocess.call([command],shell=True)
             list_of_decrypted_attachments.append(op_file_name)
-
-        print '**'*30
-        print list_of_decrypted_attachments
 
         for file_path in list_of_decrypted_attachments:
             if file_path[-4:] == 'json':

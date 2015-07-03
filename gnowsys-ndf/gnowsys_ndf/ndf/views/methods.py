@@ -163,7 +163,10 @@ def server_sync(func):
             os.makedirs(path_for_this_capture)
 
         if file_data:
-            op_file_name = file_path.split(file_data.name)[0]+ timestamp + '_' + file_data.name + '.sig'
+            #add _sig otherwise django_mailbox scrambles file name
+            # this '_sig' is later used to split the filename and obtain original file name in received attachments in 
+            # 'server_sync()' function of mailclient.py views file
+            op_file_name = file_path.split(file_data.name)[0]+ timestamp + '_' + file_data.name + '_sig'
             command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
             subprocess.call([command],shell=True)    
             src = op_file_name
@@ -175,7 +178,8 @@ def server_sync(func):
             json.dump(node_json, outfile)
         
         ''' Run command to sign the json file, rename and move to syncdata folder'''
-        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '.sig'
+        #add _sig otherwise django_mailbox scrambles file name
+        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
         command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
         subprocess.call([command],shell=True)
         src = json_op_file_name
