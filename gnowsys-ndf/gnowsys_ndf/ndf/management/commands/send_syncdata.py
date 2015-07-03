@@ -67,24 +67,3 @@ class Command(BaseCommand):
 				mail.to = ['djangotest94@gmail.com']
 				mail.send()
 				shutil.move(path,sent_folder_path)
-
-		# for filename in list_of_syncdata_files:
-		# 	if connected_to_internet() is True:
-		# 		mail = EmailMessage()
-		# 		tstamp = filename[0:19]
-		# 		mail.subject= "SYNCDATA_"+tstamp
-		# 		file_path = syncdata_folder_path + "/" + filename
-		# 		mail.attach_file(file_path)
-		# 		mail.from_email = "Gstudio <t.metastudio@gmail.com>"
-		# 		mail.to = ['djangotest94@gmail.com']
-		# 		mail.send()
-		# 		print file_path + '----------sent'
-		# 		print '**'*30
-		# 		shutil.move(file_path,sent_folder_path)
-		# 	else:
-		# 		print "syncdata_sending_stopped"
-
-
-
-		# command = 'bash'+ ' ' + path1 + ' ' + path2
-		# call([command],shell=True)
