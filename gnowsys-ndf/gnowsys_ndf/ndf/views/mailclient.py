@@ -404,6 +404,9 @@ def server_sync(mail):
             subprocess.call([command],shell=True)
             list_of_decrypted_attachments.append(op_file_name)
 
+        print '##**'*30
+        print list_of_decrypted_attachments
+        
         for file_path in list_of_decrypted_attachments:
             if file_path[-4:] == 'json':
                 json_file_path = file_path
@@ -417,6 +420,7 @@ def server_sync(mail):
             json_data = json_util.loads(json_data[1:-1])
             # print json_data
                             
+            cursor= None                            
             try:
                 settings_dir1 = os.path.dirname(__file__)
                 settings_dir2 = os.path.dirname(settings_dir1)
@@ -425,7 +429,7 @@ def server_sync(mail):
                 #may throw error        
                 conn = sqlite3.connect(path + '/example-sqlite3.db')
                 user_id = json_data[u'created_by']
-                query = 'select username from auth_user where user_id=\''+user_id+'\''
+                query = 'select username from auth_user where id=\''+str(user_id)+'\''
                 cursor = conn.execute(query)
 
             except Exception as error:
