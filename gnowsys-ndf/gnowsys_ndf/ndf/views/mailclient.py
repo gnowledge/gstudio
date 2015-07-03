@@ -385,13 +385,15 @@ def store_mails(mails, path):
             mbox.unlock()
     return
 
-def server_sync(mail,username):
+def server_sync(mail):
     if 'SYNCDATA' in mail.subject:
         all_attachments = mail.attachments.all()
         all_attachments_path = []
                         
         json_file_path = ''
         file_object_path = ''
+
+        
 
         ''' Code to decrypt every attachment and create a list with the file paths of decrypted attachments'''
         list_of_decrypted_attachments = []
@@ -415,6 +417,24 @@ def server_sync(mail,username):
             json_data = json_util.loads(json_data[1:-1])
             # print json_data
                             
+            try:
+                settings_dir1 = os.path.dirname(__file__)
+                settings_dir2 = os.path.dirname(settings_dir1)
+                settings_dir3 = os.path.dirname(settings_dir2)
+                path = os.path.abspath(os.path.dirname(settings_dir3))
+                #may throw error        
+                conn = sqlite3.connect(path + '/example-sqlite3.db')
+                user_id = json_data[u'created_by']
+                query = 'select username from auth_user where user_id=\''+user_id+'\''
+                cursor = conn.execute(query)
+
+            except Exception as error:
+                print error
+            
+            username=None
+            for row in cursor:
+                username = row[0]    
+            
             if file_object_path != '':
                 ''' for the creation of the file object '''
                 with open(file_object_path,'rb+') as to_be_saved_file:
@@ -538,7 +558,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                 # To manage the mails that comes as a part of the server-sync technique
                 for mail in all_mails:
                     #pass username which is later used by save_file function
-                    server_sync(mail,username)
+                    server_sync(mail)
 
                 # To read the mails from the directories
                 print 'STORING NEW MAILS'
