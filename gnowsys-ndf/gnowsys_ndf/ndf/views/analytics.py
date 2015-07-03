@@ -34,7 +34,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 # from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
-from gnowsys_ndf.ndf.views.methods import create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_gattribute, get_group_name_id
 
 col = db[Analytics.collection_name]
 
@@ -372,9 +372,16 @@ def page_activity(group_id,url,doc):
 		
 	return 0
 
-
-	
 def file_activity(group_id,url,doc):
+	'''
+	This function updates the Analytic_col database with the new activities done on the 
+	files of MetaStudio, and also to see whether the file is published, deleted, uploaded we
+    check the status in the Nodes collection of database.
+	And also we are assuming here that if the difference between the last update and created at 
+	is less than 5 seconds then we should have created the page else we must have viewed the page.
+	
+	'''
+
 	ins_objectid= ObjectId()
 	analytics_doc=col.Analytics()
 	analytics_doc.timestamp=doc[u'last_update']
@@ -385,11 +392,8 @@ def file_activity(group_id,url,doc):
 	analytics_doc.args=[None]*5
 	analytics_doc.action[2]="file"
 
-	
-	
 	if(url[3]=="submit"):
 		analytics_doc.action[0]="upload"
-		
 		
 	elif(url[3]=="readDoc"):
 		analytics_doc.action[0]="download"
@@ -433,11 +437,15 @@ def file_activity(group_id,url,doc):
 
 	
 	analytics_doc.save()
-
-	return 0
-
+	return 1
 
 def forum_activity(group_id,url,doc):
+	'''
+	The function analyzes the forum activities of the user. 
+	It takes in the raw normalized document from the normalize() function and analyzes the doc for activities like create, delete, view forums, thread, reply etc.  
+	The analyzed data is stored in the Analytics collection.
+	'''
+
 	ins_objectid = ObjectId()
 	analytics_doc=col.Analytics()
 	analytics_doc.timestamp=doc[u'last_update']
@@ -559,17 +567,120 @@ def forum_activity(group_id,url,doc):
 
 	return 0
 
-def course_activity(group_id,url,doc):
+def task_activity(group_id,url,doc):
+	
+	ins_objectid = ObjectId()
+	analytics_doc=col.Analytics()
+	analytics_doc.timestamp=doc[u'last_update']
+	analytics_doc.user = doc[u'user'] 
+	analytics_doc.session_key = doc[u'session_key']
+	analytics_doc.group_id = group_id
+	analytics_doc.action = [None]*5
+	analytics_doc.args = [None]*5
+	analytics_doc.action[3] = 'task'
+	
+	if ins_objectid.is_valid(url[3]) is False:
+		if(url[3]=="delete_task"):
+			if ins_objectid.is_valid(url[4]) is True:
+				analytics_doc.action[0] = 'delete'
+				analytics_doc.args[3] = url[4];
+				analytics_doc.save();
+				return 1
+
+
+		elif url[3]=="edit":
+			if ins_objectid.is_valid(url[4]) is True:
+				if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
+					analytics_doc.action[0] = 'edit'
+					analytics_doc.args[3] = str(url[4]);
+					analytics_doc.save();
+					return 1
+
+		elif url[3]=="task" :
+			if url[4] == "saveimage" :
+				if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
+					analytics_doc.action[0] = 'save image'
+					analytics_doc.save()
+					return 1
+
+	else:
+		n=node_collection.find_one({"_id":ObjectId(url[3])})
+		try :
+			author_id=n[u'created_by']
+			auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
+			if auth[u'name']==doc[u'user']:
+				created_at = n[u'created_at']
+				if (doc[u'last_update'] - created_at).seconds < 5 :
+					analytics_doc.action[0] = 'create'
+					analytics_doc.args[3] = url[3];
+					analytics_doc.save();
+					return 1
+				else :
+					analytics_doc.action[0] = 'view'
+					analytics_doc.args[3] = url[3];
+					analytics_doc.save();
+					return 1
+		except : 
+			analytics_doc.action[0] = 'view'
+			analytics_doc.args[3] = url[3];
+			analytics_doc.save();
+			return 1
+
 	return 0
 
-def task_activity(group_id,url,doc):
+def dashbard_activity(group_id,url,doc):
+	ins_objectid = ObjectId()
+	analytics_doc=col.Analytics()
+	analytics_doc.timestamp=doc[u'last_update']
+	analytics_doc.user = doc[u'user'] 
+	analytics_doc.session_key = doc[u'session_key']
+	analytics_doc.group_id = group_id
+	analytics_doc.action = [None]*5
+	analytics_doc.args = [None]*5
+	analytics_doc.action[3] = 'dashboard'
+
+	print url
+
+	try :
+		if(url[3] == 'group') :
+			analytics_doc.action[0] = 'view'
+			analytics_doc.action[1] = 'group'
+			print 'a group'
+			try :
+				group_name, group_id = get_group_name_id(url[1])
+				print 'reaching'
+				analytics_doc.args[1] = str(group_id)
+				analytics_doc.args[3] = group_name
+				analytics_doc.save()
+				return 1
+			except :
+				pass
+
+	except :
+		print 'user'
+		try :
+			user = node_collection.find_one({ "_type": "Author", "created_by" : int(url[1])})
+			try :
+				analytics_doc.action[0] = 'view'
+				analytics_doc.action[1] = 'user'
+				analytics_doc.args[1] = url[1]
+				analytics_doc.args[3] = user[u'name']
+				analytics_doc.save();
+				return 1
+
+			except :
+				pass
+		except :
+			pass
+			
+		
+
+def course_activity(group_id,url,doc):
 	return 0
 
 def event_activity(group_id,url,doc):
 	return 0
 
-def dashbard_activity(group_id,url,doc):
-	return 0
 
 def group_activity(group_id,url,doc):
 	return 0
