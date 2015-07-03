@@ -101,10 +101,10 @@ def server_sync(func):
         ret = func(*args, **kwargs)
 
         ''' The mails that would be sent '''
-        mail = EmailMessage()
-        subject = "SYNCDATA"
-        mail.to = ['djangotest94@gmail.com']
-        mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+        # mail = EmailMessage()
+        # subject = "SYNCDATA"
+        # mail.to = ['djangotest94@gmail.com']
+        # mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
 
         ''' Get current date and time to timestamp json and the document being captured by this function.
          This done so that files in syncdata folder will have unique name'''
@@ -119,17 +119,30 @@ def server_sync(func):
         # content-type of the file
         content_type = kwargs['content_type'] 
 
-        ''' path where the json file that contains the information about node is loated ''' 
+        ''' path where the json file that contains the information about node is located ''' 
         settings_dir1 = os.path.dirname(__file__)
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
         gen_path = os.path.abspath(os.path.dirname(settings_dir3))
+
+        print '+' * 20
+        print gen_path
+
         file_path = ""
+        file_name_filtered = ''
         if file_data:
-            file_path = gen_path + '/' + str(file_data.name)
-        node_data_path = gen_path + '/node_data.json'
-        subject += str(node._id)
+            file_name = file_data.name
+            special_char = ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}',' ']
+            for i in special_char:
+                file_name_filtered = file_name.replace(i,'')
+            file_path = gen_path + '/' + str(file_name_filtered)
         
+        node_data_path = gen_path + '/node_data.json'
+        # subject += str(node._id)
+        
+        print '+' * 20
+        print node_data_path
+
         if 'image' in content_type or 'video' in content_type:
             # To make the fs_file_ids filed set empty
             if file_data:
@@ -146,7 +159,7 @@ def server_sync(func):
             if file_data:
                 node.fs_file_ids = []
                 file_data.seek(0)
-                file_path = gen_path + '/' + str(file_data.name)
+                file_path = gen_path + '/' + str(file_name_filtered)
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
@@ -155,10 +168,18 @@ def server_sync(func):
         path1 = os.path.dirname(__file__)
         path2 = os.path.dirname(path1)
         dst = str(path2) + "/syncdata"
+
+        print '+' * 20
+        print dst
+
         if not os.path.exists(dst):
             os.makedirs(dst)
 
         path_for_this_capture = dst + '/' + timestamp
+        
+        print '+' * 20
+        print path_for_this_capture
+
         if not os.path.exists(path_for_this_capture):
             os.makedirs(path_for_this_capture)
 
@@ -166,13 +187,24 @@ def server_sync(func):
             #add _sig otherwise django_mailbox scrambles file name
             # this '_sig' is later used to split the filename and obtain original file name in received attachments in 
             # 'server_sync()' function of mailclient.py views file
-            op_file_name = file_path.split(file_data.name)[0]+ timestamp + '_' + file_data.name + '_sig'
-            command = 'gpg --passphrase "akazuko" --output ' + op_file_name + ' --sign ' + file_path
+            
+            
+
+            op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered + '_sig'
+            print ':' * 20
+            print op_file_name
+            print ':' * 20
+            print file_path
+            command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
             subprocess.call([command],shell=True)    
             src = op_file_name
+
+            print '+' * 20
+            print src
             shutil.move(src,path_for_this_capture)
-            mail.attach_file(file_path)         
+            # mail.attach_file(file_path)         
         
+        print 'JSON'
         node_json = bson.json_util.dumps(node)
         with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
@@ -186,8 +218,8 @@ def server_sync(func):
         shutil.move(src,path_for_this_capture)
         # mail.attach_file(json_op_file_name)
         
-        mail.attach_file(node_data_path)
-        mail.subject = subject + str(node._id)
+        # mail.attach_file(node_data_path)
+        # mail.subject = subject + str(node._id)
         #mail.send()
 
         os.remove(node_data_path)
