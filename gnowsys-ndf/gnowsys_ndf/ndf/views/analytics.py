@@ -144,44 +144,39 @@ def session_summary(request):
 def group_summary(request,group_id):
 	group_id=ObjectId("5583c42b9e745633325439d0")
 	query("group",{ "group_id" : group_id })
-	a = db['Analytic_col'].find({"group_id" : str(group_id)}).sort("timestamp",-1)
-
-	lst = []
-	for doc in a :
-		lst.append(doc)
-	sessions_list =[]
-	d={}
-	i=-1
-	'''
-	for doc in a :
-		print '\n'+str(doc)
-	'''
 	
+	'''
+	grouping the data  on the basis of user name
+	'''
+	pipe = [{'$group': {'_id': '$user', 'num_of_activities': {'$sum': 1}}}]
+	sorted_list = db['Analytic_col'].aggregate(pipeline=pipe)
+	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
+	
+	'''
+	To store the most active users in the group.
+	The user with more number of activities are considered to be more active.
+	'''
+	active_users = []
+	i=0
+	for doc in sorted_list_acc_activities :
+		active_users.append({ "name" : (doc[u'_id']) , "activities" : doc[u'num_of_activities'] } )
+		i+=1
+		if i==3:
+			break
+
+
 	num_of_forums=db['Nodes'].find({"url":"forum", "group_set":group_id, "status":"DRAFT"}).count()	
-	print num_of_forums
+	
 	num_of_threads=db['Nodes'].find({"url":"forum/thread", "group_set":group_id, "status":"DRAFT"}).count()
-	print "\n" + str(num_of_threads)
 
 	regx=re.compile("^Reply of:.*")
-
 	num_of_replies=db['Nodes'].find({"name": regx,"group_set":group_id, "status":"DRAFT"}).count()
-	print "\n" + str(num_of_replies)
 
 	num_of_files=db['Nodes'].find({"url":"file", "group_set":group_id, "status":"PUBLISHED"}).count()
-	print "\n" + str(num_of_files)
 
 	num_of_pages=db['Nodes'].find({"url":"page", "group_set":group_id, "status":"PUBLISHED"}).count()
-	print "\n" + str(num_of_pages)
-		
-		
-		
-	return (HttpResponse("hello"))
-	#return render_to_response("ndf/analytics_summary.html",
-															#{ "data" : sessions_list})
 	
-	
-
-
+	return render_to_response("ndf/analytics_group_summary.html",{"data" : active_users,'forums' : num_of_forums,'threads' : num_of_threads,'replies' : num_of_replies,'files' : num_of_files,'pages' : num_of_pages})
 	
 
 def group_list_activities(request,group_id):
@@ -209,9 +204,11 @@ Analytics_collection = db['Analytic_col']
 def query(analytics_type,details) :
 	'''
 	This function checks the Analytics data(for a user) in Analytic_col and gets the time to which the query set is updated. 
-	Based on the time, it fetches raw data from Benchmark collection and hands over to normalize to do the filtering and redundancy check.
+	Based on the time, it fetches raw data from Benchmark collection and hands over to normalize to do the filtering and 
+	redundancy check.
 	
-	In case, the analytics_type is 'group', the function resolves the members of the group and calls itself recursively for each user, to update the Analytic_col.
+	In case, the analytics_type is 'group', the function resolves the members of the group and calls itself recursively for each user,
+	 to update the Analytic_col.
 	
 	'''
 
@@ -381,7 +378,6 @@ def file_activity(group_id,url,doc):
 	is less than 5 seconds then we should have created the page else we must have viewed the page.
 	
 	'''
-
 	ins_objectid= ObjectId()
 	analytics_doc=col.Analytics()
 	analytics_doc.timestamp=doc[u'last_update']
@@ -429,9 +425,14 @@ def file_activity(group_id,url,doc):
 					analytics_doc.args[2]=str(url[4])
 	
 	elif(url[3]=="edit" or url[3]=="edit_file"):
+		if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 			if ins_objectid.is_valid(url[4]) is True:
 				analytics_doc.action[0] = "edit"
 				analytics_doc.args[2] = str(url[4])
+		
+		else:
+			return 0		
+	
 	else:
 		return 0
 

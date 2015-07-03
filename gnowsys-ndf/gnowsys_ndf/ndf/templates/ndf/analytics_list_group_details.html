@@ -1,0 +1,12 @@
+{% for x in data %}
+	<ul>
+	<li>GROUP_ID : {{x.group_id}}</li>	
+	<li>USER : {{x.user}}</li>
+	<li>SESSION_KEY : {{x.session_key}}</li>
+
+	<li>ACTION : {{x.action}}</li>
+	<li>TIMESTAMP (IST) : {{x.timestamp}}</li>
+	
+	</ul>
+	<br>
+{% endfor %}
