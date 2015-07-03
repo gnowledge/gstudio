@@ -28,7 +28,7 @@ def connected_to_internet(url='http://www.google.com/', timeout=5):
     return False
 
 class Command(BaseCommand):
-	help = 'Will call the script to generate public, private key pair. Please ensure you have edited ../gstudio/key_test/gen_key_inp.txt before running this script'
+	help = 'Will call the script to send the captured json and data files.'
 
 	def handle(self, *args, **kwargs):
 		if connected_to_internet() is False:
@@ -64,7 +64,7 @@ class Command(BaseCommand):
 					print file_path
 
 				mail.from_email = "Gstudio <t.metastudio@gmail.com>"
-				mail.to = ['abtiwari94@gmail.com']
+				mail.to = ['djangotest94@gmail.com']
 				mail.send()
 				shutil.move(path,sent_folder_path)
 

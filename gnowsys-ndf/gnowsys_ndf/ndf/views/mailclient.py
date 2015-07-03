@@ -397,10 +397,10 @@ def server_sync(mail):
         list_of_decrypted_attachments = []
         for attachment in all_attachments:
             filename = attachment.document.path
-            output_file_name = filename.split('.sig')[0]
+            op_file_name = filename.split('_sig')[0]
             command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
             subprocess.call([command],shell=True)
-            list_of_decrypted_attachments.append(output_file_name)
+            list_of_decrypted_attachments.append(op_file_name)
 
         for file_path in list_of_decrypted_attachments:
             if file_path[-4:] == 'json':
