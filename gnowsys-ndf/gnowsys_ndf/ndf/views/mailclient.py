@@ -393,6 +393,7 @@ def server_sync(mail):
         json_file_path = ''
         file_object_path = ''
 
+        ''' Code to decrypt every attachment and create a list with the file paths of decrypted attachments'''
         list_of_decrypted_attachments = []
         for attachment in all_attachments:
             filename = attachment.document.path
