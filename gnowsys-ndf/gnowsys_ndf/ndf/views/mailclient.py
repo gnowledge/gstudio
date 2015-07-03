@@ -29,6 +29,7 @@ import urllib2
 import io
 import mailbox
 import datetime
+import subprocess
 
 #-----------------Dictionary of popular servers--------------#
 server_dict = {
@@ -115,6 +116,20 @@ def mailclient(request, group_id):
 @login_required
 @get_execution_time
 def mailbox_create_edit(request, group_id):
+    '''
+    takes {
+    request : HTTP request
+    group_id : gstudio group id
+    }
+    returns {
+                template which shows the create new mailbox form
+    }
+
+    This function creates a new Mailbox. First it renders the template which has the input form. When the form is submitted, this function
+    is called again and the data is used to create a new mailbox. The email-id, password and the website on which the email-id is made 
+    is verified and if the credentials are correct a new mailbox is saved in the database. Also the function adds the mailbox id, user_id
+    record to another database to keep record of which user has which mailbox id.
+    '''
     group_name, group_id = get_group_name_id(group_id)
     home_grp_id = node_collection.one({'name': "home"})
 
@@ -378,11 +393,20 @@ def server_sync(mail):
         json_file_path = ''
         file_object_path = ''
 
+        ''' Code to decrypt every attachment and create a list with the file paths of decrypted attachments'''
+        list_of_decrypted_attachments = []
         for attachment in all_attachments:
-            if attachment.document.path[-4:] == 'json':
-                json_file_path = attachment.document.path
+            filename = attachment.document.path
+            output_file_name = filename.split('.sig')[0]
+            command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
+            subprocess.call([command],shell=True)
+            list_of_decrypted_attachments.append(output_file_name)
+
+        for file_path in list_of_decrypted_attachments:
+            if file_path[-4:] == 'json':
+                json_file_path = file_path
             else:
-                file_object_path = attachment.document.path
+                file_object_path = file_path
 
         node_exists = False
         with open(json_file_path,'r') as json_file:
@@ -514,7 +538,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                 # To manage the mails that comes as a part of the server-sync technique
                 for mail in all_mails:
                     server_sync(mail)
-                    
+
                 # To read the mails from the directories
                 print 'STORING NEW MAILS'
                 store_mails(all_mails,path)
@@ -566,6 +590,20 @@ def render_mailbox_pane(request,group_id):
 @login_required
 @get_execution_time
 def mailbox_edit(request, group_id,mailboxname):
+    '''
+    takes {
+    request : HTTP request
+    group_id : gstudio group id
+    mailboxname: the name of the mailbox to be edited
+    }
+    returns {
+                    template which shows the edit form
+    }
+
+    This function is used to edit the mailbox. The user has to change all properties: mailbox name, email-id, password and the account
+    on which the id is made. The supplied credentials are checked and if it is verified the mailbox is edited or an appropriate error
+    message is returned.
+    '''
     group_name, group_id = get_group_name_id(group_id)
     home_grp_id = node_collection.one({'name': "home"})
     title = "Edit Mailbox"
@@ -649,6 +687,20 @@ def mailbox_edit(request, group_id,mailboxname):
 @login_required
 @get_execution_time
 def mailbox_delete(request, group_id,mailboxname):
+    '''
+    takes {
+        request : HTTP request
+        group_id : gstudio group id
+        mailboxname: the name of the mailbox to be deleted
+    }
+    returns {
+                    template which shows the delete options page
+    }
+
+    This function is used to delete the mailbox. The user is directed to a confirmation page. If the user also selects to save the
+    mails before deleting the mailbox, the function moves the mails into archive folder. Otherwise the function deletes the mails 
+    and the mailbox from the database if the user confirms deletion.
+    '''
     group_name, group_id = get_group_name_id(group_id)
     title = "Delete Mailbox"
     variable = RequestContext(request, {'title': title,
@@ -747,6 +799,18 @@ def mailbox_delete(request, group_id,mailboxname):
 
 @get_execution_time
 def mailclient_error_display(request, group_id, error_obj):
+    '''
+    takes {
+        request : HTTP request
+        group_id : gstudio group id
+        error_obj: a string describing the error
+    }
+    returns {
+            template which displays the error message
+    }
+
+    Function renders a template which displays the error string passed
+    '''
     template = "ndf/mailclient_error.html"
     group_name, group_id = get_group_name_id(group_id)
     title = "Error Page"
@@ -762,6 +826,18 @@ def mailclient_error_display(request, group_id, error_obj):
 @login_required
 @get_execution_time
 def mailbox_settings(request, group_id,mailboxname):    
+    '''
+    takes {
+        request : HTTP request
+        group_id : gstudio group id
+        mailboxname: the name of the mailbox for which settings have to be changed
+    }
+    returns {
+                    template which shows the settings page
+    }
+
+    Function directs user to settings page.
+    '''
     template = "ndf/mailclient_settings.html"
     group_name, group_id = get_group_name_id(group_id)
     title = "Settings Page"
@@ -778,6 +854,21 @@ def mailbox_settings(request, group_id,mailboxname):
 @login_required
 @get_execution_time
 def compose_mail(request, group_id,mailboxname):    
+    '''
+        takes {
+        request : HTTP request
+        group_id : gstudio group id
+        mailboxname: the name of the mailbox via which new mail has to be sent
+    }
+    returns {
+        template which shows the email message form or error page
+    }
+
+    The function renders the form to create a new email and then processes it when the form is submitted (user hits 'send'). The 'to',
+    'cc', 'bcc', subject and body are processed and attached to django_mailbo's EmailMessage class object(email object). Files added 
+    as 'attachments' are read and attached to the email object and the mail is sent.
+
+    '''
     template = "ndf/compose_mail.html"
     group_name, group_id = get_group_name_id(group_id)
     title = "New Mail"
@@ -855,10 +946,17 @@ def compose_mail(request, group_id,mailboxname):
 
 def update_mail_status(request,group_id):
     '''
+    takes {
+        request : HTTP request
+        group_id : gstudio group id
+    }
+    returns {
+        template or error page
+    }
+
     This fucntion moves the mail-file stored on server from new folder
     to cur folder after the user has read the mail
     '''
-    
     group_name, group_id = get_group_name_id(group_id)
     template = "ndf/mailstatuschange.html"
     if request.method=='POST' and request.is_ajax():
@@ -876,6 +974,13 @@ def update_mail_status(request,group_id):
 # The mailBox-name must not be repeated for an individual user but other users can share the same mailBox-name
 def unique_mailbox_name(request,group_id):
     '''
+    takes {
+        request : HTTP request
+        group_id : gstudio group id
+    }
+    returns {
+        template or error page
+    }
     To check whether the mailbox name is unique for a user.
     Different users can still have two separate mailboxes with same names.
     '''
@@ -941,9 +1046,15 @@ def unique_mailbox_name(request,group_id):
 # The ID is unique to the individual user hence must not be repeated in the mailBox-data
 def unique_mailbox_id(request,group_id):
     '''
+    takes {
+        request : HTTP request
+        group_id : gstudio group id
+    }
+    returns {
+        template or error page
+    }
     The Email-ID has to be unique. No other user can use the ID that is already in use.
     '''
-
     group_name, group_id = get_group_name_id(group_id)
     template = "ndf/mail_condition_check.html"
     if request.method == 'POST' and request.is_ajax():

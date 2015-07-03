@@ -95,6 +95,7 @@ import shutil
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
+
 def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
@@ -104,6 +105,11 @@ def server_sync(func):
         subject = "SYNCDATA"
         mail.to = ['djangotest94@gmail.com']
         mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+
+        ''' Get current date and time to timestamp json and the document being captured by this function.
+         This done so that files in syncdata folder will have unique name'''
+        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_")
+
 
         ''' To fetch the data about the node '''
         # the actual file
@@ -118,10 +124,11 @@ def server_sync(func):
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
         gen_path = os.path.abspath(os.path.dirname(settings_dir3))
+        file_path = ""
         if file_data:
             file_path = gen_path + '/' + str(file_data.name)
         node_data_path = gen_path + '/node_data.json'
-
+        subject += str(node._id)
         
         if 'image' in content_type or 'video' in content_type:
             # To make the fs_file_ids filed set empty
@@ -133,13 +140,7 @@ def server_sync(func):
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
 
-                mail.attach_file(file_path)
-               
 
-        # elif 'video' in content_type:
-        #     # on the reciever end send the url
-        #     node.fs_file_ids = []
-        #     pass
         else:
             #the other documents which need only the json data to be sent
             if file_data:
@@ -149,29 +150,48 @@ def server_sync(func):
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
-
-                mail.attach_file(file_path)
-            # shutil.rmtree(file_path)
         
-        # node = node_collection.one({'_id': ObjectId(kwargs['node'])})
-        # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
+        ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
+        path1 = os.path.dirname(__file__)
+        path2 = os.path.dirname(path1)
+        dst = str(path2) + "/syncdata"
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+
+        path_for_this_capture = dst + '/' + timestamp
+        if not os.path.exists(path_for_this_capture):
+            os.makedirs(path_for_this_capture)
+
+        if file_data:
+            op_file_name = file_path.split(file_data.name)[0]+ timestamp + '_' + file_data.name + '.sig'
+            command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
+            subprocess.call([command],shell=True)    
+            src = op_file_name
+            shutil.move(src,path_for_this_capture)
+            mail.attach_file(file_path)         
+        
         node_json = bson.json_util.dumps(node)
-
-        
-        
-        # # node_json = json.dumps(node)
         with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
         
+        ''' Run command to sign the json file, rename and move to syncdata folder'''
+        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '.sig'
+        command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
+        subprocess.call([command],shell=True)
+        src = json_op_file_name
+        shutil.move(src,path_for_this_capture)
+        # mail.attach_file(json_op_file_name)
+        
         mail.attach_file(node_data_path)
         mail.subject = subject + str(node._id)
-        mail.send()
+        #mail.send()
+
         os.remove(node_data_path)
+        # os.remove(json_op_file_name)
         if file_data:
             os.remove(file_path)
-
+            # os.remove(op_file_name)
         return ret
-
     return wrap
 
 @get_execution_time
@@ -182,7 +202,6 @@ def capture_data(file_object=None, file_data=None, content_type=None):
     the decorator to send the created/updated node through E-Mail
     '''
     pass
-
 
 @get_execution_time
 def get_group_name_id(group_name_or_id, get_obj=False):
@@ -1323,7 +1342,7 @@ def get_page(request, node):
                 #     if node1.created_by ==request.user.id:
                 #           return (node2,ver2)
                 #      else:
-                #	   return (node2,ver2)
+                #      return (node2,ver2)
         return (node1, ver1)
 
 
@@ -2565,7 +2584,7 @@ def set_all_urls(member_of):
     else:
         url = u"None"
     return url
-###############################################	##########################
+############################################### ##########################
 
 
 @login_required

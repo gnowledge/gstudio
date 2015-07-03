@@ -388,6 +388,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'django.core.context_processors.csrf',
 )
 
+
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
@@ -402,7 +403,7 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
-    'captcha',	
+    'captcha',
     # 'gnowsys_ndf.mobwrite',       #textb
     # 'south',                      #textb
     # 'django_extensions',          #textb
