@@ -385,7 +385,7 @@ def store_mails(mails, path):
             mbox.unlock()
     return
 
-def server_sync(mail):
+def server_sync(mail,username):
     if 'SYNCDATA' in mail.subject:
         all_attachments = mail.attachments.all()
         all_attachments_path = []
@@ -396,11 +396,18 @@ def server_sync(mail):
         ''' Code to decrypt every attachment and create a list with the file paths of decrypted attachments'''
         list_of_decrypted_attachments = []
         for attachment in all_attachments:
+            print '--'*30
+            print attachment
             filename = attachment.document.path
-            output_file_name = filename.split('.sig')[0]
+            print filename
+            op_file_name = filename.split('_sig')[0]
+            print op_file_name
             command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
             subprocess.call([command],shell=True)
-            list_of_decrypted_attachments.append(output_file_name)
+            list_of_decrypted_attachments.append(op_file_name)
+
+        print '**'*30
+        print list_of_decrypted_attachments
 
         for file_path in list_of_decrypted_attachments:
             if file_path[-4:] == 'json':
@@ -537,7 +544,8 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                 print len(all_mails)
                 # To manage the mails that comes as a part of the server-sync technique
                 for mail in all_mails:
-                    server_sync(mail)
+                    #pass username which is later used by save_file function
+                    server_sync(mail,username)
 
                 # To read the mails from the directories
                 print 'STORING NEW MAILS'
