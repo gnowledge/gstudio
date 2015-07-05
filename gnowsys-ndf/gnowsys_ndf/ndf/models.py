@@ -515,7 +515,6 @@ class Node(DjangoDocument):
         rcsno = history_manager.get_current_version(self)
 	#update the snapshot feild
 	if kwargs.get('groupid'):
-		print "enterwa"
 		node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+kwargs['groupid']:rcsno }}, upsert=False, multi=True)
 		
     # User-Defined Functions
