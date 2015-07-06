@@ -238,6 +238,13 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 't.metastudio@gmail.com'
 EMAIL_HOST_PASSWORD = ''
 
+# The following email id and password for the email account will be used for sending/receiving SYNCDATA
+SYNCDATA_FETCHING_EMAIL_ID = 'djangotest94@gmail.com'
+SYNCDATA_FETCHING_EMAIL_ID_PASSWORD = ''
+SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS = 'imap.gmail.com'
+
+SYNCDATA_SENDING_EMAIL_ID = 'djangotest94@gmail.com'
+
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
 PASSWORD_COMPLEXITY = {  # You can ommit any or all of these for no limit for that particular set
@@ -266,12 +273,6 @@ DATABASES = {
         'PORT': '',
     },
 }
-
-# The following email id and password for the email account will be used for sending/receiving SYNCDATA
-SYNCDATA_EMAIL_ID = 'djangotest94@gmail.com'
-SYNCDATA_EMAIL_ID_PASSWORD = ''
-SYNCDATA_IMAP_SERVER_ADDRESS = 'imap.gmail.com'
-
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
