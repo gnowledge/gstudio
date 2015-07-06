@@ -1551,19 +1551,19 @@ class Benchmark(DjangoDocument):
   def identity(self):
     return self.__unicode__()
 
-# Benchmarking Class Defination
+# Analytics Class Defination
 @connection.register
 class Analytics(DjangoDocument):
 
   objects = models.Manager()
 
-  collection_name = 'Analytic_col'
+  collection_name = 'analytics_collection'
 
   structure = {
     'timestamp': datetime.datetime,
-    'action' : list,
-    'args' : list,
+    'action' : dict,
     'user' : basestring,
+    'obj' : dict,
     'group_id' : basestring,
     'session_key' : basestring
   }

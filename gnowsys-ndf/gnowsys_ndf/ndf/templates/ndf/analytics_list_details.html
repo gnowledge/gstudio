@@ -1,10 +1,6 @@
 {% for x in data %}
 	<ul>
-	<li>USER : {{x.user}}</li>
-	<li>ACTION : {{x.action}}</li>
-	<li>ACTION : {{x.args}}</li>
-	<li>TIMESTAMP (IST) : {{x.timestamp}}</li>
-	
+	{{x.user}}&nbsp;{{x.action.phrase}}<br>{{x.obj}}
 	</ul>
 	<br>
 {% endfor %}
