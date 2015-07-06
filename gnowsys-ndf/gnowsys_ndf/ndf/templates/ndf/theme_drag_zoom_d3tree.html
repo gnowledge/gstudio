@@ -436,6 +436,7 @@
                 return "translate(" + source.y0 + "," + source.x0 + ")";
             })
             .attr("data-coll-node-id", function(d) {return d.id || (d.id = ++i); })
+            .style("cursor", "pointer")
             .on('click', click);
 
         nodeEnter.append("circle")
@@ -443,7 +444,9 @@
             .attr("r", 0)
             .style("fill", function(d) {
                 return d._children ? "lightsteelblue" : "#fff";
-            });
+            })
+            .style("stroke-width", "1.5px")
+            .style("stroke", "steelblue");
  
         nodeEnter.append("text")
             .attr("x", function(d) {
@@ -457,21 +460,23 @@
             .text(function(d) {
                 return d.name;
             })
-            .style("fill-opacity", 0);
+            .style("fill-opacity", 0)
+            .style("font-family", "sans-serif")
+            .style("font-size", "10px");
  
         // phantom node to give us mouseover in a radius around it
-        nodeEnter.append("circle")
-            .attr('class', 'ghostCircle')
-            .attr("r", 30)
-            .attr("opacity", 0.2) // change this to zero to hide the target area
-        .style("fill", "red")
-            .attr('pointer-events', 'mouseover')
-            .on("mouseover", function(node) {
-                overCircle(node);
-            })
-            .on("mouseout", function(node) {
-                outCircle(node);
-            });
+        // nodeEnter.append("circle")
+        //     .attr('class', 'ghostCircle')
+        //     .attr("r", 30)
+        //     .attr("opacity", 0.2) // change this to zero to hide the target area
+        // // .style("fill", "red")
+        //     .attr('pointer-events', 'mouseover')
+        //     .on("mouseover", function(node) {
+        //         overCircle(node);
+        //     })
+        //     .on("mouseout", function(node) {
+        //         outCircle(node);
+        //     });
  
         // Update the text to reflect whether node has children or not.
         node.select('text')
@@ -535,7 +540,10 @@
                     source: o,
                     target: o
                 });
-            });
+            })
+            .style("stroke", "#ccc")
+            .style("stroke-width", "1.5px")
+            .style("fill", "none");
  
         // Transition links to their new position.
         link.transition()
@@ -636,6 +644,15 @@
 
     // }
 
-    // expandHierarchy(selectedNodeData[0]); 
+    // expandHierarchy(selectedNodeData[0]);
+
+    function downloadCollapsibleGraph(filename) 
+    {
+        var blob = new Blob([$("#theme-drag-zoom-tree").html()], {type: "image/svg+xml"});
+        filename = filename.replace(/\ /g, '_');
+        filename += "_collapsible_Graph.svg";
+        saveAs(blob, filename);
+    }
+
 
 </script>
