@@ -560,7 +560,6 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                 print len(all_mails)
                 # To manage the mails that comes as a part of the server-sync technique
                 for mail in all_mails:
-                    #pass username which is later used by save_file function
                     server_sync(mail)
 
                 # To read the mails from the directories
