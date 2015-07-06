@@ -81,7 +81,27 @@ i.remove-tag{
     </div>     
     </div> 
     </header>
-  	
+  	<div class = "page type">
+  		<span class = "fi-page" > Type:  </span>
+  		<label id = 'page_type'> WikiPage </label>
+  		<a class = "fi-pencil" id= 'edit' data-reveal-id="select_page_type" onmouseover=""> </a>	
+  	</div>
+  	<div id = "select_page_type" class="tiny reveal-modal" data-reveal >
+  		<div class = "change_page_type">
+  			<label> <h5> <b>  Select Page type   </b> </h5> </label>	
+  		</div>	
+  		<div>
+  			<select name="type_of">
+	  			{% for i in page_instance %}
+	  				<option value = {{i.pk}} > {{i.name}} </option>
+	  			{% endfor %}
+			</select>
+  		</div>	
+  		<div align="center">
+        <input type="button"  onclick="$('#select_page_type').foundation('reveal', 'close');" value = "OK">    
+        </div>
+  		<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+  	</div>
     {% check_group node as is_group %}
 
     <div class="edit-card">

@@ -304,8 +304,15 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
-
+	page_type = request.POST.getlist("type_of",'')[0]
+	if not ObjectId(page_type) in page_node.type_of:
+		page_type1=[]
+		page_type1.append(ObjectId(page_type))
+		page_node.type_of = page_type1
+		page_node.type_of
+	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+        page_node.save() 
+        
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '') 
         if metadata:
@@ -325,8 +332,13 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
+	#fetch Page instances
+	Page_node = node_collection.find_one({"name":"Page"})
+	page_instances = node_collection.find({"type_of":Page_node._id})
+	page_ins_list = [i for i in page_instances]
+        context_variables['page_instance'] = page_ins_list  
         context_variables['nodes_list'] = json.dumps(nodes_list)
-
+           
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
