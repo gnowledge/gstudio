@@ -1,7 +1,6 @@
 ''' -- Imports from python libraries -- '''
 import datetime
 import json
-import logging
 import pymongo
 import re
 
@@ -29,10 +28,7 @@ try:
 except ImportError:  # old pymongo
 	from pymongo.objectid import ObjectId
 
-	from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD  # , EXTRA_LANG_INFO, GAPPS
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
-# from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
-from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
 from gnowsys_ndf.ndf.views.methods import create_gattribute, get_group_name_id
 
@@ -76,8 +72,8 @@ def page_view(request):
 	'''
 	return HttpResponse("0")
 
-def default(request, group_id):
-	return HttpResponse(group_id)
+def default(request):
+	return HttpResponse('There ')
 
 def list_activities(request):
 	try :
@@ -253,9 +249,10 @@ def normalize(cursor) :
 				if u'has_data' in doc.keys() and bool(doc[u'has_data']) == 1 :
 					if doc[u'has_data']["POST"] == True :
 						temp_doc = doc
-					else :
-						if doc[u'has_data']["GET"] == True :
+					elif doc[u'has_data']["GET"] == True :
 							temp_doc = doc
+					else :
+						temp_doc[u'last_update'] = doc[u'last_update']
 				else :
 					temp_doc = doc
 			
@@ -271,7 +268,7 @@ def normalize(cursor) :
 		url = str(temp_doc[u'calling_url']).split("/")
 		group_id = Gid(url[1])
 		gapp = url[2]
-		#gapp_list(gapp)(group_id,url,temp_doc)
+		gapp_list(gapp)(group_id,url,temp_doc)
 
 	return 1	
 
@@ -285,7 +282,6 @@ def initialize_analytics_obj(doc, group_id, obj) :
 	analytics_doc.obj = { obj : { 'id' : None} } 
 	
 	return analytics_doc
-
 
 def page_activity(group_id,url,doc):
 	'''
@@ -304,6 +300,7 @@ def page_activity(group_id,url,doc):
 			if n['status']=="HIDDEN" or n['status']=="DELETED":
 				analytics_doc.action = { 'key' : 'delete', "phrase" : "deleted a" }
 				analytics_doc.obj['page']['id'] = url[4]
+				analytics_doc.obj['page']['name'] = n[u'name']
 				analytics_doc.save()
 				return 1
 
@@ -313,13 +310,16 @@ def page_activity(group_id,url,doc):
 			if n['status']=="PUBLISHED" :
 				analytics_doc.action = { 'key' : 'publish', "phrase" : "published a" }
 				analytics_doc.obj['page']['id'] = url[4]
+				analytics_doc.obj['page']['name'] = n[u'name']
 				analytics_doc.save()
 				return 1
 
 	elif url[3] =="edit" :
 		if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
+			n=node_collection.find_one({"_id":ObjectId(url[4])})
 			analytics_doc.action = { 'key' : 'edit' , "phrase" : "edited a" }
 			analytics_doc.obj['page']['id'] = url[4]
+			analytics_doc.obj['page']['name'] = n[u'name']
 			analytics_doc.save()
 			return 1
 		
@@ -329,16 +329,22 @@ def page_activity(group_id,url,doc):
 			author_id = n[u'created_by']
 			auth=node_collection.find_one({"_type": "Author", "created_by": author_id})
 			if auth[u'name']==doc[u'user']:
-				created_at = n[u'created_at']
-					
-			if (doc[u'last_update'] - created_at).seconds < 5 :
-				analytics_doc.action = {  "key" : "create" , "phrase" : "created a" }
-				analytics_doc.obj['page']['id'] = url[4]
-				analytics_doc.save()
-				return 1
+				if (doc[u'last_update'] - n[u'created_at']).seconds < 5 :
+					analytics_doc.action = {  "key" : "create" , "phrase" : "created a" }
+					analytics_doc.obj['page']['id'] = ObjectId(url[3])
+					analytics_doc.obj['page']['name'] = n[u'name']
+					analytics_doc.save()
+					return 1
+				else :
+					analytics_doc.action = { 'key' : "view" , "phrase" : "viewed a" }
+					analytics_doc.obj['page']['id'] = ObjectId(url[3])
+					analytics_doc.obj['page']['name'] = n[u'name']
+					analytics_doc.save()
+					return 1
 			else :
 				analytics_doc.action = { 'key' : "view" , "phrase" : "viewed a" }
-				analytics_doc.obj['page']['id'] = url[4]
+				analytics_doc.obj['page']['id'] = ObjectId(url[3])
+				analytics_doc.obj['page']['name'] = n[u'name']
 				analytics_doc.save()
 				return 1
 
@@ -372,10 +378,6 @@ def file_activity(group_id,url,doc):
 		except :
 			return 0
 
-		print 'submit'
-		pass
-
-		
 	elif(url[3]=="readDoc"):
 		n=node_collection.find_one({"_id":ObjectId(url[4])})
 		try :
@@ -616,11 +618,18 @@ def dashbard_activity(group_id,url,doc):
 		if(url[3] == 'group') :
 			try :
 				group_name, group_id = get_group_name_id(url[1])
-				analytics_doc.action = {  "key" : "view" , "phrase" : "viewed dashboard of" }
-				analytics_doc.obj['dashboard']['id'] = group_id
-				analytics_doc.obj['dashboard']['name'] = group_name
-				analytics_doc.save()
-				return 1
+				if group_name != None :
+					analytics_doc.action = {  "key" : "view" , "phrase" : "viewed dashboard of" }
+					analytics_doc.obj['dashboard']['id'] = group_id
+					analytics_doc.obj['dashboard']['name'] = group_name
+					analytics_doc.save()
+					return 1
+				else :
+					analytics_doc.action = {  "key" : "view" , "phrase" : "viewed User group's Dashboard" }
+					analytics_doc.obj['dashboard']['id'] = url[1]
+					analytics_doc.obj['dashboard']['name'] = doc[u'user']
+					analytics_doc.save()
+					return 1
 			except :
 				pass
 
@@ -639,7 +648,11 @@ def dashbard_activity(group_id,url,doc):
 		except :
 			pass
 	return 0
-			
+
+def default_activity(group_id,url,doc):
+	pass
+	return 0
+
 		
 
 
@@ -667,10 +680,6 @@ def image_activity(group_id,url,doc):
 	return 0
 
 def video_activity(group_id,url,doc):
-	return 0
-
-def default_activity(group_id,url,doc):
-	pass
 	return 0
 
 
