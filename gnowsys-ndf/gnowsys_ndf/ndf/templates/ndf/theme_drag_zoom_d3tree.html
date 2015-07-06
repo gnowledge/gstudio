@@ -649,8 +649,8 @@
     function downloadCollapsibleGraph(filename) 
     {
         var blob = new Blob([$("#theme-drag-zoom-tree").html()], {type: "image/svg+xml"});
-        filename = filename.replace(/\ /g, '_');
-        filename += "_collapsible_Graph.svg";
+        filename = filename.replace(/\ /g, '-');
+        filename += "-Collapsible-Graph.svg";
         saveAs(blob, filename);
     }
 

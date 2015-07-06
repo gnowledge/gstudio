@@ -342,7 +342,7 @@
   }
   .download-graph:hover {
   	color: black;
-  	background-color: lightgray;
+  	background-color: #e5e5e5;
   	font-size: large;
   	cursor: pointer;
   	padding: 0.5em;
@@ -604,12 +604,14 @@
 	    {% if tree == "hierarchical" %}
 	    	if({{unfold}})
 	    	{
+	    		$("article").block({message: '<h4>Building a graph... <br/>Please hold on...</h4>'});
 				$("#theme-drag-zoom-tree-container").addClass("hide")
 		    	$(".themes").removeClass("hide");
 		    	plotHierarchyTree(true);
 	    	}
 	    	else
 	    	{
+	    		$("article").block({message: '<h4>Building a graph... <br/>Please hold on...</h4>'});
 	    		$("#theme-drag-zoom-tree-container").addClass("hide")
 		    	$(".themes").removeClass("hide");
 		    	plotHierarchyTree(false);
@@ -621,6 +623,7 @@
 
     		{% if node %}
 
+    		$("article").block({message: '<h4>Building a graph... <br/>Please hold on...</h4>'});
 			    $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;})
 			    .done(function(){plotDragZoomTree(treeData);
 			    });
