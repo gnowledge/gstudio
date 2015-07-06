@@ -555,7 +555,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
                 print 'FETCHING NEW MAILS'
                 print required_mailbox
                 all_mails=required_mailbox.get_new_mail()
-                all_mails=list(reversed(all_mails))
+                # all_mails=list(reversed(all_mails))
                 print 'FETCHING DONE'
 
                 print len(all_mails)
