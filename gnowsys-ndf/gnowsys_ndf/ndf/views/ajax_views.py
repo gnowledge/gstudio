@@ -779,7 +779,7 @@ def get_collection(request, group_id, node_id):
 		n2=t/x#divides the list into those many parts
 		#Process object is created.The list after being partioned is also given as an argument. 
 		for i in range(x):
-			processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2])))
+			processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2],)))
 		for i in range(x):
 			processes[i].start()#each Process started
 		for i in range(x):
