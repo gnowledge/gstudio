@@ -503,15 +503,14 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
       for each in drawer:
         if each._id not in nlist:
           dict1[each._id] = each
-<<<<<<< HEAD
+
       #loop replaced by a list comprehension
       dict2=[node_collection.one({'_id': oid}) for oid in nlist]
-=======
+
      
       for oid in nlist:
         obj = node_collection.one({'_id': oid})
         dict2.append(obj)
->>>>>>> 140b91336d7067015d6e7e26126b6157a48cc27a
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -522,10 +521,8 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id != nid:
           if each._id not in nlist:
             dict1[each._id] = each
-<<<<<<< HEAD
       #loop replaced by a list comprehension    
       dict2=[node_collection.one({'_id': oid})  for oid in nlist]
-=======
           
       	
       for oid in nlist:
@@ -533,7 +530,6 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         dict2.append(obj)
       
       
->>>>>>> 140b91336d7067015d6e7e26126b6157a48cc27a
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
