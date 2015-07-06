@@ -501,7 +501,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         n2=n1/x
          #Process object is created.The list after being partioned is also given as an argument. 
         for i in range(x):
-            processes.append(mp.Process(target=multi_,args=(systemtype_attributetype_set[i*n2:(i+1)*n2])))
+            processes.append(mp.Process(target=multi_,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
         for i in range(x):
             processes[i].start()#each Process started 
         for i in range(x):
@@ -527,7 +527,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         n2=n1/x
         #Process object is created.The list after being partioned is also given as an argument. 
         for i in range(x):
-            processes2.append(mp.Process(target=multi_2,args=(systemtype_relationtype_set[i*n2:(i+1)*n2])))
+            processes2.append(mp.Process(target=multi_2,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
         for i in range(x):
             processes2[i].start()#each Process started
         for i in range(x):
@@ -563,7 +563,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         n2=n1/x
         #Process object is created.The list after being partioned is also given as an argument. 
         for i in range(x):
-            processes3.append(mp.Process(target=multi_3,args=(systemtype_attributetype_set[i*n2:(i+1)*n2])))
+            processes3.append(mp.Process(target=multi_3,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
         for i in range(x):
             processes3[i].start()#each Process started
         for i in range(x):
@@ -580,7 +580,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         n2=n1/x
         #Process object is created.The list after being partioned is also given as an argument. 
         for i in range(x):
-            processes4.append(mp.Process(target=multi_4,args=(systemtype_relationtype_set[i*n2:(i+1)*n2])))
+            processes4.append(mp.Process(target=multi_4,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
         for i in range(x):
             processes4[i].start()#each Process started
         for i in range(x):
@@ -661,7 +661,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n2=n1/x
             #Process object is created.The list after being partioned is also given as an argument. 
             for i in range(x):
-                processes5.append(mp.Process(target=multi_5,args=(lst11[i*n2:(i+1)*n2])))
+                processes5.append(mp.Process(target=multi_5,args=(lst11[i*n2:(i+1)*n2],)))
             for i in range(x):
                 processes5[i].start()#each Process started
             for i in range(x):
@@ -695,7 +695,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n2=n1/x
             #Process object is created.The list after being partioned is also given as an argument. 
             for i in range(x):
-                processes6.append(mp.Process(target=multi_6,args=(lst12[i*n2:(i+1)*n2])))
+                processes6.append(mp.Process(target=multi_6,args=(lst12[i*n2:(i+1)*n2],)))
             for i in range(x):
                 processes6[i].start()#each Process started
             for i in range(x):
@@ -744,7 +744,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n2=n1/x
             #Process object is created.The list after being partioned is also given as an argument. 
             for i in range(x):
-                processes7.append(mp.Process(target=multi_7,args=(systemtype_attributetype_set[i*n2:(i+1)*n2])))
+                processes7.append(mp.Process(target=multi_7,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
             for i in range(x):
                 processes7[i].start()#each Process started
             for i in range(x):
@@ -789,7 +789,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             n2=n1/x
             #Process object is created.The list after being partioned is also given as an argument. 
             for i in range(x):
-                processes8.append(mp.Process(target=multi_4,args=(systemtype_relationtype_set[i*n2:(i+1)*n2])))
+                processes8.append(mp.Process(target=multi_4,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
             for i in range(x):
                 processes8[i].start()#each Process started
             for i in range(x):
