@@ -244,7 +244,7 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
             n2=n1/x
             #Process object is created.The list after being partioned is also given as an argument. 
             for i in range(x):
-              processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2])))
+              processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2],)))
             for i in range(x):
               processes[i].start() #each Process started 
             for i in range(x):
@@ -503,8 +503,15 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
       for each in drawer:
         if each._id not in nlist:
           dict1[each._id] = each
+<<<<<<< HEAD
       #loop replaced by a list comprehension
       dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+=======
+     
+      for oid in nlist:
+        obj = node_collection.one({'_id': oid})
+        dict2.append(obj)
+>>>>>>> 140b91336d7067015d6e7e26126b6157a48cc27a
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -515,8 +522,18 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id != nid:
           if each._id not in nlist:
             dict1[each._id] = each
+<<<<<<< HEAD
       #loop replaced by a list comprehension    
       dict2=[node_collection.one({'_id': oid})  for oid in nlist]
+=======
+          
+      	
+      for oid in nlist:
+        obj = node_collection.one({'_id': oid})
+        dict2.append(obj)
+      
+      
+>>>>>>> 140b91336d7067015d6e7e26126b6157a48cc27a
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -824,11 +841,12 @@ def build_collection(node, check_collection, right_drawer_list, checked):
       if node.prior_node != right_drawer_list:
         i = 0
         node.prior_node=[]
+	node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
-            node.prior_node.append(node_id)
+            node_prior_node_append_temp(node_id)
           
           i = i+1
         # print "\n Changed: prior_node"
@@ -849,14 +867,16 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         i = 0
         node.collection_set = []
         # checking if each _id in collection_list is valid or not
+	nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
+	node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
             if node_id not in nlist:
-              nlist.append(node_id)  
+              nlist_append_temp(node_id)  
             else:
-              node.collection_set.append(node_id)  
+              node_collection_set_append_temp(node_id)  
               # After adding it to collection_set also make the 'node' as prior node for added collection element
               node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
           
@@ -864,7 +884,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
 
         for each in nlist:
           if each not in node.collection_set:
-            node.collection_set.append(each)
+            node_collection_set_append_temp(each)
             node.status = u"PUBLISHED"
             node.save()
             # After adding it to collection_set also make the 'node' as prior node for added collection element
