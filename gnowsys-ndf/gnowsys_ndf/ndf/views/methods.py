@@ -132,9 +132,14 @@ def server_sync(func):
         file_name_filtered = ''
         if file_data:
             file_name = file_data.name
+            print '**'*30
+            print 'filename\n', file_name
             special_char = ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}',' ']
             for i in special_char:
-                file_name_filtered = file_name.replace(i,'')
+                file_name = file_name.replace(i,'')
+            file_name_filtered = file_name
+            print '**'*30
+            print 'filename filtered\n', file_name_filtered
             file_path = gen_path + '/' + str(file_name_filtered)
         
         node_data_path = gen_path + '/node_data.json'
