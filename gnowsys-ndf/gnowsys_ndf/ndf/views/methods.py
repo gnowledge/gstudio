@@ -129,8 +129,9 @@ def server_sync(func):
         print gen_path
 
         file_path = ""
-        file_name_filtered = file_data.name
+        file_name_filtered = ""
         if file_data:
+            file_name_filtered = file_data.name
             special_char = ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}',' ']
             for i in special_char:
                 file_name_filtered = file_name_filtered.replace(i,'')
