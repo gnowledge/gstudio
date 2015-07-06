@@ -297,28 +297,28 @@
 	*/
 	/* for reingold tilford tree -- end */
 
-	.node {
+	/*.node {
     cursor: pointer;
-  }
-
+  }*/
+/*
   .node circle {
     fill: #fff;
     stroke: steelblue;
     stroke-width: 1.5px;
   }
-   
-  .node text {
+*/   
+  /*.node text {
     font-size:10px; 
     font-family:sans-serif;
-  }
-   
+  }*/
+/*   
   .link {
     fill: none;
     stroke: #ccc;
     stroke-width: 1.5px;
   }
-
-  #theme-drag-zoom-tree{
+*/
+  #theme-drag-zoom-tree-container{
   	border: medium dashed #D8BFD8;
   	border-radius: 5px;
   }
@@ -329,12 +329,24 @@
     stroke-width: 3px;
   }
 */
-  .ghostCircle.show{
+  /*.ghostCircle.show{
       display:block;
-  }
-
+  }*/
+/*
   .ghostCircle, .activeDrag .ghostCircle{
        display: none;
+  }*/
+
+  .download-graph{
+  	color: gray
+  }
+  .download-graph:hover {
+  	color: black;
+  	background-color: lightgray;
+  	font-size: large;
+  	cursor: pointer;
+  	padding: 0.5em;
+  	transition: all 1s;
   }
 
   </style>
@@ -402,7 +414,14 @@
 			<div id="app-set-item" class="themes hide" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}">
 			</div>
 
-	    	<div id="theme-drag-zoom-tree" class="hide"></div>
+			<div id="theme-drag-zoom-tree-container" class="hide">
+		    	<div id="theme-drag-zoom-tree"></div>
+		    	<div class="row">
+			    	<div class="small-6 small-centered text-center columns download-graph" onclick='downloadCollapsibleGraph("{{node.name}}");'>
+			    		Download "{{node.name}}" Collapsible Graph
+			    	</div>
+		    	</div>
+			</div>
 			{% include 'ndf/theme_drag_zoom_d3tree.html' %}
 		{% endcache %}
 		
@@ -585,13 +604,13 @@
 	    {% if tree == "hierarchical" %}
 	    	if({{unfold}})
 	    	{
-				$("#theme-drag-zoom-tree").addClass("hide")
+				$("#theme-drag-zoom-tree-container").addClass("hide")
 		    	$(".themes").removeClass("hide");
 		    	plotHierarchyTree(true);
 	    	}
 	    	else
 	    	{
-	    		$("#theme-drag-zoom-tree").addClass("hide")
+	    		$("#theme-drag-zoom-tree-container").addClass("hide")
 		    	$(".themes").removeClass("hide");
 		    	plotHierarchyTree(false);
 	    	}
@@ -608,7 +627,7 @@
 
 		    {% endif %}
 
-			$("#theme-drag-zoom-tree").removeClass("hide");
+			$("#theme-drag-zoom-tree-container").removeClass("hide");
 
 		{% endif %}
 
@@ -618,7 +637,7 @@
 
 		$(".fold").click(function() {
 
-			// $("#theme-drag-zoom-tree").addClass("hide")
+			// $("#theme-drag-zoom-tree-container").addClass("hide")
 	  //   	$(".themes").removeClass("hide");
 	    	// plotHierarchyTree(false);
 			// $(function() {				
@@ -629,7 +648,7 @@
 		// script for unfold themes hierarchy
 	    $(".unfold").click(function() {
 
-			// $("#theme-drag-zoom-tree").addClass("hide")
+			// $("#theme-drag-zoom-tree-container").addClass("hide")
 	  //   	$(".themes").removeClass("hide");
 	  //   	plotHierarchyTree(true);
 	    	// $(function() {
@@ -639,7 +658,7 @@
 
 	    $(".tree_browser").click(function() {
 
-			// $("#theme-drag-zoom-tree").addClass("hide")
+			// $("#theme-drag-zoom-tree-container").addClass("hide")
 	  //   	$(".themes").removeClass("hide");
 	  //   	plotHierarchyTree()
 			// $(function() {				
@@ -660,7 +679,7 @@
 
 		 //    {% endif %}
 
-			// $("#theme-drag-zoom-tree").removeClass("hide")
+			// $("#theme-drag-zoom-tree-container").removeClass("hide")
 		});
 
 		// 	$("#theme-drag-zoom-container").removeClass("hide");
