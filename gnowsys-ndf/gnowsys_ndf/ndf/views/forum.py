@@ -194,7 +194,7 @@ def create_forum(request, group_id):
         #     end_dt[end_time.name]=en_date
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
-        colf.save()
+        colf.save(groupid=group_id)
 
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
@@ -316,7 +316,7 @@ def edit_forum(request,group_id,forum_id):
         #     end_dt[end_time.name]=en_date
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
-        colf.save()
+        colf.save(groupid=group_id)
 
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
@@ -504,7 +504,7 @@ def create_thread(request, group_id, forum_id):
             colrep.contributors.append(usrid)
         
         colrep.group_set.append(colg._id)
-        colrep.save()
+        colrep.save(groupid=group_id)
 
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(colrep._id)
@@ -634,7 +634,7 @@ def add_node(request, group_id):
             colrep.contributors.append(usrid)
         
         colrep.group_set.append(colg._id)
-        colrep.save()
+        colrep.save(groupid=group_id)
         # print "----------", colrep._id
         groupname = colg.name
         
@@ -844,7 +844,7 @@ def edit_thread(request,group_id,forum_id,thread_id):
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             thread.content = org2html(content_org, file_prefix=filename)
-        thread.save() 
+        thread.save(groupid=group_id) 
         link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(thread._id)
         for each in colg.author_set:
             if each != colg.created_by:

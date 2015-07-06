@@ -867,7 +867,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 fileobj.tags = tags
-            fileobj.save()
+            fileobj.save(groupid=group_id)
 
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
@@ -1387,7 +1387,7 @@ def file_edit(request,group_id,_id):
     if request.method == "POST":
 
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
-        file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
+        file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE),groupid=group_id)
 
         # To fill the metadata info while creating and editing file node
         metadata = request.POST.get("metadata_info", '') 

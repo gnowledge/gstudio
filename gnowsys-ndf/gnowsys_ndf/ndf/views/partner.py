@@ -81,7 +81,7 @@ def create_partner(request,group_id):
     colg.disclosure_policy = request.POST.get('member', 'DISCLOSED_TO_MEM')
     colg.encryption_policy = request.POST.get('encryption', 'NOT_ENCRYPTED')
     colg.agency_type = "Partner"
-    colg.save()
+    colg.save(groupid=group_id)
     # get alll attribute associated with partner
     attribute_set=colg.get_possible_attributes(colg.member_of).keys()
     activ="Request to become a partner"
@@ -111,10 +111,10 @@ def create_partner(request,group_id):
         Mod_colg.contributors.append(usrid)
 
       Mod_colg.prior_node.append(colg._id)
-      Mod_colg.save()
+      Mod_colg.save(groupid=group_id)
 
       colg.post_node.append(Mod_colg._id)
-      colg.save()
+      colg.save(groupid=group_id)
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 

@@ -128,7 +128,7 @@ def invite_meeting(request, group_id, meetingid):                               
             ret = set_notif_val(request,group_id,msg,activ,bx)
             if bx.id not in colg.author_set:
                 colg.author_set.append(bx.id)
-                colg.save()
+                colg.save(groupid=group_id)
             if ret :
                 return HttpResponse("success")
 

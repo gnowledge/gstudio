@@ -213,7 +213,7 @@ def image_edit(request,group_id,_id):
     if request.method == "POST":
 
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
-        img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE))
+        img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE),groupid=group_id)
         
 	get_node_metadata(request,img_node)
 	teaches_list = request.POST.get('teaches_list','') # get the teaches list 

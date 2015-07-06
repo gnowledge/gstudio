@@ -117,7 +117,7 @@ def create_edit_term(request, group_id, node_id=None):
     if request.method == "POST":
         
         # get_node_common_fields(request, page_node, group_id, gst_page)
-        term_node.save(is_changed=get_node_common_fields(request, term_node, group_id, term_GST))
+        term_node.save(is_changed=get_node_common_fields(request, term_node, group_id, term_GST),groupid=group_id)
 
         get_node_metadata(request,term_node,term_GST)
 	

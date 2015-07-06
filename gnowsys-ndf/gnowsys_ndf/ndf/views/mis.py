@@ -560,9 +560,9 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
             if user_group_location:
                 user_group_location['visited_location'] = user_last_visited_location
-                user_group_location.save()
+                user_group_location.save(groupid=group_id)
 
-        newgsystem.save()
+        newgsystem.save(groupid=group_id)
 
         if not app_set_instance_id:
             for key, value in request_at_dict.items():

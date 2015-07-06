@@ -77,7 +77,7 @@ def send_invitation(request,group_id):
             ret = set_notif_val(request,group_id,msg,activ,bx)
             if bx.id not in colg.author_set:
                 colg.author_set.append(bx.id)
-                colg.save()
+                colg.save(groupid=group_id)
         if ret :
             return HttpResponse("success")
         else:
@@ -114,7 +114,7 @@ def notify_remove_user(request,group_id):
     ret = set_notif_val(request,group_id,msg,activ,bx)
     colg.author_set.remove(bx.id)
     colg.modified_by = int(request.user.id)
-    colg.save()
+    colg.save(groupid=group_id)
     if ret:
         return HttpResponse("success")
     else:
@@ -145,7 +145,7 @@ def invite_users(request,group_id):
                         if each not in node.author_set:
                             new_users.append(each)
                             node.author_set.append(each);
-                node.save()
+                node.save(groupid=group_id)
                 
                 # Send invitations according to not_status variable
                 activ="invitation to join in group"
@@ -166,7 +166,7 @@ def invite_users(request,group_id):
                     node.author_set.remove(each)
                     msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+"'"
                     set_notif_val(request,group_id,msg,activ,bx)
-                node.save()
+                node.save(groupid=group_id)
             return HttpResponse("Success")
         else:
             coll_obj_list = []
@@ -214,7 +214,7 @@ def invite_admins(request,group_id):
                         if each not in node.group_admin:
                             new_users.append(each)
                             node.group_admin.append(each);
-                node.save()
+                node.save(groupid=group_id)
                 
                 # Send invitations according to not_status variable
                 activ="invitation to join in group"
@@ -235,7 +235,7 @@ def invite_admins(request,group_id):
                     node.group_admin.remove(each)
                     msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+" as admin'"
                     set_notif_val(request,group_id,msg,activ,bx)
-                node.save()
+                node.save(groupid=group_id)
             return HttpResponse("Success")
         else:
             coll_obj_list = []

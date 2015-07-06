@@ -515,7 +515,7 @@ class Node(DjangoDocument):
         rcsno = history_manager.get_current_version(self)
 	#update the snapshot feild
 	if kwargs.get('groupid'):
-		node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+kwargs['groupid']:rcsno }}, upsert=False, multi=True)
+		node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
 		
     # User-Defined Functions
     def get_possible_attributes(self, gsystem_type_id_or_list):

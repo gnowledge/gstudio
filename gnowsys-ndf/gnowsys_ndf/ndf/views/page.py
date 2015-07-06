@@ -304,7 +304,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
 
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '') 
@@ -381,7 +381,7 @@ def translate_node(request,group_id,node_id=None):
         get_type=get_resource_type(request, node_id)
         page_node = eval("node_collection.collection"+"."+ get_type)()
         get_translate_common_fields(request, get_type,page_node, group_id, gst_page,node_id)
-        page_node.save()
+        page_node.save(groupid=group_id)
         # add triple to the GRelation 
         # then append this ObjectId of GRelation instance in respective subject and object Nodes' relation_set field.
         relation_type = node_collection.one({'_type': 'RelationType', 'name': 'translation_of'})
@@ -452,14 +452,14 @@ def publish_page(request,group_id,node):
     group = node_collection.one({'_id': ObjectId(group_id)})
     if group.post_node:
         node.status=unicode("PUBLISHED")
-        node.save('UnderModeration')
+        node.save('UnderModeration',groupid=group_id)
     else:
         page_node,v=get_page(request,node)
         node.content = unicode(page_node.content)
         node.content_org = unicode(page_node.content_org)
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
-        node.save()
+        node.save(groupid=group_id)
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
