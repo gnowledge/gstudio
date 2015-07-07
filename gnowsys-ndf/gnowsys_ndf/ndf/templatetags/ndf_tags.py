@@ -1782,10 +1782,23 @@ def resource_info(node):
 @get_execution_time
 @register.assignment_tag
 def edit_policy(groupid,node,user):
-	group_access= group_type_info(groupid,user)
+	groupnode = node_collection.find_one({"_id":ObjectId(groupid)})
 	resource_infor=resource_info(node)
 	#code for public Groups and its Resources
-	
+	resource_type = node_collection.find_one({"_id": {"$in":resource_infor.member_of}})
+	if resource_type.name == 'Page':
+		resource_type_name = get_objectid_name(resource_infor.type_of[0])
+		if resource_type_name == 'Info page':
+			if user in groupnode.group_admin:
+				return "allow" 
+		elif resource_type_name == 'Wiki page':
+			return "allow"
+		elif resource_type_name == 'Blog page':
+			if user ==  resource_infor.created_by:
+				return "allow"
+	else:
+		return "allow"
+	''' 
 	if group_access == "PUBLIC":
 			#user_access=user_access_policy(groupid,user)
 			#if user_access == "allow":
@@ -1805,9 +1818,9 @@ def edit_policy(groupid,node,user):
 							return "allow"
 	elif group_access == "Moderated": 
 			 return "allow"
-	elif resource_infor.created_by == user.id:
+	elif resource_infor.created_by:
 							return "allow"    
-						
+	'''					
 @get_execution_time		
 @register.assignment_tag
 def get_prior_post_node(group_id):
@@ -2692,3 +2705,13 @@ def get_filters_data(gst_name):
 							}
 
 	return filter_dict
+
+@get_execution_time
+@register.assignment_tag
+def get_objectid_name(nodeid):
+ 
+ return (node_collection.find_one({'_id':ObjectId(nodeid)}).name)
+
+ 
+
+
