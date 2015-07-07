@@ -1,0 +1,12 @@
+<ul>
+
+{% for x in data %}
+   	<li>{{x.name}} : {{x.count}}</li>
+  	<br>
+  	FORUMS : {{x.forums|length}}
+  	THREADS : {{x.threads|length}}
+  	REPLIES : {{x.replies|length}}
+  	FILES : {{x.files|length}}
+  	PAGES : {{x.pages|length}}
+{% endfor %}
+</ul>

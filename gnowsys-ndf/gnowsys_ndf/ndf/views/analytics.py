@@ -72,10 +72,14 @@ def page_view(request):
 	'''
 	return HttpResponse("0")
 
+
 def default(request):
 	return HttpResponse('There ')
 
-def list_activities(request):
+
+
+
+def user_list_activities(request):
 	try :
 		start_date = request.POST['start_date']
 		end_date = request.POST['end_date']
@@ -93,7 +97,9 @@ def list_activities(request):
 	return render_to_response ("ndf/analytics_list_details.html", { "data" : lst})
 
 
-def session_summary(request):
+
+
+def user_summary(request):
 	query("user",{ "username" : request.user.username })
 	cursor = analytics_collection.find({"user" : request.user.username}).sort("timestamp",-1)
 
@@ -124,6 +130,8 @@ def session_summary(request):
 															{ "data" : sessions_list})
 
 
+
+
 def group_summary(request,group_id):
 	group_id=ObjectId("55717125421aa91eecbf8843")
 	query("group",{ "group_id" : group_id })
@@ -131,7 +139,7 @@ def group_summary(request,group_id):
 	'''
 	grouping the data  on the basis of user name
 	'''
-	pipe = [{'$group': {'_id': '$user', 'num_of_activities': {'$sum': 1}}}]
+	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user', 'num_of_activities': {'$sum': 1}}}]
 	sorted_list = analytics_collection.aggregate(pipeline=pipe)
 	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
 	
@@ -162,6 +170,8 @@ def group_summary(request,group_id):
 	return render_to_response("ndf/analytics_group_summary.html",{"data" : active_users,'forums' : num_of_forums,'threads' : num_of_threads,'replies' : num_of_replies,'files' : num_of_files,'pages' : num_of_pages})
 	
 
+
+
 def group_list_activities(request,group_id):
 	group_id=ObjectId("55717125421aa91eecbf8843")
 	query("group",{ "group_id" : group_id })
@@ -173,6 +183,72 @@ def group_list_activities(request,group_id):
 
 	return render_to_response("ndf/analytics_list_group_details.html",
 															{ "data" : lst})
+
+
+
+def group_members(request, group_id) :
+	group_id=ObjectId("55717125421aa91eecbf8843")
+	query("group",{ "group_id" : group_id })
+	
+	'''
+	grouping the data  on the basis of user name
+	'''
+	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user', 'num_of_activities': {'$sum': 1}}}]
+	sorted_list = analytics_collection.aggregate(pipeline=pipe)
+	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
+	
+	computing_urls = [
+		{ 'key' : 'forums', 'url' : 'forum', 'status' : 'DRAFT' }, 
+		{ 'key' : 'threads', 'url' : 'forum/thread', 'status' : 'DRAFT' },
+		{ 'key' : 'files', 'url' : 'file', 'status' : 'PUBLISHED' },
+		{ 'key' : 'pages', 'url' : 'page', 'status' : 'PUBLISHED' },
+		{ 'key' : 'replies', 'name' : re.compile("^Reply of:.*"), 'status' : 'DRAFT' }
+	]
+
+	list_of_members = []
+
+	for member in sorted_list_acc_activities : 
+		try :
+			member_doc = {}
+			member_doc['count'] = member[u'num_of_activities']
+
+			author = node_collection.find_one({ "_type" : "Author" , "name" : member[u'_id']})
+			
+			member_doc['name'] = member[u'_id']
+
+			for entity in computing_urls :
+				member_doc[entity['key']] = []
+				if entity['key'] == 'replies' :
+					try :
+						nodes = node_collection.find({"name":entity['name'], "group_set":group_id, "created_by" : author[u'created_by'], "status": entity[u'status']})	
+						for node in nodes :
+							member_doc[entity['key']].append({ 'name' : node[u'name'], "id" : node[u'name']})
+					except :
+						pass
+				else :
+					try :
+						nodes = node_collection.find({"url":entity['url'], "group_set":group_id, "created_by" : author[u'created_by'], "status": entity[u'status']})	
+						for node in nodes :
+							member_doc[entity['key']].append({ 'name' : node[u'name'], "id" : node[u'_id']})
+					except :
+						pass
+
+			list_of_members.append(member_doc)
+
+		except : 
+			return HttpResponse('Fatal Error')
+
+	return render_to_response("ndf/analytics_group_members.html",{"data" : list_of_members })
+
+
+'''	
+num_of_threads=db['Nodes'].find({"url":"forum/thread", "group_set":group_id, "created_by" : author[u'created_by'], "status":"DRAFT"}).count()
+	
+regx=re.compile("^Reply of:.*")
+num_of_replies=db['Nodes'].find({"name": regx,"group_set":group_id, "created_by" : author[u'created_by'],  "status":"DRAFT"}).count()
+num_of_files=db['Nodes'].find({"url":"file", "group_set":group_id, "created_by" : author[u'created_by'],  "status":"PUBLISHED"}).count()
+num_of_pages=db['Nodes'].find({"url":"page", "group_set":group_id, "created_by" : author[u'created_by'],  "status":"PUBLISHED"}).count()
+'''
 
 def query(analytics_type,details) :
 	'''
@@ -212,6 +288,7 @@ def query(analytics_type,details) :
 					query("user",{"username" : author[u'name'] })
 
 	return 1
+
 
 
 
@@ -271,6 +348,7 @@ def normalize(cursor) :
 		gapp_list(gapp)(group_id,url,temp_doc)
 
 	return 1	
+
 
 
 def initialize_analytics_obj(doc, group_id, obj) :
@@ -671,7 +749,6 @@ def course_activity(group_id,url,doc):
 
 def event_activity(group_id,url,doc):
 	return 0
-
 
 def group_activity(group_id,url,doc):
 	return 0
