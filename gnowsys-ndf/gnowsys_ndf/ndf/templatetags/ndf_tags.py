@@ -125,6 +125,12 @@ def get_group_agency_types():
 
 @get_execution_time
 @register.assignment_tag
+def get_licence():
+   return GSTUDIO_LICENCE
+
+
+@get_execution_time
+@register.assignment_tag
 def get_agency_type_of_group(group_id):
 	'''
 	Getting agency_type value of the group.
