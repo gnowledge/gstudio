@@ -1,4 +1,5 @@
 from django.core.mail import EmailMessage
+from django.views.generic import TemplateView
 from django.shortcuts import render
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
