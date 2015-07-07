@@ -35,7 +35,7 @@
 			<div class ="row">
 				<div class="large-3 columns">				
 					<label>{% trans "Choose File" %}</label>
-					<input type="file" name="doc[]"  id="docFile" multiple/>
+					<input type="file" name="doc[]"  id="docFile"/>
 				</div>
 				<div class="large-9 columns">				
 					<label>{% trans "Title of File" %}</label>
@@ -189,7 +189,16 @@
 							<b>License</b>
 						</div>
 						<div class="large-10 columns">
-							<input id="license_id" name="License" type="text" placeholder="Enter source name"/>
+							<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
+							{% get_licence as licence %}
+							<select name="License">
+			         			<option value="CC BY-SA">---Select from list---</option>
+		  						{% for each_licence in licence %}
+				        			<option value="{{each_licence}}">
+				        				{% trans each_licence %}
+				        			</option>
+								{% endfor %}
+							</select>
 						</div>
 					</div>
 
