@@ -1027,11 +1027,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
-<<<<<<< HEAD
-            # print "----- fileobj._id", fileobj._id
-
-=======
->>>>>>> mongokit
 
             return fileobj._id, is_video
 

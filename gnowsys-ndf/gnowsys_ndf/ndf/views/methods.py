@@ -947,8 +947,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
 @get_execution_time
 def build_collection(node, check_collection, right_drawer_list, checked):
-<<<<<<< HEAD
-=======
+
   is_changed = False
 
   if check_collection == "prior_node":
@@ -1016,7 +1015,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
                 node.collection_set.remove(each)
                 # Also for removing prior node element after removing collection element
                 node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
->>>>>>> mongokit
+
 
     is_changed = False
 
@@ -4367,10 +4366,6 @@ def repository(request, group_id):
                                'group_id': group_id, 'groupid': group_id
                                },
                               context_instance=RequestContext(request)
-<<<<<<< HEAD
+
                               )
-=======
-                            )
 
-
->>>>>>> 7bd32861825ec11a5da0a4f61dc800c4770b065d
