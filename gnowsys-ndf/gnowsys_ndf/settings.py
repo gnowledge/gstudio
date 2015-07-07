@@ -232,18 +232,11 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 # SMTP setting for sending mail (Using gmail SMTP server)
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 't.metastudio@gmail.com'
-EMAIL_HOST_PASSWORD = ''
-
-# The following email id and password for the email account will be used for sending/receiving SYNCDATA
-SYNCDATA_FETCHING_EMAIL_ID = 'djangotest94@gmail.com'
-SYNCDATA_FETCHING_EMAIL_ID_PASSWORD = ''
-SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS = 'imap.gmail.com'
-
-SYNCDATA_SENDING_EMAIL_ID = 'djangotest94@gmail.com'
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = ''
+#EMAIL_PORT = 587
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
