@@ -91,6 +91,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     nodes = ""
     unfold_tree = request.GET.get('unfold','')
     selected = request.GET.get('selected','')
+    tree = request.GET.get('tree','collapsible')
     unfold = "false"
 
     # topics_GST = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
@@ -130,7 +131,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
 
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'themes_cards': themes_cards,
-                               'group_id': group_id,'groupid': group_id,'node': node,'shelf_list': shelf_list,'shelves': shelves,
+                               'group_id': group_id,'groupid': group_id,'node': node,'shelf_list': shelf_list,'shelves': shelves, 'tree': tree,
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,"selected": selected,
                                'title': title,'themes_list_items': themes_list_items,
                                'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
