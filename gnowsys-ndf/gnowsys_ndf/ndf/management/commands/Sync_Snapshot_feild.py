@@ -6,7 +6,7 @@ import string
 from django.core.management.base import BaseCommand, CommandError
 history_manager = HistoryManager()
 #AttributeType,RelationType
-all_nodes = node_collection.find({"_type":{"$nin":["ToReduceDocs","IndexedWordList"]}})
+
 
 def get_last_published_version(node):
 	published_node_version = ""	
@@ -31,39 +31,40 @@ class Command(BaseCommand):
   help = "Based on "
 
   def handle(self, *args, **options):
-
+	all_nodes = node_collection.find({"_type":{"$nin":["ToReduceDocs","IndexedWordList"],"snapshot":{"$exist":"False"}}})	
 	for i in all_nodes:
-		print "updating snapshot feild",i.name	
+	     	
 		node_collection.collection.update({'_id':ObjectId(i._id)}, {'$set':{'snapshot': {} }},upsert=False, multi=False)
 
 	all_nodes.rewind()
-
-	for i in all_nodes:
-		try:	
-			get_node = node_collection.find_one({"_id":ObjectId(i._id)})
-			if (not get_node['group_set']) == False :
-					print "providing resource version to resource name",i.name
-					for j in get_node['group_set']:
-						id_type = node_collection.find_one({"_id":ObjectId(j)})
-						if  id_type._type == 'Group':
-							rcsno = get_last_published_version(i)
-							if not rcsno:
-								rcsno = history_manager.get_current_version(i) 	
+        if all_nodes.count() > 0:
+		for i in all_nodes:
+			try:	
+				get_node = node_collection.find_one({"_id":ObjectId(i._id)})
+				if (not get_node['group_set']) == False :
+						print "providing resource version to resource name",i.name
+						for j in get_node['group_set']:
+							id_type = node_collection.find_one({"_id":ObjectId(j)})
+							if  id_type._type == 'Group':
+								rcsno = get_last_published_version(i)
+								if not rcsno:
+									rcsno = history_manager.get_current_version(i) 	
 						
-							node_collection.collection.update({"_id":ObjectId(i._id)},{'$set':{'snapshot'+"."+str(j):rcsno }},upsert=False,multi=False)
-						elif id_type._type == 'Author':
-							rcsno = history_manager.get_current_version(i)
-							node_collection.collection.update({"_id":ObjectId(i._id)},{'$set':{'snapshot'+"."+str(j):rcsno }},upsert=False,multi=False)
+								node_collection.collection.update({"_id":ObjectId(i._id)},{'$set':{'snapshot'+"."+str(j):rcsno }},upsert=False,multi=False)
+							elif id_type._type == 'Author':
+								rcsno = history_manager.get_current_version(i)
+								node_collection.collection.update({"_id":ObjectId(i._id)},{'$set':{'snapshot'+"."+str(j):rcsno }},upsert=False,multi=False)
 											
-			else:
+				else:
+					pass
+
+			except:
+				print "Nodes getting Error"
+				print "Node name",i.name
 				pass
 
-		except:
-			print "Nodes getting Error"
-			print "Node name",i.name
-			pass
 
 
-
-
+	else:
+		print "No Node to update. !!"
 
