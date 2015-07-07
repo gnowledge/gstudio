@@ -4408,10 +4408,4 @@ def repository(request, group_id):
                                'group_id': group_id, 'groupid': group_id
                                },
                               context_instance=RequestContext(request)
-<<<<<<< HEAD
                               )
-=======
-                            )
-
-
->>>>>>> 7bd32861825ec11a5da0a4f61dc800c4770b065d
