@@ -1290,7 +1290,10 @@ ul#navigation li a.last {
         <div class="medium-6 columns">
           {% edit_policy groupid node request.user.id as status %}
           
-          {% if user.is_authenticated and status == "allow" and user_access == "allow" and "Group" in group_object.member_of_names_list %}
+	{% if user.is_authenticated and status == "allow" and user_access == "allow" and "Group" in group_object.member_of_names_list %}
+
+          {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+          {% if "Group" in group_object.member_of_names_list or "Author" in group_object.member_of_names_list %}
             {% get_edit_url node.pk as edit_url %}
 
             {% check_group node as is_group %}
@@ -1458,6 +1461,7 @@ ul#navigation li a.last {
               {% include "ndf/invite_admins.html" %}
             {% endif %} 
           {% endif %}
+        {% endif %}
         {% endif %}
 
       </div>      
@@ -1660,7 +1664,7 @@ ul#navigation li a.last {
 
     {% if topic %}
     
-      location.href = "{% url 'theme_page' group_name_tag theme_id %}?selected="+clicked_node+"";
+      location.href = "{% url 'theme_page' group_name_tag theme_id %}?tree=hierarchical&selected="+clicked_node+"";
 
     {% else %}
 

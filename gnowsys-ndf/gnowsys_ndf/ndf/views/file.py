@@ -7,10 +7,12 @@ import mimetypes
 import os
 import tempfile
 # import re
+import ast
 import ox
 import pandora_client
 import threading
-from PIL import Image, ImageDraw  # install PIL example:pip install PIL
+
+from PIL import Image, ImageDraw
 from StringIO import StringIO
 
 ''' -- imports from installed packages -- '''
@@ -24,25 +26,24 @@ from django.core.files.storage import get_valid_filename
 from django.core.files.move import file_move_safe
 from django.core.files.temp import gettempdir
 from django.core.files.uploadedfile import UploadedFile # django file handler
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+
 from mongokit import paginator
+
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_page, get_node_common_fields, set_all_urls,get_execution_time
-from gnowsys_ndf.ndf.views.methods import get_group_name_id
-from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
+from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id  # , get_page
 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-    from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD  # , EXTRA_LANG_INFO, GAPPS
-from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
-# from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
-from gnowsys_ndf.ndf.views.methods import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls ,create_gattribute
 from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 ############################################
@@ -51,16 +52,15 @@ GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
 GST_IMAGE = node_collection.one({'_type':'GSystemType', 'name': 'Image'})
 GST_VIDEO = node_collection.one({'_type':'GSystemType', 'name': 'Video'})
 pandora_video_st = node_collection.one({'_type':'GSystemType', 'name':'Pandora_video'})
-app=GST_FILE
+app = GST_FILE
 
-
-lock=threading.Lock()
+lock = threading.Lock()
 count = 0    
 
 @get_execution_time
 def file(request, group_id, file_id=None, page_no=1):
     """
-   * Renders a list of all 'Files' available within the database.
+    Renders a list of all 'Files' available within the database.
     """
     ins_objectid  = ObjectId()
     is_video = request.GET.get('is_video', "")
@@ -656,7 +656,8 @@ def uploadDoc(request, group_id):
 
     if request.method == "GET":
         page_url = request.GET.get("next", "")
-        template = "ndf/UploadDoc.html"
+        # template = "ndf/UploadDoc.html"
+        template = "ndf/Uploader_Form.html"
     if  page_url:
         variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id})
     else:
@@ -671,19 +672,6 @@ def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
     """
-    # ins_objectid  = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False :
-    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else :
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth :
-    #             group_id = str(auth._id)
-    # else :
-    #     # print group_id
-    #     pass
 
     try:
         group_id = ObjectId(group_id)
@@ -708,23 +696,45 @@ def submitDoc(request, group_id):
         content_org = request.POST.get('content_org', '')
         access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
         tags = request.POST.get('tags', "")
+        license = request.POST.get("License", "")
+        source = request.POST.get("Source", "")
+        Audience = request.POST.get("audience", "")
+        fileType = request.POST.get("FileType", "")
+        subject = request.POST.get("Subject", "")
+        level = request.POST.get("Level", "")
+        Based_url = request.POST.get("based_url", "")
+        map_geojson_data = request.POST.get('map-geojson-data')
+
+        if map_geojson_data:
+          map_geojson_data = map_geojson_data + ","
+          map_geojson_data = list(ast.literal_eval(map_geojson_data))
+        else:
+          map_geojson_data = []
+
 
         i = 1
 
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+                    # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
+
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
                     i = i + 1
             else:
                 title = each.name
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
+
+                # f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
                 # print "f: ", f
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
+            # if isinstance(f, list):
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
+
             if isinstance(f, list):
               alreadyUploadedFiles.append(f)
               title = mtitle
@@ -775,7 +785,7 @@ def submitDoc(request, group_id):
     
 first_object = ''
 @get_execution_time
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, **kwargs):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, request=None, map_geojson_data=[], **kwargs):
     """
       this will create file object and save files in gridfs collection
     """
@@ -853,6 +863,15 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     if user_group_object._id not in fileobj.group_set:  # File creator_group_id stored in group_set field
                         fileobj.group_set.append(user_group_object._id)
 
+            # Commented bellow code to avoid redundancy (this will be removed once testing done)
+            # if group_object._id not in fileobj.group_set:
+            #     fileobj.group_set.append(group_object._id)        #group id stored in group_set field
+            # if usrname:
+            #     user_group_object=node_collection.one({'$and':[{'_type':u'Author'},{'name':usrname}]})
+            #     if user_group_object:
+            #         if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
+            #             fileobj.group_set.append(user_group_object._id)
+
             fileobj.member_of.append(GST_FILE._id)
             #  ADDED ON 14th July.IT's DONE
             fileobj.url = set_all_urls(fileobj.member_of)
@@ -867,7 +886,44 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 fileobj.tags = tags
+
+            # new fields added
+            fileobj.license = unicode(license)
+
+            fileobj.location = map_geojson_data
+
+
             fileobj.save()
+
+            if source:
+              # create gattribute for file with source value
+              source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
+              src = create_gattribute(fileobj._id, source_AT, source)
+
+            if Audience:
+              # create gattribute for file with Audience value
+              audience_AT = node_collection.one({'_type':'AttributeType','name':'audience'})
+              aud = create_gattribute(fileobj._id, audience_AT, Audience)                
+
+            if fileType:
+              # create gattribute for file with 'educationaluse' value
+              educationaluse_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationaluse'})
+              FType = create_gattribute(fileobj._id, educationaluse_AT, fileType)                
+
+            if subject:
+              # create gattribute for file with 'educationaluse' value
+              subject_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationalsubject'})
+              sub = create_gattribute(fileobj._id, subject_AT, subject)                
+
+            if level:
+              # create gattribute for file with 'educationaluse' value
+              educationallevel_AT = node_collection.one({'_type':'AttributeType', 'name': 'educationallevel'})
+              edu_level = create_gattribute(fileobj._id, educationallevel_AT, level)                
+
+            if Based_url:
+              # create gattribute for file with 'educationaluse' value
+              basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
+              basedUrl = create_gattribute(fileobj._id, basedonurl_AT, Based_url)                
 
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
@@ -955,10 +1011,12 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
-            # print "----- fileobj._id", fileobj._id
+
             return fileobj._id, is_video
+
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
+
 
 @get_execution_time
 def getFileSize(File):
@@ -975,6 +1033,8 @@ def getFileSize(File):
     except Exception as e:
         print "Unabe to calucalate size",e
         return 0,'bytes'
+
+
 @get_execution_time                     
 def convert_image_thumbnail(files):
     """
@@ -988,6 +1048,8 @@ def convert_image_thumbnail(files):
     img.save(thumb_io, "JPEG")
     thumb_io.seek(0)
     return thumb_io
+
+
 @get_execution_time
 def convert_pdf_thumbnail(files,_id):
     '''
@@ -1003,6 +1065,7 @@ def convert_pdf_thumbnail(files,_id):
     thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
     return thumb_pdf
     
+
 @get_execution_time
 def convert_mid_size_image(files, **kwargs):
     """
@@ -1036,7 +1099,6 @@ def convert_mid_size_image(files, **kwargs):
     mid_size_img.seek(0)
 
     return mid_size_img
-
     
 
 def convertVideo(files, userid, fileobj, filename):
@@ -1098,6 +1160,7 @@ def convertVideo(files, userid, fileobj, filename):
 	
         node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 	
+
 @get_execution_time
 def GetDoc(request, group_id):
     ins_objectid  = ObjectId()
@@ -1117,6 +1180,7 @@ def GetDoc(request, group_id):
     template = "ndf/DocumentList.html"
     variable = RequestContext(request, {'filecollection':files,'groupid':group_id,'group_id':group_id})
     return render_to_response(template, variable)
+
 
 @get_execution_time
 def file_search(request, group_id):
@@ -1138,6 +1202,7 @@ def file_search(request, group_id):
         template = "ndf/file_search.html"
         variable = RequestContext(request, {'file_collection':file_search, 'view_name':'file_search','groupid':group_id,'group_id':group_id})
         return render_to_response(template, variable)
+
 
 @login_required    
 @get_execution_time
@@ -1170,6 +1235,7 @@ def delete_file(request, group_id, _id):
   except Exception as e:
     print "Exception:", e
   return HttpResponseRedirect(pageurl) 
+
 
 @get_execution_time
 def file_detail(request, group_id, _id):
@@ -1272,6 +1338,8 @@ def file_detail(request, group_id, _id):
                               },
                               context_instance = RequestContext(request)
                              )
+
+
 @get_execution_time
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
@@ -1294,8 +1362,11 @@ def getFileThumbnail(request, group_id, _id):
     if file_node is not None:
         if file_node.fs_file_ids:
           # getting latest uploaded pic's _id
-          file_fs = file_node.fs_file_ids[2]
 
+          file_fs = ""
+          if len(file_node.fs_file_ids) > 1:
+            file_fs = file_node.fs_file_ids[2]
+         
           if (file_node.fs.files.exists(file_fs)):
 
             if len(file_node.fs_file_ids) > 0:
@@ -1366,6 +1437,8 @@ def readDoc(request, _id, group_id, file_name=""):
             return HttpResponse("")
     else:
         return HttpResponse("")
+
+        
 @get_execution_time
 def file_edit(request,group_id,_id):
     ins_objectid  = ObjectId()

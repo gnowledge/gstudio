@@ -1,0 +1,25 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+
+{% block title %} Upload Resource {% endblock %}
+
+
+{% block meta_content %} 
+	<!-- This content displayed into the left panel to display the info/hrlp document -->
+	<h3>{% trans "Uploader Form" %}</h3>
+	<p class="text-justify subheader">
+        {% trans "You can upload <b>files</b> of any format to your group library." %}
+    </p>
+
+{% endblock %} 
+
+
+{% block body_content %} 
+
+	{% include "ndf/Upload_File.html" %}
+
+{% endblock %}
+
+
+
+
