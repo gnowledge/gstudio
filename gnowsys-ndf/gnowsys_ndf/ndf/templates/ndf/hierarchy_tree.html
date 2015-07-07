@@ -1,18 +1,22 @@
 {% load i18n %}
-{% load cache %}
 
 {% load ndf_tags %}
 {% get_group_name groupid as group_name_tag %}
 
 <style>
 
-  	#app-set-item li { padding:0.5em }
+  	/*#app-set-item li { padding:0.5em }*/
 
 	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
         content: "\f07b";
     }
+
     .jqtree-tree i {
         margin-right: 4px;
+    }
+
+    ul.jqtree-tree ul.jqtree_common {
+    	margin-left: 36px;
     }
 </style>
 

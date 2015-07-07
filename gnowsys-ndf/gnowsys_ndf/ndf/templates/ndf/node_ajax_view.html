@@ -303,7 +303,6 @@ ul#navigation li a.last {
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
       
   <section class="medium-9 columns">
-
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
     {% for e in breadcrumbs_list %}
@@ -316,6 +315,15 @@ ul#navigation li a.last {
       </b></li>
     {% endfor %}
   </ul>
+  {% elif node.teaches %}
+  <ul class="breadcrumbs">
+    <li>
+        {% for each_topic in node.teaches %}
+          <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{{ each_topic.name }},</a>
+        {% endfor %}
+    </li>
+  </ul>
+
   {% endif %}
 
   {% if node.status == 'MODERATION' %}
@@ -559,23 +567,7 @@ ul#navigation li a.last {
               -->
             {% endcomment %}
 
-            <div class="small-4 columns">
-              {% get_teaches_list node as teaches_list %}
-              {% if teaches_list %}
-              <div class="panel">
-                <h6>Resource for: </h6>
-                {% for  each_node in teaches_list %}
-                {% get_grid_fs_object each_node as grid_fs_obj %}
-                {% if each_node.mime_type %}
-                <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>,&nbsp;
-                {% else %}
-                <a href="{% url 'topic_details' group_name_tag each_node.pk %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>
-                {% if not forloop.last %},&nbsp; {% endif %}
-                {% endif %}
-                {% endfor %}
-              </div>
-              {% endif %}
-            </div>
+            <div class="small-4 columns"> </div>
 
             <div class="small-4 small-pull-4 columns">
               <!-- {#% if node.assesses %#} -->
