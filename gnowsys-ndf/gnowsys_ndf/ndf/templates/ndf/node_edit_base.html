@@ -378,14 +378,27 @@ i.remove-tag{
 					</label>
 				</div>
 		  	{% endfor %}
-
 		  	<div class="small-6 columns">			  	
 		  		<label>
 					<h5>{% trans "Based on Url: " %} </h5> 
-					<input name="basedonurl" type="text" value="">
+					<input name="basedonurl" type="text" value="{{node.basedonurl}}">		  	
 				</label>
 			</div>
 		  	
+		</div>
+		<div class="row">
+			<div class="small-6 columns">
+				<label>
+					<h5>{% trans "License: " %} </h5> 
+					<input name="license" type="text" value="{{node.license}}">		  	
+				</label>
+			</div>
+			<div class="small-6 columns">
+				<label>
+					<h5>{% trans "Source: " %} </h5> 
+					<input name="source" type="text" value="{{node.source}}">		  	
+				</label>
+			</div>
 		</div>
 		<div id="metadata_info"></div>
 	</div>	

@@ -619,6 +619,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
             dict_drawer[each._id] = each
 
     elif (nid is None) and (nlist):
+
         for each in drawer:
             if each._id not in nlist:
                 dict1[each._id] = each
@@ -636,6 +637,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
             if each._id != nid:
                 if each._id not in nlist:
                     dict1[each._id] = each
+
 
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
@@ -945,6 +947,76 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
 @get_execution_time
 def build_collection(node, check_collection, right_drawer_list, checked):
+<<<<<<< HEAD
+=======
+  is_changed = False
+
+  if check_collection == "prior_node":
+    if right_drawer_list != '':
+      # prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
+      right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+
+      if node.prior_node != right_drawer_list:
+        i = 0
+        node.prior_node=[]
+	node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
+        while (i < len(right_drawer_list)):
+          node_id = ObjectId(right_drawer_list[i])
+          node_obj = node_collection.one({"_id": node_id})
+          if node_obj:
+            node_prior_node_append_temp(node_id)
+          
+          i = i+1
+        # print "\n Changed: prior_node"
+        is_changed = True
+    else:
+      node.prior_node = []
+      is_changed = True
+
+  elif check_collection == "collection":
+    #  collection
+    if right_drawer_list != '':
+      right_drawer_list = [ObjectId(each.strip()) for each in right_drawer_list.split(",")]
+
+      nlist = node.collection_set
+
+      # if set(node.collection_set) != set(right_drawer_list):
+      if node.collection_set != right_drawer_list:
+        i = 0
+        node.collection_set = []
+        # checking if each _id in collection_list is valid or not
+	nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
+	node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
+        while (i < len(right_drawer_list)):
+          node_id = ObjectId(right_drawer_list[i])
+          node_obj = node_collection.one({"_id": node_id})
+          if node_obj:
+            if node_id not in nlist:
+              nlist_append_temp(node_id)  
+            else:
+              node_collection_set_append_temp(node_id)  
+              # After adding it to collection_set also make the 'node' as prior node for added collection element
+              node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
+          
+          i = i+1
+
+        for each in nlist:
+          if each not in node.collection_set:
+            node_collection_set_append_temp(each)
+            node.status = u"PUBLISHED"
+            node.save()
+            # After adding it to collection_set also make the 'node' as prior node for added collection element
+            node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
+
+        # For removing collection elements from heterogeneous collection drawer only
+        if not checked: 
+          if nlist:
+            for each in nlist:
+              if each not in right_drawer_list:
+                node.collection_set.remove(each)
+                # Also for removing prior node element after removing collection element
+                node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
+>>>>>>> mongokit
 
     is_changed = False
 
