@@ -7,6 +7,7 @@ import mimetypes
 import os
 import tempfile
 # import re
+import ast
 import ox
 import pandora_client
 import threading
@@ -671,19 +672,6 @@ def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
     """
-    # ins_objectid  = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False :
-    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else :
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth :
-    #             group_id = str(auth._id)
-    # else :
-    #     # print group_id
-    #     pass
 
     try:
         group_id = ObjectId(group_id)
