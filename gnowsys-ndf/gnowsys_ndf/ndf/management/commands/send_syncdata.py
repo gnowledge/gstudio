@@ -3,6 +3,7 @@ from django.core.mail import EmailMessage
 import os
 import requests
 import shutil
+import urllib2
 from subprocess import call
 from django.core.mail import EmailMessage
 from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID
@@ -19,14 +20,22 @@ def sorted_ls(path):
     mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
     return list(sorted(os.listdir(path), key=mtime))
 
-def connected_to_internet(url='http://www.google.com/', timeout=5):
-    try:
-        _ = requests.get(url, timeout=timeout)
-        return True
-    except requests.ConnectionError:
-    	print "Error occurred in : ", str(__file__)
-        print("No internet connection available.")
-    return False
+def connected_to_internet(url='http://www.google.com/', timeout=2):
+	try:
+		urllib2.urlopen(url, timeout=timeout)
+		return True
+	except Exception as error:
+		print 'Internet is not Available'
+		print str(error)
+		return False
+
+    # try:
+        # _ = requests.get(url, timeout=timeout)
+    #     return True
+    # except requests.ConnectionError:
+    # 	print "Error occurred in : ", str(__file__)
+    #     print("No internet connection available.")
+    # return False
 
 class Command(BaseCommand):
 	help = 'Will call the script to send the captured json and data files.'

@@ -139,6 +139,31 @@ Use corresponding package names if you are using an RPM based distro
     (2) Run following command (to start compass) and then edit scss stylesheets:
         compass watch
 
+*Following are for mailclient app and Replication features
+
+*rabbit-mq is used with celery.
+9.
+	sudo apt-get install rabbitmq-server
+*Following has to be done for using the Replication features
+10.	Create a file local_settings.py in /gstudio/gnowsys-ndf/gnowsys_ndf/
+	In this file add the following variables:
+	
+	# SMTP setting for sending mail (Using gmail SMTP server)
+	EMAIL_USE_TLS = True
+	EMAIL_HOST = ''
+	EMAIL_PORT = 587
+	EMAIL_HOST_USER = ''
+	EMAIL_HOST_PASSWORD = ''
+
+	# The following email id and password for the email account will be used for sending/receiving SYNCDATA
+	SYNCDATA_FETCHING_EMAIL_ID = ''
+	SYNCDATA_FETCHING_EMAIL_ID_PASSWORD = ''
+	SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS = ''
+
+	SYNCDATA_SENDING_EMAIL_ID = ''
+
+	# This is the duration (in secs) at which send_syncdata and fetch_syncdata scripts will be run
+	SYNCDATA_DURATION = 60
 
 * Any issues with this procedure or you need any further help, or to
   file bugs etc. visit ask us in the mailing list:
