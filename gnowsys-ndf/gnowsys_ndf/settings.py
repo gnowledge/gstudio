@@ -232,11 +232,11 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 # SMTP setting for sending mail (Using gmail SMTP server)
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 't.metastudio@gmail.com'
-EMAIL_HOST_PASSWORD = 'yolo12345'
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = ''
+#EMAIL_PORT = 587
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
@@ -388,6 +388,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'django.core.context_processors.csrf',
 )
 
+
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
@@ -402,7 +403,7 @@ INSTALLED_APPS = (
     'djangoratings',
     'notification',
     'pagination',
-    'captcha',	
+    'captcha',
     # 'gnowsys_ndf.mobwrite',       #textb
     # 'south',                      #textb
     # 'django_extensions',          #textb

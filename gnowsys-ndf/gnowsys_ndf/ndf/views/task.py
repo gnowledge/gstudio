@@ -26,7 +26,7 @@ from gnowsys_ndf.ndf.models import Node, GSystemType
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.models import GSystemType, Node 
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node,get_execution_time, capture_data
 from gnowsys_ndf.ndf.views.methods import parse_template_data, create_gattribute, create_grelation
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 
@@ -254,17 +254,26 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
               task_node = create_task(request,task_id,group_id)  
               create_task_at_rt(request,rt_list,at_list,task_node,i,group_name,group_id)
               collection_set_ids.append(ObjectId(task_node._id))
+              ''' server_sync '''
+              capture_data(file_object=task_node, file_data=None, content_type='task_create_edit')
           if len(Assignees)>1:
               task_node = create_task(request,task_id,group_id)
               task_node.collection_set = collection_set_ids
               task_node.save()  
-              create_task_at_rt(request,rt_list,at_list,task_node,request.user.id,group_name,group_id)  
+              create_task_at_rt(request,rt_list,at_list,task_node,request.user.id,group_name,group_id)
+              
+              ''' server_sync '''
+              capture_data(file_object=task_node, file_data=None, content_type='task_create_edit')  
       else: 
             task_node = create_task(request,task_id,group_id)  
             create_task_at_rt(request,rt_list,at_list,task_node,Assignees,group_name,group_id)
+
+            ''' server_sync '''
+            capture_data(file_object=task_node, file_data=None, content_type='task_create_edit')
     else: #update
-         task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
-         update(request,rt_list,at_list,task_node,group_id,group_name)
+          task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
+          update(request,rt_list,at_list,task_node,group_id,group_name)
+          
     return HttpResponseRedirect(reverse('task_details', kwargs={'group_name': group_name, 'task_id': str(task_node._id) }))
 
   # Filling blank_dict in below if block
@@ -399,6 +408,8 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
 
         task_gs_triple_instance = create_grelation(task_node._id, node_collection.collection.RelationType(rel_type_node), field_value_list)
         task_node.reload()
+        ''' server_sync '''
+        capture_data(file_object=task_node, file_data=None, content_type='task_reload')
 
       for each in at_list:
         if request.POST.get(each, ""):
@@ -443,6 +454,8 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
               
               attr.object_value = field_value
               attr.save()
+              ''' server_sync '''
+              capture_data(file_object=attr, file_data=None, content_type='attr_save')
           
           else:
             # attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':each})
@@ -511,13 +524,17 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
         update_node.save()
         update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
         update_node.save()
+        ''' server_sync '''
+        capture_data(file_object=update_node, file_data=None, content_type='node_update')
         task_node.post_node.append(update_node._id)
         task_node.save()
-        
+
         # patch
         GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
         get_node_common_fields(request, task_node, group_id, GST_TASK)
         task_node.save()
+        ''' server_sync '''
+        capture_data(file_object=task_node, file_data=None, content_type='node_update')
         # End Patch        
 
 
@@ -571,6 +588,10 @@ def create_task(request,task_id,group_id):
         parent_object.post_node = [task_node._id]
         parent_object.save()
     task_node.save()
+
+    ''' server_sync '''
+    capture_data(file_object=task_node, file_data=None, content_type='task_create') 
+
     return task_node
 
 
@@ -736,10 +757,10 @@ def delete_task(request, group_name, _id):
 		    sys_each_postnode = node_collection.find_one({'_id': each})
 		    member_of_name = node_collection.find_one({'_id': sys_each_postnode.member_of[0]}).name 
 		    if member_of_name == "Task" :
-			sys_each_postnode.prior_node.remove(node._id)
-			sys_each_postnode.save()
+			    sys_each_postnode.prior_node.remove(node._id)
+			    sys_each_postnode.save()
 		    if member_of_name == "task_update_history":
-			sys_each_postnode.delete()
+			      sys_each_postnode.delete()
             node.delete()
     except Exception as e:
         print "Exception:", e

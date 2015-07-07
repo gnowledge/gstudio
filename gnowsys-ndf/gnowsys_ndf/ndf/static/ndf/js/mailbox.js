@@ -6,6 +6,7 @@ var mailbox_name;
 var userName;
 var CSRFtoken;
 var countValue = 20;
+
 function countInitialize(){
 	Readstart = 0;
 	Unreadstart = 0;
@@ -19,7 +20,6 @@ function increaseMailFetchCount(){
 	else{
 		Readstart = Readstart + countValue;
 	}
-	// alert('Unread: ' + Unreadstart + ' Read: ' + Readstart);
 	getMails();
 }
 
@@ -37,7 +37,6 @@ function decreaseMailFetchCount(){
 			Readstart = 0;
 		}
 	}
-	// alert('Unread: ' + Unreadstart + ' Read: ' + Readstart);
 	getMails();
 
 }
@@ -80,18 +79,28 @@ function setMailBoxName(username, csrf_token, mailBoxName, emailid) {
 }
 
 function updateStatus(filename){
-	alert(typeOfMail);
 	if(typeOfMail == 0){
 	$.post( 'mailstatuschange/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'file_name': filename}, function(data){		
 	});
 	}
 }
 
-// <textarea name=\"editor1\" id=\"editor1\">&lt;p&gt;
-// &lt;/p&gt;</textarea><script>CKEDITOR.replace( 'editor1' );</script>
-function readBody(mail_id,text){
-	var content = text;
-    var elementName = "myModal" + mail_id;
+function readBody(text,attached_files, Attachments){
+	var content = '<a class="close-reveal-modal" >&#215;</a>' + text;
+	var attach_count = 0;
+	for(n in Attachments){
+		attach_count+=1;
+	}
+	if(attach_count>0){
+	content += '<br> <h3> Attachments: </h3>';
+	}
+    var elementName = "myModal";
+    var n;
+    for(n in attached_files){
+    	var link = "/" + userName + '/file/readDoc/download';
+    	var href = link + Attachments[n];
+    	content += "<br><a href=\"" + href + "\" download=\"" + attached_files[n] + "\">" + attached_files[n] + "</a>";
+    }
     document.getElementById(elementName).innerHTML = content;    			
 }
 

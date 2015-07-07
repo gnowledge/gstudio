@@ -7,7 +7,7 @@ $(document).ready(function(){
 		}
 		var limit = 1024*1024*25; // 25 MB
 		if(totalSize > limit){
-			document.getElementById("fileError").innerHTML = 'File size is greater than 25 MB';
+			document.getElementById("fileError").innerHTML = 'Total file size is greater than 25 MB. Please reselect attachment(s)';
 			document.getElementById("send_mail").disabled = true;
 		}
 		else {

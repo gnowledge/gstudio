@@ -546,7 +546,7 @@ ul#navigation li a.last {
                   {% for index_key, each_node in node.prior_node_dict.items %}
                   {% get_grid_fs_object each_node as grid_fs_obj %}
                   {% if each_node.mime_type %}
-                  <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}aaaa</a>,&nbsp;
+                  <a href="#{#%# url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}aaaa</a>,&nbsp;
                   {% else %}
                   <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
                   }
@@ -613,7 +613,7 @@ ul#navigation li a.last {
                   <li class="active">
                     <center>                   
                     {% if 'image' in node.mime_type %}
-                    <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    <a class="th" href="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">
                       <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
                       </a>
                     {% elif 'video' in node.mime_type %}
@@ -641,7 +641,7 @@ ul#navigation li a.last {
                     <li>
                       <center>
                         {% if 'image' in obj.mime_type %}
-                        <a class="th" href="{% url 'read_file' group_name_tag k grid_fs_obj.filename %}">
+                        <a class="th" href="{% url 'read_file' group_name_tag k.pk grid_fs_obj.filename %}">
                           <img src="{% url 'get_mid_size_img' group_name_tag k %}" /> 
                         </a>
                         {% elif 'Pandora_video' in obj.member_of_names_list %}
@@ -671,19 +671,19 @@ ul#navigation li a.last {
                 <!-- End of slider --> 
               {% else %}
                   {% if 'audio' in node.mime_type %}
-                    <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
+                    <audio src="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}" controls loop>
                       <p>Your browser does not support the audio element </p>
                     </audio>
                   {% elif 'html' in node.mime_type %}
-                    <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">
                       <p>Your browser does not support the audio element </p>
                     </iframe>
                     {% elif 'pdf' in node.mime_type %}
-                        <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
+                        <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}"></iframe>
                         <br/>
-                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
+                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">Full screen view</a>
                   {% else %}
-                    <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    <a href="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">
                       {{ grid_fs_obj.filename }}
                     </a>
                   {% endif %}       
@@ -693,7 +693,7 @@ ul#navigation li a.last {
             {% else %}
               <!-- not a collection -->
               {% if 'image' in node.mime_type %}
-                <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                <a class="th" href="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">
                   <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
                 </a>
               {% elif 'Pandora_video' in node.member_of_names_list %}
@@ -722,17 +722,17 @@ ul#navigation li a.last {
                   {% trans "Your browser does not support the video tag." %}
                 </video>
               {% elif 'audio' in node.mime_type %}
-                <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
+                <audio src="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}" controls loop>
                   <p>Your browser does not support the audio element </p>
                 </audio>
               {% elif 'html' in node.mime_type %}
-                <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">
                   <p>Your browser does not support the audio element </p>
                 </iframe>
               {% elif 'pdf' in node.mime_type %}
-                <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
+                <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}"></iframe>
                 <br/>
-                <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
+                <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">Full screen view</a>
               {% elif 'epub' in node.mime_type %}
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
@@ -757,7 +757,7 @@ ul#navigation li a.last {
                     <small class="fi-arrow-left"> Previous</small>
                   </h2>
 
-                  <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                  <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">
                     Download "{{ grid_fs_obj.filename }}"
                   </a>
                   <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
@@ -767,7 +767,7 @@ ul#navigation li a.last {
                 
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
-                  var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}", {
+                  var Book = ePub("{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}", {
                     width: 400,
                     height: false,
                     restore: true
@@ -812,7 +812,7 @@ ul#navigation li a.last {
                   // });
                 </script>
               {% else %}
-                <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                <a href="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
                 </a>
               {% endif %}
@@ -831,7 +831,7 @@ ul#navigation li a.last {
               {% if 'video' in node.mime_type %}
                 <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
               {% else %}
-                <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                <a class="button small secondary" href="{% url 'read_file' group_name_tag node.pk grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
               {% endif %}
                   <span class="fi-download large"> {% trans "Download " %} </span>
                 </a>

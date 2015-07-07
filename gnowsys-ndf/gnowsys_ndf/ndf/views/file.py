@@ -35,9 +35,11 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MED
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
 
+
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id, capture_data  # , get_page
+
 
 
 try:
@@ -716,7 +718,6 @@ def submitDoc(request, group_id):
 
 
         i = 1
-
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
@@ -726,6 +727,7 @@ def submitDoc(request, group_id):
                 else:
                     title = mtitle + "_" + str(i) #increament title        
                     f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync=False, oid=True)
+
                     i = i + 1
             else:
                 title = each.name
@@ -735,6 +737,7 @@ def submitDoc(request, group_id):
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
             # if isinstance(f, list):
+
                 f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync=False, oid=True)
 
             if isinstance(f, list):
@@ -787,12 +790,13 @@ def submitDoc(request, group_id):
 first_object = ''
 @get_execution_time
 
+
 def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, request=None, map_geojson_data=[], **kwargs):
 
     """
       this will create file object and save files in gridfs collection
     """
-    
+    server_sync = kwargs["server_sync"]
     global count, first_object
     
     # overwritting count and first object by sending arguments kwargs (count=0, first_object="") 
@@ -802,6 +806,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     
     is_video = ""
     fileobj = node_collection.collection.File()
+    
+    if server_sync:
+      fileobj["_id"] = ObjectId(kwargs["object_id"])
+
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
     size, unit = getFileSize(files)
@@ -843,6 +851,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
 
             fileobj.modified_by = int(userid)
             fileobj.status = u'PUBLISHED'
+
             if int(userid) not in fileobj.contributors:
                 fileobj.contributors.append(int(userid))
             if access_policy:
@@ -894,8 +903,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             fileobj.license = unicode(license)
 
             fileobj.location = map_geojson_data
-
-
             fileobj.save()
 
             if source:
@@ -932,13 +939,13 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
             node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
 
+            print '+' * 20
             # For making collection if uploaded file more than one
             if count == 0:
                 first_object = fileobj
             else:
                 node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
 
-            
 
             """
             code for uploading video to wetube.gnowledge.org
@@ -1004,16 +1011,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
-
-            '''
-            For server-sync
-            '''
-            # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
-            # can be sent as a mail to the mailing-list
-            if not server_sync:
-              print 'capture_data called'
-              capture_data(file_object=fileobj, file_data=files, content_type=filetype1)
-
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
@@ -1028,6 +1025,14 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
 
+            '''
+            For server-sync
+            '''
+            # This function captures the data and a decorater is put on this function so that node to be saved in the parent function
+            # can be sent as a mail to the mailing-list
+            if not server_sync:
+              print 'capture_data called'
+              capture_data(file_object=fileobj, file_data=files, content_type=filetype1)
             return fileobj._id, is_video
 
         except Exception as e:
@@ -1342,6 +1347,7 @@ def file_detail(request, group_id, _id):
             shelves = []
 
     annotations = json.dumps(file_node.annotations)
+    # print "=== ", type(file_node)
 
     return render_to_response(file_template,
                               { 'node': file_node,
@@ -1454,7 +1460,16 @@ def readDoc(request, _id, group_id, file_name=""):
     else:
         return HttpResponse("")
 
-        
+
+@get_execution_time
+def read_attachment(request, group_id, file_path):
+  file_path = '/' + file_path
+  with open(file_path,'r') as download_file:
+    mime = magic.Magic(mime=True)
+    response = HttpResponse(download_file.read(), content_type=mime.from_file(file_path))
+    response['Content-Disposition'] = 'attachment; filename=' + file_path.split("/")[-1]
+    return response
+
 @get_execution_time
 def file_edit(request,group_id,_id):
     ins_objectid  = ObjectId()

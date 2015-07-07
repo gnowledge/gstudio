@@ -23,6 +23,7 @@ from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 
+
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import datetime
@@ -94,15 +95,21 @@ import shutil
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
+
 def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
 
         ''' The mails that would be sent '''
-        mail = EmailMessage()
-        mail.subject = "SYNCDATA"
-        mail.to = ['djangotest94@gmail.com']
-        mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+        # mail = EmailMessage()
+        # subject = "SYNCDATA"
+        # mail.to = ['djangotest94@gmail.com']
+        # mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+
+        ''' Get current date and time to timestamp json and the document being captured by this function.
+         This done so that files in syncdata folder will have unique name'''
+        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S').replace(" ","_").replace("/","_")
+
 
         ''' To fetch the data about the node '''
         # the actual file
@@ -112,70 +119,124 @@ def server_sync(func):
         # content-type of the file
         content_type = kwargs['content_type'] 
 
-        ''' path where the json file that contains the information about node is loated ''' 
+        ''' path where the json file that contains the information about node is located ''' 
         settings_dir1 = os.path.dirname(__file__)
         settings_dir2 = os.path.dirname(settings_dir1)
         settings_dir3 = os.path.dirname(settings_dir2)
         gen_path = os.path.abspath(os.path.dirname(settings_dir3))
+
+        print '+' * 20
+        print gen_path
+
+        file_path = ""
+        file_name_filtered = ""
         if file_data:
-            file_path = gen_path + '/' + str(file_data.name)
-        node_data_path = gen_path + '/node_data.json'
-
+            file_name_filtered = file_data.name
+            special_char = ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}',' ']
+            for i in special_char:
+                file_name_filtered = file_name_filtered.replace(i,'')
+            file_path = gen_path + '/' + str(file_name_filtered)
         
-        if 'image' in content_type:
+        node_data_path = gen_path + '/node_data.json'
+        # subject += str(node._id)
+        
+        print '+' * 20
+        print node_data_path
+
+        if 'image' in content_type or 'video' in content_type:
             # To make the fs_file_ids filed set empty
-
-            node.fs_file_ids = []
-            # pass the image data as attachment
-            file_data.seek(0)
-            # path = default_storage.save(file_path, ContentFile(file_data.read()))
-            with open(file_path,'wb+') as outfile:
-                outfile.write(file_data.read())
-
-            mail.attach_file(file_path)
-               
-
-        elif 'video' in content_type:
-            # on the reciever end send the url
-            node.fs_file_ids = []
-            pass
-        else:
-            #the other documents which need only the json data to be sent
-            node.fs_file_ids = []
-
             if file_data:
+                node.fs_file_ids = []
+                # pass the image data as attachment
                 file_data.seek(0)
-                file_path = gen_path + '/' + str(file_data.name)
                 # path = default_storage.save(file_path, ContentFile(file_data.read()))
                 with open(file_path,'wb+') as outfile:
                     outfile.write(file_data.read())
 
-                mail.attach_file(file_path)
-            # shutil.rmtree(file_path)
-        
-        # node = node_collection.one({'_id': ObjectId(kwargs['node'])})
-        # node_json = json.dumps(node, sort_keys=True, indent=4, separators=(',', ': '), default=json_util.default)
-        node_json = bson.json_util.dumps(node)
 
+        else:
+            #the other documents which need only the json data to be sent
+            if file_data:
+                node.fs_file_ids = []
+                file_data.seek(0)
+                file_path = gen_path + '/' + str(file_name_filtered)
+                # path = default_storage.save(file_path, ContentFile(file_data.read()))
+                with open(file_path,'wb+') as outfile:
+                    outfile.write(file_data.read())
         
+        ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
+        path1 = os.path.dirname(__file__)
+        path2 = os.path.dirname(path1)
+        dst = str(path2) + "/syncdata"
+
+        print '+' * 20
+        print dst
+
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+
+        path_for_this_capture = dst + '/' + timestamp
         
-        # # node_json = json.dumps(node)
+        print '+' * 20
+        print path_for_this_capture
+
+        if not os.path.exists(path_for_this_capture):
+            os.makedirs(path_for_this_capture)
+
+        if file_data:
+            #add _sig otherwise django_mailbox scrambles file name
+            # this '_sig' is later used to split the filename and obtain original file name in received attachments in 
+            # 'server_sync()' function of mailclient.py views file
+            
+            
+
+            op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered + '_sig'
+            print ':' * 20
+            print op_file_name
+            print ':' * 20
+            print file_path
+            command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
+            subprocess.call([command],shell=True)    
+            src = op_file_name
+
+            print '+' * 20
+            print src
+            shutil.move(src,path_for_this_capture)
+            # mail.attach_file(file_path)         
+        
+        print 'JSON'
+        node_json = bson.json_util.dumps(node)
         with open(node_data_path,'w') as outfile:
             json.dump(node_json, outfile)
         
-        mail.attach_file(node_data_path)
-        mail.send()
+        ''' Run command to sign the json file, rename and move to syncdata folder'''
+        #add _sig otherwise django_mailbox scrambles file name
+        json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
+        command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
+        subprocess.call([command],shell=True)
+        src = json_op_file_name
+        shutil.move(src,path_for_this_capture)
+        # mail.attach_file(json_op_file_name)
+        
+        # mail.attach_file(node_data_path)
+        # mail.subject = subject + str(node._id)
+        #mail.send()
+
         os.remove(node_data_path)
+        # os.remove(json_op_file_name)
         if file_data:
             os.remove(file_path)
-
+            # os.remove(op_file_name)
         return ret
-
     return wrap
 
 @get_execution_time
 @server_sync
 def capture_data(file_object=None, file_data=None, content_type=None):
+    '''
+    Serves as an itermediate function to capture the node details and allow
+    the decorator to send the created/updated node through E-Mail
+    '''
     pass
 
 @get_execution_time
@@ -619,17 +680,16 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
             dict_drawer[each._id] = each
 
     elif (nid is None) and (nlist):
-
         for each in drawer:
             if each._id not in nlist:
                 dict1[each._id] = each
-
+     
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
+            dict_drawer['1'] = dict1
+            dict_drawer['2'] = dict2
 
-        dict_drawer['1'] = dict1
-        dict_drawer['2'] = dict2
 
     else:
         for each in drawer:
@@ -638,13 +698,13 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
                 if each._id not in nlist:
                     dict1[each._id] = each
 
-
+      	
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
+            dict_drawer['1'] = dict1
+            dict_drawer['2'] = dict2
 
-        dict_drawer['1'] = dict1
-        dict_drawer['2'] = dict2
 
     if checked == "RelationType" or checked == "CourseUnits":
         return dict_drawer
@@ -931,6 +991,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
                 user_group_location[
                     'visited_location'] = user_last_visited_location
                 user_group_location.save()
+                
+                # ''' server_sync '''
+                # capture_data(file_object=user_group_location, file_data=None, content_type='user_group_creation')
 
     if is_changed:
         node.status = unicode("DRAFT")
@@ -947,7 +1010,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
 @get_execution_time
 def build_collection(node, check_collection, right_drawer_list, checked):
-
   is_changed = False
 
   if check_collection == "prior_node":
@@ -1015,8 +1077,6 @@ def build_collection(node, check_collection, right_drawer_list, checked):
                 node.collection_set.remove(each)
                 # Also for removing prior node element after removing collection element
                 node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$in':[node._id]} },{'$pull': {'prior_node': ObjectId(node._id)}})
-
-
     is_changed = False
 
     if check_collection == "prior_node":
@@ -1385,7 +1445,7 @@ def get_page(request, node):
                 #     if node1.created_by ==request.user.id:
                 #           return (node2,ver2)
                 #      else:
-                #	   return (node2,ver2)
+                #      return (node2,ver2)
         return (node1, ver1)
 
 
@@ -1572,9 +1632,13 @@ def update_mobwrite_content_org(node_system):
         textobj = TextObj.objects.get(filename=filename)
         textobj.text = content_org
         textobj.save()
+        # ''' server_sync '''
+        # capture_data(file_object=textobj, file_data=None, content_type='update_mobwrite_content_org')
     else:
         textobj = TextObj(filename=filename, text=content_org)
         textobj.save()
+        # ''' server_sync '''
+        # capture_data(file_object=textobj, file_data=None, content_type='update_mobwrite_content_org')
     return textobj
 
 
@@ -1705,6 +1769,8 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
             gr_node.right_subject = ObjectId(relation_id)
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            # ''' server_sync '''
+            # capture_data(file_object=gr_node, file_data=None, content_type='grelation_list_creation')
 
 
 @get_execution_time
@@ -2077,6 +2143,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
             ga_node.object_value = object_value
             ga_node.save()
+            # ''' server_sync '''
+            # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_create')
 
             if object_value == u"None":
                 info_message = " GAttribute (" + ga_node.name + \
@@ -2108,6 +2176,10 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
                 ga_node.status = u"DELETED"
                 ga_node.save()
+                
+                # ''' server_sync '''
+                # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
+                
                 info_message = " GAttribute (" + ga_node.name + \
                     ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
@@ -2154,6 +2226,9 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                     if ga_node.status == u"DELETED":
                         ga_node.status = u"PUBLISHED"
                         ga_node.save()
+                        
+                        # ''' server_sync '''
+                        # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_delete')
 
                         info_message = " GAttribute (" + ga_node.name + \
                             ") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
@@ -2168,6 +2243,9 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
                     else:
                         ga_node.status = u"PUBLISHED"
                         ga_node.save()
+                        ''' server_sync '''
+                        # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_publish')
+
 
                         info_message = " GAttribute (" + \
                             ga_node.name + ") updated successfully.\n"
@@ -2228,6 +2306,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            ''' server_sync '''
+            # capture_data(file_object=gr_node, file_data=None, content_type='grelation_create')
+
             
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
@@ -2298,6 +2379,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         def _update_deleted_to_published(gr_node, relation_type_node, relation_type_text):
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+
+            ''' server_sync '''
+            # capture_data(file_object=gr_node, file_data=None, content_type='gattribute_update_delete_to_published')
 
             gr_node_name = gr_node.name
             relation_type_node_name = relation_type_node.name
@@ -2428,6 +2512,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                     # right_subject_id_or_list.remove(n.right_subject)
                     n.status = u"DELETED"
                     n.save()
+        
+                    ''' server_sync '''
+                    # capture_data(file_object=n, file_data=None, content_type='deletion')
+
                     info_message = " MultipleGRelation: GRelation (" + n.name + \
                         ") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
 
@@ -2538,6 +2626,9 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
                         node.status = u"DELETED"
                         node.save()
 
+                        ''' server_sync '''
+                        # capture_data(file_object=node, file_data=None, content_type='delete')
+
                         node_collection.collection.update({
                             '_id': subject_id, 'relation_set.' + relation_type_node_name: {'$exists': True}
                         }, {
@@ -2596,7 +2687,7 @@ def set_all_urls(member_of):
     else:
         url = u"None"
     return url
-###############################################	##########################
+############################################### ##########################
 
 
 @login_required
@@ -2639,6 +2730,9 @@ def create_discussion(request, group_id, node_id):
 
             thread_obj.save()
 
+            ''' server_sync '''
+            # capture_data(file_object=thread_obj, file_data=None, content_type='discussion_create')
+            
             # creating GRelation
             # create_grelation(node_id, relation_type, twist_st)
             response_data = ["thread-created", str(thread_obj._id)]
@@ -2697,6 +2791,9 @@ def discussion_reply(request, group_id, node_id):
 
             # saving the reply obj
             reply_obj.save()
+
+            ''' server_sync '''
+            # capture_data(file_object=reply_obj, file_data=None, content_type='discussion_reply')
 
             formated_time = reply_obj.created_at.strftime(
                 "%B %d, %Y, %I:%M %p")
@@ -2977,6 +3074,9 @@ def create_task(task_dict, task_type_creation="single"):
     # GAttribute(s)/GRelation(s)
     task_node.status = u"PUBLISHED"
     task_node.save()
+
+    ''' server_sync '''
+    # capture_data(file_object=task_node, file_data=None, content_type='task_create')
 
     # Create GAttribute(s)/GRelation(s)
     for attr_or_rel_name in task_dict_keys:
@@ -3295,6 +3395,9 @@ def create_college_group_and_setup_data(college_node):
         gfc.contributors = [creator_and_modifier]
         gfc.status = u"PUBLISHED"
         gfc.save()
+
+        ''' server_sync '''
+        # capture_data(file_object=gfc, file_data=None, content_type='college_group_create')
 
     if "_id" in gfc:
         has_group_rt = node_collection.one(
@@ -3771,6 +3874,9 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
 
         gr_node.status = u"DELETED"
         gr_node.save()
+        
+        ''' server_sync '''
+        # capture_data(file_object=gr_node, file_data=None, content_type='delete_node')
 
     try:
         # print "\n 1 >> Begin..."
@@ -4169,6 +4275,9 @@ def delete_node(
                 # Only changes the status of given node to DELETED
                 node_to_be_deleted.status = u"DELETED"
                 node_to_be_deleted.save()
+                
+                ''' server_sync '''
+                # capture_data(file_object=node_to_be_deleted, file_data=None, content_type='delete_node')
 
             # Perform Purge operation on deleting-node
             if deletion_type == 1:
@@ -4366,6 +4475,5 @@ def repository(request, group_id):
                                'group_id': group_id, 'groupid': group_id
                                },
                               context_instance=RequestContext(request)
-
                               )
 
