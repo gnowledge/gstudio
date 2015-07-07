@@ -61,7 +61,7 @@ def page(request, group_id, app_id=None):
         if group_ins:
             group_id = str(group_ins._id)
 
-            print group_id
+            
         else :
             auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
@@ -175,11 +175,11 @@ def page(request, group_id, app_id=None):
 
           if node is None:
             node = node_collection.find({'member_of':ObjectId(app_id)})
-
+	  '''
           for nodes in node:
             node,ver=get_versioned_page(nodes) 
             content.append(node)  
-
+          '''  
                     
           # rcs content ends here
           
@@ -187,7 +187,7 @@ def page(request, group_id, app_id=None):
                                     {'title': title, 
                                      'appId':app._id,
                                      'shelf_list': shelf_list,'shelves': shelves,
-                                     'page_nodes':content,
+                                     'page_nodes':nodes,
                                      'groupid':group_id,
                                      'group_id':group_id
                                     }, 
@@ -233,13 +233,14 @@ def page(request, group_id, app_id=None):
         
     else:
         # Page Single instance view
-        Group_node = node_collection.one({"_id": ObjectId(group_id)})
-       
-        if Group_node.prior_node:
+        '''Group_node = node_collection.one({"_id": ObjectId(group_id)})'''
+	page_node = node_collection.one({"_id": ObjectId(app_id)})       
+        '''if Group_node.prior_node:
             page_node = node_collection.one({"_id": ObjectId(app_id)})
             
         else:
-          node = node_collection.one({"_id": ObjectId(app_id)})
+          
+	  	
           if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None or Group_node.edit_policy == "NON_EDITABLE":
             page_node,ver=get_page(request,node)
           else:
@@ -248,7 +249,7 @@ def page(request, group_id, app_id=None):
               page_node,ver=get_versioned_page(node)
             elif node.status == u"PUBLISHED":
               page_node = node
-
+	'''	
       
  
         annotations = json.dumps(page_node.annotations)
@@ -304,12 +305,14 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-	page_type = request.POST.getlist("type_of",'')[0]
-	if not ObjectId(page_type) in page_node.type_of:
-		page_type1=[]
-		page_type1.append(ObjectId(page_type))
-		page_node.type_of = page_type1
-		page_node.type_of
+	page_type = request.POST.getlist("type_of",'')
+	if page_type:
+		objid= page_type[0]
+		if not ObjectId(objid) in page_node.type_of:
+			page_type1=[]
+			page_type1.append(ObjectId(objid))
+			page_node.type_of = page_type1
+			page_node.type_of
 	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
         page_node.save() 
         
@@ -327,7 +330,7 @@ def create_edit_page(request, group_id, node_id=None):
     else:
         if node_id:
 
-            page_node,ver=get_page(request,page_node)
+            #page_node,ver=get_page(request,page_node)
             page_node.get_neighbourhood(page_node.member_of)
             context_variables['node'] = page_node
             context_variables['groupid']=group_id

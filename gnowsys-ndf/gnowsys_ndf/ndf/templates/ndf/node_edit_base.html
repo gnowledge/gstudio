@@ -223,7 +223,14 @@ i.remove-tag{
  							<div class="small-8 columns" ends>
 				     			<select name="type_of" id="type_of">
 						  			{% for i in page_instance %}
-						  				<option value = {{i.pk}} > {{i.name}} </option>
+
+						  				{% if i.name == "Wiki page" %}	        				
+											<option value = {{i.pk}} selected> {{i.name}} </option>
+
+										{% else %}
+											<option value = {{i.pk}} > {{i.name}} </option>
+										{% endif %}
+						  				
 			  						{% endfor %}
 								</select>
 							</div>
@@ -587,6 +594,7 @@ $(document).ready(function(){
 			$("#name_id").attr("disabled",true)
 		{% endif %}
 	{% endif %}
+	
 });
 
 
