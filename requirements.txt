@@ -23,3 +23,5 @@ django-memcache-admin
 pandora-client
 pymongo==2.8
 django-simple-captcha
+django_mailbox
+celery
