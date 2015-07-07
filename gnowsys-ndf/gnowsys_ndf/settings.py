@@ -240,7 +240,7 @@ EMAIL_HOST_PASSWORD = 'yolo12345'
 
 # The following email id and password for the email account will be used for sending/receiving SYNCDATA
 SYNCDATA_FETCHING_EMAIL_ID = 'djangotest94@gmail.com'
-SYNCDATA_FETCHING_EMAIL_ID_PASSWORD = ''
+SYNCDATA_FETCHING_EMAIL_ID_PASSWORD = '123djangoqwerty'
 SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS = 'imap.gmail.com'
 
 SYNCDATA_SENDING_EMAIL_ID = 'djangotest94@gmail.com'
