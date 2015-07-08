@@ -7,7 +7,7 @@ import time
 import ast
 import json
 import math
-import multiprocessing
+import multiprocessing 
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -637,7 +637,7 @@ def get_topic_contents(request, group_id):
 def get_collection_list(collection_list, node):
   inner_list = []
   error_list = []
-  
+  inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -651,9 +651,9 @@ def get_collection_list(collection_list, node):
               inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
               if inner_sub_list:
-                inner_list.append(inner_sub_list[0])
+                inner_list_append_temp(inner_sub_list[0])
               else:
-                inner_list.append(inner_sub_dict)
+                inner_list_append_temp(inner_sub_dict)
 
               cl.update({'children': inner_list })
       else:
@@ -723,7 +723,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
-
+  inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -736,9 +736,9 @@ def get_inner_collection(collection_list, node):
             inner_sub_list = get_inner_collection(inner_sub_list, col_obj)
 
             if inner_sub_list:
-              inner_list.append(inner_sub_list[0])
+              inner_list_append_temp(inner_sub_list[0])
             else:
-              inner_list.append(inner_sub_dict)
+              inner_list_append_temp(inner_sub_dict)
 
             cl.update({'children': inner_list })
       else:
@@ -750,27 +750,43 @@ def get_inner_collection(collection_list, node):
   else:
     return collection_list
 
+
 @get_execution_time
 def get_collection(request, group_id, node_id):
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
   collection_list = []
+  collection_list_append_temp=collection_list.append
+  
+ # def a(p,q,r):
+#		collection_list.append({'name': p, 'id': q,'node_type': r})
+  #this empty list will have the Process objects as its elements
+  processes=[]
+  #Function used by Processes implemented below
+  def multi_(lst):
+		for each in lst:
+			obj = node_collection.one({'_id': ObjectId(each) })
+			if obj:
+			  node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+                          collection_list_append_temp({'name':obj.name,'id':obj.pk,'node_type':node_type})
+                          collection_list = get_inner_collection(collection_list, obj)
+			#collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+			  
 
-  if node:
-    if node.collection_set:
-      for each in node.collection_set:
-        obj = node_collection.one({'_id': ObjectId(each) })
-        if obj:
-          node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-          collection_list.append({'name': obj.name, 'id': obj.pk,'node_type': node_type})
-          collection_list = get_inner_collection(collection_list, obj)
-
-
+  if node and node.collection_set:
+		t=len(node.collection_set)
+		x=multiprocessing.cpu_count()#returns no of cores in the cpu 
+		n2=t/x#divides the list into those many parts
+		#Process object is created.The list after being partioned is also given as an argument. 
+		for i in range(x):
+			processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2],)))
+		for i in range(x):
+			processes[i].start()#each Process started
+		for i in range(x):
+			processes[i].join()#each Process converges
   data = collection_list
 
   return HttpResponse(json.dumps(data))
-# ###End of manipulating nodes collection####
-
 @get_execution_time
 def add_sub_themes(request, group_id):
   if request.is_ajax() and request.method == "POST":
@@ -1374,9 +1390,9 @@ def graph_nodes(request, group_id):
   node_metadata ='{"screen_name":"' + page_node.name + '",  "title":"' + page_node.name + '",  "_id":"'+ str(page_node._id) +'", "refType":"GSystem"}, '
   node_relations = ''
   exception_items = [
-                      "name", "content", "_id", "login_required", "attribute_set",
+                      "name", "content", "_id", "login_required", "attribute_set", "relation_set",
                       "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
                       "property_order", "rating", "apps_list", "annotations", "instance of"
@@ -3068,9 +3084,8 @@ def get_districts(request, group_id):
         }).sort('name', 1)
 
         if cur_districts.count():
-          for d in cur_districts:
-            districts.append([str(d.subject), d.name.split(" -- ")[0]])
-
+          #loop replaced by a list comprehension
+          districts=[[str(d.subject), d.name.split(" -- ")[0]] for d in cur_districts]
         else:
           error_message = "No districts found"
           raise Exception(error_message)
@@ -4559,110 +4574,79 @@ def mp_approve_students(student_cur, course_ids, course_enrollment_status_text, 
         p.join()
 
     return resultlist
+# ====================================================================================================
+
 
 @get_execution_time
 def get_students_for_batches(request, group_id):
-  """
-  This view returns ...
+    """
+    This view returns ...
 
-  Arguments:
-  group_id - ObjectId of the currently selected group
-  Returns:
-  A dictionary consisting of following key-value pairs:-
-  success - Boolean giving the state of ajax call
-  message - Basestring giving the error/information message
-  """
-  response_dict = {'success': False, 'message': ""}
-  b_arr=[]
-  try:
-    if request.is_ajax() and request.method == "GET":
-      btn_id = request.GET.get('btn_id', "")
-      batch_id = request.GET.get('node_id', "")
-      ac_id = request.GET.get('ac_id', "")
+    Arguments:
+    group_id - ObjectId of the currently selected group
+    Returns:
+    A dictionary consisting of following key-value pairs:-
+    success - Boolean giving the state of ajax call
+    message - Basestring giving the error/information message
+    """
+    response_dict = {'success': False, 'message': ""}
+    result_set = None
+    query = {}
+    try:
+        if request.is_ajax() and request.method == "POST":
+            ann_course_id = unicode(request.POST.get('ac_id', ""))
+            added_ids_list = request.POST.getlist('added_ids_list[]', "")
+            if added_ids_list:
+                added_ids_list = list(set(added_ids_list))
+            search_text = unicode(request.POST.get('search_text', ""))
+            stud_gst = node_collection.one({'_type': "GSystemType", 'name': "Student"})
+            query.update({'member_of': stud_gst._id})
+            if added_ids_list:
+                added_ids_list = [ObjectId(each) for each in added_ids_list]
+                query.update({'_id': {'$nin': added_ids_list}})
+            query.update({'name': {'$regex': search_text, '$options': "i"}})
+            query.update({'attribute_set.course_enrollment_status.' + ann_course_id: 'Enrollment Approved'})
+            response_dict["success"] = True
+            rec = node_collection.collection.aggregate([{'$match': query},
+                                      {'$project': {'_id': 0,
+                                                    'stud_id': '$_id',
+                                                    'enrollment_code': '$attribute_set.enrollment_code',
+                                                    'name': '$name',
+                                                    # 'email_id': '$attribute_set.email_id',
+                                                    # 'phone': '$attribute_set.mobile_number',
+                                                    'year_of_study': '$attribute_set.degree_year',
+                                                    'degree': '$attribute_set.degree_specialization',
+                                                    # 'college': '$relation_set.student_belongs_to_college',
+                                                    # 'college_roll_num': '$attribute_set.college_enroll_num',
+                                                    # 'university': '$relation_set.student_belongs_to_university',
+                                      }},
+                                      {'$sort': {'enrollment_code': 1}}
+            ])
+            result_set = rec['result']
+            # Column headers to be displayed on json_data
+            column_headers = [
+                        ('enrollment_code', 'Enr Code'),
+                        ("name", "Name"),
+                        ("degree", "Degree/Stream"),
+                        ("year_of_study", "Year of Study"),
+            ]
 
-      batch_name_index = 1
-      batches_for_same_course = []
-      all_batches_in_grp = []
-      batch_mem_dict = {}
-      batch_member_list = []
-      
-      batch_gst = node_collection.one({'_type':"GSystemType", 'name':"Batch"})
+            students_count = len(result_set)
+            response_dict["students_data_set"] = result_set
+            response_dict["success"] = True
+            response_dict["students_count"] = students_count
+            response_dict["column_headers"] = column_headers
+            return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+        else:
+            error_message = "BatchFetchError: Either not an ajax call or not a GET request!!!"
+            response_dict["message"] = json_datarror_message
+            return HttpResponse(json.dumps(response_dict))
 
-      batch_for_group = node_collection.find({'member_of': batch_gst._id, 'relation_set.has_course': ObjectId(ac_id)})
-      
-      for each1 in batch_for_group:
-        existing_batch = node_collection.one({'_id': ObjectId(each1._id)})
-        batch_name_index += 1
-        for each2 in each1.relation_set:
-          if "has_batch_member" in each2:
-            batch_member_list.extend(each2['has_batch_member'])
-            break
-        each1.get_neighbourhood(each1.member_of)
-        batch_mem_dict[each1.name] = each1
-      
-      # College's ObjectId is required, if student record can't be found 
-      # using group's ObjectId
-      # A use-case where records created via csv file appends MIS_admin group's 
-      # ObjectId in group_set field & not college-group's ObjectId
-      ann_course = node_collection.one({'_id': ObjectId(ac_id)}, {'relation_set.acourse_for_college': 1,"relation_set.course_has_enrollment":1})
-      sce_id = None
-      for rel in ann_course.relation_set:
-        if rel and "course_has_enrollment" in rel:
-          sce_id = rel["course_has_enrollment"][0]
-          break
+    except Exception as e:
+        error_message = "BatchFetchError: " + str(e) + "!!!"
+        response_dict["message"] = error_message
+        return HttpResponse(json.dumps(response_dict))
 
-      sce_node = node_collection.one({"_id":ObjectId(sce_id)},{"attribute_set.has_approved":1})
-
-      approved_students_list = []
-      for attr in sce_node.attribute_set:
-        if attr and "has_approved" in attr:
-          approved_students_list = attr["has_approved"]
-          break
-
-      approve_not_in_batch_studs = [stud_id for stud_id in approved_students_list if stud_id not in batch_member_list]
-
-      student = node_collection.one({'_type': "GSystemType", 'name': "Student"})
-
-      res = node_collection.find(
-        {
-          '_id': {"$in": approve_not_in_batch_studs},
-          'member_of': student._id
-          # '$or': [
-          #   {'group_set': ObjectId(group_id)},
-          #   {'relation_set.student_belongs_to_college': college_id}
-          # ],
-          # 'relation_set.selected_course': ObjectId(ac_id)
-        },
-        {'_id': 1, 'name': 1, 'member_of': 1, 'created_by': 1, 'created_at': 1, 'content': 1}
-      ).sort("name", 1) 
-
-
-      drawer_template_context = edit_drawer_widget("RelationType", group_id, None, None, None, left_drawer_content=res)
-      drawer_template_context["widget_for"] = "new_create_batch"
-      drawer_widget = render_to_string(
-        'ndf/drawer_widget.html', 
-        drawer_template_context,
-        context_instance = RequestContext(request)
-      )
-
-      response_dict["success"] = True
-      response_dict["drawer_widget"] = drawer_widget
-      response_dict["student_count"] = res.count()
-      response_dict["batch_name_index"] = batch_name_index
-      response_dict["batches_for_same_course"] = json.dumps(batch_mem_dict, cls=NodeJSONEncoder)
-
-      return HttpResponse(json.dumps(response_dict))
-    else:
-      error_message = "Batch Drawer: Either not an ajax call or not a GET request!!!"
-      response_dict["message"] = error_message
-      return HttpResponse(json.dumps(response_dict))
-
-  except Exception as e:
-    error_message = "Batch Drawer: " + str(e) + "!!!"
-    response_dict["message"] = error_message
-    return HttpResponse(json.dumps(response_dict))
-
-# ====================================================================================================
 
 @get_execution_time
 def edit_task_title(request, group_id):
@@ -4972,7 +4956,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
       performance_record_dict = {}
       marks_dict = {}
       student_node = node_collection.find_one({"_id":ObjectId(a['Name'])})
-      
+
       for i in student_node.attribute_set:
           if unicode('student_event_details') in i.keys():
             student_dict.update(i['student_event_details'])
@@ -5433,6 +5417,9 @@ def page_scroll(request,group_id,page):
        page='1'  
     if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
+    # temp. variables which stores the lookup for append method
+    user_activity_append_temp=user_activity.append
+    files_list_append_temp=files_list.append
     for each in (paged_resources.page(int(page))).object_list:
             if each.created_by == each.modified_by :
                if each.last_update == each.created_at:
@@ -5443,9 +5430,9 @@ def page_scroll(request,group_id,page):
                activity =  'created'
         
             if each._type == 'Group':
-               user_activity.append(each)
+               user_activity_append_temp(each)
             each.update({'activity':activity})
-            files_list.append(each)
+            files_list_append_temp(each)
             
  else:
       page=0           

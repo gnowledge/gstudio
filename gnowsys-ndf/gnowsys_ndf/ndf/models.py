@@ -55,15 +55,15 @@ NODE_TYPE_CHOICES = (
 )
 
 TYPES_OF_GROUP = (
-    ('ANONYMOUS'),
     ('PUBLIC'),
-    ('PRIVATE')
+    ('PRIVATE'),
+    ('ANONYMOUS')
 )
 
 EDIT_POLICY = (
-    ('NON_EDITABLE'),
+    ('EDITABLE_NON_MODERATED'),
     ('EDITABLE_MODERATED'),
-    ('EDITABLE_NON_MODERATED')
+    ('NON_EDITABLE')
 )
 
 SUBSCRIPTION_POLICY = (
@@ -235,9 +235,8 @@ class Node(DjangoDocument):
                                         # ready.
     default_values = {'created_at': datetime.datetime.utcnow, 'status': u'DRAFT'}
     use_dot_notation = True
-
+    
     ########## Setter(@x.setter) & Getter(@property) ##########
-
     @property
     def user_details_dict(self):
         """Retrieves names of created-by & modified-by users from the given
@@ -1595,7 +1594,7 @@ class Triple(DjangoDocument):
     'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
   }
-
+  
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True

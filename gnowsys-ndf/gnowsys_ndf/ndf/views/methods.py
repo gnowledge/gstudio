@@ -35,11 +35,11 @@ import ast
 import string
 import json
 import locale
+import multiprocessing as mp 
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
 from collections import OrderedDict
-
 col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
@@ -263,12 +263,28 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
         # Then append their names in list of GApps to be excluded
         if already_selected_gapps:
             gapps_list_remove = gapps_list.remove
-            for each_gapp in already_selected_gapps:
+            #Function used by Processes implemented below
+            def multi_(lst):
+              for each_gapp in lst:
                 gapp_name = each_gapp["name"]
 
                 if gapp_name in gapps_list:
                     gapps_list_remove(gapp_name)
-
+            #this empty list will have the Process objects as its elements
+            processes=[]
+            n1=len(already_selected_gapps)
+            lst1=already_selected_gapps
+            #returns no of cores in the cpu
+            x=mp.cpu_count()
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+              processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2],)))
+            for i in range(x):
+              processes[i].start() #each Process started 
+            for i in range(x):
+              processes[i].join() #each Process converges
     # Find all GAPPs
     meta_type = node_collection.one({
         "_type": "MetaType", "name": META_TYPE[0]
@@ -524,6 +540,10 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id not in nlist:
           dict1[each._id] = each
 
+      #loop replaced by a list comprehension
+      dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+
+     
       for oid in nlist:
         obj = node_collection.one({'_id': oid})
         dict2.append(obj)
@@ -537,10 +557,15 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id != nid:
           if each._id not in nlist:
             dict1[each._id] = each
+      #loop replaced by a list comprehension    
+      dict2=[node_collection.one({'_id': oid})  for oid in nlist]
           
-      for oid in nlist: 
+      	
+      for oid in nlist:
         obj = node_collection.one({'_id': oid})
         dict2.append(obj)
+      
+      
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -782,7 +807,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         node.tags = tags_list
         is_changed = True
       
-
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
         changed = build_collection(node, check_collection, right_drawer_list, checked)
@@ -790,16 +814,15 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
             is_changed = True
 
     #  org-content
-    if content_org:
-        if node.content_org != content_org:
-            node.content_org = content_org
+    if node.content_org != content_org:
+        node.content_org = content_org
 
-            # Required to link temporary files with the current user who is
-            # modifying this document
-            usrname = request.user.username
-            filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-            node.content = org2html(content_org, file_prefix=filename)
-            is_changed = True
+        # Required to link temporary files with the current user who is
+        # modifying this document
+        usrname = request.user.username
+        filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+        node.content = org2html(content_org, file_prefix=filename)
+        is_changed = True
 
     # visited_location in author class
     if node.location != map_geojson_data:
@@ -850,11 +873,12 @@ def build_collection(node, check_collection, right_drawer_list, checked):
       if node.prior_node != right_drawer_list:
         i = 0
         node.prior_node=[]
+	node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
-            node.prior_node.append(node_id)
+            node_prior_node_append_temp(node_id)
           
           i = i+1
         # print "\n Changed: prior_node"
@@ -875,14 +899,16 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         i = 0
         node.collection_set = []
         # checking if each _id in collection_list is valid or not
+	nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
+	node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
             if node_id not in nlist:
-              nlist.append(node_id)  
+              nlist_append_temp(node_id)  
             else:
-              node.collection_set.append(node_id)  
+              node_collection_set_append_temp(node_id)  
               # After adding it to collection_set also make the 'node' as prior node for added collection element
               node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
           
@@ -890,7 +916,7 @@ def build_collection(node, check_collection, right_drawer_list, checked):
 
         for each in nlist:
           if each not in node.collection_set:
-            node.collection_set.append(each)
+            node_collection_set_append_temp(each)
             node.status = u"PUBLISHED"
             node.save()
             # After adding it to collection_set also make the 'node' as prior node for added collection element
@@ -1067,6 +1093,33 @@ def build_collection(node, check_collection, right_drawer_list, checked):
   else:
     return False
 
+"""
+@get_execution_time
+def get_versioned_page(node):
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+  (fp)
+    rev_no =""
+    proc1=subprocess.Popen(cmd,shell=True,
+        stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+      if line.find('revision')!=-1 and line.find('selected') == -1:
+          rev_no=string.split(line,'revision')
+          rev_no=rev_no[1].strip( '\t\n\r')
+          rev_no=rev_no.split()[0]
+      if line.find('status')!=-1:
+          up_ind=line.find('status')
+          if line.find(('PUBLISHED'),up_ind) !=-1:
+	             rev_no=rev_no.split()[0]
+               node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
+               return (node,rev_no)    
+      if rev_no == '1.1':
+           node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
+           return(node,'1.1')
+"""
 
 @get_execution_time
 def get_versioned_page(node):
@@ -1085,15 +1138,14 @@ def get_versioned_page(node):
       if line.find('status')!=-1:
           up_ind=line.find('status')
           if line.find(('PUBLISHED'),up_ind) !=-1:
-	       rev_no=rev_no.split()[0]
-               node=history_manager.get_version_document(node,rev_no)
-               proc1.kill()
-               return (node,rev_no)    
+           rev_no=rev_no.split()[0]
+           node=history_manager.get_version_document(node,rev_no)
+           proc1.kill()
+           return (node,rev_no)   
       if rev_no == '1.1':
            node=history_manager.get_version_document(node,'1.1')
            proc1.kill()
            return(node,'1.1')
-
 
 
 @get_execution_time
@@ -1228,8 +1280,8 @@ def tag_info(request, group_id, tagname=None):
             cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
                                         'group_set':ObjectId(group_id)
                   })
-            for every in cur:
-                search_result.append(every)
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
     # Autheticate user can see all public files
     elif request.user.is_authenticated():
@@ -1251,8 +1303,8 @@ def tag_info(request, group_id, tagname=None):
                                             {'created_by': userid},
                                           ]
                                       })
-            for every in cur:
-                search_result.append(every)
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
     else:  # Unauthenticated user can see all public files.
         group_node = node_collection.one({'_id': ObjectId(group_id)})
@@ -1263,8 +1315,8 @@ def tag_info(request, group_id, tagname=None):
                                                'status': u'PUBLISHED'
                                             }
                                      )
-                for every in cur:
-                    search_result.append(every)
+                #loop replaced by a list comprehension
+                search_result=[every for every in cur]
 
     if search_result:
         total = len(search_result)
@@ -1494,18 +1546,22 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   """
   if not isinstance(at_rt_objectid_or_attr_name_list, list):
     at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
-
+  #a temp. variable which stores the lookup for append method
+  type_of_set_append_temp=type_of_set.append  
   if not type_of_set:
     node["property_order"] = []
+    #a temp. variable which stores the lookup for append method
+    node_property_order_append_temp=node["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          type_of_set.append(type_of)
+          type_of_set_append_temp(type_of)
 
       for po in gst["property_order"]:
         if po not in node["property_order"]:
-          node["property_order"].append(po)
+          node_property_order_append_temp(po)    
+          
 
   BASE_FIELD_METADATA = {
     'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
@@ -1517,6 +1573,8 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   }
 
   widget_data_list = []
+  #a temp. variable which stores the lookup for append method
+  widget_data_list_append_temp=widget_data_list.append
   for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
     if type(at_rt_objectid_or_attr_name) == ObjectId: #ObjectId.is_valid(at_rt_objectid_or_attr_name):
       # For attribute-field(s) and/or relation-field(s)
@@ -1576,7 +1634,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
         data_type = node.structure[field.name]
         value = node[field.name]
 
-      widget_data_list.append({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
+      widget_data_list_append_temp({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
                               '_id': field._id, 
                               'data_type': data_type,
                               'name': field.name, 'altnames': altnames,
@@ -1587,7 +1645,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
       # For node's base-field(s)
 
       # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
-      widget_data_list.append({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+      widget_data_list_append_temp({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
                               'data_type': node.structure[at_rt_objectid_or_attr_name],
                               'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
                               'value': node[at_rt_objectid_or_attr_name],
@@ -1615,21 +1673,25 @@ def get_property_order_with_value(node):
     
     demo["property_order"] = []
     type_of_set = []
+    #temp. variables which stores the lookup for append method
+    type_of_set_append_temp=type_of_set.append
+    demo_prop_append_temp=demo["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          type_of_set.append(type_of)
+          type_of_set_append_temp(type_of)
 
       for po in gst["property_order"]:
         if po not in demo["property_order"]:
-          demo["property_order"].append(po)
+          demo_prop_append_temp(po)
 
     demo.get_neighbourhood(node["member_of"])
-
+    #a temp. variable which stores the lookup for append method
+    new_property_order_append_temp=new_property_order.append
     for tab_name, list_field_id_or_name in demo['property_order']:
       list_field_set = get_widget_built_up_data(list_field_id_or_name, demo, type_of_set)
-      new_property_order.append([tab_name, list_field_set])
+      new_property_order_append_temp([tab_name, list_field_set])
 
     demo["property_order"] = new_property_order
   
@@ -1640,9 +1702,11 @@ def get_property_order_with_value(node):
       
       if type_of_nodes.count():
         demo["property_order"] = []
+        #a temp. variable which stores the lookup for append method
+        demo_prop_append_temp=demo["property_order"].append
         for to in type_of_nodes:
           for po in to["property_order"]:
-            demo["property_order"].append(po)
+            demo_prop_append_temp(po)
 
       node_collection.collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
 
@@ -4040,3 +4104,5 @@ def repository(request, group_id):
                               },
                               context_instance=RequestContext(request)
                             )
+
+

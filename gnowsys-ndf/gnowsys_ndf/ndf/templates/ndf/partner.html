@@ -7,7 +7,16 @@
 {% block title %} {{groups_category}} {% endblock %}
 
 {% block meta_content %}  
-<h2 class="subheader">{{groups_category}}</h2>
+
+  <h2 class="subheader">
+    {% if app_gst.altnames and app_gst.altnames != "None" %}
+      {{app_gst.altnames}}
+    {% else %}
+      {{app_gst.name}}
+    {% endif%}
+  </h2>
+  {{app_gst.content|default_if_none:''|safe}}
+
 {% endblock %}
 
 

@@ -3,6 +3,7 @@ import os
 import ast
 # from datetime import datetime
 import datetime
+import multiprocessing as mp 
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -96,8 +97,13 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       agency_type = auth.agency_type
       agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
       if agency_type_node:
-        for eachset in agency_type_node.collection_set:
-          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        #b=app_collection_set.append
+        #for eachset in agency_type_node.collection_set:
+        #  b(a({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+        
+        # loop replaced by a list comprehension
+        app_collection_set=[node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]  
+
 
     # for eachset in app.collection_set:
     #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
@@ -196,18 +202,24 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         systemtype_relationtype_set = []
         system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})
         systemtype = node_collection.find_one({"_id":ObjectId(app_set_id)})
-        for each in systemtype.attribute_type_set:
-            systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type})
-        for each in systemtype.relation_type_set:
-            systemtype_relationtype_set.append({"rt_name":each.name,"type_id":str(each._id)})
-
+        #for each in systemtype.attribute_type_set:
+        #    systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type})
+        #loop replaced by a list comprehension
+        systemtype_attributetype_set=[{"type":each.name,"type_id":str(each._id),"value":each.data_type} for each in systemtype.attribute_type_set]
+        #for each in systemtype.relation_type_set:
+        #    systemtype_relationtype_set.append({"rt_name":each.name,"type_id":str(each._id)})
+        #loop replaced by a list comprehension
+        systemtype_relationtype_set=[{"rt_name":each.name,"type_id":str(each._id)} for each in systemtype.relation_type_set] 
+        #temp. variables which stores the lookup for append method
+        atlist_append_temp=atlist.append
+        rtlist_append_temp=rtlist.append   
         for eachatset in systemtype_attributetype_set :
             for eachattribute in triple_collection.find({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])}):
-                atlist.append({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
+                atlist_append_temp({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
         for eachrtset in systemtype_relationtype_set :
             for eachrelation in triple_collection.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
                 right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
-                rtlist.append({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
+                rtlist_append_temp({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
 
         # To support consistent view
 
@@ -215,10 +227,10 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         system.get_neighbourhood(systemtype._id)
 
         # array of dict for events ---------------------
-
+        #a temp. variable which stores the lookup for append method
+        events_arr_append_temp=events_arr.append
         # if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
         if 'organiser_of_event' in system and len(system.organiser_of_event): # gives list of events
-
             for event in system.organiser_of_event:
                 event.get_neighbourhood(event.member_of)
 
@@ -236,7 +248,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                     dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
                 tempdict['id'] = str(event._id)
-                events_arr.append(tempdict)
+                events_arr_append_temp(tempdict)
 
         # elif system.has_key('event_organised_by'): # gives list of colleges/host of events
         elif 'event_organised_by' in system:  # gives list of colleges/host of events
@@ -257,24 +269,27 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                     tempdict['end'] = dt
 
                 tempdict['id'] = str(host._id)
-                events_arr.append(tempdict)
+                events_arr_append_temp(tempdict)
 
         # print json.dumps(events_arr)
 
         # END --- array of dict for events ---------------------
-
+        #a temp. variable which stores the lookup for append method
+        property_display_order_append_temp=property_display_order.append
         for tab_name, fields_order in property_order:
             display_fields = []
+            #a temp. variable which stores the lookup for append method
+            display_fields_append_temp=display_fields.append
             for field, altname in fields_order:
                 if system.structure[field] == bool:
-                    display_fields.append((altname, ("Yes" if system[field] else "No")))
+                    display_fields_append_temp((altname, ("Yes" if system[field] else "No")))
 
                 elif not system[field]:
-                    display_fields.append((altname, system[field]))
+                    display_fields_append_temp((altname, system[field]))
                     continue
 
                 elif system.structure[field] == datetime.datetime:
-                    display_fields.append((altname, system[field].date()))
+                    display_fields_append_temp((altname, system[field].date()))
 
                 elif type(system.structure[field]) == list:
                     if system[field]:
@@ -282,19 +297,20 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                             name_list = []
                             for right_sub_dict in system[field]:
                                 name_list.append(right_sub_dict.name)
-                            display_fields.append((altname, ", ".join(name_list)))
+                            display_fields_append_temp((altname, ", ".join(name_list)))
                         elif system.structure[field][0] == datetime.datetime:
                             date_list = []
-                            for dt in system[field]:
-                                date_list.append(dt.strftime("%d/%m/%Y"))
-                            display_fields.append((altname, ", ".join(date_list)))
+                            #for dt in system[field]:
+                            #    date_list.append(dt.strftime("%d/%m/%Y"))
+                            date_list=[dt.strftime("%d/%m/%Y") for dt in system[field]]
+                            display_fields_append_temp((altname, ", ".join(date_list)))
                         else:
-                            display_fields.append((altname, ", ".join(system[field])))
+                            display_fields_append_temp((altname, ", ".join(system[field])))
 
                 else:
-                    display_fields.append((altname, system[field]))
+                    display_fields_append_temp((altname, system[field]))
 
-            property_display_order.append((tab_name, display_fields))
+            property_display_order_append_temp((tab_name, display_fields))
 
         # End of code
 
@@ -396,9 +412,11 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
       agency_type = auth.agency_type
       agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
       if agency_type_node:
-        for eachset in agency_type_node.collection_set:
-          app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+      # for eachset in agency_type_node.collection_set:
+     #  app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
+        #loop replaced by a list comprehension
+        app_collection_set=[node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]
     # for eachset in app.collection_set:
     #   app_collection_set.append(node_collection.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
       # app_set = node_collection.find_one({"_id":eachset})
@@ -434,16 +452,22 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         systemtype = node_collection.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
         title = systemtype_name + " - new"
-        for each in systemtype.attribute_type_set:
-            systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type, 'sub_values': each.complex_data_type, 'altnames': each.altnames})
+       # for each in systemtype.attribute_type_set:
+        #    systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type, 'sub_values': each.complex_data_type, 'altnames': each.altnames})
 
+        #loop replaced by a list comprehension
+        systemtype_attributetype_set=[{"type":each.name,"type_id":str(each._id),"value":each.data_type, 'sub_values': each.complex_data_type, 'altnames': each.altnames} for each in systemtype.attribute_type_set]
+
+        #a temp. variable which stores the lookup for append method
+        sys_type_relation_set_append= systemtype_relationtype_set.append
         for eachrt in systemtype.relation_type_set:
             # object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in node_collection.find({'member_of': {'$all': [ node_collection.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
             object_type_cur = node_collection.find({'member_of': {'$in': eachrt.object_type}})
             object_type = []
-            for each in object_type_cur:
-              object_type.append({"name":each.name, "id":str(each._id)})
-            systemtype_relationtype_set.append({"rt_name": eachrt.name, "type_id": str(eachrt._id), "object_type": object_type})
+           # for each in object_type_cur:
+           #   object_type.append({"name":each.name, "id":str(each._id)})
+            object_type=[{"name":each.name, "id":str(each._id)} for each in object_type_cur]          
+            sys_type_relation_set_append({"rt_name": eachrt.name, "type_id": str(eachrt._id), "object_type": object_type})
 
     request_at_dict = {}
     request_rt_dict = {}
@@ -455,28 +479,60 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             node_id = node_collection.one({'name':each,'_type':'GSystemType'})._id
             if node_id in app.type_of:
                 File = 'True'
-
+        
     if app_set_instance_id : # at and rt set editing instance
-        system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})
-        for eachatset in systemtype_attributetype_set :
-            eachattribute = triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
-            if eachattribute :
-                eachatset['database_value'] = eachattribute.object_value
-                eachatset['database_id'] = str(eachattribute._id)
-            else :
-                eachatset['database_value'] = ""
-                eachatset['database_id'] = ""
-        for eachrtset in systemtype_relationtype_set :
-            eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})       
-            if eachrelation:
-                right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
-                eachrtset['database_id'] = str(eachrelation._id)
-                eachrtset["database_value"] = right_subject.name
-                eachrtset["database_value_id"] = str(right_subject._id)
-            else :
-                eachrtset['database_id'] = ""
-                eachrtset["database_value"] = ""
-                eachrtset["database_value_id"] = ""
+        system = node_collection.find_one({"_id":ObjectId(app_set_instance_id)})    
+        #Function used by Processes implemented below
+        def multi_(lst):
+            for eachatset in lst:
+                eachattribute=triple_collection.find_one({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])})
+                if eachattribute :
+                    eachatset['database_value'] = eachattribute.object_value
+                    eachatset['database_id'] = str(eachattribute._id)
+                else :
+                    eachatset['database_value'] = ""
+                    eachatset['database_id'] = ""
+        #this empty list will have the Process objects as its elements
+        processes=[]
+        #returns no of cores in the cpu
+        x=mp.cpu_count()
+        n1=len(systemtype_attributetype_set)
+        #divides the list into those many parts
+        n2=n1/x
+         #Process object is created.The list after being partioned is also given as an argument. 
+        for i in range(x):
+            processes.append(mp.Process(target=multi_,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
+        for i in range(x):
+            processes[i].start()#each Process started 
+        for i in range(x):
+            processes[i].join()#each Process converges
+            
+        #Function used by Processes implemented below
+        def multi_2(lst):
+            for eachrtset in lst:
+                eachrelation = triple_collection.find_one({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])})       
+                if eachrelation:
+                    right_subject = node_collection.find_one({"_id":ObjectId(eachrelation.right_subject)})
+                    eachrtset['database_id'] = str(eachrelation._id)
+                    eachrtset["database_value"] = right_subject.name
+                    eachrtset["database_value_id"] = str(right_subject._id)
+                else :
+                    eachrtset['database_id'] = ""
+                    eachrtset["database_value"] = ""
+                    eachrtset["database_value_id"] = ""
+        #this empty list will have the Process objects as its elements
+        processes2=[]
+        n1=len(systemtype_relationtype_set)
+        #divides the list into those many parts
+        n2=n1/x
+        #Process object is created.The list after being partioned is also given as an argument. 
+        for i in range(x):
+            processes2.append(mp.Process(target=multi_2,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
+        for i in range(x):
+            processes2[i].start()#each Process started
+        for i in range(x):
+            processes2[i].join()#each Process converges
+
 
         tags = ",".join(system.tags)
         content_org = system.content_org
@@ -495,13 +551,40 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         map_geojson_data = request.POST.get('map-geojson-data') # getting markers
         user_last_visited_location = request.POST.get('last_visited_location') # getting last visited location by user
         file1 = request.FILES.get('file', '')
-
-        for each in systemtype_attributetype_set:
-            if request.POST.get(each["type_id"],"") :
-                request_at_dict[each["type_id"]] = request.POST.get(each["type_id"],"")
-        for eachrtset in systemtype_relationtype_set:
-            if request.POST.get(eachrtset["type_id"],""):
-                request_rt_dict[eachrtset["type_id"]] = request.POST.get(eachrtset["type_id"],"")
+        #Function used by Processes implemented below
+        def multi_3(lst):
+            for each in lst:
+                if request.POST.get(each["type_id"],"") :
+                    request_at_dict[each["type_id"]] = request.POST.get(each["type_id"],"")
+        #this empty list will have the Process objects as its elements
+        processes3=[]
+        n1=len(systemtype_attributetype_set)
+        #divides the list into those many parts
+        n2=n1/x
+        #Process object is created.The list after being partioned is also given as an argument. 
+        for i in range(x):
+            processes3.append(mp.Process(target=multi_3,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
+        for i in range(x):
+            processes3[i].start()#each Process started
+        for i in range(x):
+            processes3[i].join()#each Process converges
+        #Function used by Processes implemented below
+        def multi_4(lst):
+            for eachrtset in lst:
+                if request.POST.get(eachrtset["type_id"],""):
+                    request_rt_dict[eachrtset["type_id"]] = request.POST.get(eachrtset["type_id"],"")
+        #this empty list will have the Process objects as its elements
+        processes4=[]
+        n1=len(systemtype_relationtype_set)
+        #divides the list into those many parts
+        n2=n1/x
+        #Process object is created.The list after being partioned is also given as an argument. 
+        for i in range(x):
+            processes4.append(mp.Process(target=multi_4,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
+        for i in range(x):
+            processes4[i].start()#each Process started
+        for i in range(x):
+            processes4[i].join()  #each Process converges      
 
         if File == 'True':
             if file1:
@@ -565,15 +648,26 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         newgsystem.save()
 
         if not app_set_instance_id:
-            for key, value in request_at_dict.items():
-                attributetype_key = node_collection.find_one({"_id":ObjectId(key)})
-                ga_node = create_gattribute(newgsystem._id, attributetype_key, value)
-                # newattribute = triple_collection.collection.GAttribute()
-                # newattribute.subject = newgsystem._id
-                # newattribute.attribute_type = attributetype_key
-                # newattribute.object_value = value
-                # newattribute.save()
-            for key, value in request_rt_dict.items():
+            #Function used by Processes implemented below
+            def multi_5(lst):
+                for key,value in lst:
+                    attributetype_key = node_collection.find_one({"_id":ObjectId(key)})
+                    ga_node = create_gattribute(newgsystem._id, attributetype_key, value)
+            #this empty list will have the Process objects as its elements
+            processes5=[]
+            lst11=request_at_dict.items()
+            n1=len(lst11)
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+                processes5.append(mp.Process(target=multi_5,args=(lst11[i*n2:(i+1)*n2],)))
+            for i in range(x):
+                processes5[i].start()#each Process started
+            for i in range(x):
+                processes5[i].join()#each Process converges
+            """
+             for key, value in request_rt_dict.items():
                 if key:
                     relationtype_key = node_collection.find_one({"_id": ObjectId(key)})
                 if value:
@@ -584,9 +678,33 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                     # newrelation.relation_type = relationtype_key
                     # newrelation.right_subject = right_subject._id
                     # newrelation.save()
+            """
+            def multi_6(lst):#Function used by Processes implemented below
+                for key,value in lst:
+                    if key:
+                        relationtype_key = node_collection.find_one({"_id": ObjectId(key)})
+                    if value:
+                        right_subject = node_collection.find_one({"_id": ObjectId(value)})
+                        gr_node = create_grelation(newgsystem._id, relationtype_key, right_subject._id)
+
+            #this empty list will have the Process objects as its elements
+            processes6=[]
+            lst12=request_rt_dict.items()
+            n1=len(lst12)
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+                processes6.append(mp.Process(target=multi_6,args=(lst12[i*n2:(i+1)*n2],)))
+            for i in range(x):
+                processes6[i].start()#each Process started
+            for i in range(x):
+                processes6[i].join()#each Process converges
+
 
         if app_set_instance_id:
             # editing instance
+            """
             for each in systemtype_attributetype_set:
                 if each["database_id"]:
                     attribute_instance = triple_collection.find_one({"_id": ObjectId(each['database_id'])})
@@ -602,7 +720,38 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         # newattribute.object_value = request.POST.get(each["type_id"],"")
                         # newattribute.save()
                         ga_node = create_gattribute(newgsystem._id, attributetype_key, request.POST.get(each["type_id"],""))
+            """
+            def multi_7(lst):#Function used by Processes implemented below
+                for each in lst:
+                    if each["database_id"]:
+                        attribute_instance = triple_collection.find_one({"_id": ObjectId(each['database_id'])})
+                        attribute_instance.object_value = request.POST.get(each["database_id"],"")
+                        # attribute_instance.save()
+                        ga_node = create_gattribute(attribute_instance.subject, attribute_instance.attribute_type, attribute_instance.object_value)
+                    else:
+                        if request.POST.get(each["type_id"], ""):
+                            attributetype_key = node_collection.find_one({"_id":ObjectId(each["type_id"])})
+                            # newattribute = triple_collection.collection.GAttribute()
+                            # newattribute.subject = newgsystem._id
+                            # newattribute.attribute_type = attributetype_key
+                            # newattribute.object_value = request.POST.get(each["type_id"],"")
+                            # newattribute.save()
+                            ga_node = create_gattribute(newgsystem._id, attributetype_key, request.POST.get(each["type_id"],""))
+            #this empty list will have the Process objects as its elements
+            processes7=[]
+            n1=len(systemtype_attributetype_set)
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+                processes7.append(mp.Process(target=multi_7,args=(systemtype_attributetype_set[i*n2:(i+1)*n2],)))
+            for i in range(x):
+                processes7[i].start()#each Process started
+            for i in range(x):
+                processes7[i].join()#each Process converges
 
+
+            """
             for eachrt in systemtype_relationtype_set:
                 if eachrt["database_id"]:
                     relation_instance = triple_collection.find_one({"_id":ObjectId(eachrt['database_id'])})
@@ -619,7 +768,32 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         # newrelation.relation_type = relationtype_key
                         # newrelation.right_subject = right_subject._id
                         # newrelation.save()
+            """
+            def multi_8(lst):#Function used by Processes implemented below
+                for eachrt in lst:
+                    if eachrt["database_id"]:
+                        relation_instance = triple_collection.find_one({"_id":ObjectId(eachrt['database_id'])})
+                        relation_instance.right_subject = ObjectId(request.POST.get(eachrt["database_id"],""))
+                    # relation_instance.save()
+                        gr_node = create_grelation(relation_instance.subject, relation_instance.relation_type, relation_instance.right_subject)
+                    else :
+                        if request.POST.get(eachrt["type_id"],""):
+                            relationtype_key = node_collection.find_one({"_id":ObjectId(eachrt["type_id"])})
+                            right_subject = node_collection.find_one({"_id":ObjectId(request.POST.get(eachrt["type_id"],""))})
+                            gr_node = create_grelation(newgsystem._id, relationtype_key, right_subject._id)
 
+            #this empty list will have the Process objects as its elements
+            processes8=[]
+            n1=len(systemtype_relationtype_set)
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+                processes8.append(mp.Process(target=multi_4,args=(systemtype_relationtype_set[i*n2:(i+1)*n2],)))
+            for i in range(x):
+                processes8[i].start()#each Process started
+            for i in range(x):
+                processes8[i].join() #each Process converges
         return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
     
     template = "ndf/"+template_prefix+"_create_edit.html"

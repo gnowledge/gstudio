@@ -303,7 +303,6 @@ ul#navigation li a.last {
 <div class="row page" itemscope itemtype="{{schema.1.type}}">
       
   <section class="medium-9 columns">
-
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
     {% for e in breadcrumbs_list %}
@@ -316,6 +315,15 @@ ul#navigation li a.last {
       </b></li>
     {% endfor %}
   </ul>
+  {% elif node.teaches %}
+  <ul class="breadcrumbs">
+    <li>
+        {% for each_topic in node.teaches %}
+          <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{{ each_topic.name }},</a>
+        {% endfor %}
+    </li>
+  </ul>
+
   {% endif %}
 
   {% if node.status == 'MODERATION' %}
@@ -325,7 +333,8 @@ ul#navigation li a.last {
     </small></h4>
   {% endif %}
 
-  <h1><span itemprop="{{schema.1.name}}" class='node'>{{node.altnames|default_if_none:node.name}}</span>
+  <h1><span itemprop="{{schema.1.name}}" class='node'>
+    {% if node.altnames %}{{node.altnames}}{% else %}{{node.name}}{% endif %}</span>
   {% if node %}
     {% get_publish_policy request groupid node as group_policy %}
     {% if group_policy == "allow" %}
@@ -558,23 +567,7 @@ ul#navigation li a.last {
               -->
             {% endcomment %}
 
-            <div class="small-4 columns">
-              {% get_teaches_list node as teaches_list %}
-              {% if teaches_list %}
-              <div class="panel">
-                <h6>Resource for: </h6>
-                {% for  each_node in teaches_list %}
-                {% get_grid_fs_object each_node as grid_fs_obj %}
-                {% if each_node.mime_type %}
-                <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>,&nbsp;
-                {% else %}
-                <a href="{% url 'topic_details' group_name_tag each_node.pk %}{% if nav_list %}?nav_li={{nav_list}}{% endif %}">{{ each_node.name }}</a>
-                {% if not forloop.last %},&nbsp; {% endif %}
-                {% endif %}
-                {% endfor %}
-              </div>
-              {% endif %}
-            </div>
+            <div class="small-4 columns"> </div>
 
             <div class="small-4 small-pull-4 columns">
               <!-- {#% if node.assesses %#} -->
@@ -615,19 +608,20 @@ ul#navigation li a.last {
                     <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                       <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
                       </a>
+                    {% elif 'video' in node.mime_type %}
+            		     <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
+                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">    
+                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
+                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
+                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">    
+                        {% trans "Your browser does not support the video tag." %}
+                      </video>
                     {% elif 'Pandora_video' in node.member_of_names_list %}
                       {% get_source_id node.pk as source_id %}
                       <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
                         <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
                         {% trans "Your browser does not support the video tag." %}
                       </video>  
-                    {% elif 'video' in node.mime_type %}
-		     <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">    
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-                        {% trans "Your browser does not support the video tag." %}
-                      </video>
                     {% endif %}
                     <div class="orbit-caption"> {{node.name}} </div>             
                   </li>                
@@ -701,20 +695,24 @@ ul#navigation li a.last {
                   {% trans "Your browser does not support the video tag." %}
                 </video>  
               {% elif 'video' in node.mime_type %}
-		{% get_source_id node.pk as source_id %}
-		{% if source_id %}
-                <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                  <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
-                  {% trans "Your browser does not support the video tag." %}
-                </video>
-		{% else %}
+
+              {% comment "commented getting video from wetube" %}
+            		{% get_source_id node.pk as source_id %}
+            		{% if source_id %}
+                            <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+                              <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+                              {% trans "Your browser does not support the video tag." %}
+                            </video>
+            		{% else %}
+              {% endcomment %}
+
                 <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
                   <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
+                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">    
                   {% trans "Your browser does not support the video tag." %}
                 </video>
-		{% endif %}
               {% elif 'audio' in node.mime_type %}
                 <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
                   <p>Your browser does not support the audio element </p>
@@ -816,9 +814,13 @@ ul#navigation li a.last {
             {% if user.is_authenticated %}
               <br/>
               <br/>
+              {% comment %}
               {% if 'Pandora_video' in node.member_of_names_list %}
                 <a class="button small secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
               {% elif 'video' in node.mime_type %}
+              {% endcomment %}
+
+              {% if 'video' in node.mime_type %}
                 <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
               {% else %}
                 <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
@@ -1280,7 +1282,9 @@ ul#navigation li a.last {
         <div class="medium-6 columns">
           
           {% edit_policy groupid node request.user as status %}
+
           {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+          {% if "Group" in group_object.member_of_names_list or "Author" in group_object.member_of_names_list %}
             {% get_edit_url node.pk as edit_url %}
 
             {% check_group node as is_group %}
@@ -1295,11 +1299,13 @@ ul#navigation li a.last {
                 <a href="{% url edit_url group_id node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
             {% endif %}
+
         </div>
         <div class="medium-6 columns">
 
           <!-- This button publishes the drafted resource -->
-          {% if node %}
+
+          {% if node and "Group" in group_object.member_of_names_list %}
             {% get_publish_policy request groupid node as group_policy %}
             {% if group_policy == "allow" %}
 
@@ -1331,6 +1337,8 @@ ul#navigation li a.last {
         </div>
         
         <div class="medium-7 columns">
+          
+
           {% get_create_url node.pk as create_url %}
           {% if is_group %}
             
@@ -1373,18 +1381,19 @@ ul#navigation li a.last {
               {% endif %}
             {% endif %}
           {% endif %}
+          
+        {% endif %}
         </div>
         
         <div class ="rows">
-           {% if user.is_authenticated %} 
+
+           {% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
             <div class= "medium-12 columns" >
                 <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
             </div>
            {% endif %}
         </div>     
         
-      {% endif %}
-
         {% if node %}
           {% check_group node as is_group %}
           {% if is_group %}
@@ -1392,7 +1401,7 @@ ul#navigation li a.last {
             {% get_group_policy node request.user as policy %}
             {% get_prior_post_node group_id as groupname %}
 
-          {% if group_object.edit_policy == 'EDITABLE_MODERATED' and "Group" in group_object.member_of_names_list %}
+          {% if "Group" in group_object.member_of_names_list %}
             <input type="hidden" id="groupname" value="{{node}}">
             {% if user.is_authenticated %}
               {% if user_access == "allow" %}
@@ -1444,19 +1453,24 @@ ul#navigation li a.last {
             {% endif %} 
           {% endif %}
         {% endif %}
+        {% endif %}
 
       </div>      
       {% endif %}
 
       {% ifequal group_object.edit_policy "EDITABLE_MODERATED" %}
         {% if request.user.id in group_object.group_admin or request.user.is_superuser or request.user.id == group_object.created_by %}
-          <a class="tiny expand button" href="{% url 'moderation' group_name_tag %}">
-            Moderate Resources
-          </a>
+          {% if 'ModeratingGroup' in group_object.member_of_names_list %}
+            <a class="tiny expand button" href="{% url 'moderation' group_name_tag %}">
+              Moderate Resources
+            </a>
+          {% endif %}
 
-          <a class="tiny expand button" href="{% url 'all_under_moderation' group_id %}">
-            Moderation Status
-          </a>
+          {% if 'Group' in group_object.member_of_names_list %}
+            <a class="tiny expand button" href="{% url 'all_under_moderation' group_id %}">
+              Moderation Status
+            </a>
+          {% endif %} 
         {% endif %} 
       {% endifequal %}
 
@@ -1502,7 +1516,6 @@ ul#navigation li a.last {
     </li> 
     --> 
     
-          {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
     <br/>
     <div class="label-list"> 
       <b>{% trans "Tags" %}</b><br/>
@@ -1516,6 +1529,8 @@ ul#navigation li a.last {
       {% endif %}
 
     </div>
+    
+    {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
 
     {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
       <div>
@@ -1640,7 +1655,7 @@ ul#navigation li a.last {
 
     {% if topic %}
     
-      location.href = "{% url 'theme_page' group_name_tag theme_id %}?selected="+clicked_node+"";
+      location.href = "{% url 'theme_page' group_name_tag theme_id %}?tree=hierarchical&selected="+clicked_node+"";
 
     {% else %}
 
