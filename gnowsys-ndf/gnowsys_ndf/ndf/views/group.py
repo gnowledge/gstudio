@@ -1190,7 +1190,7 @@ def group(request, group_id, app_id=None, agency_type=None):
 
     return render_to_response("ndf/group.html",
                               {'title': title,
-                               'appId':app._id,
+                               'appId':app._id, 'app_gst': group_gst,
                                'searching': True, 'query': search_field,
                                'group_nodes': group_nodes, 'group_nodes_count': group_count,
                                'groupid':group_id, 'group_id':group_id
@@ -1240,7 +1240,7 @@ def group(request, group_id, app_id=None, agency_type=None):
     
     return render_to_response("ndf/group.html", 
                               {'group_nodes': group_nodes,
-                               'appId':app._id,
+                               'appId':app._id, 'app_gst': group_gst,
                                'group_nodes_count': group_count,
                                'groupid': group_id, 'group_id': group_id
                               }, context_instance=RequestContext(request))
@@ -1439,7 +1439,7 @@ def group_dashboard(request, group_id=None):
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,
-                                                       'appId':app._id,
+                                                       'appId':app._id, 'app_gst': group_gst,
                                                        'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image
                                                       },context_instance=RequestContext(request)
