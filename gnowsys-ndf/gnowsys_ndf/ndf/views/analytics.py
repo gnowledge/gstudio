@@ -7,7 +7,7 @@ import re
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
@@ -36,50 +36,52 @@ benchmark_collection = db[Benchmark.collection_name]
 analytics_collection = db[Analytics.collection_name]
 ins_objectid = ObjectId()
 
-def page_view(request):
-	pass
-	'''
-	event = col.Benchmark()
-	event["_type"] = u"analytics"
-	event["name"] = u"analytics"
 
-	transaction = { 'status' : None}
+'''
+FUNCTION TO REGISTER CUSTOM ACTIVITIES USING AJAX
+'''
 
+def custom_events(request):
+	transaction = { 'status' : None, 'message' : None}
+
+	analytics_event = analytics_collection.Analytics()
+	analytics_event['user'] = request.user.username
+	
 	try : 
-		event.session_key = request.session.session_key
+		analytics_event['session_key'] = request.session.session_key
 	except :
 		transaction['status'] = 0
 		transaction['message'] = 'Error retrieving the session key.'
-
-	event.user = request.user.username
-	event.time_taken = unicode(str(datetime.datetime.now()))
+	
+	analytics_event['timestamp'] = datetime.datetime.now();
 	
 	try : 
-		event.action = request.POST['action']
-		event.calling_url = request.POST['resource']
+		analytics_event['group_id'] = Gid(request.POST['group_id'])
+		analytics_event['action'] = json.loads(request.POST['action'])
+		analytics_event['obj'][request.POST['obj']] = json.loads(request.POST['obj_properties'])
 	except : 
 		transaction['status'] = 0
-		transaction['message'] = 'Connot find action details.'
+		transaction['message'] = 'Incomplete Data.'
 
-	if transaction['status'] == None : 
+	if transaction['status'] is None :
+		analytics_event.save()
 		transaction['status'] = 1
-		transaction['message'] = 'transaction successful.'
-		#transaction['event'] = event
-	
-	#inserting the event object in the Analytics collection.
+		transaction['message'] = 'Transaction Successful !'
 
-	event.save()
-	'''
-	return HttpResponse("0")
+	return HttpResponse(json.dumps(transaction))
 
+'''
+USER ANALYTICS VIEWS
+'''
 
-def default(request):
-	return HttpResponse('There ')
-
-
-
+def default_user(request):
+	return redirect('/analytics/summary')
 
 def user_list_activities(request):
+	'''
+	Lists the detailed activities of the user
+	'''
+
 	try :
 		start_date = request.POST['start_date']
 		end_date = request.POST['end_date']
@@ -96,43 +98,81 @@ def user_list_activities(request):
 	
 	return render_to_response ("ndf/analytics_list_details.html", { "data" : lst})
 
+def get_user_sessions(user) :
+	'''
+	Returns the user activities grouped by sessions
+	'''
 
-
-
-def user_summary(request):
-	query("user",{ "username" : request.user.username })
-	cursor = analytics_collection.find({"user" : request.user.username}).sort("timestamp",-1)
+	cursor = analytics_collection.find({"user" : user}).sort("timestamp",-1)
 
 	lst = []
 	sessions_list =[]
 	d={}
 	i=-1
 	
-	for doc in a :
-		print '\n'+str(doc)
-		'''
-		sk = str(doc.session_key)
+	for doc in cursor :
+		sk = str(doc['session_key'])
 		if i!=-1 and d['session_key']==sk :
-			sessions_list[i]["end_date"] = doc.timestamp	
+			sessions_list[i]["start_date"] = doc['timestamp']	
 			sessions_list[i]["activities"]	+= 1
 			sessions_list[i]["duration"] = sessions_list[i]["end_date"] - sessions_list[i]["start_date"]
 		else :
 			d= {}
 			i+=1
 			d["session_key"]=sk
-			d["start_date"]	= doc.timestamp
+			d["end_date"]	= doc['timestamp']
+			d["start_date"]	= doc['timestamp']
+			d["duration"] = d["end_date"] - d["start_date"]
 			d["activities"]	= 1
-			d["user"]	= doc.user
+			d["user"]	= doc['user']
 			sessions_list.append(d)
-		'''
+
+	return sessions_list
+	
+def user_summary(request):
+	'''
+	Renders the summary of the User activities on the Metastudio 
+	'''
+
+	query("user",{ "username" : request.user.username })
+	
+	session_info = get_user_sessions(request.user.username)
+
+	data = {}
+
+	data['num_of_sessions'] = len(session_info)
+	data['latest_activity'] = session_info[0]['end_date']
+	duration = datetime.timedelta(0, 0)
+	data['total_activities'] = 0
+	for session in session_info :
+		duration += session['duration']
+		data['total_activities'] += session['activities']
+
+	data['avg_session_duration'] = duration/data['num_of_sessions']
+
+	data['num_of_pages'] = analytics_collection.find({ "action.key" : "create", "obj.page" : { '$exists' : 'true'}}).count()
+	data['num_of_files'] = analytics_collection.find({ "action.key" : "create", "obj.file" : { '$exists' : 'true'}}).count()
+	data['num_of_forums_created'] = analytics_collection.find({ "action.key" : "create", "obj.forum" : { '$exists' : 'true'}}).count()
+	data['num_of_threads_created'] = analytics_collection.find({ "action.key" : "create", "obj.thread" : { '$exists' : 'true'}}).count()
+	data['num_of_replies'] = analytics_collection.find({ "action.key" : "add", "obj.reply" : { '$exists' : 'true'}}).count()
+	
+	# More statistics can be queried from the anlytics_collection and added here.
 	
 	return render_to_response("ndf/analytics_summary.html",
-															{ "data" : sessions_list})
+															{ "data" : data})
 
+'''
+GROUP ANALYTICS VIEWS
+'''
 
-
+def default_group(request,group_id):
+	return redirect('/analytics/'+group_id+'/summary')
 
 def group_summary(request,group_id):
+	'''
+	Renders the summary of all the activities done by the members of the Group
+	'''
+
 	group_id=ObjectId("55717125421aa91eecbf8843")
 	query("group",{ "group_id" : group_id })
 	
@@ -169,10 +209,11 @@ def group_summary(request,group_id):
 	
 	return render_to_response("ndf/analytics_group_summary.html",{"data" : active_users,'forums' : num_of_forums,'threads' : num_of_threads,'replies' : num_of_replies,'files' : num_of_files,'pages' : num_of_pages})
 	
-
-
-
 def group_list_activities(request,group_id):
+	'''
+	Renders the list of activities of all the members of the group
+	'''
+
 	group_id=ObjectId("55717125421aa91eecbf8843")
 	query("group",{ "group_id" : group_id })
 	cursor = analytics_collection.find({"group_id" : str(group_id)}).sort("timestamp",-1)
@@ -184,9 +225,11 @@ def group_list_activities(request,group_id):
 	return render_to_response("ndf/analytics_list_group_details.html",
 															{ "data" : lst})
 
-
-
 def group_members(request, group_id) :
+	'''
+	Renders the list of members sorted on the basis of their contributions in the group
+	'''
+
 	group_id=ObjectId("55717125421aa91eecbf8843")
 	query("group",{ "group_id" : group_id })
 	
@@ -241,13 +284,8 @@ def group_members(request, group_id) :
 	return render_to_response("ndf/analytics_group_members.html",{"data" : list_of_members })
 
 
-'''	
-num_of_threads=db['Nodes'].find({"url":"forum/thread", "group_set":group_id, "created_by" : author[u'created_by'], "status":"DRAFT"}).count()
-	
-regx=re.compile("^Reply of:.*")
-num_of_replies=db['Nodes'].find({"name": regx,"group_set":group_id, "created_by" : author[u'created_by'],  "status":"DRAFT"}).count()
-num_of_files=db['Nodes'].find({"url":"file", "group_set":group_id, "created_by" : author[u'created_by'],  "status":"PUBLISHED"}).count()
-num_of_pages=db['Nodes'].find({"url":"page", "group_set":group_id, "created_by" : author[u'created_by'],  "status":"PUBLISHED"}).count()
+'''
+ANALYTICS PROCESSING 
 '''
 
 def query(analytics_type,details) :
@@ -288,9 +326,6 @@ def query(analytics_type,details) :
 					query("user",{"username" : author[u'name'] })
 
 	return 1
-
-
-
 
 def normalize(cursor) :
 	'''
@@ -350,8 +385,15 @@ def normalize(cursor) :
 	return 1	
 
 
+'''
+ANALYSIS OF ACTIVITIES BY INDIVIDUAL GAPPS
+'''
 
 def initialize_analytics_obj(doc, group_id, obj) :
+	'''
+	Returns a new initialized object of the Analytics class
+	'''
+
 	analytics_doc=analytics_collection.Analytics()
 	analytics_doc.timestamp=doc[u'last_update']
 	analytics_doc.user = doc[u'user'] 
@@ -590,6 +632,7 @@ def forum_activity(group_id,url,doc):
 			if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 				analytics_doc = initialize_analytics_obj(doc, group_id, 'reply')
 				analytics_doc.action = { 'key' : 'add', 'phrase' : 'added a' }
+				analytics_doc.save();
 				return 1
 
 	else:
