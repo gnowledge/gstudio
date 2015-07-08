@@ -71,6 +71,8 @@ def mailclient(request, group_id):
         conn = sqlite3.connect(path + '/example-sqlite3.db')
         user_id = str(request.user.id)
 
+        cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
+        
         query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
         cursor = conn.execute(query)
 
@@ -96,9 +98,7 @@ def mailclient(request, group_id):
     except Exception as error:
         error_obj= str(error) + ", mailclient() fn"
         return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-        #return HttpResponseRedirect(reverse('mailclient_error_display', args=(group_id,error_obj,)))
 
-    #TODO: Handle the test case which requires the next two lines of code
     if group_id == home_grp_id['_id']:
         error_obj= "Page Not accessible from Home group"
         return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
@@ -150,7 +150,6 @@ def mailbox_create_edit(request, group_id):
         # make a mailbox from the above details
         newbox = Mailbox()
 
-        #TODO: clean up mailbox_name since it will later go as part of url for :settings, edit and delete pages.
         # '_' , '.', '-' are being allowed
         mailbox_name_cleaned = mailbox_name
         characters_not_allowed= ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}','@','^','+','\\','/','\'','=','-',':',',','.']
@@ -204,6 +203,7 @@ def mailbox_create_edit(request, group_id):
             conn = sqlite3.connect(path + '/example-sqlite3.db')
             user_id = str(request.user.id)
             #query to insert (user.id,mailbox.id) pair in 'mapping' database
+            cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
             query = 'insert into user_mailboxes values (?,?);'
 
             #may throw exception
@@ -802,6 +802,7 @@ def mailbox_delete(request, group_id,mailboxname):
             conn = None
             try:
                 conn = sqlite3.connect(path + '/example-sqlite3.db')
+                cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
                 query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
                 cursor = conn.execute(query)
             except Exception as error:
@@ -825,6 +826,7 @@ def mailbox_delete(request, group_id,mailboxname):
                 #delete from our 'mapping' database (the database which tracks which user_id is asscociated with which mailbox_id )                    
 
                 # conn2 = sqlite3.connect(path + '/example-sqlite3.db')
+                cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
                 query = 'delete from user_mailboxes where mailbox_id='+str(box.id)
                 cursor = conn.execute(query)
                 conn.commit()
@@ -936,6 +938,7 @@ def compose_mail(request, group_id,mailboxname):
             #may throw error        
             conn = sqlite3.connect(path + '/example-sqlite3.db')
             user_id = str(request.user.id)
+            cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
             query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
             cursor = conn.execute(query)
 
