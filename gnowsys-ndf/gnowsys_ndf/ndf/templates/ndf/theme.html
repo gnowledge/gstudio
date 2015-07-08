@@ -364,7 +364,16 @@
 {% endcomment %}
 
 {% block meta_content %}
-	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view"><h2 class="subheader">{% trans "Themes" %}</h2></a>
+	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
+		<h3 class="subheader">
+			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
+				{{theme_GST.altnames}}
+			{% else %}
+				{{theme_GST.name}}
+			{% endif%}
+		</h3>
+	</a>
+	{{theme_GST.content|safe}}
 {% endblock %}
 
 {% block related_content %}
@@ -374,17 +383,17 @@
 	<div class="panel" style="background-color:#ddd;">
 	<ul class="no-bullet" id="app-set-item"> 
 
-	    {% get_memberof_objects_count theme_GST_id groupid as count %}
+	    {% get_memberof_objects_count theme_GST.pk groupid as count %}
 
 	      <li class="selected-app-set-item"> 
 	        <div>
 	  		  {% if user_access == "allow" %}
-	          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right;color:#0b8a91;" title="Add Theme">
+	          <a href="{% url "theme_topic_create" groupid theme_GST.pk %}" style="float:right;color:#0b8a91;" title="Add Theme">
 	            +&nbsp;Add
 	          </a>
 	          {% endif %}
 
-	          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" style="color:#0b8a91;">
+	          <a href="{% url "theme_list" groupid app_id theme_GST.pk %}" style="color:#0b8a91;">
 	            Theme ({{count}})
 	          </a> 
 

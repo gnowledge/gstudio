@@ -130,7 +130,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
     return render_to_response("ndf/theme.html",
-                               {'theme_GST_id':theme_GST._id, 'themes_cards': themes_cards,
+                               {'theme_GST_id':theme_GST._id, 'theme_GST':theme_GST, 'themes_cards': themes_cards, 'theme_GST':theme_GST,
                                'group_id': group_id,'groupid': group_id,'node': node,'shelf_list': shelf_list,'shelves': shelves, 'tree': tree,
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,"selected": selected,
                                'title': title,'themes_list_items': themes_list_items,
@@ -668,7 +668,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
         )
         
     return render_to_response("ndf/theme.html",
-                       {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
+                       {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards, 'theme_GST':theme_GST, 'theme_GST':theme_GST,
                             'shelf_list': shelf_list,'shelves': shelves,
                             'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,'appId':app._id,
                             'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
