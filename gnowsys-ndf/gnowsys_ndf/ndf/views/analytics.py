@@ -169,11 +169,13 @@ def default_group(request,group_id):
 	return redirect('/analytics/'+group_id+'/summary')
 
 def group_summary(request,group_id):
+
 	'''
 	Renders the summary of all the activities done by the members of the Group
 	'''
 
 	group_id=ObjectId("55717125421aa91eecbf8843")
+
 	query("group",{ "group_id" : group_id })
 	
 	'''
@@ -215,6 +217,7 @@ def group_list_activities(request,group_id):
 	'''
 
 	group_id=ObjectId("55717125421aa91eecbf8843")
+
 	query("group",{ "group_id" : group_id })
 	cursor = analytics_collection.find({"group_id" : str(group_id)}).sort("timestamp",-1)
 	lst=[]
@@ -226,11 +229,13 @@ def group_list_activities(request,group_id):
 															{ "data" : lst})
 
 def group_members(request, group_id) :
+
 	'''
 	Renders the list of members sorted on the basis of their contributions in the group
 	'''
 
 	group_id=ObjectId("55717125421aa91eecbf8843")
+
 	query("group",{ "group_id" : group_id })
 	
 	'''
@@ -473,13 +478,74 @@ def page_activity(group_id,url,doc):
 		
 	return 0
 
-def file_activity(group_id,url,doc):
+def course_activity(group_id,url,doc):
 	'''
-	This function updates the Analytic_col database with the new activities done on the 
-	files of MetaStudio, and also to see whether the file is published, deleted, uploaded we
+	This function updates the analytics_collection database with the new activities done on the 
+	courses of MetaStudio, and also to see whether the course is created, edited or viewed.We
     check the status in the Nodes collection of database.
 	And also we are assuming here that if the difference between the last update and created at 
-	is less than 5 seconds then we should have created the page else we must have viewed the page.
+	is less than 5 seconds then we should have created the course.
+	
+	'''
+
+	analytics_doc = initialize_analytics_obj(doc, group_id, 'course')
+	if(url[3]=="create"):
+		if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
+			try :
+				author = node_collection.find_one({'_type' : 'Author','name' : doc[u'user']})
+				cursor = node_collection.find({'url' : 'course','created_by' : author[u'created_by']})
+				for course_created in cursor :
+					if (doc[u'last_update'] - course_created[u'created_at']).seconds < 5 :
+						analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a'}
+						analytics_doc.obj['course']['id'] = ObjectId(course_created[u'_id'])
+						analytics_doc.obj['course']['name'] = str(course_created[u"name"]) 
+						analytics_doc.save()
+			except :
+				return 0
+
+	elif(url[3]=="course_detail"):
+		if(ins_objectid.is_valid(url[4])):
+			n=node_collection.find_one({"_id":ObjectId(url[4])})
+			try :
+				analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a'}
+				analytics_doc.obj['course']['id'] = ObjectId(url[4])
+				analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+				analytics_doc.save()
+			except Exception :
+				return 0
+
+	elif(url[3]=="edit") :
+		if(ins_objectid.is_valid(url[4])):
+			if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
+				n=node_collection.find_one({"_id":ObjectId(url[4])})
+				try :
+					analytics_doc.action = { 'key' : 'edit', 'phrase' : 'edited a'}
+					analytics_doc.obj['course']['id'] = ObjectId(url[4])
+					analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+					analytics_doc.save()
+				except Exception :
+					return 0
+				
+	elif(ins_objectid.is_valid(url[3])):
+		n=node_collection.find_one({"_id":ObjectId(url[3])})
+		try :
+			analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a'}
+			analytics_doc.obj['course']['id'] = ObjectId(url[4])
+			analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+			analytics_doc.save()
+		except Exception :
+			return 0
+	
+
+	return 0
+
+def file_activity(group_id,url,doc):
+	'''
+	This function updates the analytics_collection database with the new activities done on the 
+	files of MetaStudio, and also to see whether the file is viewed,edited, deleted, uploaded . 
+	We check the status in the Nodes collection of database.
+	And also we are assuming here that if the difference between the last update and created at 
+	is less than 5 seconds then we should have uploaded the file. 
 	
 	'''
 	
@@ -495,6 +561,7 @@ def file_activity(group_id,url,doc):
 					analytics_doc.obj['file']['id'] = ObjectId(file_created[u'_id'])
 					analytics_doc.obj['file']['type'] = str(file_created[u"mime_type"])
 					analytics_doc.obj['file']['name'] = str(file_created[u"name"]) 
+					analytics_doc.save()
 		except :
 			return 0
 
@@ -505,6 +572,7 @@ def file_activity(group_id,url,doc):
 			analytics_doc.obj['file']['id'] = ObjectId(url[4])
 			analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 			analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+			analytics_doc.save()
 		except Exception :
 			return 0
 
@@ -517,6 +585,7 @@ def file_activity(group_id,url,doc):
 				analytics_doc.obj['file']['id'] = ObjectId(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+				analytics_doc.save()
 			except Exception :
 				return 0
 
@@ -527,6 +596,7 @@ def file_activity(group_id,url,doc):
 			analytics_doc.obj['file']['id'] = ObjectId(url[4])
 			analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 			analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+			analytics_doc.save()
 		except Exception :
 			return 0
 
@@ -538,23 +608,17 @@ def file_activity(group_id,url,doc):
 				analytics_doc.obj['file']['id'] = ObjectId(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+				analytics_doc.save()
 	
 	elif(url[3]=="edit" or url[3]=="edit_file"):
 		if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 			if ins_objectid.is_valid(url[4]) is True:
+				n=node_collection.find_one({"_id":ObjectId(url[4])})
 				analytics_doc.action = { 'key' : 'edit', 'phrase' : 'edited'}
 				analytics_doc.obj['file']['id'] = str(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
-		
-		else:
-			return 0		
-	
-	else:
-		return 0
-
-	
-	analytics_doc.save()
+				analytics_doc.save()
 	return 1
 
 def forum_activity(group_id,url,doc):
@@ -787,8 +851,6 @@ def default_activity(group_id,url,doc):
 
 
 
-def course_activity(group_id,url,doc):
-	return 0
 
 def event_activity(group_id,url,doc):
 	return 0
