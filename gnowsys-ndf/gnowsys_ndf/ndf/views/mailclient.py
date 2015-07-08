@@ -31,6 +31,7 @@ import io
 import mailbox
 import datetime
 import subprocess
+import traceback
 
 #-----------------Dictionary of popular servers--------------#
 server_dict = {
@@ -140,7 +141,6 @@ def mailbox_create_edit(request, group_id):
     if request.method == "POST":  # create or edit
         # get all data from the form
         mailbox_name = request.POST.get("mailboxname", "")
-        mailbox_name= mailbox_name.replace(" ","_")
         emailid = request.POST.get("emailid", "")
         pwd = request.POST.get("password", "")
         domain = request.POST.get("domain","")
@@ -150,14 +150,20 @@ def mailbox_create_edit(request, group_id):
         newbox = Mailbox()
 
         #TODO: clean up mailbox_name since it will later go as part of url for :settings, edit and delete pages.
-        characters_not_allowed= ['!','@',]
+        # '_' , '.', '-' are being allowed
+        mailbox_name_cleaned = mailbox_name
+        characters_not_allowed= ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}','@','^','+','\\','/','\'','=','-',':',',','.']
+        for i in characters_not_allowed:
+                mailbox_name_cleaned = mailbox_name_cleaned.replace(i,'')
+        mailbox_name = mailbox_name_cleaned.replace(' ','_')
+
+        #assign after cleaning
         newbox.name = mailbox_name
         webserver = server_dict[domain]
 
         try:
             uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + "?archive=" + mailbox_name.replace(" ","_")
             newbox.uri = uri
-            print uri
         except IndexError: 
             print "Incorrect Email ID given!"
             error_obj= "Incorrect Email ID given!"
@@ -175,6 +181,13 @@ def mailbox_create_edit(request, group_id):
         except IMAP4.error:
             print "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
             error_obj= "Either the emailid or password is incorrect or you have chosen the wrong account (domain)"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+
+        except Exception as error:
+
+            print "Some error occurred while creating new mailbox"
+            error_obj= str(error) + '----See terminal for traceback----One unfixed bug is: if password contains 1 or more "#" characters then mailbox cant be created '
+            print(traceback.format_exc())
             return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
         
         #only on calling save() the mailbox is alotted an id
@@ -650,6 +663,12 @@ def mailbox_edit(request, group_id,mailboxname):
         emailid_split = emailid.split('@')
         webserver = server_dict[domain]
 
+        mailbox_name_cleaned = mailbox_name
+        characters_not_allowed= ['!','?','$','%','$','#','&','*','(',')','   ','|',';','\"','<','>','~','`','[',']','{','}','@','^','+','\\','/','\'','=','-',':',',','.']
+        for i in characters_not_allowed:
+                mailbox_name_cleaned = mailbox_name_cleaned.replace(i,'')
+        mailbox_name = mailbox_name_cleaned.replace(' ','_')
+
         try:
             uri = "imap+ssl://" + emailid_split[0] + "%40" + emailid_split[1] +  ":" + pwd + "@" + webserver + "?archive=" + mailbox_name.replace(" ","_")
         except IndexError:
@@ -906,6 +925,41 @@ def compose_mail(request, group_id,mailboxname):
     variable = RequestContext(request,context_dict)
 
     if request.method == "POST":
+        try:
+            settings_dir1 = os.path.dirname(__file__)
+            settings_dir2 = os.path.dirname(settings_dir1)
+            settings_dir3 = os.path.dirname(settings_dir2)
+            path = os.path.abspath(os.path.dirname(settings_dir3))
+            #may throw error        
+            conn = sqlite3.connect(path + '/example-sqlite3.db')
+            user_id = str(request.user.id)
+            query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
+            cursor = conn.execute(query)
+
+        except Exception as error:
+            print error
+            error_obj= str(error) + ", mailbox_edit() fn"
+            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+            
+        mailbox_ids=[]
+        for row in cursor:
+            mailbox_ids.append(row[0])
+
+        # find mailbox with passed mailbox_id 
+        box = None
+        flag = 0
+        boxes= Mailbox.active_mailboxes.all()
+        for box in boxes:
+            if box.name == mailboxname and box.id in mailbox_ids:
+                flag = 1
+                break
+
+        mailbox_email_id = ''
+        if flag == 1:
+            #here
+            mailbox_email_id = box.uri.split("//")[1].split(":")[0].replace('%40','@')
+        print mailbox_email_id
+
         user_id = request.POST.get("user_id","")
         to = request.POST.get("to_addrs", "")
         subject = request.POST.get("subject", "")
@@ -942,8 +996,7 @@ def compose_mail(request, group_id,mailboxname):
         if bcc:
             mail.bcc = bcc_list
 
-        #TODO: extract email id from db using mailbox name and user id
-        mail.from_email = "MetaStudio <abtiwari94@gmail.com>"
+        mail.from_email = mailbox_email_id
         mail.subject= subject
         mail.content_subtype = "html"
         mail.body = body 
@@ -952,8 +1005,6 @@ def compose_mail(request, group_id,mailboxname):
             print f.name
             print f.size
             print f.content_type
-            #TODO
-            print f.multiple_chunks(1024)
             print '-'*30
             mail.attach(f.name,f.read(),f.content_type)
         print body
