@@ -44,7 +44,18 @@
 
 <!-- left top panel -->
 {% block meta_content %}
-  <h2 class="subheader">{% trans title %}</h2>
+
+  <a href="{% url app_gst.name|lower group_name_tag %}">
+    <h2 class="subheader">
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+        {{app_gst.altnames}}
+      {% else %}
+        {{app_gst.name}}
+      {% endif%}
+    </h2>
+    {{app_gst.content|default_if_none:""|safe}}
+  </a>
+
 {% endblock %}
 
 
@@ -52,18 +63,6 @@
   {% check_user_join request groupid as user_is_joined %}
 
   <div class="panel" style="background-color:#ddd;">
-    
-    <!-- radio buttons for E-Library app: CR and XCR -->
-    {% comment %}
-    <!-- 
-    {% if title == "E-Library" %}
-      <input type="radio" name="crxcr" value="cr" id="cr-rad" title="Curricular">
-        <label for="cr-rad" title="Curricular">CR</label>
-      <input type="radio" name="crxcr" value="xcr" id="xcr-rad" title="Extra Curricular">
-        <label for="xcr-rad" title="Extra Curricular">XCR</label>
-    {% endif %}
-    -->
-    {% endcomment %}  
     
     <ul class="side-nav">
       <dl class="tabs" data-tab >
