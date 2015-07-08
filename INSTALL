@@ -7,7 +7,8 @@ Use corresponding package names if you are using an RPM based distro
 
 1. Installing required packages and its dependencies
 	
-    (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg ffmpeg2theora
+    (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg ffmpeg2theora rabbitmq-server
+	*rabbit-mq is used with celery.
 
 2. Get latest version of gstudio-mongokit -  Try one of the following commands:
 
@@ -141,11 +142,9 @@ Use corresponding package names if you are using an RPM based distro
 
 *Following are for mailclient app and Replication features
 
-*rabbit-mq is used with celery.
-9.
-	sudo apt-get install rabbitmq-server
+
 *Following has to be done for using the Replication features
-10.	Create a file local_settings.py in /gstudio/gnowsys-ndf/gnowsys_ndf/
+9.	Create a file local_settings.py in /gstudio/gnowsys-ndf/gnowsys_ndf/
 	In this file add the following variables:
 	
 	# SMTP setting for sending mail (Using gmail SMTP server)
