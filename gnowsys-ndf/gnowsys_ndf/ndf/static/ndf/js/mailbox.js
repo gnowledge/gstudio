@@ -56,6 +56,15 @@ function getMails(){
 	});
 }
 
+function toolbarDisplay(){
+	var type = 'inline-block';
+	$("#set_box")[0].style.display = type;
+	$("#compose_mail")[0].style.display = type;
+	$("#down_count")[0].style.display = type;
+	$("#up_count")[0].style.display = type;
+	$("#unreadMailsLink")[0].style.display = type;
+	$("#readMailsLink")[0].style.display = type;
+}
 
 // Function to put a POST request to fetch mails
 function setMailBoxName(username, csrf_token, mailBoxName, emailid) {
@@ -85,15 +94,23 @@ function updateStatus(filename){
 	}
 }
 
-function readBody(text,attached_files, Attachments){
-	var content = '<a class="close-reveal-modal" >&#215;</a>' + text;
+function readBody(filename, attached_files, Attachments){
+	
+	$.post( 'mail_body/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'file_name': filename}, function(data){		
+
+	var content = '<a class="close-reveal-modal" >&#215;</a>';
 	var attach_count = 0;
+
+	content += data;
+	
 	for(n in Attachments){
 		attach_count+=1;
 	}
+	
 	if(attach_count>0){
 	content += '<br> <h3> Attachments: </h3>';
 	}
+    
     var elementName = "myModal";
     var n;
     for(n in attached_files){
@@ -101,7 +118,9 @@ function readBody(text,attached_files, Attachments){
     	var href = link + Attachments[n];
     	content += "<br><a href=\"" + href + "\" download=\"" + attached_files[n] + "\">" + attached_files[n] + "</a>";
     }
+    
     document.getElementById(elementName).innerHTML = content;    			
+    });
 }
 
 $(document).ready(function(){
