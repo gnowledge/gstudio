@@ -224,12 +224,12 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
 
 # # # #SMTP setting for sending mail (Using python default SMTP server)
-# EMAIL_USE_TLS = False
-# EMAIL_HOST = 'localhost'
-# EMAIL_PORT = 1025
-# EMAIL_HOST_USER = ''
-# EMAIL_HOST_PASSWORD = ''
-# DEFAULT_FROM_EMAIL = 'testing@example.com'
+#EMAIL_USE_TLS = False
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 1025
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
+#DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 # SMTP setting for sending mail (Using gmail SMTP server)
 #EMAIL_USE_TLS = True
