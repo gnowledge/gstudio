@@ -130,7 +130,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
 	return render_to_response("ndf/resource_list.html", 
 								{'title': title, 
-								 'appId':app._id,
+								 'appId':app._id, "app_gst": app,
 								 # 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
 								 'files': files,
 								 "detail_urlname": "file_detail", 'ebook_pages': educationaluse_stats.get("eBooks", 0),

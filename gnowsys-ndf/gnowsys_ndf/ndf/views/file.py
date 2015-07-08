@@ -278,7 +278,7 @@ def file(request, group_id, file_id=None, page_no=1):
       already_uploaded = request.GET.getlist('var', "")
       return render_to_response("ndf/file.html",
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId':app._id, "app_gst": app, 
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
@@ -374,7 +374,7 @@ def file(request, group_id, file_id=None, page_no=1):
       datavisual = json.dumps(datavisual)
       return render_to_response("ndf/file.html", 
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId':app._id, "app_gst": app,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
                                  'file_pages': file_pages, 'image_pages': images_pc.count(),
