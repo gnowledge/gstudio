@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.page import *
-
+from gnowsys_ndf.ndf.views.methods import *
 
 
 
@@ -20,3 +20,9 @@ def trash_resource(request,group_id,node_id):
  print "node",node.group_set	
  node.save()
  return (eval('page')(request, group_id))
+
+
+def delete_resource(request,group_id):
+	node_id = request.GET.getlist('node_id','')[0]
+	delete_node(ObjectId(node_id),deletion_type=1)
+	return HttpResponse("Deleted Successfully")

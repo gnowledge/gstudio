@@ -824,6 +824,26 @@
 		$drContainer.css("opacity", "1"); 
 	})
 	// ---END of search in the data-review
+	function deleteNode(node_id)
+	{ 
+		a = node_id
+   		alert(a)
+		$.ajax({
+
+			 	url:"{% url 'delete_resource' groupid  %}",
+			 	type:'Get',
+			 	data:{
+			 			'node_id':node_id
+			 	},
+
+			 	success:function(data){
+			 		alert(data)	
+			 	}		
+
+
+		});
+
+	}
 
 // </script>
 {% endblock %}

@@ -291,6 +291,12 @@
 			</option> -->
 		</select>				
 	</td>
+	<td class="deletedata">
+	   	 
+		<div class="button tiny exapnd" id = "{{resource.pk}}" onclick = "deleteNode('{{resource.pk}}')"> Delete </div> 
+		<div class="button tiny exapnd" id = "{{resource.pk}}" onclick = "restoreNode('{{resource.pk}}')"> restore </div>
+	</td>
+
 
 	{% if title == "moderation" %}
 
