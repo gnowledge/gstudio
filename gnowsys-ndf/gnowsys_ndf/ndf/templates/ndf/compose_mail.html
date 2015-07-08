@@ -33,6 +33,15 @@
 	<form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
 	{% csrf_token %}
 		<h2> Using {{mailbox_name}} </h2>
+
+    <!-- From Field notificatio -->
+      <div class="row">
+          <div class="medium-12 columns">
+              <label>From:</label>
+              <h5>From Email ID will be set as the Email ID of this mailbox</h5>
+          </div>
+        </div>
+        </br>
 		<!-- To addr -->
     	<div class="row">
         	<div class="medium-12 columns">
