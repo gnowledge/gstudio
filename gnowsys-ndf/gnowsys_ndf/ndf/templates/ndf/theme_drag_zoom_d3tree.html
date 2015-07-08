@@ -1,23 +1,8 @@
-<div id="theme-drag-zoom-container" class="hide">
-        
-    <a href="#" data-reveal-id="theme-drag-zoom-tree">Show graph with zoom and drag functionality</a>
-
-    <div id="theme-drag-zoom-tree" class="reveal-modal xlarge" data-reveal>
-        <a class="close-reveal-modal">&#215;</a>
-    </div>
-
-</div>
-
 <script type="text/javascript">
-    
-    // treeData = ""
-    // $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;});
-
-    // d3.json("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(error, treeData) {
         
     function plotDragZoomTree(treeData) {
 
-    $("#theme-drag-zoom-tree").html("");
+    // $("#theme-drag-zoom-tree").html("");
 
     // Calculate total nodes, max label length
     var totalNodes = 0;
@@ -38,7 +23,7 @@
 
     // size of the diagram
     var viewerHeight = $(window).height() * 0.80;
-    var viewerWidth = $(document).width() * 0.90;
+    var viewerWidth = $(document).width() * 0.80;
 
  
     var tree = d3.layout.tree()
@@ -165,6 +150,8 @@
         .attr("width", viewerWidth)
         .attr("height", viewerHeight)
         .attr("class", "overlay")
+        .attr("version", "1.0")
+        .attr("xmlns", "http://www.w3.org/2000/svg")
         .call(zoomListener);
  
     // // Define the drag listeners for drag/drop behaviour of nodes.
@@ -277,6 +264,25 @@
             d._children = null;
         }
     }
+
+    function getHierarchyIds(d) {
+        hierarchyIdsArr = [d.id];
+
+        while(d.parent)
+        {
+            hierarchyIdsArr.push(d.parent.id);
+            d = d.parent;
+        }
+        // currently treeData doesn't hold top-theme _id, 
+        // so by default it's 1 in that place. Replace 1 with top theme's _id: 
+        hierarchyIdsArr.pop(hierarchyIdsArr.indexOf(1));
+        // hierarchyIdsArr.push("{{node.pk}}");
+
+        hierarchyIdsArr.reverse();
+        // console.log(hierarchyIdsArr)
+
+        return hierarchyIdsArr
+    }
  
     var overCircle = function(d) {
         selectedNode = d;
@@ -322,7 +328,7 @@
         scale = zoomListener.scale();
         x = -source.y0;
         y = -source.x0;
-        x = x * scale + viewerWidth / 2;
+        x = x * scale + viewerWidth / 4;
         y = y * scale + viewerHeight / 2;
         d3.select('#theme-drag-zoom-tree g').transition()
             .duration(duration)
@@ -344,13 +350,47 @@
     }
  
     // Toggle children on click.
- 
-    function click(d) {
-        if (d3.event.defaultPrevented) return; // click suppressed
-        d = toggleChildren(d);
-        update(d);
-        centerNode(d);
-    }
+    
+            // Toggle children on click.
+            function click(d) {
+              if (d.children) {
+                d._children = d.children;
+                d.children = null;
+                console.log("non-leaf 1");
+              } 
+              else {
+                if(d._children){
+                    d.children = d._children;
+                    d._children = null;
+                    console.log("non-leaf 2");
+                }
+                else if (d.node_type == "Topic"){
+                    console.log("Leaf!");
+
+                    hierarchyIdsArr = getHierarchyIds(d);
+
+                    // alert("dddddd");
+                    // var a = document.createElement('a');
+                    // a.setAttribute('href', "/{{group_name_tag}}/topic_details/"+d.id+"");
+                    // // a.setAttribute('target', '_blank');
+                    // document.body.appendChild(a);
+                    // a.click();
+                    // a.remove();
+                    location.href = "/{{group_name_tag}}/topic_details/" + d.id + 
+                                    "?nav_li=" + hierarchyIdsArr.toString() + "";
+                    // location.href = "/{{group_name_tag}}/topic_details/"+d.id+"";
+                    // $('#collaps_topic_details').foundation('reveal', 'open');     
+                }
+              }
+              update(d);
+            }
+
+    // function click(d) {
+    //     if (d3.event.defaultPrevented) return; // click suppressed
+    //     d = toggleChildren(d);
+    //     update(d);
+    //     centerNode(d);
+    // }
  
     function update(source) {
         // Compute the new height, function counts total children of root node and sets tree height accordingly.
@@ -397,14 +437,18 @@
             .attr("transform", function(d) {
                 return "translate(" + source.y0 + "," + source.x0 + ")";
             })
+            .attr("data-coll-node-id", function(d) {return d.id || (d.id = ++i); })
+            .style("cursor", "pointer")
             .on('click', click);
- 
+
         nodeEnter.append("circle")
             .attr('class', 'nodeCircle')
             .attr("r", 0)
             .style("fill", function(d) {
                 return d._children ? "lightsteelblue" : "#fff";
-            });
+            })
+            .style("stroke-width", "1.5px")
+            .style("stroke", "steelblue");
  
         nodeEnter.append("text")
             .attr("x", function(d) {
@@ -418,21 +462,23 @@
             .text(function(d) {
                 return d.name;
             })
-            .style("fill-opacity", 0);
+            .style("fill-opacity", 0)
+            .style("font-family", "sans-serif")
+            .style("font-size", "10px");
  
         // phantom node to give us mouseover in a radius around it
-        nodeEnter.append("circle")
-            .attr('class', 'ghostCircle')
-            .attr("r", 30)
-            .attr("opacity", 0.2) // change this to zero to hide the target area
-        .style("fill", "red")
-            .attr('pointer-events', 'mouseover')
-            .on("mouseover", function(node) {
-                overCircle(node);
-            })
-            .on("mouseout", function(node) {
-                outCircle(node);
-            });
+        // nodeEnter.append("circle")
+        //     .attr('class', 'ghostCircle')
+        //     .attr("r", 30)
+        //     .attr("opacity", 0.2) // change this to zero to hide the target area
+        // // .style("fill", "red")
+        //     .attr('pointer-events', 'mouseover')
+        //     .on("mouseover", function(node) {
+        //         overCircle(node);
+        //     })
+        //     .on("mouseout", function(node) {
+        //         outCircle(node);
+        //     });
  
         // Update the text to reflect whether node has children or not.
         node.select('text')
@@ -496,7 +542,10 @@
                     source: o,
                     target: o
                 });
-            });
+            })
+            .style("stroke", "#ccc")
+            .style("stroke-width", "1.5px")
+            .style("fill", "none");
  
         // Transition links to their new position.
         link.transition()
@@ -530,12 +579,82 @@
  
     // Define the root
     root = treeData;
+    aaa = root;
     root.x0 = viewerHeight / 2;
     root.y0 = 0;
  
     // Layout the tree initially and center on the root node.
+    // getData(root);
     root.children.forEach(collapse);
     update(root);
     centerNode(root);
+
+    // recursive function needed to get data for {{selected}} node
+    // result = ""
+    // function getData (d) {
+
+    //     console.log("{{selected}} : " + d.name + " : " + d.id);
+    //     if(d.id == "{{selected}}")
+    //     {
+    //         console.log("======================================================");
+    //         result = d
+    //     }
+        
+    //     if(d.children)
+    //     {
+    //         console.log(d.children)
+    //         d.children.forEach(function(i){
+    //             res = getData(i);
+    //             if (res)
+    //             {
+    //                 return res
+    //             }
+    //         })
+    //     }
+    //     else if(d._children)
+    //     {
+    //         console.log(d._children)
+    //         d._children.forEach(function(i){
+    //             res = getData(i);
+    //             if (res)
+    //             {
+    //                 return res
+    //             }
+    //         })
+    //     }
+    // }
+    // console.log(getData(root))
 }
+// alert("{{selected}}");
+//called with every property and it's value
+    
+
+    // selected = document.querySelector('[data-coll-node-id="{{selected}}"]');
+    // selectedNodeData = d3.select(selected).data();
+    // d = selectedNodeData[0];
+    // hierarchyIdsArr = getHierarchyIds(d);
+    // console.log(hierarchyIdsArr);
+
+    // while(d && d.parent)
+    // {
+    //     console.log("11")
+    //     click(d)
+    //     d = d.parent;
+    // }
+    // function expandHierarchy(d) {
+    //     console.log(d)
+
+    // }
+
+    // expandHierarchy(selectedNodeData[0]);
+
+    function downloadCollapsibleGraph(filename) 
+    {
+        var blob = new Blob([$("#theme-drag-zoom-tree").html()], {type: "image/svg+xml"});
+        filename = filename.replace(/\ /g, '-');
+        filename += "-Collapsible-Graph.svg";
+        saveAs(blob, filename);
+    }
+
+
 </script>

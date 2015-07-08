@@ -98,7 +98,7 @@ def course(request, group_id, course_id=None):
 
     return render_to_response("ndf/course.html",
                             {'title': title,
-                             'app_id': app_id,
+                             'app_id': app_id, 'course_gst': GST_COURSE,
                              'app_set_id': app_set_id,
                              'searching': True, 'course_coll': course_coll,
                              'groupid': group_id, 'group_id': group_id,
