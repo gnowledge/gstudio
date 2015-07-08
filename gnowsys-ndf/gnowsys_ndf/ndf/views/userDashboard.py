@@ -150,37 +150,37 @@ def uDashboard(request, group_id):
     user_activity = []
 
     page_gst = node_collection.one({'_type': "GSystemType", 'name': 'Page'})
-    page_cur = node_collection.find ({'member_of': {'$all': [page_gst._id]},
+    page_cur = node_collection.find({'member_of': {'$all': [page_gst._id]},
                             'created_by': int(usrid), "status": {"$nin": ["HIDDEN"]}})
-    file_cur = node_collection.find ({'_type': u"File", 'created_by': int(usrid),
+    file_cur = node_collection.find({'_type': u"File", 'created_by': int(usrid),
                                      "status": {"$nin": ["HIDDEN"]}})
     forum_gst = node_collection.one({"_type": "GSystemType", "name": "Forum"})
-    forum_count = node_collection.find ({"_type": "GSystem",
+    forum_count = node_collection.find({"_type": "GSystem",
                             "member_of": forum_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     quiz_gst = node_collection.one({"_type": "GSystemType", "name": "Quiz"})
-    quiz_count = node_collection.find ({"_type": "GSystem",
+    quiz_count = node_collection.find({"_type": "GSystem",
                             "member_of": quiz_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     thread_gst = node_collection.one({"_type": "GSystemType", "name": "Twist"})
-    thread_count =node_collection.find ({"_type": "GSystem",
+    thread_count =node_collection.find({"_type": "GSystem",
                             "member_of": thread_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     reply_gst = node_collection.one({"_type": "GSystemType", "name": "Reply"})
-    reply_count = node_collection.find ({"_type": "GSystem",
+    reply_count = node_collection.find({"_type": "GSystem",
                             "member_of": reply_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
 
     task_cur = ""
     if current_user:
         if int(current_user) == int(usrid):
-                   task_cur = node_collection.find (
+                   task_cur = node_collection.find(
             {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':usrid}
         ).sort('last_update', -1).limit(10)
                    dashboard_count.update({'Task': task_cur.count()})
   
    
-    group_cur = node_collection.find (
+    group_cur = node_collection.find(
         {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
         '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1).limit(10)
 
@@ -189,7 +189,7 @@ def uDashboard(request, group_id):
     # user activity gives all the activities of the users
 
     activity = ""
-    activity_user = node_collection.find (
+    activity_user = node_collection.find(
         {'$and': [{'$or': [{'_type': 'GSystem'}, {'_type': 'group'},
         {'_type': 'File'}]}, {"access_policy": {"$in": Access_policy}},{'status':{'$in':[u"DRAFT",u"PUBLISHED"]}},
         {'member_of': {'$nin': [exclued_from_public]}},
@@ -243,7 +243,7 @@ def uDashboard(request, group_id):
     task_cur gives the task asigned to users
     '''
 
-    obj = node_collection.find (
+    obj = node_collection.find(
         {'_type': {'$in': [u"GSystem", u"File"]}, 'contributors': int(usrid),
          'group_set': {'$all': [ObjectId(group_id)]}}
     )
