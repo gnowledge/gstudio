@@ -646,13 +646,60 @@ def mailbox_edit(request, group_id,mailboxname):
     group_name, group_id = get_group_name_id(group_id)
     home_grp_id = node_collection.one({'name': "home"})
     title = "Edit Mailbox"
+    username = request.user.username
+    cursor= None  
+    email_id = ''                          
+    try:
+        settings_dir1 = os.path.dirname(__file__)
+        settings_dir2 = os.path.dirname(settings_dir1)
+        settings_dir3 = os.path.dirname(settings_dir2)
+        path = os.path.abspath(os.path.dirname(settings_dir3))
+        conn = sqlite3.connect(path + '/example-sqlite3.db')
+        query = 'select id from auth_user where username=\''+str(username)+'\''
+        cursor = conn.execute(query)
+        userid=None
+        for row in cursor:
+            userid = row[0]
+            
+        user_mailboxes = []
+        query = 'select mailbox_id from user_mailboxes where user_id=\''+str(userid)+'\''
+        cursor = conn.execute(query)
+        for row in cursor:
+            user_mailboxes.append(row[0])
+            
+        mailboxes_name = []
+        query = 'select id from django_mailbox_mailbox where name=\''+mailboxname+'\''
+        cursor = conn.execute(query)
+        for row in cursor:
+            mailboxes_name.append(row[0])
+
+        the_id = ''
+        for k in mailboxes_name:
+            if k in user_mailboxes:
+                the_id = k
+                break
+
+        
+        query = 'select uri from django_mailbox_mailbox where id='+ str(the_id)
+        cursor = conn.execute(query)
+        for row in cursor:
+            email_id  = row[0]
+
+        if email_id != '':
+            email_id = email_id.split('//')[1].split(':')[0].replace('%40','@')
+        print email_id
+
+
+    except Exception as error:
+        print error
+    
     variable = RequestContext(request, {'title': title,
                                         'groupname': group_name,
                                         'groupid': group_id,
                                         'group_id': group_id,
                                         'server_dict' : server_dict,
                                         'mailboxname' : mailboxname,
-                                            
+                                        'email_id' : email_id
                                         })
     template = "ndf/edit_mailbox.html"
     if request.method == "POST":  # create or edit
