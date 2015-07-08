@@ -53,7 +53,7 @@
         {{app_gst.name}}
       {% endif%}
     </h2>
-    {{app_gst.content|safe}}
+    {{app_gst.content|default_if_none:""|safe}}
   </a>
 
 {% endblock %}

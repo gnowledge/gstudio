@@ -21,7 +21,7 @@
         {{course_gst.name}}
       {% endif%}
     </h2>
-    {{course_gst.content|safe}}
+    {{course_gst.content|default_if_none:""|safe}}
   </a>
 
   {% if user.is_authenticated %}

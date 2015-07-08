@@ -15,7 +15,7 @@
       {% endif%}
     </h2>
   </a>
-  {{ebook_gst.content|safe}}
+  {{ebook_gst.content|default_if_none:""|safe}}
 {% endblock %}
 
 

@@ -373,7 +373,7 @@
 			{% endif%}
 		</h3>
 	</a>
-	{{theme_GST.content|safe}}
+	{{theme_GST.content|default_if_none:""|safe}}
 {% endblock %}
 
 {% block related_content %}
