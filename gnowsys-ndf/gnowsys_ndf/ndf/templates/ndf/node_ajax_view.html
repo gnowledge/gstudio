@@ -1336,7 +1336,7 @@ ul#navigation li a.last {
         <!-- Delete button if page created by user -->
           {% if node.created_by == request.user.id %}
             {% if node.member_of_names_list.0 == "Page" %}
-              <a class="tiny alert round button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+              <a class="tiny alert round button" href="{% url 'trash_resource' group_id node %}">{% trans "Delete" %}</a>
             {% elif node.member_of_names_list.0 == "Term" %}
               <a class="tiny alert round button" href="{% url 'term_delete' group_name_tag node %}">{% trans "Delete" %}</a>
             {% endif %}
