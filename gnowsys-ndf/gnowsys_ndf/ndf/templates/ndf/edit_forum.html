@@ -44,6 +44,20 @@
     */
   </style>
 
+
+
+<script language="javascript" >
+
+function cancel(){
+
+	if(confirm("Are you sure you want to cancel edit?"))
+	{
+		 history.go(-1);
+	}
+}
+
+</script>
+
     <!-- <script type="text/javascript">
       // $(document).ready(function(){
 
@@ -109,7 +123,8 @@
       <!-- Final Create forum button -->
       <div class="large-8 columns">
         <!-- <input type="submit" id="forum" value="Edit Forum" style="display:none"> -->
-        <input type="submit" id="forum" class="button expand" value="Save forum">
+        <input type="submit" id="forum" class="button tiny" value="Save forum">
+	<input type="button" id="cancel_edit" class="button tiny" value="Cancel" onclick="cancel()">
       </div>
 
     </div>
@@ -276,7 +291,7 @@
     var name = $("#forum_name").val().trim().toLowerCase();
     var nodes = {{nodes_list|safe}} 
 
-    if (name != old_forum_name && name != "")
+    if (name == old_forum_name && name != "")
     {
       if (nodes.indexOf(name) != -1)  
       { 
