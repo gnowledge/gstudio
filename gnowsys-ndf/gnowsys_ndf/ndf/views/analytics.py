@@ -30,7 +30,7 @@ except ImportError:  # old pymongo
 
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls  # , get_page
-from gnowsys_ndf.ndf.views.methods import create_gattribute, get_group_name_id
+from gnowsys_ndf.ndf.views.methods import create_gattribute, get_group_name_id, get_execution_time
 
 benchmark_collection = db[Benchmark.collection_name]
 analytics_collection = db[Analytics.collection_name]
@@ -40,7 +40,7 @@ ins_objectid = ObjectId()
 '''
 FUNCTION TO REGISTER CUSTOM ACTIVITIES USING AJAX
 '''
-
+@get_execution_time
 def custom_events(request):
 	transaction = { 'status' : None, 'message' : None}
 
@@ -74,10 +74,12 @@ def custom_events(request):
 '''
 USER ANALYTICS VIEWS
 '''
-
+@get_execution_time
 def default_user(request):
 	return redirect('/analytics/summary')
 
+@login_required
+@get_execution_time
 def user_list_activities(request):
 	'''
 	Lists the detailed activities of the user
@@ -99,6 +101,7 @@ def user_list_activities(request):
 	
 	return render_to_response ("ndf/analytics_list_details.html", { "data" : lst})
 
+@get_execution_time
 def get_user_sessions(user) :
 	'''
 	Returns the user activities grouped by sessions
@@ -129,7 +132,9 @@ def get_user_sessions(user) :
 			sessions_list.append(d)
 
 	return sessions_list
-	
+
+@login_required
+@get_execution_time
 def user_summary(request):
 	'''
 	Renders the summary of the User activities on the Metastudio 
@@ -163,6 +168,8 @@ def user_summary(request):
 	return render_to_response("ndf/analytics_summary.html",
 															{ "data" : data})
 
+@login_required
+@get_execution_time
 def user_graphs(request) :
 	return render_to_response("ndf/analytics_user_graphs.html", {})
 
@@ -170,10 +177,12 @@ def user_graphs(request) :
 '''
 GROUP ANALYTICS VIEWS
 '''
-
+@get_execution_time
 def default_group(request,group_id):
 	return redirect('/analytics/'+group_id+'/summary')
 
+@login_required
+@get_execution_time
 def group_summary(request,group_id):
 	'''
 	Renders the summary of all the activities done by the members of the Group
@@ -218,6 +227,8 @@ def group_summary(request,group_id):
 	
 	return render_to_response("ndf/analytics_group_summary.html",{"data" : data})
 	
+@login_required
+@get_execution_time
 def group_list_activities(request,group_id):
 	'''
 	Renders the list of activities of all the members of the group
@@ -235,6 +246,8 @@ def group_list_activities(request,group_id):
 	return render_to_response("ndf/analytics_list_group_details.html",
 															{ "data" : lst})
 
+@login_required
+@get_execution_time
 def group_members(request, group_id) :
 
 	'''
@@ -296,6 +309,8 @@ def group_members(request, group_id) :
 
 	return render(request, "ndf/analytics_group_members.html",{"data" : list_of_members, "group_name" : group_name, "group_id" : group_id, "groupid" : group_id})
 
+@login_required
+@get_execution_time
 def group_member_info_details(request, group_id, user) :
 	
 	group_id=ObjectId("55717125421aa91eecbf8843")
@@ -319,7 +334,7 @@ def group_member_info_details(request, group_id, user) :
 '''
 ANALYTICS PROCESSING 
 '''
-
+@get_execution_time
 def query(analytics_type,details) :
 	'''
 	This function checks the Analytics data(for a user) in Analytic_col and gets the time to which the query set is updated. 
@@ -359,6 +374,7 @@ def query(analytics_type,details) :
 
 	return 1
 
+@get_execution_time
 def normalize(cursor) :
 	'''
 		Normailizes the raw data from Benchmark collection so as to filter irrelevent content - 
@@ -420,7 +436,7 @@ def normalize(cursor) :
 '''
 ANALYSIS OF ACTIVITIES BY INDIVIDUAL GAPPS
 '''
-
+@get_execution_time
 def initialize_analytics_obj(doc, group_id, obj) :
 	'''
 	Returns a new initialized object of the Analytics class
@@ -435,6 +451,7 @@ def initialize_analytics_obj(doc, group_id, obj) :
 	
 	return analytics_doc
 
+@get_execution_time
 def page_activity(group_id,url,doc):
 	'''
 	This function updates the Analytic_col database with the new activities done on the 
@@ -505,6 +522,7 @@ def page_activity(group_id,url,doc):
 		
 	return 0
 
+@get_execution_time
 def course_activity(group_id,url,doc):
 	'''
 	This function updates the analytics_collection database with the new activities done on the 
@@ -564,8 +582,9 @@ def course_activity(group_id,url,doc):
 			return 0
 	
 
-	return 0
+	return 1
 
+@get_execution_time
 def file_activity(group_id,url,doc):
 	'''
 	This function updates the analytics_collection database with the new activities done on the 
@@ -648,6 +667,7 @@ def file_activity(group_id,url,doc):
 				analytics_doc.save()
 	return 1
 
+@get_execution_time
 def forum_activity(group_id,url,doc):
 	'''
 	The function analyzes the forum activities of the user. 
@@ -771,6 +791,7 @@ def forum_activity(group_id,url,doc):
 
 	return 0
 
+@get_execution_time
 def task_activity(group_id,url,doc):
 	
 	analytics_doc = initialize_analytics_obj(doc, group_id, 'task')
@@ -824,6 +845,7 @@ def task_activity(group_id,url,doc):
 
 	return 0
 
+@get_execution_time
 def dashbard_activity(group_id,url,doc):
 	analytics_doc = initialize_analytics_obj(doc, group_id, 'dashboard')
 	try :
@@ -861,9 +883,9 @@ def dashbard_activity(group_id,url,doc):
 			pass
 	return 0
 
+@get_execution_time
 def default_activity(group_id,url,doc):
-	pass
-	return 0
+	return 1
 
 
 		
