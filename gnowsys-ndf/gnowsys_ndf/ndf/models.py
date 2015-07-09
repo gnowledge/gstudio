@@ -228,7 +228,39 @@ class Node(DjangoDocument):
                   'user_id':int,
                   'ip_address':basestring}]
     }
-    
+    indexes=[ 
+      {
+    'fields':['_type','name'],
+      },
+  #    {
+  #  'fields':['member_of','group_set'],
+  #    },
+      {
+    'fields':['_type','_id'],
+      },
+      {
+      'fields':['member_of','status','last_update']
+      }
+  #    {
+  #    'fields':['content'],
+  #    },
+  #    {
+  #    'fields':['tags'],
+  #    },
+  #    {
+  #    'fields':['collection_set'],
+  #    },
+  #    {
+  #    'fields':['type_of'],
+  #    },
+  #    {
+  #    'fields':['member_of'],
+  #    },
+  #    {
+  #    'fields':['status']
+  #    }
+    ]
+
     required_fields = ['name', '_type'] # 'group_set' to be included
                                         # here after the default
                                         # 'Administration' group is
@@ -1105,8 +1137,15 @@ class GSystem(Node):
         'annotations': [dict],      # List of json files for annotations on the page
         'license': basestring       # contains license/s in string format
     }
-
-    use_dot_notation = True
+#indexes=[
+#{
+#'fields':['attribute_set'],	
+#},
+#{
+#'fields':['relation_set'],
+#}
+#]
+use_dot_notation = True
 
 
 @connection.register
@@ -1559,7 +1598,17 @@ class Triple(DjangoDocument):
     'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
   }
-  
+  indexes=[
+  {
+  'fields':['_type','name'],
+  },
+  {
+  'fields':['_type','subject'],
+  },
+ # {
+ #'fields':['status'],
+ #}
+  ]
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True
@@ -1772,6 +1821,11 @@ class GAttribute(Triple):
     }
 
     required_fields = ['attribute_type', 'object_value']
+    indexes=[
+    {
+    'fields':['attribute_type'],
+    }
+    ]
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
 
@@ -1785,7 +1839,11 @@ class GRelation(Triple):
         # ObjectId's of GSystems Class / List of list of ObjectId's of GSystem Class
         'right_subject': OR(ObjectId, list)
     }
-
+    indexes=[
+    {
+    'fields':['relation_type'],
+    }
+    ]
     required_fields = ['relation_type', 'right_subject']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
