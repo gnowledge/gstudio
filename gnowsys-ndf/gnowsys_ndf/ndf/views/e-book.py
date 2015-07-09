@@ -45,5 +45,6 @@ def ebook_listing(request, group_id, page_no=1):
  #                                context_instance=RequestContext(request) )
 
 	return render_to_response("ndf/ebook.html",
-								{"all_ebooks": all_ebooks, "group_id": group_id, "groupid": group_id},
+								{"all_ebooks": all_ebooks, "ebook_gst": ebook_gst,
+								"group_id": group_id, "groupid": group_id},
 								context_instance = RequestContext(request))

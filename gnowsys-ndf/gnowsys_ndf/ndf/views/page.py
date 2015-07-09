@@ -1,6 +1,7 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
+import multiprocessing as mp 
 from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
@@ -82,7 +83,7 @@ def page(request, group_id, app_id=None):
     # Code for user shelf
     shelves = []
     shelf_list = {}
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
@@ -187,7 +188,7 @@ def page(request, group_id, app_id=None):
                                     {'title': title, 
                                      'appId':app._id,
                                      'shelf_list': shelf_list,'shelves': shelves,
-                                     'page_nodes':nodes,
+                                     'page_nodes':node,
                                      'groupid':group_id,
                                      'group_id':group_id
                                     }, 
@@ -294,8 +295,10 @@ def create_edit_page(request, group_id, node_id=None):
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
-    for each in available_nodes:
-      nodes_list.append(str((each.name).strip().lower()))
+   # for each in available_nodes:
+   #   nodes_list.append(str((each.name).strip().lower()))
+    #loop replaced by a list comprehension
+    node_list=[str((each.name).strip().lower()) for each in available_nodes]
 
     if node_id:
         page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
@@ -430,11 +433,9 @@ def translate_node(request,group_id,node_id=None):
         content = data
         node_details=[]
         for k,v in content.items():
-            
-            node_name = content['name']
-            node_content_org=content['content_org']
-            node_tags=content['tags']
-            
+          node_name = content['name']
+          node_content_org=content['content_org']
+          node_tags=content['tags']
         return render_to_response("ndf/translation_page.html",
                                {'content': content,
                                 'appId':app._id,
@@ -445,7 +446,7 @@ def translate_node(request,group_id,node_id=None):
                                       },
                              
                               context_instance = RequestContext(request)
-    )        
+    )      
 
 
 @get_execution_time        
