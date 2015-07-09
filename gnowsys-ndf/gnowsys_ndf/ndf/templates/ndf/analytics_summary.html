@@ -1,15 +1,21 @@
-<ul>
 
-{% for x in data %}
-  <li>
-    <strong>SESSION : {{x.session_key}}</strong>
-    <li> Start_date : {{x.start_date}}</li>
-	<li> End_date : {{x.end_date}}</li>
-    <li> Duration : {{x.duration}}</li>
-    <li> Activities : {{x.activities}}</li>
-    <li> User : {{x.user}}</li>
-    
-  </li>
-  <br>
-{% endfor %}
-</ul>
+<strong>total sessions : {{data.num_of_sessions}}</strong>
+<br><br>
+<strong>latest Activity : {{data.latest_activity}}</strong>
+<br><br>
+<strong>total activities : {{data.total_activities}}</strong>
+<br><br>
+<strong>Avg session duration : {{data.avg_session_duration}}</strong>
+<br><br>
+<strong>pages created : {{data.num_of_pages}}</strong>
+<br><br>
+<strong>files uploaded : {{data.num_of_files}}</strong>
+<br><br>
+<strong>tasks created : {{data.num_of_tasks}}</strong>
+<br><br>
+<strong>forums created : {{data.num_of_forums_created}}</strong>
+<br><br>
+<strong>threads created : {{data.num_of_threads_created}}</strong>
+<br><br>
+<strong>replies to posts : {{data.num_of_replies}}</strong>
+<br><br>

@@ -3,10 +3,54 @@
 {% for x in data %}
    	<li>{{x.name}} : {{x.count}}</li>
   	<br>
-  	FORUMS : {{x.forums|length}}
-  	THREADS : {{x.threads|length}}
-  	REPLIES : {{x.replies|length}}
-  	FILES : {{x.files|length}}
-  	PAGES : {{x.pages|length}}
+  	<b>FORUMS :</b> {{x.forums|length}}
+  	<br><br>
+  	<ul>
+  		{% for content in x.forums %}
+  			<li>
+  				{{content.name}}
+  			</li>
+  		{% endfor %}
+  	</ul>
+  	<br>
+  	<b>THREADS :</b> {{x.threads|length}}
+  	<br><br>
+  	<ul>
+  		{% for content in x.threads %}
+  			<li>
+  				{{content.name}}
+  			</li>
+  		{% endfor %}
+  	</ul>
+  	<br>
+  	<b>REPLIES :</b> {{x.replies|length}}
+  	<br><br>
+  	<ul>
+  		{% for content in x.replies %}
+  			<li>
+  				{{content.name}}
+  			</li>
+  		{% endfor %}
+  	</ul>
+  	<br>
+  	<b>FILES :</b> {{x.files|length}}
+  	<br><br>
+  	<ul>
+  		{% for content in x.files %}
+  			<li>
+  				{{content.name}}
+  			</li>
+  		{% endfor %}
+  	</ul>
+  	<br>
+  	<b>PAGES :</b> {{x.pages|length}}
+  	<ul>
+  		{% for content in x.pages %}
+  			<li>
+  				{{content.name}}
+  			</li>
+  		{% endfor %}
+  	</ul>
+  	<br>
 {% endfor %}
 </ul>

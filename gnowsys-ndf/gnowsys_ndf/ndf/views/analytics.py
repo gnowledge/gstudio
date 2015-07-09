@@ -155,7 +155,8 @@ def user_summary(request):
 	data['num_of_forums_created'] = analytics_collection.find({ "action.key" : "create", "obj.forum" : { '$exists' : 'true'}}).count()
 	data['num_of_threads_created'] = analytics_collection.find({ "action.key" : "create", "obj.thread" : { '$exists' : 'true'}}).count()
 	data['num_of_replies'] = analytics_collection.find({ "action.key" : "add", "obj.reply" : { '$exists' : 'true'}}).count()
-	
+	data['num_of_tasks'] = analytics_collection.find({ "action.key" : "create", "obj.task" : { '$exists' : 'true'}}).count()
+
 	# More statistics can be queried from the anlytics_collection and added here.
 	
 	return render_to_response("ndf/analytics_summary.html",
@@ -169,48 +170,50 @@ def default_group(request,group_id):
 	return redirect('/analytics/'+group_id+'/summary')
 
 def group_summary(request,group_id):
-
 	'''
 	Renders the summary of all the activities done by the members of the Group
 	'''
-
 	group_id=ObjectId("55717125421aa91eecbf8843")
 
 	query("group",{ "group_id" : group_id })
+
+	data = {}
 	
-	'''
-	grouping the data  on the basis of user name
-	'''
 	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user', 'num_of_activities': {'$sum': 1}}}]
 	sorted_list = analytics_collection.aggregate(pipeline=pipe)
 	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
 	
-	'''
-	To store the most active users in the group.
-	The user with more number of activities are considered to be more active.
-	'''
-	active_users = []
+	data['active_users'] = []
 	i=0
 	for doc in sorted_list_acc_activities :
-		active_users.append({ "name" : (doc[u'_id']) , "activities" : doc[u'num_of_activities'] } )
+		data['active_users'].append({ "name" : (doc[u'_id']) , "activities" : doc[u'num_of_activities'] } )
 		i+=1
 		if i==3:
 			break
 
-
-	num_of_forums=db['Nodes'].find({"url":"forum", "group_set":group_id, "status":"DRAFT"}).count()	
-
-	num_of_threads=db['Nodes'].find({"url":"forum/thread", "group_set":group_id, "status":"DRAFT"}).count()
-
+	data['forums'] = db['Nodes'].find({"url":"forum", "group_set":group_id, "status":"DRAFT"}).count()	
+	data['threads'] = db['Nodes'].find({"url":"forum/thread", "group_set":group_id, "status":"DRAFT"}).count()
 	regx=re.compile("^Reply of:.*")
-	num_of_replies=db['Nodes'].find({"name": regx,"group_set":group_id, "status":"DRAFT"}).count()
+	data['replies'] = db['Nodes'].find({"name": regx,"group_set":group_id, "status":"DRAFT"}).count()
+	data['files'] = db['Nodes'].find({"url":"file", "group_set":group_id, "status":"PUBLISHED"}).count()
+	data['pages'] = db['Nodes'].find({"url":"page", "group_set":group_id, "status":"PUBLISHED"}).count()
+	data['total_activities'] = analytics_collection.find({ "group_id" : str(group_id)}).count()
 
-	num_of_files=db['Nodes'].find({"url":"file", "group_set":group_id, "status":"PUBLISHED"}).count()
+	data['recent'] = {}
+
+	specific_date = datetime.datetime.now() - datetime.timedelta(days=7)
+
+	data['recent']['forums'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.forum" : { '$exists' : 'true'}}).count()
+	data['recent']['threads'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.thread" : { '$exists' : 'true'}}).count()
+	data['recent']['replies'] = analytics_collection.find({"action.key": {"$in" : ['add']}, "group_id": str(group_id), "obj.reply" : { '$exists' : 'true'}}).count()
+	data['recent']['files'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.file" : { '$exists' : 'true'}}).count()
+	data['recent']['pages'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.page" : { '$exists' : 'true'}}).count()
+			
+
 	
-	num_of_pages=db['Nodes'].find({"url":"page", "group_set":group_id, "status":"PUBLISHED"}).count()
+	return render_to_response("ndf/analytics_group_summary.html",{"data" : data})
 	
-	return render_to_response("ndf/analytics_group_summary.html",{"data" : active_users,'forums' : num_of_forums,'threads' : num_of_threads,'replies' : num_of_replies,'files' : num_of_files,'pages' : num_of_pages})
-	
+
 def group_list_activities(request,group_id):
 	'''
 	Renders the list of activities of all the members of the group
@@ -287,6 +290,25 @@ def group_members(request, group_id) :
 			return HttpResponse('Fatal Error')
 
 	return render_to_response("ndf/analytics_group_members.html",{"data" : list_of_members })
+
+def group_member_info_details(request, group_id, user) :
+	
+	group_id=ObjectId("55717125421aa91eecbf8843")
+
+	try :
+		cursor = analytics_collection.find({"group_id" : str(group_id), "user" : user})
+
+		if(cursor.count() != 0) :
+			data = {}
+			data['activities'] = []
+			
+			for doc in cursor :
+				data['activities'].append(doc)
+
+		return render_to_response("ndf/analytics_group_member_info.html",{"data" : data })
+
+	except : 
+		return HttpResponse("fatal error")
 
 
 '''

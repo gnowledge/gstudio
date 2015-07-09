@@ -1,19 +1,36 @@
+<strong>ACTIVE USERS</strong>
 <ul>
-
-{% for x in data %}
+{% for x in data.active_users %}
    	<li>{{x.name}} : {{x.activities}}</li>
-
-  <br>
 {% endfor %}
-
-<strong>FORUM : {{forums}}</strong>
-<br>
-<strong>PAGES : {{pages}}</strong>
-<br>
-<strong>THREADS : {{threads}}</strong>
-<br>
-<strong>REPLIES : {{replies}}</strong>
-<br>
-<strong>FILES : {{files}}</strong>
-
 </ul>
+
+<strong>TOTAL ACTIVITIES : {{data.total_activities}}</strong>
+<br><br>
+<strong>FORUM : {{data.forums}}</strong>
+<br><br>
+<strong>PAGES : {{data.pages}}</strong>
+<br><br>
+<strong>THREADS : {{data.threads}}</strong>
+<br><br>
+<strong>REPLIES : {{data.replies}}</strong>
+<br><br>
+<strong>FILES : {{data.files}}</strong>
+<br><br>
+<strong>COURSES : ___</strong>
+<br><br>
+<strong>ANNOUNCED COURSES : ___</strong>
+<br><br>
+<strong>RECENT CREATED/EDITED FORUMs : {{data.recent.forums}}</strong>
+<br><br>
+<strong>RECENT CREATED/EDITED PAGES : {{data.recent.pages}}</strong>
+<br><br>
+<strong>RECENT CREATED/EDITED THREADS : {{data.recent.threads}}</strong>
+<br><br>
+<strong>RECENT CREATED/EDITED REPLIES : {{data.recent.replies}}</strong>
+<br><br>
+<strong>RECENT CREATED/EDITED FILES : {{data.recent.files}}</strong>
+<br><br>
+<strong>RECENT CREATED/EDITED COURSES : ___</strong>
+<br><br>
+<strong>RECENT CREATED/EDITED ANNOUNCED COURSES : ___</strong>

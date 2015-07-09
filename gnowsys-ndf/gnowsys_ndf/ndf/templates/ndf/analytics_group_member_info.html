@@ -1,0 +1,8 @@
+<ul>
+{% for content in data.activities %}
+	{{content.user}}&nbsp;{{content.action.phrase}}
+	<br>
+	{{content.obj}}
+	<br><br>
+{% endfor %}
+</ul>
