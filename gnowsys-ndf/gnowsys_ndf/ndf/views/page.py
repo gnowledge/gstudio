@@ -61,7 +61,6 @@ def page(request, group_id, app_id=None):
         if group_ins:
             group_id = str(group_ins._id)
 
-            print group_id
         else :
             auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
@@ -105,7 +104,6 @@ def page(request, group_id, app_id=None):
     # End of user shelf
 
     if request.method == "POST":
-    
       title = gst_page.name
       search_field = request.POST['search_field']
       page_nodes = node_collection.find({
@@ -144,15 +142,14 @@ def page(request, group_id, app_id=None):
       )
 
     elif gst_page._id == ObjectId(app_id):
-        # Page list view 
+	# Page list view 
         # code for moderated Groups
         group_type = node_collection.one({'_id': ObjectId(group_id)})
         group_info=group_type_info(group_id)
 
         title = gst_page.name
-
+ 	'''
         if  group_info == "Moderated":
-          
           title = gst_page.name
           node=group_type.prior_node[0]
           page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
@@ -167,12 +164,12 @@ def page(request, group_id, app_id=None):
                                     context_instance=RequestContext(request))
         
         elif group_info == "BaseModerated":
-          #code for parent Groups
+	  #code for parent Groups
           node = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]}, 
                                        'group_set': {'$all': [ObjectId(group_id)]},                                           
                                        'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
-
+	
           if node is None:
             node = node_collection.find({'member_of':ObjectId(app_id)})
 
@@ -182,7 +179,6 @@ def page(request, group_id, app_id=None):
 
                     
           # rcs content ends here
-          
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
                                      'appId':app._id,
@@ -193,16 +189,16 @@ def page(request, group_id, app_id=None):
                                     }, 
                                     context_instance=RequestContext(request)
             )
-
-        elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:
-          """
-          Below query returns only those documents:
-          (a) which are pages,
-          (b) which belongs to given group,
-          (c) which has status either as DRAFT or PUBLISHED, and 
-          (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
-          """
-          page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
+		
+        elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:'''
+        """
+        Below query returns only those documents:
+        (a) which are pages,
+        (b) which belongs to given group,
+        (c) which has status either as DRAFT or PUBLISHED, and 
+        (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
+        """
+        page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
                                              'group_set': {'$all': [ObjectId(group_id)]},
                                              '$or': [
                                               {'access_policy': u"PUBLIC"},
@@ -214,14 +210,12 @@ def page(request, group_id, app_id=None):
                                              ],
                                              'status': {'$nin': ['HIDDEN']}
                                          }).sort('last_update', -1)
-
-          # content =[]
-          # for nodes in page_nodes:
+        # content =[]
+        # for nodes in page_nodes:
         		# node,ver=get_page(request,nodes)
-          #   if node != 'None':
-          #     content.append(node)	
-
-          return render_to_response("ndf/page_list.html",
+        #   if node != 'None':
+        #     content.append(node)	
+ 	return render_to_response("ndf/page_list.html",
                                     {'title': title,
                                      'appId':app._id,
                                      'shelf_list': shelf_list,'shelves': shelves,

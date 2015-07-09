@@ -824,20 +824,29 @@
 		$drContainer.css("opacity", "1"); 
 	})
 	// ---END of search in the data-review
-	function deleteNode(node_id)
+	function deleteNode(oid)
 	{ 
-		a = node_id
-   		alert(a)
 		$.ajax({
 
 			 	url:"{% url 'delete_resource' groupid  %}",
 			 	type:'Get',
 			 	data:{
-			 			'node_id':node_id
+			 			'node_id':oid
 			 	},
 
 			 	success:function(data){
-			 		alert(data)	
+			 		//updateContent();
+			 		var $resBlankRow = $("tr#blank-row-" + oid);
+						// fetching resource object VIEW row
+					var $resViewRow = $("tr#view-row-" + oid);
+					// fetching resource object EDIT row
+					var $resEditRow = $("tr#edit-row-" + oid);
+
+					$($resEditRow).add($resViewRow).add($resBlankRow).animate({
+							opacity: 0.1
+						}, 1000).fadeOut(1000);
+
+			 		setCurrNoneToEditRow(oid)
 			 	}		
 
 
