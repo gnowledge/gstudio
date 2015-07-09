@@ -458,8 +458,6 @@ ul#navigation li a.last {
       <dd class="tab-title active page-view"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       {% endif %}
     
-      <!-- Info-box -->
-      <dd class="tab-title info-view"><a class="view-info" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       
       <!-- Discussion -->
       {% if "Group" not in node.member_of_names_list %}
@@ -1390,6 +1388,10 @@ ul#navigation li a.last {
            {% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
             <div class= "medium-12 columns" >
                 <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
+
+		<!-- Info-box -->&nbsp;
+<!--		<a class="view-info tiny round button" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a>  -->
+      
             </div>
            {% endif %}
         </div>     

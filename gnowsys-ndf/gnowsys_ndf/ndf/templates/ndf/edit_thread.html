@@ -30,6 +30,20 @@
     .forum-summary .user i { border-radius: 50px; }
   </style>
   
+
+<script language="javascript" >
+
+function cancel(){
+
+	if(confirm("Are you sure you want to cancel edit?"))
+	{
+		 history.go(-1);
+	}
+}
+
+</script>
+
+
 {% endblock %}
 
 
@@ -109,7 +123,8 @@
 
         <input type="submit" id="forum" value="Create Forum" style="display:none">
         <!-- <input id="forum" type="hidden" value="{{forum}}"> -->
-        <input type="button" id="save_form" class="button expand" value="Edit thread" onclick="saveforum()">
+        <input type="button" id="save_form" class="button tiny" value="Save Changes" onclick="saveforum()">
+        <input type="button" id="cancel_edit" class="button tiny" value="Cancel" onclick="cancel()">
       </div>
 
     </div>
@@ -169,9 +184,15 @@
     {
       alert("Please enter thread name");
     }
-    else if(!flag)
+    else if(flag)
     {
-      if (exst_name == name)
+      if (exst_name != name)
+      {
+        flag = true;
+        $("#message").css("display", "none");
+        $("#forum").trigger('click');
+      }
+      else if (exst_name == name)
       {
         flag = true;
         $("#message").css("display", "none");
