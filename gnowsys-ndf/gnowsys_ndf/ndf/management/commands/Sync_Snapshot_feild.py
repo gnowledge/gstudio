@@ -31,13 +31,14 @@ class Command(BaseCommand):
   help = "Based on "
 
   def handle(self, *args, **options):
-	all_nodes = node_collection.find({"_type":{"$nin":["ToReduceDocs","IndexedWordList"],"snapshot":{"$exist":"False"}}})	
+	all_nodes = node_collection.find({ "_type":{"$nin":["ToReduceDocs","IndexedWordList"]},"snapshot":{"$exists":False}})	
 	for i in all_nodes:
 	     	
 		node_collection.collection.update({'_id':ObjectId(i._id)}, {'$set':{'snapshot': {} }},upsert=False, multi=False)
 
 	all_nodes.rewind()
-        if all_nodes.count() > 0:
+	print all_nodes.count()
+        if all_nodes.count() == 0:
 		for i in all_nodes:
 			try:	
 				get_node = node_collection.find_one({"_id":ObjectId(i._id)})
