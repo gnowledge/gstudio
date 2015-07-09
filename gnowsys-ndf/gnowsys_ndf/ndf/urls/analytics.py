@@ -14,6 +14,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.analytics',
 	url(r'^[/]$', 'default_user', name='default_user'),                      
 	url(r'^/list_activities[/]$', 'user_list_activities', name='user_list_activities'),
 	url(r'^/summary[/]$', 'user_summary', name='user_summary'),
+	#url(r'^/graphs[/]$', 'user_graphs', name='user_graphs'),
 	
 	# Group Analytics URLS
 	url(r'^/(?P<group_id>[^/]+)[/]$', 'default_group', name='default_group'),                      
@@ -21,5 +22,4 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.analytics',
 	url(r'^/(?P<group_id>[^/]+)/summary[/]$', 'group_summary', name='group_summary'),
 	url(r'^/(?P<group_id>[^/]+)/members[/]$', 'group_members', name='group_members'),
 	url(r'^/(?P<group_id>[^/]+)/member/(?P<user>[^/]+)$', 'group_member_info_details', name='group_member_info_details')
-
 )

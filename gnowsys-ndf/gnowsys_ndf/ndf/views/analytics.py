@@ -7,7 +7,7 @@ import re
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
@@ -69,6 +69,7 @@ def custom_events(request):
 		transaction['message'] = 'Transaction Successful !'
 
 	return HttpResponse(json.dumps(transaction))
+
 
 '''
 USER ANALYTICS VIEWS
@@ -162,6 +163,10 @@ def user_summary(request):
 	return render_to_response("ndf/analytics_summary.html",
 															{ "data" : data})
 
+def user_graphs(request) :
+	return render_to_response("ndf/analytics_user_graphs.html", {})
+
+
 '''
 GROUP ANALYTICS VIEWS
 '''
@@ -213,7 +218,6 @@ def group_summary(request,group_id):
 	
 	return render_to_response("ndf/analytics_group_summary.html",{"data" : data})
 	
-
 def group_list_activities(request,group_id):
 	'''
 	Renders the list of activities of all the members of the group
@@ -238,6 +242,7 @@ def group_members(request, group_id) :
 	'''
 
 	group_id=ObjectId("55717125421aa91eecbf8843")
+	group_name, group_id = get_group_name_id(group_id)
 
 	query("group",{ "group_id" : group_id })
 	
@@ -289,7 +294,7 @@ def group_members(request, group_id) :
 		except : 
 			return HttpResponse('Fatal Error')
 
-	return render_to_response("ndf/analytics_group_members.html",{"data" : list_of_members })
+	return render(request, "ndf/analytics_group_members.html",{"data" : list_of_members, "group_name" : group_name, "group_id" : group_id, "groupid" : group_id})
 
 def group_member_info_details(request, group_id, user) :
 	
@@ -859,6 +864,7 @@ def dashbard_activity(group_id,url,doc):
 def default_activity(group_id,url,doc):
 	pass
 	return 0
+
 
 		
 
