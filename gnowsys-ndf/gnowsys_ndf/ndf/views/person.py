@@ -638,7 +638,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
             if old_college_group_id_list:
               # If college-group list exists
-              # Then update their group_admin field (append PO's created_by)
+              # Then update their group_admin field (remove PO's created_by)
               res = node_collection.collection.update(
                 {'_id': {'$in': old_college_group_id_list}, '$or': [{'group_admin': auth_node.created_by},
                 {'author_set': auth_node.created_by}]},
@@ -657,8 +657,12 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               # Its purpose is to change the agency type back to Other
 
               auth_node.reload()
+    # if person_gst.name != "Student":
+    #     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
+    # else:
+    return HttpResponseRedirect(reverse('mis:mis_app_instance_detail',kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id, "app_set_instance_id":unicode(person_gs._id)}))
 
-    return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
+    # return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   default_template = "ndf/person_create_edit.html"
 

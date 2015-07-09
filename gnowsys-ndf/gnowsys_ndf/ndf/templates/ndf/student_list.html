@@ -586,7 +586,7 @@
                     s_id = data["stud_id"];
                     $(row).attr("id", s_id);
 
-                    edit_url = "{% url 'mis:mis_app_instance_edit' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", s_id);
+                    edit_url = "{% url 'mis:mis_app_instance_detail' 'groupid' 'app_id' 'app_set_id' 'stud_id' %}".replace("groupid", groupid_val).replace("app_id", app_id_val).replace("app_set_id", app_set_id_val).replace("stud_id", s_id);
                     name = data['Name']
                     
                     $(row).find("td:nth-child(3)").html("<a href='" + edit_url + "'>"+name+"</a>");
