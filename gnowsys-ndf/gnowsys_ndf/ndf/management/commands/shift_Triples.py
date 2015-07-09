@@ -35,7 +35,7 @@ class Command(BaseCommand):
         try:
             triple_collection_name = Triple.collection_name
             node_collection_name = Node.collection_name
-
+            
             if triple_collection_name not in db.collection_names():
                 try:
                     # [A] Create Triples collection
