@@ -17,6 +17,7 @@ import string
 import datetime
 import itertools
 import nltk
+import multiprocessing as mp
 
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
@@ -257,7 +258,9 @@ def results_search(request, group_id, return_only_dict = None):
 				For each matching GSystem, see if the GSystem has already been added to the list of ids and add if not added.
 				result is added only if belongs to the list of public groups
 				"""
-
+				#temp. variables which stores the lookup for append method
+                                all_ids_append_temp=all_ids.append
+                                search_results_ex_name_append_temp=search_results_ex['name'].append
 				for j in exact_match: 
 					j.name=(j.name).replace('"',"'") 
 					if j._id not in all_ids:
@@ -265,8 +268,8 @@ def results_search(request, group_id, return_only_dict = None):
                                         	#for gr in public_groups: 
                                         	#	if gr in grps: 
                                         	j = addType(j) 
-                                        	search_results_ex['name'].append(j) 
-                                        	all_ids.append(j['_id'])
+                                        	search_results_ex_name_append_temp(j) 
+                                        	all_ids_append_temp(j['_id'])
                                                         
 				# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY
 				#search_results_ex['name'] = sort_names_by_similarity(search_results_ex['name'], search_str_user)
@@ -274,7 +277,8 @@ def results_search(request, group_id, return_only_dict = None):
 				split_stem_match = []					# will hold all the split stem match results
 				len_stemmed = len(search_str_stemmed)	
 				c = 0							# GEN. COUNTER 
-
+                                #a temp. variable which stores the lookup for append method
+                                split_stem_match_append_temp=split_stem_match.append
 				while c < len_stemmed:	
 						word = search_str_stemmed[c]
 						temp=""
@@ -293,13 +297,15 @@ def results_search(request, group_id, return_only_dict = None):
 									   {'$or':[{"access_policy":{"$in":Access_policy}},{'created_by':request.user.id}]},
 									    {"name":{"$regex":str(word), "$options":"i"}}] },
 						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
-                                                split_stem_match.append(temp)
+                                                split_stem_match_append_temp(temp)
 						c += 1
 					
 				"""
 				For each matching GSystem, see if the GSystem has already been returned in search results and add if not 					already added.
 				Result is added only if belongs to the list of public groups and has public access policy
 				"""
+                                #a temp. variable which stores the lookup for append method
+				search_results_st_name_append=search_results_st['name'].append
 				for j in split_stem_match:
 				                c = 0
                                                 for k in j:
@@ -313,8 +319,8 @@ def results_search(request, group_id, return_only_dict = None):
 								# check that the GSystem should belong to at least one public group
                                                                 k = addType(k) # adds the link and datetime to the 
                                                                 
-                                                                search_results_st['name'].append(k)
-                                                                all_ids.append(k['_id'])#append to the list of all ids of GSYstems in the 												results
+                                                                search_results_st_name_append(k)
+                                                                all_ids_append_temp(k['_id'])#append to the list of all ids of GSYstems in the 												results
                                                                 c += 1
                                 # SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY	
 
@@ -340,6 +346,9 @@ def results_search(request, group_id, return_only_dict = None):
 									   {"group_set":ObjectId(group_id)},
 									   {"tags":search_str_user}]},
 						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
+                                # temp. variables which stores the lookup for append method
+                                all_ids_append_temp=all_ids.append
+                                search_results_ex_tags_append_temp=search_results_ex['tags'].append
 				for j in exact_match:
 						j.name=(j.name).replace('"',"'")
 						if j._id not in all_ids:
@@ -348,8 +357,8 @@ def results_search(request, group_id, return_only_dict = None):
 							#for gr in public_groups:
 							#	if gr in grps:
                                                         j = addType(j)
-                                                        search_results_ex['tags'].append(j)
-                                                        all_ids.append(j['_id'])
+                                                        search_results_ex_tags_append_temp(j)
+                                                        all_ids_append_temp(j['_id'])
                                                         
 
 				#search_results_ex['tags'] = sort_names_by_similarity(search_results_ex['tags'], search_str_user)
@@ -358,7 +367,8 @@ def results_search(request, group_id, return_only_dict = None):
 				split_stem_match = []
 				c = 0						# GEN. COUNTER 
 				len_stemmed = len(search_str_stemmed)
-
+				#a temp. variable which stores the lookup for append method
+                                split_stem_match_append_temp=split_stem_match.append
 				while c < len_stemmed:
 						word = search_str_stemmed[c]
 						if user_reqd != -1:					
@@ -375,7 +385,7 @@ def results_search(request, group_id, return_only_dict = None):
 									    {"group_set":ObjectId(group_id)}]},
 						{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}).sort('last_update',-1)
 						
-						split_stem_match.append(temp)
+						split_stem_match_append_temp(temp)
 						c += 1
 				#search_results_st['tags'] = sort_names_by_similarity(search_results_st['tags'], search_str_user)
 					
@@ -383,6 +393,8 @@ def results_search(request, group_id, return_only_dict = None):
 				For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
 				Result is added only if belongs to the list of public groups and has public access policy
 				"""
+				#a temp. variable which stores the lookup for append method
+				search_results_st_tags_append=search_results_st['tags'].append
 				for j in split_stem_match:
 						c = 0
 						for k in j:
@@ -392,8 +404,8 @@ def results_search(request, group_id, return_only_dict = None):
 								#for gr in public_groups:
 								#	if gr in grps:
                                                                 k = addType(k)
-                                                                search_results_st['tags'].append(k)
-                                                                all_ids.append(k['_id'])
+                                                                search_results_st_tags_append(k)
+                                                                all_ids_append_temp(k['_id'])
                                                                 c += 1
                                                                 
 			"""
@@ -405,7 +417,8 @@ def results_search(request, group_id, return_only_dict = None):
 			content_docs = []
 			content_match_pairs = []	# STORES A DICTIONARY OF MATCHING DOCUMENTS AND NO_OF_WORDS THAT MATCH SEARCH QUERY
 			sorted_content_match_pairs = []				# STORES THE ABOVE DICTIONARY IN A SORTED MANNER
-
+                        #a temp. variable which stores the lookup for append method
+			content_match_pairs_append_temp=content_match_pairs.append
 			if (search_by_contents == True):
 				# FETCH ALL THE GSYSTEMS THAT HAVE BEEN MAP REDUCED.
 				all_Reduced_documents = node_collection.find({"required_for": reduced_doc_requirement}, {"content": 1, "_id": 0, "orignal_id": 1})
@@ -418,10 +431,9 @@ def results_search(request, group_id, return_only_dict = None):
 						for word in search_str_stemmed:
 							if word in content.keys():# IF THE WORD EXISTS IN THE CURRENT DOCUMENT
 								match_count += content[word]	# ADD IT TO THE MATCHES COUNT
-
 						if match_count > 0:
 							all_ids.append(singleDoc.orignal_id)
-							content_match_pairs.append({'doc_id':singleDoc.orignal_id, 'matches':match_count})	
+							content_match_pairs_append_temp({'doc_id':singleDoc.orignal_id, 'matches':match_count})	
 		
 				match_counts = []			# KEEPS A SORTED LIST OF COUNT OF MATCHES IN RESULT DOCUMENTS
 				for pair in content_match_pairs:	
@@ -430,7 +442,8 @@ def results_search(request, group_id, return_only_dict = None):
 						c += 1
 					match_counts.insert(c, pair['matches'])
 					sorted_content_match_pairs.insert(c, pair)	# SORTED INSERT (INCREASING ORDER)
-
+                                #a temp. variable which stores the lookup for append method
+				search_results_st_content_append_temp=search_results_st['content'].append
 				for docId in sorted_content_match_pairs:
 					doc = node_collection.find_one({"_id":docId['doc_id'], "access_policy":Access_policy}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
                                         try:
@@ -447,9 +460,9 @@ def results_search(request, group_id, return_only_dict = None):
                                                 if ObjectId(group_id) in grps:
                                                         if user_reqd != -1:
 								if User.objects.get(username=doc['created_by']).pk == user_reqd:
-									search_results_st['content'].append(doc)
+									search_results_st_content_append_temp(doc)
                                                         else:
-								search_results_st['content'].append(doc)
+								search_results_st_content_append_temp(doc)
                                         except:
                                                 pass
 			#search_results = json.dumps(search_results, cls=Encoder)

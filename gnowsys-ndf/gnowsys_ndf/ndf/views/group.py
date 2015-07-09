@@ -1165,8 +1165,8 @@ def group(request, group_id, app_id=None, agency_type=None):
                                    }).sort('last_update', -1)
 
       if cur_groups_user.count():
-        for group in cur_groups_user:
-          group_nodes.append(group)
+        #loop replaced by a list comprehension
+        group_nodes=[group for group in cur_groups_user]
 
       group_count = cur_groups_user.count()
         
@@ -1184,14 +1184,13 @@ def group(request, group_id, app_id=None, agency_type=None):
                                    }).sort('last_update', -1)
   
       if cur_public.count():
-        for group in cur_public:
-          group_nodes.append(group)
-      
+        #loop replaced by a list comprehension
+        group_nodes=[group for group in cur_public]
       group_count = cur_public.count()
 
     return render_to_response("ndf/group.html",
                               {'title': title,
-                               'appId':app._id,
+                               'appId':app._id, 'app_gst': group_gst,
                                'searching': True, 'query': search_field,
                                'group_nodes': group_nodes, 'group_nodes_count': group_count,
                                'groupid':group_id, 'group_id':group_id
@@ -1241,7 +1240,7 @@ def group(request, group_id, app_id=None, agency_type=None):
     
     return render_to_response("ndf/group.html", 
                               {'group_nodes': group_nodes,
-                               'appId':app._id,
+                               'appId':app._id, 'app_gst': group_gst,
                                'group_nodes_count': group_count,
                                'groupid': group_id, 'group_id': group_id
                               }, context_instance=RequestContext(request))
@@ -1399,14 +1398,18 @@ def group_dashboard(request, group_id=None):
       shelf_list = {}
 
       if shelf:
+        #a temp. variable which stores the lookup for append method
+        shelves_append_temp=shelves.append
         for each in shelf:
           shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
-          shelves.append(shelf_name)
+          shelves_append_temp(shelf_name)
 
           shelf_list[shelf_name.name] = []
+          #a temp. variable which stores the lookup for append method
+          shelf_lst_shelfname_append=shelf_list[shelf_name.name].append
           for ID in shelf_name.collection_set:
             shelf_item = node_collection.one({'_id': ObjectId(ID) })
-            shelf_list[shelf_name.name].append(shelf_item.name)
+            shelf_lst_shelfname_append(shelf_item.name)
               
       else:
           shelves = []
@@ -1436,7 +1439,7 @@ def group_dashboard(request, group_id=None):
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,
-                                                       'appId':app._id,
+                                                       'appId':app._id, 'app_gst': group_gst,
                                                        'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image
                                                       },context_instance=RequestContext(request)
@@ -1615,7 +1618,8 @@ def switch_group(request,group_id,node_id):
       resource_exists = False
       resource_exists_in_grps = []
       response_dict = {'success': False, 'message': ""}
-
+      #a temp. variable which stores the lookup for append method
+      resource_exists_in_grps_append_temp=resource_exists_in_grps.append
       new_grps_list_distinct = [ObjectId(item) for item in new_grps_list if ObjectId(item) not in existing_grps]
       if new_grps_list_distinct:
         for each_new_grp in new_grps_list_distinct:
@@ -1623,7 +1627,7 @@ def switch_group(request,group_id,node_id):
             grp = node_collection.find({'name': node.name, "group_set": ObjectId(each_new_grp), "member_of":ObjectId(node.member_of[0])})
             if grp.count() > 0:
               resource_exists = True
-              resource_exists_in_grps.append(unicode(each_new_grp))
+              resource_exists_in_grps_append_temp(unicode(each_new_grp))
 
         response_dict["resource_exists_in_grps"] = resource_exists_in_grps
 
@@ -1649,11 +1653,15 @@ def switch_group(request,group_id,node_id):
       data_list = []
       user_id = request.user.id
       all_user_groups = []
-      for each in get_all_user_groups():
-        all_user_groups.append(each.name)
+    # for each in get_all_user_groups():
+    #   all_user_groups.append(each.name)
+    #loop replaced by a list comprehension
+      all_user_groups=[each.name for each in get_all_user_groups()]
       st = node_collection.find({'$and': [{'_type': 'Group'}, {'author_set': {'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
-      for each in node.group_set:
-        coll_obj_list.append(node_collection.one({'_id': each}))
+    # for each in node.group_set:
+    #   coll_obj_list.append(node_collection.one({'_id': each}))
+    #loop replaced by a list comprehension
+      coll_obj_list=[node_collection.one({'_id': each}) for each in node.group_set ]
       data_list = set_drawer_widget(st, coll_obj_list)
       return HttpResponse(json.dumps(data_list))
    
