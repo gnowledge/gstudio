@@ -6,7 +6,7 @@ import shutil
 import urllib2
 from subprocess import call
 from django.core.mail import EmailMessage
-from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID
+from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID, SYNCDATA_FROM_EMAIL_ID
 
 def sorted_ls(path):
     '''
@@ -75,8 +75,8 @@ class Command(BaseCommand):
 					folder_empty = 0
 					print file_path
 
-				mail.from_email = "Gstudio <t.metastudio@gmail.com>"
-				mail.to = [SYNCDATA_SENDING_EMAIL_ID]
+				mail.from_email = SYNCDATA_FROM_EMAIL_ID
+				mail.to = list(SYNCDATA_SENDING_EMAIL_ID)
 				if folder_empty == 0:
 					mail.send()
 			else:
