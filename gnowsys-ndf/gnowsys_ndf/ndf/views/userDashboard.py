@@ -152,7 +152,7 @@ def uDashboard(request, group_id):
     page_gst = node_collection.one({'_type': "GSystemType", 'name': 'Page'})
     page_cur = node_collection.find({'member_of': {'$all': [page_gst._id]},
                             'created_by': int(usrid), "status": {"$nin": ["HIDDEN"]}})
-    file_cur = node_collection.find ({'_type': u"File", 'created_by': int(usrid),
+    file_cur = node_collection.find({'_type': u"File", 'created_by': int(usrid),
                                      "status": {"$nin": ["HIDDEN"]}})
     forum_gst = node_collection.one({"_type": "GSystemType", "name": "Forum"})
     forum_count = node_collection.find({"_type": "GSystem",
@@ -163,7 +163,7 @@ def uDashboard(request, group_id):
                             "member_of": quiz_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     thread_gst = node_collection.one({"_type": "GSystemType", "name": "Twist"})
-    thread_count =node_collection.find ({"_type": "GSystem",
+    thread_count =node_collection.find({"_type": "GSystem",
                             "member_of": thread_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     reply_gst = node_collection.one({"_type": "GSystemType", "name": "Reply"})

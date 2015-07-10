@@ -687,6 +687,9 @@ def get_gapps_iconbar(request, group_id):
 					if k1 == "name":
 						if v1.lower() not in user_gapps:
 							del gapps[k]
+	
+	if group_obj.name == 'Trash':
+		gapps={}
         return {
             "template": "ndf/gapps_iconbar.html",
             "request": request,
