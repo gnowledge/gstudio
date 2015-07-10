@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load ndf_tags %}
 
+{% block body_content %}
+
 <ul>
 {% for content in data.activities %}
 	{{content.user}}&nbsp;{{content.action.phrase}}

@@ -7,7 +7,6 @@ import re
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-<<<<<<< HEAD
 from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
 from django.template import TemplateDoesNotExist
@@ -77,12 +76,12 @@ USER ANALYTICS VIEWS
 '''
 
 @get_execution_time
-def default_user(request):
+def default_user(request,group_id):
 	return redirect('/analytics/summary')
 
 @login_required
 @get_execution_time
-def user_list_activities(request):
+def user_list_activities(request,group_id):
 
 	'''
 	Lists the detailed activities of the user
@@ -139,7 +138,7 @@ def get_user_sessions(user) :
 
 @login_required
 @get_execution_time
-def user_summary(request):
+def user_summary(request,group_id):
 
 	'''
 	Renders the summary of the User activities on the Metastudio 
