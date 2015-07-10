@@ -64,7 +64,7 @@ def userpref(request,group_id):
 @login_required
 @get_execution_time
 def uDashboard(request, group_id):
-    usrid = int(group_id)
+    usrid = int(group_id) 
     auth = node_collection.one({'_type': "Author", 'created_by': usrid})
     group_id = auth._id
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
@@ -152,7 +152,7 @@ def uDashboard(request, group_id):
     page_gst = node_collection.one({'_type': "GSystemType", 'name': 'Page'})
     page_cur = node_collection.find({'member_of': {'$all': [page_gst._id]},
                             'created_by': int(usrid), "status": {"$nin": ["HIDDEN"]}})
-    file_cur = node_collection.find({'_type': u"File", 'created_by': int(usrid),
+    file_cur = node_collection.find ({'_type': u"File", 'created_by': int(usrid),
                                      "status": {"$nin": ["HIDDEN"]}})
     forum_gst = node_collection.one({"_type": "GSystemType", "name": "Forum"})
     forum_count = node_collection.find({"_type": "GSystem",
@@ -163,7 +163,7 @@ def uDashboard(request, group_id):
                             "member_of": quiz_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     thread_gst = node_collection.one({"_type": "GSystemType", "name": "Twist"})
-    thread_count = node_collection.find({"_type": "GSystem",
+    thread_count =node_collection.find ({"_type": "GSystem",
                             "member_of": thread_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     reply_gst = node_collection.one({"_type": "GSystemType", "name": "Reply"})
@@ -199,10 +199,13 @@ def uDashboard(request, group_id):
     a_user = []
     dashboard_count.update({'activity': activity_user.count()})
 
-    for i in activity_user:
-        if i._type != 'Batch' or i._type != 'Course' or i._type != 'Module':
-            a_user.append(i)
-
+    #for i in activity_user:
+    #    if i._type != 'Batch' or i._type != 'Course' or i._type != 'Module':
+    #        a_user.append(i)
+    #loop replaced by a list comprehension
+    a_user=[i for i in activity_user if (i._type != 'Batch' or i._type != 'Course' or i._type != 'Module')]        
+    #a temp. variable which stores the lookup for append method
+    user_activity_append_temp=user_activity.append
     for each in a_user:
         if each.created_by == each.modified_by:
             if each.last_update == each.created_at:
@@ -213,10 +216,10 @@ def uDashboard(request, group_id):
             activity = 'created'
 
         if each._type == 'Group':
-            user_activity.append(each)
+            user_activity_append_temp(each)
         else:
             member_of = node_collection.find_one({"_id": each.member_of[0]})
-            user_activity.append(each)
+            user_activity_append_temp(each)
 
     '''
     notification_list=[]
@@ -245,6 +248,8 @@ def uDashboard(request, group_id):
          'group_set': {'$all': [ObjectId(group_id)]}}
     )
     collab_drawer = []
+    #a temp. variable which stores the lookup for append method
+    collab_drawer_append_temp=collab_drawer.append
     """
     To populate collaborators according
     to their latest modification of particular resource:
@@ -252,7 +257,7 @@ def uDashboard(request, group_id):
     for each in obj.sort('last_update', -1):    
         for val in each.contributors:
             name = User.objects.get(pk=val).username
-            collab_drawer.append({'usrname': name, 'Id': val,
+            collab_drawer_append_temp({'usrname': name, 'Id': val,
                                   'resource': each.name})
 
     shelves = []
@@ -304,7 +309,6 @@ def uDashboard(request, group_id):
         context_instance=RequestContext(request)
     )
        
-   
 @get_execution_time
 def user_preferences(request,group_id,auth_id):
     try:
@@ -349,6 +353,7 @@ def user_preferences(request,group_id,auth_id):
     except Exception as e:
         print "Exception in userpreference view "+str(e)
         return HttpResponse("Failure")
+
 @get_execution_time
 def user_template_view(request,group_id):
     auth_group = None

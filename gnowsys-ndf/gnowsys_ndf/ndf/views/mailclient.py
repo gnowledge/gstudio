@@ -212,7 +212,6 @@ def mailbox_create_edit(request, group_id):
             conn.close()
         except Exception as error:
             #Very imp: must delete the mailbox if this exception occurs
-            #TODO: not only delete newbox but also remove entry from 'mapping' Database
             newbox.delete()
             print error
             error_obj= str(error) + ",mailbox_create_edit() fn, Mailbox created will be deleted"
