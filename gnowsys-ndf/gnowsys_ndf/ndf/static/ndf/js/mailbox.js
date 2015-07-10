@@ -6,6 +6,7 @@ var mailbox_name;
 var userName;
 var CSRFtoken;
 var countValue = 20;
+var fileName;
 
 function countInitialize(){
 	Readstart = 0;
@@ -92,12 +93,14 @@ function setMailBoxName(username, csrf_token, mailBoxName, emailid) {
 }
 
 function updateStatus(filename){
+	fileName = filename;
 	if(typeOfMail == 0){
 	$.post( 'mailstatuschange/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'file_name': filename}, function(data){		
 	});
 	}
 }
 
+// <a id=\"reply_mail\" href=\"#\" onclick=\"replyToMail();\" class=\"button small\" >Reply</a>
 function readBody(filename, attached_files, Attachments){
 	
 	$.post( 'mail_body/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'file_name': filename}, function(data){		
@@ -122,9 +125,22 @@ function readBody(filename, attached_files, Attachments){
     	var href = link + Attachments[n];
     	content += "<br><a href=\"" + href + "\" download=\"" + attached_files[n] + "\">" + attached_files[n] + "</a>";
     }
-    
+
+    content+="<br>";
+    content+="<form data-abide id=\"reply_mail\" enctype=\"multipart/form-data\" method=\"POST\" action=\"new_mail/"+mailbox_name+"/\">";
+    content+="<input type=\"hidden\" name=\"csrfmiddlewaretoken\" id=\"file_name\" value=\""+ CSRFtoken + "\">";
+    content+="<input type=\"hidden\" name=\"file_name\" id=\"file_name\" value=\""+ filename + "\">";
+    content+="<input type=\"hidden\" name=\"mailBoxName\" id=\"mailBoxName\" value=\""+ mailbox_name + "\">";
+    content+="<input type=\"hidden\" name=\"username\" id=\"username\" value=\""+ userName + "\">";
+    content+="<input type=\"submit\" id=\"reply_mail\" value=\"Reply\" class=\"button small\"/>";
+    content+="</form>";
     document.getElementById(elementName).innerHTML = content;    			
-    });
+
+ 	});   
+}
+
+function replyToMail(){
+	$.post( 'new_mail/'+mailbox_name+'/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'file_name': fileName});
 }
 
 $(document).ready(function(){

@@ -943,7 +943,23 @@ def mailbox_settings(request, group_id,mailboxname):
                     "mailbox_name" : mailboxname
                     }
     variable = RequestContext(request,context_dict)
-    return render_to_response(template,variable)    
+    return render_to_response(template,variable) 
+
+def get_email_id(filename,mailboxname,username):
+    settings_dir = os.path.dirname(__file__)
+    PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+    path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
+    path = path + username + '/' + mailboxname
+
+    cur_path = path + '/cur'
+    p = Parser()
+
+    msg = p.parse(open(join(cur_path, filename)))
+
+    to_email_id = msg['From']
+
+    return to_email_id
+
 
 @login_required
 @get_execution_time
@@ -1009,8 +1025,32 @@ def compose_mail(request, group_id,mailboxname):
                     }
     variable = RequestContext(request,context_dict)
 
-    if request.method == "POST":
-        
+    file_name = request.POST.get('file_name',None)
+
+    if request.method == "POST" and file_name is not None:
+        to_email_id = get_email_id(file_name,request.POST['mailBoxName'],request.POST['username'])
+        print '<>' * 20
+        print to_email_id
+        print '<>' * 20
+        to_email_id = str(to_email_id)
+        to_email_id = to_email_id.split('<')[1].split('>')[0]
+        if to_email_id=='' or to_email_id is None:
+            to_email_id = None
+
+        context_dict = { "title" : title,
+                    "group_name" : group_name,
+                    "group_id" : group_id,
+                    "groupid" : group_id,
+                    "mailbox_name" : mailboxname,
+                    "mailbox_email" : mailbox_email_id,
+                    "to_email_id" : to_email_id
+                    }
+        # variable = RequestContext(request,context_dict)
+        # return render_to_response(template,variable)
+        return render(request,template,context_dict)
+        print '$' * 20
+    
+    elif request.method == "POST":    
 
         user_id = request.POST.get("user_id","")
         to = request.POST.get("to_addrs", "")

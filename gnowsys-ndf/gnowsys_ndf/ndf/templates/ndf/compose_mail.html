@@ -39,7 +39,11 @@
     <div class="row">
       <div class="medium-12 columns">
         <h4>To:</h4>
-        <input id="to_addrs_id" name="to_addrs" type="text" placeholder="To address(es)..." required>
+        {% if to_email_id == None %}
+          <input id="to_addrs_id" name="to_addrs" type="text" placeholder="To address(es)..." required>
+        {% else %}
+          <input id="to_addrs_id" name="to_addrs" type="text" value="{{ to_email_id }}" required>
+        {% endif %}
         <small class="error">Enter valid email addresses separated by ';'</small>
       </div>
     </div>
