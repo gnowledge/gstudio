@@ -38,11 +38,11 @@ import locale
 import pymongo
 from bson import BSON
 from bson import json_util
+import multiprocessing as mp 
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
 from collections import OrderedDict
-
 col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
@@ -384,12 +384,28 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
         # Then append their names in list of GApps to be excluded
         if already_selected_gapps:
             gapps_list_remove = gapps_list.remove
-            for each_gapp in already_selected_gapps:
+            #Function used by Processes implemented below
+            def multi_(lst):
+              for each_gapp in lst:
                 gapp_name = each_gapp["name"]
 
                 if gapp_name in gapps_list:
                     gapps_list_remove(gapp_name)
-
+            #this empty list will have the Process objects as its elements
+            processes=[]
+            n1=len(already_selected_gapps)
+            lst1=already_selected_gapps
+            #returns no of cores in the cpu
+            x=mp.cpu_count()
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+              processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2],)))
+            for i in range(x):
+              processes[i].start() #each Process started 
+            for i in range(x):
+              processes[i].join() #each Process converges
     # Find all GAPPs
     meta_type = node_collection.one({
         "_type": "MetaType", "name": META_TYPE[0]
@@ -680,10 +696,14 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
             dict_drawer[each._id] = each
 
     elif (nid is None) and (nlist):
+
         for each in drawer:
             if each._id not in nlist:
                 dict1[each._id] = each
-     
+
+        #loop replaced by a list comprehension
+        dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+    
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
@@ -700,8 +720,10 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id != nid:
             if each._id not in nlist:
                 dict1[each._id] = each
-          
-      	
+         
+        #loop replaced by a list comprehension    
+        dict2=[node_collection.one({'_id': oid})  for oid in nlist]
+
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
@@ -948,7 +970,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if set(node.tags) != set(tags_list):
         node.tags = tags_list
         is_changed = True
-
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
         changed = build_collection(
@@ -1370,12 +1391,12 @@ def get_versioned_page(node):
             proc1.kill()
             return(node, '1.1')
 
-
 @get_execution_time
 def get_user_page(request, node):
     ''' function gives the last docment submited by the currently logged in user either it
         can be drafted or published
-'''
+    '''
+
     rcs = RCS()
     fp = history_manager.get_file_path(node)
     cmd = 'rlog  %s' % \
@@ -1503,10 +1524,10 @@ def tag_info(request, group_id, tagname=None):
     if request.user.is_superuser:  # Superuser can see private an public files
         if tagname:
             cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
-                                        'group_set': ObjectId(group_id)
-                                        })
-            for every in cur:
-                search_result.append(every)
+                                        'group_set':ObjectId(group_id)
+                  })
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
     # Autheticate user can see all public files
     elif request.user.is_authenticated():
@@ -1526,10 +1547,10 @@ def tag_info(request, group_id, tagname=None):
                                         '$or': [
                 {'status': u'PUBLISHED'},
                                             {'created_by': userid},
-            ]
-            })
-            for every in cur:
-                search_result.append(every)
+                                          ]
+                                      })
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
     else:  # Unauthenticated user can see all public files.
         group_node = node_collection.one({'_id': ObjectId(group_id)})
@@ -1539,9 +1560,9 @@ def tag_info(request, group_id, tagname=None):
                                             'group_set': group_id,
                                             'status': u'PUBLISHED'
                                             }
-                                           )
-                for every in cur:
-                    search_result.append(every)
+                                     )
+                #loop replaced by a list comprehension
+                search_result=[every for every in cur]
 
     if search_result:
         total = len(search_result)
@@ -1794,19 +1815,22 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
     """
     if not isinstance(at_rt_objectid_or_attr_name_list, list):
         at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
-
+    # a temp. variable which stores the lookup for append method
+    type_of_set_append_temp = type_of_set.append
     if not type_of_set:
         node["property_order"] = []
+        # a temp. variable which stores the lookup for append method
+        node_property_order_append_temp = node["property_order"].append
         gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {
                                          '$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
         for gst in gst_nodes:
             for type_of in gst["type_of"]:
                 if type_of not in type_of_set:
-                    type_of_set.append(type_of)
+                    type_of_set_append_temp(type_of)
 
             for po in gst["property_order"]:
                 if po not in node["property_order"]:
-                    node["property_order"].append(po)
+                    node_property_order_append_temp(po)
 
     BASE_FIELD_METADATA = {
         'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
@@ -1818,6 +1842,8 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
     }
 
     widget_data_list = []
+    # a temp. variable which stores the lookup for append method
+    widget_data_list_append_temp = widget_data_list.append
     for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
         # ObjectId.is_valid(at_rt_objectid_or_attr_name):
         if type(at_rt_objectid_or_attr_name) == ObjectId:
@@ -1848,30 +1874,6 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
                     if field.altnames:
                         if ";" in field.altnames:
                             altnames = field.altnames.split(";")[1]
-                        else:
-                            altnames = field.altnames
-
-                elif type_of_set:
-                    # If current node's GST is not in subject_type
-                    # Search for that GST's type_of field value in subject_type
-                    for each in type_of_set:
-                        if each in field.subject_type:
-                            data_type = node.structure[field.name]
-                            value = node[field.name]
-                            if field.altnames:
-                                if ";" in field.altnames:
-                                    altnames = field.altnames.split(";")[0]
-                                else:
-                                    altnames = field.altnames
-
-                        elif each in field.object_type:
-                            data_type = node.structure[field.inverse_name]
-                            value = node[field.inverse_name]
-                            if field.altnames:
-                                if ";" in field.altnames:
-                                    altnames = field.altnames.split(";")[0]
-                                else:
-                                    altnames = field.altnames
 
             else:
                 # For AttributeTypes
@@ -1879,26 +1881,25 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
                 data_type = node.structure[field.name]
                 value = node[field.name]
 
-            widget_data_list.append({'_type': field._type,  # It's only use on details-view template; overridden in ndf_tags html_widget()
-                                     '_id': field._id,
-                                     'data_type': data_type,
-                                     'name': field.name, 'altnames': altnames,
-                                     'value': value
-                                     })
+            widget_data_list_append_temp({'_type': field._type,  # It's only use on details-view template; overridden in ndf_tags html_widget()
+                              '_id': field._id,
+                              'data_type': data_type,
+                              'name': field.name, 'altnames': altnames,
+                              'value': value
+                              })
+
 
         else:
             # For node's base-field(s)
-
             # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
-            widget_data_list.append({'_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
-                                     'data_type': node.structure[at_rt_objectid_or_attr_name],
-                                     'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
-                                     'value': node[at_rt_objectid_or_attr_name],
-                                     'required': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['required']
-                                     })
+            widget_data_list_append_temp({'_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+                              'data_type': node.structure[at_rt_objectid_or_attr_name],
+                              'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
+                              'value': node[at_rt_objectid_or_attr_name],
+                              'required': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['required']
+                              })
 
     return widget_data_list
-
 
 @get_execution_time
 def get_property_order_with_value(node):
@@ -1917,23 +1918,27 @@ def get_property_order_with_value(node):
 
         demo["property_order"] = []
         type_of_set = []
+        # temp. variables which stores the lookup for append method
+        type_of_set_append_temp = type_of_set.append
+        demo_prop_append_temp = demo["property_order"].append
         gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {
                                          '$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
         for gst in gst_nodes:
             for type_of in gst["type_of"]:
                 if type_of not in type_of_set:
-                    type_of_set.append(type_of)
+                    type_of_set_append_temp(type_of)
 
             for po in gst["property_order"]:
                 if po not in demo["property_order"]:
-                    demo["property_order"].append(po)
+                    demo_prop_append_temp(po)
 
         demo.get_neighbourhood(node["member_of"])
-
+        # a temp. variable which stores the lookup for append method
+        new_property_order_append_temp = new_property_order.append
         for tab_name, list_field_id_or_name in demo['property_order']:
             list_field_set = get_widget_built_up_data(
                 list_field_id_or_name, demo, type_of_set)
-            new_property_order.append([tab_name, list_field_set])
+            new_property_order_append_temp([tab_name, list_field_set])
 
         demo["property_order"] = new_property_order
 

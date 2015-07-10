@@ -6,10 +6,26 @@
 
 {% block title %} Group {% endblock %}
 
-{% block meta_content %}  
-<h2 class="subheader">{% trans "Groups" %}</h2>
-{% endblock %}
+<!-- left top panel -->
+{% block meta_content %}
 
+  <h2 class="subheader">{% trans "Groups" %}</h2>
+
+<!-- 
+{% comment %}
+  <a href="{% url app_gst.name|lower group_name_tag %}">
+    <h2 class="subheader">
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+        {{app_gst.altnames}}
+      {% else %}
+        {{app_gst.name}}
+      {% endif%}
+    </h2>
+    {{app_gst.content|safe}}
+  </a>
+{% endcomment %}
+ -->
+{% endblock %}
 
 {% block help_content %}
 {% blocktrans %}<p>Groups are an easy way to share content and conversation, either privately or with the world. Many times, a group already exist for a specific interest or topic. If you can't find one you like, feel free to start your own.</p>

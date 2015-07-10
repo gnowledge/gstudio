@@ -79,5 +79,7 @@ class Command(BaseCommand):
 				mail.to = [SYNCDATA_SENDING_EMAIL_ID]
 				if folder_empty == 0:
 					mail.send()
+			else:
+				return 'Internet no longer available'
 					
 				shutil.move(path,sent_folder_path)

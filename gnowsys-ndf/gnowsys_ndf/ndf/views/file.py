@@ -84,7 +84,6 @@ def file(request, group_id, file_id=None, page_no=1):
     shelves = []
     shelf_list = {}
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
     #   dbref_has_shelf = has_shelf_RT.get_dbref()
@@ -278,7 +277,7 @@ def file(request, group_id, file_id=None, page_no=1):
       already_uploaded = request.GET.getlist('var', "")
       return render_to_response("ndf/file.html",
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId':app._id, "app_gst": app, 
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
@@ -374,7 +373,7 @@ def file(request, group_id, file_id=None, page_no=1):
       datavisual = json.dumps(datavisual)
       return render_to_response("ndf/file.html", 
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId':app._id, "app_gst": app,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
                                  'file_pages': file_pages, 'image_pages': images_pc.count(),
@@ -679,6 +678,8 @@ def submitDoc(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     alreadyUploadedFiles = []
+    #a temp. variable which stores the lookup for append method
+    alreadyUploadedFiles_append_temp=alreadyUploadedFiles.append
     str1 = ''
     img_type=""
     topic_file = ""
@@ -735,7 +736,7 @@ def submitDoc(request, group_id):
                 f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync = False,oid=True)
 
             if isinstance(f, list):
-              alreadyUploadedFiles.append(f)
+              alreadyUploadedFiles_append_temp(f)
               title = mtitle
         
         # str1 = alreadyUploadedFiles
@@ -1325,16 +1326,19 @@ def file_detail(request, group_id, _id):
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
         shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
-        
+        #a temp. variable which stores the lookup for append method
+        shelves_append_temp=shelves.append
         if shelf:
             for each in shelf:
                 shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
-                shelves.append(shelf_name)
+                shelves_append_temp(shelf_name)
 
-                shelf_list[shelf_name.name] = []         
+                shelf_list[shelf_name.name] = []
+                #a temp. variable which stores the lookup for append method
+                shelf_list_shelfname_append_temp=shelf_list[shelf_name.name].append      
                 for ID in shelf_name.collection_set:
                     shelf_item = node_collection.one({'_id': ObjectId(ID) })
-                    shelf_list[shelf_name.name].append(shelf_item.name)
+                    shelf_list_shelfname_append_temp(shelf_item.name)
                 
         else:
             shelves = []
@@ -1365,10 +1369,8 @@ def getFileThumbnail(request, group_id, _id):
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth:
-                group_id = str(auth._id)
+        elif auth:
+            group_id = str(auth._id)
     else:
         pass
 

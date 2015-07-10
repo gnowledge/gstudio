@@ -44,7 +44,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
   else :
@@ -86,8 +86,11 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     agency_type = auth.agency_type
     agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
-      for eachset in agency_type_node.collection_set:
-        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+ #     for eachset in agency_type_node.collection_set:
+ #      app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+      #loop replaced by a list comprehension
+      app_collection_set=[node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]
+
 
   if app_set_id:
     person_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
@@ -115,8 +118,10 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                   ]
       widget_for = get_widget_built_up_data(widget_for, person_gs)
 
-      for each in univ_cur:
-        univ_list.append(each)
+#     for each in univ_cur:
+#       univ_list.append(each)
+      #loop replaced by a list comprehension
+      univ_list=[each for each in univ_cur]
 
 
     elif title == "Program Officer" or title == "Voluntary Teacher":
@@ -633,7 +638,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
             if old_college_group_id_list:
               # If college-group list exists
-              # Then update their group_admin field (append PO's created_by)
+              # Then update their group_admin field (remove PO's created_by)
               res = node_collection.collection.update(
                 {'_id': {'$in': old_college_group_id_list}, '$or': [{'group_admin': auth_node.created_by},
                 {'author_set': auth_node.created_by}]},
@@ -652,8 +657,12 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               # Its purpose is to change the agency type back to Other
 
               auth_node.reload()
+    # if person_gst.name != "Student":
+    #     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
+    # else:
+    return HttpResponseRedirect(reverse('mis:mis_app_instance_detail',kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id, "app_set_instance_id":unicode(person_gs._id)}))
 
-    return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
+    # return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   default_template = "ndf/person_create_edit.html"
 
