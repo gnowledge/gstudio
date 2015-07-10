@@ -65,6 +65,9 @@ function toolbarDisplay(){
 	$("#unreadMailsLink")[0].style.display = type;
 	$("#readMailsLink")[0].style.display = type;
 	$("#tab1").css("background-color", "#DCDCDC");
+	$("#go1")[0].style.display = "none";
+	$("#go2")[0].style.display = "none";
+	$("#go3")[0].style.display = "none";
 }
 
 // Function to put a POST request to fetch mails
