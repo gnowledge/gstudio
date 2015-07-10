@@ -7,8 +7,8 @@ import re
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
-from django.template import RequestContext
+from django.shortcuts import render_to_response, redirect,render
+from django.template import RequestContext,loader
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
@@ -74,10 +74,10 @@ def custom_events(request):
 USER ANALYTICS VIEWS
 '''
 
-def default_user(request):
+def default_user(request,group_id):
 	return redirect('/analytics/summary')
 
-def user_list_activities(request):
+def user_list_activities(request,group_id):
 	'''
 	Lists the detailed activities of the user
 	'''
@@ -96,7 +96,7 @@ def user_list_activities(request):
 	for doc in cursor :
 		lst.append(doc)
 	
-	return render_to_response ("ndf/analytics_list_details.html", { "data" : lst})
+	return render (request, "ndf/analytics_list_details.html", { "data" : lst,"group_id" : group_id, "groupid" : group_id})
 
 def get_user_sessions(user) :
 	'''
@@ -129,7 +129,7 @@ def get_user_sessions(user) :
 
 	return sessions_list
 	
-def user_summary(request):
+def user_summary(request,group_id):
 	'''
 	Renders the summary of the User activities on the Metastudio 
 	'''
@@ -159,8 +159,10 @@ def user_summary(request):
 
 	# More statistics can be queried from the anlytics_collection and added here.
 	
-	return render_to_response("ndf/analytics_summary.html",
-															{ "data" : data})
+	return render (request, "ndf/analytics_summary.html",
+															{ "data" : data,"group_id" : group_id, "groupid" : group_id})
+
+	
 
 '''
 GROUP ANALYTICS VIEWS
@@ -173,7 +175,7 @@ def group_summary(request,group_id):
 	'''
 	Renders the summary of all the activities done by the members of the Group
 	'''
-	group_id=ObjectId("55717125421aa91eecbf8843")
+	group_id=ObjectId("556871639928ec0f84fe7de7")
 
 	query("group",{ "group_id" : group_id })
 
@@ -211,7 +213,8 @@ def group_summary(request,group_id):
 			
 
 	
-	return render_to_response("ndf/analytics_group_summary.html",{"data" : data})
+	return render (request ,"ndf/analytics_group_summary.html",
+																{ "data" : data, "group_id" : group_id, "groupid" : group_id})
 	
 
 def group_list_activities(request,group_id):
@@ -219,7 +222,7 @@ def group_list_activities(request,group_id):
 	Renders the list of activities of all the members of the group
 	'''
 
-	group_id=ObjectId("55717125421aa91eecbf8843")
+	group_id=ObjectId("556871639928ec0f84fe7de7")
 
 	query("group",{ "group_id" : group_id })
 	cursor = analytics_collection.find({"group_id" : str(group_id)}).sort("timestamp",-1)
@@ -228,8 +231,8 @@ def group_list_activities(request,group_id):
 	for doc in cursor:
 		lst.append(doc)
 
-	return render_to_response("ndf/analytics_list_group_details.html",
-															{ "data" : lst})
+	return render (request, "ndf/analytics_list_group_details.html",
+															{ "data" : lst, "group_id" : group_id, "groupid" : group_id})
 
 def group_members(request, group_id) :
 
@@ -237,7 +240,7 @@ def group_members(request, group_id) :
 	Renders the list of members sorted on the basis of their contributions in the group
 	'''
 
-	group_id=ObjectId("55717125421aa91eecbf8843")
+	group_id=ObjectId("556871639928ec0f84fe7de7")
 
 	query("group",{ "group_id" : group_id })
 	
@@ -289,11 +292,12 @@ def group_members(request, group_id) :
 		except : 
 			return HttpResponse('Fatal Error')
 
-	return render_to_response("ndf/analytics_group_members.html",{"data" : list_of_members })
+	return render (request, "ndf/analytics_group_members.html",
+																{"data" : list_of_members ,"group_id" : group_id, "groupid" : group_id})
 
 def group_member_info_details(request, group_id, user) :
 	
-	group_id=ObjectId("55717125421aa91eecbf8843")
+	group_id=ObjectId("556871639928ec0f84fe7de7")
 
 	try :
 		cursor = analytics_collection.find({"group_id" : str(group_id), "user" : user})
@@ -317,12 +321,12 @@ ANALYTICS PROCESSING
 
 def query(analytics_type,details) :
 	'''
-	This function checks the Analytics data(for a user) in Analytic_col and gets the time to which the query set is updated. 
+	This function checks the Analytics data(for a user) in analytics_collection and gets the time to which the query set is updated. 
 	Based on the time, it fetches raw data from Benchmark collection and hands over to normalize to do the filtering and 
 	redundancy check.
 	
 	In case, the analytics_type is 'group', the function resolves the members of the group and calls itself recursively for each user,
-	 to update the Analytic_col.
+	 to update the analytics_collection.
 	
 	'''
 
@@ -859,19 +863,6 @@ def dashbard_activity(group_id,url,doc):
 def default_activity(group_id,url,doc):
 	pass
 	return 0
-
-		
-
-
-
-
-
-
-
-
-
-
-
 
 
 def event_activity(group_id,url,doc):

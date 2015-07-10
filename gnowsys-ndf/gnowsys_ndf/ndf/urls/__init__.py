@@ -24,7 +24,7 @@ urlpatterns = patterns('',
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
     (r'^admin/data[\/]?', include('gnowsys_ndf.ndf.urls.adminDashboard')),
     (r'^admin/designer[\/]?', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
-    (r'^analytics', include('gnowsys_ndf.ndf.urls.analytics')),
+    (r'^(?P<group_id>[^/]+)/analytics', include('gnowsys_ndf.ndf.urls.analytics')),
 
     # --mobwrite-- commented for time being
     # (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),

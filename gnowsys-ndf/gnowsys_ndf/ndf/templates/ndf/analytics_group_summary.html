@@ -1,3 +1,10 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block body_content %}
+
+
 <strong>ACTIVE USERS</strong>
 <ul>
 {% for x in data.active_users %}
@@ -5,32 +12,34 @@
 {% endfor %}
 </ul>
 
-<strong>TOTAL ACTIVITIES : {{data.total_activities}}</strong>
+<strong>Total Activities : {{data.total_activities}}</strong>
 <br><br>
-<strong>FORUM : {{data.forums}}</strong>
+<strong>Forum : {{data.forums}}</strong>
 <br><br>
-<strong>PAGES : {{data.pages}}</strong>
+<strong>Pages : {{data.pages}}</strong>
 <br><br>
-<strong>THREADS : {{data.threads}}</strong>
+<strong>Threads : {{data.threads}}</strong>
 <br><br>
-<strong>REPLIES : {{data.replies}}</strong>
+<strong>Replies : {{data.replies}}</strong>
 <br><br>
-<strong>FILES : {{data.files}}</strong>
+<strong>Files : {{data.files}}</strong>
 <br><br>
-<strong>COURSES : ___</strong>
+<strong>Courses : ___</strong>
 <br><br>
-<strong>ANNOUNCED COURSES : ___</strong>
+<strong>Announced Courses : ___</strong>
 <br><br>
-<strong>RECENT CREATED/EDITED FORUMs : {{data.recent.forums}}</strong>
+<strong>Recent Created/Edited Forums : {{data.recent.forums}}</strong>
 <br><br>
-<strong>RECENT CREATED/EDITED PAGES : {{data.recent.pages}}</strong>
+<strong>Recent Created/Edited Pages : {{data.recent.pages}}</strong>
 <br><br>
-<strong>RECENT CREATED/EDITED THREADS : {{data.recent.threads}}</strong>
+<strong>Recent Created/Edited Threads : {{data.recent.threads}}</strong>
 <br><br>
-<strong>RECENT CREATED/EDITED REPLIES : {{data.recent.replies}}</strong>
+<strong>Recent Created/Edited Replies : {{data.recent.replies}}</strong>
 <br><br>
-<strong>RECENT CREATED/EDITED FILES : {{data.recent.files}}</strong>
+<strong>Recent Created/Edited Files : {{data.recent.files}}</strong>
 <br><br>
-<strong>RECENT CREATED/EDITED COURSES : ___</strong>
+<strong>Recent Created/Edited Courses : ___</strong>
 <br><br>
-<strong>RECENT CREATED/EDITED ANNOUNCED COURSES : ___</strong>
+<strong>Recent Created/Edited Announced Courses : ___</strong>
+
+{% endblock %}

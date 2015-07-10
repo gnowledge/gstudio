@@ -1,3 +1,10 @@
+
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block body_content %}
+
 <ul>
 
 {% for x in data %}
@@ -54,3 +61,5 @@
   	<br>
 {% endfor %}
 </ul>
+
+{% endblock %}
