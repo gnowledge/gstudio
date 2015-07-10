@@ -1,3 +1,9 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block body_content %}
+
 {% for x in data %}
 	<ul>
 	<li>GROUP_ID : {{x.group_id}}</li>	
