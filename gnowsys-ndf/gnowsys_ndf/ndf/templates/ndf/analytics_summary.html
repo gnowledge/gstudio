@@ -2,28 +2,116 @@
 {% load i18n %}
 {% load ndf_tags %}
 
+<!-- The StyleSheet for headings and content-->
+{% block style %}
+    .recent_activities, .overall_activities {
+        width : 100%;
+        height : auto;
+        position : relative;
+        float : left;
+        margin : 10px 0px;
+        padding : 10px;
+        font-size : 30px;
+    }
+
+	.heading{
+		font-size: 15px;
+		font-weight: 900;
+	}
+	.content{
+		font-size: 30px;
+		font-weight: normal;
+		line-height: 40px;
+	}
+
+	.content-small{
+		font-size: 20px;
+		font-weight: normal;
+		line-height: 40px;
+	}
+
+	.element{
+		float: left;
+		position: relative;
+		width: 30%;
+        border : 1px solid #ddd;
+        margin : 10px;
+        padding : 10px;
+        background-color : #f1f1f1;
+        border-radius : 2px;
+	}
+ 
+	.cate {
+		width: 100%;
+		border-bottom : 1px solid #ddd
+	}
+{% endblock %}
+
 {% block body_content %}
 
+<div class="overall_activities">
+	<div class="cate">Overall Activities</div>
 
-<strong>Total Sessions : {{data.num_of_sessions}}</strong>
-<br><br>
-<strong>Latest Activity : {{data.latest_activity}}</strong>
-<br><br>
-<strong>Total Activities : {{data.total_activities}}</strong>
-<br><br>
-<strong>Avg session duration : {{data.avg_session_duration}}</strong>
-<br><br>
-<strong>Pages Created : {{data.num_of_pages}}</strong>
-<br><br>
-<strong>Files Uploaded : {{data.num_of_files}}</strong>
-<br><br>
-<strong>Tasks Created : {{data.num_of_tasks}}</strong>
-<br><br>
-<strong>Forums Created : {{data.num_of_forums_created}}</strong>
-<br><br>
-<strong>Threads Created : {{data.num_of_threads_created}}</strong>
-<br><br>
-<strong>Replies to Posts : {{data.num_of_replies}}</strong>
-<br><br>
+	<div class="element">
+		<div class="heading">Total Sessions<br>
+			<span class="content">{{data.num_of_sessions}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Latest Activity<br>
+			<span class="content-small">{{data.latest_activity}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Total Activities<br>
+			<span class="content">{{data.total_activities}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Average Session Duration<br>
+			<span class="content-small">{{data.avg_session_duration}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Pages Created<br>
+			<span class="content">{{data.num_of_pages}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Files Uplaoded<br>
+			<span class="content">{{data.num_of_files}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Tasks Created<br>
+			<span class="content">{{data.num_of_tasks}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Forums Created<br>
+			<span class="content">{{data.num_of_forums_created}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Threads Created<br>
+			<span class="content">{{data.num_of_threads_created}}</span>
+		</div>
+	</div>
+
+	<div class="element">
+		<div class="heading">Replies to Posts<br>
+			<span class="content">{{data.num_of_replies}}</span>
+		</div>
+	</div>
+</div>
+
 
 {% endblock %}

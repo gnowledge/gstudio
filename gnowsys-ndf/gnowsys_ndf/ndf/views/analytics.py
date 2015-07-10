@@ -135,7 +135,6 @@ def get_user_sessions(user) :
 
 	return sessions_list
 
-
 @login_required
 @get_execution_time
 def user_summary(request,group_id):
@@ -172,8 +171,6 @@ def user_summary(request,group_id):
 	return render (request, "ndf/analytics_summary.html",
 															{ "data" : data,"group_id" : group_id, "groupid" : group_id})
 
-	
-
 @login_required
 @get_execution_time
 def user_graphs(request) :
@@ -193,7 +190,7 @@ def group_summary(request,group_id):
 	'''
 	Renders the summary of all the activities done by the members of the Group
 	'''
-	group_id=ObjectId(group_id)
+	group_name, group_id = get_group_name_id(group_id)
 
 	query("group",{ "group_id" : group_id })
 
@@ -241,7 +238,7 @@ def group_list_activities(request,group_id):
 	Renders the list of activities of all the members of the group
 	'''
 
-	group_id=ObjectId(group_id)
+	group_name, group_id = get_group_name_id(group_id)
 
 	query("group",{ "group_id" : group_id })
 	cursor = analytics_collection.find({"group_id" : str(group_id)}).sort("timestamp",-1)
@@ -260,9 +257,6 @@ def group_members(request, group_id) :
 	'''
 	Renders the list of members sorted on the basis of their contributions in the group
 	'''
-
-
-	group_id=ObjectId(group_id)
 	group_name, group_id = get_group_name_id(group_id)
 
 
@@ -323,7 +317,7 @@ def group_members(request, group_id) :
 @get_execution_time
 def group_member_info_details(request, group_id, user) :
 	
-	group_id=ObjectId(group_id)
+	group_name, group_id = get_group_name_id(group_id)
 
 	try :
 		cursor = analytics_collection.find({"group_id" : str(group_id), "user.name" : user})
