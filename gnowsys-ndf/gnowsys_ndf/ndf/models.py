@@ -228,7 +228,6 @@ class Node(DjangoDocument):
                   'user_id':int,
                   'ip_address':basestring}]
     }
-    
     required_fields = ['name', '_type'] # 'group_set' to be included
                                         # here after the default
                                         # 'Administration' group is

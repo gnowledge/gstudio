@@ -1653,7 +1653,7 @@ def cast_to_data_type(value, data_type):
 
     value = value.strip()
     casted_value = value
-
+   
     if data_type == "unicode":
         casted_value = unicode(value)
 
@@ -1722,6 +1722,10 @@ def get_node_metadata(request, node, **kwargs):
         for atname in attribute_type_list:
 
             field_value = request.POST.get(atname, "")
+            print '$' * 30
+            print atname,field_value
+            print '$' * 30
+            
             at = node_collection.one(
                 {"_type": "AttributeType", "name": atname})
 
@@ -1736,6 +1740,13 @@ def get_node_metadata(request, node, **kwargs):
                         updated_ga_nodes.append(temp_res)
 
                 else:
+                    print '<' * 30
+                    print at["data_type"]
+                    print node._id
+                    print at
+                    print field_value
+                    print '<' * 30
+
                     create_gattribute(node._id, at, field_value)
 
     if "is_changed" in kwargs:
@@ -2145,6 +2156,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
             ga_node.object_value = object_value
             ga_node.save()
+            print 'IN CREATE_GATTRIBUTE'
             # ''' server_sync '''
             # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_create')
 
