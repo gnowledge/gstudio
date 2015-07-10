@@ -32,14 +32,15 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
 	all_nodes = node_collection.find({ "_type":{"$nin":["ToReduceDocs","IndexedWordList"]},"snapshot":{"$exists":False}})	
+	nodes = node_collection.find({ "_type":{"$nin":["ToReduceDocs","IndexedWordList"]},"snapshot":{}})
+	print "No.of Nodes not having Snapshot feilds",all_nodes.count()
 	for i in all_nodes:
 	     	
 		node_collection.collection.update({'_id':ObjectId(i._id)}, {'$set':{'snapshot': {} }},upsert=False, multi=False)
 
-	all_nodes.rewind()
-	print all_nodes.count()
-        if all_nodes.count() == 0:
-		for i in all_nodes:
+	print "No. of Nodes not having values in snapshot feild",nodes.count()
+        if nodes.count() > 0:
+		for i in nodes:
 			try:	
 				get_node = node_collection.find_one({"_id":ObjectId(i._id)})
 				if (not get_node['group_set']) == False :
@@ -61,7 +62,9 @@ class Command(BaseCommand):
 
 			except:
 				print "Nodes getting Error"
+				print "==================="
 				print "Node name",i.name
+				print "==================="
 				pass
 
 
