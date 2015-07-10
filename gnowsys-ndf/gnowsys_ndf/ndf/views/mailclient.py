@@ -966,51 +966,51 @@ def compose_mail(request, group_id,mailboxname):
     template = "ndf/compose_mail.html"
     group_name, group_id = get_group_name_id(group_id)
     title = "New Mail"
+    try:
+        settings_dir1 = os.path.dirname(__file__)
+        settings_dir2 = os.path.dirname(settings_dir1)
+        settings_dir3 = os.path.dirname(settings_dir2)
+        path = os.path.abspath(os.path.dirname(settings_dir3))
+        conn = sqlite3.connect(path + '/example-sqlite3.db')
+        user_id = str(request.user.id)
+        cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
+        query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
+        cursor = conn.execute(query)
+
+    except Exception as error:
+        print error
+        error_obj= str(error) + ", mailbox_edit() fn"
+        return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
+            
+    mailbox_ids=[]
+    for row in cursor:
+        mailbox_ids.append(row[0])
+
+    # find mailbox with passed mailbox_id 
+    box = None
+    flag = 0
+    boxes= Mailbox.active_mailboxes.all()
+    for box in boxes:
+        if box.name == mailboxname and box.id in mailbox_ids:
+            flag = 1
+            break
+
+    mailbox_email_id = ''
+    if flag == 1:
+        mailbox_email_id = box.uri.split("//")[1].split(":")[0].replace('%40','@')
+    print mailbox_email_id
 
     context_dict = { "title" : title,
                     "group_name" : group_name,
                     "group_id" : group_id,
                     "groupid" : group_id,
-                    "mailbox_name" : mailboxname
+                    "mailbox_name" : mailboxname,
+                    "mailbox_email" : mailbox_email_id
                     }
     variable = RequestContext(request,context_dict)
 
     if request.method == "POST":
-        try:
-            settings_dir1 = os.path.dirname(__file__)
-            settings_dir2 = os.path.dirname(settings_dir1)
-            settings_dir3 = os.path.dirname(settings_dir2)
-            path = os.path.abspath(os.path.dirname(settings_dir3))
-            #may throw error        
-            conn = sqlite3.connect(path + '/example-sqlite3.db')
-            user_id = str(request.user.id)
-            cursor = conn.execute("CREATE TABLE IF NOT EXISTS user_mailboxes( user_id varchar(30), mailbox_id int, primary key(user_id,mailbox_id));")
-            query = 'select mailbox_id from user_mailboxes where user_id=\''+user_id+'\''
-            cursor = conn.execute(query)
-
-        except Exception as error:
-            print error
-            error_obj= str(error) + ", mailbox_edit() fn"
-            return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
-            
-        mailbox_ids=[]
-        for row in cursor:
-            mailbox_ids.append(row[0])
-
-        # find mailbox with passed mailbox_id 
-        box = None
-        flag = 0
-        boxes= Mailbox.active_mailboxes.all()
-        for box in boxes:
-            if box.name == mailboxname and box.id in mailbox_ids:
-                flag = 1
-                break
-
-        mailbox_email_id = ''
-        if flag == 1:
-            #here
-            mailbox_email_id = box.uri.split("//")[1].split(":")[0].replace('%40','@')
-        print mailbox_email_id
+        
 
         user_id = request.POST.get("user_id","")
         to = request.POST.get("to_addrs", "")
@@ -1129,11 +1129,14 @@ def fetch_mail_body(request,group_id):
         p = Parser()
         
         if mail_type == '0':
-            msg = p.parse(open(join(cur_path, filename)))
+            msg = p.parse(open(join(new_path, filename)))
         else:
             msg = p.parse(open(join(cur_path, filename)))
 
         _text = msg.get_payload()
+        print '+' * 20
+        print _text
+        print '+' * 20
 
         response = HttpResponse(_text, content_type='text/html')
 
