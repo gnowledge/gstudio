@@ -80,5 +80,5 @@ class Command(BaseCommand):
 				if folder_empty == 0:
 					mail.send()
 				shutil.move(path,sent_folder_path)
-				else:
-					return 'Internet no longer available'
+			else:
+				return 'Internet no longer available'
