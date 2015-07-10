@@ -77,7 +77,7 @@ USER ANALYTICS VIEWS
 
 @get_execution_time
 def default_user(request,group_id):
-	return redirect('/analytics/summary')
+	return redirect("/"+group_id+'/analytics/summary')
 
 @login_required
 @get_execution_time
@@ -95,7 +95,7 @@ def user_list_activities(request,group_id):
 		end_date = datetime.datetime.now()
 	
 	query("user",{ "username" : request.user.username })
-	cursor = analytics_collection.find({"user" : request.user.username}).sort("timestamp",-1)
+	cursor = analytics_collection.find({"user.name" : request.user.username}).sort("timestamp",-1)
 	
 	lst = []
 	for doc in cursor :
@@ -109,7 +109,7 @@ def get_user_sessions(user) :
 	Returns the user activities grouped by sessions
 	'''
 
-	cursor = analytics_collection.find({"user" : user}).sort("timestamp",-1)
+	cursor = analytics_collection.find({"user.name" : user}).sort("timestamp",-1)
 
 	lst = []
 	sessions_list =[]
@@ -160,12 +160,12 @@ def user_summary(request,group_id):
 
 	data['avg_session_duration'] = duration/data['num_of_sessions']
 
-	data['num_of_pages'] = analytics_collection.find({ "action.key" : "create", "obj.page" : { '$exists' : 'true'}}).count()
-	data['num_of_files'] = analytics_collection.find({ "action.key" : "create", "obj.file" : { '$exists' : 'true'}}).count()
-	data['num_of_forums_created'] = analytics_collection.find({ "action.key" : "create", "obj.forum" : { '$exists' : 'true'}}).count()
-	data['num_of_threads_created'] = analytics_collection.find({ "action.key" : "create", "obj.thread" : { '$exists' : 'true'}}).count()
-	data['num_of_replies'] = analytics_collection.find({ "action.key" : "add", "obj.reply" : { '$exists' : 'true'}}).count()
-	data['num_of_tasks'] = analytics_collection.find({ "action.key" : "create", "obj.task" : { '$exists' : 'true'}}).count()
+	data['num_of_pages'] = analytics_collection.find({ "user.name" : request.user.username, "action.key" : "create", "obj.page" : { '$exists' : 'true'}}).count()
+	data['num_of_files'] = analytics_collection.find({ "user.name" : request.user.username, "action.key" : "create", "obj.file" : { '$exists' : 'true'}}).count()
+	data['num_of_forums_created'] = analytics_collection.find({ "user.name" : request.user.username, "action.key" : "create", "obj.forum" : { '$exists' : 'true'}}).count()
+	data['num_of_threads_created'] = analytics_collection.find({ "user.name" : request.user.username, "action.key" : "create", "obj.thread" : { '$exists' : 'true'}}).count()
+	data['num_of_replies'] = analytics_collection.find({ "user.name" : request.user.username, "action.key" : "add", "obj.reply" : { '$exists' : 'true'}}).count()
+	data['num_of_tasks'] = analytics_collection.find({ "user.name" : request.user.username, "action.key" : "create", "obj.task" : { '$exists' : 'true'}}).count()
 
 	# More statistics can be queried from the anlytics_collection and added here.
 	
@@ -185,7 +185,7 @@ GROUP ANALYTICS VIEWS
 '''
 @get_execution_time
 def default_group(request,group_id):
-	return redirect('/analytics/'+group_id+'/summary')
+	return redirect('/'+group_id+'/analytics/group/summary')
 
 @login_required
 @get_execution_time
@@ -193,13 +193,13 @@ def group_summary(request,group_id):
 	'''
 	Renders the summary of all the activities done by the members of the Group
 	'''
-	group_id=ObjectId("556871639928ec0f84fe7de7")
+	group_id=ObjectId(group_id)
 
 	query("group",{ "group_id" : group_id })
 
 	data = {}
 	
-	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user', 'num_of_activities': {'$sum': 1}}}]
+	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user.name', 'num_of_activities': {'$sum': 1}}}]
 	sorted_list = analytics_collection.aggregate(pipeline=pipe)
 	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
 	
@@ -241,7 +241,7 @@ def group_list_activities(request,group_id):
 	Renders the list of activities of all the members of the group
 	'''
 
-	group_id=ObjectId("556871639928ec0f84fe7de7")
+	group_id=ObjectId(group_id)
 
 	query("group",{ "group_id" : group_id })
 	cursor = analytics_collection.find({"group_id" : str(group_id)}).sort("timestamp",-1)
@@ -262,7 +262,7 @@ def group_members(request, group_id) :
 	'''
 
 
-	group_id=ObjectId("556871639928ec0f84fe7de7")
+	group_id=ObjectId(group_id)
 	group_name, group_id = get_group_name_id(group_id)
 
 
@@ -271,7 +271,7 @@ def group_members(request, group_id) :
 	'''
 	grouping the data  on the basis of user name
 	'''
-	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user', 'num_of_activities': {'$sum': 1}}}]
+	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user.name', 'num_of_activities': {'$sum': 1}}}]
 	sorted_list = analytics_collection.aggregate(pipeline=pipe)
 	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
 	
@@ -316,7 +316,6 @@ def group_members(request, group_id) :
 		except : 
 			return HttpResponse('Fatal Error')
 
-
 	return render (request, "ndf/analytics_group_members.html",
 																{"data" : list_of_members ,"group_id" : group_id, "groupid" : group_id})
 
@@ -324,10 +323,10 @@ def group_members(request, group_id) :
 @get_execution_time
 def group_member_info_details(request, group_id, user) :
 	
-	group_id=ObjectId("556871639928ec0f84fe7de7")
+	group_id=ObjectId(group_id)
 
 	try :
-		cursor = analytics_collection.find({"group_id" : str(group_id), "user" : user})
+		cursor = analytics_collection.find({"group_id" : str(group_id), "user.name" : user})
 
 		if(cursor.count() != 0) :
 			data = {}
@@ -359,7 +358,7 @@ def query(analytics_type,details) :
 	'''
 
 	if analytics_type == "user" :
-		cursor = analytics_collection.find({"user" : str(details['username']) }).sort("timestamp",-1).limit(1)
+		cursor = analytics_collection.find({"user.name" : str(details['username']) }).sort("timestamp",-1).limit(1)
 		latest_timestamp = datetime.datetime(1900,1,1)
 		if cursor is None :
 			pass
@@ -456,7 +455,8 @@ def initialize_analytics_obj(doc, group_id, obj) :
 
 	analytics_doc=analytics_collection.Analytics()
 	analytics_doc.timestamp=doc[u'last_update']
-	analytics_doc.user = doc[u'user'] 
+	author = db['Nodes'].find_one({"_type" : "Author", "name" : doc[u'user']})
+	analytics_doc.user = { "name" : author[u'name'] , "id" : author[u'created_by']}
 	analytics_doc.session_key = doc[u'session_key']
 	analytics_doc.group_id = group_id
 	analytics_doc.obj = { obj : { 'id' : None} } 
@@ -482,6 +482,7 @@ def page_activity(group_id,url,doc):
 				analytics_doc.action = { 'key' : 'delete', "phrase" : "deleted a" }
 				analytics_doc.obj['page']['id'] = url[4]
 				analytics_doc.obj['page']['name'] = n[u'name']
+				analytics_doc.obj['page']['url'] = n[u'url']
 				analytics_doc.save()
 				return 1
 
@@ -492,6 +493,7 @@ def page_activity(group_id,url,doc):
 				analytics_doc.action = { 'key' : 'publish', "phrase" : "published a" }
 				analytics_doc.obj['page']['id'] = url[4]
 				analytics_doc.obj['page']['name'] = n[u'name']
+				analytics_doc.obj['page']['url'] = n[u'url']
 				analytics_doc.save()
 				return 1
 
@@ -501,6 +503,7 @@ def page_activity(group_id,url,doc):
 			analytics_doc.action = { 'key' : 'edit' , "phrase" : "edited a" }
 			analytics_doc.obj['page']['id'] = url[4]
 			analytics_doc.obj['page']['name'] = n[u'name']
+			analytics_doc.obj['page']['url'] = n[u'url']
 			analytics_doc.save()
 			return 1
 		
@@ -514,18 +517,21 @@ def page_activity(group_id,url,doc):
 					analytics_doc.action = {  "key" : "create" , "phrase" : "created a" }
 					analytics_doc.obj['page']['id'] = ObjectId(url[3])
 					analytics_doc.obj['page']['name'] = n[u'name']
+					analytics_doc.obj['page']['url'] = n[u'url']
 					analytics_doc.save()
 					return 1
 				else :
 					analytics_doc.action = { 'key' : "view" , "phrase" : "viewed a" }
 					analytics_doc.obj['page']['id'] = ObjectId(url[3])
 					analytics_doc.obj['page']['name'] = n[u'name']
+					analytics_doc.obj['page']['url'] = n[u'url']
 					analytics_doc.save()
 					return 1
 			else :
 				analytics_doc.action = { 'key' : "view" , "phrase" : "viewed a" }
 				analytics_doc.obj['page']['id'] = ObjectId(url[3])
 				analytics_doc.obj['page']['name'] = n[u'name']
+				analytics_doc.obj['page']['url'] = n[u'url']
 				analytics_doc.save()
 				return 1
 
@@ -556,6 +562,7 @@ def course_activity(group_id,url,doc):
 						analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a'}
 						analytics_doc.obj['course']['id'] = ObjectId(course_created[u'_id'])
 						analytics_doc.obj['course']['name'] = str(course_created[u"name"]) 
+						analytics_doc.obj['course']['url'] = course_created[u'url']
 						analytics_doc.save()
 			except :
 				return 0
@@ -567,6 +574,7 @@ def course_activity(group_id,url,doc):
 				analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a'}
 				analytics_doc.obj['course']['id'] = ObjectId(url[4])
 				analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+				analytics_doc.obj['course']['url'] = course_created[u'url']
 				analytics_doc.save()
 			except Exception :
 				return 0
@@ -579,6 +587,7 @@ def course_activity(group_id,url,doc):
 					analytics_doc.action = { 'key' : 'edit', 'phrase' : 'edited a'}
 					analytics_doc.obj['course']['id'] = ObjectId(url[4])
 					analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+					analytics_doc.obj['course']['url'] = course_created[u'url']
 					analytics_doc.save()
 				except Exception :
 					return 0
@@ -589,6 +598,7 @@ def course_activity(group_id,url,doc):
 			analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a'}
 			analytics_doc.obj['course']['id'] = ObjectId(url[4])
 			analytics_doc.obj['course']['name'] = str(n[u"name"]) 
+			analytics_doc.obj['course']['url'] = n[u'url']
 			analytics_doc.save()
 		except Exception :
 			return 0
@@ -619,6 +629,7 @@ def file_activity(group_id,url,doc):
 					analytics_doc.obj['file']['id'] = ObjectId(file_created[u'_id'])
 					analytics_doc.obj['file']['type'] = str(file_created[u"mime_type"])
 					analytics_doc.obj['file']['name'] = str(file_created[u"name"]) 
+					analytics_doc.obj['file']['url'] = file_created[u'url']
 					analytics_doc.save()
 		except :
 			return 0
@@ -630,6 +641,7 @@ def file_activity(group_id,url,doc):
 			analytics_doc.obj['file']['id'] = ObjectId(url[4])
 			analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 			analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+			analytics_doc.obj['file']['url'] = n[u'url']
 			analytics_doc.save()
 		except Exception :
 			return 0
@@ -643,6 +655,7 @@ def file_activity(group_id,url,doc):
 				analytics_doc.obj['file']['id'] = ObjectId(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+				analytics_doc.obj['file']['url'] = n[u'url']
 				analytics_doc.save()
 			except Exception :
 				return 0
@@ -654,6 +667,7 @@ def file_activity(group_id,url,doc):
 			analytics_doc.obj['file']['id'] = ObjectId(url[4])
 			analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 			analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+			analytics_doc.obj['file']['url'] = n[u'url']
 			analytics_doc.save()
 		except Exception :
 			return 0
@@ -666,6 +680,7 @@ def file_activity(group_id,url,doc):
 				analytics_doc.obj['file']['id'] = ObjectId(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+				analytics_doc.obj['file']['url'] = n[u'url']
 				analytics_doc.save()
 	
 	elif(url[3]=="edit" or url[3]=="edit_file"):
@@ -676,6 +691,7 @@ def file_activity(group_id,url,doc):
 				analytics_doc.obj['file']['id'] = str(url[4])
 				analytics_doc.obj['file']['type'] = str(n[u"mime_type"])
 				analytics_doc.obj['file']['name'] = str(n[u"name"]) 
+				analytics_doc.obj['file']['url'] = n[u'url']
 				analytics_doc.save()
 	return 1
 
@@ -695,6 +711,11 @@ def forum_activity(group_id,url,doc):
 					analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
 					analytics_doc.action = { 'key' : 'delete', 'phrase' : 'deleted a' }
 					analytics_doc.obj['forum']['id'] = url[4];
+					
+					forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
+					analytics_doc.obj['forum']['name'] = forum_node[u'name']
+					analytics_doc.obj['forum']['url'] = forum_node[u'url']
+					
 					analytics_doc.save();
 					return 1
 
@@ -706,7 +727,14 @@ def forum_activity(group_id,url,doc):
 						analytics_doc.action = { 'key' : 'delete', 'phrase' : 'deleted a' }
 						analytics_doc.action[2] = 'thread'
 						analytics_doc.args['thread']['id'] = ObjectId(url[6]);
-						analytics_doc.obj['thread']['forum'] = ObjectId(url[5]);
+						
+						thread_node = db['Nodes'].find_one({ "_id" : ObjectId(url[6])})
+						analytics_doc.obj['thread']['name'] = thread_node[u'name']
+						analytics_doc.obj['forum']['url'] = thread_node[u'url']
+						
+						forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[5])})
+						analytics_doc.obj['thread']['forum'] = { "id" : forum_node[u'_id'], "name" : forum_node[u'name'], "url" : forum_node[u'url']};
+						
 						analytics_doc.save();
 						return 1
 
@@ -717,8 +745,17 @@ def forum_activity(group_id,url,doc):
 						analytics_doc = initialize_analytics_obj(doc, group_id, 'reply')
 						analytics_doc.action = { 'key' : 'delete', 'phrase' : 'deleted a' }
 						analytics_doc.obj['reply']['id'] = url[7];
-						analytics_doc.obj['reply']['thread'] = url[6];
-						analytics_doc.obj['reply']['forum'] = url[5];
+
+						reply_node = db['Nodes'].find_one({ "_id" : ObjectId(url[7])})
+						analytics_doc.obj['reply']['name'] = reply_node[u'name'];
+						analytics_doc.obj['reply']['url'] = reply_node[u'url']
+
+						thread_node = db['Nodes'].find_one({ "_id" : ObjectId(url[6])})
+						analytics_doc.obj['reply']['thread'] = { "id" : thread_node[u'_id'], "name" : thread_node[u'name'], "url" : thread_node[u'url']};
+
+						forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[5])})
+						analytics_doc.obj['reply']['forum'] = { "id" : forum_node[u'_id'], "name" : forum_node[u'name'], "url" : forum_node[u'url']};
+
 						analytics_doc.save();
 						return 1
 
@@ -728,6 +765,11 @@ def forum_activity(group_id,url,doc):
 					analytics_doc = initialize_analytics_obj(doc, group_id, 'thread')
 					analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a' }
 					analytics_doc.obj['thread']['id'] = ObjectId(url[4]);
+
+					thread_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
+					analytics_doc.obj['thread']['name'] = thread_node[u'name'];
+					analytics_doc.obj['thread']['url'] = thread_node[u'url'];
+
 					analytics_doc.save();
 					return 1
 			except :
@@ -738,6 +780,11 @@ def forum_activity(group_id,url,doc):
 				analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
 				analytics_doc.action = { 'key' : 'edit', 'phrase' : 'edited a' }
 				analytics_doc.obj['forum']['id'] = ObjectId(url[4]);
+
+				forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
+				analytics_doc.obj['forum']['name'] = forum_node[u'name'];
+				analytics_doc.obj['forum']['url'] = forum_node[u'url'];
+
 				analytics_doc.save();
 				return 1
 
@@ -746,8 +793,15 @@ def forum_activity(group_id,url,doc):
 			if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 				analytics_doc = initialize_analytics_obj(doc, group_id, 'thread')
 				analytics_doc.action = { 'key' : 'edit', 'phrase' : 'edited a' }
-				analytics_doc.obj['thread']['forum'] = ObjectId(url[4]);
+				
+				forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
+				analytics_doc.obj['thread']['forum'] = { "id" : forum_node[u'_id'], "name" : forum_node[u'name'], "url" : forum_node[u'url']};
+				
 				analytics_doc.obj['thread']['id'] = ObjectId(url[5]);
+				thread_node = db['Nodes'].find_one({ "_id" : ObjectId(url[5])})
+				analytics_doc.obj['thread']['name'] = thread_node[u'name'];
+				analytics_doc.obj['thread']['url'] = thread_node[u'url'];
+
 				analytics_doc.save();
 				return 1
 
@@ -777,7 +831,14 @@ def forum_activity(group_id,url,doc):
 										analytics_doc = initialize_analytics_obj(doc, group_id, 'thread')
 										analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a' }
 										analytics_doc.obj['thread']['id'] = str(created_thread[u'_id']);
-										analytics_doc.obj['thread']['forum'] = ObjectId(url[3]);
+
+										thread_node = db['Nodes'].find_one({ "_id" : created_thread[u'_id']})
+										analytics_doc.obj['thread']['name'] = thread_node[u'name'];
+										analytics_doc.obj['thread']['url'] = thread_node[u'url'];
+
+										forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[3])})
+										analytics_doc.obj['thread']['forum'] = { "id" : forum_node[u'_id'], "name" : forum_node[u'name'], "url" : forum_node[u'url']};
+										
 										analytics_doc.save();
 										return 1
 							except : 
@@ -792,12 +853,22 @@ def forum_activity(group_id,url,doc):
 					analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
 					analytics_doc.action = { 'key' : 'create', 'phrase' : 'created a' }
 					analytics_doc.obj['forum']['id'] = ObjectId(url[3]);
+
+					forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[3])})
+					analytics_doc.obj['forum']['name'] = forum_node[u'name'];
+					analytics_doc.obj['forum']['url'] = forum_node[u'url'];
+
 					analytics_doc.save();
 					return 1
 				else :
 					analytics_doc = initialize_analytics_obj(doc, group_id, 'forum')
 					analytics_doc.action = { 'key' : 'view', 'phrase' : 'viewed a' }
 					analytics_doc.obj['forum']['id'] = ObjectId(url[3]);
+
+					forum_node = db['Nodes'].find_one({ "_id" : ObjectId(url[3])})
+					analytics_doc.obj['forum']['name'] = forum_node[u'name'];
+					analytics_doc.obj['forum']['url'] = forum_node[u'url'];
+
 					analytics_doc.save();
 					return 1
 
@@ -813,6 +884,12 @@ def task_activity(group_id,url,doc):
 			if ins_objectid.is_valid(url[4]) is True:
 				analytics_doc.action = {  "key" : "delete" , "phrase" : "deleted a" }
 				analytics_doc.obj['task']['id'] = url[4]
+				try : 
+					task_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
+					analytics_doc.obj['task']['name'] = task_node[u'name']
+					analytics_doc.obj['task']['url'] = task_node[u'url']
+				except :
+					pass
 				analytics_doc.save();
 				return 1
 
@@ -822,6 +899,12 @@ def task_activity(group_id,url,doc):
 				if u'has_data' in doc.keys() and doc[u'has_data']["POST"] == True :
 					analytics_doc.action = {  "key" : "edit" , "phrase" : "edited a" }
 					analytics_doc.obj['task']['id'] = url[4]
+					try : 
+						task_node = db['Nodes'].find_one({ "_id" : ObjectId(url[4])})
+						analytics_doc.obj['task']['name'] = task_node[u'name']
+						analytics_doc.obj['task']['url'] = task_node[u'url']
+					except :
+						pass
 					analytics_doc.save();
 					return 1
 
@@ -842,11 +925,15 @@ def task_activity(group_id,url,doc):
 				if (doc[u'last_update'] - created_at).seconds < 5 :
 					analytics_doc.action = {  "key" : "create" , "phrase" : "created a" }
 					analytics_doc.obj['task']['id'] = url[3]
+					analytics_doc.obj['task']['name'] = n[u'name']
+					analytics_doc.obj['task']['url'] = n[u'url']
 					analytics_doc.save();
 					return 1
 				else :
 					analytics_doc.action = {  "key" : "view" , "phrase" : "viewed a" }
 					analytics_doc.obj['task']['id'] = url[3]
+					analytics_doc.obj['task']['name'] = n[u'name']
+					analytics_doc.obj['task']['url'] = n[u'url']
 					analytics_doc.save();
 					return 1
 		except : 

@@ -7,9 +7,31 @@
 <ul>
 {% for content in data.activities %}
 	{{content.user}}&nbsp;{{content.action.phrase}}
+
+{% for x in data.activities %}
+	<ul>
+	{% for key, value in x.obj.items %}
+		<a href="/{{x.user.id}}/dashboard/">{{x.user.name}}</a>&nbsp;{{x.action.phrase}}&nbsp;{{key}}&nbsp;{% if not value.name|is_empty %}:&nbsp;<a>{{value.name}}{% endif %}<br>
+			{% for a, b in value.items %}
+				{% if b|is_dict %}
+					&nbsp;&nbsp;{{a}} : {{b.name}}<br>
+				{% endif %}
+			{% endfor %}
+
+			{% for a, b in value.items %}
+				{% if not b|is_empty and a != 'url' and a != 'id' and not b|is_dict %}
+					&nbsp;&nbsp;&nbsp;&nbsp;{{a}} : {{b}}<br>
+				{% endif %}
+				{% if a == 'url' %}
+					&nbsp;&nbsp;&nbsp;&nbsp;<a href="/{{x.group_id}}/{{value.url}}/{{value.id}}">Link</a>
+					<br>
+				{% endif %}
+			{% endfor %}
+
+		<div style="font-size: 15px;color : #888;padding-top: 5px;"><i>{{x.timestamp}}</i></div>
+	{% endfor %}
+	</ul>
 	<br>
-	{{content.obj}}
-	<br><br>
 {% endfor %}
 </ul>
 

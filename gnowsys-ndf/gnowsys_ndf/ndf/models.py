@@ -1561,7 +1561,7 @@ class Analytics(DjangoDocument):
   structure = {
     'timestamp': datetime.datetime,
     'action' : dict,
-    'user' : basestring,
+    'user' : dict,
     'obj' : dict,
     'group_id' : basestring,
     'session_key' : basestring
