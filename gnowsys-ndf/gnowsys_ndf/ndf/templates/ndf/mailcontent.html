@@ -18,7 +18,7 @@
   	{% endcomment %}
 	{% for mail in emails %}
 		<div id={{ mail.mail_id }} style="border-top:1px solid gray; height:fit-content; padding-top: 2px; padding-bottom: 2px;" >
-			<h4><a onclick="window.location.href='#'; updateStatus('{{ mail.mail_data.file_name }}') ; readBody('{{ mail.mail_data.file_name }}',{{ mail.mail_data.attachment_filename|safe }}, {{ mail.mail_data.Attachments|safe }});" data-reveal-id="myModal">{{ mail.mail_data.Subject }}</a></h4>
+			<h4><a onclick="window.location.href='#';  readBody('{{ mail.mail_data.file_name }}',{{ mail.mail_data.attachment_filename|safe }}, {{ mail.mail_data.Attachments|safe }}); updateStatus('{{ mail.mail_data.file_name }}') ;" data-reveal-id="myModal">{{ mail.mail_data.Subject }}</a></h4>
 		</div>
 	{% endfor %}
 </div>
