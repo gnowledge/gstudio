@@ -336,7 +336,8 @@ def group_member_info_details(request, group_id, user) :
 			for doc in cursor :
 				data['activities'].append(doc)
 
-		return render_to_response("ndf/analytics_group_member_info.html",{"data" : data })
+		return render(request, "ndf/analytics_group_member_info.html",
+																		{"data" : data , "group_id" : group_id, "groupid" : group_id})
 
 	except : 
 		return HttpResponse("fatal error")

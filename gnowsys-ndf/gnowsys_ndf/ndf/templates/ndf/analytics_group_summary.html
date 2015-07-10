@@ -2,7 +2,488 @@
 {% load i18n %}
 {% load ndf_tags %}
 
+
+<!-- The StyleSheet for headings and content-->
+{% block style %}
+	.heading{
+		font-size: 20px;
+		font-weight: bold
+	}
+	.content{
+		font-size: 16px;
+		font-weight: normal;
+		line-height: 30px;
+	}
+	.element{
+		float: left;
+		position: relative
+		width: 1000px;
+	}
+ 
+	
+	}
+	#nav {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:100px;
+    float:left;
+    padding:5px; 
+    }
+	
+
+{% endblock %}
+
+
 {% block body_content %}
+
+<aside class="medium-2 columns">
+            <div>
+              <header>
+                
+
+  <a href="None">
+    <h2 class="subheader">
+      
+        File
+      
+    </h2>
+    
+  </a>
+
+ 
+                 
+              </header>
+
+              <!-- Meta content in the (main aside header)-->
+              <section>
+                <div>
+                    
+                </div>
+
+                <div>
+                  
+  
+
+  <div class="panel" style="background-color:#ddd;">
+    
+    <ul class="side-nav">
+      <dl class="tabs" data-tab="">
+
+        <!-- all files -->
+        <dd class="active" data-filetype="all">
+          <a href="#view-all">
+            <i class="fi-eye"></i>
+            All files
+            <span class="count">
+               (3) 
+            </span>
+          </a>
+        </dd><br>
+
+        <!-- Documents -->
+        <dd data-filetype="Documents">
+          <a href="#view-doc">
+            <i class="fi-page-filled"></i>
+            Documents
+            <span class="count">
+              
+            </span>
+          </a>
+        </dd><br>
+        
+        <!-- Interactives -->
+        
+
+        <!-- eBooks -->
+        
+        
+        <!-- Audio -->
+        
+        
+        <!-- Image -->
+        <dd data-filetype="Images">
+          <a href="#view-image"><i class="fi-camera"></i>
+            Images
+            <span class="count">
+               (2) 
+            </span>
+          </a>
+        </dd><br>
+        
+        <!-- Video -->
+        
+
+          <dd data-filetype="Videos">
+            <a href="#view-video"><i class="fi-video"></i>
+              Videos
+              <span class="count">
+                (1) 
+              </span>
+            </a>
+          </dd><br>
+        
+        
+        <!-- Pandora -->
+        
+
+        
+
+        
+          <dd>
+            <a href="#view-collection">
+              <i class="fi-page-multiple"></i> Collections
+            </a>
+          </dd><br>
+        
+
+      </dl><br>
+
+      
+      
+      <b>Actions</b><br><br>
+      
+          <a href="None?next=/home/file/" class="tiny round button">
+            Upload File
+          </a><br><br>
+
+      <b>Review</b><br><br>
+      
+        
+        
+
+          <a href="None" class="tiny round button">
+            Data Review
+          </a>
+        
+      
+      
+
+      <a href="#" data-reveal-id="library-statistics" class="tiny round button">
+        File Statistics
+      </a>
+      <div class="medium reveal-modal" id="library-statistics" data-reveal="">
+        <style type="text/css">
+    #tooltip {
+        position: absolute;
+        width: 200px;
+        height: auto;
+        padding: 10px;
+        background-color: white;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+    }
+    #tooltip.hidden {
+        display: none;
+    }
+    #tooltip p {
+        margin: 0;
+        font-family: sans-serif;
+        font-size: 16px;
+        line-height: 20px;
+        color: black;
+    }
+
+    #tot_rating{
+        font-size: 25px;
+        font-weight: bold;
+    }
+</style>
+<script src="/static/ndf/bower_components/d3/d3.js"></script>
+<script src="/static/ndf/bower_components/d3-tip/index.js"></script>
+<script type="text/javascript">
+    var g = "[{&quot;count&quot;: 0, &quot;name&quot;: &quot;Doc&quot;}, {&quot;count&quot;: 2, &quot;name&quot;: &quot;Image&quot;}, {&quot;count&quot;: 1, &quot;name&quot;: &quot;Video&quot;}]";
+
+    var m = g.replace(/&quot;/gi, '"');
+
+    var dataset = [];
+
+    m = JSON.parse(m);
+    var l = m.length;
+    for (var l = 0; l < m.length; l += 1) {
+        dataset.push(m[l]);
+    }
+    //  alert(dataset);
+
+    var w = 270;
+    var h = 350;
+    //defining a custom color scale
+    var color = d3.scale.category10();
+
+</script>
+<h3>Statistics</h3>
+    <dl class="tabs" data-tab="">
+        
+            <dd class="tab-title active"><a href="#bar_visual">Bar-Chart</a></dd>
+            <dd class="tab-title"><a href="#pie_visual">Pie</a></dd>
+        
+    </dl>
+  <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
+  <br>
+    <div class="tabs-content">
+        <div id="tooltip" class="hidden">
+          <h6>Details</h6>
+          <p><span id="tip-value">100</span></p>
+        </div>
+        
+        <div class="content active" id="bar_visual">
+            <script type="text/javascript">
+                // var g = "[{&quot;count&quot;: 0, &quot;name&quot;: &quot;Doc&quot;}, {&quot;count&quot;: 2, &quot;name&quot;: &quot;Image&quot;}, {&quot;count&quot;: 1, &quot;name&quot;: &quot;Video&quot;}]";
+
+                // var m = g.replace(/&quot;/gi, '"');
+
+                // var dataset = [];
+
+                // m = JSON.parse(m);
+                // var l = m.length;
+                // for (var l = 0; l < m.length; l += 1) {
+                //     dataset.push(m[l]);
+                // }
+                // //   alert(dataset);
+
+                // var w = 270;
+                // var h = 200;
+                // //defining a custom color scale
+                // var color = d3.scale.category10();
+
+                var barPadding = 1;
+                //creating an svg canvas to draw our visualizaions
+                var svg = d3.select("#bar_visual").append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+                //core d3 at work. first we create a variable named bars. bars consists of a selection of rects . the rects will form the bars of our bar graph.
+
+                var bars = svg.selectAll("rect")
+                    .data(dataset)
+                    .enter()
+                    .append("rect")
+                    .attr("class", "bar")
+                    .attr("title", "sample")
+                    .attr("x", function (d, i) {
+                        return i * (w / dataset.length);
+                    })
+                    .attr("y", function (d) {
+                        return h;
+                    })
+                    .attr("height", function (d) {
+                        return (d.count * 4);
+                    })
+                    .attr("width", function (d) {
+                        return w / dataset.length - barPadding;
+                    })
+                    .attr("fill", function (d, i) {
+                        return color(i);
+                    })
+                    .attr("title", function (d) {
+                        return d.name + "s : " + d.count
+                    })
+                    .on("mouseover", function (d) {
+
+                        //Get this bar's x/y values, then augment for the tooltip
+                        var xPosition = parseFloat(d3.select(this).attr("x")); // xScale.rangeBand() / 2;
+                        var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+
+                        //Update the tooltip position and value
+                        d3.select("#tooltip")
+                            .style("left", xPosition + "px")
+                            .style("top", yPosition + "px")
+                            .select("#tip-value")
+                            .text(d.name + " : " + d.count);
+
+                        //Show the tooltip
+                        d3.select("#tooltip").classed("hidden", false);
+
+                        d3.select(this)
+                            .attr("fill", "orange");
+
+                    })
+                    .on("mouseout", function (d, i) {
+
+                        d3.select(this)
+                            .transition()
+                            .duration(250)
+                            .attr("fill", color(i));
+                        //Hide the tooltip
+
+                        d3.select("#tooltip").classed("hidden", true);
+
+                    });
+
+                bars.data(dataset)
+                    .transition()
+                    .attr("y", function (d) {
+                        return h - (d.count * 4);
+                    })
+                    .duration(500);
+
+
+                svg.selectAll("text")
+                    .data(dataset)
+                    .enter()
+                    .append("text")
+                    .transition()
+                    .delay(1000)
+                    .text(function (d) {
+                        return d.count;
+                    })
+                    .attr("x", function (d, i) {
+                        return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
+                    })
+                    .attr("y", function (d) {
+                        return h - (d.count * 4) + 14;
+                    })
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "11px")
+                    .attr("fill", "white")
+                    .attr("text-anchor", "middle");
+            </script><svg width="270" height="350"><rect class="bar" title="Docs : 0" x="0" y="350" height="0" width="89" fill="#1f77b4"></rect><rect class="bar" title="Images : 2" x="90" y="342" height="8" width="89" fill="#ff7f0e"></rect><rect class="bar" title="Videos : 1" x="180" y="346" height="4" width="89" fill="#2ca02c"></rect><text text-anchor="middle" fill="#ffffff" font-size="11px" font-family="sans-serif" y="364" x="44.5">0</text><text text-anchor="middle" fill="#ffffff" font-size="11px" font-family="sans-serif" y="356" x="134.5">2</text><text text-anchor="middle" fill="#ffffff" font-size="11px" font-family="sans-serif" y="360" x="224.5">1</text></svg>
+        </div>
+        
+        
+        <div class="content " id="pie_visual">
+        
+            <script type="text/javascript">
+                
+                // var g = "[{&quot;count&quot;: 0, &quot;name&quot;: &quot;Doc&quot;}, {&quot;count&quot;: 2, &quot;name&quot;: &quot;Image&quot;}, {&quot;count&quot;: 1, &quot;name&quot;: &quot;Video&quot;}]";
+
+                // var m =g.replace(/&quot;/gi,'"');
+
+                // var dataset = [];
+                var system_count = [];
+                // m = JSON.parse(m);
+                // var i = m.length;
+                
+                // for (var i =0 ; i < m.length ; i+=1)
+                // {
+                //  dataset.push(m[i]);
+                // //   alert(m[i]);
+                // }
+
+                for (var i = 0 ; i < dataset.length ; i += 1)
+                {
+                    system_count.push(dataset[i].count);
+                }
+
+                // var w= 270;
+                // var h = 350;
+                // var colorScale = d3.scale.category10();
+
+
+                var outerRadius = w/2
+                var innerRadius = 75;
+                var arc = d3.svg.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius);
+
+                var pie_svg = d3.select("#pie_visual")
+                .append("svg")
+                .attr("height",h)
+                .attr("width",w);
+
+                var pie = d3.layout.pie().sort(null);
+
+                var p = pie(system_count);
+                //alert(p);
+                var arcgrp = pie_svg.selectAll("g.arc")
+                .data(p)
+                .enter()
+                .append("g")
+                .attr("class","arc")
+                .attr("transform","translate(" + outerRadius + "," + outerRadius + ")");
+
+                arcgrp.append("path")
+                .attr("d",arc)
+                .attr("fill", function (d, i) {
+                    return color(i);
+                })
+
+                .on("mouseover", function(d,i) {
+
+                            //Get this bar's x/y values, then augment for the tooltip
+                            var xPosition = arc.centroid(d)[0] + 85 ;//+ xScale.rangeBand() / 2;
+                            var yPosition = arc.centroid(d)[1] + 225 ;// 2 + h / 2;
+
+                            //Update the tooltip position and value
+                            tips = d3.select("#tooltip")
+                            .style("left", xPosition + "px")
+                            .style("top", yPosition + "px")                     
+                            .select("#tip-value")
+                            .text(dataset[i].name+ " : " + system_count[i]);
+                            
+
+                            //Show the tooltip
+                            d3.select("#tooltip").classed("hidden", false);
+
+                            d3.select(this)
+                            .attr("fill","yellow");
+
+                        })
+                    .on("mouseout", function(d,i) {
+
+                        d3.select(this)
+                        .transition()
+                        .duration(250)
+                        .attr("fill", color(i));
+                            //Hide the tooltip
+
+                            d3.select("#tooltip").classed("hidden", true);
+                            
+                        })
+                .transition()
+                .ease("bounce")
+                .duration(2000)
+                .attrTween("d", tweenPie)
+                .transition()
+                .ease("elastic")
+                .delay(function(d, i) { return 2000 + i * 50; })
+                .duration(750)
+                .attrTween("d", tweenDonut);
+
+                function tweenPie(b) {
+                    b.innerRadius = 0;
+                    var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
+                    return function(t) { return arc(i(t)); };
+                }
+
+                function tweenDonut(b) {
+                    b.innerRadius = outerRadius * .6;
+                    var i = d3.interpolate({innerRadius: 0}, b);
+                    return function(t) { return arc(i(t)); };
+                };
+
+                arcgrp.data(system_count)
+                .attr("fill", function(d){ return color(d);});
+            </script><svg height="350" width="270"><g class="arc" transform="translate(135,135)" fill="#1f77b4"><path d="M8.266365894244634e-15,-135A135,135 0 0,1 8.266365894244634e-15,-135L4.592425496802574e-15,-75A75,75 0 0,0 4.592425496802574e-15,-75Z" fill="#1f77b4"></path></g><g class="arc" transform="translate(135,135)" fill="#2ca02c"><path d="M8.266365894244634e-15,-135A135,135 0 1,1 -116.91342951089919,67.50000000000004L-64.95190528383289,37.50000000000003A75,75 0 1,0 4.592425496802574e-15,-75Z" fill="#ff7f0e"></path></g><g class="arc" transform="translate(135,135)" fill="#ff7f0e"><path d="M-116.91342951089919,67.50000000000004A135,135 0 0,1 -2.4799097682733902e-14,-135L-1.3777276490407723e-14,-75A75,75 0 0,0 -64.95190528383289,37.50000000000003Z" fill="#2ca02c"></path></g></svg>
+        </div>
+    </div>
+        <a class="close-reveal-modal">×</a>
+      </div>
+
+    </ul>
+  </div>
+
+                </div>
+              </section>
+
+              <div>
+                  
+              </div>
+            </div>
+          </aside>
+
+
+ <div id="nav">
+  <b>Group Stats</b><br>
+  <b>summary</b><br>
+  <b>activities</b><br>
+  <b>members</b><br>
+ </div>
 
 
 <strong>ACTIVE USERS</strong>
@@ -12,34 +493,80 @@
 {% endfor %}
 </ul>
 
-<strong>Total Activities : {{data.total_activities}}</strong>
-<br><br>
-<strong>Forum : {{data.forums}}</strong>
-<br><br>
-<strong>Pages : {{data.pages}}</strong>
-<br><br>
-<strong>Threads : {{data.threads}}</strong>
-<br><br>
-<strong>Replies : {{data.replies}}</strong>
-<br><br>
-<strong>Files : {{data.files}}</strong>
-<br><br>
-<strong>Courses : ___</strong>
-<br><br>
-<strong>Announced Courses : ___</strong>
-<br><br>
-<strong>Recent Created/Edited Forums : {{data.recent.forums}}</strong>
-<br><br>
-<strong>Recent Created/Edited Pages : {{data.recent.pages}}</strong>
-<br><br>
-<strong>Recent Created/Edited Threads : {{data.recent.threads}}</strong>
-<br><br>
-<strong>Recent Created/Edited Replies : {{data.recent.replies}}</strong>
-<br><br>
-<strong>Recent Created/Edited Files : {{data.recent.files}}</strong>
-<br><br>
-<strong>Recent Created/Edited Courses : ___</strong>
-<br><br>
-<strong>Recent Created/Edited Announced Courses : ___</strong>
+<div class=element>
+<div class= heading>Total Activities : <br>
+<span class= content>{{data.total_activities}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Forum :<br>
+<span class= content>{{data.forums}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Pages :<br>
+<span class= content> {{data.pages}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Threads : <br>
+<span class= content> {{data.threads}}</span></div>
+</div>
+
+
+<div class=element>
+<div class= heading>Replies : <br>
+<span class= content> {{data.replies}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Files : <br>
+<span class= content> {{data.files}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Courses : <br>
+<span class= content> ___</span></div>
+</div>	
+
+<div class=element>
+<div class= heading>Announced Courses : <br>
+<span class= content>___</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Recent Created/Edited Forums :<br>
+<span class= content> {{data.recent.forums}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Recent Created/Edited Pages : <br>
+<span class= content>{{data.recent.pages}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Recent Created/Edited Threads : <br>
+<span class= content> {{data.recent.threads}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Recent Created/Edited Replies :<br>
+<span class= content> {{data.recent.replies}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Recent Created/Edited Files : <br>
+<span class= content>{{data.recent.files}}</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Recent Created/Edited Courses : <br>
+<span class= content> ___</span></div>
+</div>
+
+<div class=element>
+<div class= heading>Recent Created/Edited Announced Courses : <br>
+<span class= content> ___</span></div>
+</div>
 
 {% endblock %}
