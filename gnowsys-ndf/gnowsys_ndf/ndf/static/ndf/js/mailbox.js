@@ -64,6 +64,7 @@ function toolbarDisplay(){
 	$("#up_count")[0].style.display = type;
 	$("#unreadMailsLink")[0].style.display = type;
 	$("#readMailsLink")[0].style.display = type;
+	$("#tab1").css("background-color", "#DCDCDC");
 }
 
 // Function to put a POST request to fetch mails
@@ -127,6 +128,8 @@ $(document).ready(function(){
 	$("#unreadMailsLink").click(function(){
 		Unreadstart = 0;
 		typeOfMail = 0;
+		$("#tab1").css("background-color", "#DCDCDC");
+		$("#tab2").css("background-color", "#FFFFFF");
 		getMails();
 	});
 
@@ -134,5 +137,7 @@ $(document).ready(function(){
 		Readstart = 0;
 		typeOfMail = 1;
 		getMails();
+		$("#tab1").css("background-color","#FFFFFF");
+		$("#tab2").css("background-color","#DCDCDC");
 	});
 });
