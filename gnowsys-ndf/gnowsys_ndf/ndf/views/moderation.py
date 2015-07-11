@@ -28,7 +28,9 @@ from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.data_review import data_review
-from gnowsys_ndf.ndf.views.group import CreateModeratedGroup
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_sg_member_of
+from gnowsys_ndf.ndf.views.group import CreateModeratedGroup, CreateEventGroup, CreateGroup
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 
 
 @login_required
@@ -46,8 +48,11 @@ def moderation_status(request, group_id, node_id):
     current_mod_group_obj = None
     is_under_moderation = True
     top_group_name = ""
-
-    mod_group_instance = CreateModeratedGroup(request)
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    # mod_group_instance = CreateGroup(request)
+    # list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
+    # list_of_sg_member_of = get_sg_member_of(group_obj._id)
+    # print "\n\nlist_of_sg_mn-----",list_of_sg_member_of
 
     selected_group = None
     for each_group_id in node_group_set:
@@ -56,8 +61,26 @@ def moderation_status(request, group_id, node_id):
     		selected_group = each_group_obj._id
 
     selected_group = selected_group if selected_group else group_id
+    selected_group_obj = node_collection.one({'_id': ObjectId(selected_group)})
+    list_of_sg_member_of = []
+    # To prevent error if resource is pulished in top_level_group
+    if "Group" in selected_group_obj.member_of_names_list:
+    	list_of_sg_member_of = get_sg_member_of(selected_group_obj._id)
 
-    group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(selected_group)
+    # Based on the resource's current group's member_of 
+    # or if resource is in top_level_group, based on its sg_member_of
+    if "ProgramEventGroup" in selected_group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
+	    sg_member_of = "ProgramEventGroup"
+	    mod_group_instance = CreateEventGroup(request)
+    elif "CourseEventGroup" in selected_group_obj.member_of_names_list or "CourseEventGroup" in list_of_sg_member_of:
+	    sg_member_of = "CourseEventGroup"
+	    mod_group_instance = CreateEventGroup(request)
+    elif "ModeratingGroup" in selected_group_obj.member_of_names_list or "ModeratingGroup" in list_of_sg_member_of:
+	    sg_member_of = "ModeratingGroup"
+	    mod_group_instance = CreateModeratedGroup(request)
+
+
+    group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(selected_group,sg_member_of)
     # returns result in <True, all_sub_group_list> format
 
     if group_hierarchy_result[0]:
@@ -96,14 +119,23 @@ def moderation_status(request, group_id, node_id):
 def all_under_moderation(request, group_id):
 
 	group_obj = get_group_name_id(group_id, get_obj=True)
-
 	if not group_obj.edit_policy == 'EDITABLE_MODERATED':
-		raise Http404('Group is not EDITABLE_MODERATED') 
+		raise Http404('Group is not EDITABLE_MODERATED')
 
-	mod_group_instance = CreateModeratedGroup(request)
-	group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(group_obj._id)
+	mod_group_instance = CreateGroup(request)
+	list_of_sg_mn = mod_group_instance.get_all_subgroups_member_of_list(group_obj._id)
+	if "ProgramEventGroup" in list_of_sg_mn:
+		sg_member_of = "ProgramEventGroup"
+		mod_group_instance = CreateEventGroup(request)
+	elif "CourseEventGroup" in list_of_sg_mn:
+		sg_member_of = "CourseEventGroup"
+		mod_group_instance = CreateEventGroup(request)
+	elif "ModeratingGroup" in list_of_sg_mn:
+		sg_member_of = "ModeratingGroup"
+		mod_group_instance = CreateModeratedGroup(request)
+
+	group_hierarchy_result = mod_group_instance.get_all_group_hierarchy(group_obj._id,sg_member_of)
 	group_hierarchy_obj_list = []
-
 	if group_hierarchy_result[0]:
 		group_hierarchy_obj_list = group_hierarchy_result[1]
 		group_hierarchy_id_list = [g._id for g in group_hierarchy_obj_list]
@@ -122,7 +154,7 @@ def all_under_moderation(request, group_id):
 			}, RequestContext(request))
 
 	else:
-		raise Http404(error_message) 
+		raise Http404('Group is not EDITABLE_MODERATED') 
 
 @login_required
 def moderation(request, group_id, page_no=1):
@@ -211,7 +243,7 @@ def approve_resource(request, group_id):
 @login_required
 def create_moderator_task(request, group_id, node_id, \
 	task_type_creation='group', task_type='Moderation', task_content_org="", \
-	created_by_name=""):
+	created_by_name="",on_upload=False):
 	'''
 	Method to create task to group admins or moderators of the moderated groups.
 	'''
@@ -220,59 +252,88 @@ def create_moderator_task(request, group_id, node_id, \
     # - Required keys: _id[optional], name, group_set, created_by, modified_by, contributors, content_org,
         # created_by_name, Status, Priority, start_time, end_time, Assignee, has_type
 
-	node_obj = node_collection.one({'_id': ObjectId(node_id)})
+	try:
+		task_dict = {}
+		node_obj = node_collection.one({'_id': ObjectId(node_id)})
+		if node_obj.relation_set:
+			for rel in node_obj.relation_set:
+				if rel and 'has_current_approval_task' in rel:
+					task_id = rel['has_current_approval_task'][0]
+					task_dict["_id"] = ObjectId(task_id)
 
-	# last group is next appended group
-	group_obj = get_group_name_id(group_id, get_obj=True)
+		# last group is next appended group
+		group_obj = get_group_name_id(group_id, get_obj=True)
+		at_curr_app_task = node_collection.one({'_type': "RelationType", 'name': "has_current_approval_task"})
+		glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
+		task_type_list = []
+		task_type_list.append(node_collection.one({'member_of': glist_gst._id, 'name':unicode(task_type)})._id)
+		site = Site.objects.get(pk=1)
+		site = unicode(site.name.__str__())
+		auth_grp = node_collection.one({'_type': "Author", 'created_by': int(node_obj.created_by)})
 
+		if task_type == "Moderation":
+			task_title = u"Moderate Resource: " + node_obj.name
+			if task_content_org:
+				pass
 
-	if task_type == "Moderation":
-		task_title = u"Moderate Resource: " + node_obj.name
-	else:
-		task_title = u"\n\nResource " + node_obj.name + \
-					u" is successfully moderated and published to " + group_obj.name
+			else:
+				url = u"http://" + site + "/"+ unicode(group_obj._id) \
+						+ u"/moderation#" + unicode(node_obj._id.__str__())
 
-	glist_gst = node_collection.one({'_type': "GSystemType", 'name': "GList"})
-	task_type_list = []
-	task_type_list.append(node_collection.one({'member_of': glist_gst._id, 'name':unicode(task_type)})._id)
+				task_content_org = u'\n\nModerate resource: "' + unicode(node_obj.name) \
+								+ u'" having id: "' + unicode(node_obj._id.__str__()) + '"' \
+								+ u'\n\nPlease moderate resource accesible at following link: \n'\
+								+ unicode(url)
+			task_dict = {
+			    "name": task_title,
+			    "group_set": [group_obj._id],
+			    "created_by": node_obj.created_by,
+			    "modified_by": request.user.id,
+			    "contributors": [request.user.id],
+			    "content_org": unicode(task_content_org),
+			    "created_by_name": unicode(request.user.username),
+			    "Status": u"New",
+			    "Priority": u"Normal",
+			    # "start_time": "",
+			    # "end_time": "",
+			    "Assignee": list(group_obj.group_admin[:]),
+			    "has_type": task_type_list
+			}
 
-	site = Site.objects.get(pk=1)
-	site = unicode(site.name.__str__())
+		else:
+			task_title = u"\n\nResource " + node_obj.name + \
+						 u" in " + group_obj.name + u" is Approved. "
+			task_dict = {
+			    "name": task_title,
+			    "modified_by": request.user.id,
+			    "created_by_name": unicode(request.user.username),
+			    "Status": u"Feedback",
+			    "group_set": [group_obj._id],
+			    "created_by": node_obj.created_by,
+			    "content_org": unicode(task_content_org),
+			    "modified_by": request.user.id,
+			    "contributors": [request.user.id],
+			    "Priority": u"Normal",
+			    "Assignee": list(group_obj.group_admin[:] + [node_obj.created_by]),
+			    "has_type": task_type_list
+			}
+		task_obj = create_task(task_dict, task_type_creation)
+		if on_upload:
+			url = u"http://" + site + "/"+ unicode(auth_grp._id) \
+				+ u"/moderation/status/" + unicode(node_obj._id.__str__())
 
-	if task_content_org:
-		pass
+			activ = "Contribution to " + group_obj.name +"."
+			mail_content = "Your contributed file has been sent for Moderation.\n" \
+				+ "You may visit this link to check the status of Moderation :\t" \
+				+ url
+			user_obj = User.objects.get(id=request.user.id)
+			set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
 
-	else:
-		url = u"http://" + site + "/"+ unicode(group_obj._id) \
-				+ u"/moderation#" + unicode(node_obj._id.__str__())
-
-		task_content_org = u'\n\nModerate resource: "' + unicode(node_obj.name) \
-						+ u'" having id: "' + unicode(node_obj._id.__str__()) + '"' \
-						+ u'\n\nPlease moderate resource accesible at following link: \n'\
-						+ unicode(url)
-
-	task_dict = {
-	    "name": task_title,
-	    "group_set": [group_obj._id],
-	    "created_by": node_obj.created_by,
-	    "modified_by": request.user.id,
-	    "contributors": [request.user.id],
-	    "content_org": unicode(task_content_org),
-	    # "created_by_name": unicode(created_by_name),
-	    "created_by_name": unicode(request.user.username),
-	    "Status": u"New",
-	    "Priority": u"Normal",
-	    # "start_time": "",
-	    # "end_time": "",
-	    "Assignee": list(group_obj.group_admin[:] + [node_obj.created_by]),
-	    "has_type": task_type_list
-	}
-
-	task_obj = create_task(task_dict, task_type_creation)
-
-	if task_obj:
-		return True
-
+		if task_obj:
+			create_grelation(node_obj._id, at_curr_app_task, task_obj._id)
+			return True
+	except Exception as e:
+		print "Error in task create moderation --- " + str(e)
 
 def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 	'''
@@ -323,18 +384,25 @@ def get_moderator_group_set(node_group_set, curr_group_id, get_details=False):
 
 	# ---| getting appropriate member_of group |---
 	# for top level of moderated group
-	if len(curr_group_obj.member_of) == 1 and 'Group' in curr_group_obj.member_of_names_list:
+	list_of_sg_member_of = get_sg_member_of(curr_group_obj._id)
+
+	if "ModeratingGroup" in list_of_sg_member_of:
 		member_of = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
 
+	elif 'ProgramEventGroup' in list_of_sg_member_of:
+		member_of = node_collection.one({'_type': 'GSystemType', 'name': u'ProgramEventGroup'})
+	
+	elif 'CourseEventGroup' in list_of_sg_member_of:
+		member_of = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
+
     # for sub-group falling under one of following categories:
-	elif curr_group_obj.member_of_names_list[0] in ['ProgramEventGroup', 'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']:
-		member_of = node_collection.one({'_id': curr_group_obj.member_of[0]})
+	# elif curr_group_obj.member_of_names_list[0] in ['PartnerGroup', 'ModeratingGroup']:
+	# 	member_of = node_collection.one({'_id': curr_group_obj.member_of[0]})
 
     # final fallback option
 	else:
     	# GST of "ModeratingGroup"
 		member_of = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
-
     # getting sub-group having:
     # curr_group in prior_node 
     # and member_of as fetched above
