@@ -69,7 +69,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/compare', include('gnowsys_ndf.ndf.urls.version')),
     (r'^(?P<group_id>[^/]+)/moderation', include('gnowsys_ndf.ndf.urls.moderation')),
     (r'^(?P<group_id>[^/]+)/feeds', include('gnowsys_ndf.ndf.urls.feeds')),
-
+    (r'^(?P<group_id>[^/]+)/trash',include('gnowsys_ndf.ndf.urls.trash')),
 
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 
