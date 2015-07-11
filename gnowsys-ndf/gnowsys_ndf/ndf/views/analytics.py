@@ -78,8 +78,7 @@ USER ANALYTICS VIEWS
 
 @get_execution_time
 def default_user(request,group_id):
-	return redirect("/"+group_id+'/analytics/summary')
-
+	return redirect("/")
 
 @login_required
 @get_execution_time
@@ -310,34 +309,40 @@ def group_members(request, group_id) :
 	list_of_members = []
 
 	for member in sorted_list_acc_activities : 
-		try :
-			member_doc = {}
-			member_doc['count'] = member[u'num_of_activities']
+		#try :
+		member_doc = {}
+		member_doc['count'] = member[u'num_of_activities']
 
-			author = node_collection.find_one({ "_type" : "Author" , "name" : member[u'_id']})
-			
-			member_doc['name'] = member[u'_id']
+		author = node_collection.find_one({ "_type" : "Author" , "name" : member[u'_id']})
+
+
+		print member[u'_id']
+		
+		member_doc['name'] = member[u'_id']
+		try : 
 			member_doc['email'] = author[u'email']
+		except :
+			pass
 
-			for entity in computing_urls :
-				member_doc[entity['key']] = 0
-				if entity['key'] == 'replies' :
-					try :
-						nodes = node_collection.find({"name":entity['name'], "group_set":ObjectId(group_id), "created_by" : author[u'created_by'], "status": entity[u'status']}).count()	
-						member_doc[entity['key']] = nodes
-					except :
-						pass
-				else :
-					try :
-						nodes = node_collection.find({"url":entity['url'], "group_set":ObjectId(group_id), "created_by" : author[u'created_by'], "status": entity[u'status']}).count()
-						member_doc[entity['key']] = nodes
-					except :
-						pass
+		for entity in computing_urls :
+			member_doc[entity['key']] = 0
+			if entity['key'] == 'replies' :
+				try :
+					nodes = node_collection.find({"name":entity['name'], "group_set":ObjectId(group_id), "created_by" : author[u'created_by'], "status": entity[u'status']}).count()	
+					member_doc[entity['key']] = nodes
+				except :
+					pass
+			else :
+				try :
+					nodes = node_collection.find({"url":entity['url'], "group_set":ObjectId(group_id), "created_by" : author[u'created_by'], "status": entity[u'status']}).count()
+					member_doc[entity['key']] = nodes
+				except :
+					pass
 
-			list_of_members.append(member_doc)
+		list_of_members.append(member_doc)
 
-		except : 
-			return HttpResponse('Fatal Error')
+		#except : 
+		#	return HttpResponse('Fatal Error')
 
 	print list_of_members
 
