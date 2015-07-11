@@ -51,7 +51,7 @@
 
 
 <div class="table_wrapper">
-	<div class="cate">Detailed Activities in the the group</div>
+	<div class="cate">Detailed Activities in the group : {{group_name}}</div>
 	
 	{% for day in data %}
 		{% for date, activity_lst in day.items %}
@@ -62,11 +62,10 @@
 						<tr class="c_row">
 							<td class="b1">
 								<div class="element">
-									<b><a href="/{{x.user.id}}/dashboard/">{{activity.user.name}}</a></b>&nbsp;{{activity.action.phrase}}&nbsp;{{key}}&nbsp;
-										{% if not value.name|is_empty %}
-											:&nbsp;
+									<b><a href="/{{activity.user.id}}/dashboard/">{{activity.user.name}}</a></b>&nbsp;{{activity.action.phrase}}&nbsp;{{key}}
+										{% if not value.name|is_empty %}:
 											{% if not value.url|is_empty %}
-												<a href="/{{x.group_id}}/{{value.url}}/{{value.id}}">{{value.name}} <i class="fi-link"></i></a>
+												<a href="/{{activity.group_id}}/{{value.url}}/{{value.id}}">{{value.name}} <i class="fi-link"></i></a>
 													<br>
 											{% else %}
 												{{value.name}}
