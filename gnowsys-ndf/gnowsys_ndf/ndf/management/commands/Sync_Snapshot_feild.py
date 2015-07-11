@@ -31,7 +31,7 @@ class Command(BaseCommand):
   help = "Based on "
 
   def handle(self, *args, **options):
-	all_nodes = node_collection.find({ "_type":{"$nin":["ToReduceDocs","IndexedWordList"]},"snapshot":{"$exists":False}})	
+	all_nodes = node_collection.find({ "_type":{"$nin":["ToReduceDocs","IndexedWordList,node_holder"]},"snapshot":{"$exists":False}})	
 	nodes = node_collection.find({ "_type":{"$nin":["ToReduceDocs","IndexedWordList"]},"snapshot":{}})
 	print "No.of Nodes not having Snapshot feilds",all_nodes.count()
 	for i in all_nodes:
