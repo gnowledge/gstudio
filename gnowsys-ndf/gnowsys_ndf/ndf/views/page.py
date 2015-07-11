@@ -147,7 +147,7 @@ def page(request, group_id, app_id=None):
         # code for moderated Groups
         group_type = node_collection.one({'_id': ObjectId(group_id)})
         group_info=group_type_info(group_id)
-
+	node = node_collection.find({'member_of':ObjectId(app_id)})
         title = gst_page.name
  	'''
         if  group_info == "Moderated":
@@ -172,19 +172,19 @@ def page(request, group_id, app_id=None):
                                       }).sort('last_update', -1)
 	
           if node is None:
-            node = node_collection.find({'member_of':ObjectId(app_id)})
+            
 	  '''
-          for nodes in node:
+	for nodes in node:
             node,ver=get_versioned_page(nodes) 
             content.append(node)  
-          '''  
+	'''  
                     
           # rcs content ends here
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
                                      'appId':app._id,
                                      'shelf_list': shelf_list,'shelves': shelves,
-                                     'page_nodes':node,
+                                     'page_nodes':nodes,
                                      'groupid':group_id,
                                      'group_id':group_id
                                     }, 
