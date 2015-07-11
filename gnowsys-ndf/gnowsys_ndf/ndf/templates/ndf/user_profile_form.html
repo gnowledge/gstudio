@@ -16,10 +16,10 @@
 				<!-- space to fill the information -->
 				<div align="center">
 						<div class="row" >
-							<div class="small-3 columns" style="left:-1%;">
-								<label id="first_name_info"></label>
+							<div class="small-3 columns" style="right:1%;">
+								<label id="first_name_info"> </label>
 							</div>
-							<div class="small-3 columns" style="left:-10%;">
+							<div class="small-3 columns" style="right:10%;">
 								<b><label id="last_name_info"> </label></b>
 							</div>
 							<div class="small-3 columns" style="left:1%">
@@ -32,7 +32,7 @@
 							<div class="small-4 columns" style="left:1%;">
 								<label > <h6> Language proficiency </h6> </label>
 							</div>
-							<div class="small-3  columns" style="right:5%;">
+							<div class="small-3  columns" style="right:5%; ">
 								<label id="language_proficiency_info"></label>
 							</div>
 							<div>
@@ -43,7 +43,7 @@
 							<div class="small-4 columns">
 								<label> <h6>  Subject Proficiency </h6></label>
 							</div>
-							<div class="small-2 columns " style="left:1%;" > 
+							<div class="small-2 columns " style="right:1%;" > 
 								<label id="subject_proficiecncy_info"></label>
 							</div>
 							<div class="small-3 columns">
@@ -192,11 +192,11 @@ function load_information()
 				url: "{% url 'user_data_profile' group_id %}",
 				type:"GET",
 				dataType: "json",
-				success:function(data1)
-					{   $('#first_name_info').append("<b> <h4>" + data1['first_name']+ "<h4></b>")
-						$('#last_name_info').append ("<b><h4>" + data1['last_name']+ "</h4></b>")
-						$('#language_proficiency_info').append("<b>" +data1['node']['language_proficiency'] +"</b>" )
-						$('#subject_proficiecncy_info').append ("<b>" +data1['node']['subject_proficiency'] + "</b>" )
+				success:function(data)
+					{   $('#first_name_info').html("<b> <h4>" + data['first_name']+ "<h4></b>")
+						$('#last_name_info').html ("<b><h4>" + data['last_name']+ "</h4></b>")
+						$('#language_proficiency_info').html("<b>" +data['node']['language_proficiency'] +"</b>" )
+						$('#subject_proficiecncy_info').html ("<b>" +data['node']['subject_proficiency'] + "</b>" )
 		
 					}
 			   });
