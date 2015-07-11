@@ -2716,6 +2716,14 @@ def get_objectid_name(nodeid):
  
  return (node_collection.find_one({'_id':ObjectId(nodeid)}).name)
 
- 
+@register.filter
+def is_dict(val):
+    return isinstance(val, dict)
 
+@register.filter
+def is_empty(val):
+    if val == None :
+    	return 1
+    else :
+    	return 0
 

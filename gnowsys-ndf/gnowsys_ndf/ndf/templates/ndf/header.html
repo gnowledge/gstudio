@@ -206,6 +206,9 @@
             <li class="text-center">
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
+            <li class="text-center">
+              <a href='/{{group_id}}/analytics/summary'>{% trans "Analytics" %}</a>
+            </li>
             {% if user.is_superuser %}
               <li class="text-center">
                 <a href="/admin/data">{% trans "Admin Data" %}</a>
@@ -286,10 +289,18 @@
                       <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
                         <i class="fi-record"></i> {% trans "About" %}
                       </a>
+
                     {% else %}
                       <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
                         <i class="fi-results"></i> {% trans "Updates" %}
                       </a>
+                       <li>
+                <a href="/{{group_id}}/feeds/updates/" class="tiny round button">
+                  <i class="fi-rss"></i> &nbsp;&nbsp;Feeds
+
+                </a>
+              </li>
+                     
                     {% endif %}
                   {% endif %}
 

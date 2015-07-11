@@ -575,3 +575,12 @@ class Command(BaseCommand):
             i.save()
         else:
             print i.name,"Page already Updated"	
+
+    nodes = node_collection.find({"_type":"Author",
+			'$or':[{'language_proficiency':{'$exists':False}},{'subject_proficiency':{'$exists':False}}]}) 
+    for i in nodes:
+		    node_collection.collection.update({'_id':ObjectId(i._id)}, {'$set':{'language_proficiency': '','subject_proficiency':'' }},upsert=False, multi=False)
+		    print i.name, "Updated !!"	
+
+
+
