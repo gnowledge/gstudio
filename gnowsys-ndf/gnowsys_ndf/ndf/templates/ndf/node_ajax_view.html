@@ -458,8 +458,6 @@ ul#navigation li a.last {
       <dd class="tab-title active page-view"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       {% endif %}
     
-      <!-- Info-box -->
-      <dd class="tab-title info-view"><a class="view-info" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       
       <!-- Discussion -->
       {% if "Group" not in node.member_of_names_list %}
@@ -1330,7 +1328,7 @@ ul#navigation li a.last {
         <!-- Delete button if page created by user -->
           {% if node.created_by == request.user.id %}
             {% if node.member_of_names_list.0 == "Page" %}
-              <a class="tiny alert round button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+              <a class="tiny alert round button" href="{% url 'trash_resource' group_id node %}">{% trans "Delete" %}</a>
             {% elif node.member_of_names_list.0 == "Term" %}
               <a class="tiny alert round button" href="{% url 'term_delete' group_name_tag node %}">{% trans "Delete" %}</a>
             {% endif %}
@@ -1391,6 +1389,10 @@ ul#navigation li a.last {
            {% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
             <div class= "medium-12 columns" >
                 <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
+
+		<!-- Info-box -->&nbsp;
+<!--		<a class="view-info tiny round button" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a>  -->
+      
             </div>
            {% endif %}
         </div>     
