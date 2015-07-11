@@ -1,6 +1,5 @@
 {% load cache %}
 
-
 <table id="data-review-table" style="width:auto">
 <!-- <table> -->
 
@@ -14,6 +13,9 @@
 			<th class="text-center right-border" colspan="3">Alignment & Level</th>
 			<th class="text-center right-border" colspan="7">Curate</th>
 			<th class="text-center right-border" colspan="3">Advance</th>
+			{% if user.is_superuser %}
+				<th class="text-center right-border" colspan="2">Admin</th>
+			{% endif %}
 			{% if title == "moderation" %}
 				<th class="text-center right-border" colspan="3">Moderation</th>
 			{% endif %}
@@ -65,7 +67,11 @@
 			<th class="expand-width-3">Reading Level</th>
 			<th>Time Required</th>
 			<th class="expand-width-3 right-border">Text Complexity</th>
-
+            <!-- Admin -->
+            {% if user.is_superuser %}
+	            <th class="expand-width-3"> Purge </th>
+	            <th class="expand-width-3"> Restore </th>
+	        {% endif %}    
 			<!-- moderation -->
 			{% if title == "moderation" %}
 				<th class="expand-width-2">Discuss</th>
