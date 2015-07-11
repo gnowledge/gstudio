@@ -289,7 +289,6 @@ def group_members(request, group_id) :
 	'''
 	group_name, group_id = get_group_name_id(group_id)
 
-
 	query("group",{ "group_id" : group_id })
 	
 	'''
@@ -304,6 +303,7 @@ def group_members(request, group_id) :
 		{ 'key' : 'threads', 'url' : 'forum/thread', 'status' : 'DRAFT' },
 		{ 'key' : 'files', 'url' : 'file', 'status' : 'PUBLISHED' },
 		{ 'key' : 'pages', 'url' : 'page', 'status' : 'PUBLISHED' },
+		{ 'key' : 'tasks', 'url' : 'task', 'status' : 'DRAFT' },
 		{ 'key' : 'replies', 'name' : re.compile("^Reply of:.*"), 'status' : 'DRAFT' }
 	]
 
@@ -317,21 +317,20 @@ def group_members(request, group_id) :
 			author = node_collection.find_one({ "_type" : "Author" , "name" : member[u'_id']})
 			
 			member_doc['name'] = member[u'_id']
+			member_doc['email'] = author[u'email']
 
 			for entity in computing_urls :
-				member_doc[entity['key']] = []
+				member_doc[entity['key']] = 0
 				if entity['key'] == 'replies' :
 					try :
-						nodes = node_collection.find({"name":entity['name'], "group_set":group_id, "created_by" : author[u'created_by'], "status": entity[u'status']})	
-						for node in nodes :
-							member_doc[entity['key']].append({ 'name' : node[u'name'], "id" : node[u'name']})
+						nodes = node_collection.find({"name":entity['name'], "group_set":ObjectId(group_id), "created_by" : author[u'created_by'], "status": entity[u'status']}).count()	
+						member_doc[entity['key']] = nodes
 					except :
 						pass
 				else :
 					try :
-						nodes = node_collection.find({"url":entity['url'], "group_set":group_id, "created_by" : author[u'created_by'], "status": entity[u'status']})	
-						for node in nodes :
-							member_doc[entity['key']].append({ 'name' : node[u'name'], "id" : node[u'_id']})
+						nodes = node_collection.find({"url":entity['url'], "group_set":ObjectId(group_id), "created_by" : author[u'created_by'], "status": entity[u'status']}).count()
+						member_doc[entity['key']] = nodes
 					except :
 						pass
 
@@ -339,6 +338,8 @@ def group_members(request, group_id) :
 
 		except : 
 			return HttpResponse('Fatal Error')
+
+	print list_of_members
 
 	return render (request, "ndf/analytics_group_members.html",
 																{"data" : list_of_members ,"group_id" : group_id, "groupid" : group_id})

@@ -8,74 +8,96 @@
 
 
 {% block style %}
-  .heading{
-    font-size: 28px;
-    font-weight: bold
-  }
- .sub-heading{
-    font-size: 18px;
-    font-weight: bold
-  }
+  .member_list {
+        width : 100%;
+        height : auto;
+        position : relative;
+        float : left;
+        margin : 10px 0px;
+        padding : 10px;
+        font-size : 30px;
+    }
 
+  .heading{
+    font-size: 15px;
+    font-weight: 900;
+  }
+  .content{
+    font-size: 30px;
+    font-weight: normal;
+    line-height: 40px;
+    border-bottom : 1px solid #ddd;
+    padding-bottom : 5px;
+    margin-bottom : 10px;
+  }
+  .element{
+    float: left;
+    position: relative;
+    width: 30%;
+        border : 1px solid #ddd;
+        margin : 10px;
+        padding : 10px;
+        background-color : #f1f1f1;
+        border-radius : 2px;
+  }
+ 
+  .cate {
+        width: 100%;
+        border-bottom : 1px solid #ddd
+    }
+
+    .email-block {
+        font-size : 15px;
+        line-height : 23px;
+    }
+
+    .total {
+        line-height : 30px;
+        padding-bottom : 5px;
+        margin-bottom : 10px;
+    }
+
+    .prompt {
+        font-size : 10px;
+        color : #454A94;
+        float : right;
+        cursor : pointer;
+    }
+
+    .more-box {
+        text-transform : uppercase;
+        font-size : 13px;
+        font-weight : bold;
+        border-top : 1px solid #ddd;
+        padding-top : 5px;
+    }
+ 
 {% endblock %}
 
 {% block body_content %}
 
-<ul>
-<div class = heading> Group Member Activities  </div><br>
-{% for x in data %}
-   	<li>{{x.name}} : {{x.count}}</li>
-  	<br>
-  	<b class = sub-heading>FORUMS :</b> {{x.forums|length}}
-  	<br><br>
-  	<ul>
-  		{% for content in x.forums %}
-  			<li>
-  				{{content.name}}
-  			</li>
-  		{% endfor %}
-  	</ul>
-  	<br>
-  	<b class = sub-heading>THREADS :</b> {{x.threads|length}}
-  	<br><br>
-  	<ul>
-  		{% for content in x.threads %}
-  			<li>
-  				{{content.name}}
-  			</li>
-  		{% endfor %}
-  	</ul>
-  	<br>
-  	<b class = sub-heading>REPLIES :</b> {{x.replies|length}}
-  	<br><br>
-  	<ul>
-  		{% for content in x.replies %}
-  			<li>
-  				{{content.name}}
-  			</li>
-  		{% endfor %}
-  	</ul>
-  	<br>
-  	<b class = sub-headingclass = sub-heading>FILES :</b> {{x.files|length}}
-  	<br><br>
-  	<ul>
-  		{% for content in x.files %}
-  			<li>
-  				{{content.name}}
-  			</li>
-  		{% endfor %}
-  	</ul>
-  	<br>
-  	<b class = sub-heading>PAGES :</b> {{x.pages|length}}
-  	<ul>
-  		{% for content in x.pages %}
-  			<li>
-  				{{content.name}}
-  			</li>
-  		{% endfor %}
-  	</ul>
-  	<br>
-{% endfor %}
-</ul>
+
+<div class="member_list">
+    <div class="cate">Contributors </div>
+    {% for x in data %}
+        <div class="element">
+            <div class= "content"><i class="fi-torso"></i>&nbsp;&nbsp;<a href="/{{group_id}}/analytics/group/member/{{x.name}}">{{x.name}}&nbsp;<span style="font-size : 20px;"></a></span></div>
+            <div class="email-block"><i class="fi-mail"></i>&nbsp;&nbsp;<a href="mailto:{{x.email}}">{{x.email}}</a></div>
+            <div class="total"><span class="email-block">Total Contributions : </span><br>{{x.count}}</div>
+
+            <div class="more-box">
+                {{x.pages}} pages · {{x.files}} files · {{x.forums}} forums · {{x.threads}} threads · {{x.replies}} replies · {{x.tasks}} tasks  
+            </div>
+
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    $(".prompt").click(function() {
+        alert('sd');
+    })
+</script>
+
 
 {% endblock %}
