@@ -2696,3 +2696,14 @@ def get_filters_data(gst_name):
 							}
 
 	return filter_dict
+
+@register.filter
+def is_dict(val):
+    return isinstance(val, dict)
+
+@register.filter
+def is_empty(val):
+    if val == None :
+    	return 1
+    else :
+    	return 0
