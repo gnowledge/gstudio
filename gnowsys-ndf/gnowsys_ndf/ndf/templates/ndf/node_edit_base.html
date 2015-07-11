@@ -64,14 +64,14 @@ i.remove-tag{
     <header> 
     <div class="row">
  	<div class="large-8 columns">    
- 		
-		<h3><span class="subheader">		
+ 		<h3><span class="subheader">		
 		{% if node %}
 			{% trans "Editing " %} {{title}} : {{node.name}}
 		{% else %}
 			{% trans "Create New " %} {{title}} :
 		{% endif %} 
-		</span></h3>		
+		</span></h3>
+
 
 	    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
   		<label id="message" style="display:none; color:red"></label>
@@ -81,8 +81,7 @@ i.remove-tag{
     </div>     
     </div> 
     </header>
-  	
-    {% check_group node as is_group %}
+  	    {% check_group node as is_group %}
 
     <div class="edit-card">
         
@@ -215,7 +214,29 @@ i.remove-tag{
 							</a>
 	                    </div>
 		     		</div>
-		     		{% endcache %}                
+		     		{% endcache %}
+		     		<div class = "page type" >
+		     			<div class="row">
+		     			 	<div class = "small-2 columns">	
+			     				<span  style="width: 70px; float: left;" > Page Type:  </span>
+ 							</div>
+ 							<div class="small-8 columns" ends>
+				     			<select name="type_of" id="type_of">
+						  			{% for i in page_instance %}
+
+						  				{% if i.name == "Wiki page" %}	        				
+											<option value = {{i.pk}} selected> {{i.name}} </option>
+
+										{% else %}
+											<option value = {{i.pk}} > {{i.name}} </option>
+										{% endif %}
+						  				
+			  						{% endfor %}
+								</select>
+							</div>
+						</div>	
+		     		</div>
+                    	                
 	            </div> 
 			</div>  
 
@@ -581,10 +602,12 @@ $(document).ready(function(){
 	{% if node %}
 		old_name = "{{node.name}}"
 	    old_name = old_name.toLowerCase();
+	    $("select[name='type_of'] option[value='{{node.type_of.0}}']").prop("selected", true);
 		{% if is_auth_node %}
 			$("#name_id").attr("disabled",true)
 		{% endif %}
 	{% endif %}
+	
 });
 
 
@@ -1213,7 +1236,13 @@ $(document).ready(function(){
 	// 	lastVisitedLocationVal.push(mapZoom)
 	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
+function update()
+ {
+ 	$('#page_type').empty();
+ 	$('#page_type').append($('#type_of :selected').text());	
+ 	$('#select_page_type').foundation('reveal', 'close');
 
+ } 
 
 </script>
 
