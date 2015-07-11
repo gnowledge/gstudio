@@ -111,7 +111,43 @@ def user_list_activities(request,group_id):
 			lst[i][str(temp_date)].append(doc)
 			pass
 	
-	return render (request, "ndf/analytics_list_details.html", { "user_name" : user, "data" : lst,"group_id" : group_id, "groupid" : group_id})
+	return render (request, "ndf/analytics_list_details.html", { "user_name" : user, "data" : lst,"group_id" : group_id, "groupid" : group_id, "specific" : False})
+
+
+@login_required
+@get_execution_time
+def user_app_activities(request,group_id,part):
+
+	'''
+	Lists the detailed activities of the user
+	'''
+
+	user = request.user.username
+
+	print part 
+
+	query("user",{ "username" : request.user.username })
+	cursor = analytics_collection.find({"obj."+part : { "$exists" : True}, "action.key" : {"$in" : ['create', 'edit', 'add', 'delete']}, "user.name" : request.user.username}).sort("timestamp",-1)
+	
+	lst = []
+	temp_date = datetime.date(1970, 1, 1)
+	date_col = {}
+
+	i=-1
+
+	for doc in cursor :
+		if temp_date != doc[u'timestamp'].date().strftime("%d %b, %Y") :
+			temp_date = doc[u'timestamp'].date().strftime("%d %b, %Y")
+			date_col = {}
+			date_col[str(temp_date)] = []
+			date_col[str(temp_date)].append(doc)
+			lst.append(date_col)
+			i=i+1
+		else :
+			lst[i][str(temp_date)].append(doc)
+			pass
+	
+	return render (request, "ndf/analytics_list_details.html", { "user_name" : user, "data" : lst,"group_id" : group_id, "groupid" : group_id, "specific" : True, "app" : part})
 
 
 @get_execution_time

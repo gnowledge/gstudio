@@ -28,12 +28,16 @@
 		font-size: 30px;
 		font-weight: normal;
 		line-height: 40px;
+		position : relative;
+		float: left;
 	}
 
 	.content-small{
 		font-size: 20px;
 		font-weight: normal;
 		line-height: 40px;
+		position : relative;
+		float: left;
 	}
 
 	.element{
@@ -63,6 +67,13 @@
       .tabs{
     font-size: 18px;
     }
+	.link-handle {
+		postion : relative;
+		float : left;
+		line-height : 48px;
+		font-size : 20px;
+	}
+
 {% endblock %}
 
 {% block meta_content%}
@@ -119,61 +130,67 @@
 
 	<div class="element">
 		<div class="heading">Total Sessions<br>
-			<span class="content">{{data.num_of_sessions}}</span>
+			<div class="content">{{data.num_of_sessions}}</div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Latest Activity<br>
-			<span class="content-small">{{data.latest_activity}}</span>
+			<div class="content-small">{{data.latest_activity}}</div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Total Activities<br>
-			<span class="content">{{data.total_activities}}</span>
+			<div class="content">{{data.total_activities}}</div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Average Session Duration<br>
-			<span class="content-small">{{data.avg_session_duration}}</span>
+			<div class="content-small">{{data.avg_session_duration}}</div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Pages Created<br>
-			<span class="content">{{data.num_of_pages}}</span>
+			<div class="content">{{data.num_of_pages}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/page"><i class="fi-link"></i></a></div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Files Uplaoded<br>
-			<span class="content">{{data.num_of_files}}</span>
+			<div class="content">{{data.num_of_files}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/file"><i class="fi-link"></i></a></div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Tasks Created<br>
-			<span class="content">{{data.num_of_tasks}}</span>
+			<div class="content">{{data.num_of_tasks}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/task"><i class="fi-link"></i></a></div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Forums Created<br>
-			<span class="content">{{data.num_of_forums_created}}</span>
+			<div class="content">{{data.num_of_forums_created}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/forum"><i class="fi-link"></i></a></div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Threads Created<br>
-			<span class="content">{{data.num_of_threads_created}}</span>
+			<div class="content">{{data.num_of_threads_created}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/thread"><i class="fi-link"></i></a></div>
 		</div>
 	</div>
 
 	<div class="element">
 		<div class="heading">Replies to Posts<br>
-			<span class="content">{{data.num_of_replies}}</span>
+			<div class="content">{{data.num_of_replies}}</div>
+			<div class="link-handle">&nbsp;&nbsp;<a href="/{{group_id}}/analytics/list_activities/reply"><i class="fi-link"></i></a></div>
 		</div>
 	</div>
 </div>
