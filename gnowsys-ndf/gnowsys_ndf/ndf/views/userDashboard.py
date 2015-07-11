@@ -15,7 +15,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE
+from gnowsys_ndf.settings import META_TYPE, GAPPS, GSTUDIO_SITE_DEFAULT_LANGUAGE, GSTUDIO_SITE_NAME
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CREATION_RATING, GSTUDIO_RESOURCES_REGISTRATION_RATING, GSTUDIO_RESOURCES_REPLY_RATING
 
 from gnowsys_ndf.ndf.models import *
@@ -46,7 +46,9 @@ ins_objectid  = ObjectId()
 #######################################################################################################################################
 @get_execution_time
 def userpref(request,group_id):
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    usrid = int(group_id)
+    auth = node_collection.one({'_type': "Author", 'created_by': usrid})
+    # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
     lan_dict={}
     pref=request.POST["pref"]
     fall_back=request.POST["fallback"]
@@ -59,34 +61,32 @@ def userpref(request,group_id):
         auth.save()
     return HttpResponse("Success")
 
+@login_required
 @get_execution_time
 def uDashboard(request, group_id):
-    usrid = group_id
-    
-    ID = int(usrid)
-    auth = node_collection.one({'_type': "Author", 'created_by': ID}, {'name': 1, 'relation_set': 1,'created_at':1 })
+    usrid = int(group_id) 
+    auth = node_collection.one({'_type': "Author", 'created_by': usrid})
     group_id = auth._id
     # Fetching user group of current user & then reassigning group_id with it's corresponding ObjectId value
-    
- 
+
     group_name = auth.name
     usrname = auth.name
     date_of_join = auth['created_at']
     current_user = request.user.pk
-    
+
     has_profile_pic = None
     profile_pic_image = None
     is_already_selected = None
-    
+
     task_gst = node_collection.one(
         {'_type': "GSystemType", 'name': "Task"}
     )
-    
+
     if current_user:
         exclued_from_public = ""  
-        if int(current_user) == int(ID):
+        if int(current_user) == int(usrid):
           Access_policy=["PUBLIC","PRIVATE"]
-        if int(current_user) != int(ID):
+        if int(current_user) != int(usrid):
           Access_policy=["PUBLIC"]
     else:
           Access_policy=["PUBLIC"]  
@@ -145,105 +145,120 @@ def uDashboard(request, group_id):
                 if profile_pic_image:
                     gr_node = create_grelation(auth._id, has_profile_pic, profile_pic_image._id)
 
-    dashboard_count={}  
-    group_list=[]
-    user_activity=[]
-    
+    dashboard_count = {}
+    group_list = []
+    user_activity = []
 
-    GST_PAGE = node_collection.one({'_type': "GSystemType", 'name': 'Page'})
-    page_cur = node_collection.find({'member_of': {'$all': [GST_PAGE._id]}, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
-    file_cur = node_collection.find({'_type':  u"File", 'created_by': int(ID), "status":{"$nin":["HIDDEN"]}})
-    forum_gst = node_collection.one({"_type": "GSystemType", "name":"Forum"})
-    forum_count = node_collection.find({"_type":"GSystem","member_of":forum_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
-    quiz_gst = node_collection.one({"_type": "GSystemType", "name":"Quiz"})
-    quiz_count = node_collection.find({"_type":"GSystem","member_of":quiz_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
-    thread_gst = node_collection.one({"_type": "GSystemType", "name":"Twist"})
-    thread_count = node_collection.find({"_type":"GSystem","member_of":thread_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
-    reply_gst = node_collection.one({"_type": "GSystemType", "name":"Reply"})
-    reply_count = node_collection.find({"_type":"GSystem","member_of":reply_gst._id, 'created_by':int(ID), "status":{"$nin":["HIDDEN"]}})
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': 'Page'})
+    page_cur = node_collection.find({'member_of': {'$all': [page_gst._id]},
+                            'created_by': int(usrid), "status": {"$nin": ["HIDDEN"]}})
+    file_cur = node_collection.find({'_type': u"File", 'created_by': int(usrid),
+                                     "status": {"$nin": ["HIDDEN"]}})
+    forum_gst = node_collection.one({"_type": "GSystemType", "name": "Forum"})
+    forum_count = node_collection.find({"_type": "GSystem",
+                            "member_of": forum_gst._id, 'created_by': int(usrid),
+                            "status": {"$nin": ["HIDDEN"]}})
+    quiz_gst = node_collection.one({"_type": "GSystemType", "name": "Quiz"})
+    quiz_count = node_collection.find({"_type": "GSystem",
+                            "member_of": quiz_gst._id, 'created_by': int(usrid),
+                            "status": {"$nin": ["HIDDEN"]}})
+    thread_gst = node_collection.one({"_type": "GSystemType", "name": "Twist"})
+    thread_count =node_collection.find({"_type": "GSystem",
+                            "member_of": thread_gst._id, 'created_by': int(usrid),
+                            "status": {"$nin": ["HIDDEN"]}})
+    reply_gst = node_collection.one({"_type": "GSystemType", "name": "Reply"})
+    reply_count = node_collection.find({"_type": "GSystem",
+                            "member_of": reply_gst._id, 'created_by': int(usrid),
+                            "status": {"$nin": ["HIDDEN"]}})
 
-    
     task_cur = ""
     if current_user:
-        if int(current_user) == int(ID):
+        if int(current_user) == int(usrid):
                    task_cur = node_collection.find(
-            {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':ID}
+            {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':usrid}
         ).sort('last_update', -1).limit(10)
                    dashboard_count.update({'Task': task_cur.count()})
   
    
     group_cur = node_collection.find(
         {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
-        '$or': [{'group_admin': int(ID)}, {'author_set': int(ID)}]}).sort('last_update', -1).limit(10)
+        '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1).limit(10)
 
     dashboard_count.update({'group':group_cur.count()})
-    
-    #user activity gives all the activities of the users
-    
+
+    # user activity gives all the activities of the users
+
     activity = ""
     activity_user = node_collection.find(
-        {'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
-        {"access_policy":{"$in":Access_policy}},{'member_of':{'$nin': [exclued_from_public]}},
-        {'$or':[{'created_by':int(ID)}, {'modified_by':int(ID)}]}] 
+        {'$and': [{'$or': [{'_type': 'GSystem'}, {'_type': 'group'},
+        {'_type': 'File'}]}, {"access_policy": {"$in": Access_policy}},{'status':{'$in':[u"DRAFT",u"PUBLISHED"]}},
+        {'member_of': {'$nin': [exclued_from_public]}},
+        {'$or': [{'created_by': int(usrid)}, {'modified_by': int(usrid)}]}]
     }).sort('last_update', -1).limit(10)
 
     a_user = []
-    dashboard_count.update({'activity':activity_user.count()})
-    
-      
-    
-    for i in activity_user:
-        if i._type != 'Batch' or i._type != 'Course' or i._type !='Module':
-              a_user.append(i)
-               
+    dashboard_count.update({'activity': activity_user.count()})
+
+    #for i in activity_user:
+    #    if i._type != 'Batch' or i._type != 'Course' or i._type != 'Module':
+    #        a_user.append(i)
+    #loop replaced by a list comprehension
+    a_user=[i for i in activity_user if (i._type != 'Batch' or i._type != 'Course' or i._type != 'Module')]        
+    #a temp. variable which stores the lookup for append method
+    user_activity_append_temp=user_activity.append
     for each in a_user:
-        if each.created_by == each.modified_by :
+        if each.created_by == each.modified_by:
             if each.last_update == each.created_at:
-                activity =  'created'
+                activity = 'created'
             else:
-                activity =  'modified'
+                activity = 'modified'
         else:
-            activity =  'created'
-        
+            activity = 'created'
+
         if each._type == 'Group':
-            user_activity.append(each)
+            user_activity_append_temp(each)
         else:
             member_of = node_collection.find_one({"_id": each.member_of[0]})
-            user_activity.append(each)
-    
+            user_activity_append_temp(each)
+
     '''
-    notification_list=[]    
+    notification_list=[]
     notification_object = notification.NoticeSetting.objects.filter(user_id=int(ID))
     for each in notification_object:
         ntid = each.notice_type_id
         ntype = notification.NoticeType.objects.get(id=ntid)
         label = ntype.label.split("-")[0]
         notification_list.append(label)
-    ''' 
-    # Retrieving Tasks Assigned for User (Only "New" and "In Progress")
+    Retrieving Tasks Assigned for User (Only "New" and "In Progress")
     user_assigned = []
-    # attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    # attr_assignee = triple_collection.find(
-    #     {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": request.user.id}
-    # ).sort('last_update', -1).limit(10)
-    
-    # dashboard_count.update({'Task':attr_assignee.count()})
-    # for attr in attr_assignee :
-    #     task_node = node_collection.one({'_id':attr.subject})
-    #     if task_node:   
-    #         user_assigned.append(task_node) 
-    
-    # task_cur gives the task asigned to users
-    
-    
+    attributetype_assignee = node_collection.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    attr_assignee = triple_collection.find(
+        {"_type": "GAttribute", "attribute_type.$id": attributetype_assignee._id, "object_value": request.user.id}
+    ).sort('last_update', -1).limit(10)
+    dashboard_count.update({'Task':attr_assignee.count()})
+    for attr in attr_assignee :
+        task_node = node_collection.one({'_id':attr.subject})
+        if task_node:
+            user_assigned.append(task_node)
+    task_cur gives the task asigned to users
+    '''
+
     obj = node_collection.find(
-        {'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}}
+        {'_type': {'$in': [u"GSystem", u"File"]}, 'contributors': int(usrid),
+         'group_set': {'$all': [ObjectId(group_id)]}}
     )
-    collab_drawer = []  
-    for each in obj.sort('last_update', -1):    # To populate collaborators according to their latest modification of particular resource:
+    collab_drawer = []
+    #a temp. variable which stores the lookup for append method
+    collab_drawer_append_temp=collab_drawer.append
+    """
+    To populate collaborators according
+    to their latest modification of particular resource:
+    """
+    for each in obj.sort('last_update', -1):    
         for val in each.contributors:
-            name = User.objects.get(pk=val).username    
-            collab_drawer.append({'usrname':name, 'Id': val,'resource': each.name})   
+            name = User.objects.get(pk=val).username
+            collab_drawer_append_temp({'usrname': name, 'Id': val,
+                                  'resource': each.name})
 
     shelves = []
     datavisual = []
@@ -261,38 +276,40 @@ def uDashboard(request, group_id):
                     break
 
     forum_create_rate = forum_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
-    file_create_rate  = file_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING
-    page_create_rate  = page_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING
-    quiz_create_rate  = quiz_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
+    file_create_rate = file_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING
+    page_create_rate = page_cur.count() * GSTUDIO_RESOURCES_CREATION_RATING
+    quiz_create_rate = quiz_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
     reply_create_rate = reply_count.count() * GSTUDIO_RESOURCES_REPLY_RATING
     thread_create_rate = thread_count.count() * GSTUDIO_RESOURCES_CREATION_RATING
-    
-    datavisual.append({"name":"Forum", "count":forum_create_rate})
-    datavisual.append({"name":"File", "count":file_create_rate})
-    datavisual.append({"name":"Page", "count":page_create_rate})
-    datavisual.append({"name":"Quiz", "count":quiz_create_rate})
-    datavisual.append({"name":"Reply", "count":reply_create_rate})
-    datavisual.append({"name":"Thread", "count":thread_create_rate})
-    datavisual.append({"name":"Registration", "count":GSTUDIO_RESOURCES_REGISTRATION_RATING})
+
+    datavisual.append({"name": "Forum", "count": forum_create_rate})
+    datavisual.append({"name": "File", "count": file_create_rate})
+    datavisual.append({"name": "Page", "count": page_create_rate})
+    datavisual.append({"name": "Quiz", "count": quiz_create_rate})
+    datavisual.append({"name": "Reply", "count": reply_create_rate})
+    datavisual.append({"name": "Thread", "count": thread_create_rate})
+    datavisual.append({"name": "Registration", "count": GSTUDIO_RESOURCES_REGISTRATION_RATING})
 
     total_activity_rating = GSTUDIO_RESOURCES_REGISTRATION_RATING + (page_cur.count()  + file_cur.count()  + forum_count.count()  + quiz_count.count()) * GSTUDIO_RESOURCES_CREATION_RATING + (thread_count.count()  + reply_count.count()) * GSTUDIO_RESOURCES_REPLY_RATING
-    
+
     return render_to_response(
         "ndf/uDashboard.html",
         {
-            'usr': current_user, 'username': usrname, 'user_id': ID, 'DOJ': date_of_join, 'author':auth,
-            'group_id':group_id, 'groupid':group_id, 'group_name':group_name,
-            'already_set': is_already_selected, 'prof_pic_obj': profile_pic_image,
-            'group_count':group_cur.count(),'page_count':page_cur.count(),'file_count':file_cur.count(),
-            'user_groups':group_cur, 'user_task': task_cur, 'user_activity':user_activity,
-            'dashboard_count':dashboard_count,
-            'datavisual': json.dumps(datavisual),'show_only_pie':show_only_pie,
-            'total_activity_rating': total_activity_rating
+            'usr': current_user, 'username': usrname, 'user_id': usrid,
+            'DOJ': date_of_join, 'author': auth, 'group_id': group_id,
+            'groupid': group_id, 'group_name': group_name,
+            'already_set': is_already_selected, 'user_groups': group_cur,
+            'prof_pic_obj': profile_pic_image, 'user_task': task_cur,
+            'group_count': group_cur.count(), 'page_count': page_cur.count(),
+            'file_count': file_cur.count(), 'user_activity': user_activity,
+            'dashboard_count': dashboard_count, 'show_only_pie': show_only_pie,
+            'datavisual': json.dumps(datavisual),
+            'total_activity_rating': total_activity_rating,
+            'site_name': GSTUDIO_SITE_NAME,
          },
         context_instance=RequestContext(request)
     )
        
-   
 @get_execution_time
 def user_preferences(request,group_id,auth_id):
     try:
@@ -337,6 +354,7 @@ def user_preferences(request,group_id,auth_id):
     except Exception as e:
         print "Exception in userpreference view "+str(e)
         return HttpResponse("Failure")
+
 @get_execution_time
 def user_template_view(request,group_id):
     auth_group = None

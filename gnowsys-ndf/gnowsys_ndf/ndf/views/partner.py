@@ -18,17 +18,19 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
 
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups, get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import *
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 
 # ######################################################################################################################################
 
 gst_group = node_collection.one({"_type": "GSystemType", 'name': GAPPS[2]})
+partner_group_gst = node_collection.one({"_type": "GSystemType", 'name': u'PartnerGroup'})
 get_all_usergroups=get_all_user_groups()
 at_apps_list=node_collection.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
 ins_objectid  = ObjectId()
@@ -57,7 +59,8 @@ def create_partner(request,group_id):
   if request.method == "POST":
     colg = node_collection.collection.Group()
     Mod_colg = node_collection.collection.Group()
-
+    street = request.POST.get('street', "")
+    
     cname = request.POST.get('groupname', "").strip()
     colg.altnames = cname
     colg.name = unicode(cname)
@@ -72,15 +75,29 @@ def create_partner(request,group_id):
     if usrid not in colg.contributors:
       colg.contributors.append(usrid)
 
-    colg.group_type = request.POST.get('group_type', "")        
-    colg.edit_policy = request.POST.get('edit_policy', "")
-    colg.subscription_policy = request.POST.get('subscription', "")
+    #colg.group_type = request.POST.get('group_type', "")        
+    #colg.edit_policy = request.POST.get('edit_policy', "")
+    #colg.subscription_policy = request.POST.get('subscription', "")
     colg.visibility_policy = request.POST.get('existance', 'ANNOUNCED')
     colg.disclosure_policy = request.POST.get('member', 'DISCLOSED_TO_MEM')
     colg.encryption_policy = request.POST.get('encryption', 'NOT_ENCRYPTED')
     colg.agency_type = "Partner"
     colg.save()
-
+    # get alll attribute associated with partner
+    attribute_set=colg.get_possible_attributes(colg.member_of).keys()
+    activ="Request to become a partner"
+    msg = colg.name+" is interested to became a partner on the platform "
+    set_notif_val(request, colg._id, msg, activ, request.user)           
+    for each in attribute_set:
+        
+        if each !="apps_list":
+            obj_val = request.POST.get(each, "").strip()
+            att_type=node_collection.one({'_type':"AttributeType","name":each})
+            # set  Attribute type values for partner
+            create_gattribute(colg._id, att_type , object_value = obj_val)
+         
+ 
+       
     if colg.edit_policy == "EDITABLE_MODERATED":
       Mod_colg.altnames = cname + "Mod" 
       Mod_colg.name = cname + "Mod"     
@@ -159,7 +176,7 @@ def partner_list(request, group_id):
     # print GSTUDIO_NROER_MENU
     return render_to_response("ndf/partner_list.html", 
                           {'group_nodes': collection_set, "groups_category": groups_category,
-                           'groupid': group_id, 'group_id': group_id
+                           'groupid': group_id, 'group_id': group_id, "app_gst": partner_group_gst,
                           }, context_instance=RequestContext(request))
 
 
@@ -184,10 +201,17 @@ def nroer_groups(request, group_id, groups_category):
                                         'name': {'$nin': ["home"], '$in': groups_names_list},
                                         'group_type': "PUBLIC"
                                      })#.sort('last_update', -1)
-    
+
+    if groups_category == "Partners":
+        app_gst = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
+
+    elif groups_category == "Groups":
+        app_gst = gst_group
+
+    # print "=============", app_gst
     group_nodes_count = group_nodes.count() if group_nodes else 0
     return render_to_response("ndf/partner.html", 
                           {'group_nodes': group_nodes, "groups_category": groups_category,
-                           'group_nodes_count': group_nodes_count,
+                           'group_nodes_count': group_nodes_count, 'app_gst': app_gst,
                            'groupid': group_id, 'group_id': group_id
                           }, context_instance=RequestContext(request))

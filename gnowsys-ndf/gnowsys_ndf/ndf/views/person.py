@@ -44,7 +44,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     if group_ins:
       group_id = str(group_ins._id)
     else :
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
       if auth :
         group_id = str(auth._id)
   else :
@@ -71,6 +71,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   nodes = None
   nodes_keys = []
   node = None
+  response_dict = {'success': False}
   property_order_list = []
   widget_for = []
   is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
@@ -85,12 +86,22 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     agency_type = auth.agency_type
     agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
-      for eachset in agency_type_node.collection_set:
-        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+ #     for eachset in agency_type_node.collection_set:
+ #      app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+      #loop replaced by a list comprehension
+      app_collection_set=[node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}) for eachset in agency_type_node.collection_set]
+
 
   if app_set_id:
     person_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
     title = person_gst.name
+    column_headers = None
+    query = {}
+    college = {}
+    course = {}
+    ac_data_set = []
+    records_list = []
+    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
 
     if title == "Student":
       person_gs = node_collection.collection.GSystem()
@@ -107,9 +118,105 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                   ]
       widget_for = get_widget_built_up_data(widget_for, person_gs)
 
-      for each in univ_cur:
-        univ_list.append(each)
-  
+#     for each in univ_cur:
+#       univ_list.append(each)
+      #loop replaced by a list comprehension
+      univ_list=[each for each in univ_cur]
+
+
+    elif title == "Program Officer" or title == "Voluntary Teacher":
+        query = {
+            "member_of": person_gst._id,
+        }
+
+        if title == "Program Officer":
+            res = node_collection.collection.aggregate([
+                {
+                    '$match': query
+                }, {
+                    '$project': {
+                        '_id': 0,
+                        'person_id': "$_id",
+                        'name': '$name',
+                        'college':'$relation_set.officer_incharge_of',
+                        'email_id': '$attribute_set.email_id',
+                    }
+                },
+                {
+                    '$sort': {'name': 1}
+                }
+            ])
+        else:
+            res = node_collection.collection.aggregate([
+                {
+                    '$match': query
+                }, {
+                    '$project': {
+                        '_id': 0,
+                        'person_id': "$_id",
+                        'name': '$name',
+                        'collegecourse': '$relation_set.trainer_teaches_course_in_college',
+                        'email_id': '$attribute_set.email_id',
+                    }
+                },
+                {
+                    '$sort': {'name': 1}
+                }
+            ])
+
+        records_list = res["result"]
+        colg_list_name = []
+        if records_list:
+            for each in res["result"]:
+                if 'college' in each:
+                    if each['college']:
+                        if each["college"][0]:
+                            colg_list_name = []
+                            for each_col in each["college"][0]:
+                                colg_id = each_col
+                                colg_node = node_collection.one({'_id':ObjectId(colg_id)})
+                                colg_list_name.append(colg_node.name)
+                each["college"] = colg_list_name
+                colg_list_name = []
+                str_colg_course = ""
+                if 'collegecourse' in each:
+                    if each['collegecourse']:
+                        if each["collegecourse"][0]:
+                            # each["collegecourse"][0] is list of lists
+                            for eachcc in each["collegecourse"][0]:
+                                # eachcc is one list holding Course and College
+                                first = True
+                                for colg_course in eachcc:
+                                    n = node_collection.one({'_id': ObjectId(colg_course)}).name
+                                    str_colg_course += n
+                                    if first:
+                                        str_colg_course += " - "
+                                    else:
+                                        str_colg_course += "; "
+                                    first = False
+                                    # print "\n\nvt", eachcc
+                                    # colg_list_name = eachcc
+                    each["college"] = str_colg_course
+                ac_data_set.append(each)
+                colg_list_name = []
+
+
+        column_headers = [
+                    ("person_id", "Edit"),
+                    ("name", "Name"),
+                    ("email_id", "Email"),
+                    ("college", "College"),
+        ]
+
+        response_dict["column_headers"] = column_headers
+        response_dict["success"] = True
+        response_dict["students_data_set"] = ac_data_set
+        response_dict["groupid"] = group_id
+        response_dict["app_id"] = app_id
+        response_dict["app_set_id"] = app_set_id
+
+        template = "ndf/person_list.html"
+
     else:
       query = {}
       if request.method == "POST":
@@ -206,8 +313,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
         ('email_id', 'Email ID')
       ]
 
-    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
-    default_template = "ndf/person_list.html"
+    default_template = "ndf/mis_list.html"
 
   if app_set_instance_id:
     template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_details.html"
@@ -224,11 +330,12 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                         'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
                         'property_order_list': property_order_list, 'lstFilters': widget_for,
                         'univ_list':json.dumps(univ_list, cls=NodeJSONEncoder),
-                        'is_link_needed': is_link_needed
+                        'is_link_needed': is_link_needed,
+                        'response_dict':json.dumps(response_dict, cls=NodeJSONEncoder)
                       }
 
   try:
-    return render_to_response([template, default_template], 
+    return render_to_response([template, default_template],
                               context_variables,
                               context_instance = RequestContext(request)
                             )
@@ -281,6 +388,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   college_id = None
   student_enrollment_code = u""
   create_student_enrollment_code = False
+  existing_colg = []
   registration_date = None
 
   property_order_list = []
@@ -330,7 +438,9 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       person_gs.status = u"PUBLISHED"
 
     person_gs.save(is_changed=is_changed)
-
+    for each_rel in person_gs.relation_set:
+      if each_rel and "officer_incharge_of" in each_rel:
+        existing_colg = each_rel["officer_incharge_of"]
     if college_node:
         mis_admin = node_collection.one({
             "_type": "Group",
@@ -476,7 +586,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               for college_id in rel["officer_incharge_of"]:
                 if college_id not in college_id_list:
                   college_id_list.append(college_id)
-              
               break  # break outer-loop (of relation_set)
 
         if college_id_list:
@@ -494,7 +603,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 if rel["has_group"]:
                   if rel["has_group"][0] not in college_group_id_list:
                     college_group_id_list.append(rel["has_group"][0])
-                  
+
                   break  # break inner-loop (college.relation_set)
 
           if college_group_id_list:
@@ -505,8 +614,55 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               {'$addToSet': {'group_admin': auth_node.created_by}},
               upsert=False, multi=True
             )
+        old_college_id_list = []
+        if existing_colg:
+          if len(existing_colg) > len(college_id_list):
+            for each_colg_id in existing_colg:
+              if each_colg_id not in college_id_list:
+                old_college_id_list.append(each_colg_id)
 
-    return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
+            old_college_cur = node_collection.find(
+              {'_id': {'$in': old_college_id_list}},
+              {'relation_set.has_group': 1}
+            )
+
+            old_college_group_id_list = []
+            for college in old_college_cur:
+              for rel in college.relation_set:
+                if rel and "has_group" in rel:
+                  if rel["has_group"]:
+                    if rel["has_group"][0] not in old_college_group_id_list:
+                      old_college_group_id_list.append(rel["has_group"][0])
+
+                    break  # break inner-loop (college.relation_set)
+
+            if old_college_group_id_list:
+              # If college-group list exists
+              # Then update their group_admin field (remove PO's created_by)
+              res = node_collection.collection.update(
+                {'_id': {'$in': old_college_group_id_list}, '$or': [{'group_admin': auth_node.created_by},
+                {'author_set': auth_node.created_by}]},
+                {'$pull': {'group_admin': auth_node.created_by, 'author_set': auth_node.created_by}},
+                upsert=False, multi=True
+              )
+              # The code below is commented as the college groups are PRIVATE.
+              # for rel in person_gs.relation_set:
+              #   if rel and "officer_incharge_of" in rel:
+              #       pass
+              #   else:
+              #       node_collection.collection.update({'_id': auth_node._id},
+              #       {'$set': {'agency_type': u"Other"}},
+              #       upsert=False, multi=False
+              #       )
+              # Its purpose is to change the agency type back to Other
+
+              auth_node.reload()
+    # if person_gst.name != "Student":
+    #     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
+    # else:
+    return HttpResponseRedirect(reverse('mis:mis_app_instance_detail',kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id, "app_set_instance_id":unicode(person_gs._id)}))
+
+    # return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   default_template = "ndf/person_create_edit.html"
 
@@ -560,8 +716,8 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
             each_course_college[1]._id.__str__(),
             univ_name
         ))
-
-      person_gs.trainer_teaches_course_in_college = l
+      if l:
+        person_gs.trainer_teaches_course_in_college = l
 
     context_variables['node'] = person_gs
 
@@ -570,13 +726,11 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                               context_variables,
                               context_instance = RequestContext(request)
                             )
-  
+
   except TemplateDoesNotExist as tde:
     error_message = "\n PersonCreateEditViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
-  
+
   except Exception as e:
     error_message = "\n PersonCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
-
-

@@ -1,4 +1,3 @@
-
 ''' -- Imports from python libraries -- '''
 import json
 import hashlib
@@ -6,10 +5,14 @@ import magic
 import subprocess
 import mimetypes
 import os
+import tempfile
 # import re
+import ast
 import ox
+import pandora_client
 import threading
-from PIL import Image, ImageDraw  # install PIL example:pip install PIL
+
+from PIL import Image, ImageDraw
 from StringIO import StringIO
 
 ''' -- imports from installed packages -- '''
@@ -19,12 +22,17 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import get_valid_filename
+from django.core.files.move import file_move_safe
+from django.core.files.temp import gettempdir
+from django.core.files.uploadedfile import UploadedFile # django file handler
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from mongokit import paginator
+
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id  # , get_page
@@ -34,6 +42,9 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
+from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls ,create_gattribute
+from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 ############################################
 
@@ -41,16 +52,15 @@ GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
 GST_IMAGE = node_collection.one({'_type':'GSystemType', 'name': 'Image'})
 GST_VIDEO = node_collection.one({'_type':'GSystemType', 'name': 'Video'})
 pandora_video_st = node_collection.one({'_type':'GSystemType', 'name':'Pandora_video'})
-app=GST_FILE
+app = GST_FILE
 
-
-lock=threading.Lock()
+lock = threading.Lock()
 count = 0    
 
 @get_execution_time
 def file(request, group_id, file_id=None, page_no=1):
     """
-   * Renders a list of all 'Files' available within the database.
+    Renders a list of all 'Files' available within the database.
     """
     ins_objectid  = ObjectId()
     is_video = request.GET.get('is_video', "")
@@ -74,7 +84,6 @@ def file(request, group_id, file_id=None, page_no=1):
     shelves = []
     shelf_list = {}
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
     #   dbref_has_shelf = has_shelf_RT.get_dbref()
@@ -268,7 +277,7 @@ def file(request, group_id, file_id=None, page_no=1):
       already_uploaded = request.GET.getlist('var', "")
       return render_to_response("ndf/file.html",
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId':app._id, "app_gst": app, 
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
@@ -362,10 +371,9 @@ def file(request, group_id, file_id=None, page_no=1):
       datavisual.append({"name":"Video","count":videoCollection.count()})
       #datavisual.append({"name":"Pandora Video","count":pandoraCollection.count()})
       datavisual = json.dumps(datavisual)
-
       return render_to_response("ndf/file.html", 
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId':app._id, "app_gst": app,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
                                  'file_pages': file_pages, 'image_pages': images_pc.count(),
@@ -443,6 +451,8 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
 def paged_file_objs(request, group_id, filetype, page_no):
     '''
     Method to implement pagination in File and E-Library app.
+
+
     '''
     if request.is_ajax() and request.method == "POST":
 
@@ -619,7 +629,6 @@ def paged_file_objs(request, group_id, filetype, page_no):
             result_cur = result_dict["result_cur"]
             result_paginated_cur = result_dict["result_cur"]
             result_pages = result_dict["result_pages"]
-     
         return render_to_response ("ndf/file_list_tab.html", {
                 "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
                 "resource_type": result_paginated_cur, "detail_urlname": "file_detail", 
@@ -662,21 +671,15 @@ def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        # print group_id
-        pass
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     alreadyUploadedFiles = []
+    #a temp. variable which stores the lookup for append method
+    alreadyUploadedFiles_append_temp=alreadyUploadedFiles.append
     str1 = ''
     img_type=""
     topic_file = ""
@@ -715,38 +718,60 @@ def submitDoc(request, group_id):
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
+                    # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
                     f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
+
                 else:
                     title = mtitle + "_" + str(i) #increament title        
                     f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
                     i = i + 1
             else:
                 title = each.name
+
+                # f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
+                # print "f: ", f
+            # if not obj_id_instance.is_valid(f):
+            # check if file is already uploaded file
+            # if isinstance(f, list):
                 f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
-            if not obj_id_instance.is_valid(f):
-              alreadyUploadedFiles.append(f)
+
+            if isinstance(f, list):
+              alreadyUploadedFiles_append_temp(f)
               title = mtitle
         
         # str1 = alreadyUploadedFiles
        
         if img_type != "": 
+            # print "----------1-----------"
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))
 
         elif topic_file != "": 
             
+            # print "----------2-----------"
             return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
         else:
             if alreadyUploadedFiles:
                 # return HttpResponseRedirect(page_url+'?var='+str1)
                 # if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
-                return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
+                # print "----------3-----------", alreadyUploadedFiles[0][1]
+                return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][1].__str__() }))
                 # else:
                     # if alreadyUploadedFiles[0][1]:
                         # return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
             else:
-                return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
+                group_object = node_collection.one({'_id': ObjectId(group_id)})
+
+                if group_object.edit_policy == 'EDITABLE_MODERATED' and isinstance(f, ObjectId):
+                    # print "----------4-----------"
+                    fileobj = node_collection.one({'_id': ObjectId(f)})
+                    # newly appended group id in group_set is at last
+                    create_moderator_task(request, fileobj.group_set[len(fileobj.group_set)-1], fileobj._id)
+                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_id, 'node_id': f }))
+                else:
+                    # print "----------5-----------"
+                    return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
 
                 # if is_video == "True":
                 #     return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
@@ -754,6 +779,7 @@ def submitDoc(request, group_id):
                 #     return HttpResponseRedirect(page_url)
 
     else:
+        # print "----------6-----------"
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
 
 
@@ -777,76 +803,66 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
     size, unit = getFileSize(files)
-    size = {'size':round(size, 2), 'unit':unicode(unit)}
-    
-    if fileobj.fs.files.exists({"md5":filemd5}):
+    size = {'size': round(size, 2), 'unit': unicode(unit)}
+
+    if fileobj.fs.files.exists({"md5": filemd5}):
         # gridfs_collection = get_database()['fs.files']
-	cur_oid = gridfs_collection.find_one({"md5":filemd5}, {'docid':1, '_id':0})
-	# coll_new = get_database()['Nodes']
-	new_name = node_collection.find_one({'_id':ObjectId(str(cur_oid["docid"]))})     
+        cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+
+        # coll_new = get_database()['Nodes']
+        new_name = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
         # if calling function is passing oid=True as last parameter then reply with id and name.
         if "oid" in kwargs:
-          if kwargs["oid"]: 
-            # gridfs_collection = get_database()['fs.files']
-            cur_oid = gridfs_collection.find_one({"md5":filemd5}, {'docid':1, '_id':0})
-            # returning only ObjectId (of GSystem containing file info) in dict format.
-            # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
-            return cur_oid["docid"], 'True'
+            if kwargs["oid"]:
+                # gridfs_collection = get_database()['fs.files']
+                cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+                # returning only ObjectId (of GSystem containing file info) in dict format.
+                # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
+                return cur_oid["docid"], 'True'
         else:
-            return [files.name, new_name.name],'True'
+            # print "already Uploaded file"
+            return [files.name, new_name._id], 'True'
 
     else:
         try:
             files.seek(0)
-            filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
+            filetype = magic.from_buffer(files.read(100000), mime='true')  # Gusing filetype by python-magic
             filetype1 = mimetypes.guess_type(files.name)[0]
             if filetype1:
                 filetype1 = filetype1
-            else :
+            else:
                 filetype1 = ""
             filename = files.name
             fileobj.name = unicode(title)
 
             if language:
-                fileobj.language= unicode(language)
+                fileobj.language = unicode(language)
             fileobj.created_by = int(userid)
 
             fileobj.modified_by = int(userid)
-
+            fileobj.status = u'PUBLISHED'
             if int(userid) not in fileobj.contributors:
                 fileobj.contributors.append(int(userid))
-            
             if access_policy:
-                fileobj.access_policy = unicode(access_policy) # For giving privacy to file objects   
-            
+                fileobj.access_policy = unicode(access_policy)  # For giving privacy to file objects
             fileobj.file_size = size
 
+            group_object = node_collection.one({'_id': ObjectId(group_id)})
+
+            if group_object._id not in fileobj.group_set:
+                # group id stored in group_set field
+                fileobj.group_set.append(group_object._id)
+
+            # if group is of EDITABLE_MODERATED, update group_set accordingly
+            if group_object.edit_policy == "EDITABLE_MODERATED":
+                fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
+                fileobj.status = u'MODERATION'
+
             if usrname:
-              user_obj = User.objects.get(username=usrname)
-              user_group_object=node_collection.one({'_type': "Author", 'name':usrname})
-
-
-            group_object = node_collection.one({'_id':ObjectId(group_id)})
-            mod_group = node_collection.one({'_type': "Group", 'name': "Clearing House Of "+group_object.name, 'group_type': "PRIVATE" })
-            
-            if group_object.edit_policy == "EDITABLE_MODERATED" or group_object.name == "home":
-              if mod_group:
-                if not fileobj.group_set:
-                  # Contributors area to save resources in moderated i.e clearing house group
-                  fileobj.group_set.append(mod_group._id)
-                  # To store the author group id into the group_set(So that till resource not published by curators it should visible for user in its user space)
-                  fileobj.group_set.append(user_group_object._id)
-                # if user_obj.pk != group_object.created_by or user_obj.pk not in group_object.group_admin:
-
-                elif mod_group._id in fileobj.group_set and user_obj.pk in group_object.group_admin:
-                  # Group admins i.e curators area to save resources
-                  if mod_group._id in fileobj.group_set :
-                    fileobj.group_set.remove(mod_group._id)
-                  if group_object._id not in fileobj.group_set:
-                    fileobj.group_set.append(group_object._id)
-
-                  # After publishing resource to original group notification will receive to all subscribe users of the group
-
+                user_group_object = node_collection.one({'$and': [{'_type': u'Author'},{'name': usrname}]})
+                if user_group_object:
+                    if user_group_object._id not in fileobj.group_set:  # File creator_group_id stored in group_set field
+                        fileobj.group_set.append(user_group_object._id)
 
             # Commented bellow code to avoid redundancy (this will be removed once testing done)
             # if group_object._id not in fileobj.group_set:
@@ -857,22 +873,20 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             #         if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
             #             fileobj.group_set.append(user_group_object._id)
 
-
             fileobj.member_of.append(GST_FILE._id)
-            #### ADDED ON 14th July.IT's DONE
+            #  ADDED ON 14th July.IT's DONE
             fileobj.url = set_all_urls(fileobj.member_of)
             fileobj.mime_type = filetype
-            if img_type == "" or img_type == None:
+            if img_type == "" or img_type is None:
                 if content_org:
                     fileobj.content_org = unicode(content_org)
                     # Required to link temporary files with the current user who is modifying this document
                     filename_content = slugify(title) + "-" + usrname + "-"
-                    fileobj.content = org2html(content_org, file_prefix = filename_content)
+                    fileobj.content = org2html(content_org, file_prefix=filename_content)
 
                 if not type(tags) is list:
                     tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
                 fileobj.tags = tags
-            
 
             # new fields added
             fileobj.license = unicode(license)
@@ -912,119 +926,98 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
               basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
               basedUrl = create_gattribute(fileobj._id, basedonurl_AT, Based_url)                
 
-
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
-            node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
-            
+            node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
+
             # For making collection if uploaded file more than one
             if count == 0:
                 first_object = fileobj
             else:
-                node_collection.find_and_modify({'_id':first_object._id},{'$push':{'collection_set':fileobj._id}})
-                
-                
-            """ 
-            code for converting video into webm and converted video assigning to varible files
+                node_collection.find_and_modify({'_id': first_object._id}, {'$push': {'collection_set': fileobj._id}})
+
             """
-            if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
-                is_video = 'True'
-                node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_VIDEO._id}})
-                node_collection.find_and_modify({'_id':fileobj._id},{'$set':{'mime_type':'video'}})
-            	# webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
-	       
+            code for uploading video to wetube.gnowledge.org
+            """
+            if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') is True:
+                
+                # --- code for wetube processing part ---
+
+                # is_video = 'True'
+                # path = files.temporary_file_path() # method gets temporary location of the file
+                # base_url = "http://wetube.gnowledge.org/"
+                # api_url = base_url + "api/"
+                # # connenting to wetube api using pandora_client                                                                  
+                # api = pandora_client.API(api_url)
+                # # signin takes username, password & returns user data                                                          
+                # api.signin(username=WETUBE_USERNAME, password=WETUBE_PASSWORD)
+                # # return metadata about the file                                                                                  
+                # info = ox.avinfo(path)
+                # oshash = info['oshash']
+                # # add media file the given item                                                                                    
+                # r = api.addMedia({
+                #     'id': oshash,
+                #     'filename': fileobj.name,
+                #     'info': info
+                # })
+                # # return unique item id for file                                                                                 
+                # item = r['data']['item']
+                # url = '%supload/direct/' % api_url
+                # # upload one or more media file for given item                                                                                   
+                # r = api.upload_chunks(url, path, {
+                #     'id': oshash
+                # })
+                # --- END of code for wetube processing part ---
+
+                fileobj.reload()
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_VIDEO._id}})
+                # node_collection.find_and_modify({'_id': fileobj._id}, {'$set': {'mime_type': 'video'}})
+                fileobj.reload()
+
+                # --- code for wetube processing part ---
+                # # create gattribute 
+                # source_id_AT = node_collection.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+                # create_gattribute(fileobj._id, source_id_AT, unicode(item))
+                # --- END of code for wetube processing part ---
+
+                # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
+
                 # '''storing thumbnail of video with duration in saved object'''
                 # tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
-       	        
                 # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-                
-       	        # if filename.endswith('.webm') == False:
+                # if filename.endswith('.webm') == False:
                 #     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
                 #     # saving webm video id into file object
                 #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-                
+
                 '''creating thread for converting vedio file into webm'''
-                t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
-                t.start()
-            
-            '''storing thumbnail of pdf and svg files  in saved object'''        
+                #t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
+                #t.start()
+
+            '''storing thumbnail of pdf and svg files  in saved object'''
             # if 'pdf' in filetype or 'svg' in filetype:
             #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
             #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-             
-            
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
-                node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
                 thumbnailimg = convert_image_thumbnail(files)
                 tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
-                node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-                
+                node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': tobjectid}})
+
                 files.seek(0)
                 mid_size_img = convert_mid_size_image(files)
-                if  mid_size_img:
+                if mid_size_img:
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-                    node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
+                    node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
 
-            # Create a task for curators and assign task
-            if mod_group:
-              task_node = node_collection.collection.GSystem()
-              GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
-              object_value = []
-              assignees = []
-              assignee_names = []
-              sitename = Site.objects.all()
-              sitename = sitename[0]
-              res_link = u"Click here to go for curation: http://"+sitename.name+"/"+mod_group.name.replace(" ","%20").encode('utf8')+"/file/"+str(fileobj._id)
-
-              # Create a task first time while uploading resource
-              task_node.name = u"Resource '"+fileobj.name+"' reported for curation"
-              task_node.created_by = user_obj.pk
-              task_node.group_set.append(mod_group._id)
-              task_node.member_of.append(GST_TASK._id)
-              task_node.content_org = unicode(res_link)
-              task_node.modified_by = user_obj.pk
-              task_node.status = u"DRAFT"
-              task_node.contributors.append(user_obj.pk)
-              task_node.save()
-
-              if task_node:
-                assignee_AT = node_collection.find_one({"_type": 'AttributeType', 'name': "Assignee" })
-                # List the group admins for assigning a task 
-                for each in group_object.group_admin:
-                  object_value.append(each)
-
-                for each in group_object.group_admin:
-                  assignees.append(User.objects.get(pk=int(each)) )
-
-                for each in group_object.group_admin:
-                  assignee_names.append(User.objects.get(pk=int(each)).username )
-
-                # This sets assignees to task by setting attribute
-                ga_node = create_gattribute(task_node._id, assignee_AT, object_value)
-
-                # variable to hold user id for sending notification about its contribution
-                user_notified = user_obj
-                # Variable to hold list of group admins for assigning a task for curation of user contribution
-                task_assignees = assignees
-
-                for user in task_assignees:
-                  task_lable = "Task reported"
-                  msg = task_node.name + \
-                    "' Resource uploaded by " + user_obj.username + \
-                    "\n     - Status: Pending" + \
-                    "\n     - Assignee: " + ", ".join(assignee_names) + \
-                    "\n     - Url: http://" + sitename.name + "/" + mod_group.name.replace(" ","%20").encode('utf8') + "/task/" + str(task_node._id)
-
-                  set_notif_val(request, mod_group._id, msg, task_lable, user)
-
-
-
             return fileobj._id, is_video
+
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
+
 
 @get_execution_time
 def getFileSize(File):
@@ -1041,6 +1034,8 @@ def getFileSize(File):
     except Exception as e:
         print "Unabe to calucalate size",e
         return 0,'bytes'
+
+
 @get_execution_time                     
 def convert_image_thumbnail(files):
     """
@@ -1054,6 +1049,8 @@ def convert_image_thumbnail(files):
     img.save(thumb_io, "JPEG")
     thumb_io.seek(0)
     return thumb_io
+
+
 @get_execution_time
 def convert_pdf_thumbnail(files,_id):
     '''
@@ -1069,6 +1066,7 @@ def convert_pdf_thumbnail(files,_id):
     thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
     return thumb_pdf
     
+
 @get_execution_time
 def convert_mid_size_image(files, **kwargs):
     """
@@ -1102,7 +1100,6 @@ def convert_mid_size_image(files, **kwargs):
     mid_size_img.seek(0)
 
     return mid_size_img
-
     
 
 def convertVideo(files, userid, fileobj, filename):
@@ -1164,6 +1161,7 @@ def convertVideo(files, userid, fileobj, filename):
 	
         node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 	
+
 @get_execution_time
 def GetDoc(request, group_id):
     ins_objectid  = ObjectId()
@@ -1183,6 +1181,7 @@ def GetDoc(request, group_id):
     template = "ndf/DocumentList.html"
     variable = RequestContext(request, {'filecollection':files,'groupid':group_id,'group_id':group_id})
     return render_to_response(template, variable)
+
 
 @get_execution_time
 def file_search(request, group_id):
@@ -1204,6 +1203,7 @@ def file_search(request, group_id):
         template = "ndf/file_search.html"
         variable = RequestContext(request, {'file_collection':file_search, 'view_name':'file_search','groupid':group_id,'group_id':group_id})
         return render_to_response(template, variable)
+
 
 @login_required    
 @get_execution_time
@@ -1237,25 +1237,26 @@ def delete_file(request, group_id, _id):
     print "Exception:", e
   return HttpResponseRedirect(pageurl) 
 
+
 @get_execution_time
 def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
-    ins_objectid  = ObjectId()
-    imageCollection=""
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    imageCollection = ""
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
 
-
+    group_name, group_id = get_group_name_id(group_id)
     file_node = node_collection.one({"_id": ObjectId(_id)})
     file_node.get_neighbourhood(file_node.member_of)
     if file_node._type == "GSystemType":
@@ -1311,16 +1312,19 @@ def file_detail(request, group_id, _id):
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
         shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
-        
+        #a temp. variable which stores the lookup for append method
+        shelves_append_temp=shelves.append
         if shelf:
             for each in shelf:
                 shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
-                shelves.append(shelf_name)
+                shelves_append_temp(shelf_name)
 
-                shelf_list[shelf_name.name] = []         
+                shelf_list[shelf_name.name] = []
+                #a temp. variable which stores the lookup for append method
+                shelf_list_shelfname_append_temp=shelf_list[shelf_name.name].append      
                 for ID in shelf_name.collection_set:
                     shelf_item = node_collection.one({'_id': ObjectId(ID) })
-                    shelf_list[shelf_name.name].append(shelf_item.name)
+                    shelf_list_shelfname_append_temp(shelf_item.name)
                 
         else:
             shelves = []
@@ -1338,28 +1342,29 @@ def file_detail(request, group_id, _id):
                               },
                               context_instance = RequestContext(request)
                              )
+
+
 @get_execution_time
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    ins_objectid = ObjectId()
+    if ins_objectid.is_valid(group_id) is False:
+        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
+        elif auth:
+            group_id = str(auth._id)
+    else:
         pass
 
     file_node = node_collection.one({"_id": ObjectId(_id)})
-
+    """
     if file_node is not None:
         if file_node.fs_file_ids:
           # getting latest uploaded pic's _id
+
           file_fs = ""
           if len(file_node.fs_file_ids) > 1:
             file_fs = file_node.fs_file_ids[2]
@@ -1379,6 +1384,26 @@ def getFileThumbnail(request, group_id, _id):
             return HttpResponse("")
     else:
         return HttpResponse("")
+    """
+    if file_node is not None:
+        fs_file_ids = file_node.fs_file_ids
+        if fs_file_ids and len(fs_file_ids) == 3:
+          # getting latest uploaded pic's _id
+          # file_fs = file_node.fs_file_ids[2]
+
+          # if (file_node.fs.files.exists(file_fs)):
+
+          f = file_node.fs.files.get(ObjectId(fs_file_ids[2]))
+
+          return HttpResponse(f.read(), content_type=f.content_type)
+
+          # else:
+          #     return HttpResponse("")
+        else:
+            return HttpResponse("")
+    else:
+        return HttpResponse("")
+
 
 @get_execution_time
 def readDoc(request, _id, group_id, file_name=""):
@@ -1414,6 +1439,8 @@ def readDoc(request, _id, group_id, file_name=""):
             return HttpResponse("")
     else:
         return HttpResponse("")
+
+        
 @get_execution_time
 def file_edit(request,group_id,_id):
     ins_objectid  = ObjectId()
@@ -1445,7 +1472,7 @@ def file_edit(request,group_id,_id):
             if file_node:
               get_node_metadata(request,file_node)
         # End of filling metadata
-
+        
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:

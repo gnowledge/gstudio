@@ -1,6 +1,6 @@
 {% extends "registration/registration_base.html" %}
 {% load i18n %}
-
+{% load ndf_tags %}
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block style %}
@@ -19,7 +19,7 @@
 {% block body_content %} 
 	{% url 'auth_password_reset' as auth_pwd_reset_url %}
 	{% url 'registration_register' as register_url %}
-
+    
     <div class="row" style="margin: 1.2rem 0;">
         <div class="small-8 medium-8 large-8 small-centered medium-centered large-centered columns">
             <div class="row">
@@ -70,29 +70,33 @@
 						{{ form.password }}
 					</div>
 				</div>
-
+				<div class = "captcha-feild">
+					{% include "ndf/Captcha.html" %}
+				</div>	
 				<!-- Login button -->
 				<div class="row">
 					<div class="small-2 large-2 small-offset-3 large-offset-3 columns end">
-						<input type="submit" class="button small expand" value="{% trans "Login" %}" style="font-size:15px" />
+						<input type="submit" class="button small expand" tabindex= "3" value="{% trans "Login" %}" style="font-size:15px" />
 					</div>
 				</div>
 
 				<!-- Forgot password link & New Registration link -->
-				<div class="row">
-					<div class="small-6 large-6 small-offset-1 large-offset-1 columns end">
-						<center>
-						<label>
-						<a title="Click here to register" href="{{ register_url }}">
-							{% trans "Don't have an account? Register yourself now." %}
-						</a>
-						</label>
-						</center>
+      			{% if site.SITE_NAME != "NROER" %} 
+					<div class="row">
+						<div class="small-6 large-6 small-offset-1 large-offset-1 columns end">
+							<center>
+							<label>
+							<a title="Click here to register" href="{{ register_url }}">
+								{% trans "Don't have an account? Register yourself now." %}
+							</a>
+							</label>
+							</center>
+						</div>
 					</div>
-				</div>
-				    
-				<!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+				{% endif %}
+				<input type="hidden" name="next" value="{{ next }}" />
 			</form>
+
 		</div>
 	</div>
 {% endblock %}
@@ -103,12 +107,22 @@
 	// Setting tabindex for following html elements
 	$("#id_username").attr("tabindex", "1");
 	$("#id_password").attr("tabindex", "2");
-	$("a[title='Recover your password']").attr("tabindex", "3");
-	$("a[title='Click here to register']").attr("tabindex", "4");
+	$("a[title='Recover your password']").attr("tabindex", "4");
+	$("a[title='Click here to register']").attr("tabindex", "5");
 
 	$("input[id='id_username'], input[id='id_password']").each(function(){
 		$(this).attr("required", "");
 		$(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
 	});
+    
+	//Code to refresh the Captcha
+    $('.js-captcha-refresh').click(function(){
+    $form = $(this).parents('form');
 
+    $.getJSON($(this).data('url'), {}, function(json) {
+        // This should update your captcha image src and captcha hidden input
+    });
+
+    return false;
+	});
 {% endblock %}

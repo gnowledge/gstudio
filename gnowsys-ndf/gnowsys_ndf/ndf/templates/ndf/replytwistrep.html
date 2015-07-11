@@ -10,42 +10,38 @@
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
 <script type="text/javascript">
-function reply_del{{eachrep}}() {
-   var repl_count=$("#replycount{{eachrep}}").val();
-   if (repl_count <= 0)
-   {
-      if (!window.confirm("Are you sure you want to delete this ?"))
-      {
-         $("edit-options").class="f-dropdown";		
-         return false;
+
+  function reply_del{{eachrep}}() {
+    var repl_count=$("#replycount{{eachrep}}").val();
+  
+    if (repl_count <= 0) {
+      if (!window.confirm("Are you sure you want to delete this ?")) {
+        $("edit-options").class="f-dropdown";		
+        return false;
       }
-   }
-   else
-   {
+    }
+    else {
       alert("This reply has "+repl_count +" existing replies.Please delete them and then try again.");
       $("edit-options").hide();
       return false;
-   }
-}
+    }
+  }
+  
   $(document).ready(function(){
-
     $("#orgitdownreps{{eachrep}}").orgitdown(mySettings);
 
-    $("#reply_forum{{eachrep}}").on("click",function(){
-
+    $("#reply_forum{{eachrep}}").on("click", function() {
       document.getElementById('org{{eachrep}}').style.visibility='visible';
       $("#org{{eachrep}}").css("display","block");
-
     });
 
-    $("#savereply{{eachrep}}").on("click",function(){
+    $("#savereply{{eachrep}}").on("click", function() {
 
-      var contento=$('#orgitdownreps{{eachrep}}').val()
+      var contento=$('#orgitdownreps{{eachrep}}').val();
 
       $('#orgitdownreps{{eachrep}}').val("");
       
-      if (contento != "")
-      {
+      if (contento != "") {
         var repl=$("#rep{{eachrep}}").val();
         var thd=$("#thd{{eachrep}}").val();
         var twname=""
@@ -54,46 +50,37 @@ function reply_del{{eachrep}}() {
         var ajurl="/"+gpid+"/forum/add_node/"
 
         $.ajax({
-
           url: ajurl,
+
           type: 'POST',
-          data: {node:'Reply',thread:thd,forumid:fid,supnode:repl,reply:contento,twistname:twname,csrfmiddlewaretoken: '{{ csrf_token }}'},
 
-          beforeSend: function() {
-
-            $("#ajax_load_image").show();
-            $("#body").css({"opacity":"0.1",})
+          data: {
+            node: 'Reply',
+            thread: thd,
+            forumid: fid,
+            supnode: repl,
+            reply: contento,
+            twistname: twname,
+            csrfmiddlewaretoken: '{{csrf_token}}'
           },
 
           success: function(data){
-
-            $("#ajax_load_image").hide();
             document.getElementById('org{{eachrep}}').style.visibility='hidden';
             $("#org{{eachrep}}").css("display","none");
 
             $('#refreshthread').html(data);
-            $('a.close-reveal-modal').trigger('click');
-
-
-          },
-
-          complete: function(){
-            $("#ajax_load_image").hide();
-            $("#body").css({"opacity":"",})
+            // $('a.close-reveal-modal').trigger('click');
           }
-        })
-
-
+        });
       }
-      else
-        {alert("Reply can't be empty");}
-      $('a.close-reveal-modal').trigger('click');
 
+      else {
+        alert("Reply can't be empty");
+      }
+
+      // $('a.close-reveal-modal').trigger('click');
     });
-});
-
-
-
+  });
 </script>
 
 <style type="text/css">
@@ -163,7 +150,7 @@ function reply_del{{eachrep}}() {
 
    {% if eachrep.created_by == user_obj.id %}
      {% if eachrep != thread %}
-       <a class="tiny alert button" id="myname" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
+       <a class="tiny alert button" data-reply-id="{{eachrep.created_by}}" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
      
      {% endif %}
    {% endif %}

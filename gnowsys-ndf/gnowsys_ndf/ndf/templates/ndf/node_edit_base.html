@@ -2,9 +2,11 @@
 
 {% load i18n %}
 {% load ndf_tags %}
+{% load cache %}
 
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
 
+{% cache 3600 node_edit_base style %}
 {% block style %}
 
 .divider-line { font-size: xx-large; color:lightgray; }
@@ -33,8 +35,26 @@ height:40px;
 background-repeat:no-repeat; background-size: 48px 48px
 }
 
-{% endblock %}
+#tags_error{
+	color: red;
+}
 
+div.tags{ 
+	/*padding: 5px 10px; */
+	margin: 2px 5px;
+	/*color: white;*/
+	font-size: 1em;
+	border: solid thin #FFD400;
+}
+
+i.remove-tag{
+	padding-left: 8px;
+	font-size: 1.1em;
+	cursor: pointer;
+}
+
+{% endblock %}
+{% endcache %}
 
 
 {% block body_content %}
@@ -53,7 +73,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% endif %} 
 		</span></h3>		
 
-	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
+	    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
   		<label id="message" style="display:none; color:red"></label>
 
 	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
@@ -76,7 +96,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 				  	<a>{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
 				</dd>
 				<!-- change name of collection tab overide block in your code -->
-				<dd class="collection_tab" data-reveal-id="{% if node %}{% if is_group == False %}publish_resource{% endif %}{% endif %}" title="Click here to add/edit collection">
+				<dd class="collection_tab" data-reveal-id="{% if not node %}{% if is_group == False %}publish_resource{% endif %}{% endif %}" title="Click here to add/edit collection">
 				  	<a>{% block collection_tab %} {% trans "Collection" %} {% endblock %}</a>
 				</dd>
 				<!-- change name of metadata tab overide block in your code -->
@@ -97,14 +117,14 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
         
   	{% csrf_token %}
-
+        {% comment %}
   	<div id="publish_resource" class="reveal-modal" data-reveal style="width:500px;">
   		Do you want to create:<br/><br/>
   		<input class="collection" type="radio" name="coll" value="homogeneous"> &nbsp;Homogeneous Collection<br/>
   		<input class="collection" type="radio" name="coll" value="heterogeneous"> &nbsp;Heterogeneous Collection
   		<a class="close-reveal-modal">&#215;</a>
   	</div>
-  
+        {% endcomment %}
   	<div id="node-details-edit-div" class="tabs-content" > 
 
     	<div class="active content row contents" id="panel-name-description">
@@ -118,6 +138,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 	                <h5>{% trans "Settings" %}</h5>           
 	            	<div class="row">
 		    		{% if node.created_by == request.user.pk %}	
+
+		    			{% cache 300 node_edit_base_visibility node.access_policy request.LANGUAGE_CODE %}
 	                    <div class="large-4 columns">
 							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Visibility" %}</label></span>
 						</div>                    
@@ -142,6 +164,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 							<span></span>
 							</div>
 						</div>
+						{% endcache %}
+
 					{% else %}
 							
 						{% if not node %}
@@ -167,6 +191,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	            	</div>                
 	            	
+	    			{% cache 300 node_edit_base_lang_loc request.LANGUAGE_CODE %}
+
 	            	<div class="row">
 	                	<div class="large-4 columns">
 	                		<label class="inline">{% trans "Language" %}</label>
@@ -188,17 +214,52 @@ background-repeat:no-repeat; background-size: 48px 48px
 							<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 							</a>
 	                    </div>
-		     		</div>                
+		     		</div>
+		     		{% endcache %}                
 	            </div> 
 			</div>  
 
 			<div class="row">
 				<div class="small-8 columns">
-					<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','">
-						<h3><span class="subheader"> {% trans "Tag'" %} {{node.tags|pluralize|default_if_none:""}} 
-						</span></h3>
+					<span>
+
+						<div class="row">
+							<h3 >
+								
+							<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
+							</span>
+
+							</h3>
+							<div class="small-9 columns">
+							<div class="row collapse">
+								
+							<div class="small-10 columns">
+						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
+						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
+					        </div>
+					        <div class="small-2 columns">
+					          <span tabindex="3" id="add-tag-btn" class="tiny button">{% trans 'Add Tag' %}</span>
+					        </div>
+							</div>							
+
+							</div>
+						</div>
+
+						<!-- show tags error msg -->
+						<div class="row hide" id="tags_error">
+							<div class="small-10 columns small-push-2">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>
+						</div>
+
+						<!-- show added tags -->
+						<div class="row">
+							<div id="added_tags" class="small-9 small-push-3 columns">
+								{% for each_tag in node.tags %}
+									<div class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>
+								{% endfor %}
+							</div>
+						</div>
+
 			    	</span>
-			    	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas..."> 
 		    	</div>
 	    	</div>      
     	</div>
@@ -224,6 +285,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 			<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}></div>
 		</div>
 		
+		{% cache 3600 node_edit_base_coll_type_radio request.LANGUAGE_CODE %}
+
 		<div class="choose" style="display:none;">
 		  	
 			<div class="row">
@@ -258,6 +321,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 			</div>
 		</div>
 
+		{% endcache %}
+
 		<div class="row drawers" style="display:none;">
 			<div class="small-12 columns">
 			  <div id="collection_drawer" >
@@ -270,6 +335,7 @@ background-repeat:no-repeat; background-size: 48px 48px
       
     {% endblock %}
     
+	{% cache 300 node_edit_base_metadata request.LANGUAGE_CODE %}
     <div class="content contents" id="panel-metadata" style="width:95%; display:none;" >      
       	<div class="row">
 		  	<h4>{% trans "Please add or edit Metadata" %} </h4>
@@ -312,17 +378,31 @@ background-repeat:no-repeat; background-size: 48px 48px
 					</label>
 				</div>
 		  	{% endfor %}
-
 		  	<div class="small-6 columns">			  	
 		  		<label>
 					<h5>{% trans "Based on Url: " %} </h5> 
-					<input name="basedonurl" type="text" value="">
+					<input name="basedonurl" type="text" value="{{node.basedonurl}}">		  	
 				</label>
 			</div>
 		  	
 		</div>
+		<div class="row">
+			<div class="small-6 columns">
+				<label>
+					<h5>{% trans "License: " %} </h5> 
+					<input name="license" type="text" value="{{node.license}}">		  	
+				</label>
+			</div>
+			<div class="small-6 columns">
+				<label>
+					<h5>{% trans "Source: " %} </h5> 
+					<input name="source" type="text" value="{{node.source}}">		  	
+				</label>
+			</div>
+		</div>
 		<div id="metadata_info"></div>
 	</div>	
+	{% endcache %}
     
     <!-- Kept this bellow commented part for future reference(Don't delete this) -->
 
@@ -392,6 +472,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   	{% block add_fields %} {% endblock %}
   
  	<!-- Overlay : Map Widget -->
+ 	{% cache 300 node_edit_base_map_widget %}
     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
     	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
         <a class="close-reveal-modal" >&#215;</a>
@@ -399,9 +480,10 @@ background-repeat:no-repeat; background-size: 48px 48px
         <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
       <!-- #{#%# endif %} -->
     </div>
+    {% endcache %}
 
     <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}"> -->
-    <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button" />
+    <input type="submit" tabindex="4" id="save-node" value="Save as Draft And Preview" class="round button" />
 
 </form>
 
@@ -639,16 +721,15 @@ $(document).ready(function(){
 		});
 
 	});
-
-	{% if is_group or not node %}
+      	{% if is_group or node or not node %}
 		$(".collection_tab").click(function() {
-			var collection = "heterogeneous";
+      			var collection = "heterogeneous";
+        
 	{% else %}
 		$(".collection").click(function() {
-			var collection = this.value;
+      			var collection = this.value;
 	{% endif %}
-
-		$("#publish_resource").foundation('reveal', 'close');
+      		$("#publish_resource").foundation('reveal', 'close');
 		$("input[type='radio'][name='col']").attr("checked", false);
 		$("input[type='radio'][name='coll']").attr("checked", false);
 		
@@ -862,6 +943,103 @@ $(document).ready(function(){
 
 	});
 
+	var tags = document.getElementById("tags_id");
+	var addedTags = document.getElementById("added_tags");
+
+	function checkTag()
+	{
+		var textValue = tags.value.trim();
+		// console.log(textValue.length);
+
+		if(textValue.length < 1){ return false; }
+
+		if(textValue.match(/[^A-Za-z0-9\-\ ]/g))
+		{	// having special characters
+			$('#tags_error').removeClass("hide");
+			return false;
+		}
+		else
+		{	// passed the test and now add tag label
+			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
+			return true;
+		}
+	}
+
+	tags.onchange = checkTag;
+	tags.onmouseup = checkTag;
+	tags.onkeyup = checkTag;
+
+	function updateAllTags() {
+		
+		var tagsArr = new Array();
+
+		$("#added_tags").children("div.tags.label").each(function(){
+			tagsArr.push(this.textContent.trim().toLowerCase());
+		});
+
+		$("input:hidden[name='tags']").val(tagsArr.toString());
+		// console.log(tagsArr)
+	}
+	
+
+	function removeTag(){
+		$(this).parent().fadeOut("slow", function(){
+			$(this).detach();
+		});
+
+		updateAllTags();
+	};
+
+	$(".remove-tag").click(removeTag);
+
+	$(".remove-tag").mouseenter(function(){
+		$(this).parent("div.tags").css("text-decoration", "line-through");
+	});
+
+	$(".remove-tag").mouseleave(function(){
+		$(this).parent("div.tags").css("text-decoration", "none");
+	});
+
+	function addTag() {
+		if(checkTag())
+		{
+			var textValue = tags.value.trim().toLowerCase();
+			tags.value = '';
+
+			var tagDiv = document.createElement("div");
+			tagDiv.className = "tags label radius info";
+			tagDiv.appendChild(document.createTextNode(textValue));
+			// tagDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+
+			var closeBtn = document.createElement("i");
+			closeBtn.className = "fi-x-circle remove-tag";
+			closeBtn.title = "Remove this tag";
+			closeBtn.onclick = removeTag;
+
+			$(closeBtn).mouseenter(function(){
+				$(this).parent("div.tags").css("text-decoration", "line-through");
+			});
+
+			$(closeBtn).mouseleave(function(){
+				$(this).parent("div.tags").css("text-decoration", "none");
+			});
+
+			tagDiv.appendChild(closeBtn);
+
+			addedTags.appendChild(tagDiv);
+
+			updateAllTags();
+		}
+		else
+		{
+			$('#tags_error').removeClass("hide");
+		}
+		tags.focus();
+	}
+
+	var addTagBtn = document.getElementById("add-tag-btn");
+	addTagBtn.onclick = addTag;
+	addTagBtn.onkeypress = addTag;
 
 	$("#save-node").click(function(event) {
                       
@@ -870,6 +1048,14 @@ $(document).ready(function(){
 		md_arr = [] //for adding module
 		tch_arr=[]  // for teaches
 		assess_arr=[] // for assesses		
+
+		// tags_str = $("#tags_id").val()
+		// escape_chars = "~!@#$%^&*()_+{}|:<>?/.,';][=-`'"
+		// if(tags_str.indexOf(escape_chars)>0){
+		// 	alert("Tags cannot contain special characters");
+		// 	event.preventDefault();
+
+		// }
 
  		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
@@ -909,14 +1095,22 @@ $(document).ready(function(){
 	    		condition_result_var = true;
 	    	}
 	    {% endif %}
+	    var val_chk = name.search(/mod$/gi)    
     	if (condition_result_var && name != "")
 	    {
-	      if (nodes.indexOf(name) != -1)  
-	      { 
-	        $("#message").css("display", "block");
-	        $("#message").text("{{title}} '" + name +"' already exist. Please choose another name");
-	        event.preventDefault();
-	      }
+			if(val_chk == -1){
+				if (nodes.indexOf(name) != -1)  
+				{ 
+					$("#message").css("display", "block");
+					$("#message").text("{{title}} '" + name +"' already exist. Please choose another name");
+					event.preventDefault();
+				}
+			}
+			else if (val_chk != -1){
+				$("#message").css("display", "block");
+				$("#message").text("Name cannot include 'Mod'.");
+				event.preventDefault();
+			}
 	    }
 	    else if (name == ""){
 	      $("#message").css("display", "block");
@@ -927,6 +1121,8 @@ $(document).ready(function(){
     	{
           $("#message").css("display", "none");
 	    }
+
+	    updateAllTags();
 	});
 
 
@@ -1017,6 +1213,7 @@ $(document).ready(function(){
 	// 	lastVisitedLocationVal.push(mapZoom)
 	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
+
 
 </script>
 

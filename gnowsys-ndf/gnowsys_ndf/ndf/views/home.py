@@ -58,6 +58,16 @@ def homepage(request, group_id):
                 print "error in getting node_holder details for an author"+str(e)
             auth.save()
 
+            # as on when user gets register on platform make user member of two groups:
+            # 1: his/her own username group. 2: "home" group
+            # adding user's id into author_set of "home" group.
+            home_group_obj = node_collection.one({'_type': u"Group", 'name': unicode("home")})
+            # being user is log-in for first time on site after registration,
+            # directly add user's id into author_set of home group without anymore checking overhead.
+            home_group_obj.author_set.append(request.user.id)
+            home_group_obj.save()
+            
+
         if GSTUDIO_SITE_LANDING_PAGE == "home":
             return HttpResponseRedirect( reverse('landing_page') )
 

@@ -286,6 +286,22 @@ class Command(BaseCommand):
           print " GList ("+glc_node_name+") container already created !"
           info_message += "\n GList ("+glc_node_name+") container already created !"
 
+        Group_node = node_collection.collection.Group();
+        node_doc =node_collection.one({'$and':[{'_type': u'Group'},{'name': u'Trash'}]})
+        if node_doc is None:
+	        Group_node.name = unicode('Trash')
+        	Group_node.status = unicode('PUBLISHED')
+        	Group_node.created_by = 1
+	        Group_node.modified_by = 1
+	        Group_node.access_policy = unicode("PRIVATE")
+        	Group_node.member_of.append(node_collection.one({"_type": "GSystemType", 'name': "Group"})._id)
+        	Group_node.disclosure_policy=unicode('DISCLOSED_TO_MEM')
+        	Group_node.visibility_policy=unicode('NOT_ANNOUNCED')
+        	Group_node.encryption_policy=unicode('NOT_ENCRYPTED')
+        	Group_node.edit_policy =unicode('NON_EDITABLE')
+        	Group_node.save()
+        else:
+        	print "Trash Group already created."	
         print "\n"
         info_message += "\n\n"
         log_list.append(info_message)
@@ -624,8 +640,8 @@ def clean_structure():
 
   # to fix broken documents which are having partial/outdated attributes/relations in their attribute_set/relation_set. 
   # first make their attribute_set and relation_set empty and them fill them with latest key-values. 
-  # gsystem_list = ["GSystem", "File", "Group", "Author"]
-  gsystem_list = ["Group", "Author"]
+  gsystem_list = ["GSystem", "File", "Group", "Author"]
+  # gsystem_list = ["Group", "Author"]
   node_collection.collection.update(
     {'_type': {'$in': gsystem_list}, 'attribute_set': {'$exists': True}, 'relation_set': {'$exists': True}},
     {'$set': {'attribute_set': [], 'relation_set': []}}, 
@@ -636,12 +652,16 @@ def clean_structure():
                               '$or': [{'attribute_set': []}, {'relation_set': []}] 
                             }, timeout=False)
 
-  for each_gs in gs:
+  gs_count = gs.count()
+  # for each_gs in gs:
+  gs_iter = iter(gs)
+  for i, each_gs in enumerate(gs_iter):
     attr_list = []  # attribute-list
     rel_list = []  # relation-list
     inv_rel_list = []  # inverse-relation-list
 
-    print " .",
+    # print " .",
+    print " \n Processing node #.", (i+1), " out of ", gs_count, " ... ",
     if each_gs.member_of_names_list:
       info_message = "\n\n >>> " + str(each_gs.name) + " ("+str(each_gs.member_of_names_list[0])+")"
     else:
@@ -766,7 +786,7 @@ def clean_structure():
     if res['n']:
       info_message = "\n\n\t" + str(each_gs.name) + " updated succesfully !"
       log_list.append(info_message)
-      # print " -- attribute_set & relation_set updated succesfully !"
+      print " -- attribute_set & relation_set updated succesfully !"
 
   # ------------------------------------------------------------------------------------
   # Close cursor object if still alive

@@ -1,49 +1,115 @@
 {% load i18n %}
 {% load ndf_tags %}
 
+<style type="text/css">
+	
+
+	#tags_error{
+		color: red;
+	}
+
+	div.tags{ 
+		/*padding: 5px 10px; */
+		margin: 2px 5px;
+		/*color: white;*/
+		font-size: 1em;
+		border: solid thin #FFD400;
+	}
+
+	i.remove-tag{
+		padding-left: 8px;
+		font-size: 1.1em;
+		cursor: pointer;
+	}
+
+</style>
+
 {% get_group_name groupid as group_name_tag %}
 {% if user.is_authenticated %}	
 
 	<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name_tag %}">{% csrf_token %}
 
-		
+		<!-- file browse and name -->
 		<fieldset style="background:#ccc;">
 			<legend style="background:#10c1cb">{% trans "Upload File" %}</legend>
 			<div class ="row">
-				<div class="large-2 columns">				
+				<div class="large-3 columns">				
 					<label>{% trans "Choose File" %}</label>
-					<input type="file" name="doc[]"  id="docFile" multiple/>
+					<input type="file" name="doc[]"  id="docFile"/>
 				</div>
-				<div class="large-10 columns">				
+				<div class="large-9 columns">				
 					<label>{% trans "Title of File" %}</label>
 					<input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File">
 				</div>
 			</div>
 		</fieldset>
+
+		<!-- other details -->
 		<fieldset style="background:#ccc;">
 			<legend style="background:#10c1cb">{% trans "Enter Details" %}</legend>
 
 			<div class ="row">
-				<div class="large-6 columns">
+				<div class="large-5 columns">
 					<b>Add Description</b>
 					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
+
+					<div class="row">
+					
+						<b class="small-3 columns"> {% trans "Add Tag" %}:
+						</b>
+
+						<div class="small-9 columns">
+							<div class="row collapse" data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}">
+									
+								<div class="small-9 columns">
+							    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
+							    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
+						        </div>
+						        <div class="small-3 columns">
+						        	<span tabindex="3" id="add-tag-btn" class="tiny button">
+						        		{% trans 'Add Tag' %}
+						        	</span>
+						        </div>
+
+							</div>
+
+							<!-- show tags error msg -->
+							<div class="row hide" id="tags_error">
+								<div class="small-10 columns">{% trans 'Non empty tags can have only alphanumeric characters, dash(-) and spaces.' %}</div>
+							</div>
+
+							<!-- show added tags -->
+							<div class="row">
+								<div id="added_tags" class="small-9 columns">
+									{% for each_tag in node.tags %}
+										<div class="tags label radius info">{{each_tag}}<i title="Remove this tag" class="fi-x-circle remove-tag"></i></div>
+									{% endfor %}
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+
 				</div>
 
-				<div class="large-6 columns">
+				<div class="large-7 columns">
 					<div class ="row">
 						<div class="large-4 columns">
 							<b>Set Language</b>
 							<select name="lan">
 								{% get_language_info_list for LANGUAGES as languages %}
 								{% for language in languages %}
-								<option value="{{ language.code }}">{{ language.name }} 
+								<option value="{{ language.code }}">
+									{{ language.name }}
 								</option>
 								{% endfor %}
 							</select>
 						</div>
 						<div class="large-4 columns">
-							<b>Add Tag</b>
-							<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" />
+							<b>Location</b>
+							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand"> <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+							</a>
 						</div>
 						<div class="large-4 columns">
 							<b>Set Privacy</b><br/>
@@ -119,31 +185,41 @@
 					</div>
 
 					<div class ="row">
-						<div class="large-4 columns">
-							<b>Location</b>
-							<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand" disabled> <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
-							</a>
-						</div>
-						<div class="large-4 columns">
+						<div class="large-2 columns">
 							<b>License</b>
-							<input id="license_id" name="License" type="text" placeholder="Enter valid license name"/>
 						</div>
-						<div class="large-4 columns">
+						<div class="large-10 columns">
+							<!-- <input id="license_id" name="License" type="text" placeholder="Enter source name"/> -->
+							{% get_licence as licence %}
+							<select name="License">
+			         			<option value="CC BY-SA">---Select from list---</option>
+		  						{% for each_licence in licence %}
+				        			<option value="{{each_licence}}">
+				        				{% trans each_licence %}
+				        			</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+
+					<div class ="row">
+						<div class="large-2 columns">
 							<b>Source</b>
+						</div>
+						<div class="large-10 columns">
 							<input id="source_id" name="Source" type="text" placeholder="Enter source name"/>
 						</div>
 					</div>
 
 					<div class ="row">
-						<div class="large-4 columns">
+						<div class="large-3 columns">
 							<b>Based on url</b>
-							<input id="based_url_id" name="based_url" type="text" placeholder="Enter valid url"/>
 						</div>
-						<div class="large-4 columns">
+						<div class="large-9 columns">
+							<input id="based_on_id" name="based_url" type="text" placeholder="Enter valid url"/>
 						</div>
 					</div>
 
-				</div>
 			</div>	
 			
 
@@ -157,15 +233,21 @@
 			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} 
 		</p>
 
-		
+
+		<!-- Overlay : Map Widget -->
+	    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+	    	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+	        <a class="close-reveal-modal" >&#215;</a>
+	        {% include "ndf/map_widget.html" with mode="edit" %}
+	        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+	      <!-- #{#%# endif %} -->
+	    </div>
+
 	</form>
-
-
 
 {% else %}
 	<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
 {% endif %}
-
 
 <script type="text/javascript">
 
@@ -201,8 +283,144 @@
 		alert("select a file");
 		return false;
 		}
+	});
+
+	// --- tags ---	
+	var tags = document.getElementById("tags_id");
+	var addedTags = document.getElementById("added_tags");
+
+	function checkTag()
+	{
+		var textValue = tags.value.trim();
+		// console.log(textValue.length);
+
+		if(textValue.length < 1){ return false; }
+
+		if(textValue.match(/[^A-Za-z0-9\-\ ]/g))
+		{	// having special characters
+			$('#tags_error').removeClass("hide");
+			return false;
+		}
+		else
+		{	// passed the test and now add tag label
+			$('#tags_error').addClass("hide") // fadeout fastly ongoing fadeout event
+			return true;
+		}
+	}
+
+	tags.onchange = checkTag;
+	tags.onmouseup = checkTag;
+	tags.onkeyup = checkTag;
+
+	function updateAllTags() {
+		
+		var tagsArr = new Array();
+
+		$("#added_tags").children("div.tags.label").each(function(){
+			tagsArr.push(this.textContent.trim().toLowerCase());
+		});
+
+		$("input:hidden[name='tags']").val(tagsArr.toString());
+		// console.log(tagsArr)
+	}
+	
+
+	function removeTag(){
+		$(this).parent().fadeOut("slow", function(){
+			$(this).detach();
+		});
+
+		updateAllTags();
+	};
+
+	$(".remove-tag").click(removeTag);
+
+	$(".remove-tag").mouseenter(function(){
+		$(this).parent("div.tags").css("text-decoration", "line-through");
+	});
+
+	$(".remove-tag").mouseleave(function(){
+		$(this).parent("div.tags").css("text-decoration", "none");
+	});
+
+	function addTag() {
+		if(checkTag())
+		{
+			var textValue = tags.value.trim().toLowerCase();
+			tags.value = '';
+
+			var tagDiv = document.createElement("div");
+			tagDiv.className = "tags label radius info";
+			tagDiv.appendChild(document.createTextNode(textValue));
+			// tagDiv.setAttribute("data-primary-type", selFieldPrimaryType);
+
+			var closeBtn = document.createElement("i");
+			closeBtn.className = "fi-x-circle remove-tag";
+			closeBtn.title = "Remove this tag";
+			closeBtn.onclick = removeTag;
+
+			$(closeBtn).mouseenter(function(){
+				$(this).parent("div.tags").css("text-decoration", "line-through");
+			});
+
+			$(closeBtn).mouseleave(function(){
+				$(this).parent("div.tags").css("text-decoration", "none");
+			});
+
+			tagDiv.appendChild(closeBtn);
+
+			addedTags.appendChild(tagDiv);
+
+			updateAllTags();
+		}
+		else
+		{
+			$('#tags_error').removeClass("hide");
+		}
+		tags.focus();
+	}
+
+	var addTagBtn = document.getElementById("add-tag-btn");
+	addTagBtn.onclick = addTag;
+	addTagBtn.onkeypress = addTag;
 
 
+	// --- map ---
+  	$(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+    
+  		$.ajax({
+  			url: "{% url 'get_visited_location' groupid %}",
+  			success: function(data){ 
+   
+			  	data = JSON.parse(data);
+
+			    var lastVisitedLocationVal = data;
+			    
+			    if(lastVisitedLocationVal){
+
+			      if(lastVisitedLocationVal == "[]"){
+			        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+			      }
+
+			      if(lastVisitedLocationVal.length > 0){
+			            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+			            var zoom = lastVisitedLocationVal.pop(),
+			                lng = lastVisitedLocationVal[1],
+			                lat = lastVisitedLocationVal[0];
+			              map.setView([lat, lng], zoom);
+			            }
+			    }
+			    else if( tempArr.length )
+			    {
+			      var group = new L.featureGroup(tempArr)
+			          map.fitBounds(group.getBounds());
+			    }
+			}
+		});
+  	});
+
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
+		map.invalidateSize();  
 	});
 
 </script>

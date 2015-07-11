@@ -8,12 +8,14 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response  # , render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.cache import cache
+
 from mongokit import paginator
 import mongokit
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
-from gnowsys_ndf.settings import DEFAULT_GAPPS_LIST, WORKING_GAPPS, BENCHMARK
+from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK
 from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
@@ -32,11 +34,11 @@ import ast
 import string
 import json
 import locale
+import multiprocessing as mp 
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
 from collections import OrderedDict
-
 col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
@@ -97,10 +99,28 @@ def get_group_name_id(group_name_or_id, get_obj=False):
 
       Example 2: res_group_obj = get_group_name_id(group_name_or_id, True)
       - "res_group_obj" will contain entire object.
+
+      Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
+      try:
+          group_id = ObjectId(group_id)
+      except:
+          group_name, group_id = get_group_name_id(group_id)
+
     '''
+    # if cached result exists return it
+    if not get_obj:
+        slug = slugify(group_name_or_id)
+        # for unicode strings like hindi-text slugify doesn't works
+        cache_key = 'get_group_name_id_' + str(slug) if slug else str(abs(hash(group_name_or_id)))
+        cache_result = cache.get(cache_key)
+
+        if cache_result:
+            return cache_result
+    # ---------------------------------
 
     # case-1: argument - "group_name_or_id" is ObjectId
     if ObjectId.is_valid(group_name_or_id):
+
         group_obj = node_collection.one({"_id": ObjectId(group_name_or_id)})
 
         # checking if group_obj is valid
@@ -112,6 +132,10 @@ def get_group_name_id(group_name_or_id, get_obj=False):
             if get_obj:
                 return group_obj
             else:
+                # setting cache with both ObjectId and group_name
+                cache.set(cache_key, (group_name, group_id), 60*60)
+                cache_key = u'get_group_name_id_' + slugify(group_name)
+                cache.set(cache_key, (group_name, group_id), 60*60)
                 return group_name, group_id
 
     # case-2: argument - "group_name_or_id" is group name
@@ -127,6 +151,10 @@ def get_group_name_id(group_name_or_id, get_obj=False):
             if get_obj:
                 return group_obj
             else:
+                # setting cache with both ObjectId and group_name
+                cache.set(cache_key, (group_name, group_id), 60*60)
+                cache_key = u'get_group_name_id_' + slugify(group_name)
+                cache.set(cache_key, (group_name, group_id), 60*60)
                 return group_name, group_id
 
     if get_obj:
@@ -172,7 +200,7 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
         that is, in menu-bar and GAPPs selection menu for a given group
         - True: DEFAULT_GAPPS (menu-bar)
             - At present used in listing GAPPS whenever a new group is created
-        - False: WORKING_GAPPS (selection-menu)
+        - False: GSTUDIO_WORKING_GAPPS (selection-menu)
             - At present used in listing GAPPS for setting-up GAPPS for a group
 
     already_selected_gapps -- (Optional argument)
@@ -186,25 +214,41 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
     """
     gapps_list = []
 
-    global DEFAULT_GAPPS_LIST
-    gapps_list = DEFAULT_GAPPS_LIST
+    global GSTUDIO_DEFAULT_GAPPS_LIST
+    gapps_list = GSTUDIO_DEFAULT_GAPPS_LIST
 
     if not gapps_list or not default_gapp_listing:
-        # If DEFAULT_GAPPS_LIST not set (i.e. empty)
+        # If GSTUDIO_DEFAULT_GAPPS_LIST not set (i.e. empty)
         # Or we need to setup list for selection purpose of GAPPS
         # for a group
-        gapps_list = WORKING_GAPPS
+        gapps_list = GSTUDIO_WORKING_GAPPS
 
         # If already_selected_gapps is non-empty,
         # Then append their names in list of GApps to be excluded
         if already_selected_gapps:
             gapps_list_remove = gapps_list.remove
-            for each_gapp in already_selected_gapps:
+            #Function used by Processes implemented below
+            def multi_(lst):
+              for each_gapp in lst:
                 gapp_name = each_gapp["name"]
 
                 if gapp_name in gapps_list:
                     gapps_list_remove(gapp_name)
-
+            #this empty list will have the Process objects as its elements
+            processes=[]
+            n1=len(already_selected_gapps)
+            lst1=already_selected_gapps
+            #returns no of cores in the cpu
+            x=mp.cpu_count()
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+              processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2],)))
+            for i in range(x):
+              processes[i].start() #each Process started 
+            for i in range(x):
+              processes[i].join() #each Process converges
     # Find all GAPPs
     meta_type = node_collection.one({
         "_type": "MetaType", "name": META_TYPE[0]
@@ -403,6 +447,9 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
       elif checked == "Group":
         drawer = node_collection.find({'_type': u"Group", '_id': {'$nin': filtering} })
+        
+      elif checked == "Users":
+        drawer = node_collection.find({'_type': u"Author", '_id': {'$nin': filtering} })
 
       elif checked == "Forum":
         gst_forum_id = node_collection.one({'_type': "GSystemType", 'name': "Forum"})._id
@@ -457,6 +504,10 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id not in nlist:
           dict1[each._id] = each
 
+      #loop replaced by a list comprehension
+      dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+
+     
       for oid in nlist:
         obj = node_collection.one({'_id': oid})
         dict2.append(obj)
@@ -470,10 +521,15 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
         if each._id != nid:
           if each._id not in nlist:
             dict1[each._id] = each
+      #loop replaced by a list comprehension    
+      dict2=[node_collection.one({'_id': oid})  for oid in nlist]
           
-      for oid in nlist: 
+      	
+      for oid in nlist:
         obj = node_collection.one({'_id': oid})
         dict2.append(obj)
+      
+      
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -488,7 +544,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 # get type of resourc
 @get_execution_time
 def get_resource_type(request,node_id):
-  get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
+  get_resource_type=node_collection.one({'_id':ObjectId(node_id)})
   get_type=get_resource_type._type
   return get_type 
                           
@@ -558,210 +614,213 @@ def get_translate_common_fields(request, get_type, node, group_id, node_type, no
 
 @get_execution_time
 def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
-  """Updates the retrieved values of common fields from request into the given node."""
+    """Updates the retrieved values of common fields from request
+    into the given node.
+    """
 
-  group_obj = node_collection.one({'_id': ObjectId(group_id)})
-  # theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
-  # topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
-  collection = None
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    # theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
+    # topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
+    # collection = None
 
-  if coll_set:
-      if "Theme" in coll_set.member_of_names_list:
-        node_type = theme_GST
-      if "theme_item" in coll_set.member_of_names_list:
-        node_type = theme_item_GST
-      if "Topic" in coll_set.member_of_names_list:
-        node_type = topic_GST
+    if coll_set:
+        if "Theme" in coll_set.member_of_names_list:
+            node_type = theme_GST
+        if "theme_item" in coll_set.member_of_names_list:
+            node_type = theme_item_GST
+        if "Topic" in coll_set.member_of_names_list:
+            node_type = topic_GST
 
-      name = request.POST.get('name_'+ str(coll_set._id),"")
-      content_org = request.POST.get(str(coll_set._id),"")
-      tags = request.POST.get('tags'+ str(coll_set._id),"")
-     
-  else:    
-    name =request.POST.get('name','').strip()
-    content_org = request.POST.get('content_org')
-    tags = request.POST.get('tags')
-
-  language= request.POST.get('lan')
-  sub_theme_name = request.POST.get("sub_theme_name", '')
-  add_topic_name = request.POST.get("add_topic_name", '')
-  is_changed = False
-  sub_theme_name = unicode(request.POST.get("sub_theme_name", ''))
-  add_topic_name = unicode(request.POST.get("add_topic_name", ''))
-  usrid = int(request.user.id)
-  usrname = unicode(request.user.username)
-  access_policy = request.POST.get("login-mode", '')
-  right_drawer_list = []
-  checked = request.POST.get("checked", '') 
-  check_collection = request.POST.get("check_collection", '') 
-  if check_collection:
-    if check_collection == "collection":
-      right_drawer_list = request.POST.get('collection_list','')
-    elif check_collection == "prior_node":    
-      right_drawer_list = request.POST.get('prior_node_list','')
-    elif check_collection == "teaches":    
-      right_drawer_list = request.POST.get('teaches_list','')
-    elif check_collection == "assesses":    
-      right_drawer_list = request.POST.get('assesses_list','')
-    elif check_collection == "module":    
-      right_drawer_list = request.POST.get('module_list','')
-
-
-  map_geojson_data = request.POST.get('map-geojson-data')
-  user_last_visited_location = request.POST.get('last_visited_location')
-  altnames = request.POST.get('altnames', '')
-  featured = request.POST.get('featured', '')
-
-  if map_geojson_data:
-    map_geojson_data = map_geojson_data + ","
-    map_geojson_data = list(ast.literal_eval(map_geojson_data))
-  else:
-    map_geojson_data = []
-  
-  # --------------------------------------------------------------------------- For create only
-  if not node.has_key('_id'):
-    
-    node.created_by = usrid
-    
-    if node_type._id not in node.member_of:
-      node.member_of.append(node_type._id)
-      if node_type.name == "Term":
-        node.member_of.append(topic_GST._id)
+        name = request.POST.get('name_' + str(coll_set._id), "")
+        content_org = request.POST.get(str(coll_set._id), "")
+        tags = request.POST.get('tags' + str(coll_set._id), "")
         
-     
-    if group_obj._id not in node.group_set:
-      node.group_set.append(group_obj._id)
-
-    if access_policy == "PUBLIC":
-      node.access_policy = unicode(access_policy)
     else:
-      node.access_policy = unicode(access_policy)
+        name = request.POST.get('name', '').strip()
+        content_org = request.POST.get('content_org')
+        tags = request.POST.get('tags','')
+    language = request.POST.get('lan')
+    sub_theme_name = request.POST.get("sub_theme_name", '')
+    add_topic_name = request.POST.get("add_topic_name", '')
+    is_changed = False
+    sub_theme_name = unicode(request.POST.get("sub_theme_name", ''))
+    add_topic_name = unicode(request.POST.get("add_topic_name", ''))
+    usrid = int(request.user.id)
+    usrname = unicode(request.user.username)
+    access_policy = request.POST.get("login-mode", '')
+    right_drawer_list = []
+    checked = request.POST.get("checked", '')
+    check_collection = request.POST.get("check_collection", '')
+    if check_collection:
+        if check_collection == "collection":
+            right_drawer_list = request.POST.get('collection_list', '')
+        elif check_collection == "prior_node":
+            right_drawer_list = request.POST.get('prior_node_list', '')
+        elif check_collection == "teaches":
+            right_drawer_list = request.POST.get('teaches_list', '')
+        elif check_collection == "assesses":
+            right_drawer_list = request.POST.get('assesses_list', '')
+        elif check_collection == "module":
+            right_drawer_list = request.POST.get('module_list', '')
 
-    node.status = "PUBLISHED"
+    map_geojson_data = request.POST.get('map-geojson-data')
+    user_last_visited_location = request.POST.get('last_visited_location')
+    altnames = request.POST.get('altnames', '')
+    # featured = request.POST.get('featured', '')
 
-    is_changed = True
-          
-    # End of if
-    specific_url = set_all_urls(node.member_of)
-    node.url = specific_url
+    if map_geojson_data:
+        map_geojson_data = map_geojson_data + ","
+        map_geojson_data = list(ast.literal_eval(map_geojson_data))
+    else:
+        map_geojson_data = []
 
-  if name:
-    if node.name != name:
-      node.name = name
-      is_changed = True
-  
-  if altnames or request.POST.has_key("altnames"):
-    if node.altnames != altnames:
-      node.altnames = altnames
-      is_changed = True
+    # For create only ---------------------------------------------------------
+    if not ("_id" in node):
+        node.created_by = usrid
 
-  if (featured == True) or (featured == False) :
-    if node.featured != featured:
-      node.featured = featured
-      is_changed = True
+        if node_type._id not in node.member_of:
+            node.member_of.append(node_type._id)
+            if node_type.name == "Term":
+                node.member_of.append(topic_GST._id)
 
-  if sub_theme_name:
-    if node.name != sub_theme_name:
-      node.name = sub_theme_name
-      is_changed = True
-  
-  if add_topic_name:
-    if node.name != add_topic_name:
-      node.name = add_topic_name
-      is_changed = True
+        if group_obj._id not in node.group_set:
+            node.group_set.append(group_obj._id)
 
-  #  language
-  if language:
-      node.language = unicode(language) 
-  else:
-      node.language = u"en"
+        if access_policy == "PUBLIC":
+            node.access_policy = unicode(access_policy)
+        else:
+            node.access_policy = unicode(access_policy)
 
-  #  access_policy
+        node.status = "PUBLISHED"
+        is_changed = True
 
-  if access_policy:
-    # Policy will be changed only by the creator of the resource
-    # via access_policy(public/private) option on the template which is visible only to the creator
-    if access_policy == "PUBLIC" and node.access_policy != access_policy:
+        # End of if
+        specific_url = set_all_urls(node.member_of)
+        node.url = specific_url
+
+    if name:
+        if node.name != name:
+            node.name = name
+            is_changed = True
+
+    if altnames or "altnames" in request.POST:
+        if node.altnames != altnames:
+            node.altnames = altnames
+            is_changed = True
+
+    # if featured or (not featured):
+    #     if node.featured != featured:
+    #         node.featured = featured
+    #         is_changed = True
+
+    if sub_theme_name:
+        if node.name != sub_theme_name:
+            node.name = sub_theme_name
+            is_changed = True
+
+    if add_topic_name:
+        if node.name != add_topic_name:
+            node.name = add_topic_name
+            is_changed = True
+
+    #  language
+    if language:
+        node.language = unicode(language)
+    else:
+        node.language = u"en"
+
+    #  access_policy
+    if access_policy:
+        # Policy will be changed only by the creator of the resource
+        # via access_policy(public/private) option on the template which
+        # is visible only to the creator
+        if access_policy == "PUBLIC" and node.access_policy != access_policy:
+            node.access_policy = u"PUBLIC"
+            # print "\n Changed: access_policy (pu 2 pr)"
+            is_changed = True
+        elif access_policy == "PRIVATE" and node.access_policy != access_policy:
+            node.access_policy = u"PRIVATE"
+            # print "\n Changed: access_policy (pr 2 pu)"
+            is_changed = True
+    else:
         node.access_policy = u"PUBLIC"
-        # print "\n Changed: access_policy (pu 2 pr)"
-        is_changed = True
-    elif access_policy == "PRIVATE" and node.access_policy != access_policy:
-        node.access_policy = u"PRIVATE"
-        # print "\n Changed: access_policy (pr 2 pu)"
-        is_changed = True
-  else:
-      node.access_policy = u"PUBLIC"
 
-  # For displaying nodes in home group as well as in creator group.
-  user_group_obj = node_collection.one({'$and': [{'_type': ObjectId(group_id)}, {'name': usrname}]})
+    # For displaying nodes in home group as well as in creator group.
+    user_group_obj = node_collection.one({
+        '_type': ObjectId(group_id), 'name': usrname
+    })
 
-  if group_obj._id not in node.group_set:
-      node.group_set.append(group_obj._id)
-  else:
-      if user_group_obj:
-          if user_group_obj._id not in node.group_set:
-              node.group_set.append(user_group_obj._id)
+    if group_obj._id not in node.group_set:
+        node.group_set.append(group_obj._id)
+    else:
+        if user_group_obj:
+            if user_group_obj._id not in node.group_set:
+                node.group_set.append(user_group_obj._id)
 
-  #  tags
-  if tags:
+    # tags
+    # if tags:
     tags_list = []
 
     for tag in tags.split(","):
-      tag = unicode(tag.strip())
+        tag = unicode(tag.strip())
 
-      if tag:
-        tags_list.append(tag)
+        if tag:
+            tags_list.append(tag)
 
     if set(node.tags) != set(tags_list):
-      node.tags = tags_list
-      is_changed = True
-
-  #  Build collection, prior node, teaches and assesses lists
-  if check_collection:
-    changed = build_collection(node, check_collection, right_drawer_list, checked)  
-    if changed == True:
-      is_changed = True
-    
-  #  org-content
-  if content_org:
-    if node.content_org != content_org:
-      node.content_org = content_org
+        node.tags = tags_list
+        is_changed = True
       
-      # Required to link temporary files with the current user who is modifying this document
-      usrname = request.user.username
-      filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
-      node.content = org2html(content_org, file_prefix=filename)
-      is_changed = True
+    #  Build collection, prior node, teaches and assesses lists
+    if check_collection:
+        changed = build_collection(node, check_collection, right_drawer_list, checked)
+        if changed:
+            is_changed = True
 
-  # visited_location in author class
-  if node.location != map_geojson_data:
-    node.location = map_geojson_data # Storing location data
-    is_changed = True
-  
-  if user_last_visited_location:
-    user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
+    #  org-content
+    if node.content_org != content_org:
+        node.content_org = content_org
 
-    author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
-    user_group_location = node_collection.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+        # Required to link temporary files with the current user who is
+        # modifying this document
+        usrname = request.user.username
+        filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
+        node.content = org2html(content_org, file_prefix=filename)
+        is_changed = True
 
-    if user_group_location:
-      if node._type == "Author" and user_group_location._id == node._id:
-        if node['visited_location'] != user_last_visited_location:
-          node['visited_location'] = user_last_visited_location
-          is_changed = True
+    # visited_location in author class
+    if node.location != map_geojson_data:
+        node.location = map_geojson_data  # Storing location data
+        is_changed = True
 
-      else:
-        user_group_location['visited_location'] = user_last_visited_location
-        user_group_location.save()
+    if user_last_visited_location:
+        user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
-  if is_changed:
-    node.status = unicode("DRAFT")
+        author = node_collection.one({'_type': "GSystemType", 'name': "Author"})
+        user_group_location = node_collection.one({
+            '_type': "Author", 'member_of': author._id, 'created_by': usrid,
+            'name': usrname
+        })
 
-    node.modified_by = usrid
+        if user_group_location:
+            if node._type == "Author" and user_group_location._id == node._id:
+                if node['visited_location'] != user_last_visited_location:
+                    node['visited_location'] = user_last_visited_location
+                    is_changed = True
 
-    if usrid not in node.contributors:
-      node.contributors.append(usrid)
-  return is_changed
+            else:
+                user_group_location['visited_location'] = user_last_visited_location
+                user_group_location.save()
+
+    if is_changed:
+        node.status = unicode("DRAFT")
+
+        node.modified_by = usrid
+
+        if usrid not in node.contributors:
+            node.contributors.append(usrid)
+
+    return is_changed
 
 
 # ============= END of def get_node_common_fields() ==============
@@ -778,11 +837,12 @@ def build_collection(node, check_collection, right_drawer_list, checked):
       if node.prior_node != right_drawer_list:
         i = 0
         node.prior_node=[]
+	node_prior_node_append_temp=node.prior_node.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
-            node.prior_node.append(node_id)
+            node_prior_node_append_temp(node_id)
           
           i = i+1
         # print "\n Changed: prior_node"
@@ -803,14 +863,16 @@ def build_collection(node, check_collection, right_drawer_list, checked):
         i = 0
         node.collection_set = []
         # checking if each _id in collection_list is valid or not
+	nlist_append_temp=nlist.append #a temp. variable which stores the lookup for append method
+	node_collection_set_append_temp=node.collection_set.append #a temp. variable which stores the lookup for append method
         while (i < len(right_drawer_list)):
           node_id = ObjectId(right_drawer_list[i])
           node_obj = node_collection.one({"_id": node_id})
           if node_obj:
             if node_id not in nlist:
-              nlist.append(node_id)  
+              nlist_append_temp(node_id)  
             else:
-              node.collection_set.append(node_id)  
+              node_collection_set_append_temp(node_id)  
               # After adding it to collection_set also make the 'node' as prior node for added collection element
               node_collection.collection.update({'_id': ObjectId(node_id), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
           
@@ -818,7 +880,9 @@ def build_collection(node, check_collection, right_drawer_list, checked):
 
         for each in nlist:
           if each not in node.collection_set:
-            node.collection_set.append(each)
+            node_collection_set_append_temp(each)
+            node.status = u"PUBLISHED"
+            node.save()
             # After adding it to collection_set also make the 'node' as prior node for added collection element
             node_collection.collection.update({'_id': ObjectId(each), 'prior_node': {'$nin':[node._id]} },{'$push': {'prior_node': ObjectId(node._id)}})
 
@@ -993,6 +1057,33 @@ def build_collection(node, check_collection, right_drawer_list, checked):
   else:
     return False
 
+"""
+@get_execution_time
+def get_versioned_page(node):
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+  (fp)
+    rev_no =""
+    proc1=subprocess.Popen(cmd,shell=True,
+        stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+      if line.find('revision')!=-1 and line.find('selected') == -1:
+          rev_no=string.split(line,'revision')
+          rev_no=rev_no[1].strip( '\t\n\r')
+          rev_no=rev_no.split()[0]
+      if line.find('status')!=-1:
+          up_ind=line.find('status')
+          if line.find(('PUBLISHED'),up_ind) !=-1:
+	             rev_no=rev_no.split()[0]
+               node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
+               return (node,rev_no)    
+      if rev_no == '1.1':
+           node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
+           return(node,'1.1')
+"""
 
 @get_execution_time
 def get_versioned_page(node):
@@ -1011,15 +1102,14 @@ def get_versioned_page(node):
       if line.find('status')!=-1:
           up_ind=line.find('status')
           if line.find(('PUBLISHED'),up_ind) !=-1:
-	       rev_no=rev_no.split()[0]
-               node=history_manager.get_version_document(node,rev_no)
-               proc1.kill()
-               return (node,rev_no)    
+           rev_no=rev_no.split()[0]
+           node=history_manager.get_version_document(node,rev_no)
+           proc1.kill()
+           return (node,rev_no)   
       if rev_no == '1.1':
            node=history_manager.get_version_document(node,'1.1')
            proc1.kill()
            return(node,'1.1')
-
 
 
 @get_execution_time
@@ -1124,100 +1214,95 @@ def check_page_first_creation(request,node):
 
 
 @get_execution_time
-def tag_info(request, group_id, tagname = None):
+def tag_info(request, group_id, tagname=None):
     '''
     Function to get all the resources related to tag
     '''
-
     group_name, group_id = get_group_name_id(group_id)
-
+    group_id = ObjectId(group_id)
     cur = None
     total = None
-    total_length = None  
+    total_length = None
     yesterdays_result = []
     week_ago_result = []
     search_result = []
-    group_cur_list = [] #for AutheticatedUser
+    group_cur_list = []  # for AutheticatedUser
     today = date.today()
-    yesterdays_search = {date.today()-timedelta(days=1)}
-    week_ago_search = {date.today()-timedelta(days=7)}
+    yesterdays_search = {date.today() - timedelta(days=1)}
+    week_ago_search = {date.today() - timedelta(days=7)}
     locale.setlocale(locale.LC_ALL, '')
     userid = request.user.id
-    collection = get_database()[Node.collection_name]
+    # collection = get_database()[Node.collection_name]
+    tag_str = request.GET.get("search", "")
+    tag_search = tag_str.lower()
+    # if coming from search, set tagname value to search value
+    if tag_search:
+        tagname = tag_search
 
-    if not tagname:
-        tagname = request.GET["search"].lower()
-
-    if request.user.is_superuser:  #Superuser can see private an public files 
+    if request.user.is_superuser:  # Superuser can see private an public files
         if tagname:
-            cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                          # '$or':[   {'access_policy':u'PUBLIC'},
-                                          #           {'access_policy':u'PRIVATE'}
-                                          #       ],   
-                                         'status':u'PUBLISHED'
-                                    }
-                                 )
-            for every in cur:
-                search_result.append(every)
+            cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                        'group_set':ObjectId(group_id)
+                  })
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
-        total = len(search_result)
-        total = locale.format("%d", total, grouping=True)
-        if len(search_result) == 0:
-            total_length = len(search_result)    
+    # Autheticate user can see all public files
+    elif request.user.is_authenticated():
+        # group_cur = node_collection.find({'_type': 'Group',
+        #                                   '$or': [
+        #                                       {'created_by': userid},
+        #                                       {'group_admin': userid},
+        #                                       {'author_set': userid},
+        #                                       {'group_type': u'PUBLIC'},
+        #                                     ]
+        #                                   })
+        # for each in group_cur:
+        #     group_cur_list.append(each._id)
+        if tagname:  # and (group_id in group_cur_list):
+            cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                         'group_set': ObjectId(group_id),
+                                         '$or': [
+                                            {'status': u'PUBLISHED'},
+                                            {'created_by': userid},
+                                          ]
+                                      })
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
-    elif request.user.is_authenticated():   #Autheticate user can see all public files  
-        group_cur = collection.Node.find({'_type':'Group',
-                                           '$or':[ {'created_by':userid},
-                                                 {'group_admin':userid},
-                                                 {'author_set':userid},
-                                                 {'group_type':u'PUBLIC'},
-                                               ]
-                                    }      
-                                )
-        for each in group_cur:
-            group_cur_list.append(each._id)
+    else:  # Unauthenticated user can see all public files.
+        group_node = node_collection.one({'_id': ObjectId(group_id)})
+        if group_node.group_type == u"PUBLIC":
+            if tagname:
+                cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
+                                               'group_set': group_id,
+                                               'status': u'PUBLISHED'
+                                            }
+                                     )
+                #loop replaced by a list comprehension
+                search_result=[every for every in cur]
 
-        if tagname and (group_id in group_cur_list):
-            cur = collection.Node.find( {'tags':{'$in':[tagname]},
-                                         'group_set':{'$in': [group_id]},
-                                         'status':u'PUBLISHED'
-                                    }
-                             )
-            for every in cur: 
-                search_result.append(every)
-
+    if search_result:
         total = len(search_result)
         total = locale.format("%d", total, grouping=True)
         if len(search_result) == 0:
             total_length = len(search_result)
-
-    else: #Unauthenticated user can see all public files.
-        if tagname:
-            cur = collection.Node.find( { 'tags':{'$in':[tagname]},
-                                           'access_policy':u'PUBLIC',
-                                           'status':u'PUBLISHED'
-                                        }
-                                 )
-            for every in cur:
-                search_result.append(every)
-
-        total = len(search_result)
-        total = locale.format("%d", total, grouping=True)
-        if len(search_result) == 0:
-            total_length = len(search_result)
-    
+    context_variable = {'group_id': group_id, 'groupid': group_id,
+                        'search_result': search_result,
+                        'tagname': tagname, 'total': total,
+                        'total_length': total_length}
     return render_to_response(
         "ndf/tag_browser.html",
-        {'group_id': group_id, 'groupid': group_id, 'search_result':search_result ,'tagname':tagname,'total':total,'total_length':total_length},
+        context_variable,
         context_instance=RequestContext(request)
     )
 
 
-#code for merging two text Documents
+# code for merging two text Documents
 import difflib
 @get_execution_time
-def diff_string(original,revised):
-        
+def diff_string(original, revised):
+
         # build a list of sentences for each input string
         original_text = _split_with_maintain(original)
         new_text = _split_with_maintain(revised)
@@ -1425,18 +1510,22 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   """
   if not isinstance(at_rt_objectid_or_attr_name_list, list):
     at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
-
+  #a temp. variable which stores the lookup for append method
+  type_of_set_append_temp=type_of_set.append  
   if not type_of_set:
     node["property_order"] = []
+    #a temp. variable which stores the lookup for append method
+    node_property_order_append_temp=node["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          type_of_set.append(type_of)
+          type_of_set_append_temp(type_of)
 
       for po in gst["property_order"]:
         if po not in node["property_order"]:
-          node["property_order"].append(po)
+          node_property_order_append_temp(po)    
+          
 
   BASE_FIELD_METADATA = {
     'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
@@ -1448,6 +1537,8 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
   }
 
   widget_data_list = []
+  #a temp. variable which stores the lookup for append method
+  widget_data_list_append_temp=widget_data_list.append
   for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
     if type(at_rt_objectid_or_attr_name) == ObjectId: #ObjectId.is_valid(at_rt_objectid_or_attr_name):
       # For attribute-field(s) and/or relation-field(s)
@@ -1507,7 +1598,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
         data_type = node.structure[field.name]
         value = node[field.name]
 
-      widget_data_list.append({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
+      widget_data_list_append_temp({ '_type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
                               '_id': field._id, 
                               'data_type': data_type,
                               'name': field.name, 'altnames': altnames,
@@ -1518,7 +1609,7 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
       # For node's base-field(s)
 
       # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
-      widget_data_list.append({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+      widget_data_list_append_temp({ '_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
                               'data_type': node.structure[at_rt_objectid_or_attr_name],
                               'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
                               'value': node[at_rt_objectid_or_attr_name],
@@ -1546,21 +1637,25 @@ def get_property_order_with_value(node):
     
     demo["property_order"] = []
     type_of_set = []
+    #temp. variables which stores the lookup for append method
+    type_of_set_append_temp=type_of_set.append
+    demo_prop_append_temp=demo["property_order"].append
     gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
       for type_of in gst["type_of"]:
         if type_of not in type_of_set:
-          type_of_set.append(type_of)
+          type_of_set_append_temp(type_of)
 
       for po in gst["property_order"]:
         if po not in demo["property_order"]:
-          demo["property_order"].append(po)
+          demo_prop_append_temp(po)
 
     demo.get_neighbourhood(node["member_of"])
-
+    #a temp. variable which stores the lookup for append method
+    new_property_order_append_temp=new_property_order.append
     for tab_name, list_field_id_or_name in demo['property_order']:
       list_field_set = get_widget_built_up_data(list_field_id_or_name, demo, type_of_set)
-      new_property_order.append([tab_name, list_field_set])
+      new_property_order_append_temp([tab_name, list_field_set])
 
     demo["property_order"] = new_property_order
   
@@ -1571,9 +1666,11 @@ def get_property_order_with_value(node):
       
       if type_of_nodes.count():
         demo["property_order"] = []
+        #a temp. variable which stores the lookup for append method
+        demo_prop_append_temp=demo["property_order"].append
         for to in type_of_nodes:
           for po in to["property_order"]:
-            demo["property_order"].append(po)
+            demo_prop_append_temp(po)
 
       node_collection.collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
 
@@ -1901,7 +1998,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
     """
     gr_node = None
     multi_relations = False
-
     try:
         subject_id = ObjectId(subject_id)
 
@@ -1915,6 +2011,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            
             gr_node_name = gr_node.name
             info_message = "%(relation_type_text)s: GRelation (%(gr_node_name)s) " % locals() \
                 + "created successfully.\n"
@@ -2315,61 +2412,92 @@ def create_discussion(request, group_id, node_id):
 
 # to add discussion replie
 @get_execution_time
-def discussion_reply(request, group_id):
+def discussion_reply(request, group_id, node_id):
 
-  try:
+    try:
 
-    prior_node = request.POST.get("prior_node_id", "")
-    content_org = request.POST.get("reply_text_content", "") # reply content
+        prior_node = request.POST.get("prior_node_id", "")
+        content_org = request.POST.get("reply_text_content", "") # reply content
 
-    # process and save node if it reply has content  
-    if content_org:
-  
-      user_id = int(request.user.id)
-      user_name = unicode(request.user.username)
-
-      # auth = node_collection.one({'_type': 'Author', 'name': user_name })
-      reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
+        # process and save node if it reply has content  
+        if content_org:
       
-      # creating empty GST and saving it
-      reply_obj = node_collection.collection.GSystem()
+            user_id = int(request.user.id)
+            user_name = unicode(request.user.username)
 
-      reply_obj.name = unicode("Reply of:" + str(prior_node))
-      reply_obj.status = u"PUBLISHED"
+            # auth = node_collection.one({'_type': 'Author', 'name': user_name })
+            reply_st = node_collection.one({ '_type': 'GSystemType', 'name': 'Reply'})
+            
+            # creating empty GST and saving it
+            reply_obj = node_collection.collection.GSystem()
 
-      reply_obj.created_by = user_id
-      reply_obj.modified_by = user_id
-      reply_obj.contributors.append(user_id)
+            reply_obj.name = unicode("Reply of:" + str(prior_node))
+            reply_obj.status = u"PUBLISHED"
 
-      reply_obj.member_of.append(ObjectId(reply_st._id))
-      reply_obj.prior_node.append(ObjectId(prior_node))
-      reply_obj.group_set.append(ObjectId(group_id))
-  
-      reply_obj.content_org = unicode(content_org)
-      filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
-      reply_obj.content = org2html(content_org, file_prefix=filename)
-  
-      # saving the reply obj
-      reply_obj.save()
+            reply_obj.created_by = user_id
+            reply_obj.modified_by = user_id
+            reply_obj.contributors.append(user_id)
 
-      formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
+            reply_obj.member_of.append(ObjectId(reply_st._id))
+            reply_obj.prior_node.append(ObjectId(prior_node))
+            reply_obj.group_set.append(ObjectId(group_id))
+        
+            reply_obj.content_org = unicode(content_org)
+            filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+            reply_obj.content = org2html(content_org, file_prefix=filename)
+        
+            # saving the reply obj
+            reply_obj.save()
+
+            formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
+            
+            # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
+            reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
+
+            # ---------- mail/notification sending -------
+            node = node_collection.one({"_id": ObjectId(node_id)})
+            node_creator_user_obj = User.objects.get(id=node.created_by)
+            node_creator_user_name = node_creator_user_obj.username
+
+            site = Site.objects.get(pk=1)
+            site = site.name.__str__()
+            
+            from_user = user_name
+
+            to_user_list = [node_creator_user_obj]
+
+            msg = "\n\nDear " + node_creator_user_name + ",\n\n" + \
+                  "A reply has been added in discussion under the " + \
+                  node.member_of_names_list[0] + " named: '" + \
+                  node.name + "' by '" + user_name + "'."
+
+            activity = "Discussion Reply"
+            render_label = render_to_string(
+                "notification/label.html",
+                {
+                    # "sender": from_user,
+                    "activity": activity,
+                    "conjunction": "-",
+                    "link": "url_link"
+                }
+            )
+            notification.create_notice_type(render_label, msg, "notification")
+            notification.send(to_user_list, render_label, {"from_user": from_user})
+
+            # ---------- END of mail/notification sending ---------
+
+            return HttpResponse( reply )
+
+        else: # no reply content
+
+            return HttpResponse(json.dumps(["no_content"]))      
+
+    except Exception as e:
       
-      # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
-      reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
+        error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
+        raise Exception(error_message)
 
-      return HttpResponse( reply )
-
-    else: # no reply content
-
-      return HttpResponse(json.dumps(["no_content"]))      
-
-  except Exception as e:
-    
-    error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
-    raise Exception(error_message)
-
-    return HttpResponse(json.dumps(["Server Error"]))
-
+        return HttpResponse(json.dumps(["Server Error"]))
 
 
 @get_execution_time
@@ -2496,6 +2624,14 @@ def get_user_activity(userObject):
 
 @get_execution_time
 def get_file_node(file_name=""):
+  # if cached result exists return it
+  cache_key = u'get_file_node' + slugify(unicode(file_name))
+  cache_result = cache.get(cache_key)
+
+  if cache_result:
+      return cache_result
+  # ---------------------------------
+
   file_list=[]
   new=[]
   a=str(file_name).split(',')
@@ -2511,6 +2647,7 @@ def get_file_node(file_name=""):
           if filedoc:
              for i in filedoc:
 		            file_list.append(i.name)	
+  cache.set(cache_key, file_list, 60*15)
   return file_list	
 
 @get_execution_time
@@ -2941,9 +3078,12 @@ def parse_data(doc):
   '''Section to parse node '''
   user_idlist = ['modified_by','created_by','author_set','contributors']
   date_typelist = ['last_update','created_at']
-  objecttypelist = ['member_of']
+  objecttypelist = ['member_of','group_set', 'collection_set','prior_node']
   languagelist = ['language']
   content = ['content']
+  keys_by_dict = ['attribute_set', 'relation_set']
+  keys_by_filesize = ['file_size']
+
   for i in doc:
            
           if i in content:
@@ -2972,6 +3112,37 @@ def parse_data(doc):
                for j in doc[i]:
                    node = node_collection.one({"_id":ObjectId(j)})
                    doc[i] = node.name
+          if i in keys_by_dict:
+              att_dic = {}
+              if "None" not in doc[i]:
+                      if type(doc[i]) != str and i == "attribute_set":
+                              str1 =""
+                              for att in doc[i]:
+                                      for k1, v1 in att.items():
+                                        if type(v1) == list:
+                                                str1 = ""
+                                                if type(v1[0]) in [OrderedDict, dict]:
+                                                    for each in v1:
+                                                        str1 += str(each["name"]) + ", "
+                                                else:
+                                                    str1 = ",".join(v1)
+                                                att_dic[k1] = str1
+                                        else:
+                                                att_dic[k1] = str(v1)
+                              for att,value in att_dic.items():
+                                  str1 =  str1 + att + " : " + value + "  "+"\n"
+                              doc[i] = str1                    
+                      if i == "relation_set":
+                              str1 =""
+                              for each in doc[i]:
+                                      for k1, v1 in each.items():
+                                              for rel in v1:
+                                                      rel = node_collection.one({'_id':ObjectId(rel)})
+                                                      att_dic[k1] = rel.name
+                              for att,value in att_dic.items():
+                                  str1 =  str1 + att + " : " + value + "  "+"\n"
+                              doc[i] = str1        
+  
           elif i == "rating":
              new_str = ""
              if doc[i]:
@@ -3897,3 +4068,5 @@ def repository(request, group_id):
                               },
                               context_instance=RequestContext(request)
                             )
+
+

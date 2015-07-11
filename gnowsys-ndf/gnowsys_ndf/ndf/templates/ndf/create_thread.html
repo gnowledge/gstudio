@@ -1,8 +1,11 @@
-
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% load cache %}
+
 {% block title %}Creating Thread to Forum:  {{forum.name}} {% endblock %}
+
+{% cache 3600 create_thread request.LANGUAGE_CODE %}
 
 {% block head %}
 
@@ -49,6 +52,8 @@
   <p>{% trans "Threads are new ideas on the topic" %}</p>
 {% endblock %}
 
+{% endcache %}
+
 
 {% block body_content %} 
     
@@ -80,6 +85,7 @@
 
   <form id="create_thread" method="POST">
   {% csrf_token %}
+  {% cache 3600 create_thread_form request.LANGUAGE_CODE %}
 
     <!-- forum name   -->
     <div class="row">
@@ -107,79 +113,65 @@
 
       <!-- Final Create forum button -->
       <div class="large-8 columns">
-
         <input type="submit" id="forum" value="Create Forum" style="display:none">
         <!-- <input id="forum" type="hidden" value="{{forum}}"> -->
         <input type="button" id="save_form" class="button expand" value="Create thread" onclick="saveforum()">
       </div>
 
     </div>
- 
+    
+    {% endcache %}
   </form>
 
 {% endblock %}
 
+{% block document_ready %}
+  // orgitdown
+  $('#orgitdown').orgitdown(mySettings);
+{% endblock %}
 
-  {% block script %}
+{% block script %}
+  $("#node_search_form").parent().hide();
 
-    $("#node_search_form").parent().hide();
+  var flag = false;
+  var nodes = JSON.parse($("#forum_threads").val());
 
-    var flag = false;
-    var nodes = JSON.parse($("#forum_threads").val());
+  html = '<ul class="pricing-table"> <li class="title">{% trans "Existing threads of forum" %} </li>'
+  nodes.forEach( function(s, i){ html += '<li class="bullet-item">' + s + '</li>' });
 
-    html = '<ul class="pricing-table"> <li class="title">{% trans "Existing threads of forum" %} </li>'
-    nodes.forEach( function(s, i){ html += '<li class="bullet-item">' + s + '</li>' });
+  $("#thread-listing").html(html + "</ul>");
 
-    $("#thread-listing").html(html + "</ul>")
-    
+  $("#thread_name").change(function(){
+    var name = $("#thread_name").val().toLowerCase();
+    nodes.forEach( function(s, i){ nodes[i] = s.toLowerCase()})
 
-    {% block document_ready %}
-
-
-      $("#thread_name").change(function(){
-
-        var name = $("#thread_name").val().toLowerCase();
-        nodes.forEach( function(s, i){ nodes[i] = s.toLowerCase()})
-
-        if (nodes.indexOf(name) > -1)
-        {
-          flag = false;
-          $("#message").css("display", "block");
-          $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
-          $("#thread_name").val("");
-        }
-        else
-        {
-          flag = true;
-          $("#message").css("display", "none");
-        }
-
-      });
-
-
-    function saveforum(){
-      var name=$("#thread_name").val();
-      if (name=="" )
-      {
-        alert("Please enter forum name");
-      }
-      else if(!flag)
-      {
-        alert("Thread with same name already exist !")
-      }
-      else
-      {
-        $("#forum").trigger('click');
-      }
+    if (nodes.indexOf(name) > -1)
+    {
+      flag = false;
+      $("#message").css("display", "block");
+      $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+      $("#thread_name").val("");
     }
+    else
+    {
+      flag = true;
+      $("#message").css("display", "none");
+    }
+  });
 
-
-    // ==================================
-
-    // orgitdown
-    $('#orgitdown').orgitdown(mySettings);
-
-
-  {% endblock %}
-
+  function saveforum(){
+    var name=$("#thread_name").val();
+    if (name=="" )
+    {
+      alert("Please enter forum name");
+    }
+    else if(!flag)
+    {
+      alert("Thread with same name already exist !")
+    }
+    else
+    {
+      $("#forum").trigger('click');
+    }
+  }
 {% endblock %}

@@ -6,8 +6,11 @@ Use corresponding package names if you are using an RPM based distro
 
 
 1. Installing required packages and its dependencies
-	
-    (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev libfreetype6-dev zlib1g-dev ffmpeg ffmpeg2theora
+	// first use 3 commands to download ppa repository and then 	use this command as ffmpeg doesn't exist now
+	sudo add-apt-repository ppa:mc3man/trusty-media
+	sudo apt-get update
+	sudo apt-get install ffmpeg gstreamer0.10-ffmpeg
+    (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev memcached libevent-dev libfreetype6-dev zlib1g-dev ffmpeg ffmpeg2theora
 
 2. Get latest version of gstudio-mongokit -  Try one of the following commands:
 
@@ -100,6 +103,36 @@ Use corresponding package names if you are using an RPM based distro
 7.  Install Search Dependencies
     Follow instructions in search_dependencies.txt
 
+
+	// REQUIREMENTS.TXT
+		pip install -U pyyaml nltk
+
+		Install.txt-----------------
+		1. Activate the environment
+		2. Go to gstudio/gnowsys-ndf (directory containing manage.py)
+		3. run ipython / python
+		4. in python shell run the foll. commands:-
+			>>> import nltk
+			>>> nltk.download()
+	
+			CASE 1: GUI OPENS
+			-- Go to the 'Corpora' tab
+			-- Download the module with identifier - "stopwords"
+			-- Download the module with identifier - "wordnet"
+			-- Go to "Models" tab
+			-- Download the module with identifier - "maxnet_treebank_pos_tagger"
+			-- Download the module with identifier - "punkt"
+
+			Case 2: GUI Does not open
+			-- Press d
+			-- It prompts for the identifier => Enter "stopwords" => It gets downloaded
+			-- It prompts for the identifier => Enter "wordnet" => It gets downloaded
+			-- It prompts for the identifier => Enter "maxent_treebank_pos_tagger" => It gets downloaded
+			-- Download the module with identifier - "punkt"
+
+		exit ipython
+
+
 8. To run "gstudio" project, perform following steps: 
 
     (1) Make sure you are in the virtualenv-folder and it's activated
@@ -144,4 +177,13 @@ Use corresponding package names if you are using an RPM based distro
   file bugs etc. visit ask us in the mailing list:
 
   - http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
+
+
+
+
+
+
+sudo mongod --fork --dbpath /var/lib/mongodb/ --smallfiles --logpath /var/log/mongodb.log --logappend
+
   
+

@@ -1,10 +1,13 @@
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
 
 {% block head %}
 
+  {% cache 3600 collection_view_static_files %}
   <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
   <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+  {% endcache %}
     
   <script type="text/javascript">
     $(document).ready(function() {      
@@ -44,7 +47,14 @@
       var $tree = $('.collection');
       var arr = [];  
       {% get_node_type node as node_type %}  
+      
       var node_type = "{{node_type}}";
+
+      if(node_type=="Course"){
+        $('.collection').tree({
+           autoOpen: true
+         });
+      }
 
       $tree.tree({
         selectable: true,
@@ -67,7 +77,7 @@
       $tree.bind(          
         'tree.select',
         function(event) {
-            // The clicked node is 'event.node'
+            // The clicked node is 'event.node
             var node = event.node;
             var parent_arr = [];
             var parent_node = node;
@@ -103,7 +113,6 @@
                   csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function(data) {
-
                   if (node_type == "Page"){
                    window.history.pushState("", "", "/{{group_name_tag}}/page/{{node.pk}}"+"?selected="+node.id+"");
                   }
@@ -112,6 +121,9 @@
                   }
                   else if (node_type == "Term"){
                     window.history.pushState("", "", "/{{group_name_tag}}/term/{{node.pk}}"+"?selected="+node.id+"");
+                  }
+                  else if (node_type == "Course"){
+                    window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
                   }
                   else if (node_type == "Group"){
                     window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");

@@ -20,6 +20,7 @@ from gnowsys_ndf.ndf.management.commands.nroer_data_entry import get_user_id, cr
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.views.methods import create_gattribute
+from gnowsys_ndf.settings import GAPPS       
 
 db=get_database()
 collection =db[Node.collection_name]

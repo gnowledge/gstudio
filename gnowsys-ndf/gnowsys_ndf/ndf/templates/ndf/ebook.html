@@ -4,6 +4,21 @@
 
 {% block title %} Repository {% endblock %}
 
+
+{% block meta_content %}
+  <a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
+    <h2 class="subheader">
+      {% if ebook_gst.altnames and ebook_gst.altnames != "None" %}
+        {{ebook_gst.altnames}}
+      {% else %}
+        {{ebook_gst.name}}
+      {% endif%}
+    </h2>
+  </a>
+  {{ebook_gst.content|default_if_none:""|safe}}
+{% endblock %}
+
+
 {% block body_content %}
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -34,6 +49,7 @@
                 </b>
             </div>
           </div>
+          <hr/>
           {% if node.status == "PUBLISHED" or node.created_by == request.user.id %}
           <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
           {% endif %}

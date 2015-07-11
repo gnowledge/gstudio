@@ -1,7 +1,8 @@
 {% load ndf_tags %}
 {% load i18n %}
+{% load cache %}
 
-<div id="view-discussion" class="content">
+<div>
 
   <br/>
   <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
@@ -35,9 +36,9 @@
 
       <div class="row">
         <div class="small-8 columns"> <small>{{ each_reply.last_update }}</small> </div>
-        <div class="reply-btn small-2 columns" onclick="deleteReply($(this))">delete</div>
+        <div class="reply-btn small-2 columns" data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))">{% trans "delete" %}</div>
         <div class='reply-btn text-right small-2 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
-          reply
+          {% trans "reply" %}
         </div>
       </div>
 
@@ -59,7 +60,6 @@
 
 </div>
 
-
 <script type="text/javascript">
 
   // for discussion tab
@@ -70,16 +70,24 @@
   {% edit_policy groupid node request.user as status %}
   var edit_policy = "{{ status }}"; // "allow" or "disallow"
 
-  if( user_access == "allow" && edit_policy == "allow" )
-  { 
+  var is_user_authenticated = {{ request.user.is_authenticated|lower }};
+
+  // if( user_access == "allow" && edit_policy == "allow" )
+  // { 
+  //   $("#orgitdownreps").orgitdown(mySettings);
+  // }
+
+  {% if request.user.is_authenticated %}
     $("#orgitdownreps").orgitdown(mySettings);
-  }
+  {% endif %}
   
   function createDiscussion()
   {
 
-    if( user_access == "allow" && edit_policy == "allow" )
+    // if( user_access == "allow" && edit_policy == "allow" )
+    if( is_user_authenticated )
     {  
+      {% if request.user.is_authenticated %}
         // ajax to create thread for first time.
         $.ajax({
 
@@ -119,10 +127,12 @@
 
         });
         // --- END ajax and create thread for first time.
+        {% endif %}
       }
       else
       {
-        alert("To start discussion you need to login and be the member of this group.");
+        // alert("To start discussion you need to login and be the member of this group.");
+        alert("Login to start discussion");
       }
 
     }
@@ -132,7 +142,8 @@
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openOrgEditor(sourceObj)
   {
-    if( user_access == "allow" && edit_policy == "allow" )
+    // if( user_access == "allow" && edit_policy == "allow" )
+    if( is_user_authenticated )
     {
 
       var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
@@ -164,7 +175,8 @@
     }
     else
     {
-      alert("To start discussion you need to login and be the member of this group.");
+      // alert("To start discussion you need to login and be the member of this group.");
+      alert("Login to start discussion.");
     }
   }
 
@@ -193,7 +205,7 @@
     + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
 
     + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
-    + "<div class='reply-btn small-2 columns' onclick='deleteReply($(this))'>delete</div>"
+    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>delete</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
     + data[1] + "' class='reply-btn text-right small-2 columns'> reply </div></div></div>"
@@ -217,13 +229,14 @@
         
         type: "POST",
 
-        url: "{% url 'discussion_reply' group_id %}",
+        url: "{% url 'discussion_reply' group_id node.pk %}",
 
         data: { 
 
           "csrfmiddlewaretoken": "{{ csrf_token }}",
           "prior_node_id": priorNodeId,
           "reply_text_content": replyContent
+
         },
 
         success: function(data){
@@ -277,7 +290,8 @@
 
   function deleteReply(sourceObj)
   {
-    if( user_access == "allow" && edit_policy == "allow" )
+    var userid = $(sourceObj).attr("data-userid");
+    if( (user_access == "allow" && edit_policy == "allow") || (userid == "{{request.user.id}}") )
     {
       var reply_id = $(sourceObj).closest("div.disc-replies").attr("data-reply-id");
 
@@ -323,9 +337,10 @@
     }
     else
     {
-      alert("To delete this reply you need to be login and be the member of this group.");
+      alert("To delete this reply, you need to be login and author of this reply.");
     }
   }
+
 
   // recursive function to get child replies
   function getChildReplies(oid, replyArr)

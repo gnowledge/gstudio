@@ -28,7 +28,11 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'techreport','meta_type':'factory_types'},
                          {'name':'unpublished_entry','meta_type':'factory_types'},
                          {'name':'booklet','meta_type':'factory_types'},
-                         {'name':'GList','meta_type':'factory_types'}
+                         {'name':'GList','meta_type':'factory_types'},
+                         {'name':'ProgramEventGroup','meta_type':'factory_types'},
+                         {'name':'CourseEventGroup','meta_type':'factory_types'},
+                         {'name':'PartnerGroup','meta_type':'factory_types'},
+                         {'name':'ModeratingGroup','meta_type':'factory_types'}
                         ]
 
 
@@ -51,7 +55,7 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                            {'module_set_md5':{'gsystem_names_list':['Module'], 
                                               'data_type':'u""',
                                               'meta_type':'factory_types'}},
-                           {'source_id':{'gsystem_names_list':['Pandora_video'], 
+                           {'source_id':{'gsystem_names_list':['Pandora_video','File'], 
                                          'data_type':'u""',
                                          'meta_type':'factory_types'}},
                            {'version':{'gsystem_names_list':['Module'], 
@@ -169,8 +173,8 @@ factory_relation_types = [
     }, 
 
     {'translation_of': {
-            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP'],
-            'object_type':['Page','Topic','Theme','theme_item','File','GAPP'], 
+            'subject_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'],
+            'object_type':['Page','Topic','Theme','theme_item','File','GAPP','factory_types','Binary'], 
             'inverse_name':'translation_of', 
             'meta_type':'factory_types'
         }

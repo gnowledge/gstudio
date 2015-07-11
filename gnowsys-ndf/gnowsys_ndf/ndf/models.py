@@ -29,7 +29,7 @@ from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
-from gnowsys_ndf.settings import GROUP_AGENCY_TYPES, AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.settings import GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.rcslib import RCS
 from django.dispatch import receiver
@@ -55,15 +55,15 @@ NODE_TYPE_CHOICES = (
 )
 
 TYPES_OF_GROUP = (
-    ('ANONYMOUS'),
     ('PUBLIC'),
-    ('PRIVATE')
+    ('PRIVATE'),
+    ('ANONYMOUS')
 )
 
 EDIT_POLICY = (
-    ('NON_EDITABLE'),
+    ('EDITABLE_NON_MODERATED'),
     ('EDITABLE_MODERATED'),
-    ('EDITABLE_NON_MODERATED')
+    ('NON_EDITABLE')
 )
 
 SUBSCRIPTION_POLICY = (
@@ -108,7 +108,7 @@ to_reduce_doc_requirement = u'storing_to_be_reduced_doc'
 indexed_word_list_requirement = u'storing_indexed_words'
 
 # CUSTOM DATA-TYPE DEFINITIONS
-STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED', u'DELETED')
+STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED', u'DELETED', u'MODERATION')
 STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
@@ -235,9 +235,8 @@ class Node(DjangoDocument):
                                         # ready.
     default_values = {'created_at': datetime.datetime.utcnow, 'status': u'DRAFT'}
     use_dot_notation = True
-
+    
     ########## Setter(@x.setter) & Getter(@property) ##########
-
     @property
     def user_details_dict(self):
         """Retrieves names of created-by & modified-by users from the given
@@ -1146,10 +1145,12 @@ class Group(GSystem):
         'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
 
         'group_admin': [int],		     # ObjectId of Author class
-        'partner': bool                       # Shows partners exists for a group or not
+        'moderation_level': int              # range from 0 till any integer level
     }
 
     use_dot_notation = True
+
+    default_values = {'moderation_level': -1}
 
     validators = {
         'group_type': lambda x: x in TYPES_OF_GROUP,
@@ -1158,7 +1159,10 @@ class Group(GSystem):
         'visibility_policy': lambda x: x in EXISTANCE_POLICY,
         'disclosure_policy': lambda x: x in LIST_MEMBER_POLICY,
         'encryption_policy': lambda x: x in ENCRYPTION_POLICY,
-        'agency_type': lambda x: x in GROUP_AGENCY_TYPES
+        'agency_type': lambda x: x in GSTUDIO_GROUP_AGENCY_TYPES,
+        # 'name': lambda x: x not in \
+        # [ group_obj['name'] for group_obj in \
+        # node_collection.find({'_type': 'Group'}, {'name': 1, '_id': 0})]
     }
 
     def is_gstaff(self, user):
@@ -1201,7 +1205,7 @@ class Author(Group):
     use_dot_notation = True
 
     validators = {
-        'agency_type': lambda x: x in AUTHOR_AGENCY_TYPES         # agency_type inherited from Group class
+        'agency_type': lambda x: x in GSTUDIO_AUTHOR_AGENCY_TYPES         # agency_type inherited from Group class
     }
 
     required_fields = ['name', 'password']
@@ -1555,7 +1559,7 @@ class Triple(DjangoDocument):
     'lang': basestring,  # Put validation for standard language codes
     'status': STATUS_CHOICES_TU
   }
-
+  
   required_fields = ['name', 'subject']
   use_dot_notation = True
   use_autorefs = True
@@ -1569,7 +1573,6 @@ class Triple(DjangoDocument):
 
   def save(self, *args, **kwargs):
     is_new = False
-
     if "_id" not in self:
       is_new = True  # It's a new document, hence yet no ID!"
 
@@ -1615,19 +1618,8 @@ class Triple(DjangoDocument):
 
       left_subject_member_of_list = subject_document.member_of
       relation_type_name = self.relation_type['name']
-
-      if META_TYPE[3] in self.relation_type.member_of_names_list:
-        # If Binary relationship found
-        # Single relation: ObjectId()
-        # Multi relation: [ObjectId(), ObjectId(), ...]
-        right_subject_document = node_collection.one({'_id': self.right_subject})
-
-        right_subject_member_of_list = right_subject_document.member_of
-        right_subject_name = right_subject_document.name
-
-        self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
-
-      else:
+      if META_TYPE[4] in self.relation_type.member_of_names_list:
+        #  print META_TYPE[3], self.relation_type.member_of_names_list,"!!!!!!!!!!!!!!!!!!!!!"  
         # Relationship Other than Binary one found; e.g, Triadic
         # Single relation: [ObjectId(), ObjectId(), ...]
         # Multi relation: [[ObjectId(), ObjectId(), ...], [ObjectId(), ObjectId(), ...], ...]
@@ -1636,7 +1628,7 @@ class Triple(DjangoDocument):
 
         right_subject_name_list = []
         right_subject_name_list_append = right_subject_name_list.append
-
+        print self.right_subject,"%%%%%%%%%%%%%",type(self.right_subject)
         for each in self.right_subject:
           # Here each is an ObjectId
           right_subject_document = node_collection.one({
@@ -1658,7 +1650,21 @@ class Triple(DjangoDocument):
         # with other comma-separated values from another list(s)
         object_type_list = list(chain.from_iterable(object_type_list))
         right_subject_member_of_list = list(chain.from_iterable(right_subject_member_of_list))
+      
 
+      else:
+          #META_TYPE[3] in self.relation_type.member_of_names_list:
+          # If Binary relationship found
+          # Single relation: ObjectId()
+          # Multi relation: [ObjectId(), ObjectId(), ...]
+          right_subject_document = node_collection.one({'_id': self.right_subject})
+
+          right_subject_member_of_list = right_subject_document.member_of
+          right_subject_name = right_subject_document.name
+
+          self.name = "%(subject_name)s -- %(relation_type_name)s -- %(right_subject_name)s" % locals()
+
+      
       name_value = self.name
 
       left_intersection = set(subject_type_list) & set(left_subject_member_of_list)

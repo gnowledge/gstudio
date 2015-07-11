@@ -3,6 +3,11 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+{% block title %}
+  {% trans "Course Announcement "%}
+{% endblock %}
+
+
 {% block style %}
   {{block.super}}
 
@@ -48,13 +53,13 @@
   <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
 
     <header class="row" style="margin: 1rem 0 0 0 ;">
-      <h2 class="small-12 columns">
+      <h3 class="small-12 columns">
         {% if node %}
         {% blocktrans with title_var=title node_name=node.name %} Editing {{title_var}}: {{node_name}} {% endblocktrans %}
         {% else %}
         {% trans "Course Announcement "%}
         {% endif %}
-      </h2>
+      </h3>
     </header>
 
     <nav class="row" style="margin-top: 0.5rem;">
@@ -124,7 +129,6 @@
             </fieldset>
 
           {% endif %}
-
           <div class="row" id="course_dur" style='display: none'>
             <div class="small-2 columns">
               <label for="Course Period" class="right inline"> 
@@ -149,26 +153,24 @@
             </div>
           </div>
         </fieldset>
-
+        {% if tiss_site %}
         <fieldset id="fsCollege" class="hide">
-          <legend><label><h5>College</h5></label></legend>
+            <legend><label><h5>Select College</h5></label></legend>
 
           <div class="row">
             <div class="small-2 columns">
               <label class="right inline"> 
                 {% if node %}
                   {% trans "Announced in College(s)" %}
-
                 {% else %}
                     {% trans "Select University" %}
-                {% endif %}
+              {% endif %} 
               </label>
             </div>
 
             <div class="small-5 columns end">
               {% if node %}
                 <input type="text" value="{{acourse_for_college}}" disabled="disabled">
-
               {% else %}
                 <select id="univ_cur" required style="float:left; width:95%">
                   <option value="">{% trans "- - - Select University - - -" %}</option>
@@ -207,6 +209,7 @@
           <div class="row" id="divcolg">
           </div>
         </fieldset>
+        {% endif %} 
 
         <div class="row tab-nav">
           <div class="small-2 columns for-prev">
@@ -235,7 +238,11 @@
     $("#unassigned_PO_college_div").addClass("hide");
 
     $("#univ_cur").prop("selectedIndex", 0);
-    $("#announce-course").addClass("hide");
+    {% if not tiss_site %}
+      $("#announce-course").removeClass("hide");
+    {% else %}
+      $("#announce-course").addClass("hide");
+    {% endif %}
   }
 
   var announce_course_in_college = false;
@@ -556,24 +563,93 @@
       // Valid, move to next step
       
       var announce_to_colg_list = [];
-      {% if not node %}
-        colg_in_rt_drawer = $("#announced_course_create_edit_drawer2 li input");
-        $.each(colg_in_rt_drawer,function(i, v){
-          // announce_to_colg_list.push(v.getAttribute('name'));
-          announce_to_colg_list.push(v.getAttribute('value'));
+
+      {% if not tiss_site %}
+        
+        var nussd_course_type = $("#nussd_course_type").val();
+        var nussd_course_type_list = []
+        nussd_course_type_list.push(nussd_course_type);
+
+        announce_to_colg_list.push("{{group_id}}");
+        $("#announce_to_colg_list").val(announce_to_colg_list);
+
+        $('article').block({ 
+          message: '<h4>Processing... Please wait!</h4>',
+          css: { 
+            border: 'none', 
+            padding: '15px', 
+            color: '#fff !important', 
+            backgroundColor: '#10c1cb !important', 
+            '-webkit-border-radius': '10px', 
+            '-moz-border-radius': '10px', 
+            opacity: 1.0
+          }
         });
 
-        if (announce_to_colg_list.length > 0) {
-          var nussd_course_type = $("#nussd_course_type").val();
-          var nussd_course_type_list = []
-          nussd_course_type_list.push(nussd_course_type);
+      {% else %}
 
-          $("#announce_to_colg_list").val(announce_to_colg_list);
-  
-          if (announce_course_in_college) {
-            $("input[name='ann_course_closure']").attr("disabled", false);
-            $(".unsetOption").removeAttr("disabled", "disabled");
-          }        
+        {% if not node %}
+          colg_in_rt_drawer = $("#announced_course_create_edit_drawer2 li input");
+          $.each(colg_in_rt_drawer,function(i, v){
+            // announce_to_colg_list.push(v.getAttribute('name'));
+            announce_to_colg_list.push(v.getAttribute('value'));
+          });
+
+          if (announce_to_colg_list.length > 0) {
+            var nussd_course_type = $("#nussd_course_type").val();
+            var nussd_course_type_list = []
+            nussd_course_type_list.push(nussd_course_type);
+
+            $("#announce_to_colg_list").val(announce_to_colg_list);
+    
+            if (announce_course_in_college) {
+              $("input[name='ann_course_closure']").attr("disabled", false);
+              $(".unsetOption").removeAttr("disabled", "disabled");
+            }        
+
+            $('article').block({ 
+              message: '<h4>Processing... Please wait!</h4>',
+              css: { 
+                border: 'none', 
+                padding: '15px', 
+                color: '#fff !important', 
+                backgroundColor: '#10c1cb !important', 
+                '-webkit-border-radius': '10px', 
+                '-moz-border-radius': '10px', 
+                opacity: 1.0
+              }
+            });
+          }
+
+          else{
+            $("#alertModalLabel").text("Please select College!!!");
+            $("#alertModal").addClass("alert");
+            $("#alertModal").foundation('reveal', 'open');
+            
+            // Disable only when "Foundation Course" selected as Course Type
+            if ($("#nussd_course_type :selected").index() == 0) {
+              $(".unsetOption").attr("disabled", "disabled");
+            }
+
+            event.preventDefault();
+          }
+        
+        {% else %}
+          // Fetch college objectid in which this Course is announced
+          {% for col in node.acourse_for_college %}
+          announce_to_colg_list.push("{{col.pk}}");
+          {% endfor %}
+
+          if (announce_to_colg_list.length > 0) {
+            $("#announce_to_colg_list").val(announce_to_colg_list);
+          }
+
+          // Enable Course Type
+          $('#nussd_course_type').attr("disabled", false);
+
+          // Enable Course duration
+          $("#start_time").attr("disabled", false);
+          $("#end_time").attr("disabled", false);
 
           $('article').block({ 
             message: '<h4>Processing... Please wait!</h4>',
@@ -587,51 +663,10 @@
               opacity: 1.0
             }
           });
-        }
+        {% endif %}
 
-        else{
-          $("#alertModalLabel").text("Please select College!!!");
-          $("#alertModal").addClass("alert");
-          $("#alertModal").foundation('reveal', 'open');
-          
-          // Disable only when "Foundation Course" selected as Course Type
-          if ($("#nussd_course_type :selected").index() == 0) {
-            $(".unsetOption").attr("disabled", "disabled");
-          }
-
-          event.preventDefault();
-        }
-      
-      {% else %}
-      // Fetch college objectid in which this Course is announced
-      {% for col in node.acourse_for_college %}
-      announce_to_colg_list.push("{{col.pk}}");
-      {% endfor %}
-
-      if (announce_to_colg_list.length > 0) {
-        $("#announce_to_colg_list").val(announce_to_colg_list);
-      }
-
-      // Enable Course Type
-      $('#nussd_course_type').attr("disabled", false);
-
-      // Enable Course duration
-      $("#start_time").attr("disabled", false);
-      $("#end_time").attr("disabled", false);
-
-      $('article').block({ 
-        message: '<h4>Processing... Please wait!</h4>',
-        css: { 
-          border: 'none', 
-          padding: '15px', 
-          color: '#fff !important', 
-          backgroundColor: '#10c1cb !important', 
-          '-webkit-border-radius': '10px', 
-          '-moz-border-radius': '10px', 
-          opacity: 1.0
-        }
-      });
       {% endif %}
+
     }
 
     else {

@@ -29,6 +29,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_TASK_TYPES  # , MEDIA_ROOT
 # from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_execution_time  # , parse_template_data, get_node_common_fields
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
@@ -179,6 +180,10 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
             reopen_task_id = request.POST.get("reopen_task_id", "")
             reopen_task_id = ObjectId(reopen_task_id)
 
+        admin_update = None
+        if "admin_update" in request.POST:
+            admin_update = request.POST.get("admin_update", "")
+
         at_rt_list = ["start_enroll", "end_enroll", "for_acourse", "for_college", "for_university", "enrollment_status", "has_enrolled", "has_enrollment_task", "has_approval_task"]
         at_rt_dict = {}
 
@@ -239,7 +244,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                             break
 
                     # Ann course name
-                    ann_course_name = "Foundation_Course_" + str(colg_code) + "_" + str(start_time_ac) + "_" + str(end_time_ac)
+                    ann_course_name = "Foundation Course - " + str(colg_code) + " - " + str(start_time_ac) + " - " + str(end_time_ac)
 
                     # course name
                     course_name = nussd_course_type
@@ -322,8 +327,8 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                 if enrollment_gs and "_id" in enrollment_gs:
                     enrollment_gs_name = enrollment_gs.name
                 else:
-                    enrollment_gs_name = "StudentCourseEnrollment" \
-                        + "_" + ann_course_name
+                    enrollment_gs_name = "Student Course Enrollment" \
+                        + " - " + ann_course_name
 
                     enrollment_gs = node_collection.one({
                         'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
@@ -352,13 +357,60 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     enrollment_gs.status = u"PUBLISHED"
                     enrollment_gs.save()
 
-                if "_id" in enrollment_gs:
+                enrollment_task_ids = None
+                each_enrollment_task_node = None
+                list_of_task_status = [u'New', u'In Progress']
+                task_status = None
+                updated_one_task = False
+                if "_id" in enrollment_gs and admin_update is not None:
+                    for each_enrollment in enrollment_gs.attribute_set:
+                        if "has_enrollment_task" in each_enrollment:
+                            if each_enrollment["has_enrollment_task"]:
+                                enrollment_task_dict = each_enrollment["has_enrollment_task"]
+                                break
+                    enrollment_task_ids = enrollment_task_dict.keys()
+                    for each_enrollment_task in enrollment_task_ids:
+                        if not updated_one_task:
+                            each_enrollment_task_node = node_collection.one({'_id': ObjectId(each_enrollment_task)})
+                            if each_enrollment_task_node.attribute_set:
+                                for each_attr_task in each_enrollment_task_node.attribute_set:
+                                    if each_attr_task and 'Status' in each_attr_task:
+                                        task_status = each_attr_task['Status']
+                            # task_status = each_enrollment_task_node.attribute_set[0]['Status']
+
+                            if task_status in list_of_task_status:
+                                task_dict = {}
+                                task_dict["_id"] = each_enrollment_task_node._id
+                                task_dict["modified_by"] = user_id
+                                task_dict["created_by_name"] = user_name
+                                content_text = each_enrollment_task_node['content_org']
+                                content_text += "\n\n- New enrollment dates are from : "+start_enroll.strftime("%d-%b-%Y")+" to " +end_enroll.strftime("%d-%b-%Y")
+                                task_dict["content_org"] = unicode(content_text)
+                                task_dict["start_time"] = start_enroll
+                                task_dict["end_time"] = end_enroll
+                                task_node = create_task(task_dict)
+
+                                enrollment_status_at = node_collection.one({
+                                    '_type': "AttributeType",
+                                    'name': u"enrollment_status"
+                                })
+                                end_enroll_at = node_collection.one({
+                                    '_type': "AttributeType",
+                                    'name': u"end_enroll"
+                                })
+                                at_status_node = create_gattribute(enrollment_gs._id, enrollment_status_at, u"OPEN")
+                                at_enroll_node = create_gattribute(enrollment_gs._id, end_enroll_at, end_enroll)
+                                updated_one_task = True
+
+                if not updated_one_task:
+                    admin_update = None
+                if "_id" in enrollment_gs and admin_update is None:
                     # [2] Create task for PO of respective college
                     # for Student-Course Enrollment
                     task_dict = {}
-                    task_name = "StudentCourseEnrollment_Task" + "_" + \
-                        start_enroll.strftime("%d-%b-%Y") + "_" + \
-                        end_enroll.strftime("%d-%b-%Y") + "_" + \
+                    task_name = "Student Course Enrollment Task " + \
+                        start_enroll.strftime("%d/%b/%Y") + " - " + \
+                        end_enroll.strftime("%d/%b/%Y") + " - " + \
                         ann_course_name
                     task_name = unicode(task_name)
                     task_dict["name"] = task_name
@@ -511,8 +563,8 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                 if enrollment_gs and "_id" in enrollment_gs :
                     enrollment_gs_name = enrollment_gs.name
                 else:
-                    enrollment_gs_name = "StudentCourseEnrollment" \
-                        + "_" + ann_course_name
+                    enrollment_gs_name = "Student Course Enrollment" \
+                        + " - " + ann_course_name
 
                     enrollment_gs = node_collection.one({
                         'member_of': enrollment_gst._id, 'name': enrollment_gs_name,
@@ -541,13 +593,56 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
                     enrollment_gs.status = u"PUBLISHED"
                     enrollment_gs.save()
 
-                if "_id" in enrollment_gs:
+                enrollment_task_ids = None
+                each_enrollment_task_node = None
+                list_of_task_status = [u'New', u'In Progress']
+                task_status = None
+                updated_one_task = False
+                if "_id" in enrollment_gs and admin_update is not None:
+                    for each_enrollment in enrollment_gs.attribute_set:
+                        if "has_enrollment_task" in each_enrollment:
+                            if each_enrollment["has_enrollment_task"]:
+                                enrollment_task_dict = each_enrollment["has_enrollment_task"]
+                                break
+                    enrollment_task_ids = enrollment_task_dict.keys()
+                    for each_enrollment_task in enrollment_task_ids:
+                        if not updated_one_task:
+                            each_enrollment_task_node = node_collection.one({'_id': ObjectId(each_enrollment_task)})
+                            task_status = each_enrollment_task_node.attribute_set[0]['Status']
+
+                            if task_status in list_of_task_status:
+                                task_dict = {}
+                                task_dict["_id"] = each_enrollment_task_node._id
+                                task_dict["modified_by"] = user_id
+                                task_dict["created_by_name"] = user_name
+                                content_text = each_enrollment_task_node['content_org']
+                                content_text += "\n- The duration for this enrollment task has been extended to "+end_enroll.strftime("%d-%b-%Y")+"."
+                                task_dict["content_org"] = unicode(content_text)
+                                task_dict["start_time"] = start_enroll
+                                task_dict["end_time"] = end_enroll
+                                task_node = create_task(task_dict)
+
+                                enrollment_status_at = node_collection.one({
+                                    '_type': "AttributeType",
+                                    'name': u"enrollment_status"
+                                })
+                                end_enroll_at = node_collection.one({
+                                    '_type': "AttributeType",
+                                    'name': u"end_enroll"
+                                })
+                                at_status_node = create_gattribute(enrollment_gs._id, enrollment_status_at, u"OPEN")
+                                at_enroll_node = create_gattribute(enrollment_gs._id, end_enroll_at, end_enroll)
+                                updated_one_task = True
+
+                if not updated_one_task:
+                    admin_update = None
+                if "_id" in enrollment_gs and admin_update is None:
                     # [2] Create task for PO of respective college
                     # for Student-Course Enrollment
                     task_dict = {}
-                    task_name = "StudentCourseEnrollment_Task" + "_" + \
-                        start_enroll.strftime("%d-%b-%Y") + "_" + \
-                        end_enroll.strftime("%d-%b-%Y") + "_" + \
+                    task_name = "Student Course Enrollment Task " + \
+                        start_enroll.strftime("%d/%b/%Y") + " - " + \
+                        end_enroll.strftime("%d/%b/%Y") + " - " + \
                         ann_course_name
                     task_name = unicode(task_name)
                     task_dict["name"] = task_name
@@ -664,6 +759,9 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                                 elif at_rt_type_node._type == "RelationType" and at_rt_dict[at_rt_name]:
                                     at_rt_node = create_grelation(enrollment_gs._id, at_rt_type_node, at_rt_dict[at_rt_name])
+
+
+
                 enrollment_gs = None
 
         if reopen_task_id:
@@ -677,6 +775,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
             task_dict["content_org"] = unicode(task_dict["content_org"])
             task_node = create_task(task_dict)
 
+        if reopen_task_id or admin_update is None:
             # Update the current approval task as "Closed"
             if old_current_approval_task and not approval_task_dict[str(old_current_approval_task)]:
                 old_app_task_dict = {}
@@ -799,7 +898,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
 
   sce_gst = None
   sce_gs = None
-
+  response_dict = {'success': False}
   nodes = None
   nodes_keys = []
   node = None
@@ -812,7 +911,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
 
   if request.user:
     if auth is None:
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      auth = node_collection.one({'_type': 'Author', 'created_by': int(request.user.id)})
     agency_type = auth.agency_type
     agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
@@ -822,19 +921,117 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
   if app_set_id:
     sce_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
     title = sce_gst.name
+    if title == "StudentCourseEnrollment":
+        query = {}
+        college = {}
+        course = {}
+        ac_data_set = []
+        records_list = []
+        query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id)}
 
-    query = {}
-    if request.method == "POST":
-      search = request.POST.get("search","")
-      query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id), 'name': {'$regex': search, '$options': 'i'}}
+        res = node_collection.collection.aggregate([
+            {
+                '$match': query
+            }, {
+                '$project': {
+                    '_id': 0,
+                    'sce_id': "$_id",
+                    'name': '$name',
+                    'college': '$relation_set.for_college',
+                    'start_enroll': '$attribute_set.start_enroll',
+                    'end_enroll': '$attribute_set.end_enroll',
+                    'start_date': '$attribute_set.start_enroll',
+                    'end_date': '$attribute_set.end_enroll',
+                    'enrollment_status': '$attribute_set.enrollment_status',
+                    'enrollment_stud': '$attribute_set.has_enrolled',
+                    'approved_stud': '$attribute_set.has_approved',
+                    'for_course': '$relation_set.for_acourse'
+                }
+            },
+            {
+                '$sort': {'name': 1}
+            }
+        ])
 
+        records_list = res["result"]
+        if records_list:
+            for each in res["result"]:
+                if each["college"]:
+                    if each["college"][0]:
+                        colg_list_name = []
+                        for each_col in each["college"][0]:
+                            colg_id = each_col
+                            colg_node = node_collection.one({'_id':ObjectId(colg_id)})
+                            colg_list_name.append(colg_node.name)
+                each["college"] = colg_list_name
+
+                enrollment_stud_count = 0
+                if each["enrollment_stud"]:
+                    if each["enrollment_stud"][0]:
+                        enrollment_stud_count = len(each["enrollment_stud"][0])
+                each["enrollment_stud"] = enrollment_stud_count
+
+                approved_stud_count = 0
+                if each["approved_stud"]:
+                    if each["approved_stud"][0]:
+                        approved_stud_count = len(each["approved_stud"][0])
+                each["approved_stud"] = approved_stud_count
+
+                if each["start_date"]:
+                    if each["start_date"][0]:
+                        each["start_date"] = each["start_date"][0].strftime("%d/%m/%Y")
+
+                if each["end_date"]:
+                    if each["end_date"][0]:
+                        each["end_date"] = each["end_date"][0].strftime("%d/%m/%Y")
+
+                if each["for_course"]:
+                    if each["for_course"][0]:
+                        each["for_course"] = each["for_course"][0]
+                        course_len = len(each['for_course'])
+                        if course_len > 1:
+                            each['for_course'] = "FoundationCourse"
+                        elif course_len == 1:
+                            course_node = node_collection.one({'_id':ObjectId(each['for_course'][0])})
+                            if course_node:
+                                for attr in course_node.attribute_set:
+                                    if attr and 'nussd_course_type' in attr:
+                                        each['for_course'] = attr['nussd_course_type']
+                                    break
+                                        
+
+                ac_data_set.append(each)
+
+        column_headers = [
+                    ("sce_id", "Action"),
+                    ("name", "Name"),
+                    ("for_course", "Course Type"),
+                    ("college", "College"),
+                    ("start_date", "Enrollment Start-Date"),
+                    ("end_date", "Enrollment End-Date"),
+                    ("enrollment_stud", "Enrolled"),
+                    ("approved_stud", "Approved"),
+                    ("enrollment_status", "Status"),
+        ]
+
+        response_dict["column_headers"] = column_headers
+        response_dict["success"] = True
+        response_dict["students_data_set"] = ac_data_set
+        response_dict["groupid"] = group_id
+        response_dict["app_id"] = app_id
+        response_dict["app_set_id"] = app_set_id
     else:
-      query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id)}
+        if request.method == "POST":
+          search = request.POST.get("search", "")
+          query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id), 'name': {'$regex': search, '$options': 'i'}}
 
-    nodes = list(node_collection.find(query).sort('name', 1))
+        else:
+          query = {'member_of': sce_gst._id, 'group_set': ObjectId(group_id)}
 
-    nodes_keys = [('name', "Name")]
-    template = ""
+        nodes = list(node_collection.find(query).sort('name', 1))
+
+        nodes_keys = [('name', "Name")]
+        template = ""
     template = "ndf/" + sce_gst.name.strip().lower().replace(' ', '_') + "_list.html"
     default_template = "ndf/mis_list.html"
 
@@ -852,7 +1049,8 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
                         'title': title,
                         'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
                         'property_order_list': property_order_list, 'lstFilters': widget_for,
-                        'is_link_needed': is_link_needed
+                        'is_link_needed': is_link_needed,
+                        'response_dict':json.dumps(response_dict, cls=NodeJSONEncoder)
                       }
   try:
     return render_to_response([template, default_template], 
@@ -907,7 +1105,7 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
     if user_id:
         if auth is None:
             auth = node_collection.one({
-                '_type': 'Author', 'name': unicode(user_name)
+                '_type': 'Author', 'created_by': int(user_id)
             })
 
         agency_type = auth.agency_type
@@ -1064,14 +1262,14 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
         if enroll_state == "Re-open Enrollment":
             task_dict["name"] = ""
             if nussd_course_type == "Foundation Course":
-                task_dict["name"] = "StudentCourseReOpenEnrollment_Task" + "_" + \
-                    start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + \
-                    "_FC_" + college_enrollment_code + "_" + start_time.strftime("%b-%Y") + "_" + end_time.strftime("%b-%Y")
+                task_dict["name"] = "Student Course ReOpen Enrollment Task "+ \
+                    start_enroll.strftime("%d/%b/%Y") + " - " + end_enroll.strftime("%d/%b/%Y") + \
+                    " - FC - " + college_enrollment_code + " - " + start_time.strftime("%b %Y") + " - " + end_time.strftime("%b %Y")
 
             else:
-                task_dict["name"] = "StudentCourseReOpenEnrollment_Task" + "_" + \
-                    start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + \
-                    "_" + ann_course_name
+                task_dict["name"] = "Student Course ReOpen Enrollment Task "+ \
+                    start_enroll.strftime("%d/%b/%Y") + " - " + end_enroll.strftime("%d/%b/%Y") + \
+                    " - " + ann_course_name
 
             task_dict["name"] = unicode(task_dict["name"])
             task_dict["created_by"] = user_id
@@ -1186,14 +1384,14 @@ def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instan
                 completed_on = datetime.datetime.now()
 
                 if nussd_course_type == "Foundation Course":
-                    task_dict["name"] = "StudentCourseApproval_Task" + "_" + \
-                        start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + \
-                        "_FC_" + college_enrollment_code + "_" + start_time.strftime("%b-%Y") + "_" + end_time.strftime("%b-%Y")
+                    task_dict["name"] = "Student Course Approval Task "+ \
+                        start_enroll.strftime("%d/%b/%Y") + " - " + end_enroll.strftime("%d/%b/%Y") + \
+                        " - FC - " + college_enrollment_code + " - " + start_time.strftime("%b %Y") + " - " + end_time.strftime("%b %Y")
 
                 else:
-                    task_dict["name"] = "StudentCourseApproval_Task" + "_" + \
-                        start_enroll.strftime("%d-%b-%Y") + "_" + end_enroll.strftime("%d-%b-%Y") + \
-                        "_" + ann_course_name
+                    task_dict["name"] = "Student Course Approval Task "+ \
+                        start_enroll.strftime("%d/%b/%Y") + " - " + end_enroll.strftime("%d/%b/%Y") + \
+                        " - " + ann_course_name
 
                 task_dict["name"] = unicode(task_dict["name"])
                 task_dict["created_by"] = mis_admin.group_admin[0]

@@ -1,7 +1,7 @@
-
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
+{% load cache %}
 
 {% block title %} Create a new partner {% endblock %}
 
@@ -19,13 +19,187 @@
   {% endif %}
 {% endblock %}
 
-{% block body_content %} 
+{% block body_content %}
 
   <h2>{% trans "Create a new partner" %}</h2><br>
 
   <form data-abide id="create_group" class="row" method="post" action="{% url 'create_partner' group_id %}">
     {% csrf_token %}
+    {% cache 3600 create_partner request.user.id request.LANGUAGE_CODE %}
+    <fieldset>
+    <legend>Partners Details</legend>
+   
+     <div class="row">
+       <div class="small-2 columns">
+       <lable for="right-label" class="right inline">Name
+       </div>
+     <div class ="small-5 end columns">
+       <input type="text"  id="" name="groupname" placeholder="Enter partner name" required>
+       <small class="error">Name is required and must be a string.</small>     
+  
+     </div><br><br><br>
+     </div>     
+     <div class="row">
+       <div class="small-2 columns">
+       <lable for="right-label" class="right inline">Category</lable>
+       </div>
+     <div class ="small-5 end columns">
+       <input type="text"  id="" name="" placeholder="Enter partner category" required>
+       <small class="error">required</small>     
+  
+     </div>
+     </div>     
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Description</lable>
+       </div>
+       <div class ="small-9 columns">
+	 {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
 
+     </div>
+     </div>
+     </div>
+    </div>
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Street</lable>
+       </div>
+     <div class ="small-9 columns">
+       <input type="text"  id="" name="house_street" placeholder="Enter Street" required>
+       <small class="error">required</small>     
+
+     </div><br><br><br>
+     </div>
+     </div>
+    </div>
+      
+
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Place</lable>
+       </div>
+     <div class ="small-9 columns">
+       <input type="text"  id="" name="town_city" placeholder="Enter Place" required>
+       <small class="error">required</small>     
+     </div><br><br><br>
+     </div>
+     </div>
+    </div>
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">PIN</lable>
+       </div>
+     <div class ="small-9 columns">
+       <input type="text"  id="" name="pin_code" placeholder="Enter PIN" required>
+       <small class="error">required</small>     
+     </div><br><br><br>
+     </div>
+     </div>
+    </div>
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Contact Point</lable>
+       </div>
+     <div class ="small-9 columns">
+       <input type="text"  id="" name="contact_point" placeholder="Enter Contact Point">
+     </div>
+     </div>
+     </div>
+    </div>
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Email</lable>
+       </div>
+     <div class ="small-9 columns">
+       <input type="email"  id="" name="email_id" value={{request.user.email}} placeholder="Email" required>
+       <small class="error">required</small>     
+     
+     </div><br><br>
+     </div>
+     </div>
+    </div>
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Logo</lable>
+       </div>
+     <div class ="small-9 columns">
+	<input type="file" name="doc[]"  id="docFile"/>
+       </div>
+     </div>
+     </div>
+    </div>
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Banner</lable>
+       </div>
+     <div class ="small-9 columns">
+	<input type="file" name="doc[]"  id="docFile"/>
+
+     </div>
+     </div>
+     </div>
+    </div>
+
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Telephone</lable>
+       </div>
+     <div class ="small-9 columns">
+       <input type="tel"  id="" name="telephone" placeholder="">
+     </div>
+     </div>
+     </div>
+    </div>
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Website</lable>
+       </div>
+     <div class ="small-9 columns">
+       <input type="url"  id="" name="website" placeholder="" >
+     </div>
+     </div>
+     </div>
+    </div>
+     <div class="row">
+     <div class="small-8">
+      <div class ="row">
+       <div class="small-3 columns">
+       <lable for="right-label" class="right inline">Location</lable>
+       </div>
+     <div class ="small-9 columns">
+       <a href="#view-map-edit-widget" id="label-location" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+         <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+          </a>
+      
+     </div>
+     </div>
+     </div>
+    </div>
+     
+</fieldset>
+  {% endcache %}
+
+{% comment %}
       <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
         <div style='display:table-row;' >
           <div style='display:table-cell;'> 
@@ -33,13 +207,10 @@
           </div>
           <div style='display:table-cell;'> 
             <input type="text"  id="group_name" name="groupname" placeholder="Enter partner Name" required>
-	    <small class="error">{% trans "Name is required and must be a string" %}</small>
+      <small class="error">{% trans "Name is required and must be a string" %}</small>
             <label id="message" style="display:none; color:red"></label>
-          </div>
-
-          <div style='display:table-cell;'> 
+          </div> 
             <font size="3" >{% trans "Partner Type" %}</font>
-          </div>
           <div style='display:table-cell;'> 
             <select name="group_type" class="gtype">
               <option id="PUBLIC">{% trans "PUBLIC" %}</option>
@@ -71,7 +242,7 @@
             </select>
           </div>
         </div>
-	<div style='display:table-row;'>
+  <div style='display:table-row;'>
           <div style='display:table-cell;'> 
             <font size="3" >{% trans "Group Encryption policy" %}</font>
           </div>
@@ -99,7 +270,9 @@
             <input type="submit" value="Create Partner" id="grpsubmit" class="button">
           </div>
         </div>
+  {% endcomment %}
         <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}">            -->
+<input type="" value="Create Partner" id="grpsubmit" class="button disabled">
       </div>
   </form>
 {% endblock %}

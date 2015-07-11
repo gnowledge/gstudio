@@ -33,12 +33,12 @@ urlpatterns = patterns('',
     # (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
     # (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     # --end of mobwrite
-
     (r'^admin/', include(admin.site.urls)),
     # (r'^$', HomeRedirectView.as_view()),        
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-
+    url(r'^captcha/', include('captcha.urls')),
+    (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
     # all main apps
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
@@ -66,6 +66,8 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/data-review', include('gnowsys_ndf.ndf.urls.data_review')),
     (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
     (r'^(?P<group_id>[^/]+)/compare', include('gnowsys_ndf.ndf.urls.version')),
+    (r'^(?P<group_id>[^/]+)/moderation', include('gnowsys_ndf.ndf.urls.moderation')),
+    (r'^(?P<group_id>[^/]+)/trash',include('gnowsys_ndf.ndf.urls.trash')),
 
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.topics.topic_detail_view', name='topic_details'),
 
@@ -95,7 +97,7 @@ urlpatterns = patterns('',
 
     # --discussion--
     url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.methods.create_discussion', name='create_discussion'),    
-    url(r'^(?P<group_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_reply', name='discussion_reply'),
+    url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_reply', name='discussion_reply'),
     url(r'^(?P<group_id>[^/]+)/discussion_delete_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_delete_reply', name='discussion_delete_reply'),    
     # --end of discussion
 
@@ -106,7 +108,7 @@ urlpatterns = patterns('',
     url(r'^(?P<group_id>[^/]+)/partners$', 'gnowsys_ndf.ndf.views.partner.partner_list', name='partnerlist'),
     # --------end of listing sub partners--------
     # -- tags --
-    url(r'^(?P<group_id>[^/]+)/tags$', 'gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
+    #url(r'^(?P<group_id>[^/]+)/tags$', 'gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$', 'gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
     # ---end of tags
 
@@ -167,7 +169,9 @@ urlpatterns = patterns('',
         name='registration_register'),
 
     url(r'^accounts/', include('registration_email.backends.default.urls')),
+
    # --end of django-registration
 
+   (r'^status/cache/$', 'gnowsys_ndf.ndf.views.cache.cache_status'),
     # url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )
