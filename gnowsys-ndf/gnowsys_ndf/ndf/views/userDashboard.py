@@ -639,7 +639,6 @@ def user_profile(request,group_id):
 
 def user_data_profile(request,group_id):
 	user = {}
-	print "Asdfasdf"
 	Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
 	user_details = User.objects.get(id=request.user.id)
 	user['first_name'] = user_details.first_name

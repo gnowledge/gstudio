@@ -40,10 +40,10 @@
 							</div>
 						</div>
 						<div class="row">
-							<div class="small-4 columns">
+							<div class="small-4 columns" style="right:1%;">
 								<label> <h6>  Subject Proficiency </h6></label>
 							</div>
-							<div class="small-2 columns " style="right:1%;" > 
+							<div class="small-2 columns " style="right:1%; " > 
 								<label id="subject_proficiecncy_info"></label>
 							</div>
 							<div class="small-3 columns">
@@ -86,6 +86,7 @@
 			</div>	
 			<div class="small-6 columns">
 				<select name="language_proficiency" id="language_proficiency">
+					<option  value=" "> --- Select --- </option>
 					{% for i in values.language %}
 						<option name = '{{i}}' value="{{i}}"> {{i}} </option>
 					{% endfor %}
@@ -101,6 +102,7 @@
 			</div>
 			<div class="small-6 columns">
 				<select name="subject_proficiency" id="subject_proficiency">
+					<option  value=" "> --- Select --- </option>
 					{% for i in values.educationalsubject %}
 						<option name = '{{i}}' value="{{i}}"> {{i}} </option>
 					{% endfor %}
