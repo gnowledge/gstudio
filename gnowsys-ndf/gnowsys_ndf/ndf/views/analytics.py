@@ -89,6 +89,8 @@ def user_list_activities(request,group_id):
 	Lists the detailed activities of the user
 	'''
 
+	user = request.user.username
+
 	query("user",{ "username" : request.user.username })
 	cursor = analytics_collection.find({"user.name" : request.user.username}).sort("timestamp",-1)
 	
@@ -110,7 +112,7 @@ def user_list_activities(request,group_id):
 			lst[i][str(temp_date)].append(doc)
 			pass
 	
-	return render (request, "ndf/analytics_list_details.html", { "data" : lst,"group_id" : group_id, "groupid" : group_id})
+	return render (request, "ndf/analytics_list_details.html", { "user_name" : user, "data" : lst,"group_id" : group_id, "groupid" : group_id})
 
 
 @get_execution_time
@@ -275,7 +277,7 @@ def group_list_activities(request,group_id):
 			pass
 
 	return render (request, "ndf/analytics_list_group_details.html",
-															{ "data" : lst, "group_id" : group_id, "groupid" : group_id})
+															{ "data" : lst, "group_id" : group_id, "groupid" : group_id, "group_name" : group_name})
 
 
 @login_required
@@ -347,6 +349,7 @@ def group_members(request, group_id) :
 def group_member_info_details(request, group_id, user) :
 	
 	group_name, group_id = get_group_name_id(group_id)
+	user_name = user
 
 	try :
 		cursor = analytics_collection.find({"group_id" : str(group_id), "user.name" : user}).sort("timestamp", -1)
@@ -375,7 +378,7 @@ def group_member_info_details(request, group_id, user) :
 
 
 		return render(request, "ndf/analytics_group_member_info.html",
-																		{"data" : data , "group_id" : group_id, "groupid" : group_id})
+																		{"data" : data , "group_id" : group_id, "groupid" : group_id, "group_name" : group_name, "user_name" : user_name})
 
 	except : 
 		return HttpResponse("fatal error")
