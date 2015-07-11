@@ -44,6 +44,10 @@
   .img-height {
     height: 100%;
   }
+  .fi-trash{
+        color:orange;
+
+  }
 
   .div-height {
     margin-bottom: 0.5em; 
@@ -127,12 +131,19 @@
             {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
             {% trans "Quiz" %}: {{quiz_count}}<br> 
             {% trans "Forum" %}: {{forum_count}}<br>
+            
         <!--    FOR AWARDS  -->  
         <!-- {% if page_count > 1 %}  
             <img src="/static/ndf/images/close.png">
             {% endif %}     -->      
           </h5>
       </div>
+
+      {% if user.is_superuser %}
+        <div class"trashdiv" style="position:absolute; float:right; right:11%; top:2%;">
+          <a href="/Trash/data-review" > <h5>  <span class = "fi-trash"> </span> <b >  Trash </b> </h5> </a>
+        </div>
+      {% endif %}  
     </div>
     
     <br/>

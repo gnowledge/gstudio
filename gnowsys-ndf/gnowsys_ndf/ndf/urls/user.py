@@ -10,4 +10,3 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.userDashboard',
 		       url(r'^userprofile', 'user_profile', name='user_profile'),
 		       url(r'^user_preference/(?P<auth_id>[\w-]+)$','user_preferences',name='user_preferences'),
 )
-

@@ -5,6 +5,7 @@ from collections import OrderedDict
 from time import time
 import json
 import ox
+import multiprocessing as mp 
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
@@ -662,7 +663,9 @@ def get_gapps_iconbar(request, group_id):
 					if k1 == "name":
 						if v1.lower() not in user_gapps:
 							del gapps[k]
-
+	
+	if group_obj.name == 'Trash':
+		gapps={}
         return {
             "template": "ndf/gapps_iconbar.html",
             "request": request,
@@ -778,11 +781,10 @@ def thread_reply_count( oid ):
 				global_thread_latest_reply["content_org"] = each.content_org
 				global_thread_latest_reply["last_update"] = each.last_update
 				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
-			else:
-				if global_thread_latest_reply["last_update"] < each.last_update:
-					global_thread_latest_reply["content_org"] = each.content_org
-					global_thread_latest_reply["last_update"] = each.last_update
-					global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+			elif global_thread_latest_reply["last_update"] < each.last_update:
+				global_thread_latest_reply["content_org"] = each.content_org
+				global_thread_latest_reply["last_update"] = each.last_update
+				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
 					
 			thread_reply_count(each._id)
 	
@@ -1212,10 +1214,10 @@ def get_prior_node(node_id):
 	if topic_GST._id in obj.member_of:
 
 		if obj.prior_node:
-			for each in obj.prior_node:
-				node = node_collection.one({'_id': ObjectId(each) })
-				prior.append(( node._id , node.name ))
-
+	#	for each in obj.prior_node:
+#			node = node_collection.one({'_id': ObjectId(each) })
+	#		prior.append(( node._id , node.name ))
+			prior=[(node_collection.one({'_id': ObjectId(each) })._id,node_collection.one({'_id': ObjectId(each) }).name) for each in obj.prior_node]
 		return prior
 
 	return prior
@@ -2113,8 +2115,10 @@ def get_source_id(obj_id):
 @get_execution_time
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
    get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   r_list_append_temp=r_list.append #a temp. variable which stores the lookup for append method
+   translation_list_append_temp=translation_list.append#a temp. variable which stores the lookup
    if obj_id not in r_list:
-      r_list.append(obj_id)
+      r_list_append_temp(obj_id)
       node_sub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
       node_rightsub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
       
@@ -2123,20 +2127,20 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
          for each in list(node_sub_rt):
             right_subject = node_collection.one({'_id':each.right_subject})
             if right_subject._id not in r_list:
-               r_list.append(right_subject._id)
+               r_list_append_temp(right_subject._id)
       if list(node_rightsub_rt):
          node_rightsub_rt.rewind()
          for each in list(node_rightsub_rt):
             right_subject = node_collection.one({'_id':each.subject})
             if right_subject._id not in r_list:
-               r_list.append(right_subject._id)
+               r_list_append_temp(right_subject._id)
       if r_list:
          r_list.remove(obj_id)
          for each in r_list:
             dic={}
             node = node_collection.one({'_id':each})
             dic[node._id]=node.language
-            translation_list.append(dic)
+            translation_list_append_temp(dic)
             get_translation_relation(each,translation_list, r_list)
    return translation_list
 

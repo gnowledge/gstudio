@@ -8,6 +8,19 @@
 
 {% block meta_content %}  
 <h2 class="subheader">{{groups_category}}s</h2>
+<!-- 
+  {% comment %}
+  <a href="{% url app_gst.name|lower group_name_tag %}">
+    <h2 class="subheader">
+      {% if app_gst.altnames and app_gst.altnames != "None" %}
+        {{app_gst.altnames}}
+      {% else %}
+        {{app_gst.name}}
+      {% endif%}
+    </h2>
+    {{app_gst.content|safe}}
+  </a>
+  {% endcomment %} -->
 {% endblock %}
 
 
