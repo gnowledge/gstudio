@@ -15,14 +15,16 @@
 			<div  style=" position:relative; float:left; width:45%; border-radius: 1px; box-shadow:1px 0.3px 0.6px 1.2px rgba(9,9,9,0.2);" style="position:relative;">
 				<!-- space to fill the information -->
 				<div align="center">
-						<div class="row" >
-							<div class="small-3 columns" style="right:1%;">
+						<div class="row" align="left" >
+
+							<div class="small-3 columns" style=" left:2%;width:75%;">
 								<label id="first_name_info"> </label>
 							</div>
-							<div class="small-3 columns" style="right:10%;">
+							<!--
+							<div class="small-3 columns" style="right:10%; width:auto;">
 								<b><label id="last_name_info"> </label></b>
-							</div>
-							<div class="small-3 columns" style="left:1%">
+							</div> -->
+							<div class="small-3 columns" style="left:1% width:auto	">
 								<a class="fi-pencil" onclick="load_profile()"> Edit</a>
 							</div>
 						</div>
@@ -195,7 +197,7 @@ function load_information()
 				type:"GET",
 				dataType: "json",
 				success:function(data)
-					{   $('#first_name_info').html("<b> <h4>" + data['first_name']+ "<h4></b>")
+					{   $('#first_name_info').html("<b> <h4>" + "" + data['first_name']+ " "+ data['last_name'] + ""+ "<h4></b>")
 						$('#last_name_info').html ("<b><h4>" + data['last_name']+ "</h4></b>")
 						$('#language_proficiency_info').html("<b>" +data['node']['language_proficiency'] +"</b>" )
 						$('#subject_proficiecncy_info').html ("<b>" +data['node']['subject_proficiency'] + "</b>" )
