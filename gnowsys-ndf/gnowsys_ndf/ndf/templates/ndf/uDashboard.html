@@ -116,7 +116,7 @@
                  {% endif %}
             </div>  
         </div>
-
+      <div> <a  onclick="load_profile()"> profile </a></div>   
       <div class="small-10 columns">
           <h2 class="style-text">{{username}}</h2>
           <h5>
@@ -147,11 +147,12 @@
 
   <!-- Task names -->
   <dl class="tabs" data-tab data-options="deep_linking:true">
+    <dd><a href="#view-profile" id='p5'> Info </a> </dd>
     <dd class="active"><a href="#group" id="p1">Groups </a></dd>
-    
     {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
     <dd ><a href="#Activity" id="p3">My Activities </a></dd>      
     <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
+
   </dl>
 
   <!-- Tab views -->
@@ -159,7 +160,9 @@
     <div class="content" id="view-scheduler-calendar">
       {% include "ndf/scheduler_calender.html"  %}
     </div>
-
+    <div class = "content" id="view-profile">
+        {% include "ndf/user_profile_form.html"  %}
+    </div> 
     <div class="content active" id="group">
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
         {% for node in user_groups %}
@@ -340,6 +343,12 @@
       </ul>
     </div>
   </div>
+  <div id = "user_profile_edit_overlay" class="reveal-modal small" data-reveal>
+    <div id = "user_profile_edit">
+      
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+  </div>
 
 {% endblock %}
 
@@ -401,6 +410,9 @@
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
       $(this).removeClass("success").removeClass("alert").removeClass("warning");
     });
+
+    
+
 {% endblock %}
 
 {% block document_ready %}
@@ -413,4 +425,6 @@
   {% endif %}
 
   $('#docFile').val("");
+
+  
 {% endblock %}

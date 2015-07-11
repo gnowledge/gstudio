@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-
+import ast
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -600,3 +600,49 @@ def group_dashboard(request, group_id):
         },
         context_instance=RequestContext(request)
     )
+
+def user_profile(request,group_id):
+	from django.contrib.auth.models import User
+	if request.method == "POST":
+		
+
+		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+		user = User.objects.get(id=request.user.id)
+		user_data = request.POST.getlist('forminputData[]','')
+		user_select_data = request.POST.getlist('formselectData[]','')
+		for i in user_data:
+			a=ast.literal_eval(i)
+			if  a.get('first_name',None) != None:
+			  	user.first_name = a['first_name']
+			if a.get('last_name',None) != None:
+				user.last_name = a['last_name']
+		user.save()
+		for i in user_select_data:
+			a=ast.literal_eval(i)
+                        if  a.get('language_proficiency','') :
+				Author_group['language_proficiency'] = a.get('language_proficiency','')	
+			if  a.get('subject_proficiency',''):			
+				Author_group['subject_proficiency'] =  a.get('subject_proficiency','')
+		Author_group.save()	 
+		return HttpResponse("Details Successfully Updated")
+	else:
+		user={}		
+		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+		user_details = User.objects.get(id=request.user.id)
+		user['first_name'] = user_details.first_name
+		user['last_name']  = user_details.last_name	
+ 	return render_to_response(	"ndf/user_profile_form.html",
+					{'group_id':group_id,'node':Author_group,'user':user},
+					context_instance=RequestContext(request)
+		
+	)
+
+def user_data_profile(request,group_id):
+	user = {}
+	print "Asdfasdf"
+	Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+	user_details = User.objects.get(id=request.user.id)
+	user['first_name'] = user_details.first_name
+	user['last_name']  = user_details.last_name
+	user['node'] = Author_group
+	return HttpResponse(json.dumps(user,cls=NodeJSONEncoder))
