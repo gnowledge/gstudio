@@ -26,7 +26,6 @@
   }); });
 
 
-<!-- Ajax for removing user from  List  -->
   $(document).on('click',".button.alert.small.remove",function(){
   user_id = $(this).attr("id")
   node_id = $('#node_id').val()
@@ -37,7 +36,6 @@
   $('#firstModal').html(data); },
   });}); 
   });
-<!-- End Ajax -->
 
 
 </script> 
@@ -217,7 +215,6 @@ $(document).ready(function()
   {% check_is_gstaff groupid request.user as is_gstaff %}
   {% if is_gstaff %}
     {% include "ndf/invite_users.html" %}
-
     {% include "ndf/invite_admins.html" %}
   {% endif %} 
 
