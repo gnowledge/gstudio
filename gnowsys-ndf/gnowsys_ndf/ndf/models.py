@@ -226,7 +226,8 @@ class Node(DjangoDocument):
         'status': STATUS_CHOICES_TU,
         'rating':[{'score':int,
                   'user_id':int,
-                  'ip_address':basestring}]
+                  'ip_address':basestring}],
+	'snapshot':dict
     }
     
     required_fields = ['name', '_type'] # 'group_set' to be included
@@ -1199,7 +1200,9 @@ class Author(Group):
         'password': unicode,
         'visited_location': [],
         'preferred_languages': dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
-        'group_affiliation': basestring
+        'group_affiliation': basestring,
+	'language_proficiency':basestring,
+	'subject_proficiency':basestring
     }
 
     use_dot_notation = True

@@ -1,0 +1,229 @@
+{% load ndf_tags %}
+{% load i18n %}
+<style>
+.textarea {
+    width: 500px;
+}
+.space
+{
+	width:1900px; 
+}
+</style>
+
+{% get_metadata_values as values%}
+<div class = "information-div" style="position:relative; ">
+			<div  style=" position:relative; float:left; width:45%; border-radius: 1px; box-shadow:1px 0.3px 0.6px 1.2px rgba(9,9,9,0.2);" style="position:relative;">
+				<!-- space to fill the information -->
+				<div align="center">
+						<div class="row" align="left" >
+
+							<div class="small-3 columns" style=" left:2%;width:75%;">
+								<label id="first_name_info"> </label>
+							</div>
+							<!--
+							<div class="small-3 columns" style="right:10%; width:auto;">
+								<b><label id="last_name_info"> </label></b>
+							</div> -->
+							<div class="small-3 columns" style="left:1% width:auto	">
+								<a class="fi-pencil" onclick="load_profile()"> Edit</a>
+							</div>
+						</div>
+						
+						
+						<div class="row">
+							<div class="small-4 columns" style="left:1%;">
+								<label > <h6> Language proficiency </h6> </label>
+							</div>
+							<div class="small-3  columns" style="right:5%; ">
+								<label id="language_proficiency_info"></label>
+							</div>
+							<div>
+								
+							</div>
+						</div>
+						<div class="row">
+							<div class="small-4 columns" style="right:1%;">
+								<label> <h6>  Subject Proficiency </h6></label>
+							</div>
+							<div class="small-2 columns " style="right:1%; " > 
+								<label id="subject_proficiecncy_info"></label>
+							</div>
+							<div class="small-3 columns">
+								
+
+							</div>
+						</div>
+				</div>		
+			</div>
+			
+</div>
+<div id ='user_profile_edit' method="post" action="{% url 'user_profile' group_id %}" hidden>
+	{% csrf_token %}
+	<div class = "first_name textarea">
+	   <div class="row">
+	   		<div class="small-6 columns"> 	
+				<label> <b> <h5> {% trans "First name" %} </h5> </b> </label>
+			</div>
+			<div <div class="small-6 columns ">
+				<span > <input type="text"   id = "first_name" name = "first_name"> </span>	
+			</div>
+		</div>	
+	</div>
+
+	<div class = "last_name textarea">
+		<div class="row">
+			<div class="small-6 columns">
+				<label>  <b> <h5> {% trans "Last name" %} </h5> </b> </label>
+			</div>
+			<div class="small-6 columns">	
+				<span> <input type="text" id="last_name" name = "last_name"> </span>	
+			</div>	
+		</div>
+	</div>
+
+	<div class = "language_proficiency textarea" >
+		<div class="row">
+			<div class="small-6 columns">	
+				<label> <b> <h5> {% trans "Language proficiency" %}  </h5> </b> </label>
+			</div>	
+			<div class="small-6 columns">
+				<select name="language_proficiency" id="language_proficiency">
+					<option  value=" "> --- Select --- </option>
+					{% for i in values.language %}
+						<option name = '{{i}}' value="{{i}}"> {{i}} </option>
+					{% endfor %}
+				</select>
+			</div>	
+		</div>
+	</div>
+
+	<div class = "subject_proficiency textarea">
+		<div class="row">
+			<div class="small-6 columns">
+				<label> <b> <h5> {% trans "Subject proficiency" %}   </h5> </b> </label>
+			</div>
+			<div class="small-6 columns">
+				<select name="subject_proficiency" id="subject_proficiency">
+					<option  value=" "> --- Select --- </option>
+					{% for i in values.educationalsubject %}
+						<option name = '{{i}}' value="{{i}}"> {{i}} </option>
+					{% endfor %}
+				</select>	
+				
+			</div>
+		</div>
+	</div>
+	<input type="button" onclick="save()" value="submit">
+	<input type="button" onclick="$('#user_profile_edit').hide()
+                  				$('.information-div').show()
+                  				" value="cancel">	
+</div>
+
+
+<script type="text/javascript">
+
+function  save()
+	{
+		var forminputData = []
+		var formselectData = []
+		$('#user_profile_edit').find("input[name]").each(function (index, node) {
+	    forminputData.push('{"' + String(node.name) +'"' +':'+ '"'+ String(node.value)+'"}');
+	    });	
+		$('#user_profile_edit').find("select[name]").each(function (index, node) {
+	    formselectData.push('{"' + String(node.name) +'"' +':'+ '"'+ String(node.value)+'"}');
+	    });	
+		$.ajax({
+				url: "{% url 'user_profile' group_id %}",
+				type:"POST",
+				data:{
+						forminputData,
+						formselectData,	
+						csrfmiddlewaretoken: '{{ csrf_token }}'},
+
+				success:function(data)
+					{   
+						if (data == 'Details Successfully Updated')
+							{
+								$('#user_profile_edit').hide()
+                  				$('.information-div').show()
+                  				load_information()
+                  
+							}
+
+					}
+			   });
+	
+	}
+$(document).ready()
+{	
+	
+	if ('{{node}}')
+		{	
+			$("select[name='language_proficiency'] option[value='{{node.language_proficiency}}']").prop("selected", true);
+			$("select[name='subject_proficiency'] option[value='{{node.subject_proficiency}}']").prop("selected", true)
+			
+		}
+	if('{{user}}')
+		{	
+			$('#first_name').val( String('{{user.first_name}}'))
+			$('#last_name').val(String('{{user.last_name}}'))	
+			
+		}
+	/*	
+	$.ajax({
+				url: "{% url 'user_data_profile' group_id %}",
+				type:"GET",
+				dataType: "json",
+				success:function(data1)
+					{   
+						$('#first_name_info').append(data1['first_name'])
+						$('#last_name_info').append (data1['last_name'])
+						$('#language_proficiency_info').append(data1['node']['language_proficiency'])
+						$('#subject_proficiecncy_info').append (data1['node']['subject_proficiency'])
+		
+					}
+			   });
+	*/
+
+}
+$('#view-profile').on('toggled', function (event, tab) {
+             load_information();
+        });
+
+function load_information()
+{
+		$.ajax({
+				url: "{% url 'user_data_profile' group_id %}",
+				type:"GET",
+				dataType: "json",
+				success:function(data)
+					{   $('#first_name_info').html("<b> <h4>" + "" + data['first_name']+ " "+ data['last_name'] + ""+ "<h4></b>")
+						$('#last_name_info').html ("<b><h4>" + data['last_name']+ "</h4></b>")
+						$('#language_proficiency_info').html("<b>" +data['node']['language_proficiency'] +"</b>" )
+						$('#subject_proficiecncy_info').html ("<b>" +data['node']['subject_proficiency'] + "</b>" )
+		
+					}
+			   });
+
+}
+function load_profile()
+    {
+
+        $.ajax({
+
+              url:"{% url 'user_profile' group_id %}",
+              type:'GET',
+              success:function(data){
+              	  $('#user_profile_edit').show()
+                  $('.information-div').hide()
+                  
+              }   
+                   
+
+
+          });
+          
+    }  
+
+
+</script>
