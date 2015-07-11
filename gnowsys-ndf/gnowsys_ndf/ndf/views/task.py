@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils import simplejson
-from online_status.utils import encode_json     
+from online_status.utils import encode_json
 
 from mongokit import paginator
 try:
@@ -26,7 +26,7 @@ from gnowsys_ndf.ndf.models import Node, GSystemType
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.models import GSystemType, Node 
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node,get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_file_node,get_execution_time,get_group_name_id
 from gnowsys_ndf.ndf.views.methods import parse_template_data, create_gattribute, create_grelation
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 
@@ -43,18 +43,19 @@ def task(request, group_name, task_id=None):
     """Renders a list of all 'task' available within the database.
     
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_name) is False :
-      group_ins = node_collection.find_one({'_type': "Group","name": group_name})
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if group_ins:
-        group_id = str(group_ins._id)
-      else :
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-          group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_name) is False :
+    #   group_ins = node_collection.find_one({'_type': "Group","name": group_name})
+    #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #   if group_ins:
+    #     group_id = str(group_ins._id)
+    #   else :
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if auth :
+    #       group_id = str(auth._id)
+    # else :
+    #     pass
+    group_name, group_id = get_group_name_id(group_name)
 
     GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
     title = "Task"
