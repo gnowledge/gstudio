@@ -1791,12 +1791,12 @@ def edit_policy(groupid,node,user):
 	if resource_type.name == 'Page':
 		resource_type_name = get_objectid_name(resource_infor.type_of[0])
 		if resource_type_name == 'Info page':
-			if user in groupnode.group_admin:
+			if user.id in groupnode.group_admin:
 				return "allow" 
 		elif resource_type_name == 'Wiki page':
 			return "allow"
 		elif resource_type_name == 'Blog page':
-			if user ==  resource_infor.created_by:
+			if user.id ==  resource_infor.created_by:
 				return "allow"
 	else:
 		return "allow"
