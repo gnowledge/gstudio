@@ -2694,3 +2694,30 @@ def get_filters_data(gst_name):
 							}
 
 	return filter_dict
+
+@get_execution_time
+@register.assignment_tag
+def get_sg_member_of(group_id):
+	'''
+	Returns list of names of "member_of" of sub-groups.
+	- Takes group_id as compulsory and only argument.
+	'''
+
+	sg_member_of_list = []
+	# get all underlying groups
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_id, group_name = get_group_name_id(group_id)
+
+	group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+	# Fetch post_node of group
+	post_node_id_list = group_obj.post_node
+
+	if post_node_id_list:
+		# getting parent's sub group's member_of in a list
+		for each_sg in post_node_id_list:
+			each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
+			sg_member_of_list.extend(each_sg_node.member_of_names_list)
+	return sg_member_of_list
