@@ -2,6 +2,12 @@
 {% load i18n %}
 {% load ndf_tags %}
 
+{% block title %}
+ 
+ {{"Group Summary"}}
+ 
+ {% endblock %}
+
 
 <!-- The StyleSheet for headings and content-->
 {% block style %}
@@ -78,17 +84,8 @@
         </dd>
 
         <br>
-        
-        <!-- Interactives -->
-        
+ 
 
-        <!-- eBooks -->
-        
-        
-        <!-- Audio -->
-        
-        
-        <!-- Image -->
         <dd data-filetype="Images">
             <a href="#view-image"><i class="fi-camera"></i>
                 Images
@@ -97,8 +94,7 @@
         </dd>
 
         <br>
-        
-        <!-- Video -->
+      
         
 
         <dd data-filetype="Videos">
@@ -110,13 +106,7 @@
         </dd>
 
         <br>
-        
-        
-        <!-- Pandora -->
-        
-
-        
-
+   
         
           <dd>
             <a href="#view-collection">

@@ -1,17 +1,32 @@
-
 {% extends "ndf/base.html" %}
 {% load i18n %}
 {% load ndf_tags %}
 
+{% block title %}
+  {{" Group Members "}}
+{% endblock %}
+
+
+{% block style %}
+  .heading{
+    font-size: 28px;
+    font-weight: bold
+  }
+ .sub-heading{
+    font-size: 18px;
+    font-weight: bold
+  }
+
+{% endblock %}
+
 {% block body_content %}
 
-
 <ul>
-
+<div class = heading> Group Member Activities  </div><br>
 {% for x in data %}
    	<li>{{x.name}} : {{x.count}}</li>
   	<br>
-  	<b>FORUMS :</b> {{x.forums|length}}
+  	<b class = sub-heading>FORUMS :</b> {{x.forums|length}}
   	<br><br>
   	<ul>
   		{% for content in x.forums %}
@@ -21,7 +36,7 @@
   		{% endfor %}
   	</ul>
   	<br>
-  	<b>THREADS :</b> {{x.threads|length}}
+  	<b class = sub-heading>THREADS :</b> {{x.threads|length}}
   	<br><br>
   	<ul>
   		{% for content in x.threads %}
@@ -31,7 +46,7 @@
   		{% endfor %}
   	</ul>
   	<br>
-  	<b>REPLIES :</b> {{x.replies|length}}
+  	<b class = sub-heading>REPLIES :</b> {{x.replies|length}}
   	<br><br>
   	<ul>
   		{% for content in x.replies %}
@@ -41,7 +56,7 @@
   		{% endfor %}
   	</ul>
   	<br>
-  	<b>FILES :</b> {{x.files|length}}
+  	<b class = sub-headingclass = sub-heading>FILES :</b> {{x.files|length}}
   	<br><br>
   	<ul>
   		{% for content in x.files %}
@@ -51,7 +66,7 @@
   		{% endfor %}
   	</ul>
   	<br>
-  	<b>PAGES :</b> {{x.pages|length}}
+  	<b class = sub-heading>PAGES :</b> {{x.pages|length}}
   	<ul>
   		{% for content in x.pages %}
   			<li>
