@@ -40,6 +40,7 @@ ins_objectid = ObjectId()
 '''
 FUNCTION TO REGISTER CUSTOM ACTIVITIES USING AJAX
 '''
+
 @get_execution_time
 def custom_events(request):
 	transaction = { 'status' : None, 'message' : None}
@@ -79,6 +80,7 @@ USER ANALYTICS VIEWS
 def default_user(request,group_id):
 	return redirect("/"+group_id+'/analytics/summary')
 
+
 @login_required
 @get_execution_time
 def user_list_activities(request,group_id):
@@ -87,21 +89,29 @@ def user_list_activities(request,group_id):
 	Lists the detailed activities of the user
 	'''
 
-	try :
-		start_date = request.POST['start_date']
-		end_date = request.POST['end_date']
-	except:
-		start_date = datetime.datetime.now() - datetime.timedelta(7)
-		end_date = datetime.datetime.now()
-	
 	query("user",{ "username" : request.user.username })
 	cursor = analytics_collection.find({"user.name" : request.user.username}).sort("timestamp",-1)
 	
 	lst = []
+	temp_date = datetime.date(1970, 1, 1)
+	date_col = {}
+
+	i=-1
+
 	for doc in cursor :
-		lst.append(doc)
+		if temp_date != doc[u'timestamp'].date().strftime("%d %b, %Y") :
+			temp_date = doc[u'timestamp'].date().strftime("%d %b, %Y")
+			date_col = {}
+			date_col[str(temp_date)] = []
+			date_col[str(temp_date)].append(doc)
+			lst.append(date_col)
+			i=i+1
+		else :
+			lst[i][str(temp_date)].append(doc)
+			pass
 	
 	return render (request, "ndf/analytics_list_details.html", { "data" : lst,"group_id" : group_id, "groupid" : group_id})
+
 
 @get_execution_time
 def get_user_sessions(user) :
@@ -134,6 +144,7 @@ def get_user_sessions(user) :
 			sessions_list.append(d)
 
 	return sessions_list
+
 
 @login_required
 @get_execution_time
@@ -171,6 +182,7 @@ def user_summary(request,group_id):
 	return render (request, "ndf/analytics_summary.html",
 															{ "data" : data,"group_id" : group_id, "groupid" : group_id})
 
+
 @login_required
 @get_execution_time
 def user_graphs(request) :
@@ -180,9 +192,11 @@ def user_graphs(request) :
 '''
 GROUP ANALYTICS VIEWS
 '''
+
 @get_execution_time
 def default_group(request,group_id):
 	return redirect('/'+group_id+'/analytics/group/summary')
+
 
 @login_required
 @get_execution_time
@@ -230,6 +244,7 @@ def group_summary(request,group_id):
 	
 	return render (request ,"ndf/analytics_group_summary.html",
 																{ "data" : data, "group_id" : group_id, "groupid" : group_id})
+
 	
 @login_required
 @get_execution_time
@@ -243,12 +258,25 @@ def group_list_activities(request,group_id):
 	query("group",{ "group_id" : group_id })
 	cursor = analytics_collection.find({"group_id" : str(group_id)}).sort("timestamp",-1)
 	lst=[]
+	i=-1
+	temp_date = datetime.date(1970,1,1)
+	date_col = {}
 
-	for doc in cursor:
-		lst.append(doc)
+	for doc in cursor :
+		if temp_date != doc[u'timestamp'].date().strftime("%d %b, %Y") :
+			temp_date = doc[u'timestamp'].date().strftime("%d %b, %Y")
+			date_col = {}
+			date_col[str(temp_date)] = []
+			date_col[str(temp_date)].append(doc)
+			lst.append(date_col)
+			i=i+1
+		else :
+			lst[i][str(temp_date)].append(doc)
+			pass
 
 	return render (request, "ndf/analytics_list_group_details.html",
 															{ "data" : lst, "group_id" : group_id, "groupid" : group_id})
+
 
 @login_required
 @get_execution_time
@@ -313,6 +341,7 @@ def group_members(request, group_id) :
 	return render (request, "ndf/analytics_group_members.html",
 																{"data" : list_of_members ,"group_id" : group_id, "groupid" : group_id})
 
+
 @login_required
 @get_execution_time
 def group_member_info_details(request, group_id, user) :
@@ -320,14 +349,29 @@ def group_member_info_details(request, group_id, user) :
 	group_name, group_id = get_group_name_id(group_id)
 
 	try :
-		cursor = analytics_collection.find({"group_id" : str(group_id), "user.name" : user})
+		cursor = analytics_collection.find({"group_id" : str(group_id), "user.name" : user}).sort("timestamp", -1)
 
 		if(cursor.count() != 0) :
 			data = {}
 			data['activities'] = []
 			
+			
+			data['activities']=[]
+			i=-1
+			temp_date = datetime.date(1970,1,1)
+			date_col = {}
+
 			for doc in cursor :
-				data['activities'].append(doc)
+				if temp_date != doc[u'timestamp'].date().strftime("%d %b, %Y") :
+					temp_date = doc[u'timestamp'].date().strftime("%d %b, %Y")
+					date_col = {}
+					date_col[str(temp_date)] = []
+					date_col[str(temp_date)].append(doc)
+					data['activities'].append(date_col)
+					i=i+1
+				else :
+					data['activities'][i][str(temp_date)].append(doc)
+					pass
 
 
 		return render(request, "ndf/analytics_group_member_info.html",
@@ -340,6 +384,7 @@ def group_member_info_details(request, group_id, user) :
 '''
 ANALYTICS PROCESSING 
 '''
+
 @get_execution_time
 def query(analytics_type,details) :
 	'''
@@ -379,6 +424,7 @@ def query(analytics_type,details) :
 					query("user",{"username" : author[u'name'] })
 
 	return 1
+
 
 @get_execution_time
 def normalize(cursor) :

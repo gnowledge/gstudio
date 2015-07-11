@@ -13,13 +13,30 @@
         padding : 10px;
         font-size : 30px;
     }
-
-	
 	.cate {
         width: 100%;
         border-bottom : 1px solid #ddd;
         margin-bottom : 10px;
     }
+    .date-head {
+    	font-size : 20px;
+    }
+    .c_row {
+    	margin : 10px 100px !important;
+    	height : 45px;
+    }
+    .timestamp {
+    	font-size : 12px;
+    	color : #444;
+    	margin-top : 5px;
+    }
+	.b1 {
+		width : 75%;
+	}
+	.element {
+		margin : 5px;
+	}
+
 {% endblock %}
 
 
@@ -28,29 +45,38 @@
 
 <div class="table_wrapper">
 	<div class="cate">Detailed Activities in the the group</div>
-	<table style="width : 100%">
-		{% for x in data %}
-			{% for key, value in x.obj.items %}
-				<tr>
-					<td>
-						<b><a href="/{{x.user.id}}/dashboard/">{{x.user.name}}</a></b>&nbsp;{{x.action.phrase}}&nbsp;{{key}}&nbsp;
-							{% if not value.name|is_empty %}
-								:&nbsp;
-								{% if not value.url|is_empty %}
-									<a href="/{{x.group_id}}/{{value.url}}/{{value.id}}">{{value.name}} <i class="fi-link"></i></a>
-										<br>
-								{% else %}
-									{{value.name}}
-								{% endif %}
-							{% endif %}
-					</td>
-					<td>
-						<div style="font-size: 15px;color : #888;padding-top: 5px;"><i>{{x.timestamp}}</i></div>
-					</td>
-				</tr>
-			{% endfor %}
+	
+	{% for day in data %}
+		{% for date, activity_lst in day.items %}
+			<div class="date-head">{{date}}</div>
+			<table style="width : 100%">
+				{% for activity in activity_lst %}
+					{% for key, value in activity.obj.items %}
+						<tr class="c_row">
+							<td class="b1">
+								<div class="element">
+									<b><a href="/{{x.user.id}}/dashboard/">{{activity.user.name}}</a></b>&nbsp;{{activity.action.phrase}}&nbsp;{{key}}&nbsp;
+										{% if not value.name|is_empty %}
+											:&nbsp;
+											{% if not value.url|is_empty %}
+												<a href="/{{x.group_id}}/{{value.url}}/{{value.id}}">{{value.name}} <i class="fi-link"></i></a>
+													<br>
+											{% else %}
+												{{value.name}}
+											{% endif %}
+										{% endif %}
+									<div class="timestamp">{{activity.timestamp}}</div>
+								</div>
+							</td>
+							<td class="b2">
+								<div class="timestamp"><b>{{activity.timestamp|timesince}} ago</b></div>
+							</td>
+						</tr>
+					{% endfor %}
+				{% endfor %}
+			</table>
 		{% endfor %}
-	</table>
+	{% endfor %}
 </div>
 
 
