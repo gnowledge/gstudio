@@ -2,7 +2,6 @@
 {% load i18n %}
 {% load ndf_tags %}
 
-
 {% block title %}
  
  {{"User Summary"}}
@@ -52,6 +51,65 @@
 		width: 100%;
 		border-bottom : 1px solid #ddd
 	}
+	.panel {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #c6f8fb;
+        margin-bottom: 1.25rem;
+        padding: 1.25rem;
+        background: #f9feff;
+        color: #333333;
+      }
+      .tabs{
+    font-size: 18px;
+    }
+{% endblock %}
+
+{% block meta_content%}
+    <div>
+        <header>
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+                <h2 class="subheader">User Analytics</h2>
+            </a>
+        </header>
+
+        <!-- Meta content in the (main aside header)-->
+        <section>
+            <div>
+                <div class="panel" style="background-color:#ddd;">
+                    <ul class="side-nav">
+                        
+        <!-- summary -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/summary/">
+                 Summary
+            </a>
+            </div>
+        
+
+        <br><br>
+
+        <!-- activities -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/list_activities/">
+               
+                Activities
+          	</a>
+          	</div>
+
+        <br><br>
+ 
+        
+        </ul>
+  </div>
+
+                </div>
+              </section>
+
+              <div>
+                  
+              </div>
+            </div>
 {% endblock %}
 
 {% block body_content %}

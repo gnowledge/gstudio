@@ -16,7 +16,7 @@
   
   <!-- Scripts and stylesheets for SideComments -->
   <!-- <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script> -->
-  <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
+  <!-- <link rel="stylesheet" type"text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
   <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css"> -->
 
   {% if user.is_authenticated %}
@@ -1348,7 +1348,14 @@ ul#navigation li a.last {
                 <a href="{% url create_url group_name_tag %}" class="tiny round button">
                   <span class="fi-plus">&nbsp;&nbsp; New Group</span>
                 </a>
+                </li>
+                 <li>
+                <a href="/{{group_id}}/analytics/group/summary/" class="tiny round button">
+                  &nbsp;&nbsp; Group Analytics
+
+                </a>
               </li>
+               
 
               {% endif %}
             {% endif %}

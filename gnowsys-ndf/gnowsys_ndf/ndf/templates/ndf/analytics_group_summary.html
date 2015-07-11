@@ -20,6 +20,9 @@
         padding : 10px;
         font-size : 30px;
     }
+    .tabs{
+    font-size: 18px;
+    }
 
 	.heading{
 		font-size: 15px;
@@ -45,14 +48,22 @@
         width: 100%;
         border-bottom : 1px solid #ddd
     }
+    .panel {
+			  border-style: solid;
+			  border-width: 1px;
+			  border-color: #c6f8fb;
+			  margin-bottom: 1.25rem;
+			  padding: 1.25rem;
+			  background: #f9feff;
+			  color: #333333;
+			}
 {% endblock %}
 
 {% block meta_content%}
-<aside class="medium-2 columns">
     <div>
         <header>
-            <a href="None">
-                <h2 class="subheader">Analytics</h2>
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+                <h2 class="subheader">Group Analytics</h2>
             </a>
         </header>
 
@@ -61,65 +72,43 @@
             <div>
                 <div class="panel" style="background-color:#ddd;">
                     <ul class="side-nav">
-                        <dl class="tabs" data-tab="">
-
-        <!-- all files -->
-        <dd class="active" data-filetype="all">
-            <a href="#view-all">
-                <i class="fi-eye"></i>
-                All files
-                <span class="count">(3) </span>
+                        
+        <!-- summary -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/group/summary/">
+                 Summary
             </a>
-        </dd>
+            </div>
+        
 
-        <br>
+        <br><br>
 
-        <!-- Documents -->
-        <dd data-filetype="Documents">
-            <a href="#view-doc">
-                <i class="fi-page-filled"></i>
-                Documents
-                <span class="count"></span>
-          </a>
-        </dd>
+        <!-- activities -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+               
+                Activities
+          	</a>
+          	</div>
 
-        <br>
+        <br><br>
  
-
-        <dd data-filetype="Images">
-            <a href="#view-image"><i class="fi-camera"></i>
-                Images
-                <span class="count">(2)</span>
+        <!-- members -->
+        	<div class="tabs">
+            <a href="/{{group_id}}/analytics/group/members/">
+                Members
+                
             </a>
-        </dd>
+            </div>
 
         <br>
       
         
 
-        <dd data-filetype="Videos">
-            <a href="#view-video">
-                <i class="fi-video"></i>
-                Videos
-                <span class="count">(1)</span>
-            </a>
-        </dd>
+       
 
-        <br>
-   
         
-          <dd>
-            <a href="#view-collection">
-              <i class="fi-page-multiple"></i> Collections
-            </a>
-          </dd><br>
-        
-
-      </dl><br>
-
-      
-      
-
+          
 
     </ul>
   </div>
@@ -131,7 +120,6 @@
                   
               </div>
             </div>
-          </aside>
 {% endblock %}
 
 

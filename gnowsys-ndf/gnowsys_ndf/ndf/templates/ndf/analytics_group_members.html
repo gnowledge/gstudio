@@ -6,18 +6,111 @@
   {{" Group Members "}}
 {% endblock %}
 
-
 {% block style %}
-  .heading{
-    font-size: 28px;
-    font-weight: bold
-  }
- .sub-heading{
+    .recent_activities, .overall_activities {
+        width : 100%;
+        height : auto;
+        position : relative;
+        float : left;
+        margin : 10px 0px;
+        padding : 10px;
+        font-size : 30px;
+    }
+    .tabs{
     font-size: 18px;
-    font-weight: bold
-  }
+    }
 
+  .heading{
+    font-size: 15px;
+    font-weight: 900;
+  }
+  .content{
+    font-size: 30px;
+    font-weight: normal;
+    line-height: 40px;
+  }
+  .element{
+    float: left;
+    position: relative;
+    width: 30%;
+        border : 1px solid #ddd;
+        margin : 10px;
+        padding : 10px;
+        background-color : #f1f1f1;
+        border-radius : 2px;
+  }
+ 
+  .cate {
+        width: 100%;
+        border-bottom : 1px solid #ddd
+    }
+    .panel {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #c6f8fb;
+        margin-bottom: 1.25rem;
+        padding: 1.25rem;
+        background: #f9feff;
+        color: #333333;
+      }
 {% endblock %}
+
+{% block meta_content%}
+    <div>
+        <header>
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+                <h2 class="subheader">Group Analytics</h2>
+            </a>
+        </header>
+
+        <!-- Meta content in the (main aside header)-->
+        <section>
+            <div>
+                <div class="panel" style="background-color:#ddd;">
+                    <ul class="side-nav">
+                        
+        <!-- summary -->
+          <div class="tabs">
+            <a href="/{{group_id}}/analytics/group/summary/">
+                 Summary
+            </a>
+            </div>
+        
+
+        <br><br>
+
+        <!-- activities -->
+          <div class="tabs">
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+               
+                Activities
+            </a>
+            </div>
+
+        <br><br>
+ 
+        <!-- members -->
+          <div class="tabs">
+            <a href="/{{group_id}}/analytics/group/members/">
+                Members
+                
+            </a>
+            </div>
+
+        <br>
+
+    </ul>
+  </div>
+
+                </div>
+              </section>
+
+              <div>
+                  
+              </div>
+            </div>
+{% endblock %}
+
 
 {% block body_content %}
 
