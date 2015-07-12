@@ -285,6 +285,17 @@ class Command(BaseCommand):
         else:
           print " GList ("+glc_node_name+") container already created !"
           info_message += "\n GList ("+glc_node_name+") container already created !"
+	
+	page_node = node_collection.find_one({"name":"Page"})
+	page_node_instance = ['Info page','Blog page','Wiki page']
+	instance_nodes = node_collection.find({"name":{"$in":page_node_instance}})
+	for i in instance_nodes:
+		if not page_node._id in i.type_of:
+			i.type_of.append(page_node._id)
+			i.save()
+		else:
+			print "Page " + ""+ i.name + "" +" instance already updated."
+
 
         Group_node = node_collection.collection.Group();
         node_doc =node_collection.one({'$and':[{'_type': u'Group'},{'name': u'Trash'}]})
