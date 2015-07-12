@@ -216,15 +216,15 @@ def page(request, group_id, app_id=None):
         		# node,ver=get_page(request,nodes)
         #   if node != 'None':
         #     content.append(node)	
- 	return render_to_response("ndf/page_list.html",
-                                    {'title': title,
-                                     'appId':app._id,
-                                     'shelf_list': shelf_list,'shelves': shelves,
-                                     'page_nodes': page_nodes,
-                                     'groupid':group_id,
-                                     'group_id':group_id
-                                    },
-                                    context_instance=RequestContext(request))
+     	return render_to_response("ndf/page_list.html",
+                                        {'title': title,
+                                         'appId':app._id,
+                                         'shelf_list': shelf_list,'shelves': shelves,
+                                         'page_nodes': page_nodes,
+                                         'groupid':group_id,
+                                         'group_id':group_id
+                                        },
+                                        context_instance=RequestContext(request))
         
     else:
         # Page Single instance view
@@ -246,7 +246,6 @@ def page(request, group_id, app_id=None):
               page_node = node
 	'''	
       
- 
         annotations = json.dumps(page_node.annotations)
         page_node.get_neighbourhood(page_node.member_of)
         return render_to_response('ndf/page_details.html', 
