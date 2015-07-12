@@ -1947,10 +1947,9 @@ def get_publish_policy(request, groupid, res_node):
 		
 		group_name, group_id = get_group_name_id(groupid)
 		node = node_collection.one({"_id": ObjectId(group_id)})
-
 		group_type = group_type_info(groupid)
 		group = user_access_policy(groupid,request.user)
-		ver = node.current_version
+		ver = resnode.current_version
 
 		if request.user.id:
 			if group_type == "Moderated":
@@ -1997,10 +1996,10 @@ def get_resource_collection(groupid, resource_type):
   Mongodb's cursor object holding nodes having collections
   """
   try:
-    gst = node_collection.one({'_type': "GSystemType", 'name': unicode(resource_type)})
-
+    file_gst = node_collection.one({'_type': "GSystemType", 'name': unicode(resource_type)})
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     res_cur = node_collection.find({'_type': {'$in': [u"GSystem", u"File"]},
-                                    'member_of': gst._id,
+                                    'member_of': {'$in': [file_gst._id, page_gst._id]},
                                     'group_set': ObjectId(groupid),
                                     'collection_set': {'$exists': True, '$not': {'$size': 0}}
                                   })
