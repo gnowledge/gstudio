@@ -1217,14 +1217,13 @@ def get_page(request,node):
                         
 			return(node1,ver1)		
 	    
-  else:
-         
+  else: 
         # if node._type == "GSystem" and node1.status == "DRAFT":
         #     if node1.created_by ==request.user.id:
         #           return (node2,ver2)
         #      else:
 	#	   return (node2,ver2)
-         return (node1,ver1)
+        return (node1,ver1)
 
 @get_execution_time
 def check_page_first_creation(request,node):
