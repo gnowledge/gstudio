@@ -301,34 +301,65 @@ def create_moderator_task(request, group_id, node_id, \
 			}
 
 		else:
-			task_title = u"\n\nResource " + node_obj.name + \
-						 u" in " + group_obj.name + u" is Approved. "
-			task_dict = {
-			    "name": task_title,
-			    "modified_by": request.user.id,
-			    "created_by_name": unicode(request.user.username),
-			    "Status": u"Feedback",
-			    "group_set": [group_obj._id],
-			    "created_by": node_obj.created_by,
-			    "content_org": unicode(task_content_org),
-			    "modified_by": request.user.id,
-			    "contributors": [request.user.id],
-			    "Priority": u"Normal",
-			    "Assignee": list(group_obj.group_admin[:] + [node_obj.created_by]),
-			    "has_type": task_type_list
-			}
-		task_obj = create_task(task_dict, task_type_creation)
+			# on final publish to top group
+
+			# 	task_title = u"\n\nResource " + node_obj.name + \
+			# 				 u" in " + group_obj.name + u" is Approved. "
+			# 	task_dict = {
+			# 	    "name": task_title,
+			# 	    "modified_by": request.user.id,
+			# 	    "created_by_name": unicode(request.user.username),
+			# 	    "Status": u"Feedback",
+			# 	    "group_set": [group_obj._id],
+			# 	    "created_by": node_obj.created_by,
+			# 	    "content_org": unicode(task_content_org),
+			# 	    "modified_by": request.user.id,
+			# 	    "contributors": [request.user.id],
+			# 	    "Priority": u"Normal",
+			# 	    "Assignee": list(group_obj.group_admin[:] + [node_obj.created_by]),
+			# 	    "has_type": task_type_list
+			# 	}
+			# task_obj = create_task(task_dict, task_type_creation)
+
+			try:
+				# delete the task associated with the resource
+				if task_id:
+					task_node = node_collection.one({'_id': ObjectId(task_id)})
+					del_status, del_status_msg = delete_node(
+						node_id=node_item._id, deletion_type=0)
+
+				list_of_recipients_ids = []
+				list_of_recipients_ids.extend(group_obj.group_admin)
+				list_of_recipients_ids.extend(node_obj.created_by)
+
+				# Sending notification to all watchers about the updates of the task
+
+			    for each_user_id in list_of_recipients_ids:
+					url = u"http://" + site + "/"+ unicode(auth_grp._id) \
+						+ u"/moderation/status/" + unicode(node_obj._id.__str__())
+
+					activ = "Contribution to " + group_obj.name +"."
+					mail_content = "Your contributed file has been sent for Moderation.\n" \
+						+ "You may visit this link to check the status of Moderation :\t" \
+						+ url
+					user_obj = User.objects.get(id=int(each_user_id))
+					set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
+
+			except:
+				msg = "Unable to send Notification"
 		if on_upload:
-			url = u"http://" + site + "/"+ unicode(auth_grp._id) \
-				+ u"/moderation/status/" + unicode(node_obj._id.__str__())
+			try:
+				url = u"http://" + site + "/"+ unicode(auth_grp._id) \
+					+ u"/moderation/status/" + unicode(node_obj._id.__str__())
 
-			activ = "Contribution to " + group_obj.name +"."
-			mail_content = "Your contributed file has been sent for Moderation.\n" \
-				+ "You may visit this link to check the status of Moderation :\t" \
-				+ url
-			user_obj = User.objects.get(id=request.user.id)
-			set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
-
+				activ = "Contribution to " + group_obj.name +"."
+				mail_content = "Your contributed file has been sent for Moderation.\n" \
+					+ "You may visit this link to check the status of Moderation :\t" \
+					+ url
+				user_obj = User.objects.get(id=node_obj.created_by)
+				set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
+			except:
+				msg = "Unable to send Notification"
 		if task_obj:
 			create_grelation(node_obj._id, at_curr_app_task, task_obj._id)
 			return True
