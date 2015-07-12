@@ -1116,22 +1116,20 @@ class GroupCreateEditHandler(View):
         if action == "edit":  # to edit existing group
 
             group_obj = get_group_name_id(group_id, get_obj=True)
-        
+
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
 
         elif action == "create":  # to create new group
 
             available_nodes = node_collection.find({'_type': u'Group'}, {'name': 1, '_id': 0})
-        
             # making list of group names (to check uniqueness of the group):
             nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
             # print nodes_list
-        
         # why following logic exists? Do we need so?
         # if group_obj.status == u"DRAFT":
         #     group_obj, ver = get_page(request, group_obj)
-        #     group_obj.get_neighbourhood(group_obj.member_of) 
+        #     group_obj.get_neighbourhood(group_obj.member_of)
 
         title = action + ' Group'
 
@@ -1151,9 +1149,9 @@ class GroupCreateEditHandler(View):
     def post(self, request, group_id, action):
         '''
         To handle post request of group form.
-        To save edited or newly-created group's data. 
+        To save edited or newly-created group's data.
         '''
-        
+
         # getting group's object:
         group_obj = get_group_name_id(group_id, get_obj=True)
 
@@ -1264,7 +1262,6 @@ class EventGroupCreateEditHandler(View):
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
-
         # check if group's editing policy is already 'EDITABLE_MODERATED' or
         # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
         if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
@@ -1276,6 +1273,7 @@ class EventGroupCreateEditHandler(View):
             elif sg_type == "CourseEventGroup":
                 mod_group = CreateCourseEventGroup(request)
 
+
             # calling method to create new group
             result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id,)
 
@@ -1283,11 +1281,14 @@ class EventGroupCreateEditHandler(View):
             # operation success: create ATs
             group_obj = result[1]
             date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id)
-            # print "\n\ndate_result", date_result
             if date_result[0]:
                 # Successfully had set dates to EventGroup
                 group_name = group_obj.name
                 url_name = 'groupchange'
+            else:
+                # operation fail: redirect to group-listing
+                group_name = 'home'
+                url_name = 'group'
         else:
             # operation fail: redirect to group-listing
             group_name = 'home'

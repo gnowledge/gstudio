@@ -121,7 +121,7 @@ this template is modified. So for the fields in the template it supports -
     </div>
     
     <!-- editing policy -->
-    <div class="row">
+    <div class="row hide">
       <div class="small-12 medium-6 medium-centered columns">
         <div class="row">
           
@@ -146,7 +146,7 @@ this template is modified. So for the fields in the template it supports -
     </div>
     
     <!-- moderation level -->
-    <div class="row {% if node.edit_policy != 'EDITABLE_MODERATED' %}hide{% endif%}" id="moderation-level">
+    <div class="row hide" id="moderation-level">
       <div class="small-12 medium-6 medium-centered columns">
         <div class="row">
       
@@ -393,6 +393,9 @@ this template is modified. So for the fields in the template it supports -
         {% endif %}
       </div>
     </div>
+    <input type="hidden" name="moderation_level" value="2">
+    <input type="hidden" name="edit_policy" value="EDITABLE_MODERATED">
+    <input type="hidden" name="agency_type" value="Project">
 
   </form>
 {% endblock %}
@@ -402,26 +405,9 @@ this template is modified. So for the fields in the template it supports -
 
   document.getElementById("group_name").focus();
 
-  function moderatedEditPolicy () {
-    var selectedPolicy = this.value;
-    var moderationLevel = document.getElementById("moderation-level");
-
-    if(selectedPolicy == "EDITABLE_MODERATED")
-    {
-      moderationLevel.classList.remove("hide");
-    }
-    else
-    {
-      moderationLevel.classList.add("hide");
-    }
-  }
-
-  var editPolicy = document.getElementById("editp");
-  editPolicy.onblur = moderatedEditPolicy;
-
   $("#create_group").submit(function(event){
-    $("#editp").removeAttr("disabled")
-    $("select[name='moderation_level']").removeAttr("disabled")
+    // $("#editp").removeAttr("disabled")
+    // $("select[name='moderation_level']").removeAttr("disabled")
     var name = $("#group_name").val().trim().toLowerCase();
     var nodes = {{nodes_list|safe}} 
     var val_chk = name.search(/mod$/gi)    
@@ -591,12 +577,5 @@ this template is modified. So for the fields in the template it supports -
         $(this).datepicker('setDate', new Date(year, (month-1), day));
       },
     });
-
-    $("#editp option:eq(1)").prop('selected',true)
-    $("#editp").attr("disabled",true);
-    
-    $("#moderation-level").removeClass("hide")  
-    $("select[name='moderation_level'] option:eq(2)").prop('selected',true)
-    $("select[name='moderation_level']").attr("disabled",true);
 
 {% endblock %}
