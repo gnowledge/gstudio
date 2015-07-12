@@ -1789,15 +1789,18 @@ def edit_policy(groupid,node,user):
 	#code for public Groups and its Resources
 	resource_type = node_collection.find_one({"_id": {"$in":resource_infor.member_of}})
 	if resource_type.name == 'Page':
-		resource_type_name = get_objectid_name(resource_infor.type_of[0])
-		if resource_type_name == 'Info page':
-			if user.id in groupnode.group_admin:
-				return "allow" 
-		elif resource_type_name == 'Wiki page':
-			return "allow"
-		elif resource_type_name == 'Blog page':
-			if user.id ==  resource_infor.created_by:
+		if resource_infor.type_of:
+			resource_type_name = get_objectid_name(resource_infor.type_of[0])
+			if resource_type_name == 'Info page':
+				if user.id in groupnode.group_admin:
+					return "allow" 
+			elif resource_type_name == 'Wiki page':
 				return "allow"
+			elif resource_type_name == 'Blog page':
+				if user.id ==  resource_infor.created_by:
+					return "allow"
+		else:
+			return "allow"			
 	else:
 		return "allow"
 	''' 
