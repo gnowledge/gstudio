@@ -37,7 +37,7 @@ this template is modified. So for the fields in the template it supports -
     <small>
       {% if node %} Edit | {{node.name}}
       {% else %} 
-        {% trans "Create " %}{{spl_group_type}}{% trans " Group" %}
+        {% trans "Create " %}{{spl_group_type}}
       {% endif %}
     </small>
   </h2>
@@ -387,9 +387,9 @@ this template is modified. So for the fields in the template it supports -
     <div class="row">
       <div class="small-12 medium-6 medium-centered columns">
         {% if node %}
-          <input type="submit" value="Save Changes" id="group-submit" class="button expand">
+          <input type="submit" value="Update {{spl_group_type}}" id="group-submit" class="button expand">
         {% else %}
-          <input type="submit" value="Create Group" id="group-submit" class="button expand">
+          <input type="submit" value="Create {{spl_group_type}}" id="group-submit" class="button expand">
         {% endif %}
       </div>
     </div>
