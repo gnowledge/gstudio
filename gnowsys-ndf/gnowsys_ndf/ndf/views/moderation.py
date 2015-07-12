@@ -299,6 +299,22 @@ def create_moderator_task(request, group_id, node_id, \
 			    "Assignee": list(group_obj.group_admin[:]),
 			    "has_type": task_type_list
 			}
+			task_obj = create_task(task_dict, task_type_creation)
+			if task_obj:
+				create_grelation(node_obj._id, at_curr_app_task, task_obj._id)
+				if not on_upload:
+					try:
+						url = u"http://" + site + "/" + unicode(auth_grp._id) \
+							+ u"/moderation/status/" + unicode(node_obj._id.__str__())
+
+						activ = "Contribution to " + group_obj.name + "."
+						mail_content = "Moderation status of your contributed file has been updated.\n" \
+							+ "You may visit this link to check the status of Moderation :\t" \
+							+ url
+						user_obj = User.objects.get(id=node_obj.created_by)
+						set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
+					except:
+						msg = "Unable to send Notification"
 
 		else:
 			# on final publish to top group
@@ -319,34 +335,33 @@ def create_moderator_task(request, group_id, node_id, \
 			# 	    "Assignee": list(group_obj.group_admin[:] + [node_obj.created_by]),
 			# 	    "has_type": task_type_list
 			# 	}
-			# task_obj = create_task(task_dict, task_type_creation)
 
 			try:
 				# delete the task associated with the resource
 				if task_id:
 					task_node = node_collection.one({'_id': ObjectId(task_id)})
 					del_status, del_status_msg = delete_node(
-						node_id=node_item._id, deletion_type=0)
-
+						node_id=task_node._id, deletion_type=0)
 				list_of_recipients_ids = []
 				list_of_recipients_ids.extend(group_obj.group_admin)
-				list_of_recipients_ids.extend(node_obj.created_by)
+				list_of_recipients_ids.append(node_obj.created_by)
 
 				# Sending notification to all watchers about the updates of the task
-
-			    for each_user_id in list_of_recipients_ids:
-					url = u"http://" + site + "/"+ unicode(auth_grp._id) \
-						+ u"/moderation/status/" + unicode(node_obj._id.__str__())
+				for each_user_id in list_of_recipients_ids:
+					url = u"http://" + site + "/"+ unicode(group_obj._id) \
+						+ u"/file/" + unicode(node_obj._id.__str__())
 
 					activ = "Contribution to " + group_obj.name +"."
-					mail_content = "Your contributed file has been sent for Moderation.\n" \
-						+ "You may visit this link to check the status of Moderation :\t" \
-						+ url
+					mail_content = u"\n\n Contribution file "+ node_obj.name +" is moderated " \
+								 + "and successfully published to " + \
+								group_obj.name + \
+								u". \n\nVisit this link to view the resource : " \
+								+ url
 					user_obj = User.objects.get(id=int(each_user_id))
 					set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
 
-			except:
-				msg = "Unable to send Notification"
+			except Exception as e:
+				msg = "Unable to send Notification", str(e)
 		if on_upload:
 			try:
 				url = u"http://" + site + "/"+ unicode(auth_grp._id) \
@@ -360,8 +375,6 @@ def create_moderator_task(request, group_id, node_id, \
 				set_notif_val(request, auth_grp._id, mail_content, activ, user_obj)
 			except:
 				msg = "Unable to send Notification"
-		if task_obj:
-			create_grelation(node_obj._id, at_curr_app_task, task_obj._id)
 			return True
 	except Exception as e:
 		print "Error in task create moderation --- " + str(e)
