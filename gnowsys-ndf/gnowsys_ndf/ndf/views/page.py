@@ -143,44 +143,50 @@ def page(request, group_id, app_id=None):
       )
 
     elif gst_page._id == ObjectId(app_id):
-	# Page list view 
-        # code for moderated Groups
-        group_type = node_collection.one({'_id': ObjectId(group_id)})
-        group_info=group_type_info(group_id)
-	node = node_collection.find({'member_of':ObjectId(app_id)})
+	    # Page list view 
+      # code for moderated Groups
+      group_type = node_collection.one({'_id': ObjectId(group_id)})
+      group_info=group_type_info(group_id)
+      node = node_collection.find({'member_of':ObjectId(app_id)})
+      title = gst_page.name
+      '''
+      if  group_info == "Moderated":
         title = gst_page.name
- 	'''
-        if  group_info == "Moderated":
-          title = gst_page.name
-          node=group_type.prior_node[0]
-          page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
+        node=group_type.prior_node[0]
+        page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
                                              'group_set': {'$all': [ObjectId(node)]},
                                        }).sort('last_update', -1)
 
-          return render_to_response("ndf/page_list.html",
+        return render_to_response("ndf/page_list.html",
                                     {'title': title, 
                                      'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
                                      'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                     }, 
                                     context_instance=RequestContext(request))
         
-        elif group_info == "BaseModerated":
-	  #code for parent Groups
-          node = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]}, 
+      elif group_info == "BaseModerated":
+      #code for parent Groups
+        node = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]}, 
                                        'group_set': {'$all': [ObjectId(group_id)]},                                           
                                        'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
 	
-          if node is None:
+        if node is None:
             
-	  '''
-	for nodes in node:
-            node,ver=get_versioned_page(nodes) 
-            content.append(node)  
-	'''  
+      '''
+      # for i in node:
+      #   pass
+      
+      for nodes in node:
+        node,ver=get_versioned_page(nodes) 
+        print '^'*20
+        print node,ver
+        content.append(node)
+
+      '''  
                     
-          # rcs content ends here
-          return render_to_response("ndf/page_list.html",
+      # rcs content ends here
+        return render_to_response("ndf/page_list.html",
                                     {'title': title, 
                                      'appId':app._id,
                                      'shelf_list': shelf_list,'shelves': shelves,
@@ -191,15 +197,15 @@ def page(request, group_id, app_id=None):
                                     context_instance=RequestContext(request)
             )
 		
-        elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:'''
-        """
+      elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:'''
+      """
         Below query returns only those documents:
         (a) which are pages,
         (b) which belongs to given group,
         (c) which has status either as DRAFT or PUBLISHED, and 
         (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
-        """
-        page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
+      """
+      page_nodes = node_collection.find({'member_of': {'$all': [ObjectId(app_id)]},
                                              'group_set': {'$all': [ObjectId(group_id)]},
                                              '$or': [
                                               {'access_policy': u"PUBLIC"},
@@ -216,7 +222,7 @@ def page(request, group_id, app_id=None):
         		# node,ver=get_page(request,nodes)
         #   if node != 'None':
         #     content.append(node)	
-     	return render_to_response("ndf/page_list.html",
+      return render_to_response("ndf/page_list.html",
                                         {'title': title,
                                          'appId':app._id,
                                          'shelf_list': shelf_list,'shelves': shelves,
@@ -227,10 +233,10 @@ def page(request, group_id, app_id=None):
                                         context_instance=RequestContext(request))
         
     else:
-        # Page Single instance view
-        '''Group_node = node_collection.one({"_id": ObjectId(group_id)})'''
-	page_node = node_collection.one({"_id": ObjectId(app_id)})       
-        '''if Group_node.prior_node:
+      # Page Single instance view
+      '''Group_node = node_collection.one({"_id": ObjectId(group_id)})'''
+      page_node = node_collection.one({"_id": ObjectId(app_id)})       
+      '''if Group_node.prior_node:
             page_node = node_collection.one({"_id": ObjectId(app_id)})
             
         else:
@@ -244,11 +250,11 @@ def page(request, group_id, app_id=None):
               page_node,ver=get_versioned_page(node)
             elif node.status == u"PUBLISHED":
               page_node = node
-	'''	
+	    '''	
       
-        annotations = json.dumps(page_node.annotations)
-        page_node.get_neighbourhood(page_node.member_of)
-        return render_to_response('ndf/page_details.html', 
+      annotations = json.dumps(page_node.annotations)
+      page_node.get_neighbourhood(page_node.member_of)
+      return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'appId':app._id,
                                     'group_id': group_id,

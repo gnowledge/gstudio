@@ -94,8 +94,18 @@ function setMailBoxName(username, csrf_token, mailBoxName, emailid) {
 
 function updateStatus(filename){
 	fileName = filename;
+	var temp = 0;
 	if(typeOfMail == 0){
-	$.post( 'mailstatuschange/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'file_name': filename}, function(data){		
+		temp = Unreadstart;
+	}
+	else {
+		temp = Readstart;
+	}
+	if(typeOfMail == 0){
+	$.post( 'mailstatuschange/', {'mailBoxName':mailbox_name, 'username': userName, 'csrfmiddlewaretoken': CSRFtoken, 'mail_type': typeOfMail, 'file_name': filename, 'startFrom': temp }, function(data){		
+		var content = $(data).filter( '#mailContent' );
+		console.log(content[0].innerHTML);
+		$( ".mailBoxContent" ).empty().append( content );
 	});
 	}
 }
