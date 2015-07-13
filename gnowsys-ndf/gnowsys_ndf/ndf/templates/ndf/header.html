@@ -9,7 +9,7 @@
 
     <!-- top LHS logo -->
     {% cache 3600 site_logo %}
-    <a class="large-2 small-5 medium-5 columns drop-shadow logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+    <a class="large-2 small-5 medium-5 columns logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
       <img src="{{site.LOGO}}">
     </a>
     {% endcache %}
@@ -18,7 +18,7 @@
     <div class="large-10 small-7 medium-7 columns two-nav-container">
     
       <!-- first menu header  -->
-      <nav class="top-bar drop-shadow" data-topbar role="navigation">
+      <nav class="top-bar " data-topbar role="navigation">
 
         <ul class="title-area">
           <li class="name"> </li>
@@ -258,7 +258,7 @@
 
       <!-- =========| divider between two nav's/header's |=========== -->
       <!-- start of second nav  or group level header-->
-      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %} drop-shadow" id="group-level-header">
+      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
 
         <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->

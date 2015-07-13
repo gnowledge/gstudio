@@ -71,14 +71,14 @@
  -->
 
 {% block meta_content %}
-	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
-		<h3 class="subheader">
+	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
+		<h2 class="subheader">
 			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
 				{{theme_GST.altnames}}
 			{% else %}
 				{{theme_GST.name}}
 			{% endif%}
-		</h3>
+		</h2>
 	</a>
 	{{theme_GST.content|default_if_none:""|safe}}
 {% endblock %}
