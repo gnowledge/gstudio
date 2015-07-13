@@ -204,7 +204,25 @@ def server_sync(func):
         ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
         path1 = os.path.dirname(__file__)
         path2 = os.path.dirname(path1)
-        dst = str(path2) + "/syncdata"
+        
+        settings_dir = os.path.dirname(__file__)
+        PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+        path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+        
+        if not os.path.exists(path_MailClient):
+            os.makedirs(path_MailClient)
+        
+        p1 = path_MailClient + 'syncdata/'
+        
+        if not os.path.exists(p1):
+            os.makedirs(p1)
+        
+        p1 = path_MailClient + 'sent_syncdata_files/'
+        
+        if not os.path.exists(p1):
+            os.makedirs(p1)
+
+        dst = str(path2) + "/MailClient/syncdata"
 
         print '+' * 20
         print dst

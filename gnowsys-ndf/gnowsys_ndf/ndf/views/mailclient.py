@@ -821,6 +821,26 @@ def mailbox_delete(request, group_id,mailboxname):
             mails_path_dir2 = os.path.dirname(mails_path_dir1)
             src = str(mails_path_dir2) + "/MailClient/mailbox_data/" + str(request.user.username) + "/" + mailboxname
             dst = str(mails_path_dir2) + "/MailClient/mailbox_data" + "/Archived_Mails/" + str(request.user.username) + "/" + mailboxname 
+            
+            settings_dir = os.path.dirname(__file__)
+            PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+            path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+        
+            if not os.path.exists(path_MailClient):
+                os.makedirs(path_MailClient)
+        
+            p1 = path_MailClient + 'Archived_Mails/'
+            if not os.path.exists(p1):
+                os.makedirs(p1)
+
+            p1 = path_MailClient + str(request.user.username) + '/'
+            if not os.path.exists(p1):
+                os.makedirs(p1)
+
+            p1 = path_MailClient + mailboxname + '/'
+            if not os.path.exists(p1):
+                os.makedirs(p1)
+
             print '*'*30
             print src
             print dst

@@ -44,9 +44,9 @@ class Command(BaseCommand):
 		if connected_to_internet() is False:
 			return None
 
-		syncdata_folder_path = os.path.dirname(__file__).split('/management')[0] + '/syncdata'
+		syncdata_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/syncdata'
 		list_of_syncdata_folders = []
-		sent_folder_path = os.path.dirname(__file__).split('/management')[0] + '/sent_syncdata_files'
+		sent_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/sent_syncdata_files'
 
 		if not os.path.exists(sent_folder_path):
 			os.makedirs(sent_folder_path)
