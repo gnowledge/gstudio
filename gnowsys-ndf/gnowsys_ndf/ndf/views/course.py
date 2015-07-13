@@ -85,14 +85,14 @@ def course(request, group_id, course_id=None):
 
 
         auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
-
+	'''
         if auth_node.attribute_set:
             for each in auth_node.attribute_set:
                 if each and "course_enrollment_status" in each:
                     course_enrollment_dict = each["course_enrollment_status"]
                     course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
                     enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
-
+	'''
     ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id),'status':u"PUBLISHED"})
 
 

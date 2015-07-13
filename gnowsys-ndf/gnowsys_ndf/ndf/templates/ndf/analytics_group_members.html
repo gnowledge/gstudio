@@ -1,0 +1,172 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+
+{% block title %}
+  {{" Group Members "}}
+{% endblock %}
+
+{% block style %}
+  .member_list {
+        width : 100%;
+        height : auto;
+        position : relative;
+        float : left;
+        margin : 10px 0px;
+        padding : 10px;
+        font-size : 30px;
+    }
+    .tabs{
+    font-size: 18px;
+    }
+
+  .heading{
+    font-size: 15px;
+    font-weight: 900;
+  }
+  .content{
+    font-size: 30px;
+    font-weight: normal;
+    line-height: 40px;
+    border-bottom : 1px solid #ddd;
+    padding-bottom : 5px;
+    margin-bottom : 10px;
+  }
+  .element{
+    float: left;
+    position: relative;
+    width: 30%;
+        border : 1px solid #ddd;
+        margin : 10px;
+        padding : 10px;
+        background-color : #f1f1f1;
+        border-radius : 2px;
+  }
+
+ 
+  .cate {
+        width: 100%;
+        border-bottom : 1px solid #ddd
+    }
+
+    .email-block {
+        font-size : 15px;
+        line-height : 23px;
+    }
+
+    .total {
+        line-height : 30px;
+        padding-bottom : 5px;
+        margin-bottom : 10px;
+    }
+
+    .prompt {
+        font-size : 10px;
+        color : #454A94;
+        float : right;
+        cursor : pointer;
+    }
+
+    .more-box {
+        text-transform : uppercase;
+        font-size : 13px;
+        border-top : 1px solid #ddd;
+        padding-top : 5px;
+    }
+ 
+
+    .panel {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #c6f8fb;
+        margin-bottom: 1.25rem;
+        padding: 1.25rem;
+        background: #f9feff;
+        color: #333333;
+      }
+{% endblock %}
+
+{% block meta_content%}
+    <div>
+        <header>
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+                <h2 class="subheader">Group Analytics</h2>
+            </a>
+        </header>
+
+        <!-- Meta content in the (main aside header)-->
+        <section>
+            <div>
+                <div class="panel" style="background-color:#ddd;">
+                    <ul class="side-nav">
+                        
+        <!-- summary -->
+          <div class="tabs">
+            <a href="/{{group_id}}/analytics/group/summary/">
+                 Summary
+            </a>
+            </div>
+        
+
+        <br><br>
+
+        <!-- activities -->
+          <div class="tabs">
+            <a href="/{{group_id}}/analytics/group/list_activities/">
+               
+                Activities
+            </a>
+            </div>
+
+        <br><br>
+ 
+        <!-- members -->
+          <div class="tabs">
+            <a href="/{{group_id}}/analytics/group/members/">
+                Members
+                
+            </a>
+            </div>
+
+        <br>
+
+    </ul>
+  </div>
+
+                </div>
+              </section>
+
+              <div>
+                  
+              </div>
+            </div>
+{% endblock %}
+
+
+{% block body_content %}
+
+
+<div class="member_list">
+    <div class="cate">Contributors </div>
+    {% for x in data %}
+        <div class="element">
+            <div class= "content"><i class="fi-torso"></i>&nbsp;&nbsp;<a href="/{{group_id}}/analytics/group/member/{{x.name}}">{{x.name}}&nbsp;<span style="font-size : 20px;"></a></span></div>
+            <div class="email-block"><i class="fi-mail"></i>&nbsp;&nbsp;<a href="mailto:{{x.email}}">{{x.email}}</a></div>
+            <div class="total"><span class="email-block">Total Contributions : </span><br>{{x.count}}</div>
+
+            <div class="more-box">
+                {{x.pages}} pages · {{x.files}} files · {{x.forums}} forums · {{x.threads}} threads · {{x.replies}} replies · {{x.tasks}} tasks  
+            </div>
+
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    $(".prompt").click(function() {
+        alert('sd');
+    })
+</script>
+
+
+{% endblock %}

@@ -546,10 +546,16 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
     # To find the path to the mailbox_data folder where the mails are stored in the maildir format
     settings_dir = os.path.dirname(__file__)
     PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-    path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
+    path = os.path.join(PROJECT_ROOT, 'MailClient/')
+    
+    if not os.path.exists(path):
+        os.makedirs(path)
+    
+    path = path + 'mailbox_data/'
+    if not os.path.exists(path):
+        os.makedirs(path)
+    
     path = path + username
-    
-    
     # Necessary for the storage of mails in maildir format : if not exists -> make the corresponding the directories
     if not os.path.exists(path):
         os.makedirs(path)
@@ -820,8 +826,28 @@ def mailbox_delete(request, group_id,mailboxname):
         if save_mails == "YES" and yes == "YES":
             mails_path_dir1 = os.path.dirname(__file__)
             mails_path_dir2 = os.path.dirname(mails_path_dir1)
-            src = str(mails_path_dir2) + "/mailbox_data/" + str(request.user.username) + "/" + mailboxname
-            dst = str(mails_path_dir2) + "/mailbox_data" + "/Archived_Mails/" + str(request.user.username) + "/" + mailboxname 
+            src = str(mails_path_dir2) + "/MailClient/mailbox_data/" + str(request.user.username) + "/" + mailboxname
+            dst = str(mails_path_dir2) + "/MailClient/mailbox_data" + "/Archived_Mails/" + str(request.user.username) + "/" + mailboxname 
+            
+            settings_dir = os.path.dirname(__file__)
+            PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+            path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+        
+            if not os.path.exists(path_MailClient):
+                os.makedirs(path_MailClient)
+        
+            p1 = path_MailClient + 'Archived_Mails/'
+            if not os.path.exists(p1):
+                os.makedirs(p1)
+
+            p1 = path_MailClient + str(request.user.username) + '/'
+            if not os.path.exists(p1):
+                os.makedirs(p1)
+
+            p1 = path_MailClient + mailboxname + '/'
+            if not os.path.exists(p1):
+                os.makedirs(p1)
+
             print '*'*30
             print src
             print dst
@@ -835,7 +861,7 @@ def mailbox_delete(request, group_id,mailboxname):
         elif save_mails== "NO" and yes =="YES":
             mails_path_dir1 = os.path.dirname(__file__)
             mails_path_dir2 = os.path.dirname(mails_path_dir1)
-            src = str(mails_path_dir2) + "/mailbox_data/" + str(request.user.username) + "/" + mailboxname
+            src = str(mails_path_dir2) + "/MailClient/mailbox_data/" + str(request.user.username) + "/" + mailboxname
                        
             print '*'*30
             print src
@@ -955,7 +981,8 @@ def mailbox_settings(request, group_id,mailboxname):
 def get_email_id(filename,mailboxname,username):
     settings_dir = os.path.dirname(__file__)
     PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-    path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
+    path = os.path.join(PROJECT_ROOT, 'MailClient/')
+    path = path + 'mailbox_data/'
     path = path + username + '/' + mailboxname
 
     cur_path = path + '/cur'
@@ -1133,16 +1160,82 @@ def update_mail_status(request,group_id):
     '''
     group_name, group_id = get_group_name_id(group_id)
     template = "ndf/mailstatuschange.html"
+    
     if request.method=='POST' and request.is_ajax():
+
+        mailboxname = request.POST['mailBoxName']
+        username = request.POST['username']
+        mail_type = request.POST['mail_type']
+        filename = request.POST['file_name']
+        startFrom = request.POST['startFrom']
+
+        settings_dir = os.path.dirname(__file__)
+        PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+        path = os.path.join(PROJECT_ROOT, 'MailClient/')
+        path = path + 'mailbox_data/'
+        path = path + username
+        path = path + '/' + mailboxname
+
+        new_path = path + '/new/' + filename
+        cur_path = path + '/cur/' + filename
+
+        shutil.move(new_path,cur_path)
+    
+        new_path = path + '/new/'
+        cur_path = path + '/cur/'
+
+        start = int(startFrom)
+        end  = int(startFrom) + 20
+
+        p = Parser()
+
+        emails = []
+        mails_list = []
+
+        if mail_type == '0':
+            all_unread_mails = sorted_ls(new_path)
+            all_unread_mails.reverse()
+        
+            if end > len(all_unread_mails):
+                end = len(all_unread_mails)
+
+            required_mails = all_unread_mails[start:end]
+
+            for temp_mail in required_mails:
+                temp = {}
+                temp_list = []
+                msg = p.parse(open(join(new_path, temp_mail)))
+                for key in msg.keys():
+                    if key == 'Attachments':
+                        if msg[key] != '':
+                            temp[key] = msg[key].split(';')
+                        else:
+                            temp[key] = []
+                    else:       
+                        temp[key] = msg[key]
+            
+                for attachment_path in temp["Attachments"]:
+                    if attachment_path != '':
+                        _name = attachment_path.split("/")[-1]
+                        temp_list.append(_name)
+
+                temp["attachment_filename"] = temp_list
+                temp['text'] = msg.get_payload()
+                temp['file_name'] = temp_mail
+                mails_list.append(temp)
+
+            i=1
+            for mail in mails_list:
+                emails.append({'mail_id':i, 'mail_data':mail})
+                i+=1
+
         variable = RequestContext(request, {
         'groupname': group_name,
         "group_id" : group_id,
         "groupid" : group_id,
-        'mailboxname': request.POST['mailBoxName'],
-        'username' : request.POST['username'],
-        'mail_type' : request.POST['mail_type'],
-        'filename' : request.POST['file_name']
+        "emails"  : emails
         })
+        # return render(request, template, {'groupname': group_name,'groupid': group_id,'group_id': group_id, "emails"  : mails_list})
         return render_to_response(template,variable)
 
 def fetch_mail_body(request,group_id):
@@ -1167,7 +1260,8 @@ def fetch_mail_body(request,group_id):
         
         settings_dir = os.path.dirname(__file__)
         PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-        path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
+        path = os.path.join(PROJECT_ROOT, 'MailClient/')
+        path = path + 'mailbox_data/'
         path = path + username + '/' + mailboxname
         
         cur_path = path + '/cur'
@@ -1181,9 +1275,6 @@ def fetch_mail_body(request,group_id):
             msg = p.parse(open(join(cur_path, filename)))
 
         _text = msg.get_payload()
-        print '+' * 20
-        print _text
-        print '+' * 20
 
         response = HttpResponse(_text, content_type='text/html')
 

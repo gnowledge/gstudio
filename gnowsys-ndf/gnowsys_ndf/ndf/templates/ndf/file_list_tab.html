@@ -38,8 +38,10 @@
         <div class='{% if each_res.status == "PUBLISHED" %}published{% endif %}'>
       {% endif %} 
 
-      {% if "Pandora_video" in each.member_of_names_list %}
+      {% if "Pandora_video" in each_res.member_of_names_list %}
         <a href="{% url detail_urlname group_id each_res %}?vid_id={{src_id}}">
+      {% elif "Page" in each_res.member_of_names_list %}
+        <a href="{% url 'page_details' group_id each_res %}">
       {% else %}
         <a href="{% url detail_urlname group_id each_res %}">
       {% endif %}
@@ -93,11 +95,15 @@
           </footer>
           </a>
 
-          <div class="label-list small-12 columns">
+          <div class="label-list small-11 columns">
             {% for tag in each_res.tags|slice:":3" %}
             <a href="{% url 'tag_info' group_name_tag tag %}">
               <span class="label" style="background-color:yellow">{{tag}}</span>
             </a>{% endfor %}
+          </div>
+
+          <div class="label-list small-1 columns">
+            <input type="checkbox" name="filenode" class="filenode" value="{{each_res.pk}}">
           </div>
 
 
@@ -140,5 +146,3 @@
   {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
 
 {% endif %}
-
-

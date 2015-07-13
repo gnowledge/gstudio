@@ -1808,10 +1808,26 @@ def resource_info(node):
 @get_execution_time
 @register.assignment_tag
 def edit_policy(groupid,node,user):
-	group_access= group_type_info(groupid,user)
+	groupnode = node_collection.find_one({"_id":ObjectId(groupid)})
 	resource_infor=resource_info(node)
 	#code for public Groups and its Resources
-	
+	resource_type = node_collection.find_one({"_id": {"$in":resource_infor.member_of}})
+	if resource_type.name == 'Page':
+		if resource_infor.type_of:
+			resource_type_name = get_objectid_name(resource_infor.type_of[0])
+			if resource_type_name == 'Info page':
+				if user.id in groupnode.group_admin:
+					return "allow" 
+			elif resource_type_name == 'Wiki page':
+				return "allow"
+			elif resource_type_name == 'Blog page':
+				if user.id ==  resource_infor.created_by:
+					return "allow"
+		else:
+			return "allow"			
+	else:
+		return "allow"
+	''' 
 	if group_access == "PUBLIC":
 			#user_access=user_access_policy(groupid,user)
 			#if user_access == "allow":
@@ -1831,9 +1847,9 @@ def edit_policy(groupid,node,user):
 							return "allow"
 	elif group_access == "Moderated": 
 			 return "allow"
-	elif resource_infor.created_by == user.id:
+	elif resource_infor.created_by:
 							return "allow"    
-						
+	'''					
 @get_execution_time		
 @register.assignment_tag
 def get_prior_post_node(group_id):
@@ -1958,10 +1974,9 @@ def get_publish_policy(request, groupid, res_node):
 		
 		group_name, group_id = get_group_name_id(groupid)
 		node = node_collection.one({"_id": ObjectId(group_id)})
-
 		group_type = group_type_info(groupid)
 		group = user_access_policy(groupid,request.user)
-		ver = node.current_version
+		ver = resnode.current_version
 
 		if request.user.id:
 			if group_type == "Moderated":
@@ -2008,10 +2023,10 @@ def get_resource_collection(groupid, resource_type):
   Mongodb's cursor object holding nodes having collections
   """
   try:
-    gst = node_collection.one({'_type': "GSystemType", 'name': unicode(resource_type)})
-
+    file_gst = node_collection.one({'_type': "GSystemType", 'name': unicode(resource_type)})
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     res_cur = node_collection.find({'_type': {'$in': [u"GSystem", u"File"]},
-                                    'member_of': gst._id,
+                                    'member_of': {'$in': [file_gst._id, page_gst._id]},
                                     'group_set': ObjectId(groupid),
                                     'collection_set': {'$exists': True, '$not': {'$size': 0}}
                                   })
@@ -2768,12 +2783,30 @@ def create_default_mailbox(request,username):
 		return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
 
 import shutil
+
+def sorted_ls(path):
+    '''
+    takes {
+        path : Path to the folder location
+    }
+    returns {
+        list of file-names sorted based on time
+    }
+    '''
+    mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
+    return list(sorted(os.listdir(path), key=mtime))
+
+from os.path import isfile, join
+from email.parser import Parser
+import email.utils
+
 @get_execution_time
 @register.assignment_tag
-def mail_status_change(mailboxname, username, mail_type, file_name):
+def mail_status_change(mailboxname, username, mail_type, file_name, startFrom):
 	settings_dir = os.path.dirname(__file__)
 	PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-	path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
+	path = os.path.join(PROJECT_ROOT, 'MailClient/')
+	path = path + 'mailbox_data/'
 	path = path + username
 	path = path + '/' + mailboxname
 
@@ -2781,5 +2814,68 @@ def mail_status_change(mailboxname, username, mail_type, file_name):
 	cur_path = path + '/cur/' + file_name
 
 	shutil.move(new_path,cur_path)
+	
+	new_path = path + '/new/'
+	cur_path = path + '/cur/'
 
-	return True
+	start = int(startFrom)
+	end  = int(startFrom) + 20
+
+	p = Parser()
+
+	mails_list = []
+
+	if mail_type == '0':
+		all_unread_mails = sorted_ls(new_path)
+		all_unread_mails.reverse()
+        
+		if end > len(all_unread_mails):
+			end = len(all_unread_mails)
+
+		required_mails = all_unread_mails[start:end]
+
+		for temp_mail in required_mails:
+			temp = {}
+			temp_list = []
+			msg = p.parse(open(join(new_path, temp_mail)))
+			for key in msg.keys():
+				if key == 'Attachments':
+					if msg[key] != '':
+						temp[key] = msg[key].split(';')
+					else:
+						temp[key] = []
+				else:       
+					temp[key] = msg[key]
+            
+			for attachment_path in temp["Attachments"]:
+				if attachment_path != '':
+					_name = attachment_path.split("/")[-1]
+					temp_list.append(_name)
+
+			temp["attachment_filename"] = temp_list
+			temp['text'] = msg.get_payload()
+			temp['file_name'] = temp_mail
+			mails_list.append(temp)
+            
+		emails = mails_list
+		print emails
+		return emails
+
+
+@get_execution_time
+@register.assignment_tag
+def get_objectid_name(nodeid):
+ 
+ return (node_collection.find_one({'_id':ObjectId(nodeid)}).name)
+
+@register.filter
+def is_dict(val):
+    return isinstance(val, dict)
+
+@register.filter
+def is_empty(val):
+    if val == None :
+    	return 1
+    else :
+    	return 0
+
