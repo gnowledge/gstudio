@@ -3,6 +3,10 @@ from django.conf import global_settings
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
+import djcelery
+
+
+
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
 TEMPLATE_DEBUG = DEBUG
@@ -305,7 +309,7 @@ LOCALE_PATHS = (os.path.join(os.path.dirname(__file__), '..','conf/locale/'),)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = 'gnowsys_ndf/ndf/static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -413,6 +417,7 @@ INSTALLED_APPS = (
     'jsonrpc',
     'registration_email',
     'memcache_admin',
+    'djcelery',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -675,3 +680,9 @@ WETUBE_PASSWORD = "gl@b$@)we!ube"
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.math_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
 
+# celery configuration
+djcelery.setup_loader()
+CELERY_RESULT_BACKEND = "mongodb"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_IMPORTS = ("gnowsys_ndf.ndf.views.tasks",)
+BROKER_URL = 'mongodb://localhost:27017/' + DATABASES['mongodb']['NAME']

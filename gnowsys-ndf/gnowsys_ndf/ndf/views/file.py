@@ -46,6 +46,9 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls ,create_gattribute
 from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
+from gnowsys_ndf.ndf.views.tasks import convertVideo
+
+
 ############################################
 
 GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
@@ -1017,25 +1020,24 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 # create_gattribute(fileobj._id, source_id_AT, unicode(item))
                 # --- END of code for wetube processing part ---
 
-                # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
+                # # -- convert viedo into webm format
+                # webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj, filename)
 
-                # '''storing thumbnail of video with duration in saved object'''
-                # tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
-                # node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-                # if filename.endswith('.webm') == False:
-                #     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
-                #     # saving webm video id into file object
-                #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
-                '''creating thread for converting vedio file into webm'''
-                #t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
-                #t.start()
+                '''put video conversion in the Q using celery'''
+                convertVideo.delay(userid, str(fileobj._id), filename)
+                # convertVideo(userid, str(fileobj._id), filename)
 
+                
+                # t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
+                # t.start()
+            
             '''storing thumbnail of pdf and svg files  in saved object'''
             # if 'pdf' in filetype or 'svg' in filetype:
             #     thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
             #     tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
             #     node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
                 node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'member_of': GST_IMAGE._id}})
@@ -1049,7 +1051,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
-
             return fileobj._id, is_video
 
         except Exception as e:
@@ -1138,66 +1139,7 @@ def convert_mid_size_image(files, **kwargs):
 
     return mid_size_img
     
-
-def convertVideo(files, userid, fileobj, filename):
-    """
-    converting video into webm format, if video already in webm format ,then pass to create thumbnails
-    """
-    objid = fileobj._id
-    fileVideoName = str(objid)
-    initialFileName = str(objid)
-    os.system("mkdir -p "+ "/tmp"+"/"+str(userid)+"/"+fileVideoName+"/")
-    fd = open('%s/%s/%s/%s' % (str("/tmp"), str(userid),str(fileVideoName), str(fileVideoName)), 'wb')
-    for chunk in files.chunks():
-        fd.write(chunk)
-    fd.close()
-    if files._get_name().endswith('.webm') == False:
-        proc = subprocess.Popen(['ffmpeg', '-y', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")])
-        proc.wait()
-        files = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
-    else : 
-        files = open("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
-    filetype = "video"
-    oxData = ox.avinfo("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName)
-    duration = oxData['duration'] # fetching duration of video by python ox
-    duration = int(duration)
-    secs, mins, hrs = 00, 00, 00
-    if duration > 60 :
-        secs  = duration % 60
-        mins = duration / 60
-        if mins > 60 :
-            hrs = mins / 60
-            mins = mins % 60 
-    else:
-        secs = duration
-    videoDuration = ""
-    durationTime = str(str(hrs)+":"+str(mins)+":"+str(secs)) # calculating Time duration of video in hrs,mins,secs
-
-    if duration > 30 :
-	videoDuration = "00:00:30"
-    else :
-    	videoDuration = "00:00:00"    	
-    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
-    proc.wait()
-    background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
-    fore = Image.open(MEDIA_ROOT+"ndf/images/poster.jpg")
-    background.paste(fore, (120, 100))
-    draw = ImageDraw.Draw(background)
-    draw.text((120, 100), durationTime, (255, 255, 255)) # drawing duration time on thumbnail image
-    background.save("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
-    thumbnailvideo = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
-    
-    webmfiles = files
-    '''storing thumbnail of video with duration in saved object'''
-    tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
-    
-    node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-    if filename.endswith('.webm') == False:
-        tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
-        # saving webm video id into file object
-	
-        node_collection.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-	
+        
 
 @get_execution_time
 def GetDoc(request, group_id):
@@ -1430,14 +1372,12 @@ def getFileThumbnail(request, group_id, _id):
 
           # if (file_node.fs.files.exists(file_fs)):
 
-          f = file_node.fs.files.get(ObjectId(fs_file_ids[2]))
-
-          return HttpResponse(f.read(), content_type=f.content_type)
-
-          # else:
-          #     return HttpResponse("")
+            # -- for video thumbnail
+            f = file_node.fs.files.get(ObjectId(fs_file_ids[1]))
         else:
-            return HttpResponse("")
+            # --  image thumbnail
+            f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))
+        return HttpResponse(f.read(), content_type=f.content_type)
     else:
         return HttpResponse("")
 
