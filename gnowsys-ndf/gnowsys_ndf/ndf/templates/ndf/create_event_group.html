@@ -120,58 +120,6 @@ this template is modified. So for the fields in the template it supports -
       </div>
     </div>
     
-    <!-- editing policy -->
-    <div class="row hide">
-      <div class="small-12 medium-6 medium-centered columns">
-        <div class="row">
-          
-          <div class="small-4 columns">
-            <label for="right-label" class="inline">{% trans "Group Editing Policy" %}</label>
-          </div>
-        
-          <div class="small-8 columns">
-            <!-- getting "EDIT_POLICY" defined in models.py  -->
-            {% get_possible_edit_policy_values as poss_edit_policy %}
-            <select name="edit_policy" id="editp">
-              {% for each_gr_edit_policy in poss_edit_policy %}
-                <option {% if each_gr_edit_policy == node.edit_policy %}selected=selected{% endif %}>
-                  {{each_gr_edit_policy}}
-                </option>
-              {% endfor %}
-            </select> 
-            <small class="error">Please select group editing policy.</small>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- moderation level -->
-    <div class="row hide" id="moderation-level">
-      <div class="small-12 medium-6 medium-centered columns">
-        <div class="row">
-      
-          <div class="small-4 columns">
-            <label for="right-label" class="inline">{% trans "Level of moderation" %}</label>
-          </div>
-
-          <div class="small-8 columns">
-            <select name="moderation_level">
-              <!-- EDITABLE_MODERATED group cannot have moderation_level to 0 -->
-              <option value="1">--- {% trans "Select Level" %} ---</option>
-              {% get_allowed_moderation_levels as mod_levels %}
-              {% for each_level in mod_levels %}
-                <option value="{{each_level}}" 
-                {% if each_level == node.moderation_level %}selected=selected{% endif %}>
-                  {{each_level}}
-                </option>
-              {% endfor %}
-            </select>
-            <small class="error">{% trans "Please select moderation level." %}</small>
-          </div>
-
-        </div>
-      </div>
-    </div>
 
       <!-- start date -->
       <div class="row">
@@ -337,30 +285,6 @@ this template is modified. So for the fields in the template it supports -
     </div>
 
     <br/>
-    
-    <!-- agency type -->
-    <div class="row">
-      <div class="small-12 medium-6 medium-centered columns">
-        <div class="row">
-          <div class="small-4 columns">
-            <label for="right-label" class="inline">{% trans "Group Agency Types" %}</label>
-          </div>
-          
-          {% get_group_agency_types as agency_types %}
-          <div class="small-8 columns">
-            <select name="agency_type" class="agencygrp">
-              {% for each_agency_type in agency_types %}
-                <option {% if each_agency_type == node.agency_type %}selected=selected{% endif %}>
-                  {{each_agency_type}}
-                </option>
-              {% endfor %}
-            </select>
-            <small class="error">Please select group agency type.</small>
-          </div>
-
-        </div>
-      </div>
-    </div>
     {% endcomment %}
 
     <!-- description -->
@@ -386,6 +310,11 @@ this template is modified. So for the fields in the template it supports -
 
     <div class="row">
       <div class="small-12 medium-6 medium-centered columns">
+    
+        <input type="hidden" name="moderation_level" value="2">
+        <input type="hidden" name="edit_policy" value="EDITABLE_MODERATED">
+        <input type="hidden" name="agency_type" value="Other">
+
         {% if node %}
           <input type="submit" value="Update {{spl_group_type}}" id="group-submit" class="button expand">
         {% else %}
@@ -393,9 +322,6 @@ this template is modified. So for the fields in the template it supports -
         {% endif %}
       </div>
     </div>
-    <input type="hidden" name="moderation_level" value="2">
-    <input type="hidden" name="edit_policy" value="EDITABLE_MODERATED">
-    <input type="hidden" name="agency_type" value="Other">
 
   </form>
 {% endblock %}
