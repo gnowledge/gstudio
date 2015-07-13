@@ -1,0 +1,4 @@
+{% for key, value in obj.obj.items|slice:":1" %}
+	<a target="_new" href='/{{author.created_by}}/dashboard/'>{{obj.user.name}}</a>&nbsp;<i>(&nbsp;{{author.email}}&nbsp;)</i>&nbsp;{{obj.action.phrase}}&nbsp;{{key}}&nbsp;:&nbsp;<a href="/{{obj.group_id}}/{{node.url}}/{{value.id}}" target="_new">{{node.name}}</a> 
+	<br><i >{{obj.timestamp}}</i>
+{% endfor %}

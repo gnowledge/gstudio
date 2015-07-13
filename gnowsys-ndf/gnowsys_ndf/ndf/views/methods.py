@@ -12,6 +12,7 @@ from django.core.cache import cache
 
 from mongokit import paginator
 import mongokit
+import json
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -59,34 +60,70 @@ ins_objectid = ObjectId()
 
 
 def get_execution_time(f):
-    if BENCHMARK == 'ON':
+   if BENCHMARK == 'ON': 
 
-        def wrap(*args, **kwargs):
-            time1 = time.time()
-            total_parm_size = 0
-            for key, value in kwargs.iteritems():
-                total_parm_size = total_parm_size + getsizeof(value)
-            total_param = len(kwargs)
-            ret = f(*args, **kwargs)
-            t2 = time.clock()
-            time2 = time.time()
-            time_diff = time2 - time1
-            benchmark_node = col.Benchmark()
-            benchmark_node.time_taken = unicode(str(time_diff))
-            benchmark_node.name = unicode(f.func_name)
-            benchmark_node.parameters = unicode(total_param)
-            benchmark_node.size_of_parameters = unicode(total_parm_size)
-            benchmark_node.last_update = datetime.today()
-            #benchmark_node.functionOplength = unicode(getsizeof(ret))
-            try:
-                benchmark_node.calling_url = unicode(args[0].path)
-            except:
-                pass
-            benchmark_node.save()
-            return ret
-    if BENCHMARK == 'ON':
-        return wrap
-    if BENCHMARK == 'OFF':
+	    def wrap(*args,**kwargs):
+	        time1 = time.time()
+	        total_parm_size = 0
+	        for key, value in kwargs.iteritems():
+	           total_parm_size = total_parm_size + getsizeof(value)
+	        total_param = len(kwargs)
+	        ret = f(*args,**kwargs)
+	        t2 = time.clock()
+	        time2 = time.time()
+	        time_diff = time2 - time1
+	        benchmark_node =  col.Benchmark()
+	        benchmark_node.time_taken = unicode(str(time_diff))
+	        benchmark_node.name = unicode(f.func_name)
+	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+	        try :
+	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
+	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
+	        except : 
+	        	pass
+	        try :
+	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+	        except : 
+	        	pass
+	        try :
+	        	benchmark_node.user = unicode(args[0].user.username)
+	        except :
+	        	pass
+	        benchmark_node.parameters = unicode(total_param)
+	        benchmark_node.size_of_parameters = unicode(total_parm_size)
+	        benchmark_node.last_update = datetime.today()
+	        try:
+	        	benchmark_node.calling_url = unicode(args[0].path)
+	        	url = benchmark_node.calling_url.split("/")
+	        	
+	        	if url[1] != "" : 
+	        		group = url[1]
+	        		benchmark_node.group = group
+	        		try :
+	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+	        			if bool(n) :
+	        				benchmark_node.group = group;
+	        		except :
+	        			group_name, group = get_group_name_id(group)
+	        			benchmark_node.group = str(group)
+	        	else :
+	        		pass
+
+	        	if url[2] == "" : 
+	        		benchmark_node.action = None
+	        	else : 
+	        		benchmark_node.action = url[2]
+		        	if url[3] != '' : 
+		        		benchmark_node.action +=  str('/'+url[3])
+		        	else : 
+		        		pass
+	        except : 
+	        	pass
+	        benchmark_node.save()
+	        return ret
+   if BENCHMARK == 'ON': 
+    	return wrap
+   if BENCHMARK == 'OFF':
         return f
 
 import json
@@ -1471,6 +1508,51 @@ def get_page(request, node):
                 #      return (node2,ver2)
         return (node1, ver1)
 
+@get_execution_time
+def get_page(request,node):
+  ''' 
+  function to filter between the page to be displyed to user 
+  i.e which page to be shown to the user drafted or the published page
+  if a user have some drafted content then he would be shown his own drafted contents 
+  and if he has published his contents then he would be shown the current published contents
+  '''
+  username =request.user
+  node1,ver1=get_versioned_page(node)
+  node2,ver2=get_user_page(request,node)     
+  
+  if  ver2 != '1.1':                           
+	    if node2 is not None:
+                if node2.status == 'PUBLISHED':
+                  
+			if float(ver2) > float(ver1):			
+				return (node2,ver2)
+			elif float(ver2) < float(ver1):
+				return (node1,ver1)
+			elif float(ver2) == float(ver1):
+				return(node1,ver1)
+		elif node2.status == 'DRAFT':
+                       #========== conditions for Group===============#
+
+                        if   node._type == "Group":
+			    
+			    count=check_page_first_creation(request,node2)
+                            if count == 1:
+                                return (node1,ver1)
+                            elif count == 2:
+                               	return (node2,ver2)
+                        
+                        return (node2,ver2)  
+	    else:
+                        
+			return(node1,ver1)		
+	    
+  else: 
+        # if node._type == "GSystem" and node1.status == "DRAFT":
+        #     if node1.created_by ==request.user.id:
+        #           return (node2,ver2)
+        #      else:
+	#	   return (node2,ver2)
+        return (node1,ver1)
 
 @get_execution_time
 def check_page_first_creation(request, node):
