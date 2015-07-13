@@ -15,6 +15,8 @@
 
   .tabs dd.active{ width: 100%; }
 
+  .panel > .side-nav > .tabs i {margin-right: 0.5rem;}
+
 {% endblock %}
 
 <!--
@@ -62,7 +64,7 @@
 {% block related_content %}
   {% check_user_join request groupid as user_is_joined %}
 
-  <div class="panel" style="background-color:#ddd;">
+  <div class="panel" style="background-color:#ddd; padding: 0.25rem;">
     
     <ul class="side-nav">
       <dl class="tabs" data-tab >
@@ -81,7 +83,7 @@
         <!-- Documents -->
         <dd data-filetype="Documents">
           <a href="#view-doc">
-            <i class="fi-page-filled"></i>
+            <i class="fi-page-doc"></i>
             {% trans "Documents" %}
             <span class="count">
               {% if doc_pages %} ({{ doc_pages }}) {% endif %}
@@ -104,7 +106,7 @@
         {% if interactive_pages %}
           <dd data-filetype="Interactives">
             <a href="#view-interactive">
-              <i class="fi-arrows-compress"></i>
+              <i class="fi-shuffle"></i>
               {% trans "Interactives" %}
               <span class="count">
                 ({{ interactive_pages }})
@@ -187,7 +189,6 @@
           </dd><br/>
         {% endif %}
 
-        
         <dd>
           <a href="#view-collection">
             <i class="fi-page-multiple"></i> {% trans "Collections" %}
@@ -199,25 +200,27 @@
 
       {% if user.is_authenticated %}
       {% if user_is_joined == "joined" or user_is_joined == "author" %}
-      <b>{% trans "Actions" %}</b><br/><br/>
+      <!-- <b>{% trans "Actions" %}</b><br/><br/> -->
       
-          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny round button">
+          <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="tiny expand button">
             {% trans "Upload File" %}
-          </a><br/><br/>
+          </a><br/>
 
-      <b>{% trans "Review" %}</b><br/><br/>
-      
+        {% comment %}
         {% user_access_policy groupid request.user as user_access %}
         {% if user_access == "allow" %}
+        {% endcomment %}
 
-          <a href="{% url 'data_review' group_name_tag %}" class="tiny round button">
+        {% if user.is_superuser %}
+          <!-- <b>{% trans "Review" %}</b> -->
+            <a href="{% url 'data_review' group_name_tag %}" class="tiny button expand">
             {% trans "Data Review" %}
           </a>
         {% endif %}
       {% endif %}
       {% endif %}
 
-      <a href="#" data-reveal-id="library-statistics" class="tiny round button">
+      <a href="#" data-reveal-id="library-statistics" class="tiny button expand">
         {% trans "File Statistics" %}
       </a>
       <div class="medium reveal-modal" id="library-statistics" data-reveal>
