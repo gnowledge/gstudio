@@ -8,6 +8,13 @@
 {% cache 3600 create_thread request.LANGUAGE_CODE %}
 
 {% block head %}
+{{block.super}}
+
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
 
   <!-- orgitdown! -->
   <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
@@ -96,7 +103,34 @@
         <input type="hidden" id="forum_threads" value="{{forum_threads}}"/>          
       </div>
     </div>
-    <br/><br/>
+    <br/>
+
+    <div class="row">
+      <div class="large-2 medium-4 columns "><h5><b>{% trans "Release Response:" %} </b></h5>
+      </div>
+      
+      <div class="large-pull-4 large-6 medium-8 columns">
+        <select id="release_resp_sel">
+          <option>True</option>
+          <option>False</option>
+        </select>
+        <input type="hidden" id="release_resp" name="release_resp">
+      </div>
+
+    </div>
+    <br/>
+
+    <div class="row">
+      <div class="large-3 medium-4 columns "><h5><b>{% trans "Thread Close Date-Time:" %} </b></h5>
+      </div>
+      
+      <div class="large-pull-4 large-6 medium-8 columns">
+        <input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY HH:MM" readonly="" required="" class="date_month_day_year" style="width:15rem">      
+      </div>
+
+    </div>
+
+    <br/>
 
     <!-- Description org editor -->
     <h5><b>{% trans "Thread Content: " %}</b></h5>
@@ -113,24 +147,36 @@
 
       <!-- Final Create forum button -->
       <div class="large-8 columns">
-        <input type="submit" id="forum" value="Create Forum" style="display:none">
-        <!-- <input id="forum" type="hidden" value="{{forum}}"> -->
-        <input type="button" id="save_form" class="button expand" value="Create thread" onclick="saveforum()">
+        <input type="submit" id="save_form" class="button expand" value="Create thread">
       </div>
 
     </div>
-    
     {% endcache %}
   </form>
 
 {% endblock %}
 
 {% block document_ready %}
-  // orgitdown
   $('#orgitdown').orgitdown(mySettings);
+
+
 {% endblock %}
 
 {% block script %}
+  var currentYear = (new Date()).getFullYear()
+  lowerYearLimit = currentYear;
+  upperYearLimit = currentYear + 20;
+
+  $(".date_month_day_year").datetimepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    yearRange: lowerYearLimit + ":" + upperYearLimit,
+    hourGrid: 6,
+    minuteGrid: 15,
+    minDate:0,
+  });
+
   $("#node_search_form").parent().hide();
 
   var flag = false;
@@ -159,19 +205,19 @@
     }
   });
 
-  function saveforum(){
+  $("#create_thread").submit(function(event){
+
     var name=$("#thread_name").val();
+    $("#release_resp").attr('value',$("#release_resp_sel").val())
     if (name=="" )
     {
       alert("Please enter forum name");
+      event.preventDefault();
     }
     else if(!flag)
     {
-      alert("Thread with same name already exist !")
+      alert("Thread with same name already exist !");
+      event.preventDefault();
     }
-    else
-    {
-      $("#forum").trigger('click');
-    }
-  }
+  })
 {% endblock %}

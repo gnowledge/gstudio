@@ -387,12 +387,37 @@ def get_reply(request, thread,parent,forum,token,user,group_id):
 
 @get_execution_time
 @register.assignment_tag
-def get_all_replies(parent):
-	 ex_reply=""
-	 if parent:
-		 ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
-		 ex_reply.sort('created_at',-1)
-	 return ex_reply
+def get_all_replies(parent, user):
+	ex_reply = ""
+	thread_close_date_time = None
+	allow_to_reply = True
+	result_set = []
+	if parent:
+		userobj = User.objects.get(id=user)
+		# To check whether user is_gstaff
+		# This will be reliable only when parent has one id in group_set
+		# Using check_is_gstaff func to handle exceptions, if any
+		group_obj_id = parent.group_set[0]
+		gstaff_access = check_is_gstaff(group_obj_id, userobj)
+		if parent.attribute_set:
+			for attr in parent.attribute_set:
+				if attr and 'thread_release_response' in attr:
+					val = attr['thread_release_response']
+					if val or parent.created_by == user or gstaff_access:
+						ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
+						ex_reply.sort('created_at', -1)
+					else:
+						ex_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id),'created_by': int(user)}],'status':{'$nin':['HIDDEN']}})
+						ex_reply.sort('created_at',-1)
+				if attr and 'thread_close_date' in attr:
+					thread_close_date_time = attr['thread_close_date']
+					if thread_close_date_time is not None:
+						curr_date_time = datetime.datetime.now()
+						if curr_date_time > thread_close_date_time:
+							allow_to_reply = False
+	result_set.append(ex_reply)
+	result_set.append(allow_to_reply)
+	return result_set
 
 
 @get_execution_time
