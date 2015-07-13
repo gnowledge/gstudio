@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response  # , render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.cache import cache
 
@@ -23,6 +23,10 @@ from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 
+#get pub of gpg key with which to sign syncdata attachments
+from gnowsys_ndf.settings import SYNCDATA_KEY_PUB
+#to display error template if non existent pub is given in settings.py
+from django.shortcuts import render
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -100,11 +104,28 @@ def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
 
-        ''' The mails that would be sent '''
-        # mail = EmailMessage()
-        # subject = "SYNCDATA"
-        # mail.to = ['djangotest94@gmail.com']
-        # mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+        
+        #do a regex check on SYNCDATA_KEY_PUB, if it contains anything other than letters and nos DONOT run the subprocess.call()
+        # function as this can be a potential security LOOPHOLE
+        #if pub is found to be invalid changes WILL NOT be captured
+        searchObj = re.search( r'[^A-Za-z0-9]', SYNCDATA_KEY_PUB, re.M|re.I)
+        if searchObj:
+            print "Invalid character found in SYNCDATA_KEY_PUB. Please ensure valid existing PUB has been added to local_settings.py", searchObj.group()
+            return            
+        
+        check_command = 'gpg --list-keys | grep -o "'+SYNCDATA_KEY_PUB+'"'
+        std_out= subprocess.call([check_command],shell=True)
+
+        #code to check if SYNCDATA_KEY_PUB in local settings.py is a pub which is present in the gpg database of the system
+        #if not, change WILL NOT be captured
+        if std_out != SYNCDATA_KEY_PUB:
+            error_obj =  "Given pub = %s is not in gpg database of your system. Failed to capture changes for syncdata" % SYNCDATA_KEY_PUB
+            print '**'*30
+            print '\n'*3
+            print error_obj
+            print '\n'*3
+            print '**'*30
+            return
 
         ''' Get current date and time to timestamp json and the document being captured by this function.
          This done so that files in syncdata folder will have unique name'''
@@ -184,19 +205,18 @@ def server_sync(func):
             os.makedirs(path_for_this_capture)
 
         if file_data:
-            #add _sig otherwise django_mailbox scrambles file name
-            # this '_sig' is later used to split the filename and obtain original file name in received attachments in 
+            
+            # '.gpg' in output file name is later used to split the filename and obtain original file name in received attachments in 
             # 'server_sync()' function of mailclient.py views file
             
-            
-
-            op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered + '_sig'
+            #make filename.extension --> filename_extension since finally the name should be filename_extension.gpg
+            op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered.replace('.','_') + '.gpg'
             print ':' * 20
             print op_file_name
             print ':' * 20
             print file_path
-            command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
-            subprocess.call([command],shell=True)    
+            command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + op_file_name + ' --sign ' + file_path
+            subprocess.call([command],shell=True)
             src = op_file_name
 
             print '+' * 20
@@ -212,7 +232,7 @@ def server_sync(func):
         ''' Run command to sign the json file, rename and move to syncdata folder'''
         #add _sig otherwise django_mailbox scrambles file name
         json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
-        command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
+        command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
         subprocess.call([command],shell=True)
         src = json_op_file_name
         shutil.move(src,path_for_this_capture)
