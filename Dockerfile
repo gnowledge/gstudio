@@ -109,16 +109,17 @@ VOLUME /var/data/db
 
 EXPOSE 27017
 expose 80
-CMD ["mongod"]
+#CMD ["mongod"]
 
 # nltk installation and building search base
 
 run pip install -U pyyaml nltk
-run nltk-initialization.py
+run /home/docker/code/nltk-initialization.py
 
+run service mongodb start
 # edit the following file to change the default superuser password 
 # this also does syncdb and filldb 
-run initialize.sh
+run /home/docker/code/initialize.sh
 
 # change this line for your timezone
 run ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
