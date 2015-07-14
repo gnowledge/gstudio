@@ -41,7 +41,7 @@
 
 
 {% block help_content %}
-<p>Threads are new ideas on the topic</p>
+<p> {% trans 'Threads are new ideas on the topic' %}</p>
 {% endblock %}
 
 
@@ -56,7 +56,7 @@
 <ul class="no-bullet" id="create-thread"> 
   <li class="create card ">
     <div>
-      <h4><i class="fi-plus"></i> New</h4>
+      <h4><i class="fi-plus"></i> {% trans 'New' %}</h4>
 
       {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
@@ -154,7 +154,7 @@
                 {{each.name}}
               </a>
               <br/>
-                <i class="gray-text">by {{user_obj.username}}</i>
+                <i class="gray-text"> {% trans 'by' %} {{user_obj.username}}</i>
             </td>
           
             <td class="org-content-style">
@@ -188,7 +188,7 @@
     
     {% else %}
     
-    <h2 ><small>&#8220;This forum dosen't have any threads. Be the first to create a thread!&#8221;</small></h2>
+    <h2 ><small>&#8220; {% trans 'This forum dosen&#39t have any threads. Be the first to create a thread' %}!&#8221;</small></h2>
 
     {% endif %}
 
@@ -256,7 +256,7 @@ if (!window.confirm("Are you sure you want to delete this ?"))
 else
 {
 
-alert("This forum has "+th_count +" existing threads.Please remove them and try again.");
+alert(" {% blocktrans %} This forum has  {{thread_count}}  existing threads.Please remove them and try again {% endblocktrans %}.");
 $("edit-options").hide();
 return false;
 }

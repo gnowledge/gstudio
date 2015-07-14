@@ -7,9 +7,10 @@
   <br/>
   <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
     {% if all_replies %}
-      Initiate New Discussion Thread
+      {% trans 'Initiate New Discussion Thread' %}
+      }
     {% else %}
-      Initiate discussion on {{ node.name }}
+      {% trans 'Initiate discussion on' %} {{ node.name }}
     {% endif %}
   </div>
 
@@ -51,7 +52,7 @@
   <!-- orgitdown container -->
   <div id="org" style="" class="reveal-modal small" data-reveal>
     <!-- Reply : -->
-    <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
+    <textarea id="orgitdownreps" name="content_org" placeholder="{% trans 'Enter your reply text here.'%}"></textarea>
     <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
     <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
@@ -132,7 +133,7 @@
       else
       {
         // alert("To start discussion you need to login and be the member of this group.");
-        alert("Login to start discussion");
+        alert("{% trans 'Login to start discussion' %}");
       }
 
     }
@@ -176,7 +177,7 @@
     else
     {
       // alert("To start discussion you need to login and be the member of this group.");
-      alert("Login to start discussion.");
+      alert(" {% trans 'Login to start discussion.' %} ");
     }
   }
 
@@ -186,12 +187,12 @@
     var totalReplies = $("#replies-area div.disc-replies:visible").length;
     if(totalReplies == 0)
     {
-      $(".view-discussion span").fadeOut().fadeIn().html("Begin Discussion");
-      $("#create-discussion").text("Initiate discussion on " + $("h1 span.node[itemprop]").text().trim());
+      $(".view-discussion span").fadeOut().fadeIn().html(" {% trans 'Begin Discussion' %}");
+      $("#create-discussion").text("{% trans 'Initiate discussion on' %}" + $("h1 span.node[itemprop]").text().trim());
     }
     else
     {
-      $(".view-discussion span").fadeOut().fadeIn().html("Join Discussion ("+totalReplies+")");
+      $(".view-discussion span").fadeOut().fadeIn().html("{% trans 'Join Discussion' %}("+totalReplies+")");
     }
   }
 
@@ -205,10 +206,10 @@
     + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
 
     + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
-    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>delete</div>"
+    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'delete' %}</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-    + data[1] + "' class='reply-btn text-right small-2 columns'> reply </div></div></div>"
+    + data[1] + "' class='reply-btn text-right small-2 columns'>{% trans  'reply' %} </div></div></div>"
 
     return htmlReply;
   }
@@ -252,7 +253,7 @@
               if(priorNodeId == "{{ node.pk }}")  // main reply
               {
                 // change the text of Start discussion and make it visible
-                $("#create-discussion").html("Initiate New Discussion Thread");                
+                $("#create-discussion").html("{% trans 'Initiate New Discussion Thread' %}");                
                 // $("#create-discussion").fadeIn();
 
                 //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
@@ -274,7 +275,7 @@
             }
             else if( data[0] == "no_content" ){
               
-              alert("Please provide the reply content.")
+              alert("{% trans 'Please provide the reply content.' %}")
             }
             else { alert(data) }
           }
@@ -282,7 +283,7 @@
     }
     else // content is not provided
     {
-      alert("Please provide the reply content.")
+      alert(" {% trans 'Please provide the reply content.' %}")
     } // --- END of IF-ELSE
   
   } // --- END of addReply()
@@ -302,11 +303,11 @@
 
       if(nodesToDeleteArr.length > 1)
       {
-        deleteConfirm = confirm("Along with this reply, total of: " + nodesToDeleteArr.length + " replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'");
+        deleteConfirm = confirm("{% trans 'Along with this reply, total of' %}: " + nodesToDeleteArr.length + "{% trans 'replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'' %} ");
       }
       else
       {
-        deleteConfirm = confirm("Are you sure to delete this reply ?\nClick 'OK' to delete.");
+        deleteConfirm = confirm("{% trans 'Are you sure to delete this reply ?\nClick 'OK' to delete.' %} ");
       }
 
       if(deleteConfirm)
@@ -337,7 +338,7 @@
     }
     else
     {
-      alert("To delete this reply, you need to be login and author of this reply.");
+      alert("{% trans 'To delete this reply, you need to be login and author of this reply.' %}");
     }
   }
 

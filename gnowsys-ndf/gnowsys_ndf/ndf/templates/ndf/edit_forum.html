@@ -50,7 +50,7 @@
 
 function cancel(){
 
-	if(confirm("Are you sure you want to cancel edit?"))
+	if(confirm("{% trans 'Are you sure you want to cancel edit'%}?"))
 	{
 		 history.go(-1);
 	}
@@ -86,7 +86,7 @@ function cancel(){
     <div class="row">
       <div class="large-2 medium-4 columns "><h5><b>{% trans "Forum name:" %} </b></h5></div>
       <div class="large-pull-4 large-6 medium-8 columns">
-        <input type="text" placeholder="Forum Name " 
+        <input type="text" placeholder="{% trans 'Forum Name' %} " 
         name="forum_name" id="forum_name" value="{{forum.name}}">
         <label id="message" style="display:none; color:red"></label>
       </div>
@@ -123,8 +123,8 @@ function cancel(){
       <!-- Final Create forum button -->
       <div class="large-8 columns">
         <!-- <input type="submit" id="forum" value="Edit Forum" style="display:none"> -->
-        <input type="submit" id="forum" class="button tiny" value="Save forum">
-	<input type="button" id="cancel_edit" class="button tiny" value="Cancel" onclick="cancel()">
+        <input type="submit" id="forum" class="button tiny" value="{% trans 'Save' %} {% trans 'Forum' %}">
+	<input type="button" id="cancel_edit" class="button tiny" value="{% trans 'Cancel' %}" onclick="cancel()">
       </div>
 
     </div>
@@ -296,13 +296,13 @@ function cancel(){
       if (nodes.indexOf(name) != -1)  
       { 
         $("#message").css("display", "block");
-        $("#message").text("Forum '"+ name +"' already exist. Please choose another name");
+        $("#message").text("{% trans 'Forum  with same name already exist. Please choose another name' %}");
         event.preventDefault();
       }
     }
     else if (name == ""){
       $("#message").css("display", "block");
-      $("#message").text("Forum name cannot be empty.");
+      $("#message").text("{% trans 'Forum name cannot be empty' %}.");
       event.preventDefault();
     }
     else
@@ -322,7 +322,7 @@ function cancel(){
       var name=$("#forum_name").val();
       if (name=="" )
       {
-        alert("Please enter forum name");
+        alert("{% trans 'Please enter forum name' %}");
       }
       else
       {

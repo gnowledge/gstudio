@@ -92,7 +92,7 @@
               <div>
                 <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
                 </span>
-                <input class="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+                <input class="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="{% trans 'Separate tags with commas...' %}">
               </div>  
               <!-- To enter description(org content) -->
               <div class="row">
@@ -101,7 +101,7 @@
                 </div>
               </div>
 
-              <input type="submit" id="add_page" value="Save Page" class="medium round button"/>
+              <input type="submit" id="add_page" value="{% trans 'Save Page' %}" class="medium round button"/>
 
               <a class="close-reveal-modal">&#215;</a>
 
@@ -130,7 +130,7 @@
             <input type="hidden" name="context_name" id="context_name" value="Topic">
             <!-- This is for getting the user of the uploaded file -->
             <input type="hidden" name="user" value="{{request.user.pk}}">
-            <input type="submit" class="small round button" id="add_file" value="Save File">
+            <input type="submit" class="small round button" id="add_file" value="{% trans 'Save File' %}">
 
             </form>
             <a class="close-reveal-modal">&#215;</a>
@@ -176,7 +176,7 @@ $("#add_page").click(function() {
           var page = $(".name_id").val();
 
           if ($.trim(data["success"]) === false) {
-            alert("Page name "+ page +" already available, Please choose different name");
+            alert(" Page name "+ page +" already available, Please choose different name");
           }
 
           if ($.trim(data["success"]) === true) {
@@ -206,7 +206,7 @@ $("#add_page").click(function() {
   
     {% include "ndf/shelf.html" %}
   {% else %}
-  <h4>Please Login to create your shelf</h4>
+  <h4>{% trans 'Please Login to create your shelf' %}</h4>
   {% endif %}  
 {% endblock %}
 
@@ -232,7 +232,7 @@ function addNewShelf(shelfName)
   }
 
   else {
-    alert("Shelf with this name already exist !\n\n Create shelf with different name.");
+    alert("{% trans 'Shelf with this name already exist !\n\n Create shelf with different name.' %}");
   }
 
 }

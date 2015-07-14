@@ -62,31 +62,33 @@ i.remove-tag{
 <form data-abide id="form-edit-node" method="POST" action="">    
     
     <header> 
-    <div class="row">
- 	<div class="large-8 columns">    
- 		<h3><span class="subheader">		
-		{% if node %}
-			{% trans "Editing " %} {{title}} : {{node.name}}
-		{% else %}
-			{% trans "Create New " %} {{title}} :
-		{% endif %} 
-		</span></h3>
+	    <div class="row">
+		 	<div class="large-8 columns">    
+		 		<h3><span class="subheader">		
+					{% if node %}
+						{% trans "Editing " %} {{title}} : {{node.name}}
+					{% else %}
+						{% trans "Create New " %} {{title}} :
+					{% endif %} 
+				</span></h3>
 
 
-	    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
-  		<label id="message" style="display:none; color:red"></label>
+			    <input tabindex="1" id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." {% if node.group_type %}disabled=disabled{% endif %} required>
+		  		<label id="message" style="display:none; color:red"></label>
 
-	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
-	  
-    </div>     
-    </div> 
+			    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
+			  
+		    </div>     
+	    </div> 
     </header>
-  	    {% check_group node as is_group %}
+  	{% check_group node as is_group %}
 
     <div class="edit-card">
         
 	    <div class="row">
+
 	      	<dl class="tabs pill large-12 columns select">
+
 				<dd class="active node_tab" title="Click here to add Name, Description, Privacy and Tags">
 		  		<!-- change name of collection tab overide block in your code -->
 		  			<a>{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
@@ -117,19 +119,21 @@ i.remove-tag{
         
   	{% csrf_token %}
         {% comment %}
-  	<div id="publish_resource" class="reveal-modal" data-reveal style="width:500px;">
-  		Do you want to create:<br/><br/>
-  		<input class="collection" type="radio" name="coll" value="homogeneous"> &nbsp;Homogeneous Collection<br/>
-  		<input class="collection" type="radio" name="coll" value="heterogeneous"> &nbsp;Heterogeneous Collection
-  		<a class="close-reveal-modal">&#215;</a>
-  	</div>
+		  	<div id="publish_resource" class="reveal-modal" data-reveal style="width:500px;">
+		  		Do you want to create:<br/><br/>
+		  		<input class="collection" type="radio" name="coll" value="homogeneous"> &nbsp;Homogeneous Collection<br/>
+		  		<input class="collection" type="radio" name="coll" value="heterogeneous"> &nbsp;Heterogeneous Collection
+		  		<a class="close-reveal-modal">&#215;</a>
+		  	</div>
         {% endcomment %}
   	<div id="node-details-edit-div" class="tabs-content" > 
 
     	<div class="active content row contents" id="panel-name-description">
+
       		<div class="medium-8 columns">
-		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
-			</div>
+
+		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+		  	</div>
 		
 			<!--  -->
 			<div class="large-4 columns">
@@ -139,56 +143,55 @@ i.remove-tag{
 		    		{% if node.created_by == request.user.pk %}	
 
 		    			{% cache 300 node_edit_base_visibility node.access_policy request.LANGUAGE_CODE %}
-	                    <div class="large-4 columns">
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Visibility" %}</label></span>
-						</div>                    
+		                    <div class="large-4 columns">
+								<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Visibility" %}</label></span>
+							</div>                    
 
-						<div class="large-8 columns">
-							<div class="privacy-mode ">
-							{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
-								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-								<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
+							<div class="large-8 columns">
+								<div class="privacy-mode ">
+									{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
+										<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+										<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
-								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-								<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
-							{% else %}
-								{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
-									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-									<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
+										<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+										<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
+									{% else %}
+										{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
+											<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
+											<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
-									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-									<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
-								{% endif %}
-							{% endif %}
-							<span></span>
+											<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
+											<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
+										{% endif %}
+									{% endif %}
+								</div>
 							</div>
-						</div>
 						{% endcache %}
 
 					{% else %}
 							
 						{% if not node %}
-	                     <div class="large-4 columns">
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">{% trans "Visibility" %}</label></span>
-	                     </div>
-	                     
-	                     <div class="large-8 columns">
-							<div class="privacy-mode">
-							
-								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-								<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
+		                    <div class="large-4 columns">
+								<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">{% trans "Visibility" %}</label></span>
+		                    </div>
+		                     
+		                    <div class="large-8 columns">
+									<div class="privacy-mode">
+									
+										<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+										<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
-								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-								<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
-							
-								<span></span>
+										<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+										<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
+									
+										<span></span>
+									</div>
 							</div>
-						</div>
 						{% endif %}
 
 					{% endif %}	 
 
-	            	</div>                
+	            </div>                
 	            	
 	    			{% cache 300 node_edit_base_lang_loc request.LANGUAGE_CODE %}
 
@@ -200,7 +203,7 @@ i.remove-tag{
 	               			<select name="lan">
                                        {% get_language_info_list for LANGUAGES as languages %}
                                        {% for language in languages %}
-                                       <option value="{{language.code}}">{{language.name}}</option>{% endfor %}</select>
+                                       <option value="{{language.code}}">{% trans language.name %}</option>{% endfor %}</select>
 	                    </div>
 	                </div>
 	                
@@ -218,17 +221,17 @@ i.remove-tag{
 		     		<div class = "page type" >
 		     			<div class="row">
 		     			 	<div class = "small-2 columns">	
-			     				<span  style="width: 70px; float: left;" > Page Type:  </span>
+			     				<span  style="width: 70px; float: left;" >{% trans 'Page Type' %}:  </span>
  							</div>
  							<div class="small-8 columns" ends>
 				     			<select name="type_of" id="type_of">
 						  			{% for i in page_instance %}
 
 						  				{% if i.name == "Wiki page" %}	        				
-											<option value = {{i.pk}} selected> {{i.name}} </option>
+											<option value = {{i.pk}} selected> {% trans i.name %} </option>
 
 										{% else %}
-											<option value = {{i.pk}} > {{i.name}} </option>
+											<option value = {{i.pk}} > {% trans i.name %} </option>
 										{% endif %}
 						  				
 			  						{% endfor %}
@@ -504,7 +507,7 @@ i.remove-tag{
     {% endcache %}
 
     <!-- <input type="hidden" id="nodes_list" value="{{nodes_list}}"> -->
-    <input type="submit" tabindex="4" id="save-node" value="Save as Draft And Preview" class="round button" />
+    <input type="submit" tabindex="4" id="save-node" value=" {% trans 'Save as Draft And Preview' %}" class="round button" />
 
 </form>
 
@@ -521,7 +524,7 @@ function setdrawer(){
       $('#switchgrp').foundation('reveal', 'open');
        $('.close-reveal-modal.st').click(function(){
        if (saveflag == 0){
-         alert("This will cancel the save");
+         alert("{% trans 'This will cancel the save' %}");
       }
 });
 }
@@ -567,7 +570,7 @@ $.ajax({
        type: 'POST',
        data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
         success: function(data){
-                       alert("Successfully switched groups");
+                       alert("{% trans 'Successfully switched groups' %}");
             
            },
 }); //end of ajax
@@ -1036,7 +1039,7 @@ $(document).ready(function(){
 
 			var closeBtn = document.createElement("i");
 			closeBtn.className = "fi-x-circle remove-tag";
-			closeBtn.title = "Remove this tag";
+			closeBtn.title = "{% trans 'Remove this tag' %}";
 			closeBtn.onclick = removeTag;
 
 			$(closeBtn).mouseenter(function(){
@@ -1123,21 +1126,21 @@ $(document).ready(function(){
 	    {
 			if(val_chk == -1){
 				if (nodes.indexOf(name) != -1)  
-				{ 
+				{   
 					$("#message").css("display", "block");
-					$("#message").text("{{title}} '" + name +"' already exist. Please choose another name");
+					$("#message").text("{% trans title %}'" + name +"' {% trans 'already exist. Please choose another name' %}");
 					event.preventDefault();
 				}
 			}
 			else if (val_chk != -1){
 				$("#message").css("display", "block");
-				$("#message").text("Name cannot include 'Mod'.");
+				$("#message").text("{% trans 'Name cannot include 'Mod'.'%}");
 				event.preventDefault();
 			}
 	    }
 	    else if (name == ""){
 	      $("#message").css("display", "block");
-	      $("#message").text("Name cannot be empty.");
+	      $("#message").text("{% trans 'Name cannot be empty.' %}");
 	      event.preventDefault();
 	    }
 	    else
