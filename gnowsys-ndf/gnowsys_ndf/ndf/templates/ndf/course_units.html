@@ -27,6 +27,11 @@
       border: 1px solid white;
   	}
 
+    .largesize{
+      font-size:22px;
+      color:#0b8a91 !important;
+    }
+
     #res_table , td, tr {
       border: 2px solid #0b8a91 !important;
       border-collapse: collapse;
@@ -512,8 +517,8 @@
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
       var cell3 = row.insertCell(2);
-      cell1.innerHTML = "Name";
-      cell2.innerHTML = "Type";
+      cell1.innerHTML = "Type";
+      cell2.innerHTML = "Name";
       cell3.innerHTML = "Action";
 
       {% get_node unit_node.pk as unit_node %}
@@ -541,10 +546,10 @@
               var cell1 = row.insertCell(0);
               var cell2 = row.insertCell(1);
               var cell3 = row.insertCell(2);
-              cell1.innerHTML = str_unit;
-              cell2.innerHTML = "<span data-tooltip title='Resource type'>{{res_node.member_of_names_list.0}}</span>";
+              cell1.innerHTML = "<span data-tooltip title='Resource type'>{{res_node.member_of_names_list.0}}</span>";
+              cell2.innerHTML = str_unit;
+              cell3.innerHTML = "<span data-tooltip title='Move Up'><a class='fi-arrow-up largesize'></a></span>&nbsp;&nbsp;&nbsp;<span data-tooltip title='Move Down'><a class='fi-arrow-down largesize'></a></span>&nbsp;&nbsp;&nbsp;<span data-tooltip title='Remove from unit'><a class='fi-trash largesize'></a></span>";
               $(".collection_details").append(table)
-              cell3.innerHTML = "<a class='fi-arrow-up'>Moveup</a>&nbsp;&nbsp;<a class='fi-arrow-down'>Movedown</a>";
           {% endif %}
         {% endfor %}
       {% else %}
@@ -560,7 +565,7 @@
       }
     }
 
-  // Reordering li elements to move UP------------------------------------
+  // Reordering tr elements to move UP------------------------------------
     $(document).on('click','.fi-arrow-up',function(){
       var $current = $(this).closest('tr');
       var $previous = $current.prev('tr');
@@ -596,7 +601,7 @@
       }    
     });
 
-  // Reordering li elements to move DOWN-----
+  // Reordering tr elements to move DOWN-----
     $(document).on('click','.fi-arrow-down',function(){
       var $current = $(this).closest('tr');
       var $next = $current.next('tr');
@@ -634,6 +639,43 @@
 
       });
 
+  // Deleting resource tr elements------------------------------------
+    $(document).on('click','.fi-trash',function(){
+      var rowIndex = $("table").index(this);
+      var res = $(this).closest('tr');
+      var res_id = $(this).closest('tr').attr('id');
+      var parent_node = "{{unit_node.pk}}"
+      if(res_id){
+          $.ajax({
+            url: "{% url 'remove_resource_from_unit' group_id %}",
+
+            data: {
+              'unit_node_id': parent_node,
+              'res_id': res_id,
+              'csrfmiddlewaretoken': "{{csrf_token}}"
+            },
+
+            type: "POST",
+
+            dataType: "json",
+
+            success: function(data){
+              success_state = data["success"]
+              if(success_state){  
+                $("tr#"+res_id).remove();
+                if($("table").find("tr").length==1){
+                  $("table").remove();
+                }
+                location.reload();
+              }
+              else{
+                alert("Unable to delete this row. Try later.")
+              }    
+            },
+          });//end of ajax
+
+      }
+    });
 
 {% endblock %}
 
