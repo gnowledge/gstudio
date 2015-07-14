@@ -27,9 +27,16 @@
       border: 1px solid white;
   	}
 
+    #res_table , td, tr {
+      border: 2px solid #0b8a91 !important;
+      border-collapse: collapse;
+    }
+
+
     .unit-name-div{
       width:60% !important;
     }
+
 
     .resource-drawer{ 
       border-color: #D3D3D3; border-style: solid; 
@@ -99,14 +106,14 @@
       <div class="small-2 columns">
 
           {% if unit_node %}
-            <input type="button" value="Edit Unit" class="edit_unit tiny round button"/>
+            <input type="button" value="Edit Title" class="edit_unit tiny round button"/>
           {% else %}
             <input type="button"  value="Create Unit" class="create_unit tiny round button"/>
           {% endif %}
       </div>
       <div class="small-3 columns">
           <span data-tooltip title="You will be redirected to Course Authoring page" style="float:right;">
-            <a class="done_units tiny button round" style="float:right;">Add later..</a>
+            <a class="done_units tiny button round" style="float:right;">Cancel</a>
           </span>
       </div>
 
@@ -500,6 +507,15 @@
       
       $(".collection_details").html("")
       dict_res = {};
+      var table = document.createElement("TABLE");
+      var row = table.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      cell1.innerHTML = "Name";
+      cell2.innerHTML = "Type";
+      cell3.innerHTML = "Action";
+
       {% get_node unit_node.pk as unit_node %}
       {% if unit_node.collection_set %}
         {% for each_res in unit_node.collection_set %}
@@ -517,8 +533,18 @@
               {% else %}
                 k = "{% url res_node.member_of_names_list.0|lower|concat:"_detail" groupid res_node.pk %}"
               {% endif %}
-              var str_unit = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ {{forloop.counter}}+". <a href='"+k+"' target='_blank' class='unit_name'>{{res_node.name}}</a>    ({{res_node.member_of_names_list.0}})<br>"
-              $(".collection_details").append(str_unit)
+              var str_unit = "<a href='"+k+"' target='_blank' >{{res_node.name}}</a><br>"
+              
+
+              var row = table.insertRow(-1);
+              row.id = '{{res_node.pk}}'
+              var cell1 = row.insertCell(0);
+              var cell2 = row.insertCell(1);
+              var cell3 = row.insertCell(2);
+              cell1.innerHTML = str_unit;
+              cell2.innerHTML = "<span data-tooltip title='Resource type'>{{res_node.member_of_names_list.0}}</span>";
+              $(".collection_details").append(table)
+              cell3.innerHTML = "<a class='fi-arrow-up'>Moveup</a>&nbsp;&nbsp;<a class='fi-arrow-down'>Movedown</a>";
           {% endif %}
         {% endfor %}
       {% else %}
@@ -533,6 +559,81 @@
         })
       }
     }
+
+  // Reordering li elements to move UP------------------------------------
+    $(document).on('click','.fi-arrow-up',function(){
+      var $current = $(this).closest('tr');
+      var $previous = $current.prev('tr');
+      var parent_node = "{{unit_node.pk}}"
+      movenodeup = $current.attr("id")
+      movenodedown = $previous.attr("id")
+      if(movenodedown){
+          $.ajax({
+            url: "{% url 'change_order' group_id %}",
+
+            data: {
+              node_id_up: movenodeup,
+              node_id_down: movenodedown,
+              parent_node: parent_node,
+              'csrfmiddlewaretoken': "{{csrf_token}}"
+            },
+
+            type: "POST",
+
+            dataType: "json",
+
+            success: function(data){
+              success_state = data["success"]
+              if(success_state){
+                $current.insertBefore($previous);
+              }
+            },
+          });//end of ajax
+
+      }
+      else{
+        alert("You are on First element")
+      }    
+    });
+
+  // Reordering li elements to move DOWN-----
+    $(document).on('click','.fi-arrow-down',function(){
+      var $current = $(this).closest('tr');
+      var $next = $current.next('tr');
+      var parent_node;
+      movenodeup = $current.attr("id")
+      movenodedown = $next.attr("id")
+      parent_node = '{{unit_node.pk}}'
+
+      if(movenodedown){
+          $.ajax({
+            url: "{% url 'change_order' group_id %}",
+
+            data: {
+              node_id_up: movenodeup,
+              node_id_down: movenodedown,
+              parent_node: parent_node,
+              'csrfmiddlewaretoken': "{{csrf_token}}"
+            },
+
+            type: "POST",
+
+            dataType: "json",
+
+            success: function(data){
+              success_state = data["success"]
+              if(success_state){
+                $current.insertAfter($next);
+              }
+            },
+          });//end of ajax
+      }
+      else{
+        alert("You are on Last element")
+      }    
+
+      });
+
 
 {% endblock %}
 
