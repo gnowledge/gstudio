@@ -41,7 +41,7 @@ run npm install -g bower
 # install our code
 add . /home/docker/code/
 run mv /home/docker/code/bower_components /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/
-run cp emacs /root/.emacs
+run cp /home/docker/code/emacs /root/.emacs
 # RUN chown -R docker /home/docker/
 
 # ENV HOME /home/docker
