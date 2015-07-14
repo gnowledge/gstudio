@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "[run] start mongod"
+mongod &
 echo "[run] go to the code folder"
 cd /home/docker/code/gstudio/gnowsys-ndf/
 

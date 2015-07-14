@@ -41,7 +41,7 @@ run npm install -g bower
 # install our code
 add . /home/docker/code/
 run mv /home/docker/code/bower_components /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/
-
+run cp emacs /root/.emacs
 # RUN chown -R docker /home/docker/
 
 # ENV HOME /home/docker
@@ -103,27 +103,21 @@ RUN set -x \
 RUN mkdir -p /data/db && chown -R mongodb:mongodb /data/db
 VOLUME /data/db
 
-# COPY mongodb.sh /mongodb.sh
-# run chmod +x /mongodb.sh
-# ENTRYPOINT ["/entrypoint.sh"]
-
 EXPOSE 27017
 expose 80
+
+# change this line for your timezone
+run ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 
 # nltk installation and building search base
 
 run pip install -U pyyaml nltk
 run /home/docker/code/nltk-initialization.py
 
-CMD ["mongod"]
-
 # run service mongod start
 # edit the following file to change the default superuser password 
 # this also does syncdb and filldb 
 run mkdir /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/management/commands/schema_files
 run /home/docker/code/initialize.sh
-
-# change this line for your timezone
-run ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 
 cmd ["supervisord", "-n"]
