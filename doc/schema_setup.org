@@ -2,7 +2,7 @@
 
 Schema files will now be located in gstudio/doc/schema_directory/
 
-Put STs.csv, RTs.csv, ATs.csv under management/commands/schema_files/ and to run these, python manage.py create_schema [csv_file_name].csv
+Put STs.csv, RTs.csv, ATs.csv under management/commands/schema_files/ and the execute following commands:
 
 #+BEGIN_EXAMPLE
 python manage.py create_schema STs_run1.csv
