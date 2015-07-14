@@ -100,8 +100,8 @@ RUN set -x \
 	&& rm -rf /var/lib/mongodb \
 	&& mv /etc/mongod.conf /etc/mongod.conf.orig
 
-RUN mkdir -p /var/data/db && chown -R mongodb:mongodb /var/data/db
-VOLUME /var/data/db
+RUN mkdir -p /data/db && chown -R mongodb:mongodb /data/db
+VOLUME /data/db
 
 # COPY mongodb.sh /mongodb.sh
 # run chmod +x /mongodb.sh
