@@ -3,6 +3,7 @@ from django.conf import global_settings
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
+import djcelery
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
 TEMPLATE_DEBUG = DEBUG
@@ -388,6 +389,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # 'django.core.context_processors.csrf',
 )
 
+djcelery.setup_loader()
+CELERY_RESULT_BACKEND = "mongodb"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_IMPORTS = ("gnowsys_ndf.ndf.views.tasks",)
+BROKER_URL = 'mongodb://localhost:27017/' + DATABASES['mongodb']['NAME']
+
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
@@ -413,6 +420,7 @@ INSTALLED_APPS = (
     'jsonrpc',
     'registration_email',
     'memcache_admin',
+    'djcelery',
 )
 
 AUTHENTICATION_BACKENDS = (
