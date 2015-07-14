@@ -37,9 +37,9 @@ if f[-1] == "ATs.json" or f[-1] == "RTs.json" or f[-1] == "STs.json":
 else:
   json_file = ""
 
-SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files")
+SCHEMA_ROOT = os.path.join( os.path.dirname(__file__))
 
-log_list = [] # To hold intermediate error and information messages
+log_list = []  # To hold intermediate error and information messages
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 ###############################################################################

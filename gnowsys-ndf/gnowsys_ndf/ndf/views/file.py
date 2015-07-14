@@ -760,7 +760,7 @@ def submitDoc(request, group_id):
                     f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
 
                 else:
-                    title = mtitle + "_" + str(i) #increament title        
+                    title = mtitle + "_" + str(i)  # increament title
                     f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
                     i = i + 1
             else:
@@ -776,15 +776,14 @@ def submitDoc(request, group_id):
             if isinstance(f, list):
               alreadyUploadedFiles_append_temp(f)
               title = mtitle
-        
+
         # str1 = alreadyUploadedFiles
-       
-        if img_type != "": 
+
+        if img_type != "":
             # print "----------1-----------"
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))
 
-        elif topic_file != "": 
-            
+        elif topic_file != "":
             # print "----------2-----------"
             return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
@@ -799,13 +798,16 @@ def submitDoc(request, group_id):
                         # return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
             else:
                 group_object = node_collection.one({'_id': ObjectId(group_id)})
-
+                try:
+                    f = ObjectId(f)
+                except:
+                    f = f[0]
                 if group_object.edit_policy == 'EDITABLE_MODERATED' and isinstance(f, ObjectId):
                     # print "----------4-----------"
                     fileobj = node_collection.one({'_id': ObjectId(f)})
                     # newly appended group id in group_set is at last
-                    create_moderator_task(request, fileobj.group_set[len(fileobj.group_set)-1], fileobj._id)
-                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_id, 'node_id': f }))
+                    t = create_moderator_task(request, fileobj.group_set[0], fileobj._id,on_upload=True)
+                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': fileobj.group_set[1], 'node_id': f }))
                 else:
                     # print "----------5-----------"
                     return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))

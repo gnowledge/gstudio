@@ -26,7 +26,6 @@
   }); });
 
 
-<!-- Ajax for removing user from  List  -->
   $(document).on('click',".button.alert.small.remove",function(){
   user_id = $(this).attr("id")
   node_id = $('#node_id').val()
@@ -37,7 +36,6 @@
   $('#firstModal').html(data); },
   });}); 
   });
-<!-- End Ajax -->
 
 
 </script> 
@@ -158,7 +156,6 @@ $(document).ready(function()
     {% endif %}   
 
   </div>
-
 {% endblock %}
 {% endcache %}
 <!-- end of meta_content block -->
@@ -266,4 +263,3 @@ $(document).ready(function()
     $('#search_text').val(search_key);
   </script>
 -->
-
