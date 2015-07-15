@@ -9393,6 +9393,10 @@ body {
 #top-headers div.two-nav-container {
   padding: 0;
 }
+/* line 203, ../../../scss/_app_styles.scss */
+#top-headers ul.dropdown {
+  box-shadow: 0px 2px 5px black;
+}
 /* line 212, ../../../scss/_app_styles.scss */
 #top-headers a.logo img {
   margin: 10% auto;
@@ -9416,16 +9420,12 @@ body {
 #top-headers #group-level-header .top-bar ul.title-area h1:hover, #top-headers #group-level-header .top-bar ul.title-area article h1:not(.subheader) div input:hover, article h1:not(.subheader) div #top-headers #group-level-header .top-bar ul.title-area input:hover {
   background-color: #4e4e4e;
 }
-/* line 240, ../../../scss/_app_styles.scss */
-#top-headers #group-level-header .top-bar-section li.active:not(.has-form) > a:not(.button) {
-  background-color: #184c6e !important;
-}
 /* line 244, ../../../scss/_app_styles.scss */
 #top-headers #group-level-header .top-bar-section li a:not(.button), #top-headers #group-level-header .top-bar-section li {
   background-color: #383838;
 }
 /* line 248, ../../../scss/_app_styles.scss */
-#top-headers #group-level-header .top-bar-section li a:not(.button):hover, #top-headers #group-level-header .top-bar-section li:hover {
+#top-headers #group-level-header .top-bar-section li a:not(.button):hover, #top-headers #group-level-header .top-bar-section li:not(.has-form):hover {
   background-color: #143f5c !important;
 }
 
