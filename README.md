@@ -2,9 +2,9 @@
 Docker file for gstudio
 =======================
 
-To build the docker image, we need to clone the project in your docker host, and run the script build-docker-sh. This script clones the gstudio code and builds the image. 
+To build the docker image, we need to clone the project in your docker host, and run the script build-docker.sh. This script clones the gstudio code and builds the image. 
 
-The image uses Ubuntu 14.04, django, nginx, mongodb, and several code dependent python libraries. 
+The image uses Ubuntu 14.04, django, nginx, mongodb, and several code dependent python libraries and OS level libraries.  The image builds to about 1.6GB.  
 
 Under development
 -----------------
