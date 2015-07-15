@@ -13,6 +13,10 @@ Under development
 - schema files to be updated for course builder and course player
 - single point data directory for all data (mongo, sqlite, static files, rcs files, mail queue, etc.)
 - after successful completion of the above tasks the docker project to be published in dockerhub.
+- security enhancements
+  - run all services as non-root user
+  - expose only port 80
+  - gpg keys installation script for school servers joining auto-sync program.
 
 Building the Image
 ------------------
