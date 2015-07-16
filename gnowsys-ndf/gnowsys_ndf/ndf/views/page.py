@@ -174,9 +174,9 @@ def page(request, group_id, app_id=None):
           if node is None:
             
 	  '''
-	for nodes in node:
-            node,ver=get_versioned_page(nodes) 
-            content.append(node)  
+	# for nodes in node:
+ #            node,ver=get_versioned_page(nodes) 
+ #            content.append(node)  
 	'''  
                     
           # rcs content ends here
