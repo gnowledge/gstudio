@@ -314,6 +314,9 @@ this template is modified. So for the fields in the template it supports -
         <input type="hidden" name="moderation_level" value="2">
         <input type="hidden" name="edit_policy" value="EDITABLE_MODERATED">
         <input type="hidden" name="agency_type" value="Other">
+        {% if spl_group_type == "CourseEventGroup" %}
+          <input type="hidden" name="course_node_id" value="{{course_node_id}}">
+        {% endif %}
 
         {% if node %}
           <input type="submit" value="Update {{spl_group_type}}" id="group-submit" class="button expand">
