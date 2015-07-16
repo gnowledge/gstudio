@@ -31,7 +31,7 @@ from django.contrib.sites.models import Site
 
 from mongokit import paginator
 
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD, GSTUDIO_FILE_UPLOAD_FORM
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
@@ -677,23 +677,21 @@ def paged_file_objs(request, group_id, filetype, page_no):
 @login_required    
 @get_execution_time
 def uploadDoc(request, group_id):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     if request.method == "GET":
         page_url = request.GET.get("next", "")
         # template = "ndf/UploadDoc.html"
-        template = "ndf/Uploader_Form.html"
+
+        template = "ndf/UploadDoc.html"
+        
+        if GSTUDIO_FILE_UPLOAD_FORM == 'detail':
+            template = "ndf/Uploader_Form.html"
+
     if  page_url:
         variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id})
     else:

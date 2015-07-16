@@ -644,12 +644,8 @@ GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
 GSTUDIO_LICENCE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "OTHERS"]
 
-try:
-    from local_settings import *
-    # print "Local settings applied"
-except:
-    # print "Default settings applied"
-    pass
+GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
+
 
 # #textb
 # import warnings
@@ -685,3 +681,15 @@ WETUBE_PASSWORD = "gl@b$@)we!ube"
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.math_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
 
+
+
+# this has to be at last
+# just put every thing above it
+try:
+    from local_settings import *
+    # print "Local settings applied"
+except:
+    # print "Default settings applied"
+    pass
+
+# ========= nothing to be added below this line ===========

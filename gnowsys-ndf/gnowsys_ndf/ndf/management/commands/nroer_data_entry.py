@@ -37,7 +37,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
-from gnowsys_ndf.ndf.management.commands.data_entry import perform_eval_type
+from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import create_object, add_to_collection_set
 
 ##############################################################################
 
@@ -781,4 +781,16 @@ def create_resource_gsystem(resource_data):
         print info_message
 
         # print "\n----------", fileobj
+
+        collection_name = resource_data.get('collection', '')
+
+        if collection_name:
+
+            collection_node = node_collection.one({'_type': 'File', 'name': unicode(collection_name)})
+
+            if not collection_node:
+                collection_node = create_object(name, member_of_id, content_org=None)
+
+            add_to_collection_set(collection_node, fileobj_oid)
+
         return fileobj_oid
