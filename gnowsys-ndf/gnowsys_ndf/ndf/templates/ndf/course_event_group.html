@@ -1,0 +1,199 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+{% load cache %}
+{% load ndf_tags %}
+{% block title %} CourseEvent {{node.name}} {% endblock %}
+{% block style %}
+    .course_outline_table, tr {
+      border: 2px solid #0b8a91 !important;
+      border-collapse: collapse;
+    }
+
+  .gray-text{
+    color: gray;
+  }
+
+	#content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
+
+
+	tr:hover{
+	  cursor:pointer;
+	}
+
+    .tab{
+    	padding-left: 2em;
+    	background-color:yellow !important;
+    }
+
+    .tab2{
+    	padding-left: 4em;
+    }
+{% endblock %}
+
+{% block head %}
+    <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+    <!-- orgitdown! toolbar settings -->
+    <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+    <!-- orgitdown! skin -->
+    <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+{% endblock %}
+
+{% block meta_content %}
+  <h3>Course Outline</h3>
+  <div id="view_collection">
+    {% include "ndf/collection_ajax_view.html" %}  
+  </div>
+
+{% endblock %}
+{% block body_content %}
+
+      <dl class="tabs" data-tab> 
+          <!-- Basic Description -->
+          <dd class="active "><a href="#view-activities"><i class="fi-list-thumbnails"></i> {% trans "Activities" %}</a>
+
+
+          </dd>
+            {% get_disc_replies node.pk node.pk global_disc_all_replies as all_replies %}
+            <dd class="tab-title discussion-view">
+              <a class="view-discussion" href="#view-discussion"><i class="fi-comment"></i>
+
+              {% if all_replies %}
+                <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
+                  {% trans "Join Discussion" %} ({{ all_replies | length }})
+                </span>
+              {% else %}            
+                <span title="{% trans 'Be the first to start a discussion' %}">
+                  {% trans "Begin Discussion" %}
+                </span>
+              {% endif %}
+
+              </a>
+            </dd>
+
+
+          <dd><a href="#journal-tab"><i class="fi-page-edit"></i> {% trans "Journal" %}</a></dd>
+      </dl>
+    <div class="row">
+      
+		<section class="medium-12 columns content">
+	        <div class="tabs-content">
+	          <!-- Tab content -->
+				<div class="content active" id="view-activities" data-section-id="1">
+	    
+		            <div class="row">
+		            	This is activities Area
+		            </div>
+
+				  	<div id="activities-area">
+
+					<ul class="small-block-grid-2 medium-block-grid-4">
+
+					  {% for each in list_of_unit_events %}
+					  <!-- #{#% for each in forum_detail_list %} -->
+					  <li class="card">
+					    <div class="forum">
+
+					    <a href="{% url 'show' node.pk each.id %}?course='{{each.name}}'">
+					    <header>
+					      <div class="label-list">
+					      {% for tag in each.tags|slice:":3" %}
+					        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+					      {% endfor %}
+					      </div>
+
+
+					      <h5>{{ each.name }}</h5>
+					             
+					    </header>
+					      <section>
+					    <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+					</section>
+
+
+					    {% comment %}
+					    {% if node.created_by == request.user.id %}
+					    <a class="button alert tiny" href="{% url '' group_name_tag each.id %}">Delete</a>
+					    {% endif %}
+					    {% endcomment %}
+
+					    <footer>
+					        
+					        <div class="age">
+					         Unit created {{each.created_at|timesince}} ago 
+					          by <span href="#" class="user" data-gnow="">{{ each.user_details_dict.created_by }}</span> 
+					        
+					        </div>
+					        
+					      <span><i class="fi-torsos-all gray-text"> </i> <strong>{{each.contributors|length}}</strong> <span class="gray-text">Contributor{{each.contributors|pluralize}}</span></span>
+					      <span class="right"><i class="fi-shuffle gray-text"> </i> <strong>{{each.threads}}</strong> <span class="gray-text">Resources{{each.threads|pluralize}}</span></span> 
+					    </footer>
+					</a>
+					        
+					    </div>
+					  </li>
+					  
+					  {% empty %}
+					  	<div class="row">
+					  	  <div class="small-12 columns">
+					  	   <h5> {% blocktrans %}No units have been created for this Course.</h5>{% endblocktrans %}<h5>
+					  	  </div>
+					  	</div>
+					  
+					  {% endfor %}
+					</ul>
+
+				  	</div>
+
+	            </div>
+				<div class="content" id="view-discussion">
+
+		            <div class="row">
+		            	This is Discussion Area
+
+		            	{% include 'ndf/discussion.html' %}
+		            </div>
+
+				</div>
+
+		        <div class="content" id="journal-tab">
+		          
+		            <div class="row">
+		            	This is Journal Area
+		            	<a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="round button small" style="float:right"> Add + </a>
+		            </div>
+		        </div>
+
+			</div>
+	    </section>
+  
+  	</div>
+{% endblock %}
+
+{% block script %}
+
+	function open_res_thread(tnode){
+	  	console.log(tnode)
+		$.ajax({
+			url: "{% url 'get_res_disc_thread' group_id %}",
+
+			data: {
+				'oid': tnode,
+				'replies':'{{global_disc_all_replies}}',
+				'csrfmiddlewaretoken': "{{csrf_token}}"
+			},
+
+			type: "GET",
+
+			dataType: "json",
+
+			success: function(data){
+			console.log(data)
+			},
+		});//end of ajax
+
+	}
+
+
+{% endblock %}
+
