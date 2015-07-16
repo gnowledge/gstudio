@@ -12,6 +12,7 @@ from django.core.cache import cache
 
 from mongokit import paginator
 import mongokit
+import json
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -54,7 +55,6 @@ ins_objectid = ObjectId()
 def get_execution_time(f):
    if BENCHMARK == 'ON': 
 
-  
 	    def wrap(*args,**kwargs):
 	        time1 = time.time()
 	        total_parm_size = 0
@@ -68,14 +68,50 @@ def get_execution_time(f):
 	        benchmark_node =  col.Benchmark()
 	        benchmark_node.time_taken = unicode(str(time_diff))
 	        benchmark_node.name = unicode(f.func_name)
+	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+	        try :
+	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
+	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
+	        except : 
+	        	pass
+	        try :
+	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+	        except : 
+	        	pass
+	        try :
+	        	benchmark_node.user = unicode(args[0].user.username)
+	        except :
+	        	pass
 	        benchmark_node.parameters = unicode(total_param)
 	        benchmark_node.size_of_parameters = unicode(total_parm_size)
 	        benchmark_node.last_update = datetime.today()
-	        #benchmark_node.functionOplength = unicode(getsizeof(ret))
 	        try:
 	        	benchmark_node.calling_url = unicode(args[0].path)
-	        except:	
-	        	pass 
+	        	url = benchmark_node.calling_url.split("/")
+	        	
+	        	if url[1] != "" : 
+	        		group = url[1]
+	        		benchmark_node.group = group
+	        		try :
+	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+	        			if bool(n) :
+	        				benchmark_node.group = group;
+	        		except :
+	        			group_name, group = get_group_name_id(group)
+	        			benchmark_node.group = str(group)
+	        	else :
+	        		pass
+
+	        	if url[2] == "" : 
+	        		benchmark_node.action = None
+	        	else : 
+	        		benchmark_node.action = url[2]
+		        	if url[3] != '' : 
+		        		benchmark_node.action +=  str('/'+url[3])
+		        	else : 
+		        		pass
+	        except : 
+	        	pass
 	        benchmark_node.save()
 	        return ret
    if BENCHMARK == 'ON': 
@@ -1181,14 +1217,13 @@ def get_page(request,node):
                         
 			return(node1,ver1)		
 	    
-  else:
-         
+  else: 
         # if node._type == "GSystem" and node1.status == "DRAFT":
         #     if node1.created_by ==request.user.id:
         #           return (node2,ver2)
         #      else:
 	#	   return (node2,ver2)
-         return (node1,ver1)
+        return (node1,ver1)
 
 @get_execution_time
 def check_page_first_creation(request,node):

@@ -32,7 +32,10 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'ProgramEventGroup','meta_type':'factory_types'},
                          {'name':'CourseEventGroup','meta_type':'factory_types'},
                          {'name':'PartnerGroup','meta_type':'factory_types'},
-                         {'name':'ModeratingGroup','meta_type':'factory_types'}
+                         {'name':'ModeratingGroup','meta_type':'factory_types'},
+                         {'name':'Info page','meta_type':'factory_types'},
+			 {'name':'Blog page','meta_type':'factory_types'},
+			 {'name':'Wiki page','meta_type':'factory_types'}
                         ]
 
 
@@ -121,7 +124,7 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                            {'educationalalignment':{'gsystem_names_list':['Quiz','QuizItem','Topic','File','Page','NUSSD Course', 'Pandora_video'],
                                                     'data_type':'basestring',
                                                     'meta_type':'factory_types'}},
-                           {'curricular':{'gsystem_names_list':['File','Page', 'Pandora_video'],
+                           {'curricular':{'gsystem_names_list':['File','Page', 'Pandora_video', 'Theme'],
                                          'data_type':'bool',
                                          'meta_type':'factory_types'}},
                            {'source':{'gsystem_names_list':['File', 'Page', 'Pandora_video'],

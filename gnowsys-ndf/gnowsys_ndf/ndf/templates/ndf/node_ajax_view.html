@@ -16,7 +16,7 @@
   
   <!-- Scripts and stylesheets for SideComments -->
   <!-- <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script> -->
-  <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
+  <!-- <link rel="stylesheet" type"text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css"> -->
   <!-- <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css"> -->
 
   {% if user.is_authenticated %}
@@ -458,8 +458,6 @@ ul#navigation li a.last {
       <dd class="tab-title active page-view"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       {% endif %}
     
-      <!-- Info-box -->
-      <dd class="tab-title info-view"><a class="view-info" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a></dd>
       
       <!-- Discussion -->
       {% if "Group" not in node.member_of_names_list %}
@@ -1282,16 +1280,23 @@ ul#navigation li a.last {
         <div class="medium-6 columns">
           
           {% edit_policy groupid node request.user as status %}
-
           {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
           {% if "Group" in group_object.member_of_names_list or "Author" in group_object.member_of_names_list %}
+
             {% get_edit_url node.pk as edit_url %}
 
             {% check_group node as is_group %}
             {% if is_group %}
               {% check_is_gstaff groupid request.user as is_gstaff %}
               {% if is_gstaff %}
-              <a href="{% url edit_url group_id %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+                {% get_sg_member_of groupid as list_of_sg_member_of %}
+                {% if "ProgramEventGroup" in list_of_sg_member_of %}
+                  <li><a href="{% url 'edit_event_group' group_id 'ProgramEventGroup' %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit ProgramEvent" %}</a></li><br>
+                {% elif "CourseEventGroup" in list_of_sg_member_of %}
+                  <li><a href="{% url 'edit_event_group' group_id 'CourseEventGroup' %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit CourseEvent" %}</a></li><br>
+                {% else %}
+                  <li><a href="{% url edit_url group_id %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li><br>
+                {% endif %}
               {% endif %}
 
             {% else %}
@@ -1299,6 +1304,8 @@ ul#navigation li a.last {
                 <a href="{% url edit_url group_id node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
               {% endif %}
             {% endif %}
+          {% endif %}
+          {% endif %}
 
         </div>
         <div class="medium-6 columns">
@@ -1329,7 +1336,7 @@ ul#navigation li a.last {
         <!-- Delete button if page created by user -->
           {% if node.created_by == request.user.id %}
             {% if node.member_of_names_list.0 == "Page" %}
-              <a class="tiny alert round button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+              <a class="tiny alert round button" href="{% url 'trash_resource' group_id node %}">{% trans "Delete" %}</a>
             {% elif node.member_of_names_list.0 == "Term" %}
               <a class="tiny alert round button" href="{% url 'term_delete' group_name_tag node %}">{% trans "Delete" %}</a>
             {% endif %}
@@ -1348,7 +1355,14 @@ ul#navigation li a.last {
                 <a href="{% url create_url group_name_tag %}" class="tiny round button">
                   <span class="fi-plus">&nbsp;&nbsp; New Group</span>
                 </a>
+                </li>
+                 <li>
+                <a href="/{{group_id}}/analytics/group/summary/" class="tiny round button">
+                  &nbsp;&nbsp; Group Analytics
+
+                </a>
               </li>
+               
 
               {% endif %}
             {% endif %}
@@ -1372,12 +1386,11 @@ ul#navigation li a.last {
                   <a href="{% url create_url group_name_tag %}" class="tiny round button">
                     <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} Topic</span>
                   </a>
-                {% elif node.member_of_names_list.0 != "Group"  %}
+                {% elif node.member_of_names_list.0 != "Group" and node.member_of_names_list.0 != "ProgramEventGroup" and node.member_of_names_list.0 != "CourseEventGroup" and node.member_of_names_list.0 != "ModeratingGroup" %}
                   <a href="{% url create_url group_name_tag %}" class="tiny round button">
                     <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                   </a>
                 {% endif %}
-
               {% endif %}
             {% endif %}
           {% endif %}
@@ -1390,6 +1403,10 @@ ul#navigation li a.last {
            {% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
             <div class= "medium-12 columns" >
                 <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
+
+		<!-- Info-box -->&nbsp;
+<!--		<a class="view-info tiny round button" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a>  -->
+      
             </div>
            {% endif %}
         </div>     
@@ -1401,66 +1418,76 @@ ul#navigation li a.last {
             {% get_group_policy node request.user as policy %}
             {% get_prior_post_node group_id as groupname %}
 
-          {% if "Group" in group_object.member_of_names_list %}
-            <input type="hidden" id="groupname" value="{{node}}">
-            {% if user.is_authenticated %}
-              {% if user_access == "allow" %}
-               {% if user.is_superuser %}
-                  <li>
-                    <a href="{% url 'create_sub_group' group_id %}" class="tiny round button">
-                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New SubGroup" %}
-                    </a>
-                  </li>
-               {% endif %}
-              {% endif %}
-            {% if group_name_tag != "home"%}
-              {% if user_is_joined == "joined" %}
-                {% if is_user_group and node.created_by != request.user %}
-                <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
+            {% if "Group" in group_object.member_of_names_list %}
+              <input type="hidden" id="groupname" value="{{node}}">
+              {% if user.is_authenticated %}
+                {% if user_access == "allow" %}
+                 {% if user.is_superuser %}
+                    <li>
+                      <a href="{% url 'create_sub_group' group_id %}" class="tiny round button">
+                      <span class="fi-plus">&nbsp;&nbsp; {% trans "New SubGroup" %}
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny button round fi-plus">
+                      {% trans "New Program Event" %}
+                      </a>
+                    </li>
+                 {% endif %}
+                {% endif %}
+              {% if group_name_tag != "home"%}
+                {% if user_is_joined == "joined" %}
+                  {% if is_user_group and node.created_by != request.user %}
+                  <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
 
-                {% else %}
-                <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
-                {% endif %} 
+                  {% else %}
+                  <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
+                  {% endif %} 
 
-              {% elif user_is_joined == "not" or not user.is_authenticated %}
-                {% if is_user_group and node.created_by != request.user %}
-                <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
-
-                {% else %}
-                <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                {% elif user_is_joined == "not" or not user.is_authenticated %}
+                  {% if is_user_group and node.created_by != request.user %}
+                  <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
+                  {% else %}
+                    {% if allow_to_join %}
+                      <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                    {% else %}
+                      <li><input class="tiny round button" type="submit" id="notify" value="Enrollment Closed" disabled="disabled"></li>
+                    {% endif %}
+                  {% endif %}
                 {% endif %}
 
+        {% endif %}
+        {% endif %}
+
               {% endif %}
-            {% endif %}
 
-            {% endif %}
+              <!-- Triggers the modals -->
 
-          {% endif %}
-            <!-- Triggers the modals -->
-            <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
+              <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
 
-            <!-- Reveal Modals begin -->
-            <div id="firstModal" class="reveal-modal" data-reveal></div>
+              <!-- Reveal Modals begin -->
+              <div id="firstModal" class="reveal-modal" data-reveal></div>
 
-            {% check_is_gstaff groupid request.user as is_gstaff %}
-            {% if is_gstaff %}
+              {% check_is_gstaff groupid request.user as is_gstaff %}
+              {% if is_gstaff %}
 
-              {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
-                  {% include "ndf/invite_users.html" %}
-              {% endifnotequal %}
+                {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
+                    {% include "ndf/invite_users.html" %}
+                {% endifnotequal %}
 
-              {% include "ndf/invite_admins.html" %}
-            {% endif %} 
+                {% include "ndf/invite_admins.html" %}
+              {% endif %} 
           {% endif %}
         {% endif %}
-        {% endif %}
+
+
 
       </div>      
-      {% endif %}
 
       {% ifequal group_object.edit_policy "EDITABLE_MODERATED" %}
         {% if request.user.id in group_object.group_admin or request.user.is_superuser or request.user.id == group_object.created_by %}
-          {% if 'ModeratingGroup' in group_object.member_of_names_list %}
+          {% if 'ModeratingGroup' in group_object.member_of_names_list or 'ProgramEventGroup' in group_object.member_of_names_list or 'CourseEventGroup' in group_object.member_of_names_list and 'Group' not in group_object.member_of_names_list %}
+
             <a class="tiny expand button" href="{% url 'moderation' group_name_tag %}">
               Moderate Resources
             </a>

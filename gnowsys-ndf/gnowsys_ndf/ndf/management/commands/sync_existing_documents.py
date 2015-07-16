@@ -564,3 +564,23 @@ class Command(BaseCommand):
     
     node_collection.collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'access_policy': {'$in': [None, "PUBLIC"]}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
     node_collection.collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'access_policy': "PRIVATE"}, {'$set': {'access_policy': u"PRIVATE"}}, upsert=False, multi=True)
+    
+    gstpage_node = node_collection.find_one({"name":"Page"})
+    gstwiki = node_collection.find_one({"name":"Wiki page"})
+
+    page_nodes = node_collection.find({"member_of":gstpage_node._id})
+    for i in page_nodes:
+        if gstwiki._id not in i.type_of:
+            i.type_of.append(gstwiki._id)
+            i.save()
+        else:
+            print i.name,"Page already Updated"	
+
+    nodes = node_collection.find({"_type":"Author",
+			'$or':[{'language_proficiency':{'$exists':False}},{'subject_proficiency':{'$exists':False}}]}) 
+    for i in nodes:
+		    node_collection.collection.update({'_id':ObjectId(i._id)}, {'$set':{'language_proficiency': '','subject_proficiency':'' }},upsert=False, multi=False)
+		    print i.name, "Updated !!"	
+
+
+

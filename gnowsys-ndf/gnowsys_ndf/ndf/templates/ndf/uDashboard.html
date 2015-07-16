@@ -44,6 +44,10 @@
   .img-height {
     height: 100%;
   }
+  .fi-trash{
+        color:orange;
+
+  }
 
   .div-height {
     margin-bottom: 0.5em; 
@@ -116,7 +120,6 @@
                  {% endif %}
             </div>  
         </div>
-
       <div class="small-10 columns">
           <h2 class="style-text">{{username}}</h2>
           <h5>
@@ -127,12 +130,19 @@
             {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
             {% trans "Quiz" %}: {{quiz_count}}<br> 
             {% trans "Forum" %}: {{forum_count}}<br>
+            
         <!--    FOR AWARDS  -->  
         <!-- {% if page_count > 1 %}  
             <img src="/static/ndf/images/close.png">
             {% endif %}     -->      
           </h5>
       </div>
+
+      {% if user.is_superuser %}
+        <div class"trashdiv" style="position:absolute; float:right; right:11%; top:2%;">
+          <a href="/Trash/data-review" > <h5>  <span class = "fi-trash"> </span> <b >  Trash </b> </h5> </a>
+        </div>
+      {% endif %}  
     </div>
     
     <br/>
@@ -147,11 +157,12 @@
 
   <!-- Task names -->
   <dl class="tabs" data-tab data-options="deep_linking:true">
-    <dd class="active"><a href="#group" id="p1">Groups </a></dd>
-    
+    <dd class="active"><a href="#view-profile" id='p5'> Info </a> </dd>
+    <dd ><a href="#group" id="p1">Groups </a></dd>
     {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
     <dd ><a href="#Activity" id="p3">My Activities </a></dd>      
     <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
+
   </dl>
 
   <!-- Tab views -->
@@ -159,8 +170,10 @@
     <div class="content" id="view-scheduler-calendar">
       {% include "ndf/scheduler_calender.html"  %}
     </div>
-
-    <div class="content active" id="group">
+    <div class = "content active" id="view-profile">
+        {% include "ndf/user_profile_form.html"  %}
+    </div> 
+    <div class="content " id="group">
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
         {% for node in user_groups %}
           {% get_version_of_module node.pk as version %}
@@ -340,7 +353,7 @@
       </ul>
     </div>
   </div>
-
+  
 {% endblock %}
 
 {% block script %}
@@ -401,6 +414,9 @@
     $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
       $(this).removeClass("success").removeClass("alert").removeClass("warning");
     });
+
+    
+
 {% endblock %}
 
 {% block document_ready %}
@@ -413,4 +429,6 @@
   {% endif %}
 
   $('#docFile').val("");
+
+  
 {% endblock %}

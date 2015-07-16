@@ -101,6 +101,29 @@ def terms_list(request, group_id):
             context_instance=RequestContext(request)
         )
 
+
+# This ajax view creates the page collection of selected nodes from list view
+@get_execution_time
+def collection_create(request, group_id):
+  '''
+  This ajax view creates the page collection of selected nodes from list view
+  '''  
+  if request.is_ajax() and request.method == "POST":
+    Collections = request.POST.getlist("collection[]", '')
+    # name is comming from post request ajax
+    
+
+    gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    page_node = node_collection.collection.GSystem()
+    page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+    for each in Collections:
+      node_collection.collection.update({'_id': page_node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
+
+    # print page_node,"\n"
+    return HttpResponse("success")
+
+
             
 # This ajax view renders the output as "node view" by clicking on collections
 @get_execution_time
@@ -756,34 +779,44 @@ def get_collection(request, group_id, node_id):
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
   collection_list = []
-  collection_list_append_temp=collection_list.append
+  # collection_list_append_temp=collection_list.append
   
+  for each in node.collection_set:
+    obj = node_collection.one({'_id': ObjectId(each) })
+    if obj:
+      node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+      collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+
+      collection_list = get_inner_collection(collection_list, obj)
+
  # def a(p,q,r):
 #		collection_list.append({'name': p, 'id': q,'node_type': r})
   #this empty list will have the Process objects as its elements
-  processes=[]
+  # processes=[]
   #Function used by Processes implemented below
-  def multi_(lst):
-		for each in lst:
-			obj = node_collection.one({'_id': ObjectId(each) })
-			if obj:
-			  node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-                          collection_list_append_temp({'name':obj.name,'id':obj.pk,'node_type':node_type})
-                          collection_list = get_inner_collection(collection_list, obj)
-			#collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
-			  
+  # def multi_(lst):
 
-  if node and node.collection_set:
-		t=len(node.collection_set)
-		x=multiprocessing.cpu_count()#returns no of cores in the cpu 
-		n2=t/x#divides the list into those many parts
-		#Process object is created.The list after being partioned is also given as an argument. 
-		for i in range(x):
-			processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2],)))
-		for i in range(x):
-			processes[i].start()#each Process started
-		for i in range(x):
-			processes[i].join()#each Process converges
+  #   for each in lst:
+  #     obj = node_collection.one({'_id': ObjectId(each) })
+  #     if obj:
+  #       node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+  #       collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+
+  #       collection_list = get_inner_collection(collection_list, obj)
+  		  #collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+	
+  # if node and node.collection_set:
+  #   t=len(node.collection_set)
+  #   x=multiprocessing.cpu_count()#returns no of cores in the cpu 
+  #   n2=t/x#divides the list into those many parts
+  #   #Process object is created.The list after being partioned is also given as an argument. 
+    
+  #   for i in range(x):
+  #     processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2], )))
+  #   for i in range(x):
+  #     processes[i].start()#each Process started
+  #   for i in range(x):
+  #     processes[i].join()#each Process converges
   data = collection_list
 
   return HttpResponse(json.dumps(data))

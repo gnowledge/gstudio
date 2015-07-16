@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.views.generic import RedirectView
 from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.analytics import *
 
 try:
     from bson import ObjectId
@@ -22,6 +23,7 @@ from gnowsys_ndf.ndf.models import node_collection
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
 ###################################################
+
 @get_execution_time
 def homepage(request, group_id):
     

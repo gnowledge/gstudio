@@ -226,7 +226,8 @@ class Node(DjangoDocument):
         'status': STATUS_CHOICES_TU,
         'rating':[{'score':int,
                   'user_id':int,
-                  'ip_address':basestring}]
+                  'ip_address':basestring}],
+	'snapshot':dict
     }
     indexes=[ 
       {
@@ -1238,7 +1239,9 @@ class Author(Group):
         'password': unicode,
         'visited_location': [],
         'preferred_languages': dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
-        'group_affiliation': basestring
+        'group_affiliation': basestring,
+	'language_proficiency':basestring,
+	'subject_proficiency':basestring
     }
 
     use_dot_notation = True
@@ -1563,6 +1566,7 @@ class Benchmark(DjangoDocument):
   objects = models.Manager()
 
   collection_name = 'Benchmarks'
+
   structure = {
     '_type':unicode,
     'name': unicode,
@@ -1571,8 +1575,14 @@ class Benchmark(DjangoDocument):
     'size_of_parameters':unicode,
     'function_output_length':unicode,
     'calling_url':unicode,
-    'last_update': datetime.datetime
+    'last_update': datetime.datetime,
+    'action' : basestring,
+    'user' : basestring,
+    'session_key' : basestring,
+    'group' : basestring,
+    'has_data' : dict
   }
+
   required_fields = ['name']
   use_dot_notation = True
 
@@ -1581,6 +1591,34 @@ class Benchmark(DjangoDocument):
 
   def identity(self):
     return self.__unicode__()
+
+# Analytics Class Defination
+@connection.register
+class Analytics(DjangoDocument):
+
+  objects = models.Manager()
+
+  collection_name = 'analytics_collection'
+
+  structure = {
+    'timestamp': datetime.datetime,
+    'action' : dict,
+    'user' : dict,
+    'obj' : dict,
+    'group_id' : basestring,
+    'session_key' : basestring
+  }
+
+  required_fields = ['timestamp']
+  use_dot_notation = True
+
+  def __unicode__(self):
+    return self._id
+
+  def identity(self):
+    return self.__unicode__()
+
+
 
 
 #  TRIPLE CLASS DEFINITIONS

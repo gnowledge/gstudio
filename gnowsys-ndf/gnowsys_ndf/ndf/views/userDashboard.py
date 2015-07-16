@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
-
+import ast
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -150,37 +150,37 @@ def uDashboard(request, group_id):
     user_activity = []
 
     page_gst = node_collection.one({'_type': "GSystemType", 'name': 'Page'})
-    page_cur = node_collection.find ({'member_of': {'$all': [page_gst._id]},
+    page_cur = node_collection.find({'member_of': {'$all': [page_gst._id]},
                             'created_by': int(usrid), "status": {"$nin": ["HIDDEN"]}})
-    file_cur = node_collection.find ({'_type': u"File", 'created_by': int(usrid),
+    file_cur = node_collection.find({'_type': u"File", 'created_by': int(usrid),
                                      "status": {"$nin": ["HIDDEN"]}})
     forum_gst = node_collection.one({"_type": "GSystemType", "name": "Forum"})
-    forum_count = node_collection.find ({"_type": "GSystem",
+    forum_count = node_collection.find({"_type": "GSystem",
                             "member_of": forum_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     quiz_gst = node_collection.one({"_type": "GSystemType", "name": "Quiz"})
-    quiz_count = node_collection.find ({"_type": "GSystem",
+    quiz_count = node_collection.find({"_type": "GSystem",
                             "member_of": quiz_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     thread_gst = node_collection.one({"_type": "GSystemType", "name": "Twist"})
-    thread_count =node_collection.find ({"_type": "GSystem",
+    thread_count =node_collection.find({"_type": "GSystem",
                             "member_of": thread_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
     reply_gst = node_collection.one({"_type": "GSystemType", "name": "Reply"})
-    reply_count = node_collection.find ({"_type": "GSystem",
+    reply_count = node_collection.find({"_type": "GSystem",
                             "member_of": reply_gst._id, 'created_by': int(usrid),
                             "status": {"$nin": ["HIDDEN"]}})
 
     task_cur = ""
     if current_user:
         if int(current_user) == int(usrid):
-                   task_cur = node_collection.find (
+                   task_cur = node_collection.find(
             {'member_of': task_gst._id, 'attribute_set.Status': {'$in': ["New", "In Progress"]}, 'attribute_set.Assignee':usrid}
         ).sort('last_update', -1).limit(10)
                    dashboard_count.update({'Task': task_cur.count()})
   
    
-    group_cur = node_collection.find (
+    group_cur = node_collection.find(
         {'_type': "Group", 'name': {'$nin': ["home", auth.name]},"access_policy":{"$in":Access_policy}, 
         '$or': [{'group_admin': int(usrid)}, {'author_set': int(usrid)}]}).sort('last_update', -1).limit(10)
 
@@ -189,7 +189,7 @@ def uDashboard(request, group_id):
     # user activity gives all the activities of the users
 
     activity = ""
-    activity_user = node_collection.find (
+    activity_user = node_collection.find(
         {'$and': [{'$or': [{'_type': 'GSystem'}, {'_type': 'group'},
         {'_type': 'File'}]}, {"access_policy": {"$in": Access_policy}},{'status':{'$in':[u"DRAFT",u"PUBLISHED"]}},
         {'member_of': {'$nin': [exclued_from_public]}},
@@ -243,7 +243,7 @@ def uDashboard(request, group_id):
     task_cur gives the task asigned to users
     '''
 
-    obj = node_collection.find (
+    obj = node_collection.find(
         {'_type': {'$in': [u"GSystem", u"File"]}, 'contributors': int(usrid),
          'group_set': {'$all': [ObjectId(group_id)]}}
     )
@@ -605,3 +605,48 @@ def group_dashboard(request, group_id):
         },
         context_instance=RequestContext(request)
     )
+
+def user_profile(request,group_id):
+	from django.contrib.auth.models import User
+	if request.method == "POST":
+		
+
+		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+		user = User.objects.get(id=request.user.id)
+		user_data = request.POST.getlist('forminputData[]','')
+		user_select_data = request.POST.getlist('formselectData[]','')
+		for i in user_data:
+			a=ast.literal_eval(i)
+			if  a.get('first_name',None) != None:
+			  	user.first_name = a['first_name']
+			if a.get('last_name',None) != None:
+				user.last_name = a['last_name']
+		user.save()
+		for i in user_select_data:
+			a=ast.literal_eval(i)
+                        if  a.get('language_proficiency','') :
+				Author_group['language_proficiency'] = a.get('language_proficiency','')	
+			if  a.get('subject_proficiency',''):			
+				Author_group['subject_proficiency'] =  a.get('subject_proficiency','')
+		Author_group.save()	 
+		return HttpResponse("Details Successfully Updated")
+	else:
+		user={}		
+		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+		user_details = User.objects.get(id=request.user.id)
+		user['first_name'] = user_details.first_name
+		user['last_name']  = user_details.last_name	
+ 	return render_to_response(	"ndf/user_profile_form.html",
+					{'group_id':group_id,'node':Author_group,'user':user},
+					context_instance=RequestContext(request)
+		
+	)
+
+def user_data_profile(request,group_id):
+	user = {}
+	Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
+	user_details = User.objects.get(id=request.user.id)
+	user['first_name'] = user_details.first_name
+	user['last_name']  = user_details.last_name
+	user['node'] = Author_group
+	return HttpResponse(json.dumps(user,cls=NodeJSONEncoder))
