@@ -1359,13 +1359,16 @@ class EventGroupCreateEditHandler(View):
                 mod_group = CreateProgramEventGroup(request)
             elif sg_type == "CourseEventGroup":
                 mod_group = CreateCourseEventGroup(request)
-
-
+            parent_group_obj = group_obj
             # calling method to create new group
             result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id,)
         if result[0]:
             # operation success: create ATs
             group_obj = result[1]
+            parent_group_obj.post_node.append(group_obj._id)
+            group_obj.prior_node.append(parent_group_obj._id)
+            group_obj.save()
+            parent_group_obj.save()
             date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id)
             if date_result[0]:
                 # Successfully had set dates to EventGroup
