@@ -433,7 +433,7 @@
           complete: function () {
             var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
             var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='"+ css_new_id+"' style='float:left;'>"+lbl_val+"</label><span><span data-tooltip title='Edit name'><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:left;'></i></span></div>" 
-            var str_prop="<div class='small-2 columns end css_setting'><span data-tooltip title='Settings'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i></span>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+"  "+"<span data-tooltip title='Deletee'><i class='fi-trash largesize'></i></span></div></div>"
+            var str_prop="<div class='small-2 columns end css_setting'><span data-tooltip title='Settings'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i></span>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+"  "+"<span data-tooltip title='Delete'><i class='fi-trash largesize'></i></span></div></div>"
 
             $("#"+curr_css_li_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-1 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
             $("#"+curr_css_li_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
