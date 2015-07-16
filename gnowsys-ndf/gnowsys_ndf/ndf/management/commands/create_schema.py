@@ -42,7 +42,7 @@ class Command(BaseCommand):
 
         if os.path.exists(file_path):
           # if not ("ST" in file_path or "AT" in file_path or "RT" in file_path):
-          if file_name not in ["STs.csv", "STs.json", "ATs.csv", "ATs.json", "RTs.csv", "RTs.json"]:
+          if file_name not in ["STs_run1.csv", "STs_run1.json","STs_run2.csv", "STs_run2.json", "ATs.csv", "ATs.json", "RTs.csv", "RTs.json"]:
             error_message = "\n InvalidSchemaFile ("+file_path+") : Please select a valid file for creating schema !!!\n"
             log_list.append(error_message)
             raise Exception(error_message)

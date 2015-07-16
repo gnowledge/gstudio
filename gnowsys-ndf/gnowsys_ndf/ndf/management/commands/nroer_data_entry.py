@@ -52,6 +52,13 @@ theme_gst = node_collection.one({"name": "Theme"})
 theme_item_gst = node_collection.one({"name": "theme_item"})
 topic_gst = node_collection.one({"name": "Topic"})
 nroer_team_id = 1
+
+
+# INFO notes:
+# http://172.16.0.252/sites/default/files/nroer_resources/ (for room no 012)
+# http://192.168.1.102/sites/default/files/nroer_resources/ (for whole ncert campus)
+# http://125.23.112.5/sites/default/files/nroer_resources/ (for public i.e outside campus)
+
 resource_link_common = "http://125.23.112.5/sites/default/files/nroer_resources/"
 
 class Command(BaseCommand):

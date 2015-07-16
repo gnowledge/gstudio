@@ -1542,3 +1542,30 @@ def enroll_generic(request, group_id):
         return HttpResponse(json.dumps(response_dict))
     else:
         return HttpResponse(json.dumps(response_dict))
+
+@login_required
+def remove_resource_from_unit(request, group_id):
+    '''
+    Accepts:
+     * ObjectId of node to be removed from collection_set.
+     * ObjectId of unit_node.
+
+    Actions:
+     * Removed res_id from unit_node's collection_set
+
+    Returns:
+     * success (i.e True/False)
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        unit_node_id = request.POST.get("unit_node_id", '')
+        res_id = request.POST.get("res_id", '')
+
+        unit_node = node_collection.one({'_id': ObjectId(unit_node_id)})
+
+        if unit_node.collection_set and res_id:
+              node_collection.collection.update({'_id': unit_node._id}, {'$pull': {'collection_set': ObjectId(res_id)}}, upsert=False, multi=False)
+
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
+

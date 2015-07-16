@@ -102,10 +102,11 @@
             </a>{% endfor %}
           </div>
 
-          <div class="label-list small-1 columns">
-            <input type="checkbox" name="filenode" class="filenode" value="{{each_res.pk}}">
-          </div>
-
+          {% if user.is_authenticated %}
+            <div class="label-list small-1 columns">
+              <input type="checkbox" name="filenode" class="filenode" value="{{each_res.pk}}">
+            </div>
+          {% endif %}
 
       </div>
     </li>
