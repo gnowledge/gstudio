@@ -1128,17 +1128,20 @@ class CreateCourseEventGroup(CreateEventGroup):
                                                         each_res_node = node_collection.one({'_id': ObjectId(each_res)})
                                                         name_arg = each_res_node.name
                                                         new_res = self.create_corresponding_gsystem(name_arg,twist_gst,user_id, new_cu)
-                                                        if "mime_type" in each_res_node:
-	                                                        if "image" in each_res_node.mime_type:
-	                                                            # content_org = u"[["+"http://"+sitename+"/"+group_obj.name+"/file/readDoc/"+str(each_cu_node._id)+"/"+each_cu_node.name+"]]"
-	                                                            content_org = u"[["+"http://127.0.0.1:8000/"+group_obj.name+"/file/readDoc/"+str(each_res_node._id)+"/"+each_res_node.name+"]]"
-	                                                        elif "video" in each_res_node.mime_type:
-	                                                            # content_org = u'#+BEGIN_HTML \r\n\r\n<video width="600" height="400" controls>\r\n  <source src="http://www.metastudio.org/i2c/video/fullvideo/5594f380109bad4990dd22de" type="video/webm">\r\n \r\n  Your browser does not support HTML5 video.\r\n</video>\r\n\r\n#+END_HTML\r\n'
-	                                                            content_org = u'#+BEGIN_HTML \r\n\r\n<video width="600" height="400" controls>\r\n  <source src="127.0.0.1:8000/'+group_obj.name+'/video/fullvideo/'+str(each_res_node._id)+ \
-	                                                            '" type="video/webm">\r\n \r\n  Your browser does not support HTML5 video.\r\n</video>\r\n\r\n#+END_HTML\r\n'
-	                                                        new_res.content_org = unicode(content_org)
-	                                                        new_res.content = org2html(content_org, file_prefix=ObjectId().__str__())
-	                                                        new_res.save()
+                                                        if "Page" in each_res_node.member_of_names_list:
+                                                            new_res.content = each_res_node.content
+                                                            new_res.content_org = each_res_node.content_org
+                                                            new_res.save()
+                                                        elif "File" in each_res_node.member_of_names_list:
+                                                            if "mime_type" in each_res_node:
+                                                                if "image" in each_res_node.mime_type:
+                                                                    content_org = u"[["+"http://"+sitename+"/"+group_obj.name+"/file/readDoc/"+str(each_res_node._id)+"/"+each_res_node.name+"]]"
+                                                                elif "video" in each_res_node.mime_type:
+                                                                    content_org = u'#+BEGIN_HTML \r\n\r\n<video width="600" height="400" controls>\r\n  <source src="http://'+ sitename + '/' + group_obj.name+'/video/fullvideo/'+str(each_res_node._id)+ \
+                                                                    '" type="video/webm">\r\n \r\n  Your browser does not support HTML5 video.\r\n</video>\r\n\r\n#+END_HTML\r\n'
+                                                            new_res.content_org = unicode(content_org)
+                                                            new_res.content = org2html(content_org, file_prefix=ObjectId().__str__())
+                                                            new_res.save()
             return True
         except Exception as e:
 
@@ -1649,6 +1652,7 @@ def group_dashboard(request, group_id=None):
     alternate_template = ""
     profile_pic_image = None
     list_of_unit_events = []
+    blog_pages = None
 
     group_obj = get_group_name_id(group_id, get_obj=True)
 
@@ -1705,6 +1709,10 @@ def group_dashboard(request, group_id=None):
   if "CourseEventGroup" in list_of_sg_member_of:
 			forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
 			twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+			page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+			blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+			blog_pages = node_collection.find({'member_of':page_gst._id, 'created_by': int(request.user.id),
+									'type_of': blogpage_gst._id})
 			alternate_template = "ndf/course_event_group.html"
 			existing_forums = node_collection.find({
                                           'member_of': forum_gst._id,
@@ -1757,6 +1765,7 @@ def group_dashboard(request, group_id=None):
                                                        'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
+                                                       'blog_pages':blog_pages,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
                                                        'annotations' : annotations, 'shelves': shelves,

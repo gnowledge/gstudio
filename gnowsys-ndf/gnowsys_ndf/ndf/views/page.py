@@ -33,7 +33,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
@@ -267,22 +267,25 @@ def page(request, group_id, app_id=None):
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
 
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    group_name, group_id = get_group_name_id(group_id)
+    ce_id = request.GET.get('course_event_id')
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
-                          'groupid': group_id
+                          'groupid': group_id,
+                          'ce_id': ce_id
                       }
     
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
@@ -302,6 +305,7 @@ def create_edit_page(request, group_id, node_id=None):
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
 	page_type = request.POST.getlist("type_of",'')
+	ce_id = request.POST.get("ce_id",'')
 	if page_type:
 		objid= page_type[0]
 		if not ObjectId(objid) in page_node.type_of:
@@ -320,6 +324,9 @@ def create_edit_page(request, group_id, node_id=None):
             if page_node:
               get_node_metadata(request,page_node)
         # End of filling metadata
+        if ce_id:
+          url_name = "/" + ce_id
+          return HttpResponseRedirect(url_name)
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 

@@ -155,6 +155,17 @@
 		            <div class="row">
 		            	<a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="round button small" style="float:right"> Add + </a>
 		            </div>
+		            <div class="row">
+		            	{% for each_blog in blog_pages %}
+		            		<h4>{{each_blog.name}}</h4>
+			            	<span>
+			            	Created at {{each_blog.created_at}}
+			            	</span>
+			            	<div>
+			            		{{each_blog.html_content|safe}}
+			            	</div>
+		            	{% endfor %}
+		            </div>
 		        </div>
 
 			</div>
