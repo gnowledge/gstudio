@@ -414,14 +414,8 @@ def server_sync(mail):
         list_of_decrypted_attachments = []
         for attachment in all_attachments:
             filename = attachment.document.path
-            op_file_name = filename.split('.gpg')[0]
-
-            #code to replace last '_' with '.' so that filename_extension.gpg is finally converted to filename.extension
-            last_index = op_file_name.rindex('_')
-            op_file_name = op_file_name[:last_index-1] + op_file_name[last_index].replace('_','.') + op_file_name[last_index+1:]
-
-            print 'output file name of decrypted attachment : \n %s' % op_file_name
-            
+            op_file_name = filename.split('_sig')[0]            
+            print 'output file name of decrypted attachment : \n %s' % op_file_name            
             command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
             std_out= subprocess.call([command],shell=True)
             list_of_decrypted_attachments.append(op_file_name)
