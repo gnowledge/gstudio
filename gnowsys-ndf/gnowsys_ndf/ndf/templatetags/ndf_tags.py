@@ -17,6 +17,8 @@ from django_mailbox.models import Mailbox
 from imaplib import IMAP4
 import socket
 
+import multiprocessing as mp 
+
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -685,6 +687,9 @@ def get_gapps_iconbar(request, group_id):
 					if k1 == "name":
 						if v1.lower() not in user_gapps:
 							del gapps[k]
+	
+	if group_obj.name == 'Trash':
+		gapps={}
         return {
             "template": "ndf/gapps_iconbar.html",
             "request": request,
@@ -800,11 +805,10 @@ def thread_reply_count( oid ):
 				global_thread_latest_reply["content_org"] = each.content_org
 				global_thread_latest_reply["last_update"] = each.last_update
 				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
-			else:
-				if global_thread_latest_reply["last_update"] < each.last_update:
-					global_thread_latest_reply["content_org"] = each.content_org
-					global_thread_latest_reply["last_update"] = each.last_update
-					global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+			elif global_thread_latest_reply["last_update"] < each.last_update:
+				global_thread_latest_reply["content_org"] = each.content_org
+				global_thread_latest_reply["last_update"] = each.last_update
+				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
 					
 			thread_reply_count(each._id)
 	
@@ -1234,10 +1238,10 @@ def get_prior_node(node_id):
 	if topic_GST._id in obj.member_of:
 
 		if obj.prior_node:
-			for each in obj.prior_node:
-				node = node_collection.one({'_id': ObjectId(each) })
-				prior.append(( node._id , node.name ))
-
+	#	for each in obj.prior_node:
+#			node = node_collection.one({'_id': ObjectId(each) })
+	#		prior.append(( node._id , node.name ))
+			prior=[(node_collection.one({'_id': ObjectId(each) })._id,node_collection.one({'_id': ObjectId(each) }).name) for each in obj.prior_node]
 		return prior
 
 	return prior
@@ -1804,10 +1808,26 @@ def resource_info(node):
 @get_execution_time
 @register.assignment_tag
 def edit_policy(groupid,node,user):
-	group_access= group_type_info(groupid,user)
+	groupnode = node_collection.find_one({"_id":ObjectId(groupid)})
 	resource_infor=resource_info(node)
 	#code for public Groups and its Resources
-	
+	resource_type = node_collection.find_one({"_id": {"$in":resource_infor.member_of}})
+	if resource_type.name == 'Page':
+		if resource_infor.type_of:
+			resource_type_name = get_objectid_name(resource_infor.type_of[0])
+			if resource_type_name == 'Info page':
+				if user.id in groupnode.group_admin:
+					return "allow" 
+			elif resource_type_name == 'Wiki page':
+				return "allow"
+			elif resource_type_name == 'Blog page':
+				if user.id ==  resource_infor.created_by:
+					return "allow"
+		else:
+			return "allow"			
+	else:
+		return "allow"
+	''' 
 	if group_access == "PUBLIC":
 			#user_access=user_access_policy(groupid,user)
 			#if user_access == "allow":
@@ -1827,9 +1847,9 @@ def edit_policy(groupid,node,user):
 							return "allow"
 	elif group_access == "Moderated": 
 			 return "allow"
-	elif resource_infor.created_by == user.id:
+	elif resource_infor.created_by:
 							return "allow"    
-						
+	'''					
 @get_execution_time		
 @register.assignment_tag
 def get_prior_post_node(group_id):
@@ -1954,10 +1974,9 @@ def get_publish_policy(request, groupid, res_node):
 		
 		group_name, group_id = get_group_name_id(groupid)
 		node = node_collection.one({"_id": ObjectId(group_id)})
-
 		group_type = group_type_info(groupid)
 		group = user_access_policy(groupid,request.user)
-		ver = node.current_version
+		ver = resnode.current_version
 
 		if request.user.id:
 			if group_type == "Moderated":
@@ -2004,10 +2023,10 @@ def get_resource_collection(groupid, resource_type):
   Mongodb's cursor object holding nodes having collections
   """
   try:
-    gst = node_collection.one({'_type': "GSystemType", 'name': unicode(resource_type)})
-
+    file_gst = node_collection.one({'_type': "GSystemType", 'name': unicode(resource_type)})
+    page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
     res_cur = node_collection.find({'_type': {'$in': [u"GSystem", u"File"]},
-                                    'member_of': gst._id,
+                                    'member_of': {'$in': [file_gst._id, page_gst._id]},
                                     'group_set': ObjectId(groupid),
                                     'collection_set': {'$exists': True, '$not': {'$size': 0}}
                                   })
@@ -2135,8 +2154,10 @@ def get_source_id(obj_id):
 @get_execution_time
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
    get_translation_rt = node_collection.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   r_list_append_temp=r_list.append #a temp. variable which stores the lookup for append method
+   translation_list_append_temp=translation_list.append#a temp. variable which stores the lookup
    if obj_id not in r_list:
-      r_list.append(obj_id)
+      r_list_append_temp(obj_id)
       node_sub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':obj_id}]})
       node_rightsub_rt = triple_collection.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'right_subject':obj_id}]})
       
@@ -2145,20 +2166,20 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
          for each in list(node_sub_rt):
             right_subject = node_collection.one({'_id':each.right_subject})
             if right_subject._id not in r_list:
-               r_list.append(right_subject._id)
+               r_list_append_temp(right_subject._id)
       if list(node_rightsub_rt):
          node_rightsub_rt.rewind()
          for each in list(node_rightsub_rt):
             right_subject = node_collection.one({'_id':each.subject})
             if right_subject._id not in r_list:
-               r_list.append(right_subject._id)
+               r_list_append_temp(right_subject._id)
       if r_list:
          r_list.remove(obj_id)
          for each in r_list:
             dic={}
             node = node_collection.one({'_id':each})
             dic[node._id]=node.language
-            translation_list.append(dic)
+            translation_list_append_temp(dic)
             get_translation_relation(each,translation_list, r_list)
    return translation_list
 
@@ -2762,18 +2783,60 @@ def create_default_mailbox(request,username):
 		return render(request, 'ndf/mailclient_error.html', {'error_obj': error_obj,'groupid': group_id,'group_id': group_id})
 
 import shutil
+
+def sorted_ls(path):
+    '''
+    takes {
+        path : Path to the folder location
+    }
+    returns {
+        list of file-names sorted based on time
+    }
+    '''
+    mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
+    return list(sorted(os.listdir(path), key=mtime))
+
+
 @get_execution_time
 @register.assignment_tag
-def mail_status_change(mailboxname, username, mail_type, file_name):
-	settings_dir = os.path.dirname(__file__)
-	PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-	path = os.path.join(PROJECT_ROOT, 'mailbox_data/')
-	path = path + username
-	path = path + '/' + mailboxname
+def get_sg_member_of(group_id):
+	'''
+	Returns list of names of "member_of" of sub-groups.
+	- Takes group_id as compulsory and only argument.
+	'''
 
-	new_path = path + '/new/' + file_name
-	cur_path = path + '/cur/' + file_name
+	sg_member_of_list = []
+	# get all underlying groups
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_id, group_name = get_group_name_id(group_id)
 
-	shutil.move(new_path,cur_path)
+	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
-	return True
+	# Fetch post_node of group
+	post_node_id_list = group_obj.post_node
+
+	if post_node_id_list:
+		# getting parent's sub group's member_of in a list
+		for each_sg in post_node_id_list:
+			each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
+			sg_member_of_list.extend(each_sg_node.member_of_names_list)
+	return sg_member_of_list
+
+def get_objectid_name(nodeid):
+ print ';' * 50
+ print nodeid
+ return (node_collection.find_one({'_id':ObjectId(nodeid)}).name)
+
+@register.filter
+def is_dict(val):
+    return isinstance(val, dict)
+
+@register.filter
+def is_empty(val):
+    if val == None :
+    	return 1
+    else :
+    	return 0
+

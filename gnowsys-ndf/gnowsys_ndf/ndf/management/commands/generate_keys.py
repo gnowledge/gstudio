@@ -12,9 +12,9 @@ class Command(BaseCommand):
 		script_name = 'gen_key_script.sh'
 		script_input_file_name = 'gen_key_inp.txt'
 
-		path2 = path1 + script_input_file_name
 		path1 = path1 + script_name
-		
+		path2 = path1 + script_input_file_name
+
 		# pass path2 as argument to be used by script
 		# need to pass path of gen_key_input.txt to the gen_key_script.sh so that it can read it because the bash
 		# command will be run from /gnowsys-ndf as:

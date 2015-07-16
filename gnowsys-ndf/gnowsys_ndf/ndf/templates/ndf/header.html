@@ -1,5 +1,49 @@
 {% load get_nroer_menu  get_user_group  get_group_object  get_existing_groups_excluded  get_profile_pic  get_gapps_iconbar from ndf_tags %}
 
+<style type="text/css">
+  #search_text {
+    border-bottom: solid thin gray;
+    background-color: #383838;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    padding: none !important;
+    color: #fff !important;
+    height: inherit;
+    box-shadow: none;
+}
+::-webkit-input-placeholder {
+   color: gray;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+   color: gray;  
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+   color: gray;  
+}
+
+:-ms-input-placeholder {  
+   color: gray;  
+}
+#search_text:focus{
+    /*color: white !important;*/
+    border-bottom-color: white;
+    transition: 1s ease-out;
+}
+
+#search-submit{
+  background-color: #383838;
+  color: gray;
+}
+#search-submit:hover {
+  color: white;
+  background-color: gray;
+  transition: 0.8s ease-out;
+}
+
+</style>
 {% load i18n %}
 {% load cache %}
 
@@ -9,7 +53,7 @@
 
     <!-- top LHS logo -->
     {% cache 3600 site_logo %}
-    <a class="large-2 small-5 medium-5 columns drop-shadow logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
+    <a class="large-2 small-5 medium-5 columns logo" href="{{site.HOME_PAGE|default_if_none:'/home/'}}">
       <img src="{{site.LOGO}}">
     </a>
     {% endcache %}
@@ -18,7 +62,7 @@
     <div class="large-10 small-7 medium-7 columns two-nav-container">
     
       <!-- first menu header  -->
-      <nav class="top-bar drop-shadow" data-topbar role="navigation">
+      <nav class="top-bar " data-topbar role="navigation">
 
         <ul class="title-area">
           <li class="name"> </li>
@@ -144,9 +188,9 @@
 
       <!-- Closes Left Nav section -->
 
-       <!-- Right Nav Section -->
+      <!-- Right Nav Section -->
       <ul class="right">
-
+{% comment %}
       <!-- Language selector--> 
       <li class="has-form"> 
         <a href="#" class="rounded language button"  data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
@@ -168,18 +212,17 @@
                   <a class="close-reveal-modal">&#215;</a>
             </form>
 
-            {% comment %}       
             <!--                       {% get_languages as lan %} -->
             <!--                   <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>     -->
             <!--                   <h3>Secondary language</h3> -->
             <!--                   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>       -->
             <!--                   <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/> -->
             <!--                   <a class="close-reveal-modal">&#215;</a> -->
-            {% endcomment %}
 
           </div> 
         </li>
         <!-- end of language selector -->
+{% endcomment %}
 
         <!-- If logged in show user options -->
         {% if user.is_authenticated %}
@@ -207,12 +250,15 @@
               <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}</a>
             </li>
 
-
             <!-- CHANGE DONE HERE, MAILCLIENT ADDED -->
             {%if user.is_authenticated %}
             <li class="text-center">
               <a href="/{{ user.username }}/mailclient">{% trans "MailClient" %}</a>
             {% endif %}
+
+            <li class="text-center">
+              <a href='/{{group_id}}/analytics/summary'>{% trans "Analytics" %}</a>
+            </li>
 
             {% if user.is_superuser %}
               <li class="text-center">
@@ -247,15 +293,34 @@
           as redirection-url was of logout; similar case with password-reset!
         -->
         
-        <li class="has-form">
-          <a class="button" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
-            <i class="fi-key"></i> {% trans "Login" %}
+        <li>
+          <a class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+            <i class="fi-key"></i>&nbsp; {% trans "Login" %}
           </a>
         </li>
         {% endif %}
-        </ul>  
+        </ul>
         <!-- Closes Right Nav section -->
 
+        <ul class="right">
+          <li class="has-dropdown">
+            <a>{% trans "Language" %} &nbsp; | &nbsp; {{request.LANGUAGE_CODE}}</a>
+            <ul class="dropdown">
+
+              {% for lang in LANGUAGES %}
+                <li>
+                  <form action="/i18n/setlang/" method="POST">
+                    {% csrf_token %}
+                    <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+                    <input type="hidden"  name="language" value="{{ lang.0 }}">
+                    <input type="submit" class="button expand secondary" value="{{ lang.1 }}"/>
+                  </form>
+                </li>
+              {% endfor %}
+
+            </ul>
+          </li>
+        </ul>
         </section>
 
       </nav>
@@ -263,7 +328,7 @@
 
       <!-- =========| divider between two nav's/header's |=========== -->
       <!-- start of second nav  or group level header-->
-      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %} drop-shadow" id="group-level-header">
+      <div class="contain-to-grid {% if request.path != '/welcome' %}{% if group_object.edit_policy != 'EDITABLE_MODERATED' %}{% if not is_ac_url %}sticky{% endif %}{% endif %}{% endif %}" id="group-level-header">
 
         <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->
@@ -294,10 +359,18 @@
                       <a title="About - {{ group_object.name }}" href="{% url 'groupchange' group_object.name %}">
                         <i class="fi-record"></i> {% trans "About" %}
                       </a>
+
                     {% else %}
                       <a title="Find Latest Updates in {{ group_object.name }}" href="{% url 'group_dashboard' group_object.name %}">
                         <i class="fi-results"></i> {% trans "Updates" %}
                       </a>
+                       <li>
+                <a href="/{{group_id}}/feeds/updates/" class="">
+                  <i class="fi-rss"></i>
+
+                </a>
+              </li>
+                     
                     {% endif %}
                   {% endif %}
 
@@ -306,7 +379,7 @@
               <!-- END of update/about of group -->
 
               <!-- search in the app bar -->
-              <li class="has-form">
+              <!-- <li class="has-form">
                 <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                   name="search_form" method="GET" >
                   <div class="row collapse">
@@ -318,7 +391,25 @@
                     </div>
                   </div>
                 </form>
+              </li> -->
+              <li class="has-form">
+                <form {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                  name="search_form" method="GET" >
+              
+                  <div class="row collapse">
+                    <div class="large-9 small-10 columns">
+                      <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                    </div>
+                    <div class="large-3 small-2 columns">
+                      <button type="submit" class="tiny button" value="" id="search-submit">
+                        <i class="fi-magnifying-glass"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                </form>
               </li>
+              
               <!-- END of search in the app bar -->
 
               <!-- <li class="has-dropdown">

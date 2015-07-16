@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.core.mail import EmailMessage
 import os
+import urllib2
 import requests
 import shutil
 from subprocess import call
@@ -11,13 +12,13 @@ from gnowsys_ndf.settings import SYNCDATA_FETCHING_EMAIL_ID, SYNCDATA_FETCHING_E
 from gnowsys_ndf.ndf.views.mailclient import server_sync
 
 def connected_to_internet(url='http://www.google.com/', timeout=2):
-    try:
-        _ = requests.get(url, timeout=timeout)
-        return True
-    except requests.ConnectionError:
-    	print "Error occurred in : ", str(__file__)
-        print("No internet connection available.")
-    return False
+	try:
+		urllib2.urlopen(url, timeout=timeout)
+		return True
+	except Exception as error:
+		print 'Internet is not Available'
+		print str(error)
+		return False
 
 class Command(BaseCommand):
 	help = 'Function to fetch mails from the MailID specified in settings.py '
@@ -51,7 +52,7 @@ class Command(BaseCommand):
 						print '**'*30; print mail; print ''
 						server_sync(mail)
 				else:
-					print 'No new syncdata mails received'
+					print 'No new mails received'
 			metabox.delete()
 		except Exception as error:
 			#delete temporary mailbox from database

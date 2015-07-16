@@ -6,12 +6,13 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response  # , render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.cache import cache
 
 from mongokit import paginator
 import mongokit
+import json
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
@@ -23,6 +24,10 @@ from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
 
+#get pub of gpg key with which to sign syncdata attachments
+from gnowsys_ndf.settings import SYNCDATA_KEY_PUB
+#to display error template if non existent pub is given in settings.py
+from django.shortcuts import render
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -38,11 +43,11 @@ import locale
 import pymongo
 from bson import BSON
 from bson import json_util
+import multiprocessing as mp 
 from datetime import datetime, timedelta, date
 # import csv
 # from collections import Counter
 from collections import OrderedDict
-
 col = db[Benchmark.collection_name]
 
 history_manager = HistoryManager()
@@ -59,34 +64,70 @@ ins_objectid = ObjectId()
 
 
 def get_execution_time(f):
-    if BENCHMARK == 'ON':
+   if BENCHMARK == 'ON': 
 
-        def wrap(*args, **kwargs):
-            time1 = time.time()
-            total_parm_size = 0
-            for key, value in kwargs.iteritems():
-                total_parm_size = total_parm_size + getsizeof(value)
-            total_param = len(kwargs)
-            ret = f(*args, **kwargs)
-            t2 = time.clock()
-            time2 = time.time()
-            time_diff = time2 - time1
-            benchmark_node = col.Benchmark()
-            benchmark_node.time_taken = unicode(str(time_diff))
-            benchmark_node.name = unicode(f.func_name)
-            benchmark_node.parameters = unicode(total_param)
-            benchmark_node.size_of_parameters = unicode(total_parm_size)
-            benchmark_node.last_update = datetime.today()
-            #benchmark_node.functionOplength = unicode(getsizeof(ret))
-            try:
-                benchmark_node.calling_url = unicode(args[0].path)
-            except:
-                pass
-            benchmark_node.save()
-            return ret
-    if BENCHMARK == 'ON':
-        return wrap
-    if BENCHMARK == 'OFF':
+	    def wrap(*args,**kwargs):
+	        time1 = time.time()
+	        total_parm_size = 0
+	        for key, value in kwargs.iteritems():
+	           total_parm_size = total_parm_size + getsizeof(value)
+	        total_param = len(kwargs)
+	        ret = f(*args,**kwargs)
+	        t2 = time.clock()
+	        time2 = time.time()
+	        time_diff = time2 - time1
+	        benchmark_node =  col.Benchmark()
+	        benchmark_node.time_taken = unicode(str(time_diff))
+	        benchmark_node.name = unicode(f.func_name)
+	        benchmark_node.has_data = { "POST" : 0, "GET" : 0}
+	        try :
+	        	benchmark_node.has_data["POST"] = bool(args[0].POST)
+	        	benchmark_node.has_data["GET"] = bool(args[0].GET)
+	        except : 
+	        	pass
+	        try :
+	        	benchmark_node.session_key = unicode(args[0].COOKIES['sessionid'])
+	        except : 
+	        	pass
+	        try :
+	        	benchmark_node.user = unicode(args[0].user.username)
+	        except :
+	        	pass
+	        benchmark_node.parameters = unicode(total_param)
+	        benchmark_node.size_of_parameters = unicode(total_parm_size)
+	        benchmark_node.last_update = datetime.today()
+	        try:
+	        	benchmark_node.calling_url = unicode(args[0].path)
+	        	url = benchmark_node.calling_url.split("/")
+	        	
+	        	if url[1] != "" : 
+	        		group = url[1]
+	        		benchmark_node.group = group
+	        		try :
+	        			n = node_collection.find_one({u'_type' : "Author", u'created_by': int(group)})
+	        			if bool(n) :
+	        				benchmark_node.group = group;
+	        		except :
+	        			group_name, group = get_group_name_id(group)
+	        			benchmark_node.group = str(group)
+	        	else :
+	        		pass
+
+	        	if url[2] == "" : 
+	        		benchmark_node.action = None
+	        	else : 
+	        		benchmark_node.action = url[2]
+		        	if url[3] != '' : 
+		        		benchmark_node.action +=  str('/'+url[3])
+		        	else : 
+		        		pass
+	        except : 
+	        	pass
+	        benchmark_node.save()
+	        return ret
+   if BENCHMARK == 'ON': 
+    	return wrap
+   if BENCHMARK == 'OFF':
         return f
 
 import json
@@ -100,11 +141,29 @@ def server_sync(func):
     def wrap(*args, **kwargs):
         ret = func(*args, **kwargs)
 
-        ''' The mails that would be sent '''
-        # mail = EmailMessage()
-        # subject = "SYNCDATA"
-        # mail.to = ['djangotest94@gmail.com']
-        # mail.from_mail= 'Metastudio <t.metastudio@gmail.com>'
+        
+        #do a regex check on SYNCDATA_KEY_PUB, if it contains anything other than letters and nos DONOT run the subprocess.call()
+        # function as this can be a potential security LOOPHOLE
+        #if pub is found to be invalid changes WILL NOT be captured
+        searchObj = re.search( r'[^A-Za-z0-9]', SYNCDATA_KEY_PUB, re.M|re.I)
+        if searchObj:
+            print "Invalid character found in SYNCDATA_KEY_PUB. Please ensure valid existing PUB has been added to local_settings.py", searchObj.group()
+            return            
+        
+        check_command = 'gpg --list-keys | grep -o "'+SYNCDATA_KEY_PUB+'"'
+        std_out= subprocess.call([check_command],shell=True)
+        print std_out
+        #code to check if SYNCDATA_KEY_PUB in local settings.py is a pub which is present in the gpg database of the system
+        #if not, change WILL NOT be captured
+        #std_out will have shell command return code =0 (success) 1 (failure)
+        if str(std_out) == '1':
+            error_obj =  "Given pub = %s is not in gpg database of your system. Failed to capture changes for syncdata" % SYNCDATA_KEY_PUB
+            print '**'*30
+            print '\n'*3
+            print error_obj
+            print '\n'*3
+            print '**'*30
+            return
 
         ''' Get current date and time to timestamp json and the document being captured by this function.
          This done so that files in syncdata folder will have unique name'''
@@ -167,7 +226,25 @@ def server_sync(func):
         ''' Code to sign the document file, prefix timestamp to document file name and move it to syncdata folder '''
         path1 = os.path.dirname(__file__)
         path2 = os.path.dirname(path1)
-        dst = str(path2) + "/syncdata"
+        
+        settings_dir = os.path.dirname(__file__)
+        PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
+        path_MailClient = os.path.join(PROJECT_ROOT, 'MailClient/')
+        
+        if not os.path.exists(path_MailClient):
+            os.makedirs(path_MailClient)
+        
+        p1 = path_MailClient + 'syncdata/'
+        
+        if not os.path.exists(p1):
+            os.makedirs(p1)
+        
+        p1 = path_MailClient + 'sent_syncdata_files/'
+        
+        if not os.path.exists(p1):
+            os.makedirs(p1)
+
+        dst = str(path2) + "/MailClient/syncdata"
 
         print '+' * 20
         print dst
@@ -184,19 +261,18 @@ def server_sync(func):
             os.makedirs(path_for_this_capture)
 
         if file_data:
-            #add _sig otherwise django_mailbox scrambles file name
-            # this '_sig' is later used to split the filename and obtain original file name in received attachments in 
+            
+            # '.gpg' in output file name is later used to split the filename and obtain original file name in received attachments in 
             # 'server_sync()' function of mailclient.py views file
             
-            
-
+            #make filename.extension --> filename_extension since finally the name should be filename_extension.gpg
             op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered + '_sig'
             print ':' * 20
             print op_file_name
             print ':' * 20
             print file_path
-            command = 'gpg --output ' + op_file_name + ' --sign ' + file_path
-            subprocess.call([command],shell=True)    
+            command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + op_file_name + ' --sign ' + file_path
+            subprocess.call([command],shell=True)
             src = op_file_name
 
             print '+' * 20
@@ -212,7 +288,7 @@ def server_sync(func):
         ''' Run command to sign the json file, rename and move to syncdata folder'''
         #add _sig otherwise django_mailbox scrambles file name
         json_op_file_name = node_data_path.split('node_data.json')[0]+ timestamp + '_' + 'node_data.json' + '_sig'
-        command = 'gpg --output ' + json_op_file_name + ' --sign ' + node_data_path
+        command = 'gpg -u ' + SYNCDATA_KEY_PUB + ' --output ' + json_op_file_name + ' --sign ' + node_data_path
         subprocess.call([command],shell=True)
         src = json_op_file_name
         shutil.move(src,path_for_this_capture)
@@ -384,12 +460,28 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
         # Then append their names in list of GApps to be excluded
         if already_selected_gapps:
             gapps_list_remove = gapps_list.remove
-            for each_gapp in already_selected_gapps:
+            #Function used by Processes implemented below
+            def multi_(lst):
+              for each_gapp in lst:
                 gapp_name = each_gapp["name"]
 
                 if gapp_name in gapps_list:
                     gapps_list_remove(gapp_name)
-
+            #this empty list will have the Process objects as its elements
+            processes=[]
+            n1=len(already_selected_gapps)
+            lst1=already_selected_gapps
+            #returns no of cores in the cpu
+            x=mp.cpu_count()
+            #divides the list into those many parts
+            n2=n1/x
+            #Process object is created.The list after being partioned is also given as an argument. 
+            for i in range(x):
+              processes.append(mp.Process(target=multi_,args=(lst1[i*n2:(i+1)*n2],)))
+            for i in range(x):
+              processes[i].start() #each Process started 
+            for i in range(x):
+              processes[i].join() #each Process converges
     # Find all GAPPs
     meta_type = node_collection.one({
         "_type": "MetaType", "name": META_TYPE[0]
@@ -680,16 +772,19 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
             dict_drawer[each._id] = each
 
     elif (nid is None) and (nlist):
+
         for each in drawer:
             if each._id not in nlist:
                 dict1[each._id] = each
-     
+
+        #loop replaced by a list comprehension
+        dict2=[node_collection.one({'_id': oid}) for oid in nlist]
+    
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
             dict_drawer['1'] = dict1
             dict_drawer['2'] = dict2
-
 
     else:
         for each in drawer:
@@ -698,13 +793,18 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
                 if each._id not in nlist:
                     dict1[each._id] = each
 
-      	
+        if each._id != nid:
+            if each._id not in nlist:
+                dict1[each._id] = each
+         
+        #loop replaced by a list comprehension    
+        dict2=[node_collection.one({'_id': oid})  for oid in nlist]
+
         for oid in nlist:
             obj = node_collection.one({'_id': oid})
             dict2.append(obj)
             dict_drawer['1'] = dict1
             dict_drawer['2'] = dict2
-
 
     if checked == "RelationType" or checked == "CourseUnits":
         return dict_drawer
@@ -946,7 +1046,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if set(node.tags) != set(tags_list):
         node.tags = tags_list
         is_changed = True
-
     #  Build collection, prior node, teaches and assesses lists
     if check_collection:
         changed = build_collection(
@@ -1368,12 +1467,12 @@ def get_versioned_page(node):
             proc1.kill()
             return(node, '1.1')
 
-
 @get_execution_time
 def get_user_page(request, node):
     ''' function gives the last docment submited by the currently logged in user either it
         can be drafted or published
-'''
+    '''
+
     rcs = RCS()
     fp = history_manager.get_file_path(node)
     cmd = 'rlog  %s' % \
@@ -1448,6 +1547,51 @@ def get_page(request, node):
                 #      return (node2,ver2)
         return (node1, ver1)
 
+@get_execution_time
+def get_page(request,node):
+  ''' 
+  function to filter between the page to be displyed to user 
+  i.e which page to be shown to the user drafted or the published page
+  if a user have some drafted content then he would be shown his own drafted contents 
+  and if he has published his contents then he would be shown the current published contents
+  '''
+  username =request.user
+  node1,ver1=get_versioned_page(node)
+  node2,ver2=get_user_page(request,node)     
+  
+  if  ver2 != '1.1':                           
+	    if node2 is not None:
+                if node2.status == 'PUBLISHED':
+                  
+			if float(ver2) > float(ver1):			
+				return (node2,ver2)
+			elif float(ver2) < float(ver1):
+				return (node1,ver1)
+			elif float(ver2) == float(ver1):
+				return(node1,ver1)
+		elif node2.status == 'DRAFT':
+                       #========== conditions for Group===============#
+
+                        if   node._type == "Group":
+			    
+			    count=check_page_first_creation(request,node2)
+                            if count == 1:
+                                return (node1,ver1)
+                            elif count == 2:
+                               	return (node2,ver2)
+                        
+                        return (node2,ver2)  
+	    else:
+                        
+			return(node1,ver1)		
+	    
+  else: 
+        # if node._type == "GSystem" and node1.status == "DRAFT":
+        #     if node1.created_by ==request.user.id:
+        #           return (node2,ver2)
+        #      else:
+	#	   return (node2,ver2)
+        return (node1,ver1)
 
 @get_execution_time
 def check_page_first_creation(request, node):
@@ -1501,10 +1645,10 @@ def tag_info(request, group_id, tagname=None):
     if request.user.is_superuser:  # Superuser can see private an public files
         if tagname:
             cur = node_collection.find({'tags': {'$regex': tagname, '$options': "i"},
-                                        'group_set': ObjectId(group_id)
-                                        })
-            for every in cur:
-                search_result.append(every)
+                                        'group_set':ObjectId(group_id)
+                  })
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
     # Autheticate user can see all public files
     elif request.user.is_authenticated():
@@ -1524,10 +1668,10 @@ def tag_info(request, group_id, tagname=None):
                                         '$or': [
                 {'status': u'PUBLISHED'},
                                             {'created_by': userid},
-            ]
-            })
-            for every in cur:
-                search_result.append(every)
+                                          ]
+                                      })
+            #loop replaced by a list comprehension
+            search_result=[every for every in cur]
 
     else:  # Unauthenticated user can see all public files.
         group_node = node_collection.one({'_id': ObjectId(group_id)})
@@ -1537,9 +1681,9 @@ def tag_info(request, group_id, tagname=None):
                                             'group_set': group_id,
                                             'status': u'PUBLISHED'
                                             }
-                                           )
-                for every in cur:
-                    search_result.append(every)
+                                     )
+                #loop replaced by a list comprehension
+                search_result=[every for every in cur]
 
     if search_result:
         total = len(search_result)
@@ -1651,7 +1795,7 @@ def cast_to_data_type(value, data_type):
 
     value = value.strip()
     casted_value = value
-
+   
     if data_type == "unicode":
         casted_value = unicode(value)
 
@@ -1720,6 +1864,10 @@ def get_node_metadata(request, node, **kwargs):
         for atname in attribute_type_list:
 
             field_value = request.POST.get(atname, "")
+            print '$' * 30
+            print atname,field_value
+            print '$' * 30
+            
             at = node_collection.one(
                 {"_type": "AttributeType", "name": atname})
 
@@ -1734,6 +1882,13 @@ def get_node_metadata(request, node, **kwargs):
                         updated_ga_nodes.append(temp_res)
 
                 else:
+                    print '<' * 30
+                    print at["data_type"]
+                    print node._id
+                    print at
+                    print field_value
+                    print '<' * 30
+
                     create_gattribute(node._id, at, field_value)
 
     if "is_changed" in kwargs:
@@ -1781,19 +1936,22 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
     """
     if not isinstance(at_rt_objectid_or_attr_name_list, list):
         at_rt_objectid_or_attr_name_list = [at_rt_objectid_or_attr_name_list]
-
+    # a temp. variable which stores the lookup for append method
+    type_of_set_append_temp = type_of_set.append
     if not type_of_set:
         node["property_order"] = []
+        # a temp. variable which stores the lookup for append method
+        node_property_order_append_temp = node["property_order"].append
         gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {
                                          '$in': node["member_of"]}}, {'type_of': 1, 'property_order': 1})
         for gst in gst_nodes:
             for type_of in gst["type_of"]:
                 if type_of not in type_of_set:
-                    type_of_set.append(type_of)
+                    type_of_set_append_temp(type_of)
 
             for po in gst["property_order"]:
                 if po not in node["property_order"]:
-                    node["property_order"].append(po)
+                    node_property_order_append_temp(po)
 
     BASE_FIELD_METADATA = {
         'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
@@ -1805,6 +1963,8 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
     }
 
     widget_data_list = []
+    # a temp. variable which stores the lookup for append method
+    widget_data_list_append_temp = widget_data_list.append
     for at_rt_objectid_or_attr_name in at_rt_objectid_or_attr_name_list:
         # ObjectId.is_valid(at_rt_objectid_or_attr_name):
         if type(at_rt_objectid_or_attr_name) == ObjectId:
@@ -1835,30 +1995,6 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
                     if field.altnames:
                         if ";" in field.altnames:
                             altnames = field.altnames.split(";")[1]
-                        else:
-                            altnames = field.altnames
-
-                elif type_of_set:
-                    # If current node's GST is not in subject_type
-                    # Search for that GST's type_of field value in subject_type
-                    for each in type_of_set:
-                        if each in field.subject_type:
-                            data_type = node.structure[field.name]
-                            value = node[field.name]
-                            if field.altnames:
-                                if ";" in field.altnames:
-                                    altnames = field.altnames.split(";")[0]
-                                else:
-                                    altnames = field.altnames
-
-                        elif each in field.object_type:
-                            data_type = node.structure[field.inverse_name]
-                            value = node[field.inverse_name]
-                            if field.altnames:
-                                if ";" in field.altnames:
-                                    altnames = field.altnames.split(";")[0]
-                                else:
-                                    altnames = field.altnames
 
             else:
                 # For AttributeTypes
@@ -1866,26 +2002,25 @@ def get_widget_built_up_data(at_rt_objectid_or_attr_name_list, node, type_of_set
                 data_type = node.structure[field.name]
                 value = node[field.name]
 
-            widget_data_list.append({'_type': field._type,  # It's only use on details-view template; overridden in ndf_tags html_widget()
-                                     '_id': field._id,
-                                     'data_type': data_type,
-                                     'name': field.name, 'altnames': altnames,
-                                     'value': value
-                                     })
+            widget_data_list_append_temp({'_type': field._type,  # It's only use on details-view template; overridden in ndf_tags html_widget()
+                              '_id': field._id,
+                              'data_type': data_type,
+                              'name': field.name, 'altnames': altnames,
+                              'value': value
+                              })
+
 
         else:
             # For node's base-field(s)
-
             # widget_data_list.append([node['member_of'], BASE_FIELD_METADATA[at_rt_objectid_or_attr_name], node[at_rt_objectid_or_attr_name]])
-            widget_data_list.append({'_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
-                                     'data_type': node.structure[at_rt_objectid_or_attr_name],
-                                     'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
-                                     'value': node[at_rt_objectid_or_attr_name],
-                                     'required': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['required']
-                                     })
+            widget_data_list_append_temp({'_type': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['_type'],
+                              'data_type': node.structure[at_rt_objectid_or_attr_name],
+                              'name': at_rt_objectid_or_attr_name, 'altnames': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['altnames'],
+                              'value': node[at_rt_objectid_or_attr_name],
+                              'required': BASE_FIELD_METADATA[at_rt_objectid_or_attr_name]['required']
+                              })
 
     return widget_data_list
-
 
 @get_execution_time
 def get_property_order_with_value(node):
@@ -1904,23 +2039,27 @@ def get_property_order_with_value(node):
 
         demo["property_order"] = []
         type_of_set = []
+        # temp. variables which stores the lookup for append method
+        type_of_set_append_temp = type_of_set.append
+        demo_prop_append_temp = demo["property_order"].append
         gst_nodes = node_collection.find({'_type': "GSystemType", '_id': {
                                          '$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
         for gst in gst_nodes:
             for type_of in gst["type_of"]:
                 if type_of not in type_of_set:
-                    type_of_set.append(type_of)
+                    type_of_set_append_temp(type_of)
 
             for po in gst["property_order"]:
                 if po not in demo["property_order"]:
-                    demo["property_order"].append(po)
+                    demo_prop_append_temp(po)
 
         demo.get_neighbourhood(node["member_of"])
-
+        # a temp. variable which stores the lookup for append method
+        new_property_order_append_temp = new_property_order.append
         for tab_name, list_field_id_or_name in demo['property_order']:
             list_field_set = get_widget_built_up_data(
                 list_field_id_or_name, demo, type_of_set)
-            new_property_order.append([tab_name, list_field_set])
+            new_property_order_append_temp([tab_name, list_field_set])
 
         demo["property_order"] = new_property_order
 
@@ -2143,6 +2282,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 
             ga_node.object_value = object_value
             ga_node.save()
+            print 'IN CREATE_GATTRIBUTE'
             # ''' server_sync '''
             # capture_data(file_object=ga_node, file_data=None, content_type='gattribute_create')
 
@@ -4476,4 +4616,3 @@ def repository(request, group_id):
                                },
                               context_instance=RequestContext(request)
                               )
-

@@ -6,7 +6,7 @@ import shutil
 import urllib2
 from subprocess import call
 from django.core.mail import EmailMessage
-from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID
+from gnowsys_ndf.settings import SYNCDATA_SENDING_EMAIL_ID, SYNCDATA_FROM_EMAIL_ID
 
 def sorted_ls(path):
     '''
@@ -44,9 +44,9 @@ class Command(BaseCommand):
 		if connected_to_internet() is False:
 			return None
 
-		syncdata_folder_path = os.path.dirname(__file__).split('/management')[0] + '/syncdata'
+		syncdata_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/syncdata'
 		list_of_syncdata_folders = []
-		sent_folder_path = os.path.dirname(__file__).split('/management')[0] + '/sent_syncdata_files'
+		sent_folder_path = os.path.dirname(__file__).split('/management')[0] + '/MailClient/sent_syncdata_files'
 
 		if not os.path.exists(sent_folder_path):
 			os.makedirs(sent_folder_path)
@@ -75,9 +75,10 @@ class Command(BaseCommand):
 					folder_empty = 0
 					print file_path
 
-				mail.from_email = "Gstudio <t.metastudio@gmail.com>"
-				mail.to = [SYNCDATA_SENDING_EMAIL_ID]
+				mail.from_email = SYNCDATA_FROM_EMAIL_ID
+				mail.to = list(SYNCDATA_SENDING_EMAIL_ID)
 				if folder_empty == 0:
 					mail.send()
-					
 				shutil.move(path,sent_folder_path)
+			else:
+				return 'Internet no longer available'

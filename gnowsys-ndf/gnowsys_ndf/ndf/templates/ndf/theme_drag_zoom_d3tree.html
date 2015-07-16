@@ -150,6 +150,8 @@
         .attr("width", viewerWidth)
         .attr("height", viewerHeight)
         .attr("class", "overlay")
+        .attr("version", "1.0")
+        .attr("xmlns", "http://www.w3.org/2000/svg")
         .call(zoomListener);
  
     // // Define the drag listeners for drag/drop behaviour of nodes.
@@ -577,7 +579,6 @@
  
     // Define the root
     root = treeData;
-    aaa = root;
     root.x0 = viewerHeight / 2;
     root.y0 = 0;
  
@@ -586,6 +587,11 @@
     root.children.forEach(collapse);
     update(root);
     centerNode(root);
+
+    setTimeout(function () {
+        firstChild = root.children[0];
+        click(firstChild);
+    }, 1500);
 
     // recursive function needed to get data for {{selected}} node
     // result = ""

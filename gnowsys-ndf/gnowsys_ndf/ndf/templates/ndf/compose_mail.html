@@ -32,75 +32,56 @@
 	{% if user.is_authenticated %}
 	<form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
 	{% csrf_token %}
-		<h2> Using {{mailbox_name}} </h2>
-		<!-- To addr -->
-    	<div class="row">
-        	<div class="medium-12 columns">
-          		<label>To:</label>
-          		<input id="to_addrs_id" name="to_addrs" type="text" placeholder="To address(es)..." required>
-          		<small class="error">Enter valid email addresses separated by ';'</small>
-        	</div>
-      	</div>
-      	</br>
+		<h2 style="float:left"> Using {{mailbox_name}} </h2>
+    <br>
+    <h5 style="margin-left:15rem">(From: {{ mailbox_email }} )</h5>
 
-      	<!-- Cc addr -->
-    	<div class="row">
-        	<div class="medium-12 columns">
-          		<label>Cc:</label>
-          		<input id="cc_addrs_id" name="cc_addrs" type="text" placeholder="Cc address(es)">
-          		<small class="error">Enter valid email addresses separated by ';'</small>
-        	</div>
-      	</div>
-      	</br>
+    <div class="row">
+      <div class="medium-12 columns">
+        <h4>To:</h4>
+        {% if to_email_id == None %}
+          <input id="to_addrs_id" name="to_addrs" type="text" placeholder="To address(es)..." required>
+        {% else %}
+          <input id="to_addrs_id" name="to_addrs" type="text" value="{{ to_email_id }}" required>
+        {% endif %}
+        <small class="error">Enter valid email addresses separated by ';'</small>
+      </div>
+    </div>
+  </br>
+          		
+  <h4 id="CC_header" style="float:left; margin-right:10rem"><a id="CC" >Cc:</a></h4>
+  <input id="cc_addrs_id" name="cc_addrs" type="text" placeholder="Cc address(es)" style="display:none;">
+  
+  <h4><a id="BCC">Bcc:</a></h4>
+  <input id="bcc_addrs_id" name="bcc_addrs" type="text" placeholder="Bcc address(es)..." style="display:none;">
+  
+  <h4>Subject:</h4>
+  <input id="subject_id" name="subject" type="text" placeholder="Subject...">
+  </br>
+  
+  <h5>Body:</h5>
+	<textarea name="body_editor" id="body_editor" placeholder="What do you want to put in this mail?"></textarea>
+    <script>
+      CKEDITOR.replace('body_editor');
+    </script>
+	</br>
+		
+  <!-- File Upload -->
+	<label>Attach Files:</label>
+	(Please ensure all your files are in the same folder when uploading multiple files)
+  <input type="file" name="attached_files" id="attached_files_id" accept="file_extension|audio/*|video/*|image/*|media_type" multiple> 
+  <p id="fileError" style="color:red"></p>
 
-      	<!-- Bcc addr -->
-    	<div class="row">
-        	<div class="medium-12 columns">
-          		<label>Bcc:</label>
-          		<input id="bcc_addrs_id" name="bcc_addrs" type="text" placeholder="Bcc address(es)...">
-          		<small class="error">Enter valid email addresses separated by ';'</small>
-        	</div>
-      	</div>
-      	</br>
-
-      	<!-- Subject -->
-    	<div class="row">
-        	<div class="medium-12 columns">
-          		<label>Subject:</label>
-          		<input id="subject_id" name="subject" type="text" placeholder="Subject...">
-        	</div>
-      	</div>
-      	</br>
-
-		<!-- Body -->
-		<div class ="row">
-			<label>Body:</label>
-			<textarea name="body_editor" id="body_editor">What do you want to put in this mail?</textarea>
-            <script>
-                CKEDITOR.replace( 'body_editor' );
-                /*CKEDITOR.replace( 'body_editor', {extraPlugins: 'MathJax'} );*/
-            </script>
-		</div>
-		</br>
-		</br>
-
-		<!-- File Upload -->
-		<div class ="row">
-			<label>Attach Files:</label>
-			(Please ensure all your files are in the same folder when uploading multiple files)
-			 <input type="file" name="attached_files" id="attached_files_id" accept="file_extension|audio/*|video/*|image/*|media_type" multiple> 
-       <p id="fileError" style="color:red"></p>
-		</div>		
-
-		<!-- <input type="file" id="file_id"> -->
-		<input type="hidden" name="node" value="{{node.pk}}">
-        <input type="hidden" name="user" value="{{user.id}}">
-        <input type="hidden" name="page_url" value="{{request.path}}">
-        <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
-		</br>
-        <input type="submit" id="send_mail" value="Send" class="button small"/>
+	<input type="hidden" name="node" value="{{node.pk}}">
+  <input type="hidden" name="user" value="{{user.id}}">
+  <input type="hidden" name="page_url" value="{{request.path}}">
+  <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
+	</br>
+  <input type="submit" id="send_mail" value="Send" class="button small"/>
 	</form>
-	{% else %}
+	
+  {% else %}
 		<p><em>{% trans "You are not an authorised user. Please Log in" %} </em></p>
-	{% endif %}
+  {% endif %}
+
 {% endblock %}

@@ -6,6 +6,7 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
+  <script src="/static/ndf/js/mailclientcheck.js"></script>
 {% endblock %}
 
 
@@ -16,7 +17,7 @@
 {% block body_content %}
   <!-- reveal-modal removed -->
 
-  <form data-abide id="form-edit-node" enctype="multipart/form-data" onSubmit="enableselect();" method="POST" action="">
+  <form data-abide id="form-edit-node" enctype="multipart/form-data" method="POST" action="">
     {% csrf_token %}
 
         
@@ -27,6 +28,9 @@
       {% endif %}
     </h2>
     <br/><br/>
+    <p id="page_type" style="display:none;">edit</p>
+    <p id="mailboxname" style="display:none;">{{ mailboxname }}</p>
+    <p id="mailboxid" style="display:none;">{{ email_id }}</p>
 
     <div class="medium-6 columns end">
       
@@ -36,18 +40,20 @@
           <label>Mailbox Name <font color="red">*</font></label>
           <input id="name_id" name="mailboxname" type="text" placeholder="Enter name..." required>
           <small class="error">Please give a Mailbox name.It should contain only alphabets, digits and undescores.</small>
+          <small id="name_id_error"></small>
         </div>
       </div>
-<br/><br/>      
+
       <!-- E-Mail ID -->
       <div class="row">
         <div class="medium-12 columns">
           <label>Email ID <font color="red">*</font></label>
           <input id="email_id" name="emailid" type="text" placeholder="Enter Email ID for this mail box..." required>
           <small class="error">Please enter an email id for this mail box.</small>
+          <small id="email_id_error"></small>
         </div>
       </div>
-<br/><br/>
+
     <!-- Password -->
       <div class="row">
         <div class="medium-12 columns">
@@ -56,7 +62,7 @@
           <small class="error">Please enter the password for this email id.</small>
         </div>
       </div>
-      <br/><br/>
+
       <!-- Domains List -->
       <div class="row">
         <div class="medium-12 columns">
@@ -78,9 +84,9 @@
           <input type="hidden" name="page_url" value="{{request.path}}">
           <!-- deleted above -->
           <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
-          
-          <!-- Save button -->
-          <input type="submit" id="save-node" value="Save" class="button small expand"/>
+          <div id="saveButton">
+            <input type="submit" id="save-node" value="Save" class="button small expand" />
+          </div>
         </div>
       </div>
     </div>

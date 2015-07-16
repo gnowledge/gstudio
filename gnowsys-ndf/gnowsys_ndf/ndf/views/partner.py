@@ -30,6 +30,7 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 # ######################################################################################################################################
 
 gst_group = node_collection.one({"_type": "GSystemType", 'name': GAPPS[2]})
+partner_group_gst = node_collection.one({"_type": "GSystemType", 'name': u'PartnerGroup'})
 get_all_usergroups=get_all_user_groups()
 at_apps_list=node_collection.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
 ins_objectid  = ObjectId()
@@ -175,7 +176,7 @@ def partner_list(request, group_id):
     # print GSTUDIO_NROER_MENU
     return render_to_response("ndf/partner_list.html", 
                           {'group_nodes': collection_set, "groups_category": groups_category,
-                           'groupid': group_id, 'group_id': group_id
+                           'groupid': group_id, 'group_id': group_id, "app_gst": partner_group_gst,
                           }, context_instance=RequestContext(request))
 
 
@@ -200,10 +201,17 @@ def nroer_groups(request, group_id, groups_category):
                                         'name': {'$nin': ["home"], '$in': groups_names_list},
                                         'group_type': "PUBLIC"
                                      })#.sort('last_update', -1)
-    
+
+    if groups_category == "Partners":
+        app_gst = node_collection.one({'_type': 'GSystemType', 'name': 'PartnerGroup'})
+
+    elif groups_category == "Groups":
+        app_gst = gst_group
+
+    # print "=============", app_gst
     group_nodes_count = group_nodes.count() if group_nodes else 0
     return render_to_response("ndf/partner.html", 
                           {'group_nodes': group_nodes, "groups_category": groups_category,
-                           'group_nodes_count': group_nodes_count,
+                           'group_nodes_count': group_nodes_count, 'app_gst': app_gst,
                            'groupid': group_id, 'group_id': group_id
                           }, context_instance=RequestContext(request))

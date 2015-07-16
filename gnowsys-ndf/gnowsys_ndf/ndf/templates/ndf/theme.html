@@ -21,325 +21,17 @@
 	<link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> 
 	<script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script>
 
-<!-- 	<script type="text/javascript">
-
-  	$(document).ready(function() {
-
-		// Funtion for loading tree for showing collection list left side panel
-		doc();
-
-		// Function for manipulating tree when user visits to page directly via browser url
-		{% if selected %} TreeTillNode(); {% endif %}
-    });
-
-
-  	function TreeTillNode () {
-
-		// This gives the last hierarchy node id from browser url.
-		var url = "{{selected}}";
-
-		var tree_build = $(".themes").not(".jqtree-loading");
-		var node = tree_build.tree('getNodeById', url);
-		tree_build.tree('openNode', node);
-
-		// Javascript function to be used for checking objects in specific time of interval
-		setTimeout(function(){
-
-		// console.log($(".themes"))
-		if( ($(".themes").length > 0) ) { TreeTillNode() }
-		}, 100 );
-    }
-
-
-	function doc() {
-		
-		var $tree = $('.themes');
-		var user = "{{user.is_authenticated}}";
-		var unfold = "{{unfold}}";
-
-		if(unfold == "true"){
-			unfold = true
-		}
-		else{
-			unfold = false
-		}
-
-		$tree.tree({
-			autoOpen: unfold,
-
-    		onCreateLi: function(node, $li) {
-					
-				if (node.node_type == "Topic"){
-					$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
-				}
-				else{
-					$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:orange"></span> &nbsp;');				        		
-				}
-    			   
-				if (node.node_type == "Topic"){        					
-					$li.find('.jqtree-element').append(
-
-            				'&nbsp;&nbsp;<a id='+node.id+' name='+node.name+' class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
-        			);	            			
-				}
-				else{
-					if (user == "True"){
-
-    					$li.find('.jqtree-element').append(
-        					{% user_access_policy groupid request.user as user_access %}
-        					{% if user_access == "allow" %}
-
-                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
-                			
-                			{% endif %}
-        				);
-					}
-				}
-    		}
-		});
-		
-		// bind 'tree.click' event
-		$tree.bind(
-		    'tree.click',
-		    function(event) {
-		        // The clicked node is 'event.node'
-		        var node = event.node;
-
-		        var parent_arr = [];
-	            var parent_node = node;
-	            parent_arr.push(node.id);
-
-	            // Bellow code manipulates the parent hierarchy of clicked node in a tree
-	            while (parent_node) {
-	                if (parent_node.name !== undefined){           
-	                  $tree.tree('openNode', parent_node);
-	                  parent_node = parent_node.parent;
-	                  if (parent_node.name !== undefined){
-	                    parent_arr.push(parent_node.id);                                          
-	                  }
-	                }
-	                else{
-	                  break;
-	                }
-	            }
-	            var nav_list = parent_arr.reverse();
-		        // alert(nav_list);
-
-		        // If its topic node i.e no children of this node then show the detail view for topic
-		  		if( node.children[0] == null ){
-
-		  			if (node.node_type == "Topic"){
-		  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"?nav_li="+nav_list+"";
-		  			}
-			        
-		  		}
-		  		
-		    }
-		);
-
-		$tree.bind(
-		    'tree.contextmenu',
-		    function(event) {
-		        // The clicked node is 'event.node'
-		        var node = event.node;
-		        {% user_access_policy groupid request.user as user_access %}
-        		{% if user_access == "allow" %}
-			        var msg = confirm("Do you want to delete this topic ?");
-			        if (msg == true) {
-
-			        	$.ajax({
-			            	url: "{% url 'delete_themes' groupid %}",
-			             	type: 'POST',
-			             	data:{
-			             		deleteobj: node.id,
-			             		csrfmiddlewaretoken: '{{ csrf_token }}'
-			             	},
-			             	success: function(result){
-			             		alert("Topic "+node.name+" deleted successfully");
-			             		location.reload(true);
-			             	},
-			             	
-			            });
-
-					}
-				{% endif %} 
-
-		    }
-		);
-                 
-
-	};
-
-
-	// method to handle hover on topics
-	function showTopicStats(){
-      // Javascript function to be used for checking objects in specific time of interval
-      setTimeout(function(){
-      	//  On hover of topic node manipulate resources only once
-
-		$(".jqtree-title.jqtree_common").hover( function(){
-
-			topic_id = $(this).siblings("a").attr("id");
-			// var topic_name = $(this).siblings("a").attr("name");
-			var data_info = $(this).attr("data-info");
-			var hover_context = this;
-			if ( ! data_info && topic_id ){
-				$(".topic_stats").css("display", "none");
-
-				$.ajax({
-	            	url: "{% url 'get_topic_contents' groupid %}",
-	             	type: 'POST',
-	             	data:{
-	             		node_id: topic_id,
-	             		csrfmiddlewaretoken: '{{ csrf_token }}'
-	             	},
-	             	success: function(data){
-	             		
-	             		count = display_top_res(data)
-
-	             		if (data != "{}"){
-
-	             			$(".topic_stats").html(count);
-	             			$(hover_context).attr("data-info", data)
-
-	             			$(".topic_stats").css("display", "block");
-	             			
-	             		}
-	             		else{
-	             			$(hover_context).attr("data-info", data);	             			
-	             		}
-
-	             	},
-	             	
-	            });
-
-
-			}
-			else{ 
-				
-				if (topic_id){
-					var data = $(this).attr("data-info");
-					count = display_top_res(data)
-					$(".topic_stats").html(count);
-	     			$(".topic_stats").css("display", "block");
-				}
-
-			}
-		});
-		
-        // console.log($(".jqtree-element.jqtree_common"))
-        if( ($(".jqtree-title.jqtree_common").length <= 0) ) { 
-        	showTopicStats() 
-        }
-
-      }, 1000 );
-	}
-
-
-	function display_top_res(data){
-		data_obj = JSON.parse(data);
- 		count = ""
-
- 		if (data != "{}"){
- 			var k = Object.keys(data_obj); // To get the keys from incomming data
-
- 			for (var m = 0; m < k.length; m++) { 
- 				var key = k[m];  
- 				var len = data_obj[key].length;  // length of list as a value of key
- 				// alert(key+": "+len);
- 				count += key+": "+len+"<br/>";
- 			} 			
-
- 		}
- 		else{
- 			count += "No Resources !<br/>";
- 		}
-
- 		return count
-
-	}
-
-	showTopicStats();
-
-  </script>
- -->
   <style>
-/*
-  	#app-set-item li { padding:0.5em }
 
-	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
-        content: "\f07b";
-    }
-    .jqtree-tree i {
-        margin-right: 4px;
-    }
-*/    /* for reingold tilford tree */
-/*
-	.node {
-	  cursor: pointer;
-	}
-
-	.node circle {
-	  fill: #fff;
-	  stroke: green;
-	  stroke-width: 1.5px;
-	}
-
-	.node text {
-	  font: 12px sans-serif;
-	}
-
-	.link {
-	  fill: none;
-	  stroke: #ccc;
-	  stroke-width: 1.5px;
-	}
-	*/
-	/* for reingold tilford tree -- end */
-
-	/*.node {
-    cursor: pointer;
-  }*/
-/*
-  .node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 1.5px;
-  }
-*/   
-  /*.node text {
-    font-size:10px; 
-    font-family:sans-serif;
-  }*/
-/*   
-  .link {
-    fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
-  }
-*/
   #theme-drag-zoom-tree-container{
   	border: medium dashed #D8BFD8;
   	border-radius: 5px;
   }
 
-/*  .templink {
-    fill: none;
-    stroke: red;
-    stroke-width: 3px;
-  }
-*/
-  /*.ghostCircle.show{
-      display:block;
-  }*/
-/*
-  .ghostCircle, .activeDrag .ghostCircle{
-       display: none;
-  }*/
-
   .download-graph{
   	color: gray
   }
+
   .download-graph:hover {
   	color: black;
   	background-color: #e5e5e5;
@@ -349,10 +41,24 @@
   	transition: all 1s;
   }
 
+  .themes {
+  	margin: 2rem 5rem;
+  }
+
+  .highlight {
+  	background-color: #efefef;
+	padding: 0 1em;
+	border: solid #e5e5e5;
+  }
+
+  #hover1.f-dropdown {
+  	width: 10em;
+  }
+
   </style>
 {% endblock%}
 
-
+<!-- 
 {% comment %}
 	{% block shelf_content %}
 	  {% if user.is_authenticated %}
@@ -362,9 +68,19 @@
 	  {% endif %}  
 	{% endblock %}
 {% endcomment %}
+ -->
 
 {% block meta_content %}
-	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view"><h2 class="subheader">{% trans "Themes" %}</h2></a>
+	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
+		<h2 class="subheader">
+			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
+				{{theme_GST.altnames}}
+			{% else %}
+				{{theme_GST.name}}
+			{% endif%}
+		</h2>
+	</a>
+	{{theme_GST.content|default_if_none:""|safe}}
 {% endblock %}
 
 {% block related_content %}
@@ -374,29 +90,78 @@
 	<div class="panel" style="background-color:#ddd;">
 	<ul class="no-bullet" id="app-set-item"> 
 
-	    {% get_memberof_objects_count theme_GST_id groupid as count %}
+	    {% get_memberof_objects_count theme_GST.pk groupid as count %}
 
 	      <li class="selected-app-set-item"> 
 	        <div>
 	  		  {% if user_access == "allow" %}
-	          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right;color:#0b8a91;" title="Add Theme">
+	          <a href="{% url "theme_topic_create" groupid theme_GST.pk %}" style="float:right;color:#0b8a91;" title="Add Theme">
 	            +&nbsp;Add
 	          </a>
 	          {% endif %}
 
-	          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" style="color:#0b8a91;">
+	          <a href="{% url "theme_list" groupid app_id theme_GST.pk %}" style="color:#0b8a91;">
 	            Theme ({{count}})
 	          </a> 
 
 	        </div>
 	      </li>
 	  
-	</ul>
+		</ul>
 	</div>
 
 	{% endif %}
+	<br/>
+    <!-- <br/> -->
+    <div>
+    {% if tree == "hierarchical" %}
+		{% if user.is_authenticated %}
+    		{% if user_access == "allow" %}
+    		
+				<div>
+
+					<a class="button tiny expand" data-reveal-id="view_add_page" title="Add Theme Item">
+						+ Add Theme Item
+					</a>
+
+					<div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
+
+						<h3>Add New Theme Item:</h3>
+						<!-- To enter name of theme item -->
+						<div>
+							<input class="name_id" name="name" type="text" placeholder="Enter name...">
+						</div>
+						<br/>           
+
+						<input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
+
+						<a class="close-reveal-modal">&#215;</a>
+
+					</div>          
+
+			    </div>
+
+    			<span><input class="checkedAll" type="checkbox"> Select All</span>
+    			<input class="button tiny deleteObjects right" type="button" value="Delete">
+
+    			<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+			        <h3>{% trans "Are you sure you want to delete? All of the related items for the following themes also will be deleted:" %}</h3> 
+			        
+			        <input class="button confirmDeleteObjects" type="button" value="Confirm">
+			        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+			        <div id="deletion_results"></div>
+			        <a class="close-reveal-modal">&#215;</a>
+
+		      	</div>		
+
+    		{% endif %}
+		{% endif %}
+	{% endif %}
+	</div>
 
 	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
+
 {% endblock %}
 
 
@@ -404,11 +169,31 @@
 
 	{% user_access_policy groupid request.user as user_access %}
 
-
 	{% if themes_hierarchy and node %}
 
+		<div style="float:left; font-size: 2em; line-height: 0.8;"> {{node.name}}</div> 
 
-		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE %}
+        <div style="float:right;  margin:0 2em;">
+
+			<a class="collapsible_tree {% if tree == 'collapsible' or not tree %} highlight {% endif %}" style="">
+				{% trans "Theme" %} {% trans "Graph" %}
+			</a>
+			
+			<a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="tree_browser {% if tree == 'hierarchical' %} highlight {% endif %}" style="margin-left:2em;">
+				{% trans "Theme" %} {% trans "Tree" %}
+			</a>
+			
+			<ul id="hover1" class="f-dropdown" data-dropdown-content style="width: 7em;">
+				<li><a class="fold"><i class="fi-plus"></i> {% trans "Open" %} </a></li> 
+				<li><a class="unfold"><i class="fi-minus"></i> {% trans "Close" %} </a></li>  
+			</ul> 
+
+		</div>
+
+		<br/>
+		<br/>
+
+		{% cache 300 theme_tree node.pk request.LANGUAGE_CODE tree unfold %}
 
 			{% include "ndf/hierarchy_tree.html" %}
 			<div id="app-set-item" class="themes hide" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}">
@@ -418,7 +203,7 @@
 		    	<div id="theme-drag-zoom-tree"></div>
 		    	<div class="row">
 			    	<div class="small-6 small-centered text-center columns download-graph" onclick='downloadCollapsibleGraph("{{node.name}}");'>
-			    		Download "{{node.name}}" Collapsible Graph
+			    		Download {{node.name}} Graph
 			    	</div>
 		    	</div>
 			</div>
@@ -599,7 +384,8 @@
 // ------ jqtree tree ------
 		// script for fold themes_cards hierarchy
 
-    {% if node %}
+	// being the common template for all, to distinguish between the tree landing using following condition:
+    {% if node and tree %}
 
 	    {% if tree == "hierarchical" %}
 	    	if({{unfold}})

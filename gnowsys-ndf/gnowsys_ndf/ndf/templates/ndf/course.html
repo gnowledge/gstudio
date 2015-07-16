@@ -12,16 +12,26 @@
 
 
 {% block meta_content %}
-  <h2 class="subheader">{% trans "Courses" %}</h2>
-    {% if user.is_authenticated %}
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-        <a class="small button" href="{% url 'create_edit' group_name_tag %}">
-          <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
-        </a>
-        <a class="small publish-btn button" style="width:73%" href="{% url 'ann_course_create_edit' group_id app_id app_set_id %}">{% trans "Announce" %}</a>
-      {% endif %}
+
+  <a href="{% url course_gst.name|lower group_name_tag %}">
+    <h2 class="subheader">
+      {% if course_gst.altnames and course_gst.altnames != "None" %}
+        {{course_gst.altnames}}
+      {% else %}
+        {{course_gst.name}}
+      {% endif%}
+    </h2>
+    {{course_gst.content|default_if_none:""|safe}}
+  </a>
+
+  {% if user.is_authenticated %}
+    {% user_access_policy groupid request.user as user_access %}
+    {% if user_access == "allow" %}
+      <a class="small button" href="{% url 'create_edit' group_name_tag %}">
+        <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
+      </a>
     {% endif %}
+  {% endif %}
 {% endblock %}
 
 

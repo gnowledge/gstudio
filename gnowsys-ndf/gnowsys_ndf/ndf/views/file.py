@@ -34,13 +34,8 @@ from mongokit import paginator
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
-
-
-from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id, capture_data  # , get_page
-
-
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id,capture_data  # , get_page
 
 try:
     from bson import ObjectId
@@ -54,6 +49,7 @@ from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderato
 ############################################
 
 GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
+GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': 'Page'})
 GST_IMAGE = node_collection.one({'_type':'GSystemType', 'name': 'Image'})
 GST_VIDEO = node_collection.one({'_type':'GSystemType', 'name': 'Video'})
 pandora_video_st = node_collection.one({'_type':'GSystemType', 'name':'Pandora_video'})
@@ -89,7 +85,6 @@ def file(request, group_id, file_id=None, page_no=1):
     shelves = []
     shelf_list = {}
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
     #   dbref_has_shelf = has_shelf_RT.get_dbref()
@@ -283,7 +278,7 @@ def file(request, group_id, file_id=None, page_no=1):
       already_uploaded = request.GET.getlist('var', "")
       return render_to_response("ndf/file.html",
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId':app._id, "app_gst": app, 
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
@@ -321,6 +316,13 @@ def file(request, group_id, file_id=None, page_no=1):
       docCollection = doc["result_cur"]
       docs_pc = doc["result_cur"]
       doc_pages = doc["result_pages"]
+
+      # --- for pages ---
+      page_dict = get_query_cursor_filetype('$all', [ObjectId(GST_PAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp, "Pages")
+
+      pageCollection = page_dict["result_cur"]
+      pages_pc = page_dict["result_cur"]
+      page_nodes = page_dict["result_pages"]
 
       # --- for images ---
       image_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp)
@@ -377,14 +379,15 @@ def file(request, group_id, file_id=None, page_no=1):
       datavisual.append({"name":"Video","count":videoCollection.count()})
       #datavisual.append({"name":"Pandora Video","count":pandoraCollection.count()})
       datavisual = json.dumps(datavisual)
+
       return render_to_response("ndf/file.html", 
                                 {'title': title,
-                                 'appId':app._id,
+                                 'appId':app._id, "app_gst": app,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
-                                 'file_pages': file_pages, 'image_pages': images_pc.count(),
+                                 'file_pages': file_pages, 'image_pages': images_pc.count(), 'page_count': pages_pc.count(), 
                                  'doc_pages': docs_pc.count(), 'video_pages': videos_pc.count(), "pandora_pages": pandoravideoCollection.count(),
-                                 'files': files_pc, 'docCollection': docs_pc, 'imageCollection': images_pc,
+                                 'files': files_pc, 'docCollection': docs_pc, 'imageCollection': images_pc, 'page_nodes':pages_pc,
                                  'videoCollection': videos_pc, 'pandoravideoCollection':pandoravideoCollection, 
                                  'pandoraCollection':get_member_set,'is_video':is_video,'groupid': group_id,
                                  'group_id':group_id,"datavisual":datavisual, "detail_urlname": "file_detail"
@@ -431,6 +434,23 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
                                                   '_type': "File", 'access_policy': u"PUBLIC"
                                                   }
                                            ]}).sort("last_update", -1)
+    
+
+    elif tab_type == "Pages":
+        result_cur = node_collection.find({'member_of': GST_PAGE._id,
+                                    '_type': 'GSystem',
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    '$or': [
+                                        {'access_policy': u"PUBLIC"},
+                                        {'$and': [
+                                            {'access_policy': u"PRIVATE"},
+                                            {'created_by': userid}
+                                        ]
+                                     }
+                                    ]
+                                }).sort("last_update", -1)
+
+
     else:
         result_cur = node_collection.find({'member_of': {operator: member_of_list},
                                     '_type': 'File', 'fs_file_ids':{'$ne': []},
@@ -548,6 +568,11 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
             #     result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 
+        elif filetype == "Pages":
+            if app == "File":
+                result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_PAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp, "Pages")
+
+
         elif filetype == "Images":
             if app == "File":
                 result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp)
@@ -635,9 +660,15 @@ def paged_file_objs(request, group_id, filetype, page_no):
             result_cur = result_dict["result_cur"]
             result_paginated_cur = result_dict["result_cur"]
             result_pages = result_dict["result_pages"]
+
+        if filetype == "Pages":
+          detail_urlname = "page_details"
+        else:
+          detail_urlname = "file_detail"
+
         return render_to_response ("ndf/file_list_tab.html", {
                 "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
-                "resource_type": result_paginated_cur, "detail_urlname": "file_detail", 
+                "resource_type": result_paginated_cur, "detail_urlname": detail_urlname, 
                 "filetype": filetype, "res_type_name": "", "page_info": result_pages
             }, 
             context_instance = RequestContext(request))
@@ -684,6 +715,8 @@ def submitDoc(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     alreadyUploadedFiles = []
+    #a temp. variable which stores the lookup for append method
+    alreadyUploadedFiles_append_temp=alreadyUploadedFiles.append
     str1 = ''
     img_type=""
     topic_file = ""
@@ -721,13 +754,13 @@ def submitDoc(request, group_id):
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
+                    # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync=False, oid=True)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync = False,oid=True)
 
                 else:
-                    title = mtitle + "_" + str(i) #increament title        
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync=False, oid=True)
-
+                    title = mtitle + "_" + str(i)  # increament title
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync = False, oid=True)
                     i = i + 1
             else:
                 title = each.name
@@ -737,21 +770,19 @@ def submitDoc(request, group_id):
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
             # if isinstance(f, list):
-
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync=False, oid=True)
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, server_sync = False,oid=True)
 
             if isinstance(f, list):
-              alreadyUploadedFiles.append(f)
+              alreadyUploadedFiles_append_temp(f)
               title = mtitle
-        
+
         # str1 = alreadyUploadedFiles
-       
-        if img_type != "": 
+
+        if img_type != "":
             # print "----------1-----------"
             return HttpResponseRedirect(reverse('dashboard', kwargs={'group_id': int(userid)}))
 
-        elif topic_file != "": 
-            
+        elif topic_file != "":
             # print "----------2-----------"
             return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
@@ -766,13 +797,16 @@ def submitDoc(request, group_id):
                         # return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
             else:
                 group_object = node_collection.one({'_id': ObjectId(group_id)})
-
+                try:
+                    f = ObjectId(f)
+                except:
+                    f = f[0]
                 if group_object.edit_policy == 'EDITABLE_MODERATED' and isinstance(f, ObjectId):
                     # print "----------4-----------"
                     fileobj = node_collection.one({'_id': ObjectId(f)})
                     # newly appended group id in group_set is at last
-                    create_moderator_task(request, fileobj.group_set[len(fileobj.group_set)-1], fileobj._id)
-                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': group_id, 'node_id': f }))
+                    t = create_moderator_task(request, fileobj.group_set[0], fileobj._id,on_upload=True)
+                    return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': fileobj.group_set[1], 'node_id': f }))
                 else:
                     # print "----------5-----------"
                     return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
@@ -789,10 +823,7 @@ def submitDoc(request, group_id):
 
 first_object = ''
 @get_execution_time
-
-
 def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, request=None, map_geojson_data=[], **kwargs):
-
     """
       this will create file object and save files in gridfs collection
     """
@@ -1024,6 +1055,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids':mid_img_id}})
             count = count + 1
+            # print "----- fileobj._id", fileobj._id
+
 
             '''
             For server-sync
@@ -1332,16 +1365,19 @@ def file_detail(request, group_id, _id):
     if auth:
         has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
         shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type.$id': has_shelf_RT._id })        
-        
+        #a temp. variable which stores the lookup for append method
+        shelves_append_temp=shelves.append
         if shelf:
             for each in shelf:
                 shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})           
-                shelves.append(shelf_name)
+                shelves_append_temp(shelf_name)
 
-                shelf_list[shelf_name.name] = []         
+                shelf_list[shelf_name.name] = []
+                #a temp. variable which stores the lookup for append method
+                shelf_list_shelfname_append_temp=shelf_list[shelf_name.name].append      
                 for ID in shelf_name.collection_set:
                     shelf_item = node_collection.one({'_id': ObjectId(ID) })
-                    shelf_list[shelf_name.name].append(shelf_item.name)
+                    shelf_list_shelfname_append_temp(shelf_item.name)
                 
         else:
             shelves = []
@@ -1372,10 +1408,8 @@ def getFileThumbnail(request, group_id, _id):
         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth:
-                group_id = str(auth._id)
+        elif auth:
+            group_id = str(auth._id)
     else:
         pass
 

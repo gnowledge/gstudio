@@ -170,7 +170,7 @@ def image_detail(request, group_id, _id):
       nav_li = nav_l
 
     if img_node._type == "GSystemType":
-	return imageDashboard(request, group_id, _id)
+    	return imageDashboard(request, group_id, _id)
     img_node.get_neighbourhood(img_node.member_of)
 
     imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
@@ -214,18 +214,19 @@ def image_edit(request,group_id,_id):
 
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
         img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE))
-        
-	get_node_metadata(request,img_node)
-	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
-	if teaches_list !='':
+    
+        get_node_metadata(request,img_node)
+	
+        teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+        if teaches_list !='':
 			teaches_list=teaches_list.split(",")
 	
-	create_grelation_list(img_node._id,"teaches",teaches_list)
-	assesses_list = request.POST.get('assesses_list','')	
-	if assesses_list !='':
-		assesses_list=assesses_list.split(",")
+        create_grelation_list(img_node._id,"teaches",teaches_list)
+        assesses_list = request.POST.get('assesses_list','')	
+        if assesses_list !='':
+            assesses_list=assesses_list.split(",")
 					
-	create_grelation_list(img_node._id,"assesses",assesses_list)
+        create_grelation_list(img_node._id,"assesses",assesses_list)
         
 	
         return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))

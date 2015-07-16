@@ -31,7 +31,7 @@
                 <div id="group-banner">
 
                     <div class="slide" style="background-color:#10a05d">
-                        <i class="fi-torsos slide-back-image"></i>
+                        <!-- <i class="fi-torsos slide-back-image"></i> -->
                         <div class="row">
                             <div class="small-12 columns">
                                 <h2> {% trans "An initiative of Government of India" %} </h2>
@@ -60,8 +60,8 @@
                         </div>
                     </div>
 
-                    <div class="slide row" style="background-color:#0F69B4">
-                        <i class="fi-lightbulb slide-back-image"></i>
+                    <div class="slide" style="background-color:#0F69B4">
+                        <!-- <i class="fi-lightbulb slide-back-image"></i> -->
                         <div class="medium-12 columns">
                             <div class="row">
                                 <div class="medium-12 columns">
@@ -90,7 +90,7 @@
 
 
                     <div class="slide" style="background-color:#eb3849">
-                        <i class="fi-asl slide-back-image"></i>
+                        <!-- <i class="fi-asl slide-back-image"></i> -->
                         <div class="row">
                             <div class="small-12 columns">
                                 <h2> {% trans "Connecting knowledge connecting people..." %} </h2>
@@ -149,7 +149,27 @@
             }
             finally{
             }
+	
+/*
+            function resize()
+            {
+                // alert("resize event detected!");
+                // $(".slide").height($("#group-banner").height() - 50);
+                if($(document).height() < $(document).width()) 
+                {
+                    $(".slide").height("20vh");
+                }
+                else
+                {
+                    $(".slide").height("12vw");
+                }
+            }
+
+            setTimeout(function() {window.onresize = resize; resize()}, 7000);
+*/
+            
       });
+
 
     </script>
 

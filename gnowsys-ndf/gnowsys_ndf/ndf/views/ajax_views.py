@@ -7,7 +7,7 @@ import time
 import ast
 import json
 import math
-import multiprocessing
+import multiprocessing 
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -100,6 +100,29 @@ def terms_list(request, group_id):
             },
             context_instance=RequestContext(request)
         )
+
+
+# This ajax view creates the page collection of selected nodes from list view
+@get_execution_time
+def collection_create(request, group_id):
+  '''
+  This ajax view creates the page collection of selected nodes from list view
+  '''  
+  if request.is_ajax() and request.method == "POST":
+    Collections = request.POST.getlist("collection[]", '')
+    # name is comming from post request ajax
+    
+
+    gst_page = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+    page_node = node_collection.collection.GSystem()
+    page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+    for each in Collections:
+      node_collection.collection.update({'_id': page_node._id}, {'$push': {'collection_set': ObjectId(each) }}, upsert=False, multi=False)
+
+    # print page_node,"\n"
+    return HttpResponse("success")
+
 
             
 # This ajax view renders the output as "node view" by clicking on collections
@@ -637,7 +660,7 @@ def get_topic_contents(request, group_id):
 def get_collection_list(collection_list, node):
   inner_list = []
   error_list = []
-  
+  inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -651,9 +674,9 @@ def get_collection_list(collection_list, node):
               inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
               if inner_sub_list:
-                inner_list.append(inner_sub_list[0])
+                inner_list_append_temp(inner_sub_list[0])
               else:
-                inner_list.append(inner_sub_dict)
+                inner_list_append_temp(inner_sub_dict)
 
               cl.update({'children': inner_list })
       else:
@@ -723,7 +746,7 @@ def get_tree_hierarchy(request, group_id, node_id):
 def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
-
+  inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
   if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
@@ -736,9 +759,9 @@ def get_inner_collection(collection_list, node):
             inner_sub_list = get_inner_collection(inner_sub_list, col_obj)
 
             if inner_sub_list:
-              inner_list.append(inner_sub_list[0])
+              inner_list_append_temp(inner_sub_list[0])
             else:
-              inner_list.append(inner_sub_dict)
+              inner_list_append_temp(inner_sub_dict)
 
             cl.update({'children': inner_list })
       else:
@@ -750,27 +773,53 @@ def get_inner_collection(collection_list, node):
   else:
     return collection_list
 
+
 @get_execution_time
 def get_collection(request, group_id, node_id):
   node = node_collection.one({'_id':ObjectId(node_id)})
   # print "\nnode: ",node.name,"\n"
   collection_list = []
+  # collection_list_append_temp=collection_list.append
+  
+  for each in node.collection_set:
+    obj = node_collection.one({'_id': ObjectId(each) })
+    if obj:
+      node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+      collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
 
-  if node:
-    if node.collection_set:
-      for each in node.collection_set:
-        obj = node_collection.one({'_id': ObjectId(each) })
-        if obj:
-          node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-          collection_list.append({'name': obj.name, 'id': obj.pk,'node_type': node_type})
-          collection_list = get_inner_collection(collection_list, obj)
+      collection_list = get_inner_collection(collection_list, obj)
 
+ # def a(p,q,r):
+#		collection_list.append({'name': p, 'id': q,'node_type': r})
+  #this empty list will have the Process objects as its elements
+  # processes=[]
+  #Function used by Processes implemented below
+  # def multi_(lst):
 
+  #   for each in lst:
+  #     obj = node_collection.one({'_id': ObjectId(each) })
+  #     if obj:
+  #       node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
+  #       collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+
+  #       collection_list = get_inner_collection(collection_list, obj)
+  		  #collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type})
+	
+  # if node and node.collection_set:
+  #   t=len(node.collection_set)
+  #   x=multiprocessing.cpu_count()#returns no of cores in the cpu 
+  #   n2=t/x#divides the list into those many parts
+  #   #Process object is created.The list after being partioned is also given as an argument. 
+    
+  #   for i in range(x):
+  #     processes.append(multiprocessing.Process(target=multi_,args=(node.collection_set[i*n2:(i+1)*n2], )))
+  #   for i in range(x):
+  #     processes[i].start()#each Process started
+  #   for i in range(x):
+  #     processes[i].join()#each Process converges
   data = collection_list
 
   return HttpResponse(json.dumps(data))
-# ###End of manipulating nodes collection####
-
 @get_execution_time
 def add_sub_themes(request, group_id):
   if request.is_ajax() and request.method == "POST":
@@ -1376,7 +1425,7 @@ def graph_nodes(request, group_id):
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set", "relation_set",
                       "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
                       "property_order", "rating", "apps_list", "annotations", "instance of"
@@ -3068,9 +3117,8 @@ def get_districts(request, group_id):
         }).sort('name', 1)
 
         if cur_districts.count():
-          for d in cur_districts:
-            districts.append([str(d.subject), d.name.split(" -- ")[0]])
-
+          #loop replaced by a list comprehension
+          districts=[[str(d.subject), d.name.split(" -- ")[0]] for d in cur_districts]
         else:
           error_message = "No districts found"
           raise Exception(error_message)
@@ -5402,6 +5450,9 @@ def page_scroll(request,group_id,page):
        page='1'  
     if int(page) != int(tot_page) and int(page) != int(1):
         page=int(page)+1
+    # temp. variables which stores the lookup for append method
+    user_activity_append_temp=user_activity.append
+    files_list_append_temp=files_list.append
     for each in (paged_resources.page(int(page))).object_list:
             if each.created_by == each.modified_by :
                if each.last_update == each.created_at:
@@ -5412,9 +5463,9 @@ def page_scroll(request,group_id,page):
                activity =  'created'
         
             if each._type == 'Group':
-               user_activity.append(each)
+               user_activity_append_temp(each)
             each.update({'activity':activity})
-            files_list.append(each)
+            files_list_append_temp(each)
             
  else:
       page=0           

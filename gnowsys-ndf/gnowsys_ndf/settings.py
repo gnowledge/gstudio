@@ -3,8 +3,11 @@ from django.conf import global_settings
 # from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
+import djcelery
+
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
+
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 BENCHMARK = "ON"
@@ -224,12 +227,12 @@ django.conf.locale.LANG_INFO = LANG_INFO
 # LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",)
 
 # # # #SMTP setting for sending mail (Using python default SMTP server)
-# EMAIL_USE_TLS = False
-# EMAIL_HOST = 'localhost'
-# EMAIL_PORT = 1025
-# EMAIL_HOST_USER = ''
-# EMAIL_HOST_PASSWORD = ''
-# DEFAULT_FROM_EMAIL = 'testing@example.com'
+#EMAIL_USE_TLS = False
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 1025
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
+#DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 # SMTP setting for sending mail (Using gmail SMTP server)
 #EMAIL_USE_TLS = True
@@ -389,6 +392,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 
+djcelery.setup_loader()
+CELERY_RESULT_BACKEND = "mongodb"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_IMPORTS = ("gnowsys_ndf.ndf.views.tasks",)
+BROKER_URL = 'mongodb://localhost:27017/' + DATABASES['mongodb']['NAME']
+
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',
     'django.contrib.auth',
@@ -415,6 +424,7 @@ INSTALLED_APPS = (
     'registration_email',
     'memcache_admin',
     'django_mailbox',
+    'djcelery',
 )
 
 AUTHENTICATION_BACKENDS = (

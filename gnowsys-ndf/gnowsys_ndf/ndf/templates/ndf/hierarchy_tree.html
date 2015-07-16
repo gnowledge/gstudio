@@ -1,25 +1,27 @@
 {% load i18n %}
-{% load cache %}
 
 {% load ndf_tags %}
 {% get_group_name groupid as group_name_tag %}
 
 <style>
 
-  	#app-set-item li { padding:0.5em }
-
 	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
         content: "\f07b";
     }
+
     .jqtree-tree i {
-        margin-right: 4px;
+		margin-right: 4px;
     }
+
+    ul.jqtree-tree ul.jqtree_common {
+    	margin-left: 36px;
+    }
+    
 </style>
 
 
 <script type="text/javascript">
 
-  	// $(document).ready(function() {
   	function plotHierarchyTree() {
 		// Funtion for loading tree for showing collection list left side panel
 		doc();
@@ -27,7 +29,6 @@
 		// Function for manipulating tree when user visits to page directly via browser url
 		{% if selected %} TreeTillNode(); {% endif %}
     }
-    // });
 
 
   	function TreeTillNode () {
@@ -128,9 +129,7 @@
 		  			if (node.node_type == "Topic"){
 		  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"?nav_li="+nav_list+"";
 		  			}
-			        
 		  		}
-		  		
 		    }
 		);
 
@@ -155,16 +154,11 @@
 			             		alert("Topic "+node.name+" deleted successfully");
 			             		location.reload(true);
 			             	},
-			             	
 			            });
-
 					}
 				{% endif %} 
-
 		    }
 		);
-                 
-
 	};
 
 
@@ -548,72 +542,4 @@
 
 		});
 
-
-  </script>
-
-
-	{% if themes_hierarchy %}  <!-- bool -->
-
-		<h2> {{node.name}}</h2> 
-		<div class="row">
-		<div class="large-4 columns">
-
-			{% if user_access == "allow" %}
-
-	          <a class="button tiny" data-reveal-id="view_add_page" title="Add Theme Item">
-	            +&nbsp;Add Theme Item
-	          </a>
-
-	          <div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
-
-	              <h3>Add New Theme Item:</h3>
-	              <!-- To enter name of theme item -->
-	              <div>
-	                <input class="name_id" name="name" type="text" placeholder="Enter name...">
-	              </div>   <br/>           
-
-	              <input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
-
-	              <a class="close-reveal-modal">&#215;</a>
-
-	          </div>          
-	        {% endif %}
-	    </div>
-
-        <div class="large-4 columns">
-
-			<a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="tree_browser" style="border: 2px solid #0eacb5; padding: 5px;"><b> {% trans "Tree Browser" %} </b></a> &nbsp;&nbsp;&nbsp;
-			<ul id="hover1" class="f-dropdown" data-dropdown-content>
-				<li><a class="fold"><i class="fi-plus"></i> {% trans "Fold" %} </a></li> 
-				<li><a class="unfold"><i class="fi-minus"></i> {% trans "Unfold" %} </a></li>  
-			</ul> 
-			
-			<a class="collapsible_tree" style="border: 2px solid #0eacb5; padding: 5px;"><b> {% trans "Collapsible Tree" %} </b></a>
-
-		</div>
-
-		<div class="large-4 columns">
-		{% if user.is_authenticated %}
-    		{% if user_access == "allow" %}
-    		
-    			<input class="button tiny deleteObjects right" type="button" value="Delete">
-    			<span class="right"><input class="checkedAll" type="checkbox"> Select All &nbsp;&nbsp;</span>
-
-    			<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
-        
-			        <h3>{% trans "Are you sure you want to delete? All of the related items for the following themes also will be deleted:" %}</h3> 
-			        
-			        <input class="button confirmDeleteObjects" type="button" value="Confirm">
-			        <input class="button cancelDeleteObjects" type="button" value="Cancel">
-			        <div id="deletion_results"></div>
-			        <a class="close-reveal-modal">&#215;</a>
-
-		      	</div>		
-
-    		{% endif %}
-		{% endif %}
-		</div>
-		</div>
-		<hr/>
-
-	{% endif %}
+</script>
