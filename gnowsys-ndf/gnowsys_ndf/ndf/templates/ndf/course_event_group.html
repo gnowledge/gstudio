@@ -170,30 +170,3 @@
   	</div>
 {% endblock %}
 
-{% block script %}
-
-	function open_res_thread(tnode){
-	  	console.log(tnode)
-		$.ajax({
-			url: "{% url 'get_res_disc_thread' group_id %}",
-
-			data: {
-				'oid': tnode,
-				'replies':'{{global_disc_all_replies}}',
-				'csrfmiddlewaretoken': "{{csrf_token}}"
-			},
-
-			type: "GET",
-
-			dataType: "json",
-
-			success: function(data){
-			console.log(data)
-			},
-		});//end of ajax
-
-	}
-
-
-{% endblock %}
-
