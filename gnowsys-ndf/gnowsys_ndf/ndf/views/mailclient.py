@@ -32,6 +32,7 @@ import mailbox
 import datetime
 import subprocess
 import traceback
+import requests
 
 #-----------------Dictionary of popular servers--------------#
 server_dict = {
@@ -47,6 +48,15 @@ server_dict = {
     "Bits_Pilani": "imap.gmail.com",
     "Rediffmail": "pop.rediffmail.com"
 }
+
+def connected_to_internet(url='http://www.google.com/', timeout=2):
+    try:
+        _ = requests.get(url, timeout=timeout)
+        return True
+    except requests.ConnectionError:
+        print "Error occurred in : ", str(__file__)
+        print("No internet connection available.")
+    return False
 
 @login_required
 def mailclient(request, group_id):
@@ -414,14 +424,10 @@ def server_sync(mail):
         list_of_decrypted_attachments = []
         for attachment in all_attachments:
             filename = attachment.document.path
-            op_file_name = filename.split('.gpg')[0]
-
-            #code to replace last '_' with '.' so that filename_extension.gpg is finally converted to filename.extension
-            last_index = op_file_name.rindex('_')
-            op_file_name = op_file_name[:last_index-1] + op_file_name[last_index].replace('_','.') + op_file_name[last_index+1:]
+            print filename
+            op_file_name = filename.split('_sig')[0]
 
             print 'output file name of decrypted attachment : \n %s' % op_file_name
-            
             command = 'gpg --output ' + op_file_name + ' --decrypt ' + filename
             std_out= subprocess.call([command],shell=True)
             list_of_decrypted_attachments.append(op_file_name)
@@ -577,12 +583,13 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 
     if required_mailbox is not None:
         emails=[]
-
+        all_mails=[]
         if mail_type == '0':
             if displayFrom == 0:
                 print 'FETCHING NEW MAILS'
                 print required_mailbox
-                all_mails=required_mailbox.get_new_mail()
+                if connected_to_internet():
+                    all_mails=required_mailbox.get_new_mail()
                 print 'FETCHING DONE'
 
                 print len(all_mails)

@@ -2796,76 +2796,12 @@ def sorted_ls(path):
     mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
     return list(sorted(os.listdir(path), key=mtime))
 
-from os.path import isfile, join
-from email.parser import Parser
-import email.utils
-
-@get_execution_time
-@register.assignment_tag
-def mail_status_change(mailboxname, username, mail_type, file_name, startFrom):
-	settings_dir = os.path.dirname(__file__)
-	PROJECT_ROOT = os.path.abspath(os.path.dirname(settings_dir))
-	path = os.path.join(PROJECT_ROOT, 'MailClient/')
-	path = path + 'mailbox_data/'
-	path = path + username
-	path = path + '/' + mailboxname
-
-	new_path = path + '/new/' + file_name
-	cur_path = path + '/cur/' + file_name
-
-	shutil.move(new_path,cur_path)
-	
-	new_path = path + '/new/'
-	cur_path = path + '/cur/'
-
-	start = int(startFrom)
-	end  = int(startFrom) + 20
-
-	p = Parser()
-
-	mails_list = []
-
-	if mail_type == '0':
-		all_unread_mails = sorted_ls(new_path)
-		all_unread_mails.reverse()
-        
-		if end > len(all_unread_mails):
-			end = len(all_unread_mails)
-
-		required_mails = all_unread_mails[start:end]
-
-		for temp_mail in required_mails:
-			temp = {}
-			temp_list = []
-			msg = p.parse(open(join(new_path, temp_mail)))
-			for key in msg.keys():
-				if key == 'Attachments':
-					if msg[key] != '':
-						temp[key] = msg[key].split(';')
-					else:
-						temp[key] = []
-				else:       
-					temp[key] = msg[key]
-            
-			for attachment_path in temp["Attachments"]:
-				if attachment_path != '':
-					_name = attachment_path.split("/")[-1]
-					temp_list.append(_name)
-
-			temp["attachment_filename"] = temp_list
-			temp['text'] = msg.get_payload()
-			temp['file_name'] = temp_mail
-			mails_list.append(temp)
-            
-		emails = mails_list
-		print emails
-		return emails
-
 
 @get_execution_time
 @register.assignment_tag
 def get_objectid_name(nodeid):
- 
+ print ';' * 50
+ print nodeid
  return (node_collection.find_one({'_id':ObjectId(nodeid)}).name)
 
 @register.filter

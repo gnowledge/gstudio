@@ -155,7 +155,7 @@ def server_sync(func):
 
         #code to check if SYNCDATA_KEY_PUB in local settings.py is a pub which is present in the gpg database of the system
         #if not, change WILL NOT be captured
-        if std_out != SYNCDATA_KEY_PUB:
+        if str(std_out) == '1':
             error_obj =  "Given pub = %s is not in gpg database of your system. Failed to capture changes for syncdata" % SYNCDATA_KEY_PUB
             print '**'*30
             print '\n'*3
@@ -265,7 +265,7 @@ def server_sync(func):
             # 'server_sync()' function of mailclient.py views file
             
             #make filename.extension --> filename_extension since finally the name should be filename_extension.gpg
-            op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered.replace('.','_') + '.gpg'
+            op_file_name = file_path.split(file_name_filtered)[0]+ timestamp + '_' + file_name_filtered + '_sig'
             print ':' * 20
             print op_file_name
             print ':' * 20
