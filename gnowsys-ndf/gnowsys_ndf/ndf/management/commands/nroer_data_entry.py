@@ -786,7 +786,11 @@ def create_resource_gsystem(resource_data):
 
         if collection_name:
 
-            collection_node = node_collection.one({'_type': 'File', 'name': unicode(collection_name)})
+            collection_node = node_collection.one({
+                    '_type': 'File',
+                    'group_set': {'$in': [home_group._id]},
+                    'name': unicode(collection_name)
+                })
 
             if not collection_node:
                 collection_node = create_object(name, member_of_id, content_org=None)

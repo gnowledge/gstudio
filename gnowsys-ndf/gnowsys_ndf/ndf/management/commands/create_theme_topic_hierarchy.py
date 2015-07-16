@@ -275,7 +275,7 @@ def create_theme_topic_hierarchy(row):
         add_to_collection_set(node_object=parent_node, id_to_be_added=topic_node._id)
 
 
-def create_object(name, member_of_id, prior_node_id=None, content_org=None):
+def create_object(name, member_of_id, prior_node_id=None, content_org=None, group_set_id=home_group_id):
 
     node                = node_collection.collection.GSystem()
     node.name           = unicode(name)
@@ -285,7 +285,7 @@ def create_object(name, member_of_id, prior_node_id=None, content_org=None):
     node.modified_by    = nroer_team_id
     node.created_by     = nroer_team_id
     node.contributors.append(nroer_team_id)
-    node.group_set.append(home_group_id)
+    node.group_set.append(group_set_id)
     node.member_of.append(member_of_id)
 
     if prior_node_id:
