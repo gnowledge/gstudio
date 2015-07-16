@@ -95,7 +95,7 @@
       </small>
    </section>
    <section class="medium-3 columns name-section" >
-   <span><a class="small publish-btn button" style="width:73%" href="{% url 'create_event_group' group_id 'CourseEventGroup' %}">{% trans "Announce" %}</a></span>
+   <span><a class="small publish-btn button" style="width:73%" href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{node.pk}}">{% trans "Announce" %}</a></span>
 
   </section>
 </header>
