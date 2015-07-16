@@ -221,14 +221,23 @@ i.remove-tag{
 			     				<span  style="width: 70px; float: left;" > Page Type:  </span>
  							</div>
  							<div class="small-8 columns" ends>
-				     			<select name="type_of" id="type_of">
+		     					{% if ce_id %}
+		     						<input type="hidden" name="ce_id" value="{{ce_id}}">
+				     				<select name="type_of" id="type_of" disabled="disabled">
+				     			{% else %}
+					     			<select name="type_of" id="type_of">
+				     			{% endif %}
 						  			{% for i in page_instance %}
-
-						  				{% if i.name == "Wiki page" %}	        				
-											<option value = {{i.pk}} selected> {{i.name}} </option>
-
+										{% if ce_id %}
+							  				{% if i.name == "Blog page" %}
+												<option value = {{i.pk}} selected> {{i.name}} </option>
+											{% endif %}
 										{% else %}
-											<option value = {{i.pk}} > {{i.name}} </option>
+							  				{% if i.name == "Wiki page" %}
+							  					<option value = {{i.pk}} selected> {{i.name}} </option>
+											{% else %}
+												<option value = {{i.pk}} > {{i.name}} </option>
+											{% endif %}
 										{% endif %}
 						  				
 			  						{% endfor %}
@@ -1079,7 +1088,7 @@ $(document).ready(function(){
 		// 	event.preventDefault();
 
 		// }
-
+		$("#type_of").removeAttr("disabled")
  		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());

@@ -12,6 +12,7 @@ from django.template import RequestContext
 # from django.template.defaultfilters import slugify
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.views.generic import View
 
@@ -22,14 +23,13 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
-
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups  # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.org2any import org2html
-
 # ######################################################################################################################################
 
 group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'Group'})
@@ -1081,6 +1081,90 @@ class CreateCourseEventGroup(CreateEventGroup):
         super(CreateCourseEventGroup, self).__init__(request)
         self.request = request
 
+    def initialize_course_event_structure(self, request, group_id):
+        course_node_id = request.POST.get('course_node_id', '')
+        if course_node_id:
+            course_node = node_collection.one({'_id': ObjectId(course_node_id)})
+            rt_group_has_course_event = node_collection.one({'_type': "RelationType", 'name': "group_has_course_event"})
+            group_obj = node_collection.one({'_id': ObjectId(group_id)})
+            create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
+            self.ce_set_up(request, course_node, group_obj)
+
+    def ce_set_up(self, request, node, group_obj):
+        """
+            Recursive function to fetch from Course'collection_set
+            and build new GSystem for CourseEventGroup
+        """
+        try:
+            section_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
+            subsection_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSectionEvent"})
+            forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
+            twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+            page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+            sitename = Site.objects.all()[0].name.__str__()
+            user_id = request.user.id
+            if node.collection_set:
+                for each in node.collection_set:
+                    each_node = node_collection.one({'_id': ObjectId(each)})
+                    if "CourseSection" in each_node.member_of_names_list:
+                        name_arg = each_node.name
+                        new_cse = self.create_corresponding_gsystem(name_arg,section_event_gst,user_id, group_obj)
+                        if each_node.collection_set:
+                            for each_ss in each_node.collection_set:
+                                each_ss_node = node_collection.one({'_id': ObjectId(each_ss)})
+                                if "CourseSubSection" in each_ss_node.member_of_names_list:
+                                    name_arg = each_ss_node.name
+                                    new_csse = self.create_corresponding_gsystem(name_arg,subsection_event_gst,user_id, new_cse)
+                                    if each_ss_node.collection_set:
+                                        for each_cu in each_ss_node.collection_set:
+                                            each_cu_node = node_collection.one({'_id': ObjectId(each_cu)})
+                                            if "CourseUnit" in each_cu_node.member_of_names_list:
+                                                name_arg = each_cu_node.name
+                                                new_cu = self.create_corresponding_gsystem(name_arg,forum_gst,user_id, new_csse)
+                                                new_cu.group_set.append(group_obj._id)
+                                                new_cu.save()
+                                                if each_cu_node.collection_set:
+                                                    for each_res in each_cu_node.collection_set:
+                                                        each_res_node = node_collection.one({'_id': ObjectId(each_res)})
+                                                        name_arg = each_res_node.name
+                                                        new_res = self.create_corresponding_gsystem(name_arg,twist_gst,user_id, new_cu)
+                                                        if "Page" in each_res_node.member_of_names_list:
+                                                            new_res.content = each_res_node.content
+                                                            new_res.content_org = each_res_node.content_org
+                                                            new_res.save()
+                                                        elif "File" in each_res_node.member_of_names_list:
+                                                            if "mime_type" in each_res_node:
+                                                                if "image" in each_res_node.mime_type:
+                                                                    content_org = u"[["+"http://"+sitename+"/"+group_obj.name+"/file/readDoc/"+str(each_res_node._id)+"/"+each_res_node.name+"]]"
+                                                                elif "video" in each_res_node.mime_type:
+                                                                    content_org = u'#+BEGIN_HTML \r\n\r\n<video width="600" height="400" controls>\r\n  <source src="http://'+ sitename + '/' + group_obj.name+'/video/fullvideo/'+str(each_res_node._id)+ \
+                                                                    '" type="video/webm">\r\n \r\n  Your browser does not support HTML5 video.\r\n</video>\r\n\r\n#+END_HTML\r\n'
+                                                            new_res.content_org = unicode(content_org)
+                                                            new_res.content = org2html(content_org, file_prefix=ObjectId().__str__())
+                                                            new_res.save()
+            return True
+        except Exception as e:
+
+            print e, "CourseEventGroup structure setup Error"
+
+    def create_corresponding_gsystem(self,gs_name,gs_member_of,user_id,gs_under_coll_set_of_obj):
+
+        try:
+            new_gsystem = node_collection.collection.GSystem()
+            new_gsystem.name = unicode(gs_name)
+            new_gsystem.member_of.append(gs_member_of._id)
+            new_gsystem.modified_by = int(user_id)
+            new_gsystem.created_by = int(user_id)
+            new_gsystem.contributors.append(int(user_id))
+            new_gsystem.save()
+            gs_under_coll_set_of_obj.collection_set.append(new_gsystem._id)
+            gs_under_coll_set_of_obj.save()
+            new_gsystem.prior_node.append(gs_under_coll_set_of_obj._id)
+            new_gsystem.save()
+            return new_gsystem
+        except:
+            return False
+
 
 # --- END of class CreateCourseEventGroup ---
 # -----------------------------------------
@@ -1215,7 +1299,7 @@ class EventGroupCreateEditHandler(View):
             group_id = ObjectId(group_id)
         except:
             group_name, group_id = get_group_name_id(group_id)
-
+        course_node_id = request.GET.get('cnode_id', '')
         group_obj = None
         nodes_list = []
         spl_group_type = sg_type
@@ -1244,6 +1328,7 @@ class EventGroupCreateEditHandler(View):
                                         'node': group_obj, 'title': title,
                                         'nodes_list': nodes_list,
                                         'spl_group_type': spl_group_type,
+                                        'course_node_id': course_node_id,
                                         'groupid': group_id, 'group_id': group_id
                                         # 'appId':app._id, # 'is_auth_node':is_auth_node
                                       }, context_instance=RequestContext(request))
@@ -1262,6 +1347,8 @@ class EventGroupCreateEditHandler(View):
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
+        course_node_id = request.POST.get('course_node_id', '')
+
         # check if group's editing policy is already 'EDITABLE_MODERATED' or
         # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
         if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
@@ -1275,7 +1362,6 @@ class EventGroupCreateEditHandler(View):
             parent_group_obj = group_obj
             # calling method to create new group
             result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id,)
-
         if result[0]:
             # operation success: create ATs
             group_obj = result[1]
@@ -1286,6 +1372,8 @@ class EventGroupCreateEditHandler(View):
             date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id)
             if date_result[0]:
                 # Successfully had set dates to EventGroup
+                if sg_type == "CourseEventGroup":
+                    mod_group.initialize_course_event_structure(request, group_obj._id)
                 group_name = group_obj.name
                 url_name = 'groupchange'
             else:
@@ -1566,6 +1654,8 @@ def group_dashboard(request, group_id=None):
     shelves = []
     alternate_template = ""
     profile_pic_image = None
+    list_of_unit_events = []
+    blog_pages = None
 
     group_obj = get_group_name_id(group_id, get_obj=True)
 
@@ -1615,8 +1705,44 @@ def group_dashboard(request, group_id=None):
     group_id=group_obj['_id']
     pass
 
+	
   # Call to get_neighbourhood() is required for setting-up property_order_list
   group_obj.get_neighbourhood(group_obj.member_of)
+  list_of_sg_member_of = get_sg_member_of(group_obj._id)
+  if "CourseEventGroup" in list_of_sg_member_of:
+			forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
+			twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+			page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+			blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+			blog_pages = node_collection.find({'member_of':page_gst._id, 'created_by': int(request.user.id),
+									'type_of': blogpage_gst._id})
+			alternate_template = "ndf/course_event_group.html"
+			existing_forums = node_collection.find({
+                                          'member_of': forum_gst._id,
+                                          'group_set': ObjectId(group_obj._id), 
+                                          }).sort('created_at', -1)
+			for each in existing_forums:
+
+					temp_forum = {}
+					temp_forum['name'] = each.name
+					temp_forum['created_at'] = each.created_at
+					temp_forum['tags'] = each.tags
+					temp_forum['member_of_names_list'] = each.member_of_names_list
+					temp_forum['user_details_dict'] = each.user_details_dict
+					temp_forum['html_content'] = each.html_content
+					temp_forum['contributors'] = each.contributors
+					temp_forum['id'] = each._id
+					temp_forum['threads'] = node_collection.find({
+                                                      '$and':[
+                                                      				{'member_of': twist_gst._id},
+                                                              {'_type': 'GSystem'},
+                                                              {'prior_node': ObjectId(each._id)}
+                                                              ], 
+                                                      'status': {'$nin': ['HIDDEN']} 
+                                                      }).count()
+          
+					list_of_unit_events.append(temp_forum)
+
   allow_to_join = True
   if 'end_enroll' in group_obj:
       last_enrollment_date = group_obj.end_enroll
@@ -1641,6 +1767,8 @@ def group_dashboard(request, group_id=None):
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,
+                                                       'list_of_unit_events': list_of_unit_events,
+                                                       'blog_pages':blog_pages,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
                                                        'annotations' : annotations, 'shelves': shelves,
