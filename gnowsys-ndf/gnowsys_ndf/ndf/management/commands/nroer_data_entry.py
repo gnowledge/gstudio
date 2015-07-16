@@ -37,7 +37,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_co
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
-from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import create_object, add_to_collection_set
+from gnowsys_ndf.ndf.management.commands.create_theme_topic_hierarchy import add_to_collection_set
 
 ##############################################################################
 
@@ -46,13 +46,12 @@ SCHEMA_ROOT = os.path.join(os.path.dirname(__file__), "schema_files")
 log_list = []  # To hold intermediate errors
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
-file_gst = node_collection.one({"name": "File"})
+file_gst = node_collection.one({'_type': 'GSystemType', "name": "File"})
 home_group = node_collection.one({"name": "home", "_type": "Group"})
-theme_gst = node_collection.one({"name": "Theme"})
-theme_item_gst = node_collection.one({"name": "theme_item"})
-topic_gst = node_collection.one({"name": "Topic"})
+theme_gst = node_collection.one({'_type': 'GSystemType', "name": "Theme"})
+theme_item_gst = node_collection.one({'_type': 'GSystemType', "name": "theme_item"})
+topic_gst = node_collection.one({'_type': 'GSystemType', "name": "Topic"})
 nroer_team_id = 1
-
 
 # INFO notes:
 # http://172.16.0.252/sites/default/files/nroer_resources/ (for room no 012)
@@ -266,6 +265,56 @@ def cast_to_data_type(value, data_type):
     return casted_value
 
 
+def get_id_from_hierarchy(hier_list):
+    """
+    method to check hierarchy of theme-topic.
+    returns - ObjectId or None
+    
+    Args:
+        hier_list (list):
+        # e.g:
+        # [u'NCF', u'Biology', u'Living world', u'Biological classification']
+    
+    Returns: ObjectId or None
+        - If hierarchy found to be correct, _id/ObjectId will be returned.
+        - else None will be returned.
+    """
+
+    theme = hier_list[0]
+    topic = hier_list[-1:][0]
+    theme_items_list = hier_list[1:-1]
+
+    theme_node = node_collection.one({'name': {'$regex': "^" + unicode(theme) + "$", '$options': 'i'}, 'group_set': {'$in': [home_group._id]}, 'member_of': theme_gst._id })
+
+    if not theme_node:
+        return None
+
+    node_id = theme_node._id
+    node = theme_node
+
+    for each_item in theme_items_list:
+        node = node_collection.one({
+                    'name': {'$regex': "^" + unicode(each_item) + "$", '$options': 'i'},
+                    'prior_node': {'$in': [node_id]},
+                    'member_of': {'$in': [theme_item_gst._id]},
+                    'group_set': {'$in': [home_group._id]}
+                })
+
+        print each_item, "===", node.name
+        if not node:
+            return None
+
+        node_id = node._id
+
+    # print topic, "node_id : ", node_id 
+
+    # fetching a theme-item node
+    topic_node = node_collection.one({'name': {'$regex': "^" + unicode(topic) + "$", '$options': 'i'}, 'group_set': {'$in': [home_group._id]}, 'member_of': {'$in': [topic_gst._id]}, 'prior_node': {'$in': [node_id]} })
+
+    if topic_node:
+        return topic_node._id        
+
+
 def parse_data_create_gsystem(json_file_path):
     json_file_content = ""
 
@@ -372,6 +421,21 @@ def parse_data_create_gsystem(json_file_path):
 
             # calling method to create File GSystems
             nodeid = create_resource_gsystem(parsed_json_document)
+
+
+            collection_name = parsed_json_document.get('collection', '')
+
+            if collection_name:
+
+                collection_node = node_collection.one({
+                        '_type': 'File',
+                        'group_set': {'$in': [home_group._id]},
+                        'name': unicode(collection_name)
+                    })
+
+                if collection_node:
+                    add_to_collection_set(collection_node, fileobj_oid)
+
             # print type(nodeid), "-------", nodeid, "\n"
 
             # starting processing for the attributes and relations saving
@@ -541,11 +605,13 @@ def parse_data_create_gsystem(json_file_path):
                                         log_list.append(error_message)
 
                                 else:
+                                    print "==== return oid: ", oid
                                     global hierarchy_output
                                     hierarchy_output = oid
-                                    # print "return oid: ", oid
 
+                                print "==== hierarchy_output"
                                 return hierarchy_output
+                                print "==== hierarchy_output"
 
                                 # -----------------------------                  
                           
@@ -596,7 +662,9 @@ def parse_data_create_gsystem(json_file_path):
                                     formatted_list.append(v.strip())
 
                                 right_subject_id = []
-                                rsub_id = _get_id_from_hierarchy(formatted_list)
+                                print "~~~~~~~~~~~", formatted_list
+                                # rsub_id = _get_id_from_hierarchy(formatted_list)
+                                rsub_id = get_id_from_hierarchy(formatted_list)
                                 hierarchy_output = None
 
                                 # checking every item in hierarchy exist and leaf node's _id found
@@ -781,20 +849,4 @@ def create_resource_gsystem(resource_data):
         print info_message
 
         # print "\n----------", fileobj
-
-        collection_name = resource_data.get('collection', '')
-
-        if collection_name:
-
-            collection_node = node_collection.one({
-                    '_type': 'File',
-                    'group_set': {'$in': [home_group._id]},
-                    'name': unicode(collection_name)
-                })
-
-            if not collection_node:
-                collection_node = create_object(name, member_of_id, content_org=None)
-
-            add_to_collection_set(collection_node, fileobj_oid)
-
         return fileobj_oid
