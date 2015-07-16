@@ -1710,7 +1710,6 @@ def group_type_info(groupid,user=0):
 
 	return group_type
 
-
 @get_execution_time			
 @register.assignment_tag
 def user_access_policy(node, user):
@@ -1732,7 +1731,11 @@ def user_access_policy(node, user):
   string value (allow/disallow), i.e. whether user is allowed or not!
   """
   user_access = False
-
+  group_name, group_id = get_group_name_id(node)
+  cache_key='access'+str(group_id) #Low level API cache implemented in this function
+  cache_result=cache.get(cache_key)
+  if cache_result:
+  	return cache_result
   try:
   	# Please make a note, here the order in which check is performed is IMPORTANT!
 
@@ -1741,7 +1744,6 @@ def user_access_policy(node, user):
 
     else:
       # group_node = node_collection.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
-      group_name, group_id = get_group_name_id(node)
       group_node = node_collection.one({"_id": ObjectId(group_id)})
 
       if user.id == group_node.created_by:
@@ -1760,15 +1762,18 @@ def user_access_policy(node, user):
         user_access = False
 
     if user_access:
+      cache.set(cache_key,"allow")
       return "allow"
 
     else:
+      cache.set(cache_key,"disallow")
       return "disallow"
 
   except Exception as e:
     error_message = "\n UserAccessPolicyError: " + str(e) + " !!!\n"
     raise Exception(error_message)
-			
+#implemeted cache in this method
+
 @get_execution_time		
 @register.assignment_tag
 def resource_info(node):
