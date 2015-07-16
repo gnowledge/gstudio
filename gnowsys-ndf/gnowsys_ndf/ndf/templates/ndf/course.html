@@ -51,14 +51,8 @@
     {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-          <dd class="tab-title active" role="presentational" ><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">{% trans "All Courses" %}</a></dd>
           <dd class="tab-title" role="presentational" ><a href="#panel2-2" role="tab" tabindex="0"aria-selected="false" controls="panel2-2">{% trans "Courses" %}</a></dd>
-      {% else %}
-          <dd class="tab-title active" role="presentational"><a href="#panel2-4" role="tab" tabindex="0" aria-selected="false" controls="panel2-4">{% trans "My Courses" %}</a></dd>
-      {% endif %}    
-      <dd class="tab-title" role="presentational"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Announced Courses" %}</a></dd>
-    {% else %}
-      <dd class="tab-title active" role="presentational"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Announced Courses" %}</a></dd>
+    {% endif %}    
     {% endif %}    
     </dl>
     </header>
