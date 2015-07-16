@@ -181,13 +181,11 @@
     if (this.id == "id_email") {
       $(this).prop("type", "email");
     }
-    aaa = this;
+
     $(this).css("width", "95%");
     $(this).attr("required", "");
     $(this).css("float", "left");
-    $(this).after("<small class='error'>Please fill valid "+
-    $(this).parent().parent().find("label").text().trim()+
-    "</small>");
+    $(this).after("<small class='error'>Please fill valid "+this.name+"</small>");
     $(this).after("<i style='color:red; float:left display:inline'>*</i>");
   });
 
