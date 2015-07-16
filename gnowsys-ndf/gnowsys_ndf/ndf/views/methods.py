@@ -155,7 +155,8 @@ def server_sync(func):
         print std_out
         #code to check if SYNCDATA_KEY_PUB in local settings.py is a pub which is present in the gpg database of the system
         #if not, change WILL NOT be captured
-        if str(std_out) != '0':
+        #std_out will have shell command return code =0 (success) 1 (failure)
+        if str(std_out) == '1':
             error_obj =  "Given pub = %s is not in gpg database of your system. Failed to capture changes for syncdata" % SYNCDATA_KEY_PUB
             print '**'*30
             print '\n'*3
