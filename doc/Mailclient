@@ -1,0 +1,114 @@
+[REQUIRED PACKAGES]
+
+	Download the package 'django_mailbox' using command:
+		1. pip install django-mailbox
+		2. pip install celery
+		3. sudo apt-get install rabbitmq-server (has to be done at root level) 
+	
+	Download CKEditor with the 'confighelper' plugin added to it and place the same in 'ndf/static/' folder
+
+[IMPORTANT] : 
+
+	1. The following folders would be created at
+	
+	parent : 'gnowsys-ndf/gnowsys_ndf/ndf' level:
+	
+		1.1 MailClient
+		1.2 MailClient/mailbox_data
+		1.3 MailClient/mailbox_data/[username]/[mailbox_name]/[cur/new/temp]
+		1.4 MailClient/mailbox_data/[username]/Archived_Mails	
+		1.5 MailClient/sent_syncdata_files
+		1.6 MailClient/syncdata
+	
+	parent : 'gnowsys-ndf
+	
+		1.1 mailbox_attachments
+
+	2. In case of changes made to the same file, the last made change [by anyone] remains. 
+
+	3. The following varaibles have to be filled in 'local_settings.py':
+
+		# SMTP setting for sending mail (Using gmail SMTP server)
+		EMAIL_USE_TLS = True
+		EMAIL_HOST = ''
+		EMAIL_PORT = 587
+		EMAIL_HOST_USER = ''
+		EMAIL_HOST_PASSWORD = ''
+
+		# The following variables are for email id and password for the email account which will be used for receiving SYNCDATA mails
+		SYNCDATA_FETCHING_EMAIL_ID = ''
+		SYNCDATA_FETCHING_EMAIL_ID_PASSWORD = ''
+		SYNCDATA_FETCHING_IMAP_SERVER_ADDRESS = ''
+		
+		# Mailing-list ID (ie to this id syncdata mails will be sent)
+		SYNCDATA_SENDING_EMAIL_ID = (
+			'',
+		)
+		
+		#While sending syncdata mails the from field of the mail is set by this variable		
+		SYNCDATA_FROM_EMAIL_ID =''
+			# sample:  'Gstudio <t.metastudio@gmail.com>'
+
+		# This is the duration (in secs) at which send_syncdata and fetch_syncdata scripts will be run
+		SYNCDATA_DURATION = 60
+
+		#SIGNING KEY Pub. Fill the pub of the key with which to sign syncdata mails here
+		SYNCDATA_KEY_PUB = ''
+
+[INSTRUCTIONS]
+
+	1. Fill in details in gstudio/key_script/gen_key_inp.txt
+	2. Run $ python manage.py generate_keys
+	3. Put the key pub of this key in local_settings.py
+	4. Fill other variables of local_settings.py for sending and receiving syncdata mails
+	5. Give the public to other systems and take public keys from other systems involved in the program
+	
+	INSTRUCTIONS TO IMPORT KEYS
+	1. When the public key file 'key.pub' is in pwd run:
+		$ gpg --import key.pub
+	
+	2. Run:
+		$ gpg --list-keys
+	   All the keys will be listed, including the one you just imported. Copy the 'pub' of this newly imported key. As an example, assume the following output appears after running the above command. Further assume that this is the key we want to import:
+		/home/sample_user/.gnupg/pubring.gpg
+		--------------------------------
+		pub   2048R/963E2E69 2015-06-29
+		uid                  SchoolServer (ss) <gstudio.ss@gmail.com>
+	So what we have to copy is '963E2E69'
+
+	3. Key has been imported but that is not enough. We must sign it with our own private key to mark it as trusted. To do so, run: 
+		$ gpg --edit-key 963E2E69
+	   Note: we pasted the key pub here
+	4. A prompt 'gpg> ' will appear. Here type:
+		gpg> sign
+	5. Enter 'y' when prompted to confirm
+	7. Enter 'q' hit enter and then 'y' and hit enter to save the changes and exit.
+
+	INSTRUCTIONS FOR MANUALLY SENDING/ RECEIVING SYNCDATA
+	1. A change on metastudio is defined as : adding/editing page , file or forum.
+	2. From the system on which the new changes were made run:
+		$ python manage.py send_syncdata 
+	3. On the system on which the new changes are to be fetched run:
+		$ python manage.py fetch_syncdata 
+
+	INSTRUCTIONS FOR AUTOMATICLLY SENDING/ RECEIVING SYNCDATA (WILL USE celery and rabbitmq)
+	1. A change on metastudio is defined as : adding/editing page , file or forum.
+	2. Check that SYNCDATA_DURATION variable in local_settings.py is assigned.
+	3. On all involved systems, from the directory 'gstudio/gnowsys-ndf' run :
+		$ celery -A gnowsys_ndf worker -B -l info
+	   This will start the celery beat scheduler which will run scripts 'send_syncdata' and 'fetch_syncdata' every SYNCDATA_DURATION seconds
+
+[ISSUES]
+	1. The mailbox's password can't have '#' 
+	2. Unable to capture node-data for 'Themes' + 'Tasks' group properly because of associated Triples
+
+[TO BE TESTED]:
+
+	1. Handle cases where attachments received in syncdata mails are not signed or are signed by keys nt in our web of trust
+
+[FUTURE SCOPE]
+	1. Displaying the sent mails + Deleted Mails + Assigning the labels on the mails + Drafts
+	2. While descrypting if failure occurs delete the attachment
+	
+	
+
