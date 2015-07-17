@@ -1090,9 +1090,9 @@ class CreateCourseEventGroup(CreateEventGroup):
             create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
             self.ce_set_up(request, course_node, group_obj)
             if "CourseEventGroup" not in group_obj.member_of_names_list:
-		            node_collection.collection.update({'_id': group_obj._id},
-		                {'$push': {'member_of': ObjectId(courseevent_group_gst._id)}}, upsert=False, multi=False)
-		            group_obj.reload()
+                node_collection.collection.update({'_id': group_obj._id},
+                    {'$push': {'member_of': ObjectId(courseevent_group_gst._id)}}, upsert=False, multi=False)
+                group_obj.reload()
 
     def ce_set_up(self, request, node, group_obj):
         """
