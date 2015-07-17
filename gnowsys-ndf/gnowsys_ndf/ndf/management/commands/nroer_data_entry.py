@@ -63,7 +63,7 @@ update_file_exists_in_gridfs = True
 # http://192.168.1.102/sites/default/files/nroer_resources/ (for whole ncert campus)
 # http://125.23.112.5/sites/default/files/nroer_resources/ (for public i.e outside campus)
 
-resource_link_common = "http://192.168.1.102/sites/default/files/nroer_resources/"
+resource_link_common = "http://125.23.112.5/sites/default/files/nroer_resources/"
 
 class Command(BaseCommand):
     help = "\n\tFor saving data in gstudio DB from NROER schema files. This will create 'File' type GSystem instances.\n\tCSV file condition: The first row should contain DB names.\n"
@@ -314,7 +314,12 @@ def get_id_from_hierarchy(hier_list):
     # print topic, "node_id : ", node_id 
 
     # fetching a theme-item node
-    topic_node = node_collection.one({'name': {'$regex': "^" + unicode(topic) + "$", '$options': 'i'}, 'group_set': {'$in': [home_group._id]}, 'member_of': {'$in': [topic_gst._id]}, 'prior_node': {'$in': [node_id]} })
+    topic_node = node_collection.one({
+                'name': {'$regex': "^" + unicode(topic) + "$", '$options': 'i'},
+                'group_set': {'$in': [home_group._id]},
+                'member_of': {'$in': [topic_gst._id]},
+                'prior_node': {'$in': [node_id]}
+            })
 
     if topic_node:
         return topic_node._id        
@@ -546,7 +551,10 @@ def parse_data_create_gsystem(json_file_path):
 
                 gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
 
+
                 # processing each entry in relation_list
+                # print "=== relation_list : ", relation_list
+
                 for key in relation_list:
                   is_relation = True
 
@@ -557,105 +565,105 @@ def parse_data_create_gsystem(json_file_path):
 
                         if json_document[key]:
 
-                            # -----------------------------
-                            hierarchy_output = None
-                            def _get_id_from_hierarchy(hier_list, oid=None):
-                                '''
-                                Returns the last hierarchical element's ObjectId.
-                                Arguments to be passes is list of unicode names.
-                                e.g.
-                                hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
-                                '''
-                                # print oid
-                                if len(hier_list) >= 2:
-                                    # print hier_list, "len(hier_list) : ", len(hier_list)
-                                    # object_exist = ""
-                                    try:
-                                        if oid:
-                                            curr_oid = node_collection.one({ "_id": oid })
-                                            # print "curr_oid._id", curr_oid._id
+                            # # -----------------------------
+                            # hierarchy_output = None
+                            # def _get_id_from_hierarchy(hier_list, oid=None):
+                            #     '''
+                            #     Returns the last hierarchical element's ObjectId.
+                            #     Arguments to be passes is list of unicode names.
+                            #     e.g.
+                            #     hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
+                            #     '''
+                            #     # print oid
+                            #     if len(hier_list) >= 2:
+                            #         # print hier_list, "len(hier_list) : ", len(hier_list)
+                            #         # object_exist = ""
+                            #         try:
+                            #             if oid:
+                            #                 curr_oid = node_collection.one({ "_id": oid })
+                            #                 # print "curr_oid._id", curr_oid._id
 
-                                        else:
-                                            row_list = []
+                            #             else:
+                            #                 row_list = []
 
-                                            for e in hier_list:
-                                                row_list.append(e)
+                            #                 for e in hier_list:
+                            #                     row_list.append(e)
 
-                                            curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                            #                 curr_oid = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
 
-                                        if curr_oid:
-                                            # object_exist = True
-                                            next_oid = node_collection.one({ 
-                                                                      "name": hier_list[1],
-                                                                      'group_set': {'$all': [ObjectId(home_group._id)]},
-                                                                      'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
-                                                                      '_id': {'$in': curr_oid.collection_set }
-                                                                      })
+                            #             if curr_oid:
+                            #                 # object_exist = True
+                            #                 next_oid = node_collection.one({ 
+                            #                                           "name": hier_list[1],
+                            #                                           'group_set': {'$all': [ObjectId(home_group._id)]},
+                            #                                           'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
+                            #                                           '_id': {'$in': curr_oid.collection_set }
+                            #                                           })
 
                                         
-                                            # print "||||||", next_oid.name
-                                            hier_list.remove(hier_list[0])
-                                            # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
+                            #                 # print "||||||", next_oid.name
+                            #                 hier_list.remove(hier_list[0])
+                            #                 # print "calling _get_id_from_hierarchy(", hier_list,", ", next_oid._id,")" 
 
-                                            _get_id_from_hierarchy(hier_list, next_oid._id)
+                            #                 _get_id_from_hierarchy(hier_list, next_oid._id)
       
-                                        else:
-                                            error_message = "!! ObjectId of curr_oid does not found."
-                                            print error_message
-                                            log_list.append(error_message)
+                            #             else:
+                            #                 error_message = "!! ObjectId of curr_oid does not found."
+                            #                 print error_message
+                            #                 log_list.append(error_message)
 
-                                    except Exception as e:
-                                        error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
-                                        # print error_message
-                                        log_list.append(error_message)
+                            #         except Exception as e:
+                            #             error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
+                            #             # print error_message
+                            #             log_list.append(error_message)
 
-                                else:
-                                    print "==== return oid: ", oid
-                                    global hierarchy_output
-                                    hierarchy_output = oid
+                            #     else:
+                            #         print "==== return oid: ", oid
+                            #         global hierarchy_output
+                            #         hierarchy_output = oid
 
-                                print "==== hierarchy_output"
-                                return hierarchy_output
-                                print "==== hierarchy_output"
+                            #     print "==== hierarchy_output"
+                            #     return hierarchy_output
+                            #     print "==== hierarchy_output"
 
-                                # -----------------------------                  
+                            #     # -----------------------------                  
                           
-                                # if len(hier_list) == 1:
-                                #     if oid:
-                                #       print "oid: ", oid
-                                #       return oid
-                                #     else:
-                                #       # print "else - hier_list : ", hier_list
-                                #       temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                #       # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                #       # print temp_obj
-                                #       if temp_obj.count() > 0:
-                                #           for e in temp_obj:
-                                #               if e.prior_node:
-                                #                   for k in e.prior_node:
-                                #                       obj = node_collection.one({'_id':ObjectId(k) })
-                                #                       # print "\nitem: ",row_list[len(row_list)-2],"\n"
-                                #                       if obj.name == row_list[len(row_list)-2]:
-                                #                           # print e._id
-                                #                           return e._id
+                            #     # if len(hier_list) == 1:
+                            #     #     if oid:
+                            #     #       print "oid: ", oid
+                            #     #       return oid
+                            #     #     else:
+                            #     #       # print "else - hier_list : ", hier_list
+                            #     #       temp_obj = node_collection.find({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                            #     #       # temp_obj = node_collection.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                            #     #       # print temp_obj
+                            #     #       if temp_obj.count() > 0:
+                            #     #           for e in temp_obj:
+                            #     #               if e.prior_node:
+                            #     #                   for k in e.prior_node:
+                            #     #                       obj = node_collection.one({'_id':ObjectId(k) })
+                            #     #                       # print "\nitem: ",row_list[len(row_list)-2],"\n"
+                            #     #                       if obj.name == row_list[len(row_list)-2]:
+                            #     #                           # print e._id
+                            #     #                           return e._id
 
-                                #           return None
-                                #       else:
-                                #           return None
-                                #       # if temp_obj:
-                                #       #   return temp_obj._id
-                                #       # else:
-                                #       #   return None
+                            #     #           return None
+                            #     #       else:
+                            #     #           return None
+                            #     #       # if temp_obj:
+                            #     #       #   return temp_obj._id
+                            #     #       # else:
+                            #     #       #   return None
 
-                                #   # if any one of the item of hierarchy does not exist in database then:
-                                # elif not object_exist:
-                                #     temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
-                                #     if temp_obj:
-                                #       return temp_obj._id
-                                #     else:
-                                #       return None
+                            #     #   # if any one of the item of hierarchy does not exist in database then:
+                            #     # elif not object_exist:
+                            #     #     temp_obj = node_collection.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                            #     #     if temp_obj:
+                            #     #       return temp_obj._id
+                            #     #     else:
+                            #     #       return None
 
-                              # -------------- END of _get_id_from_hierarchy() ---------------                  
+                            #   # -------------- END of _get_id_from_hierarchy() ---------------                  
 
                             # most often the data is hierarchy sep by ":"
                             if ":" in json_document[key]:
@@ -670,6 +678,7 @@ def parse_data_create_gsystem(json_file_path):
                                 # print "~~~~~~~~~~~", formatted_list
                                 # rsub_id = _get_id_from_hierarchy(formatted_list)
                                 rsub_id = get_id_from_hierarchy(formatted_list)
+                                # print "=== rsub_id : ", rsub_id
                                 hierarchy_output = None
 
                                 # checking every item in hierarchy exist and leaf node's _id found
