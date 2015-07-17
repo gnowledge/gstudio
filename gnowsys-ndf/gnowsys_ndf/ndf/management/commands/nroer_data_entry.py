@@ -53,12 +53,17 @@ theme_item_gst = node_collection.one({'_type': 'GSystemType', "name": "theme_ite
 topic_gst = node_collection.one({'_type': 'GSystemType', "name": "Topic"})
 nroer_team_id = 1
 
+# setting variable:
+# If set true, despite of having file nlob in gridfs, it fetches concern File which contains this _id in it's fs_file_ids field and returns it.
+# If set False, returns None
+update_file_exists_in_gridfs = True
+
 # INFO notes:
 # http://172.16.0.252/sites/default/files/nroer_resources/ (for room no 012)
 # http://192.168.1.102/sites/default/files/nroer_resources/ (for whole ncert campus)
 # http://125.23.112.5/sites/default/files/nroer_resources/ (for public i.e outside campus)
 
-resource_link_common = "http://125.23.112.5/sites/default/files/nroer_resources/"
+resource_link_common = "http://192.168.1.102/sites/default/files/nroer_resources/"
 
 class Command(BaseCommand):
     help = "\n\tFor saving data in gstudio DB from NROER schema files. This will create 'File' type GSystem instances.\n\tCSV file condition: The first row should contain DB names.\n"
@@ -300,7 +305,7 @@ def get_id_from_hierarchy(hier_list):
                     'group_set': {'$in': [home_group._id]}
                 })
 
-        print each_item, "===", node.name
+        # print each_item, "===", node.name
         if not node:
             return None
 
@@ -434,7 +439,7 @@ def parse_data_create_gsystem(json_file_path):
                     })
 
                 if collection_node:
-                    add_to_collection_set(collection_node, fileobj_oid)
+                    add_to_collection_set(collection_node, nodeid)
 
             # print type(nodeid), "-------", nodeid, "\n"
 
@@ -662,7 +667,7 @@ def parse_data_create_gsystem(json_file_path):
                                     formatted_list.append(v.strip())
 
                                 right_subject_id = []
-                                print "~~~~~~~~~~~", formatted_list
+                                # print "~~~~~~~~~~~", formatted_list
                                 # rsub_id = _get_id_from_hierarchy(formatted_list)
                                 rsub_id = get_id_from_hierarchy(formatted_list)
                                 hierarchy_output = None
@@ -802,35 +807,52 @@ def create_resource_gsystem(resource_data):
     # fcol = get_database()[File.collection_name]
     # fileobj = fcol.File()
 
-    fileobj = node_collection.collection.File()
+    # fileobj = node_collection.collection.File()
 
-    check_obj_by_name = node_collection.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
+    # there can be two different files with same name.
+    # e.g: "The Living World" exists with epub, document, audio etc.
+    # hence not to check by name.
+    # check_obj_by_name = node_collection.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
     # print "\n====", check_obj_by_name, "==== ", fileobj.fs.files.exists({"md5":filemd5})
 
+    check_file_in_gridfs = gridfs_collection.find_one({"md5": filemd5})
     # even though file resource exists as a GSystem or in gridfs return None
-    if fileobj.fs.files.exists({"md5": filemd5}) or check_obj_by_name:
+    # if fileobj.fs.files.exists({"md5": filemd5})  # or check_obj_by_name:
+    if check_file_in_gridfs:
         
         # coll_oid = get_database()['fs.files']
-        cur_oid = gridfs_collection.find_one({"md5": filemd5})
+        # cur_oid = gridfs_collection.find_one({"md5": filemd5})
         
         # printing appropriate error message
-        if check_obj_by_name:
-            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the home group. (Ref _id: '"+ str(check_obj_by_name._id) + "' )"
-            print info_message
-            log_list.append(str(info_message))
-            return check_obj_by_name._id
+        # if check_obj_by_name:
+        #     info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the home group. (Ref _id: '"+ str(check_obj_by_name._id) + "' )"
+        #     print info_message
+        #     log_list.append(str(info_message))
+        #     return check_obj_by_name._id
 
-        elif cur_oid:
-            info_message = "\n- Resource file exists in gridfs having id: '" + str(cur_oid["_id"]) + "'"
-            print info_message
-            log_list.append(str(info_message))
-            return None
+        # elif cur_oid:
+        info_message = "\n- Resource file exists in gridfs having id: '" + \
+        str(check_file_in_gridfs["_id"]) + "'"
+        print info_message
+        log_list.append(str(info_message))
 
-        else:
-            info_message = "\n- Resource file does not exists in database"
-            print info_message
-            log_list.append(str(info_message))
-            return None
+        if update_file_exists_in_gridfs:
+            file_obj = node_collection.one({'_type': 'File', 'fs_file_ids': {'$in': [ObjectId(check_file_in_gridfs['_id'])]} })
+
+            if file_obj:
+                info_message = "\n- Returning file _id despite of having in gridfs"
+                print info_message
+                log_list.append(str(info_message))
+
+                return file_obj._id
+
+        return None
+
+        # else:
+        #     info_message = "\n- Resource file does not exists in database"
+        #     print info_message
+        #     log_list.append(str(info_message))
+        #     return None
 
     else:  # creating new resource
 
