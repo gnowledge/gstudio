@@ -2551,7 +2551,7 @@ def get_students(request, group_id):
 
       # Column headers to be displayed on html
       column_headers = [
-          ('University', 'University'),
+          #('University', 'University'),
           ('College ( Graduation )', 'College'),
           ("Name", "Name"),
           ("Enrollment Code", "Enr Code"),
