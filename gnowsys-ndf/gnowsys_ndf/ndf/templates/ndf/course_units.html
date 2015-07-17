@@ -118,7 +118,7 @@
       </div>
       <div class="small-3 columns">
           <span data-tooltip title="You will be redirected to Course Authoring page" style="float:right;">
-            <a class="done_units tiny button round" style="float:right;">Cancel</a>
+            <a class="done_units tiny button round" style="float:right;">Back</a>
           </span>
       </div>
 
@@ -160,7 +160,7 @@
         <div id="view_add_file" class="hide">
           <h5>{% trans "Add New File: " %}</h5><br/>
           <!-- Upload file -->
-          <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' group_id %}?context_node={{unit_node.pk}}">
+          <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_course_file' group_id %}?context_node={{unit_node.pk}}">
           {% csrf_token %}
             <div>
               <span class="fi-upload"><input type="file" name="doc[]" id="docFile" multiple/></span>
