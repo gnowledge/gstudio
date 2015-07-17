@@ -1089,6 +1089,10 @@ class CreateCourseEventGroup(CreateEventGroup):
             group_obj = node_collection.one({'_id': ObjectId(group_id)})
             create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
             self.ce_set_up(request, course_node, group_obj)
+            if "CourseEventGroup" not in group_obj.member_of_names_list:
+                node_collection.collection.update({'_id': group_obj._id},
+                    {'$push': {'member_of': ObjectId(courseevent_group_gst._id)}}, upsert=False, multi=False)
+                group_obj.reload()
 
     def ce_set_up(self, request, node, group_obj):
         """
@@ -1359,6 +1363,7 @@ class EventGroupCreateEditHandler(View):
                 mod_group = CreateProgramEventGroup(request)
             elif sg_type == "CourseEventGroup":
                 mod_group = CreateCourseEventGroup(request)
+                moderation_level = -1
             parent_group_obj = group_obj
             # calling method to create new group
             result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id,)
@@ -1705,11 +1710,12 @@ def group_dashboard(request, group_id=None):
     group_id=group_obj['_id']
     pass
 
-	
+
   # Call to get_neighbourhood() is required for setting-up property_order_list
   group_obj.get_neighbourhood(group_obj.member_of)
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
-  if "CourseEventGroup" in list_of_sg_member_of:
+  # print "\n\n list_of_sg_member_of", list_of_sg_member_of
+  if "CourseEventGroup" in group_obj.member_of_names_list:
 			forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
 			twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
 			page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
