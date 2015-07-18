@@ -31,16 +31,19 @@
     $("#orgitdownreps{{eachrep}}").orgitdown(mySettings);
 
     $("#reply_forum{{eachrep}}").on("click", function() {
+     
       document.getElementById('org{{eachrep}}').style.visibility='visible';
       $("#org{{eachrep}}").css("display","block");
+      document.getElementById('upload_link').style.visibility='visible';
     });
+
 
     $("#savereply{{eachrep}}").on("click", function() {
 
       var contento=$('#orgitdownreps{{eachrep}}').val();
 
       $('#orgitdownreps{{eachrep}}').val("");
-      
+      var docs_list=new FormData();
       if (contento != "") {
         var repl=$("#rep{{eachrep}}").val();
         var thd=$("#thd{{eachrep}}").val();
@@ -48,26 +51,37 @@
         var fid="{{forum}}"
         var gpid="{{groupid}}"
         var ajurl="/"+gpid+"/forum/add_node/"
+        var docs_count=$("#docFile{{eachrep}}").get(0).files.length
+        alert(docs_count);
+        for(var i=0; i< docs_count; i++)
+        {
+         docs_list.append("upload"+i,$('input[type=file]')[0].files[i]);
+        }
+alert(docs_list);
+docs_list.append('upload_cnt',docs_count)
+docs_list.append('node','Reply');
+docs_list.append('thread',thd);
+docs_list.append('forumid',fid);
+docs_list.append('supnode',repl);
+docs_list.append('reply',contento);
+docs_list.append('twistname',twname);
+docs_list.append('csrfmiddlewaretoken','{{csrf_token}}');
 
         $.ajax({
           url: ajurl,
 
           type: 'POST',
-
-          data: {
-            node: 'Reply',
-            thread: thd,
-            forumid: fid,
-            supnode: repl,
-            reply: contento,
-            twistname: twname,
-            csrfmiddlewaretoken: '{{csrf_token}}'
-          },
+         
+          data : docs_list,
+          processData: false, 
+          contentType: false,
 
           success: function(data){
             document.getElementById('org{{eachrep}}').style.visibility='hidden';
             $("#org{{eachrep}}").css("display","none");
-
+            document.getElementById('upload_link').style.visibility='hidden';
+            $("upload_link").css("display","none");
+            $("#docFile{{eachrep}}").replaceWith($("#docFile{{eachrep}}").val('').clone(true));
             $('#refreshthread').html(data);
             // $('a.close-reveal-modal').trigger('click');
           }
@@ -145,6 +159,9 @@
     <button id="reply_forum{{eachrep}}" class="button large postfix" style="height: 2.5em;">
       Reply  &nbsp;|&nbsp; <i class="fi-refresh"></i>
     </button>
+<div class="uploaded_files">
+{% get_files_for_reply eachrep eachrep %}
+</div>
  </div>
     {% get_group_name groupid as group_name_tag %}
 
@@ -162,11 +179,14 @@
     <!-- Reply : -->
 
     <textarea id="orgitdownreps{{eachrep}}" name="content_org" placeholder="Please enter description..."></textarea>
+
+    <input type="file" name="doc"  id="docFile{{eachrep}}" multiple/>
   
     <input id="savereply{{eachrep}}" type="button" value="Post Reply"  class="button tiny reply-button">
   
     <input type="hidden" id="rep{{eachrep}}" style="visibility:hidden" value="{{eachrep}}">
     <input type="hidden" id="thd{{eachrep}}" style="visibility:hidden" value="{{thread}}">
-  
+
   </div>
+ <div id="upload_link">upload file</div>
 </div>
