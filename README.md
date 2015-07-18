@@ -2,7 +2,7 @@
 Docker file for gstudio
 =======================
 
-To build the docker image, we need to clone the project in your docker host, and run the script build-docker.sh. This script clones the gstudio code and builds the image. After clining the gstudio-docker, download and install the static javascript depedencies from [[http://gnowledge.org/~nagarjun/bower_components.tar.gz]]. unzip the contents of this file in the project directory before starting the buuild-docker.sh script.
+To build the docker image, we need to clone the project in your docker host, and run the script build-docker.sh. This script clones the gstudio code and builds the image. After clining the gstudio-docker, download and install the static javascript depedencies from http://gnowledge.org/~nagarjun/bower_components.tar.gz. unzip the contents of this file in the project directory before starting the buuild-docker.sh script.
 
 The image uses Ubuntu 14.04, django, nginx, mongodb, and several code dependent python libraries and OS level libraries.  The image builds to about 1.6GB.  
 
