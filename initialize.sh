@@ -1,4 +1,6 @@
 #!/bin/bash
+echo "[run] get updated additional schema STs, ATs and RTs"
+cp -a /home/docker/code/gstudio/doc/schema_directory/ /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/management/commands/schema_files/
 
 echo "[run] start mongod"
 mongod &
@@ -19,4 +21,7 @@ if not User.objects.filter(username='admin').count():
 
 echo "[run] create or update gstudio schema in mongodb"
 python manage.py filldb
-
+python manage.py create_schema STs_run1.cvs
+python manage.py create_schema ATs.cvs
+python manage.py create_schema RTs.cvs
+python manage.py create_schema STs_run2.cvs
