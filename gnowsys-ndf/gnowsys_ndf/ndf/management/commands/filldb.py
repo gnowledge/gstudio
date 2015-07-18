@@ -37,9 +37,9 @@ if f[-1] == "ATs.json" or f[-1] == "RTs.json" or f[-1] == "STs.json":
 else:
   json_file = ""
 
-SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files")
+SCHEMA_ROOT = os.path.join( os.path.dirname(__file__))
 
-log_list = [] # To hold intermediate error and information messages
+log_list = []  # To hold intermediate error and information messages
 log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 ###############################################################################
@@ -285,6 +285,17 @@ class Command(BaseCommand):
         else:
           print " GList ("+glc_node_name+") container already created !"
           info_message += "\n GList ("+glc_node_name+") container already created !"
+	
+	page_node = node_collection.find_one({"name":"Page"})
+	page_node_instance = ['Info page','Blog page','Wiki page']
+	instance_nodes = node_collection.find({"name":{"$in":page_node_instance}})
+	for i in instance_nodes:
+		if not page_node._id in i.type_of:
+			i.type_of.append(page_node._id)
+			i.save()
+		else:
+			print "Page " + ""+ i.name + "" +" instance already updated."
+
 
         Group_node = node_collection.collection.Group();
         node_doc =node_collection.one({'$and':[{'_type': u'Group'},{'name': u'Trash'}]})

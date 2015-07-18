@@ -163,7 +163,7 @@ background-color: red !important;
       // console.log(this.offsetWidth)
       allAppsTotWidth += this.offsetWidth;
 
-      if( flagExtraMenu || ((allAppsTotWidth + 100) > availableWidth))
+      if( flagExtraMenu || ((allAppsTotWidth + 150) > availableWidth))
       {
         if(!flagExtraMenu)
         {
@@ -187,6 +187,4 @@ background-color: red !important;
 
   adjustGroupApps();
 
-  // $("#group-level-header > nav").bind("resize", function(){adjustGroupApps()});
-  $("#group-level-header").resize(function(){console.log("kkkkkkkkkk")})
 </script>

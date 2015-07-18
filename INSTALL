@@ -1,4 +1,9 @@
-* INSTALLATION Procedure for for gstudio
+* Dockerfile for gstudio
+Please use [[https://github.com/gnowledge/gstudio-docker/]] for a quick and best method to get a running instance 
+of gstudio with code as well as all the dependencies satisfied. 
+
+
+* Manual INSTALLATION Procedure for for gstudio
 
 If you are on a debian or Ubuntu PC install the following packages.
 Use corresponding package names if you are using an RPM based distro

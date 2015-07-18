@@ -33,7 +33,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
@@ -147,7 +147,7 @@ def page(request, group_id, app_id=None):
         # code for moderated Groups
         group_type = node_collection.one({'_id': ObjectId(group_id)})
         group_info=group_type_info(group_id)
-
+	node = node_collection.find({'member_of':ObjectId(app_id)})
         title = gst_page.name
  	'''
         if  group_info == "Moderated":
@@ -172,20 +172,19 @@ def page(request, group_id, app_id=None):
                                       }).sort('last_update', -1)
 	
           if node is None:
-            node = node_collection.find({'member_of':ObjectId(app_id)})
-          #a temp. variable which stores the lookup for append method
-          content_append_temp=content.append
-          for nodes in node:
-            node,ver=get_versioned_page(nodes) 
-            content_append_temp(node)  
-
+            
+	  '''
+	# for nodes in node:
+ #            node,ver=get_versioned_page(nodes) 
+ #            content.append(node)  
+	'''  
                     
           # rcs content ends here
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
                                      'appId':app._id,
                                      'shelf_list': shelf_list,'shelves': shelves,
-                                     'page_nodes':content,
+                                     'page_nodes':nodes,
                                      'groupid':group_id,
                                      'group_id':group_id
                                     }, 
@@ -217,25 +216,26 @@ def page(request, group_id, app_id=None):
         		# node,ver=get_page(request,nodes)
         #   if node != 'None':
         #     content.append(node)	
- 	return render_to_response("ndf/page_list.html",
-                                    {'title': title,
-                                     'appId':app._id,
-                                     'shelf_list': shelf_list,'shelves': shelves,
-                                     'page_nodes': page_nodes,
-                                     'groupid':group_id,
-                                     'group_id':group_id
-                                    },
-                                    context_instance=RequestContext(request))
+     	return render_to_response("ndf/page_list.html",
+                                        {'title': title,
+                                         'appId':app._id,
+                                         'shelf_list': shelf_list,'shelves': shelves,
+                                         'page_nodes': page_nodes,
+                                         'groupid':group_id,
+                                         'group_id':group_id
+                                        },
+                                        context_instance=RequestContext(request))
         
     else:
         # Page Single instance view
-        Group_node = node_collection.one({"_id": ObjectId(group_id)})
-       
-        if Group_node.prior_node:
+        '''Group_node = node_collection.one({"_id": ObjectId(group_id)})'''
+	page_node = node_collection.one({"_id": ObjectId(app_id)})       
+        '''if Group_node.prior_node:
             page_node = node_collection.one({"_id": ObjectId(app_id)})
             
         else:
-          node = node_collection.one({"_id": ObjectId(app_id)})
+          
+	  	
           if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None or Group_node.edit_policy == "NON_EDITABLE":
             page_node,ver=get_page(request,node)
           else:
@@ -244,9 +244,8 @@ def page(request, group_id, app_id=None):
               page_node,ver=get_versioned_page(node)
             elif node.status == u"PUBLISHED":
               page_node = node
-
+	'''	
       
- 
         annotations = json.dumps(page_node.annotations)
         page_node.get_neighbourhood(page_node.member_of)
         return render_to_response('ndf/page_details.html', 
@@ -268,22 +267,25 @@ def page(request, group_id, app_id=None):
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
 
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    group_name, group_id = get_group_name_id(group_id)
+    ce_id = request.GET.get('course_event_id')
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
-                          'groupid': group_id
+                          'groupid': group_id,
+                          'ce_id': ce_id
                       }
     
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
@@ -302,8 +304,18 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
-
+	page_type = request.POST.getlist("type_of",'')
+	ce_id = request.POST.get("ce_id",'')
+	if page_type:
+		objid= page_type[0]
+		if not ObjectId(objid) in page_node.type_of:
+			page_type1=[]
+			page_type1.append(ObjectId(objid))
+			page_node.type_of = page_type1
+			page_node.type_of
+	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+        page_node.save() 
+        
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '') 
         if metadata:
@@ -312,19 +324,27 @@ def create_edit_page(request, group_id, node_id=None):
             if page_node:
               get_node_metadata(request,page_node)
         # End of filling metadata
+        if ce_id:
+          url_name = "/" + ce_id
+          return HttpResponseRedirect(url_name)
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:
         if node_id:
 
-            page_node,ver=get_page(request,page_node)
+            #page_node,ver=get_page(request,page_node)
             page_node.get_neighbourhood(page_node.member_of)
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
+	#fetch Page instances
+	Page_node = node_collection.find_one({"name":"Page"})
+	page_instances = node_collection.find({"type_of":Page_node._id})
+	page_ins_list = [i for i in page_instances]
+        context_variables['page_instance'] = page_ins_list  
         context_variables['nodes_list'] = json.dumps(nodes_list)
-
+           
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)

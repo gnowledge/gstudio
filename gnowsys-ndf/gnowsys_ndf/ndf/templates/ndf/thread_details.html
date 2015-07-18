@@ -56,7 +56,15 @@ color: #7a7a7a;
 
 
 {% block meta_content %}
-<h2> Thread </h2>
+  {% if other_threads_list %}
+    <h3> &nbsp;
+	{% trans "Other Threads" %}</h3>
+    {% for each_thread in other_threads_list %}
+      <a href="/{{groupid}}/forum/thread/{{each_thread.0}}">
+      {{each_thread.1}}</a><br>
+    {% endfor %}
+  {% endif %}
+
 {% endblock %}
 
 

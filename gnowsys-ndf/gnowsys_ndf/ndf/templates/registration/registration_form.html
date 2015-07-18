@@ -25,6 +25,22 @@
     }
 {% endblock %}
 
+{% block meta_content %}
+<h2 class="subheader text-center">{% trans "Register" %}</h2>
+
+  <b>As a registered user you can:</b>
+  <ul>
+    
+  <li> critique resources</li>
+  <li> share feedback</li>
+  <li> contribute creations</li>
+  <li> Participate and create events</li>
+  <li> Participate and create courses</li>
+  <li> And many more...</li>
+  </ul>
+{% endblock meta_content %}
+
+
 {% block body_content %}
   {% get_site_registration_variable_visibility as site_registration_variable_visibility %}
 
@@ -34,7 +50,7 @@
       <!-- Heading text -->
       <div class="row">
         <div class="small-10 large-10 columns end text-center">
-          <h2 style="padding-left: 30px;">{% trans "Register a New User Account" %}</h2>
+          <!-- <h2 style="padding-left: 30px;">{% trans "Register a New User Account" %}</h2> -->
         </div>
       </div>
     </div>

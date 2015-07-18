@@ -26,20 +26,18 @@
 <!-- overiding block from node_detail_base.html -->
 
 {% block collection_content %}
+  <div id="view_collection">
+  {{node_type}}
+    {% include "ndf/collection_ajax_view.html" %}  
+  </div>
+
   {% if node_type == "Course" %}
     {% user_access_policy groupid request.user as user_access %}
     {% if user_access == "allow" %}
-      <div id="view_collection">
-        {% include "ndf/collection_ajax_view.html" %}  
-      </div>
-
       <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
-    {% elif enrolled_status %}
-        <div id="view_collection">
-          {% include "ndf/collection_ajax_view.html" %}  
-        </div>
     {% endif %}
   {% endif %}
+
 {% endblock %}
 
 {% block meta_content %}
@@ -97,7 +95,8 @@
       </small>
    </section>
    <section class="medium-3 columns name-section" >
-     <span>{% include "ndf/rating.html" %} </span>
+   <span><a class="small publish-btn button" style="width:73%" href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{node.pk}}">{% trans "Announce" %}</a></span>
+
   </section>
 </header>
 

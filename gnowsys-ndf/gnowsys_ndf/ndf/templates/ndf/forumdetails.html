@@ -47,29 +47,45 @@
 
 {% block meta_content %}
 <!-- <h2>Threads</h2> -->
-{%  blocktrans %}<h3> &nbsp;Add thread to this forum</h3>{% endblocktrans %}
+  {% if other_forums %}
+    <h3> &nbsp;
+      {% trans "Other Forums" %}
+    </h3>
+    {% for each_forum in other_forums %}
+      <a href="{% url 'show' group_id each_forum.0 %}">
+      {{each_forum.1}}</a><br>
+    {% endfor %}
+  {% endif %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+    <a class="tiny button" href="{% url 'create_forum' group_name_tag %}">
+    {% if hide_create_thread_btn %}
+       <span class="fi-plus">&nbsp;&nbsp;{% trans "Create Forum" %}</span>
+    {% endif %}
+    </a>
+  {% endif %}
+  {% endif %}
+
+
 {% endblock %}
 
 
 {% block concern_information %}
 <br/>
 <ul class="no-bullet" id="create-thread"> 
-  <li class="create card ">
-    <div>
-      <h4><i class="fi-plus"></i> New</h4>
+      {% if hide_create_thread_btn %}
+        {% if user.is_authenticated %}
+        {% user_access_policy groupid request.user as user_access %}
 
-      {% if user.is_authenticated %}
-      {% user_access_policy groupid request.user as user_access %}
-
-      {% if user_access == "allow" %}
-      <a class="button expand" href="{% url 'create_thread' groupid forum.pk %}">
-       {% blocktrans %} Create &nbsp;Thread {% endblocktrans %}
-      </a>
+        {% if user_access == "allow" %}
+        {%  blocktrans %}<h3> &nbsp;Add thread to this forum</h3>{% endblocktrans %}
+        <a class="button expand" href="{% url 'create_thread' groupid forum.pk %}">
+         {% blocktrans %} Create &nbsp;Thread {% endblocktrans %}
+        </a>
+        {% endif %}
+        {% endif %}
       {% endif %}
-
-      {% endif %}
-    </div>
-  </li>
 </ul>
 
 <!-- <a href="#"> Browse forums</a> -->
@@ -89,7 +105,7 @@
 
     <h2>{% trans "Forum:" %} 
     <a title="{{forum.name}}" href="#">
-     <a href="/{{groupid}}/forum/{{forum}}">
+     <a href="{% url 'show' groupid forum.pk %}">
         {{forum.name}}</a></h2>
     </a>
     {% get_edit_url forum.pk as edit_url %}
@@ -148,7 +164,6 @@
           {% get_user_object each.created_by as user_obj %}
 
           <tr>
-
             <td>
               <a href="/{{groupid}}/forum/thread/{{each}}">
                 {{each.name}}

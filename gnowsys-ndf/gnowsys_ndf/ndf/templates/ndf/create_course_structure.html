@@ -119,7 +119,7 @@
       display:block;
     }
 
-    .lbl_of_cs, .lbl_of_css{
+    .lbl_of_cs, .lbl_of_css, .contains-unit {
       white-space: nowrap;
       overflow: hidden;
       width: 35% !important;
@@ -146,7 +146,7 @@
     }
 
     .unit-anch{
-      font-size:130%;
+      font-size:100%;
     }
 
     .course-section-class:hover .cs_setting{
@@ -433,7 +433,7 @@
           complete: function () {
             var str_btn="<div class='row'><div class='small-1 columns text-center'><i class='fi-minus largesize fold-btn'></i></div>"
             var str_lbl="<span data-tooltip title='"+ lbl_val +"'><div class='small-8 columns left inline div_lbl'><label name='lbl_name' class='lbl_of_css' id='"+ css_new_id+"' style='float:left;'>"+lbl_val+"</label><span><span data-tooltip title='Edit name'><i class='fi-pencil css_setting largesize edit_course_structure_name' style='float:left;'></i></span></div>" 
-            var str_prop="<div class='small-2 columns end css_setting'><span data-tooltip title='Settings'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i></span>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+"  "+"<span data-tooltip title='Deletee'><i class='fi-trash largesize'></i></span></div></div>"
+            var str_prop="<div class='small-2 columns end css_setting'><span data-tooltip title='Settings'><i class='fi-widget largesize reveal_prop_form' id='widget_id'></i></span>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+"  "+"<span data-tooltip title='Delete'><i class='fi-trash largesize'></i></span></div></div>"
 
             $("#"+curr_css_li_id).parents("li").find("div.fold-btn-div").replaceWith("<div class='small-1 columns text-center fold-btn-div'><i class='fi-minus fold-btn largesize'></i></div>")
             $("#"+curr_css_li_id).parents("li").find("input.sub-section-btn").removeAttr("disabled");
@@ -874,7 +874,7 @@
               {% for each_unit in css_node.collection_set %}
                 {% get_node each_unit as unit_node %}
 
-                    str_unit = "<li class='course-unit-class' value='{{unit_node.pk}}'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class='small-4 columns end'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='units-btn unit-anch' data-unit-id='{{unit_node.pk}}' style='width:50%;' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a></div>"
+                    str_unit = "<li class='course-unit-class' value='{{unit_node.pk}}'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span data-tooltip title='{{unit_node.name}}'><div class='small-4 columns end contains-unit'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class='units-btn unit-anch' data-unit-id='{{unit_node.pk}}' data-css-id='{{css_node.pk}}'>{{unit_node.name}}</a></div></span>"
                     str_opt = "<div class='small-2 columns end'>"+" "+"<span data-tooltip title='Move Down'><i class='fi-arrow-down largesize'></i></span>"+" "+"<span data-tooltip title='Move Up'><i class='fi-arrow-up largesize'></i></span>"+" "+"<span data-tooltip title='Delete'><i class='fi-trash largesize'></i></span></div></li>"
                     $("#"+cloned_ss_ele_id).find(".new-units-btn").before(str_unit+ str_opt)
 

@@ -46,7 +46,7 @@
 {% endblock %}
 
 {% block related_content%}
-	content goes here...
+	{% trans "Digital" %} {% trans "resources" %} {% trans "grouped in multiple ways" %}
 {% endblock %}
 
 {% block body_content %}
@@ -63,7 +63,21 @@
 				</a>
 			</li>
 		{% endfor %}
+		<li>
+			<a class="app-card text-center" href="/home/e-library">
+				<h4><small>Partner Resources</small></h4>
+				<hr/>
+				<i class="icons fi-results-demographics"></i>
+				<p>
+					<b>Contributes Corrections</b>
+					<br/>
+					<br/>
+					From Institutional and Individual Partners
+				</p>
+			</a>
+		</li>
 	</ul>
+
 
 	<script type="text/javascript">
         // // removing left panel:

@@ -1,6 +1,7 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
+import datetime
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -11,6 +12,7 @@ from django.template import RequestContext
 # from django.template.defaultfilters import slugify
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.views.generic import View
 
@@ -21,21 +23,22 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS
-
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups  # get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_sg_member_of  # get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.org2any import org2html
-
 # ######################################################################################################################################
 
 group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'Group'})
 gst_group = group_gst
 app = gst_group
-            
+
 moderating_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ModeratingGroup'})
+programevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'ProgramEventGroup'})
+courseevent_group_gst = node_collection.one({'_type': 'GSystemType', 'name': u'CourseEventGroup'})
 
 file_gst = node_collection.one({'_type': 'GSystemType', 'name': 'File'})
 page_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})
@@ -347,7 +350,6 @@ class CreateSubGroup(CreateGroup):
 
         # if sg_member_of in ['ProgramEventGroup', 'CourseEventGroup', 'PartnerGroup', 'ModeratingGroup']:
         if sg_member_of in self.moderated_groups_member_of:
-            
             # overriding member_of field of subgroup
             member_of_group = node_collection.one({'_type': u'GSystemType', 'name': unicode(sg_member_of)})
             group_obj.member_of = [ObjectId(member_of_group._id)]
@@ -497,12 +499,12 @@ class CreateModeratedGroup(CreateSubGroup):
         # referenced while creating new moderated sub-groups.
         self.altnames = {
             'ModeratingGroup': [u'Clearing House', u'Curation House'],
-            'ProgramEventGroup': [],
-            'CourseEventGroup': []
+            'ProgramEventGroup': [u'Clearing House', u'Curation House'],
+            'CourseEventGroup': [u'Clearing House', u'Curation House']
         }
 
 
-    def create_edit_moderated_group(self, group_name, moderation_level=1, **kwargs):
+    def create_edit_moderated_group(self, group_name, moderation_level=1, sg_member_of="ModeratingGroup", **kwargs):
         '''
         Creates/Edits top level group as well as underlying sub-mod groups.
         - Takes group_name as compulsory argument and optional kwargs.
@@ -528,7 +530,7 @@ class CreateModeratedGroup(CreateSubGroup):
             if node_id:
                 # i.e: Editing already existed group object.
                 # method modifies the underlying mod-sub-group structure and doesn't return anything.
-                self.check_reset_mod_group_hierarchy(top_group_obj=group_obj)
+                self.check_reset_mod_group_hierarchy(sg_member_of=sg_member_of, top_group_obj=group_obj)
 
             else:
                 # i.e: New group is created and following code will create
@@ -537,7 +539,7 @@ class CreateModeratedGroup(CreateSubGroup):
 
                 for each_sg_iter in range(0, int(moderation_level)):
 
-                    result = self.add_moderation_level(parent_group_id, 'ModeratingGroup')
+                    result = self.add_moderation_level(parent_group_id, sg_member_of=sg_member_of)
 
                     # result is tuple of (bool, newly-created-sub-group-obj)
                     if result[0]:
@@ -600,7 +602,7 @@ class CreateModeratedGroup(CreateSubGroup):
 
             if (pg_moderation_level == 0) and increment_mod_level:
                 # needs to increase moderation_level of all group hierarchy
-                self.increment_hierarchy_mod_level(parent_group_id)
+                self.increment_hierarchy_mod_level(parent_group_id, sg_member_of)
                 pg_moderation_level += 1
 
             try:
@@ -628,7 +630,7 @@ class CreateModeratedGroup(CreateSubGroup):
             return sub_group_result_tuple
 
 
-    def increment_hierarchy_mod_level(self, group_id):
+    def increment_hierarchy_mod_level(self, group_id, sg_member_of):
         '''
         Raises moderation_level by one of all the groups (right from top) in the hierarchy.
         Takes group_id as compulsory argument.
@@ -641,7 +643,7 @@ class CreateModeratedGroup(CreateSubGroup):
             group_name, group_id = get_group_name_id(group_id)
 
         # firstly getting all the sub-group-object list
-        result = self.get_all_group_hierarchy(group_id)
+        result = self.get_all_group_hierarchy(group_id, sg_member_of=sg_member_of)
 
         if result[0]:
             # get group's object's list into variables
@@ -672,7 +674,7 @@ class CreateModeratedGroup(CreateSubGroup):
             return False
 
 
-    def get_all_group_hierarchy(self, group_id, top_group_obj=None, with_deleted=False):
+    def get_all_group_hierarchy(self, group_id, sg_member_of, top_group_obj=None, with_deleted=False):
         '''
         Provide _id of any of the group in the hierarchy and get list of all groups.
         Order will be from top to bottom.
@@ -680,10 +682,10 @@ class CreateModeratedGroup(CreateSubGroup):
             - "group_id": Takes _id of any of the group among hierarchy
             - "top_group_obj":  Takes object of top group (optional).
                                 To be used in certain conditions.
-            - "with_deleted":   Takes boolian value.
+            - "with_deleted":   Takes boolean value.
                                 If it's True - returns all the groups irrespective of:
                                 post_node and status field whether it's deleted or not.
-                                To be used catiously in certain conditions.
+                                To be used cautiously in certain conditions.
         e.g: [top_gr_obj, sub_gr_obj, sub_sub_gr_obj, ..., ...]
         NOTE: this function will return hierarchy of 
         only groups with edit_policy: 'EDITABLE_MODERATED'
@@ -711,14 +713,13 @@ class CreateModeratedGroup(CreateSubGroup):
         # taking top_group's object in group_obj. which will be used to start while loop
         group_obj = top_group
 
-        # loop till overwritten group_obj exists and 
+        # loop till overwritten group_obj exists and
         # if group_obj.post_node exists or with_deleted=True
         while group_obj and (group_obj.post_node or with_deleted):
-            
+
             # getting previous group objects name before it get's overwritten
             temp_group_obj_name = group_obj.name
-
-            group_obj = self.get_particular_member_of_subgroup(group_obj._id, 'ModeratingGroup')
+            group_obj = self.get_particular_member_of_subgroup(group_obj._id, sg_member_of)
 
             # if in the case group_obj doesn't exists and with_deleted=True
             if with_deleted and not group_obj:
@@ -740,7 +741,6 @@ class CreateModeratedGroup(CreateSubGroup):
             if group_obj:
                 group_obj_name = group_obj.name
                 all_sub_group_list.append(group_obj)
-                
             # group object not found with regular conditions and arg: with_deleted=False (default val)
             else:
                 # return partially-completed/incompleted (at least with top-group-obj) group hierarchy list.
@@ -775,7 +775,7 @@ class CreateModeratedGroup(CreateSubGroup):
         return True, curr_group_obj
 
 
-    def check_reset_mod_group_hierarchy(self, top_group_obj):
+    def check_reset_mod_group_hierarchy(self, top_group_obj, sg_member_of):
         '''
         This is the method to reset/adjust all the group objects in the hierarchy,
         right from top group to last group.
@@ -798,11 +798,11 @@ class CreateModeratedGroup(CreateSubGroup):
 
         # last sub-groups _id
         last_sg_id = top_group_obj._id
-        
-        # getting all the group hierarchy irrespective of 
+
+        # getting all the group hierarchy irrespective of
         # it's fields like post_node, moderation_level, status
         result = self.get_all_group_hierarchy(top_group_obj._id, \
-            top_group_obj=top_group_obj, with_deleted=True)
+            sg_member_of=sg_member_of, top_group_obj=top_group_obj, with_deleted=True)
 
         if result[0]:
 
@@ -845,7 +845,7 @@ class CreateModeratedGroup(CreateSubGroup):
                 # even we need to update altnames field \
                  # w.r.t. altnames dict (defined at class level variable)
                 try:
-                    sg_altnames = self.altnames['ModeratingGroup'][index-1] \
+                    sg_altnames = self.altnames[sg_member_of][index-1] \
                                     + u" of " + top_group_name
                 except Exception, e:
                     # if not found in altnames dict (defined at class level variable)
@@ -854,10 +854,15 @@ class CreateModeratedGroup(CreateSubGroup):
                 # do not update altnames field of top group w.r.t altnames dict and 
                 # keep Group gst's id in member_of of top-group's object:
                 if each_sg._id == top_group_obj._id:
-                    sg_altnames = each_sg.altnames 
+                    sg_altnames = each_sg.altnames
                     member_of_id = group_gst._id
                 else:
-                    member_of_id = moderating_group_gst._id
+                    if sg_member_of == "ModeratingGroup":
+                        member_of_id = moderating_group_gst._id
+                    elif sg_member_of == "ProgramEventGroup":
+                        member_of_id = programevent_group_gst._id
+                    elif sg_member_of == "CourseEventGroup":
+                        member_of_id = courseevent_group_gst._id
 
                 # print "=== altnames: ", sg_altnames
 
@@ -876,7 +881,7 @@ class CreateModeratedGroup(CreateSubGroup):
                         
                     # except top-group, add current group's _id in top group's post_node
                     if pg_id != each_sg._id:
-                        self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, 'ModeratingGroup')
+                        self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, sg_member_of)
 
                     # one group/element of all_sub_group_obj_list is processed now \
                     # decrement group_moderation_level by 1:
@@ -899,14 +904,13 @@ class CreateModeratedGroup(CreateSubGroup):
                             'moderation_level': group_moderation_level,
                             'status': u'PUBLISHED',
                             'post_node': []
-                            } 
+                            }
                         },
                         upsert=False, multi=False )
-                    
                     # except top-group, add current group's _id in top group's post_node
                     if pg_id != each_sg._id:
-                        self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, 'ModeratingGroup')
-                        
+                        self.add_subgroup_to_parents_postnode(pg_id, each_sg._id, sg_member_of)
+
                     # one group/element of all_sub_group_obj_list is processed now \
                     # decrement group_moderation_level by 1:
                     group_moderation_level -= 1
@@ -976,19 +980,197 @@ class CreateModeratedGroup(CreateSubGroup):
             for each_sg_iter in range(0, group_moderation_level+1):
 
                 # print each_sg_iter, " === each_sg_iter", last_sg_id
-                result = self.add_moderation_level(last_sg_id, 'ModeratingGroup')
+                result = self.add_moderation_level(last_sg_id, sg_member_of=sg_member_of)
                 # result is tuple of (bool, newly-created-sub-group-obj)
 
                 if result[0]:
                     last_sg_id = result[1]._id
                     # print " === new group created: ", result[0].name
-                    
+
                 else:
                     # if result is False, means sub-group is not created.
                     # In this case, there is no point to go ahead and create subsequent sub-group.
                     break
 
 # --- END of class CreateModeratedGroup ---
+# -----------------------------------------
+
+
+
+class CreateEventGroup(CreateModeratedGroup):
+    """
+        Creates moderated event sub-groups.
+        Instantiate with request.
+    """
+
+    def __init__(self, request):
+        super(CreateEventGroup, self).__init__(request)
+        self.request = request
+
+    def set_event_and_enrollment_dates(self, request, group_id):
+        '''
+        Sets Start-Date, End-Date, Start-Enroll-Date, End-Enroll-Date
+        - Takes required dates from request object.
+        - Returns tuple: (True/False, top_group_object/error)
+        '''
+
+        # retrieves node_id. means it's edit operation of existing group.
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+        # if "ProgramEventGroup" not in group_obj.member_of_names_list:
+        #     node_collection.collection.update({'_id': group_obj._id},
+        #         {'$push': {'member_of': ObjectId(programevent_group_gst._id)}}, upsert=False, multi=False)
+        #     group_obj.reload()
+        try:
+            start_date_val = self.request.POST.get('event_start_date','')
+            if start_date_val:
+                start_date_val = datetime.strptime(start_date_val, "%d/%m/%Y")
+            end_date_val = self.request.POST.get('event_end_date','')
+            if end_date_val:
+                end_date_val = datetime.strptime(end_date_val, "%d/%m/%Y")
+
+            start_enroll_val = self.request.POST.get('event_start_enroll_date','')
+            if start_enroll_val:
+                start_enroll_val = datetime.strptime(start_enroll_val, "%d/%m/%Y")
+
+            end_enroll_val = self.request.POST.get('event_end_enroll_date','')
+            if end_enroll_val:
+                end_enroll_val = datetime.strptime(end_enroll_val, "%d/%m/%Y")
+
+            start_date_AT = node_collection.one({'_type': "AttributeType", 'name': "start_time"})
+            end_date_AT = node_collection.one({'_type': "AttributeType", 'name': "end_time"})
+
+            start_enroll_AT = node_collection.one({'_type': "AttributeType", 'name': "start_enroll"})
+            end_enroll_AT = node_collection.one({'_type': "AttributeType", 'name': "end_enroll"})
+
+            create_gattribute(group_obj._id, start_date_AT, start_date_val)
+            create_gattribute(group_obj._id, end_date_AT, end_date_val)
+            create_gattribute(group_obj._id, start_enroll_AT, start_enroll_val)
+            create_gattribute(group_obj._id, end_enroll_AT, end_enroll_val)
+
+            return True, group_obj
+
+        except Exception as e:
+            return False, 'Cannot Set Dates to EventGroup.' + str(e)
+
+
+# --- END of class CreateEventGroup ---
+# -----------------------------------------
+
+class CreateProgramEventGroup(CreateEventGroup):
+    """
+        Creates ProgramEvent sub-groups.
+        Instantiate with request.
+    """
+
+    def __init__(self, request):
+        super(CreateProgramEventGroup, self).__init__(request)
+        self.request = request
+
+
+# --- END of class CreateProgramEventGroup ---
+# -----------------------------------------
+
+class CreateCourseEventGroup(CreateEventGroup):
+    """
+        Creates CourseEvent sub-groups.
+        Instantiate with request.
+    """
+
+    def __init__(self, request):
+        super(CreateCourseEventGroup, self).__init__(request)
+        self.request = request
+
+    def initialize_course_event_structure(self, request, group_id):
+        course_node_id = request.POST.get('course_node_id', '')
+        if course_node_id:
+            course_node = node_collection.one({'_id': ObjectId(course_node_id)})
+            rt_group_has_course_event = node_collection.one({'_type': "RelationType", 'name': "group_has_course_event"})
+            group_obj = node_collection.one({'_id': ObjectId(group_id)})
+            create_grelation(group_obj._id, rt_group_has_course_event, course_node._id)
+            self.ce_set_up(request, course_node, group_obj)
+            if "CourseEventGroup" not in group_obj.member_of_names_list:
+                node_collection.collection.update({'_id': group_obj._id},
+                    {'$push': {'member_of': ObjectId(courseevent_group_gst._id)}}, upsert=False, multi=False)
+                group_obj.reload()
+
+    def ce_set_up(self, request, node, group_obj):
+        """
+            Recursive function to fetch from Course'collection_set
+            and build new GSystem for CourseEventGroup
+        """
+        try:
+            section_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
+            subsection_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSectionEvent"})
+            forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
+            twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+            page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+            sitename = Site.objects.all()[0].name.__str__()
+            user_id = request.user.id
+            if node.collection_set:
+                for each in node.collection_set:
+                    each_node = node_collection.one({'_id': ObjectId(each)})
+                    if "CourseSection" in each_node.member_of_names_list:
+                        name_arg = each_node.name
+                        new_cse = self.create_corresponding_gsystem(name_arg,section_event_gst,user_id, group_obj)
+                        if each_node.collection_set:
+                            for each_ss in each_node.collection_set:
+                                each_ss_node = node_collection.one({'_id': ObjectId(each_ss)})
+                                if "CourseSubSection" in each_ss_node.member_of_names_list:
+                                    name_arg = each_ss_node.name
+                                    new_csse = self.create_corresponding_gsystem(name_arg,subsection_event_gst,user_id, new_cse)
+                                    if each_ss_node.collection_set:
+                                        for each_cu in each_ss_node.collection_set:
+                                            each_cu_node = node_collection.one({'_id': ObjectId(each_cu)})
+                                            if "CourseUnit" in each_cu_node.member_of_names_list:
+                                                name_arg = each_cu_node.name
+                                                new_cu = self.create_corresponding_gsystem(name_arg,forum_gst,user_id, new_csse)
+                                                new_cu.group_set.append(group_obj._id)
+                                                new_cu.save()
+                                                if each_cu_node.collection_set:
+                                                    for each_res in each_cu_node.collection_set:
+                                                        each_res_node = node_collection.one({'_id': ObjectId(each_res)})
+                                                        name_arg = each_res_node.name
+                                                        new_res = self.create_corresponding_gsystem(name_arg,twist_gst,user_id, new_cu)
+                                                        if "Page" in each_res_node.member_of_names_list:
+                                                            new_res.content = each_res_node.content
+                                                            new_res.content_org = each_res_node.content_org
+                                                            new_res.save()
+                                                        elif "File" in each_res_node.member_of_names_list:
+                                                            if "mime_type" in each_res_node:
+                                                                if "image" in each_res_node.mime_type:
+                                                                    content_org = u"[["+"http://"+sitename+"/"+group_obj.name+"/file/readDoc/"+str(each_res_node._id)+"/"+each_res_node.name+"]]"
+                                                                elif "video" in each_res_node.mime_type:
+                                                                    content_org = u'#+BEGIN_HTML \r\n\r\n<video width="600" height="400" controls>\r\n  <source src="http://'+ sitename + '/' + group_obj.name+'/video/fullvideo/'+str(each_res_node._id)+ \
+                                                                    '" type="video/webm">\r\n \r\n  Your browser does not support HTML5 video.\r\n</video>\r\n\r\n#+END_HTML\r\n'
+                                                            new_res.content_org = unicode(content_org)
+                                                            new_res.content = org2html(content_org, file_prefix=ObjectId().__str__())
+                                                            new_res.save()
+            return True
+        except Exception as e:
+
+            print e, "CourseEventGroup structure setup Error"
+
+    def create_corresponding_gsystem(self,gs_name,gs_member_of,user_id,gs_under_coll_set_of_obj):
+
+        try:
+            new_gsystem = node_collection.collection.GSystem()
+            new_gsystem.name = unicode(gs_name)
+            new_gsystem.member_of.append(gs_member_of._id)
+            new_gsystem.modified_by = int(user_id)
+            new_gsystem.created_by = int(user_id)
+            new_gsystem.contributors.append(int(user_id))
+            new_gsystem.save()
+            gs_under_coll_set_of_obj.collection_set.append(new_gsystem._id)
+            gs_under_coll_set_of_obj.save()
+            new_gsystem.prior_node.append(gs_under_coll_set_of_obj._id)
+            new_gsystem.save()
+            return new_gsystem
+        except:
+            return False
+
+
+# --- END of class CreateCourseEventGroup ---
 # -----------------------------------------
 
 
@@ -1011,7 +1193,6 @@ class GroupCreateEditHandler(View):
         Catering GET request of group's create/edit.
         Render's to create_group template.
         """
-
         try:
             group_id = ObjectId(group_id)
         except:
@@ -1023,22 +1204,20 @@ class GroupCreateEditHandler(View):
         if action == "edit":  # to edit existing group
 
             group_obj = get_group_name_id(group_id, get_obj=True)
-        
+
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
 
         elif action == "create":  # to create new group
 
             available_nodes = node_collection.find({'_type': u'Group'}, {'name': 1, '_id': 0})
-        
             # making list of group names (to check uniqueness of the group):
             nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
             # print nodes_list
-        
         # why following logic exists? Do we need so?
         # if group_obj.status == u"DRAFT":
         #     group_obj, ver = get_page(request, group_obj)
-        #     group_obj.get_neighbourhood(group_obj.member_of) 
+        #     group_obj.get_neighbourhood(group_obj.member_of)
 
         title = action + ' Group'
 
@@ -1058,9 +1237,9 @@ class GroupCreateEditHandler(View):
     def post(self, request, group_id, action):
         '''
         To handle post request of group form.
-        To save edited or newly-created group's data. 
+        To save edited or newly-created group's data.
         '''
-        
+
         # getting group's object:
         group_obj = get_group_name_id(group_id, get_obj=True)
 
@@ -1068,7 +1247,6 @@ class GroupCreateEditHandler(View):
         group_name = request.POST.get('name', '').strip()  # hidden-form-field
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
-
         # check if group's editing policy is already 'EDITABLE_MODERATED' or
         # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
         if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
@@ -1080,11 +1258,11 @@ class GroupCreateEditHandler(View):
             mod_group = CreateModeratedGroup(request)
 
             # calling method to create new group
-            result = mod_group.create_edit_moderated_group(group_name, moderation_level, node_id=node_id)
-            
+            result = mod_group.create_edit_moderated_group(group_name, moderation_level, "ModeratingGroup", node_id=node_id)
+
         else:
 
-            # instantiate moderated group
+            # instantiate regular group
             group = CreateGroup(request)
 
             # calling method to create new group
@@ -1105,7 +1283,118 @@ class GroupCreateEditHandler(View):
         return HttpResponseRedirect( reverse( url_name, kwargs={'group_id': group_name} ) )
 
 # ===END of class EditGroup() ===
-    
+# -----------------------------------------
+
+class EventGroupCreateEditHandler(View):
+    """
+    Class to handle create/edit group requests.
+    Currently it supports the functionality for following types of groups:
+        - CourseEvent Group
+        - ProgramEvent Group
+    """
+    @method_decorator(login_required)
+    @method_decorator(get_execution_time)
+    def get(self, request, group_id, action, sg_type):
+        """
+        Catering GET request of group's create/edit.
+        Render's to create_group template.
+        """
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+        course_node_id = request.GET.get('cnode_id', '')
+        group_obj = None
+        nodes_list = []
+        spl_group_type = sg_type
+        # spl_group_type = request.GET.get('sg_type','')
+        # print "\n\n spl_group_type", spl_group_type
+
+        if action == "edit":  # to edit existing group
+
+            group_obj = get_group_name_id(group_id, get_obj=True)
+            # as group edit will not have provision to change name field.
+            # there is no need to send nodes_list while group edit.
+
+        elif action == "create":  # to create new group
+
+            available_nodes = node_collection.find({'_type': u'Group'}, {'name': 1, '_id': 0})
+
+            # making list of group names (to check uniqueness of the group):
+            nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
+
+        title = action + ' ' + spl_group_type
+
+        # In the case of need, we can simply replace:
+        # "ndf/create_group.html" with "ndf/edit_group.html"
+        return render_to_response("ndf/create_event_group.html",
+                                    {
+                                        'node': group_obj, 'title': title,
+                                        'nodes_list': nodes_list,
+                                        'spl_group_type': spl_group_type,
+                                        'course_node_id': course_node_id,
+                                        'groupid': group_id, 'group_id': group_id
+                                        # 'appId':app._id, # 'is_auth_node':is_auth_node
+                                      }, context_instance=RequestContext(request))
+    # --- END of get() ---
+
+    @method_decorator(login_required)
+    @method_decorator(get_execution_time)
+    def post(self, request, group_id, action, sg_type):
+        '''
+        To handle post request of group form.
+        To save edited or newly-created group's data.
+        '''
+        group_obj = get_group_name_id(group_id, get_obj=True)
+
+        # getting field values from form:
+        group_name = request.POST.get('name', '').strip()  # hidden-form-field
+        node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
+        edit_policy = request.POST.get('edit_policy', '')
+        course_node_id = request.POST.get('course_node_id', '')
+
+        # check if group's editing policy is already 'EDITABLE_MODERATED' or
+        # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
+        if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
+
+            moderation_level = request.POST.get('moderation_level', '')
+            # instantiate moderated group
+            if sg_type == "ProgramEventGroup":
+                mod_group = CreateProgramEventGroup(request)
+            elif sg_type == "CourseEventGroup":
+                mod_group = CreateCourseEventGroup(request)
+                moderation_level = -1
+            parent_group_obj = group_obj
+            # calling method to create new group
+            result = mod_group.create_edit_moderated_group(group_name, moderation_level, sg_type, node_id=node_id,)
+        if result[0]:
+            # operation success: create ATs
+            group_obj = result[1]
+            parent_group_obj.post_node.append(group_obj._id)
+            group_obj.prior_node.append(parent_group_obj._id)
+            group_obj.save()
+            parent_group_obj.save()
+            date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id)
+            if date_result[0]:
+                # Successfully had set dates to EventGroup
+                if sg_type == "CourseEventGroup":
+                    mod_group.initialize_course_event_structure(request, group_obj._id)
+                group_name = group_obj.name
+                url_name = 'groupchange'
+            else:
+                # operation fail: redirect to group-listing
+                group_name = 'home'
+                url_name = 'group'
+        else:
+            # operation fail: redirect to group-listing
+            group_name = 'home'
+            url_name = 'group'
+
+        return HttpResponseRedirect(reverse(url_name, kwargs={'group_id': group_name}))
+
+# ===END of class EventGroupCreateEditHandler() ===
+# -----------------------------------------
+
 
 @get_execution_time
 def group(request, group_id, app_id=None, agency_type=None):
@@ -1370,6 +1659,8 @@ def group_dashboard(request, group_id=None):
     shelves = []
     alternate_template = ""
     profile_pic_image = None
+    list_of_unit_events = []
+    blog_pages = None
 
     group_obj = get_group_name_id(group_id, get_obj=True)
 
@@ -1419,9 +1710,52 @@ def group_dashboard(request, group_id=None):
     group_id=group_obj['_id']
     pass
 
+
   # Call to get_neighbourhood() is required for setting-up property_order_list
   group_obj.get_neighbourhood(group_obj.member_of)
+  list_of_sg_member_of = get_sg_member_of(group_obj._id)
+  # print "\n\n list_of_sg_member_of", list_of_sg_member_of
+  if "CourseEventGroup" in group_obj.member_of_names_list:
+			forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
+			twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+			page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+			blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+			blog_pages = node_collection.find({'member_of':page_gst._id, 'created_by': int(request.user.id),
+									'type_of': blogpage_gst._id})
+			alternate_template = "ndf/course_event_group.html"
+			existing_forums = node_collection.find({
+                                          'member_of': forum_gst._id,
+                                          'group_set': ObjectId(group_obj._id), 
+                                          }).sort('created_at', -1)
+			for each in existing_forums:
 
+					temp_forum = {}
+					temp_forum['name'] = each.name
+					temp_forum['created_at'] = each.created_at
+					temp_forum['tags'] = each.tags
+					temp_forum['member_of_names_list'] = each.member_of_names_list
+					temp_forum['user_details_dict'] = each.user_details_dict
+					temp_forum['html_content'] = each.html_content
+					temp_forum['contributors'] = each.contributors
+					temp_forum['id'] = each._id
+					temp_forum['threads'] = node_collection.find({
+                                                      '$and':[
+                                                      				{'member_of': twist_gst._id},
+                                                              {'_type': 'GSystem'},
+                                                              {'prior_node': ObjectId(each._id)}
+                                                              ], 
+                                                      'status': {'$nin': ['HIDDEN']} 
+                                                      }).count()
+          
+					list_of_unit_events.append(temp_forum)
+
+  allow_to_join = True
+  if 'end_enroll' in group_obj:
+      last_enrollment_date = group_obj.end_enroll
+      if last_enrollment_date:
+        curr_date_time = datetime.now()
+        if curr_date_time > last_enrollment_date:
+            allow_to_join = False
   property_order_list = []
   if "group_of" in group_obj:
     if group_obj['group_of']:
@@ -1439,6 +1773,9 @@ def group_dashboard(request, group_id=None):
   return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id, 
                                                        'group_id':group_id, 'user':request.user, 
                                                        'shelf_list': shelf_list,
+                                                       'list_of_unit_events': list_of_unit_events,
+                                                       'blog_pages':blog_pages,
+                                                       'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
                                                        'annotations' : annotations, 'shelves': shelves,
                                                        'prof_pic_obj': profile_pic_image

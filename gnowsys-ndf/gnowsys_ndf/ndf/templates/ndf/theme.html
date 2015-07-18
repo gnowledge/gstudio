@@ -71,14 +71,14 @@
  -->
 
 {% block meta_content %}
-	<a  class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
-		<h3 class="subheader">
+	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
+		<h2 class="subheader">
 			{% if theme_GST.altnames and theme_GST.altnames != "None" %}
 				{{theme_GST.altnames}}
 			{% else %}
 				{{theme_GST.name}}
 			{% endif%}
-		</h3>
+		</h2>
 	</a>
 	{{theme_GST.content|default_if_none:""|safe}}
 {% endblock %}
@@ -112,36 +112,35 @@
 
 	{% endif %}
 	<br/>
-	<div>
-	{% if user_access == "allow" %}
-
-		<a class="button tiny expand" data-reveal-id="view_add_page" title="Add Theme Item">
-			+ Add Theme Item
-		</a>
-
-		<div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
-
-			<h3>Add New Theme Item:</h3>
-			<!-- To enter name of theme item -->
-			<div>
-				<input class="name_id" name="name" type="text" placeholder="Enter name...">
-			</div>
-			<br/>           
-
-			<input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
-
-			<a class="close-reveal-modal">&#215;</a>
-
-		</div>          
-
-	{% endif %}
-				
-    </div>
     <!-- <br/> -->
     <div>
+    {% if tree == "hierarchical" %}
 		{% if user.is_authenticated %}
     		{% if user_access == "allow" %}
     		
+				<div>
+
+					<a class="button tiny expand" data-reveal-id="view_add_page" title="Add Theme Item">
+						+ Add Theme Item
+					</a>
+
+					<div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
+
+						<h3>Add New Theme Item:</h3>
+						<!-- To enter name of theme item -->
+						<div>
+							<input class="name_id" name="name" type="text" placeholder="Enter name...">
+						</div>
+						<br/>           
+
+						<input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
+
+						<a class="close-reveal-modal">&#215;</a>
+
+					</div>          
+
+			    </div>
+
     			<span><input class="checkedAll" type="checkbox"> Select All</span>
     			<input class="button tiny deleteObjects right" type="button" value="Delete">
 
@@ -158,6 +157,7 @@
 
     		{% endif %}
 		{% endif %}
+	{% endif %}
 	</div>
 
 	<div class="topic_stats panel" style="display:none; position:fixed; background-color:#ddd;border: 1px solid #1a1a1a;"> </div>
@@ -176,16 +176,16 @@
         <div style="float:right;  margin:0 2em;">
 
 			<a class="collapsible_tree {% if tree == 'collapsible' or not tree %} highlight {% endif %}" style="">
-				{% trans "Collapsible Tree" %}
+				{% trans "Theme" %} {% trans "Graph" %}
 			</a>
 			
 			<a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="tree_browser {% if tree == 'hierarchical' %} highlight {% endif %}" style="margin-left:2em;">
-				{% trans "Tree Browser" %}
+				{% trans "Theme" %} {% trans "Tree" %}
 			</a>
 			
 			<ul id="hover1" class="f-dropdown" data-dropdown-content style="width: 7em;">
-				<li><a class="fold"><i class="fi-plus"></i> {% trans "Fold" %} </a></li> 
-				<li><a class="unfold"><i class="fi-minus"></i> {% trans "Unfold" %} </a></li>  
+				<li><a class="fold"><i class="fi-plus"></i> {% trans "Open" %} </a></li> 
+				<li><a class="unfold"><i class="fi-minus"></i> {% trans "Close" %} </a></li>  
 			</ul> 
 
 		</div>
@@ -203,7 +203,7 @@
 		    	<div id="theme-drag-zoom-tree"></div>
 		    	<div class="row">
 			    	<div class="small-6 small-centered text-center columns download-graph" onclick='downloadCollapsibleGraph("{{node.name}}");'>
-			    		Download "{{node.name}}" Collapsible Graph
+			    		Download {{node.name}} Graph
 			    	</div>
 		    	</div>
 			</div>

@@ -27,13 +27,14 @@ from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.file import save_file
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
+from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
 from gnowsys_ndf.notification import models as notification
+
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
 GST_ACOURSE = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
@@ -85,14 +86,14 @@ def course(request, group_id, course_id=None):
 
 
         auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
-
+	'''
         if auth_node.attribute_set:
             for each in auth_node.attribute_set:
                 if each and "course_enrollment_status" in each:
                     course_enrollment_dict = each["course_enrollment_status"]
                     course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
                     enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
-
+	'''
     ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id),'status':u"PUBLISHED"})
 
 
@@ -1542,3 +1543,148 @@ def enroll_generic(request, group_id):
         return HttpResponse(json.dumps(response_dict))
     else:
         return HttpResponse(json.dumps(response_dict))
+
+@login_required
+def remove_resource_from_unit(request, group_id):
+    '''
+    Accepts:
+     * ObjectId of node to be removed from collection_set.
+     * ObjectId of unit_node.
+
+    Actions:
+     * Removed res_id from unit_node's collection_set
+
+    Returns:
+     * success (i.e True/False)
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        unit_node_id = request.POST.get("unit_node_id", '')
+        res_id = request.POST.get("res_id", '')
+
+        unit_node = node_collection.one({'_id': ObjectId(unit_node_id)})
+
+        if unit_node.collection_set and res_id:
+              node_collection.collection.update({'_id': unit_node._id}, {'$pull': {'collection_set': ObjectId(res_id)}}, upsert=False, multi=False)
+
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
+
+
+
+@login_required
+def find_units_of_subsection(request, group_id):
+    '''
+    Accepts:
+     * ObjectId of node that is Subsection.
+
+    Actions:
+     * Finds its units/forums
+
+    Returns:
+     * success (i.e True/False)
+     * Units
+    '''
+    response_dict = {"success": False}
+    data_dict = {}
+    list_of_forums = []
+    if request.is_ajax() and request.method == "GET":
+        node_id = request.GET.get("subsection_node_id", '')
+        print "\n\n node_id", node_id
+        subsection_node = node_collection.one({'_id': ObjectId(node_id)})
+        if subsection_node.collection_set:
+            for each_forum_unit in subsection_node.collection_set:
+                # each_unit will be a Forum
+                each_forum_unit_node = node_collection.one({'_id': ObjectId(each_forum_unit)})
+                list_of_forums.append(each_forum_unit_node.name)
+                data_dict[each_forum_unit_node.name] = []
+                if each_forum_unit_node.collection_set:
+                    for each_res_thread in each_forum_unit_node.collection_set:
+                        each_res_node = node_collection.one({'_id': ObjectId(each_res_thread)})
+                        data_dict[each_forum_unit_node.name].append(each_res_node.name)
+        response_dict['forums'] = list_of_forums
+        response_dict['data_dict'] = json.dumps(data_dict)
+        response_dict["success"] = True
+        print "response_dict", response_dict
+        return HttpResponse(json.dumps(response_dict))
+
+
+
+@get_execution_time
+def get_res_disc_thread(request, group_id):
+    if request.is_ajax() and request.method == "GET":
+        # page number which have clicked on pagination
+        res_node_id = request.GET.get("oid", '')
+        replies_get = request.GET.get("replies", '')
+        res_node = node_collection.one({'_id': ObjectId(res_node_id)})
+        all_res_replies = get_disc_replies(res_node._id, group_id, replies_get)
+
+        return render_to_response(
+            'ndf/discussion.html',
+            {
+                'group_id': group_id, 'groupid': group_id, 'request': request,
+                'node': res_node, 'all_replies': all_res_replies
+            },
+            context_instance=RequestContext(request)
+        )
+
+
+@get_execution_time
+def add_course_file(request, group_id):
+    # this is context node getting from the url get request
+    context_node_id = request.GET.get('context_node', '')
+
+    context_node = node_collection.one({'_id': ObjectId(context_node_id)})
+    if request.method == "POST":
+
+        context_name = request.POST.get("context_name", "")
+        css_node_id = request.POST.get("css_node_id", "")
+        course_node = request.POST.get("course_node", "")
+        unit_name = request.POST.get("unit_name_file", "")
+        app_id = request.POST.get("app_id", "")
+        app_set_id = request.POST.get("app_set_id", "")
+
+        # i.e  if context_name is "Course"
+        url_name = "/" + group_id + "/course/add_units/?css_node_id=" + \
+            css_node_id + "&unit_node_id=" + context_node_id + "&course_node="+ course_node
+        if app_id and app_set_id:
+            url_name += "&app_id=" + app_id + "&app_set_id=" + app_set_id + ""
+        if context_node_id:
+            # set the unit node name
+            node_collection.collection.update({'_id': ObjectId(context_node_id)}, {'$set': {'name': unit_name }}, upsert=False, multi=False)
+
+        new_list = []
+        # For checking the node is already available in gridfs or not
+        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+            fileobj = node_collection.collection.File()
+            filemd5 = hashlib.md5(each.read()).hexdigest()
+            if not fileobj.fs.files.exists({"md5": filemd5}):
+                # If not available append to the list for making the collection for topic below
+                new_list.append(each)
+            else:
+                # If file exists, PUBLISH it and add to collection set
+                cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+                old_file_node = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
+                if old_file_node._id not in context_node.collection_set:
+                        context_node.collection_set.append(old_file_node._id)
+                        old_file_node.status = u"PUBLISHED"
+                        old_file_node.prior_node.append(context_node._id)
+                        old_file_node.save()
+                        context_node.save()
+        # After taking new_lst[] , now go for saving the files
+        # save_file(new_list,"File", request.user.id, group_id, content_org=None, tags=None, img_type = None, language = None, usrname = None, access_policy=None, license=None, source=None, Audience=None, fileType=None, subject=None, level=None, Based_url=None, request=None, map_geojson_data=[])
+
+        submitDoc(request, group_id)
+
+    # After file gets saved , that file's id should be saved in collection_set of context topic node
+
+    for k in new_list:
+        cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
+        file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
+        file_obj.prior_node.append(context_node._id)
+        file_obj.status = u"PUBLISHED"
+        file_obj.save()
+        context_node.collection_set.append(file_obj._id)
+        file_obj.save()
+        context_node.save()
+    return HttpResponseRedirect(url_name)

@@ -30,7 +30,6 @@
       <a class="small button" href="{% url 'create_edit' group_name_tag %}">
         <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
       </a>
-      <a class="small publish-btn button" style="width:73%" href="{% url 'ann_course_create_edit' group_id app_id app_set_id %}">{% trans "Announce" %}</a>
     {% endif %}
   {% endif %}
 {% endblock %}
@@ -52,14 +51,8 @@
     {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-          <dd class="tab-title active" role="presentational" ><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">{% trans "All Courses" %}</a></dd>
           <dd class="tab-title" role="presentational" ><a href="#panel2-2" role="tab" tabindex="0"aria-selected="false" controls="panel2-2">{% trans "Courses" %}</a></dd>
-      {% else %}
-          <dd class="tab-title active" role="presentational"><a href="#panel2-4" role="tab" tabindex="0" aria-selected="false" controls="panel2-4">{% trans "My Courses" %}</a></dd>
-      {% endif %}    
-      <dd class="tab-title" role="presentational"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Announced Courses" %}</a></dd>
-    {% else %}
-      <dd class="tab-title active" role="presentational"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Announced Courses" %}</a></dd>
+    {% endif %}    
     {% endif %}    
     </dl>
     </header>

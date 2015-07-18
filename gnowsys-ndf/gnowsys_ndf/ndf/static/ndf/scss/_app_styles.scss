@@ -178,11 +178,11 @@ pre{
 }
 }
 
-body a{
-  &:visited{
-    color: #1d484a;
-}
-}
+// body a{
+//   &:visited{
+//     color: #1d484a;
+// }
+// }
 
 
 // ------| following style lines were there in _metastudio_styles.scss |------
@@ -194,6 +194,8 @@ body{
 #top-headers{
     background-color: black;
     margin-bottom: 1.5rem;
+    box-shadow: 0px 2px 5px black;
+    height: 101px;
 
     div.two-nav-container{
         padding: 0;
@@ -204,17 +206,19 @@ body{
     }
 
     a.logo{
-        height: $topbar-height * 2;
-        margin: 0;
+        height: 101px;
 
         img{
           margin: 10% auto;
+          // height: 100px;
           display: block;
-          // padding: 5px;
+          // width: 100%;
+          // padding: 3px;
         }
 
         &:hover{
-            background-color: scale-color($topbar-bg-color, $lightness: 10%);
+            // background-color: scale-color($topbar-bg-color, $lightness: 5%);
+            box-shadow: inset 0px 101px 50px #222;
             transition: 0.8s all;
         }
     }
@@ -242,7 +246,7 @@ body{
             background-color: scale-color($topbar-bg-color, $lightness: 10%);
         }
         
-        .top-bar-section li a:not(.button):hover, .top-bar-section li:hover {
+        .top-bar-section li a:not(.button):hover, .top-bar-section li:not(.has-form):hover {
             background-color: scale-color($theme-color-invert, $lightness: 10%) !important;
         }
 
@@ -441,7 +445,7 @@ body{
                 }
             }
             header{
-             padding: 10px;
+             padding: 0 10px;
          }
          footer{
             background-color: #222;
