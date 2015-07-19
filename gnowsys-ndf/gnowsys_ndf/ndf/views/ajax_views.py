@@ -747,7 +747,7 @@ def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
-  if node.collection_set:
+  if node.collection_set  and "CourseUnitEvent" not in node.member_of_names_list:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
       if col_obj:
@@ -820,6 +820,8 @@ def get_collection(request, group_id, node_id):
   data = collection_list
 
   return HttpResponse(json.dumps(data))
+
+
 @get_execution_time
 def add_sub_themes(request, group_id):
   if request.is_ajax() and request.method == "POST":
@@ -915,7 +917,6 @@ def add_topics(request, group_id):
 @get_execution_time
 def add_page(request, group_id):
   if request.is_ajax() and request.method == "POST":
-
     context_node_id = request.POST.get("context_node", '')
     css_node_id = request.POST.get("css_node", '')
     unit_name = request.POST.get("unit_name", '')
@@ -5954,3 +5955,4 @@ def get_detailed_report(request, group_id):
     error_message = "ReportFetchError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+
