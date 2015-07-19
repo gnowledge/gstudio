@@ -195,6 +195,7 @@ body{
     background-color: black;
     margin-bottom: 1.5rem;
     box-shadow: 0px 2px 5px black;
+    height: 101px;
 
     div.two-nav-container{
         padding: 0;
@@ -205,19 +206,19 @@ body{
     }
 
     a.logo{
-        // min-height: $topbar-height * 2;
-        // height: $topbar-height * 2;
-        // margin: 0;
+        height: 101px;
 
         img{
           margin: 10% auto;
+          // height: 100px;
           display: block;
-          padding: 3px;
+          // width: 100%;
+          // padding: 3px;
         }
 
         &:hover{
             // background-color: scale-color($topbar-bg-color, $lightness: 5%);
-            box-shadow: inset 0px 100px 50px #222;
+            box-shadow: inset 0px 101px 50px #222;
             transition: 0.8s all;
         }
     }
@@ -237,9 +238,9 @@ body{
             }
         }
 
-        // .top-bar-section li.active:not(.has-form) > a:not(.button){
-        //     background-color: scale-color($theme-color-invert, $lightness: 15%) !important;
-        // }
+        .top-bar-section li.active:not(.has-form) > a:not(.button){
+            background-color: scale-color($theme-color-invert, $lightness: 15%) !important;
+        }
 
         .top-bar-section li a:not(.button), .top-bar-section li {
             background-color: scale-color($topbar-bg-color, $lightness: 10%);

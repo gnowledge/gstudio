@@ -510,7 +510,7 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
 
       elif checked == "RelationType" or checked == "CourseUnits":
         # Special case used while dealing with RelationType widget
-        if kwargs.has_key("left_drawer_content"):
+        if "left_drawer_content" in kwargs:
           drawer = kwargs["left_drawer_content"]
     else:
       # For heterogeneous collection
@@ -543,10 +543,9 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
       #loop replaced by a list comprehension
       dict2=[node_collection.one({'_id': oid}) for oid in nlist]
 
-     
-      for oid in nlist:
-        obj = node_collection.one({'_id': oid})
-        dict2.append(obj)
+      # for oid in nlist:
+      #   obj = node_collection.one({'_id': oid})
+      #   dict2.append(obj)
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -561,9 +560,9 @@ def get_drawers(group_id, nid=None, nlist=[], page_no=1, checked=None, **kwargs)
       dict2=[node_collection.one({'_id': oid})  for oid in nlist]
           
       	
-      for oid in nlist:
-        obj = node_collection.one({'_id': oid})
-        dict2.append(obj)
+      # for oid in nlist:
+      #   obj = node_collection.one({'_id': oid})
+      #   dict2.append(obj)
       
       
 
