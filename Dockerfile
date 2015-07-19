@@ -19,7 +19,7 @@ run apt-get install -y software-properties-common python-software-properties
 run add-apt-repository -y ppa:nginx/stable
 run apt-get install -y sqlite3
 
-# for ffmpeg 
+# for ffmpeg
 run add-apt-repository ppa:mc3man/trusty-media
 run apt-get update
 run apt-get install -y ffmpeg gstreamer0.10-ffmpeg
@@ -27,7 +27,7 @@ run apt-get install -y ffmpeg gstreamer0.10-ffmpeg
 # for nodejs
 run add-apt-repository ppa:chris-lea/node.js
 run apt-get update
-run apt-get install -y  nodejs  
+run apt-get install -y  nodejs
 run npm install -g bower
 
 # creating user for bower
@@ -42,7 +42,7 @@ run npm install -g bower
 add . /home/docker/code/
 run mv /home/docker/code/bower_components /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/
 run cp /home/docker/code/emacs /root/.emacs
-run cp /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/wsgi.py /home/docker/code/gstudio/gnowsys-ndf/wsgi.py 
+run cp /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/wsgi.py /home/docker/code/gstudio/gnowsys-ndf/wsgi.py
 # RUN chown -R docker /home/docker/
 
 # ENV HOME /home/docker
@@ -67,18 +67,18 @@ run pip install -r /home/docker/code/gstudio/requirements.txt
 RUN groupadd -r mongodb && useradd -r -g mongodb mongodb
 
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		ca-certificates \
-		numactl
-#	&& rm -rf /var/lib/apt/lists/*
+        && apt-get install -y --no-install-recommends \
+                ca-certificates \
+                numactl
+#       && rm -rf /var/lib/apt/lists/*
 
 # grab gosu for easy step-down from root
 RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
 RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.2/gosu-$(dpkg --print-architecture)" \
-	&& curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.2/gosu-$(dpkg --print-architecture).asc" \
-	&& gpg --verify /usr/local/bin/gosu.asc \
-	&& rm /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu
+        && curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.2/gosu-$(dpkg --print-architecture).asc" \
+        && gpg --verify /usr/local/bin/gosu.asc \
+        && rm /usr/local/bin/gosu.asc \
+        && chmod +x /usr/local/bin/gosu
 
 # gpg: key 7F0CEB10: public key "Richard Kreuter <richard@10gen.com>" imported
 RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 492EAFE8CD016A07919F1D2B9ECBEC467F0CEB10
@@ -90,16 +90,16 @@ RUN echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.1 multiver
 
 
 RUN set -x \
-	&& apt-get update \
-	&& apt-get install -y \
-		mongodb-org-unstable \
-		mongodb-org-unstable-server \
-		mongodb-org-unstable-shell \
-		mongodb-org-unstable-mongos \
-		mongodb-org-unstable-tools \
-#	&& rm -rf /var/lib/apt/lists/* \
-	&& rm -rf /var/lib/mongodb \
-	&& mv /etc/mongod.conf /etc/mongod.conf.orig
+        && apt-get update \
+        && apt-get install -y \
+                mongodb-org-unstable \
+                mongodb-org-unstable-server \
+                mongodb-org-unstable-shell \
+                mongodb-org-unstable-mongos \
+                mongodb-org-unstable-tools \
+#       && rm -rf /var/lib/apt/lists/* \
+        && rm -rf /var/lib/mongodb \
+        && mv /etc/mongod.conf /etc/mongod.conf.orig
 
 RUN mkdir -p /data/db && chown -R mongodb:mongodb /data/db
 VOLUME /data/db
@@ -116,9 +116,10 @@ run pip install -U pyyaml nltk
 run /home/docker/code/nltk-initialization.py
 
 # run service mongod start
-# edit the following file to change the default superuser password 
-# this also does syncdb and filldb 
+# edit the following file to change the default superuser password
+# this also does syncdb and filldb
 run mkdir /home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/management/commands/schema_files
-run /home/docker/code/initialize.sh
+#run /home/docker/code/initialize.sh
 
-cmd ["supervisord", "-n"]
+#cmd ["supervisord", "-n"]
+CMD /home/docker/code/initialize.sh
