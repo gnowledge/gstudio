@@ -249,16 +249,30 @@ PASSWORD_COMPLEXITY = {  # You can ommit any or all of these for no limit for th
     "DIGITS": 1,      # Digits
 }
 
+# Absolute filesystem path to the project's base directory,
+# i.e. having settings.py file
+# Example: "/.../project-name/app-name/"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# Absolute filesystem path to the project's data directory,
+# i.e. common place to store all database(s)
+# Example: "/home/<user-name>/data/"
+# Don't edit this below path
+GSTUDIO_DATA_ROOT = os.path.join(os.path.expanduser("~/"), 'gstudio_data')
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
 MANAGERS = ADMINS
 
+# Don't edit default database's NAME attribute
+# If overridden in local settings file, then
+# follow the same pattern and edit only the database-name
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'example-sqlite3.db',
+        'NAME': os.path.join(GSTUDIO_DATA_ROOT, 'example-sqlite3.db'),
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
@@ -462,11 +476,6 @@ LOGGING = {
 
 LOGIN_REDIRECT_URL = "/"
 
-# Absolute filesystem path to the project's base directory,
-# i.e. having settings.py file
-# Example: "/.../project-name/app-name/"
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 # Binary - Only meant for RelationType's document to represent
 # Binary relationship, especially defined to differentiate
 # from other relationship(s), i.e. Triadic, etc.
@@ -585,7 +594,7 @@ VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes',
 
 # Absolute filesystem path to the directory that will hold all rcs-files
 # (history-files corresponding to every json-file created for each document)
-RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
+RCS_REPO_DIR = os.path.join(GSTUDIO_DATA_ROOT, "rcs-repo")
 
 # Indicates the "hash-level-number", i.e the number of sub-directories that
 # will be created for the corresponding document under it's
