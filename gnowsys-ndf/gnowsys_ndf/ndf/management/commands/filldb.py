@@ -22,10 +22,11 @@ from gnowsys_ndf.ndf.models import db, node_collection, triple_collection
 # from gnowsys_ndf.ndf.models import Node, GSystemType, ToReduceDocs, ReducedDocs, IndexedWordList
 # from gnowsys_ndf.ndf.models import Group
 # from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GAPPS
 from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.settings import GSTUDIO_TASK_TYPES
 from gnowsys_ndf.factory_type import factory_gsystem_types, factory_attribute_types, factory_relation_types
+from gnowsys_ndf.ndf.utils import is_dir_exists, get_current_dbs_path, move_file_or_dirctory
 
 ###############################################################################
 # Global variables
@@ -58,6 +59,18 @@ class Command(BaseCommand):
   option_list = option_list + user_defined_option_list
 
   def handle(self, *args, **options):
+    try:
+        if not is_dir_exists(GSTUDIO_DATA_ROOT):
+            print "\n GSTUDIO_DATA_ROOT ({0}) created succesfully.".format(GSTUDIO_DATA_ROOT)
+            for each_path in get_current_dbs_path().values():
+                move_file_or_dirctory(each_path, GSTUDIO_DATA_ROOT)
+                print "\t{0} moved succesfully to {1}".format(os.path.basename(each_path), GSTUDIO_DATA_ROOT)
+    except Exception as e:
+        error_message = str(e)
+        log_list.append(error_message)
+        print "\n {0}\n".format(error_message)
+        return
+
     if options["setup_structure"]:
       try:
         info_message = "\n Performing structure create/update...\n"
