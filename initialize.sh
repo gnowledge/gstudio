@@ -4,6 +4,7 @@ cp /home/docker/code/gstudio/doc/schema_directory/* /home/docker/code/gstudio/gn
 
 echo "[run] start mongod"
 mongod &
+sleep 60
 echo "[run] go to the code folder"
 cd /home/docker/code/gstudio/gnowsys-ndf/
 
@@ -26,3 +27,4 @@ python manage.py create_schema ATs.csv
 python manage.py create_schema RTs.csv
 python manage.py create_schema STs_run2.csv
 python manage.py filldb
+supervisord -n
