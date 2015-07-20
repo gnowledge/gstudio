@@ -29,9 +29,9 @@ def get_current_dbs_path(sqlite_dbname=None, rcs_repo_dirname=None, search_in_pa
 
     Returns dictionary with following set of key-value pairs:
         > current_sqlite_db_abspath: This is an aboslute path of the sqlite database;
-          if found in the project-directory, otherwise None
+          if found in the search_in_path, otherwise None
         > current_rcs_repo_abspath: This is an aboslute path of the rcs-repo directory;
-          if found in the project-directory, otherwise None
+          if found in the search_in_path, otherwise None
     """
     if not sqlite_dbname:
         sqlite_dbname = "*.db"
