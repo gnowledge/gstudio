@@ -50,21 +50,20 @@ def get_current_dbs_path(sqlite_dbname=None, rcs_repo_dirname=None, search_in_pa
 
     try:
         for root, dirnames, filenames in OS_WALK(OS_PATH.expanduser(search_in_path)):
-            if not rcs_repo_found or not sqlite_db_found:
-                if not rcs_repo_found:
-                    dir_matches = fnmatch.filter(dirnames, rcs_repo_dirname)
-                    if dir_matches:
-                        rcs_repo_found = True
-                        current_rcs_repo_abspath = OS_PATH.join(root, dir_matches[0])
+            if not rcs_repo_found:
+                dir_matches = fnmatch.filter(dirnames, rcs_repo_dirname)
+                if dir_matches:
+                    rcs_repo_found = True
+                    current_rcs_repo_abspath = OS_PATH.join(root, dir_matches[0])
 
-                if not sqlite_db_found:
-                    file_matches = fnmatch.filter(filenames, sqlite_dbname)
-                    if file_matches:
-                        sqlite_db_found = True
-                        current_sqlite_db_abspath = OS_PATH.join(root, file_matches[0])
+            if not sqlite_db_found:
+                file_matches = fnmatch.filter(filenames, sqlite_dbname)
+                if file_matches:
+                    sqlite_db_found = True
+                    current_sqlite_db_abspath = OS_PATH.join(root, file_matches[0])
 
-                if sqlite_db_found and rcs_repo_found:
-                    break
+            if sqlite_db_found and rcs_repo_found:
+                break
     except Exception as e:
         raise Exception("\n Exception (ndf.utils.get_current_dbs_path): {0}".format(str(e)))
 
