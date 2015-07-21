@@ -56,7 +56,7 @@
 		{% for each_gapp in gapps_obj_list %}
 			<li>
 				<a class="app-card text-center" href="{% url each_gapp.name|lower group_id %}">
-					<h4><small>{{ each_gapp.altnames }}</small></h4>
+					<h4>{{ each_gapp.altnames }}</h4>
 					<hr/>
 					<i class="icons {{ each_gapp.url }}"></i>
 					<p>{{ each_gapp.content|safe }}</p>
@@ -65,14 +65,11 @@
 		{% endfor %}
 		<li>
 			<a class="app-card text-center" href="/home/e-library">
-				<h4><small>Partner Resources</small></h4>
+				<h4>Partner Resources</h4>
 				<hr/>
 				<i class="icons fi-results-demographics"></i>
 				<p>
-					<b>Contributes Corrections</b>
-					<br/>
-					<br/>
-					From Institutional and Individual Partners
+					<b>Contributions from institutions and individuals</b>
 				</p>
 			</a>
 		</li>

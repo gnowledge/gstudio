@@ -39,7 +39,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time,get_group_name_id
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
@@ -747,7 +747,7 @@ def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
-  if node.collection_set:
+  if node.collection_set  and "CourseUnitEvent" not in node.member_of_names_list:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
       if col_obj:
@@ -820,6 +820,8 @@ def get_collection(request, group_id, node_id):
   data = collection_list
 
   return HttpResponse(json.dumps(data))
+
+
 @get_execution_time
 def add_sub_themes(request, group_id):
   if request.is_ajax() and request.method == "POST":
@@ -915,7 +917,6 @@ def add_topics(request, group_id):
 @get_execution_time
 def add_page(request, group_id):
   if request.is_ajax() and request.method == "POST":
-
     context_node_id = request.POST.get("context_node", '')
     css_node_id = request.POST.get("css_node", '')
     unit_name = request.POST.get("unit_name", '')
@@ -2412,7 +2413,7 @@ def get_students(request, group_id):
       else:
         # Otherwise, append given group's ObjectId
         group_set_to_check.append(groupid)
-
+      university_id = None
       if university_id:
         university_id = ObjectId(university_id)
         university = node_collection.one({'_id': university_id}, {'name': 1})
@@ -2551,7 +2552,7 @@ def get_students(request, group_id):
 
       # Column headers to be displayed on html
       column_headers = [
-          ('University', 'University'),
+          #('University', 'University'),
           ('College ( Graduation )', 'College'),
           ("Name", "Name"),
           ("Enrollment Code", "Enr Code"),
@@ -5954,3 +5955,4 @@ def get_detailed_report(request, group_id):
     error_message = "ReportFetchError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+

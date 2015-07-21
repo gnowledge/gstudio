@@ -10,7 +10,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/edit/(?P<node_id>[\w-]+)$', 'create_edit', name='create_edit'),
 
                         url(r'^/course_detail/(?P<_id>[\w-]+)$', 'course_detail', name='course_detail'),
-                        url(r'^/(?P<_id>[\w-]+)$', 'mis_course_detail', name='mis_course_detail'),
+                        url(r'^/mis_course_detail/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)$', 'mis_course_detail', name='mis_course_detail'),  # mis_app_instance_detail
 
                         # Course structure set up urls
                         url(r'^/structure/create/(?P<node_id>[\w-]+)$', 'create_course_struct', name='create_course_struct'),
@@ -31,5 +31,4 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/unitevents/$', 'find_units_of_subsection', name='find_units_of_subsection'),
                         url(r'^/thread_posts/$', 'get_res_disc_thread', name='get_res_disc_thread'),
                         url(r'^/add_course_file/$', 'add_course_file', name='add_course_file'),
-
                        )
