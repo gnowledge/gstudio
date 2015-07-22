@@ -50,14 +50,17 @@
         var twname=""
         var fid="{{forum}}"
         var gpid="{{groupid}}"
-        var ajurl="/"+gpid+"/forum/add_node/"
-        var docs_count=$("#docFile{{eachrep}}").get(0).files.length
-        alert(docs_count);
+        var ajurl="/"+gpid+"/forum/add_node/";
+        var docs_count=$("#docFile{{eachrep}}").get(0).files.length;
+        var all_files = document.getElementById("docFile{{eachrep}}");
+
         for(var i=0; i< docs_count; i++)
         {
-         docs_list.append("upload"+i,$('input[type=file]')[0].files[i]);
+          // docs_list.append("upload"+i,$("docFile{{eachrep}}")[0].files[i]);
+          docs_list.append("upload"+i, all_files.files[i]);
+          // console.log(all_files.files[i]);
         }
-alert(docs_list);
+// console.log(docs_list);
 docs_list.append('upload_cnt',docs_count)
 docs_list.append('node','Reply');
 docs_list.append('thread',thd);
@@ -66,6 +69,7 @@ docs_list.append('supnode',repl);
 docs_list.append('reply',contento);
 docs_list.append('twistname',twname);
 docs_list.append('csrfmiddlewaretoken','{{csrf_token}}');
+// console.log(docs_list);
 
         $.ajax({
           url: ajurl,
@@ -160,7 +164,7 @@ docs_list.append('csrfmiddlewaretoken','{{csrf_token}}');
       Reply  &nbsp;|&nbsp; <i class="fi-refresh"></i>
     </button>
 <div class="uploaded_files">
-{% get_files_for_reply eachrep eachrep %}
+<!-- {#% get_files_for_reply eachrep eachrep %} -->
 </div>
  </div>
     {% get_group_name groupid as group_name_tag %}
@@ -180,7 +184,7 @@ docs_list.append('csrfmiddlewaretoken','{{csrf_token}}');
 
     <textarea id="orgitdownreps{{eachrep}}" name="content_org" placeholder="Please enter description..."></textarea>
 
-    <input type="file" name="doc"  id="docFile{{eachrep}}" multiple/>
+    <input type="file" name="doc" id="docFile{{eachrep}}" multiple/>
   
     <input id="savereply{{eachrep}}" type="button" value="Post Reply"  class="button tiny reply-button">
   

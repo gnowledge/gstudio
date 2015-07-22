@@ -607,10 +607,18 @@ def add_node(request, group_id):
         usrid = int(request.user.id)
         if upload_files_count > 0:
             #print "uploaded items",request.FILES.items()
+            try:
+                thread_obj = node_collection.one({'_id': ObjectId(thread)})
+                access_policy = thread_obj.access_policy
+            except:
+                access_policy = u'PUBLIC'
+
             for key,value in request.FILES.items():
                 fname=unicode(value.__dict__['_name'])
                 #print "key=",key,"value=",value,"fname=",fname
-                fileobj,fs=save_file(value,fname,usrid,group_id,"","", username = unicode(request.user.username))
+                
+                fileobj,fs=save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=access_policy, count=0, first_object="")
+
                 if type(fileobj) == list:
                     obid = str(list(fileobj)[1])
                 else:
