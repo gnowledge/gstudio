@@ -23,6 +23,8 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager, Benchmark
 from gnowsys_ndf.notification import models as notification
+from django.contrib.sites.models import Site
+from django.template.loader import render_to_string
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -48,6 +50,7 @@ theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_ite
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 # C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
+
 
 grp_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'name': 'Group'}]})
 ins_objectid = ObjectId()
@@ -199,7 +202,179 @@ def get_group_name_id(group_name_or_id, get_obj=False):
         return None, None
 
 
+
 @get_execution_time
+def create_task(request,group_id,task_dict,set_notif_val,attribute_list):
+   '''
+        creates a task for assignee
+   '''
+   try:
+           usr=request.user.id
+           task_node = collection.GSystem()
+           GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'}) 	
+           grp=collection.Node.one({'_id':ObjectId(group_id)})
+           if not grp:
+                   return
+           else:
+                   group_name=grp.name
+           if request.method == "POST": # create 
+                   task_node.name = unicode(task_dict['name'])
+                   task_node.content_org = unicode(task_dict['content_org'])
+                   task_node.created_by=usr
+                   if GST_TASK._id not in task_node.member_of:
+                           task_node.member_of.append(GST_TASK._id)
+                   if usr not in task_node.contributors:
+                           task_node.contributors.append(request.user.id)
+                   if group_id not in task_node.group_set:
+                           task_node.group_set.append(grp._id)
+                   task_node.status=u'DRAFT'
+                   task_node.url= u'task'
+                   task_node.language=u'en'
+                   contr=[]
+                   contr.append(usr)
+                   task_node.contributors=contr
+                   parent = task_dict['parent']
+                   Status = task_dict['Status']
+                   Start_date = task_dict['start_time']
+                   Priority = task_dict['Priority']
+                   Due_date = task_dict['end_time']
+                   Estimated_time = task_dict['Estimated_time']
+                   watchers = task_dict['watchers']
+                   if watchers:
+                           for each_watchers in watchers.split(','):
+                                   bx=User.objects.get(username=each_watchers)
+                                   task_node.author_set.append(bx.id)
+                   task_node.save()
+                   # filename = task_node.name 
+                   # task_node.content = org2html(task_dict['content_org'], file_prefix=filename)
+                   # task_node.save() 
+                   if parent: # prior node saving
+                           task_node.prior_node = [ObjectId(parent)]
+                           parent_object = collection.Node.find_one({'_id':ObjectId(parent)})
+                           parent_object.post_node = [task_node._id]
+                           parent_object.save()
+                           task_node.save()
+                   for each in attribute_list:
+                           if task_dict.has_key(str(each)) :
+                                   if not task_dict[each] == "":
+                                           attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+                                           newattribute = collection.GAttribute()
+                                           newattribute.subject = task_node._id
+                                           newattribute.attribute_type = attributetype_key
+                                           if type(task_dict[each]) == date_time.datetime :
+                                                   newattribute.name= task_dict['name']+"--"+str(each)+"--"+str(task_dict[str(each)])
+                                        
+                                           else:
+                                                   if each == 'Assignee':
+                                                           usr_ob=User.objects.get(id=task_dict['Assignee'])
+                                                           if usr_ob:
+                                                                   newattribute.name= task_dict['name']+"--"+str(each)+"--"+usr_ob.username
+                                                   else:
+                                                           newattribute.name= task_dict['name']+"--"+str(each)+"--"+unicode(task_dict[str(each)])
+                                           if each == 'start_time' or each == 'end_time':
+                                                   newattribute.object_value=task_dict[str(each)]
+                                           else:
+                                                   if each == 'Assignee':
+                                                           usr_ob=User.objects.get(id=task_dict['Assignee'])
+                                                           if usr_ob:
+                                                                   newattribute.object_value = unicode(usr_ob.username)
+                                                   else:
+                                                           newattribute.object_value = unicode(task_dict[str(each)])
+                                           newattribute.save()
+                   if task_dict['Assignee'] :	
+                            activ="task reported"
+                            msg="Task -"+task_node.name+"- has been reported by "+"\n     - Status: "+task_dict['Status']+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
+                            bx=User.objects.get(id=task_dict['Assignee'])
+                            site=sitename.name.__str__()
+                            objurl="http://test"
+                            render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':group_id,'site':site,'link':objurl})
+                            notification.create_notice_type(render, msg, "notification")
+                            notification.send([bx], render, {"from_user": request.user})
+
+           return task_node
+   except Exception as e:
+           print "Exception in create_task "+ str(e)
+
+def create_task_for_activity(request,group_id,activity_dict,get_assignee_list,set_notif_val):
+    """Creates a task for an activity and notify assignee.
+    """
+    try:
+        ins_objectid  = ObjectId()
+        if ins_objectid.is_valid(group_id) is False :
+            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+            if group_ins:
+                group_id = str(group_ins._id)
+            else:
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                if auth:
+                    group_id=str(auth._id)
+        elif ins_objectid.is_valid(group_id) is True :
+            group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+            if group_ins:
+                group_id = str(group_ins._id)
+        grp=collection.Node.one({'_id':ObjectId(group_id)})
+        group_name=grp.name
+        at_list = ["Status", "start_time", "Priority", "end_time", "Assignee"]
+        task_dict=activity_dict
+        assignee=grp.created_by
+        task_dict['Assignee']=assignee
+        main_task=create_task(request,group_id,task_dict,set_notif_val,at_list)
+        if not main_task:
+                return
+        if not get_assignee_list:
+                return
+        if len(get_assignee_list) == 1 : #Single assignee 
+                #IF IT'S SINGLE ASSIGNEE CREATE A SINGLE TASK ON ASSIGNEE
+                assignee=get_assignee_list[0]
+                task_dict['Assignee']=assignee
+                one_task=create_task(request,group_id,task_dict,set_notif_val,at_list)
+                return
+        else:
+                task_collection_list=[]
+                if len(get_assignee_list) > 1 : #task collection 
+                        #CREATE A GROUP TASK (TASK_COLLECTION)
+                        for each in get_assignee_list:
+                                if not each == grp.created_by and not request.user.id == each: # check if uploaded user is not moderator or creator 
+                                        task_dict['Assignee']=each
+                                        task=create_task(request,group_id,task_dict,set_notif_val,at_list)
+                                        if task:
+                                                task_collection_list.append(task._id)
+                        if task_collection_list:
+                                op = collection.update({'_id': ObjectId(main_task._id)}, {'$set': {'collection_set': task_collection_list}})
+        return
+    except Exception as e:
+        print "Exception in create_task_for_activity "+str(e)
+
+
+def get_all_subscribed_users(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  ins_objectid  = ObjectId()
+  all_users=[]
+  if ins_objectid.is_valid(group_id) :
+    if grp.author_set:
+      all_users=grp.author_set
+    if grp.created_by in all_users:
+      all_users.remove(grp.created_by)
+  return all_users
+  
+def get_all_admins(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  return grp.group_admin
+
+
+def check_if_moderated_group(group_id):
+  grp=collection.Node.one({'_id':ObjectId(group_id)})
+  ins_objectid  = ObjectId()
+  print "edtpol",grp.edit_policy
+  if ins_objectid.is_valid(group_id) :
+    if grp.edit_policy == "EDITABLE_MODERATED":
+      return True
+    else:
+      return False
+  else:
+    return False
+
+
 def check_delete(main):
   try:
 

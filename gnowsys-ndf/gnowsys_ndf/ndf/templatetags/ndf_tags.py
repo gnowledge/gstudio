@@ -386,6 +386,18 @@ def get_reply(request, thread,parent,forum,token,user,group_id):
 
 
 @get_execution_time
+@register.inclusion_tag('ndf/uploaded_files_for_replies.html')
+def get_files_for_reply(rep_id,groupid):
+        lst_files_uploaded = []  
+        grp_id=groupid._id
+        for each in rep_id.collection_set:
+                file_item=node_collection.one({"_id": each})
+                lst_files_uploaded.append(file_item)
+	return {'group_id':groupid._id,'node_list':lst_files_uploaded}
+
+
+
+@get_execution_time
 @register.assignment_tag
 def get_all_replies(parent):
 	 ex_reply=""
