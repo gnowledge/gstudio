@@ -1438,6 +1438,10 @@ def getFileThumbnail(request, group_id, _id):
 
           # else:
           #     return HttpResponse("")
+        elif fs_file_ids and 'image' in file_node.mime_type:
+            f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))            
+            return HttpResponse(f.read(), content_type=f.content_type)
+
         else:
             return HttpResponse("")
     else:
