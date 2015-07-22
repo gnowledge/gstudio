@@ -177,7 +177,6 @@ class CreateGroup(object):
 
         if gst_group._id not in group_obj.type_of:
             group_obj.type_of.append(gst_group._id)
-      
         # user related fields:
         user_id = int(self.request.user.id)
         group_obj.created_by = user_id
@@ -519,7 +518,6 @@ class CreateModeratedGroup(CreateSubGroup):
 
             # values will be taken from POST form fields
             group_obj = self.get_group_fields(group_name, node_id=node_id)
-
             try:
                 group_obj.save()
             except Exception, e:
@@ -1080,6 +1078,11 @@ class CreateCourseEventGroup(CreateEventGroup):
     def __init__(self, request):
         super(CreateCourseEventGroup, self).__init__(request)
         self.request = request
+        self.section_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
+        self.subsection_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSectionEvent"})
+        self.courseunit_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnitEvent"})
+        self.user_id = request.user.id
+
 
     def initialize_course_event_structure(self, request, group_id):
         course_node_id = request.POST.get('course_node_id', '')
@@ -1096,78 +1099,100 @@ class CreateCourseEventGroup(CreateEventGroup):
 
     def ce_set_up(self, request, node, group_obj):
         """
-            Recursive function to fetch from Course'collection_set
+            Will build into Recursive function
+            To fetch from Course'collection_set
             and build new GSystem for CourseEventGroup
+
+            node is course node
+            group_obj is CourseEvent node
+
         """
         try:
-            section_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
-            subsection_event_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSectionEvent"})
-            forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
-            twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
-            page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-            sitename = Site.objects.all()[0].name.__str__()
-            user_id = request.user.id
-            if node.collection_set:
-                for each in node.collection_set:
-                    each_node = node_collection.one({'_id': ObjectId(each)})
-                    if "CourseSection" in each_node.member_of_names_list:
-                        name_arg = each_node.name
-                        new_cse = self.create_corresponding_gsystem(name_arg,section_event_gst,user_id, group_obj)
-                        if each_node.collection_set:
-                            for each_ss in each_node.collection_set:
-                                each_ss_node = node_collection.one({'_id': ObjectId(each_ss)})
-                                if "CourseSubSection" in each_ss_node.member_of_names_list:
-                                    name_arg = each_ss_node.name
-                                    new_csse = self.create_corresponding_gsystem(name_arg,subsection_event_gst,user_id, new_cse)
-                                    if each_ss_node.collection_set:
-                                        for each_cu in each_ss_node.collection_set:
-                                            each_cu_node = node_collection.one({'_id': ObjectId(each_cu)})
-                                            if "CourseUnit" in each_cu_node.member_of_names_list:
-                                                name_arg = each_cu_node.name
-                                                new_cu = self.create_corresponding_gsystem(name_arg,forum_gst,user_id, new_csse)
-                                                new_cu.group_set.append(group_obj._id)
-                                                new_cu.save()
-                                                if each_cu_node.collection_set:
-                                                    for each_res in each_cu_node.collection_set:
-                                                        each_res_node = node_collection.one({'_id': ObjectId(each_res)})
-                                                        name_arg = each_res_node.name
-                                                        new_res = self.create_corresponding_gsystem(name_arg,twist_gst,user_id, new_cu)
-                                                        if "Page" in each_res_node.member_of_names_list:
-                                                            new_res.content = each_res_node.content
-                                                            new_res.content_org = each_res_node.content_org
-                                                            new_res.save()
-                                                        elif "File" in each_res_node.member_of_names_list:
-                                                            if "mime_type" in each_res_node:
-                                                                if "image" in each_res_node.mime_type:
-                                                                    content_org = u"[["+"http://"+sitename+"/"+group_obj.name+"/file/readDoc/"+str(each_res_node._id)+"/"+each_res_node.name+"]]"
-                                                                elif "video" in each_res_node.mime_type:
-                                                                    content_org = u'#+BEGIN_HTML \r\n\r\n<video width="600" height="400" controls>\r\n  <source src="http://'+ sitename + '/' + group_obj.name+'/video/fullvideo/'+str(each_res_node._id)+ \
-                                                                    '" type="video/webm">\r\n \r\n  Your browser does not support HTML5 video.\r\n</video>\r\n\r\n#+END_HTML\r\n'
-                                                            new_res.content_org = unicode(content_org)
-                                                            new_res.content = org2html(content_org, file_prefix=ObjectId().__str__())
-                                                            new_res.save()
+            group_obj.content = node.content
+            group_obj.content_org = node.content_org
+            group_obj.save()
+            self.call_setup(node, group_obj, group_obj)
             return True
+
         except Exception as e:
 
             print e, "CourseEventGroup structure setup Error"
 
-    def create_corresponding_gsystem(self,gs_name,gs_member_of,user_id,gs_under_coll_set_of_obj):
+    def create_corresponding_gsystem(self,gs_name,gs_member_of,gs_under_coll_set_of_obj, group_obj):
 
         try:
             new_gsystem = node_collection.collection.GSystem()
             new_gsystem.name = unicode(gs_name)
-            new_gsystem.member_of.append(gs_member_of._id)
-            new_gsystem.modified_by = int(user_id)
-            new_gsystem.created_by = int(user_id)
-            new_gsystem.contributors.append(int(user_id))
+            if gs_member_of == "CourseSection":
+                gst_node = self.section_event_gst
+            elif gs_member_of == "CourseSubSection":
+                gst_node = self.subsection_event_gst
+            elif gs_member_of == "CourseUnit":
+                gst_node = self.courseunit_event_gst
+
+            new_gsystem.member_of.append(gst_node._id)
+            new_gsystem.group_set.append(group_obj._id)
+            new_gsystem.modified_by = int(self.user_id)
+            new_gsystem.created_by = int(self.user_id)
+            new_gsystem.contributors.append(int(self.user_id))
             new_gsystem.save()
             gs_under_coll_set_of_obj.collection_set.append(new_gsystem._id)
             gs_under_coll_set_of_obj.save()
             new_gsystem.prior_node.append(gs_under_coll_set_of_obj._id)
             new_gsystem.save()
             return new_gsystem
-        except:
+        except Exception as e:
+            # print e
             return False
+
+    def call_setup(self, node, prior_node_obj, group_obj):
+        if node.collection_set:
+            if "CourseUnit" in node.member_of_names_list:
+                for each_res in node.collection_set:
+                    each_res_node = node_collection.one({'_id': ObjectId(each_res)})
+                    new_res = self.replicate_resource(each_res_node, group_obj)
+                    prior_node_obj.collection_set.append(new_res._id)
+                    # below code changes the grup_set of resources
+                    # i.e cross-publication
+                    # each_res_node.group_set.append(group_obj._id)
+                    # prior_node_obj.collection_set.append(each_res_node._id)
+                    # node.save()
+                    prior_node_obj.save()
+            else:
+                for each in node.collection_set:
+                    each_node = node_collection.one({'_id': ObjectId(each)})
+                    name_arg = each_node.name
+                    member_of_name_str = each_node.member_of_names_list[0]
+                    new_node = self.create_corresponding_gsystem(name_arg,member_of_name_str, prior_node_obj, group_obj)
+                    self.call_setup(each_node, new_node, group_obj)
+
+    def replicate_resource(self, node, group_obj):
+        try:
+            if "Page" in node.member_of_names_list:
+                new_gsystem = node_collection.collection.GSystem()
+            else:
+                new_gsystem = node_collection.collection.File()
+                new_gsystem.fs_file_ids = node.fs_file_ids
+                new_gsystem.file_size = node.file_size
+                new_gsystem.mime_type = node.mime_type
+
+            new_gsystem.group_set.append(group_obj._id)
+            new_gsystem.name = unicode(node.name)
+            new_gsystem.status = u"PUBLISHED"
+            new_gsystem.member_of = node.member_of
+            new_gsystem.modified_by = int(self.user_id)
+            new_gsystem.created_by = int(self.user_id)
+            new_gsystem.contributors.append(int(self.user_id))
+            new_gsystem.tags = node.tags
+            new_gsystem.content_org = node.content_org
+            new_gsystem.content = node.content
+            new_gsystem.save()
+            return new_gsystem
+
+        except Exception as e:
+            # print e
+            return False
+
 
 
 # --- END of class CreateCourseEventGroup ---
@@ -1352,7 +1377,6 @@ class EventGroupCreateEditHandler(View):
         node_id = request.POST.get('node_id', '').strip()  # hidden-form-field
         edit_policy = request.POST.get('edit_policy', '')
         course_node_id = request.POST.get('course_node_id', '')
-
         # check if group's editing policy is already 'EDITABLE_MODERATED' or
         # it was not and now it's changed to 'EDITABLE_MODERATED' or vice-versa.
         if (edit_policy == "EDITABLE_MODERATED") or (group_obj.edit_policy == "EDITABLE_MODERATED"):
@@ -1370,6 +1394,7 @@ class EventGroupCreateEditHandler(View):
         if result[0]:
             # operation success: create ATs
             group_obj = result[1]
+            # to make PE/CE as sub groups of the grp from which it is created.
             parent_group_obj.post_node.append(group_obj._id)
             group_obj.prior_node.append(parent_group_obj._id)
             group_obj.save()
@@ -1661,7 +1686,7 @@ def group_dashboard(request, group_id=None):
     profile_pic_image = None
     list_of_unit_events = []
     blog_pages = None
-
+    selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
 
     if not group_obj:
@@ -1716,29 +1741,31 @@ def group_dashboard(request, group_id=None):
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   if "CourseEventGroup" in group_obj.member_of_names_list:
-			forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
-			twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
-			page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
-			blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-			blog_pages = node_collection.find({'member_of':page_gst._id, 'created_by': int(request.user.id),
-									'type_of': blogpage_gst._id})
-			alternate_template = "ndf/course_event_group.html"
-			existing_forums = node_collection.find({
-                                          'member_of': forum_gst._id,
-                                          'group_set': ObjectId(group_obj._id), 
-                                          }).sort('created_at', -1)
-			for each in existing_forums:
+      forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
+      twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+      page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
+      blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+      alternate_template = "ndf/course_event_group.html"
 
-					temp_forum = {}
-					temp_forum['name'] = each.name
-					temp_forum['created_at'] = each.created_at
-					temp_forum['tags'] = each.tags
-					temp_forum['member_of_names_list'] = each.member_of_names_list
-					temp_forum['user_details_dict'] = each.user_details_dict
-					temp_forum['html_content'] = each.html_content
-					temp_forum['contributors'] = each.contributors
-					temp_forum['id'] = each._id
-					temp_forum['threads'] = node_collection.find({
+      existing_forums = node_collection.find({
+                                    'member_of': forum_gst._id,
+                                    'group_set': ObjectId(group_obj._id), 
+                                    }).sort('created_at', -1)
+      if request.user.id:
+          blog_pages = node_collection.find({'member_of':page_gst._id, 'created_by': int(request.user.id),
+						'type_of': blogpage_gst._id})
+      for each in existing_forums:
+
+      		temp_forum = {}
+      		temp_forum['name'] = each.name
+      		temp_forum['created_at'] = each.created_at
+      		temp_forum['tags'] = each.tags
+      		temp_forum['member_of_names_list'] = each.member_of_names_list
+      		temp_forum['user_details_dict'] = each.user_details_dict
+      		temp_forum['html_content'] = each.html_content
+      		temp_forum['contributors'] = each.contributors
+      		temp_forum['id'] = each._id
+      		temp_forum['threads'] = node_collection.find({
                                                       '$and':[
                                                       				{'member_of': twist_gst._id},
                                                               {'_type': 'GSystem'},
@@ -1747,7 +1774,7 @@ def group_dashboard(request, group_id=None):
                                                       'status': {'$nin': ['HIDDEN']} 
                                                       }).count()
           
-					list_of_unit_events.append(temp_forum)
+      		list_of_unit_events.append(temp_forum)
 
   allow_to_join = True
   if 'end_enroll' in group_obj:
@@ -1775,6 +1802,7 @@ def group_dashboard(request, group_id=None):
                                                        'shelf_list': shelf_list,
                                                        'list_of_unit_events': list_of_unit_events,
                                                        'blog_pages':blog_pages,
+                                                       'selected': selected,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
                                                        'annotations' : annotations, 'shelves': shelves,
@@ -1864,7 +1892,7 @@ def group_dashboard(request, group_id=None):
 #                                     context_instance=RequestContext(request)
 #                                     )
 
-        
+
 @login_required
 @get_execution_time
 def app_selection(request, group_id):
