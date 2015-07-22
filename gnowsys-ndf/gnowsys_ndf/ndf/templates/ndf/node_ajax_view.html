@@ -1292,7 +1292,7 @@ ul#navigation li a.last {
                 {% get_sg_member_of groupid as list_of_sg_member_of %}
                 {% if "ProgramEventGroup" in list_of_sg_member_of %}
                   <li><a href="{% url 'edit_event_group' group_id 'ProgramEventGroup' %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit ProgramEvent" %}</a></li><br>
-                {% elif "CourseEventGroup" in list_of_sg_member_of %}
+                {% elif "CourseEventGroup" in node.member_of_names_list %}
                   <li><a href="{% url 'edit_event_group' group_id 'CourseEventGroup' %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit CourseEvent" %}</a></li><br>
                 {% else %}
                   <li><a href="{% url edit_url group_id %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li><br>
@@ -1362,8 +1362,6 @@ ul#navigation li a.last {
 
                 </a>
               </li>
-               
-
               {% endif %}
             {% endif %}
             
@@ -1470,10 +1468,9 @@ ul#navigation li a.last {
 
               {% check_is_gstaff groupid request.user as is_gstaff %}
               {% if is_gstaff %}
-
-                {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
+              {% if group_object.edit_policy != EDITABLE_MODERATED%}
                     {% include "ndf/invite_users.html" %}
-                {% endifnotequal %}
+              {% endif %}
 
                 {% include "ndf/invite_admins.html" %}
               {% endif %} 
