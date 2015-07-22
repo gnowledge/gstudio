@@ -4,30 +4,52 @@
 {% load ndf_tags %}
 {% block title %} CourseEvent {{node.name}} {% endblock %}
 {% block style %}
-    .course_outline_table, tr {
-      border: 2px solid #0b8a91 !important;
-      border-collapse: collapse;
-    }
+  .course_outline_table, tr {
+    border: 2px solid #0b8a91 !important;
+    border-collapse: collapse;
+  }
 
   .gray-text{
     color: gray;
   }
 
-	#content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
+  #content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
 
 
-	tr:hover{
-	  cursor:pointer;
-	}
+  tr:hover{
+    cursor:pointer;
+  }
 
-    .tab{
-    	padding-left: 2em;
-    	background-color:yellow !important;
-    }
+  .tab{
+    padding-left: 2em;
+    background-color:yellow !important;
+  }
 
-    .tab2{
-    	padding-left: 4em;
-    }
+  .tab2{
+    padding-left: 4em;
+  }
+
+
+  .all_blogs{
+      overflow-y: auto;
+      height:500px;
+  }
+
+  .jqtree-tree .jqtree-title {
+      margin: 5px;
+      font-size: 15px;
+      color: black !important;
+      /*Change the color here to change font color of tree*/
+  }
+  
+  .jqtree-tree {
+      border-color:#0b8a91;
+      border-width:1px;
+      border-style: solid;
+  }
+
+
+
 {% endblock %}
 
 {% block head %}
@@ -44,133 +66,142 @@
   <div id="view_collection">
     {% include "ndf/collection_ajax_view.html" %}  
   </div>
-
 {% endblock %}
+
 {% block body_content %}
+	<div id="view-page"></div>
+      <dl class="tabs" data-tab data-options="deep_linking:true"  > 
 
-      <dl class="tabs" data-tab> 
-          <!-- Basic Description -->
-          <dd class="active "><a href="#view-activities"><i class="fi-list-thumbnails"></i> {% trans "Activities" %}</a>
+          {% user_access_policy node.pk request.user as user_access %} 
 
-
-          </dd>
-            {% get_disc_replies node.pk node.pk global_disc_all_replies as all_replies %}
-            <dd class="tab-title discussion-view">
-              <a class="view-discussion" href="#view-discussion"><i class="fi-comment"></i>
-
-              {% if all_replies %}
-                <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
-                  {% trans "Join Discussion" %} ({{ all_replies | length }})
-                </span>
-              {% else %}            
-                <span title="{% trans 'Be the first to start a discussion' %}">
-                  {% trans "Begin Discussion" %}
-                </span>
-              {% endif %}
-
-              </a>
+            <dd class="tab-title active">
+              <a href="#about-tab"><i class="fi-info"></i> {% trans "About" %}</a>
+            </dd>
+            <dd class="tab-title">
+              <a href="#view_page" class="view_page_link"><i class="fi-list-thumbnails"></i> {% trans "Activities" %}</a>
             </dd>
 
+          {% if user_access == "allow" %}
+            <dd class="tab-title">
+              <a href="#journal-tab"><i class="fi-page-edit"></i> {% trans "Note Book" %}</a>
+            </dd>
 
-          <dd><a href="#journal-tab"><i class="fi-page-edit"></i> {% trans "Journal" %}</a></dd>
+            <dd class="tab-title">
+              <a href="#gallery-tab"><i class="fi-photo"></i> {% trans "Gallery" %}</a>
+            </dd>
+
+            <dd class="tab-title">
+              <a href="#analytics-tab"><i class="fi-graph-trend"></i> {% trans "Analytics" %}</a>
+            </dd>
+          {% endif %}
       </dl>
     <div class="row">
       
 		<section class="medium-12 columns content">
-	        <div class="tabs-content">
-	          <!-- Tab content -->
-				<div class="content active" id="view-activities" data-section-id="1">
-	    
-				  	<div id="activities-area">
+      <div class="tabs-content">
+        <!-- Tab content -->
+        <div class="content active" id="about-tab">
+          <div class="row">
+            {% include "ndf/res_node_ajax_view.html" %} 
+          </div>
+        </div>
 
-					<ul class="small-block-grid-2 medium-block-grid-4">
+        <div class="content" id="view_page">
+            <div id="activities-area">
+            </div>
+        </div>
+        {% if user_access == "allow" %}
 
-					  {% for each in list_of_unit_events %}
-					  <!-- #{#% for each in forum_detail_list %} -->
-					  <li class="card">
-					    <div class="forum">
+        <div class="content" id="journal-tab">
+            <div class="row">
+              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="round button small" style="float:right"> Add Blog </a>
+            </div>
+            <div class="row all_blogs">
+            	{% for each_blog in blog_pages %}
+                <div class="blogpage"  style="margin-left:10px;">
+                  <h4><u>{{each_blog.name}}</u></h4>
+                  <span>
+                  Created at {{each_blog.created_at}}
+                  by {{request.user.username}}
+                  </span>
+                  <div>
+                    {{each_blog.html_content|safe}}
+                  </div>
+                </div>
+              {% empty %}
+                <div class="blogpage"  style="margin-left:10px;">
+                  <h4><u>
+                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}">Start writing blogs </a>
+                  </u></h4>
+                </div>
+              {% endfor %}
+            </div>
+        </div>
+        <div class="content" id="gallery-tab">
+                <div class="row">
+                      {% include "ndf/file_list_tab.html" %} 
 
-					    <a href="{% url 'show' node.pk each.id %}?course='{{each.name}}'">
-					    <header>
-					      <div class="label-list">
-					      {% for tag in each.tags|slice:":3" %}
-					        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-					      {% endfor %}
-					      </div>
+                </div>
+        </div>
 
+        <div class="content" id="analytics-tab">
+                <div class="row">
+                {% get_user_object request.user.id as user_obj %}
+                {% check_is_gstaff node.pk user_obj as gstaff_access %}
+                {{check_is_gstaff}}
+                {% if gstaff_access %}
+                    <a href='{% url "group_summary" node.pk %}' target="_blank">{%  trans "Click here to view Group Analytics" %}</a>
 
-					      <h5>{{ each.name }}</h5>
-					             
-					    </header>
-					      <section>
-					    <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-					</section>
-
-
-					    {% comment %}
-					    {% if node.created_by == request.user.id %}
-					    <a class="button alert tiny" href="{% url '' group_name_tag each.id %}">Delete</a>
-					    {% endif %}
-					    {% endcomment %}
-
-					    <footer>
-					        
-					        <div class="age">
-					         Unit created {{each.created_at|timesince}} ago 
-					          by <span href="#" class="user" data-gnow="">{{ each.user_details_dict.created_by }}</span> 
-					        
-					        </div>
-					        
-					      <span><i class="fi-torsos-all gray-text"> </i> <strong>{{each.contributors|length}}</strong> <span class="gray-text">Contributor{{each.contributors|pluralize}}</span></span>
-					      <span class="right"><i class="fi-shuffle gray-text"> </i> <strong>{{each.threads}}</strong> <span class="gray-text">Resources{{each.threads|pluralize}}</span></span> 
-					    </footer>
-					</a>
-					        
-					    </div>
-					  </li>
-					  
-					  {% empty %}
-					  	<div class="row">
-					  	  <div class="small-12 columns">
-					  	   <h5> {% blocktrans %}No units have been created for this Course.</h5>{% endblocktrans %}<h5>
-					  	  </div>
-					  	</div>
-					  
-					  {% endfor %}
-					</ul>
-
-				  	</div>
-
-	            </div>
-				<div class="content" id="view-discussion">
-
-		            <div class="row">
-		            	{% include 'ndf/discussion.html' %}
-		            </div>
-
-				</div>
-
-		        <div class="content" id="journal-tab">
-		          
-		            <div class="row">
-		            	<a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="round button small" style="float:right"> Add + </a>
-		            </div>
-		            <div class="row">
-		            	{% for each_blog in blog_pages %}
-		            		<h4>{{each_blog.name}}</h4>
-			            	<span>
-			            	Created at {{each_blog.created_at}}
-			            	</span>
-			            	<div>
-			            		{{each_blog.html_content|safe}}
-			            	</div>
-		            	{% endfor %}
-		            </div>
-		        </div>
+                {% else %}
+                    <a href='{% url "user_summary" node.pk %}' target="_blank">{%  trans "Click here to view  My Analytics" %}</a>
+                {% endif %}
+                </div>
+        </div>
+        {% endif %}
 
 			</div>
-	    </section>
+    </section>
   
   	</div>
 {% endblock %}
 
+
+
+{% block script %}
+
+  $(document).on('click','.enroll-btn',function(){
+    //trigger the ajax call to enroll
+      $.ajax({
+        url: "{% url 'enroll_to_course' node.pk %}",
+
+        data: {
+          'csrfmiddlewaretoken': "{{csrf_token}}"
+        },
+
+        type: "POST",
+
+        dataType: "json",
+
+        success: function(data){
+          success_state = data["success"]
+          if(success_state){
+            $(".enroll-btn").attr('value', 'ENROLLED')
+            $(".enroll-btn").attr("disabled","disabled")
+            location.reload();
+          }
+        },
+      });//end of ajax
+  })
+
+  $("main.row > aside.columns")
+    .removeClass("medium-2")
+    .addClass('medium-3').addClass("large-3");
+
+  $("main.row > article.columns")
+    .removeClass("medium-10")
+    .addClass("medium-9")
+    .addClass("large-9")
+    .css('float','left');
+    $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder')
+
+{% endblock %}
