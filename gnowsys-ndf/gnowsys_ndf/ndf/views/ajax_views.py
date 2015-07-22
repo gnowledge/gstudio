@@ -135,7 +135,7 @@ def collection_nav(request, group_id):
     node_id = request.POST.get("node_id", '')
     curr_node_id = request.POST.get("curr_node", '')
     node_type = request.POST.get("nod_type", '')
-
+    template = "ndf/node_ajax_view.html"
     breadcrumbs_list = []
     curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id)})
     if node_type == "Topic":
@@ -146,7 +146,11 @@ def collection_nav(request, group_id):
           breadcrumbs_list.append((str(prior._id), prior.name))
 
     topic = ""
+
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    if "CourseEventGroup" in group_obj.member_of_names_list:
+      template = "ndf/res_node_ajax_view.html"
     nav_list = request.POST.getlist("nav[]", '')
     n_list = request.POST.get("nav", '')
 
@@ -189,7 +193,7 @@ def collection_nav(request, group_id):
           else:
             breadcrumbs_list.remove(e)
     # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
-    return render_to_response('ndf/node_ajax_view.html', 
+    return render_to_response(template, 
                                 { 'node': node_obj,
                                   'original_node':curr_node_obj,
                                   'group_id': group_id,
@@ -747,7 +751,7 @@ def get_inner_collection(collection_list, node):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
-  if node.collection_set  and "CourseUnitEvent" not in node.member_of_names_list:
+  if node.collection_set:
     for each in node.collection_set:
       col_obj = node_collection.one({'_id': ObjectId(each)})
       if col_obj:
