@@ -163,24 +163,25 @@ def video_edit(request,group_id,_id):
     vid_node = node_collection.one({"_id": ObjectId(_id)})
     title = GST_VIDEO.name
     video_obj=request.GET.get("vid_id","")
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
     if request.method == "POST":
 
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO))
-	get_node_metadata(request,vid_node)
-	teaches_list = request.POST.get('teaches_list','') # get the teaches list
-        assesses_list = request.POST.get('assesses_list','') # get the teaches list 
-	if teaches_list !='':
-			teaches_list=teaches_list.split(",")
-	create_grelation_list(vid_node._id,"teaches",teaches_list)
-	
-	if assesses_list !='':
-		assesses_list=assesses_list.split(",")
-					
-	create_grelation_list(vid_node._id,"assesses",assesses_list)
-
-
+    if "CourseEventGroup" not in group_obj.member_of_names_list:
+        get_node_metadata(request,vid_node)
+        teaches_list = request.POST.get('teaches_list', '')  # get the teaches list
+        assesses_list = request.POST.get('assesses_list', '')  # get the teaches list
+        if teaches_list !='':
+            teaches_list=teaches_list.split(",")
+        create_grelation_list(vid_node._id,"teaches",teaches_list)
+        if assesses_list !='':
+            assesses_list=assesses_list.split(",")
+        create_grelation_list(vid_node._id,"assesses",assesses_list)
         return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
+    else:
+        url = "/"+ group_id +"/?selected="+str(vid_node._id)+"#view_page"
+        return HttpResponseRedirect(url)
     vid_col = node_collection.find({'member_of': GST_VIDEO._id,'group_set': ObjectId(group_id)})
     nodes_list = []
     for each in vid_col:
