@@ -28,10 +28,10 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task
 from gnowsys_ndf.notification import models as notification
 
@@ -1684,4 +1684,28 @@ def add_course_file(request, group_id):
         file_obj.save()
         context_node.save()
     return HttpResponseRedirect(url_name)
+
+
+@login_required
+def enroll_to_course(request, group_id):
+    '''
+    Accepts:
+     * ObjectId of group.
+     * Django user obj
+
+    Actions:
+     * Adds user to group
+
+    Returns:
+     * success (i.e True/False)
+    '''
+    response_dict = {"success": False}
+    if request.is_ajax() and request.method == "POST":
+        user_id = request.user.id
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+        if user_id not in group_obj.author_set:
+            group_obj.author_set.append(user_id)
+        group_obj.save()
+        response_dict["success"] = True
+        return HttpResponse(json.dumps(response_dict))
 
