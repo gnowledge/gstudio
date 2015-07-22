@@ -133,6 +133,18 @@
         </ul>
         <!-- -END of NROER level one menu -->
       {% else %}
+      {% if "CourseEventGroup" in group_object.member_of_names_list %}
+      <ul class="left">
+
+        <!-- Current group selector -->
+        <li class="group">
+          <a title="{{group_object.name|default:' -- '}}" class="active" >
+            {{group_object.name|truncatechars:20}}
+          </a>
+          </li>
+          </ul>
+      {% else %}
+
       <ul class="left">
 
         <!-- Current group selector -->
@@ -140,7 +152,6 @@
           <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
             {{group_object.name|truncatechars:20}}
           </a>
-          
           <!-- If logged in show user groups -->
           {% if user.is_authenticated %}
           {% get_user_group request.user group_object.name as groups %}
@@ -183,6 +194,7 @@
         </li>
 
       </ul>
+      {% endif %}
       {% endif %}
       <!-- {#% endcache %} -->
 
@@ -324,7 +336,7 @@
 
         <nav class="top-bar" data-topbar data-options="sticky_on: large" role="navigation">
         <!-- don't show this app bar for groups with editable moderated -->
-        {% if "ModeratingGroup" not in group_object.member_of_names_list %}
+        {% if "ModeratingGroup" not in group_object.member_of_names_list and "CourseEventGroup" not in group_object.member_of_names_list %}
         {% if not is_ac_url %}
         {% if request.path != "/welcome" %}
           <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->

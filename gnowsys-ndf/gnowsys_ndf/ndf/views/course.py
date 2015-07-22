@@ -1328,7 +1328,6 @@ def get_resources(request, group_id):
             widget_for = request.POST.get('widget_for', "")
             resource_type = request.POST.get('resource_type', "")
             resource_type = resource_type.strip()
-
             list_resources = []
             css_node = node_collection.one({"_id": ObjectId(css_node_id)})
             try:
@@ -1347,9 +1346,9 @@ def get_resources(request, group_id):
                         'status': u"PUBLISHED"
                     }
                 )
-
                 for each in res:
-                    list_resources.append(each)
+                    if each not in list_resources:
+                        list_resources.append(each)
 
                 drawer_template_context = edit_drawer_widget("CourseUnits", group_id, unit_node, None, checked="collection_set", left_drawer_content=list_resources)
                 drawer_template_context["widget_for"] = widget_for
@@ -1412,7 +1411,6 @@ def save_resources(request, group_id):
 
         if cu_new._id not in css_node.collection_set:
             node_collection.collection.update({'_id': css_node._id}, {'$push': {'collection_set': cu_new._id }}, upsert=False, multi=False)
-
 
         node_collection.collection.update({'_id': cu_new._id}, {'$set': {'collection_set':list_of_res_ids}},upsert=False,multi=False)
         cu_new.reload()
@@ -1590,7 +1588,6 @@ def find_units_of_subsection(request, group_id):
     list_of_forums = []
     if request.is_ajax() and request.method == "GET":
         node_id = request.GET.get("subsection_node_id", '')
-        print "\n\n node_id", node_id
         subsection_node = node_collection.one({'_id': ObjectId(node_id)})
         if subsection_node.collection_set:
             for each_forum_unit in subsection_node.collection_set:
@@ -1605,7 +1602,6 @@ def find_units_of_subsection(request, group_id):
         response_dict['forums'] = list_of_forums
         response_dict['data_dict'] = json.dumps(data_dict)
         response_dict["success"] = True
-        print "response_dict", response_dict
         return HttpResponse(json.dumps(response_dict))
 
 
@@ -1688,3 +1684,4 @@ def add_course_file(request, group_id):
         file_obj.save()
         context_node.save()
     return HttpResponseRedirect(url_name)
+
