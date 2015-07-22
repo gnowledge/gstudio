@@ -749,9 +749,10 @@ def submitDoc(request, group_id):
 
 
         i = 1
-
+        filename="" 
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
+                filename=filename+mtitle+" "
                 if index == 0:
                     # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
@@ -774,6 +775,7 @@ def submitDoc(request, group_id):
             if isinstance(f, list):
               alreadyUploadedFiles_append_temp(f)
               title = mtitle
+
 
         # str1 = alreadyUploadedFiles
 

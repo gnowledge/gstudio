@@ -24,10 +24,12 @@ from gnowsys_ndf.ndf.views.methods import get_forum_repl_type, forum_notificatio
 from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
+from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.org2any import org2html
-
+import StringIO
+import sys
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -436,7 +438,6 @@ def display_thread(request,group_id, thread_id, forum_id=None):
             reply_count=len(lst_rep)
         else:
             reply_count=0
-        # print "reply count=",reply_count
         forum = ""
         
         for each in thread.prior_node:
@@ -516,7 +517,7 @@ def create_thread(request, group_id, forum_id):
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             colrep.content = org2html(content_org, file_prefix=filename)
-        # print "content=",colrep.content
+
         usrid = int(request.user.id)
         colrep.created_by = usrid
         colrep.modified_by = usrid
@@ -599,11 +600,26 @@ def add_node(request, group_id):
         forumid = request.POST.get("forumid","") # getting forum _id
         sup_id = request.POST.get("supnode","") #getting _id of it's parent node
         tw_name = request.POST.get("twistname","")
+        upload_files_count=int(request.POST.get("upload_cnt",0))
+        #print "upfiles=",upload_files_count
+        lst=[]
+        lstobj_collection=[]
+        usrid = int(request.user.id)
+        if upload_files_count > 0:
+            #print "uploaded items",request.FILES.items()
+            for key,value in request.FILES.items():
+                fname=unicode(value.__dict__['_name'])
+                #print "key=",key,"value=",value,"fname=",fname
+                fileobj,fs=save_file(value,fname,usrid,group_id,"","", username = unicode(request.user.username))
+                if type(fileobj) == list:
+                    obid = str(list(fileobj)[1])
+                else:
+                    obid=str(fileobj)
+                file_obj=node_collection.find_one({'_id': ObjectId(obid)})
+                lstobj_collection.append(file_obj._id) 
         forumobj = ""
         groupobj = ""
-
         colg = node_collection.one({'_id':ObjectId(group_id)})
-
         if forumid:
             forumobj = node_collection.one({"_id": ObjectId(forumid)})
     
@@ -620,10 +636,13 @@ def add_node(request, group_id):
         elif node == "Reply":
             name = unicode("Reply of:"+str(sup._id))
             colrep.member_of.append(reply_gst._id)
+        #Adding uploaded files id's in collection set of reply
+        if upload_files_count > 0:
+            colrep.collection_set = lstobj_collection   
     
         colrep.prior_node.append(sup._id)
         colrep.name = name
-
+        
         if content_org:
             colrep.content_org = unicode(content_org)
             # Required to link temporary files with the current user who is modifying this document
@@ -631,13 +650,12 @@ def add_node(request, group_id):
             filename = slugify(name) + "-" + usrname + "-"
             colrep.content = org2html(content_org, file_prefix = filename)
 
-        usrid = int(request.user.id)
+       
         colrep.created_by = usrid
         colrep.modified_by = usrid
 
         if usrid not in colrep.contributors:
             colrep.contributors.append(usrid)
-
         colrep.prior_node.append(sup._id)
         colrep.name = name
 
