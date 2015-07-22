@@ -31,4 +31,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/unitevents/$', 'find_units_of_subsection', name='find_units_of_subsection'),
                         url(r'^/thread_posts/$', 'get_res_disc_thread', name='get_res_disc_thread'),
                         url(r'^/add_course_file/$', 'add_course_file', name='add_course_file'),
+                        url(r'^/enroll_to_course/$', 'enroll_to_course', name='enroll_to_course'),
+                       
                        )
