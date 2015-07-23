@@ -483,7 +483,11 @@
             {% if user_access == "allow" %}
               <input class="enroll-btn button large" type="button" value="ENROLLED" disabled="disabled">
             {% else %}
+            {% if allow_to_join %}
               <input class="enroll-btn button large" type="button" value="ENROLL">
+            {% else %}
+              <input class="enroll-btn button large" type="button" value="ENROLLMENT CLOSED" disabled="disabled">
+            {% endif %}
             {% endif %}
             </li>
           </ul> 
