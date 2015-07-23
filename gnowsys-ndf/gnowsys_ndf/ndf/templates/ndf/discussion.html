@@ -7,9 +7,9 @@
   <br/>
   <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
     {% if all_replies %}
-      Initiate New Discussion Thread
+        Comment
     {% else %}
-      Initiate discussion on {{ node.name }}
+      Comment on {{ node.name }}
     {% endif %}
   </div>
 
@@ -100,7 +100,7 @@
   function createDiscussion()
   {
 
-    // if( user_access == "allow" && edit_policy == "allow" )
+    if( user_access == "allow"){
     if( is_user_authenticated )
     {  
       {% if request.user.is_authenticated %}
@@ -150,15 +150,19 @@
         // alert("To start discussion you need to login and be the member of this group.");
         alert("Login to start discussion");
       }
-
     }
+  else{
+        alert("Only group members can comment.");
+
+  }
+  }
   // --- END of createDiscussion()
 
 
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openOrgEditor(sourceObj)
   {
-    // if( user_access == "allow" && edit_policy == "allow" )
+    if( user_access == "allow"){
     if( is_user_authenticated )
     {
 
@@ -195,6 +199,11 @@
       alert("Login to start discussion.");
     }
   }
+  else{
+      alert("Only group members can reply to comment.");
+
+  }
+  }
 
 
   function updateDiscussionTabText()
@@ -203,7 +212,7 @@
     if(totalReplies == 0)
     {
       $(".view-discussion span").fadeOut().fadeIn().html("Begin Discussion");
-      $("#create-discussion").text("Initiate discussion on " + $("h1 span.node[itemprop]").text().trim());
+      $("#create-discussion").text("Comment " + $("h1 span.node[itemprop]").text().trim());
     }
     else
     {
@@ -252,7 +261,7 @@
     $('#org').foundation('reveal', 'close');
 
     var priorNodeId = $("#prior-node").val(),
-        replyContent = $("#orgitdownreps").val().trim();
+        replyContent = $("#orgitdownreps:visible").val().trim();
 
     // If reply is non empty - make ajax to save reply.
     if( (replyContent.length > 0) && (priorNodeId.length == 24) )
@@ -296,7 +305,7 @@
               if(priorNodeId == "{{ node.pk }}")  // main reply
               {
                 // change the text of Start discussion and make it visible
-                $("#create-discussion").html("Initiate New Discussion Thread");                
+                $("#create-discussion").html("Comment");                
                 // $("#create-discussion").fadeIn();
 
                 //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
@@ -315,6 +324,7 @@
               }
               // updating tab-text
               updateDiscussionTabText();
+              location.reload();
             }
             else if( data[0] == "no_content" ){
               

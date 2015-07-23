@@ -117,7 +117,7 @@
           {% endif %}
       </div>
       <div class="small-3 columns">
-          <span data-tooltip title="You will be redirected to Course Authoring page" style="float:right;">
+          <span data-tooltip title="You will be redirected previous page" style="float:right;">
             <a class="done_units tiny button round" style="float:right;">Back</a>
           </span>
       </div>
@@ -498,11 +498,16 @@
 
 
     $(document).on('click','.done_units',function(){
-      turl = "{% url 'create_course_struct' groupid course_node.pk %}"
-      if("{{app_id}}"!= ""){
-        turl += "?app_id={{app_id}}&app_set_id={{app_set_id}}"
-      }
-      $(this).attr("href",turl)
+      {% get_group_object groupid as group_object %}
+      {% if "CourseEventGroup" in group_object.member_of_names_list %}
+        $(this).attr('href', '/{{group_id}}/course/structure/create/{{group_id}}')
+      {% else %}
+        turl = "{% url 'create_course_struct' groupid course_node.pk %}"
+        if("{{app_id}}"!= ""){
+          turl += "?app_id={{app_id}}&app_set_id={{app_set_id}}"
+        }
+        $(this).attr("href",turl)
+      {% endif %}
 
     })
 
@@ -518,7 +523,7 @@
       var cell2 = row.insertCell(1);
       var cell3 = row.insertCell(2);
       cell1.innerHTML = "Type";
-      cell2.innerHTML = "Name";
+      cell2.innerHTML = "All Resources";
       cell3.innerHTML = "Action";
 
       {% get_node unit_node.pk as unit_node %}

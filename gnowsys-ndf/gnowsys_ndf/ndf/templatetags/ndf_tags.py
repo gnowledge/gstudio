@@ -2743,13 +2743,14 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
 	# Fetch post_node of group
-	post_node_id_list = group_obj.post_node
+	if group_obj.post_node:
+		post_node_id_list = group_obj.post_node
 
-	if post_node_id_list:
-		# getting parent's sub group's member_of in a list
-		for each_sg in post_node_id_list:
-			each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
-			sg_member_of_list.extend(each_sg_node.member_of_names_list)
+		if post_node_id_list:
+			# getting parent's sub group's member_of in a list
+			for each_sg in post_node_id_list:
+				each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
+				sg_member_of_list.extend(each_sg_node.member_of_names_list)
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):

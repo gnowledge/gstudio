@@ -17,12 +17,12 @@
 
       // Function for manipulating tree when user visits to page directly via browser url
       TreeTillNode();
-
     });
 
     function TreeTillNode () {
       // This gives the last hierarchy node id from browser url.
-      var url = window.location.search.replace("?selected=", "")
+      // var url = window.location.search.replace("?selected=", "")
+      var url = "{{selected}}";
 
       // Condition to check whether the tree has been loaded on the page completely or not before attempting any function on tree(such as 'getNodeById')
       if (url && $(".collection").not(".jqtree-loading").length > 0){
@@ -37,8 +37,7 @@
       setTimeout(function(){
         // console.log($(".collection"))
         if(url && ($(".collection").length > 0)) { TreeTillNode() }
-      }, 100 );
-    
+        $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder');}, 100 );
     }
     
 
@@ -49,12 +48,6 @@
       {% get_node_type node as node_type %}  
       
       var node_type = "{{node_type}}";
-
-      if(node_type=="Group"||node_type=="Course"){
-        $('.collection').tree({
-           autoOpen: true
-         });
-      }
 
       $tree.tree({
         selectable: true,
@@ -97,10 +90,10 @@
                 }
             }
             var nav_list = parent_arr.reverse();
+            if(node['node_type']!="CourseSectionEvent" && node['node_type']!="CourseSubSectionEvent" && node['node_type']!="CourseUnitEvent"){
 
             // alert(nav_list);
-            // alert(node_type);
-            if(node_type!="Group"){
+            // alert("node_type");
               
             $.ajax({
                 type: "POST",
@@ -126,21 +119,18 @@
                   // else if (node_type == "Course"){
                   //   window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
                   // }
-                  // else if (node_type == "Group"){
-                  //   window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
-                  // }
+                  if (node_type == "CourseEventGroup"){
+                    window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
+                    $(".view_page_link").trigger('click')
+                  }
                   // else if (node_type == "Topic"){
                   //   window.history.pushState("", "", "/{{group_name_tag}}/topic_details/{{node.pk}}"+"?selected="+node.id+"");
                   // }
                                       
                   $("#view_page").html(data);
-
                 }
-
-
             });
-          
-            }
+          }
         }
       );
       
