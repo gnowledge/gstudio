@@ -71,8 +71,8 @@
    <span><a class="tiny publish-btn button" href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{node.pk}}">{% trans "Announce" %}</a></span>
 
     {% if node_type == "Course" %}
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+      {% if is_gstaff %}
         <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
       {% endif %}
     {% endif %}
