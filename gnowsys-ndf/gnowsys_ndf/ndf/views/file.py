@@ -1501,6 +1501,8 @@ def file_edit(request,group_id,_id):
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     file_node = node_collection.one({"_id": ObjectId(_id)})
     title = GST_FILE.name
+    ce_id = request.GET.get('course_event_id')
+    res = request.GET.get('res')
 
     if request.method == "POST":
 
@@ -1528,7 +1530,9 @@ def file_edit(request,group_id,_id):
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,'title':title,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid':group_id,
+                                    'ce_id': ce_id,
+                                    'res': res
                                 },
                                   context_instance=RequestContext(request)
                               )

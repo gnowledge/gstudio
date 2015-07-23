@@ -282,10 +282,12 @@ def create_edit_page(request, group_id, node_id=None):
     #     pass
     group_name, group_id = get_group_name_id(group_id)
     ce_id = request.GET.get('course_event_id')
+    res = request.GET.get('res')
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id,
-                          'ce_id': ce_id
+                          'ce_id': ce_id,
+                          'res':res
                       }
     
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
@@ -304,7 +306,9 @@ def create_edit_page(request, group_id, node_id=None):
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
 	page_type = request.POST.getlist("type_of",'')
-	ce_id = request.POST.get("ce_id",'')
+        ce_id = request.POST.get("ce_id",'')
+        res = request.POST.get("res",'')
+        print "\n\n res", res
         if ce_id:
                 blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
                 page_node.type_of = [blogpage_gst._id]
@@ -324,6 +328,8 @@ def create_edit_page(request, group_id, node_id=None):
         metadata = request.POST.get("metadata_info", '') 
         if ce_id:
           url_name = "/" + ce_id +"/#journal-tab"
+          if res:
+            url_name = "/" + ce_id +"/?selected=" + str(page_node._id)+ "#journal-tab"
           return HttpResponseRedirect(url_name)
         if metadata:
           # Only while metadata editing

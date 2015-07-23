@@ -164,6 +164,9 @@ def video_edit(request,group_id,_id):
     title = GST_VIDEO.name
     video_obj=request.GET.get("vid_id","")
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    ce_id = request.GET.get('course_event_id')
+    res = request.GET.get('res')
+
     if request.method == "POST":
 
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
@@ -186,14 +189,16 @@ def video_edit(request,group_id,_id):
     nodes_list = []
     for each in vid_col:
       nodes_list.append(str((each.name).strip().lower()))
-        
+
     else:
         return render_to_response("ndf/video_edit.html",
                                   { 'node': vid_node, 'title': title,
                                     'group_id': group_id,
                                     'groupid':group_id,
                                     'video_obj':video_obj,
-                                    'nodes_list':nodes_list
+                                    'nodes_list':nodes_list,
+                                    'ce_id': ce_id,
+                                    'res': res
                                 },
                                   context_instance=RequestContext(request)
                               )

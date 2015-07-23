@@ -210,6 +210,9 @@ def image_edit(request,group_id,_id):
         pass
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     img_node = node_collection.one({"_id": ObjectId(_id)})
+    ce_id = request.GET.get('course_event_id')
+    res = request.GET.get('res')
+
     title = GST_IMAGE.name
     if request.method == "POST":
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
@@ -235,7 +238,9 @@ def image_edit(request,group_id,_id):
         return render_to_response("ndf/image_edit.html",
                                   {'node': img_node, 'title': title,
                                     'group_id': group_id,
-                                    'groupid': group_id
+                                    'groupid': group_id,
+                                    'ce_id':ce_id,
+                                    'res': res
                                 },
                                   context_instance=RequestContext(request)
                               )
