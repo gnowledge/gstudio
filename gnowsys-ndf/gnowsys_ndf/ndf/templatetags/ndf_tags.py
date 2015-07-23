@@ -854,6 +854,7 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 			temp_disc_reply["userid"] = int(each.created_by)
 			temp_disc_reply["oid"] = str(each._id)
 			temp_disc_reply["prior_node"] = str(each.prior_node[0])
+			temp_disc_reply["collection_set"] = [node_collection.one({'_id': ObjectId(i)}) for i in each.collection_set]
 			temp_disc_reply["level"] = level
 
 			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
