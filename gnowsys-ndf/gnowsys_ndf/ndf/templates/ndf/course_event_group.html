@@ -63,6 +63,11 @@
 
 {% block meta_content %}
   <h3>Course Outline</h3>
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+      {% if is_gstaff %}
+        <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+      {% endif %}
+  
   <div id="view_collection">
     {% include "ndf/collection_ajax_view.html" %}  
   </div>

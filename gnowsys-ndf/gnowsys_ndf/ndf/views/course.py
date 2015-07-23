@@ -1003,18 +1003,23 @@ def create_course_struct(request, group_id, node_id):
 
     """
 
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else:
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth:
-                group_id = str(auth._id)
-    else:
-        pass
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False:
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else:
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth:
+    #             group_id = str(auth._id)
+    # else:
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
     app_id = None
     app_set_id = None
     tiss_site = False
@@ -1022,8 +1027,9 @@ def create_course_struct(request, group_id, node_id):
     property_order_list_cs = []
     property_order_list_css = []
     course_structure_exists = False
-
     title = "Course Authoring"
+    if "CourseEventGroup" in group_obj.member_of_names_list:
+        title = "CourseEvent Authoring"
 
     if GSTUDIO_SITE_NAME is "TISS":
         tiss_site = True
@@ -1040,10 +1046,9 @@ def create_course_struct(request, group_id, node_id):
     css_gs.member_of.append(css_gst._id)
     property_order_list_css = get_property_order_with_value(css_gs)
 
-
     course_collection_list = course_node.collection_set
     if course_collection_list:
-      course_structure_exists = True
+        course_structure_exists = True
 
     # for attr in course_node.attribute_set:
     #   if attr.has_key("evaluation_type"):
@@ -1090,9 +1095,18 @@ def save_course_section(request, group_id):
     '''
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+        if "CourseEventGroup" in group_obj.member_of_names_list:
+            cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSectionEvent"})
+        else:
+            cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
         cs_node_name = request.POST.get("cs_name", '')
         course_node_id = request.POST.get("course_node_id", '')
-        cs_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSection"})
         cs_new = node_collection.collection.GSystem()
         cs_new.member_of.append(cs_gst._id)
         cs_new.name = cs_node_name
@@ -1128,9 +1142,19 @@ def save_course_sub_section(request, group_id):
 
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+        if "CourseEventGroup" in group_obj.member_of_names_list:
+            css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSectionEvent"})
+        else:
+            css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSection"})
+
         css_node_name = request.POST.get("css_name", '')
         cs_node_id = request.POST.get("cs_node_id", '')
-        css_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseSubSection"})
         css_new = node_collection.collection.GSystem()
         css_new.member_of.append(css_gst._id)
         # set name
@@ -1435,6 +1459,17 @@ def create_edit_unit(request, group_id):
     '''
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+        if "CourseEventGroup" in group_obj.member_of_names_list:
+            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnitEvent"})
+        else:
+            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
+
         css_node_id = request.POST.get("css_node_id", '')
         unit_node_id = request.POST.get("unit_node_id", '')
         unit_name = request.POST.get("unit_name", '')
@@ -1444,7 +1479,6 @@ def create_edit_unit(request, group_id):
         except:
             cu_node = None
         if cu_node is None:
-            cu_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseUnit"})
             cu_node = node_collection.collection.GSystem()
             cu_node.member_of.append(cu_gst._id)
             # set name
@@ -1487,8 +1521,18 @@ def delete_from_course_structure(request, group_id):
     response_dict = {"success": False}
     del_stat = False
     if request.is_ajax() and request.method == "POST":
+        try:
+            group_id = ObjectId(group_id)
+        except:
+            group_name, group_id = get_group_name_id(group_id)
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
+        if "CourseEventGroup" in group_obj.member_of_names_list:
+            ce = True
+        else:
+            ce = False
         oid = request.POST.get("oid", '')
-        del_stat = delete_item(oid)
+        del_stat = delete_item(oid, ce)
 
         if del_stat:
             response_dict["success"] = True
@@ -1496,10 +1540,14 @@ def delete_from_course_structure(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 
-def delete_item(item):
+def delete_item(item, ce_flag):
     node_item = node_collection.one({'_id': ObjectId(item)})
+    if ce_flag:
+        cu_name = u"CourseUnit"
+    else:
+        cu_name = u"CourseUnitEvent"
 
-    if u"CourseUnit" not in node_item.member_of_names_list and node_item.collection_set:
+    if cu_name not in node_item.member_of_names_list and node_item.collection_set:
         for each in node_item.collection_set:
             d_st = delete_item(each)
 
@@ -1542,6 +1590,7 @@ def enroll_generic(request, group_id):
     else:
         return HttpResponse(json.dumps(response_dict))
 
+
 @login_required
 def remove_resource_from_unit(request, group_id):
     '''
@@ -1568,61 +1617,6 @@ def remove_resource_from_unit(request, group_id):
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
-
-
-@login_required
-def find_units_of_subsection(request, group_id):
-    '''
-    Accepts:
-     * ObjectId of node that is Subsection.
-
-    Actions:
-     * Finds its units/forums
-
-    Returns:
-     * success (i.e True/False)
-     * Units
-    '''
-    response_dict = {"success": False}
-    data_dict = {}
-    list_of_forums = []
-    if request.is_ajax() and request.method == "GET":
-        node_id = request.GET.get("subsection_node_id", '')
-        subsection_node = node_collection.one({'_id': ObjectId(node_id)})
-        if subsection_node.collection_set:
-            for each_forum_unit in subsection_node.collection_set:
-                # each_unit will be a Forum
-                each_forum_unit_node = node_collection.one({'_id': ObjectId(each_forum_unit)})
-                list_of_forums.append(each_forum_unit_node.name)
-                data_dict[each_forum_unit_node.name] = []
-                if each_forum_unit_node.collection_set:
-                    for each_res_thread in each_forum_unit_node.collection_set:
-                        each_res_node = node_collection.one({'_id': ObjectId(each_res_thread)})
-                        data_dict[each_forum_unit_node.name].append(each_res_node.name)
-        response_dict['forums'] = list_of_forums
-        response_dict['data_dict'] = json.dumps(data_dict)
-        response_dict["success"] = True
-        return HttpResponse(json.dumps(response_dict))
-
-
-
-@get_execution_time
-def get_res_disc_thread(request, group_id):
-    if request.is_ajax() and request.method == "GET":
-        # page number which have clicked on pagination
-        res_node_id = request.GET.get("oid", '')
-        replies_get = request.GET.get("replies", '')
-        res_node = node_collection.one({'_id': ObjectId(res_node_id)})
-        all_res_replies = get_disc_replies(res_node._id, group_id, replies_get)
-
-        return render_to_response(
-            'ndf/discussion.html',
-            {
-                'group_id': group_id, 'groupid': group_id, 'request': request,
-                'node': res_node, 'all_replies': all_res_replies
-            },
-            context_instance=RequestContext(request)
-        )
 
 
 @get_execution_time
