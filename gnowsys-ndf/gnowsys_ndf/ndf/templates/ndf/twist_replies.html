@@ -82,11 +82,8 @@
     {% if user.is_authenticated %}
 
       <!-- only for partners group: allow user to add reply even without being member of that partner group -->
-      {% if group_agency_type == "Partner" or request.user.id == eachrep.created_by or request.user.is_superuser  %}
 
         {% include "ndf/replytwistrep.html" %}
-
-      {% endif %}
 
     {% endif %}
 

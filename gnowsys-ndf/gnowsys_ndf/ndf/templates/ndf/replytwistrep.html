@@ -148,7 +148,7 @@
  </div>
     {% get_group_name groupid as group_name_tag %}
 
-   {% if eachrep.created_by == user_obj.id %}
+   {% if  request.user.id == eachrep.created_by or request.user.is_superuser %}
      {% if eachrep != thread %}
        <a class="tiny alert button" data-reply-id="{{eachrep.created_by}}" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}" onClick="return reply_del{{eachrep}}();" >{% trans "Delete" %}</a>
      
