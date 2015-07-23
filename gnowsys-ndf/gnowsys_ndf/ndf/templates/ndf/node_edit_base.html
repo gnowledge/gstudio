@@ -980,7 +980,10 @@ $(document).ready(function(){
 
 		if(textValue.length < 1){ return false; }
 
-		if(textValue.match(/[^A-Za-z0-9\-\ ]/g))
+		// re expression containing special characters
+		var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+
+		if(re.test(textValue))
 		{	// having special characters
 			$('#tags_error').removeClass("hide");
 			return false;
