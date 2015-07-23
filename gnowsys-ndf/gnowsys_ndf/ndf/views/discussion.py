@@ -192,7 +192,7 @@ def discussion_reply(request, group_id, node_id):
                 # lstobj_collection = []
             # ==============================
             reply_obj.collection_set = lstobj_collection
-            print "=== lstobj_collection: ", lstobj_collection
+            # print "=== lstobj_collection: ", lstobj_collection
         
             # saving the reply obj
             reply_obj.save()
@@ -209,12 +209,12 @@ def discussion_reply(request, group_id, node_id):
                 
                 files.append(temp_list)
 
-            print files
+            # print files
 
             # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
             reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time, files], cls=DjangoJSONEncoder )
 
-            print "===========", reply
+            # print "===========", reply
 
             # ---------- mail/notification sending -------
             node = node_collection.one({"_id": ObjectId(node_id)})
