@@ -1132,6 +1132,7 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.member_of.append(gst_node._id)
             new_gsystem.group_set.append(group_obj._id)
             new_gsystem.modified_by = int(self.user_id)
+            new_gsystem.status = u"PUBLISHED"
             new_gsystem.created_by = int(self.user_id)
             new_gsystem.contributors.append(int(self.user_id))
             new_gsystem.save()
@@ -1151,7 +1152,7 @@ class CreateCourseEventGroup(CreateEventGroup):
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
                     new_res = self.replicate_resource(each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
-                    # below code changes the grup_set of resources
+                    # below code changes the group_set of resources
                     # i.e cross-publication
                     # each_res_node.group_set.append(group_obj._id)
                     # prior_node_obj.collection_set.append(each_res_node._id)

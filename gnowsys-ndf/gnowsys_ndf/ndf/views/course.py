@@ -1111,6 +1111,7 @@ def save_course_section(request, group_id):
         cs_new.member_of.append(cs_gst._id)
         cs_new.name = cs_node_name
         cs_new.modified_by = int(request.user.id)
+        cs_new.status = u"PUBLISHED"
         cs_new.created_by = int(request.user.id)
         cs_new.contributors.append(int(request.user.id))
         course_node = node_collection.one({"_id": ObjectId(course_node_id)})
@@ -1160,6 +1161,7 @@ def save_course_sub_section(request, group_id):
         # set name
         css_new.name = css_node_name
         css_new.modified_by = int(request.user.id)
+        css_new.status = u"PUBLISHED"
         css_new.created_by = int(request.user.id)
         css_new.contributors.append(int(request.user.id))
 
@@ -1425,6 +1427,7 @@ def save_resources(request, group_id):
             # set name
             cu_new.name = unit_name.strip()
             cu_new.modified_by = int(request.user.id)
+            cu_new.status = u"PUBLISHED"
             cu_new.created_by = int(request.user.id)
             cu_new.contributors.append(int(request.user.id))
 
@@ -1485,6 +1488,7 @@ def create_edit_unit(request, group_id):
             cu_node.name = unit_name.strip()
             cu_node.modified_by = int(request.user.id)
             cu_node.created_by = int(request.user.id)
+            cu_node.status = u"PUBLISHED"
             cu_node.contributors.append(int(request.user.id))
             cu_node.prior_node.append(css_node._id)
             cu_node.save()
