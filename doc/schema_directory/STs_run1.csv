@@ -16,8 +16,8 @@ Master Trainer,"[""Person""]","[""factory_types""]",[],[],[]
 Faculty Coordinator,"[""Person""]","[""factory_types""]",[],[],[]
 NSS Coordinator,"[""Person""]","[""factory_types""]",[],[],[]
 Course Developer,"[""Person""]","[""factory_types""]",[],[],[]
-Steering Committee Member,"[""Person""]","[""factory_types""]",[],[],"[""Organization"", ""University"", ""College"", ""Course"", ""NUSSD Course"", ""Announced Course"", ""Person"", ""Partners"", ""Program Manager"", ""Steering Committee Member"", ""Faculty Coordinator"", ""Program Officer"", ""NSS Coordinator"", ""Course Developer"", ""Master Trainer"", ""Voluntary Teacher"", ""Student"", ""Enrollment"", ""StudentCourseEnrollment""]"
-Program Officer,"[""Person""]","[""factory_types""]",[],[],"[""Person"", ""Student"", ""Enrollment"", ""StudentCourseEnrollment""]"
+Steering Committee Member,"[""Person""]","[""factory_types""]",[],[],[]
+Program Officer,"[""Person""]","[""factory_types""]",[],[],[]
 Program Manager,"[""Person""]","[""factory_types""]",[],[],[]
 Partners,"[""Person""]","[""factory_types""]",[],[],[]
 Event,[],"[""GAPP""]",[],[],[]
@@ -34,8 +34,8 @@ Lab Session,"[""Event""]","[""factory_types""]",[],[],[]
 Exam,"[""Event""]","[""factory_types""]",[],[],[]
 Enrollment,[],"[""factory_types""]",[],[],[]
 StudentCourseEnrollment,"[""Enrollment""]","[""factory_types""]",[],[],[]
-MIS,[],"[""GAPP""]",[],[],"[""Organization"", ""University"", ""College"", ""Course"", ""NUSSD Course"", ""Announced Course"", ""Person"", ""Partners"", ""Program Manager"", ""Steering Committee Member"", ""Faculty Coordinator"", ""Program Officer"", ""NSS Coordinator"", ""Course Developer"", ""Master Trainer"", ""Voluntary Teacher"", ""Student"", ""Enrollment"", ""StudentCourseEnrollment""]"
-MIS-PO,[],"[""GAPP""]",[],[],"[""Person"", ""Voluntary Teacher"", ""Student""]"
+MIS,[],"[""GAPP""]",[],[],[]
+MIS-PO,[],"[""GAPP""]",[],[],[]
 CourseSection,[],"[""factory_types""]",[],[],[]
 CourseSubSection,[],"[""factory_types""]",[],[],[]
 CourseUnit,[],"[""factory_types""]",[],[],[]
