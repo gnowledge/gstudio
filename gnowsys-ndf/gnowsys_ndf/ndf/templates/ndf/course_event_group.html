@@ -125,6 +125,7 @@
             	{% for each_blog in blog_pages %}
                 <div class="blogpage"  style="margin-left:10px;">
                   <h4><u>{{each_blog.name}}</u></h4>
+                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}">Edit</a>
                   <span>
                   Created at {{each_blog.created_at}}
                   by {{request.user.username}}
