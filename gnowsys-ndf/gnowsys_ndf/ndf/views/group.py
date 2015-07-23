@@ -1746,6 +1746,7 @@ def group_dashboard(request, group_id=None):
       twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
       page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
       blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
       if group_obj.collection_set:
           course_structure_exists = True
       alternate_template = "ndf/course_event_group.html"
@@ -1784,7 +1785,7 @@ def group_dashboard(request, group_id=None):
       last_enrollment_date = group_obj.end_enroll
       if last_enrollment_date:
         curr_date_time = datetime.now()
-        if curr_date_time > last_enrollment_date:
+        if curr_date_time >= last_enrollment_date:
             allow_to_join = False
   property_order_list = []
   if "group_of" in group_obj:
@@ -1806,6 +1807,7 @@ def group_dashboard(request, group_id=None):
                                                        'list_of_unit_events': list_of_unit_events,
                                                        'blog_pages':blog_pages,
                                                        'selected': selected,
+                                                       'files_cur': files_cur,
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
