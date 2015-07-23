@@ -1267,12 +1267,12 @@ ul#navigation li a.last {
 
 
 <section class="medium-3 columns"> 
-
+{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
+    
   <!-- Modal links for associated views like graphs and map-->
   <ul class="side-nav">
     <div class="panel" style="background-color:#ddd;">
       {% get_group_object groupid as group_object %}
-
       {% user_access_policy groupid request.user as user_access %} 
       
       {% if user.is_authenticated %}
@@ -1622,7 +1622,7 @@ ul#navigation li a.last {
 
     </div>
   </ul>
-
+{% endif %}
   {% if "video" in node.mime_type %}
     <link rel="stylesheet" href="/static/ndf/bower_components/videojs/dist/video-js/video-js.min.css">
     <script src="/static/ndf/bower_components/videojs/dist/video-js/video.js"></script>
