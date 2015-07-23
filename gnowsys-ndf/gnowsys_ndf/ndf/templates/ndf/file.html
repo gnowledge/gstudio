@@ -13,7 +13,11 @@
 
   .tabs dd.active a, .tabs .tab-title.active a { background-color: #f7f7f7; }
 
-  .tabs dd.active{ width: 100%; }
+  .tabs dd { width: 100%; }
+
+  .tabs dd a { padding-right: 0; width: 100%; }
+
+  .count { position: absolute; right: 5px; opacity: 0.75; }
 
   .panel > .side-nav > .tabs i {margin-right: 0.5rem;}
 
@@ -69,16 +73,17 @@
     <ul class="side-nav">
       <dl class="tabs" data-tab >
 
+
         <!-- all files -->
         <dd class="active" data-filetype="all">
           <a href="#view-all">
             <i class="fi-eye"></i>
             {% trans "All files" %}
-            <span class="count">
-              {% if file_pages.count > 0 %} ({{ file_pages.count }}) {% endif %}
+            <span class="count text-right">
+              {% if file_pages.count > 0 %} {{ file_pages.count }} {% endif %}
             </span>
           </a>
-        </dd><br/>
+        </dd>
 
         <!-- Documents -->
         <dd data-filetype="Documents">
@@ -86,7 +91,7 @@
             <i class="fi-page-doc"></i>
             {% trans "Documents" %}
             <span class="count">
-              {% if doc_pages %} ({{ doc_pages }}) {% endif %}
+              {% if doc_pages %} {{ doc_pages }} {% endif %}
             </span>
           </a>
         </dd><br/>
@@ -97,7 +102,7 @@
             <i class="fi-page-filled"></i>
             {% trans "Pages" %}
             <span class="count">
-              {% if page_count %} ({{ page_count }}) {% endif %}
+              {% if page_count %} {{ page_count }} {% endif %}
             </span>
           </a>
         </dd><br/>   
@@ -109,7 +114,7 @@
               <i class="fi-shuffle"></i>
               {% trans "Interactives" %}
               <span class="count">
-                ({{ interactive_pages }})
+                {{ interactive_pages }}
               </span>
             </a>
           </dd><br/>
@@ -122,7 +127,7 @@
               <i class="fi-book"></i>
               {% trans "eBooks" %}
               <span class="count">
-                ({{ ebook_pages }})
+                {{ ebook_pages }}
               </span>
             </a>
           </dd><br/>
@@ -135,7 +140,7 @@
               <i class="fi-music"></i>
               {% trans "Audios" %}
               <span class="count">
-                {% if audio_pages %} ({{ audio_pages }}) {% endif %}
+                {% if audio_pages %} {{ audio_pages }} {% endif %}
               </span>
             </a>
           </dd><br/>
@@ -146,7 +151,7 @@
           <a href="#view-image"><i class="fi-camera"></i>
             {% trans "Images" %}
             <span class="count">
-              {% if image_pages %} ({{ image_pages }}) {% endif %}
+              {% if image_pages %} {{ image_pages }} {% endif %}
             </span>
           </a>
         </dd><br/>
@@ -158,7 +163,7 @@
             <a href="#view-video"><i class="fi-video"></i>
               {% trans "Videos" %}
               <span class="count">
-                {% if video_pages %}({{ video_pages }}) {% endif %}
+                {% if video_pages %} {{ video_pages }} {% endif %}
               </span>
             </a>
           </dd><br/>
@@ -183,18 +188,18 @@
             <a href="#view-pandora-video"><i class="fi-video"></i>
               {% trans "Videos" %}
               <span class="count">
-                {% if video_pages %}({{ video_pages }}){% endif %}
+                {% if video_pages %} {{ video_pages }} {% endif %}
               </span>
             </a>
           </dd><br/>
         {% endif %}
 
         <dd>
+        <!-- <dd data-filetype="all"> -->
           <a href="#view-collection">
             <i class="fi-page-multiple"></i> {% trans "Collections" %}
           </a>
-        </dd><br/>
-        
+        </dd>
 
       </dl><br/>
 
@@ -545,11 +550,11 @@
       var c = this.getAttribute("data-filetype");
 
       if(educationaluse_stats.hasOwnProperty(c)){
-        $(this).find("a > span.count:visible").fadeOut().fadeIn().text( "(" + educationaluse_stats[c] + ")");
+        $(this).find("a > span.count:visible").fadeOut().fadeIn().text(educationaluse_stats[c]);
       }
       else
       {
-        $(this).find("a > span.count:visible").fadeOut().fadeIn().text("(0)");
+        $(this).find("a > span.count:visible").fadeOut().fadeIn().text("0");
       }
 
     });

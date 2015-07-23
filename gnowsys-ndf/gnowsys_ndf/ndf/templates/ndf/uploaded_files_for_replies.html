@@ -1,0 +1,29 @@
+{% load ndf_tags %}
+{% load i18n %}
+{% load cache %}
+
+<div class="row">
+{% get_group_name groupid as group_name%}
+
+
+{% if node_list|length > 0 %}
+Uploaded files :
+{% endif %}
+{% for node in node_list %}
+
+{{node.mime_type}}
+ {% if 'image' in node.mime_type  %}
+<a class="th" href="{% url 'read_file' group_name node node.name %}">
+<img src="{% url 'getFileThumbnail' group_name node.pk %}" />
+{% elif 'html' in node.mime_type or 'pdf' in node.mime_type %}
+ <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name node node.name %}"></iframe>
+{% comment %}
+{% elif 'text' in node.mime_type %}
+<iframe id="html-res-iframe" width="50%" src="{% url 'read_file' group_name node node.name %}">
+{% endcomment %}
+{% endif %}
+<p>Name:{{node.name}}</p>
+</a>  
+{% endfor %}
+</div>
+

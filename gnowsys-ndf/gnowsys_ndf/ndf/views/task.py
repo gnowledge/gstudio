@@ -625,6 +625,7 @@ def create_task_at_rt(request,rt_list,at_list,task_node,assign,group_name,group_
             # newattribute.object_value = field_value
             object_value = field_value
     
+
           # newattribute.save()
           ga_node = create_gattribute(subject, attributetype_key, object_value)
       
