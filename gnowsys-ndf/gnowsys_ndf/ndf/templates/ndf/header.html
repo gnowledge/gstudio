@@ -139,7 +139,7 @@
 
         <!-- Current group selector -->
         <li class="group">
-          <a title="{{group_object.name|default:' -- '}}" class="active" >
+          <a title="{{group_object.name|default:' -- '}}" class="active" href="{% url 'groupchange' group_object.name %}">
             {{group_object.name|truncatechars:20}}
           </a>
           </li>
