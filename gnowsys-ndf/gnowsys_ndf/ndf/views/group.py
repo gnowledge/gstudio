@@ -1756,7 +1756,7 @@ def group_dashboard(request, group_id=None):
                                     }).sort('created_at', -1)
       if request.user.id:
           blog_pages = node_collection.find({'member_of':page_gst._id, 'created_by': int(request.user.id),
-						'type_of': blogpage_gst._id})
+						'type_of': blogpage_gst._id, 'group_set': group_obj._id})
       for each in existing_forums:
 
       		temp_forum = {}
