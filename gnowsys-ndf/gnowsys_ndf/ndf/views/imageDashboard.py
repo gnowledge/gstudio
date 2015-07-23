@@ -208,34 +208,39 @@ def image_edit(request,group_id,_id):
                 group_id = str(auth._id)
     else :
         pass
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
     img_node = node_collection.one({"_id": ObjectId(_id)})
+    ce_id = request.GET.get('course_event_id')
+    res = request.GET.get('res')
+
     title = GST_IMAGE.name
     if request.method == "POST":
-
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
         img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE))
-        
-	get_node_metadata(request,img_node)
-	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
-	if teaches_list !='':
-			teaches_list=teaches_list.split(",")
-	
-	create_grelation_list(img_node._id,"teaches",teaches_list)
-	assesses_list = request.POST.get('assesses_list','')	
-	if assesses_list !='':
-		assesses_list=assesses_list.split(",")
-					
-	create_grelation_list(img_node._id,"assesses",assesses_list)
-        
-	
-        return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))
-        
+        if "CourseEventGroup" not in group_obj.member_of_names_list:
+            get_node_metadata(request,img_node)
+            teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+            if teaches_list !='':
+                teaches_list=teaches_list.split(",")
+            create_grelation_list(img_node._id,"teaches",teaches_list)
+            assesses_list = request.POST.get('assesses_list','')
+            if assesses_list !='':
+                assesses_list=assesses_list.split(",")
+
+            create_grelation_list(img_node._id,"assesses",assesses_list)
+
+            return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))
+        else:
+            url = "/"+ group_id +"/?selected="+str(img_node._id)+"#view_page"
+            return HttpResponseRedirect(url)
     else:
-	img_node.get_neighbourhood(img_node.member_of)
+        img_node.get_neighbourhood(img_node.member_of)
         return render_to_response("ndf/image_edit.html",
-                                  { 'node': img_node,'title': title,
+                                  {'node': img_node, 'title': title,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid': group_id,
+                                    'ce_id':ce_id,
+                                    'res': res
                                 },
                                   context_instance=RequestContext(request)
                               )

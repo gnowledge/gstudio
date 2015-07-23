@@ -678,7 +678,7 @@ CACHES = {
 WETUBE_USERNAME = "glab"
 WETUBE_PASSWORD = "gl@b$@)we!ube"
 #Captcha settings
-CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.math_challenge'
+CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
 
 

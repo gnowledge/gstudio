@@ -9,11 +9,15 @@
 {% get_group_name groupid as group_name_tag %}
 
 {% block meta_content %}
-
-  {% if 'NUSSD Course' in cnode.member_of_names_list %}
-    <a href="{% url 'mis_course_detail' group_name_tag app_id app_set_id cnode %}"><h3><u>{{cnode.name}}</u></h3></a>
+  {% get_group_object groupid as group_object %}
+  {% if "CourseEventGroup" in group_object.member_of_names_list %}
+      <a href="{% url 'groupchange' groupid %}"><h3><u>{{cnode.name}}</u></h3></a>
   {% else %}
-    <a href="{% url 'course_detail' group_name_tag cnode %}"><h3><u>{{cnode.name}}</h3></u></a>
+    {% if 'NUSSD Course' in cnode.member_of_names_list %}
+      <a href="{% url 'mis_course_detail' group_name_tag app_id app_set_id cnode %}"><h3><u>{{cnode.name}}</u></h3></a>
+    {% else %}
+      <a href="{% url 'course_detail' group_name_tag cnode %}"><h3><u>{{cnode.name}}</h3></u></a>
+    {% endif %}
   {% endif %}
 
 {% endblock %}
@@ -22,7 +26,6 @@
 {% block style %}
 
   {{block.super}}
-  /*<style type="text/css">*/
     /* Resetting css-properties for fieldset (also legend, input) */
     /* fieldset (padding-bottom) */ 
     fieldset {
@@ -160,7 +163,6 @@
     .course-section-class:hover .cs_setting{
       display:block;
     }
-    /*</style>*/
 {% endblock %}
 
 

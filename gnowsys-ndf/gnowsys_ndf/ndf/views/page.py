@@ -282,51 +282,61 @@ def create_edit_page(request, group_id, node_id=None):
     #     pass
     group_name, group_id = get_group_name_id(group_id)
     ce_id = request.GET.get('course_event_id')
+    res = request.GET.get('res')
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id,
-                          'ce_id': ce_id
+                          'ce_id': ce_id,
+                          'res':res
                       }
     
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
-   # for each in available_nodes:
-   #   nodes_list.append(str((each.name).strip().lower()))
-    #loop replaced by a list comprehension
-    node_list=[str((each.name).strip().lower()) for each in available_nodes]
+    # for each in available_nodes:
+    #   nodes_list.append(str((each.name).strip().lower()))
+    # loop replaced by a list comprehension
+    node_list = [str((each.name).strip().lower()) for each in available_nodes]
 
     if node_id:
         page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
         page_node = node_collection.collection.GSystem()
-        
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
 	page_type = request.POST.getlist("type_of",'')
-	ce_id = request.POST.get("ce_id",'')
-	if page_type:
-		objid= page_type[0]
-		if not ObjectId(objid) in page_node.type_of:
-			page_type1=[]
-			page_type1.append(ObjectId(objid))
-			page_node.type_of = page_type1
-			page_node.type_of
+        ce_id = request.POST.get("ce_id",'')
+        res = request.POST.get("res",'')
+        print "\n\n res", res
+        if ce_id:
+                blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+                page_node.type_of = [blogpage_gst._id]
+        else:
+
+        	if page_type:
+        		objid= page_type[0]
+        		if not ObjectId(objid) in page_node.type_of:
+        			page_type1=[]
+        			page_type1.append(ObjectId(objid))
+        			page_node.type_of = page_type1
+        			page_node.type_of
 	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
-        page_node.save() 
-        
+        page_node.save()
+
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '') 
+        if ce_id:
+          url_name = "/" + ce_id +"/#journal-tab"
+          if res:
+            url_name = "/" + ce_id +"/?selected=" + str(page_node._id)+ "#journal-tab"
+          return HttpResponseRedirect(url_name)
         if metadata:
           # Only while metadata editing
           if metadata == "metadata":
             if page_node:
               get_node_metadata(request,page_node)
         # End of filling metadata
-        if ce_id:
-          url_name = "/" + ce_id
-          return HttpResponseRedirect(url_name)
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 

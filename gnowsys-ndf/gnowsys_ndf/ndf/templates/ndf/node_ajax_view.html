@@ -6,7 +6,8 @@
 
 {% cache 360 node_ajax_view request.LANGUAGE_CODE %}
 
-<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
+<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+
 <script type="text/javascript">
   $(document).foundation();
 </script>
@@ -1266,12 +1267,12 @@ ul#navigation li a.last {
 
 
 <section class="medium-3 columns"> 
-
+{% if 'CourseEventGroup' not in group_object.member_of_names_list %}
+    
   <!-- Modal links for associated views like graphs and map-->
   <ul class="side-nav">
     <div class="panel" style="background-color:#ddd;">
       {% get_group_object groupid as group_object %}
-
       {% user_access_policy groupid request.user as user_access %} 
       
       {% if user.is_authenticated %}
@@ -1292,7 +1293,7 @@ ul#navigation li a.last {
                 {% get_sg_member_of groupid as list_of_sg_member_of %}
                 {% if "ProgramEventGroup" in list_of_sg_member_of %}
                   <li><a href="{% url 'edit_event_group' group_id 'ProgramEventGroup' %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit ProgramEvent" %}</a></li><br>
-                {% elif "CourseEventGroup" in list_of_sg_member_of %}
+                {% elif "CourseEventGroup" in node.member_of_names_list %}
                   <li><a href="{% url 'edit_event_group' group_id 'CourseEventGroup' %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit CourseEvent" %}</a></li><br>
                 {% else %}
                   <li><a href="{% url edit_url group_id %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li><br>
@@ -1362,8 +1363,6 @@ ul#navigation li a.last {
 
                 </a>
               </li>
-               
-
               {% endif %}
             {% endif %}
             
@@ -1470,10 +1469,9 @@ ul#navigation li a.last {
 
               {% check_is_gstaff groupid request.user as is_gstaff %}
               {% if is_gstaff %}
-
-                {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
+              {% if group_object.edit_policy != EDITABLE_MODERATED%}
                     {% include "ndf/invite_users.html" %}
-                {% endifnotequal %}
+              {% endif %}
 
                 {% include "ndf/invite_admins.html" %}
               {% endif %} 
@@ -1624,7 +1622,7 @@ ul#navigation li a.last {
 
     </div>
   </ul>
-
+{% endif %}
   {% if "video" in node.mime_type %}
     <link rel="stylesheet" href="/static/ndf/bower_components/videojs/dist/video-js/video-js.min.css">
     <script src="/static/ndf/bower_components/videojs/dist/video-js/video.js"></script>
