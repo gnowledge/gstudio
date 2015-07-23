@@ -892,10 +892,11 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 # group id stored in group_set field
                 fileobj.group_set.append(group_object._id)
 
-            # if group is of EDITABLE_MODERATED, update group_set accordingly
-            if group_object.edit_policy == "EDITABLE_MODERATED":
-                fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
-                fileobj.status = u'MODERATION'
+            if "CourseEventGroup" not in group_object.member_of_names_list:
+                # if group is of EDITABLE_MODERATED, update group_set accordingly
+                if group_object.edit_policy == "EDITABLE_MODERATED":
+                    fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
+                    fileobj.status = u'MODERATION'
 
             if usrname:
                 user_group_object = node_collection.one({'$and': [{'_type': u'Author'},{'name': usrname}]})
