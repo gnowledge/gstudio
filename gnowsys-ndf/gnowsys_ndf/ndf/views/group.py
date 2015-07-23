@@ -1737,6 +1737,7 @@ def group_dashboard(request, group_id=None):
 
   # Call to get_neighbourhood() is required for setting-up property_order_list
   group_obj.get_neighbourhood(group_obj.member_of)
+  course_structure_exists = False
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   if "CourseEventGroup" in group_obj.member_of_names_list:
@@ -1744,6 +1745,8 @@ def group_dashboard(request, group_id=None):
       twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
       page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
       blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+      if group_obj.collection_set:
+          course_structure_exists = True
       alternate_template = "ndf/course_event_group.html"
 
       existing_forums = node_collection.find({
@@ -1802,6 +1805,7 @@ def group_dashboard(request, group_id=None):
                                                        'list_of_unit_events': list_of_unit_events,
                                                        'blog_pages':blog_pages,
                                                        'selected': selected,
+                                                       'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
                                                        'annotations' : annotations, 'shelves': shelves,
