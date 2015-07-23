@@ -4724,7 +4724,14 @@ def edit_task_content(request, group_id):
 @get_execution_time
 def insert_picture(request, group_id):
     if request.is_ajax():
-        resource_list=node_collection.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'name': 1})
+        resource_list=node_collection.find(
+          {
+            '_type' : 'File',
+            'group_set': {'$in': [ObjectId(group_id)]},
+            'mime_type' : u"image/jpeg" 
+          },
+          {'name': 1})
+
         resources=list(resource_list)
         n=[]
         for each in resources:

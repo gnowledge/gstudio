@@ -32,6 +32,20 @@
           {{each_reply.HTMLcontent | safe }}
           {% endspaceless %}
         </div>
+
+        {% for node in each_reply.collection_set  %}
+        <div style="margin: 1em;">
+          
+        {{node.mime_type}}
+        <br/>
+        <a class="th" style="" href="{% url 'read_file' group_id node node.name %}">
+           {% if 'image' in node.mime_type  %}
+            <img style="height:100px;" src="{% url 'getFileThumbnail' group_id node.pk %}" />
+          {% endif %}
+          <p>{{node.name}}</p>
+        </a>  
+        </div>
+        {% endfor %}
       </div>
 
       <div class="row">
@@ -53,6 +67,7 @@
     <!-- Reply : -->
     <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
     <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
+    <input type="file" id="uploaded-files" style="" value="" multiple>
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
     <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
   </div>
@@ -80,6 +95,7 @@
   {% if request.user.is_authenticated %}
     $("#orgitdownreps").orgitdown(mySettings);
   {% endif %}
+
   
   function createDiscussion()
   {
@@ -207,13 +223,30 @@
 
   function createReplyHTML(replyStyle, data)
   {
+    var files = data[8];
+    // console.log(files)
+    filesContent = ""
+    files.forEach(function(f){
+        // console.log("=========")
+        // console.log(f)
+        var mime_type = f[1];
+
+        filesContent += "<div style='margin: 1em;'>"+ f[1] +"<br/>"+
+        "<a class='th' href='/{{group_id}}/file/readDoc/"+f[0]+"/"+f[2]+"'>";
+
+        if(mime_type.indexOf("image") >= 0){
+          filesContent += "<img style='height: 100px;' src='/{{group_id}}/file/thumbnail/"+ f[0] +"'/>";}
+
+        filesContent += "<p>" + f[2] + "</p></a></div>";
+        // console.log(filesContent);
+    });
     var htmlReply = "<div style='"+ replyStyle +"' data-reply-id='"+ data[1] +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
     + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
     + "<span class='align-center'><i class='fi-torso'></i></span>"
     + "<label>" + data[6] + "</label></a></div>"
-    + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
+    + "<div class='small-9 columns'>"+ data[3] + filesContent +"</div></div>"
 
-    + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
+    + "<div class='row'><div class='small-8 columns'><small>"+ data[7] +"</small></div>"
     + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>delete</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
@@ -234,19 +267,30 @@
     if( (replyContent.length > 0) && (priorNodeId.length == 24) )
     {
 
+      docs_list = new FormData();
+      var all_files = document.getElementById("uploaded-files");
+      var docs_count = all_files.files.length;
+
+      for(var i = 0; i < docs_count; i++)
+        {
+          docs_list.append("upload"+i, all_files.files[i]);
+          // console.log(all_files.files[i]);
+        }
+
+        docs_list.append('upload_cnt', docs_count)
+        docs_list.append('csrfmiddlewaretoken','{{csrf_token}}');
+        docs_list.append('reply_text_content', replyContent)
+        docs_list.append('prior_node_id', priorNodeId)
+
       $.ajax({
         
         type: "POST",
 
         url: "{% url 'discussion_reply' group_id node.pk %}",
 
-        data: { 
-
-          "csrfmiddlewaretoken": "{{ csrf_token }}",
-          "prior_node_id": priorNodeId,
-          "reply_text_content": replyContent
-
-        },
+        data: docs_list,
+        processData: false, 
+        contentType: false,
 
         success: function(data){
             

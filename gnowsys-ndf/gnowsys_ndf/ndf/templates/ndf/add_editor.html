@@ -138,7 +138,7 @@ function insertImg(fileurl){
            $("#orgitdown_content_org").val(content); 
            }
  }       
- $(".close-reveal-modal").trigger("click");
+ $("#insert-pic .close-reveal-modal").trigger("click");
    }
 }
 
@@ -243,12 +243,13 @@ $(".orgitdownButton.orgitdownButton10 a").click(function(){
 </div>
 
 <div id="insert-pic" class="small reveal-modal" data-reveal>
-<a class="close-reveal-modal">&#215;</a>
-<h3>Add Internal/External Images:</h3> 
-<div>
-<input type="radio" id="extimage" name="imginsert" onclick="externalImg()"><label>External</label>
-<input type="radio" id="intimage" name="imginsert" onclick="internalImg()"><label>Internal</label>
-</div></div>
+  <a class="close-reveal-modal">&#215;</a>
+  <h3>Add Internal/External Images:</h3> 
+  <div>
+    <input type="radio" id="extimage" name="imginsert" onclick="externalImg()"><label>External</label>
+    <input type="radio" id="intimage" name="imginsert" onclick="internalImg()"><label>Internal</label>
+  </div>
+</div>
 
 <div id="int-img" class="small reveal-modal" data-reveal>
 <a class="close-reveal-modal">&#215;</a>
