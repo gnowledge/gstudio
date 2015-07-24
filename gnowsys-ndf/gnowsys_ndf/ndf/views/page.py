@@ -308,10 +308,13 @@ def create_edit_page(request, group_id, node_id=None):
 	page_type = request.POST.getlist("type_of",'')
         ce_id = request.POST.get("ce_id",'')
         res = request.POST.get("res",'')
-        print "\n\n res", res
+        if res:
+            res = eval(res)
         if ce_id:
-                blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-                page_node.type_of = [blogpage_gst._id]
+                if res == None:
+                    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+                    page_node.type_of = [blogpage_gst._id]
+                    page_node.status = u"PUBLISHED"
         else:
 
         	if page_type:
