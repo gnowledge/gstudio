@@ -34,6 +34,7 @@ topic_gst       = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 home_group      = node_collection.one({'_type': 'Group', 'name': 'home'})
 home_group_id   = home_group._id
 curricular_at   = node_collection.one({'_type': 'AttributeType', 'name': u'curricular'})
+alignment_at    = node_collection.one({'_type': 'AttributeType', 'name': u'educationalalignment'})
 
 nroer_team_id = 1
 
@@ -85,11 +86,13 @@ class Command(BaseCommand):
             Creating themes topic hierarchy\
             Schema for CSV has to be as follows:\
             column 1: CR/XCR\
-            column 2: content_org for topic\
-            column 3: Theme/Collection\
-            column 4: Theme-item\
-            column ... : ...\
-            column n-1: Theme-item\
+            column 2: featured\
+            column 3: alignment\
+            column 4: content_org for topic\
+            column 5: Theme/Collection\
+            column 6: Theme-item (sub-theme)\
+            column ... : ... (sub-theme)\
+            column n-1: Theme-item (sub-theme)\
             column n: Topic\
             "
 
@@ -158,17 +161,19 @@ def create_theme_topic_hierarchy(row):
     
     Args:
         row (list): each row of CSV
-        e.g: ["CR/XCR", "content_org", "Theme name", "theme item name", .., .., .... , "topic"]
+        e.g: ["CR/XCR", "featured", "alignment", "content_org", "Theme name", "theme item name", .., .., .... , "topic"]
     
     Returns:
         TYPE: Description
     """
 
     # print row
-    curricular = row[0] #
-    content_org = row[1]
-    theme_name = row[2] #
-    topic_name = row[-1:]
+    curricular = row[0] # CR or XCR
+    featured = int(row[1])   # 0 or 1
+    alignment = row[2]  # like NCF
+    content_org = row[3]
+    theme_name = row[4] # theme-name like National Curriculum
+    # topic_name = row[-1:]
 
     # --- Theme processing ---
 
@@ -181,7 +186,12 @@ def create_theme_topic_hierarchy(row):
 
     # creating a new theme node:
     if not theme_node:
-        theme_node = create_object(name=theme_name, member_of_id=theme_gst._id)
+        theme_node = create_object(name=theme_name, member_of_id=theme_gst._id, featured=bool(featured))
+
+        info_message = "- Created New Object : "+ str(theme_node.name) + "\n"
+        print info_message 
+        log_list.append(str(info_message))
+
 
     # casting curricular field to bool:
     if curricular == "CR":
@@ -195,17 +205,27 @@ def create_theme_topic_hierarchy(row):
     # otherwise it will create a new attribute:
     ga_node = create_gattribute(theme_node._id, curricular_at, curricular)
 
+    info_message = "- Created ga_node : "+ str(ga_node.name) + "\n"
+    print info_message 
+    log_list.append(str(info_message))
+
+    ga_node = create_gattribute(theme_node._id, alignment_at, unicode(alignment))
+
+    info_message = "- Created ga_node : "+ str(ga_node.name) + "\n"
+    print info_message 
+    log_list.append(str(info_message))
+
     # --- END of Theme processing ---
     
     # --- theme-item and topic processing ---
     # from 4th item or 3rd index of row there will be start of theme-item and topic(at last)
-    theme_item_topic_list = row[3:]
+    theme_item_topic_list = row[5:]
     
     # do not entertain any blank values here:
     theme_item_topic_list = [i for i in theme_item_topic_list if i]
     # print theme_item_topic_list
 
-    topic_name = theme_item_topic_list.pop()  # Only 1 topic name, last item of row
+    topic_name = theme_item_topic_list.pop()  # Only 1 topic name, last item of row/list
     theme_item_list = theme_item_topic_list  # list of only theme-item name's, after pop
 
     # to initiate with parent node:
@@ -275,10 +295,11 @@ def create_theme_topic_hierarchy(row):
         add_to_collection_set(node_object=parent_node, id_to_be_added=topic_node._id)
 
 
-def create_object(name, member_of_id, prior_node_id=None, content_org=None, group_set_id=home_group_id):
+def create_object(name, member_of_id, prior_node_id=None, content_org=None, group_set_id=home_group_id, featured=None):
 
     node                = node_collection.collection.GSystem()
     node.name           = unicode(name)
+    node.featured       = featured
     node.language       = u"en"
     node.access_policy  = u"PUBLIC"
     node.status         = u"PUBLISHED"

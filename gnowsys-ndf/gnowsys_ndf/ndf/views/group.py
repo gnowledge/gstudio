@@ -1741,6 +1741,7 @@ def group_dashboard(request, group_id=None):
   course_structure_exists = False
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
+  files_cur = None
   if "CourseEventGroup" in group_obj.member_of_names_list:
       forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
       twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
