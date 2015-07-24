@@ -279,7 +279,7 @@
             <b>{% trans "Actions" %}</b><br/>
             <div class="row">         
             <div class="medium-6 columns">
-            <a href="{% url 'edit_event_group' groupid 'CourseEventGroup' %}" class="tiny button round edit"><i class="fi-pencil"></i> {% trans "Edit CourseEvent" %}</a>
+            <a href="{% url 'edit_event_group' groupid 'CourseEventGroup' %}" class="hide tiny button round edit"><i class="fi-pencil"></i> {% trans "Edit CourseEvent" %}</a>
             <br>
             <br>
             {% if "CourseEventGroup" in node.member_of_names_list%}

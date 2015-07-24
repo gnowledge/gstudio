@@ -1739,6 +1739,7 @@ def group_dashboard(request, group_id=None):
   # Call to get_neighbourhood() is required for setting-up property_order_list
   group_obj.get_neighbourhood(group_obj.member_of)
   course_structure_exists = False
+  files_cur = None
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   if "CourseEventGroup" in group_obj.member_of_names_list:
