@@ -170,7 +170,7 @@ def image_detail(request, group_id, _id):
       nav_li = nav_l
 
     if img_node._type == "GSystemType":
-	return imageDashboard(request, group_id, _id)
+    	return imageDashboard(request, group_id, _id)
     img_node.get_neighbourhood(img_node.member_of)
 
     imageCollection = node_collection.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 

@@ -229,7 +229,6 @@ class Node(DjangoDocument):
                   'ip_address':basestring}],
 	'snapshot':dict
     }
-    
     required_fields = ['name', '_type'] # 'group_set' to be included
                                         # here after the default
                                         # 'Administration' group is
