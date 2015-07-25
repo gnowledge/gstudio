@@ -118,14 +118,14 @@
         {% if user_access == "allow" %}
 
         <div class="content" id="journal-tab">
-            <div class="row">
-              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="round button small" style="float:right"> Add Blog </a>
+            <div class="">
+              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small" style="float:right"> Add Blog </a>
             </div>
             <div class="row all_blogs">
             	{% for each_blog in blog_pages %}
                 <div class="blogpage"  style="margin-left:10px;">
-                  <h4><u>{{each_blog.name}}</u></h4>
-                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}">Edit</a>
+                  <h4><a href="{% url 'page_details' group_id node.pk %}">{{each_blog.name}}</a></h4>
+                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
                   <span>
                   Created at {{each_blog.created_at}}
                   by {{request.user.username}}
@@ -134,6 +134,7 @@
                     {{each_blog.html_content|safe}}
                   </div>
                 </div>
+                <hr/>
               {% empty %}
                 <div class="blogpage"  style="margin-left:10px;">
                   <h4><u>
