@@ -1801,13 +1801,23 @@ class Triple(DjangoDocument):
 
 @connection.register
 class GAttribute(Triple):
-
     structure = {
         'attribute_type_scope': basestring,
-        'attribute_type': AttributeType,  # DBRef of AttributeType Class
+        'attribute_type': AttributeType,  # Embedded document of AttributeType Class
         'object_value_scope': basestring,
-        'object_value': None		  # value -- it's data-type, is determined by attribute_type field
+        'object_value': None  # value -- it's data-type, is determined by attribute_type field
     }
+
+    indexes = [
+        {
+            # 1: Compound index
+            'fields': [
+                ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
+                ('attribute_type.$id', INDEX_ASCENDING), ('status', INDEX_ASCENDING)
+            ],
+            'check': False  # Required because $id is not explicitly specified in the structure
+        }
+    ]
 
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
@@ -1824,9 +1834,26 @@ class GRelation(Triple):
         'right_subject': OR(ObjectId, list)
     }
 
+    indexes = [{
+        # 1: Compound index
+        'fields': [
+            ('_type', INDEX_ASCENDING), ('subject', INDEX_ASCENDING), \
+            ('relation_type.$id'), ('status', INDEX_ASCENDING), \
+            ('right_subject', INDEX_ASCENDING)
+        ],
+        'check': False  # Required because $id is not explicitly specified in the structure
+    }, {
+        # 2: Compound index
+        'fields': [
+            ('_type', INDEX_ASCENDING), ('right_subject', INDEX_ASCENDING), \
+            ('relation_type.$id'), ('status', INDEX_ASCENDING)
+        ],
+        'check': False  # Required because $id is not explicitly specified in the structure
+    }]
+
     required_fields = ['relation_type', 'right_subject']
     use_dot_notation = True
-    use_autorefs = True                   # To support Embedding of Documents
+    use_autorefs = True  # To support Embedding of Documents
 
 
 
