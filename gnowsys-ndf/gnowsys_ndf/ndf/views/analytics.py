@@ -124,8 +124,6 @@ def user_app_activities(request,group_id,part):
 
 	user = request.user.username
 
-	print part 
-
 	query("user",{ "username" : request.user.username })
 	cursor = analytics_collection.find({"obj."+part : { "$exists" : True}, "action.key" : {"$in" : ['create', 'edit', 'add', 'delete']}, "user.name" : request.user.username}).sort("timestamp",-1)
 	
@@ -246,7 +244,6 @@ def group_summary(request,group_id):
 	query("group",{ "group_id" : group_id })
 
 	data = {}
-	
 	pipe = [{'$match' : { 'group_id' : str(group_id)}}, {'$group': {'_id': '$user.name', 'num_of_activities': {'$sum': 1}}}]
 	sorted_list = analytics_collection.aggregate(pipeline=pipe)
 	sorted_list_acc_activities = sorted(sorted_list['result'],key = lambda k:k[u'num_of_activities'],reverse=True)
@@ -258,25 +255,28 @@ def group_summary(request,group_id):
 		i+=1
 		if i==3:
 			break
-
-	data['forums'] = db['Nodes'].find({"url":"forum", "group_set":group_id, "status":"DRAFT"}).count()	
-	data['threads'] = db['Nodes'].find({"url":"forum/thread", "group_set":group_id, "status":"DRAFT"}).count()
+	Course = node_collection.find_one({"_type":"GSystemType","name":"Course"})
+	CourseEventGroup  =  node_collection.find_one({"_type":"GSystemType","name":"CourseEventGroup"})
+        TwistGst = node_collection.find_one({"_type":"GSystemType","name":"Twist"})
+	data['forums'] = db['Nodes'].find({"url":"forum", "group_set":ObjectId(group_id)}).count()	
+	data['threads'] = db['Nodes'].find({"member_of":ObjectId(TwistGst._id),"group_set":ObjectId(group_id)}).count()
 	regx=re.compile("^Reply of:.*")
-	data['replies'] = db['Nodes'].find({"name": regx,"group_set":group_id, "status":"DRAFT"}).count()
-	data['files'] = db['Nodes'].find({"url":"file", "group_set":group_id, "status":"PUBLISHED"}).count()
-	data['pages'] = db['Nodes'].find({"url":"page", "group_set":group_id, "status":"PUBLISHED"}).count()
-	data['total_activities'] = analytics_collection.find({ "group_id" : str(group_id)}).count()
-
+	data['replies'] = db['Nodes'].find({"name": regx,"group_set":ObjectId(group_id)}).count()
+	data['files'] = db['Nodes'].find({"url":"file", "group_set":ObjectId(group_id)}).count()
+	data['pages'] = db['Nodes'].find({"url":"page", "group_set":ObjectId(group_id)}).count()
+	data['total_activities'] = analytics_collection.find({ "group_id" : unicode(group_id)}).count()
+	data['Courses'] =  node_collection.find({"type_of":Course._id}).count()
+	data['announce_courses'] = node_collection.find({"prior_node":ObjectId(group_id),"member_of":CourseEventGroup._id}).count()
 	data['recent'] = {}
 
 	specific_date = datetime.datetime.now() - datetime.timedelta(days=7)
 
-	data['recent']['forums'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.forum" : { '$exists' : 'true'}}).count()
-	data['recent']['threads'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.thread" : { '$exists' : 'true'}}).count()
-	data['recent']['replies'] = analytics_collection.find({"action.key": {"$in" : ['add']}, "group_id": str(group_id), "obj.reply" : { '$exists' : 'true'}}).count()
-	data['recent']['files'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.file" : { '$exists' : 'true'}}).count()
-	data['recent']['pages'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.page" : { '$exists' : 'true'}}).count()
-			
+	data['recent']['forums'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.forum" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
+	data['recent']['threads'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.thread" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
+	data['recent']['replies'] = analytics_collection.find({"action.key": {"$in" : ['add']}, "group_id": str(group_id), "obj.reply" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
+	data['recent']['files'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.file" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
+	data['recent']['pages'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.page" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()
+	data['recent']['create_edit_course'] = analytics_collection.find({"action.key": {"$in" : ['create', 'edit']}, "group_id": str(group_id), "obj.course" : { '$exists' : 'true'},"timestamp":{'$gte':specific_date}}).count()	
 
 	
 	return render (request ,"ndf/analytics_group_summary.html",
@@ -351,9 +351,6 @@ def group_members(request, group_id) :
 
 		author = node_collection.find_one({ "_type" : "Author" , "name" : member[u'_id']})
 
-
-		print member[u'_id']
-		
 		member_doc['name'] = member[u'_id']
 		try : 
 			member_doc['email'] = author[u'email']
@@ -380,7 +377,6 @@ def group_members(request, group_id) :
 		#except : 
 		#	return HttpResponse('Fatal Error')
 
-	print list_of_members
 
 	return render (request, "ndf/analytics_group_members.html",
 																{"data" : list_of_members ,"group_id" : group_id, "groupid" : group_id})
@@ -460,7 +456,7 @@ def query(analytics_type,details) :
 
 	else :
 		group_id = details['group_id']	
-		group_node = node_collection.find_one({"_id" : group_id})
+		group_node = node_collection.find_one({"_id" : ObjectId(group_id)})
 		if group_node is not None :
 			member_list = group_node[u'author_set'] + group_node[u'group_admin']
 			for member in member_list :
@@ -488,7 +484,7 @@ def normalize(cursor) :
 				"page": page_activity,
 				"file": file_activity,
 				"course": course_activity,
-				"forum": forum_activity,
+                                "forum": forum_activity,
 				"task": task_activity,
 				"event": event_activity,
 				"dashboard": dashbard_activity,
@@ -518,9 +514,10 @@ def normalize(cursor) :
 					url = str(temp_doc[u'calling_url']).split("/")
 					group_id = Gid(url[1])
 					gapp = url[2]
-					gapp_list(gapp)(group_id,url,temp_doc)
+					gapp_list(gapp)(group_id,url,temp_doc) 
+					
 				temp_doc = doc
-
+        
 	if temp_doc[u'calling_url'] != None :
 		url = str(temp_doc[u'calling_url']).split("/")
 		group_id = Gid(url[1])
@@ -558,9 +555,7 @@ def page_activity(group_id,url,doc):
 	And also we are assuming here that if the difference between the last update and created at 
 	is less than 5 seconds then we should have created the page else we must have viewed the page.
 	'''
-
 	analytics_doc = initialize_analytics_obj(doc, group_id, 'page')
-	
 	if url[3] == "delete":
 		if ins_objectid.is_valid(url[4]) is True:
 			n = node_collection.find_one({"_id":ObjectId(url[4])})
@@ -593,7 +588,7 @@ def page_activity(group_id,url,doc):
 			analytics_doc.save()
 			return 1
 		
-	else:
+	else:	
 		try : 
 			n = node_collection.find_one({"_id":ObjectId(url[3])})
 			author_id = n[u'created_by']

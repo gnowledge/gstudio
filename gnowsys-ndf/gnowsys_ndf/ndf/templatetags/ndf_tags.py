@@ -386,6 +386,18 @@ def get_reply(request, thread,parent,forum,token,user,group_id):
 
 
 @get_execution_time
+@register.inclusion_tag('ndf/uploaded_files_for_replies.html')
+def get_files_for_reply(rep_id,groupid):
+        lst_files_uploaded = []  
+        grp_id=groupid._id
+        for each in rep_id.collection_set:
+                file_item=node_collection.one({"_id": each})
+                lst_files_uploaded.append(file_item)
+	return {'group_id':groupid._id,'node_list':lst_files_uploaded}
+
+
+
+@get_execution_time
 @register.assignment_tag
 def get_all_replies(parent):
 	 ex_reply=""
@@ -842,6 +854,7 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 			temp_disc_reply["userid"] = int(each.created_by)
 			temp_disc_reply["oid"] = str(each._id)
 			temp_disc_reply["prior_node"] = str(each.prior_node[0])
+			temp_disc_reply["collection_set"] = [node_collection.one({'_id': ObjectId(i)}) for i in each.collection_set]
 			temp_disc_reply["level"] = level
 
 			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
@@ -2730,13 +2743,14 @@ def get_sg_member_of(group_id):
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
 
 	# Fetch post_node of group
-	post_node_id_list = group_obj.post_node
+	if group_obj.post_node:
+		post_node_id_list = group_obj.post_node
 
-	if post_node_id_list:
-		# getting parent's sub group's member_of in a list
-		for each_sg in post_node_id_list:
-			each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
-			sg_member_of_list.extend(each_sg_node.member_of_names_list)
+		if post_node_id_list:
+			# getting parent's sub group's member_of in a list
+			for each_sg in post_node_id_list:
+				each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
+				sg_member_of_list.extend(each_sg_node.member_of_names_list)
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):

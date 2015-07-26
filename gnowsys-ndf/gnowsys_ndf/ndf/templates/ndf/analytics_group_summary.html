@@ -159,13 +159,13 @@
 
     <div class="element">
         <div class="heading">Courses : <br>
-            <span class="content"> --</span>
+            <span class="content"> {{data.Courses}} </span>
         </div>
     </div>	
 
     <div class="element">
         <div class="heading">Announced Courses : <br>
-            <span class= "content">--</span>
+            <span class= "content"> {{data.announce_courses}}</span>
         </div>
     </div>
 
@@ -217,15 +217,17 @@
 
     <div class="element">
         <div class="heading">Created/Edited Courses : <br>
-            <span class= content> --</span>
+            <span class= content>  {{data.recent.create_edit_course }}</span>
         </div>
     </div>
-
+    <!--
     <div class="element">
         <div class="heading">Created/Edited Announced Courses : <br>
             <span class= content> --</span>
         </div>
     </div>
+    -->
+
 </div>
 
 {% endblock %}

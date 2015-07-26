@@ -91,6 +91,7 @@ i.remove-tag{
 		  		<!-- change name of collection tab overide block in your code -->
 		  			<a>{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 				</dd>
+				{% if not ce_id %}
 				<dd class="prior_node_tab" title="Click here to add/edit Prior Node">
 				  	<a>{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
 				</dd>
@@ -110,6 +111,7 @@ i.remove-tag{
 				<dd class="assesses_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Assesses" %} </a> 
 				</dd>	
+				{% endif %}
 	     	</dl>     
 	            
 	   	</div>
@@ -130,8 +132,13 @@ i.remove-tag{
       		<div class="medium-8 columns">
 		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
 			</div>
-		
 			<!--  -->
+			{% if ce_id %}
+				<input type="hidden" name="ce_id" value="{{ce_id}}">
+				<input type="hidden" name="res" value="{{res}}">
+			{% endif %}
+
+			{% if not ce_id %}
 			<div class="large-4 columns">
 	            <div class="panel">                
 	                <h5>{% trans "Settings" %}</h5>           
@@ -221,25 +228,13 @@ i.remove-tag{
 			     				<span  style="width: 70px; float: left;" > Page Type:  </span>
  							</div>
  							<div class="small-8 columns" ends>
-		     					{% if ce_id %}
-		     						<input type="hidden" name="ce_id" value="{{ce_id}}">
-				     				<select name="type_of" id="type_of" disabled="disabled">
-				     			{% else %}
 					     			<select name="type_of" id="type_of">
-				     			{% endif %}
 						  			{% for i in page_instance %}
-										{% if ce_id %}
-							  				{% if i.name == "Blog page" %}
-												<option value = {{i.pk}} selected> {{i.name}} </option>
-											{% endif %}
-										{% else %}
 							  				{% if i.name == "Wiki page" %}
 							  					<option value = {{i.pk}} selected> {{i.name}} </option>
 											{% else %}
 												<option value = {{i.pk}} > {{i.name}} </option>
-											{% endif %}
-										{% endif %}
-						  				
+											{% endif %}						  				
 			  						{% endfor %}
 								</select>
 							</div>
@@ -248,6 +243,7 @@ i.remove-tag{
                     	                
 	            </div> 
 			</div>  
+			{% endif %}
 
 			<div class="row">
 				<div class="small-8 columns">
@@ -255,7 +251,6 @@ i.remove-tag{
 
 						<div class="row">
 							<h3 >
-								
 							<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
 							</span>
 
@@ -985,7 +980,10 @@ $(document).ready(function(){
 
 		if(textValue.length < 1){ return false; }
 
-		if(textValue.match(/[^A-Za-z0-9\-\ ]/g))
+		// re expression containing special characters
+		var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+
+		if(re.test(textValue))
 		{	// having special characters
 			$('#tags_error').removeClass("hide");
 			return false;
