@@ -1300,6 +1300,9 @@ class GroupCreateEditHandler(View):
             group_name = group_obj.name
             url_name = 'groupchange'
 
+            # print request.POST.get('apps_to_set', '')
+            app_selection(request, group_obj._id)
+
         else:
             # operation fail: redirect to group-listing
             group_name = 'home'
