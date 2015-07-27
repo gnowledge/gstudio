@@ -18,7 +18,7 @@
   .selection > .item{
     float: left;
     font-size: larger;
-    padding-top: 1.5px;
+    padding-top: 2.5px;
   }
 
   i.remove-tag{
@@ -237,7 +237,9 @@
       return selectedValuesList
     }
 
-    function getSelValuesHiddenElement (name, idToAppend=false){
+    function getSelValuesHiddenElement (name, idToAppend){
+
+      idToAppend = idToAppend || false;
 
       var hiddenInput = document.createElement('input');
       hiddenInput.type = 'hidden';
