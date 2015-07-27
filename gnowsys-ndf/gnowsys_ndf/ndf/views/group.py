@@ -1762,7 +1762,7 @@ def group_dashboard(request, group_id=None):
                 'member_of':page_gst._id,
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
-            })
+            }).sort('last_update', -1)
       for each in existing_forums:
 
       		temp_forum = {}
