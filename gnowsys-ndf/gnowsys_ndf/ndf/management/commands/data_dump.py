@@ -173,8 +173,9 @@ def get_file_node_details(node):
 		if 'group_set' == i:
 			for i in node.group_set:
 				node = node_collection.find_one({"_id":ObjectId(i)})
-				if node._type != unicode('Author'):
-			        	group_set.extend(node.group_set)
+				if node:
+					if node._type != unicode('Author'):
+						group_set.extend(node.group_set)
 		if 'author_set' == i:
 		        user_list.extend(node.author_set)			
 	return node
@@ -184,8 +185,9 @@ def get_page_node_details(node):
 		if 'group_set' == i:
 			for i in node.group_set:
 				node = node_collection.find_one({"_id":ObjectId(i)})
-				if node._type != unicode('Author'):
-			        	group_set.extend(node.group_set)
+				if node:
+					if node._type != unicode('Author'):
+						group_set.extend(node.group_set)
 		if 'author_set' == i:
 		        user_list.extend(node.author_set)			
 	return node
