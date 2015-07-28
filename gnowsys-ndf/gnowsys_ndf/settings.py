@@ -623,7 +623,7 @@ GSTUDIO_TASK_TYPES = ["Bug", "Feature", "Support", "UI Feature", "Moderation", "
 
 GSTUDIO_NROER_MENU = [{"Repository": []}, {"Partners": ["States", "Institutions", "Individuals"]}, {"Groups":["Teachers", "Interest Groups", "Schools"]}]
 
-GSTUDIO_NROER_GAPPS = [{"Curated Zone": "topics"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}, {"eLibrary": "e-library"}]
+GSTUDIO_NROER_GAPPS = [{"Themes": "topics"}, {"eLibrary": "e-library"}, {"eBooks": "e-book"}, {"eCourses": "course"}, {"Events": "event"}]
 
 GSTUDIO_NROER_MENU_MAPPINGS = {
             "States": "State Partner", "Institutions": "Institutional Partner", "Individuals": "Individual Partner",
@@ -644,12 +644,8 @@ GSTUDIO_ALLOWED_GROUP_MODERATION_LEVELS = [1, 2, 3]
 
 GSTUDIO_LICENCE = ["CC BY-SA", "CC BY", "CC BY-NC-SA", "CC BY-NC-ND", "CC BY-ND", "PUBLIC-DOMAIN", "FDL (FREE DOCUMENTATION LICENSE)", "OTHERS"]
 
-try:
-    from local_settings import *
-    # print "Local settings applied"
-except:
-    # print "Default settings applied"
-    pass
+GSTUDIO_FILE_UPLOAD_FORM = 'simple'  # possible values are 'simple' or 'detail'
+
 
 # #textb
 # import warnings
@@ -682,6 +678,18 @@ CACHES = {
 WETUBE_USERNAME = "glab"
 WETUBE_PASSWORD = "gl@b$@)we!ube"
 #Captcha settings
-CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.math_challenge'
+CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs','captcha.helpers.noise_null')
 
+
+
+# this has to be at last
+# just put every thing above it
+try:
+    from local_settings import *
+    # print "Local settings applied"
+except:
+    # print "Default settings applied"
+    pass
+
+# ========= nothing to be added below this line ===========

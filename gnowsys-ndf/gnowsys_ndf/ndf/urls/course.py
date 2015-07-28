@@ -10,7 +10,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/edit/(?P<node_id>[\w-]+)$', 'create_edit', name='create_edit'),
 
                         url(r'^/course_detail/(?P<_id>[\w-]+)$', 'course_detail', name='course_detail'),
-                        url(r'^/(?P<_id>[\w-]+)$', 'mis_course_detail', name='mis_course_detail'),
+                        url(r'^/mis_course_detail/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)$', 'mis_course_detail', name='mis_course_detail'),  # mis_app_instance_detail
 
                         # Course structure set up urls
                         url(r'^/structure/create/(?P<node_id>[\w-]+)$', 'create_course_struct', name='create_course_struct'),
@@ -25,7 +25,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.course',
                         url(r'^/change_order/$', 'change_order', name='change_order'),
                         url(r'^/delete_from_structure/$', 'delete_from_course_structure', name='delete_from_cs'),
                         url(r'^/delete/(?P<node_id>[\w-]+)$', 'delete_course', name='del_course'),
-                        url(r'^/enroll/$', 'enroll_generic', name='course_enroll'),
                         url(r'^/remove/$', 'remove_resource_from_unit', name='remove_resource_from_unit'),
-
+                        url(r'^/add_course_file/$', 'add_course_file', name='add_course_file'),
+                        url(r'^/enroll_to_course/$', 'enroll_to_course', name='enroll_to_course'),
+                       
                        )

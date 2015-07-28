@@ -33,7 +33,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, get_group_name_id
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
@@ -174,9 +174,9 @@ def page(request, group_id, app_id=None):
           if node is None:
             
 	  '''
-	for nodes in node:
-            node,ver=get_versioned_page(nodes) 
-            content.append(node)  
+	# for nodes in node:
+ #            node,ver=get_versioned_page(nodes) 
+ #            content.append(node)  
 	'''  
                     
           # rcs content ends here
@@ -267,53 +267,73 @@ def page(request, group_id, app_id=None):
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
 
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    group_name, group_id = get_group_name_id(group_id)
+    ce_id = request.GET.get('course_event_id')
+    res = request.GET.get('res')
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
-                          'groupid': group_id
+                          'groupid': group_id,
+                          'ce_id': ce_id,
+                          'res':res
                       }
     
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
-   # for each in available_nodes:
-   #   nodes_list.append(str((each.name).strip().lower()))
-    #loop replaced by a list comprehension
-    node_list=[str((each.name).strip().lower()) for each in available_nodes]
+    # for each in available_nodes:
+    #   nodes_list.append(str((each.name).strip().lower()))
+    # loop replaced by a list comprehension
+    node_list = [str((each.name).strip().lower()) for each in available_nodes]
 
     if node_id:
         page_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
         page_node = node_collection.collection.GSystem()
-        
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
 	page_type = request.POST.getlist("type_of",'')
-	if page_type:
-		objid= page_type[0]
-		if not ObjectId(objid) in page_node.type_of:
-			page_type1=[]
-			page_type1.append(ObjectId(objid))
-			page_node.type_of = page_type1
-			page_node.type_of
+        ce_id = request.POST.get("ce_id",'')
+        res = request.POST.get("res",'')
+        if res:
+            res = eval(res)
+        if ce_id:
+                if res == None:
+                    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+                    page_node.type_of = [blogpage_gst._id]
+                    page_node.status = u"PUBLISHED"
+        else:
+
+        	if page_type:
+        		objid= page_type[0]
+        		if not ObjectId(objid) in page_node.type_of:
+        			page_type1=[]
+        			page_type1.append(ObjectId(objid))
+        			page_node.type_of = page_type1
+        			page_node.type_of
 	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
-        page_node.save() 
-        
+        page_node.save()
+
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '') 
+        if ce_id:
+          url_name = "/" + ce_id +"/#journal-tab"
+          if res:
+            url_name = "/" + ce_id +"/?selected=" + str(page_node._id)+ "#journal-tab"
+          return HttpResponseRedirect(url_name)
         if metadata:
           # Only while metadata editing
           if metadata == "metadata":

@@ -15,7 +15,7 @@
 
 	.app-card{
 		width: 17rem;
-		min-height: 17rem;
+		min-height: 15rem;
 		margin: 20px 1rem;
 		background-color: #efefef;
 		border: thin solid lightgray;
@@ -35,7 +35,7 @@
 		font-size: 7em;
 		z-index: 0;
 		opacity: 0.1;
-		padding-top: 2rem;
+		/*padding-top: 2rem;*/
 	}
 
 {% endblock %}
@@ -56,14 +56,25 @@
 		{% for each_gapp in gapps_obj_list %}
 			<li>
 				<a class="app-card text-center" href="{% url each_gapp.name|lower group_id %}">
-					<h4><small>{{ each_gapp.altnames }}</small></h4>
+					<h4>{{ each_gapp.altnames }}</h4>
 					<hr/>
 					<i class="icons {{ each_gapp.url }}"></i>
 					<p>{{ each_gapp.content|safe }}</p>
 				</a>
 			</li>
 		{% endfor %}
+		<li>
+			<a class="app-card text-center" href="/home/e-library">
+				<h4>Partner Resources</h4>
+				<hr/>
+				<i class="icons fi-results-demographics"></i>
+				<p>
+					<b>Contributions from institutions and individuals</b>
+				</p>
+			</a>
+		</li>
 	</ul>
+
 
 	<script type="text/javascript">
         // // removing left panel:

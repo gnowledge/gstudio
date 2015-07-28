@@ -122,9 +122,16 @@
               <h5> {% trans "Sorry, No resources found with selected filters :(" %}</h5>
             {% else %}
               {% if not dont_show_error %}
+              {% if "CourseEventGroup" in node.member_of_names_list %}
+              <h5> 
+                {% blocktrans %}No files have been uploaded yet.{% endblocktrans %}
+              </h5>
+              {% else %}
               <h5> 
                 {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %}
               </h5>
+              {% endif %}
+              
               {% endif %}
             {% endif %}
 

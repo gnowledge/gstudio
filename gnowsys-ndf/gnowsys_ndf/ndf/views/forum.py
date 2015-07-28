@@ -24,10 +24,12 @@ from gnowsys_ndf.ndf.views.methods import get_forum_repl_type, forum_notificatio
 from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.views.notify import set_notif_val,get_userobject
+from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_forum_twists,get_all_replies
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.org2any import org2html
-
+import StringIO
+import sys
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -352,22 +354,34 @@ def edit_forum(request,group_id,forum_id):
 
 @get_execution_time
 def display_forum(request,group_id,forum_id):
+    hide_create_thread_btn = True
+    other_forums_list = None
+    other_forums = node_collection.find({'member_of': forum_gst._id,'group_set': ObjectId(group_id),
+                                        '_id':{'$nin':[ObjectId(forum_id)]}})
+    if other_forums.count():
+        other_forums_list = [[str(d._id), d.name] for d in other_forums]
+
     forum = node_collection.one({'_id': ObjectId(forum_id)})
 
     usrname = User.objects.get(id=forum.created_by).username
 
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     forum_object = node_collection.one({'_id': ObjectId(forum_id)})
     if forum_object._type == "GSystemType":
        return forum(request, group_id, forum_id)
@@ -378,8 +392,10 @@ def display_forum(request,group_id,forum_id):
         th_count=0
     variables = RequestContext(request,{
                                         'forum':forum,
+                                        'hide_create_thread_btn': hide_create_thread_btn,
                                         'groupid':group_id,'group_id':group_id,
                                         'forum_created_by':usrname,
+                                        'other_forums': other_forums_list,
                                         'thread_count':th_count,
                                         })
 
@@ -392,28 +408,36 @@ def display_thread(request,group_id, thread_id, forum_id=None):
     '''
     Method to display thread and it's content
     '''
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     try:
+        other_threads_list = None
         thread = node_collection.one({'_id': ObjectId(thread_id)})
+        other_threads = node_collection.find({'member_of': twist_gst._id, 'prior_node': thread.prior_node,
+                                            '_id': {'$nin': [ObjectId(thread._id)]}})
+        if other_threads.count():
+            other_threads_list = [[str(d._id), d.name] for d in other_threads]
         rep_lst=get_all_replies(thread)
         lst_rep=list(rep_lst)
         if lst_rep:
             reply_count=len(lst_rep)
         else:
             reply_count=0
-        # print "reply count=",reply_count
         forum = ""
         
         for each in thread.prior_node:
@@ -424,6 +448,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                                             {   'forum':forum,
                                                 'thread':thread,
                                                 'groupid':group_id,
+                                                'other_threads_list':other_threads_list,
                                                 'group_id':group_id,
                                                 'eachrep':thread,
                                                 'user':request.user,
@@ -437,6 +462,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                                                 'thread':None,
                                                 'groupid':group_id,
                                                 'group_id':group_id,
+                                                'other_threads_list':other_threads_list,
                                                 'eachrep':thread,
                                                 'user':request.user,
                                                 'reply_count':reply_count,
@@ -451,13 +477,13 @@ def display_thread(request,group_id, thread_id, forum_id=None):
 @login_required
 @get_execution_time
 def create_thread(request, group_id, forum_id):
-    ''' 
+    '''
     Method to create thread
     '''
 
     forum = node_collection.one({'_id': ObjectId(forum_id)})
-    
-    # forum_data = {  
+
+    # forum_data = {
     #                 'name':forum.name,
     #                 'content':forum.content,
     #                 'created_by':User.objects.get(id=forum.created_by).username
@@ -468,25 +494,21 @@ def create_thread(request, group_id, forum_id):
     exstng_reply = node_collection.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
     exstng_reply.sort('created_at')
     for each in exstng_reply:
-        forum_threads.append(each.name)
-    
+        forum_threads.append((each.name).strip().lower())
+
     if request.method == "POST":
 
         colg = node_collection.one({'_id':ObjectId(group_id)})
 
         name = unicode(request.POST.get('thread_name',""))
-        
         content_org = request.POST.get('content_org',"")
 
         # -------------------
         colrep = node_collection.collection.GSystem()
-    
         colrep.member_of.append(twist_gst._id)
-        #### ADDED ON 14th July
+        # ADDED ON 14th July
         colrep.access_policy = u"PUBLIC"
         colrep.url = set_all_urls(colrep.member_of)
-        
-        
         colrep.prior_node.append(forum._id)
         colrep.name = name
         if content_org:
@@ -495,14 +517,14 @@ def create_thread(request, group_id, forum_id):
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             colrep.content = org2html(content_org, file_prefix=filename)
-        print "content=",colrep.content
-        usrid=int(request.user.id)
-        colrep.created_by=usrid
+
+        usrid = int(request.user.id)
+        colrep.created_by = usrid
         colrep.modified_by = usrid
 
         if usrid not in colrep.contributors:
             colrep.contributors.append(usrid)
-        
+
         colrep.group_set.append(colg._id)
         colrep.save()
 
@@ -524,20 +546,21 @@ def create_thread(request, group_id, forum_id):
                     no_check=True
                 if no_check:
                     ret = set_notif_val(request,colg._id,msg,activity,bx)
-
-        variables = RequestContext(request,
-                                     {   'forum':forum,
-                                        'thread':colrep,
-                                        'eachrep':colrep,
-                                        'groupid':group_id,
-                                        'group_id':group_id,
-                                        'user':request.user,
-                                        'reply_count':0,
-                                        'forum_threads': json.dumps(forum_threads),
-                                        'forum_created_by':User.objects.get(id=forum.created_by).username
-                                    })
-
-        return render_to_response("ndf/thread_details.html",variables)
+        url_name = "/" + group_id + "/forum/thread/" + str(colrep._id)
+        return HttpResponseRedirect(url_name)
+        # variables = RequestContext(request,
+        #                              {  'forum':forum,
+        #                                 'thread':colrep,
+        #                                 'eachrep':colrep,
+        #                                 'groupid':group_id,
+        #                                 'group_id':group_id,
+        #                                 'user': request.user,
+        #                                 'reply_count':0,
+        #                                 'forum_threads': json.dumps(forum_threads),
+        #                                 'forum_created_by':User.objects.get(id=forum.created_by).username
+        #                             })
+        # print "\n\n renedering to thread_details"
+        # return render_to_response("ndf/thread_details.html",variables)
 
     else:
         return render_to_response("ndf/create_thread.html",
@@ -577,11 +600,34 @@ def add_node(request, group_id):
         forumid = request.POST.get("forumid","") # getting forum _id
         sup_id = request.POST.get("supnode","") #getting _id of it's parent node
         tw_name = request.POST.get("twistname","")
+        upload_files_count=int(request.POST.get("upload_cnt",0))
+        #print "upfiles=",upload_files_count
+        lst=[]
+        lstobj_collection=[]
+        usrid = int(request.user.id)
+        if upload_files_count > 0:
+            #print "uploaded items",request.FILES.items()
+            try:
+                thread_obj = node_collection.one({'_id': ObjectId(thread)})
+                access_policy = thread_obj.access_policy
+            except:
+                access_policy = u'PUBLIC'
+
+            for key,value in request.FILES.items():
+                fname=unicode(value.__dict__['_name'])
+                #print "key=",key,"value=",value,"fname=",fname
+                
+                fileobj,fs=save_file(value,fname,usrid,group_id, "", "", username=unicode(request.user.username), access_policy=access_policy, count=0, first_object="")
+
+                if type(fileobj) == list:
+                    obid = str(list(fileobj)[1])
+                else:
+                    obid=str(fileobj)
+                file_obj=node_collection.find_one({'_id': ObjectId(obid)})
+                lstobj_collection.append(file_obj._id) 
         forumobj = ""
         groupobj = ""
-
         colg = node_collection.one({'_id':ObjectId(group_id)})
-
         if forumid:
             forumobj = node_collection.one({"_id": ObjectId(forumid)})
     
@@ -598,10 +644,13 @@ def add_node(request, group_id):
         elif node == "Reply":
             name = unicode("Reply of:"+str(sup._id))
             colrep.member_of.append(reply_gst._id)
+        #Adding uploaded files id's in collection set of reply
+        if upload_files_count > 0:
+            colrep.collection_set = lstobj_collection   
     
         colrep.prior_node.append(sup._id)
         colrep.name = name
-
+        
         if content_org:
             colrep.content_org = unicode(content_org)
             # Required to link temporary files with the current user who is modifying this document
@@ -609,13 +658,12 @@ def add_node(request, group_id):
             filename = slugify(name) + "-" + usrname + "-"
             colrep.content = org2html(content_org, file_prefix = filename)
 
-        usrid = int(request.user.id)
+       
         colrep.created_by = usrid
         colrep.modified_by = usrid
 
         if usrid not in colrep.contributors:
             colrep.contributors.append(usrid)
-
         colrep.prior_node.append(sup._id)
         colrep.name = name
 

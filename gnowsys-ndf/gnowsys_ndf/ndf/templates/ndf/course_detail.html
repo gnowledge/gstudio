@@ -27,35 +27,8 @@
 
 {% block collection_content %}
   <div id="view_collection">
-  {{node_type}}
     {% include "ndf/collection_ajax_view.html" %}  
   </div>
-
-  {% if node_type == "Course" %}
-    {% user_access_policy groupid request.user as user_access %}
-    {% if user_access == "allow" %}
-      <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
-    {% endif %}
-  {% endif %}
-
-{% endblock %}
-
-{% block meta_content %}
-{% endblock %}
-  
-
-
-<!-- overiding block_related content -->
-{% block related_content %}
-<!-- <section class="medium-6 large-12 columns">
-  <h3>{% trans "Modules" %}</h3>
-  <div class ="row">
-    {% for each in node.collection_set %}
-    bellow div for making tree from json data
-    <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{each}}"></div>
-    {% endfor %}
-  </div>
-</section> -->
 {% endblock %}
 
 <!-- overiding block from node_detail_base.html -->
@@ -95,7 +68,15 @@
       </small>
    </section>
    <section class="medium-3 columns name-section" >
-   <span><a class="small publish-btn button" style="width:73%" href="{% url 'create_event_group' group_id 'CourseEventGroup' %}">{% trans "Announce" %}</a></span>
+
+    {% if node_type == "Course" %}
+      {% check_is_gstaff groupid request.user as is_gstaff %}
+      {% if is_gstaff %}
+        <span><a class="tiny publish-btn button" href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{node.pk}}">{% trans "Announce" %}</a></span>
+        <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+      {% endif %}
+    {% endif %}
+
 
   </section>
 </header>
@@ -108,30 +89,6 @@
   {% endwith %}
 </div>
 <br>
-{% if node_type != "Course" %}
-    <section class="medium-8 columns" >
-      <div class="ann_for row">
-        <label class="small-3 columns "> {% trans "Announced Course for :"%}</label>
-        <span class="small-6 columns end"><u><a href="{% url 'course_detail' group_name_tag cnode.pk %}">{{cnode.name}}</a></u></span>
-      </div>
-      <br/>
-    </section>
-    {% if user.is_authenticated %}
-
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access != "allow" %}
-
-          <section class="medium-4 columns" >
-            <div class="row">
-              <div class="small-6 columns">
-                  <input type="button" class="button enroll-btn" value="Enroll">
-              </div>
-            </div>  
-          </section>
-
-      {% endif %}
-    {% endif %}
-{% endif %}
 
 <div id="view_page"></div>
 
@@ -139,35 +96,6 @@
 
 {% block script %}
   {{block.super}}
-
-    $(document).on("click", ".enroll-btn", function(event) {
-        console.log("{{request.user.id}}")
-        enr_btn = $(this)
-        $.ajax({
-          url: "{% url 'course_enroll' group_id %}",
-
-          data: {
-            node_id: "{{node.pk}}",
-            usr_id: "{{request.user.id}}",
-            'csrfmiddlewaretoken': "{{csrf_token}}"
-          },
-
-          type: "POST",
-
-          dataType: "json",
-
-          success: function(data){
-            success_state = data["success"]
-            if(success_state){
-              enr_btn.attr("disabled",true)
-                     .val("Enrolled");
-            }
-            else{
-              alert("Something went wrong. Please try again later.")
-            }
-          },
-        });//end of ajax
-    })
 
   // Click on delete button
     $(document).on('click','.fi-trash',function(){
@@ -197,11 +125,6 @@
 
 {% block document_ready %}
   {{block.super}}
-
-  {% if enrolled_status %}
-      $(".enroll-btn").attr("disabled",true)
-             .val("Enrolled");
-  {% endif %}
 
   $(function() {
     $('.tree').tree({

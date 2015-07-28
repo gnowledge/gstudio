@@ -31,7 +31,7 @@ from django.contrib.sites.models import Site
 
 from mongokit import paginator
 
-from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO, EXTRA_LANG_INFO, GAPPS, MEDIA_ROOT, WETUBE_USERNAME, WETUBE_PASSWORD, GSTUDIO_FILE_UPLOAD_FORM
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import Node, GSystemType, File, GRelation, STATUS_CHOICES, Triple, node_collection, triple_collection, gridfs_collection
@@ -677,23 +677,21 @@ def paged_file_objs(request, group_id, filetype, page_no):
 @login_required    
 @get_execution_time
 def uploadDoc(request, group_id):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     if request.method == "GET":
         page_url = request.GET.get("next", "")
         # template = "ndf/UploadDoc.html"
-        template = "ndf/Uploader_Form.html"
+
+        template = "ndf/UploadDoc.html"
+        
+        if GSTUDIO_FILE_UPLOAD_FORM == 'detail':
+            template = "ndf/Uploader_Form.html"
+
     if  page_url:
         variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id})
     else:
@@ -751,9 +749,10 @@ def submitDoc(request, group_id):
 
 
         i = 1
-
+        filename="" 
         for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
+                filename=filename+mtitle+" "
                 if index == 0:
                     # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
@@ -776,6 +775,7 @@ def submitDoc(request, group_id):
             if isinstance(f, list):
               alreadyUploadedFiles_append_temp(f)
               title = mtitle
+
 
         # str1 = alreadyUploadedFiles
 
@@ -892,10 +892,11 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 # group id stored in group_set field
                 fileobj.group_set.append(group_object._id)
 
-            # if group is of EDITABLE_MODERATED, update group_set accordingly
-            if group_object.edit_policy == "EDITABLE_MODERATED":
-                fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
-                fileobj.status = u'MODERATION'
+            if "CourseEventGroup" not in group_object.member_of_names_list:
+                # if group is of EDITABLE_MODERATED, update group_set accordingly
+                if group_object.edit_policy == "EDITABLE_MODERATED":
+                    fileobj.group_set = get_moderator_group_set(fileobj.group_set, group_object._id)
+                    fileobj.status = u'MODERATION'
 
             if usrname:
                 user_group_object = node_collection.one({'$and': [{'_type': u'Author'},{'name': usrname}]})
@@ -1438,6 +1439,10 @@ def getFileThumbnail(request, group_id, _id):
 
           # else:
           #     return HttpResponse("")
+        elif fs_file_ids and 'image' in file_node.mime_type:
+            f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))            
+            return HttpResponse(f.read(), content_type=f.content_type)
+
         else:
             return HttpResponse("")
     else:
@@ -1494,26 +1499,31 @@ def file_edit(request,group_id,_id):
                 group_id = str(auth._id)
     else :
         pass
-
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
     file_node = node_collection.one({"_id": ObjectId(_id)})
     title = GST_FILE.name
+    ce_id = request.GET.get('course_event_id')
+    res = request.GET.get('res')
 
     if request.method == "POST":
 
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
+        if "CourseEventGroup" not in group_obj.member_of_names_list:
+            # To fill the metadata info while creating and editing file node
+            metadata = request.POST.get("metadata_info", '')
+            if metadata:
+                # Only while metadata editing
+                if metadata == "metadata":
+                    if file_node:
+                        get_node_metadata(request,file_node)
+            # End of filling metadata
 
-        # To fill the metadata info while creating and editing file node
-        metadata = request.POST.get("metadata_info", '') 
-        if metadata:
-          # Only while metadata editing
-          if metadata == "metadata":
-            if file_node:
-              get_node_metadata(request,file_node)
-        # End of filling metadata
-        
-        return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
-        
+            return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
+        else:
+            url = "/"+ group_id +"/?selected="+str(file_node._id)+"#view_page"
+            return HttpResponseRedirect(url)
+
     else:
         if file_node:
             file_node.get_neighbourhood(file_node.member_of)
@@ -1521,7 +1531,9 @@ def file_edit(request,group_id,_id):
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,'title':title,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid':group_id,
+                                    'ce_id': ce_id,
+                                    'res': res
                                 },
                                   context_instance=RequestContext(request)
                               )

@@ -24,7 +24,7 @@
   <style>
 
   #theme-drag-zoom-tree-container{
-  	border: medium dashed #D8BFD8;
+  	border: thin solid #D8BFD8;
   	border-radius: 5px;
   }
 
@@ -184,8 +184,8 @@
 			</a>
 			
 			<ul id="hover1" class="f-dropdown" data-dropdown-content style="width: 7em;">
-				<li><a class="fold"><i class="fi-plus"></i> {% trans "Open" %} </a></li> 
-				<li><a class="unfold"><i class="fi-minus"></i> {% trans "Close" %} </a></li>  
+				<li><a class="unfold"><i class="fi-minus"></i> {% trans "Open" %} </a></li>  
+				<li><a class="fold"><i class="fi-plus"></i> {% trans "Close" %} </a></li> 
 			</ul> 
 
 		</div>
@@ -388,20 +388,20 @@
     {% if node and tree %}
 
 	    {% if tree == "hierarchical" %}
+
+    		$("article").block({message: '<h4>Building the theme tree...</h4>'});
+			$("#theme-drag-zoom-tree-container").addClass("hide")
+	    	$(".themes").removeClass("hide");
+
 	    	if({{unfold}})
 	    	{
-	    		$("article").block({message: '<h4>Building a graph... <br/>Please hold on...</h4>'});
-				$("#theme-drag-zoom-tree-container").addClass("hide")
-		    	$(".themes").removeClass("hide");
 		    	plotHierarchyTree(true);
 	    	}
 	    	else
 	    	{
-	    		$("article").block({message: '<h4>Building a graph... <br/>Please hold on...</h4>'});
-	    		$("#theme-drag-zoom-tree-container").addClass("hide")
-		    	$(".themes").removeClass("hide");
 		    	plotHierarchyTree(false);
 	    	}
+
 
 	    {% else %}
 	        
@@ -409,9 +409,11 @@
 
     		{% if node %}
 
-    		$("article").block({message: '<h4>Building a graph... <br/>Please hold on...</h4>'});
+    		$("article").block({message: '<h4>Building the theme graph...</h4>'});
 			    $.getJSON("{% url 'get_tree_hierarchy' group_id node.pk %}?collapsible=true", function(data){ treeData = data;})
-			    .done(function(){plotDragZoomTree(treeData);
+			    .done(function(){
+			    	plotDragZoomTree(treeData);
+			    	$('article').unblock(); 
 			    });
 
 		    {% endif %}

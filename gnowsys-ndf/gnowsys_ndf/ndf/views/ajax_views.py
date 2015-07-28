@@ -39,7 +39,7 @@ from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, get_node_metadata, create_grelation,create_gattribute,create_task,parse_template_data,get_execution_time,get_group_name_id
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents
@@ -135,7 +135,7 @@ def collection_nav(request, group_id):
     node_id = request.POST.get("node_id", '')
     curr_node_id = request.POST.get("curr_node", '')
     node_type = request.POST.get("nod_type", '')
-
+    template = "ndf/node_ajax_view.html"
     breadcrumbs_list = []
     curr_node_obj = node_collection.one({'_id': ObjectId(curr_node_id)})
     if node_type == "Topic":
@@ -146,7 +146,11 @@ def collection_nav(request, group_id):
           breadcrumbs_list.append((str(prior._id), prior.name))
 
     topic = ""
+
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    group_obj = node_collection.one({'_id': ObjectId(group_id)})
+    if "CourseEventGroup" in group_obj.member_of_names_list:
+      template = "ndf/res_node_ajax_view.html"
     nav_list = request.POST.getlist("nav[]", '')
     n_list = request.POST.get("nav", '')
 
@@ -189,7 +193,7 @@ def collection_nav(request, group_id):
           else:
             breadcrumbs_list.remove(e)
     # print "breadcrumbs_list: ",breadcrumbs_list,"\n"
-    return render_to_response('ndf/node_ajax_view.html', 
+    return render_to_response(template, 
                                 { 'node': node_obj,
                                   'original_node':curr_node_obj,
                                   'group_id': group_id,
@@ -820,6 +824,8 @@ def get_collection(request, group_id, node_id):
   data = collection_list
 
   return HttpResponse(json.dumps(data))
+
+
 @get_execution_time
 def add_sub_themes(request, group_id):
   if request.is_ajax() and request.method == "POST":
@@ -915,7 +921,6 @@ def add_topics(request, group_id):
 @get_execution_time
 def add_page(request, group_id):
   if request.is_ajax() and request.method == "POST":
-
     context_node_id = request.POST.get("context_node", '')
     css_node_id = request.POST.get("css_node", '')
     unit_name = request.POST.get("unit_name", '')
@@ -936,6 +941,8 @@ def add_page(request, group_id):
     if name not in collection_list:
         page_node = node_collection.collection.GSystem()
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+        page_node.status = u"PUBLISHED"
+        page_node.save()
         context_node.collection_set.append(page_node._id)
         context_node.save()
         response_dict["success"] = True
@@ -2412,7 +2419,7 @@ def get_students(request, group_id):
       else:
         # Otherwise, append given group's ObjectId
         group_set_to_check.append(groupid)
-
+      university_id = None
       if university_id:
         university_id = ObjectId(university_id)
         university = node_collection.one({'_id': university_id}, {'name': 1})
@@ -2551,7 +2558,7 @@ def get_students(request, group_id):
 
       # Column headers to be displayed on html
       column_headers = [
-          ('University', 'University'),
+          #('University', 'University'),
           ('College ( Graduation )', 'College'),
           ("Name", "Name"),
           ("Enrollment Code", "Enr Code"),
@@ -4719,7 +4726,14 @@ def edit_task_content(request, group_id):
 @get_execution_time
 def insert_picture(request, group_id):
     if request.is_ajax():
-        resource_list=node_collection.find({'_type' : 'File', 'mime_type' : u"image/jpeg" },{'name': 1})
+        resource_list=node_collection.find(
+          {
+            '_type' : 'File',
+            'group_set': {'$in': [ObjectId(group_id)]},
+            'mime_type' : u"image/jpeg" 
+          },
+          {'name': 1})
+
         resources=list(resource_list)
         n=[]
         for each in resources:
@@ -5954,3 +5968,4 @@ def get_detailed_report(request, group_id):
     error_message = "ReportFetchError: " + str(e) + "!!!"
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
+

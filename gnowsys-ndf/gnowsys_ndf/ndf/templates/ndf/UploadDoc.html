@@ -158,12 +158,12 @@ i.remove-tag{
 		    	</div>
 	    	</div>  
 		<fieldset class="medium-4 columns">
-			<legend>Privacy</legend>
+			<legend>Visibility</legend>
 			<div class="row">
 					<div class="medium-6 columns">
 						{% if node.created_by == request.user.pk %}	
 			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"></span>
-						<div class="privacy-mode switch round">
+						<div class="privacy-mode">
 						
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
 							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
@@ -176,10 +176,11 @@ i.remove-tag{
 						{% else %}
 						{% if not node %}
 							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"></span>
-						<div class="privacy-mode switch round">
+						<div class="privacy-mode">
 						
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
 							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
+							<br/>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
 							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
@@ -257,7 +258,10 @@ i.remove-tag{
 
 		if(textValue.length < 1){ return false; }
 
-		if(textValue.match(/[^A-Za-z0-9\-\ ]/g))
+		// re expression containing special characters
+		var re = /[.*+=~`<>;:'"_?^${}()!%\^|[\]\\\/#]/g;
+
+		if(re.test(textValue))
 		{	// having special characters
 			$('#tags_error').removeClass("hide");
 			return false;
