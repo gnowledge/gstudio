@@ -736,10 +736,13 @@ def submitDoc(request, group_id):
         source = request.POST.get("Source", "")
         Audience = request.POST.get("audience", "")
         fileType = request.POST.get("FileType", "")
-        subject = request.POST.get("Subject", "")
-        level = request.POST.get("Level", "")
         Based_url = request.POST.get("based_url", "")
         map_geojson_data = request.POST.get('map-geojson-data')
+        subject = request.POST.get("Subject", "")
+        level = request.POST.get("Level", "")
+
+        subject = '' if (subject=='Not Sure') else subject
+        level = '' if (level=='Not Sure') else level
 
         if map_geojson_data:
           map_geojson_data = map_geojson_data + ","
@@ -756,11 +759,11 @@ def submitDoc(request, group_id):
                 if index == 0:
                     # f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
-                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
 
                 else:
                     title = mtitle + "_" + str(i)  # increament title
-                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
                     i = i + 1
             else:
                 title = each.name
@@ -770,14 +773,23 @@ def submitDoc(request, group_id):
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
             # if isinstance(f, list):
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data, oid=True)
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
 
-            if isinstance(f, list):
-              alreadyUploadedFiles_append_temp(f)
-              title = mtitle
+
+            # print "=============== : ", f
+            try:
+                ObjectId(f)
+
+            except:
+                if isinstance(f, list):
+                  # alreadyUploadedFiles_append_temp(f)
+                  alreadyUploadedFiles = f
+                  title = mtitle
 
 
         # str1 = alreadyUploadedFiles
+
+        # print "=============== : ", alreadyUploadedFiles
 
         if img_type != "":
             # print "----------1-----------"
@@ -791,8 +803,8 @@ def submitDoc(request, group_id):
             if alreadyUploadedFiles:
                 # return HttpResponseRedirect(page_url+'?var='+str1)
                 # if (type(alreadyUploadedFiles[0][0]).__name__ == "ObjectId"):
-                # print "----------3-----------", alreadyUploadedFiles[0][1]
-                return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][1].__str__() }))
+                # print "----------3-----------", alreadyUploadedFiles
+                return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[1].__str__() }))
                 # else:
                     # if alreadyUploadedFiles[0][1]:
                         # return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": alreadyUploadedFiles[0][0].__str__() }))
@@ -809,8 +821,9 @@ def submitDoc(request, group_id):
                     t = create_moderator_task(request, fileobj.group_set[0], fileobj._id,on_upload=True)
                     return HttpResponseRedirect(reverse('moderation_status', kwargs={'group_id': fileobj.group_set[1], 'node_id': f }))
                 else:
-                    # print "----------5-----------"
-                    return HttpResponseRedirect(reverse('file', kwargs={'group_id': group_id }))
+                    # print "----------5-----------", f
+
+                    return HttpResponseRedirect(reverse("file_detail", kwargs={'group_id': group_id, "_id": ObjectId(f) }))
 
                 # if is_video == "True":
                 #     return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
