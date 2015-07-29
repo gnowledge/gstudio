@@ -1403,8 +1403,8 @@ ul#navigation li a.last {
             <div class= "medium-12 columns" >
                 <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
 
-		<!-- Info-box -->&nbsp;
-<!--		<a class="view-info tiny round button" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a>  -->
+      		<!-- Info-box -->&nbsp;
+          <!--		<a class="view-info tiny round button" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a>  -->
       
             </div>
            {% endif %}
@@ -1554,40 +1554,44 @@ ul#navigation li a.last {
       {% endif %}
 
     </div>
-    
-    {% ifnotequal group_object.edit_policy "EDITABLE_MODERATED" %}
+    {% endif %}
+
+    {% if group_object.edit_policy != "EDITABLE_MODERATED" or "CourseEventGroup" in group_object.member_of_names_list %}
 
     {% if "File" in node.member_of_names_list or "Page" in node.member_of_names_list %}
       <div>
       {% include "ndf/rating.html" %} 
       </div><br/>
     {% endif %}
-
-    <div>
-      <ul class="side-nav">
-        <!-- Bellow part is commented because we are already listing other language resources in topic page -->
-        <!-- For time being commented this part to avoid confusion -->
-        {% comment %}        
-        <!-- <li><b>{% trans "In other languages" %}</b></li>
-        {% get_possible_translations node as tran %}
-        {% for each in tran %}
-          {% for k,v in each.items %}
-          <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
-          {% endfor %}
-        {% endfor %} -->
-        {% endcomment %}
-          
-        <!-- This button translates given resource -->
-        {% if user.is_authenticated %}
-          {% if user_is_joined == "joined" or user_is_joined == "author" %}
-            <li>
-              <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
-            </li>
+    {% if "CourseEventGroup" not in group_object.member_of_names_list %}
+      <div>
+        <ul class="side-nav">
+          <!-- Bellow part is commented because we are already listing other language resources in topic page -->
+          <!-- For time being commented this part to avoid confusion -->
+          {% comment %}        
+          <!-- <li><b>{% trans "In other languages" %}</b></li>
+          {% get_possible_translations node as tran %}
+          {% for each in tran %}
+            {% for k,v in each.items %}
+            <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
+            {% endfor %}
+          {% endfor %} -->
+          {% endcomment %}
+            
+          <!-- This button translates given resource -->
+          {% if user.is_authenticated %}
+            {% if user_is_joined == "joined" or user_is_joined == "author" %}
+              <li>
+                <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
+              </li>
+            {% endif %}
           {% endif %}
-        {% endif %}
-      </ul>
-    </div>
-          {% endifnotequal %}
+        </ul>
+      </div>
+    {% endif %}
+    {% endif %}
+
+  {% if 'CourseEventGroup' not in group_object.member_of_names_list %}
 
     {% if user.is_authenticated %}
     {% switch_group_conditions request.user group_id as switch_conditions %}
@@ -1622,7 +1626,7 @@ ul#navigation li a.last {
 
     </div>
   </ul>
-{% endif %}
+  {% endif %}
   {% if "video" in node.mime_type %}
     <link rel="stylesheet" href="/static/ndf/bower_components/videojs/dist/video-js/video-js.min.css">
     <script src="/static/ndf/bower_components/videojs/dist/video-js/video.js"></script>
