@@ -1787,11 +1787,13 @@ def group_dashboard(request, group_id=None):
 
   allow_to_join = True
   if 'end_enroll' in group_obj:
-      last_enrollment_date = group_obj.end_enroll
-      if last_enrollment_date:
-        curr_date_time = datetime.now()
-        if curr_date_time >= last_enrollment_date:
-            allow_to_join = False
+      if group_obj.end_enroll:
+          last_enrollment_date = group_obj.end_enroll
+          last_enrollment_date = last_enrollment_date.date()
+          if last_enrollment_date:
+            curr_date_time = datetime.now().date()
+            if last_enrollment_date < curr_date_time:
+                allow_to_join = False
   property_order_list = []
   if "group_of" in group_obj:
     if group_obj['group_of']:
