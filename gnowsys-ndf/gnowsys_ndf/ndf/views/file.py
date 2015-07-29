@@ -773,7 +773,7 @@ def submitDoc(request, group_id):
             # if not obj_id_instance.is_valid(f):
             # check if file is already uploaded file
             # if isinstance(f, list):
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
+                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, license, source, Audience, fileType, subject, level, Based_url, request, map_geojson_data)
 
 
             # print "=============== : ", f
