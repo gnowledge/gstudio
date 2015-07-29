@@ -280,6 +280,24 @@ def all_gapps():
 
 @get_execution_time
 @register.assignment_tag
+def get_group_gapps(group_id=None):
+
+	group_obj = node_collection.one({"_id": ObjectId(group_id) }, { "name": 1, "attribute_set.apps_list": 1, '_type': 1 })
+
+	if group_obj:
+		group_name = group_obj.name
+		for attr in group_obj.attribute_set: 
+			if attr and "apps_list" in attr: 
+				gapps_list = attr["apps_list"] 
+
+				all_gapp_ids_list = [node_collection.one({'_id':ObjectId(g['_id'])}) for g in gapps_list]
+				return all_gapp_ids_list
+
+	return []
+
+
+@get_execution_time
+@register.assignment_tag
 def get_create_group_visibility():
 	if CREATE_GROUP_VISIBILITY:
 		return True
@@ -655,6 +673,7 @@ def get_gapps_iconbar(request, group_id):
             for attr in group_obj.attribute_set:
                 if attr and "apps_list" in attr:
                     gapps_list = attr["apps_list"]
+
                     break
         if not gapps_list:
             # If gapps not found for group, then make use of default apps list
