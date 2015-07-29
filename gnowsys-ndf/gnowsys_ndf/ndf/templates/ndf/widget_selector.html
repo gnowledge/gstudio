@@ -8,6 +8,14 @@
   #select-search-container{
     width: 100%;
     background-color: whitesmoke;
+    padding-right: 5px;
+  }
+
+  #select-search-container > i.fi-play{
+    position: absolute;
+    right: 12px;
+    transform: rotate(90deg);
+    color: gray;
   }
 
   #selected-items > .selection{
@@ -63,11 +71,13 @@
 
   .item-title{
     text-transform: uppercase;
+    color: #020;
   }
 
   .item-description{
     color: gray;
   }
+
 
 </style>
 
@@ -78,7 +88,9 @@
 
           <div id="select-search-container">
 
-            <div id="selected-items" style=""></div>
+            <i class="fi-play"></i>
+
+            <div id="selected-items"></div>
             
             <div id="search-text" contenteditable>search</div>
 
