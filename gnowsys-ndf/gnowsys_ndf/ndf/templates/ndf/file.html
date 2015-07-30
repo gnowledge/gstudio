@@ -550,11 +550,11 @@
       var c = this.getAttribute("data-filetype");
 
       if(educationaluse_stats.hasOwnProperty(c)){
-        $(this).find("a > span.count:visible").fadeOut().fadeIn().text(educationaluse_stats[c]);
+        $(this).find("a > span.count:visible").text(educationaluse_stats[c]);
       }
       else
       {
-        $(this).find("a > span.count:visible").fadeOut().fadeIn().text("0");
+        $(this).find("a > span.count:visible").text("0");
       }
 
     });

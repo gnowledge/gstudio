@@ -301,6 +301,18 @@ this template is modified. So for the fields in the template it supports -
     
     <br/>
 
+    {% all_gapps as all_gapps %}
+    {% get_group_gapps node.pk|default:None as group_gapps %}
+
+
+    <div class="row">
+      <div class="small-12 medium-6 medium-centered columns">
+        <label>Select Apps:</label>
+        {% include 'ndf/widget_selector.html' with for='gapps' all_options=all_gapps selected_options=group_gapps %}
+      </div>
+    </div>
+        
+
     <div class="row">
       <div class="small-12 medium-6 medium-centered columns">
         {% if node %}
@@ -365,7 +377,11 @@ this template is modified. So for the fields in the template it supports -
       $("#message").text("Group name cannot be empty.");
       event.preventDefault();
     }
+
+    getSelValuesHiddenElement('apps_to_set', 'create_group');
+
   });
+
 
 // </script>
 {% endblock %}
