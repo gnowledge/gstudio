@@ -1300,6 +1300,9 @@ class GroupCreateEditHandler(View):
             group_name = group_obj.name
             url_name = 'groupchange'
 
+            # print request.POST.get('apps_to_set', '')
+            app_selection(request, group_obj._id)
+
         else:
             # operation fail: redirect to group-listing
             group_name = 'home'
@@ -1762,7 +1765,7 @@ def group_dashboard(request, group_id=None):
                 'member_of':page_gst._id,
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
-            })
+            }).sort('last_update', -1)
       for each in existing_forums:
 
       		temp_forum = {}
