@@ -37,7 +37,11 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 
 	is_video = request.GET.get('is_video', "")
 	
-	group_name, group_id = get_group_name_id(group_id)
+	# group_name, group_id = get_group_name_id(group_id)
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_name, group_id = get_group_name_id(group_id)
 
 	if app_id is None:
 		app_id = str(app._id)

@@ -43,18 +43,23 @@ app = gst_quiz
 def quiz(request, group_id, app_id=None):
     """Renders a list of all 'Quiz-type-GSystems' available within the database.
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     if app_id is None:
         app_ins = node_collection.find_one({'_type':"GSystemType", "name":"Quiz"})
         if app_ins:
@@ -111,18 +116,23 @@ def quiz(request, group_id, app_id=None):
 def create_edit_quiz_item(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     gst_quiz_item = node_collection.one({'_type': u'GSystemType', 'name': u'QuizItem'})
 
     context_variables = { 'title': gst_quiz_item.name,
@@ -246,18 +256,23 @@ def create_edit_quiz_item(request, group_id, node_id=None):
 def create_edit_quiz(request, group_id, node_id=None):
     """Creates/Edits quiz category.
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+        
     context_variables = { 'title': gst_quiz.name,
                           'group_id': group_id,
                           'groupid': group_id

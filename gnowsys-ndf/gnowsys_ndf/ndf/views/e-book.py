@@ -29,8 +29,13 @@ app = node_collection.one({'_type':'GSystemType', 'name': 'E-Library'})
 @get_execution_time
 def ebook_listing(request, group_id, page_no=1):
 
-	group_name, group_id = get_group_name_id(group_id)
+	# group_name, group_id = get_group_name_id(group_id)
 
+	try:
+		group_id = ObjectId(group_id) 
+	except: 
+		group_name, group_id = get_group_name_id(group_id)
+        
 	all_ebooks = node_collection.find({"_type": "File", "attribute_set.educationaluse": "eBooks"})
 	# all_ebook = node_collection.find({"_type": "File", "member_of": {"$in":[gst_ebook._id]} })
 

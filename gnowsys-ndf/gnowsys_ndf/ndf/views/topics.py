@@ -150,18 +150,23 @@ coll_set_dict={}
 def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     #####################
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     ###################### 
     
     nodes_dict = []
@@ -713,6 +718,7 @@ def topic_detail_view(request, group_id, app_Id=None):
             group_id = str(auth._id)
   else :
     pass
+    
   ###################### 
 
   obj = node_collection.one({'_id': ObjectId(app_Id)})

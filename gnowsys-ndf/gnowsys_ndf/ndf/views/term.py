@@ -34,18 +34,22 @@ if term_GST:
 @get_execution_time
 def term(request, group_id, node_id=None):
 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else :
-			auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-			if auth :
-				group_id = str(auth._id)
-	else :
-		pass
+	# ins_objectid  = ObjectId()
+	# if ins_objectid.is_valid(group_id) is False :
+	# 	group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+	# 	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 	if group_ins:
+	# 		group_id = str(group_ins._id)
+	# 	else :
+	# 		auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	# 		if auth :
+	# 			group_id = str(auth._id)
+	# else :
+	# 	pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 	
 
 	if not node_id:
@@ -81,18 +85,22 @@ def term(request, group_id, node_id=None):
 @get_execution_time
 def create_edit_term(request, group_id, node_id=None):
 
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
 
     context_variables = { 'title': title,
@@ -146,18 +154,22 @@ def delete_term(request, group_id, node_id):
     
     Just hide the term from users!
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     return HttpResponseRedirect(reverse('term', kwargs={'group_id': group_id}))

@@ -23,18 +23,23 @@ def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, a
     """
     custom view for custom GAPPS
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    #ins_objectid  = ObjectId()
+    #if ins_objectid.is_valid(group_id) is False :
+        #group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        #auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        #if group_ins:
+            #group_id = str(group_ins._id)
+        #else :
+            #auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            #if auth :
+                #group_id = str(auth._id)
+    #else :
+        #pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     if app_id is None:
         if app_name == "partners":
             app_name = "Partners"
@@ -172,18 +177,26 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
     """
     create new instance of app_set of apps view for custom GAPPS
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+        # group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+        # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        # if group_ins:
+            # group_id = str(group_ins._id)
+        # else :
+            # auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            # if auth :
+                # group_id = str(auth._id)
+    # else :
+        # pass
+
+    
+    try:
+        group_id = ObjectId(group_id)
+    
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+        
     if app_id is None:
         app_ins = node_collection.find_one({'_type':"GSystemType", "name":app_name})
         if app_ins:

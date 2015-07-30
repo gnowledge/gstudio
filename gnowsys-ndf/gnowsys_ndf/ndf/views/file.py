@@ -65,17 +65,22 @@ def file(request, group_id, file_id=None, page_no=1):
     """
     ins_objectid  = ObjectId()
     is_video = request.GET.get('is_video', "")
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     if file_id is None:
         file_ins = node_collection.find_one({'_type':"GSystemType", "name":"File"})
         if file_ins:
@@ -1204,18 +1209,23 @@ def convertVideo(files, userid, fileobj, filename):
 
 @get_execution_time
 def GetDoc(request, group_id):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     files = node_collection.find({'_type': u'File'})
     #return files
     template = "ndf/DocumentList.html"
@@ -1225,18 +1235,23 @@ def GetDoc(request, group_id):
 
 @get_execution_time
 def file_search(request, group_id):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     if request.method == "GET":
         keyword = request.GET.get("search", "")
         file_search = node_collection.find({'$or':[{'name':{'$regex': keyword}}, {'tags':{'$regex':keyword}}]}) #search result from file
@@ -1250,18 +1265,23 @@ def file_search(request, group_id):
 def delete_file(request, group_id, _id):
   """Delete file and its data
   """
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-      group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if group_ins:
-          group_id = str(group_ins._id)
-      else :
-          auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-          if auth :
-              group_id = str(auth._id)
-  else :
-      pass
+  # ins_objectid  = ObjectId()
+  # if ins_objectid.is_valid(group_id) is False :
+  #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if group_ins:
+  #         group_id = str(group_ins._id)
+  #     else :
+  #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #         if auth :
+  #             group_id = str(auth._id)
+  # else :
+  #     pass
+  try:
+        group_id = ObjectId(group_id)
+  except:
+        group_name, group_id = get_group_name_id(group_id)
+
   auth = node_collection.one({'_type': u'Author', 'name': unicode(request.user.username) })
   pageurl = request.GET.get("next", "")
   try:
@@ -1388,16 +1408,21 @@ def file_detail(request, group_id, _id):
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
     """
-    ins_objectid = ObjectId()
-    if ins_objectid.is_valid(group_id) is False:
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        elif auth:
-            group_id = str(auth._id)
-    else:
-        pass
+    # ins_objectid = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False:
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     elif auth:
+    #         group_id = str(auth._id)
+    # else:
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
 
     file_node = node_collection.one({"_id": ObjectId(_id)})
     """
@@ -1453,18 +1478,23 @@ def getFileThumbnail(request, group_id, _id):
 def readDoc(request, _id, group_id, file_name=""):
     '''Return Files 
     '''
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
 
     file_node = node_collection.one({"_id": ObjectId(_id)})
     if file_node is not None:
@@ -1487,18 +1517,23 @@ def readDoc(request, _id, group_id, file_name=""):
         
 @get_execution_time
 def file_edit(request,group_id,_id):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     file_node = node_collection.one({"_id": ObjectId(_id)})
     title = GST_FILE.name

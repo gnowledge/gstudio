@@ -23,18 +23,23 @@ def module(request, group_id, module_id=None):
     """
     * Renders a list of all 'modules' available within the database.
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-      group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if group_ins:
-        group_id = str(group_ins._id)
-      else :
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-          group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #   group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #   if group_ins:
+    #     group_id = str(group_ins._id)
+    #   else :
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if auth :
+    #       group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     
     if module_id is None:
       module_ins = node_collection.find_one({'_type':"GSystemType", "name":"Module"})
@@ -73,18 +78,23 @@ def module(request, group_id, module_id=None):
 
 @get_execution_time
 def module_detail(request, group_id, _id):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     course_node = node_collection.one({"_id": ObjectId(_id)})
     if course_node._type == "GSystemType":
 	return module(request, group_id, _id)
@@ -104,18 +114,23 @@ def module_detail(request, group_id, _id):
 def delete_module(request, group_id, _id):
     """This method will delete module object and its Attribute and Relation
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+        
     pageurl = request.GET.get("next", "")
     try:
         node = node_collection.one({'_id': ObjectId(_id)})
