@@ -17,6 +17,7 @@ from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id 
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
 GST_IMAGE = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 
