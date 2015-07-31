@@ -311,7 +311,8 @@
     {
       currentEl.nextElementSibling.classList.add('traversing-el');
       currentEl.classList.remove('traversing-el');
-      toBeSelected.scrollBy(0, currentEl.clientHeight);
+      // toBeSelected.scrollBy(0, currentEl.clientHeight);
+      toBeSelected.scrollTop += currentEl.clientHeight;
     }
   }
 
@@ -328,7 +329,8 @@
     {
       currentEl.previousElementSibling.classList.add('traversing-el');
       currentEl.classList.remove('traversing-el');
-      toBeSelected.scrollBy(0,-50);
+      // toBeSelected.scrollBy(0,-50);
+      toBeSelected.scrollTop -= currentEl.clientHeight;
     }
   }
   
