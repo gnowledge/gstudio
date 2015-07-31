@@ -229,7 +229,8 @@
   function showOptionItems () {
     toBeSelected.classList.remove('hide');
     // console.log(this);
-    toBeSelected.scrollTo(0,0);
+
+    toBeSelected.scrollTop = 0
     document.querySelector('#to-be-selected > .item:first-child').classList.add('traversing-el');
 
     if(!searchText.textContent || searchText.textContent=='search'){
