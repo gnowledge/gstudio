@@ -299,10 +299,11 @@
   }
 
   document.querySelector('html').onclick = function (e) {
-    // aaa = e; 
-    var parentEl = $(e.target).closest('.selector-widget');
+    // var parentEl = $(e.target).closest('.selector-widget');
+    var parentEl = closest(e.target, '.selector-widget');
     // console.log(parentEl);
-    if (parentEl.hasClass('selector-widget')) {
+    // if (parentEl.hasClass('selector-widget')) {
+    if (parentEl) {
       // document.getElementById('to-be-selected').classList.remove('hide');
       showOptionItems();
       bindKeyEvents();
@@ -333,7 +334,22 @@
     else if(!currentEl)
     {
       
-      makeTraversingEl = $('#to-be-selected > .item:visible')[0];
+      // var makeTraversingEl = $('#to-be-selected > .item:visible')[0];
+
+      var tempItemList = $sa('#to-be-selected > .item'),
+          tempItemListLen = tempItemList.length;
+
+      for (var i = 0; i < tempItemListLen; i++)
+      {
+        if( (tempItemList[i].offsetHeight > 0 && tempItemList[i].offsetWidth > 0) ||
+          (window.getComputedStyle(tempItemList[i]).getPropertyValue('display') != 'none'))
+        {
+          var makeTraversingEl = tempItemList[i];
+          break;
+        }
+        // console.log(tempItemList[i])
+      };
+
       if(makeTraversingEl){ makeTraversingEl.classList.add('traversing-el'); }
 
       // var makeTraversingEl = $s('#to-be-selected > .item');
@@ -383,6 +399,20 @@
     Mousetrap.unbind('up');
     Mousetrap.unbind('down');
     Mousetrap.bind('enter');
+  }
+
+  function closest(elem, selector) {
+
+   var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+
+    while (elem) {
+        if (matchesSelector.bind(elem)(selector)) {
+            return true;
+        } else {
+            elem = elem.parentElement;
+        }
+    }
+    return false;
   }
 
 </script>
