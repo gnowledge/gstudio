@@ -63,7 +63,9 @@
             {% elif "video" in each_res.mime_type and each_res.member_of_names_list|join:', ' != "Pandora_video" %}
 	      {% get_source_id each_res.pk as source_id %}
 	      {% if source_id %}
+	      <!--
               <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
+	      -->
 	      {% endif %}
               <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!"/>
              {% comment %}
