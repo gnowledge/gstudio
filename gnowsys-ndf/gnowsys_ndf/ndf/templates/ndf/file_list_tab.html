@@ -4,7 +4,7 @@
 {% if searching and resource_type.count > 0 %}
   <div class="row">
     <div class="small-12 columns end">
-    	<p>{% trans "Search Results:" %} <span class="label success round">Found {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
+    	<p>{% trans "Search Results:" %} <span class="label success round">{% trans 'Found' %} {{resource_type.count}} {{title|lower}}{{resource_type.count|pluralize}}.</span></p>
     </div>
   </div>
 {% elif searching and resource_type.count == 0 %}
@@ -89,9 +89,9 @@
         </footer>
         <footer>
             <div class="age">
-              {{ each_res.member_of_names_list|join:', ' }} created {{each_res.created_at|timesince}} ago 
+              {{ each_res.member_of_names_list|join:', ' }}{% trans 'created' %} {{each_res.created_at|timesince}} {% trans 'ago' %} 
               <br/>
-            <span><strong>{{each_res.contributors|length}}</strong> Contributor{{each_res.contributors|pluralize}} | </span>
+            <span><strong>{{each_res.contributors|length}}</strong> {% trans 'Contributor' %}{{each_res.contributors|pluralize}} | </span>
               by <span class="user" href="{% url 'dashboard' each_res.created_by %}" data-gnow="">{{each_res.user_details_dict.created_by}}</span> &nbsp;&nbsp;&nbsp;
             </div>
           </footer>
@@ -121,7 +121,7 @@
             {% if res_type_name == "collection" %}
               <h5> {% trans "This group doesn't have any collections." %}</h5>
             {% elif filter_result == "False" %}
-              <h5> {% trans "Sorry, No resources found with selected filters :(" %}</h5>
+              <h5> {% trans "Sorry, No resources found with selected filters" %} :( </h5>
             {% else %}
               {% if not dont_show_error %}
               {% if "CourseEventGroup" in node.member_of_names_list %}
