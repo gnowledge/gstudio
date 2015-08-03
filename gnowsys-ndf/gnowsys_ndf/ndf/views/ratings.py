@@ -43,7 +43,7 @@ def ratings(request, group_id):
             fl=1
     if not fl:
         node.rating.append(ratedict)
-    node.save()
+    node.save(groupid=group_id)
     vars=RequestContext(request,{'node':node})
     template="ndf/rating.html"
     return render_to_response(template, vars)

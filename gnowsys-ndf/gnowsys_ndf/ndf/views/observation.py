@@ -254,7 +254,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 					if each['properties']['ref'] == marker_ref:
 						app_set_element.location.remove(each)
 						app_set_element.location.append(marker_geojson)
-						app_set_element.save()
+						app_set_element.save(groupid=group_id)
 						unique_token = marker_ref
 						operation_performed = "edit"
 
@@ -266,7 +266,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 		if app_set_element:
 			app_set_element.location.append(marker_geojson)
-			app_set_element.save()
+			app_set_element.save(groupid=group_id)
 			operation_performed = "create_new"
 			
 		# for anonymous user
@@ -333,7 +333,7 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 			
 			if each['properties']['ref'] == marker_ref:
 				app_set_element.location.remove(each)
-				app_set_element.save()
+				app_set_element.save(groupid=group_id)
 
 				operation_performed = "marker_deleted"	
 
