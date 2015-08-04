@@ -265,13 +265,13 @@ def shelf(request, group_id):
           shelf_gs.name = unicode(shelf)
           shelf_gs.created_by = int(request.user.id)
           shelf_gs.member_of.append(shelf_gst._id)
-          shelf_gs.save()
+          shelf_gs.save(groupid=group_id)
 
           shelf_R = triple_collection.collection.GRelation()
           shelf_R.subject = ObjectId(auth._id)
           shelf_R.relation_type = has_shelf_RT
           shelf_R.right_subject = ObjectId(shelf_gs._id)
-          shelf_R.save()
+          shelf_R.save(groupid=group_id)
         else:
           if shelf_add:
             shelf_item = ObjectId(shelf_add)
@@ -846,7 +846,7 @@ def add_sub_themes(request, group_id):
         node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, theme_GST)
 
-        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST))
+        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST),groupid=group_id)
         node.reload()
         # Add this sub-theme into context nodes collection_set
         node_collection.collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -877,7 +877,7 @@ def add_theme_item(request, group_id):
 
       theme_item_node = node_collection.collection.GSystem()
 
-      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST))
+      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST),groupid=group_id)
       theme_item_node.reload()
 
       # Add this theme item into context theme's collection_set
@@ -906,7 +906,7 @@ def add_topics(request, group_id):
         node = node_collection.collection.GSystem()
         # get_node_common_fields(request, node, group_id, topic_GST)
 
-        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST))
+        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST),groupid=group_id)
         node.reload()
         # Add this topic into context nodes collection_set
         node_collection.collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -940,11 +940,13 @@ def add_page(request, group_id):
 
     if name not in collection_list:
         page_node = node_collection.collection.GSystem()
-        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page),groupid=group_id)
         page_node.status = u"PUBLISHED"
         page_node.save()
+
         context_node.collection_set.append(page_node._id)
-        context_node.save()
+        context_node.save(groupid=group_id)
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
@@ -999,8 +1001,8 @@ def add_file(request, group_id):
                                 context_node.collection_set.append(old_file_node._id)
                                 old_file_node.status = u"PUBLISHED"
                                 old_file_node.prior_node.append(context_node._id)
-                                old_file_node.save()
-                                context_node.save()
+                                old_file_node.save(groupid=group_id)
+                                context_node.save(groupid=group_id)
                 else:
                         # If availbale ,then return to the topic page
                         return HttpResponseRedirect(url_name)
@@ -1014,10 +1016,10 @@ def add_file(request, group_id):
         file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
         file_obj.prior_node.append(context_node._id)
         file_obj.status = u"PUBLISHED"
-        file_obj.save()
+        file_obj.save(groupid=group_id)
         context_node.collection_set.append(file_obj._id)
-        file_obj.save()
-        context_node.save()
+        file_obj.save(groupid=group_id)
+        context_node.save(groupid=group_id)
     return HttpResponseRedirect(url_name)
 
 
@@ -1186,7 +1188,7 @@ def change_group_settings(request,group_id):
                 group_node.disclosure_policy = disclosure_policy
                 group_node.encryption_policy = encryption_policy
                 group_node.modified_by = int(request.user.id)
-                group_node.save()
+                group_node.save(groupid=group_id)
                 return HttpResponse("changed successfully")
         except:
             return HttpResponse("failed")
@@ -1255,7 +1257,7 @@ def make_module_set(request, group_id):
                     if(check == 'True'):
                         return HttpResponse("This module already Exists")
                     else:
-                        gsystem_obj.save()
+                        gsystem_obj.save(groupid=group_id)
                         create_relation_of_module(node._id, gsystem_obj._id)
                         create_version_of_module(gsystem_obj._id,node._id)
                         check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
@@ -2164,7 +2166,7 @@ def remove_user_from_author_set(request, group_id):
         if node.created_by == request.user.id:
             node.author_set.remove(user_id)
             can_remove = True
-            node.save()
+            node.save(groupid=group_id)
 
             if node.author_set:
                 for each in node.author_set:
@@ -2282,7 +2284,7 @@ def annotationlibInSelText(request, group_id):
     }
     sg_obj.annotations.append(ann)
   
-  sg_obj.save()
+  sg_obj.save(groupid=group_id)
 
   return HttpResponse(json.dumps(sg_obj.annotations))
 
@@ -4698,7 +4700,7 @@ def edit_task_title(request, group_id):
         title = request.POST.get('title',"")
 	task = node_collection.find_one({'_id':ObjectId(taskid)})
         task.name = title
-	task.save()
+	task.save(groupid=group_id)
         return HttpResponse(task.name)
     else:
 	raise Http404
@@ -4718,7 +4720,7 @@ def edit_task_content(request, group_id):
     	usrname = request.user.username
     	filename = slugify(task.name) + "-" + usrname + "-"
     	task.content = org2html(content_org, file_prefix=filename)
-	task.save()
+	task.save(groupid=group_id)
         return HttpResponse(task.content)
     else:
 	raise Http404
@@ -4788,7 +4790,7 @@ def save_time(request, group_id, node):
      name_arr = name.split("--")
      new_name = unicode(str(name_arr[0]) + "--" + str(name_arr[1]) + "--" + str(start_time))
      event_node.name = new_name
-     event_node.save() 
+     event_node.save(groupid=group_id) 
   return HttpResponse("Session rescheduled") 
 
 @get_execution_time

@@ -1,3 +1,4 @@
+{% load i18n %}
 <style type="text/css">
     #tooltip {
         position: absolute;
@@ -54,17 +55,17 @@
 <h3>Statistics</h3>
     <dl class="tabs" data-tab>
         {% if not show_only_pie %}
-            <dd class="tab-title active"><a href="#bar_visual">Bar-Chart</a></dd>
-            <dd class="tab-title"><a href="#pie_visual">Pie</a></dd>
+            <dd class="tab-title active"><a href="#bar_visual">{% trans 'Bar-Chart' %}</a></dd>
+            <dd class="tab-title"><a href="#pie_visual">{% trans 'Pie' %}</a></dd>
         {% else %}
-            <dd class="tab-title active"><a href="#pie_visual">Activity Ratings</a></dd>
+            <dd class="tab-title active"><a href="#pie_visual">{% trans 'Activity Ratings' %}</a></dd>
         {% endif %}
     </dl>
   <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
   <br/>
     <div class="tabs-content">
         <div id="tooltip" class="hidden">
-          <h6>Details</h6>
+          <h6>{% trans 'Details' %}</h6>
           <p><span id="tip-value">100</span></p>
         </div>
         {% if not show_only_pie %}
@@ -183,7 +184,7 @@
         </div>
         {% endif %}
         {% if show_only_pie %}
-        <label id="tot_rating">{{username}}'s Total Rating Score: {{total_activity_rating}}</label>
+        <label id="tot_rating">{{username}}'s{% trans 'Total Rating Score' %}: {{total_activity_rating}}</label>
         <div class="content active" id="pie_visual">
         {% else %}
         <div class="content " id="pie_visual">

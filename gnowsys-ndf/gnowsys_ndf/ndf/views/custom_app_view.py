@@ -348,9 +348,9 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
 
             if user_group_location:
                 user_group_location['visited_location'] = user_last_visited_location
-                user_group_location.save()
+                user_group_location.save(groupid=group_id)
 
-        newgsystem.save()
+        newgsystem.save(groupid=group_id)
 
         if not app_set_instance_id :
             for key,value in request_at_dict.items():
@@ -359,7 +359,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                 newattribute.subject = newgsystem._id
                 newattribute.attribute_type = attributetype_key
                 newattribute.object_value = value
-                newattribute.save()
+                newattribute.save(groupid=group_id)
             for key,value in request_rt_dict.items():
                 if key:
                     relationtype_key = node_collection.find_one({"_id":ObjectId(key)})
@@ -369,14 +369,14 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                     newrelation.subject = newgsystem._id
                     newrelation.relation_type = relationtype_key
                     newrelation.right_subject = right_subject._id
-                    newrelation.save()
+                    newrelation.save(groupid=group_id)
 
         if app_set_instance_id : # editing instance
             for each in systemtype_attributetype_set:
                 if each["database_id"]:
                     attribute_instance = node_collection.find_one({"_id":ObjectId(each['database_id'])})
                     attribute_instance.object_value = request.POST.get(each["database_id"],"")
-                    attribute_instance.save()
+                    attribute_instance.save(groupid=group_id)
                 else :
                     if request.POST.get(each["type_id"],""):
                         attributetype_key = node_collection.find_one({"_id":ObjectId(each["type_id"])})
@@ -384,13 +384,13 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                         newattribute.subject = newgsystem._id
                         newattribute.attribute_type = attributetype_key
                         newattribute.object_value = request.POST.get(each["type_id"],"")
-                        newattribute.save()
+                        newattribute.save(groupid=group_id)
 
             for eachrt in systemtype_relationtype_set:
                 if eachrt["database_id"]:
                     relation_instance = node_collection.find_one({"_id":ObjectId(eachrt['database_id'])})
                     relation_instance.right_subject = ObjectId(request.POST.get(eachrt["database_id"],""))
-                    relation_instance.save()
+                    relation_instance.save(groupid=group_id)
                 else :
                     if request.POST.get(eachrt["type_id"],""):
                         relationtype_key = node_collection.find_one({"_id":ObjectId(eachrt["type_id"])})
@@ -399,7 +399,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                         newrelation.subject = newgsystem._id
                         newrelation.relation_type = relationtype_key
                         newrelation.right_subject = right_subject._id
-                        newrelation.save()
+                        newrelation.save(groupid=group_id)
         
 
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))

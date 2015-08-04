@@ -303,7 +303,7 @@ def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set
       # Remove this when publish button is setup on interface
       organization_gs.status = u"PUBLISHED"
 
-    organization_gs.save(is_changed=is_changed)
+    organization_gs.save(is_changed=is_changed,groupid=group_id)
 
     # [B] Store AT and/or RT field(s) of given organization-node (i.e., organization_gs)
     for tab_details in property_order_list:

@@ -86,21 +86,21 @@ height:100px;
 </style>
 
 
-<a href="#" id="reply_forum" class="button" data-reveal-id="reply">Add a Thread</a>
+<a href="#" id="reply_forum" class="button" data-reveal-id="reply">{% trans 'Add a Thread' %}</a>
 </p>
 <div id="reply" class="reveal-modal medium" data-reveal="">
-{% trans "Add a thread to the Forum:" %} <br/>
+{% trans "Add a thread to the Forum": %} <br/>
 <div class="row">
 <div class="large-3 small-2 columns">
-<label>{% trans "Thread Name: " %}</label>
+<label>{% trans "Thread Name ": %}</label>
 </div>
 <div class="large-9 small-2 columns">
  <input type="text" id="thread_name"> 
 </div>
 </div>
-  <textarea id="orgitdown" name="content_org" placeholder="Please enter description..."></textarea>
+  <textarea id="orgitdown" name="content_org" placeholder="{% trans 'Please enter description' %}..."></textarea>
 
-<input id="twist_save_reply" type="button" value="Save">
+<input id="twist_save_reply" type="button" value="{% trans 'Save' %}">
 <input id="forum" type="hidden" value="{{forum}}">
 <a  class="close-reveal-modal">×</a>
 </div>

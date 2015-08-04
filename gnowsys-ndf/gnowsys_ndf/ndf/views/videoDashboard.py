@@ -170,7 +170,8 @@ def video_edit(request,group_id,_id):
     if request.method == "POST":
 
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
-        vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO))
+        vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO),groupid=group_id)
+
     if "CourseEventGroup" not in group_obj.member_of_names_list:
         get_node_metadata(request,vid_node)
         teaches_list = request.POST.get('teaches_list', '')  # get the teaches list
@@ -181,6 +182,7 @@ def video_edit(request,group_id,_id):
         if assesses_list !='':
             assesses_list=assesses_list.split(",")
         create_grelation_list(vid_node._id,"assesses",assesses_list)
+
         return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
     else:
         url = "/"+ group_id +"/?selected="+str(vid_node._id)+"#view_page"

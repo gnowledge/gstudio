@@ -130,16 +130,16 @@
       {% if user_policy == "allow" %}
 
         <input type="file" name="has_profile_pic" class="hide" />
-        <input type="hidden" name="type" value="profile_pic" />
+        <input type="hidden" name="type" value=" {% trans 'profile_pic' %}" />
         <input type="hidden" name="user" value="{{usr}}" />
         
-        <div class="button expand tiny" id="group-img-edit-btn"> Edit </div>
+        <div class="button expand tiny" id="group-img-edit-btn">{% trans  'Edit' %} </div>
         <input class="button expand tiny hide" id="group-img-browse-btn" accept="image/*" name="has_profile_pic" type="file">
 
         <div class="row hide" id="group-img-save-cancel-btn">
 
           <div class="small-6 columns">
-            <input type="submit" class="button tiny expand" value="Save">
+            <input type="submit" class="button tiny expand" value="{% trans 'Save' %}">
           </div>
 
           <div class="small-6 columns">
@@ -164,10 +164,10 @@
     <label id="alertModalLabel"></label>
     <div class="row approval_modal hide">
       <div class="small-3 small-offset-3 columns">
-        <input type="button" id="btnConfirmYes" class="button tiny expand" value="Yes">
+        <input type="button" id="btnConfirmYes" class="button tiny expand" value="{% trans 'Yes' %}">
       </div>
       <div class="small-3 columns end">
-        <input type="button" id="btnConfirmNo" class="button tiny expand " value="No">
+        <input type="button" id="btnConfirmNo" class="button tiny expand " value="{% trans 'No' %}">
       </div>
     </div>
     <a class="close-reveal-modal">&#215;</a>
@@ -196,7 +196,7 @@
             <input type="hidden" name="type" value="banner_pic">           
             <input type="hidden" name="user" value="{{usr}}">         
             <p id="message" style="display:none">
-              {% trans "Please wait for uploading profile picture" %}
+              {% trans "Please wait while profile picture is uploading .." %}
             </p>
           </div> 
         </div>
@@ -214,7 +214,7 @@
             </a>
           </div>
           <div>
-            <input type="submit" id="submitpostid" value="Save" style="font-size:15px;"  />
+            <input type="submit" id="submitpostid" value="{% trans 'Save' %}" style="font-size:15px;"  />
           </div>
         </div>
         {% endif %}
@@ -241,11 +241,11 @@
       {% endif %}
       
       <dd class="{% if not approval %}active{% endif %}" >
-        <a onclick="loaddata()" href="#status" name="Status">Activity</a>
+        <a onclick="loaddata()" href="#status" name="Status">{% trans 'Activity' %}</a>
       </dd>
       
       <dd>
-        <a href="#view-scheduler-calendar" name="Calendar">Calendar</a>
+        <a href="#view-scheduler-calendar" name="Calendar">{% trans 'Calendar' %}</a>
       </dd>
     </dl>
   </nav>
@@ -370,7 +370,7 @@
 
           if(!data) {
             if(morecount ==0) { 
-              $("#status").append("<h6> No more data to show</h6>");
+              $("#status").append("<h6> {% trans ' No more data to show' %}</h6>");
               morecount = morecount+1;
               counter = 2;
             } 
@@ -411,7 +411,7 @@
     {
       // not of image type file
       this.value = "";  // removing selected file
-      alert("Please select the image type file!");
+      alert("{% trans 'Please select the image type file!' %}");
     }
     else  // image type file selected
     {
@@ -593,7 +593,7 @@
               });
             }
             else {
-              nesc = "<p class='text-center'><b>  Students have been approved" + "</b></p>"
+              nesc = "<p class='text-center'><b> {% trans 'Students have been approved' %}" + "</b></p>"
               $("#approval_table").html(nesc); 
               $("#approval_buttons").addClass("hide")
             }
@@ -646,10 +646,10 @@
       approval_state = $(this).val();
       if ( !is_approve_confirm && !is_reject_confirm) {
         if(approval_state == "Approve"){
-          $("#alertModalLabel").text("Do you want to continue approving the selected students?");
+          $("#alertModalLabel").text("{% trans 'Do you want to continue approving the selected students?' %}");
         }
         else if(approval_state == "Reject"){
-          $("#alertModalLabel").text("Do you want to continue rejecting the selected stuffdents?");
+          $("#alertModalLabel").text("{% trans 'Do you want to continue rejecting the selected stuffdents?' %}");
         }
         $("#alertModal")
           .removeClass("medium").addClass("small")

@@ -343,7 +343,7 @@ def data_review_save(request, group_id):
                 is_changed = True
 
         if is_changed:
-            file_node.save()
+            file_node.save(groupid=group_id)
 
         # print edit_summary
 

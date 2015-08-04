@@ -58,7 +58,7 @@ def userpref(request,group_id):
         lan_dict['default']=GSTUDIO_SITE_DEFAULT_LANGUAGE
         auth.preferred_languages=lan_dict
         auth.modified_by=request.user.id
-        auth.save()
+        auth.save(groupid=group_id)
     return HttpResponse("Success")
 
 @login_required

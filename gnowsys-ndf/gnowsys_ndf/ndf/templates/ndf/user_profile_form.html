@@ -32,7 +32,7 @@
 						
 						<div class="row">
 							<div class="small-4 columns" style="left:1%;">
-								<label > <h6> Language proficiency </h6> </label>
+								<label > <h6> {% trans 'Language proficiency' %} </h6> </label>
 							</div>
 							<div class="small-3  columns" style="right:5%; ">
 								<label id="language_proficiency_info"></label>
@@ -43,7 +43,7 @@
 						</div>
 						<div class="row">
 							<div class="small-4 columns" style="right:1%;">
-								<label> <h6>  Subject Proficiency </h6></label>
+								<label> <h6> {% trans 'Subject Proficiency' %}</h6></label>
 							</div>
 							<div class="small-2 columns " style="right:1%; " > 
 								<label id="subject_proficiecncy_info"></label>
@@ -90,7 +90,7 @@
 				<select name="language_proficiency" id="language_proficiency">
 					<option  value=" "> --- Select --- </option>
 					{% for i in values.language %}
-						<option name = '{{i}}' value="{{i}}"> {{i}} </option>
+						<option name = '{{i}}' value="{{i}}"> {% trans  i  %}</option>
 					{% endfor %}
 				</select>
 			</div>	
@@ -106,7 +106,7 @@
 				<select name="subject_proficiency" id="subject_proficiency">
 					<option  value=" "> --- Select --- </option>
 					{% for i in values.educationalsubject %}
-						<option name = '{{i}}' value="{{i}}"> {{i}} </option>
+						<option name = '{{i}}' value="{{i}}"> {% trans i %} </option>
 					{% endfor %}
 				</select>	
 				

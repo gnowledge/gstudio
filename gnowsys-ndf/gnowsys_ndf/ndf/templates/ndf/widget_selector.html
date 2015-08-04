@@ -1,3 +1,5 @@
+<script type="text/javascript" src="/static/ndf/bower_components/mousetrap/mousetrap.js"></script>
+
 <style type="text/css">
   .selector-widget{
     margin-bottom: 2rem;
@@ -69,6 +71,10 @@
     background-color: lightgray;
   }
 
+  .traversing-el{
+    background-color: lightgray;
+  }
+
   .item-title{
     text-transform: uppercase;
     color: #020;
@@ -92,7 +98,7 @@
 
             <div id="selected-items"></div>
             
-            <div id="search-text" contenteditable>search</div>
+            <div id="search-text" class="mousetrap" contenteditable>search</div>
 
           </div>
 
@@ -127,154 +133,222 @@
 
 <script type="text/javascript">
 
-    selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
-    // console.log(selected_options)
+  selected_options = [ {% for each_opt in selected_options %}"{{each_opt.pk|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
+  // console.log(selected_options)
 
-    // querySelector, jQuery style
-    var $s = function (selector) {
-      return document.querySelector(selector);
+  // querySelector, jQuery style
+  var $s = function (selector) {
+    return document.querySelector(selector);
+  };
+
+  var $sa = function (selector) {
+    return document.querySelectorAll(selector);
+  };
+
+  toBeSelected = document.getElementById('to-be-selected');
+  selectedItems = document.getElementById('selected-items');
+  searchText = document.getElementById('search-text');
+  selectorWidget = $s('.selector-widget');
+
+  sItems = $sa("#to-be-selected .item");
+
+  function removeTag(){
+    tempItem = this.parentNode.querySelector('.item');
+    tempItem.querySelector('.item-title').style.textDecoration = '';
+
+    tempItem.onclick = addToSelection;
+    tempItem.querySelector('.item-description').classList.remove('hide');
+    toBeSelected.appendChild(tempItem);
+
+    this.parentNode.onclick = detachEvent
+    this.parentNode.remove();
+    toBeSelected.classList.remove('hide');
+  }
+
+  function lineThrough(){
+    // this.previousSibling.style.textDecoration = 'line-through';
+    this.previousSibling.querySelector('.item-title').style.textDecoration = 'line-through'
+  }
+
+  function removeLineThrough(){
+    // this.previousSibling.style.textDecoration = ''
+    this.previousSibling.querySelector('.item-title').style.textDecoration = ''
+  }
+
+  function detachEvent() { return false; }
+
+  function addToSelection () {
+    // console.log(this.textContent);
+    this.onclick = detachEvent;
+    this.classList.remove('traversing-el');
+
+    this.querySelector('.item-description').classList.add('hide');
+
+    selDiv = document.createElement('div');
+    selDiv.classList.add('label', 'secondary', 'selection');
+
+    var closeBtn = document.createElement("i");
+    closeBtn.className = "fi-x-circle remove-tag";
+    closeBtn.title = "Remove";
+    closeBtn.onclick = removeTag;
+    closeBtn.onmouseenter = lineThrough;
+    closeBtn.onmouseleave = removeLineThrough;
+
+    selDiv.appendChild(this);
+    selDiv.appendChild(closeBtn);
+
+    selectedItems.appendChild(selDiv);
+    selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
+  }
+
+  for (var i = sItems.length - 1; i >= 0; i--) {
+    sItems[i].onclick = addToSelection;
+    // console.log(sItems[i].getAttribute('data-value'))
+  }
+
+  for (var i = 0; i < selected_options.length; i++) {
+    temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
+    if(temp_item){temp_item.click()}; 
+  };
+
+  function searchOnItems (ev){
+    // console.log(this.textContent)
+    var toBeSearch = this.textContent.trim().toLowerCase();
+    sItemsTemp = $sa("#to-be-selected .item");
+
+    for (var i = sItemsTemp.length - 1; i >= 0; i--) {
+
+      // sItemsTemp[i].style.display = (sItemsTemp[i].textContent.indexOf(toBeSearch)>=0)? 'block': 'none';
+      sItemsTemp[i].style.display = (sItemsTemp[i].getAttribute('data-title').toLowerCase().indexOf(toBeSearch)>=0)? 'block': 'none';
     };
 
-    var $sa = function (selector) {
-      return document.querySelectorAll(selector);
-    };
+  }
+  
+  searchText.oninput = searchOnItems;
 
-    toBeSelected = document.getElementById('to-be-selected');
-    selectedItems = document.getElementById('selected-items');
-    searchText = document.getElementById('search-text');
-    selectorWidget = $s('.selector-widget');
+  function showOptionItems () {
+    toBeSelected.classList.remove('hide');
+    // console.log(this);
 
-    sItems = $sa("#to-be-selected .item");
+    toBeSelected.scrollTop = 0
+    document.querySelector('#to-be-selected > .item:first-child').classList.add('traversing-el');
 
-    function removeTag(){
-      tempItem = this.parentNode.querySelector('.item');
-      tempItem.style.textDecoration = '';
-      tempItem.onclick = addToSelection;
-      tempItem.querySelector('.item-description').classList.remove('hide');
-      toBeSelected.appendChild(tempItem);
-
-      this.parentNode.onclick = detachEvent
-      this.parentNode.remove();
-      toBeSelected.classList.remove('hide');
+    if(!searchText.textContent || searchText.textContent=='search'){
+      searchText.textContent = this.id == 'search-text'? '': searchText.textContent;
     }
+  }
 
-    function lineThrough(){
-      this.previousSibling.style.textDecoration = 'line-through';
+
+  function hideOptionItems () {
+    // toBeSelected.style.display = 'none';
+
+    document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
+
+    if(!searchText.textContent || searchText.textContent=='search'){
+      searchText.textContent = 'search';
     }
+  }
 
-    function removeLineThrough(){
-      this.previousSibling.style.textDecoration = ''
-    }
+  searchText.onfocus = showOptionItems;
+  searchText.onblur = hideOptionItems;
 
-    function detachEvent() { return false; }
-
-    function addToSelection () {
-      // console.log(this.textContent);
-      this.onclick = detachEvent;
-
-      this.querySelector('.item-description').classList.add('hide');
-
-      selDiv = document.createElement('div');
-      selDiv.classList.add('label', 'secondary', 'selection');
-
-      var closeBtn = document.createElement("i");
-      closeBtn.className = "fi-x-circle remove-tag";
-      closeBtn.title = "Remove";
-      closeBtn.onclick = removeTag;
-
-      closeBtn.onmouseenter = lineThrough;
-      
-      closeBtn.onmouseleave = removeLineThrough;
-
-      selDiv.appendChild(this);
-      selDiv.appendChild(closeBtn);
-
-      selectedItems.appendChild(selDiv);
-      selDiv.onclick = function(){selectedItems.insertBefore(this, this.previousSibling );}
-    }
-
-    for (var i = sItems.length - 1; i >= 0; i--) {
-      sItems[i].onclick = addToSelection;
-      // console.log(sItems[i].getAttribute('data-value'))
-    }
-
-    for (var i = 0; i < selected_options.length; i++) {
-      temp_item = toBeSelected.querySelector('.item[data-value="'+ selected_options[i] +'"]');
-      if(temp_item){temp_item.click()}; 
-    };
-
-    function searchOnItems (){
-      // console.log(this.textContent)
-      var toBeSearch = this.textContent.trim().toLowerCase();
-      sItemsTemp = $sa("#to-be-selected .item");
-
-      for (var i = sItemsTemp.length - 1; i >= 0; i--) {
-
-        // sItemsTemp[i].style.display = (sItemsTemp[i].textContent.indexOf(toBeSearch)>=0)? 'block': 'none';
-        sItemsTemp[i].style.display = (sItemsTemp[i].getAttribute('data-title').toLowerCase().indexOf(toBeSearch)>=0)? 'block': 'none';
-      };
-
-    }
+  function getSelectedValues ({{for}}) {
     
-    searchText.oninput = searchOnItems;
+    selected = selectedItems.querySelectorAll('.selection .item');
+  
+    selectedValuesList = [];
 
-    function showOptionItems () {
-      toBeSelected.classList.remove('hide');
-      // searchText.textContent = '';
-      if(!searchText.textContent || searchText.textContent=='search'){
-        searchText.textContent = '';
-      }
+    for (var i = 0; i < selected.length; i++) {
+      selectedValuesList.push( selected[i].getAttribute('data-value') );
+    }
+
+    // console.log(selectedValuesList);
+    return selectedValuesList
+  }
+
+  function getSelValuesHiddenElement (name, idToAppend){
+
+    idToAppend = idToAppend || false;
+
+    var hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = name;
+    hiddenInput.value = JSON.stringify(getSelectedValues());
+
+    if (idToAppend) {
+      document.getElementById(idToAppend).appendChild(hiddenInput);
+    }
+
+    return hiddenInput;
+  }
+
+  document.querySelector('html').onclick = function (e) {
+    // aaa = e; 
+    p = $(e.target).closest('.selector-widget');
+    // console.log(p);
+    if (p.hasClass('selector-widget')) {
+      // document.getElementById('to-be-selected').classList.remove('hide');
+      showOptionItems();
+      bindKeyEvents();
+      // console.log(e);
+    } else {
+      document.getElementById('to-be-selected').classList.add('hide');
+      // hideOptionItems();
+      unBindKeyEvents();
 
     }
-    function hideOptionItems () {
-      // toBeSelected.style.display = 'none';
-      if(!searchText.textContent || searchText.textContent=='search'){
-        searchText.textContent = 'search';
-      }
-    }
-    searchText.onfocus = showOptionItems;
-    searchText.onblur = hideOptionItems;
+  };
 
-    function getSelectedValues ({{for}}) {
-      
-      selected = selectedItems.querySelectorAll('.selection .item');
+  function traverseListDown (ev) {
+
+    ev.preventDefault();
     
-      selectedValuesList = [];
+    var currentEl = $s('#to-be-selected > .item.traversing-el');
+    // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
 
-      for (var i = 0; i < selected.length; i++) {
-        selectedValuesList.push( selected[i].getAttribute('data-value') );
-      }
-
-      // console.log(selectedValuesList);
-      return selectedValuesList
+    // console.log(currentEl.classList)
+    if(currentEl && currentEl.nextElementSibling)
+    {
+      currentEl.nextElementSibling.classList.add('traversing-el');
+      currentEl.classList.remove('traversing-el');
+      // toBeSelected.scrollBy(0, currentEl.clientHeight);
+      toBeSelected.scrollTop += currentEl.clientHeight;
     }
+  }
 
-    function getSelValuesHiddenElement (name, idToAppend){
 
-      idToAppend = idToAppend || false;
+  function traverseListUp (ev) {
 
-      var hiddenInput = document.createElement('input');
-      hiddenInput.type = 'hidden';
-      hiddenInput.name = name;
-      hiddenInput.value = JSON.stringify(getSelectedValues());
+    ev.preventDefault();
+    
+    var currentEl = $s('#to-be-selected > .item.traversing-el');
+    // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
 
-      if (idToAppend) {
-        document.getElementById(idToAppend).appendChild(hiddenInput);
-      }
-
-      return hiddenInput;
+    // console.log(currentEl.classList)
+    if(currentEl && currentEl.previousElementSibling)
+    {
+      currentEl.previousElementSibling.classList.add('traversing-el');
+      currentEl.classList.remove('traversing-el');
+      // toBeSelected.scrollBy(0,-50);
+      toBeSelected.scrollTop -= currentEl.clientHeight;
     }
+  }
+  
+  function bindKeyEvents () {
+    Mousetrap.bind('up', traverseListUp );
+    Mousetrap.bind('down', traverseListDown );
+    Mousetrap.bind('enter', function(){
+      // console.log(this); aaa=this;
+      var elemToBeSelected = $s('#to-be-selected > .item.traversing-el')
+      elemToBeSelected.classList.remove('traversing-el');
+      elemToBeSelected.click();
+    });
+  }
 
-    document.querySelector('html').onclick = function (e) {
-      // aaa = e; 
-      p = $(e.target).closest('.selector-widget');
-      // console.log(p);
-      if (p.hasClass('selector-widget')) {
-        document.getElementById('to-be-selected').classList.remove('hide');
-        // console.log(e);
-      } else {
-        document.getElementById('to-be-selected').classList.add('hide');
-      }
-    };
+  function unBindKeyEvents () {
+    Mousetrap.unbind('up');
+    Mousetrap.unbind('down');
+    Mousetrap.bind('enter');
+  }
 
 </script>

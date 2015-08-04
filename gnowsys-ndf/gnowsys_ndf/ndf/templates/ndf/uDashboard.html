@@ -11,17 +11,17 @@
    <a href="#" data-reveal-id="activity-statistics" class="tiny round button">
       {% trans "Activity Ratings" %}
    </a>
-   {% comment %}
-     {% if site_name == "NROER" %}
-     <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown">Become Partner</button><br> 
-     <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true"> 
-       <li><a href="/home/partner/create_partner/">State</a></li>
-       <li><a href="/home/partner/create_partner/">Institutional</a></li> 
-       <li><a href="/home/partner/create_partner/">Individuals</a></li>
-     </ul>
-  {% endif %}
-   {% endcomment %}
-   <div class="small reveal-modal" id="activity-statistics" data-reveal>
+{% comment %}
+   {% if site_name == "NROER" %}
+   <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br> 
+   <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true"> 
+     <li><a href="/home/partner/create_partner/"> {% trans 'State' %} </a> </li>
+     <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li> 
+     <li><a href="/home/partner/create_partner/"> {% trans 'Individuals' %} </a></li>
+   </ul>
+{% endif %}
+{% endcomment %}
+<div class="small reveal-modal" id="activity-statistics" data-reveal>
       {% include "ndf/file_statistics.html" %}
       <a href="#" class="close-reveal-modal">&#215;</a>
    </div>
@@ -305,7 +305,7 @@
     });
   });
 
-  $("#btnUploadProfilePic").click(function() {
+  $("#btnUploadProPages createdfilePic").click(function() {
     $("#docFile").trigger("click");
   });
 

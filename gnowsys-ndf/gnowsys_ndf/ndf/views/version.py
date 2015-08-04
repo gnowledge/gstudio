@@ -219,7 +219,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      node.content_org=doc2.content_org
      node.content=doc2.content
      node.modified_by=request.user.id
-     node.save()
+     node.save(groupid=group_id)
      #update_mobwrite = update_mobwrite_content_org(node)
      ver=history_manager.get_current_version(node)
      view='merge'
@@ -252,7 +252,7 @@ def revert_doc(request,group_id,node_id,version_1):
             except:
 		node[attr] =node[attr]
    node.modified_by=request.user.id
-   node.save()
+   node.save(groupid=group_id)
    view ='revert'
    ver=history_manager.get_current_version(node)
    selected_versions=selected_versions = {"1": version_1, "2": ""}

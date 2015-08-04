@@ -414,7 +414,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
            name= "Class" + "--"+ slugify(request.POST.get("course_name","")) + "--" + field_value
         event_gs.name=name 
     
-    event_gs.save(is_changed=is_changed)
+    event_gs.save(is_changed=is_changed,groupid=group_id)
     # print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
   
     # [B] Store AT and/or RT field(s) of given event-node (i.e., event_gs)

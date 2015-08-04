@@ -31,7 +31,7 @@ def lang_pref(request):
         if not auth.agency_type: 
             auth.agency_type = "Other"  # Sets default value for agency_type as "Other"
         auth.modified_by=request.user.id
-        auth.save()
+        auth.save(groupid=group_id)
     if appid:
         appname = node_collection.one({'_id': ObjectId(str(appid))})
         return HttpResponseRedirect("/home/"+appname.name.lower())
