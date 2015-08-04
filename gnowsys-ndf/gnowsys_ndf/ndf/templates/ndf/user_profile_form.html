@@ -24,28 +24,28 @@
 							<div class="small-3 columns" style="right:10%; width:auto;">
 								<b><label id="last_name_info"> </label></b>
 							</div> -->
-							<div class="small-3 columns" style="left:1% width:auto	">
+							<div class="small-3 columns" style="left:1% width:auto;">
 								<a class="fi-pencil" onclick="load_profile()"> Edit</a>
 							</div>
 						</div>
 						
 						
 						<div class="row">
-							<div class="small-4 columns" style="left:1%;">
+							<div class="small-5 columns" style="right:1%;">
 								<label > <h6> Language proficiency </h6> </label>
 							</div>
-							<div class="small-3  columns" style="right:5%; ">
+							<div class="small-2  columns" style="right:1%; ">
 								<label id="language_proficiency_info"></label>
 							</div>
-							<div>
+							<div class="small-3 columns">
 								
 							</div>
 						</div>
 						<div class="row">
-							<div class="small-4 columns" style="right:1%;">
+							<div class="small-5 columns" style="right:2%;">
 								<label> <h6>  Subject Proficiency </h6></label>
 							</div>
-							<div class="small-2 columns " style="right:1%; " > 
+							<div class="small-2 columns " style="right:1%; width:auto; " > 
 								<label id="subject_proficiecncy_info"></label>
 							</div>
 							<div class="small-3 columns">
@@ -184,12 +184,13 @@ $(document).ready()
 					}
 			   });
 	*/
-
+	load_information();
 }
-$('#view-profile').on('toggled', function (event, tab) {
+/*
+$('#view-profile').on('r', function (event, tab) {
              load_information();
         });
-
+*/
 function load_information()
 {
 		$.ajax({
