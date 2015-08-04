@@ -228,7 +228,7 @@ def approve_resource(request, group_id):
 					group_set_details_dict['newly_appended_group_id'],\
 					 node_obj._id)
 			# node_obj.modified_by = int(request.user.id)
-			node_obj.save()
+			node_obj.save(groupid=group_id)
 
 			flag = 1
 		else:

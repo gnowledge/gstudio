@@ -355,7 +355,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     enrollment_gs.last_update = datetime.datetime.today()
                     enrollment_gs.status = u"PUBLISHED"
-                    enrollment_gs.save()
+                    enrollment_gs.save(groupid=group_id)
 
                 enrollment_task_ids = None
                 each_enrollment_task_node = None
@@ -591,7 +591,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
                     enrollment_gs.last_update = datetime.datetime.today()
                     enrollment_gs.status = u"PUBLISHED"
-                    enrollment_gs.save()
+                    enrollment_gs.save(groupid=group_id)
 
                 enrollment_task_ids = None
                 each_enrollment_task_node = None

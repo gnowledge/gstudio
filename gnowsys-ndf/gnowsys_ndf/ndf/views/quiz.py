@@ -216,11 +216,11 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         if tags:
             quiz_item_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
         
-        quiz_item_node.save()
+        quiz_item_node.save(groupid=group_id)
 
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
-            quiz_node.save()
+            quiz_node.save(groupid=group_id)
 	
         assesses_list = request.POST.get('assesses_list','') 	
 	if assesses_list !='':
@@ -271,7 +271,7 @@ def create_edit_quiz(request, group_id, node_id=None):
     if request.method == "POST":
 
         # get_node_common_fields(request, quiz_node, group_id, gst_quiz)
-        quiz_node.save(is_changed=get_node_common_fields(request, quiz_node, group_id, gst_quiz))
+        quiz_node.save(is_changed=get_node_common_fields(request, quiz_node, group_id, gst_quiz),groupid=group_id)
 	# get_node_metadata(request, quiz_node,gst_quiz)
 	
        
