@@ -258,7 +258,7 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
           if len(Assignees)>1:
               task_node = create_task(request,task_id,group_id)
               task_node.collection_set = collection_set_ids
-              task_node.save()  
+              task_node.save(groupid=group_id)  
               create_task_at_rt(request,rt_list,at_list,task_node,request.user.id,group_name,group_id)  
       else: 
             task_node = create_task(request,task_id,group_id)  
@@ -443,7 +443,7 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
                 change_list.append(each.encode('utf8')+' changed from ' + str(attr.object_value) + ' to ' + str(field_value))  # updated    details
               
               attr.object_value = field_value
-              attr.save()
+              attr.save(groupid=group_id)
           
           else:
             # attributetype_key = node_collection.find_one({"_type":'AttributeType', 'name':each})
@@ -509,16 +509,16 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
 
         update_node.prior_node = [task_node._id]        
         update_node.name = unicode(task_node.name+"-update_history")
-        update_node.save()
+        update_node.save(groupid=group_id)
         update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
-        update_node.save()
+        update_node.save(groupid=group_id)
         task_node.post_node.append(update_node._id)
-        task_node.save()
+        task_node.save(groupid=group_id)
         
         # patch
         GST_TASK = node_collection.one({'_type': "GSystemType", 'name': 'Task'})
         get_node_common_fields(request, task_node, group_id, GST_TASK)
-        task_node.save()
+        task_node.save(groupid=group_id)
         # End Patch        
 
 
@@ -563,15 +563,15 @@ def create_task(request,task_id,group_id):
           if bx not in user_to_be_notified:
             user_to_be_notified.append(bx)
 
-      task_node.save()
+      task_node.save(groupid=group_id)
       
     if parent: # prior node saving
       if not task_id:       
         task_node.prior_node = [ObjectId(parent)]
         parent_object = node_collection.find_one({'_id': ObjectId(parent)})
         parent_object.post_node = [task_node._id]
-        parent_object.save()
-    task_node.save()
+        parent_object.save(groupid=group_id)
+    task_node.save(groupid=group_id)
     return task_node
 
 
@@ -708,18 +708,24 @@ def task_collection(request,group_name,task_id=None,each_page=1):
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_name) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_name) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     pageurl = request.GET.get("next", "")
     try:
         node = node_collection.one({'_id': ObjectId(_id)})
@@ -739,9 +745,9 @@ def delete_task(request, group_name, _id):
 		    member_of_name = node_collection.find_one({'_id': sys_each_postnode.member_of[0]}).name 
 		    if member_of_name == "Task" :
 			sys_each_postnode.prior_node.remove(node._id)
-			sys_each_postnode.save()
+			sys_each_postnode.save(groupid=group_id)
 		    if member_of_name == "task_update_history":
-			sys_each_postnode.delete()
+			sys_each_postnode.delete(groupid=group_id)
             node.delete()
     except Exception as e:
         print "Exception:", e
@@ -754,19 +760,24 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     history = []
     subtask = []
     group_name=group_name
-    ins_objectid  = ObjectId()
+    # ins_objectid  = ObjectId()
     task=[]
-    if ins_objectid.is_valid(group_name) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_name})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # if ins_objectid.is_valid(group_name) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_name})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+        
     
     #section to get the Tasks 
     group = node_collection.find_one({'_id': ObjectId(group_id)})

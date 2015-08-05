@@ -305,6 +305,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
+
 	page_type = request.POST.getlist("type_of",'')
         ce_id = request.POST.get("ce_id",'')
         res = request.POST.get("res",'')
@@ -324,7 +325,7 @@ def create_edit_page(request, group_id, node_id=None):
         			page_type1.append(ObjectId(objid))
         			page_node.type_of = page_type1
         			page_node.type_of
-	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page), groupid=group_id)
         page_node.save()
 
         # To fill the metadata info while creating and editing page node
@@ -371,18 +372,23 @@ def delete_page(request, group_id, node_id):
     
     Just hide the page from users!
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id}))
 
@@ -391,18 +397,22 @@ def delete_page(request, group_id, node_id):
 @get_execution_time
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
@@ -412,7 +422,7 @@ def translate_node(request,group_id,node_id=None):
         get_type=get_resource_type(request, node_id)
         page_node = eval("node_collection.collection"+"."+ get_type)()
         get_translate_common_fields(request, get_type,page_node, group_id, gst_page,node_id)
-        page_node.save()
+        page_node.save(groupid=group_id)
         # add triple to the GRelation 
         # then append this ObjectId of GRelation instance in respective subject and object Nodes' relation_set field.
         relation_type = node_collection.one({'_type': 'RelationType', 'name': 'translation_of'})
@@ -464,31 +474,35 @@ def translate_node(request,group_id,node_id=None):
 
 @get_execution_time        
 def publish_page(request,group_id,node):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     node = node_collection.one({'_id': ObjectId(node)})
     group = node_collection.one({'_id': ObjectId(group_id)})
     if group.post_node:
         node.status=unicode("PUBLISHED")
-        node.save('UnderModeration')
+        node.save('UnderModeration',groupid=group_id)
     else:
         page_node,v=get_page(request,node)
         node.content = unicode(page_node.content)
         node.content_org = unicode(page_node.content_org)
         node.status = unicode("PUBLISHED")
         node.modified_by = int(request.user.id)
-        node.save()
+        node.save(groupid=group_id)
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    

@@ -8,9 +8,9 @@
 
 {% block help_topics %}
 
-  <li><a href="#">Pages Introduction</a></li>
-  <li><a href="#">Working with Pages</a></li>
-  <li><a href="#">Page types</a></li>
+  <li><a href="#">{% trans 'Pages Introduction' %}</a></li>
+  <li><a href="#">{% trans 'Working with Pages' %}</a></li>
+  <li><a href="#">{% trans 'Page types' %}</a></li>
 
 {% endblock %}
 
@@ -33,7 +33,7 @@
   {% if user.is_authenticated %}
     {% include "ndf/shelf.html" %}
   {% else %}
-  <h4>Please Login to create your shelf</h4>
+  <h4> {% trans 'Please Login to create your shelf' %}</h4>
   {% endif %}  
 {% endblock %}
 
@@ -72,7 +72,7 @@
   <div class="panel" style="background-color:#ddd;">
     <b>{% trans "Visit" %}</b>
       <dl class="tabs" data-tab data-options="deep_linking:true">
-        <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd><br/>
+        <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> {% trans 'All Pages' %} {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd><br/>
 
         <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> {% trans "Collections" %}</a></dd>
       </dl><br/>
@@ -124,14 +124,14 @@
 {% if searching and page_nodes.count > 0 %}
 <div class="row">
   <div class="small-12 columns end">
-    <p>Search Results: <span class="label success round">Found {{page_nodes.count}} {{title|lower}}{{page_nodes.count|pluralize}}.</span></p>
+    <p>Search Results: <span class="label success round"> {% trans 'Found' %} {{page_nodes.count}} {{title|lower}}{{page_nodes.count|pluralize}}.</span></p>
   </div>
 </div>
 
 {% elif searching and page_nodes.count == 0 %}
 <div class="row">
   <div class="small-12 columns">
-    <p>Search Results: <span class="label alert">No {{title|lower}}{{page_nodes.count|pluralize}} matched your search criteria!!!</span></p>
+    <p>Search Results: <span class="label alert"> {% trans 'No' %} {{title|lower}}{{page_nodes.count|pluralize}} {% trans 'matched your search criteria!!!' %}</span></p>
   </div>  
 </div>  
 
@@ -173,11 +173,11 @@
           {% endif %}
           <footer>
             <div class="age">
-              {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+              {{ node.member_of_names_list|join:', ' }}{% trans  'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
               <br/>
               by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
             </div>
-            <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
+            <span><strong>{{node.contributors|length}}</strong> {% trans 'Contributor' %}{{node.contributors|pluralize}}</span>
           </footer>
           </a>
 
@@ -233,26 +233,26 @@
       
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
   
-      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
+      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}"> {% trans 'Page Details' %}</a>
 
       {% if node.created_by == request.user.id %}
-      <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+        <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">{% trans 'Delete' %}</a>
       {% endif %}
 
       {% group_type_info groupid request.user as grouptype %}
       {% if grouptype == "Moderated" %}
       {% if node.status == "DRAFT" %}
-      <a class="button alert tiny" >Under Moderation</a>
+      <a class="button alert tiny" > {% trans 'Under Moderation' %}</a>
       {% endif %}
       {% endif %} 
 
       <footer>
           <div class="age">
-            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            {{ node.member_of_names_list|join:', ' }}{% trans  'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
             <br/>
             by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
           </div>
-        <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
+        <span><strong>{{node.contributors|length}}</strong>{% trans  'Contributor' %}{{node.contributors|pluralize}}</span>
       </footer>
 
       </div>

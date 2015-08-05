@@ -320,7 +320,7 @@ ul#navigation li a.last {
   <ul class="breadcrumbs">
     <li>
         {% for each_topic in node.teaches %}
-          <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{{ each_topic.name }},</a>
+          <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{% trans each_topic.name %},</a>
         {% endfor %}
     </li>
   </ul>
@@ -329,8 +329,9 @@ ul#navigation li a.last {
 
   {% if node.status == 'MODERATION' %}
     <h4><small>
-      Note: Following Resource is Under Moderation -
-      <a href="{% url 'moderation_status' group_id node.pk %}">Check the current status of Moderation</a>
+      {% trans
+      'Note: Following Resource is Under Moderation -' %}
+      <a href="{% url 'moderation_status' group_id node.pk %}">{% trans 'Check the current status of Moderation' %}</a>
     </small></h4>
   {% endif %}
 
@@ -339,7 +340,7 @@ ul#navigation li a.last {
   {% if node %}
     {% get_publish_policy request groupid node as group_policy %}
     {% if group_policy == "allow" %}
-      &nbsp;&nbsp;&nbsp;<span data-tooltip title= "Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see." ><span style='position:relative; color: gray;'>Draft</span></span>
+      &nbsp;&nbsp;&nbsp;<span data-tooltip title= "{% blocktrans %} Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see. {% endblocktrans %}" ><span style='position:relative; color: gray;'>{% trans 'DRAFT' %}</span></span>
     {% endif %}
   {% endif %}
   </h1>
@@ -593,7 +594,7 @@ ul#navigation li a.last {
             {% get_grid_fs_object node as grid_fs_obj %}
 
             <!-- New Implementation -->
-            Resource Type: {{node.mime_type}}<br/><br/>          
+            {% trans 'Resource Type' %}: {{node.mime_type}}<br/><br/>          
             
             {% if node.collection_set %} 
 
@@ -663,16 +664,16 @@ ul#navigation li a.last {
               {% else %}
                   {% if 'audio' in node.mime_type %}
                     <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
-                      <p>Your browser does not support the audio element </p>
+                      <p>{% trans 'Your browser does not support the audio element' %} </p>
                     </audio>
                   {% elif 'html' in node.mime_type %}
                     <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      <p>Your browser does not support the audio element </p>
+                      <p>{% trans 'Your browser does not support the audio element' %} </p>
                     </iframe>
                     {% elif 'pdf' in node.mime_type %}
                         <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                         <br/>
-                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
+                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">{% trans 'Full screen view' %}</a>
                   {% else %}
                     <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                       {{ grid_fs_obj.filename }}
@@ -714,16 +715,16 @@ ul#navigation li a.last {
                 </video>
               {% elif 'audio' in node.mime_type %}
                 <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
-                  <p>Your browser does not support the audio element </p>
+                  <p>{% trans 'Your browser does not support the audio element' %} </p>
                 </audio>
               {% elif 'html' in node.mime_type %}
                 <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                  <p>Your browser does not support the audio element </p>
+                  <p>{% trans 'Your browser does not support the audio element' %} </p>
                 </iframe>
               {% elif 'pdf' in node.mime_type %}
                 <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
                 <br/>
-                <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
+                <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">{% trans 'Full screen view' %}</a>
               {% elif 'epub' in node.mime_type %}
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
                 <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
@@ -731,7 +732,7 @@ ul#navigation li a.last {
 
                 <div class="row">
                   <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
-                    <small class="fi-arrow-left"> Previous</small>
+                    <small class="fi-arrow-left"> {% trans 'Previous' %}</small>
                   </h2>
                   <div class="small-8 columns text-center"></div>
                   <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
@@ -745,11 +746,11 @@ ul#navigation li a.last {
                 
                 <div class="row">
                   <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
-                    <small class="fi-arrow-left"> Previous</small>
+                    <small class="fi-arrow-left">{% trans 'Previous' %}</small>
                   </h2>
 
                   <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                    Download "{{ grid_fs_obj.filename }}"
+                    {% trans 'Download' %}"{{ grid_fs_obj.filename }}"
                   </a>
                   <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
                     <small>Next <i class="fi-arrow-right"></i></small>
@@ -1043,7 +1044,7 @@ ul#navigation li a.last {
             <!-- Overview -->
             <dd class="accordion-navigation">
               <!-- Title-1 -->
-              <a href="#panel1a" style="font-color:blue">Overview</a>
+              <a href="#panel1a" style="font-color:blue"> {% trans 'Overview' %}</a>
               
               <!-- Content-1 -->
               <div id="panel1a" class="content active">
@@ -1085,7 +1086,7 @@ ul#navigation li a.last {
             <!-- Collection set -->
             <dd class="accordion-navigation">
               <!-- Title-2 -->
-              <a href="#panel2a">Collection Set</a>
+              <a href="#panel2a">{% trans 'Collection Set' %}</a>
     
               <!-- Content-2 -->
               <div id="panel2a" class="content">
@@ -1109,7 +1110,7 @@ ul#navigation li a.last {
               {% endfor %}
               {% for key, value in obj.items %}
               {% if key == "collection_set" and "None" in value %}
-              No Collections associted with {{node.name}} resource.
+              {% blocktrans %} No Collections associted with {{node.name}} resource{% endblocktrans %}.
               {% endif %}
               {% endfor %}
               </div>
@@ -1118,7 +1119,7 @@ ul#navigation li a.last {
             <!-- Attribute set -->
             <dd class="accordion-navigation">
               <!-- Title-3 -->
-              <a href="#panel3a">Attribute Set</a>
+              <a href="#panel3a">{% trans 'Attribute Set' %}</a>
     
               <!-- Content-3 -->
               <div id="panel3a" class="content">
@@ -1142,7 +1143,7 @@ ul#navigation li a.last {
               {% endfor %}    
               {% for key, value in obj.items %}
               {% if key == "attribute_set" and "None" in value %}
-              No Attributes associted with {{node.name}} resource.
+              {% blocktrans %} No Attributes associted with {{node.name}} resource {% endblocktrans %}.
               {% endif %}
               {% endfor %}
               </div>
@@ -1151,7 +1152,7 @@ ul#navigation li a.last {
             <!-- Relation set -->
             <dd class="accordion-navigation">
               <!-- Title-4 -->
-              <a href="#panel4a">Relation Set</a>
+              <a href="#panel4a"> {% trans 'Relation Set' %}</a>
     
               <!-- Content-4 -->
               <div id="panel4a" class="content">
@@ -1174,7 +1175,7 @@ ul#navigation li a.last {
               {% endfor %}
               {% for key, value in obj.items %}
               {% if key == "relation_set" and "None" in value %}
-              No Relations associted with {{node.name}} resource.
+              {% trans 'No Relations associted with' %} {{node.name}}{% trans 'resource.' %}
               {% endif %}
               {% endfor %}
               </div>
@@ -1188,39 +1189,39 @@ ul#navigation li a.last {
 
           <div class="row">
             <div class="small-6 columns">
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="clearing_house" aria-controls="clearing_house" data-reveal-id="cl_house_modal" aria-expanded="false" class="button secondary medium">Manage Clearing House&nbsp;&nbsp;&raquo;</a><br/>
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="clearing_house" aria-controls="clearing_house" data-reveal-id="cl_house_modal" aria-expanded="false" class="button secondary medium"> {% trans 'Manage Clearing House' %}&nbsp;&nbsp;&raquo;</a><br/>
               <ul id="clearing_house" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                <li><a data-reveal-id="approver" class="approvers">Manage Approvers</a></li>    
-                <li><a href="#">Manage Curators</a></li>
-                <li><a href="#">Manage Group Admins</a></li>
+                <li><a data-reveal-id="approver" class="approvers">{% trans 'Manage Approvers' %}</a></li>    
+                <li><a href="#">{% trans 'Manage Curators' %}</a></li>
+                <li><a href="#">{% trans 'Manage Group Admins' %}</a></li>
               </ul>
               <div id="approver" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
                 <!-- {#% edit_drawer_widget "Group" group_id node 1 "Users" user_type="Approver" %#} -->
                 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
               </div>
 
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_partners" aria-controls="manage_partners" aria-expanded="false" class="button secondary medium">Manage Partners&nbsp;&nbsp;&raquo;</a><br/> 
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_partners" aria-controls="manage_partners" aria-expanded="false" class="button secondary medium">{% trans 'Manage Partners' %}&nbsp;&nbsp;&raquo;</a><br/> 
               <ul id="manage_partners" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                <li><a href="#">Manage Partner Admins</a></li>
-                <li><a href="#">Manage Partner MOU's</a></li>
+                <li><a href="#">{% trans 'Manage Partner Admins' %}</a></li>
+                <li><a href="#">{% trans "Manage Partner MOU's" %}</a></li>
               </ul>
 
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_events" aria-controls="manage_events" aria-expanded="false" class="button secondary medium">Manage Events&nbsp;&nbsp;&raquo;</a> <br/>
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_events" aria-controls="manage_events" aria-expanded="false" class="button secondary medium">{% trans 'Manage Events' %}&nbsp;&nbsp;&raquo;</a> <br/>
                 <ul id="manage_events" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                  <li><a href="#">Manage Event Admins</a></li>
-                  <li><a href="#">Manage Event Coordinators</a></li>
-                  <li><a href="#">Manage Event Attendees</a></li>
+                  <li><a href="#">{% trans 'Manage Event Admins' %}</a></li>
+                  <li><a href="#">{% trans 'Manage Event Coordinators' %}</a></li>
+                  <li><a href="#">{% trans 'Manage Event Attendees' %}</a></li>
                 </ul>
 
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_courses" aria-controls="manage_courses" aria-expanded="false" class="button secondary medium">Manage Courses&nbsp;&nbsp;&raquo;</a> <br/>
+              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_courses" aria-controls="manage_courses" aria-expanded="false" class="button secondary medium">{% trans 'Manage Courses' %}&nbsp;&nbsp;&raquo;</a> <br/>
               <ul id="manage_courses" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                <li><a href="#">Manage Course Admins</a></li>
-                <li><a href="#">Manage Course Subscribers</a></li>
+                <li><a href="#">{% trans 'Manage Course Admins' %}</a></li>
+                <li><a href="#">{% trans 'Manage Course Subscribers' %}</a></li>
               </ul>
 
             </div>
             <div class="small-6 columns">
-              <a href="#" class="round small button right">View Statistics</a> <br/>
+              <a href="#" class="round small button right">{% trans 'View Statistics' %}</a> <br/>
             </div>
           </div>
 
@@ -1228,13 +1229,13 @@ ul#navigation li a.last {
         <div id="cl_house_modal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
           <div class="row">
             <div class="small-4 columns">
-              <b>List Of Approvers</b>
+              <b> {% trans 'List Of Approvers' %}</b>
             </div>
             <div class="small-4 columns">
-              <b>List Of Curators</b>
+              <b>{% trans 'List Of Curators' %}</b>
             </div>
             <div class="small-4 columns">
-              <b>List Of Admins</b>
+              <b>{% trans 'List Of Admins' %}</b>
             </div>
           </div>
           <a class="close-reveal-modal" aria-label="Close">&#215;</a>
@@ -1354,12 +1355,12 @@ ul#navigation li a.last {
               {% if request.user.is_superuser %}
               <li>
                 <a href="{% url create_url group_name_tag %}" class="tiny round button">
-                  <span class="fi-plus">&nbsp;&nbsp; New Group</span>
+                  <span class="fi-plus">&nbsp;&nbsp; {% trans 'New Group' %}</span>
                 </a>
                 </li>
                  <li>
                 <a href="/{{group_id}}/analytics/group/summary/" class="tiny round button">
-                  &nbsp;&nbsp; Group Analytics
+                  &nbsp;&nbsp; {% trans 'Group Analytics' %}
 
                 </a>
               </li>
@@ -1401,7 +1402,7 @@ ul#navigation li a.last {
 
            {% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
             <div class= "medium-12 columns" >
-                <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
+                <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'> {% trans 'History' %}  </label>  </a> 
 
 		<!-- Info-box -->&nbsp;
 <!--		<a class="view-info tiny round button" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a>  -->
@@ -1437,20 +1438,20 @@ ul#navigation li a.last {
               {% if group_name_tag != "home"%}
                 {% if user_is_joined == "joined" %}
                   {% if is_user_group and node.created_by != request.user %}
-                  <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
+                  <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Stop following' %}"> </li>
 
                   {% else %}
-                  <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
+                  <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Unsubscribe' %}"></li>
                   {% endif %} 
 
                 {% elif user_is_joined == "not" or not user.is_authenticated %}
                   {% if is_user_group and node.created_by != request.user %}
-                  <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
+                  <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Follow' %}"></li>
                   {% else %}
                     {% if allow_to_join %}
-                      <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                      <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Join' %}"></li>
                     {% else %}
-                      <li><input class="tiny round button" type="submit" id="notify" value="Enrollment Closed" disabled="disabled"></li>
+                      <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Enrollment Closed' %}" disabled="disabled"></li>
                     {% endif %}
                   {% endif %}
                 {% endif %}
@@ -1487,13 +1488,13 @@ ul#navigation li a.last {
           {% if 'ModeratingGroup' in group_object.member_of_names_list or 'ProgramEventGroup' in group_object.member_of_names_list or 'CourseEventGroup' in group_object.member_of_names_list and 'Group' not in group_object.member_of_names_list %}
 
             <a class="tiny expand button" href="{% url 'moderation' group_name_tag %}">
-              Moderate Resources
+              {% trans 'Moderate Resources' %}
             </a>
           {% endif %}
 
           {% if 'Group' in group_object.member_of_names_list %}
             <a class="tiny expand button" href="{% url 'all_under_moderation' group_id %}">
-              Moderation Status
+              {% trans 'Moderation Status' %}
             </a>
           {% endif %} 
         {% endif %} 
@@ -1609,7 +1610,7 @@ ul#navigation li a.last {
                 <div id="group_drawer">
                   {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
                 </div><br/>
-                <input type="button" id="save_switch_group" class="round button push-4" value="Save selected group">
+                <input type="button" id="save_switch_group" class="round button push-4" value="{% trans 'Save selected group' %}">
               </div>
 
               <a class="close-reveal-modal">&#215;</a>
@@ -1649,7 +1650,7 @@ ul#navigation li a.last {
   $(document).on('click',"#switch_group",function(){
     $('#switchgrp #collection_set_drawer1').html("");
      $('#switchgrp #collection_set_drawer2').html("");
-     $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+     $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans "Type here to search in the resources" %}" id="collection_set_search" class="margin-0"></li>');
       var url='/{{groupid}}/group/switch_group/'+'{{node}}';
       $.getJSON( url, function( data ) {
         $.each(data ,function(index , drawer_elements){

@@ -143,7 +143,7 @@ def adminDashboardEdit(request):
                 node['relation_type_set'] = typelist
 
 
-        node.save()     
+        node.save(groupid=group_id)     
         return StreamingHttpResponse(node.name+" edited successfully")
     except Exception as e:
           return StreamingHttpResponse(e)

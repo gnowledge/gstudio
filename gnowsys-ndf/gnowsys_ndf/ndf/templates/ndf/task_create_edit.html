@@ -107,11 +107,11 @@
 {% block body_content %}
   
   <div id="myModal" class="reveal-modal" animation="None" data-reveal>
-    <h3> Please wait till file is Uploading... </h3>                
+    <h3>  {% trans 'Please wait till file is Uploading...' %} </h3>                
   </div>
   
   <div id="selectAssigneeslist" class="tiny reveal-modal" animation="None" data-reveal>
-    <h3> Assignees </h3> 
+    <h3> {% trans 'Assignees' %} </h3> 
     
     <div id="list">
     </div>
@@ -163,9 +163,9 @@
       {% if not task_id %}
     	<div class="row">
     	  <div class="medium-12 columns">
-    	    <label>{{title}} Name <font color="red">*</font></label>
-    	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-    	    <small class="error">Please give your Task a descriptive name.</small>
+    	    <label> {% trans title %}  {% trans  'Name' %} <font color="red">*</font></label>
+    	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="{% trans 'Enter name' %}..." required>
+    	    <small class="error">{% trans 'Please give your Task a descriptive name' %}.</small>
     	  </div>
     	</div>
     	{% endif %}
@@ -173,7 +173,7 @@
       <!-- Parent task -->
     	<div class="row">
     	  <div class="medium-12 columns">
-    	    <label>Parent task</label>
+    	    <label>{% trans 'Parent' %} {% trans 'Task' %} </label>
     	    <input id="parent" type="text" value="{{parent}}">
     	    <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
     	  </div>
@@ -182,21 +182,21 @@
       <!-- Status & Start date -->
     	<div class="row">
     	  <div class="medium-6 columns">
-    	    <label>Status <font color="red">*</font></label>
+    	    <label>{% trans 'Status' %} <font color="red">*</font></label>
       		<select required="" class="medium" id="customDropdown" name="Status" data-invalid="">
-      			<option selected="selected" value="New" id="New">New</option>
-      			<option value="In Progress" id="In Progress">In Progress</option>
-      			<option value="Resolved" id="Resolved">Resolved</option>
-      			<option value="Feedback" id="Feedback">Feedback</option>
-      			<option value="Closed" id="Closed">Closed</option>
-      			<option value="Rejected" id="Rejected">Rejected</option></select>
+      			<option selected="selected" value="New" id="New">{% trans 'New' %}</option>
+      			<option value="In Progress" id="In Progress">{% trans 'In Progress' %}</option>
+      			<option value="Resolved" id="Resolved">{% trans 'Resolved' %}</option>
+      			<option value="Feedback" id="Feedback">{% trans 'Feedback' %}</option>
+      			<option value="Closed" id="Closed">{% trans 'Closed' %}</option>
+      			<option value="Rejected" id="Rejected">{% trans 'Rejected' %}</option></select>
       		</select>
       		<input type="hidden" name="myselect" value="myselectedvalue" />
       		<small class="error">Broke.</small>
     	  </div>
 
     	  <div class="medium-3 columns end">
-    	    <label>Start date</label>
+    	    <label>{% trans 'Start date' %}</label>
           <input id="start_date" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="start_time" readonly="" {% if start_time %}disabled{% endif %}>
     	  </div>
     	</div>	
@@ -204,18 +204,18 @@
       <!-- Priority & Due date -->
     	<div class="row">
     	  <div class="medium-6 columns">
-    	    <label>Priority <font color="red">*</font></label>
+    	    <label>{% trans 'Priority' %} <font color="red">*</font></label>
     	    <select required="" class="medium" id="customDropdown1" name="Priority" data-invalid="">
-        		<option value="Low" id="Low">Low</option>
-        		<option selected="selected" value="Normal" id="Normal">Normal</option>
-        		<option value="High" id="High">High</option>
-        		<option value="Urgent" id="Urgent">Urgent</option>
-        		<option value="Immediate" id="Immediate">Immediate</option></select>
+        		<option value="Low" id="Low">{% trans 'Low' %}</option>
+        		<option selected="selected" value="Normal" id="Normal">{% trans 'Normal' %}</option>
+        		<option value="High" id="High">{% trans 'High' %}</option>
+        		<option value="Urgent" id="Urgent">{% trans 'Urgent' %}</option>
+        		<option value="Immediate" id="Immediate">{% trans 'Immediate' %}</option></select>
     	    </select>
     	  </div>
 
     	  <div class="medium-3 columns end">
-    	    <label>Due date</label>
+    	    <label>{% trans 'Due date' %}</label>
           <input id="end_date" class="date_month_day_year" type="text" placeholder="DD/MM/YYYY" value="" name="end_time" readonly="">
     	  </div>
     	</div>
@@ -224,24 +224,24 @@
     	<div class="row">
     	  
 	    	  <div class="medium-4 columns">
-	    	    <label>Estimated time</label>
-	    	    <input id="Estimated time" name="Estimated_time" type="text" value="{{Estimated_time}}" placeholder="Enter Hours..."/>
-	    	    <small class="error">Please give Time in HH:MM:SS</small>
+	    	    <label>{% trans 'Estimated time' %}</label>
+	    	    <input id="Estimated time" name="Estimated_time" type="text" value="{{Estimated_time}}" placeholder="{% trans 'Enter Hours' %}..."/>
+	    	    <small class="error">{% trans 'Please give Time in' %} HH:MM:SS</small>
 	    	  </div>
 		    
 		     <div class = "medium-4 columns">
 		        <label> To be done By </label>
 				<select name = "assignees" class = "assignees" id = "assignees">
 				<option value = 'Select'> -- select -- </option>
-				<option value = 'Single Assignee'> Single Assignee </option>	
-				<option value = 'Multiple Assignee'>  Multiple Assignee </option>
-				<option value = 'Group Assignees'>  Group Assignees </option>
+				<option value = 'Single Assignee'> {% trans 'Single Assignee' %} </option>	
+				<option value = 'Multiple Assignee'>{% trans 'Multiple Assignee' %}</option>
+				<option value = 'Group Assignees'> {%  trans  'Group Assignees' %} </option>
 				</select>
 		 	 </div>
 	    	
 	    	<div class= "medium-2 columns">
 				<br>
-				<label class = "fi-plus " id = "selectAssignees" data-reveal-id = "selectAssigneeslist" value ="select Asssignees"> </label>
+				<label class = "fi-plus " id = "selectAssignees" data-reveal-id = "selectAssigneeslist" value ="{% trans 'select Asssignees' %}"> </label>
 			</div>
 	        <div class= "medium-2 columns">
 				<br>
@@ -251,7 +251,7 @@
     	</div>
     	<div>
     	    <div id = "assignee_information_div">
-    	    	<label> <h3>  Assignees Assigned for task: </h3> </lable>
+    	    	<label> <h3>  {% trans 'Assignees Assigned for task' %}: </h3> </lable>
     	    </div>
 
 	    	<div id="selected_assignees">
@@ -317,7 +317,7 @@
           <input type="hidden" name = "Assignee" id="Assignee" required>
 
           <!-- Save button -->
-          <input type="submit" id="save-node" value="Save" class="button small expand"/>
+          <input type="submit" id="save-node" value="{% trans 'Save' %}" class="button small expand"/>
         </div>
       </div>
     </div>
@@ -353,7 +353,7 @@
     }  
     else if( $('#Assignee').val() == "" )
       {
-        $('#assignee_warning').append("<h6 style = 'color:red;'> Assignees not selected </h6>")
+        $('#assignee_warning').append("<h6 style = 'color:red;'> {% trans 'Assignees not selected' %} </h6>")
       	return false;
 	  } 
     
@@ -415,7 +415,7 @@
       var reader = new FileReader();
       reader.onload = function (e) {
         var html = "<div>" + 
-                      "<span data-file='"+f.name+"' class='selFile' title='Click to remove'>" + 
+                      "<span data-file='"+f.name+"' class='selFile' title='{% trans 'Click to remove'%}'>" + 
                         f.name + " &#215;" +
                       "</span>" + 
                     "</div>";
@@ -637,9 +637,9 @@
   {% endif %}
   {% if Assignee_name %}
   Assignee_name ='{{Assignee_name}}'
-  	$('#selected_assignees').append("<label>  <h4>" + Assignee_name + " </h4></label>")
+  	$('#selected_assignees').append("<label>  <h4>" +  Assignee_name + " </h4></label>")
   {% else %}
-    $('#selected_assignees').append("<label> <h4> No Assignees Assigned </h4> </label>")	
+    $('#selected_assignees').append("<label> <h4> {% trans 'No Assignees Assigned' %} </h4> </label>")	
   {% endif %}
 
   // Populates group's user(s) into Assignee & Watcher widgets respectively

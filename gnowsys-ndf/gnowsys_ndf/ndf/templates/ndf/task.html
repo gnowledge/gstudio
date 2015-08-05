@@ -38,12 +38,12 @@
 
 <header class="row" >
   <dl class="tabs" data-tab data-options="deep_linking:true" >
-    <dd class="active"><a href="#panel2-1" id="p1"><i class="fi-eye"></i> All Task {% if count %}({{ count }}){% endif %}</a></dd>
-  <dd ><a href="#panel2-2" id="p2" name="Completed" onClick="$('#example').empty()"> Completed </a></dd>
-  <dd ><a href="#panel2-3" id="p3" name="Createdbyme" onClick="$('#example').empty()"> Created by me </a></dd>
-  <dd ><a href="#panel2-4" id="p4" name="Assignedtome" onClick="$('#example').empty()"> Assigned to me </a></dd> 
-  <dd ><a href="#panel2-5" id="p5" name="pending" onClick="$('#example').empty()"> pending </a></dd> 
-  <dd ><a href="#panel2-6" id="p6" name="Statuswise" onClick="$('#example').empty()"> Status Wise </a></dd>
+    <dd class="active"><a href="#panel2-1" id="p1"><i class="fi-eye"></i>{% trans 'All Task' %} {% if count %}({{ count }}){% endif %}</a></dd>
+  <dd ><a href="#panel2-2" id="p2" name="Completed" onClick="$('#example').empty()">{% trans 'Completed' %} </a></dd>
+  <dd ><a href="#panel2-3" id="p3" name="Createdbyme" onClick="$('#example').empty()">{% trans 'Created by me' %} </a></dd>
+  <dd ><a href="#panel2-4" id="p4" name="Assignedtome" onClick="$('#example').empty()"> {% trans 'Assigned to me' %} </a></dd> 
+  <dd ><a href="#panel2-5" id="p5" name="pending" onClick="$('#example').empty()">{% trans  'pending' %} </a></dd> 
+  <dd ><a href="#panel2-6" id="p6" name="Statuswise" onClick="$('#example').empty()">{% trans 'Status Wise' %} </a></dd>
 
 
   </dl>
@@ -59,12 +59,12 @@
  		<div class="small-3  rows">
  			 <select id="filter">
   				<option id="0" onClick="showHide()" value="New">  </option>
-  				<option id="1" onClick="showHide()" value="New"> New </option>
-  				<option id="2" onClick="showHide()" value="In Progress"> In Progress </option>
-  				<option id="3" onClick="showHide()" value="Resolved"> Resolved </option>
-  				<option id="4" onClick="showHide()" value="Feedback"> Feedback</option>
-  				<option id="5" onClick="showHide()" value="Closed"> Closed </option>
-  				<option id="6" onClick="showHide()" value="Rejected"> Rejected </option>
+  				<option id="1" onClick="showHide()" value="New"> {% trans 'New' %} </option>
+  				<option id="2" onClick="showHide()" value="In Progress">{% trans  'In Progress' %} </option>
+  				<option id="3" onClick="showHide()" value="Resolved"> {% trans 'Resolved' %} </option>
+  				<option id="4" onClick="showHide()" value="Feedback">{% trans  'Feedback' %}</option>
+  				<option id="5" onClick="showHide()" value="Closed"> {% trans 'Closed' %} </option>
+  				<option id="6" onClick="showHide()" value="Rejected">{% trans 'Rejected' %} </option>
 
   			 </select>
   		</div>
@@ -327,7 +327,7 @@ if (val == "Rejected")
 {% elif searching and TASK_inst.count == 0 %}
 <div class="row">
   <div class="small-12 columns">
-    <p>Search Results: <span class="label alert">No {{title|lower}}{{TASK_inst.count|pluralize}} matched your search criteria!!!</span></p>
+    <p> {% blocktrans %}Search Results: <span class="label alert">No {{title|lower}}{{TASK_inst.count|pluralize}} matched your search criteria {% endblocktrans %}!!!</span></p>
   </div>  
 </div>  
 

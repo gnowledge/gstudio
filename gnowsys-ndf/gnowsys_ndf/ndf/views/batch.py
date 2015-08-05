@@ -196,7 +196,7 @@ def save_batch(request, group_id):
 
             b_node.contributors.append(int(request.user.id))
             b_node.modified_by = int(request.user.id)
-            b_node.save()
+            b_node.save(groupid=group_id)
             all_batches_in_grp.append(b_node._id)
 
             rt_group_has_batch = node_collection.one({'_type': 'RelationType', 'name': 'group_has_batch'})
@@ -276,7 +276,7 @@ def remove_stud_from_batch(request, group_id):
         )
 
         grelation_node.status = u"DELETED"
-        grelation_node.save()
+        grelation_node.save(groupid=group_id)
         status = "success"
         return HttpResponse(json.dumps(status, cls=NodeJSONEncoder))
 
