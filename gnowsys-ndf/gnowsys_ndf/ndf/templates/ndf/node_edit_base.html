@@ -788,7 +788,6 @@ $(document).ready(function(){
 
 		{% if 'has_thread' in node %}
 			{% with node.has_thread.0 as disc_thread_node %}
-				console.log("{{node}}")
 				{% if disc_thread_node %}
 					{% get_attribute_value disc_thread_node.pk 'release_response' as resp_val %}
 					{% get_attribute_value disc_thread_node.pk 'thread_interaction_type' as thr_int_type %}
