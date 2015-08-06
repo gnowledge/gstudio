@@ -5,6 +5,7 @@ import magic
 import subprocess
 import mimetypes
 import os
+import datetime
 import tempfile
 # import re
 import ast
@@ -43,7 +44,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls ,create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, set_all_urls ,create_gattribute, node_thread_access, create_thread_for_node
 from gnowsys_ndf.ndf.views.moderation import create_moderator_task, get_moderator_group_set
 
 ############################################
@@ -935,7 +936,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
 
 
             fileobj.save()
-
+            return_status = create_thread_for_node(request,group_id, fileobj)
             if source:
               # create gattribute for file with source value
               source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
@@ -965,7 +966,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
               # create gattribute for file with 'educationaluse' value
               basedonurl_AT = node_collection.one({'_type':'AttributeType', 'name': 'basedonurl'})
               basedUrl = create_gattribute(fileobj._id, basedonurl_AT, Based_url)                
-
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
             node_collection.find_and_modify({'_id': fileobj._id}, {'$push': {'fs_file_ids': objectid}})
@@ -1334,9 +1334,10 @@ def file_detail(request, group_id, _id):
         #grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
         #return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
     else:
-         raise Http404 
-
-
+         raise Http404
+    thread_node = None
+    allow_to_comment = None
+    thread_node, allow_to_comment = node_thread_access(group_id, file_node)
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
     shelves = []
     shelf_list = {}
@@ -1377,6 +1378,8 @@ def file_detail(request, group_id, _id):
                                 'groupid':group_id,
                                 'annotations' : annotations,
                                 'shelf_list': shelf_list,
+                                'allow_to_comment':allow_to_comment,
+                                'node_has_thread': thread_node,
                                 'shelves': shelves, 'nav_list':nav_li,
                                 'imageCollection':imageCollection
                               },
@@ -1509,6 +1512,7 @@ def file_edit(request,group_id,_id):
 
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
+        return_status = create_thread_for_node(request,group_id, file_node)
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             # To fill the metadata info while creating and editing file node
             metadata = request.POST.get("metadata_info", '')
