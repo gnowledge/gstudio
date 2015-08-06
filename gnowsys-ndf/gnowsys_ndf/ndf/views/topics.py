@@ -142,6 +142,48 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     )       
 
 
+def list_themes(request, group_id):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    title = theme_GST.name
+    
+    nodes = node_collection.find({
+        'member_of': {'$all': [theme_GST._id]},
+        'group_set':{'$all': [ObjectId(group_id)]}
+        },
+        {'_id': 1, 'name': 1, 'created_by': 1, 'created_at': 1})
+    
+    return render_to_response("ndf/list_themes.html",
+                            { 
+                                'groupid': group_id,
+                                'group_id': group_id,
+                                'nodes': nodes,
+                                'theme_GST': theme_GST
+                            },
+                            context_instance = RequestContext(request) )
+
+
+def delete_theme(request, group_id, theme_id):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    trash_group = node_collection.one({'_type': 'Group', 'name': 'Trash'})
+
+    theme_to_be_deleted = node_collection.one({'_id': ObjectId(theme_id)})
+    theme_to_be_deleted.group_set = [ObjectId(trash_group._id)]
+    theme_to_be_deleted.save()
+    # print trash_group._id,"  ", theme_to_be_deleted.group_set
+
+    return HttpResponseRedirect( reverse('list_themes', kwargs={"group_id": group_id} ))
+
+
 global list_trans_coll
 list_trans_coll = []
 coll_set_dict={}
