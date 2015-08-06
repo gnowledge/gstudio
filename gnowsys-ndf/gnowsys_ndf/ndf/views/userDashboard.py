@@ -610,13 +610,14 @@ def user_profile(request,group_id):
 	from django.contrib.auth.models import User
 	if request.method == "POST":
 		
-
 		Author_group = node_collection.find_one({"_id":ObjectId(group_id)})
 		user = User.objects.get(id=request.user.id)
-		user_data = request.POST.getlist('forminputData[]','')
-		user_select_data = request.POST.getlist('formselectData[]','')
+		user_data = request.POST.getlist('forminputs[]','')
+		user_select_data = request.POST.getlist('formselects[]','')
 		for i in user_data:
+			print i
 			a=ast.literal_eval(i)
+			print a
 			if  a.get('first_name',None) != None:
 			  	user.first_name = a['first_name']
 			if a.get('last_name',None) != None:
@@ -624,7 +625,7 @@ def user_profile(request,group_id):
 		user.save()
 		for i in user_select_data:
 			a=ast.literal_eval(i)
-                        if  a.get('language_proficiency','') :
+			if  a.get('language_proficiency','') :
 				Author_group['language_proficiency'] = a.get('language_proficiency','')	
 			if  a.get('subject_proficiency',''):			
 				Author_group['subject_proficiency'] =  a.get('subject_proficiency','')
