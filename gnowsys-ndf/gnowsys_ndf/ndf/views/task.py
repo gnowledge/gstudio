@@ -708,18 +708,24 @@ def task_collection(request,group_name,task_id=None,each_page=1):
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_name) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_name) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_name})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     pageurl = request.GET.get("next", "")
     try:
         node = node_collection.one({'_id': ObjectId(_id)})
@@ -754,19 +760,24 @@ def check_filter(request,group_name,choice=1,status='New',each_page=1):
     history = []
     subtask = []
     group_name=group_name
-    ins_objectid  = ObjectId()
+    # ins_objectid  = ObjectId()
     task=[]
-    if ins_objectid.is_valid(group_name) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_name})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # if ins_objectid.is_valid(group_name) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_name})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+        
     
     #section to get the Tasks 
     group = node_collection.find_one({'_id': ObjectId(group_id)})

@@ -372,18 +372,23 @@ def delete_page(request, group_id, node_id):
     
     Just hide the page from users!
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     op = node_collection.collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id}))
 
@@ -392,18 +397,22 @@ def delete_page(request, group_id, node_id):
 @get_execution_time
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group","name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group","name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
@@ -465,18 +474,22 @@ def translate_node(request,group_id,node_id=None):
 
 @get_execution_time        
 def publish_page(request,group_id,node):
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     node = node_collection.one({'_id': ObjectId(node)})
     group = node_collection.one({'_id': ObjectId(group_id)})
