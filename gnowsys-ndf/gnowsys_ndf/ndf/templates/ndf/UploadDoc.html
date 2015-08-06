@@ -6,6 +6,12 @@
 {% block title %} Upload Document {% endblock %}
 
 {% block head %}
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
 <!-- Dropzonejs : Enable dropping of files with thumbnails and progress bar http://www.dropzonejs.com/ MIT LICENSE-->
 
 <!--
@@ -105,7 +111,7 @@ i.remove-tag{
 
 		<fieldset>
 			<legend>{% trans "Add Description" %}</legend>
-			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
+			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter description here" %}
 			
 		</fieldset>
 		<!-- <fieldset>
@@ -120,10 +126,8 @@ i.remove-tag{
 
 						<div class="row">
 							<h3 >
-								
-							<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
-							</span>
-
+								<span  class="subheader small-3 columns"  data-tooltip class="has-tip" title="{% trans 'Tags help identify similiar work easily. Just add tag text and click Add Tag button' %}"> {% trans "Add Tag" %}:
+								</span>
 							</h3>
 							<div class="small-9 columns">
 							<div class="row collapse">
@@ -157,6 +161,7 @@ i.remove-tag{
 			    	</span>
 		    	</div>
 	    	</div>  
+		<div class="row">
 		<fieldset class="medium-4 columns">
 			<legend>Visibility</legend>
 			<div class="row">
@@ -192,6 +197,56 @@ i.remove-tag{
 					</div>
 				</div>
 		</fieldset>
+		{% check_is_gstaff groupid request.user as is_gstaff %}
+		{% if is_gstaff %}
+		<fieldset class="medium-7 columns" style="margin-left:10px;">
+			<legend>Thread Properties</legend>
+		    <div class="row">
+		      <div class="large-4 medium-4 columns "><h5>{% trans "Release Response:" %}</h5>
+		      </div>
+		      <div class="large-4 medium-4 columns end">
+		        <select id="release_resp_sel" name="release_resp_sel">
+		          <option value="True">True</option>
+		          <option value="False">False</option>
+		        </select>
+		      </div>
+		    </div>
+
+		    <div class="row">
+		      <div class="large-4 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>
+		      </div>
+		      <div class="large-4 medium-4 columns end">
+		        <select id="interaction_type_sel" name="interaction_type_sel">
+		          <option value="Comment">Comment</option>
+		          <option value="Discuss">Discuss</option>
+		          <option value="Reply">Reply</option>
+		          <option value="Submit">Submit</option>
+		          <option value="Answer">Answer</option>
+		          <option value="Feedback">Feedback</option>
+		          <option value="Moderate">Moderate</option>
+		        </select>
+		      </div>
+		    </div>
+
+		    <div class="row">
+		      <div class="large-4 medium-4 columns "><h5>{% trans "Thread start date:" %}</h5>
+		      </div>
+		      <div class="large-4 medium-4 columns end">
+		      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year"> 
+		      </div>
+		    </div>
+
+		    <div class="row">
+		      <div class="large-4 medium-4 columns "><h5>{% trans "Thread close date:" %}</h5>
+		      </div>
+		      <div class="large-4 medium-4 columns end">
+		      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year"> 
+		      </div>
+		    </div>
+
+		</fieldset>
+		{% endif %}
+		</div>
 		<input type="hidden" name="user" value="{{user.id}}">
 		<input type="hidden" name="page_url" value="{{page_url}}">
 		<input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
@@ -199,8 +254,6 @@ i.remove-tag{
 			<br/>
 			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} </p>
 		</form>
-
-
 
 		{% else %}
 		<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
@@ -210,6 +263,107 @@ i.remove-tag{
 
 {% block script %}
 	// <script type="text/javascript">
+  var startEnrollDt = $("#thread_start_date");
+  var endEnrollDt = $("#thread_close_date");
+
+  currentDate = new Date();
+  var currentDay = currentDate.getDate();
+  var currentMonth = currentDate.getMonth();
+  var currentYear = currentDate.getFullYear();
+  lowerYearLimit = currentYear;
+  upperYearLimit = currentYear + 20;
+
+
+  $(".date_month_day_year").datepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    yearRange: lowerYearLimit + ":" + upperYearLimit,
+    defaultDate: '0',
+
+    onClose: function(dateText, inst) {
+      $(this).val(dateText);
+      
+      var month_year = $(this).val();
+      day = currentDay;
+      month = currentMonth;
+      year = currentYear;
+      
+      if ($(this).attr('id') == "thread_start_date") {
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        if (endEnrollDt.val() != '') {
+          var testStartDate = startEnrollDt.datepicker('getDate');
+          var testEndDate = endEnrollDt.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            endEnrollDt.datepicker('setDate', testStartDate);
+          }
+
+          else {
+            $(this).val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+
+        else {
+          endEnrollDt.val(day+"/"+month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        }
+        $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+      }
+
+      else if ($(this).attr('id') == "thread_close_date") {
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        if (startEnrollDt.val() != '') {
+          var testStartDate = startEnrollDt.datepicker('getDate');
+          var testEndDate = endEnrollDt.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            startEnrollDt.datepicker('setDate', testEndDate);
+          }
+          else {
+            $(this).val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+
+        else {
+          startEnrollDt.val(day+"/"+month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        }
+      }
+    },
+
+    beforeShow: function() {
+      var month_year = $(this).val();
+      day = currentDay;
+      month = currentMonth;
+      year = currentYear;
+
+      if (month_year) {
+        month_year = month_year.split("/");
+        day = parseInt(month_year[0]);
+        month = parseInt(month_year[1]);
+        year = parseInt(month_year[2]);
+      }
+      $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+      $(this).datepicker('setDate', new Date(year, (month-1), day));
+    },
+
+
+  });
 	
 	$("#docFile").change(function() {
 	var max_size =100000
