@@ -9,7 +9,7 @@
 
   #select-search-container{
     width: 100%;
-    background-color: whitesmoke;
+    /*background-color: whitesmoke;*/
     padding-right: 5px;
   }
 
@@ -39,11 +39,16 @@
   }
 
   #search-text{
-    min-height: 2em;
-    margin: auto 1em;
+    /*min-height: 2em;
     padding: 2px;
+    color: gray;*/
+    display: inline-block;
     float: left;
-    color: gray;
+    margin: auto 1em;
+    width: 5em;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: inherit;
   }
 
   #to-be-selected{
@@ -98,7 +103,8 @@
 
             <div id="selected-items"></div>
             
-            <div id="search-text" class="mousetrap" contenteditable>search</div>
+            <!-- <div id="search-text" class="mousetrap" contenteditable>search</div> -->
+            <input type="text" id="search-text" class="mousetrap" placeholder="search" autocomplete="off">
 
           </div>
 
@@ -153,7 +159,7 @@
   sItems = $sa("#to-be-selected .item");
 
   function removeTag(){
-    tempItem = this.parentNode.querySelector('.item');
+    var tempItem = this.parentNode.querySelector('.item');
     tempItem.querySelector('.item-title').style.textDecoration = '';
 
     tempItem.onclick = addToSelection;
@@ -166,26 +172,26 @@
   }
 
   function lineThrough(){
-    // this.previousSibling.style.textDecoration = 'line-through';
-    this.previousSibling.querySelector('.item-title').style.textDecoration = 'line-through'
+    var tempEl = this.previousSibling?this.previousSibling.querySelector('.item-title'):false;
+    if (tempEl) {tempEl.style.textDecoration = 'line-through';}
   }
 
   function removeLineThrough(){
-    // this.previousSibling.style.textDecoration = ''
-    this.previousSibling.querySelector('.item-title').style.textDecoration = ''
+    var tempEl = this.previousSibling?this.previousSibling.querySelector('.item-title'):false;
+    if (tempEl) {tempEl.style.textDecoration = '';}
   }
 
   function detachEvent() { return false; }
 
   function addToSelection () {
     // console.log(this.textContent);
-    this.onclick = detachEvent;
-    this.classList.remove('traversing-el');
-
-    this.querySelector('.item-description').classList.add('hide');
-
     selDiv = document.createElement('div');
     selDiv.classList.add('label', 'secondary', 'selection');
+    
+    this.onclick = detachEvent;
+    this.classList.remove('traversing-el');
+    this.querySelector('.item-description').classList.add('hide');
+    selDiv.appendChild(this);
 
     var closeBtn = document.createElement("i");
     closeBtn.className = "fi-x-circle remove-tag";
@@ -193,8 +199,6 @@
     closeBtn.onclick = removeTag;
     closeBtn.onmouseenter = lineThrough;
     closeBtn.onmouseleave = removeLineThrough;
-
-    selDiv.appendChild(this);
     selDiv.appendChild(closeBtn);
 
     selectedItems.appendChild(selDiv);
@@ -212,41 +216,53 @@
   };
 
   function searchOnItems (ev){
-    // console.log(this.textContent)
-    var toBeSearch = this.textContent.trim().toLowerCase();
-    sItemsTemp = $sa("#to-be-selected .item");
+    // console.log(this.value)
+    var toBeSearch = this.value.trim().toLowerCase();
+    var sItemsTemp = $sa("#to-be-selected .item");
 
     for (var i = sItemsTemp.length - 1; i >= 0; i--) {
 
       // sItemsTemp[i].style.display = (sItemsTemp[i].textContent.indexOf(toBeSearch)>=0)? 'block': 'none';
-      sItemsTemp[i].style.display = (sItemsTemp[i].getAttribute('data-title').toLowerCase().indexOf(toBeSearch)>=0)? 'block': 'none';
+        if(sItemsTemp[i].getAttribute('data-title').toLowerCase().indexOf(toBeSearch) >= 0)
+        {
+          sItemsTemp[i].style.display = 'block';
+          // tempFirstItem = sItemsTemp[i];
+        }
+        else
+        {
+          sItemsTemp[i].style.display = 'none';
+          sItemsTemp[i].classList.remove('traversing-el');
+        }
     };
 
   }
   
   searchText.oninput = searchOnItems;
+  searchText.onkeydown = function (e) { if(e.keyCode == 13) return false; };
+  // searchText.onchange = searchOnItems;
 
   function showOptionItems () {
     toBeSelected.classList.remove('hide');
     // console.log(this);
 
     toBeSelected.scrollTop = 0
-    document.querySelector('#to-be-selected > .item:first-child').classList.add('traversing-el');
+    // document.querySelector('#to-be-selected > .item:first-child').classList.add('traversing-el');
 
-    if(!searchText.textContent || searchText.textContent=='search'){
-      searchText.textContent = this.id == 'search-text'? '': searchText.textContent;
-    }
+    // if(!searchText.textContent || searchText.textContent=='search'){
+    //   searchText.textContent = this.id == 'search-text'? '': searchText.textContent;
+    // }
   }
 
 
   function hideOptionItems () {
     // toBeSelected.style.display = 'none';
 
-    document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
+    elem = document.querySelector('#to-be-selected > .item');
+    if(elem) {elem.classList.remove('traversing-el');}
 
-    if(!searchText.textContent || searchText.textContent=='search'){
-      searchText.textContent = 'search';
-    }
+    // if(!searchText.textContent || searchText.textContent=='search'){
+    //   searchText.textContent = 'search';
+    // }
   }
 
   searchText.onfocus = showOptionItems;
@@ -254,9 +270,9 @@
 
   function getSelectedValues ({{for}}) {
     
-    selected = selectedItems.querySelectorAll('.selection .item');
+    var selected = selectedItems.querySelectorAll('.selection .item');
   
-    selectedValuesList = [];
+    var selectedValuesList = [];
 
     for (var i = 0; i < selected.length; i++) {
       selectedValuesList.push( selected[i].getAttribute('data-value') );
@@ -268,7 +284,7 @@
 
   function getSelValuesHiddenElement (name, idToAppend){
 
-    idToAppend = idToAppend || false;
+    var idToAppend = idToAppend || false;
 
     var hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
@@ -283,10 +299,11 @@
   }
 
   document.querySelector('html').onclick = function (e) {
-    // aaa = e; 
-    p = $(e.target).closest('.selector-widget');
-    // console.log(p);
-    if (p.hasClass('selector-widget')) {
+    // var parentEl = $(e.target).closest('.selector-widget');
+    var parentEl = closest(e.target, '.selector-widget');
+    // console.log(parentEl);
+    // if (parentEl.hasClass('selector-widget')) {
+    if (parentEl) {
       // document.getElementById('to-be-selected').classList.remove('hide');
       showOptionItems();
       bindKeyEvents();
@@ -303,16 +320,40 @@
 
     ev.preventDefault();
     
-    var currentEl = $s('#to-be-selected > .item.traversing-el');
+    currentEl = $s('#to-be-selected > .item.traversing-el');
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
 
     // console.log(currentEl.classList)
-    if(currentEl && currentEl.nextElementSibling)
+    if(currentEl && currentEl.nextElementSibling && (currentEl.nextElementSibling.offsetHeight>0))
     {
       currentEl.nextElementSibling.classList.add('traversing-el');
       currentEl.classList.remove('traversing-el');
       // toBeSelected.scrollBy(0, currentEl.clientHeight);
       toBeSelected.scrollTop += currentEl.clientHeight;
+    }
+    else if(!currentEl)
+    {
+      
+      // var makeTraversingEl = $('#to-be-selected > .item:visible')[0];
+
+      var tempItemList = $sa('#to-be-selected > .item'),
+          tempItemListLen = tempItemList.length;
+
+      for (var i = 0; i < tempItemListLen; i++)
+      {
+        if( (tempItemList[i].offsetHeight > 0 && tempItemList[i].offsetWidth > 0) ||
+          (window.getComputedStyle(tempItemList[i]).getPropertyValue('display') != 'none'))
+        {
+          var makeTraversingEl = tempItemList[i];
+          break;
+        }
+        // console.log(tempItemList[i])
+      };
+
+      if(makeTraversingEl){ makeTraversingEl.classList.add('traversing-el'); }
+
+      // var makeTraversingEl = $s('#to-be-selected > .item');
+      // if (makeTraversingEl) {makeTraversingEl.classList.add('traversing-el');};
     }
   }
 
@@ -325,12 +366,16 @@
     // document.querySelector('#to-be-selected > .item').classList.remove('traversing-el');
 
     // console.log(currentEl.classList)
-    if(currentEl && currentEl.previousElementSibling)
+    if(currentEl && currentEl.previousElementSibling  && (currentEl.previousElementSibling.offsetHeight>0))
     {
       currentEl.previousElementSibling.classList.add('traversing-el');
       currentEl.classList.remove('traversing-el');
       // toBeSelected.scrollBy(0,-50);
       toBeSelected.scrollTop -= currentEl.clientHeight;
+    }
+    else if(currentEl)
+    {
+      currentEl.classList.remove('traversing-el');
     }
   }
   
@@ -339,9 +384,14 @@
     Mousetrap.bind('down', traverseListDown );
     Mousetrap.bind('enter', function(){
       // console.log(this); aaa=this;
-      var elemToBeSelected = $s('#to-be-selected > .item.traversing-el')
-      elemToBeSelected.classList.remove('traversing-el');
-      elemToBeSelected.click();
+      var elemToBeSelected = $s('#to-be-selected > .item.traversing-el');
+
+      if(elemToBeSelected)
+      {
+        elemToBeSelected.classList.remove('traversing-el');
+        elemToBeSelected.click();
+      }
+
     });
   }
 
@@ -349,6 +399,20 @@
     Mousetrap.unbind('up');
     Mousetrap.unbind('down');
     Mousetrap.bind('enter');
+  }
+
+  function closest(elem, selector) {
+
+   var matchesSelector = elem.matches || elem.webkitMatchesSelector || elem.mozMatchesSelector || elem.msMatchesSelector;
+
+    while (elem) {
+        if (matchesSelector.bind(elem)(selector)) {
+            return true;
+        } else {
+            elem = elem.parentElement;
+        }
+    }
+    return false;
   }
 
 </script>
