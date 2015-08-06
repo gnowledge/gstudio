@@ -55,7 +55,16 @@ i.remove-tag{
 
 {% endblock %}
 {% endcache %}
-
+ {% block head %}
+	{{block.super}}
+{% if title == "Page" or "File" in node.member_of_names_list %}
+  <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+ {% endif %}
+ {% endblock %}
 
 {% block body_content %}
 
@@ -82,7 +91,6 @@ i.remove-tag{
     </div> 
     </header>
   	    {% check_group node as is_group %}
-
     <div class="edit-card">
         
 	    <div class="row">
@@ -103,6 +111,15 @@ i.remove-tag{
 				<dd class="meta_tab" title="Click here to add/edit metadata">
 				  	<a>{% trans "Metadata" %} </a> 
 				</dd>  
+				{% if title == "Page" or "File" in node.member_of_names_list %}
+					{% check_is_gstaff groupid request.user as is_gstaff %}
+
+					{% if is_gstaff %}
+						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
+						  	<a>{% trans "Thread Properties" %} </a> 
+						</dd>  
+					{% endif %}
+				{% endif %}
 		
 				<dd class="teaches_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Teaches" %} </a> 
@@ -428,6 +445,59 @@ i.remove-tag{
 		<div id="metadata_info"></div>
 	</div>	
 	{% endcache %}
+
+    <div class="content contents" id="panel-thread" style="width:95%; display:none;" >      
+      	<div class="row">
+		  	<h4>{% trans "Discussion Settings" %} </h4>
+		</div>
+
+	    <div class="row">
+	      <div class="large-2 medium-4 columns "><h5>{% trans "Release Response:" %}</h5>
+	      </div>
+	      <div class="large-pull-4 large-6 medium-8 columns">
+	        <select id="release_resp_sel" name="release_resp_sel">
+	          <option>True</option>
+	          <option>False</option>
+	        </select>
+	      </div>
+	    </div>
+
+	    <div class="row">
+	      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>
+	      </div>
+	      
+	      <div class="large-pull-4 large-6 medium-8 columns">
+	        <select id="interaction_type_sel" name="interaction_type_sel">
+	          <option>Comment</option>
+	          <option>Discuss</option>
+	          <option>Reply</option>
+	          <option>Submit</option>
+	          <option>Answer</option>
+	          <option>Feedback</option>
+	          <option>Moderate</option>
+	        </select>
+	      </div>
+	    </div>
+
+	    <div class="row">
+	      <div class="large-2 medium-4 columns "><h5>{% trans "Thread start date:" %}</h5>
+	      </div>
+	      
+	      <div class="large-pull-4 large-6 medium-8 columns">
+	      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+	      </div>
+	    </div>
+
+	    <div class="row">
+	      <div class="large-2 medium-4 columns "><h5>{% trans "Thread close date:" %}</h5>
+	      </div>
+	      
+	      <div class="large-pull-4 large-6 medium-8 columns">
+	      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+	      </div>
+	    </div>
+	</div>	
+
     
     <!-- Kept this bellow commented part for future reference(Don't delete this) -->
 
@@ -512,12 +582,111 @@ i.remove-tag{
 
 </form>
 
-
-
-
 <!-- Reveal Modals begin -->
 
 <script type="text/javascript">
+  var startEnrollDt = $("#thread_start_date");
+  var endEnrollDt = $("#thread_close_date");
+
+  currentDate = new Date();
+  var currentDay = currentDate.getDate();
+  var currentMonth = currentDate.getMonth();
+  var currentYear = currentDate.getFullYear();
+  lowerYearLimit = currentYear;
+  upperYearLimit = currentYear + 20;
+
+
+  $(".date_month_day_year").datepicker({ 
+    changeMonth: true,
+    changeYear: true,
+    dateFormat: 'dd/mm/yy',
+    yearRange: lowerYearLimit + ":" + upperYearLimit,
+    defaultDate: '0',
+
+    onClose: function(dateText, inst) {
+      $(this).val(dateText);
+      
+      var month_year = $(this).val();
+      day = currentDay;
+      month = currentMonth;
+      year = currentYear;
+      
+      if ($(this).attr('id') == "thread_start_date") {
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        if (endEnrollDt.val() != '') {
+          var testStartDate = startEnrollDt.datepicker('getDate');
+          var testEndDate = endEnrollDt.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            endEnrollDt.datepicker('setDate', testStartDate);
+          }
+
+          else {
+            $(this).val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+
+        else {
+          endEnrollDt.val(day+"/"+month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        }
+        $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+      }
+
+      else if ($(this).attr('id') == "thread_close_date") {
+        if (month_year) {
+          month_year = month_year.split("/");
+          day = parseInt(month_year[0]);
+          month = parseInt(month_year[1]);
+          year = parseInt(month_year[2]);
+        }
+
+        if (startEnrollDt.val() != '') {
+          var testStartDate = startEnrollDt.datepicker('getDate');
+          var testEndDate = endEnrollDt.datepicker('getDate');
+
+          if (testStartDate > testEndDate) {
+            startEnrollDt.datepicker('setDate', testEndDate);
+          }
+          else {
+            $(this).val(day+"/"+month+"/"+year);
+            $(this).datepicker('setDate', new Date(year, (month-1), day));
+          }
+        }
+
+        else {
+          startEnrollDt.val(day+"/"+month+"/"+year);
+          $(this).datepicker('setDate', new Date(year, (month-1), day));
+        }
+      }
+    },
+
+    beforeShow: function() {
+      var month_year = $(this).val();
+      day = currentDay;
+      month = currentMonth;
+      year = currentYear;
+
+      if (month_year) {
+        month_year = month_year.split("/");
+        day = parseInt(month_year[0]);
+        month = parseInt(month_year[1]);
+        year = parseInt(month_year[2]);
+      }
+      $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+      $(this).datepicker('setDate', new Date(year, (month-1), day));
+    },
+
+
+  });
+
 var data_list = ""
 var saveflag = 0
 var old_name;
@@ -610,6 +779,23 @@ $(document).ready(function(){
 		{% if is_auth_node %}
 			$("#name_id").attr("disabled",true)
 		{% endif %}
+
+		{% if 'has_thread' in node %}
+			{% with node.has_thread.0 as disc_thread_node %}
+				console.log("{{node}}")
+				{% if disc_thread_node %}
+					{% get_attribute_value disc_thread_node.pk 'release_response' as resp_val %}
+					{% get_attribute_value disc_thread_node.pk 'thread_interaction_type' as thr_int_type %}
+					{% get_attribute_value disc_thread_node.pk 'start_time' as thr_start_time %}
+					{% get_attribute_value disc_thread_node.pk 'end_time' as thr_end_time %}
+					$("#release_resp_sel").val("{{resp_val}}")
+					$("#interaction_type_sel").val("{{thr_int_type}}")
+					$("#thread_start_date").val('{{thr_start_time|date:"d/m/Y"}}')
+					$("#thread_close_date").val('{{thr_end_time|date:"d/m/Y"}}')
+				{% endif %}
+			{% endwith %}
+		{% endif %}
+
 	{% endif %}
 	
 });
@@ -697,6 +883,20 @@ $(document).ready(function(){
 
 		$("#metadata_info").html("<input type='hidden' name='metadata_info' value='metadata'>");
 	});			
+
+	$(".thread_prop_tab").click(function() {
+		// for activating "panel-metadata" div and deactivate other div's
+		$("div.contents").css("display", "none");
+		$("#panel-thread").css("display", "block");
+		$("#save-node").css("display", "block");
+		// For highlighting current clicked element
+
+		$("dl.select > dd").removeClass("active")
+		$(this).addClass("active")
+	});			
+
+
+
 
 	$(".prior_node_tab").click(function() {
 
