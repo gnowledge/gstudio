@@ -1614,6 +1614,16 @@ def get_user_object(user_id):
 		print "User Not found in User Table",e
 	return user_obj
 
+
+@get_execution_time
+@register.filter
+def get_username(user_id):
+	try:
+		return User.objects.get(id=user_id).username
+	except:
+		return user_id
+
+
 @get_execution_time
 @register.assignment_tag
 def get_grid_fs_object(f):

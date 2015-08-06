@@ -12,11 +12,11 @@
       {% trans "Activity Ratings" %}
    </a>
    {% if site_name == "NROER" %}
-   <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown">Become Partner</button><br> 
+   <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br> 
    <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true"> 
-     <li><a href="/home/partner/create_partner/">State</a></li>
-     <li><a href="/home/partner/create_partner/">Institutional</a></li> 
-     <li><a href="/home/partner/create_partner/">Individuals</a></li>
+     <li><a href="/home/partner/create_partner/"> {% trans 'State' %} </a> </li>
+     <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li> 
+     <li><a href="/home/partner/create_partner/"> {% trans 'Individuals' %} </a></li>
    </ul>
 {% endif %}
    <div class="small reveal-modal" id="activity-statistics" data-reveal>
@@ -97,7 +97,7 @@
 			                      <div class="row" >
 			                        <div class="small-12 columns" >
 			                          <br>
-			                          <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+			                          <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}{% trans 'Change' %}{% else %}Upload{% endif %}">
 			                        </div>
 			                      </div>
 		          			    {% endif %}
@@ -125,7 +125,7 @@
           <h5>
           {% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
             {% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
-            {% trans "Pages created" %}: &nbsp;{{page_count}}<br>
+            {% trans 'Pages created' %}: &nbsp;{{page_count}}<br>
             <!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
             {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
             {% trans "Quiz" %}: {{quiz_count}}<br> 
@@ -158,10 +158,10 @@
   <!-- Task names -->
   <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#view-profile" id='p5'> Info </a> </dd>
-    <dd ><a href="#group" id="p1">Groups </a></dd>
-    {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
-    <dd ><a href="#Activity" id="p3">My Activities </a></dd>      
-    <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
+    <dd ><a href="#group" id="p1"> {% trans 'Groups'  %}</a></dd>
+    {% if user_task %}<dd><a href="#AssignedTasks" id="p2"> {% trans 'Assigned Tasks' %}</a></dd> {% endif %}
+    <dd ><a href="#Activity" id="p3"> {% trans 'My Activities' %}</a></dd>      
+    <dd ><a href="#view-scheduler-calendar" id="p4">{% trans 'Events' %}</a></dd>
 
   </dl>
 
@@ -176,9 +176,7 @@
     <div class="content " id="group">
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
         {% for node in user_groups %}
-          {% get_version_of_module node.pk as version %}
           <li class="card">
-            
             <div id="group">
               <header>
                   <a href="/{{node.pk}}">
@@ -186,7 +184,7 @@
             <h4>{{ node.name|truncatechars:20 }}</h4>
           <div>
           <hr/>
-                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %}{{node.created_at|timesince}} {% trans 'ago' %} 
                       <br/>
                       by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
                     </small>
@@ -208,7 +206,7 @@
           {% if not searching %}
             <div class="row">
                 <div class="small-12 columns" align="left">
-                  <h5> {% blocktrans %}No Groups </b>{% endblocktrans %} </h5>
+                  <h5> {% blocktrans %} No Groups </b>{% endblocktrans %} </h5>
                 </div>
             </div>
           {% endif %}
@@ -218,7 +216,7 @@
         {% if dashboard_count.group > 10 %}
           <div class="row">
             <div class="small-12 columns" align="right">
-              <h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
+              <h6> <a href="{% url 'group' group_id %}">{% trans 'Show More..' %} </a> </h6>
             </div>
           </div>
         {% endif %}
@@ -250,7 +248,7 @@
                   <h4 title="{{ node.name }}">{{ node.name|truncatechars:20 }}</h4>
 
                   <div>
-                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
                       <br/>
                       by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
                     </small>
@@ -281,7 +279,7 @@
           {% if dashboard_count.Task > 10 %}
           <div class="row">
             <div class="small-12 columns" align="right">
-              <h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
+              <h6> <a href="{% url 'task' group_name %}"> {% trans 'Show More..' %}' </a> </h6>
             </div>
           </div>
           {% endif %}
@@ -314,7 +312,7 @@
                       <h4>{{ node.name|truncatechars:20 }}</h4>
 
                       <div>
-                        <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                        <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
                         <br/>
                         by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
                         </small>
@@ -346,7 +344,7 @@
         {% if dashboard_count.activity > 10 %}
             <div class="row">
               <div class="small-12 columns" align="right">
-                <h6> <a href="{% url 'user_activity' group_id %}"> Show More.. </a></h6>
+                <h6> <a href="{% url 'user_activity' group_id %}"> {% trans 'Show More..' %} </a></h6>
               </div>
             </div>
         {% endif %}
@@ -369,7 +367,7 @@
     });
   });
 
-  $("#btnUploadProfilePic").click(function() {
+  $("#btnUploadProPages createdfilePic").click(function() {
     $("#docFile").trigger("click");
   });
 

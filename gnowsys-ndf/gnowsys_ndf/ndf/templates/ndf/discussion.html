@@ -73,7 +73,7 @@
   <!-- orgitdown container -->
   <div id="org" style="" class="reveal-modal small" data-reveal>
     <!-- Reply : -->
-    <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
+    <textarea id="orgitdownreps" name="content_org" placeholder="{% trans 'Enter your reply text here.'%}"></textarea>
     <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
     <input type="file" id="uploaded-files" style="" value="" multiple>
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
@@ -160,7 +160,7 @@
       else
       {
         // alert("To start discussion you need to login and be the member of this group.");
-        alert("Login to start discussion");
+        alert("{% trans 'Login to start discussion' %}");
       }
     }
   else{
@@ -208,7 +208,7 @@
     else
     {
       // alert("To start discussion you need to login and be the member of this group.");
-      alert("Login to start discussion.");
+      alert(" {% trans 'Login to start discussion.' %} ");
     }
   }
   else{
@@ -223,12 +223,12 @@
     var totalReplies = $("#replies-area div.disc-replies:visible").length;
     if(totalReplies == 0)
     {
-      $(".view-discussion span").fadeOut().fadeIn().html("Begin Discussion");
-      $("#create-discussion").text("Comment " + $("h1 span.node[itemprop]").text().trim());
+      $(".view-discussion span").fadeOut().fadeIn().html(" {% trans 'Begin Discussion' %}");
+      $("#create-discussion").text("{% trans 'Comment' %}" + $("h1 span.node[itemprop]").text().trim());
     }
     else
     {
-      $(".view-discussion span").fadeOut().fadeIn().html("Join Discussion ("+totalReplies+")");
+      $(".view-discussion span").fadeOut().fadeIn().html("{% trans 'Join Discussion' %}("+totalReplies+")");
     }
   }
 
@@ -258,11 +258,11 @@
     + "<label>" + data[6] + "</label></a></div>"
     + "<div class='small-9 columns'>"+ data[3] + filesContent +"</div></div>"
 
-    + "<div class='row'><div class='small-8 columns'><small>"+ data[7] +"</small></div>"
-    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>delete</div>"
+    + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
+    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'delete' %}</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-    + data[1] + "' class='reply-btn text-right small-2 columns'> reply </div></div></div>"
+    + data[1] + "' class='reply-btn text-right small-2 columns'>{% trans  'reply' %} </div></div></div>"
 
     return htmlReply;
   }
@@ -340,7 +340,7 @@
             }
             else if( data[0] == "no_content" ){
               
-              alert("Please provide the reply content.")
+              alert("{% trans 'Please provide the reply content.' %}")
             }
             else { alert(data) }
           }
@@ -348,7 +348,7 @@
     }
     else // content is not provided
     {
-      alert("Please provide the reply content.")
+      alert(" {% trans 'Please provide the reply content.' %}")
     } // --- END of IF-ELSE
   
   } // --- END of addReply()
@@ -368,11 +368,11 @@
 
       if(nodesToDeleteArr.length > 1)
       {
-        deleteConfirm = confirm("Along with this reply, total of: " + nodesToDeleteArr.length + " replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'");
+        deleteConfirm = confirm("{% trans 'Along with this reply, total of' %}: " + nodesToDeleteArr.length + "{% trans 'replies would get deleted.\nClick 'OK' to delete. Else click on 'Cancel'' %} ");
       }
       else
       {
-        deleteConfirm = confirm("Are you sure to delete this reply ?\nClick 'OK' to delete.");
+        deleteConfirm = confirm("{% trans 'Are you sure to delete this reply ?\nClick 'OK' to delete.' %} ");
       }
 
       if(deleteConfirm)
@@ -403,7 +403,7 @@
     }
     else
     {
-      alert("To delete this reply, you need to be login and author of this reply.");
+      alert("{% trans 'To delete this reply, you need to be login and author of this reply.' %}");
     }
   }
 

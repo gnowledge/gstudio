@@ -1020,7 +1020,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
             else:
                 user_group_location['visited_location'] = user_last_visited_location
-                user_group_location.save()
+                user_group_location.save(groupid=group_id)
 
     if is_changed:
         node.status = unicode("DRAFT")
@@ -2563,7 +2563,6 @@ def set_all_urls(member_of):
 		url = u"None"
 	return url
 ###############################################	###############################################    
-
 
 @get_execution_time
 def get_user_group(userObject):

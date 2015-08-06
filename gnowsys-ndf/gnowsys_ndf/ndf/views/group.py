@@ -2074,7 +2074,7 @@ def publish_group(request,group_id,node):
     node.content_org=page_node.content_org
     node.status=unicode("PUBLISHED")
     node.modified_by = int(request.user.id)
-    node.save() 
+    node.save(groupid=group_id) 
    
     return render_to_response("ndf/groupdashboard.html",
                                    { 'group_id':group_id, 'groupid':group_id,
@@ -2136,11 +2136,11 @@ def create_sub_group(request,group_id):
           colg.agency_type=request.POST.get('agency_type',"")
           if group_id:
               colg.prior_node.append(group_ins._id)
-          colg.save()
+          colg.save(groupid=group_id)
           #save subgroup_id in the collection_set of parent group 
           group_ins.collection_set.append(colg._id)
           #group_ins.post_node.append(colg._id)
-          group_ins.save()
+          group_ins.save(groupid=group_id)
     
           if colg.edit_policy == "EDITABLE_MODERATED":
               Mod_colg.altnames = cname + "Mod" 
@@ -2153,10 +2153,10 @@ def create_sub_group(request,group_id):
               if usrid not in Mod_colg.contributors:
                   Mod_colg.contributors.append(usrid)
               Mod_colg.prior_node.append(colg._id)
-              Mod_colg.save() 
+              Mod_colg.save(groupid=group_id) 
 
               colg.post_node.append(Mod_colg._id)
-              colg.save()
+              colg.save(groupid=group_id)
           auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
           has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
           shelves = []

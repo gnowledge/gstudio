@@ -43,18 +43,22 @@ app=gst_group
 @login_required
 @get_execution_time
 def create_partner(request,group_id):
-  ins_objectid  = ObjectId()
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    if group_ins:
-      group_id = str(group_ins._id)
-    else:
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth:
-        group_id = str(auth._id)	
-  else :
-  	pass
+  # ins_objectid  = ObjectId()
+  # if ins_objectid.is_valid(group_id) is False :
+  #   group_ins = node_collection.find_one({'_type': "Group","name": group_id}) 
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+  #   if group_ins:
+  #     group_id = str(group_ins._id)
+  #   else:
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if auth:
+  #       group_id = str(auth._id)	
+  # else :
+  # 	pass
+  try:
+        group_id = ObjectId(group_id)
+  except:
+        group_name, group_id = get_group_name_id(group_id)
 
   if request.method == "POST":
     colg = node_collection.collection.Group()
@@ -82,7 +86,7 @@ def create_partner(request,group_id):
     colg.disclosure_policy = request.POST.get('member', 'DISCLOSED_TO_MEM')
     colg.encryption_policy = request.POST.get('encryption', 'NOT_ENCRYPTED')
     colg.agency_type = "Partner"
-    colg.save()
+    colg.save(groupid=group_id)
     # get alll attribute associated with partner
     attribute_set=colg.get_possible_attributes(colg.member_of).keys()
     activ="Request to become a partner"
@@ -112,10 +116,10 @@ def create_partner(request,group_id):
         Mod_colg.contributors.append(usrid)
 
       Mod_colg.prior_node.append(colg._id)
-      Mod_colg.save()
+      Mod_colg.save(groupid=group_id)
 
       colg.post_node.append(Mod_colg._id)
-      colg.save()
+      colg.save(groupid=group_id)
 
     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
