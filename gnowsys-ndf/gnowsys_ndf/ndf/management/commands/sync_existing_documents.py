@@ -587,32 +587,33 @@ class Command(BaseCommand):
     # Add attributes to discussion thread for every page node.
     # If thread does not exist, create it.
     t0 = time.time()
-    pages_not_updated = []
+    pages_files_not_updated = []
     page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" } )
-    page_cur = node_collection.find( { 'member_of': page_gst._id , 'status': { '$in': [u'DRAFT', u'PUBLISHED']}} ).sort('last_update', -1)
+    file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" } )
+    page_file_cur = node_collection.find( { 'member_of': {'$in':[page_gst._id, file_gst._id]} , 'status': { '$in': [u'DRAFT', u'PUBLISHED']}} ).sort('last_update', -1)
     has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
     twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
     rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
     thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
-    print "\n Total pages found : ", page_cur.count()
-    for idx, each_page in enumerate(page_cur):
+    print "\n Total pages and files found : ", page_file_cur.count()
+    for idx, each_node in enumerate(page_file_cur):
         try:
-            print "\nPage# ",idx, "\t - ", each_page._id, '\t - ' , each_page.name
+            print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name
             release_response_val = True
             interaction_type_val = unicode('Comment')
-            userid = each_page.created_by
-            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),'name': unicode(each_page.name), "prior_node": ObjectId(each_page._id) })
+            userid = each_node.created_by
+            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),'name': unicode(each_node.name), "prior_node": ObjectId(each_node._id) })
 
             if thread_obj:
                 print "thread_obj exists ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
-                node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_page.name), 'prior_node': []}}, upsert = False, multi = False)
+                node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': []}}, upsert = False, multi = False)
                 thread_obj.reload()
                 print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
             else:
                 print "thread_obj does not exists"
                 thread_obj = node_collection.collection.GSystem()
 
-                thread_obj.name = u"Thread of " + unicode(each_page.name)
+                thread_obj.name = u"Thread of " + unicode(each_node.name)
                 thread_obj.status = u"PUBLISHED"
 
                 thread_obj.created_by = int(userid)
@@ -621,25 +622,26 @@ class Command(BaseCommand):
 
                 thread_obj.member_of.append(ObjectId(twist_gst._id))
                 # thread_obj.prior_node.append(ObjectId(node._id))
-                thread_obj.group_set = each_page.group_set
+                thread_obj.group_set = each_node.group_set
 
                 thread_obj.save()
                 print "Successfully created thread obj ", thread_obj._id,'\t - ', thread_obj.name, '\t - ', thread_obj.prior_node
             # creating GRelation
-            gr = create_grelation(each_page._id, has_thread_rt, thread_obj._id)
+            gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
             if release_response_val:
                 create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
             if interaction_type_val:
                 create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
 
-            each_page.reload()
+            each_node.reload()
             thread_obj.reload()
             print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
         except Exception as e:
-            pages_not_updated.append(each_page._id)
-            print "\n\nError occurred for page ", each_page._id, "--", each_page.name
+            pages_files_not_updated.append(each_node._id)
+            print "\n\nError occurred for page ", each_node._id, "--", each_node.name
             print e
             pass
+
     t1 = time.time()
 
     time_diff = t1 - t0
@@ -648,4 +650,4 @@ class Command(BaseCommand):
 
     print "\n------- Discussion thread for Page GST successfully completed-------\n"
     print "- Total time taken: \n\n\t" + str(total_time_minute) + " MINUTES\n\t=== OR ===\n\t" + str(total_time_hour) + " HOURS\n"
-    print "\n\n Pages that were not able to updated\t", pages_not_updated
+    print "\n\n Pages that were not able to updated\t", pages_files_not_updated
