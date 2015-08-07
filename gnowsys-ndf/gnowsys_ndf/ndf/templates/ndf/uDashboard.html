@@ -8,7 +8,7 @@
   {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}<br><br>
   <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}</b><br> 
   
-   <a href="#" data-reveal-id="activity-statistics" class="tiny round button">
+   <a href="#" data-reveal-id="activity-statistics" class="tiny button">
       {% trans "Activity Ratings" %}
    </a>
    {% if site_name == "NROER" %}
@@ -76,7 +76,7 @@
   <div class="row" id="new" style="margin-top: 0.5rem">
   	<!-- Users General Information -->
   	<div class="row">
-  		<div class="small-2 columns">
+  		<div class="small-4 large-2 columns">
   		    <div class="text-center">
           			{% if prof_pic_obj %}
 			                    <div class="div-height">
@@ -97,7 +97,7 @@
 			                      <div class="row" >
 			                        <div class="small-12 columns" >
 			                          <br>
-			                          <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}{% trans 'Change' %}{% else %}Upload{% endif %}">
+			                          <input type="button" class="button tiny expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}{% trans 'Change' %}{% else %}Upload{% endif %}">
 			                        </div>
 			                      </div>
 		          			    {% endif %}
@@ -120,7 +120,7 @@
                  {% endif %}
             </div>  
         </div>
-      <div class="small-10 columns">
+      <div class="small-8 large-10 columns">
           <h2 class="style-text">{{username}}</h2>
           <h5>
           {% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
