@@ -135,9 +135,6 @@ i.remove-tag{
       		<div class="medium-8 columns">
 		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}		  
 			</div>
-
-		  		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
-		  	</div>
 		
 			<!--  -->
 			{% if ce_id %}
@@ -236,13 +233,6 @@ i.remove-tag{
  							<div class="small-8 columns" ends>
 					     			<select name="type_of" id="type_of">
 						  			{% for i in page_instance %}
-<<<<<<< HEAD
-							  				{% if i.name == "Wiki page" %}
-							  					<option value = {{i.pk}} selected> {{i.name}} </option>
-											{% else %}
-												<option value = {{i.pk}} > {{i.name}} </option>
-											{% endif %}						  				
-=======
 
 						  				{% if i.name == "Wiki page" %}	        				
 											<option value = {{i.pk}} selected> {% trans i.name %} </option>
@@ -251,7 +241,7 @@ i.remove-tag{
 											<option value = {{i.pk}} > {% trans i.name %} </option>
 										{% endif %}
 						  				
->>>>>>> da2de24d6e40014b6c8e11d2cf4969f920667128
+
 			  						{% endfor %}
 								</select>
 							</div>
