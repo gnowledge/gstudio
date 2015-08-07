@@ -37,6 +37,7 @@
 				success:function(data)
 					{   if (data == 'True')
 						{   //Diconnect the on Submit action from form
+							// $('.invalid-captcha').empty();
 							$('form').off("submit")
 							//Trigger the submit action manually
 							$('form').submit()
