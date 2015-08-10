@@ -101,10 +101,17 @@
           <article class="medium-10 columns">
             <!-- The actual body content -->
             <!-- Url redirection -->
+  
+
+            {% block breadcrumb %} 
+              {% get_breadcrumb request.path %}
+            {% endblock breadcrumb %}
+
 
             {% get_group_type request.path request.user as group_type %}
             
             {% if group_type %}
+
             {% block body_content %} {% endblock %} 
             {% block extra_content %}  {% endblock %}  
             {% endif %}
