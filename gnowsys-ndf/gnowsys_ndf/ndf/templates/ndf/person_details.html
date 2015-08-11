@@ -148,8 +148,11 @@
       </div> <!-- End of class="tabs-content" -->
   
     </section>
-
     <section class="medium-3 columns">
+    {% if "Student" in node.member_of_names_list %}
+      <div><input type="button" value="PRINT" class="print-btn small button"></div>
+    {% endif %}
+
       <div class="panel">
         <p>
         {{ node.member_of_names_list.0 }} 
@@ -249,11 +252,39 @@
   </div>
 
 </div>
-
+<br>
+<div class="printable-data-div hide">
+  {% include "ndf/tiss_app_form.html" %}
+</div>
 {% endblock %}
 
 {% block script %}
 // <script type="text/javascript">
+$(document).on('click',".print-btn",function(){
+    console.log("hi")
+    printDiv("testing");
+    // printDiv("testing_2");
+  });
+function printDiv(divID) {
+    //Get the HTML of div
+    var divElements = document.getElementById(divID).innerHTML;
+    //Get the HTML of whole page
+    var oldPage = document.body.innerHTML;
+
+    //Reset the page's HTML with div's HTML only
+    document.body.innerHTML = "<html><body>" + divElements + "</body></html>";
+    //Print Page
+    document.body.style.marginLeft = '2rem';
+    // document.body.style.lineHeight = '0em';
+    $("body table tbody tr td").css("lineHeight","0.125rem");
+    $("body .declration_td,.nss_reg_td").css("lineHeight","1.125rem");
+    // $("body ").css("marginBottom","1.0rem");
+        
+    window.print();
+
+    //Restore orignal HTML
+    document.body.innerHTML = oldPage;
+}
 
 $(document).on('click',".checkedAll",function(){
   if($(this).is(":checked")==true){
@@ -374,6 +405,4 @@ $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[d
   map.invalidateSize();  
 });
 
-
-// </script>
 {% endblock %}	
