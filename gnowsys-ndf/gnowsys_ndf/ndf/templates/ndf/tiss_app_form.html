@@ -42,22 +42,22 @@
 
   <div id="testing" style="margin-right:2px;">
     <!-- Header -->
-    <div class="text-center" style="margin-bottom:2rem;">
-    <img src="/static/ndf/images/tiss_form_header.png" width="550px">
+    <br>
+    <div class="text-center" style="margin-bottom:0.125rem;">
+    <img src="/static/ndf/images/tiss_form_header.png" width="530px">
     {% if node.user_photo %}
-      <img src="/{{groupid}}/file/readDoc/{{node.user_photo}}" width="100px" style="display:inline-block;margin-top:4rem;">
+      <img src="/{{groupid}}/file/readDoc/{{node.user_photo}}" width="100px" style="display:inline-block;margin-top:2rem;">
     {% endif %}
     </div>
     Form No. {{node.enrollment_code}}
-    </br>
     <!-- Course -->
-    <table class="fullWidth">
+    <table class="fullWidth" style="margin-top:0.25rem;">
       <tbody>
         <tr>
           <td width="2%">I.</td>
-          <td width="25%">Organization</td></br>
+          <td width="35%">Organization</td></br>
           <td width="1%"></td>
-          <td width="72%"></td>
+          <td width="62%"></td>
         </tr>
         <tr>
           <td></td>
@@ -79,9 +79,9 @@
       <tbody>
         <tr>
           <td width="2%">II.</td>
-          <td width="25%">Personal</td>
+          <td width="35%">Personal</td>
           <td width="1%"></td>
-          <td width="72%" colspan="3"></td>
+          <td width="62%" colspan="3"></td>
           <!-- <th></th> -->
           <!-- <th></th> -->
         </tr>
@@ -129,7 +129,7 @@
           <td></td>
           <td>Religion</td>
           <td>:</td>
-          <td width="25%">{{node.religion|default_if_none:""}}</td>
+          <td width="35%">{{node.religion|default_if_none:""}}</td>
           <td width="48%" colspan="2">Caste Category : {{node.student_of_caste_category.0.name|default_if_none:""}}</td>
         </tr>
         <tr>
@@ -144,14 +144,14 @@
           <td></td>
           <td>Mobile No.</td>
           <td>:</td>
-          <td width="25%">{{node.mobile_number|default_if_none:""}}</td>
+          <td width="35%">{{node.mobile_number|default_if_none:""}}</td>
           <td width="48%" colspan="2 "></td>
         </tr>
         <tr>
           <td></td>
-          <td>Alternate No./Landline </td>
+          <td>Alternate No./Landline</td>
           <td>:</td>
-          <td width="38%" colspan="3">{{node.alternate_number|default_if_none:"  -  "}}</td>
+          <td colspan="3">{{node.alternate_number|default_if_none:"  -  "}}</td>
         </tr>
         <tr>
           <td></td>
@@ -178,9 +178,9 @@
       <tbody>
         <tr>
           <td width="2%">III.</td>
-          <td width="25%">Address</td>
+          <td width="35%">Address</td>
           <td width="1%"></td>
-          <td width="72%" colspan="3"></td>
+          <td width="62%" colspan="3"></td>
           <!-- <th></th> -->
           <!-- <th></th> -->
         </tr>
@@ -204,7 +204,7 @@
           <td></td>
           <td>Taluka</td>
           <td>:</td>
-          <td width="25%">{{node.taluka|default_if_none:""}}</td>
+          <td width="35%">{{node.taluka|default_if_none:""}}</td>
           <td width="48%" colspan="2">Town/City : {{node.town_city|default_if_none:""}}</td>
           <!-- <td></td> -->
         </tr>
@@ -212,7 +212,7 @@
           <td></td>
           <td>State</td>
           <td>:</td>
-          <td width="25%">{{node.person_belongs_to_state.0.name|default_if_none:""}}</td>
+          <td width="35%">{{node.person_belongs_to_state.0.name|default_if_none:""}}</td>
           <td width="48%" colspan="2">District : {{node.person_belongs_to_district.0.name|default_if_none:""}}</td>
           <!-- <td></td> -->
         </tr>
@@ -234,9 +234,9 @@
       <tbody>
         <tr>
           <td width="2%">IV.</td>
-          <td width="25%">Educational</td>
+          <td width="35%">Educational</td>
           <td width="1%"></td>
-          <td width="72%" colspan="3"></td>
+          <td width="62%" colspan="3"></td>
           <!-- <th></th> -->
           <!-- <th></th> -->
         </tr>
@@ -244,21 +244,21 @@
           <td></td>
           <td>Year of Passing XII</td>
           <td>:</td>
-          <td width="25%">{{node.12_passing_year|date:"d-m-Y"}}</td>
+          <td width="35%">{{node.12_passing_year|date:"d-m-Y"}}</td>
           <td width="48%" colspan="2">Year of Study (I/II/III) : {{node.degree_year|default_if_none:""}}</td>
         </tr>
         <tr>
           <td></td>
           <td>Name of Degree</td>
           <td>:</td>
-          <td width="25%">{{node.degree_name|default_if_none:""}}</td>
+          <td width="35%">{{node.degree_name|default_if_none:""}}</td>
           <td width="48%" colspan="2">Stream/Subject : {{node.degree_specialization|default_if_none:""}}</td>
         </tr>
         <tr>
           <td></td>
           <td class="nss_reg_td">Are you registered with NSS?</td>
           <td>:</td>
-          <td width="25%">{% if node.is_nss_registered %}Yes{% else %}No {% endif %} </td>
+          <td width="35%">{% if node.is_nss_registered %}Yes{% else %}No {% endif %} </td>
           <td width="48%" colspan="2">College Roll No. : {{node.college_enroll_num|default_if_none:""}}</td>
         </tr>
       </tbody>
@@ -269,7 +269,7 @@
       <tbody>
         <tr>
           <td width="2%">V.</td>
-          <td width="25%">Declaration</td>
+          <td width="35%">Declaration</td>
           <td width="73%"></td>
         </tr>
         <tr>
@@ -280,13 +280,13 @@
           <!-- <td></td> -->
         </tr>
         <tr>
-          <td width="25%" colspan="2">
+          <td width="35%" colspan="2">
               {% if node.signature %}
             	 <img src="/{{groupid}}/file/readDoc/{{node.signature}}" width="125px" style="margin-left:3rem;">
               {% endif %}
 		      </td>
 		      <!-- <td></td> -->
-          <td width="25%" class="text-right">{{node.registration_date|date:"d-m-Y"}}</td>
+          <td width="35%" class="text-right">{{node.registration_date|date:"d-m-Y"}}</td>
 
         </tr>
 

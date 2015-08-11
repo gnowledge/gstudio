@@ -274,10 +274,9 @@ function printDiv(divID) {
     document.body.innerHTML = "<html><body>" + divElements + "</body></html>";
     //Print Page
     document.body.style.marginLeft = '2rem';
-    // document.body.style.lineHeight = '0em';
+    document.body.style.marginRight = '2rem';
     $("body table tbody tr td").css("lineHeight","0.125rem");
     $("body .declration_td,.nss_reg_td").css("lineHeight","1.125rem");
-    // $("body ").css("marginBottom","1.0rem");
         
     window.print();
 
