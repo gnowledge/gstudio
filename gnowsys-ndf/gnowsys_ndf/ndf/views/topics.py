@@ -34,20 +34,10 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 @get_execution_time
 def themes(request, group_id, app_id=None, app_set_id=None):
     
-    # ins_objectid  = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False :
-    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else :
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth :
-    #             group_id = str(auth._id)
-    # else :
-    #     pass
-
-    group_name, group_id = get_group_name_id(group_id)
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     if app_id is None:
         # app_ins = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
