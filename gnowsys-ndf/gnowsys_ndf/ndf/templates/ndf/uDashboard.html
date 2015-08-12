@@ -11,14 +11,18 @@
    <a href="#" data-reveal-id="activity-statistics" class="tiny button">
       {% trans "Activity Ratings" %}
    </a>
-   {% if site_name == "NROER" %}
-   <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br> 
-   <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true"> 
-     <li><a href="/home/partner/create_partner/"> {% trans 'State' %} </a> </li>
-     <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li> 
-     <li><a href="/home/partner/create_partner/"> {% trans 'Individuals' %} </a></li>
-   </ul>
-{% endif %}
+
+   {% comment %} 
+     {% if site_name == "NROER" %}
+     <button data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="small button dropdown"> {% trans 'Become Partner' %} </button><br> 
+     <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true"> 
+       <li><a href="/home/partner/create_partner/"> {% trans 'State' %} </a> </li>
+       <li><a href="/home/partner/create_partner/"> {% trans 'Institutional' %} </a> </li> 
+       <li><a href="/home/partner/create_partner/"> {% trans 'Individuals' %} </a></li>
+     </ul>
+     {% endif %}
+    {% endcomment %} 
+
    <div class="small reveal-modal" id="activity-statistics" data-reveal>
       {% include "ndf/file_statistics.html" %}
       <a href="#" class="close-reveal-modal">&#215;</a>
@@ -73,9 +77,10 @@
   </div>
 
   {% get_group_name groupid as group_name_tag %}
-  <div class="row" id="new" style="margin-top: 0.5rem">
+ <div class="row"  id="new" style="margin-top: 0.5rem">
   	<!-- Users General Information -->
-  	<div class="row">
+<!-- <<<<<<< HEAD
+ -->  	<div class="row">
   		<div class="small-4 large-2 columns">
   		    <div class="text-center">
           			{% if prof_pic_obj %}
@@ -137,16 +142,215 @@
             {% endif %}     -->      
           </h5>
       </div>
+<!-- ======= -->
+      
+          
+        <div class="small-10 columns">
+                <dl class="tabs" data-tab >
+                <dd class="active"><a href="#view-profile" id='p5'> Profile </a> </dd>
+                <dd ><a href="#group" id="p1">Groups </a></dd>
+                {% if user_task %}<dd><a href="#AssignedTasks" id="p2">Assigned Tasks </a></dd> {% endif %}
+                <dd ><a href="#Activity" id="p3">My Activities </a></dd>      
+                <dd ><a href="#view-scheduler-calendar" id="p4">Events </a></dd>
+                </dl>
+                <div class="tabs-content">
+                    <div class="content" id="view-scheduler-calendar">
+                          {% include "ndf/scheduler_calender.html"  %}
+                    </div>
+                    
+                    <div class = "content active" id="view-profile">
+                        {% include "ndf/user_profile_form.html"  %}
+                    </div>
+
+                    <div class="content " id="group">
+                        <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                            {% for node in user_groups %}
+                            {% get_version_of_module node.pk as version %}
+                            <li class="card">
+                            
+                              <div id="groups">
+                                  <header>
+                                    <a href="/{{node.pk}}">
+                                      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+                                    <h4>{{ node.name|truncatechars:20 }}</h4>
+                                <div>
+                                    <hr/>
+                                      <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                                        <br/>
+                                        by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                                      </small>
+                                    </div>
+                                  </header>
+                      
+                                  <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                                  </a>
+                              
+                                  <div class="label-list">
+                                      {% for tag in node.tags|slice:":3" %}
+                                           <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                                      {% endfor %}
+                                  </div>  
+                                </div>
+                              </li>
+                    
+                        {% empty %}
+                          {% if not searching %}
+                            <div class="row">
+                                <div class="small-12 columns" align="left">
+                                  <h5> {% blocktrans %}No Groups </b>{% endblocktrans %} </h5>
+                                </div>
+                            </div>
+                          {% endif %}
+
+                        {% endfor %}
+
+                        {% if dashboard_count.group > 10 %}
+                          <div class="row">
+                            <div class="small-12 columns" align="right">
+                              <h6> <a href="{% url 'group' group_id %}"> Show More.. </a> </h6>
+                            </div>
+                          </div>
+                        {% endif %}
+                      </ul>
+                    </div>
+                    <!-- Activity -->
+                    <div class="content" id="Activity">
+                      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                            {% for node in user_activity %}
+                              {% get_version_of_module node.pk as version %}
+                              {% get_url node.pk as res_type %}
+                              {% if res_type != "None" %}
+                                        <li class="card">
+                                            <div id="activity">
+                                                <header>
+                                                   <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+                                                      {% if res_type == 'group' %}
+                                                        <a href="/{{node.pk}}">
+                                                      {% elif res_type %}
+                                                        {% if res_type != "event_app_instance_detail" %}
+                                                                <a href="{% url res_type groupid node.pk   %}">{{i.url}} 
+                                                        {% else %}
+                                                              {% get_event_type node as app_set_id %}
+                                                              <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}          
+                                                        {% endif %}
+                                                      {% endif %}
+                                                    <h4>{{ node.name|truncatechars:20 }}</h4>
+
+                                                    <div>
+                                                        <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
+                                                        <br/>
+                                                        by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                                                        </small>
+                                                    </div>
+                                                </header>
+
+                                                <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                                                </a>
+                                                <div class="label-list">
+                                                    {% for tag in node.tags|slice:":3" %}
+                                                         <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </li>  
+                              {% endif %}
+                            {% empty %}
+                              {% if not searching %}
+                                <div class="row">
+                                  <div class="small-12 columns" align="left">
+                                    <h5> {% trans "No Recent Activities" %}</h5>
+                                  </div>
+                                </div>
+                              {% endif %}
+                            {% endfor %}
+                            
+                            {% if dashboard_count.activity > 10 %}
+                                <div class="row">
+                                  <div class="small-12 columns" align="right">
+                                    <h6> <a href="{% url 'user_activity' group_id %}"> {% trans 'Show More..' %} </a></h6>
+                                  </div>
+                                </div>
+                            {% endif %}
+                      </ul>
+                    </div>
+                    <!-- Notifications -->
+                    <div id="Notification">
+                      <div>
+                        <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                          <li class="card">
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <!-- Assigned Tasks -->
+                    <div class="content" id="AssignedTasks" >
+                      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                          {% for node in user_task %}
+                            {% get_version_of_module node.pk as version %}
+                            <li class="card">
+                              
+                              <div id="assignedTask">
+                                <header>
+                                  <a href="{% url 'task_details' group_id node.pk %}">
+                                  <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+                                  <h4 title="{{ node.name }}">{{ node.name|truncatechars:20 }}</h4>
+
+                                  <div>
+                                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+                                      <br/>
+                                      by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                                    </small>
+                                  </div>
+                                </header>
+                          <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                                </a>
+                                <div class="label-list">
+                                    {% for tag in node.tags|slice:":3" %}
+                                         <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                                    {% endfor %}
+                                </div>
+                              </div>
+                               
+                            </li>  
+
+                          {% empty %}
+                            {% if not searching %}
+                              <div class="row">
+                                <div class="small-2 columns" align="right">
+                                  <h5> {% trans "No Assinged Task" %} </h5>
+                                </div>
+                              </div>
+                            {% endif %}
+
+                          {% endfor %}
+
+                          {% if dashboard_count.Task > 10 %}
+                          <div class="row">
+                            <div class="small-12 columns" align="right">
+                              <h6> <a href="{% url 'task' group_name %}"> Show More.. </a> </h6>
+                            </div>
+                          </div>
+                          {% endif %}
+                      </ul>
+                    </div>
+
+            </div>      
+        </div> 
+        
+ </div>    
+<!-- >>>>>>> 63384ab418137b09d3198ad4a98cc5ad9e945ea5 -->
 
       {% if user.is_superuser %}
         <div class"trashdiv" style="position:absolute; float:right; right:11%; top:2%;">
           <a href="/Trash/data-review" > <h5>  <span class = "fi-trash"> </span> <b >  Trash </b> </h5> </a>
         </div>
       {% endif %}  
-    </div>
+    
     
     <br/>
-    
+    <!-- 
     <div class="row">
       <div class="small-12 columns" style="padding-top:10px;">
         <b><a>{{username}}'s {% trans "Dashboard" %}</a></b>
@@ -154,204 +358,9 @@
       </div>
     </div>
   </div>
+  -->
 
-  <!-- Task names -->
-  <dl class="tabs" data-tab data-options="deep_linking:true">
-    <dd class="active"><a href="#view-profile" id='p5'> Info </a> </dd>
-    <dd ><a href="#group" id="p1"> {% trans 'Groups'  %}</a></dd>
-    {% if user_task %}<dd><a href="#AssignedTasks" id="p2"> {% trans 'Assigned Tasks' %}</a></dd> {% endif %}
-    <dd ><a href="#Activity" id="p3"> {% trans 'My Activities' %}</a></dd>      
-    <dd ><a href="#view-scheduler-calendar" id="p4">{% trans 'Events' %}</a></dd>
-
-  </dl>
-
-  <!-- Tab views -->
-  <div class="tabs-content">
-    <div class="content" id="view-scheduler-calendar">
-      {% include "ndf/scheduler_calender.html"  %}
-    </div>
-    <div class = "content active" id="view-profile">
-        {% include "ndf/user_profile_form.html"  %}
-    </div> 
-    <div class="content " id="group">
-      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-        {% for node in user_groups %}
-          <li class="card">
-            <div id="group">
-              <header>
-                  <a href="/{{node.pk}}">
-                  <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-            <h4>{{ node.name|truncatechars:20 }}</h4>
-          <div>
-          <hr/>
-                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %}{{node.created_at|timesince}} {% trans 'ago' %} 
-                      <br/>
-                      by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-                    </small>
-                  </div>
-              </header>
       
-        <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-              </a>
-              
-              <div class="label-list">
-                  {% for tag in node.tags|slice:":3" %}
-                       <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
-                  {% endfor %}
-              </div>  
-            </div>
-          </li>
-    
-        {% empty %}
-          {% if not searching %}
-            <div class="row">
-                <div class="small-12 columns" align="left">
-                  <h5> {% blocktrans %} No Groups </b>{% endblocktrans %} </h5>
-                </div>
-            </div>
-          {% endif %}
-
-        {% endfor %}
-
-        {% if dashboard_count.group > 10 %}
-          <div class="row">
-            <div class="small-12 columns" align="right">
-              <h6> <a href="{% url 'group' group_id %}">{% trans 'Show More..' %} </a> </h6>
-            </div>
-          </div>
-        {% endif %}
-      </ul>
-    </div>
-
-    <!-- Notifications -->
-    <div id="Notification">
-      <div>
-        <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-          <li class="card">
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Assigned Tasks -->
-    <div class="content" id="AssignedTasks" >
-      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-          {% for node in user_task %}
-            {% get_version_of_module node.pk as version %}
-            <li class="card">
-              
-              <div id="assignedTask">
-                <header>
-                  <a href="{% url 'task_details' group_id node.pk %}">
-                  <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
-                  <h4 title="{{ node.name }}">{{ node.name|truncatechars:20 }}</h4>
-
-                  <div>
-                    <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
-                      <br/>
-                      by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-                    </small>
-                  </div>
-                </header>
-          <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-                </a>
-                <div class="label-list">
-                    {% for tag in node.tags|slice:":3" %}
-                         <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
-                    {% endfor %}
-                </div>
-              </div>
-               
-            </li>  
-
-          {% empty %}
-            {% if not searching %}
-              <div class="row">
-                <div class="small-2 columns" align="right">
-                  <h5> {% trans "No Assinged Task" %} </h5>
-                </div>
-              </div>
-            {% endif %}
-
-          {% endfor %}
-
-          {% if dashboard_count.Task > 10 %}
-          <div class="row">
-            <div class="small-12 columns" align="right">
-              <h6> <a href="{% url 'task' group_name %}"> {% trans 'Show More..' %}' </a> </h6>
-            </div>
-          </div>
-          {% endif %}
-      </ul>
-    </div>
-
-
-
-    <div class="content" id="Activity">
-      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-        {% for node in user_activity %}
-          {% get_version_of_module node.pk as version %}
-          {% get_url node.pk as res_type %}
-            {% if res_type != "None" %}
-            <li class="card">
-                 
-                <div id="activity">
-                    <header>
-                     <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-                        {% if res_type == 'group' %}
-                          <a href="/{{node.pk}}">
-                        {% elif res_type %}
-                          {% if res_type != "event_app_instance_detail" %}
-                                <a href="{% url res_type groupid node.pk   %}">{{i.url}} 
-                          {% else %}
-                              {% get_event_type node as app_set_id %}
-                              <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}          
-                          {% endif %}
-                        {% endif %}
-                      <h4>{{ node.name|truncatechars:20 }}</h4>
-
-                      <div>
-                        <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
-                        <br/>
-                        by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-                        </small>
-                      </div>
-                      
-                    </header>
-
-                      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-                      </a>
-                    <div class="label-list">
-                        {% for tag in node.tags|slice:":3" %}
-                             <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
-                        {% endfor %}
-                    </div>
-                </div>
-                      
-            </li>  
-            {% endif %}
-        {% empty %}
-          {% if not searching %}
-            <div class="row">
-              <div class="small-12 columns" align="left">
-                <h5> {% trans "No Recent Activities" %}</h5>
-              </div>
-            </div>
-          {% endif %}
-            
-        {% endfor %}
-        {% if dashboard_count.activity > 10 %}
-            <div class="row">
-              <div class="small-12 columns" align="right">
-                <h6> <a href="{% url 'user_activity' group_id %}"> {% trans 'Show More..' %} </a></h6>
-              </div>
-            </div>
-        {% endif %}
-      </ul>
-    </div>
-  </div>
-  
 {% endblock %}
 
 {% block script %}
