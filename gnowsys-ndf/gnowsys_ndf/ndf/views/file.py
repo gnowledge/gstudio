@@ -1437,7 +1437,7 @@ def getFileThumbnail(request, group_id, _id):
             f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))            
             return HttpResponse(f.read(), content_type=f.content_type)
 
-        elif fs_file_ids and 'video' in file_node.mime_type:
+        elif fs_file_ids and ((len(fs_file_ids) >= 1) or ('video' in file_node.mime_type)):
             # -- for video thumbnail
             f = file_node.fs.files.get(ObjectId(fs_file_ids[1]))
             return HttpResponse(f.read(), content_type=f.content_type)
