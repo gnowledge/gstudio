@@ -299,7 +299,7 @@
         {% if not is_ac_url %}
         {% if request.path != "/welcome" %}
           <!-- #{#% cache 3600 group_header request.LANGUAGE_CODE request.path request.user.username %} -->
-          <ul class="title-area">
+          <ul class="title-area text-center">
             <li class="name">
               <h1><a href="{{site.HOME_PAGE|default_if_none:'/home/'}}"><i class="fi-home"></i></a></h1>
               <!-- <i class="fi-home"></i> -->
