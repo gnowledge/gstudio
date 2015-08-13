@@ -1361,6 +1361,19 @@ def file_detail(request, group_id, _id):
                              )
 
 
+def file_content(request, group_id):
+
+    node_id = request.GET.get('id', None)
+
+    # print "========", node_id
+    node = node_collection.one({'_id': ObjectId(node_id)});
+
+    return render_to_response('ndf/node_ajax_content.html',
+                                {
+                                    'group_id': group_id,'groupid': group_id,
+                                    'node': node
+                                }, context_instance = RequestContext(request))
+
 @get_execution_time
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
@@ -1426,7 +1439,7 @@ def getFileThumbnail(request, group_id, _id):
             f = file_node.fs.files.get(ObjectId(fs_file_ids[0]))            
             return HttpResponse(f.read(), content_type=f.content_type)
 
-        elif fs_file_ids and 'video' in file_node.mime_type:
+        elif fs_file_ids and ((len(fs_file_ids) >= 1) or ('video' in file_node.mime_type)):
             # -- for video thumbnail
             f = file_node.fs.files.get(ObjectId(fs_file_ids[1]))
             return HttpResponse(f.read(), content_type=f.content_type)

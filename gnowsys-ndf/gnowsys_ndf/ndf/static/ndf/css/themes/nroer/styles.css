@@ -2267,9 +2267,9 @@ select {
   margin-left: 0;
   list-style: none;
   border-style: solid;
-  border-width: 1px;
-  background-color: #2b87c2;
-  border-color: #2779af;
+  border-width: 0;
+  background-color: #fafafa;
+  border-color: #e1e1e1;
   border-radius: 5px;
 }
 /* line 122, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
@@ -2279,7 +2279,7 @@ select {
   font-size: 0.6875rem;
   line-height: 0.6875rem;
   text-transform: uppercase;
-  color: white;
+  color: #2980b9;
 }
 /* line 68, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *:hover a, .breadcrumbs > *:focus a {
@@ -2287,17 +2287,17 @@ select {
 }
 /* line 70, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > * a {
-  color: white;
+  color: #2980b9;
 }
 /* line 75, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *.current {
   cursor: default;
-  color: white;
+  color: #333333;
 }
 /* line 78, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *.current a {
   cursor: default;
-  color: white;
+  color: #333333;
 }
 /* line 84, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *.current:hover, .breadcrumbs > *.current:hover a, .breadcrumbs > *.current:focus, .breadcrumbs > *.current:focus a {
@@ -2321,7 +2321,7 @@ select {
 /* line 102, ../../../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *:before {
   content: "/";
-  color: #555555;
+  color: #aaaaaa;
   margin: 0 0.75rem;
   position: relative;
   top: 1px;
