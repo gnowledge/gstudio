@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list,get_execution_time, get_group_name_id, get_node_metadata,create_grelation
 
 #######################################################################################################################################
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
@@ -696,6 +696,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 global list_trans_coll
                 list_trans_coll = []
                 trans_coll_list = get_coll_set(str(app_GST._id))
+                print LANGUAGES 
                 return render_to_response("ndf/translation_page.html",
 	                                  {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LANGUAGES, 'list1':trans_coll_list
 	                           },context_instance = RequestContext(request)
