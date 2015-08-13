@@ -228,17 +228,18 @@ body{
   #group-level-header{
 
     opacity: 0.9;
+    background-color: #E1E1E1;
 
     &:hover{
       opacity: 1;
       transition: 0.3s all;
-      box-shadow: 0px 2px 3px black;
+      box-shadow: 0px 2px 3px #E1E1E1;
     }
 
     #second-header.top-bar {
       background-color: #fafafa;
       border-top: solid thin gray;
-      height: 51px;
+      height: 52px;
 
       // &:hover{
       //     box-shadow: inset 0px 101px 50px #E1E1E1;
