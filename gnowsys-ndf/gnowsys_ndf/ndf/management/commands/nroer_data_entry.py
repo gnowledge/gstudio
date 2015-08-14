@@ -446,6 +446,15 @@ def parse_data_create_gsystem(json_file_path):
                 if collection_node:
                     add_to_collection_set(collection_node, nodeid)
 
+            thumbnail_url = parsed_json_document.get('thumbnail')
+            # print "thumbnail_url : ", thumbnail_url
+
+            if thumbnail_url:
+                try:
+                    attach_resource_thumbnail(thumbnail_url, nodeid, parsed_json_document)
+                except:
+                    pass
+
             # print type(nodeid), "-------", nodeid, "\n"
 
             # starting processing for the attributes and relations saving
@@ -881,3 +890,38 @@ def create_resource_gsystem(resource_data):
 
         # print "\n----------", fileobj
         return fileobj_oid
+
+
+def attach_resource_thumbnail(thumbnail_url, node_id, resource_data):
+    
+    updated_res_data = resource_data.copy()
+
+    updated_res_data['resource_link'] = thumbnail_url
+    updated_res_data['name'] = u'thumbnail'
+    
+    updated_res_data['content_org'] = ''
+    updated_res_data['tags'] = []
+
+    # th_id: thumbnail id
+    th_id = create_resource_gsystem(updated_res_data)
+    # print "th_id: ", th_id
+    
+    th_obj = node_collection.one({'_id': ObjectId(th_id)})
+    th_gridfs_id = th_obj.fs_file_ids[1]
+    # print "th_gridfs_id: ", th_gridfs_id
+
+    node_obj = node_collection.one({'_id': ObjectId(node_id)})
+    # print "node_obj.fs_file_ids: ", node_obj.fs_file_ids
+    node_fs_file_ids = node_obj.fs_file_ids
+
+    if len(node_fs_file_ids) == 1:
+        node_fs_file_ids.append(ObjectId(th_gridfs_id))
+    elif len(node_fs_file_ids) > 1:
+        node_fs_file_ids[1] = ObjectId(th_gridfs_id)
+
+    # print "node_fs_file_ids: ", node_fs_file_ids
+
+    node_collection.collection.update(
+                                        {'_id': ObjectId(node_id)},
+                                        {'$set': {'fs_file_ids': node_fs_file_ids}}
+                                    )

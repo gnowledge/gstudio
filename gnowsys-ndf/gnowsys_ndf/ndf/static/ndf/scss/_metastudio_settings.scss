@@ -15,6 +15,9 @@ $theme-color:#33C284 !default;
 $theme-color-invert:scale-color($theme-color, $lightness: -70%);
 $theme-text-color:scale-color($theme-color, $lightness: -40%);
 
+// Select variables
+$select-bg-color: #fafafa;
+
 //
 // FOUNDATION SETTINGS
 //
@@ -344,7 +347,8 @@ $icon-bar-item-padding: 0.5rem;
 // $include-html-nav-classes: $include-html-classes;
 
 // We use this to set the background color for the breadcrumb container.
- $crumb-bg: $active-color;
+ // $crumb-bg: $active-color;
+ $crumb-bg: $select-bg-color;
 
 // We use these to set the padding around the breadcrumbs.
 // $crumb-padding: rem-calc(9 14 9);
@@ -353,20 +357,21 @@ $icon-bar-item-padding: 0.5rem;
 // We use these to control border styles.
 // $crumb-function-factor: -10%;
 // $crumb-border-size: 1px;
+$crumb-border-size: 0;
 // $crumb-border-style: solid;
 // $crumb-border-color: scale-color($crumb-bg, $lightness: $crumb-function-factor);
 // $crumb-radius: $global-radius;
 
 // We use these to set various text styles for breadcrumbs.
 // $crumb-font-size: rem-calc(11);
- $crumb-font-color: white;
- $crumb-font-color-current: white;
+ // $crumb-font-color: white;
+ // $crumb-font-color-current: white;
 // $crumb-font-color-unavailable: #999;
 // $crumb-font-transform: uppercase;
 // $crumb-link-decor: underline;
 
 // We use these to control the slash between breadcrumbs
- $crumb-slash-color: #555;
+ // $crumb-slash-color: #555;
 // $crumb-slash: "/";
 
 //
@@ -593,9 +598,6 @@ $global-radius:5px;
 // We use this to style the glowing effect of inputs when focused
 // $glowing-effect-fade-time: 0.45s;
 // $glowing-effect-color: $input-focus-border-color;
-
-// Select variables
-// $select-bg-color: #fafafa;
 
 // Inline Lists
 

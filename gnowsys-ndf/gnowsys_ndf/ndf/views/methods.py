@@ -3940,9 +3940,10 @@ def delete_node(
                     # print "\n 10 >> node found as File; nodes in GridFS : ", len(node_to_be_deleted.fs_file_ids)
                     if node_to_be_deleted.fs_file_ids:
                         for each in node_to_be_deleted.fs_file_ids:
-                            if node_to_be_deleted.fs.files.exists(each):
+                            if node_to_be_deleted.fs.files.exists(each) and node_collection.find({'fs_file_ids': {'$in': [each]} }).count() == 1:
                                 # print "\tdeleting node in GridFS : ", each
                                 node_to_be_deleted.fs.files.delete(each)
+
 
                 # Finally delete the node
                 node_to_be_deleted.delete()
@@ -4113,3 +4114,29 @@ def repository(request, group_id):
                             )
 
 
+def get_prior_node_hierarchy(oid):
+    """pass the node's ObjectId and get list of objects in hierarchy
+    
+    Args:
+        oid (TYPE): mongo ObjectId
+    
+    Returns:
+        list: List of objects starts from passed node till top node
+    """
+    hierarchy_list = []
+    prev_obj_id = ObjectId(oid)
+
+    while prev_obj_id:
+        try:
+            prev_obj = node_collection.one({'_id': prev_obj_id})
+            prev_obj_id = prev_obj.prior_node[0]
+            # print prev_obj.name
+    
+        except:
+            # print "===", prev_obj.name
+            prev_obj_id = None
+    
+        finally:
+            hierarchy_list.append(prev_obj)
+
+    return hierarchy_list
