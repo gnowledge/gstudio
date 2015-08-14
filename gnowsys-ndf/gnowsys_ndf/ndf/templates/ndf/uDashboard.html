@@ -79,73 +79,60 @@
   {% get_group_name groupid as group_name_tag %}
  <div class="row"  id="new" style="margin-top: 0.5rem">
   	<!-- Users General Information -->
-<!-- <<<<<<< HEAD
- -->  	<div class="row">
-  		<div class="small-4 large-2 columns">
-  		    <div class="text-center">
-          			{% if prof_pic_obj %}
-			                    <div class="div-height">
-			          			      <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
-			                    </div>
-                {% else %}
-			                    <div class="div-height">
-			                    <i class="fi-torso style2 text-center"></i>
-			                    </div>
-					      
-					      {% endif %}   
-                {% if user.is_authenticated %}
-            				    {% if user_id == usr %}
-			                      <div style="height:10px;">
-			                        <!-- div to seprate height -->
-			                      </div>
-			                      
-			                      <div class="row" >
-			                        <div class="small-12 columns" >
-			                          <br>
-			                          <input type="button" class="button tiny expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}{% trans 'Change' %}{% else %}Upload{% endif %}">
-			                        </div>
-			                      </div>
-		          			    {% endif %}
+        <div class="small-2 columns">
+                  <div class="text-center">
+                      {% if prof_pic_obj %}
+                                <div class="div-height">
+                                    <img src="{% url 'getFileThumbnail' group_id prof_pic_obj.pk %}" class="img-height"/>
+                                </div>
+                      {% else %}
+                                <div class="div-height">
+                                    <i class="fi-torso style2 text-center"></i>
+                                </div>
+                      
+                      {% endif %}   
+                      {% if user.is_authenticated %}
+                              {% if user_id == usr %}
+                                  <div style="height:10px;">
+                                    <!-- div to seprate height -->
+                                  </div>
+                                  
+                                  <div class="row" >
+                                    <div class="small-12 columns" >
+                                      <br>
+                                      <input type="button" class="button tiny round expand margin-p5" id="btnUploadProfilePic" style="font-size:15px; " value="{% if prof_pic_obj %}Change{% else %}Upload{% endif %}">
+                                    </div>
+                                  </div>
+                              {% endif %}
 
-	              			<div id="pic_div" class="hide" class="row">
-	              				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
-	              				{% csrf_token %}
-	              				<input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
-						        <input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
-	              				<input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
-	                        	<input type="hidden" name="type" value="profile_pic">           
-	                        	<input type="hidden" name="user" value="{{usr}}">         
-	                            <p id="message" style="display:none">
-	              					{% trans "Please wait for uploading profile picture" %}
-	              				</p>
-	              						
-	              				</form>
-		              		</div>
-            			
-                 {% endif %}
-            </div>  
-        </div>
-      <div class="small-8 large-10 columns">
-          <h2 class="style-text">{{username}}</h2>
-          <h5>
-          {% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
-            {% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
-            {% trans 'Pages created' %}: &nbsp;{{page_count}}<br>
-            <!-- {% trans "Pages modified" %}: &nbsp;{{pagecountmodified}}<br> -->
-            {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
-            {% trans "Quiz" %}: {{quiz_count}}<br> 
-            {% trans "Forum" %}: {{forum_count}}<br>
-            
-        <!--    FOR AWARDS  -->  
-        <!-- {% if page_count > 1 %}  
-            <img src="/static/ndf/images/close.png">
-            {% endif %}     -->      
-          </h5>
-      </div>
-<!-- ======= -->
-      
+                            <div id="pic_div" class="hide" class="row">
+                                <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
+                                {% csrf_token %}
+                                    <input type="file" name="has_profile_pic" id="docFile" accept="image/*" class="hide" />
+                                    <input type="text" id="txtSelectedFiles" readonly="" class="small-12 columns margin-p5">
+                                        <input type="submit" id="submitpostid" value="Save" style="font-size:15px;" class="small-6 small-centered columns button tiny margin-p5" />
+                                            <input type="hidden" name="type" value="profile_pic">           
+                                            <input type="hidden" name="user" value="{{usr}}">         
+                                              <p id="message" style="display:none">
+                                          {% trans "Please wait for uploading profile picture" %}
+                                        </p>
+                                </form>
+                            </div>
+                       {% endif %}
+                  </div>
+                  <br>
+                  <div class = "user-info"> 
+                      {% trans "Registered on" %} : &nbsp;{{DOJ}}<br>
+                      {% trans "Member of" %}&nbsp; {{group_count}}&nbsp; {% trans "Groups"%}<br>
+                      {% trans "Pages created" %}: &nbsp;{{page_count}}<br>
+                      {% trans "Files uploaded" %}: &nbsp;{{file_count}}<br>
+                      {% trans "Quiz" %}: {{quiz_count}}<br> 
+                      {% trans "Forum" %}: {{forum_count}}<br>
+                      </h5>
+                  </div>
+        </div>  
           
-        <div class="small-12 large-10 columns ">
+        <div class="small-10 columns">
                 <dl class="tabs" data-tab >
                 <dd class="active"><a href="#view-profile" id='p5'> Profile </a> </dd>
                 <dd ><a href="#group" id="p1">Groups </a></dd>
@@ -340,7 +327,7 @@
         </div> 
         
  </div>    
-<!-- >>>>>>> 63384ab418137b09d3198ad4a98cc5ad9e945ea5 -->
+
 
       {% if user.is_superuser %}
         <div class"trashdiv" style="position:absolute; float:right; right:11%; top:2%;">
