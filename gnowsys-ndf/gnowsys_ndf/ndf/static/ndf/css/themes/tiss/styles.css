@@ -4343,7 +4343,7 @@ fieldset {
 /* line 273, ../../../bower_components/foundation/scss/foundation/components/_forms.scss */
 fieldset legend {
   font-weight: bold;
-  background: white;
+  background: inherit;
   padding: 0 0.1875rem;
   margin: 0;
   margin-left: -0.1875rem;
