@@ -204,6 +204,7 @@ body{
       &:hover{
           // background-color: scale-color($topbar-bg-color, $lightness: 5%);
           box-shadow: inset 0px 100px 50px #fff;
+          // box-shadow: inset 0px 100px 50px scale-color($theme-color-invert, $lightness: 10%);
           transition: 0.8s all;
       }
     }
@@ -301,11 +302,16 @@ body{
 
   #search-submit{
     background-color: #fafafa;
-    color: gray;
+    // color: gray;
     top: 10px;
+    position: absolute;
+    left: -30px;
+    opacity: 0.3;
+    color: black;
   }
 
   #search-submit:hover {
+    opacity: 1;
     color: white;
     background-color: gray;
     transition: 0.8s ease-out;

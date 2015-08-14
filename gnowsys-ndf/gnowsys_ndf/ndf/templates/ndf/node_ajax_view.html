@@ -672,7 +672,7 @@ ul#navigation li a.last {
   {% endif %}
 </section>
 
-
+<!-- 
 <div id="file-resource-overlay" class="reveal-modal xlarge" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
   <div id="resource-details">
     kjhkj
@@ -680,53 +680,53 @@ ul#navigation li a.last {
 
   <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
-
+ -->
 <script type="text/javascript">
 
-  fileResources = document.querySelectorAll('.file-resource');
-  for (var i = fileResources.length - 1; i >= 0; i--) 
-  {
-    fileResources[i].onclick = function (){
+  // fileResources = document.querySelectorAll('.file-resource');
+  // for (var i = fileResources.length - 1; i >= 0; i--) 
+  // {
+  //   fileResources[i].onclick = function (){
 
-      // e.preventDefault();
-      // alert("hiii")
-      var resourceDetail = document.getElementById('resource-details');
-      resourceDetail.innerHTML = "";
-      var resourceId = this.getAttribute('data-resource-id'),
-        resourceGroupId = this.getAttribute('data-group-id');
+  //     // e.preventDefault();
+  //     // alert("hiii")
+  //     var resourceDetail = document.getElementById('resource-details');
+  //     resourceDetail.innerHTML = "";
+  //     var resourceId = this.getAttribute('data-resource-id'),
+  //       resourceGroupId = this.getAttribute('data-group-id');
 
-      $.ajax({
-        type: "GET",
-          url: "{% url 'file_content' group_id %}",
-          datatype: "html",
-          data:{
-            'id': resourceId,
-            'group_id': resourceGroupId
-          },
-          success:function (data) {
-            $('article').unblock();
-            resourceDetail.innerHTML = data;
-            resHtml = document.querySelector('#resource-details > .row > .columns');
-            if(resHtml) {
-            // console.log('kjhkj')
-              resHtml.classList.add('medium-10');
-              resHtml.classList.add('medium-centered');
-              resHtml.classList.remove('medium-9');
-            }
-            setTimeout(function() { adjustIframeHt() },3000);
-          },
-          complete: function () {
+  //     $.ajax({
+  //       type: "GET",
+  //         url: "{% url 'file_content' group_id %}",
+  //         datatype: "html",
+  //         data:{
+  //           'id': resourceId,
+  //           'group_id': resourceGroupId
+  //         },
+  //         success:function (data) {
+  //           $('article').unblock();
+  //           resourceDetail.innerHTML = data;
+  //           resHtml = document.querySelector('#resource-details > .row > .columns');
+  //           if(resHtml) {
+  //           // console.log('kjhkj')
+  //             resHtml.classList.add('medium-10');
+  //             resHtml.classList.add('medium-centered');
+  //             resHtml.classList.remove('medium-9');
+  //           }
+  //           setTimeout(function() { adjustIframeHt() },3000);
+  //         },
+  //         complete: function () {
 
-            // setTimeout(function() {
-              document.querySelector('#resource-details  ul.breadcrumbs').remove();
-              document.querySelector('#resource-details  h1.subheader').remove();
-            // }, 10);
+  //           // setTimeout(function() {
+  //             document.querySelector('#resource-details  ul.breadcrumbs').remove();
+  //             document.querySelector('#resource-details  h1.subheader').remove();
+  //           // }, 10);
 
-          }
+  //         }
           
-      })
-    }
-  }
+  //     })
+  //   }
+  // }
 
   // publishing resource in other groups
   var data_list = []
