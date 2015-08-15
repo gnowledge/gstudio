@@ -115,7 +115,7 @@
 
         <div id="to-be-selected" class="hide">
             
-          {% for each_opt in all_options %}
+          {% for each_opt in all_options|dictsort:'name' %}
             <div class="item" data-title="{{each_opt.name}}" data-description="{{each_opt.content_org|default_if_none:''}}" title="{{each_opt.content_org|default_if_none:each_opt.name}}" data-value="{{each_opt.pk}}">
               <div class="row">
                 <!-- <div class="small-1 columns text-center"> </div> -->
@@ -124,7 +124,7 @@
                     {{each_opt.name}}
                   </div>
                   <div class="item-description">
-                    {{each_opt.content_org|default_if_none:''|safe|truncatechars:50}}
+                    {{each_opt.content_org|default_if_none:''|safe|truncatewords:5}}
                   </div>
                 </div>
               </div>

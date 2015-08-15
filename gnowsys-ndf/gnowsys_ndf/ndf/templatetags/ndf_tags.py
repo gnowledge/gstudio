@@ -2797,3 +2797,69 @@ def is_empty(val):
     else :
     	return 0
 
+
+@get_execution_time
+@register.inclusion_tag('ndf/breadcrumb.html')
+def get_breadcrumb(url):
+
+	url = url.strip()
+
+	exception_list= [ 
+						'welcome', 'accounts', 'admin', '/dashboard',
+						'/partner/partners', '/partner/groups', '/group/'
+					]
+	path = []
+	apps = GAPPS + ['repository']
+
+	# print "===========", map(lambda x: x in url.lower(), exception_list)
+	if not any(map(lambda x: x in url.lower(), exception_list)):
+		# print url
+
+		url_list = filter(lambda x: x != "", url.split('/'))
+
+		try:
+
+			# --- first element: group name ---
+			first_el = url_list[0]
+			first_group_name, group_id = get_group_name_id(first_el)
+			# print "00000000000000000", first_el
+			first_group_url = '/' + first_group_name
+			path.append({'name': first_group_name, 'link': first_group_url})
+			# print path
+			
+			# --- second element: app name ---
+			second_el = url_list[1]
+			if any(map(lambda x: x == second_el, [i.lower() for i in apps])):
+				try:
+					temp_obj = node_collection.one({'_type': 'GSystemType',
+						'name': {'$regex': second_el, '$options': 'i'} })
+					second_app_name = temp_obj.altnames if temp_obj.altnames else temp_obj.name
+				except:
+					second_app_name = second_el
+				# print second_el,"second_app_name: ", second_app_name
+				second_app_url = first_group_url + '/' + second_el
+				path.append({'name': second_app_name, 'link': second_app_url})
+			
+				# --- third element: object/instance id ---
+				third_el = url_list[2]
+				if ObjectId.is_valid(third_el):
+					node_obj = node_collection.one({'_id': ObjectId(third_el)})
+					third_node_name = node_obj.name
+					third_node_url = second_app_name + '/' + third_el
+					path.append({'name': third_node_name, 'link': third_node_url})
+				# else:
+				# 	third_node_name = 
+
+				# --- fourth element: object/instance id ---
+				fourth_el = url_list[3]
+				if ObjectId.is_valid(fourth_el):
+					node_obj = node_collection.one({'_id': ObjectId(fourth_el)})
+					fourth_node_name = node_obj.name
+					fourth_node_url = second_app_name + '/' + fourth_el
+					path.append({'name': fourth_node_name, 'link': fourth_node_url})
+
+		except:
+			pass
+
+	# print 'path : ', path
+	return {'path': path if (len(path) > 1) else []}

@@ -130,6 +130,7 @@
                   $("#view_page").html(data);
                 }
             });
+            $('article').unblock()
           }
         }
       );
@@ -156,18 +157,25 @@
   }
 
   .collection > ul li:nth-child(odd) { background: #ddd; }
+    
+  #view_collection legend{
+    text-align: center;
+    border-left: solid thin #ddd;
+    border-right: solid thin #ddd;
+  }
   
 </style>  
 
-{% endblock %}  
-
+{% endblock %}
+  
   {% if topic %}
     <!-- For displaying related nodes in topic page -->
     <!-- Related node means all collection elements of its teme item i.e all siblings of topic node -->
     <fieldset>
       {% if prior_obj %}        
-      <legend>Topics of {{prior_obj.name}}</legend>
-
+      <legend><h3><small>Topics in {{prior_obj.name}}</small></h3></legend>
+  
+        {% comment %}
           {% for each in prior_obj.collection_set %}
               <!-- To get the node object -->
               {% get_node each as obj %}
@@ -178,13 +186,29 @@
               {% endif %} 
 
           {% endfor %}
+        {% endcomment %}
+
+          <ul>
+            {% for each in prior_obj.collection_set %}
+
+                <!-- To get the node object -->
+                {% get_node each as obj %}
+                
+                <!-- Clicked topic should not be included in related nodes list -->
+                {% if node.pk != obj.pk %}
+                <li> <a onclick='topic_redirect("{{obj.pk}}")'>{{obj.name}}</a> </li>
+                {% endif %} 
+
+            {% endfor %}
+          </ul>
 
       {% endif %}
         
     </fieldset>
 
   {% endif %}
-  <b class="current">{{node.name}}</b>
+  <!-- <b class="current">{{node.name}}</b> -->
+  <h4 class="">{{node.name}}</h4>
   <div>
     <div class="collection" data-url="{% url 'get_collection' group_id node.pk %}"></div>
   </div>

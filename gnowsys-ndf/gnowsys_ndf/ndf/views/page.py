@@ -281,8 +281,8 @@ def create_edit_page(request, group_id, node_id=None):
     # else :
     #     pass
     group_name, group_id = get_group_name_id(group_id)
-    ce_id = request.GET.get('course_event_id')
-    res = request.GET.get('res')
+    ce_id = request.GET.get('course_event_id','')
+    res = request.GET.get('res','')
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id,
@@ -311,25 +311,23 @@ def create_edit_page(request, group_id, node_id=None):
         res = request.POST.get("res",'')
         if res:
             res = eval(res)
+        if page_type:
+                objid= page_type[0]
+                if not ObjectId(objid) in page_node.type_of:
+                        page_type1=[]
+                        page_type1.append(ObjectId(objid))
+                        page_node.type_of = page_type1
+                        page_node.type_of
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
         if ce_id:
-                if res == None:
+                if not res:
                     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
                     page_node.type_of = [blogpage_gst._id]
-                    page_node.status = u"PUBLISHED"
-        else:
-
-        	if page_type:
-        		objid= page_type[0]
-        		if not ObjectId(objid) in page_node.type_of:
-        			page_type1=[]
-        			page_type1.append(ObjectId(objid))
-        			page_node.type_of = page_type1
-        			page_node.type_of
-	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page), groupid=group_id)
+                page_node.status = u"PUBLISHED"
         page_node.save()
 
         # To fill the metadata info while creating and editing page node
-        metadata = request.POST.get("metadata_info", '') 
+        metadata = request.POST.get("metadata_info", '')
         if ce_id:
           url_name = "/" + ce_id +"/#journal-tab"
           if res:
