@@ -61,7 +61,7 @@
 {% get_group_name groupid as group_name_tag %}
 <header class="row">
   <dl class="tabs" data-tab data-options="deep_linking:true">
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> {% trans 'All Groups' %} {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
     <!--<dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>-->
   </dl>
 </header>
@@ -71,12 +71,13 @@
 {% if searching and group_nodes_count > 0 %}
 
   <div class="small-12 columns end">
-    <p>{% trans "Search Results:" %} <span class="label success round">Found {{group_nodes_count}} {{title|lower}}{{group_nodes_count|pluralize}}.</span></p>
+    <p>{% trans "Search Results:" %} <span class="label success round">{% trans 'Found' %} {{group_nodes_count}} {{title|lower}}{{group_nodes_count|pluralize}}.</span></p>
   </div>
 
 {% elif searching and group_nodes_count == 0 %}
   <div class="small-12 columns">
-    <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{group_nodes_count|pluralize}} matched your search criteria!!!</span></p>
+    <p>{% trans "Search Results:" %} <span class="label alert">
+     {% blocktrans %} No {{title|lower}}{{group_nodes_count|pluralize}} matched your search criteria {% endblocktrans %}!!!</span></p>
   </div>  
 
 {% endif %}
@@ -90,7 +91,7 @@
   {% autopaginate group_nodes 23 %}
 
   {% for node in group_nodes %}
-  {% if node.name != request.user.username %}
+  {% if node and node.name != request.user.username %}
   
     <li class="card">
       {% if grouptype == "Moderated" %}
@@ -112,15 +113,15 @@
         </div>
       </div>
       <hr/>
-      <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+      <span style="font-size:12px;">{{ node.html_content|default_if_none:"{ % trans 'Add some description.' %}"|safe|striptags|truncatechars:75 }}</span><br/>
       
       <footer>
           <div class="age">
-            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span>
+            {{ node.member_of_names_list|join:', ' }}{% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} {% trans 'by' %} <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span>
         </div>
-        <span><strong>{{node.author_set|length}}</strong> Members</span>
+        <span><strong>{{node.author_set|length}}</strong> {% trans 'Members' %} </span>
         {% get_group_resources node as obj_count %}
-        <span class="right"><strong>{{obj_count}}</strong> Objects</span>
+        <span class="right"><strong>{{obj_count}}</strong>{% trans 'Objects' %} </span>
       </footer>
       </a>
 

@@ -50,7 +50,7 @@
         {% get_user_object node.created_by as user_obj %}
       
         {% if user_obj.username == request.user.username or request.user.is_superuser %}
-        <a href="#" class="button tiny" style="float:right" data-reveal-id="titleModal">Edit</a>
+        <a href="#" class="button tiny" style="float:right" data-reveal-id="titleModal"> {% trans 'Edit' %}</a>
         {% endif %}
       </span> 
     </h2>
@@ -60,7 +60,7 @@
       <div class="medium-5 columns end">
         <div class="row">
           <div class="medium-4 columns">
-            <label class="align right"><b>{% trans "Parent task:" %}</b></label>
+            <label class="align right"><b>{% trans 'Parent task' %}</b></label>
           </div>
           <div class="medium-8 columns">
             <label>{% if parent %}{{parent}}{% else %} -- {% endif %}</label>
@@ -173,7 +173,7 @@
           <b>{% trans "Description:" %}</b>
           
           {% if user_obj.username == request.user.username or request.user.is_superuser %}
-          <a href="#" class="button tiny" style="float:right" data-reveal-id="contentModal">Edit</a>
+          <a href="#" class="button tiny" style="float:right" data-reveal-id="contentModal"> {% trans 'Edit' %}</a>
           {% endif %}
         </label>
       
@@ -244,9 +244,9 @@
     <div class="panel">
       <h3 class="subheader"></h3>
   
-      Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
+      {% trans 'Edited' %} {{ node.last_update|timesince }} {% trans 'ago' %} {% trans 'by' %} <a class="user">{{node.user_details_dict.modified_by}}</a>
       <small>
-        <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+        <div><a href="#view-changes"><i class="fi-clock"></i>{% trans 'Versions' %} </a>
         {% for seq_no, version_no in node.version_dict.items reversed %}
         <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
         {% endfor %}
@@ -264,7 +264,7 @@
   <div id="titleModal" class="reveal-modal" data-reveal>
     <label><b>{% trans "Editing Name" %}</b></label><br/>
     <div class="medium-6 columns">
-       <input id="name_id" name="name" type="text" value="{{node.name}}"  class="medium-3 columns" placeholder="Enter name..." required>
+       <input id="name_id" name="name" type="text" value="{{node.name}}"  class="medium-3 columns" placeholder="{% trans 'Enter name' %}..." required>
        <a href="#" class="button tiny" id="title_save">{% trans "Save" %}</a>
     </div>
     <a class="close-reveal-modal"> &#215;</a>
@@ -275,7 +275,7 @@
       <label><b>{% trans "Description" %}</b></label>
 
       <div id="contentlist" class="content">
-        {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
+        {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder=" trans Enter the content here " var_value=node.content_org %}
       </div>
 
       <a href="#" class="button tiny" id="content_save">{% trans "Save" %}</a>
@@ -294,7 +294,7 @@ var task_title = "{{node.name}}"
 $(document).on('click',"#title_save",function(){
 var editedTitle = $('input[name=name]').val();
 if(task_title == $('input[name=name]').val()){
-alert('Nothing is Changed');
+alert("{% trans 'Nothing is Changed' %}");
 }
 else {
              $.ajax({

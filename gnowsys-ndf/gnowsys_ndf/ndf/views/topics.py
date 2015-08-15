@@ -34,20 +34,10 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 @get_execution_time
 def themes(request, group_id, app_id=None, app_set_id=None):
     
-    # ins_objectid  = ObjectId()
-    # if ins_objectid.is_valid(group_id) is False :
-    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #     if group_ins:
-    #         group_id = str(group_ins._id)
-    #     else :
-    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    #         if auth :
-    #             group_id = str(auth._id)
-    # else :
-    #     pass
-
-    group_name, group_id = get_group_name_id(group_id)
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
 
     if app_id is None:
         # app_ins = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
@@ -142,6 +132,48 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     )       
 
 
+def list_themes(request, group_id):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    title = theme_GST.name
+    
+    nodes = node_collection.find({
+        'member_of': {'$all': [theme_GST._id]},
+        'group_set':{'$all': [ObjectId(group_id)]}
+        },
+        {'_id': 1, 'name': 1, 'created_by': 1, 'created_at': 1})
+    
+    return render_to_response("ndf/list_themes.html",
+                            { 
+                                'groupid': group_id,
+                                'group_id': group_id,
+                                'nodes': nodes,
+                                'theme_GST': theme_GST
+                            },
+                            context_instance = RequestContext(request) )
+
+
+def delete_theme(request, group_id, theme_id):
+
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    trash_group = node_collection.one({'_type': 'Group', 'name': 'Trash'})
+
+    theme_to_be_deleted = node_collection.one({'_id': ObjectId(theme_id)})
+    theme_to_be_deleted.group_set = [ObjectId(trash_group._id)]
+    theme_to_be_deleted.save()
+    # print trash_group._id,"  ", theme_to_be_deleted.group_set
+
+    return HttpResponseRedirect( reverse('list_themes', kwargs={"group_id": group_id} ))
+
+
 global list_trans_coll
 list_trans_coll = []
 coll_set_dict={}
@@ -150,18 +182,23 @@ coll_set_dict={}
 def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     #####################
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
-        auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
+    # ins_objectid  = ObjectId()
+    # if ins_objectid.is_valid(group_id) is False :
+    #     group_ins = node_collection.find_one({'_type': "Group", "name": group_id})
+    #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #     if group_ins:
+    #         group_id = str(group_ins._id)
+    #     else :
+    #         auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    #         if auth :
+    #             group_id = str(auth._id)
+    # else :
+    #     pass
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
     ###################### 
     
     nodes_dict = []
@@ -254,7 +291,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                       	if translate != "true":
                             theme_topic_node = node_collection.collection.GSystem()
                             # get_node_common_fields(request, theme_topic_node, group_id, app_GST)
-                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_GST))
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_GST),groupid=group_id)
                         if translate == "true":
                             global list_trans_coll
                             list_trans_coll = []
@@ -268,7 +305,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                     app_obj = theme_item_GST
                                 if "topic" in each.member_of_names_list:
                                     app_obj = topic_GST
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_obj, each))
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_obj, each),groupid=group_id)
                                 coll_set_dict[each._id]=theme_topic_node._id
                                 relation_type = node_collection.one({'_type':'RelationType', 'name':'translation_of'})
                                 # grelation=collection.GRelation()
@@ -288,7 +325,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                         n= coll_set_dict[collset]
                                         sub_node = node_collection.one({'_id':ObjectId(str(n))})
                                         parent_node.collection_set.append(sub_node._id)
-                                        parent_node.save()
+                                        parent_node.save(groupid=group_id)
                         
                 
                 # To return themes card view for listing theme nodes after creating new Themes
@@ -314,9 +351,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         if name.upper() != theme_topic_node.name.upper():
                             if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                                 # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST),groupid=group_id)
                         else:
-                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))      
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST),groupid=group_id)      
 
 
                     if translate != "true":
@@ -334,7 +371,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 
                             i = i+1
                             
-                        theme_topic_node.save() 
+                        theme_topic_node.save(groupid=group_id) 
                         # End of storing collection
 
                     title = theme_GST.name
@@ -411,17 +448,17 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 # If editing node in root theme items
                                 if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                                     # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST))
+                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id)
                                     
                             else:
                                 # If editing theme item in prior_theme_collection hierarchy 
                                 if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
                                     # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST)) 
+                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id) 
                            
                         else:
                             # If name not changed but other fields has changed
-                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST))  
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id)  
 
 
 
@@ -439,7 +476,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 theme_topic_node.collection_set.append(node_id)
                                 
                             i = i+1
-                        theme_topic_node.save() 
+                        theme_topic_node.save(groupid=group_id) 
                         # End of storing collection
 
                     # This will return to Themes items edit  
@@ -472,13 +509,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         if theme_topic_node.name != name:
                             topic_name = theme_topic_node.name
                             if not name.upper() in (theme_name.upper() for theme_name in root_topics):
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)
 
                             elif topic_name.upper() == name.upper():
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))                                
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)                                
 
                         else:
-                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)
 
 
                         if collection_list:
@@ -495,7 +532,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                     theme_topic_node.collection_set.append(node_id)
                                     
                                 i = i+1
-                            theme_topic_node.save()
+                            theme_topic_node.save(groupid=group_id)
                             
                         title = topic_GST.name 
                         
@@ -521,7 +558,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 
                             i = i+1
                         
-                        theme_topic_node.save()
+                        theme_topic_node.save(groupid=group_id)
 
                         if teaches_list !='':
                             teaches_list=teaches_list.split(",")
@@ -713,6 +750,7 @@ def topic_detail_view(request, group_id, app_Id=None):
             group_id = str(auth._id)
   else :
     pass
+    
   ###################### 
 
   obj = node_collection.one({'_id': ObjectId(app_Id)})

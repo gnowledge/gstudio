@@ -70,6 +70,7 @@
 {% endcomment %}
  -->
 
+
 {% block meta_content %}
 	<a class="Tp" href="{% url 'topics' group_name_tag %}" title="Click to go to themes card view">
 		<h2 class="subheader">
@@ -83,6 +84,7 @@
 	{{theme_GST.content|default_if_none:""|safe}}
 {% endblock %}
 
+
 {% block related_content %}
 	{% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
@@ -95,12 +97,13 @@
 	      <li class="selected-app-set-item"> 
 	        <div>
 	  		  {% if user_access == "allow" %}
-	          <a href="{% url "theme_topic_create" groupid theme_GST.pk %}" style="float:right;color:#0b8a91;" title="Add Theme">
+	          <a href="{% url "theme_topic_create" groupid theme_GST.pk %}" style="float:right;" title="Add Theme">
 	            +&nbsp;Add
 	          </a>
 	          {% endif %}
 
-	          <a href="{% url "theme_list" groupid app_id theme_GST.pk %}" style="color:#0b8a91;">
+	          {# <a href="{% url "theme_list" groupid app_id theme_GST.pk %}" style="color:#0b8a91;"> #}
+	          <a href="{% url "list_themes" group_name_tag %}">
 	            Theme ({{count}})
 	          </a> 
 

@@ -43,6 +43,7 @@ def event(request, group_id):
         group_id = str(auth._id)
  else :
     pass
+
  #view written just to show the landing page of the events
  group_inverse_rel_id = [] 
  Event_app = True
@@ -101,17 +102,21 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   View for handling Event and it's sub-types detail-view
   """
   auth = None
-  if ObjectId.is_valid(group_id) is False :
-    group_ins = node_collection.one({'_type': "Group","name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-      group_id = str(group_ins._id)
-    else :
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-        group_id = str(auth._id)
-  else :
-    pass
+  # if ObjectId.is_valid(group_id) is False :
+  #   group_ins = node_collection.one({'_type': "Group","name": group_id})
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+  #     group_id = str(group_ins._id)
+  #   else :
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if auth :
+  #       group_id = str(auth._id)
+  # else :
+  #   pass
+  try:
+        group_id = ObjectId(group_id)
+  except:
+        group_name, group_id = get_group_name_id(group_id)
   session_node = ""
   app = None
   session_node = ""
@@ -306,17 +311,21 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
   View for handling Event and it's sub-types create-edit-view
   """
   auth = None
-  if ObjectId.is_valid(group_id) is False :
-    group_ins = node_collection.one({'_type': "Group","name": group_id})
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-      group_id = str(group_ins._id)
-    else :
-      auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-        group_id = str(auth._id)
-  else :
-    pass
+  # if ObjectId.is_valid(group_id) is False :
+  #   group_ins = node_collection.one({'_type': "Group","name": group_id})
+  #   auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #   if group_ins:
+  #     group_id = str(group_ins._id)
+  #   else :
+  #     auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+  #     if auth :
+  #       group_id = str(auth._id)
+  # else :
+  #   pass
+  try:
+        group_id = ObjectId(group_id)
+  except:
+        group_name, group_id = get_group_name_id(group_id)
   ''' 
   app = None
   if app_id is None:
@@ -414,7 +423,7 @@ def event_create_edit(request, group_id, app_set_id=None, app_set_instance_id=No
            name= "Class" + "--"+ slugify(request.POST.get("course_name","")) + "--" + field_value
         event_gs.name=name 
     
-    event_gs.save(is_changed=is_changed)
+    event_gs.save(is_changed=is_changed,groupid=group_id)
     # print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
   
     # [B] Store AT and/or RT field(s) of given event-node (i.e., event_gs)

@@ -54,9 +54,9 @@
   <a href="{% url app_gst.name|lower group_name_tag %}">
     <h2 class="subheader">
       {% if app_gst.altnames and app_gst.altnames != "None" %}
-        {{app_gst.altnames}}
+         {% trans app_gst.altnames %}
       {% else %}
-        {{app_gst.name}}
+        {% trans app_gst.name %}
       {% endif%}
     </h2>
     {{app_gst.content|default_if_none:""|safe}}
@@ -550,11 +550,11 @@
       var c = this.getAttribute("data-filetype");
 
       if(educationaluse_stats.hasOwnProperty(c)){
-        $(this).find("a > span.count:visible").fadeOut().fadeIn().text(educationaluse_stats[c]);
+        $(this).find("a > span.count:visible").text(educationaluse_stats[c]);
       }
       else
       {
-        $(this).find("a > span.count:visible").fadeOut().fadeIn().text("0");
+        $(this).find("a > span.count:visible").text("0");
       }
 
     });

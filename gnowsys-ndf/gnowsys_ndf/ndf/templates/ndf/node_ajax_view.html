@@ -6,11 +6,14 @@
 
 {% cache 360 node_ajax_view request.LANGUAGE_CODE %}
 
-<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script>
+<!--
+<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> 
 
 <script type="text/javascript">
   $(document).foundation();
 </script>
+-->
+
 {% block head %}
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -301,970 +304,7 @@ ul#navigation li a.last {
 
 {% check_user_join request groupid as user_is_joined %}
 
-<div class="row page" itemscope itemtype="{{schema.1.type}}">
-      
-  <section class="medium-9 columns">
-  {% if breadcrumbs_list %}
-  <ul class="breadcrumbs"> 
-    {% for e in breadcrumbs_list %}
-      <li><b>
-      {% if node.pk != e.0 %}
-        <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
-      {% else %} 
-        {{e.1}} 
-      {% endif %}
-      </b></li>
-    {% endfor %}
-  </ul>
-  {% elif node.teaches %}
-  <ul class="breadcrumbs">
-    <li>
-        {% for each_topic in node.teaches %}
-          <a href="{% url 'topic_details' group_name_tag each_topic.pk %}" style="color:black;">{{ each_topic.name }},</a>
-        {% endfor %}
-    </li>
-  </ul>
-
-  {% endif %}
-
-  {% if node.status == 'MODERATION' %}
-    <h4><small>
-      Note: Following Resource is Under Moderation -
-      <a href="{% url 'moderation_status' group_id node.pk %}">Check the current status of Moderation</a>
-    </small></h4>
-  {% endif %}
-
-  <h1><span itemprop="{{schema.1.name}}" class='node'>
-    {% if node.altnames %}{{node.altnames}}{% else %}{{node.name}}{% endif %}</span>
-  {% if node %}
-    {% get_publish_policy request groupid node as group_policy %}
-    {% if group_policy == "allow" %}
-      &nbsp;&nbsp;&nbsp;<span data-tooltip title= "Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see." ><span style='position:relative; color: gray;'>Draft</span></span>
-    {% endif %}
-  {% endif %}
-  </h1>
-      
-  <h1 class="subheader">
-    <dl class="tabs" data-tab> 
-
-      {% if topic %}
-      <!-- Basic Description -->
-      <dd class="active page-view view_list"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
-
-      <!-- Filter view for Topics -->
-      <dd class="filters-view">
-        <nav id="nav">
-          <ul id="navigation">
-            <li><a href="#" class="view-filters"><i class="fi-list"></i> {% trans "Filter based on" %} </a>
-              <ul id="view-elements">
-                {% get_metadata_values as metadata %}
-                {% for k,v in metadata.items %}
-                  {% if k == "educationallevel" %}            
-                    <li>
-                      <a> {% trans "Educational Level" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li> 
-                  {% elif k == "educationalsubject" %}
-                    <li>
-                      <a> {% trans "Educational Subject" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "educationaluse" %}
-                    <li>
-                      <a> {% trans "Educational Use" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                    <!-- Commented bellow filters for time being will be using this filter at different place "So dont remove this code" -->
-                    {% comment %}                    
-                  <!-- {% elif k == "textcomplexity" %}
-                    <li>
-                      <a> {% trans "Text Complexity" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li> 
-                  {% elif k == "educationalalignment" %}
-                    <li>
-                      <a> {% trans "Educational Alignment" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li> -->
-                    {% endcomment %}                    
-                  {% elif k == "language" %}
-                    <li>
-                      <a> {% trans "Language" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "interactivitytype" %}
-                    <li>
-                      <a> {% trans "Interactivity Type" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% elif k == "audience" %}
-                    <li>
-                      <a> {% trans "Audience" %} &raquo;</a>
-                      <ul>
-                        {% for opts in v %}
-                          <li class="view_list edu-sub-li view-filters" id="{{k}}" title="{{opts}}"><a>{% trans opts %}</a></li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% endif %}
-
-                {% endfor %}
-              </ul>
-            </li>
-          </ul>
-        </nav>
-      </dd>
-
-      <!--
-      <dd class="active page-view"><a data-dropdown="hover1" data-options="is_hover:true; hover_timeout:5000" class="view-page"><i class="fi-eye"></i> {#% trans "View" %#}</a></dd>
-      <ul id="hover1" class="f-dropdown" data-dropdown-content>
-        <li class="view_list" id="Images"><a><i class="fi-photo"></i> {#% trans "Images" %#} </a></li> 
-        <li class="view_list" id="Videos"><a><i class="fi-play-circle"></i> {#% trans "Videos" %#} </a></li>  
-        <li class="view_list" id="Audios"><a><i class="fi-music"></i> {#% trans "Audios" %#} </a></li>  
-        <li class="view_list" id="Documents"><a><i class="fi-page-filled"></i> {#% trans "Documents" %#} </a></li>  
-        <li class="view_list" id="Interactives"><a><i class="fi-arrows-compress"></i> {#% trans "Interactives" %#} </a></li>  
-      </ul>
-      -->
-        
-      {% else %}
-      <!-- Basic Description -->
-      <dd class="tab-title active page-view"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
-      {% endif %}
-    
-      
-      <!-- Discussion -->
-      {% if "Group" not in node.member_of_names_list %}
-
-        {% if node|is_File or node|is_Page %}         
-        <!-- calling ndf tags for discussion replies -->
-        {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-        <dd class="tab-title discussion-view"><a class="view-discussion" href="#view-discussion"><i class="fi-comment"></i>
-
-          {% if all_replies %}
-            <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
-              {% trans "Join Discussion" %} ({{ all_replies | length }})
-            </span>
-          {% else %}            
-            <span title="{% trans 'Be the first to start a discussion' %}">
-              {% trans "Begin Discussion" %}
-            </span>
-          {% endif %}
-
-        </a></dd>
-        {% endif %}
-      <!-- ---END of Discussion -->
-
-      {% comment %}
-        {% else %}
-        <!-- If its group then show management tab only for group admins and superuser-->
-          {% check_group node as is_group %}
-          {% if is_group %}
-            {% check_is_gstaff groupid request.user as is_gstaff %}
-            {% if is_gstaff %}
-              <dd class="tab-title manage-view"><a class="view-manage" href="#view-manage"><i class="fi-wrench"></i> {% trans "Management" %}</a></dd>
-            {% endif %}
-          {% endif %}
-      {% endcomment %}
-
-      {% endif %}
-    </dl>
-  </h1>
-  <!-- new  -->
-
-  {% if schema.0 %}
-    <meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">
-    <meta itemprop="{{schema.1.DM}}" content="{{node.last_update}}" >
-    <meta itemprop="{{schema.1.creator}}" content="{{node.user_details_dict.created_by}}">
-    <meta itemprop="{{schema.1.editor}}" content="{{node.user_details_dict.modified_by}}">
-    <meta itemprop="{{schema.1.lang}}" content="{{node.language}}">
-    <meta itemprop="{{schema.1.agerange}}" content="{{node.age_range}}">
-    <meta itemprop="{{schema.1.timerequired}}" content="{{node.timerequired}}">
-    {% for contributor_name in node.user_details.contributors %}
-    <meta itemprop="{{schema.1.contributor}}" content="{{contributor_name}}">
-    {% endfor %}                                                             
-    {% if node|is_File %}         
-    <meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " >  
-    <meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >      
-    {% endif %}                                 
-  {% endif %}   
-
-  {% for neighbour in node.teaches %}                                 
-  <div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
-    <meta itemprop="{{schema.1.educationalframework}}" content="">
-    <meta itemprop="{{schema.1.alignmenttype}}" content="teaches">  
-    <meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
-    <meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
-    <meta itemprop ="{{Schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
-  </div>
-  {% endfor %}
-
-  {% for neighbour in node.assesses %}                                
-  <div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
-    <meta itemprop="{{schema.1.educationalframework}}" content="">
-    <meta itemprop="{{schema.1.alignmenttype}}" content="assesses"> 
-    <meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
-    <meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
-    <meta itemprop ="{{schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
-  </div>
-  {% endfor %}
-
-  <div class="row">
-    
-    <section class="medium-12 columns content">
-      <div class="tabs-content">
-        <!-- Tab content -->
-        <div class="content active commentable-section" id="view-page" data-section-id="1">
-          <div class="row">
-            {% comment %}
-              <!--
-              <div class="small-4 columns">
-                {% if node.prior_node|length > 0 %}
-                {% if "Group" not in node.member_of_names_list %}
-                <div class="panel">
-                  <h6>{% trans "You may want to read these first: " %}</h6>
-                  {% for index_key, each_node in node.prior_node_dict.items %}
-                  {% get_grid_fs_object each_node as grid_fs_obj %}
-                  {% if each_node.mime_type %}
-                  <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}aaaa</a>,&nbsp;
-                  {% else %}
-                  <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-                  }
-    	            {% endif %}
-                  {% endfor %}
-                </div>
-    	          {% endif %}
-                {% endif %}
-              </div>
-              -->
-            {% endcomment %}
-
-            <div class="small-4 columns"> </div>
-
-            <div class="small-4 small-pull-4 columns">
-              <!-- {#% if node.assesses %#} -->
-              {% get_assesses_list node as assesses_list %}
-              {% if assesses_list %}
-              <div class="panel">
-                <h6>This resource assesses these</h6>
-                {% for  each_node in assesses_list %}
-                {% get_grid_fs_object each_node as grid_fs_obj %}
-                {% if each_node.mime_type %}
-                <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-                {% else %}
-                <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-                {% endif %}
-                {% endfor %}
-              </div>
-              {% endif %}
-            </div>
-          </div>
-    
-          <!-- Code for showing media details -->
-          {% if node.mime_type %}
-
-            {% get_grid_fs_object node as grid_fs_obj %}
-
-            <!-- New Implementation -->
-            Resource Type: {{node.mime_type}}<br/><br/>          
-            
-            {% if node.collection_set %} 
-
-              {% if 'image' in node.mime_type or 'video' in node.mime_type %}
-                <!-- Orbit image slider only for image and video collections--> 
-                
-                <ul data-orbit data-options="variable_height: true;timer:false;">
-                  <li class="active">
-                    <center>                   
-                    {% if 'image' in node.mime_type %}
-                    <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
-                      </a>
-                    {% elif 'video' in node.mime_type %}
-            		     <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">    
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-                        <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">    
-                        {% trans "Your browser does not support the video tag." %}
-                      </video>
-                    {% elif 'Pandora_video' in node.member_of_names_list %}
-                      {% get_source_id node.pk as source_id %}
-                      <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                        <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
-                        {% trans "Your browser does not support the video tag." %}
-                      </video>  
-                    {% endif %}
-                    <div class="orbit-caption"> {{node.name}} </div>             
-                  </li>                
-
-                  {% for k in node.collection_set %}
-                    {% get_node k as obj %}
-                    {% get_grid_fs_object obj as grid_fs_obj %}
-                    {% if 'image' in obj.mime_type or 'video' in obj.mime_type %}
-                    <li>
-                      <center>
-                        {% if 'image' in obj.mime_type %}
-                        <a class="th" href="{% url 'read_file' group_name_tag k grid_fs_obj.filename %}">
-                          <img src="{% url 'get_mid_size_img' group_name_tag k %}" /> 
-                        </a>
-                        {% elif 'Pandora_video' in obj.member_of_names_list %}
-                          {% get_source_id k as source_id %}
-                          <!-- <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls> -->
-                          <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                            <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
-                            {% trans "Your browser does not support the video tag." %}
-                          </video>  
-                        {% elif 'video' in obj.mime_type %}
-                          <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-
-                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/webm">
-                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/ogg">    
-                            <source src="{% url 'getFullvideo' group_name_tag k %}" type="video/mp4">    
-                            {% trans "Your browser does not support the video tag." %}
-                          </video>                    
-                        {% endif %}    
-                        <div class="orbit-caption"> {{obj.name}} </div> 
-                      </center>
-                    </li>
-                    {% endif %} 
-
-                  {% endfor %}
-                </ul>           
-
-                <!-- End of slider --> 
-              {% else %}
-                  {% if 'audio' in node.mime_type %}
-                    <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
-                      <p>Your browser does not support the audio element </p>
-                    </audio>
-                  {% elif 'html' in node.mime_type %}
-                    <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      <p>Your browser does not support the audio element </p>
-                    </iframe>
-                    {% elif 'pdf' in node.mime_type %}
-                        <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
-                        <br/>
-                        <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
-                  {% else %}
-                    <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                      {{ grid_fs_obj.filename }}
-                    </a>
-                  {% endif %}       
-              {% endif %}
-              <!-- end of if 'image' in node.mime_type ... -->
-
-            {% else %}
-              <!-- not a collection -->
-              {% if 'image' in node.mime_type %}
-                <a class="th" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                  <img src="{% url 'get_mid_size_img' group_name_tag node.pk %}" /> 
-                </a>
-              {% elif 'Pandora_video' in node.member_of_names_list %}
-                {% get_source_id node.pk as source_id %}
-                <video width="500" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                  <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
-                  {% trans "Your browser does not support the video tag." %}
-                </video>  
-              {% elif 'video' in node.mime_type %}
-
-              {% comment "commented getting video from wetube" %}
-            		{% get_source_id node.pk as source_id %}
-            		{% if source_id %}
-                            <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
-                              <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
-                              {% trans "Your browser does not support the video tag." %}
-                            </video>
-            		{% else %}
-              {% endcomment %}
-
-                <video width="768" height="432" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{ "autoplay": false, "preload": "metadata" }' poster="{% url 'getvideoThumbnail' group_name_tag node %}" controls buffered>
-                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/mp4">
-                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-                  <source src="{% url 'getFullvideo' group_name_tag node %}" type="{{node.mime_type}}">    
-                  {% trans "Your browser does not support the video tag." %}
-                </video>
-              {% elif 'audio' in node.mime_type %}
-                <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
-                  <p>Your browser does not support the audio element </p>
-                </audio>
-              {% elif 'html' in node.mime_type %}
-                <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                  <p>Your browser does not support the audio element </p>
-                </iframe>
-              {% elif 'pdf' in node.mime_type %}
-                <iframe width="100%" style="height:90vh;" src="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}"></iframe>
-                <br/>
-                <a target="_blank" href="/static/ndf/bower_components/pdfjs-build/generic/web/viewer.html?file={% url 'read_file' group_name_tag node grid_fs_obj.filename %}">Full screen view</a>
-              {% elif 'epub' in node.mime_type %}
-                <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/epub.js"></script>
-                <script type="text/javascript" src="/static/ndf/bower_components/epub.js/build/libs/zip.min.js"></script>
-                <!-- <script type="text/javascript" src="https://raw.githubusercontent.com/futurepress/epub.js/master/build/libs/zip.min.js"></script> -->
-
-                <div class="row">
-                  <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
-                    <small class="fi-arrow-left"> Previous</small>
-                  </h2>
-                  <div class="small-8 columns text-center"></div>
-                  <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
-                    <small>Next <i class="fi-arrow-right"></i></small>
-                  </h2>
-                </div>
-                
-                <div class="row ebook-container border-thin-lightgray">
-                  <div class="small-12 columns" id="ebook-area"></div>
-                </div>
-                
-                <div class="row">
-                  <h2 class="small-4 columns redirection" onclick="Book.prevPage();">
-                    <small class="fi-arrow-left"> Previous</small>
-                  </h2>
-
-                  <a class="small-4 columns button tiny text-center" style="margin-top: 1em;" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                    Download "{{ grid_fs_obj.filename }}"
-                  </a>
-                  <h2 class="text-right small-4 columns redirection" onclick="Book.nextPage();">
-                    <small>Next <i class="fi-arrow-right"></i></small>
-                  </h2>
-                </div>
-                
-                <script>
-                  // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
-                  var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}", {
-                    width: 400,
-                    height: false,
-                    restore: true
-                  });
-                  Book.renderTo("ebook-area");
-
-                  // REF - https://github.com/futurepress/epub.js/tree/master/documentation
-
-                  // Loads book chapter at a given spine position or epub CFI string.
-                  // Book.displayChapter('epubcfi(/6/6[Untitled-12]!4[Untitled-12]/2/64/6/2/2/1:0)');
-
-                  // Setting End to true will advance to the last page of the chapter.
-                  // Book.displayChapter(3, true);
-
-                  // Loads book chapter that has the given url:
-                  // var skip = Book.goto("chapter_001.xhtml");
-                  //             skip.then(function(){
-                  //                 console.log("On Chapter 1");
-                  //             })
-
-                  // Adds style to be attached to the body element rendered book.
-                  // Book.setStyle("font-size", "inherit");
-
-                  // Removes a style from the rendered book
-                  // Book.removeStyle(style)
-
-                  // Promises:
-                  // Book.getMetadata().then(function(meta){
-                  //   document.title = meta.bookTitle+" – "+meta.creator;
-                  // });
-
-                  // Book.getToc().then(function(toc){
-                  //     console.log(toc);
-                  // });
-
-                  // Book.on('book:pageChanged', function(location){
-                  //     console.log(location.anchorPage, location.pageRange)
-                  // });
-
-                  // Book.on('renderer:locationChanged', function(locationCfi){
-                  //     console.log(locationCfi)
-                  // });
-                </script>
-              {% else %}
-                <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                  {{ grid_fs_obj.filename }}
-                </a>
-              {% endif %}
-
-            {% endif %}
-
-            {% if user.is_authenticated %}
-              <br/>
-              <br/>
-              {% comment %}
-              {% if 'Pandora_video' in node.member_of_names_list %}
-                <a class="button small secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
-              {% elif 'video' in node.mime_type %}
-              {% endcomment %}
-
-              {% if 'video' in node.mime_type %}
-                <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-              {% else %}
-                <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-              {% endif %}
-                  <span class="fi-download large"> {% trans "Download " %} </span>
-                </a>
-              
-            {% endif %}
-
-            <!-- End New -->          
-      
-          {% endif %}
-          
-          {% block add_fields %} {% endblock %}
-
-          <ul class="inline-list">
-            {% if user.is_authenticated %}
-            {% block add_list %}{% endblock %}
-            {% endif %}
-          </ul>
-
-          {% for tab_name, tab_fields_list in property_order_list %}
-            {% for field in tab_fields_list %}
-            <div class="row">
-              <div class="small-3 columns"> 
-                <label>{{field.altnames}}</label>
-              </div>
-              <div class="small-7 end columns">
-                {% if field.type == "RelationType" %}
-                  {% if field.value|length > 5 %}
-                    <a href="#" id="{{field.altnames}}">{{field.value|length}}</a>
-
-                  {% else %}
-                  {% for n in field.value %}
-                    <a href="#">{{n.name|default_if_none:"--"|title}}</a><br/>
-                  {% endfor %}
-
-                  {% endif %}
-                {% else %}
-                  <label>{{field.value|default_if_none:"--"|title}}</label>
-                {% endif %}
-              </div>
-            </div>
-            <br>
-            {% endfor %}
-          {% endfor %}
-        
-          <!-- <div id="commentable-area"> -->
-          <div>
-            {% with node.html_content|safe as description %}
-            {% if description != "None" %}
-            <span itemprop="{{schema.1.description}}">{{ description }}</span>
-            {% endif %}
-            {% endwith %}
-          </div>
-          
-          <br/>
-          
-          <div>
-            {% get_grid_fs_object each_node as grid_fs_obj %}
-            {% if "Group" in node.member_of_names_list %}
-            {% get_object_value node as objvalue %}
-            <table style="width:60%; border-width:0px;" >
-              <tbody>
-              {% for key, value in objvalue.items %}
-              <tr>
-                {% if key == "Website" %}
-                <td align ="left"> {{key}}</td>  
-                <td align = "right"><a href="{{value}}">{{value}}</a> </td>
-                {% else %}
-                <td align ="left"> {{key}}</td>  
-                <td align = "right">{{value}}</td>
-                {% endif %}
-              </tr>
-              {% endfor %}
-              </tbody>
-            </table>
-            {% endif %}
-        	</div>
-        </div>
-        
-        <!-- Resource contents of topic -->
-        {% if topic %}
-        <!-- <div class="content" id="view-graph">  </div> -->
-        <div class="topic_content" id="contents"> 
-
-          {% get_all_resources request node.pk as resources %}
-              {% for key, val in resources.items %}
-              <fieldset id="{{key}}">
-                <legend>{{key}}</legend>
-                {% if  key == "Images" %}
-                  {% for k,v in val.items %}
-                    {% if k == "fallback_lang" %}
-                      {% for each in v %}
-              
-                        <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-                        <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-                        <br/><div>{{each.name}}</div>
-                        </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                      {% endfor %}
-                    {% elif k == "other_languages" %}
-                      {% if v %}
-                      <fieldset id="{{k}}">
-                        <legend>{% trans "In other languages" %}</legend>
-                        {% for each in v %}
-                          <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-                          <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-                          <br/><div>{{each.name}}</div>
-                          </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                        {% endfor %}
-                      </fieldset>
-                      {% endif %}
-                    {% endif %}
-                  {% endfor %}
-
-                {% elif  key == "Videos" %}
-                  {% for k,v in val.items %}
-                    {% if k == "fallback_lang" %}
-                      {% for each in v %}
-                        <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-                        <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-                        <br/><div>{{each.name}}</div>
-                        </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                      {% endfor %}
-                    {% elif k == "other_languages" %}
-                      {% if v %}
-                      <fieldset id="{{k}}">
-                        <legend>{% trans "In other languages" %}</legend>
-                        {% for each in v %}
-                          <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block">
-                          <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
-                          <br/><div>{{each.name}}</div>
-                          </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                        {% endfor %}
-                      </fieldset>
-                      {% endif %}          
-                    {% endif %}                
-                  {% endfor %}
-                
-                {% else %}
-                  {% for k,v in val.items %}
-                    {% if k == "fallback_lang" %}
-                      {% for each in v %}
-                        <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
-                        &nbsp;&nbsp;
-                      {% endfor %}
-                    {% elif k == "other_languages" %}
-                      {% if v %}
-                        <fieldset id="{{k}}">
-                          <legend>{% trans "In other languages" %}</legend>
-                          {% for each in v %}
-                            <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}"> {{each.name}} </a>&nbsp;
-                            &nbsp;&nbsp;
-                          {% endfor %}
-                        </fieldset>	      
-                      {% endif %}
-                    {% endif %}
-                  {% endfor %}
-              
-                {% endif %}
-
-              </fieldset>
-              {% endfor %}
-            
-
-        </div>
-        <!-- End of displaying topic page contents -->
-        {% endif %}
-
-        <!-- /////////////////// -->
-
-        <!-- Display Maps only for Topic or Concept node -->
-        {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
-          <!-- Below code/widgets will only be shown for all resource instances/documents
-               which are neither Topic nor Concept
-          -->
-
-          <!-- Content for Concept Graph -->
-          <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
-            <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
-            {% include "ndf/graph_concept.html" %}
-          </div>
-
-          <div id="view-levels" style="display:none;">
-          </div>
-          
-          <!-- Content for Collection Graph -->
-          {% if node.collection_set %}
-            <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-              <a class="close-reveal-modal">&#215;</a>
-              {% include "ndf/graph_collection.html" %}
-            </div>
-          {% endif %}
-
-          <!-- Content for dependency Graph -->
-          {% if node.prior_node %}
-            <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
-             <a class="close-reveal-modal">&#215;</a>
-             {% include "ndf/graph_dependency.html" %}
-            </div>
-          {% endif %}
-         
-          <!-- Tab View Map Widget -->
-        {% elif node.location %}
-          <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
-            <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
-            <a class="close-reveal-modal" >&#215;</a>
-            {% include "ndf/map_widget.html" with mode="read" %}
-            <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
-            <!-- #{#%# endif %} -->
-          </div>
-        {% endif %}
-
-        <!-- /////////////////// -->
-
-        <div class="content" id="view-info">
-          <br/>
-          <h3 class="text-center" color="blue"> {{node.name}}</h3>
-
-          <dl class="accordion" data-accordion>
-            <!-- Overview -->
-            <dd class="accordion-navigation">
-              <!-- Title-1 -->
-              <a href="#panel1a" style="font-color:blue">Overview</a>
-              
-              <!-- Content-1 -->
-              <div id="panel1a" class="content active">
-              <table id="panel1a" align ="center" style="width:80%; border-width:0px; height: 200px; display: block;overflow-y: scroll;">
-                <tbody>
-    	   
-                {% get_json node.pk as jsonobj %}
-                {% str_to_dict jsonobj as obj %}
-                {% for key, value in obj.items %}
-                <tr>
-                {% if key != "attribute_set" and key != "relation_set" and key != "collection_set" %}
-                <td align ="left"><strong>{{key|del_underscore|title}}</strong></td>
-                <td align = "right"> 
-                {% if "None" not in value %}
-                {% if key|is_in:"attribute_set, file_size, relation_set" %}
-
-                {% for k, v in value.items %}
-                {{k}} : {{v}}<br/>
-                {% endfor %}
-                {% elif key|is_in:"group_set ,collection_set, member_of, tags, prior_node, post_node" %}
-                {% for each in value %}
-                {{each.name}}</br>
-                {% endfor %}
-                {% else %}
-                {{value}}
-                {% endif %}
-                </td>
-                {% else %}	     
-                Not set</td>
-                {% endif %}
-                </tr>
-                {% endif %}
-                {% endfor %}	    
-                </tbody>
-              </table>
-              </div>
-            </dd>
-
-            <!-- Collection set -->
-            <dd class="accordion-navigation">
-              <!-- Title-2 -->
-              <a href="#panel2a">Collection Set</a>
-    
-              <!-- Content-2 -->
-              <div id="panel2a" class="content">
-              {% get_json node.pk as jsonobj %}
-              {% str_to_dict jsonobj as obj %}
-              {% for key, value in obj.items %}
-
-              {% if key == "collection_set" %}
-              {% if "None" not in value %}
-              <table align ="center" style="width:80%; border-width:0px; height: 200px; display: block;overflow-y: scroll;" >
-              <tbody>
-              <tr>
-              {% for each in value %}
-              <td align ="center">{{each.name}}</td>
-              </tr>
-              {% endfor %}
-              {% endif %}
-              </tdbody>
-              </table>
-              {% endif %}
-              {% endfor %}
-              {% for key, value in obj.items %}
-              {% if key == "collection_set" and "None" in value %}
-              No Collections associted with {{node.name}} resource.
-              {% endif %}
-              {% endfor %}
-              </div>
-            </dd>
-
-            <!-- Attribute set -->
-            <dd class="accordion-navigation">
-              <!-- Title-3 -->
-              <a href="#panel3a">Attribute Set</a>
-    
-              <!-- Content-3 -->
-              <div id="panel3a" class="content">
-              {% get_json node.pk as jsonobj %}
-              {% str_to_dict jsonobj as obj %}
-              {% for key, value in obj.items %}
-              {% if key == "attribute_set" %}
-              {% if "None" not in value %}
-              <table align ="center" style="width:80%; border-width:0px; height: 200px;display: block;overflow-y: scroll;" >
-              <tbody>
-              <tr>
-              {% for k, v in value.items %}
-              <td align ="left"><strong>{{k}}</strong></td>
-              <td align ="right">{{v}}</td>
-              </tr>
-              {% endfor %}
-              </tdbody>
-              </table>
-              {% endif %}
-              {% endif %}
-              {% endfor %}    
-              {% for key, value in obj.items %}
-              {% if key == "attribute_set" and "None" in value %}
-              No Attributes associted with {{node.name}} resource.
-              {% endif %}
-              {% endfor %}
-              </div>
-            </dd>
-
-            <!-- Relation set -->
-            <dd class="accordion-navigation">
-              <!-- Title-4 -->
-              <a href="#panel4a">Relation Set</a>
-    
-              <!-- Content-4 -->
-              <div id="panel4a" class="content">
-              {% get_json node.pk as jsonobj %}
-              {% str_to_dict jsonobj as obj %}
-              {% for key, value in obj.items %}
-              {% if key == "relation_set" %}
-              {% if "None" not in value %}
-              <table align ="center" style="width:80%; border-width:0px; height:200px;" >
-              <tbody><tr>
-              {% for k, v in value.items %}
-              <td align ="left"><strong>{{k}}</strong></td>
-              <td align ="right">{{v}}</td>
-              </tr>
-              {% endfor %}
-              </tdbody>
-              </table>
-              {% endif %}
-              {% endif %}
-              {% endfor %}
-              {% for key, value in obj.items %}
-              {% if key == "relation_set" and "None" in value %}
-              No Relations associted with {{node.name}} resource.
-              {% endif %}
-              {% endfor %}
-              </div>
-            </dd>
-          </dl>
-        </div>
-
-        <!-- Only visible to the group admins and super user for managing group activities -->
-        {% comment %}
-        <div class="content" id="view-manage">
-
-          <div class="row">
-            <div class="small-6 columns">
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="clearing_house" aria-controls="clearing_house" data-reveal-id="cl_house_modal" aria-expanded="false" class="button secondary medium">Manage Clearing House&nbsp;&nbsp;&raquo;</a><br/>
-              <ul id="clearing_house" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                <li><a data-reveal-id="approver" class="approvers">Manage Approvers</a></li>    
-                <li><a href="#">Manage Curators</a></li>
-                <li><a href="#">Manage Group Admins</a></li>
-              </ul>
-              <div id="approver" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-                <!-- {#% edit_drawer_widget "Group" group_id node 1 "Users" user_type="Approver" %#} -->
-                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-              </div>
-
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_partners" aria-controls="manage_partners" aria-expanded="false" class="button secondary medium">Manage Partners&nbsp;&nbsp;&raquo;</a><br/> 
-              <ul id="manage_partners" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                <li><a href="#">Manage Partner Admins</a></li>
-                <li><a href="#">Manage Partner MOU's</a></li>
-              </ul>
-
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_events" aria-controls="manage_events" aria-expanded="false" class="button secondary medium">Manage Events&nbsp;&nbsp;&raquo;</a> <br/>
-                <ul id="manage_events" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                  <li><a href="#">Manage Event Admins</a></li>
-                  <li><a href="#">Manage Event Coordinators</a></li>
-                  <li><a href="#">Manage Event Attendees</a></li>
-                </ul>
-
-              <a href="#" data-options="align:right; is_hover:true" data-dropdown="manage_courses" aria-controls="manage_courses" aria-expanded="false" class="button secondary medium">Manage Courses&nbsp;&nbsp;&raquo;</a> <br/>
-              <ul id="manage_courses" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                <li><a href="#">Manage Course Admins</a></li>
-                <li><a href="#">Manage Course Subscribers</a></li>
-              </ul>
-
-            </div>
-            <div class="small-6 columns">
-              <a href="#" class="round small button right">View Statistics</a> <br/>
-            </div>
-          </div>
-
-        </div>
-        <div id="cl_house_modal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-          <div class="row">
-            <div class="small-4 columns">
-              <b>List Of Approvers</b>
-            </div>
-            <div class="small-4 columns">
-              <b>List Of Curators</b>
-            </div>
-            <div class="small-4 columns">
-              <b>List Of Admins</b>
-            </div>
-          </div>
-          <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
-
-        {% endcomment %}
-        <!-- /////////////////// -->
-
-        <div class="content" id="view-discussion">
-          <!-- discussion content area -->
-          {% include 'ndf/discussion.html' %}
-          <!-- END of discussion content area -->     
-        </div>
-
-      </div><!-- end of tab's content -->
-    </section>
-  
-  </div>
-
-  <footer>
-    <p><small>
-      <em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> at {{node.last_update}}
-    </small></p>
-  </footer>
-        
-  <!-- schema ends here -->
-  <!-- end new -->
-
-  </section>
-
+{% include "ndf/node_ajax_content.html" %}
 
 <section class="medium-3 columns"> 
 {% if 'CourseEventGroup' not in group_object.member_of_names_list %}
@@ -1354,12 +394,12 @@ ul#navigation li a.last {
               {% if request.user.is_superuser %}
               <li>
                 <a href="{% url create_url group_name_tag %}" class="tiny round button">
-                  <span class="fi-plus">&nbsp;&nbsp; New Group</span>
+                  <span class="fi-plus">&nbsp;&nbsp; {% trans 'New Group' %}</span>
                 </a>
                 </li>
                  <li>
                 <a href="/{{group_id}}/analytics/group/summary/" class="tiny round button">
-                  &nbsp;&nbsp; Group Analytics
+                  &nbsp;&nbsp; {% trans 'Group Analytics' %}
 
                 </a>
               </li>
@@ -1401,7 +441,7 @@ ul#navigation li a.last {
 
            {% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
             <div class= "medium-12 columns" >
-                <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'>  History   </label>  </a> 
+                <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'> {% trans 'History' %}  </label>  </a> 
 
       		<!-- Info-box -->&nbsp;
           <!--		<a class="view-info tiny round button" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a>  -->
@@ -1437,20 +477,20 @@ ul#navigation li a.last {
               {% if group_name_tag != "home"%}
                 {% if user_is_joined == "joined" %}
                   {% if is_user_group and node.created_by != request.user %}
-                  <li><input class="tiny round button" type="submit" id="notify" value="Stop following"> </li>
+                  <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Stop following' %}"> </li>
 
                   {% else %}
-                  <li><input class="tiny round button" type="submit" id="notify" value="Unsubscribe"></li>
+                  <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Unsubscribe' %}"></li>
                   {% endif %} 
 
                 {% elif user_is_joined == "not" or not user.is_authenticated %}
                   {% if is_user_group and node.created_by != request.user %}
-                  <li><input class="tiny round button" type="submit" id="notify" value="Follow"></li>
+                  <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Follow' %}"></li>
                   {% else %}
                     {% if allow_to_join %}
-                      <li><input class="tiny round button" type="submit" id="notify" value="Join"></li>
+                      <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Join' %}"></li>
                     {% else %}
-                      <li><input class="tiny round button" type="submit" id="notify" value="Enrollment Closed" disabled="disabled"></li>
+                      <li><input class="tiny round button" type="submit" id="notify" value="{% trans 'Enrollment Closed' %}" disabled="disabled"></li>
                     {% endif %}
                   {% endif %}
                 {% endif %}
@@ -1487,13 +527,13 @@ ul#navigation li a.last {
           {% if 'ModeratingGroup' in group_object.member_of_names_list or 'ProgramEventGroup' in group_object.member_of_names_list or 'CourseEventGroup' in group_object.member_of_names_list and 'Group' not in group_object.member_of_names_list %}
 
             <a class="tiny expand button" href="{% url 'moderation' group_name_tag %}">
-              Moderate Resources
+              {% trans 'Moderate Resources' %}
             </a>
           {% endif %}
 
           {% if 'Group' in group_object.member_of_names_list %}
             <a class="tiny expand button" href="{% url 'all_under_moderation' group_id %}">
-              Moderation Status
+              {% trans 'Moderation Status' %}
             </a>
           {% endif %} 
         {% endif %} 
@@ -1613,7 +653,7 @@ ul#navigation li a.last {
                 <div id="group_drawer">
                   {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
                 </div><br/>
-                <input type="button" id="save_switch_group" class="round button push-4" value="Save selected group">
+                <input type="button" id="save_switch_group" class="round button push-4" value="{% trans 'Save selected group' %}">
               </div>
 
               <a class="close-reveal-modal">&#215;</a>
@@ -1636,8 +676,62 @@ ul#navigation li a.last {
   {% endif %}
 </section>
 
+<!-- 
+<div id="file-resource-overlay" class="reveal-modal xlarge" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+  <div id="resource-details">
+    kjhkj
+  </div>
 
+  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+ -->
 <script type="text/javascript">
+
+  // fileResources = document.querySelectorAll('.file-resource');
+  // for (var i = fileResources.length - 1; i >= 0; i--) 
+  // {
+  //   fileResources[i].onclick = function (){
+
+  //     // e.preventDefault();
+  //     // alert("hiii")
+  //     var resourceDetail = document.getElementById('resource-details');
+  //     resourceDetail.innerHTML = "";
+  //     var resourceId = this.getAttribute('data-resource-id'),
+  //       resourceGroupId = this.getAttribute('data-group-id');
+
+  //     $.ajax({
+  //       type: "GET",
+  //         url: "{% url 'file_content' group_id %}",
+  //         datatype: "html",
+  //         data:{
+  //           'id': resourceId,
+  //           'group_id': resourceGroupId
+  //         },
+  //         success:function (data) {
+  //           $('article').unblock();
+  //           resourceDetail.innerHTML = data;
+  //           resHtml = document.querySelector('#resource-details > .row > .columns');
+  //           if(resHtml) {
+  //           // console.log('kjhkj')
+  //             resHtml.classList.add('medium-10');
+  //             resHtml.classList.add('medium-centered');
+  //             resHtml.classList.remove('medium-9');
+  //           }
+  //           setTimeout(function() { adjustIframeHt() },3000);
+  //         },
+  //         complete: function () {
+
+  //           // setTimeout(function() {
+  //             document.querySelector('#resource-details  ul.breadcrumbs').remove();
+  //             document.querySelector('#resource-details  h1.subheader').remove();
+  //           // }, 10);
+
+  //         }
+          
+  //     })
+  //   }
+  // }
+
   // publishing resource in other groups
   var data_list = []
 
@@ -1653,7 +747,7 @@ ul#navigation li a.last {
   $(document).on('click',"#switch_group",function(){
     $('#switchgrp #collection_set_drawer1').html("");
      $('#switchgrp #collection_set_drawer2').html("");
-     $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+     $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="{% trans "Type here to search in the resources" %}" id="collection_set_search" class="margin-0"></li>');
       var url='/{{groupid}}/group/switch_group/'+'{{node}}';
       $.getJSON( url, function( data ) {
         $.each(data ,function(index , drawer_elements){
@@ -1912,14 +1006,14 @@ ul#navigation li a.last {
   // iframe for html content  
   function adjustIframeHt(){
 
-    var iframeBodyHt = $("iframe#html-res-iframe").contents().find("body").height();
-    $("iframe#html-res-iframe").height(iframeBodyHt + 50);
+    var iframeBodyHt = $("iframe").contents().find("body").height();
+    $("iframe").height(iframeBodyHt + 50);
     
     var changedHt;
     
     setTimeout(function(){
 
-      changedHt = $("iframe#html-res-iframe").contents().find("body").height();
+      changedHt = $("iframe").contents().find("body").height();
       if(changedHt > iframeBodyHt) { adjustIframeHt() }
 
     }, 4000 );
@@ -1927,7 +1021,7 @@ ul#navigation li a.last {
 
   $("document").ready(function(){
 
-    setTimeout(function() { adjustIframeHt() },3000) 
+    setTimeout(function() { adjustIframeHt() },3000);
 
     // making <a> disabled of images in html pages in iframe
     var imgInIframe = $("iframe#html-res-iframe").contents().find("img");
