@@ -319,20 +319,19 @@ def create_edit_page(request, group_id, node_id=None):
         res = request.POST.get("res",'')
         if res:
             res = eval(res)
+        if page_type:
+                objid= page_type[0]
+                if not ObjectId(objid) in page_node.type_of:
+                        page_type1=[]
+                        page_type1.append(ObjectId(objid))
+                        page_node.type_of = page_type1
+                        page_node.type_of
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
         if ce_id:
-                if res == None:
+                if not res:
                     blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
                     page_node.type_of = [blogpage_gst._id]
-                    page_node.status = u"PUBLISHED"
-        else:
-        	if page_type:
-        		objid= page_type[0]
-        		if not ObjectId(objid) in page_node.type_of:
-        			page_type1=[]
-        			page_type1.append(ObjectId(objid))
-        			page_node.type_of = page_type1
-        			page_node.type_of
-	page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page), groupid=group_id)
+                page_node.status = u"PUBLISHED"
         page_node.save()
         return_status = create_thread_for_node(request,group_id, page_node)
         # To fill the metadata info while creating and editing page node

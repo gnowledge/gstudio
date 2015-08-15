@@ -130,7 +130,6 @@
                     <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
                   <span>
                   Created at {{each_blog.created_at}}
-                  by {{request.user.username}}
                   </span>
                   <div>
                     {{each_blog.html_content|safe}}

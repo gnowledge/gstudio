@@ -15,13 +15,13 @@
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
     {% for e in breadcrumbs_list %}
-      <li><b>
+      <li>
       {% if node.pk != e.0 %}
         <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
       {% else %} 
         {{e.1}} 
       {% endif %}
-      </b></li>
+      </li>
     {% endfor %}
   </ul>
   {% elif node.teaches %}
@@ -43,16 +43,17 @@
     </small></h4>
   {% endif %}
 
-  <h1><span itemprop="{{schema.1.name}}" class='node'>
-    {# {% if node.altnames %}{{node.altnames}}{% else %}{{node.name}}{% endif %}</span> #}
-    {% firstof node.altnames node.name %}
+  <h2>
+    <span itemprop="{{schema.1.name}}" class='node'> {% firstof node.altnames node.name %} </span>
+    {# {% if node.altnames %}{{node.altnames}}{% else %}{{node.name}}{% endif %} #}
+    
   {% if node %}
     {% get_publish_policy request groupid node as group_policy %}
     {% if group_policy == "allow" %}
       &nbsp;&nbsp;&nbsp;<span data-tooltip title= "{% blocktrans %} Only you can see the latest changes in this {{node.member_of_names_list.0}}. Click on 'Publish' to let others see. {% endblocktrans %}" ><span style='position:relative; color: gray;'>{% trans 'DRAFT' %}</span></span>
     {% endif %}
   {% endif %}
-  </h1>
+  </h2>
       
   <h1 class="subheader">
     <dl class="tabs" data-tab> 
@@ -635,9 +636,9 @@
                       <fieldset id="{{k}}">
                         <legend>{% trans "In other languages" %}</legend>
                         {% for each in v %}
-                          <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource">
+                          <!--{# <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource"> #}-->
 
-                          {# <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block" class="file-resource"> #}
+                          <a href ="{% url 'image_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block" class="file-resource">
                           <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
                           <br/><div>{{each.name}}</div>
                           </a>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -661,9 +662,9 @@
                       <fieldset id="{{k}}">
                         <legend>{% trans "In other languages" %}</legend>
                         {% for each in v %}
-                        <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource">
-                          
-                          {# <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block" class="file-resource"> #}
+                        <!-- {# <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource">
+                         #}  -->
+                          <a href ="{% url 'video_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" style="display: inline-block" class="file-resource">
                           <img src="{% url 'getFileThumbnail' group_name_tag each.pk %}" />
                           <br/><div>{{each.name}}</div>
                           </a>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -685,10 +686,10 @@
                         <fieldset id="{{k}}">
                           <legend>{% trans "In other languages" %}</legend>
                           {% for each in v %}
-                          <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource">
-                          
-                            <!--{# <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" class="file-resource">
-                              #}-->
+                          <!--{# <a href="#" data-reveal-id="file-resource-overlay" data-url="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" data-resource-id="{{each.pk}}" data-group-id="{{group_id}}" class="file-resource">
+                           #}-->
+                            <a href ="{% url 'file_detail' group_name_tag each.pk %}?nav_li={{nav_list}}" class="file-resource">
+                             
                              {{each.name}} </a>&nbsp;
                             &nbsp;&nbsp;
                           {% endfor %}
