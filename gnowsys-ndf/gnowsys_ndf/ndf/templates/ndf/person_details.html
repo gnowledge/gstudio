@@ -278,10 +278,14 @@ function printDiv(divID) {
     $("body table tbody tr td").css("lineHeight","0.125rem");
     $("body .declration_td,.nss_reg_td").css("lineHeight","1.125rem");
         
-    window.print();
-
-    //Restore orignal HTML
-    document.body.innerHTML = oldPage;
+    setTimeout(function(){
+       window.print();
+       document.body.innerHTML = oldPage;
+       document.body.style.marginLeft = '0rem';
+       document.body.style.marginRight = '0rem';
+       $("body table tbody tr td").css("lineHeight","1.125rem");
+       location.reload();
+    }, 5000);        
 }
 
 $(document).on('click',".checkedAll",function(){
