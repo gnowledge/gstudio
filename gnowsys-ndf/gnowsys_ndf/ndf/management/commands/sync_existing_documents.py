@@ -602,40 +602,23 @@ class Command(BaseCommand):
             release_response_val = True
             interaction_type_val = unicode('Comment')
             userid = each_node.created_by
-            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),'name': unicode(each_node.name), "prior_node": ObjectId(each_node._id) })
+            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id) })
 
             if thread_obj:
                 print "thread_obj exists ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
                 node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': []}}, upsert = False, multi = False)
                 thread_obj.reload()
                 print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
-            else:
-                print "thread_obj does not exists"
-                thread_obj = node_collection.collection.GSystem()
+                # creating GRelation
+                gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
+                if release_response_val:
+                    create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+                if interaction_type_val:
+                    create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
 
-                thread_obj.name = u"Thread of " + unicode(each_node.name)
-                thread_obj.status = u"PUBLISHED"
-
-                thread_obj.created_by = int(userid)
-                thread_obj.modified_by = int(userid)
-                thread_obj.contributors.append(int(userid))
-
-                thread_obj.member_of.append(ObjectId(twist_gst._id))
-                # thread_obj.prior_node.append(ObjectId(node._id))
-                thread_obj.group_set = each_node.group_set
-
-                thread_obj.save()
-                print "Successfully created thread obj ", thread_obj._id,'\t - ', thread_obj.name, '\t - ', thread_obj.prior_node
-            # creating GRelation
-            gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
-            if release_response_val:
-                create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
-            if interaction_type_val:
-                create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
-
-            each_node.reload()
-            thread_obj.reload()
-            print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
+                each_node.reload()
+                thread_obj.reload()
+                print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
         except Exception as e:
             pages_files_not_updated.append(each_node._id)
             print "\n\nError occurred for page ", each_node._id, "--", each_node.name
