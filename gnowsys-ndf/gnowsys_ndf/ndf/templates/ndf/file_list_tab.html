@@ -53,7 +53,7 @@
             </b>
           </div>
           <div class="small-4 column">
-            {% if "image" in each_res.mime_type %}
+            {% if "image" in each_res.mime_type or each_res.fs_file_ids.1 %}
               <img src="{% url 'getFileThumbnail' group_id each_res.pk %}" alt="No thumbnail available!" />
             {% elif "audio" in each_res.mime_type %}
               <span class="fi-music" style="font-size:40px"></span>

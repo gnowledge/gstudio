@@ -47,6 +47,7 @@ pandora_video_st = node_collection.one({'$and': [{'_type': 'GSystemType'}, {'nam
 
 file_id = node_collection.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
 page_id = node_collection.find_one({'_type': "GSystemType", "name": "Page"}, {"_id": 1})
+theme_gst_id = node_collection.find_one({'_type': "GSystemType", "name": "Theme"}, {"_id": 1})
 
 
 # data review in File app
@@ -69,7 +70,11 @@ def data_review(request, group_id, page_no=1, **kwargs):
         group_name, group_id = get_group_name_id(group_id)
     
     files_obj = node_collection.find({'$or': [
-                                    {'member_of': {'$in': [ObjectId(file_id._id), ObjectId(page_id._id)]},
+                                    {'member_of': {'$in': [
+                                        ObjectId(file_id._id),
+                                        ObjectId(page_id._id),
+                                        ObjectId(theme_gst_id._id)
+                                        ]},
                                     # '_type': 'File', 'fs_file_ids': {'$ne': []},
                                     'group_set': {'$in': [ObjectId(group_id)]},
                                     '$or': [

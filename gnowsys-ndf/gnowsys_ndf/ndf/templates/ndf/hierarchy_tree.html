@@ -40,12 +40,13 @@
 		var node = tree_build.tree('getNodeById', url);
 		tree_build.tree('openNode', node);
 
+		// console.log(node)
 		// Javascript function to be used for checking objects in specific time of interval
 		setTimeout(function(){
 
-		// console.log($(".themes"))
-		if( ($(".themes").length > 0) ) { TreeTillNode() }
-		}, 100 );
+		// console.log(node)
+		if( (!node) ) { TreeTillNode() }
+		}, 1000 );
 		
 		$('article').unblock();
     }
