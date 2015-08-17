@@ -88,8 +88,8 @@
 		 -->
 		<div class="small-12 columns" id="create-filter">
 			<div class="row">
-				<div class="small-2 columns text-right"><h5> {% trans 'Select filter' %}</h5></div>
-				<div class="small-4 columns">
+				<div class="small-12 large-2 columns small-text-left  large-text-right"><h5> {% trans 'Select filter' %}</h5></div>
+				<div class="small-12 large-2 columns">
 					<select name="filter-field-name">
 						<option value="initial-select"> -- {% trans 'Select' %} -- </option>
 						{% for key, val in filter_dict.items %}
@@ -110,7 +110,7 @@
 						-->
 					</select>
 				</div>
-				<div class="small-4 columns">
+				<div class="small-12 large-2 columns">
 					<select name="filter-field-value"  
 					onblur="$(this).css('height', '')"
 					onfocus="$(this).css('height', '6em')" multiple>
@@ -122,7 +122,7 @@
 						 -->
 					</select>				
 				</div>
-				<div class="small-1 small-pull-1 columns">
+				<div class="small-12 large-6  columns">
 					<input type="button" class="button tiny" value="{% trans 'Apply filter' %}" id="filter-btn">
 				</div>
 			</div>
