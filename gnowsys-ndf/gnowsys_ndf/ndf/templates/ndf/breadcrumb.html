@@ -1,0 +1,19 @@
+{% if path %}
+
+	<ul class="breadcrumbs">
+		{% for each_br in path %}
+		
+			{% if forloop.last %} 
+				<li class="current">
+					<a href="#"> {{each_br.name}} </a>
+				</li>
+			{% else %}
+				<li>
+					<a href="{{each_br.link}}"> {{each_br.name}} </a>
+				</li>
+			{% endif %}
+
+		{% endfor %}
+	</ul>
+
+{% endif %}

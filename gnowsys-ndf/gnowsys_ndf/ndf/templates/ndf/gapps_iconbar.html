@@ -56,7 +56,7 @@ background-color: red !important;
       <div class="top-bar-section app">
      -->
         <!-- <ul class="app button-group"> -->
-        <li class="divider"></li>
+        <!-- <li class="divider"></li> -->
           {% for index_key, app_dict in gapps.items %}
 
             {% check_is_gapp_for_gstaff groupid app_dict request.user as gstaff_access_for_gapp %}
@@ -163,7 +163,7 @@ background-color: red !important;
       // console.log(this.offsetWidth)
       allAppsTotWidth += this.offsetWidth;
 
-      if( flagExtraMenu || ((allAppsTotWidth + 150) > availableWidth))
+      if( flagExtraMenu || ((allAppsTotWidth + 150 + 150) > availableWidth))
       {
         if(!flagExtraMenu)
         {

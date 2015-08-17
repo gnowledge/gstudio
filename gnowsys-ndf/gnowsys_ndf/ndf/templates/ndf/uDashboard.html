@@ -8,7 +8,7 @@
   {% blocktrans %}<b>Dashboard</b> shows users' own activities in the site.{% endblocktrans %}<br><br>
   <b>{% trans "Total Activity Rating" %}: &nbsp;{{total_activity_rating}}</b><br> 
   
-   <a href="#" data-reveal-id="activity-statistics" class="tiny round button">
+   <a href="#" data-reveal-id="activity-statistics" class="tiny button">
       {% trans "Activity Ratings" %}
    </a>
 {% comment %}
@@ -198,7 +198,66 @@
                         {% endif %}
                       </ul>
                     </div>
+                    <!-- Activity -->
+                    <div class="content" id="Activity">
+                      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                            {% for node in user_activity %}
+                              {% get_version_of_module node.pk as version %}
+                              {% get_url node.pk as res_type %}
+                              {% if res_type != "None" %}
+                                        <li class="card">
+                                            <div id="activity">
+                                                <header>
+                                                   <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+                                                      {% if res_type == 'group' %}
+                                                        <a href="/{{node.pk}}">
+                                                      {% elif res_type %}
+                                                        {% if res_type != "event_app_instance_detail" %}
+                                                                <a href="{% url res_type groupid node.pk   %}">{{i.url}} 
+                                                        {% else %}
+                                                              {% get_event_type node as app_set_id %}
+                                                              <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}          
+                                                        {% endif %}
+                                                      {% endif %}
+                                                    <h4>{{ node.name|truncatechars:20 }}</h4>
 
+                                                    <div>
+                                                        <small class="subheader">{{ node.member_of_names_list|join:', ' }} {% trans 'created' %} {{node.created_at|timesince}} {% trans 'ago' %} 
+                                                        <br/>
+                                                        by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+                                                        </small>
+                                                    </div>
+                                                </header>
+
+                                                <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+                                                </a>
+                                                <div class="label-list">
+                                                    {% for tag in node.tags|slice:":3" %}
+                                                         <a href="{% url 'tag_info' group_name_tag tag %}"> <span    class="label"> <mark> {{tag}} </mark> </span> </a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </li>  
+                              {% endif %}
+                            {% empty %}
+                              {% if not searching %}
+                                <div class="row">
+                                  <div class="small-12 columns" align="left">
+                                    <h5> {% trans "No Recent Activities" %}</h5>
+                                  </div>
+                                </div>
+                              {% endif %}
+                            {% endfor %}
+                            
+                            {% if dashboard_count.activity > 10 %}
+                                <div class="row">
+                                  <div class="small-12 columns" align="right">
+                                    <h6> <a href="{% url 'user_activity' group_id %}"> {% trans 'Show More..' %} </a></h6>
+                                  </div>
+                                </div>
+                            {% endif %}
+                      </ul>
+                    </div>
                     <!-- Notifications -->
                     <div id="Notification">
                       <div>
@@ -262,11 +321,8 @@
                       </ul>
                     </div>
 
-                                </div>      
+            </div>      
         </div> 
-
-    
-
         
  </div>    
 
@@ -288,8 +344,6 @@
   </div>
   -->
 
-  
-    
 {% endblock %}
 
 {% block script %}

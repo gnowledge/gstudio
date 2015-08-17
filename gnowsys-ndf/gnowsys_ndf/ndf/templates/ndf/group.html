@@ -91,7 +91,7 @@
   {% autopaginate group_nodes 23 %}
 
   {% for node in group_nodes %}
-  {% if node.name != request.user.username %}
+  {% if node and node.name != request.user.username %}
   
     <li class="card">
       {% if grouptype == "Moderated" %}

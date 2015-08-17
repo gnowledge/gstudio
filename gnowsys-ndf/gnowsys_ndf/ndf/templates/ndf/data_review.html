@@ -824,6 +824,31 @@
 		$drContainer.css("opacity", "1"); 
 	})
 	// ---END of search in the data-review
+
+	function removeRow (oid) {
+
+		var $resBlankRow = $("tr#blank-row-" + oid);
+		
+		// fetching resource object VIEW row
+		var $resViewRow = $("tr#view-row-" + oid);
+		
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid);
+
+		$($resEditRow).add($resViewRow).add($resBlankRow).animate({
+				opacity: 0.1
+			}, 1000).fadeOut(1000);
+
+ 		setCurrNoneToEditRow(oid);
+
+ 		var totalCount = parseInt($('#data-resources-count').text());
+ 		if(totalCount > 0)
+ 		{
+ 			$('#data-resources-count').text(totalCount - 1);
+ 		}
+	}
+
+
 	function deleteNode(oid)
 	{ 
 		$.ajax({
@@ -836,22 +861,28 @@
 
 			 	success:function(data){
 			 		//updateContent();
-			 		var $resBlankRow = $("tr#blank-row-" + oid);
-						// fetching resource object VIEW row
-					var $resViewRow = $("tr#view-row-" + oid);
-					// fetching resource object EDIT row
-					var $resEditRow = $("tr#edit-row-" + oid);
-
-					$($resEditRow).add($resViewRow).add($resBlankRow).animate({
-							opacity: 0.1
-						}, 1000).fadeOut(1000);
-
-			 		setCurrNoneToEditRow(oid)
+			 		removeRow(oid);
 			 	}		
+			});
+	}
 
+	function restoreNode (oid) {
+			$.ajax({
 
-		});
+			 	url:"{% url 'restore_resource' groupid  %}",
+			 	type:'Get',
+			 	data:{
+			 			'node_id':oid
+			 	},
 
+			 	success:function(data){
+			 		
+			 		//updateContent();
+			 		if (Boolean(data)) { removeRow(oid); }
+			 		else { alert("Oops some error occured! Resource could not get restored!"); };
+			 		
+			 	}		
+			});	
 	}
 
 // </script>
