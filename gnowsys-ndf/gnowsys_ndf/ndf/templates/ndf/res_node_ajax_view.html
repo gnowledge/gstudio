@@ -268,7 +268,16 @@
   {% if "CourseEventGroup" not in node.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of %}
   {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
     <div class="content" id="view-discussion">
-      {% include 'ndf/discussion.html' with sg_type="Event" %}
+        {% if 'has_thread' in node %}
+          {% with node.has_thread.0 as disc_thread_node %}
+            {% if disc_thread_node %}
+              {% include 'ndf/discussion.html' with node=disc_thread_node sg_type="Event" %}
+            {% endif %}
+            {% endwith %}
+        {% else %}            
+              {% include 'ndf/discussion.html' with sg_type="Event"%}
+        {% endif %}
+
     </div>
     </li>
     </ul>
