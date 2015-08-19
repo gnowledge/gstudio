@@ -37,22 +37,24 @@
   li{
     list-style: none;
   }
+
   </style>
 
 {% endblock %}
 
 {% get_group_name groupid as group_name_tag %}
+  {% block breadcrumb %} {% get_breadcrumb request.path %} {% endblock breadcrumb %}
+
   {% if breadcrumbs_list %}
   <ul class="breadcrumbs"> 
-
     {% for e in breadcrumbs_list %}
-      <li><b>
+      <li>
       {% if node.pk != e.0 %}
         <a class="current" id="{{e.0}}" style="color:black;">{{e.1}}</a>
       {% else %} 
         {{e.1}} 
       {% endif %}
-      </b></li>
+      </li>
     {% endfor %}
   </ul>
   {% endif %}
@@ -262,11 +264,11 @@
 			{% endwith %}
     </div>
   </div>
-  {% if "CourseEventGroup" not in node.member_of_names_list %}
-
+  {% get_sg_member_of node.pk as list_of_sg_member_of %}
+  {% if "CourseEventGroup" not in node.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of %}
   {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
     <div class="content" id="view-discussion">
-      {% include 'ndf/discussion.html' %}
+      {% include 'ndf/discussion.html' with sg_type="Event" %}
     </div>
     </li>
     </ul>
@@ -274,19 +276,13 @@
 </section>
   {% check_is_gstaff groupid request.user as is_gstaff %}
   {% if is_gstaff %}
-  {% if "CourseEventGroup" in node.member_of_names_list %}
+  {% if "CourseEventGroup" in node.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of %}
       <section class="medium-2 columns"> 
-            <b>{% trans "Actions" %}</b><br/>
             <div class="row">         
             <div class="medium-6 columns">
-            <a href="{% url 'edit_event_group' groupid 'CourseEventGroup' %}" class="hide tiny button round edit"><i class="fi-pencil"></i> {% trans "Edit CourseEvent" %}</a>
-            <br>
-            <br>
-            {% if "CourseEventGroup" in node.member_of_names_list%}
-                  {% include "ndf/invite_users.html" %}
-            {% endif %}
-              {% include "ndf/invite_admins.html" %}
-
+            <a href="{% url 'edit_event_group' groupid sg_type %}" class="tiny button edit hide"><i class="fi-pencil"></i> {% trans "Edit " %}{{sg_type}}</a>
+            {% include "ndf/invite_users.html" %}
+            {% include "ndf/invite_admins.html" %}
         </div></div>  
     </section>  
   {% else %} 

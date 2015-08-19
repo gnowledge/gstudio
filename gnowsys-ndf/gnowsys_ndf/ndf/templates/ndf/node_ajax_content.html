@@ -170,7 +170,6 @@
       <dd class="tab-title active page-view"><a class="view-page" href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       {% endif %}
     
-      
       <!-- Discussion -->
       {% if "Group" not in node.member_of_names_list %}
 
@@ -964,7 +963,15 @@
 
         <div class="content" id="view-discussion">
           <!-- discussion content area -->
-          {% include 'ndf/discussion.html' %}
+        {% if 'has_thread' in node %}
+          {% with node.has_thread.0 as disc_thread_node %}
+            {% if disc_thread_node %}
+              {% include 'ndf/discussion.html' with node=disc_thread_node%}
+            {% endif %}
+            {% endwith %}
+        {% else %}            
+              {% include 'ndf/discussion.html' with node=disc_thread_node%}
+        {% endif %}
           <!-- END of discussion content area -->     
         </div>
 
