@@ -498,10 +498,10 @@ ul#navigation li a.last {
 
           {% check_is_gstaff groupid request.user as is_gstaff %}
           {% if is_gstaff %}
-            {% if group_object.edit_policy != EDITABLE_MODERATED%}
+            {% if group_object.edit_policy != EDITABLE_MODERATED %}
               {% include "ndf/invite_users.html" %}
-              {% include "ndf/invite_admins.html" %}
             {% endif %}
+              {% include "ndf/invite_admins.html" %}
           {% endif %} 
         {% endif %}
       {% endif %}
