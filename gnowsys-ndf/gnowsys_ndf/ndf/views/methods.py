@@ -4131,7 +4131,6 @@ def create_thread_for_node(request, group_id, node):
 
 	"""
 	if request.method == "POST":
-		# response = request.POST.get("resp_sel",'')
 		release_response_val = unicode(request.POST.get("release_resp_sel",'True'))
 		interaction_type_val = unicode(request.POST.get("interaction_type_sel",'Comment'))
 		start_time = request.POST.get("thread_start_date", '')
@@ -4141,13 +4140,23 @@ def create_thread_for_node(request, group_id, node):
 		if end_time:
 			end_time = datetime.strptime(end_time, "%d/%m/%Y")
 		twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
-		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
+		thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(node._id) })
+		has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
 		if thread_obj:
-			if thread_obj.name != node.name:
+			node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name), 'prior_node': []}}, upsert = False, multi = False)
+			gr = create_grelation(node._id, has_thread_rt, thread_obj._id)
+			node.reload()
+			thread_obj.reload()
+			# print "\n\n Found old model thread node existing"
+		else:
+			thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id),"relation_set.thread_of": ObjectId(node._id)})
+			# print "\n\n Found updated thread node existing"
+		if thread_obj:
+			if thread_obj.name != u"Thread of "+ unicode(node.name):
 				node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(node.name)}}, upsert = False, multi = False)
 				thread_obj.reload()
 		else:
-			has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+			# print "\n\n Creating new thread node"
 			thread_obj = node_collection.collection.GSystem()
 
 			thread_obj.name = u"Thread of " + unicode(node.name)
