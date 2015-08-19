@@ -4,7 +4,13 @@
 {% load ndf_tags %}
 {% load cache %}
 
-{% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
+{% block title %}   
+{% if node %}
+{% trans "Edit "%}{{title}} - {{node.name}}
+{% else %}
+{% trans "Create "%}{{title}}
+{% endif %}
+{% endblock %}
 
 {% cache 3600 node_edit_base style %}
 {% block style %}
@@ -113,16 +119,6 @@ i.remove-tag{
 				<dd class="meta_tab" title="Click here to add/edit metadata">
 				  	<a>{% trans "Metadata" %} </a> 
 				</dd>  
-				{% if title == "Page" or "File" in node.member_of_names_list %}
-					{% check_is_gstaff groupid request.user as is_gstaff %}
-
-					{% if is_gstaff %}
-						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
-						  	<a>{% trans "Thread Properties" %} </a> 
-						</dd>  
-					{% endif %}
-				{% endif %}
-		
 				<dd class="teaches_tab" title="Click here to add/edit teaches">
 				 	<a>{% trans "Teaches" %} </a> 
 				</dd>
@@ -131,6 +127,16 @@ i.remove-tag{
 				 	<a>{% trans "Assesses" %} </a> 
 				</dd>	
 				{% endif %}
+
+				{% check_is_gstaff groupid request.user as is_gstaff %}
+				{% if is_gstaff %}
+					{% if title == "Page" %}
+						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
+						  	<a>{% trans "Interaction Settings" %} </a> 
+						</dd>  
+					{% endif %}
+				{% endif %}
+		
 	     	</dl>     
 	            
 	   	</div>
@@ -157,6 +163,9 @@ i.remove-tag{
 			{% if ce_id %}
 				<input type="hidden" name="ce_id" value="{{ce_id}}">
 				<input type="hidden" name="res" value="{{res}}">
+			{% endif %}
+			{% if program_res %}
+				<input type="hidden" name="program_res" value="{{program_res}}">
 			{% endif %}
 
 			{% if not ce_id %}
@@ -257,11 +266,6 @@ i.remove-tag{
 										{% else %}
 											<option value = {{i.pk}} > {% trans i.name %} </option>
 										{% endif %}
-						  				
-<<<<<<< HEAD
-=======
-
->>>>>>> 1c4d17f6f4e3ecca7e808956c02af8055c08cf8c
 			  						{% endfor %}
 								</select>
 							</div>
@@ -458,53 +462,63 @@ i.remove-tag{
 
     <div class="content contents" id="panel-thread" style="width:95%; display:none;" >      
       	<div class="row">
-		  	<h4>{% trans "Discussion Settings" %} </h4>
+		  	<h7>{% trans "Add properties to the discussion feature of this " %}{{title}}{% trans " node "%} </h7>
 		</div>
 
-	    <div class="row">
-	      <div class="large-2 medium-4 columns "><h5>{% trans "Release Response:" %}</h5>
+	    <div class="row yes_no_disc_div">
+	      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction :" %}</h5>
 	      </div>
 	      <div class="large-pull-4 large-6 medium-8 columns">
-	        <select id="release_resp_sel" name="release_resp_sel">
-	          <option>True</option>
-	          <option>False</option>
-	        </select>
+			<input type="radio" name="thread_create" value="Yes">Yes &nbsp;&nbsp;
+			<input type="radio" name="thread_create" value="No">No
 	      </div>
 	    </div>
+	    <div class="thread-settings-div hide">
+		    <div class="row">
+		      <div class="large-2 medium-4 columns "><h5>{% trans "Release Option:" %}</h5>
+		      </div>
+		      <div class="large-pull-4 large-6 medium-8 columns">
+		        <select id="release_resp_sel" name="release_resp_sel">
+		          <option value="True">Show Replies to All</option>
+		          <option value="False">Hide Replies from All</option>
+		        </select>
+		      </div>
+		    </div>
 
-	    <div class="row">
-	      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>
-	      </div>
-	      
-	      <div class="large-pull-4 large-6 medium-8 columns">
-	        <select id="interaction_type_sel" name="interaction_type_sel">
-	          <option>Comment</option>
-	          <option>Discuss</option>
-	          <option>Reply</option>
-	          <option>Submit</option>
-	          <option>Answer</option>
-	          <option>Feedback</option>
-	          <option>Moderate</option>
-	        </select>
-	      </div>
-	    </div>
+		    <div class="row">
+		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>
+		      </div>
 
-	    <div class="row">
-	      <div class="large-2 medium-4 columns "><h5>{% trans "Thread start date:" %}</h5>
-	      </div>
-	      
-	      <div class="large-pull-4 large-6 medium-8 columns">
-	      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
-	      </div>
-	    </div>
+		      <div class="large-pull-4 large-6 medium-8 columns">
+		        <select id="interaction_type_sel" name="interaction_type_sel">
+		          <option value="Comment">Comment</option>
+		          <option value="Discuss">Discuss</option>
+		          <option value="Reply">Reply</option>
+		          <option value="Submit">Submit</option>
+		          <option value="Voice-Response">Voice-Response</option>
+		          <option value="Answer">Answer</option>
+		          <option value="Feedback">Feedback</option>
+		        </select>
+		      </div>
+		    </div>
 
-	    <div class="row">
-	      <div class="large-2 medium-4 columns "><h5>{% trans "Thread close date:" %}</h5>
-	      </div>
-	      
-	      <div class="large-pull-4 large-6 medium-8 columns">
-	      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
-	      </div>
+		    <div class="row">
+		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction start date:" %}</h5>
+		      </div>
+		      
+		      <div class="large-pull-4 large-6 medium-8 columns">
+		      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+		      </div>
+		    </div>
+
+		    <div class="row">
+		      <div class="large-2 medium-4 columns "><h5>{% trans "Interaction close date:" %}</h5>
+		      </div>
+		      
+		      <div class="large-pull-4 large-6 medium-8 columns">
+		      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year" style="width:15rem"> 
+		      </div>
+		    </div>
 	    </div>
 	</div>	
 
@@ -595,221 +609,236 @@ i.remove-tag{
 <!-- Reveal Modals begin -->
 
 <script type="text/javascript">
-  var startEnrollDt = $("#thread_start_date");
-  var endEnrollDt = $("#thread_close_date");
 
-  currentDate = new Date();
-  var currentDay = currentDate.getDate();
-  var currentMonth = currentDate.getMonth();
-  var currentYear = currentDate.getFullYear();
-  lowerYearLimit = currentYear;
-  upperYearLimit = currentYear + 20;
+	$("input[name=thread_create]").change(function(){
+		var radio_sel = $('input[name=thread_create]:checked').val()
+		if(radio_sel=="Yes"){
+			$(".thread-settings-div").removeClass("hide");
+		}
+		else{
+			$(".thread-settings-div").addClass("hide");
+		}
+	})
 
+	$("select#release_resp_sel").change(function() {
+		$("select#interaction_type_sel").removeAttr("disabled");
+	})
 
-  $(".date_month_day_year").datepicker({ 
-    changeMonth: true,
-    changeYear: true,
-    dateFormat: 'dd/mm/yy',
-    yearRange: lowerYearLimit + ":" + upperYearLimit,
-    defaultDate: '0',
+	var startEnrollDt = $("#thread_start_date");
+	var endEnrollDt = $("#thread_close_date");
 
-    onClose: function(dateText, inst) {
-      $(this).val(dateText);
-      
-      var month_year = $(this).val();
-      day = currentDay;
-      month = currentMonth;
-      year = currentYear;
-      
-      if ($(this).attr('id') == "thread_start_date") {
-        if (month_year) {
-          month_year = month_year.split("/");
-          day = parseInt(month_year[0]);
-          month = parseInt(month_year[1]);
-          year = parseInt(month_year[2]);
-        }
-
-        if (endEnrollDt.val() != '') {
-          var testStartDate = startEnrollDt.datepicker('getDate');
-          var testEndDate = endEnrollDt.datepicker('getDate');
-
-          if (testStartDate > testEndDate) {
-            endEnrollDt.datepicker('setDate', testStartDate);
-          }
-
-          else {
-            $(this).val(day+"/"+month+"/"+year);
-            $(this).datepicker('setDate', new Date(year, (month-1), day));
-          }
-        }
-
-        else {
-          endEnrollDt.val(day+"/"+month+"/"+year);
-          $(this).datepicker('setDate', new Date(year, (month-1), day));
-        }
-        $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
-      }
-
-      else if ($(this).attr('id') == "thread_close_date") {
-        if (month_year) {
-          month_year = month_year.split("/");
-          day = parseInt(month_year[0]);
-          month = parseInt(month_year[1]);
-          year = parseInt(month_year[2]);
-        }
-
-        if (startEnrollDt.val() != '') {
-          var testStartDate = startEnrollDt.datepicker('getDate');
-          var testEndDate = endEnrollDt.datepicker('getDate');
-
-          if (testStartDate > testEndDate) {
-            startEnrollDt.datepicker('setDate', testEndDate);
-          }
-          else {
-            $(this).val(day+"/"+month+"/"+year);
-            $(this).datepicker('setDate', new Date(year, (month-1), day));
-          }
-        }
-
-        else {
-          startEnrollDt.val(day+"/"+month+"/"+year);
-          $(this).datepicker('setDate', new Date(year, (month-1), day));
-        }
-      }
-    },
-
-    beforeShow: function() {
-      var month_year = $(this).val();
-      day = currentDay;
-      month = currentMonth;
-      year = currentYear;
-
-      if (month_year) {
-        month_year = month_year.split("/");
-        day = parseInt(month_year[0]);
-        month = parseInt(month_year[1]);
-        year = parseInt(month_year[2]);
-      }
-      $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
-      $(this).datepicker('setDate', new Date(year, (month-1), day));
-    },
+	currentDate = new Date();
+	var currentDay = currentDate.getDate();
+	var currentMonth = currentDate.getMonth();
+	var currentYear = currentDate.getFullYear();
+	lowerYearLimit = currentYear;
+	upperYearLimit = currentYear + 20;
 
 
-  });
+	$(".date_month_day_year").datepicker({ 
+		changeMonth: true,
+		changeYear: true,
+		dateFormat: 'dd/mm/yy',
+		yearRange: lowerYearLimit + ":" + upperYearLimit,
+		defaultDate: '0',
 
-var data_list = ""
-var saveflag = 0
-var old_name;
-function setdrawer(){
-      $('#switchgrp').foundation('reveal', 'open');
-       $('.close-reveal-modal.st').click(function(){
-       if (saveflag == 0){
-         alert("{% trans 'This will cancel the save' %}");
-      }
-});
-}
-function get_new_groups(){
- $.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
-         data_list=data_list+String(item.id)+",";
-         });
-}
+		onClose: function(dateText, inst) {
+		  $(this).val(dateText);
+		  
+		  var month_year = $(this).val();
+		  day = currentDay;
+		  month = currentMonth;
+		  year = currentYear;
+		  
+		  if ($(this).attr('id') == "thread_start_date") {
+		    if (month_year) {
+		      month_year = month_year.split("/");
+		      day = parseInt(month_year[0]);
+		      month = parseInt(month_year[1]);
+		      year = parseInt(month_year[2]);
+		    }
 
-$(document).on('click',"#switch_group",function(){
-$('#switchgrp #collection_set_drawer1').html("");
- $('#switchgrp #collection_set_drawer2').html("");
- $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
-var url='/{{groupid}}/group/switch_group/'+'{{node}}';
- $.getJSON( url, function( data ) {
-  $.each(data ,function(index , drawer_elements){
-  
-   if(index == 0)
-    {
-     $.each(drawer_elements.drawer1, function(index, element) {
-        $('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
-   }
-   if(index == 1)
-    {
-    $.each(drawer_elements.drawer2, function(index, element) {
-        $('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
-    }
+		    if (endEnrollDt.val() != '') {
+		      var testStartDate = startEnrollDt.datepicker('getDate');
+		      var testEndDate = endEnrollDt.datepicker('getDate');
 
- });
-   });
+		      if (testStartDate > testEndDate) {
+		        endEnrollDt.datepicker('setDate', testStartDate);
+		      }
 
-});
+		      else {
+		        $(this).val(day+"/"+month+"/"+year);
+		        $(this).datepicker('setDate', new Date(year, (month-1), day));
+		      }
+		    }
 
-$(document).on('click',"#save_switch_group",function(){
-var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
-saveflag = 1;
-get_new_groups();
-new_groups=data_list;
-$.ajax({
-       url: turl,
-       type: 'POST',
-       data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
-        success: function(data){
-                       alert("{% trans 'Successfully switched groups' %}");
-            
-           },
-}); //end of ajax
+		    else {
+		      endEnrollDt.val(day+"/"+month+"/"+year);
+		      $(this).datepicker('setDate', new Date(year, (month-1), day));
+		    }
+		    $("#thread_close_date").datepicker('option', 'minDate', new Date(year, (month-1), day));
+		  }
 
-}); //end of document click
+		  else if ($(this).attr('id') == "thread_close_date") {
+		    if (month_year) {
+		      month_year = month_year.split("/");
+		      day = parseInt(month_year[0]);
+		      month = parseInt(month_year[1]);
+		      year = parseInt(month_year[2]);
+		    }
 
-{% get_node_type node as nodetype %}
-var nt="{{nodetype}}"
+		    if (startEnrollDt.val() != '') {
+		      var testStartDate = startEnrollDt.datepicker('getDate');
+		      var testEndDate = endEnrollDt.datepicker('getDate');
 
-$(document).ready(function(){
+		      if (testStartDate > testEndDate) {
+		        startEnrollDt.datepicker('setDate', testEndDate);
+		      }
+		      else {
+		        $(this).val(day+"/"+month+"/"+year);
+		        $(this).datepicker('setDate', new Date(year, (month-1), day));
+		      }
+		    }
 
-	$(".assesses_tab").hide();
-	$(".teaches_tab").hide();
-	$(".prior_node_tab").hide();
-	$("#metadata_info").empty();
+		    else {
+		      startEnrollDt.val(day+"/"+month+"/"+year);
+		      $(this).datepicker('setDate', new Date(year, (month-1), day));
+		    }
+		  }
+		},
 
-	if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
-	{
-		$(".teaches_tab").show();
-		$(".prior_node_tab").show();
+		beforeShow: function() {
+		  var month_year = $(this).val();
+		  day = currentDay;
+		  month = currentMonth;
+		  year = currentYear;
+
+		  if (month_year) {
+		    month_year = month_year.split("/");
+		    day = parseInt(month_year[0]);
+		    month = parseInt(month_year[1]);
+		    year = parseInt(month_year[2]);
+		  }
+		  $(this).datepicker('option', 'defaultDate', new Date(year, (month-1), day));
+		  $(this).datepicker('setDate', new Date(year, (month-1), day));
+		},
+	});
+
+	var data_list = ""
+	var saveflag = 0
+	var old_name;
+	function setdrawer(){
+		$('#switchgrp').foundation('reveal', 'open');
+		$('.close-reveal-modal.st').click(function(){
+			if (saveflag == 0){
+				alert("{% trans 'This will cancel the save' %}");
+			}
+		});
 	}
-	else if (nt == "Topic" || nt == "Term")
-	{
-		$(".teaches_tab").show();
-		$(".prior_node_tab").show(); 
-		$(".assesses_tab").show();
+
+	function get_new_groups(){
+		$.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
+			data_list=data_list+String(item.id)+",";
+		});
 	}
-	else if(nt == "Quiz" || nt == "QuizItem")
-	{
-		$(".assesses_tab").show();
-	} 
-	{% if node %}
-		old_name = "{{node.name}}"
-	    old_name = old_name.toLowerCase();
-	    $("select[name='type_of'] option[value='{{node.type_of.0}}']").prop("selected", true);
-		{% if is_auth_node %}
-			$("#name_id").attr("disabled",true)
+
+	$(document).on('click',"#switch_group",function(){
+		$('#switchgrp #collection_set_drawer1').html("");
+		$('#switchgrp #collection_set_drawer2').html("");
+		$('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+		var url='/{{groupid}}/group/switch_group/'+'{{node}}';
+		$.getJSON( url, function( data ) {
+			$.each(data ,function(index , drawer_elements){
+				if(index == 0)
+				{
+					$.each(drawer_elements.drawer1, function(index, element) {
+						$('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+					});
+				}
+				if(index == 1)
+				{
+					$.each(drawer_elements.drawer2, function(index, element) {
+						$('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+					});
+				}
+			});
+		});
+	});
+
+	$(document).on('click',"#save_switch_group",function(){
+		var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
+		saveflag = 1;
+		get_new_groups();
+		new_groups=data_list;
+		$.ajax({
+			url: turl,
+			type: 'POST',
+			data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
+			success: function(data){
+				alert("{% trans 'Successfully switched groups' %}");
+			},
+		}); //end of ajax
+	}); //end of document click
+
+	{% get_node_type node as nodetype %}
+	var nt="{{nodetype}}"
+
+	// doument ready function
+	$(document).ready(function(){
+
+		$(".assesses_tab").hide();
+		$(".teaches_tab").hide();
+		$(".prior_node_tab").hide();
+		$("#metadata_info").empty();
+
+		if (nt == "Page" || nt == "File" || nt == "Pandora_video" || nt == "Concept")
+		{
+			$(".teaches_tab").show();
+			$(".prior_node_tab").show();
+		}
+		else if (nt == "Topic" || nt == "Term")
+		{
+			$(".teaches_tab").show();
+			$(".prior_node_tab").show(); 
+			$(".assesses_tab").show();
+		}
+		else if(nt == "Quiz" || nt == "QuizItem")
+		{
+			$(".assesses_tab").show();
+		} 
+		{% if node %}
+			old_name = "{{node.name}}"
+		    old_name = old_name.toLowerCase();
+		    $("select[name='type_of'] option[value='{{node.type_of.0}}']").prop("selected", true);
+			{% if is_auth_node %}
+				$("#name_id").attr("disabled",true)
+			{% endif %}
+
+			{% if 'has_thread' in node %}
+				{% with node.has_thread.0 as disc_thread_node %}
+					{% if disc_thread_node %}
+						$("input[name='thread_create'][value='Yes']").attr("checked","checked");
+						$("input[name='thread_create']").trigger("change");
+						$(".yes_no_disc_div").addClass("hide");
+
+						{% get_attribute_value disc_thread_node.pk 'release_response' as resp_val %}
+						{% get_attribute_value disc_thread_node.pk 'thread_interaction_type' as thr_int_type %}
+						{% get_attribute_value disc_thread_node.pk 'start_time' as thr_start_time %}
+						{% get_attribute_value disc_thread_node.pk 'end_time' as thr_end_time %}
+						$("#release_resp_sel").val("{{resp_val}}")
+						$("#interaction_type_sel").val("{{thr_int_type}}")
+						$("#thread_start_date").val('{{thr_start_time|date:"d/m/Y"}}')
+						$("#thread_close_date").val('{{thr_end_time|date:"d/m/Y"}}')
+					{% endif %}
+				{% endwith %}
+			{% endif %}
+
+		{% endif %}
+		{% if ce_id or program_res %}
+	    $("#group-level-header").addClass("hide");
 		{% endif %}
 
-		{% if 'has_thread' in node %}
-			{% with node.has_thread.0 as disc_thread_node %}
-				{% if disc_thread_node %}
-					{% get_attribute_value disc_thread_node.pk 'release_response' as resp_val %}
-					{% get_attribute_value disc_thread_node.pk 'thread_interaction_type' as thr_int_type %}
-					{% get_attribute_value disc_thread_node.pk 'start_time' as thr_start_time %}
-					{% get_attribute_value disc_thread_node.pk 'end_time' as thr_end_time %}
-					$("#release_resp_sel").val("{{resp_val}}")
-					$("#interaction_type_sel").val("{{thr_int_type}}")
-					$("#thread_start_date").val('{{thr_start_time|date:"d/m/Y"}}')
-					$("#thread_close_date").val('{{thr_end_time|date:"d/m/Y"}}')
-				{% endif %}
-			{% endwith %}
-		{% endif %}
-
-	{% endif %}
-	
-});
-
-
+	});
 
 	$("input[type='radio'][name='col']").click(function() {
 
@@ -904,9 +933,6 @@ $(document).ready(function(){
 		$(this).addClass("active")
 	});			
 
-
-
-
 	$(".prior_node_tab").click(function() {
 
 		$.ajax({
@@ -957,15 +983,16 @@ $(document).ready(function(){
 		});
 
 	});
-      	{% if is_group or node or not node %}
+
+  	{% if is_group or node or not node %}
 		$(".collection_tab").click(function() {
-      			var collection = "heterogeneous";
+  			var collection = "heterogeneous";
         
 	{% else %}
 		$(".collection").click(function() {
       			var collection = this.value;
 	{% endif %}
-      		$("#publish_resource").foundation('reveal', 'close');
+  		$("#publish_resource").foundation('reveal', 'close');
 		$("input[type='radio'][name='col']").attr("checked", false);
 		$("input[type='radio'][name='coll']").attr("checked", false);
 		
@@ -1452,13 +1479,13 @@ $(document).ready(function(){
 	// 	lastVisitedLocationVal.push(mapZoom)
 	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
-function update()
- {
- 	$('#page_type').empty();
- 	$('#page_type').append($('#type_of :selected').text());	
- 	$('#select_page_type').foundation('reveal', 'close');
+	function update()
+	{
+		$('#page_type').empty();
+		$('#page_type').append($('#type_of :selected').text());	
+		$('#select_page_type').foundation('reveal', 'close');
+	} 
 
- } 
 
 </script>
 
