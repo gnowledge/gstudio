@@ -148,6 +148,10 @@ def get_node_type(node):
    if node:
       obj = node_collection.find_one({"_id": ObjectId(node._id)})
       nodetype=node.member_of_names_list[0]
+      if "Group" == nodetype:
+        pe = get_sg_member_of(node._id)
+        if "ProgramEventGroup" in pe:
+          return "ProgramEventGroup"
       return nodetype
    else:
       return ""
@@ -2770,7 +2774,7 @@ def get_sg_member_of(group_id):
 		group_id, group_name = get_group_name_id(group_id)
 
 	group_obj = node_collection.one({'_id': ObjectId(group_id)})
-
+	# print group_obj.name
 	# Fetch post_node of group
 	if group_obj.post_node:
 		post_node_id_list = group_obj.post_node
@@ -2779,7 +2783,9 @@ def get_sg_member_of(group_id):
 			# getting parent's sub group's member_of in a list
 			for each_sg in post_node_id_list:
 				each_sg_node = node_collection.one({'_id': ObjectId(each_sg)})
-				sg_member_of_list.extend(each_sg_node.member_of_names_list)
+				if each_sg_node:
+					sg_member_of_list.extend(each_sg_node.member_of_names_list)
+	# print "\n\n sg_member_of_list---",sg_member_of_list
 	return sg_member_of_list
 
 def get_objectid_name(nodeid):
