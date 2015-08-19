@@ -197,58 +197,10 @@ i.remove-tag{
 					</div>
 				</div>
 		</fieldset>
-		{% check_is_gstaff groupid request.user as is_gstaff %}
-		{% if is_gstaff %}
-		<fieldset class="medium-7 columns" style="margin-left:10px;">
-			<legend>Thread Properties</legend>
-		    <div class="row">
-		      <div class="large-4 medium-4 columns "><h5>{% trans "Release Response:" %}</h5>
-		      </div>
-		      <div class="large-4 medium-4 columns end">
-		        <select id="release_resp_sel" name="release_resp_sel">
-		          <option value="True">True</option>
-		          <option value="False">False</option>
-		        </select>
-		      </div>
-		    </div>
-
-		    <div class="row">
-		      <div class="large-4 medium-4 columns "><h5>{% trans "Interaction Type:" %}</h5>
-		      </div>
-		      <div class="large-4 medium-4 columns end">
-		        <select id="interaction_type_sel" name="interaction_type_sel">
-		          <option value="Comment">Comment</option>
-		          <option value="Discuss">Discuss</option>
-		          <option value="Reply">Reply</option>
-		          <option value="Submit">Submit</option>
-		          <option value="Answer">Answer</option>
-		          <option value="Feedback">Feedback</option>
-		          <option value="Moderate">Moderate</option>
-		        </select>
-		      </div>
-		    </div>
-
-		    <div class="row">
-		      <div class="large-4 medium-4 columns "><h5>{% trans "Thread start date:" %}</h5>
-		      </div>
-		      <div class="large-4 medium-4 columns end">
-		      	<input type="text" id="thread_start_date" name="thread_start_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year"> 
-		      </div>
-		    </div>
-
-		    <div class="row">
-		      <div class="large-4 medium-4 columns "><h5>{% trans "Thread close date:" %}</h5>
-		      </div>
-		      <div class="large-4 medium-4 columns end">
-		      	<input type="text" id="thread_close_date" name="thread_close_date" value="" placeholder="DD/MM/YYYY" readonly="" class="date_month_day_year"> 
-		      </div>
-		    </div>
-
-		</fieldset>
-		{% endif %}
 		</div>
 		<input type="hidden" name="user" value="{{user.id}}">
 		<input type="hidden" name="page_url" value="{{page_url}}">
+		<!-- <input type="hidden" name="program_res" value="{{program_res}}"> -->
 		<input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
 		<p id="message" style="display:none"> {% trans "Depending on the size of file/s and your Internet speed, upload process may take time. Please do not close this window." %}
 			<br/>
@@ -400,6 +352,9 @@ i.remove-tag{
 
 
 	});
+	{% if program_res %}
+    	$("#group-level-header").addClass("hide");
+    {% endif %}
 
 
 	var tags = document.getElementById("tags_id");
