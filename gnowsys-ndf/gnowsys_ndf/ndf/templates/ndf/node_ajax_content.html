@@ -966,11 +966,11 @@
         {% if 'has_thread' in node %}
           {% with node.has_thread.0 as disc_thread_node %}
             {% if disc_thread_node %}
-              {% include 'ndf/discussion.html' with node=disc_thread_node%}
+              {% include 'ndf/discussion.html' with node=disc_thread_node %}
             {% endif %}
             {% endwith %}
         {% else %}            
-              {% include 'ndf/discussion.html' with node=disc_thread_node%}
+              {% include 'ndf/discussion.html' %}
         {% endif %}
           <!-- END of discussion content area -->     
         </div>
