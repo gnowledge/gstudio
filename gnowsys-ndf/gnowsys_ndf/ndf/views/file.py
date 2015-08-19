@@ -693,6 +693,9 @@ def uploadDoc(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     if request.method == "GET":
+        program_res = request.GET.get("program_res", "")
+        if program_res:
+          program_res = eval(program_res)
         page_url = request.GET.get("next", "")
         # template = "ndf/UploadDoc.html"
 
@@ -702,9 +705,9 @@ def uploadDoc(request, group_id):
             template = "ndf/Uploader_Form.html"
 
     if  page_url:
-        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id})
+        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id, 'program_res':program_res})
     else:
-        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id})
+        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id,'program_res':program_res})
     return render_to_response(template, variable)
       
     
@@ -956,7 +959,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             fileobj.location = map_geojson_data
 
             fileobj.save(groupid=group_id)
-            return_status = create_thread_for_node(request,group_id, fileobj)
+            # return_status = create_thread_for_node(request,group_id, fileobj)
             if source:
               # create gattribute for file with source value
               source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
