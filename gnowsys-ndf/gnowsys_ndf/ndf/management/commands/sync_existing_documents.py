@@ -600,17 +600,17 @@ class Command(BaseCommand):
     print "\n Total pages and files found : ", page_file_cur.count()
     for idx, each_node in enumerate(page_file_cur):
         try:
-            print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name
+            # print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name
             release_response_val = True
             interaction_type_val = unicode('Comment')
             userid = each_node.created_by
             thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id) })
 
             if thread_obj:
-                print "thread_obj exists ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
+                # print "thread_obj exists ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
                 node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': []}}, upsert = False, multi = False)
                 thread_obj.reload()
-                print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
+                # print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
                 # creating GRelation
                 gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
                 if release_response_val:
@@ -620,7 +620,7 @@ class Command(BaseCommand):
 
                 each_node.reload()
                 thread_obj.reload()
-                print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
+                # print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
         except Exception as e:
             pages_files_not_updated.append(each_node._id)
             print "\n\nError occurred for page ", each_node._id, "--", each_node.name
@@ -633,6 +633,6 @@ class Command(BaseCommand):
     total_time_minute = round( (time_diff/60), 2) if time_diff else 0
     total_time_hour = round( (time_diff/(60*60)), 2) if time_diff else 0
 
-    print "\n------- Discussion thread for Page GST successfully completed-------\n"
+    print "\n------- Discussion thread for Page and File GST successfully completed-------\n"
     print "- Total time taken: \n\n\t" + str(total_time_minute) + " MINUTES\n\t=== OR ===\n\t" + str(total_time_hour) + " HOURS\n"
-    print "\n\n Pages that were not able to updated\t", pages_files_not_updated
+    print "\n\n Pages/Files that were not able to updated\t", pages_files_not_updated
