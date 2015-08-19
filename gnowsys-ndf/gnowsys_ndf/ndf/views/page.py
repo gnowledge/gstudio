@@ -290,17 +290,20 @@ def create_edit_page(request, group_id, node_id=None):
     group_name, group_id = get_group_name_id(group_id)
     ce_id = request.GET.get('course_event_id','')
     res = request.GET.get('res','')
+    program_res = request.GET.get('program_res','')
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id,
                           'ce_id': ce_id,
-                          'res':res
+                          'res':res,
+                          'program_res':program_res
                       }
 
     available_nodes = node_collection.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id),'group_set': ObjectId(group_id) })
 
     nodes_list = []
     thread = None
+    url_name = "/home"
     # for each in available_nodes:
     #   nodes_list.append(str((each.name).strip().lower()))
     # loop replaced by a list comprehension
@@ -313,39 +316,70 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         # get_node_common_fields(request, page_node, group_id, gst_page)
-
-	page_type = request.POST.getlist("type_of",'')
+        page_type = request.POST.getlist("type_of",'')
+        
         ce_id = request.POST.get("ce_id",'')
         res = request.POST.get("res",'')
+        program_res = request.POST.get('program_res','')
+
+        # we are fetching the value of release_response flag
+        # if this is set, it means, we can proceed to create a thread node
+        # for the current page node.
+        thread_create_val = request.POST.get("thread_create",'')
+        # print "\n\n thread_create_val", thread_create_val
+
+        #program_res and res are boolean values
+        if program_res:
+            program_res = eval(program_res)
+
         if res:
             res = eval(res)
+
         if page_type:
-                objid= page_type[0]
-                if not ObjectId(objid) in page_node.type_of:
-                        page_type1=[]
-                        page_type1.append(ObjectId(objid))
-                        page_node.type_of = page_type1
-                        page_node.type_of
+            objid= page_type[0]
+            if not ObjectId(objid) in page_node.type_of:
+                page_type1=[]
+                page_type1.append(ObjectId(objid))
+                page_node.type_of = page_type1
+                page_node.type_of
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+        # if course event grp's id is passed, it means
+        # its a blog page added in notebook and hence set type_of field as "Blog page"
         if ce_id:
-                if not res:
-                    blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
-                    page_node.type_of = [blogpage_gst._id]
-                page_node.status = u"PUBLISHED"
+            blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
+            page_node.type_of = [blogpage_gst._id]
+
+        # if the page created is as a resource in course or program event,
+        # set status to PUBLISHED by default
+        # one major reason for this, ONLY published nodes can be replicated.
+        if res or program_res:
+            page_node.status = u"PUBLISHED"
+
         page_node.save()
-        return_status = create_thread_for_node(request,group_id, page_node)
+        # if page is created in program event, add page_node to group's collection set
+        if program_res:
+            group_obj = node_collection.one({'_id': ObjectId(group_id)})
+            group_obj.collection_set.append(page_node._id)        
+            group_obj.save()
+
+        if thread_create_val == "Yes":
+	        return_status = create_thread_for_node(request,group_id, page_node)
         # To fill the metadata info while creating and editing page node
         metadata = request.POST.get("metadata_info", '')
-        if ce_id:
-          url_name = "/" + ce_id + "/#journal-tab"
-          if res:
-            url_name = "/" + ce_id + "/?selected=" + str(page_node._id) + "#journal-tab"
-          return HttpResponseRedirect(url_name)
+        if ce_id or res or program_res:
+            url_name = "/" + group_name + "/" + str(page_node._id)
+            if ce_id:
+                url_name = "/" + group_name + "/#journal-tab"
+            if res or program_res:
+                url_name = "/" + group_name + "/?selected=" + str(page_node._id) + "#view_page"
+            # print "\n\n url_name---",url_name
+            return HttpResponseRedirect(url_name)
         if metadata:
-          # Only while metadata editing
-          if metadata == "metadata":
-            if page_node:
-              get_node_metadata(request,page_node)
+            # Only while metadata editing
+            if metadata == "metadata":
+                if page_node:
+                    get_node_metadata(request,page_node)
         # End of filling metadata
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
@@ -359,10 +393,10 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['node'] = page_node
             context_variables['groupid'] = group_id
             context_variables['group_id'] = group_id
-	#fetch Page instances
-	# Page_node = node_collection.find_one({'_type':"GSystemType","name":"Page"})
-	page_instances = node_collection.find({"type_of": gst_page._id})
-	page_ins_list = [i for i in page_instances]
+    	# fetch Page instances
+    	# Page_node = node_collection.find_one({'_type':"GSystemType","name":"Page"})
+    	page_instances = node_collection.find({"type_of": gst_page._id})
+    	page_ins_list = [i for i in page_instances]
         context_variables['page_instance'] = page_ins_list
         context_variables['nodes_list'] = json.dumps(nodes_list)
         # print "\n\n context_variables----\n",context_variables
@@ -392,7 +426,7 @@ def delete_page(request, group_id, node_id):
     # else :
     #     pass
     try:
-        group_id = ObjectId(group_id)
+    	group_id = ObjectId(group_id)
     except:
         group_name, group_id = get_group_name_id(group_id)
 
