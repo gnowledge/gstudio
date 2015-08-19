@@ -1398,10 +1398,10 @@ class EventGroupCreateEditHandler(View):
             # operation success: create ATs
             group_obj = result[1]
             # to make PE/CE as sub groups of the grp from which it is created.
-            parent_group_obj.post_node.append(group_obj._id)
-            group_obj.prior_node.append(parent_group_obj._id)
-            group_obj.save()
-            parent_group_obj.save()
+            # parent_group_obj.post_node.append(group_obj._id)
+            # group_obj.prior_node.append(parent_group_obj._id)
+            # group_obj.save()
+            # parent_group_obj.save()
             date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id)
             if date_result[0]:
                 # Successfully had set dates to EventGroup
@@ -1412,7 +1412,7 @@ class EventGroupCreateEditHandler(View):
             else:
                 # operation fail: redirect to group-listing
                 group_name = 'home'
-                url_name = 'group'
+                url_name = 'group'  
         else:
             # operation fail: redirect to group-listing
             group_name = 'home'
@@ -1746,48 +1746,25 @@ def group_dashboard(request, group_id=None):
   list_of_sg_member_of = get_sg_member_of(group_obj._id)
   # print "\n\n list_of_sg_member_of", list_of_sg_member_of
   files_cur = None
+  sg_type = None
+  if  u"ProgramEventGroup" in list_of_sg_member_of and u"ProgramEventGroup" not in group_obj.member_of_names_list:
+      sg_type = "ProgramEventGroup"
+      files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
+      alternate_template = "ndf/program_event_group.html"
   if "CourseEventGroup" in group_obj.member_of_names_list:
-      forum_gst = node_collection.one({'_type': "GSystemType", 'name': "Forum"})
-      twist_gst = node_collection.one({'_type': "GSystemType", 'name': "Twist"})
+      sg_type = "CourseEventGroup"
+      alternate_template = "ndf/course_event_group.html"
       page_gst = node_collection.one({'_type': "GSystemType", 'name': "Page"})
       blogpage_gst = node_collection.one({'_type': "GSystemType", 'name': "Blog page"})
       files_cur = node_collection.find({'group_set': ObjectId(group_obj._id), '_type': "File"})
       if group_obj.collection_set:
           course_structure_exists = True
-      alternate_template = "ndf/course_event_group.html"
-
-      existing_forums = node_collection.find({
-                                    'member_of': forum_gst._id,
-                                    'group_set': ObjectId(group_obj._id), 
-                                    }).sort('created_at', -1)
       if request.user.id:
           blog_pages = node_collection.find({
                 'member_of':page_gst._id,
                 'type_of': blogpage_gst._id,
                 'group_set': group_obj._id
             }).sort('last_update', -1)
-      for each in existing_forums:
-
-      		temp_forum = {}
-      		temp_forum['name'] = each.name
-      		temp_forum['created_at'] = each.created_at
-      		temp_forum['tags'] = each.tags
-      		temp_forum['member_of_names_list'] = each.member_of_names_list
-      		temp_forum['user_details_dict'] = each.user_details_dict
-      		temp_forum['html_content'] = each.html_content
-      		temp_forum['contributors'] = each.contributors
-      		temp_forum['id'] = each._id
-      		temp_forum['threads'] = node_collection.find({
-                                                      '$and':[
-                                                      				{'member_of': twist_gst._id},
-                                                              {'_type': 'GSystem'},
-                                                              {'prior_node': ObjectId(each._id)}
-                                                              ], 
-                                                      'status': {'$nin': ['HIDDEN']} 
-                                                      }).count()
-          
-      		list_of_unit_events.append(temp_forum)
-
   allow_to_join = True
   if 'end_enroll' in group_obj:
       if group_obj.end_enroll:
@@ -1818,6 +1795,7 @@ def group_dashboard(request, group_id=None):
                                                        'blog_pages':blog_pages,
                                                        'selected': selected,
                                                        'files_cur': files_cur,
+                                                       'sg_type': sg_type,
                                                        'course_structure_exists':course_structure_exists,
                                                        'allow_to_join': allow_to_join,
                                                        'appId':app._id, 'app_gst': group_gst,
