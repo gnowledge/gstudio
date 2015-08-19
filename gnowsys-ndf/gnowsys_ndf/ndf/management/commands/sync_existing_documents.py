@@ -584,11 +584,13 @@ class Command(BaseCommand):
 		    node_collection.collection.update({'_id':ObjectId(i._id)}, {'$set':{'language_proficiency': '','subject_proficiency':'' }},upsert=False, multi=False)
 		    print i.name, "Updated !!"	
 
+
+
     # Add attributes to discussion thread for every page node.
     # If thread does not exist, create it.
     t0 = time.time()
     pages_files_not_updated = []
-    page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" } )
+    page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" })
     file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" } )
     page_file_cur = node_collection.find( { 'member_of': {'$in':[page_gst._id, file_gst._id]} , 'status': { '$in': [u'DRAFT', u'PUBLISHED']}} ).sort('last_update', -1)
     has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
