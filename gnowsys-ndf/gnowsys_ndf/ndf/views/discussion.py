@@ -71,8 +71,8 @@ def create_discussion(request, group_id, node_id):
     node = node_collection.one({'_id': ObjectId(node_id)})
 
     # group = node_collection.one({'_id':ObjectId(group_id)})
-
-    thread = node_collection.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
+    thread = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_st._id),"relation_set.thread_of": ObjectId(node._id)})
+    # thread = node_collection.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
     
     if not thread:
       
