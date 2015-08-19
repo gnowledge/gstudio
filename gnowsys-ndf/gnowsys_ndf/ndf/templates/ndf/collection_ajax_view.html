@@ -119,7 +119,7 @@
                   // else if (node_type == "Course"){
                   //   window.history.pushState("", "", "/{{group_id}}/course/course_detail/{{node.pk}}"+"?selected="+node.id+"");
                   // }
-                  if (node_type == "CourseEventGroup"){
+                  if (node_type == "CourseEventGroup" || node_type == "ProgramEventGroup"){
                     window.history.pushState("", "", "/{{node.pk}}"+"?selected="+node.id+"");
                     $(".view_page_link").trigger('click')
                   }
