@@ -4,19 +4,12 @@
 {% get_group_name groupid as group_name_tag %}
 {% user_access_policy groupid request.user as user_access %}
 
-{% get_attribute_value node.pk 'thread_interaction_type' as disc_btn_lbl %}
 
 <div>
   <br/>
-  {% if allow_to_comment %}
     <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
-        {{disc_btn_lbl}} 
+        Comment
     </div>
-  {% else %}
-    {% get_attribute_value node.pk 'start_time' as start_time %}
-    {% get_attribute_value node.pk 'end_time' as end_time %}
-    <label>Commenting allowed from {{start_time|date}} to {{end_time|date}}</label>
-  {% endif %}
 
   <div id="replies-area">
 
@@ -24,7 +17,6 @@
     {% check_is_gstaff groupid request.user as is_gstaff %}
 
     {% for each_reply in all_replies %}
-      {% if rel_resp_attr or is_gstaff or each_reply.userid == request.user.id %}
 
       <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
         <div class="row"> 
@@ -65,7 +57,6 @@
 
       </div>
 
-      {% endif %}
     {% endfor %}
     <!-- END of populating replies -->
   </div>
@@ -75,7 +66,9 @@
     <!-- Reply : -->
     <textarea id="orgitdownreps" name="content_org" placeholder="{% trans 'Enter your reply text here.'%}"></textarea>
     <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
-    <input type="file" id="uploaded-files" style="" value="" multiple>
+    {% if sg_type != "Event" %}
+      <input type="file" id="uploaded-files" style="" value="" multiple>
+    {% endif %}
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
     <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
   </div>
@@ -94,12 +87,6 @@
 
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
 
-  $(document).ready(function(){
-    {% if not allow_to_comment %}
-      $(".reply-btn-class").removeAttr('onclick')
-    {% endif %}
-
-  })
   // if( user_access == "allow" && edit_policy == "allow" )
   // { 
   //   $("#orgitdownreps").orgitdown(mySettings);
@@ -127,7 +114,6 @@
 
             if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
             {
-
                 // $("#create-discussion").hide();
 
                 // changing method to behave same as sub-reply button
