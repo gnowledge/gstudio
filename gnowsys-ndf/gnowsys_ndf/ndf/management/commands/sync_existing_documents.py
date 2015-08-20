@@ -595,6 +595,7 @@ class Command(BaseCommand):
     page_file_cur = node_collection.find( { 'member_of': {'$in':[page_gst._id, file_gst._id]} , 'status': { '$in': [u'DRAFT', u'PUBLISHED']}} ).sort('last_update', -1)
     has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
     twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+    reply_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Reply'})
     rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
     thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
     print "\n Total pages and files found : ", page_file_cur.count()
@@ -608,8 +609,14 @@ class Command(BaseCommand):
 
             if thread_obj:
                 # print "thread_obj exists ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
+                reply_cur = node_collection.find({'prior_node': each_node._id, 'member_of': reply_gst._id})
+                if reply_cur:
+                    for each_rep in reply_cur:
+                        node_collection.collection.update({'_id': each_rep._id},{'$set':{'prior_node':[thread_obj._id])}}, upsert = False, multi = False)
+                        each_rep.reload()
                 node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': []}}, upsert = False, multi = False)
                 thread_obj.reload()
+
                 # print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
                 # creating GRelation
                 gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
