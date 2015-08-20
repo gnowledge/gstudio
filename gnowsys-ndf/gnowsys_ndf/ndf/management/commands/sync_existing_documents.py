@@ -610,9 +610,9 @@ class Command(BaseCommand):
                 reply_cur = node_collection.find({'prior_node': each_node._id, 'member_of': reply_gst._id})
                 if reply_cur:
                     for each_rep in reply_cur:
-                        node_collection.collection.update({'_id': each_rep._id},{'$set':{'prior_node':[thread_obj._id])}}, upsert = False, multi = False)
+                        node_collection.collection.update({'_id': each_rep._id},{'$set':{'prior_node':[thread_obj._id]}}, upsert = False, multi = False)
                         each_rep.reload()
-                node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': []}}, upsert = False, multi = False)
+                node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': [each_node._id]}}, upsert = False, multi = False)
                 thread_obj.reload()
 
                 # print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
