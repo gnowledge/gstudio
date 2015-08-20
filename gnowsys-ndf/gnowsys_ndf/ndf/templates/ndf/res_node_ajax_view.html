@@ -267,15 +267,20 @@
   {% get_sg_member_of node.pk as list_of_sg_member_of %}
   {% if "CourseEventGroup" not in node.member_of_names_list and "ProgramEventGroup" not in list_of_sg_member_of %}
     <div class="content" id="view-discussion">
-        {% get_thread_node node.pk as thread_node %}
-
-        {% if thread_node %}
-            {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
-            {% get_node thread_node as thread_node_obj %}
-            {% include 'ndf/discussion.html' with node=thread_node_obj sg_type="Event" %}
-        {% else %}            
+        {% get_node group_id as group_obj %}
+        {% if "CourseEventGroup" not in group_obj.member_of_names_list %}
+          {% get_thread_node node.pk as thread_node %}
+          {% if thread_node %}
+              {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+              {% get_node thread_node as thread_node_obj %}
+              {% include 'ndf/discussion.html' with node=thread_node_obj sg_type="Event" %}
+          {% else %}            
+              {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+              {% include 'ndf/discussion.html' with sg_type="Event" %}
+          {% endif %}
+        {% else %}
             {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-            {% include 'ndf/discussion.html' with sg_type="Event" %}
+            {% include 'ndf/discussion.html' %}
         {% endif %}
 
     </div>
