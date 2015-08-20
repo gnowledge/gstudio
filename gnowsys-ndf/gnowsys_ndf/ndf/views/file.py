@@ -1545,7 +1545,7 @@ def file_edit(request,group_id,_id):
 
             return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         else:
-            url = "/"+ group_id +"/?selected="+str(file_node._id)+"#view_page"
+            url = "/"+ str(group_id) +"/?selected="+str(file_node._id)+"#view_page"
             return HttpResponseRedirect(url)
 
     else:
