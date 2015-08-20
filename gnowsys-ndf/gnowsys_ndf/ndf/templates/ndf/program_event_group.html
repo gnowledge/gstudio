@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load cache %}
 {% load ndf_tags %}
-{% block title %} CourseEvent {{node.name}} {% endblock %}
+{% block title %} Program Event {{node.name}} {% endblock %}
 {% block style %}
   .course_outline_table, tr {
     border: 2px solid #0b8a91 !important;
@@ -48,8 +48,6 @@
       border-style: solid;
   }
 
-
-
 {% endblock %}
 
 {% block head %}
@@ -62,10 +60,16 @@
 {% endblock %}
 
 {% block meta_content %}
-  <h3>Course Outline</h3>
       {% check_is_gstaff groupid request.user as is_gstaff %}
       {% if is_gstaff %}
-        <span><a class="tiny button" href="{% url 'create_course_struct' group_id node.pk %}">{% if course_structure_exists %}{% trans "Edit  Course Structure" %}{% else %}{% trans "Add  Course Structure" %}{% endif %}</a></span>
+        <span><a class="tiny button" href="{% url 'page_create_edit' node.pk %}?program_res=True">{% trans "Add Page" %}</a></span>
+
+            <a class="tiny expand button" href="{% url 'all_under_moderation' node.pk %}">
+              {% trans 'Moderation Status' %}
+            </a>
+
+      {% else %}
+        <span data-tooltip title='Your file will go through moderation.'><a href="{% url 'uploadDoc' group_name_tag %}?program_res=True" class="tiny button">{% trans "Upload File" %}</a></span>
       {% endif %}
   
   <div id="view_collection">
@@ -74,9 +78,8 @@
 {% endblock %}
 
 {% block body_content %}
-	<div id="view-page"></div>
+  <div id="view-page"></div>
       <dl class="tabs" data-tab data-options="deep_linking:true"  > 
-
           {% user_access_policy node.pk request.user as user_access %} 
 
             <dd class="tab-title active">
@@ -100,6 +103,7 @@
             </dd>
           {% endif %}
       </dl>
+  
       <!-- Right Nav Section -->
       {% if user.is_authenticated %}
         {% get_user_object request.user.id as user_obj %}
@@ -123,78 +127,75 @@
           </section>
         {% endif %}
       {% endif %}
-      
+
     <div class="row">
-      
-		<section class="medium-12 columns content">
-      <div class="tabs-content">
-        <!-- Tab content -->
-        <div class="content active" id="about-tab">
-          <div class="row">
-            {% include "ndf/res_node_ajax_view.html" %} 
+      <section class="medium-12 columns content">
+        <div class="tabs-content">
+          <!-- Tab content -->
+          <div class="content active" id="about-tab">
+            <div class="row">
+              {% include "ndf/res_node_ajax_view.html" %} 
+            </div>
           </div>
-        </div>
 
-        <div class="content" id="view_page">
-            <div id="activities-area">
-            </div>
-        </div>
-        {% if user_access == "allow" %}
+          <div class="content" id="view_page">
+              <div id="activities-area">
+              </div>
+          </div>
+          {% if user_access == "allow" %}
 
-        <div class="content" id="journal-tab">
-            <div class="">
-              <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small" style="float:right"> Add Blog </a>
-            </div>
-            <div class="row all_blogs">
-            	{% for each_blog in blog_pages %}
-                <div class="blogpage"  style="margin-left:10px;">
-                  <h4>
-                    <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
-                  </h4>
-                    <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
-                  <span>
-                  Created at {{each_blog.created_at}}
-                  </span>
-                  <div>
-                    {{each_blog.html_content|safe}}
+          <div class="content" id="journal-tab">
+              <div class="">
+                <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}" class="button small" style="float:right"> Add Blog </a>
+              </div>
+              <div class="row all_blogs">
+                {% for each_blog in blog_pages %}
+                  <div class="blogpage"  style="margin-left:10px;">
+                    <h4>
+                      <a href="{% url 'page_details' group_id each_blog.pk %}">{{each_blog.name}}</a>
+                    </h4>
+                      <a class="fi-pencil" href="{% url 'page_create_edit' node.pk each_blog.pk %}?course_event_id={{node.pk}}"> Edit </a>
+                    <span>
+                    Created at {{each_blog.created_at}}
+                    </span>
+                    <div>
+                      {{each_blog.html_content|safe}}
+                    </div>
                   </div>
-                </div>
-                <hr/>
-              {% empty %}
-                <div class="blogpage"  style="margin-left:10px;">
-                  <h4><u>
-                    <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}">Start writing blogs </a>
-                  </u></h4>
-                </div>
-              {% endfor %}
-            </div>
+                  <hr/>
+                {% empty %}
+                  <div class="blogpage"  style="margin-left:10px;">
+                    <h4><u>
+                      <a href="{% url 'page_create_edit' node.pk %}?course_event_id={{node.pk}}">Start writing blogs </a>
+                    </u></h4>
+                  </div>
+                {% endfor %}
+              </div>
+          </div>
+          <div class="content" id="gallery-tab">
+                  <div class="row">
+                        {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
+                  </div>
+          </div>
+
+          <div class="content" id="analytics-tab">
+                  <div class="row">
+                  {% get_user_object request.user.id as user_obj %}
+                  {% check_is_gstaff node.pk user_obj as gstaff_access %}
+                  {{check_is_gstaff}}
+                  {% if gstaff_access %}
+                      <a href='{% url "group_summary" node.pk %}' target="_blank">{%  trans "Click here to view Group Analytics" %}</a>
+
+                  {% else %}
+                      <a href='{% url "user_summary" node.pk %}' target="_blank">{%  trans "Click here to view  My Analytics" %}</a>
+                  {% endif %}
+                  </div>
+          </div>
+          {% endif %}
+
         </div>
-        <div class="content" id="gallery-tab">
-                <div class="row">
-                      {% include "ndf/file_list_tab.html" with resource_type=files_cur detail_urlname="file_detail" filetype="all" res_type_name="" %}
-                </div>
-        </div>
-
-        <div class="content" id="analytics-tab">
-                <div class="row">
-                {% get_user_object request.user.id as user_obj %}
-                {% check_is_gstaff node.pk user_obj as gstaff_access %}
-                {{check_is_gstaff}}
-                {% if gstaff_access %}
-                    <a href='{% url "group_summary" node.pk %}' target="_blank">{%  trans "Click here to view Group Analytics" %}</a>
-
-                {% else %}
-                    <a href='{% url "user_summary" node.pk %}' target="_blank">{%  trans "Click here to view  My Analytics" %}</a>
-                {% endif %}
-                </div>
-        </div>
-        {% endif %}
-
-			</div>
-    </section>
-  
-  	</div>
-
+      </section>
+    </div>
 {% endblock %}
 
 
@@ -236,4 +237,5 @@
     .css('float','left');
     $(".jqtree-title-folder").addClass('jqtree-toggler').removeClass('jqtree-title').removeClass('jqtree-title-folder')
 
+    $("#group-level-header").addClass("hide");
 {% endblock %}
