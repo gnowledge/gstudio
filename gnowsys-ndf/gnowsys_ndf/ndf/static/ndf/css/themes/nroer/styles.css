@@ -10142,3 +10142,236 @@ aside#help p, aside#help h5, aside#help h6 {
 #replies-area .disc-replies .reply-btn:hover {
   font-weight: bold;
 }
+
+/* line 1051, ../../../scss/_app_styles.scss */
+.rcard {
+  overflow: hidden;
+  color: #272727;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  background-color: #f5f5f5;
+}
+/* line 1061, ../../../scss/_app_styles.scss */
+.rcard:hover {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.5s ease;
+}
+/* line 1066, ../../../scss/_app_styles.scss */
+.rcard .title {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+/* line 1072, ../../../scss/_app_styles.scss */
+.rcard .content {
+  padding: 0.5rem 2rem;
+  border-radius: 0 0 2px 2px;
+  overflow: hidden;
+  height: 7.25rem;
+}
+/* line 1079, ../../../scss/_app_styles.scss */
+.rcard .content .slick-slider {
+  margin-bottom: 0;
+}
+/* line 1083, ../../../scss/_app_styles.scss */
+.rcard .content .slick-prev {
+  left: 0.25rem;
+}
+/* line 1086, ../../../scss/_app_styles.scss */
+.rcard .content .slick-prev:before {
+  color: #ccc;
+}
+/* line 1092, ../../../scss/_app_styles.scss */
+.rcard .content .slick-next {
+  right: 0.25rem;
+}
+/* line 1095, ../../../scss/_app_styles.scss */
+.rcard .content .slick-next:before {
+  color: #ccc;
+}
+/* line 1101, ../../../scss/_app_styles.scss */
+.rcard .content .card-content-title {
+  width: 100%;
+  border-bottom: 1px solid #808080;
+  line-height: 0.25em;
+  margin: 10px 0 20px;
+}
+/* line 1107, ../../../scss/_app_styles.scss */
+.rcard .content .card-content-title small {
+  padding: 0 10px;
+  background-color: whitesmoke;
+}
+/* line 1114, ../../../scss/_app_styles.scss */
+.rcard .action {
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+  padding: 0.25rem 0.5rem;
+  color: gray;
+  font-size: small;
+  height: 2rem;
+}
+/* line 1130, ../../../scss/_app_styles.scss */
+.rcard .image {
+  position: relative;
+  background-color: #E1E1E1;
+  box-shadow: 0px -35px 35px -20px gray inset;
+  height: 8em;
+  overflow: hidden;
+}
+/* line 1139, ../../../scss/_app_styles.scss */
+.rcard .image .title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 0.25rem 1rem;
+  color: #fff;
+  width: 100%;
+  box-shadow: 0px -25px 25px -20px gray inset;
+  text-transform: uppercase;
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8);
+}
+/* line 1152, ../../../scss/_app_styles.scss */
+.rcard .image img {
+  border-radius: 2px 2px 0 0;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.9;
+  height: 8em;
+  filter: blur(0.25px);
+}
+/* line 1163, ../../../scss/_app_styles.scss */
+.rcard .image img:hover {
+  filter: blur(0px);
+  transform: translate3d(0, 0, 0);
+  transition: filter 0.3s ease;
+}
+/* line 1170, ../../../scss/_app_styles.scss */
+.rcard .image i {
+  font-size: 7rem;
+  opacity: 0.75;
+  display: block;
+  margin: -15px auto;
+  text-align: center;
+  color: gray;
+  font-family: "foundation-icons";
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  text-decoration: inherit;
+}
+/* line 1187, ../../../scss/_app_styles.scss */
+.rcard .image i.file:before {
+  content: "\f18e";
+}
+/* line 1188, ../../../scss/_app_styles.scss */
+.rcard .image i.page:before {
+  content: "\f18e";
+}
+/* line 1189, ../../../scss/_app_styles.scss */
+.rcard .image i.collection:before {
+  content: "\f18a";
+}
+/* line 1191, ../../../scss/_app_styles.scss */
+.rcard .image i.documents:before {
+  content: "\f18b";
+}
+/* line 1192, ../../../scss/_app_styles.scss */
+.rcard .image i.pdf:before {
+  content: "\f18b";
+}
+/* line 1193, ../../../scss/_app_styles.scss */
+.rcard .image i.text:before {
+  content: "\f18e";
+}
+/* line 1194, ../../../scss/_app_styles.scss */
+.rcard .image i.interactives:before {
+  content: "\f1b2";
+}
+/* line 1195, ../../../scss/_app_styles.scss */
+.rcard .image i.ebooks:before {
+  content: "\f11e";
+}
+/* line 1196, ../../../scss/_app_styles.scss */
+.rcard .image i.images:before {
+  content: "\f125";
+}
+/* line 1197, ../../../scss/_app_styles.scss */
+.rcard .image i.audios:before, .rcard .image i.audio:before {
+  content: "\f17b";
+}
+/* line 1198, ../../../scss/_app_styles.scss */
+.rcard .image i.videos:before, .rcard .image i.video:before {
+  content: "\f20e";
+}
+/* line 1201, ../../../scss/_app_styles.scss */
+.rcard .card-label {
+  border-style: solid;
+  border-width: 0 70px 40px 0;
+  float: right;
+  height: 0px;
+  width: 0px;
+  transform: rotate(360deg);
+  position: absolute;
+  right: 0px;
+  z-index: 1;
+  opacity: 0.75;
+}
+/* line 1214, ../../../scss/_app_styles.scss */
+.rcard .card-label {
+  border-color: transparent #333 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #333333 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1219, ../../../scss/_app_styles.scss */
+.rcard .published.card-label {
+  border-color: transparent #43ac6a transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #43ac6a rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1223, ../../../scss/_app_styles.scss */
+.rcard .published.card-label .label-text:before {
+  content: "\221A";
+  margin-left: 5px;
+  font-size: larger;
+}
+/* line 1231, ../../../scss/_app_styles.scss */
+.rcard .draft.card-label {
+  border-color: transparent #bebebe transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #bebebe rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1235, ../../../scss/_app_styles.scss */
+.rcard .draft.card-label .label-text:before {
+  content: "Draft";
+}
+/* line 1240, ../../../scss/_app_styles.scss */
+.rcard .deleted.card-label {
+  border-color: transparent #f04124 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #f04124 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1244, ../../../scss/_app_styles.scss */
+.rcard .deleted.card-label .label-text:before {
+  content: "Deleted";
+}
+/* line 1249, ../../../scss/_app_styles.scss */
+.rcard .moderation.card-label {
+  border-color: transparent #2980b9 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) #2980b9 rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1253, ../../../scss/_app_styles.scss */
+.rcard .moderation.card-label .label-text:before {
+  content: "Mod";
+}
+/* line 1256, ../../../scss/_app_styles.scss */
+.rcard .hidden.card-label {
+  border-color: transparent #000 transparent transparent;
+  border-color: rgba(255, 255, 255, 0) black rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+}
+/* line 1260, ../../../scss/_app_styles.scss */
+.rcard .hidden.card-label .label-text:before {
+  content: "hidden";
+}
+/* line 1263, ../../../scss/_app_styles.scss */
+.rcard .label-text {
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  position: relative;
+  right: -35px;
+  white-space: nowrap;
+  transform: rotate(30deg);
+}

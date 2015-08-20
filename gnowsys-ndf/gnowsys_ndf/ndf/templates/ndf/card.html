@@ -1,0 +1,103 @@
+{% load i18n %}
+{% load ndf_tags %}
+{% load simple_filters %}
+
+<div class="rcard">
+
+  <div class="image">
+  <div class="{{resource.status|lower}} card-label">
+    <div class="label-text"></div>
+  </div>
+        {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}
+    {% if resource.fs_file_ids.1 %}
+      <img src="{% url 'get_gridfs_resource' resource.fs_file_ids.1 %}" alt="">
+    {% elif resource.collection_set %}
+        <i class="collection"></i>
+    {% elif "File" in resource.member_of_names_list %}
+      {% if attr_set_dict.educationaluse and attr_set_dict.educationaluse != "Documents" %}
+        <i class="{{attr_set_dict.educationaluse|lower}}"></i>
+      {% else %}
+        <i class="{{resource.mime_type|lower|split:'/'|join:' '}}"></i>
+      {% endif %}
+    {% else %}
+      <i class="{{resource.member_of_names_list.0|lower}}"></i>
+    {% endif %}
+
+    <span class="title">{{resource.name}}</span>
+  </div>
+
+  <div class="content">
+
+    <!-- description -->
+    {% if resource.content_org %}
+      <div title="{{resource.content_org}}">
+        <h4 class="text-center card-content-title"><small>Description</small></h4>
+        {{resource.content_org|truncatechars:75}}
+      </div>
+    {% endif %}
+    
+    <!-- tags -->
+    {% if resource.tags %}
+      <div>
+        <h4 class="text-center card-content-title"><small>Tags</small></h4>
+        {# {{resource.tags.0}} #}
+        <div class="">
+        {% comment %}
+          
+          {# <div class="label secondary">{{resource.tags.0}}</div>
+          <div class="label secondary">{{resource.tags.1}}</div>
+          <div class="label secondary">{{resource.tags.2}}</div>
+          <div class="label secondary">{{resource.tags.3}}</div>
+          <div class="label secondary">{{resource.tags.4}}</div>
+          <div class="label secondary">{{resource.tags.5}}</div> 
+          {% if resource.tags.6 %} ... {% endif %}
+           #}
+        {% endcomment %}
+          {% for each_tag in resource.tags %}
+            {% if forloop.counter < 7 %}
+              <div class="label secondary">{{each_tag}}</div>
+            {% endif %}
+          {% endfor %}
+          {% if resource.tags|length > 6 %}
+            +{{ resource.tags|length|add:"-6"}} more
+          {% endif %}
+        
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- properties -->
+    {% if resource.attribute_set %}
+      <div>
+        <h4 class="text-center card-content-title"><small>Properties</small></h4>
+        
+          {% for each_attr_key, each_attr_val in attr_set_dict.items %}
+            {% if forloop.counter < 4 %}
+              <b>{{each_attr_key}}</b>: {{each_attr_val}}<br/>
+            {% else %}
+              .
+            {% endif %}
+          {% endfor %}
+        
+        {# {{attr_set_dict.source}} #}
+        {{resource.member_of_names_list}}
+      </div>
+    {% endif %}
+
+    <!-- file info data -->
+    {% if "File" in resource.member_of_names_list %}
+      <div>
+        <h4 class="text-center card-content-title"><small>Resource Metadata</small></h4>
+          <div><b>Type</b>: {{resource.mime_type}}</div>
+          <div><b>Size</b>: {{resource.file_size.size}} {{resource.file_size.unit}}</div>
+      </div>
+    {% endif %}
+        
+  </div>
+  <!-- end of content -->
+
+  <div class="action">
+    {# <a href='#'>{{resource.created_at}}</a> #}
+    By {{resource.created_by|get_username}} at {{resource.created_at|date:"d M Y"}}
+  </div>
+</div>
