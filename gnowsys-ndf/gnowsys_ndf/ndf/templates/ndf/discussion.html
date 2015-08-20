@@ -3,21 +3,24 @@
 {% load cache %}
 {% get_group_name groupid as group_name_tag %}
 {% user_access_policy groupid request.user as user_access %}
-
+{% get_attribute_value node.pk 'release_response' as resp_val %}
+{% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
 
 <div>
   <br/>
     <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
-        Comment
+        {% if thr_int_type %}
+          {{thr_int_type}}
+        {% else %}
+          Comment
+        {% endif %}
     </div>
 
   <div id="replies-area">
 
     <!-- populating replies -->
     {% check_is_gstaff groupid request.user as is_gstaff %}
-
     {% for each_reply in all_replies %}
-
       <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
         <div class="row"> 
           <div class="small-3 columns">
@@ -68,6 +71,8 @@
     <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
     {% if sg_type != "Event" %}
       <input type="file" id="uploaded-files" style="" value="" multiple>
+    {% else %}
+      <input type="file" id="uploaded-files" style="" value="" multiple class="hide">
     {% endif %}
     <input type="hidden" id="prior-node" style="visibility:hidden" value="">
     <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
@@ -245,10 +250,10 @@
     + "<div class='small-9 columns'>"+ data[3] + filesContent +"</div></div>"
 
     + "<div class='row'><div class='small-8 columns'><small>"+ data[7] + "</small></div>"
-    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'delete' %}</div>"
+    + "<div class='reply-btn small-2 columns' data-userid='"+ data[5] +"' onclick='deleteReply($(this))'>{% trans 'Delete' %}</div>"
     + "<div data-org-content='"
     + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-    + data[1] + "' class='reply-btn text-right small-2 columns'>{% trans  'reply' %} </div></div></div>"
+    + data[1] + "' class='reply-btn text-right small-2 columns'>{% trans  'Reply' %} </div></div></div>"
 
     return htmlReply;
   }
