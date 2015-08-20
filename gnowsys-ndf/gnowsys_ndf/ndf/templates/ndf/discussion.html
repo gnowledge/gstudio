@@ -8,13 +8,17 @@
 
 <div>
   <br/>
-    <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
+    {% if allow_to_comment %}
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
         {% if thr_int_type %}
           {{thr_int_type}}
         {% else %}
           Comment
         {% endif %}
-    </div>
+      </div>
+    {% else %}
+        Commenting Closed
+    {% endif %}
 
   <div id="replies-area">
 
