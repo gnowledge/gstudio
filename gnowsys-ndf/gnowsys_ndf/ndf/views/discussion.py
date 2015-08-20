@@ -68,12 +68,16 @@ def create_discussion(request, group_id, node_id):
 
     twist_st = node_collection.one({'_type':'GSystemType', 'name':'Twist'})
 
-    node = node_collection.one({'_id': ObjectId(node_id)})
+    # node = node_collection.one({'_id': ObjectId(node_id)})
+    thread = node_collection.one({'_id': ObjectId(node_id)})
 
     # group = node_collection.one({'_id':ObjectId(group_id)})
-    thread = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_st._id),"relation_set.thread_of": ObjectId(node._id)})
+    # thread = node_collection.one({"member_of": ObjectId(twist_st._id),"relation_set.thread_of.0": ObjectId(node._id)})
+    # print "\n thread is ---", thread._id
     # thread = node_collection.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
     
+    # the following code will never be executed
+    # not commenting it for now.
     if not thread:
       
       # retriving RelationType
@@ -103,6 +107,7 @@ def create_discussion(request, group_id, node_id):
 
     else:
       response_data =  [ "Thread-exist", str(thread._id) ]
+
       return HttpResponse(json.dumps(response_data))
   
   except Exception as e:
