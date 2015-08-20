@@ -1110,7 +1110,7 @@ class CreateCourseEventGroup(CreateEventGroup):
             group_obj.content = node.content
             group_obj.content_org = node.content_org
             group_obj.save()
-            self.call_setup(node, group_obj, group_obj)
+            self.call_setup(request, node, group_obj, group_obj)
             return True
 
         except Exception as e:
@@ -1145,12 +1145,12 @@ class CreateCourseEventGroup(CreateEventGroup):
             # print e
             return False
 
-    def call_setup(self, node, prior_node_obj, group_obj):
+    def call_setup(self, request, node, prior_node_obj, group_obj):
         if node.collection_set:
             if "CourseUnit" in node.member_of_names_list:
                 for each_res in node.collection_set:
                     each_res_node = node_collection.one({'_id': ObjectId(each_res)})
-                    new_res = self.replicate_resource(each_res_node, group_obj)
+                    new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
                     # below code changes the group_set of resources
                     # i.e cross-publication
@@ -1164,9 +1164,9 @@ class CreateCourseEventGroup(CreateEventGroup):
                     name_arg = each_node.name
                     member_of_name_str = each_node.member_of_names_list[0]
                     new_node = self.create_corresponding_gsystem(name_arg,member_of_name_str, prior_node_obj, group_obj)
-                    self.call_setup(each_node, new_node, group_obj)
+                    self.call_setup(request, each_node, new_node, group_obj)
 
-    def replicate_resource(self, node, group_obj):
+    def replicate_resource(self, request, node, group_obj):
         try:
             if "Page" in node.member_of_names_list:
                 new_gsystem = node_collection.collection.GSystem()
@@ -1187,6 +1187,7 @@ class CreateCourseEventGroup(CreateEventGroup):
             new_gsystem.content_org = node.content_org
             new_gsystem.content = node.content
             new_gsystem.save()
+            return_status = create_thread_for_node(request, group_obj._id, new_gsystem)
             return new_gsystem
 
         except Exception as e:
