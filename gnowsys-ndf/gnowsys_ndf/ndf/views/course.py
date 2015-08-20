@@ -1674,12 +1674,13 @@ def add_course_file(request, group_id):
 
     for k in new_list:
         cur_oid = gridfs_collection.find_one({"md5": filemd5}, {'docid': 1, '_id': 0})
-        file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
-        file_obj.prior_node.append(context_node._id)
-        file_obj.status = u"PUBLISHED"
-        file_obj.save()
-        context_node.collection_set.append(file_obj._id)
-        file_obj.save()
+        if cur_oid and 'docid' in cur_oid:
+            file_obj = node_collection.find_one({'_id': ObjectId(str(cur_oid["docid"]))})
+            file_obj.prior_node.append(context_node._id)
+            file_obj.status = u"PUBLISHED"
+            file_obj.save()
+            context_node.collection_set.append(file_obj._id)
+            file_obj.save()
         context_node.save()
     return HttpResponseRedirect(url_name)
 

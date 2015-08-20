@@ -12,6 +12,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.settings import GSTUDIO_AUTHOR_AGENCY_TYPES
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 
 class Command(BaseCommand):
@@ -584,3 +585,53 @@ class Command(BaseCommand):
 
 
 
+    # Add attributes to discussion thread for every page node.
+    # If thread does not exist, create it.
+    pages_files_not_updated = []
+    page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" })
+    file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" } )
+    page_file_cur = node_collection.find( { 'member_of': {'$in':[page_gst._id, file_gst._id]} , 'status': { '$in': [u'DRAFT', u'PUBLISHED']}} ).sort('last_update', -1)
+    has_thread_rt = node_collection.one({"_type": "RelationType", "name": u"has_thread"})
+    twist_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Twist'})
+    reply_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Reply'})
+    rel_resp_at = node_collection.one({'_type': 'AttributeType', 'name': 'release_response'})
+    thr_inter_type_at = node_collection.one({'_type': 'AttributeType', 'name': 'thread_interaction_type'})
+    print "\n Total pages and files found : ", page_file_cur.count()
+    for idx, each_node in enumerate(page_file_cur):
+        try:
+            # print "\nPage# ",idx, "\t - ", each_node._id, '\t - ' , each_node.name
+            release_response_val = True
+            interaction_type_val = unicode('Comment')
+            userid = each_node.created_by
+            thread_obj = node_collection.one({"_type": "GSystem", "member_of": ObjectId(twist_gst._id), "prior_node": ObjectId(each_node._id) })
+
+            if thread_obj:
+                # print "thread_obj exists ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
+                reply_cur = node_collection.find({'prior_node': each_node._id, 'member_of': reply_gst._id})
+                if reply_cur:
+                    for each_rep in reply_cur:
+                        node_collection.collection.update({'_id': each_rep._id},{'$set':{'prior_node':[thread_obj._id]}}, upsert = False, multi = False)
+                        each_rep.reload()
+                node_collection.collection.update({'_id': thread_obj._id},{'$set':{'name': u"Thread of " + unicode(each_node.name), 'prior_node': [each_node._id]}}, upsert = False, multi = False)
+                thread_obj.reload()
+
+                # print "thread_obj updated ",'\t - ',thread_obj._id, '\t - ',thread_obj.name, '\t - ',thread_obj.prior_node
+                # creating GRelation
+                gr = create_grelation(each_node._id, has_thread_rt, thread_obj._id)
+                if release_response_val:
+                    create_gattribute(thread_obj._id, rel_resp_at, release_response_val)
+                if interaction_type_val:
+                    create_gattribute(thread_obj._id, thr_inter_type_at, interaction_type_val)
+
+                each_node.reload()
+                thread_obj.reload()
+                # print "\nThread_obj updated with new attr", thread_obj.attribute_set, '\n\n'
+        except Exception as e:
+            pages_files_not_updated.append(each_node._id)
+            print "\n\nError occurred for page ", each_node._id, "--", each_node.name
+            print e
+            pass
+
+
+    print "\n------- Discussion thread for Page and File GST successfully completed-------\n"
+    print "\n\n Pages/Files that were not able to updated\t", pages_files_not_updated
