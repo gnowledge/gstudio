@@ -152,6 +152,8 @@ def collection_nav(request, group_id):
     sg_type = None
     list_of_sg_member_of = get_sg_member_of(group_id)
     if "CourseEventGroup" in group_obj.member_of_names_list or "ProgramEventGroup" in list_of_sg_member_of:
+      node_obj.get_neighbourhood(node_obj.member_of)
+
       template = "ndf/res_node_ajax_view.html"
       if "ProgramEventGroup" in list_of_sg_member_of:
         sg_type = "ProgramEventGroup"
