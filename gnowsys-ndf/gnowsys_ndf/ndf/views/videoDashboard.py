@@ -223,7 +223,7 @@ def video_edit(request,group_id,_id):
             create_grelation_list(vid_node._id,"assesses",assesses_list)
             return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
         else:
-            url = "/"+ group_id +"/?selected="+str(vid_node._id)+"#view_page"
+            url = "/"+ str(group_id) +"/?selected="+str(vid_node._id)+"#view_page"
             return HttpResponseRedirect(url)
 
     else:

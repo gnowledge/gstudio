@@ -275,7 +275,7 @@ def image_edit(request,group_id,_id):
 
             return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))
         else:
-            url = "/"+ group_id +"/?selected="+str(img_node._id)+"#view_page"
+            url = "/"+ str(group_id) +"/?selected="+str(img_node._id)+"#view_page"
             return HttpResponseRedirect(url)
     else:
         img_node.get_neighbourhood(img_node.member_of)
