@@ -5,7 +5,6 @@
 {% user_access_policy groupid request.user as user_access %}
 {% get_attribute_value node.pk 'release_response' as resp_val %}
 {% get_attribute_value node.pk 'thread_interaction_type' as thr_int_type %}
-
 <div>
   <br/>
     {% if allow_to_comment %}
@@ -24,7 +23,9 @@
 
     <!-- populating replies -->
     {% check_is_gstaff groupid request.user as is_gstaff %}
+
     {% for each_reply in all_replies %}
+      {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
       <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
         <div class="row"> 
           <div class="small-3 columns">
@@ -63,6 +64,7 @@
         </div>
 
       </div>
+      {% endif %}
 
     {% endfor %}
     <!-- END of populating replies -->
