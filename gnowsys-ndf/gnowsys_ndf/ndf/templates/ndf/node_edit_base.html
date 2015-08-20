@@ -130,7 +130,7 @@ i.remove-tag{
 
 				{% check_is_gstaff groupid request.user as is_gstaff %}
 				{% if is_gstaff %}
-					{% if title == "Page" %}
+					{% if title == "Page" or "File" in node.member_of_names_list %}
 						<dd class="thread_prop_tab" title="Click here to add/edit properties of Thread">
 						  	<a>{% trans "Interaction Settings" %} </a> 
 						</dd>  
