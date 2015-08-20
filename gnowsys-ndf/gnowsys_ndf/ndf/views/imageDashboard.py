@@ -258,7 +258,9 @@ def image_edit(request,group_id,_id):
     if request.method == "POST":
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
         img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE),groupid=group_id)
-        return_status = create_thread_for_node(request,group_id, img_node)
+        thread_create_val = request.POST.get("thread_create",'')
+        if thread_create_val == "Yes":
+            return_status = create_thread_for_node(request,group_id, img_node)
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             get_node_metadata(request,img_node)
             teaches_list = request.POST.get('teaches_list','') # get the teaches list 

@@ -208,7 +208,9 @@ def video_edit(request,group_id,_id):
 
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO),groupid=group_id)
-        return_status = create_thread_for_node(request,group_id, vid_node)
+        thread_create_val = request.POST.get("thread_create",'')
+        if thread_create_val == "Yes":
+            return_status = create_thread_for_node(request,group_id, vid_node)
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             get_node_metadata(request,vid_node)
             teaches_list = request.POST.get('teaches_list', '')  # get the teaches list

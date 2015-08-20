@@ -959,7 +959,9 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             fileobj.location = map_geojson_data
 
             fileobj.save(groupid=group_id)
-            # return_status = create_thread_for_node(request,group_id, fileobj)
+            thread_create_val = request.POST.get("thread_create",'')
+            if thread_create_val == "Yes":
+              return_status = create_thread_for_node(reaquest,group_id, fileobj)
             if source:
               # create gattribute for file with source value
               source_AT = node_collection.one({'_type':'AttributeType','name':'source'})
@@ -1527,7 +1529,10 @@ def file_edit(request,group_id,_id):
 
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE),groupid=group_id)
-        return_status = create_thread_for_node(request,group_id, file_node)
+
+        thread_create_val = request.POST.get("thread_create",'')
+        if thread_create_val == "Yes":
+          return_status = create_thread_for_node(request,group_id, file_node)
         if "CourseEventGroup" not in group_obj.member_of_names_list:
             # To fill the metadata info while creating and editing file node
             metadata = request.POST.get("metadata_info", '')
