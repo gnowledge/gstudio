@@ -175,9 +175,14 @@
 
         {% if node|is_File or node|is_Page %}         
         <!-- calling ndf tags for discussion replies -->
-        {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-        <dd class="tab-title discussion-view"><a class="view-discussion" href="#view-discussion"><i class="fi-comment"></i>
+        {% get_thread_node node.pk as thread_node %}
+        {% if thread_node %}
+            {% get_disc_replies thread_node group_id global_disc_all_replies as all_replies %}
+        {% else %}
+          {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+        {% endif %}
 
+        <dd class="tab-title discussion-view"><a class="view-discussion" href="#view-discussion"><i class="fi-comment"></i>
           {% if all_replies %}
             <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
               {% trans "Join Discussion" %} ({{ all_replies | length }})
@@ -187,10 +192,9 @@
               {% trans "Begin Discussion" %}
             </span>
           {% endif %}
-
         </a></dd>
         {% endif %}
-      <!-- ---END of Discussion -->
+      <!-- -END of Discussion -->
 
       {% comment %}
         {% else %}
@@ -963,14 +967,13 @@
 
         <div class="content" id="view-discussion">
           <!-- discussion content area -->
-        {% if 'has_thread' in node %}
-          {% with node.has_thread.0 as disc_thread_node %}
-            {% if disc_thread_node %}
-              {% include 'ndf/discussion.html' with node=disc_thread_node %}
-            {% endif %}
-            {% endwith %}
+        {% get_thread_node node.pk as thread_node %}
+
+        {% if thread_node %}
+        {% get_node thread_node as thread_node_obj %}
+              {% include 'ndf/discussion.html' with node=thread_node_obj %}
         {% else %}            
-              {% include 'ndf/discussion.html' %}
+            {% include 'ndf/discussion.html' %}
         {% endif %}
           <!-- END of discussion content area -->     
         </div>
