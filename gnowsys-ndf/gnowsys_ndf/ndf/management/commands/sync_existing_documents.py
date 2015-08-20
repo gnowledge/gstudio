@@ -1,5 +1,4 @@
 ''' imports from installed packages '''
-import time
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -588,7 +587,6 @@ class Command(BaseCommand):
 
     # Add attributes to discussion thread for every page node.
     # If thread does not exist, create it.
-    t0 = time.time()
     pages_files_not_updated = []
     page_gst = node_collection.one( { '_type': "GSystemType", 'name': "Page" })
     file_gst = node_collection.one( { '_type': "GSystemType", 'name': "File" } )
@@ -634,12 +632,6 @@ class Command(BaseCommand):
             print e
             pass
 
-    t1 = time.time()
-
-    time_diff = t1 - t0
-    total_time_minute = round( (time_diff/60), 2) if time_diff else 0
-    total_time_hour = round( (time_diff/(60*60)), 2) if time_diff else 0
 
     print "\n------- Discussion thread for Page and File GST successfully completed-------\n"
-    print "- Total time taken: \n\n\t" + str(total_time_minute) + " MINUTES\n\t=== OR ===\n\t" + str(total_time_hour) + " HOURS\n"
     print "\n\n Pages/Files that were not able to updated\t", pages_files_not_updated
