@@ -331,12 +331,12 @@ ul#navigation li a.last {
                 {% if is_group %}
                   {% check_is_gstaff groupid request.user as is_gstaff %}
                   {% if is_gstaff %}
-                      <li><a href="{% url edit_url group_id %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li><br>
+                      <li><a href="{% url edit_url group_id %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a></li><br>
                   {% endif %}
 
                 {% else %}
                   {% if user_is_joined == "joined" or user_is_joined == "author" %}
-                    <a href="{% url edit_url group_id node %}" class="tiny round button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
+                    <a href="{% url edit_url group_id node %}" class="tiny button edit"><i class="fi-pencil"></i> {% trans "Edit" %}</a>
                   {% endif %}
                 {% endif %}
               {% endif %}
@@ -354,14 +354,14 @@ ul#navigation li a.last {
 
               {% if is_group %}
                 {% if user.is_superuser or node.created_by == user.id %}
-                  <a href="{% url 'publish_group' group_id node %}" class="tiny round button edit">{% trans "Publish" %}</a>
+                  <a href="{% url 'publish_group' group_id node %}" class="tiny button edit">{% trans "Publish" %}</a>
                 {% endif %}
               {% else %}
-                <a href="{% url 'publish_page' group_id node %}" class="tiny round button edit">{% trans "Publish" %}</a><br/>
+                <a href="{% url 'publish_page' group_id node %}" class="tiny button edit">{% trans "Publish" %}</a><br/>
               {% endif %}
             
             {% else %}
-              <a class="tiny round button edit" style="background-color:gray;" disabled>{% trans "Published" %}</a>
+              <a class="tiny button edit" style="background-color:gray;" disabled>{% trans "Published" %}</a>
             {% endif %}
           {% endif %}
 
@@ -386,12 +386,12 @@ ul#navigation li a.last {
               {% if user_access == "allow" %}
                 {% if request.user.is_superuser %}
                   <li>
-                    <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <a href="{% url create_url group_name_tag %}" class="tiny button">
                       <span class="fi-plus">&nbsp;&nbsp; {% trans 'New Group' %}</span>
                     </a>
                     </li>
                      <li>
-                    <a href="/{{group_id}}/analytics/group/summary/" class="tiny round button">
+                    <a href="/{{group_id}}/analytics/group/summary/" class="tiny button">
                       &nbsp;&nbsp; {% trans 'Group Analytics' %}
 
                     </a>
@@ -403,20 +403,20 @@ ul#navigation li a.last {
               {% if user_is_joined == "joined" or  user_is_joined == "author" %}
 
                 {% if node.member_of_names_list.0 == "File" %}
-                  <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny round button">
+                  <a href="{% url create_url group_name_tag %}?next={{request.path}}" class="tiny button">
                     <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                   </a>
                 {% else %}
                   {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
-                    <a href="{% url create_url group_name_tag app_id %}" class="tiny round button">
+                    <a href="{% url create_url group_name_tag app_id %}" class="tiny button">
                       <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                     </a>
                   {% elif node.member_of_names_list.0 == "Term" %}
-                    <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <a href="{% url create_url group_name_tag %}" class="tiny button">
                       <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} Topic</span>
                     </a>
                   {% elif node.member_of_names_list.0 != "Group" and node.member_of_names_list.0 != "ProgramEventGroup" and node.member_of_names_list.0 != "CourseEventGroup" and node.member_of_names_list.0 != "ModeratingGroup" %}
-                    <a href="{% url create_url group_name_tag %}" class="tiny round button">
+                    <a href="{% url create_url group_name_tag %}" class="tiny button">
                       <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                     </a>
                   {% endif %}
@@ -427,10 +427,9 @@ ul#navigation li a.last {
         </div>
       {% endif %}
     <div class ="rows">
-
        {% if user.is_authenticated and "Group" in group_object.member_of_names_list%} 
           <div class= "medium-12 columns" >
-            <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny round button" >  <label  style = 'width:8%;'> {% trans 'History' %}  </label>  </a> 
+            <a href = "{% url 'node_version' groupid node.pk  %}"   class="tiny button" >  <label  style = 'width:8%;'> {% trans 'History' %}  </label>  </a> 
 
       		<!-- Info-box -->&nbsp;
           <!--		<a class="view-info tiny round button" href="#view-info"><i class="fi-clipboard-notes"></i> {% trans "Info Box" %}</a>  -->
@@ -452,12 +451,12 @@ ul#navigation li a.last {
             {% if user_access == "allow" %}
              {% if user.is_superuser %}
                 <li>
-                  <a href="{% url 'create_sub_group' group_id %}" class="tiny round button">
+                  <a href="{% url 'create_sub_group' group_id %}" class="tiny button">
                   <span class="fi-plus">&nbsp;&nbsp; {% trans "New SubGroup" %}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny button round fi-plus">
+                  <a href="{% url 'create_event_group' group_id 'ProgramEventGroup' %}" class="tiny button fi-plus">
                   {% trans "New Program Event" %}
                   </a>
                 </li>
