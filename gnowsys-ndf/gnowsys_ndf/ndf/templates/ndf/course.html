@@ -48,15 +48,12 @@
     <header class="row" data-tab data-options="deep_linking:true">
       <dl class="tabs " data-tab role="tablist">
 
-        <dd class="tab-title active" role="presentational" ><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">{{title}}</a></dd>
+        <dd class="tab-title active" role="presentational" ><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">{% if req_from_course %}{% trans "CourseEvents" %}{% else %}{% trans "ProgramEvents" %}{% endif %}</a></dd>
         {% if request.user.is_authenticated  and not is_gstaff %}
           <dd class="tab-title" role="presentational" ><a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" controls="panel2-2">{% if req_from_course %}{% trans "My Courses" %}{% else %}{% trans "My Programs" %}{% endif %}</a></dd>
         {% endif %}    
-      
-        {% if req_from_course %}
-          {% if is_gstaff %}
+        {% if req_from_course and is_gstaff %}
             <dd class="tab-title" role="presentational" ><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" controls="panel2-3">{% trans "Courses" %}</a></dd>
-          {% endif %}
         {% endif %}
 
       </dl>
