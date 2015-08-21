@@ -106,7 +106,7 @@
           {% endif %}
       </dl>
       <!-- Right Nav Section -->
-        {% if not gstaff_access %}
+      {% if request.user.is_authenticated and not gstaff_access %}
           <section>
             <ul class="right" >
             {% user_access_policy groupid request.user as user_access %} 
