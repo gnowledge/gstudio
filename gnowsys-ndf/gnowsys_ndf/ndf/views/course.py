@@ -65,6 +65,7 @@ def course(request, group_id, course_id=None):
     all_course_coll = None
     ann_course_coll = None
     enrolled_course_coll = []
+    enr_ce_coll = []
     course_enrollment_status = None
     app_set_id = None
     if course_id is None:
@@ -74,28 +75,16 @@ def course(request, group_id, course_id=None):
 
     app_set = node_collection.one({'_type': "GSystemType", 'name': "Announced Course"})
     app_set_id = app_set._id
+    ce_gst = node_collection.one({'_type': "GSystemType", 'name': "CourseEventGroup"})
 
     # Course search view
     title = GST_COURSE.name
 
     if request.user.id:
         course_coll = node_collection.find({'member_of': GST_COURSE._id,'group_set': ObjectId(group_id),'status':u"DRAFT"})
+        enr_ce_coll = node_collection.find({'member_of': ce_gst._id,'author_set': int(request.user.id)}).sort('last_update', -1)
 
-        all_course_coll = node_collection.find({'member_of': {'$in': [GST_COURSE._id,GST_ACOURSE._id]},
-                                'group_set': ObjectId(group_id),'status':{'$in':[u"PUBLISHED",u"DRAFT"]}})
-
-
-        auth_node = node_collection.one({'_type': "Author", 'created_by': int(request.user.id)})
-	'''
-        if auth_node.attribute_set:
-            for each in auth_node.attribute_set:
-                if each and "course_enrollment_status" in each:
-                    course_enrollment_dict = each["course_enrollment_status"]
-                    course_enrollment_status = [ObjectId(each) for each in course_enrollment_dict]
-                    enrolled_course_coll = node_collection.find({'_id': {'$in': course_enrollment_status}})
-	'''
-    ann_course_coll = node_collection.find({'member_of': GST_ACOURSE._id, 'group_set': ObjectId(group_id),'status':u"PUBLISHED"})
-
+    ce_coll = node_collection.find({'member_of': ce_gst._id})
 
     return render_to_response("ndf/course.html",
                             {'title': title,
@@ -104,6 +93,8 @@ def course(request, group_id, course_id=None):
                              'searching': True, 'course_coll': course_coll,
                              'groupid': group_id, 'group_id': group_id,
                              'all_course_coll': all_course_coll,
+                             'ce_coll':ce_coll,
+                             'enr_ce_coll':enr_ce_coll,
                              'enrolled_course_coll': enrolled_course_coll,
                              'ann_course_coll': ann_course_coll
                             },
